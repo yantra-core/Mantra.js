@@ -22,7 +22,7 @@ Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any ques
   - `@yantra-core/mantra` - Core API + Plugins
   - `@yantra-core/server` - Self-hosted Websocket Server
   - `@yantra-core/edge`   - Run your authoritative server on Cloudflare Edge Workers
-  - `@yantra-core/mantra-client` - Browser-based Mantra Client with offline support
+  - `@yantra-core/client` - Browser-based Mantra Client with offline support
 
 ## Creating your first Mantra Game
 
