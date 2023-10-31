@@ -12,11 +12,11 @@ class BulletPlugin {
     this.lifetime = config.lifetime || 2000;
   }
 
-  init (game) {
+  init(game) {
     this.game = game;
     this.game.systemsManager.addSystem('bullet', this);
   }
-  
+
   update() {
     for (let entityId in this.game.components.position) {
       const bullet = this.game.getComponent(entityId, 'BulletComponent');
@@ -32,11 +32,13 @@ class BulletPlugin {
   }
 
   fireBullet(entityId) {
-    
-    let player = this.game.getEntity(entityId);
-    let playerPos = player.position;
 
-    let playerRotation = player.rotation;
+    console.log(entityId, this.game.components.position)
+    let player = this.game.getEntity(entityId);
+
+
+    let playerPos = player.position;
+    let playerRotation = player.rotation; // in radians
 
     if (!playerPos) {
       // client might not have the position or rotation component, don't client-side predict
@@ -47,13 +49,22 @@ class BulletPlugin {
     if (this.game.isClient) {
       // use mesh position, was having issues with playerPos not being updated?
       // TODO: look into why playerPos was not correct scope here, it should work
-      playerPos.x =  player.mesh.position.x;
-      playerPos.y =  player.mesh.position.z;
+      playerPos.x = player.mesh.position.x;
+      playerPos.y = player.mesh.position.z;
     }
+
+    // Distance in front of the player where the bullet should start
+    let distanceInFront = 100; // TODO: make this a config
 
     if (typeof playerRotation === 'undefined') {
       playerRotation = 0; // this should have a default
     }
+
+    // Place the bullet in front of the player
+    let bulletStartPosition = {
+      x: playerPos.x + distanceInFront * Math.sin(playerRotation),
+      y: playerPos.y + distanceInFront * -Math.cos(playerRotation)
+    };
 
     // Compute the bullet's direction based on player's rotation
     const directionX = Math.sin(playerRotation);
@@ -65,12 +76,12 @@ class BulletPlugin {
       id: bulletId,
       type: 'BULLET',
       mass: 1,
-      position: playerPos,
+      position: bulletStartPosition,
       lifetime: this.lifetime,
       owner: entityId,
       rotation: playerRotation,
       isSensor: true,
-      velocity: { 
+      velocity: {
         x: directionX * this.speed,
         y: directionY * this.speed
       },
@@ -92,19 +103,19 @@ class BulletPlugin {
     if (this.isPlayerAlreadyGlowing(entity)) {
       return; // Skip if the player is already glowing
     }
-  
+
     let originalMaterial = entity.mesh.material;
     let redGlowMaterial = this.getRedGlowMaterial();
-  
+
     entity.mesh.material = redGlowMaterial;
-  
+
     setTimeout(() => {
       if (entity.mesh.material === redGlowMaterial) {
         entity.mesh.material = originalMaterial;
       }
     }, 500);
   }
-  
+
   getRedGlowMaterial() {
     if (!this.redGlowMaterial) {
       // TODO: should not have direct calls to babylon here!
@@ -113,11 +124,11 @@ class BulletPlugin {
     }
     return this.redGlowMaterial;
   }
-  
+
   isPlayerAlreadyGlowing(entity) {
     return entity.mesh.material && entity.mesh.material.name === "redGlow";
   }
-  
+
 
   handleCollision(pair, bodyA, bodyB) {
     if (bodyA.myEntityId && bodyB.myEntityId) {
