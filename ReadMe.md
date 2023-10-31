@@ -47,7 +47,7 @@ game
   .use(new StarField())
   .use(new KeyboardBrowser());
 
-game.connect('ws://localhost:8888/websocket');
+game.connect('ws://localhost:8888');
 ```
 
 **Server**
@@ -76,7 +76,7 @@ game.listen(8888);
 game.getEntity(entityId);
 game.createEntity(entityData)
 game.updateEntity(entityData)
-game.destroy(entityId)
+game.destroyEntity(entityId)
 ```
 
 ### Component API
@@ -99,7 +99,6 @@ game.removeSystem(systemName)
 ```js
 game.getPlayerSnapshot(playerId)
 game.getSnapshot(snapshotId)
-game.destroy(entityData)
 ```
 
 ### Plugins API
