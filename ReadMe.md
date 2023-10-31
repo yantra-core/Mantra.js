@@ -29,9 +29,8 @@ Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any ques
 **Client**
 ```js
 let game = new Game();
-//
+
 // Use Plugins to add systems to the game
-//
 game
   .use(new MatterPhysics())
   .use(new Collision())
@@ -48,12 +47,13 @@ game
   .use(new StarField())
   .use(new KeyboardBrowser());
 
-  game.connect('ws://localhost:8888/websocket');
+game.connect('ws://localhost:8888/websocket');
 ```
 
 **Server**
 ```js
 let game = new Game({ isServer: true });
+
 // Use Plugins to add systems to the game
 game
   .use(new MatterPhysics())
