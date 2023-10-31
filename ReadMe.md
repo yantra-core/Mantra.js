@@ -2,12 +2,12 @@
 
 ## Introduction
 
-Welcome to `@yantra-core/mantra` –  a versatile framework revolutionizing game development. Everything is a Plugin in Mantra, including the Physics and Graphics engines. Mantra currently supports Babylon.js, Phaser.js, and Matter.js. 3D Physics via wasm are [coming soon](#features)!
+Welcome to `@yantra-core/mantra` –  a versatile framework revolutionizing game development. Everything is a Plugin in Mantra, including the Physics and Graphics engines. Mantra currently supports Babylon.js, Phaser.js, and Matter.js. 3D Physics via wasm is [coming soon](#features)!
 
 Mantra is designed for high-performance serverless physics and multiplayer environments while still making it easy to start up and quickly develop a local offline game.
 
 ### Core Features
-- [X] **Enities, Components, Systems**: Enterprise grade ECS for game development
+- [X] **Entities, Components, Systems**: Enterprise-grade ECS for game development
 - [X] **Modular Plugin System**: Facilitating easier extension and customization.
 - [X] **Edge Computing Compatible**: Games can run in CloudFlare Workers environments.
 - [X] **Offline Gameplay Support**: Fully functional gameplay in offline mode.
@@ -21,8 +21,8 @@ Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any ques
 
   - `@yantra-core/mantra` - Core API + Plugins
   - `@yantra-core/server` - Self-hosted Websocket Server
-  - `@yantra-core/edge`   - Run your authorative server on Cloudflare Edge Workers
-  - `@yantra-core/mantra-client` - Browser based Mantra Client with offline support
+  - `@yantra-core/edge`   - Run your authoritative server on Cloudflare Edge Workers
+  - `@yantra-core/mantra-client` - Browser-based Mantra Client with offline support
 
 ## Creating your first Mantra Game
 
@@ -138,9 +138,9 @@ The following checklist outlines the planned features and their current status:
 
 ## Mod Support
 
-- [X] **Creator JSON API**: Manage gamestate remotely via JSON messages
+- [X] **Creator JSON API**: Manage game state remotely via JSON messages
 - [ ] **Enhanced Event Hooks**: Wildcard splats, regex search, before/after/first/last
-- [ ] **Custom Resource Packs**: Manage game pack resoures via API
+- [ ] **Custom Resource Packs**: Manage game pack resources via API
 
 ## Multicore Performance Optimizations
 
@@ -170,4 +170,3 @@ The following checklist outlines the planned features and their current status:
 - [X] **Delta Encoding**: Encoding integer changes rather than complete states
 - [ ] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
 - [ ] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
-
