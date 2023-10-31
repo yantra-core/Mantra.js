@@ -118,9 +118,9 @@ The following checklist outlines the planned features and their current status:
 - [x] **Component System**: Flexible definition and management of entity properties.
 - [x] **System-based Logic**: Framework for implementing custom game logic.
 - [x] **Universal Plugin System** ( everything is a Plugin, all Systems are Plugins )
-- [x] **Offline Support**: blah blah blah
-- [x] **Online Multiplayer Support**: blah blah blah
-- [x] **Edge Support**: blah blah blah
+- [x] **Offline Support**
+- [x] **Online Multiplayer Support**
+- [x] **Edge Support**
 
 ### Multiplayer Netcode Support
 - [x] **Snapshot Management**: For state synchronization and time-travel features.
