@@ -29,16 +29,26 @@ Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any ques
 **Client**
 ```js
 let game = new Game();
+//
 // Use Plugins to add systems to the game
+//
 game
   .use(new MatterPhysics())
-  .use(new CollisionPlugin())
+  .use(new Collision())
   .use(new EntityFactory())
-  .use(new EntityInputPlugin())
-  .use(new EntityMovementPlugin(new AsteroidsMovement()))
-  .use(new BulletPlugin())
+  .use(new EntityInput())
+  .use(new EntityMovement(new AsteroidsMovement()))
+  .use(new Bullet())
+
+// Since this is the Client, we can add Keyboard and Graphics 
+game
   .use(new BabylonGraphics())
-  .use(new MeshPlugin())
+  .use(new Mesh())
+  .use(new Camera())
+  .use(new StarField())
+  .use(new KeyboardBrowser());
+
+  game.connect('ws://localhost:8888/websocket');
 ```
 
 **Server**
@@ -47,14 +57,16 @@ let game = new Game({ isServer: true });
 // Use Plugins to add systems to the game
 game
   .use(new MatterPhysics())
-  .use(new CollisionPlugin())
+  .use(new Collision())
   .use(new EntityFactory())
-  .use(new EntityInputPlugin())
-  .use(new EntityMovementPlugin(new AsteroidsMovement()))
-  .use(new BulletPlugin())
-  .use(new BabylonGraphics())
-  .use(new MeshPlugin())
-  ```
+  .use(new EntityInput())
+  .use(new EntityMovement(new AsteroidsMovement()))
+  .use(new Lifetime())
+  .use(new Bullet())
+  .use(new WebSocketServer());
+
+game.listen(8888);
+```
   
   
 ## Game API
