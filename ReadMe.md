@@ -132,9 +132,9 @@ The following checklist outlines the planned features and their current status:
 - [ ] **Enhanced Network Security**: Measures to secure game state and data transfer.
 
 ### Plugin System
-- [X] Everything is a Plugin
-- [ ] All Plugin methods are event emitters
-- [ ] All Plugin events have hooks
+- [X] **Everything is a Plugin**
+- [ ] **All Plugin methods are event emitters**
+- [ ] **All Plugin events have hooks**
 
 ## Mod Support
 
@@ -166,7 +166,7 @@ The following checklist outlines the planned features and their current status:
 
 ### Data Compression and Optimization
 
-- [X] **Delta Compression**: transmit only the changes between the current and previous game states
+- [X] **Delta Compression**: Transmit only the changes between the current and previous game states
 - [X] **Delta Encoding**: Encoding integer changes rather than complete states
 - [ ] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
 - [ ] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
