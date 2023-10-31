@@ -1,0 +1,20 @@
+{
+  "name": "@yantra-core/mantra",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Game.js",
+  "type": "module",
+  "scripts": {
+    "test": "tap tests/",
+    "cover": "tap --coverage-report=html tests/"
+  },
+  "keywords": [],
+  "author": "Yantra Works 2023",
+  "license": "AGPL",
+  "devDependencies": {
+    "coveralls": "^3.1.1",
+    "nyc": "^15.1.0",
+    "tap": "^18.5.2",
+    "tape": "^5.7.2"
+  }
+}

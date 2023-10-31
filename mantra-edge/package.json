@@ -1,0 +1,22 @@
+{
+  "name": "@yantra-core/edge",
+  "version": "1.0.0",
+  "devDependencies": {
+    "eslint": "^8.52.0",
+    "tap": "^18.5.2",
+    "tape": "^5.7.1",
+    "vitest": "^0.34.6",
+    "wrangler": "3.14.0"
+  },
+  "scripts": {
+    "start": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "tape ./mantra-server/tests/game-unit-test.js",
+    "cover": "tap --coverage-report ./mantra-server/tests/game-unit-test.js",
+    "cloud-test": "vitest"
+  },
+  "dependencies": {
+    "@yantra-core/mantra": "*",
+    "matter-js": "^0.19.0"
+  }
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Test</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <button id="connectButton">Connect</button>
+  <button id="createEntityButton" disabled>Create Entity</button>
+  <button id="moveEntityButton" disabled>Move Entity</button>
+  <button id="getEntityButton" disabled>Get Entity</button>
+  <button id="getSnapshotButton" disabled>Get Snapshot</button>
+  <button id="getEntitiesButton" disabled>Get Entities</button>
+  <button id="clearOutputButton">Clear Output</button>
+
+  <div id="output"></div>
+
+  <style>
+    #output {
+      max-height: 1200px;
+      /* adjust this value as per your preference */
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+    }
+  </style>
+  <script type="text/javascript">
+    var socket;
+
+    function randomId() {
+      return Math.random().toString(36).substr(2, 9);
+    }
+    let host = false;
+    let testingInputs = false;
+    let entityName = randomId();
+
+    document.getElementById('connectButton').addEventListener('click', function () {
+      socket = new WebSocket('ws://192.168.1.80:8787/websocket');
+      //socket = new WebSocket('ws://192.168.1.80:8888/websocket');
+
+      //socket = new WebSocket('wss://ayyo.cloudflare1973.workers.dev/websocket');
+
+      socket.onopen = function (event) {
+        console.log('WebSocket is connected:', event);
+        ['createEntityButton', 'moveEntityButton', 'getEntityButton', 'getSnapshotButton', 'getEntitiesButton'].forEach(function (id) {
+          document.getElementById(id).disabled = false;
+        });
+
+        if (testingInputs) {
+          setInterval(() => {
+            let controls = {
+              UP: true
+            };
+            socket.send(JSON.stringify({ action: 'player_input', controls: controls }));
+          }, 16);
+        }
+
+        /*
+        if (host) {
+          // Send gameTick signal every 16ms (assuming 60 FPS)
+          setInterval(() => {
+            socket.send(JSON.stringify({ action: 'gameTick' }));
+          }, 100);
+        }
+        */
+
+      };
+
+      let count = 0;
+      // Modify the socket.onmessage function to use the helper function
+      socket.onmessage = function (event) {
+        count++;
+        let data = JSON.parse(event.data);
+        if (data.action !== 'gametick') {
+          console.log('WebSocket message received:', event.data);
+          $('#output').append('<p>' + event.data + '</p>');
+        } else {
+          if (count % 60 === 0) {
+          }
+          console.log('WebSocket message received:', event.data);
+            $('#output').append('<p>' + event.data + '</p>');
+
+        }
+
+        //scrollToBottom();
+      };
+      socket.onclose = function (event) {
+        console.log('WebSocket is closed:', event);
+      };
+
+      socket.onerror = function (error) {
+        console.error('WebSocket error:', error);
+      };
+    });
+
+    function sendMessage(action, data) {
+      var message = JSON.stringify(Object.assign({ action: action }, data));
+      socket.send(message);
+    }
+
+    // Clear the output div
+    document.getElementById('clearOutputButton').addEventListener('click', function () {
+      $('#output').html('');
+    });
+
+    // A helper function to scroll the output div to the bottom
+    function scrollToBottom() {
+      var output = document.getElementById("output");
+      output.scrollTop = output.scrollHeight;
+    }
+
+    document.getElementById('createEntityButton').addEventListener('click', function () {
+      sendMessage('createEntity', {
+        entityId: entityName,
+        type: 'player',
+        x: 0,
+        y: 0
+      });
+    });
+
+    document.getElementById('moveEntityButton').addEventListener('click', function () {
+      sendMessage('moveEntity', {
+        entityId: entityName,
+        dx: 1,
+        dy: 1
+      });
+    });
+
+    document.getElementById('getEntityButton').addEventListener('click', function () {
+      sendMessage('getEntity', {
+        entityId: entityName
+      });
+    });
+
+    document.getElementById('getSnapshotButton').addEventListener('click', function () {
+      sendMessage('getSnapshot', {});
+    });
+
+    document.getElementById('getEntitiesButton').addEventListener('click', function () {
+      sendMessage('getEntities', {});
+    });
+
+  </script>
+</body>
+
+</html>

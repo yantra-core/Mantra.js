@@ -1,0 +1,16 @@
+{
+  "all": true,
+  "include": [
+    "**"
+  ],
+  "reporter": [
+    "text-summary",
+    "html"
+  ],
+  "extension": [
+    ".js"
+  ],
+  "cache": false,
+  "temp-directory": ".nyc_output",
+  "report-dir": "./coverage"
+}

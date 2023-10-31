@@ -1,0 +1,14 @@
+name = "ayyo"
+main = "src/index.js"
+compatibility_date = "2023-10-16"
+node_compat = true
+workers_dev = true
+
+[[durable_objects.bindings]]
+name = "AYYO"
+class_name = "Ayyo"
+script_name = "ayyo"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Ayyo"]

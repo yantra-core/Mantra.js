@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AYYO Client</title>
+  <script src="vendor/jquery.min.js"></script>
+  <script src="vendor/babylon.js"></script>
+  <script src="vendor/babylon.gui.min.js"></script>
+  <script src="vendor/babylonjs.materials.min.js"></script>
+  <!--  <script src="vendor/phaser.min.js"></script> TODO: separate HTML files for phaser, jquery, etc -->
+  <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
+
+  
+  <style>
+    #output {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+    }
+
+    #renderCanvas {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    #debugUIContainer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 98vw;
+      height: 50vw;
+      overflow-y: scroll;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      color: white;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="renderCanvas"></canvas>
+
+  <button id="connectButton">Connect</button>
+  <button id="disconnectButton">Disconnect</button>
+
+  <script type="text/javascript">
+
+
+  </script>
+  <script type="module" src="./client.js"></script>
+</body>
+
+</html>
