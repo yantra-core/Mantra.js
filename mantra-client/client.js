@@ -18,6 +18,7 @@ import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhys
 import Bullet from '@yantra-core/mantra/plugins/bullet/Bullet.js';
 import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
 import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/AsteroidsMovement.js';
+import PongMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PongMovement.js';
 
 // Browser / Client specific Plugins
 import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
@@ -94,7 +95,7 @@ function switchToOffline() {
 
   game.createEntity({
     id: playerId,
-    type: 'PLAYER',
+    type: 'PLAYER'
   });
 
   try {

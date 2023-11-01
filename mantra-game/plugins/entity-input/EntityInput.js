@@ -58,10 +58,10 @@ class EntityInputPlugin extends Plugin {
 
     this.lastBulletFireTime[entityId] = Date.now();
 
-    if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
-    if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
-    if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, moveSpeed, 0); // Might need to check these directions
-    if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, -moveSpeed, 0);
+    if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
+    if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
+    if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0); // Might need to check these directions
+    if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0);
 
     if (actions.includes('FIRE_BULLET')) {
       let Bullet = this.game.getSystem('bullet');

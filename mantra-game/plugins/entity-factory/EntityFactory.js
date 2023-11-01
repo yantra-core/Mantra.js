@@ -157,7 +157,10 @@ class EntityFactory {
       isSensor: false,
       owner: 'server',
       destroyed: false,
-      type: 'PLAYER'
+      type: 'PLAYER',
+      friction: 0.1,  // Default friction
+      frictionAir: 0.01, // Default air friction
+      frictionStatic: 0.5, // Default static friction
     };
 
     // merge config with defaultConfig
@@ -202,7 +205,10 @@ class EntityFactory {
       isStatic: isStatic,
       inertia: Infinity,
       density: density,
-      restitution: 0
+      restitution: 0,
+      friction: config.friction,
+      frictionAir: config.frictionAir,
+      frictionStatic: config.frictionStatic
     });
 
     body.myEntityId = entityId;
