@@ -141,11 +141,34 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Body.setVelocity(body, velocity);
   }
 
-  collisionStart(engine, callback) {
-    Matter.Events.on(engine, 'collisionStart', (event) => {
+  collisionStart(game, callback) {
+    Matter.Events.on(game.engine, 'collisionStart', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
+        game.emit('collisionStart', { pair, bodyA, bodyB })
+        callback(pair, bodyA, bodyB);
+      }
+    });
+  }
+
+  collisionActive(game, callback) {
+    Matter.Events.on(game.engine, 'collisionActive', (event) => {
+      for (let pair of event.pairs) {
+        const bodyA = pair.bodyA;
+        const bodyB = pair.bodyB;
+        game.emit('collisionActive', { pair, bodyA, bodyB })
+        callback(pair, bodyA, bodyB);
+      }
+    });
+  }
+
+  collisionEnd(game, callback) {
+    Matter.Events.on(game.engine, 'collisionEnd', (event) => {
+      for (let pair of event.pairs) {
+        const bodyA = pair.bodyA;
+        const bodyB = pair.bodyB;
+        game.emit('collisionEnd', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }
     });

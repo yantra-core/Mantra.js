@@ -41,7 +41,7 @@ eventEmitter.on = function onEvent(eventPattern, callback) {
 
 eventEmitter.off = function offEvent(eventPattern, callback) {
   Object.keys(eventEmitter.listeners).forEach(pattern => {
-    if (this._isMatch(eventPattern, pattern)) {
+    if (eventEmitter._isMatch(eventPattern, pattern)) {
       eventEmitter.listeners[pattern] = eventEmitter.listeners[pattern].filter(listener => listener !== callback);
     }
   });
@@ -49,7 +49,7 @@ eventEmitter.off = function offEvent(eventPattern, callback) {
 
 eventEmitter.emit = function emitEvent(eventName, data) {
   Object.keys(eventEmitter.listeners).forEach(pattern => {
-    if (this._isMatch(pattern, eventName)) {
+    if (eventEmitter._isMatch(pattern, eventName)) {
       eventEmitter.listeners[pattern].forEach(listener => {
         try {
           listener.call(null, data);

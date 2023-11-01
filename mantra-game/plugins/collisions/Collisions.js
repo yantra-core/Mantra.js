@@ -8,7 +8,9 @@ class CollisionPlugin {
     this.game = game;
     
     // Binds our handleCollision method to the game physics engine's collisionStart event
-    this.game.physics.collisionStart(this.game.engine, this.handleCollision.bind(this));
+    this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
+    this.game.physics.collisionActive(this.game,  function noop (){});
+    this.game.physics.collisionEnd(this.game, function noop (){});
     
     // Binds game.handleCollision to the Game for convenience 
     this.game.handleCollision = this.handleCollision.bind(this);
@@ -17,7 +19,6 @@ class CollisionPlugin {
   handleCollision(pair, bodyA, bodyB) {
 
     // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
-
     const entityIdA = bodyA.myEntityId;
     const entityIdB = bodyB.myEntityId;
 
