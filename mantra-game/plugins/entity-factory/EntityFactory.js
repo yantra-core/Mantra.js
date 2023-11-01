@@ -22,7 +22,6 @@ class EntityFactory {
 
     this.game.systemsManager.addSystem('entityFactory', this);
 
-
     // Bind some methods to parent Game scope for convenience
     // The most useful and common System methods are expected to be bound to Game
     // This allows developers to customcraft a clean Game API based on their needs
@@ -31,23 +30,8 @@ class EntityFactory {
     this.game.getEntity = this.getEntity.bind(this);
     this.game.getEntities = this.getEntities.bind(this);
     this.game.updateEntity = this.updateEntity.bind(this);
+    this.game.inflateEntity = this.inflateEntity.bind(this);
 
-  }
-
-  addPreCreateEntityHook(fn) {
-    this.preCreateEntityHooks.push(fn);
-  }
-
-  addPostCreateEntityHook(fn) {
-    this.postCreateEntityHooks.push(fn);
-  }
-
-  addPreUpdateEntityHook(fn) {
-    this.preUpdateEntityHooks.push(fn);
-  }
-
-  addPostUpdateEntityHook(fn) {
-    this.postUpdateEntityHooks.push(fn);
   }
 
   cleanupDestroyedEntities() {
@@ -251,6 +235,52 @@ class EntityFactory {
     return updatedEntity;
   }
 
+  inflateEntity (entityData) { // TODO: ensure creator_json API can inflate without mesh / client deps
+
+    let game = this.game;
+
+    // takes outside state and performs update/destroy/create depending
+    // on the current local state of the entity and incoming state
+
+    // if the incoming state is pending destroy, just remove it immediately and return
+    if (entityData.destroyed === true) {
+      game.removeEntity(entityData.id);
+      game.systems.mesh.removeMesh(entityData.id);
+      return;
+    }
+
+    // this isn't a destroyed state, attempt to get a copy of the local state by id
+    let localEntity = game.getEntity(entityData.id);
+
+    if (!localEntity) {
+      // no local copy of the state exists, create a new entity
+      let ent = game.createEntity(entityData);
+      if (game.systems.mesh) {
+        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
+        let mesh = game.systems.mesh.createMesh(entityData);
+        game.components.mesh.set(entityData.id, mesh);
+      }
+      return;
+    }
+
+    // a local copy of the state exists, update it
+    game.updateEntity(entityData);
+    
+    let updated = game.getEntity(entityData.id);
+
+    if (game.systems.mesh) {
+      // if there is no mesh, create one
+      if (!updated.mesh) {
+        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
+        let mesh = game.systems.mesh.createMesh(entityData);
+        game.components.mesh.set(entityData.id, mesh);
+      } else {
+        game.updateGraphic(updated);
+      }
+    }
+
+  }
+
   _generateId() {
     return this.nextEntityId++;
   }
@@ -261,60 +291,7 @@ export default EntityFactory;
 /* refactor to use this pattern */
 /*
 import Entity from './Entity.js';
-
-class EntityFactory {
-  constructor(game, customPhysicsFactory) {
-    this.game = game;
-    this.customPhysicsFactory = customPhysicsFactory;
-    this.nextEntityId = 0;
-
-    // ... other initializations
-  }
-
-  // ... other methods ...
-
-  createEntity(config) {
-    this.preCreateEntityHooks.forEach(fn => fn(config));
-
-    let entityId = this._generateId();
-    let defaultConfig = {
-      id: entityId,
-      // ... other default configs
-    };
-
-    config = { ...defaultConfig, ...config };
-    const entity = new Entity(entityId);
-    // ... add components ...
-
-    // Use the custom physics factory to create the physics body
-    const body = this.customPhysicsFactory.createPhysicsBody(config);
-    body.myEntityId = entityId;
-    this.customPhysicsFactory.addToWorld(body);
-    this.game.bodyMap[entityId] = body;
-
-    // ... other logic ...
-
-    return this.game.getEntity(entityId);
-  }
-
-  cleanupDestroyedEntities() {
-    const destroyedComponentData = this.game.components.destroyed.data;
-    for (let entityId in destroyedComponentData) {
-      if (destroyedComponentData[entityId]) {
-        let body = this.game.bodyMap[entityId];
-        if (body) {
-          this.customPhysicsFactory.removeFromWorld(body);
-          delete this.game.bodyMap[entityId];
-        }
-        // ... other cleanup logic ...
-      }
-    }
-  }
-
-  // ... other methods ...
-
-}
-
+const entity = new Entity(entityId);
 
 class CustomPhysicsFactory {
   // Add methods as per the physics library
@@ -333,5 +310,6 @@ class CustomPhysicsFactory {
 
   // ... other methods for managing physics bodies
 }
+
 
 */

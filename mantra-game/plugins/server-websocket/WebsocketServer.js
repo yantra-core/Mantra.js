@@ -74,7 +74,7 @@ class WebSocketServerClass {
         let states = parsedMessage.json.state;
         // do a quick massage of the old api into new
         states = states.map((state) => {
-          game.inflate(state);
+          game.inflateEntity(state);
           return state;
         });
         console.log('creator_json', states)

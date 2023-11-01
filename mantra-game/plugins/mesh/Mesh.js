@@ -46,6 +46,7 @@ export default class MeshPlugin {
 
   createPlayerMesh(entityData) {
 
+    // TODO: this needs to return an array of graphics, each bounds to the correct graphic scope
     let graphic = this.game.createGraphic({
       type: 'triangle',
       config: entityData

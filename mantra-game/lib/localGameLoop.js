@@ -8,7 +8,7 @@ function localGameLoop(game, playerId) {
   let snapshot = game.getPlayerSnapshot(playerId, false);
 
   snapshot.state.forEach(function(state){
-    game.inflate(state);
+    game.inflateEntity(state);
   });
  
   game.graphics.forEach(function(graphicsInterface){

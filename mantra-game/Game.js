@@ -97,51 +97,6 @@ class Game {
     return this;
   }
 
-  inflate(entityData) { // TODO: ensure creator_json API can inflate without mesh / client deps
-
-    let game = this;
-
-    // takes outside state and performs update/destroy/create depending
-    // on the current local state of the entity and incoming state
-
-    // if the incoming state is pending destroy, just remove it immediately and return
-    if (entityData.destroyed === true) {
-      game.removeEntity(entityData.id);
-      game.systems.mesh.removeMesh(entityData.id);
-      return;
-    }
-
-    // this isn't a destroyed state, attempt to get a copy of the local state by id
-    let localEntity = game.getEntity(entityData.id);
-
-    if (!localEntity) {
-      // no local copy of the state exists, create a new entity
-      let ent = game.createEntity(entityData);
-      if (game.systems.mesh) {
-        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
-        let mesh = game.systems.mesh.createMesh(entityData);
-        game.components.mesh.set(entityData.id, mesh);
-      }
-      return;
-    }
-
-    // a local copy of the state exists, update it
-    game.updateEntity(entityData);
-    
-    let updated = game.getEntity(entityData.id);
-
-    if (game.systems.mesh) {
-      // if there is no mesh, create one
-      if (!updated.mesh) {
-        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
-        let mesh = game.systems.mesh.createMesh(entityData);
-        game.components.mesh.set(entityData.id, mesh);
-      } else {
-        game.updateGraphic(updated);
-      }
-    }
-
-  }
 
   // TODO: can we encapsulate this into Component class?
   addComponent(entityId, componentType, data) {
