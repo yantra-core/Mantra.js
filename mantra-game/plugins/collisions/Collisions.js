@@ -15,9 +15,8 @@ class CollisionPlugin {
 
   }
   handleCollision(pair, bodyA, bodyB) {
-    // Your collision handling logic here.
-    // Example:
-    //console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
+
+    // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
 
     const entityIdA = bodyA.myEntityId;
     const entityIdB = bodyB.myEntityId;
@@ -26,7 +25,7 @@ class CollisionPlugin {
     const entityB = this.game.getEntity(entityIdB);
 
     if (!entityA || !entityB) {
-      console.log('handleCollision no entity found. Skipping...', entityA, entityB);
+      console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
       return;
     }
 

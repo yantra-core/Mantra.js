@@ -168,6 +168,7 @@ class Game {
   createGraphic(graphicData) {
     let mesh;
     this.graphics.forEach(function(graphicsInterface){
+      // TODO: pipeline needs to assign mesh to correct scope
       mesh = graphicsInterface.createTriangle(graphicData.config);
     })
     return mesh;
