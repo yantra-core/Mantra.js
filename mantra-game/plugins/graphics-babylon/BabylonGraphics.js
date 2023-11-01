@@ -115,7 +115,7 @@ class BabylonGraphics extends GraphicsInterface {
         graphic = this.createTriangle(entityData);
         break;
       default:
-        graphic = this.createTriangle(entityData); // TODO: createDefault()
+        graphic = this.createBox(entityData); // TODO: createDefault()
     }
     return graphic;
   }
@@ -126,6 +126,13 @@ class BabylonGraphics extends GraphicsInterface {
     sphere.position.z = entityData.position.y;
     sphere.position.x = entityData.position.x;
     return sphere;
+  }
+
+  createBox(entityData) {
+    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.height }, this.scene);
+    box.position.z = entityData.position.y;
+    box.position.x = entityData.position.x;
+    return box;
   }
 
   createTriangle(entityData) {

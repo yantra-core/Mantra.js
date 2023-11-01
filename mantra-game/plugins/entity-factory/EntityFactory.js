@@ -1,5 +1,4 @@
-// TODO: decouple matter.js from EntityFactory
-// todo: make this entity-factory plugin
+// TODO: decouple matter.js from EntityFactory, see code comments
 import Entity from '../../Entity/Entity.js';
 
 class EntityFactory {
@@ -146,6 +145,7 @@ class EntityFactory {
 
     let defaultConfig = {
       id: entityId,
+      shape: 'triangle',
       position: { x: 0, y: 0 },
       velocity: { x: 0, y: 0 },
       rotation: 0,
@@ -192,14 +192,7 @@ class EntityFactory {
     this.game.addComponent(entityId, 'isSensor', isSensor);
     this.game.addComponent(entityId, 'isStatic', isStatic);
 
-    const triangleVertices = [
-      { x: x, y: y - 32 },
-      { x: x - 32, y: y + 32 },
-      { x: x + 32, y: y + 32 }
-    ];
-
-    // replace with physics.addBody()
-    const body = this.game.physics.Bodies.fromVertices(x, y, triangleVertices, {
+    let commonBodyConfig = {
       mass: mass,
       isSensor: isSensor,
       isStatic: isStatic,
@@ -209,7 +202,25 @@ class EntityFactory {
       friction: config.friction,
       frictionAir: config.frictionAir,
       frictionStatic: config.frictionStatic
-    });
+    }
+
+    let body;
+    switch (config.shape) {
+      case 'rectangle':
+        body = this.game.physics.Bodies.rectangle(position.x, position.y, config.width, config.height, commonBodyConfig);
+        break;
+      case 'circle':
+        body = this.game.physics.Bodies.circle(position.x, position.y, config.radius, commonBodyConfig);
+        break;
+      case 'triangle':
+      default:
+        const triangleVertices = [
+          { x: x, y: y - 32 },
+          { x: x - 32, y: y + 32 },
+          { x: x + 32, y: y + 32 }
+        ];
+        body = this.game.physics.Bodies.fromVertices(x, y, triangleVertices, commonBodyConfig);
+    }
 
     body.myEntityId = entityId;
     this.game.physics.addToWorld(this.game.engine, body);

@@ -11,7 +11,7 @@ class PongMovementStrategy {
     const player = this.game.bodyMap[entityId];
     if (!player) return;
 
-    const MOVE_SPEED = 10; // This determines how fast the paddle moves, adjust as needed
+    const MOVE_SPEED = 1; // This determines how fast the paddle moves, adjust as needed
 
     // Use dx and dy to set the movement direction
     let moveDirectionX = dx; // -1 for left, 1 for right, 0 for stationary

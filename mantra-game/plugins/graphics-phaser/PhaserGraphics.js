@@ -107,9 +107,18 @@ class PhaserRenderer extends GraphicsInterface {
         graphic = this.createTriangle(entityData);
         break;
       default:
-        graphic = this.createTriangle(entityData); // TODO: createDefault()
+        graphic = this.createBox(entityData); // TODO: createDefault()
     }
     return graphic;
+  }
+
+  createBox(entityData) {
+    // create box in phaser 3
+    let box = this.scene.add.graphics();
+    box.fillStyle(0xff0000, 1);
+    box.fillRect(entityData.position.x, entityData.position.y, entityData.height, entityData.width);
+    box.setDepth(10);
+    return box;
   }
 
   createTriangle(entityData) {

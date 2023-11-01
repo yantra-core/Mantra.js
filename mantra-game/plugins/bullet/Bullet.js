@@ -1,5 +1,4 @@
-// BulletPlugin?
-// TODO: move this all into BulletPlugin
+// Bullet.js - Marak Squires 2023
 
 class BulletPlugin {
   constructor(config = {}) {
