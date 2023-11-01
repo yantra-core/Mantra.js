@@ -14,6 +14,7 @@ import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js
 import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
 
 import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
+// import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
 import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
 
 import Bullet from '@yantra-core/mantra/plugins/bullet/Bullet.js';
@@ -34,7 +35,11 @@ import WebSocketClient  from '@yantra-core/mantra/plugins/client-websocket/Webso
 //
 // Creates a new game instance
 //
-let game = new Game({ isClient : true });
+let game = new Game({ 
+  isClient : true,
+  width: 1600,
+  height: 900
+});
 
 //
 // Use Plugins to add systems to the game
@@ -51,12 +56,12 @@ game
 // Since this is the Client, we can add a Graphics Plugin
 //
 game
-  .use(new BabylonGraphics()) // TODO: demo multiple renderers at once
+  // .use(new PhaserGraphics())
+  .use(new BabylonGraphics())
   .use(new Mesh())
   .use(new Camera())
   .use(new StarField())
   .use(new KeyboardBrowser());
-
 
 // TODO: can we remove this?
 game.onlineMode = true;
@@ -110,5 +115,5 @@ function randomId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-switchToOffline();
-//switchToOnline();
+//switchToOffline();
+switchToOnline();

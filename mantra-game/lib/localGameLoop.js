@@ -17,8 +17,6 @@ function localGameLoop(game, playerId) {
 
   // Render the local snapshot
   if (snapshot) {
-    // rename to game.gui?
-    // game.client?
     game.graphics.forEach(function(graphicsInterface){
       graphicsInterface.update(snapshot);
     });

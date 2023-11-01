@@ -10,10 +10,10 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 let lastKnownStates = {};
 
-class BabylonRenderer extends GraphicsInterface {
+class BabylonGraphics extends GraphicsInterface {
   constructor() {
     super();
-    this.name = 'BabylonRenderer';
+    this.name = 'graphics-babylon';
     this.engine = null;
     this.scene = null;
     this.camera = null;
@@ -30,8 +30,12 @@ class BabylonRenderer extends GraphicsInterface {
     // Access the renderCanvas element and set its size
     const renderCanvas = document.getElementById('renderCanvas');
     // TODO: config height and width from Game constructor
-    // renderCanvas.width = 800;  // Set canvas width in pixels
-    // renderCanvas.height = 600; // Set canvas height in pixels
+    if (typeof game.width === 'number') {
+      renderCanvas.width = game.width;  // Set canvas width in pixels
+    }
+    if (typeof game.height === 'number') {
+      renderCanvas.height = game.height; // Set canvas height in pixels
+    }
 
     this.engine = new BABYLON.Engine(renderCanvas, true);
     this.scene = new BABYLON.Scene(this.engine);
@@ -61,6 +65,35 @@ class BabylonRenderer extends GraphicsInterface {
 
   }
 
+  updateGraphic(entityData) {
+    let previousEntity = this.game.getEntity(entityData.id);
+    if (!previousEntity || !previousEntity.mesh) {
+      return;
+    }
+
+    // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
+    previousEntity.mesh.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);
+    if (entityData.rotation !== undefined) {
+      previousEntity.mesh.rotation.y = -entityData.rotation;
+      // in additon, adjust by -Math.PI / 2;
+      previousEntity.mesh.rotation.y = -entityData.rotation - Math.PI / 2;
+    }
+  }
+
+  createTriangle(entityData) {
+
+    let mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {
+      diameterTop: 0,
+      diameterBottom: 100,
+      height: 100,
+      tessellation: 3
+    }, this.scene);
+
+    mesh.rotation.z = Math.PI / 2;
+    mesh.rotation.y = -Math.PI / 2;
+    return mesh;
+  }
+
   // called as much as the client requires in order to render
   render(game) {
     let self = this;
@@ -72,12 +105,7 @@ class BabylonRenderer extends GraphicsInterface {
     // Logic for zoom handling
   }
 
-  inflate (snapshot) {
-    let game = this.game;
-    snapshot.state.forEach(function (state) {
-      game.inflate(state);
-    });
-  }
+  inflate (snapshot) {} // not used?
 
   // called each time new gametick data arrives
   update() { // Remark: Important, this is bound to systemsUpdate, not view updates!
@@ -90,4 +118,4 @@ class BabylonRenderer extends GraphicsInterface {
 
 }
 
-export default BabylonRenderer;
+export default BabylonGraphics;

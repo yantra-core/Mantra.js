@@ -16,7 +16,7 @@ import onlineGameLoop from './lib/onlineGameLoop.js';
 import gameTick from './lib/gameTick.js';
 
 class Game {
-  constructor({ isClient, isOfflineMode, plugins, options }) {
+  constructor({ isClient, width, height, isOfflineMode, plugins, options }) {
 
     this.on = eventEmitter.on;
     this.off = eventEmitter.off;
@@ -29,6 +29,9 @@ class Game {
 
     // Graphics rendering pipeline
     this.graphics = [];
+
+    this.width = width || 1600;
+    this.height = height || 900;
 
     // TODO: Physics pipeline
     // Remark: Currently, only (1) physics engine is supported at a time
@@ -115,6 +118,7 @@ class Game {
       // no local copy of the state exists, create a new entity
       let ent = game.createEntity(entityData);
       if (game.systems.mesh) {
+        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
         let mesh = game.systems.mesh.createMesh(entityData);
         game.components.mesh.set(entityData.id, mesh);
       }
@@ -129,10 +133,11 @@ class Game {
     if (game.systems.mesh) {
       // if there is no mesh, create one
       if (!updated.mesh) {
+        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
         let mesh = game.systems.mesh.createMesh(entityData);
         game.components.mesh.set(entityData.id, mesh);
       } else {
-        game.systems.mesh.updateMesh(updated);
+        game.updateGraphic(updated);
       }
     }
 
@@ -152,6 +157,20 @@ class Game {
   // Helper method for getting a System by name
   getSystem(systemName) {
     return this.systemsManager.getSystem(systemName);
+  }
+
+  updateGraphic (entityData) {
+    this.graphics.forEach(function(graphicsInterface){
+      graphicsInterface.updateGraphic(entityData);
+    });
+  }
+
+  createGraphic(graphicData) {
+    let mesh;
+    this.graphics.forEach(function(graphicsInterface){
+      mesh = graphicsInterface.createTriangle(graphicData.config);
+    })
+    return mesh;
   }
 
 }

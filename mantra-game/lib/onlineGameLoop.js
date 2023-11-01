@@ -24,9 +24,11 @@
 
       while (game.snapshotQueue.length > 0) {
         let snapshot = game.snapshotQueue.shift();
-        game.graphics.forEach(function(graphicsInterface){
-          graphicsInterface.inflate(snapshot);
+
+        snapshot.state.forEach(function (state) {
+          game.inflate(state);
         });
+
       }
     
 

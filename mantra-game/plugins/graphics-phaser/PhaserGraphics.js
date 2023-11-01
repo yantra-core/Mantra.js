@@ -20,6 +20,21 @@ class PhaserRenderer extends GraphicsInterface {
     this.scenesReady = false;
 
   }
+
+  updateGraphic (entityData) {
+
+  }
+
+  createTriangle(entityData) {
+    let mainScene = this.phaserGame.scene.getScene('Main');
+    let sprite = mainScene.add.graphics();
+    sprite.fillStyle(0xff0000, 1);
+    sprite.fillRect(500, 500, 100, 100);
+    sprite.setDepth(10);
+    console.log('entityData.x', entityData.position)
+    return sprite;
+  }
+
   init(game) {
 
     game.graphics.push(this);
@@ -42,18 +57,10 @@ class PhaserRenderer extends GraphicsInterface {
 
   }
 
-
   update(entitiesData) {
     if (!this.scenesReady) {
       return;
     }
-    for (const entityData of entitiesData.state) {
-      this.entityFactory.handleEntityDebugging(entityData);
-
-      // TODO: refactor this into generic inflate() method, we'll need to keep making these for each renderer
-      this.entityFactory.updateOrDestroyEntity(entityData);
-    }
-
     // console.log('phaser update called', snapshot)
   }
 

@@ -45,11 +45,13 @@ export default class MeshPlugin {
   }
 
   createPlayerMesh(entityData) {
-    let mesh = this.createCylinderMesh(entityData);
-    // is this missing a x?
-    mesh.rotation.z = Math.PI / 2;
-    mesh.rotation.y = -Math.PI / 2;
-    return mesh;
+
+    let graphic = this.game.createGraphic({
+      type: 'triangle',
+      config: entityData
+    });
+
+    return graphic;
   }
 
   createBulletMesh(entityData) {

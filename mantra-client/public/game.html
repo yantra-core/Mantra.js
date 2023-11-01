@@ -9,10 +9,10 @@
   <script src="vendor/babylon.js"></script>
   <script src="vendor/babylon.gui.min.js"></script>
   <script src="vendor/babylonjs.materials.min.js"></script>
-  <!--  <script src="vendor/phaser.min.js"></script> TODO: separate HTML files for phaser, jquery, etc -->
+  <!-- <script src="vendor/phaser.min.js"></script> -->
+  <!--  TODO: separate HTML files for phaser, jquery, etc -->
   <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
 
-  
   <style>
     #output {
       max-height: 300px;
@@ -23,9 +23,6 @@
     }
 
     #renderCanvas {
-      width: 100vw;
-      height: 100vh;
-      position: absolute;
       top: 0;
       left: 0;
       z-index: -1;
@@ -47,13 +44,10 @@
 </head>
 
 <body>
-  <canvas id="renderCanvas"></canvas>
-
+  <canvas id="renderCanvas"></canvas><br/>
   <button id="connectButton">Connect</button>
   <button id="disconnectButton">Disconnect</button>
-
   <script type="text/javascript">
-
 
   </script>
   <script type="module" src="./client.js"></script>
