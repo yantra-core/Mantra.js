@@ -35,11 +35,14 @@ class PhaserRenderer extends GraphicsInterface {
     function loadMainScene () {
       let scene = self.phaserGame.scene.getScene('Main');
       if (!scene) {
-        setTimeout(loadMainScene.bind(self), 100);
+        setTimeout(loadMainScene.bind(self), 10);
         return;
       }
       self.scenesReady = true;
-      game.graphicsReady.push(self.name)
+      game.graphicsReady.push(self.name);
+
+      let canvas = self.phaserGame.canvas;
+      canvas.setAttribute('id', 'phaser-canvas');
       self.scene = scene;
     }
 

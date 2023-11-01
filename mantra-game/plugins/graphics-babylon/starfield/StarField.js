@@ -11,9 +11,7 @@ class StarField {
   init (game, engine, scene) {
 
     this.scene = scene;
-
-    let cameraSystem = game.getSystem('babylon-camera');
-    this.camera = cameraSystem.camera;
+    this.camera = scene.camera;
 
     this.initialize(); // TODO: rename
   }
@@ -38,6 +36,11 @@ class StarField {
   }
 
   updateStars() {
+
+    if (!this.camera) {
+      // if there is no camera, do not move the stars
+      return;
+    }
     const halfFieldSize = this.fieldSize / 2;
     
     this.pcs.updateParticle = (particle) => {

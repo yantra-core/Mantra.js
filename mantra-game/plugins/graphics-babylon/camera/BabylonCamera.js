@@ -1,6 +1,6 @@
 class CameraSystem {
   constructor(game, engine, scene) {
-    this.name = 'babylon-camera';
+    this.name = 'graphics-babylon/camera';
   }
 
   init (game, engine, scene) {
@@ -19,7 +19,7 @@ class CameraSystem {
 
     game.camera = this.camera;
 
-    this.game.systemsManager.addSystem('babylon-camera', this);
+    this.game.systemsManager.addSystem(this.name, this);
 
     // this.camera.attachControl(document.getElementById('renderCanvas'), true);
     // Setup custom camera controls
@@ -45,9 +45,32 @@ class CameraSystem {
 
   setupCameraControls() {
     // Detach default controls
-    this.camera.attachControl(document.getElementById('renderCanvas'), false);
+    this.camera.attachControl(document.getElementById('gameHolder'), false);
     return;
   }
+
+  setupCameraControlsManual() {
+    // Detach default controls from the canvas
+    this.camera.detachControl(this.scene.getEngine().getRenderingCanvas());
+
+    // Attach wheel event listener to gameHolder
+    const gameHolder = document.getElementById('gameHolder');
+    gameHolder.addEventListener('wheel', this.onMouseWheel.bind(this), { passive: false });
+
+    // Prevent default handling of wheel event on canvas
+    const canvas = this.scene.getEngine().getRenderingCanvas();
+    canvas.addEventListener('wheel', e => e.stopPropagation(), { passive: false });
+  }
+
+  onMouseWheel(e) {
+    // Adjust this scale factor as needed
+    const scaleFactor = 0.1;
+    this.camera.radius -= e.deltaY * scaleFactor;
+
+    // Prevent page scrolling
+    e.preventDefault();
+  }
+
 
   resetToHome() {
     // Reset to initial values

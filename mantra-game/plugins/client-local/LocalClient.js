@@ -10,10 +10,23 @@ export default class LocalClient {
     this.game.stop = this.stop.bind(this);
     game.localGameLoopRunning = true;
     console.log('init the local client')
-    game.localGameLoop(game, this.entityName);  // Start the local game loop when offline
   }
 
   start () {
+
+    let graphicsSystems = this.game.graphics.length;
+    let graphicsReady = this.game.graphicsReady.length;
+
+    let self = this;
+    if (graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
+      setTimeout(function(){
+        self.start();
+      }, 10)
+      return
+    }
+
+    this.game.localGameLoop(this.game, this.entityName);  // Start the local game loop when offline
+
     this.game.communicationClient = this;
     this.game.localGameLoopRunning = true;
   }

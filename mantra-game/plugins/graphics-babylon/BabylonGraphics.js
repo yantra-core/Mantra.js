@@ -145,8 +145,12 @@ class BabylonGraphics extends GraphicsInterface {
   // called as much as the client requires in order to render
   render(game) {
     let self = this;
-    let cameraSystem = game.getSystem('babylon-camera');
+    let cameraSystem = game.getSystem('graphics-babylon/camera');
     cameraSystem.render();
+
+    if (this.game.systems['graphics-babylon/camera']) {
+
+    }
   }
 
   handleZoom(event) {
@@ -158,8 +162,11 @@ class BabylonGraphics extends GraphicsInterface {
   // called each time new gametick data arrives
   update() { // Remark: Important, this is bound to systemsUpdate, not view updates!
     let game = this.game;
-    let cameraSystem = this.game.getSystem('babylon-camera');
+    let cameraSystem = this.game.getSystem('graphics-babylon/camera');
     cameraSystem.update(); // This currently does nothing
+
+    if (this.game.systems['graphics-babylon/camera']) {
+    }
 
 
   }

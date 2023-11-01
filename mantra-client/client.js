@@ -78,8 +78,6 @@ game.use(localClient);
 game.use(websocketClient);
 // game.start();
 
-
-
 // websocketClient.connect('ws://192.168.1.80:8888/websocket');
 
 // Function to switch to Online Mode
@@ -115,5 +113,5 @@ function randomId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-//switchToOffline();
-switchToOnline();
+switchToOffline();
+//switchToOnline();
