@@ -32,7 +32,7 @@ class PhaserRenderer extends GraphicsInterface {
     });
 
     let self = this;
-    function loadMainScene () {
+    function loadMainScene() {
       let scene = self.phaserGame.scene.getScene('Main');
       if (!scene) {
         setTimeout(loadMainScene.bind(self), 10);
@@ -61,7 +61,7 @@ class PhaserRenderer extends GraphicsInterface {
   }
 
 
-  updateGraphic (entityData) {
+  updateGraphic(entityData) {
 
 
     let previousEntity = this.game.getEntity(entityData.id);
@@ -69,7 +69,7 @@ class PhaserRenderer extends GraphicsInterface {
       console.log('no previous entity found for', entityData.id);
       return;
     }
-  
+
     let gameobject = previousEntity.graphics['graphics-phaser'];
 
     if (!gameobject) {
@@ -78,7 +78,6 @@ class PhaserRenderer extends GraphicsInterface {
     }
 
 
-    // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
     gameobject.x = entityData.position.y;
     gameobject.y = entityData.position.x;
 
@@ -87,7 +86,7 @@ class PhaserRenderer extends GraphicsInterface {
       gameobject.rotation = rotated;
     }
 
- 
+
     // console.log('updating position', entityData.position)
     // convert rotation to degrees
 
@@ -111,14 +110,19 @@ class PhaserRenderer extends GraphicsInterface {
     }
     return graphic;
   }
-
   createBox(entityData) {
-    // create box in phaser 3
+
     let box = this.scene.add.graphics();
+  
     box.fillStyle(0xff0000, 1);
-    box.fillRect(entityData.position.x, entityData.position.y, entityData.height, entityData.width);
-    box.setDepth(10);
-    return box;
+    box.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
+    box.rotation = -Math.PI / 2;
+  
+    // We use a container to easily manage origin and position
+    let container = this.scene.add.container(entityData.position.x, entityData.position.y);
+    container.add(box);
+  
+    return container;
   }
 
   createTriangle(entityData) {
@@ -129,21 +133,20 @@ class PhaserRenderer extends GraphicsInterface {
       return;
     }
 
-    
     // Assuming entityData.x and entityData.y specify the center of the triangle
     let centerX = entityData.position.x;
     let centerY = entityData.position.y;
-  
+
     // Calculate the vertices of the triangle
     let height = entityData.height || 64;
     let width = entityData.width || 64;
-  
+
     // Points for an equilateral triangle, adjust these calculations if you need a different type of triangle
     let halfWidth = width / 2;
     let point1 = { x: centerX - halfWidth, y: centerY + (height / 2) };
     let point2 = { x: centerX + halfWidth, y: centerY + (height / 2) };
     let point3 = { x: centerX, y: centerY - (height / 2) };  // Apex of the triangle
-  
+
     // Draw the triangle
     let sprite = this.scene.add.graphics();
     sprite.fillStyle(0xff0000, 1);
@@ -154,12 +157,12 @@ class PhaserRenderer extends GraphicsInterface {
     // rotate sprite by -Math.PI / 2;
     sprite.rotation = sprite.rotation - Math.PI / 2;
 
-  
+
     // Camera settings
     let camera = this.scene.cameras.main;
     camera.startFollow(sprite);
     camera.zoom = 0.3;
-  
+
     this.phaserGameObjects[entityData.id] = sprite;
     return sprite;
   }
@@ -175,7 +178,7 @@ class PhaserRenderer extends GraphicsInterface {
 
     return sprite;
   }
-  
+
 
   update(entitiesData) {
     if (!this.scenesReady) {

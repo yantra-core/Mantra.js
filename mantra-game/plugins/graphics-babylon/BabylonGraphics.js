@@ -129,7 +129,7 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createBox(entityData) {
-    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.height }, this.scene);
+    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: 300, depth: entityData.height }, this.scene);
     box.position.z = entityData.position.y;
     box.position.x = entityData.position.x;
     return box;
