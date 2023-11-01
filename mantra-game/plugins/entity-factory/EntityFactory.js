@@ -245,7 +245,7 @@ class EntityFactory {
     // if the incoming state is pending destroy, just remove it immediately and return
     if (entityData.destroyed === true) {
       game.removeEntity(entityData.id);
-      game.systems.mesh.removeMesh(entityData.id);
+      game.removeGraphic(entityData.id);
       return;
     }
 
@@ -256,8 +256,7 @@ class EntityFactory {
       // no local copy of the state exists, create a new entity
       let ent = game.createEntity(entityData);
       if (game.systems.mesh) {
-        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
-        let mesh = game.systems.mesh.createMesh(entityData);
+        let mesh = game.createGraphic(entityData);
         game.components.mesh.set(entityData.id, mesh);
       }
       return;
@@ -271,8 +270,7 @@ class EntityFactory {
     if (game.systems.mesh) {
       // if there is no mesh, create one
       if (!updated.mesh) {
-        // TODO: createMesh needs to be createGraphic, and use pipeline to create for all graphics interfaces
-        let mesh = game.systems.mesh.createMesh(entityData);
+        let mesh = game.createGraphic(entityData);
         game.components.mesh.set(entityData.id, mesh);
       } else {
         game.updateGraphic(updated);

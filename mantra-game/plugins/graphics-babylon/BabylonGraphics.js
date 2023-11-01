@@ -80,6 +80,15 @@ class BabylonGraphics extends GraphicsInterface {
     }
   }
 
+  removeGraphic(entityId) {
+    let entity = this.game.getEntity(entityId);
+    if (!entity || !entity.mesh) {
+      return;
+    }
+    // TODO: don't use mesh scope, needs it's own scope for babylon
+    entity.mesh.dispose();
+  }
+
   createTriangle(entityData) {
 
     let mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {

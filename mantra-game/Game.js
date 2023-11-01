@@ -124,9 +124,15 @@ class Game {
     let mesh;
     this.graphics.forEach(function(graphicsInterface){
       // TODO: pipeline needs to assign mesh to correct scope
-      mesh = graphicsInterface.createTriangle(graphicData.config);
+      mesh = graphicsInterface.createTriangle(graphicData);
     })
     return mesh;
+  }
+
+  removeGraphic(entityId) {
+    this.graphics.forEach(function(graphicsInterface){
+      graphicsInterface.removeGraphic(entityId);
+    });
   }
 
 }
