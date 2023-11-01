@@ -13,8 +13,6 @@ import EntityFactory from '@yantra-core/mantra/plugins/entity-factory/EntityFact
 import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js';
 import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
 
-import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
-// import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
 import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
 
 import Bullet from '@yantra-core/mantra/plugins/bullet/Bullet.js';
@@ -22,7 +20,9 @@ import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
 import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/AsteroidsMovement.js';
 
 // Browser / Client specific Plugins
-import Mesh from '@yantra-core/mantra/plugins/mesh/Mesh.js';
+import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
+import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
+//import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
 import KeyboardBrowser from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser.js';
 import Camera from '@yantra-core/mantra/plugins/graphics-babylon/camera/BabylonCamera.js';
 import StarField from '@yantra-core/mantra/plugins/graphics-babylon/starfield/StarField.js';
@@ -37,8 +37,8 @@ import WebSocketClient  from '@yantra-core/mantra/plugins/client-websocket/Webso
 //
 let game = new Game({ 
   isClient : true,
-  width: 1600,
-  height: 900
+  width: 800,
+  height: 600
 });
 
 //
@@ -56,9 +56,9 @@ game
 // Since this is the Client, we can add a Graphics Plugin
 //
 game
-  // .use(new PhaserGraphics())
-  .use(new BabylonGraphics())
-  .use(new Mesh())
+  .use(new Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
+  .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+  //.use(new PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
   .use(new Camera())
   .use(new StarField())
   .use(new KeyboardBrowser());

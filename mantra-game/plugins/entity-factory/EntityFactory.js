@@ -79,11 +79,12 @@ class EntityFactory {
 
   removeEntity(entityId) {
     let ent = this.game.getEntity(entityId);
+
     // console.log(this.game.bodyMap)
     this.game.removedEntities.add(entityId)
 
-    if (ent && this.game.systems.mesh && ent.mesh) {
-      this.game.systems.mesh.removeMesh(entityId);
+    if (ent && this.game.systems.graphics && ent.graphics) {
+      this.game.systems.graphics.removeGraphic(entityId);
     }
 
     let body = this.game.bodyMap[entityId];
@@ -235,7 +236,7 @@ class EntityFactory {
     return updatedEntity;
   }
 
-  inflateEntity (entityData) { // TODO: ensure creator_json API can inflate without mesh / client deps
+  inflateEntity (entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps
 
     let game = this.game;
 
@@ -255,23 +256,17 @@ class EntityFactory {
     if (!localEntity) {
       // no local copy of the state exists, create a new entity
       let ent = game.createEntity(entityData);
-      if (game.systems.mesh) {
-        let mesh = game.createGraphic(entityData);
-        game.components.mesh.set(entityData.id, mesh);
-      }
-      return;
+    } else {
+      // a local copy of the state exists, update it
+      game.updateEntity(entityData);
     }
-
-    // a local copy of the state exists, update it
-    game.updateEntity(entityData);
     
     let updated = game.getEntity(entityData.id);
+    if (game.systems.graphics) {
 
-    if (game.systems.mesh) {
-      // if there is no mesh, create one
-      if (!updated.mesh) {
-        let mesh = game.createGraphic(entityData);
-        game.components.mesh.set(entityData.id, mesh);
+      // if there are no graphics, create them
+      if (!updated.graphics) {
+        game.createGraphic(entityData);
       } else {
         game.updateGraphic(updated);
       }

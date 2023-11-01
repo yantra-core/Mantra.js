@@ -27,9 +27,7 @@ class Game {
 
     this.snapshotQueue = [];
 
-    // Graphics rendering pipeline
-    this.graphics = [];
-
+    // Game settings
     this.width = width || 1600;
     this.height = height || 900;
 
@@ -69,12 +67,23 @@ class Game {
     this.components.creationTime = new Component('creationTime');
     this.components.BulletComponent = new Component('BulletComponent');
     this.components.mesh = new Component('mesh');
+    this.components.graphics = new Component('graphics');
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
 
     // snapshotManager doesn't seem optional as plugin, not sure game loop can run without basic snapshots interface / api
     this.snapshotManager = new SnapshotManager(this);
+
+
+    // Graphics rendering pipeline
+    this.graphics = [];
+
+    // Graphics could take time to load and be ready
+    // as each Graphics plugin becomes ready, this array will be populated with the plugin name
+    // Game.connect() and Game.start() will wait for all Graphics to be ready before proceeding
+    // Remark: We could use this same ready pattern for all Plugins / Systems
+    this.graphicsReady = [];
 
     this.gameTick = gameTick.bind(this);
     this.localGameLoop = localGameLoop.bind(this);
@@ -117,21 +126,6 @@ class Game {
   updateGraphic (entityData) {
     this.graphics.forEach(function(graphicsInterface){
       graphicsInterface.updateGraphic(entityData);
-    });
-  }
-
-  createGraphic(graphicData) {
-    let mesh;
-    this.graphics.forEach(function(graphicsInterface){
-      // TODO: pipeline needs to assign mesh to correct scope
-      mesh = graphicsInterface.createTriangle(graphicData);
-    })
-    return mesh;
-  }
-
-  removeGraphic(entityId) {
-    this.graphics.forEach(function(graphicsInterface){
-      graphicsInterface.removeGraphic(entityId);
     });
   }
 

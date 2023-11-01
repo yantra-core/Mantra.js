@@ -49,8 +49,11 @@ class BulletPlugin {
     if (this.game.isClient) {
       // use mesh position, was having issues with playerPos not being updated?
       // TODO: look into why playerPos was not correct scope here, it should work
-      playerPos.x = player.mesh.position.x;
-      playerPos.y = player.mesh.position.z;
+      if (player.graphics['graphics-babylon']) {
+        let graphic = player.graphics['graphics-babylon'];
+        playerPos.x = graphic.position.x;
+        playerPos.y = graphic.position.z;
+      }
     }
 
     // Distance in front of the player where the bullet should start
@@ -92,14 +95,14 @@ class BulletPlugin {
     this.game.createEntity(bulletDirectionConfig);
 
     if (this.game.isClient) {
-      let meshPlugin = this.game.getSystem('mesh');
-      let mesh = meshPlugin.createMesh(bulletDirectionConfig);
-      this.game.components.mesh.set(bulletId, mesh);
+      // will delegate what gets renderered based on type property
+      let graphic = this.game.createGraphic(bulletDirectionConfig);
     }
 
   }
 
   applyTemporaryGlowEffect(entity) {
+
     if (this.isPlayerAlreadyGlowing(entity)) {
       return; // Skip if the player is already glowing
     }
@@ -126,7 +129,7 @@ class BulletPlugin {
   }
 
   isPlayerAlreadyGlowing(entity) {
-    return entity.mesh.material && entity.mesh.material.name === "redGlow";
+    return entity.graphics['graphics-babylon'].material && entity.graphics['graphics-babylon'].material.name === "redGlow";
   }
 
 
@@ -142,7 +145,7 @@ class BulletPlugin {
       // console.log('types', entityA.type, entityB.type);
 
       if (!entityA || !entityB) {
-        console.log('handleCollision no entity found. Skipping...', entityA, entityB);
+        console.log('Bullet.handleCollision no entity found. Skipping...', entityA, entityB);
         return;
       }
 
@@ -160,9 +163,11 @@ class BulletPlugin {
 
       if (entityA && entityA.id !== entityB.owner) {
 
+        /* TODO: move this to BabylonGraphics and Graphics Plugins
+
         if (entityA.type === 'PLAYER') {
-          let playerMesh = entityA.mesh;
-          if (playerMesh) {
+          let playerGraphics = entityA.graphics;
+          if (playerGraphics) {
             this.applyTemporaryGlowEffect(entityA);
           }
         }
@@ -201,7 +206,11 @@ class BulletPlugin {
           // Dispose the bullet mesh
           mesh.dispose();
         }
+        */
         //game.systems.health.applyDamage(entityIdB, bulletA.damage);
+        if (this.game.systems.graphics) {
+          this.game.removeGraphic(entityIdB);
+        }
         this.game.removeEntity(entityIdB);
       }
 

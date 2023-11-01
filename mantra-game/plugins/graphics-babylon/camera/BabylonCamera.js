@@ -62,10 +62,14 @@ class CameraSystem {
 
   render() {
     let currentPlayer = this.game.getEntity(window.currentPlayerId);
-    if (currentPlayer && currentPlayer.mesh) {
-      this.camera.target.x = currentPlayer.mesh.position.x;
-      this.camera.target.z = currentPlayer.mesh.position.z;
-      let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+    if (currentPlayer) {
+      let graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
+      if (graphic) {
+        this.camera.target.x = graphic.position.x;
+        this.camera.target.z = graphic.position.z;
+        // why not use vector positon for camera?
+        // let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+      }
     }
   }
 

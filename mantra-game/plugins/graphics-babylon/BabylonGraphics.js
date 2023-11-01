@@ -63,30 +63,61 @@ class BabylonGraphics extends GraphicsInterface {
     window.addEventListener('resize', () => this.engine.resize());
     renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
 
+    // Babylon seems to be immediately ready, versus Phaser which must wait for scene to be ready
+    game.graphicsReady.push(this.name);
   }
 
   updateGraphic(entityData) {
     let previousEntity = this.game.getEntity(entityData.id);
-    if (!previousEntity || !previousEntity.mesh) {
+    if (!previousEntity || !previousEntity.graphics) {
+      console.log('no previous entity found for', entityData.id);
       return;
     }
-
+    let graphic = previousEntity.graphics['graphics-babylon'];
     // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
-    previousEntity.mesh.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);
+    graphic.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);
     if (entityData.rotation !== undefined) {
-      previousEntity.mesh.rotation.y = -entityData.rotation;
+      graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
-      previousEntity.mesh.rotation.y = -entityData.rotation - Math.PI / 2;
+      graphic.rotation.y = -entityData.rotation - Math.PI / 2;
     }
   }
 
   removeGraphic(entityId) {
     let entity = this.game.getEntity(entityId);
-    if (!entity || !entity.mesh) {
+    if (!entity || !entity.graphics || !entity.graphics['graphics-babylon']) {
       return;
     }
-    // TODO: don't use mesh scope, needs it's own scope for babylon
-    entity.mesh.dispose();
+    // TODO: auto-scope graphics-babylon to the entity, so we don't need to do this
+    entity.graphics['graphics-babylon'].dispose();
+  }
+
+
+  createGraphic(entityData) {
+    // switch case based on entityData.type
+    let graphic;
+    switch (entityData.type) {
+      case 'PLAYER':
+        graphic = this.createTriangle(entityData);
+        break;
+      case 'BULLET':
+        graphic = this.createSphere(entityData);
+        break;
+      case 'TRIANGLE':
+        graphic = this.createTriangle(entityData);
+        break;
+      default:
+        graphic = this.createTriangle(entityData); // TODO: createDefault()
+    }
+    return graphic;
+  }
+
+  createSphere(entityData) {
+    let sphere = BABYLON.MeshBuilder.CreateSphere('bullet', { diameter: entityData.radius * 2 }, this.scene);
+    // reposition the sphere to the center of the bullet
+    sphere.position.z = entityData.position.y;
+    sphere.position.x = entityData.position.x;
+    return sphere;
   }
 
   createTriangle(entityData) {

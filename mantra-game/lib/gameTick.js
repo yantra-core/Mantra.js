@@ -23,14 +23,18 @@ function gameTick() {
       console.error(`No body found for entity ${entityId}`);
       continue;
     }
-    // TODO: is this running in online mode? no good, this represents kinematic logic?
-    // TODO: why is this in game tick? seems like it's bullet system logic
+
     // TODO: move this to Bullet plugin
+    // TODO: why is this in game tick? seems like it's bullet system logic
     let entity = this.getEntity(entityId);
     if (this.isClient && entity.type === 'BULLET') { // kinematic bullet movements on client
-      let mesh = entity.mesh;
-      if (mesh) {
-        mesh.position = new BABYLON.Vector3(entity.position.x, 1, entity.position.y);
+      // console.log("kinematic", entity)
+      if (entity.graphics) {
+        // TODO: multiple renderers, move this to graphics plugin
+        let graphic = entity.graphics['graphics-babylon'];
+        if (graphic) {
+          graphic.position = new BABYLON.Vector3(entity.position.x, 1, entity.position.y);
+        }
       }
     }
 
