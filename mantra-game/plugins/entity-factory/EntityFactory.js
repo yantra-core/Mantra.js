@@ -41,6 +41,7 @@ class EntityFactory {
         // Remove entity from physics world
         let body = this.game.bodyMap[entityId];
         if (body) {
+          // i think we need to uncomment this?
           //this.game.physics.removeFromWorld(this.game.engine, this.game.bodyMap[entityId]);
         } else {
           console.log('no body found for entity', entityId, 'cannot remove from world');
@@ -145,6 +146,7 @@ class EntityFactory {
 
     let defaultConfig = {
       id: entityId,
+      body: true,
       shape: 'triangle',
       position: { x: 0, y: 0 },
       velocity: { x: 0, y: 0 },
@@ -192,63 +194,25 @@ class EntityFactory {
     this.game.addComponent(entityId, 'isSensor', isSensor);
     this.game.addComponent(entityId, 'isStatic', isStatic);
 
-    let commonBodyConfig = {
-      mass: mass,
-      isSensor: isSensor,
-      isStatic: isStatic,
-      inertia: Infinity,
-      density: density,
-      restitution: 0,
-      friction: config.friction,
-      frictionAir: config.frictionAir,
-      frictionStatic: config.frictionStatic
-    }
+    if (config.body) {
+      let body = this.createBody(config);
+      body.myEntityId = entityId;
+      this.game.physics.addToWorld(this.game.engine, body);
+      this.game.bodyMap[entityId] = body;
 
-    let body;
-    switch (config.shape) {
-      case 'rectangle':
-        body = this.game.physics.Bodies.rectangle(position.x, position.y, config.width, config.height, commonBodyConfig);
-        break;
-      case 'circle':
-        body = this.game.physics.Bodies.circle(position.x, position.y, config.radius, commonBodyConfig);
-        break;
-      case 'triangle':
-      default:
-        const triangleVertices = [
-          { x: x, y: y - 32 },
-          { x: x - 32, y: y + 32 },
-          { x: x + 32, y: y + 32 }
-        ];
-        body = this.game.physics.Bodies.fromVertices(x, y, triangleVertices, commonBodyConfig);
-    }
+      if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
+        this.game.physics.setVelocity(body, velocity);
+      }
 
-    body.myEntityId = entityId;
-    this.game.physics.addToWorld(this.game.engine, body);
-    this.game.bodyMap[entityId] = body;
-
-    if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
-      this.game.physics.setVelocity(body, velocity);
-    }
-
-    if (position) {
-      this.game.physics.setPosition(body, position);
+      if (position) {
+        this.game.physics.setPosition(body, position);
+      }
     }
 
     this.postCreateEntityHooks.forEach(fn => fn(entity));
 
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);
-
-    // TODO: move to BulletPlugin
-    if (type === 'BULLET') {
-      // set friction to 0 for bullets
-      // this.game.physics.setFriction(body, 0);
-      // TODO: make this config with defaults
-      body.friction = 0;
-      body.frictionAir = 0;
-      body.frictionStatic = 0;
-
-    }
 
     return updatedEntity;
   }
@@ -291,6 +255,53 @@ class EntityFactory {
 
   }
 
+  // TODO: move this to PhysicsPlugin
+  createBody(config) {
+    let commonBodyConfig = {
+      mass: config.mass,
+      isSensor: config.isSensor,
+      isStatic: config.isStatic,
+      inertia: Infinity,
+      density: config.density,
+      restitution: 0,
+      friction: config.friction,
+      frictionAir: config.frictionAir,
+      frictionStatic: config.frictionStatic
+    };
+
+    let body;
+    switch (config.shape) {
+      case 'rectangle':
+        body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
+        break;
+      case 'circle':
+        body = this.game.physics.Bodies.circle(config.position.x, config.position.y, config.radius, commonBodyConfig);
+        break;
+      case 'triangle':
+      default:
+        const triangleVertices = [
+          { x: config.position.x, y: config.position.y - 32 },
+          { x: config.position.x - 32, y: config.position.y + 32 },
+          { x: config.position.x + 32, y: config.position.y + 32 }
+        ];
+        body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
+        break;
+    }
+
+    // TODO: move to BulletPlugin ?
+    if (config.type === 'BULLET') {
+      // set friction to 0 for bullets
+      // this.game.physics.setFriction(body, 0);
+      // TODO: make this config with defaults
+      body.friction = 0;
+      body.frictionAir = 0;
+      body.frictionStatic = 0;
+
+    }
+
+    return body;
+  }
+
   _generateId() {
     return this.nextEntityId++;
   }
@@ -318,7 +329,6 @@ class CustomPhysicsFactory {
     // setPosition() is in matter.js could be diff elsewhere
   }
 
-  // ... other methods for managing physics bodies
 }
 
 
