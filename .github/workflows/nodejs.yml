@@ -19,7 +19,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies and run tests in mantra-game
-      if: contains(github.event.push.commits[*].added, 'project-A/')
+      if: contains(github.event.push.commits[*].added, 'mantra-game/')
       run: |
         cd mantra-game
         npm install
