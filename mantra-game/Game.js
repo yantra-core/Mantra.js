@@ -66,7 +66,6 @@ class Game {
     this.components.lifetime = new Component('lifetime');
     this.components.creationTime = new Component('creationTime');
     this.components.BulletComponent = new Component('BulletComponent');
-    this.components.mesh = new Component('mesh');
     this.components.graphics = new Component('graphics');
 
     // Systems Manager

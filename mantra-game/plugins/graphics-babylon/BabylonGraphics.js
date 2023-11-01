@@ -20,12 +20,18 @@ class BabylonGraphics extends GraphicsInterface {
     // this.babylonEntities = {}; // TODO: remove this and all references to it, use game instead
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
+
+
+
   }
 
   init(game) {
 
     game.graphics.push(this);
     this.game = game;
+
+    this.game.systemsManager.addSystem('graphics-babylon', this);
+
 
     // Access the renderCanvas element and set its size
     const renderCanvas = document.getElementById('renderCanvas');
@@ -68,11 +74,13 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   updateGraphic(entityData) {
+
     let previousEntity = this.game.getEntity(entityData.id);
     if (!previousEntity || !previousEntity.graphics) {
       console.log('no previous entity found for', entityData.id);
       return;
     }
+
     let graphic = previousEntity.graphics['graphics-babylon'];
     // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
     graphic.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);

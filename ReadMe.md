@@ -41,8 +41,8 @@ game
 
 // Since this is the Client, we can add Keyboard and Graphics 
 game
+  .use(new Graphics())
   .use(new BabylonGraphics())
-  .use(new Mesh())
   .use(new Camera())
   .use(new StarField())
   .use(new KeyboardBrowser());

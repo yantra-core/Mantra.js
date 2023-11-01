@@ -20,6 +20,9 @@ class PhaserRenderer extends GraphicsInterface {
     game.graphics.push(this);
     this.game = game;
 
+    this.game.systemsManager.addSystem('graphics-phaser', this);
+
+
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'phaser-root',
@@ -36,7 +39,7 @@ class PhaserRenderer extends GraphicsInterface {
         return;
       }
       self.scenesReady = true;
-      game.graphicsReady = true;
+      game.graphicsReady.push(self.name)
       self.scene = scene;
     }
 
@@ -44,26 +47,66 @@ class PhaserRenderer extends GraphicsInterface {
 
   }
 
-  removeGraphic (entityData) {}
+  removeGraphic(entityId) {
+    let entity = this.game.getEntity(entityId);
+    if (!entity || !entity.graphics || !entity.graphics['graphics-phaser']) {
+      return;
+    }
+    // TODO: auto-scope graphics-babylon to the entity, so we don't need to do this
+    let gameobject = entity.graphics['graphics-phaser'];
+    gameobject.destroy();
+  }
+
 
   updateGraphic (entityData) {
 
-    // console.log('updateGraphic entityData', entityData, this.phaserGameObjects);
-    let gameobject = this.phaserGameObjects[entityData.id];
+
+    let previousEntity = this.game.getEntity(entityData.id);
+    if (!previousEntity || !previousEntity.graphics) {
+      console.log('no previous entity found for', entityData.id);
+      return;
+    }
+  
+    let gameobject = previousEntity.graphics['graphics-phaser'];
 
     if (!gameobject) {
       console.log('no gameobject found for', entityData.id);
       return;
     }
-    // console.log('updating position', entityData.position)
+
+
+    // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
     gameobject.x = entityData.position.y;
     gameobject.y = entityData.position.x;
-    // convert rotation to degrees
+
     if (entityData.rotation) {
       let rotated = -entityData.rotation - Math.PI / 2;
       gameobject.rotation = rotated;
     }
 
+ 
+    // console.log('updating position', entityData.position)
+    // convert rotation to degrees
+
+  }
+
+  createGraphic(entityData) {
+    // switch case based on entityData.type
+    let graphic;
+    switch (entityData.type) {
+      case 'PLAYER':
+        graphic = this.createTriangle(entityData);
+        break;
+      case 'BULLET':
+        graphic = this.createCircle(entityData);
+        break;
+      case 'TRIANGLE':
+        graphic = this.createTriangle(entityData);
+        break;
+      default:
+        graphic = this.createTriangle(entityData); // TODO: createDefault()
+    }
+    return graphic;
   }
 
   createTriangle(entityData) {
@@ -106,6 +149,18 @@ class PhaserRenderer extends GraphicsInterface {
     camera.zoom = 0.3;
   
     this.phaserGameObjects[entityData.id] = sprite;
+    return sprite;
+  }
+
+  createCircle(entityData) {
+    let sprite = this.scene.add.graphics();
+    sprite.fillStyle(0xff0000, 1);
+    sprite.fillCircle(0, 0, 50);
+    sprite.setDepth(10);
+
+    sprite.x = entityData.position.x;
+    sprite.y = entityData.position.y;
+
     return sprite;
   }
   

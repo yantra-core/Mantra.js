@@ -30,10 +30,11 @@ function gameTick() {
     if (this.isClient && entity.type === 'BULLET') { // kinematic bullet movements on client
       // console.log("kinematic", entity)
       if (entity.graphics) {
-        // TODO: multiple renderers, move this to graphics plugin
-        let graphic = entity.graphics['graphics-babylon'];
-        if (graphic) {
-          graphic.position = new BABYLON.Vector3(entity.position.x, 1, entity.position.y);
+        for (let g in entity.graphics) {
+          let graphicInterface = this.systems[g];
+          if (graphicInterface) {
+            graphicInterface.updateGraphic(entity);
+          }
         }
       }
     }

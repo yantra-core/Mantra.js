@@ -22,7 +22,7 @@ import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strat
 // Browser / Client specific Plugins
 import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
 import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
-//import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
+import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
 import KeyboardBrowser from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser.js';
 import Camera from '@yantra-core/mantra/plugins/graphics-babylon/camera/BabylonCamera.js';
 import StarField from '@yantra-core/mantra/plugins/graphics-babylon/starfield/StarField.js';
@@ -58,7 +58,7 @@ game
 game
   .use(new Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
   .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-  //.use(new PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
+  // .use(new PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
   .use(new Camera())
   .use(new StarField())
   .use(new KeyboardBrowser());
