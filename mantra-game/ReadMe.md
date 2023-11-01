@@ -1,0 +1,1 @@
+# Mantra Game Class
