@@ -10,9 +10,9 @@ class PhaserRenderer extends GraphicsInterface {
     this.config = config;
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
-      parent: 'root',
-      width: 1600,
-      height: 1200,
+      parent: 'phaser-root',
+      width: 800, // TODO: config
+      height: 600,
       scene: [Main],
       // Additional Phaser configuration...
     });
@@ -21,8 +21,8 @@ class PhaserRenderer extends GraphicsInterface {
 
   }
   init(game) {
-    console.log('ccc', game)
-    game.graphics = this;
+
+    game.graphics.push(this);
     this.game = game;
 
     console.log('phaser init called')

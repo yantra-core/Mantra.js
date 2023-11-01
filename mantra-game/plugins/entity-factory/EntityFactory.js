@@ -165,6 +165,7 @@ class EntityFactory {
       velocity: { x: 0, y: 0 },
       rotation: 0,
       mass: 100,
+      density: 100,
       health: 100,
       lifetime: Infinity,
       isStatic: false,
@@ -180,7 +181,7 @@ class EntityFactory {
     entityId = config.id;
     const entity = new Entity(entityId);
 
-    const { type, position, mass, velocity, isSensor, isStatic, width, height, radius, health, owner, lifetime } = config;
+    const { type, position, mass, density, velocity, isSensor, isStatic, width, height, radius, health, owner, lifetime } = config;
     let { x, y } = position;
 
     // Using game's API to add components
@@ -190,6 +191,7 @@ class EntityFactory {
     this.game.addComponent(entityId, 'velocity', velocity);
     this.game.addComponent(entityId, 'rotation', config.rotation);
     this.game.addComponent(entityId, 'mass', mass);
+    this.game.addComponent(entityId, 'density', density);
     this.game.addComponent(entityId, 'health', health);
     this.game.addComponent(entityId, 'width', width);
     this.game.addComponent(entityId, 'height', height);
@@ -213,7 +215,9 @@ class EntityFactory {
       mass: mass,
       isSensor: isSensor,
       isStatic: isStatic,
-      inertia: Infinity
+      inertia: Infinity,
+      density: density,
+      restitution: 0
     });
 
     body.myEntityId = entityId;

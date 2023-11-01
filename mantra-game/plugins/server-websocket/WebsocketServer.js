@@ -7,7 +7,7 @@ import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
 let config = {};
 config.deltaCompression = false; // Toggle this to enable delta compression
 
-config.deltaEncoding = false; // Toggle this to enable delta compression
+config.deltaEncoding = true; // Toggle this to enable delta compression
 
 const FIXED_DT = 40; // 25 FPS
 let accumulatedTime = 0;

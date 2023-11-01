@@ -11,13 +11,17 @@ function localGameLoop(game, playerId) {
     game.inflate(state);
   });
  
-  game.graphics.render(game);
+  game.graphics.forEach(function(graphicsInterface){
+    graphicsInterface.render(game);
+  });
 
   // Render the local snapshot
   if (snapshot) {
     // rename to game.gui?
     // game.client?
-    game.graphics.update(snapshot);
+    game.graphics.forEach(function(graphicsInterface){
+      graphicsInterface.update(snapshot);
+    });
   }
 
   // Call the next iteration of the loop

@@ -24,14 +24,19 @@
 
       while (game.snapshotQueue.length > 0) {
         let snapshot = game.snapshotQueue.shift();
-        game.graphics.inflate(snapshot);
+        game.graphics.forEach(function(graphicsInterface){
+          graphicsInterface.inflate(snapshot);
+        });
       }
     
 
     } else {
       // console.log("No new data or snapshot already rendered");
     }
-    game.graphics.render(game);
+
+    game.graphics.forEach(function(graphicsInterface){
+      graphicsInterface.render(game);
+    });
 
     game.gameTick(false);
 

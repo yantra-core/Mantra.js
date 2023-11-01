@@ -24,10 +24,16 @@ class BabylonRenderer extends GraphicsInterface {
 
   init(game) {
 
-    game.graphics = this;
+    game.graphics.push(this);
     this.game = game;
 
-    this.engine = new BABYLON.Engine(document.getElementById('renderCanvas'), true);
+    // Access the renderCanvas element and set its size
+    const renderCanvas = document.getElementById('renderCanvas');
+    // TODO: config height and width from Game constructor
+    // renderCanvas.width = 800;  // Set canvas width in pixels
+    // renderCanvas.height = 600; // Set canvas height in pixels
+
+    this.engine = new BABYLON.Engine(renderCanvas, true);
     this.scene = new BABYLON.Scene(this.engine);
 
     game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
@@ -51,7 +57,7 @@ class BabylonRenderer extends GraphicsInterface {
 
     this.engine.runRenderLoop(() => this.scene.render());
     window.addEventListener('resize', () => this.engine.resize());
-    document.getElementById('renderCanvas').addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
+    renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
 
   }
 

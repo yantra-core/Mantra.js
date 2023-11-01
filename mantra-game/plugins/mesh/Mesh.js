@@ -38,9 +38,9 @@ export default class MeshPlugin {
   }
 
   createBoxMesh (entityData) {
-    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.height }, this.scene);
-    box.x = entityData.position.x;
-    box.z = entityData.position.y;
+    // TODO: remove references to BABYLON
+    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: 100, depth: entityData.height }, this.scene);
+    box.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);
     return box;
   }
 
@@ -78,6 +78,7 @@ export default class MeshPlugin {
     if (!previousEntity || !previousEntity.mesh) {
       return;
     }
+
     // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
     previousEntity.mesh.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);
     if (entityData.rotation !== undefined) {

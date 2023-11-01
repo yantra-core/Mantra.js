@@ -27,8 +27,14 @@ class Game {
 
     this.snapshotQueue = [];
 
-    // TODO: make that that changed entities is set when an new entity is created
-    // if we always wait for the next tick of physics, we will always be one tick behind
+    // Graphics rendering pipeline
+    this.graphics = [];
+
+    // TODO: Physics pipeline
+    // Remark: Currently, only (1) physics engine is supported at a time
+    //  If we want to run multiple physics engines, we'll want to make this array
+    // this.physics = [];
+
     this.changedEntities = new Set();
     this.removedEntities = new Set();
 
@@ -38,8 +44,7 @@ class Game {
     this.onlineGameLoopRunning = false;
 
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
-    // either way the components should be in Game.js
-    // define required components for the game
+    // Remark: I don't think we need to explicitly define components, we can just add them as needed
     this.components = {
       type: new Component('type'),           // string type, name of Entity
       destroyed: new Component('destroyed'), // boolean, if true, entity is pending destroy and will be removed from game
@@ -47,6 +52,7 @@ class Game {
       velocity: new Component('velocity'),
       rotation: new Component('rotation'),
       mass: new Component('mass'),
+      density: new Component('density'),
       width: new Component('width'),
       height: new Component('height'),
       radius: new Component('radius'),
@@ -108,8 +114,10 @@ class Game {
     if (!localEntity) {
       // no local copy of the state exists, create a new entity
       let ent = game.createEntity(entityData);
-      let mesh = game.systems.mesh.createMesh(entityData);
-      game.components.mesh.set(entityData.id, mesh);
+      if (game.systems.mesh) {
+        let mesh = game.systems.mesh.createMesh(entityData);
+        game.components.mesh.set(entityData.id, mesh);
+      }
       return;
     }
 
@@ -118,12 +126,14 @@ class Game {
     
     let updated = game.getEntity(entityData.id);
 
-    // if there is no mesh, create one
-    if (!updated.mesh) {
-      let mesh = game.systems.mesh.createMesh(entityData);
-      game.components.mesh.set(entityData.id, mesh);
-    } else {
-      game.systems.mesh.updateMesh(updated);
+    if (game.systems.mesh) {
+      // if there is no mesh, create one
+      if (!updated.mesh) {
+        let mesh = game.systems.mesh.createMesh(entityData);
+        game.components.mesh.set(entityData.id, mesh);
+      } else {
+        game.systems.mesh.updateMesh(updated);
+      }
     }
 
   }
