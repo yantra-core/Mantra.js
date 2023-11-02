@@ -175,6 +175,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.creationTime = new _Component["default"]('creationTime');
     this.components.BulletComponent = new _Component["default"]('BulletComponent');
     this.components.graphics = new _Component["default"]('graphics');
+    this.components.lockedProperties = new _Component["default"]('lockedProperties');
 
     // Systems Manager
     this.systemsManager = new _SystemsManager["default"](this);
@@ -245,7 +246,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   return Game;
 }();
 
-},{"./Component/Component.js":1,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":31}],4:[function(require,module,exports){
+},{"./Component/Component.js":1,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":32}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -418,13 +419,14 @@ MANTRA.plugins = {
   LocalClient: require('./plugins/client-local/LocalClient.js')["default"],
   MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js')["default"],
   PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js')["default"],
+  PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js')["default"],
   StarField: require('./plugins/graphics-babylon/starfield/StarField.js')["default"]
   // ... add other plugins similarly
 };
 
 module.exports = MANTRA;
 
-},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/graphics-babylon/BabylonGraphics.js":23,"./plugins/graphics-babylon/camera/BabylonCamera.js":24,"./plugins/graphics-babylon/starfield/StarField.js":25,"./plugins/graphics-phaser/PhaserGraphics.js":26,"./plugins/graphics/Graphics.js":27,"./plugins/lifetime/Lifetime.js":28,"./plugins/physics-matter/MatterPhysics.js":29}],7:[function(require,module,exports){
+},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/entity-movement/strategies/PongMovement.js":23,"./plugins/graphics-babylon/BabylonGraphics.js":24,"./plugins/graphics-babylon/camera/BabylonCamera.js":25,"./plugins/graphics-babylon/starfield/StarField.js":26,"./plugins/graphics-phaser/PhaserGraphics.js":27,"./plugins/graphics/Graphics.js":28,"./plugins/lifetime/Lifetime.js":29,"./plugins/physics-matter/MatterPhysics.js":30}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -907,6 +909,7 @@ var BrowserKeyboard = exports["default"] = /*#__PURE__*/function () {
           break;
         case 'Space':
           this.controls.SPACE = true;
+          event.preventDefault(); // Prevent default browser behavior for space key
           break;
         case 'KeyR':
           // reset to home in UI camera
@@ -1011,23 +1014,6 @@ var BulletPlugin = /*#__PURE__*/function () {
         console.log('no player data available');
         return;
       }
-
-      /*
-      if (this.game.isClient) {
-        // use mesh position, was having issues with playerPos not being updated?
-        // TODO: look into why playerPos was not correct scope here, it should work
-        if (player.graphics['graphics-babylon']) {
-          let graphic = player.graphics['graphics-babylon'];
-          //playerPos.x = graphic.position.x;
-          //playerPos.y = graphic.position.z;
-        }
-         if (player.graphics['graphics-phaser']) {
-          let graphic = player.graphics['graphics-phaser'];
-          //playerPos.x = graphic.x;
-          //playerPos.y = graphic.y;
-        }
-       }
-      */
 
       // Distance in front of the player where the bullet should start
       var distanceInFront = 100; // TODO: make this a config
@@ -1199,7 +1185,6 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
     _classCallCheck(this, LocalClient);
     this.entityName = playerId; // Remark: localClient expects player name in constructor?
     this.started = false; // TODO: This doesn't seem ideal, we may not know the player name at this point
-
     // window.currentPlayerId currently used for various local client scoped auth functions, will need to be replaced with a better solution
     window.currentPlayerId = playerId;
   }
@@ -1207,7 +1192,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      // this.game.isClient = true;
+      this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
       this.game.start = this.start.bind(this);
       this.game.stop = this.stop.bind(this);
       game.localGameLoopRunning = true;
@@ -1288,7 +1273,7 @@ var CollisionPlugin = /*#__PURE__*/function () {
   }, {
     key: "handleCollision",
     value: function handleCollision(pair, bodyA, bodyB) {
-      console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
+      // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
       var entityIdA = bodyA.myEntityId;
       var entityIdB = bodyB.myEntityId;
       var entityA = this.game.getEntity(entityIdA);
@@ -1461,18 +1446,34 @@ var EntityFactory = /*#__PURE__*/function () {
         this.removeEntity(entityId);
         return;
       }
+      if (entityData.position) {
+        // Get the lockedProperties properties for this entity
+        var lockedProperties = this.game.components.lockedProperties.get(entityId);
 
-      // can we remove the bullet check here? it shouldn't be sent if its not needed?
-      if (entityData.position /*&& entityData.id !== window.currentPlayerId*/) {
-        // client-side prediction flag
-        // Online Mode: Incremental position updates
+        // Check if position is lockedProperties
+        if (lockedProperties && lockedProperties.position) {
+          // If position is lockedProperties, use the lockedProperties value
+          console.log('Using lockedProperties position for entity', entityId);
+          var newPosition = entityData.position;
+          if (typeof lockedProperties.position.x !== 'undefined') {
+            //newPosition.x = lockedProperties.position.x;
+          }
+          if (typeof lockedProperties.position.y !== 'undefined') {
+            //newPosition.y = lockedProperties.position.y;
+          }
+
+          //this.game.components.position.set(entityId, newPosition);
+        } else {
+          // If position is not lockedProperties, use the new value from entityData
+          // this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y });
+        }
         this.game.components.position.set(entityId, {
           x: entityData.position.x,
           y: entityData.position.y
         });
-      }
-      if (typeof entityData.rotation !== 'undefined') {
-        this.game.components.rotation.set(entityId, entityData.rotation);
+        if (typeof entityData.rotation !== 'undefined') {
+          this.game.components.rotation.set(entityId, entityData.rotation);
+        }
       }
     }
   }, {
@@ -1512,7 +1513,9 @@ var EntityFactory = /*#__PURE__*/function () {
         // Default friction
         frictionAir: 0.01,
         // Default air friction
-        frictionStatic: 0.5 // Default static friction
+        frictionStatic: 0.5,
+        // Default static friction
+        lockedProperties: null // object hash of properties that should never be updated
       };
 
       // merge config with defaultConfig
@@ -1527,6 +1530,7 @@ var EntityFactory = /*#__PURE__*/function () {
         velocity = _config.velocity,
         isSensor = _config.isSensor,
         isStatic = _config.isStatic,
+        lockedProperties = _config.lockedProperties,
         width = _config.width,
         height = _config.height,
         radius = _config.radius,
@@ -1566,6 +1570,41 @@ var EntityFactory = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'creationTime', Date.now()); // Current time in milliseconds
       this.game.addComponent(entityId, 'isSensor', isSensor);
       this.game.addComponent(entityId, 'isStatic', isStatic);
+      this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
+      console.log("fffasdasd", lockedProperties);
+
+      // TODO: goal here is to iterate through props of lockedProperties and for each prop we find, use as key name
+      // to lookup the current entity value and set it to the lockedProperties value
+      // we will later reference this lockedProperties value when updating the entity
+      if (lockedProperties) {
+        console.log("Processing lockedProperties properties");
+        for (var key in lockedProperties) {
+          var currentVal = this.game.components[key].get(entityId);
+          if (currentVal !== undefined && currentVal !== null) {
+            if (_typeof(lockedProperties[key]) === 'object' && !Array.isArray(lockedProperties[key])) {
+              // If lockedProperties[key] is an object, iterate through its keys
+              for (var subKey in lockedProperties[key]) {
+                if (lockedProperties[key][subKey] === true) {
+                  // only process if the value is true
+                  var nestedVal = currentVal[subKey];
+                  if (nestedVal !== undefined && nestedVal !== null) {
+                    console.log('Setting lockedProperties property', "".concat(key, ".").concat(subKey), 'to', nestedVal);
+                    this.game.components['lockedProperties'].set(entityId, _defineProperty({}, key, _defineProperty({}, subKey, nestedVal)));
+                  } else {
+                    console.log('Error: No such component or invalid value for', "".concat(key, ".").concat(subKey));
+                  }
+                }
+              }
+            } else if (lockedProperties[key] === true) {
+              // if lockedProperties[key] is not an object and the value is true
+              console.log('Setting lockedProperties property', key, 'to', currentVal);
+              this.game.components['lockedProperties'].set(entityId, _defineProperty({}, key, currentVal));
+            }
+          } else {
+            console.log('Error: No such component or invalid value for', key);
+          }
+        }
+      }
       if (config.body) {
         var body = this.createBody(config);
         body.myEntityId = entityId;
@@ -1999,6 +2038,59 @@ var _default = exports["default"] = MovementStrategy;
 },{}],23:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _MovementStrategy = _interopRequireDefault(require("./MovementStrategy.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // PongMovement.js - Marak Squires 2023
+var PongMovementStrategy = /*#__PURE__*/function () {
+  function PongMovementStrategy() {
+    _classCallCheck(this, PongMovementStrategy);
+  }
+  _createClass(PongMovementStrategy, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+    }
+  }, {
+    key: "update",
+    value: function update(entityId, dx, dy) {
+      var player = this.game.bodyMap[entityId];
+      if (!player) return;
+      var MOVE_SPEED = 1; // This determines how fast the paddle moves, adjust as needed
+
+      // Use dx and dy to set the movement direction
+      var moveDirectionX = dx; // -1 for left, 1 for right, 0 for stationary
+      var moveDirectionY = dy; // -1 for up, 1 for down, 0 for stationary
+
+      // If there is any movement, update the entity's state
+      if (moveDirectionX !== 0 || moveDirectionY !== 0) {
+        var velocity = {
+          x: 0,
+          // in pong we only move on the Y axis
+          y: -MOVE_SPEED * moveDirectionY // invert the Y axis to match the game's coordinate system
+        };
+
+        // Assuming this.game.physics.Body.setVelocity() is the correct method
+        // to update the player's velocity in your physics engine.
+        this.game.physics.Body.setVelocity(player, velocity);
+      }
+    }
+  }]);
+  return PongMovementStrategy;
+}();
+var _default = exports["default"] = PongMovementStrategy;
+
+},{"./MovementStrategy.js":22}],24:[function(require,module,exports){
+"use strict";
+
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2209,7 +2301,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 }(_GraphicsInterface2["default"]);
 var _default = exports["default"] = BabylonGraphics;
 
-},{"../../lib/GraphicsInterface.js":7}],24:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":7}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2345,7 +2437,7 @@ var CameraSystem = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = CameraSystem;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2426,7 +2518,7 @@ var StarField = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = StarField;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2637,11 +2729,8 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
         // Camera settings
         var camera = this.scene.cameras.main;
         var player = this.game.getEntity(window.currentPlayerId);
-        console.log("pppp", player);
         var graphics = this.game.components.graphics.get(window.currentPlayerId);
-        console.log("ggg", graphics);
         if (player && graphics) {
-          console.log('following player', player);
           camera.startFollow(player.graphics['graphics-phaser']);
           camera.zoom = 0.4;
           this.followingPlayer = true;
@@ -2680,7 +2769,7 @@ var Main = new Phaser.Class({
   }
 });
 
-},{"../../lib/GraphicsInterface.js":7}],27:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":7}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2761,7 +2850,7 @@ var Graphics = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Graphics;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2828,7 +2917,7 @@ var Lifetime = /*#__PURE__*/function (_Plugin) {
 }(_Plugin2["default"]);
 var _default = exports["default"] = Lifetime;
 
-},{"../../Plugin.js":4}],29:[function(require,module,exports){
+},{"../../Plugin.js":4}],30:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2898,6 +2987,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
             maxSpeed = body.entity.maxSpeed;
           }
           limitSpeed(body, maxSpeed);
+          _this2.lockedProperties(body);
         });
       });
 
@@ -3115,6 +3205,25 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
         }
       });
     }
+  }, {
+    key: "lockedProperties",
+    value: function lockedProperties(body) {
+      var eId = body.myEntityId;
+      var ent = this.game.getEntity(eId);
+      if (ent && ent.lockedProperties) {
+        // TODO: iterate through lockedProperties and set them ( check for position )
+        if (ent.lockedProperties.position) {
+          var currentPosition = body.position;
+          if (typeof ent.lockedProperties.position.x === 'number') {
+            currentPosition.x = ent.lockedProperties.position.x;
+          }
+          if (typeof ent.lockedProperties.position.y === 'number') {
+            currentPosition.y = ent.lockedProperties.position.y;
+          }
+          _matterJs["default"].Body.setPosition(body, currentPosition);
+        }
+      }
+    }
   }]);
   return MatterPhysics;
 }(_PhysicsInterface2["default"]);
@@ -3209,7 +3318,7 @@ class MatterPhysics extends PhysicsInterface {
 
 */
 
-},{"./PhysicsInterface.js":30,"matter-js":33}],30:[function(require,module,exports){
+},{"./PhysicsInterface.js":31,"matter-js":34}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3311,7 +3420,7 @@ var PhysicsInterface = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = PhysicsInterface;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3449,7 +3558,7 @@ getDecodedSnapshot(snapshotId) {
 
 */
 
-},{"./getPlayerSnapshot.js":32}],32:[function(require,module,exports){
+},{"./getPlayerSnapshot.js":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3541,7 +3650,7 @@ var getPlayerSnapshot = function getPlayerSnapshot(playerId) {
 };
 var _default = exports["default"] = getPlayerSnapshot;
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (global){(function (){
 /*!
  * matter-js 0.19.0 by @liabru

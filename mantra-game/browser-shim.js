@@ -20,6 +20,7 @@ MANTRA.plugins = {
   LocalClient: require('./plugins/client-local/LocalClient.js').default,
   MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js').default,
   PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js').default,
+  PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js').default,
   StarField: require('./plugins/graphics-babylon/starfield/StarField.js').default
   // ... add other plugins similarly
 };
