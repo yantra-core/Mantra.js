@@ -40,6 +40,7 @@ export default class BrowserKeyboard {
         break;
       case 'Space':
         this.controls.SPACE = true;
+        event.preventDefault();  // Prevent default browser behavior for space key
         break;
       case 'KeyR':
         // reset to home in UI camera

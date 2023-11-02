@@ -21,8 +21,8 @@ class PongMovementStrategy {
     // If there is any movement, update the entity's state
     if (moveDirectionX !== 0 || moveDirectionY !== 0) {
       let velocity = {
-        x: MOVE_SPEED * moveDirectionY,
-        y: MOVE_SPEED * moveDirectionX
+        x: 0, // in pong we only move on the Y axis
+        y: -MOVE_SPEED * moveDirectionY // invert the Y axis to match the game's coordinate system
       };
 
       // Assuming this.game.physics.Body.setVelocity() is the correct method

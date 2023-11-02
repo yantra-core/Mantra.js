@@ -14,7 +14,7 @@ class EntityFactory {
 
   }
 
-  init (game) {
+  init(game) {
 
     // bind game scope to this.game
     this.game = game;
@@ -126,16 +126,14 @@ class EntityFactory {
       return;
     }
 
-    // can we remove the bullet check here? it shouldn't be sent if its not needed?
-    if (entityData.position /*&& entityData.id !== window.currentPlayerId*/) { // client-side prediction flag
-      // Online Mode: Incremental position updates
+    if (entityData.position) {
+      // If position is not lockedProperties, use the new value from entityData
       this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y });
     }
 
     if (typeof entityData.rotation !== 'undefined') {
       this.game.components.rotation.set(entityId, entityData.rotation);
     }
-
   }
 
   createEntity(config) {
@@ -167,6 +165,7 @@ class EntityFactory {
       friction: 0.1,  // Default friction
       frictionAir: 0.01, // Default air friction
       frictionStatic: 0.5, // Default static friction
+      lockedProperties: null // object hash of properties that should never be updated
     };
 
     // merge config with defaultConfig
@@ -175,7 +174,7 @@ class EntityFactory {
     entityId = config.id;
     const entity = new Entity(entityId);
 
-    const { type, position, mass, density, velocity, isSensor, isStatic, width, height, radius, shape, maxSpeed, health, owner, lifetime } = config;
+    const { type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, radius, shape, maxSpeed, health, owner, lifetime } = config;
     let { x, y } = position;
 
     /*
@@ -207,6 +206,38 @@ class EntityFactory {
     this.game.addComponent(entityId, 'creationTime', Date.now());  // Current time in milliseconds
     this.game.addComponent(entityId, 'isSensor', isSensor);
     this.game.addComponent(entityId, 'isStatic', isStatic);
+    this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
+
+    // iterate through props of lockedProperties and for each prop we find, use as key name
+    // to lookup the current entity value and set it to the lockedProperties value
+    // we will later reference this lockedProperties value when updating the entity
+    if (lockedProperties) {
+      console.log("Processing lockedProperties properties");
+      for (let key in lockedProperties) {
+        let currentVal = this.game.components[key].get(entityId);
+        if (currentVal !== undefined && currentVal !== null) {
+          if (typeof lockedProperties[key] === 'object' && !Array.isArray(lockedProperties[key])) {
+            // If lockedProperties[key] is an object, iterate through its keys
+            for (let subKey in lockedProperties[key]) {
+              if (lockedProperties[key][subKey] === true) {  // only process if the value is true
+                let nestedVal = currentVal[subKey];
+                if (nestedVal !== undefined && nestedVal !== null) {
+                  console.log('Setting lockedProperties property', `${key}.${subKey}`, 'to', nestedVal);
+                  this.game.components['lockedProperties'].set(entityId, { [key]: { [subKey]: nestedVal } });
+                } else {
+                  console.log('Error: No such component or invalid value for', `${key}.${subKey}`);
+                }
+              }
+            }
+          } else if (lockedProperties[key] === true) {  // if lockedProperties[key] is not an object and the value is true
+            console.log('Setting lockedProperties property', key, 'to', currentVal);
+            this.game.components['lockedProperties'].set(entityId, { [key]: currentVal });
+          }
+        } else {
+          console.log('Error: No such component or invalid value for', key);
+        }
+      }
+    }
 
     if (config.body) {
       let body = this.createBody(config);
@@ -231,7 +262,7 @@ class EntityFactory {
     return updatedEntity;
   }
 
-  inflateEntity (entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps
+  inflateEntity(entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps
 
     let game = this.game;
 
@@ -255,7 +286,7 @@ class EntityFactory {
       // a local copy of the state exists, update it
       game.updateEntity(entityData);
     }
-    
+
     let updated = game.getEntity(entityData.id);
     if (game.systems.graphics) {
 

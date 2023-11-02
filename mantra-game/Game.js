@@ -67,6 +67,7 @@ class Game {
     this.components.creationTime = new Component('creationTime');
     this.components.BulletComponent = new Component('BulletComponent');
     this.components.graphics = new Component('graphics');
+    this.components.lockedProperties = new Component('lockedProperties');
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
