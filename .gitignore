@@ -95,7 +95,7 @@ web_modules/
 # Yarn Integrity file
 
 .yarn-integrity
-
+# 
 # dotenv environment variable files
 
 .env
@@ -117,7 +117,6 @@ out
 # Nuxt.js build / generate output
 
 .nuxt
-dist
 
 # Gatsby files
 

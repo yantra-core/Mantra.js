@@ -1,11 +1,14 @@
 export default class LocalClient {
-  constructor(entityName) {
-    this.entityName = entityName; // Remark: localClient expects player name in constructor?
+  constructor(playerId) {
+    this.entityName = playerId; // Remark: localClient expects player name in constructor?
     this.started = false;         // TODO: This doesn't seem ideal, we may not know the player name at this point
+    // window.currentPlayerId currently used for various local client scoped auth functions, will need to be replaced with a better solution
+    window.currentPlayerId = playerId;
   }
 
   init (game) {
     this.game = game;
+    this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
     this.game.start = this.start.bind(this);
     this.game.stop = this.stop.bind(this);
     game.localGameLoopRunning = true;

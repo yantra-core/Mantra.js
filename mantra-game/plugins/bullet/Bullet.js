@@ -45,24 +45,6 @@ class BulletPlugin {
       return;
     }
 
-    if (this.game.isClient) {
-      // use mesh position, was having issues with playerPos not being updated?
-      // TODO: look into why playerPos was not correct scope here, it should work
-      if (player.graphics['graphics-babylon']) {
-        let graphic = player.graphics['graphics-babylon'];
-        playerPos.x = graphic.position.x;
-        playerPos.y = graphic.position.z;
-      }
-
-      if (player.graphics['graphics-phaser']) {
-        let graphic = player.graphics['graphics-phaser'];
-        playerPos.x = graphic.x;
-        playerPos.y = graphic.y;
-      }
-
-
-    }
-
     // Distance in front of the player where the bullet should start
     let distanceInFront = 100; // TODO: make this a config
 

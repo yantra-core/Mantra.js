@@ -15,10 +15,20 @@ import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMo
 
 import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
 
+
+//
+// Game elements
+//
 import Bullet from '@yantra-core/mantra/plugins/bullet/Bullet.js';
+import Border from '@yantra-core/mantra/plugins/border/Border.js';
+
+
 import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
 import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/AsteroidsMovement.js';
 import PongMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PongMovement.js';
+import PacManMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PacManMovement.js';
+import FroggerMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/FroggerMovement.js';
+
 
 // Browser / Client specific Plugins
 import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
@@ -52,6 +62,7 @@ game
   .use(new EntityInput())
   .use(new EntityMovement(new AsteroidsMovement()))
   .use(new Bullet())
+  .use(new Border());
 
 //
 // Since this is the Client, we can add a Graphics Plugin
@@ -59,16 +70,13 @@ game
 game
   .use(new Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
   .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-  // .use(new PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
+  .use(new PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
   .use(new Camera())
   .use(new StarField())
   .use(new KeyboardBrowser());
 
-// TODO: can we remove this?
-game.onlineMode = true;
 
 let playerId = randomId();
-window.currentPlayerId = playerId;
 
 // Initialize both clients
 const localClient = new LocalClient(playerId);
@@ -77,15 +85,10 @@ const websocketClient = new WebSocketClient(playerId);
 // Default Mode setup based on config
 game.use(localClient);
 game.use(websocketClient);
-// game.start();
-
-// websocketClient.connect('ws://192.168.1.80:8888/websocket');
 
 // Function to switch to Online Mode
 function switchToOnline() {
-
   game.removeEntity(playerId); // Destroy the local player
-
   game.stop(); // Stop local client
   game.connect('ws://192.168.1.80:8888/websocket');
 }
@@ -107,8 +110,8 @@ function switchToOffline() {
 }
 
 // Setup button event listeners
-document.getElementById('connectButton').addEventListener('click', switchToOnline);
-document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
+//document.getElementById('connectButton').addEventListener('click', switchToOnline);
+//document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
 
 function randomId() {
   return Math.random().toString(36).substr(2, 9);

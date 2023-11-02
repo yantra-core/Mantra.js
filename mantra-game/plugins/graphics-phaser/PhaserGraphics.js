@@ -70,7 +70,6 @@ class PhaserRenderer extends GraphicsInterface {
 
   updateGraphic(entityData) {
 
-
     let previousEntity = this.game.getEntity(entityData.id);
     if (!previousEntity || !previousEntity.graphics) {
       console.log('no previous entity found for', entityData.id);
@@ -185,13 +184,14 @@ class PhaserRenderer extends GraphicsInterface {
       // Camera settings
       let camera = this.scene.cameras.main;
       let player = this.game.getEntity(window.currentPlayerId);
-      if (player && player.graphics) {
-        // camera.startFollow(player.graphics['graphics-phaser']);
+      let graphics = this.game.components.graphics.get(window.currentPlayerId);
+      
+      if (player && graphics) {
+        camera.startFollow(player.graphics['graphics-phaser']);
+        camera.zoom = 0.4;
+        this.followingPlayer = true;
       }
-      camera.zoom = 0.2;
-      this.followingPlayer = true;
     }
-
 
     // console.log('phaser update called', snapshot)
   }
