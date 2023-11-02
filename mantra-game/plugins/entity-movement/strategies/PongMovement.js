@@ -1,3 +1,4 @@
+// PongMovement.js - Marak Squires 2023
 import MovementStrategy from "./MovementStrategy.js";
 
 class PongMovementStrategy {

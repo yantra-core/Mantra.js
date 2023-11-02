@@ -9,10 +9,9 @@ class StarField {
   }
 
   init (game, engine, scene) {
-
+    // not correct scope? is scene sent here?
     this.scene = scene;
-    this.camera = scene.camera;
-
+    this.camera = scene.cameras[0];
     this.initialize(); // TODO: rename
   }
 
@@ -39,6 +38,7 @@ class StarField {
 
     if (!this.camera) {
       // if there is no camera, do not move the stars
+      console.log('this.camera was not found in StarField.updateStars, returning early')
       return;
     }
     const halfFieldSize = this.fieldSize / 2;

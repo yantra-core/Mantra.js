@@ -54,6 +54,7 @@ eventEmitter.emit = function emitEvent(eventName, data) {
         try {
           listener.call(null, data);
         } catch (error) {
+          throw error;
           console.error(`Error when executing listener for event "${eventName}":`, error);
         }
       });

@@ -20,9 +20,6 @@ class BabylonGraphics extends GraphicsInterface {
     // this.babylonEntities = {}; // TODO: remove this and all references to it, use game instead
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
-
-
-
   }
 
   init(game) {
@@ -31,7 +28,6 @@ class BabylonGraphics extends GraphicsInterface {
     this.game = game;
 
     this.game.systemsManager.addSystem('graphics-babylon', this);
-
 
     // Access the renderCanvas element and set its size
     const renderCanvas = document.getElementById('renderCanvas');
@@ -60,11 +56,6 @@ class BabylonGraphics extends GraphicsInterface {
     let light = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), this.scene);
     light.intensity = 0.7;
 
-    // Initialize the StarField
-    // this.starField = new StarField(this.scene, this.camera);
-
-    // TODO Inject the Babylon.js specific MeshFactory as a Provider to the core MeshFactory
-
     this.engine.runRenderLoop(() => this.scene.render());
     window.addEventListener('resize', () => this.engine.resize());
     renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
@@ -82,12 +73,12 @@ class BabylonGraphics extends GraphicsInterface {
     }
 
     let graphic = previousEntity.graphics['graphics-babylon'];
-    // TODO: this needs to call into the meshFactory, no direct calls to babylon here!
-    graphic.position = new BABYLON.Vector3(entityData.position.x, 1, entityData.position.y);
+
+    graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
     if (entityData.rotation !== undefined) {
-      graphic.rotation.y = -entityData.rotation;
+      //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
-      graphic.rotation.y = -entityData.rotation - Math.PI / 2;
+      graphic.rotation.y = entityData.rotation + -Math.PI / 2;
     }
   }
 
@@ -96,17 +87,20 @@ class BabylonGraphics extends GraphicsInterface {
     if (!entity || !entity.graphics || !entity.graphics['graphics-babylon']) {
       return;
     }
-    // TODO: auto-scope graphics-babylon to the entity, so we don't need to do this
+    // TODO: auto-scope graphics-babylon to the entity, so we don't need manually reference it
     entity.graphics['graphics-babylon'].dispose();
   }
-
 
   createGraphic(entityData) {
     // switch case based on entityData.type
     let graphic;
     switch (entityData.type) {
       case 'PLAYER':
-        graphic = this.createTriangle(entityData);
+        if (entityData.shape === 'rectangle') {
+          graphic = this.createBox(entityData);
+        } else {
+          graphic = this.createTriangle(entityData);
+        }
         break;
       case 'BULLET':
         graphic = this.createSphere(entityData);
@@ -136,7 +130,6 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createTriangle(entityData) {
-
     let mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {
       diameterTop: 0,
       diameterBottom: 100,
@@ -145,7 +138,7 @@ class BabylonGraphics extends GraphicsInterface {
     }, this.scene);
 
     mesh.rotation.z = Math.PI / 2;
-    mesh.rotation.y = -Math.PI / 2;
+    mesh.rotation.y += -Math.PI / 2;
     return mesh;
   }
 
@@ -172,8 +165,7 @@ class BabylonGraphics extends GraphicsInterface {
     let cameraSystem = this.game.getSystem('graphics-babylon/camera');
     cameraSystem.update(); // This currently does nothing
 
-    if (this.game.systems['graphics-babylon/camera']) {
-    }
+    if (this.game.systems['graphics-babylon/camera']) {}
 
 
   }

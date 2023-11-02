@@ -41,6 +41,8 @@ class CameraSystem {
     // Adjust wheelPrecision for more zoom per scroll
     this.camera.wheelPrecision = 0.5;
 
+    //   Rotate the camera by -Math.PI / 2
+    this.camera.alpha += Math.PI / 2;
   }
 
   setupCameraControls() {

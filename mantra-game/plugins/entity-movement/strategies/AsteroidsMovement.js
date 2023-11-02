@@ -1,3 +1,4 @@
+// AsteroidsMovement.js - Marak Squires 2023
 import MovementStrategy from "./MovementStrategy.js";
 
 class AsteroidsMovementStrategy {
@@ -13,7 +14,7 @@ class AsteroidsMovementStrategy {
 
     if (dx !== 0) { // Rotation
       const rotationSpeed = 0.022;
-      this.game.physics.Body.rotate(body, dx * -rotationSpeed, body.position);
+      this.game.physics.Body.rotate(body, dx * rotationSpeed, body.position);
     }
 
     if (dy !== 0) { // Thrust
@@ -22,8 +23,8 @@ class AsteroidsMovementStrategy {
 
       // Assuming angle = 0 is upwards, and increases in the clockwise direction
       const force = {
-        x: Math.sin(angle) * dy * -thrust,
-        y: -Math.cos(angle) * dy * -thrust
+        x: Math.sin(angle) * dy * thrust,
+        y: -Math.cos(angle) * dy * thrust
       };
 
       this.game.physics.Body.applyForce(body, body.position, force);

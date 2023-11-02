@@ -53,6 +53,14 @@ class BulletPlugin {
         playerPos.x = graphic.position.x;
         playerPos.y = graphic.position.z;
       }
+
+      if (player.graphics['graphics-phaser']) {
+        let graphic = player.graphics['graphics-phaser'];
+        playerPos.x = graphic.x;
+        playerPos.y = graphic.y;
+      }
+
+
     }
 
     // Distance in front of the player where the bullet should start

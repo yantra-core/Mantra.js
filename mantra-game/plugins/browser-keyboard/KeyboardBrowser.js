@@ -25,47 +25,52 @@ export default class BrowserKeyboard {
 
   handleKeyDown(event) {
     let game = this.game;
-    switch (event.key.toLowerCase()) {
-      case 'w':
+    switch (event.code) {
+      case 'KeyW':
         this.controls.W = true;
         break;
-      case 's':
+      case 'KeyS':
         this.controls.S = true;
         break;
-      case 'a':
+      case 'KeyA':
         this.controls.A = true;
         break;
-      case 'd':
+      case 'KeyD':
         this.controls.D = true;
         break;
-      case 'x':
+      case 'Space':
         this.controls.SPACE = true;
         break;
-      case 'h':
+      case 'KeyR':
         // reset to home in UI camera
         // TODO: this.game.systems scope
-        this.game.renderer.cameraSystem.resetToHome();
+        // this.game.renderer.cameraSystem.resetToHome();
         break;
     }
     game.communicationClient.sendMessage('player_input', { controls: this.controls });
   }
 
   handleKeyUp(event) {
-    switch (event.key.toLowerCase()) {
-      case 'w':
+    switch (event.code) {
+      case 'KeyW':
         this.controls.W = false;
         break;
-      case 's':
+      case 'KeyS':
         this.controls.S = false;
         break;
-      case 'a':
+      case 'KeyA':
         this.controls.A = false;
         break;
-      case 'd':
+      case 'KeyD':
         this.controls.D = false;
         break;
-      case 'x':
+      case 'Space':
         this.controls.SPACE = false;
+        break;
+      case 'KeyR':
+        // reset to home in UI camera
+        // TODO: this.game.systems scope
+        this.game.renderer.cameraSystem.resetToHome();
         break;
     }
   }

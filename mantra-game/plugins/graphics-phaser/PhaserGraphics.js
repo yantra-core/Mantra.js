@@ -11,7 +11,6 @@ class PhaserRenderer extends GraphicsInterface {
 
     this.scenesReady = false;
     this.scene = null;
-    this.phaserGameObjects = {};
 
   }
 
@@ -44,6 +43,14 @@ class PhaserRenderer extends GraphicsInterface {
       let canvas = self.phaserGame.canvas;
       canvas.setAttribute('id', 'phaser-canvas');
       self.scene = scene;
+      let camera = scene.cameras.main;
+      // camera.rotation = -Math.PI / 2;
+      /*
+      // TODO: mouse wheel zoom.js
+      self.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
+        console.log('wheel', pointer, gameObjects, deltaX, deltaY, deltaZ)
+      });
+      */
     }
 
     loadMainScene();
@@ -77,15 +84,14 @@ class PhaserRenderer extends GraphicsInterface {
       return;
     }
 
-
-    gameobject.x = entityData.position.y;
-    gameobject.y = entityData.position.x;
+    gameobject.setPosition(entityData.position.x, entityData.position.y);
+    gameobject.x = entityData.position.x;
+    gameobject.y = entityData.position.y;
 
     if (entityData.rotation) {
-      let rotated = -entityData.rotation - Math.PI / 2;
-      gameobject.rotation = rotated;
+    //  let rotated = -entityData.rotation - Math.PI / 2;
+      gameobject.rotation = entityData.rotation;
     }
-
 
     // console.log('updating position', entityData.position)
     // convert rotation to degrees
@@ -102,21 +108,18 @@ class PhaserRenderer extends GraphicsInterface {
       case 'BULLET':
         graphic = this.createCircle(entityData);
         break;
-      case 'TRIANGLE':
         graphic = this.createTriangle(entityData);
-        break;
       default:
         graphic = this.createBox(entityData); // TODO: createDefault()
     }
+    graphic.setPosition(entityData.position.x, entityData.position.y);
     return graphic;
   }
   createBox(entityData) {
 
     let box = this.scene.add.graphics();
-  
     box.fillStyle(0xff0000, 1);
     box.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
-    box.rotation = -Math.PI / 2;
   
     // We use a container to easily manage origin and position
     let container = this.scene.add.container(entityData.position.x, entityData.position.y);
@@ -126,7 +129,6 @@ class PhaserRenderer extends GraphicsInterface {
   }
 
   createTriangle(entityData) {
-    console.log("CREATE TRIANGLE", entityData)
 
     if (!this.scene) {
       console.log('no scene yet, this should not happen.');
@@ -153,17 +155,12 @@ class PhaserRenderer extends GraphicsInterface {
     sprite.fillTriangle(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
     sprite.setDepth(10);
 
-
     // rotate sprite by -Math.PI / 2;
-    sprite.rotation = sprite.rotation - Math.PI / 2;
+    sprite.rotation = entityData.rotation;
 
-
-    // Camera settings
-    let camera = this.scene.cameras.main;
-    camera.startFollow(sprite);
-    camera.zoom = 0.3;
-
-    this.phaserGameObjects[entityData.id] = sprite;
+    //camera.rotation m= -Math.PI / 2;
+    sprite.setPosition(entityData.position.x, entityData.position.y);
+    this.scene.add.existing(sprite);
     return sprite;
   }
 
@@ -172,18 +169,28 @@ class PhaserRenderer extends GraphicsInterface {
     sprite.fillStyle(0xff0000, 1);
     sprite.fillCircle(0, 0, 50);
     sprite.setDepth(10);
-
     sprite.x = entityData.position.x;
     sprite.y = entityData.position.y;
-
     return sprite;
   }
-
 
   update(entitiesData) {
     if (!this.scenesReady) {
       return;
     }
+
+    if (this.followingPlayer !== true) {
+      // Camera settings
+      let camera = this.scene.cameras.main;
+      let player = this.game.getEntity(window.currentPlayerId);
+      if (player && player.graphics) {
+        // camera.startFollow(player.graphics['graphics-phaser']);
+      }
+      camera.zoom = 0.2;
+      this.followingPlayer = true;
+    }
+
+
     // console.log('phaser update called', snapshot)
   }
 

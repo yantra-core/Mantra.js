@@ -154,9 +154,13 @@ class EntityFactory {
       mass: 100,
       density: 100,
       health: 100,
+      height: 100,
+      width: 100,
       lifetime: Infinity,
+      maxSpeed: 9999,
       isStatic: false,
       isSensor: false,
+      restitution: 0,
       owner: 'server',
       destroyed: false,
       type: 'PLAYER',
@@ -171,9 +175,17 @@ class EntityFactory {
     entityId = config.id;
     const entity = new Entity(entityId);
 
-    const { type, position, mass, density, velocity, isSensor, isStatic, width, height, radius, health, owner, lifetime } = config;
+    const { type, position, mass, density, velocity, isSensor, isStatic, width, height, radius, shape, maxSpeed, health, owner, lifetime } = config;
     let { x, y } = position;
 
+    /*
+    if (typeof config.position !== 'undefined') {
+      position.x = config.position.x;
+      position.y = config.position.y;
+    }
+    */
+
+    // console.log('position', position, 'width', width, 'height', height)
     // Using game's API to add components
     // alert(type)
     this.game.addComponent(entityId, 'type', type || 'PLAYER');
@@ -186,6 +198,8 @@ class EntityFactory {
     this.game.addComponent(entityId, 'width', width);
     this.game.addComponent(entityId, 'height', height);
     this.game.addComponent(entityId, 'radius', radius);
+    this.game.addComponent(entityId, 'shape', shape);
+    this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
 
     this.game.addComponent(entityId, 'owner', owner);
     this.game.addComponent(entityId, 'lifetime', lifetime);
@@ -263,7 +277,7 @@ class EntityFactory {
       isStatic: config.isStatic,
       inertia: Infinity,
       density: config.density,
-      restitution: 0,
+      restitution: config.restitution,
       friction: config.friction,
       frictionAir: config.frictionAir,
       frictionStatic: config.frictionStatic

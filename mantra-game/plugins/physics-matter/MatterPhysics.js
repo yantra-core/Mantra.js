@@ -41,9 +41,16 @@ class MatterPhysics extends PhysicsInterface {
 
     this.game = game;
 
-    // TODO: this shouldn't be directly in the Physics.js file
-    // We'll want to move this to the Physics Interface, which can call into Matter.js API
-
+    this.onAfterUpdate(this.engine, (event) => {
+      Matter.Composite.allBodies(this.engine.world).forEach((body) => {
+        let maxSpeed = 10;
+        if (body.entity && body.entity.maxSpeed) {
+          maxSpeed = body.entity.maxSpeed;
+        }
+        limitSpeed(body, maxSpeed);
+      });
+    });
+    
     // should this be onAfterUpdate? since we are serializing the state of the world?
     // i would assume we want that data *after* the update?
     this.onBeforeUpdate(this.engine, (event) => {
@@ -129,8 +136,14 @@ class MatterPhysics extends PhysicsInterface {
     return body.velocity;
   }
 
+   
   onBeforeUpdate(engine, callback) {
     Matter.Events.on(engine, 'beforeUpdate', callback);
+  }
+
+
+  onAfterUpdate(engine, callback) {
+    Matter.Events.on(engine, 'afterUpdate', callback);
   }
 
   setPosition(body, position) {
@@ -146,6 +159,17 @@ class MatterPhysics extends PhysicsInterface {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
+
+
+        const entityIdA = bodyA.myEntityId;
+        const entityIdB = bodyB.myEntityId;
+    
+        const entityA = this.game.getEntity(entityIdA);
+        const entityB = this.game.getEntity(entityIdB);
+        
+        bodyA.entity = entityA;
+        bodyB.entity = entityB;
+        
         game.emit('collisionStart', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }
@@ -178,6 +202,14 @@ class MatterPhysics extends PhysicsInterface {
 }
 
 export default MatterPhysics;
+
+function limitSpeed(body, maxSpeed) {
+  let speed = Matter.Vector.magnitude(body.velocity);
+  if (speed > maxSpeed) {
+    let newVelocity = Matter.Vector.mult(Matter.Vector.normalise(body.velocity), maxSpeed);
+    Matter.Body.setVelocity(body, newVelocity);
+  }
+}
 
 /*
 
@@ -215,7 +247,6 @@ class MatterPhysics extends PhysicsInterface {
     // and so on for all other methods
   }
 
-  // ... rest of the methods, including postMessageToWorker and handleWorkerMessages
 }
 
 // 1:1 mapping use function, not proxy, simple call to object

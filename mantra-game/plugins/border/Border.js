@@ -1,0 +1,80 @@
+// Border.js - Marak Squires 2023
+class Border {
+  constructor(config = {}) {
+    this.name = 'border';
+    this.bulletCount = 0;
+    this.redGlowMaterial = null; // Used for caching the material`
+    this.speed = config.speed || 22; // or 22?
+    this.direction = config.direction || { x: 0, y: 1 };
+    this.damage = config.damage || 10;
+    this.lifetime = config.lifetime || 2000;
+  }
+
+  init(game) {
+    this.game = game;
+    this.game.systemsManager.addSystem('border', this);
+
+    // create the border based on the game size
+    this.createBorder({
+      id: 'border',
+      height: 1500,
+      width: 2500,
+      position: {
+        x: -500,
+        y: -500
+      }
+    });
+
+  }
+
+  update() {
+  }
+
+  createBorder(entityData) {
+    console.log("CREATING THE BORDER", entityData);
+    let height = entityData.height;
+    let width = entityData.width;
+    let WALL_THICKNESS = 100;
+
+    const borders = {
+      top: {
+        position: { x: 0, y: -height / 2 - WALL_THICKNESS / 2 },
+        size: { width: width + WALL_THICKNESS * 2, height: WALL_THICKNESS }
+      },
+      bottom: {
+        position: { x: 0, y: height / 2 + WALL_THICKNESS / 2 },
+        size: { width: width + WALL_THICKNESS * 2, height: WALL_THICKNESS }
+      },
+      left: {
+        position: { x: -width / 2 - WALL_THICKNESS / 2, y: 0 },
+        size: { width: WALL_THICKNESS, height: height }
+      },
+      right: {
+        position: { x: width / 2 + WALL_THICKNESS / 2, y: 0 },
+        size: { width: WALL_THICKNESS, height: height }
+      }
+    };
+
+    for (let b in borders) {
+      let border = borders[b];
+
+      this.game.createEntity({
+        id: entityData.id + '-' + b,
+        type: 'BODY',
+        shape: 'rectangle',
+        isStatic: true,
+        position: {
+          x: border.position.x,
+          y: border.position.y
+        },
+        width: border.size.width,
+        height: border.size.height,
+        thickness: 80
+      });
+    }
+
+  }
+
+}
+
+export default Border;

@@ -8,14 +8,9 @@ class Graphics {
   init(game) {
     this.game = game; // Store the reference to the game logic
     this.game.systemsManager.addSystem('graphics', this);
-
-
     this.game.createGraphic = this.createGraphic.bind(this);
     this.game.removeGraphic = this.removeGraphic.bind(this);
     this.game.updateGraphic = this.updateGraphic.bind(this);
-
-
-
   }
 
   update () {}
