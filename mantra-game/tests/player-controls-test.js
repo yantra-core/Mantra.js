@@ -54,7 +54,9 @@ tap.test('player movement and controls', (t) => {
     let player = game.getEntity('Bobby');
 
     let entityInputSystem = game.systemsManager.getSystem('entityInput');
-    entityInputSystem.handleInputs(player.id, { SPACE: true }, 1);
+    entityInputSystem.handleInputs(player.id, {
+      controls: { SPACE: true }
+    }, 1);
 
     for (let i = 0; i < 10; i++) {
       game.gameTick();

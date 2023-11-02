@@ -60,8 +60,30 @@ class BabylonGraphics extends GraphicsInterface {
     window.addEventListener('resize', () => this.engine.resize());
     renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
 
+
+    // remit all pointer events to the document
+    this.scene.onPointerObservable.add((pointerInfo) => {
+      switch (pointerInfo.type) {
+          case BABYLON.PointerEventTypes.POINTERDOWN:
+          case BABYLON.PointerEventTypes.POINTERUP:
+          case BABYLON.PointerEventTypes.POINTERMOVE:
+              reEmitEvent(pointerInfo.event);
+              break;
+      }
+  });
+
+  function reEmitEvent(babylonEvent) {
+    const newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
+    document.dispatchEvent(newEvent);
+}
+
+
+
     // Babylon seems to be immediately ready, versus Phaser which must wait for scene to be ready
     game.graphicsReady.push(this.name);
+
+
+
   }
 
   updateGraphic(entityData) {

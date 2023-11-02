@@ -65,7 +65,10 @@ export default class WebSocketClient {
       let entityInput = this.game.getSystem('entityInput');
       //
       // TODO: switch flag config for isClientSidePredictionEnabled
-      entityInput.handleInputs(this.entityName, data.controls, this.inputSequenceNumber);
+      entityInput.handleInputs(this.entityName, {
+        controls: data.controls,
+        mouse: data.mouse
+      }, this.inputSequenceNumber);
       //
       var message = JSON.stringify(Object.assign({ action: action, sequenceNumber: this.inputSequenceNumber }, data));
       this.socket.send(message);
@@ -105,7 +108,7 @@ export default class WebSocketClient {
           for (let i = lastProcessedInput + 1; i <= this.inputSequenceNumber; i++) {
             let input = this.inputBuffer[i];
             let entityInput = this.game.getSystem('entityInput');
-            entityInput.handleInputs(this.entityName, input.controls, i);
+            entityInput.handleInputs(this.entityName, { controls: input.controls, mouse: input.controls }, i);
           }
         }
         // Clear the already processed inputs from the inputBuffer

@@ -1,3 +1,4 @@
+// EntityInput.js - Marak Squiers 2023
 import Plugin from '../../Plugin.js';
 
 const defaultControlsMapping = {
@@ -32,15 +33,20 @@ class EntityInputPlugin extends Plugin {
 
   destroy() { }
 
-  handleInputs(entityId, controls, sequenceNumber) {// fix signature
+  handleInputs(entityId, { controls = {}, mouse = {}}, sequenceNumber) {// fix signature
     // console.log('running update in entity input plugin', deltaTime, snapshot);
 
     this.game.lastProcessedInput[entityId] = sequenceNumber;
 
     const moveSpeed = 5;
 
-
     let entityMovementSystem = this.game.getSystem('entityMovement')
+
+    // Extract mouse position and button states
+    const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
+
+    // TODO: Process mouse position
+    //  entityMovementSystem.processMousePosition(entityId, position.x, position.y);
 
     //console.log('Entity Movement System:', entityMovementSystem);
     //console.log('Fire Bullet System:', this.game.getSystem('fireBullet'));
