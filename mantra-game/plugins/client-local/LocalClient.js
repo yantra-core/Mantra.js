@@ -1,7 +1,7 @@
 export default class LocalClient {
   constructor(entityName) {
-    this.entityName = entityName;
-    this.started = false;
+    this.entityName = entityName; // Remark: localClient expects player name in constructor?
+    this.started = false;         // TODO: This doesn't seem ideal, we may not know the player name at this point
   }
 
   init (game) {

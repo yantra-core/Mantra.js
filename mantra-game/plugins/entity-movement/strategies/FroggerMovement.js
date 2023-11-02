@@ -13,7 +13,6 @@ class FroggerMovementStrategy {
     let body = this.game.bodyMap[entityId];
     if (!entity) return;
 
-    console.log('eeeeee', entity)
     const GRID_SIZE = entity.width / 10; // Assuming each step moves by one grid unit
 
     // Update the position based on input
