@@ -16,6 +16,16 @@ let lastTimestamp;
 class WebSocketServerClass {
   constructor(config) {
     this.config = config;
+
+    if (typeof config.player === 'undefined') {
+      // TODO: move defaults elsewhere
+      config.player = {
+        friction: 0.1,
+        frictionAir: 0.01,
+        frictionStatic: 0.5
+      };
+    }
+
   }
 
   init(game) {
@@ -33,9 +43,14 @@ class WebSocketServerClass {
   handleConnection(ws) {
     const playerEntityId = 'player_' + nanoid(7);
     ws.playerEntityId = playerEntityId;
+    
     this.game.createEntity({
       id: playerEntityId,
       type: 'PLAYER',
+      friction: this.config.player.friction,  // Default friction
+      frictionAir: this.config.player.frictionAir, // Default air friction
+      frictionStatic: this.config.player.frictionStatic, // Default static friction
+  
     });
 
     ws.send(JSON.stringify({

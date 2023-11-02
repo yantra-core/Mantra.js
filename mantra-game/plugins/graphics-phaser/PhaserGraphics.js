@@ -156,7 +156,9 @@ class PhaserRenderer extends GraphicsInterface {
     sprite.setDepth(10);
 
     // rotate sprite by -Math.PI / 2;
-    sprite.rotation = entityData.rotation;
+    if (typeof entityData.rotation !== 'undefined') { // Remark: shouldn't this be default 0?
+      sprite.rotation = entityData.rotation;
+    }
 
     //camera.rotation m= -Math.PI / 2;
     sprite.setPosition(entityData.position.x, entityData.position.y);

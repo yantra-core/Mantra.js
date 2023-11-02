@@ -111,21 +111,20 @@ class BabylonGraphics extends GraphicsInterface {
       default:
         graphic = this.createBox(entityData); // TODO: createDefault()
     }
+
+    // translate the graphic to the correct position in 2.5D space
+    graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+
     return graphic;
   }
 
   createSphere(entityData) {
     let sphere = BABYLON.MeshBuilder.CreateSphere('bullet', { diameter: entityData.radius * 2 }, this.scene);
-    // reposition the sphere to the center of the bullet
-    sphere.position.z = entityData.position.y;
-    sphere.position.x = entityData.position.x;
     return sphere;
   }
 
   createBox(entityData) {
     let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: 300, depth: entityData.height }, this.scene);
-    box.position.z = entityData.position.y;
-    box.position.x = entityData.position.x;
     return box;
   }
 
@@ -136,7 +135,7 @@ class BabylonGraphics extends GraphicsInterface {
       height: 100,
       tessellation: 3
     }, this.scene);
-
+    // rotate the triangle to the correct orientation ( forward facing )
     mesh.rotation.z = Math.PI / 2;
     mesh.rotation.y += -Math.PI / 2;
     return mesh;

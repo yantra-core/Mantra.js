@@ -94,6 +94,14 @@ game.addSystem(systemName, system)
 game.removeSystem(systemName)
 ```
 
+### Collision API
+
+```js
+game.on('collisionStart', (event) => {})
+game.on('collisionActive', (event) => {})
+game.on('collisionEnd', (event) => {})
+```
+
 ### Snapshot API
 
 ```js

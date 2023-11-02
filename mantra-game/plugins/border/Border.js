@@ -1,13 +1,10 @@
 // Border.js - Marak Squires 2023
 class Border {
-  constructor(config = {}) {
+  constructor({ height  = 1500, width = 2500, position = { x: 0, y: 0 } } = {}) {
     this.name = 'border';
-    this.bulletCount = 0;
-    this.redGlowMaterial = null; // Used for caching the material`
-    this.speed = config.speed || 22; // or 22?
-    this.direction = config.direction || { x: 0, y: 1 };
-    this.damage = config.damage || 10;
-    this.lifetime = config.lifetime || 2000;
+    this.height = height;
+    this.width = width;
+    this.position = position;
   }
 
   init(game) {
@@ -17,21 +14,20 @@ class Border {
     // create the border based on the game size
     this.createBorder({
       id: 'border',
-      height: 1500,
-      width: 2500,
+      height: this.height,
+      width: this.width,
       position: {
-        x: -500,
-        y: -500
+        x: this.position.x,
+        y: this.position.y
       }
     });
 
   }
 
-  update() {
-  }
+  update() {}
 
   createBorder(entityData) {
-    console.log("CREATING THE BORDER", entityData);
+
     let height = entityData.height;
     let width = entityData.width;
     let WALL_THICKNESS = 100;
