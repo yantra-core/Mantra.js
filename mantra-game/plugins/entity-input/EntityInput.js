@@ -17,7 +17,7 @@ class EntityInputPlugin extends Plugin {
     this.bulletCooldown = 20; // Cooldown time in milliseconds
     this.buttonCooldown = 20; // Cooldown time in milliseconds
     this.lastBulletFireTime = {}; // Store the last fire time for each entity
-
+    this.useMouseControls = false;
 
   }
 
@@ -27,13 +27,13 @@ class EntityInputPlugin extends Plugin {
     this.game.systemsManager.addSystem('entityInput', this);
   }
 
-  update () {}
+  update() { }
 
   render() { }
 
   destroy() { }
 
-  handleInputs(entityId, { controls = {}, mouse = {}}, sequenceNumber) {// fix signature
+  handleInputs(entityId, { controls = {}, mouse = {} }, sequenceNumber) {// fix signature
     // console.log('running update in entity input plugin', deltaTime, snapshot);
 
     this.game.lastProcessedInput[entityId] = sequenceNumber;
@@ -42,10 +42,45 @@ class EntityInputPlugin extends Plugin {
 
     let entityMovementSystem = this.game.getSystem('entityMovement')
 
+
     // Extract mouse position and button states
     const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
 
     const actions = Object.keys(controls).filter(key => controls[key]).map(key => defaultControlsMapping[key]);
+
+    let entityData = this.game.getEntity(entityId);
+
+    if (entityData.position) {
+
+
+      // TODO: this should be moved to a separate plugin, per strategy pattern
+      if (this.useMouseControls) {
+
+        // Assuming your game's origin (0,0) is at the center of the canvas
+        const canvasCenter = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+        // Assuming mouse.canvasPosition gives coordinates relative to the canvas
+        const deltaX = position.x - (entityData.position.x + canvasCenter.x);
+        const deltaY = position.y - (entityData.position.y + canvasCenter.y);
+
+        const angle = Math.atan2(deltaY, deltaX);  // atan2 returns angle in radians
+
+        // Convert angle from radians to degrees
+        const angleDeg = angle * (180 / Math.PI);
+
+        if (angleDeg >= -45 && angleDeg < 45) {
+          actions.push('MOVE_RIGHT');
+        } else if (angleDeg >= 45 && angleDeg < 135) {
+          actions.push('MOVE_BACKWARD');
+        } else if (angleDeg >= 135 || angleDeg < -135) {
+          actions.push('MOVE_LEFT');
+        } else if (angleDeg >= -135 && angleDeg < -45) {
+          actions.push('MOVE_FORWARD');
+        }
+      }
+
+    }
+
 
     // Map left mouse click to FIRE_BULLET action
     if (buttons.LEFT) {
