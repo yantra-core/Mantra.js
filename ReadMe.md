@@ -33,7 +33,6 @@ Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any ques
 
 | Name | Source |
 | --- | --- |
-| └ multiplayer | [📂](https://yantra.gg/mantra/examples/multiplayer) |
 | └ solo | [📂](https://yantra.gg/mantra/examples/solo) |
 |         └ babylon | [📂](https://yantra.gg/mantra/examples/solo/babylon) |
 | &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/babylon/asteroids.html) |
