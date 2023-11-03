@@ -93,9 +93,9 @@
         .use(new Plugins.PhaserGraphics({
           followPlayer: true
         }))   // PhaserGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-        .use(new Plugins.HTMLGraphics({
+        .use(new Plugins.CSSGraphics({
           followPlayer: false // breaks the demo a bit, too many split screens
-        }))     // HTMLGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        }))     // CSSGraphics will now recieve game.createGraphic, game.removeGraphic, etc
         .use(new Plugins.Camera({
           followPlayer: true
         }))

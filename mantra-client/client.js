@@ -34,22 +34,30 @@ import FroggerMovement from '@yantra-core/mantra/plugins/entity-movement/strateg
 import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
 import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
 import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
+import CSSGraphics from '@yantra-core/mantra/plugins/graphics-html/CSSGraphics.js';
+
+
+// TODO: create some common Plugins scope so we don't have to require like this
+
 import KeyboardBrowser from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser.js';
+import MouseBrowser from '@yantra-core/mantra/plugins/browser-mouse/MouseBrowser.js';
 import Camera from '@yantra-core/mantra/plugins/graphics-babylon/camera/BabylonCamera.js';
 import StarField from '@yantra-core/mantra/plugins/graphics-babylon/starfield/StarField.js';
 
+import Chat from '@yantra-core/mantra/plugins/chat/Chat.js';
+import PongWorld from '@yantra-core/mantra/plugins/world/pong/PongWorld.js';
 
 import LocalClient from '@yantra-core/mantra/plugins/client-local/LocalClient.js';
-import WebSocketClient  from '@yantra-core/mantra/plugins/client-websocket/WebsocketClient.js';
+import WebSocketClient from '@yantra-core/mantra/plugins/client-websocket/WebsocketClient.js';
 
 
 //
 // Creates a new game instance
 //
-let game = new Game({ 
-  isClient : true,
-  width: 800,
-  height: 600
+let game = new Game({
+  isClient: true,
+  width: 1600 * 2,
+  height: 900 * 2,
 });
 
 //
@@ -70,10 +78,12 @@ game
 game
   .use(new Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
   .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-  .use(new PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
-  .use(new Camera())
+  // .use(new CSSGraphics())
+  // .use(new PhaserGraphics({ followPlayer: true })) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
+  .use(new Camera({ followPlayer: true }))
   .use(new StarField())
-  .use(new KeyboardBrowser());
+  .use(new KeyboardBrowser())
+  //.use(new MouseBrowser());
 
 
 let playerId = randomId();
@@ -85,6 +95,9 @@ const websocketClient = new WebSocketClient(playerId);
 // Default Mode setup based on config
 game.use(localClient);
 game.use(websocketClient);
+
+
+// game.use(new PongWorld())
 
 // Function to switch to Online Mode
 function switchToOnline() {
@@ -98,20 +111,24 @@ function switchToOffline() {
 
   game.createEntity({
     id: playerId,
-    type: 'PLAYER'
+    type: 'PLAYER',
+    position: {
+      x: 0,
+      y: 0
+    }
   });
 
   try {
     game.disconnect(); // Disconnect online client
   } catch (err) {
 
-  } 
+  }
   game.start();
 }
 
 // Setup button event listeners
-//document.getElementById('connectButton').addEventListener('click', switchToOnline);
-//document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
+document.getElementById('connectButton').addEventListener('click', switchToOnline);
+document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
 
 function randomId() {
   return Math.random().toString(36).substr(2, 9);

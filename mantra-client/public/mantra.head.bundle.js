@@ -416,7 +416,7 @@ MANTRA.plugins = {
   EntityInput: require('./plugins/entity-input/EntityInput.js')["default"],
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js')["default"],
   Graphics: require('./plugins/graphics/Graphics.js')["default"],
-  HTMLGraphics: require('./plugins/graphics-html/HTMLGraphics.js')["default"],
+  CSSGraphics: require('./plugins/graphics-html/CSSGraphics.js')["default"],
   KeyboardBrowser: require('./plugins/browser-keyboard/KeyboardBrowser.js')["default"],
   // MouseBrowser: require('./plugins/browser-mouse/MouseBrowser.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js')["default"],
@@ -431,7 +431,7 @@ MANTRA.plugins = {
 
 module.exports = MANTRA;
 
-},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/entity-movement/strategies/PongMovement.js":23,"./plugins/graphics-babylon/BabylonGraphics.js":24,"./plugins/graphics-babylon/camera/BabylonCamera.js":25,"./plugins/graphics-babylon/starfield/StarField.js":26,"./plugins/graphics-html/HTMLGraphics.js":27,"./plugins/graphics-phaser/PhaserGraphics.js":28,"./plugins/graphics/Graphics.js":29,"./plugins/lifetime/Lifetime.js":30,"./plugins/physics-matter/MatterPhysics.js":31,"./plugins/world/pong/PongWorld.js":35}],7:[function(require,module,exports){
+},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/entity-movement/strategies/PongMovement.js":23,"./plugins/graphics-babylon/BabylonGraphics.js":24,"./plugins/graphics-babylon/camera/BabylonCamera.js":25,"./plugins/graphics-babylon/starfield/StarField.js":26,"./plugins/graphics-html/CSSGraphics.js":27,"./plugins/graphics-phaser/PhaserGraphics.js":28,"./plugins/graphics/Graphics.js":29,"./plugins/lifetime/Lifetime.js":30,"./plugins/physics-matter/MatterPhysics.js":31,"./plugins/world/pong/PongWorld.js":35}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2635,10 +2635,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-var HTMLGraphics = /*#__PURE__*/function (_GraphicsInterface) {
-  _inherits(HTMLGraphics, _GraphicsInterface);
-  var _super = _createSuper(HTMLGraphics);
-  function HTMLGraphics() {
+var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
+  _inherits(CSSGraphics, _GraphicsInterface);
+  var _super = _createSuper(CSSGraphics);
+  function CSSGraphics() {
     var _this;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$debug = _ref.debug,
@@ -2647,7 +2647,7 @@ var HTMLGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       onlineMode = _ref$onlineMode === void 0 ? true : _ref$onlineMode,
       _ref$followPlayer = _ref.followPlayer,
       followPlayer = _ref$followPlayer === void 0 ? false : _ref$followPlayer;
-    _classCallCheck(this, HTMLGraphics);
+    _classCallCheck(this, CSSGraphics);
     _this = _super.call(this);
     _this.onlineMode = onlineMode;
     _this.entityStates = {};
@@ -2660,7 +2660,7 @@ var HTMLGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     };
     return _this;
   }
-  _createClass(HTMLGraphics, [{
+  _createClass(CSSGraphics, [{
     key: "init",
     value: function init(game) {
       // register renderer with graphics pipeline
@@ -2837,9 +2837,9 @@ var HTMLGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "render",
     value: function render() {}
   }]);
-  return HTMLGraphics;
+  return CSSGraphics;
 }(_GraphicsInterface2["default"]);
-var _default = exports["default"] = HTMLGraphics;
+var _default = exports["default"] = CSSGraphics;
 
 },{"../../lib/GraphicsInterface.js":7}],28:[function(require,module,exports){
 "use strict";

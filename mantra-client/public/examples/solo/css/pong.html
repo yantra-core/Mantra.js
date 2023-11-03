@@ -4,41 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantra - CSS Graphics - Asteroids World</title>
-  
+  <title>Mantra - CSS Graphics - Pong World</title>
+  <script src="/vendor/phaser.min.js"></script>
   <style>
     body {
       margin: 0;
       padding: 0;
       overflow: hidden;
     }
-
-    canvas {
-      width: 100vw;
-      height: 100vh;
-    }
-
-    #debugUIContainer {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 98vw;
-      height: 50vw;
-      overflow-y: scroll;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-      color: white;
-      z-index: 9999;
-    }
-
-    #gameHolder {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-  </style>
-
-
   </style>
 </head>
 
@@ -48,10 +21,7 @@
   <script>
 
     document.addEventListener('DOMContentLoaded', (event) => {
-      let game = new MANTRA.Game({
-        width: 1600 * 2,
-        height: 900 * 2,
-      });
+      let game = new MANTRA.Game();
       let Plugins = MANTRA.plugins;
 
       //
@@ -62,7 +32,7 @@
         .use(new Plugins.Collision())
         .use(new Plugins.EntityFactory())
         .use(new Plugins.EntityInput())
-        .use(new Plugins.EntityMovement(new Plugins.AsteroidsMovement()))
+        .use(new Plugins.EntityMovement(new Plugins.PongMovement()))
         .use(new Plugins.Bullet())
         .use(new Plugins.Border());
 
@@ -71,23 +41,18 @@
       //
       game
         .use(new Plugins.Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
-        .use(new Plugins.HTMLGraphics({
-          followPlayer: true
-        }))   // PhaserGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        .use(new Plugins.CSSGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        //.use(new Plugins.Camera())
+        //.use(new Plugins.StarField())
         .use(new Plugins.KeyboardBrowser())
         // .use(new Plugins.MouseBrowser())
         .use(new Plugins.LocalClient('Bobby'));
 
-
-        game.createEntity({
-        id: 'Bobby',
-        type: 'PLAYER',
-        position: {
-          x: 0,
-          y: 0
-        }
-      });
-
+      //
+      // Now let's attach a World
+      //
+      // You look at the code for PongWorld and see it's just calling methods on the game object
+      game.use(new Plugins.PongWorld())
 
       game.start();
     });

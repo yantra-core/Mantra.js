@@ -1,3 +1,4 @@
+// BrowserKeyboard.js - Marak Squires 2023
 export default class BrowserKeyboard {
   constructor(communicationClient) {
     // this.communicationClient = communicationClient;
