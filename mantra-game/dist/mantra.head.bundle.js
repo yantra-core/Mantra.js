@@ -120,8 +120,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // Snapshots
 // Main game loop / game tick
 var Game = exports.Game = /*#__PURE__*/function () {
-  function Game(_ref) {
-    var isClient = _ref.isClient,
+  function Game() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      isClient = _ref.isClient,
       width = _ref.width,
       height = _ref.height,
       isOfflineMode = _ref.isOfflineMode,
@@ -138,6 +139,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     // Game settings
     this.width = width || 1600;
     this.height = height || 900;
+    console.log('setting game width', this.width, this.height);
 
     // TODO: Physics pipeline
     // Remark: Currently, only (1) physics engine is supported at a time
@@ -175,6 +177,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.creationTime = new _Component["default"]('creationTime');
     this.components.BulletComponent = new _Component["default"]('BulletComponent');
     this.components.graphics = new _Component["default"]('graphics');
+    this.components.lockedProperties = new _Component["default"]('lockedProperties');
 
     // Systems Manager
     this.systemsManager = new _SystemsManager["default"](this);
@@ -245,7 +248,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   return Game;
 }();
 
-},{"./Component/Component.js":1,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":31}],4:[function(require,module,exports){
+},{"./Component/Component.js":1,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":33}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -413,18 +416,22 @@ MANTRA.plugins = {
   EntityInput: require('./plugins/entity-input/EntityInput.js')["default"],
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js')["default"],
   Graphics: require('./plugins/graphics/Graphics.js')["default"],
+  HTMLGraphics: require('./plugins/graphics-html/HTMLGraphics.js')["default"],
   KeyboardBrowser: require('./plugins/browser-keyboard/KeyboardBrowser.js')["default"],
+  // MouseBrowser: require('./plugins/browser-mouse/MouseBrowser.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js')["default"],
   LocalClient: require('./plugins/client-local/LocalClient.js')["default"],
   MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js')["default"],
   PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js')["default"],
-  StarField: require('./plugins/graphics-babylon/starfield/StarField.js')["default"]
+  PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js')["default"],
+  StarField: require('./plugins/graphics-babylon/starfield/StarField.js')["default"],
+  PongWorld: require('./plugins/world/pong/PongWorld.js')["default"]
   // ... add other plugins similarly
 };
 
 module.exports = MANTRA;
 
-},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/graphics-babylon/BabylonGraphics.js":23,"./plugins/graphics-babylon/camera/BabylonCamera.js":24,"./plugins/graphics-babylon/starfield/StarField.js":25,"./plugins/graphics-phaser/PhaserGraphics.js":26,"./plugins/graphics/Graphics.js":27,"./plugins/lifetime/Lifetime.js":28,"./plugins/physics-matter/MatterPhysics.js":29}],7:[function(require,module,exports){
+},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/entity-movement/strategies/PongMovement.js":23,"./plugins/graphics-babylon/BabylonGraphics.js":24,"./plugins/graphics-babylon/camera/BabylonCamera.js":25,"./plugins/graphics-babylon/starfield/StarField.js":26,"./plugins/graphics-html/HTMLGraphics.js":27,"./plugins/graphics-phaser/PhaserGraphics.js":28,"./plugins/graphics/Graphics.js":29,"./plugins/lifetime/Lifetime.js":30,"./plugins/physics-matter/MatterPhysics.js":31,"./plugins/world/pong/PongWorld.js":35}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -449,8 +456,18 @@ var RendererInterface = /*#__PURE__*/function () {
     }
   }, {
     key: "render",
-    value: function render(entities) {
+    value: function render(game) {
       throw new Error("render method not implemented.");
+    }
+  }, {
+    key: "update",
+    value: function update(entities) {
+      throw new Error("update method not implemented.");
+    }
+  }, {
+    key: "inflateEntity",
+    value: function inflateEntity(entityData) {
+      throw new Error("inflateEntity method not implemented.");
     }
   }, {
     key: "createEntity",
@@ -745,9 +762,9 @@ var Border = /*#__PURE__*/function () {
   function Border() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 1500 : _ref$height,
+      height = _ref$height === void 0 ? 600 : _ref$height,
       _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 2500 : _ref$width,
+      width = _ref$width === void 0 ? 800 : _ref$width,
       _ref$position = _ref.position,
       position = _ref$position === void 0 ? {
         x: 0,
@@ -768,8 +785,8 @@ var Border = /*#__PURE__*/function () {
       // create the border based on the game size
       this.createBorder({
         id: 'border',
-        height: this.height,
-        width: this.width,
+        height: this.game.height,
+        width: this.game.width,
         position: {
           x: this.position.x,
           y: this.position.y
@@ -907,6 +924,7 @@ var BrowserKeyboard = exports["default"] = /*#__PURE__*/function () {
           break;
         case 'Space':
           this.controls.SPACE = true;
+          event.preventDefault(); // Prevent default browser behavior for space key
           break;
         case 'KeyR':
           // reset to home in UI camera
@@ -1011,23 +1029,6 @@ var BulletPlugin = /*#__PURE__*/function () {
         console.log('no player data available');
         return;
       }
-
-      /*
-      if (this.game.isClient) {
-        // use mesh position, was having issues with playerPos not being updated?
-        // TODO: look into why playerPos was not correct scope here, it should work
-        if (player.graphics['graphics-babylon']) {
-          let graphic = player.graphics['graphics-babylon'];
-          //playerPos.x = graphic.position.x;
-          //playerPos.y = graphic.position.z;
-        }
-         if (player.graphics['graphics-phaser']) {
-          let graphic = player.graphics['graphics-phaser'];
-          //playerPos.x = graphic.x;
-          //playerPos.y = graphic.y;
-        }
-       }
-      */
 
       // Distance in front of the player where the bullet should start
       var distanceInFront = 100; // TODO: make this a config
@@ -1199,7 +1200,6 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
     _classCallCheck(this, LocalClient);
     this.entityName = playerId; // Remark: localClient expects player name in constructor?
     this.started = false; // TODO: This doesn't seem ideal, we may not know the player name at this point
-
     // window.currentPlayerId currently used for various local client scoped auth functions, will need to be replaced with a better solution
     window.currentPlayerId = playerId;
   }
@@ -1207,7 +1207,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      // this.game.isClient = true;
+      this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
       this.game.start = this.start.bind(this);
       this.game.stop = this.stop.bind(this);
       game.localGameLoopRunning = true;
@@ -1240,7 +1240,10 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
     value: function sendMessage(action, data) {
       if (action === 'player_input') {
         var entityInput = this.game.getSystem('entityInput');
-        entityInput.handleInputs(this.entityName, data.controls);
+        entityInput.handleInputs(this.entityName, {
+          controls: data.controls,
+          mouse: data.mouse
+        });
       }
     }
   }]);
@@ -1267,11 +1270,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// CollisionPlugin.js
+// Collisions.js - Marak Squires 2023
 var CollisionPlugin = /*#__PURE__*/function () {
   function CollisionPlugin() {
     _classCallCheck(this, CollisionPlugin);
-  } // You can also add listeners for collisionActive and collisionEnd if needed
+  }
   _createClass(CollisionPlugin, [{
     key: "init",
     value: function init(game) {
@@ -1288,7 +1291,7 @@ var CollisionPlugin = /*#__PURE__*/function () {
   }, {
     key: "handleCollision",
     value: function handleCollision(pair, bodyA, bodyB) {
-      console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
+      // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
       var entityIdA = bodyA.myEntityId;
       var entityIdB = bodyB.myEntityId;
       var entityA = this.game.getEntity(entityIdA);
@@ -1300,12 +1303,15 @@ var CollisionPlugin = /*#__PURE__*/function () {
 
       //console.log(entityA)
       //console.log(entityB)
+
       // do not process player collisions locally ( for now )
       if (this.game.isClient && entityA.type === 'PLAYER' && entityB.type === 'PLAYER') {
         //console.log("BYPASSING PLAYER COLISION ON CLIENT")
         pair.isActive = false;
         return;
       }
+
+      // iterate through all systems and see if they have a handleCollision method
       var _iterator = _createForOfIteratorHelper(this.game.systemsManager.systems),
         _step;
       try {
@@ -1314,6 +1320,7 @@ var CollisionPlugin = /*#__PURE__*/function () {
             _ = _step$value[0],
             system = _step$value[1];
           if (typeof system.handleCollision === "function") {
+            // any system that has a handleCollision method will be called here
             system.handleCollision(pair, bodyA, bodyB);
           }
         }
@@ -1461,11 +1468,8 @@ var EntityFactory = /*#__PURE__*/function () {
         this.removeEntity(entityId);
         return;
       }
-
-      // can we remove the bullet check here? it shouldn't be sent if its not needed?
-      if (entityData.position /*&& entityData.id !== window.currentPlayerId*/) {
-        // client-side prediction flag
-        // Online Mode: Incremental position updates
+      if (entityData.position) {
+        // If position is not lockedProperties, use the new value from entityData
         this.game.components.position.set(entityId, {
           x: entityData.position.x,
           y: entityData.position.y
@@ -1512,7 +1516,9 @@ var EntityFactory = /*#__PURE__*/function () {
         // Default friction
         frictionAir: 0.01,
         // Default air friction
-        frictionStatic: 0.5 // Default static friction
+        frictionStatic: 0.5,
+        // Default static friction
+        lockedProperties: null // object hash of properties that should never be updated
       };
 
       // merge config with defaultConfig
@@ -1527,6 +1533,7 @@ var EntityFactory = /*#__PURE__*/function () {
         velocity = _config.velocity,
         isSensor = _config.isSensor,
         isStatic = _config.isStatic,
+        lockedProperties = _config.lockedProperties,
         width = _config.width,
         height = _config.height,
         radius = _config.radius,
@@ -1566,6 +1573,40 @@ var EntityFactory = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'creationTime', Date.now()); // Current time in milliseconds
       this.game.addComponent(entityId, 'isSensor', isSensor);
       this.game.addComponent(entityId, 'isStatic', isStatic);
+      this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
+
+      // iterate through props of lockedProperties and for each prop we find, use as key name
+      // to lookup the current entity value and set it to the lockedProperties value
+      // we will later reference this lockedProperties value when updating the entity
+      if (lockedProperties) {
+        console.log("Processing lockedProperties properties");
+        for (var key in lockedProperties) {
+          var currentVal = this.game.components[key].get(entityId);
+          if (currentVal !== undefined && currentVal !== null) {
+            if (_typeof(lockedProperties[key]) === 'object' && !Array.isArray(lockedProperties[key])) {
+              // If lockedProperties[key] is an object, iterate through its keys
+              for (var subKey in lockedProperties[key]) {
+                if (lockedProperties[key][subKey] === true) {
+                  // only process if the value is true
+                  var nestedVal = currentVal[subKey];
+                  if (nestedVal !== undefined && nestedVal !== null) {
+                    console.log('Setting lockedProperties property', "".concat(key, ".").concat(subKey), 'to', nestedVal);
+                    this.game.components['lockedProperties'].set(entityId, _defineProperty({}, key, _defineProperty({}, subKey, nestedVal)));
+                  } else {
+                    console.log('Error: No such component or invalid value for', "".concat(key, ".").concat(subKey));
+                  }
+                }
+              }
+            } else if (lockedProperties[key] === true) {
+              // if lockedProperties[key] is not an object and the value is true
+              console.log('Setting lockedProperties property', key, 'to', currentVal);
+              this.game.components['lockedProperties'].set(entityId, _defineProperty({}, key, currentVal));
+            }
+          } else {
+            console.log('Error: No such component or invalid value for', key);
+          }
+        }
+      }
       if (config.body) {
         var body = this.createBody(config);
         body.myEntityId = entityId;
@@ -1577,6 +1618,10 @@ var EntityFactory = /*#__PURE__*/function () {
         if (position) {
           this.game.physics.setPosition(body, position);
         }
+      } else {
+        this.game.bodyMap[entityId] = {
+          id: entityId
+        };
       }
       this.postCreateEntityHooks.forEach(function (fn) {
         return fn(entity);
@@ -1710,18 +1755,12 @@ class CustomPhysicsFactory {
 },{"../../Entity/Entity.js":2}],18:[function(require,module,exports){
 "use strict";
 
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
 var _Plugin2 = _interopRequireDefault(require("../../Plugin.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
@@ -1729,34 +1768,120 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-var defaultControlsMapping = {
-  W: 'MOVE_FORWARD',
-  S: 'MOVE_BACKWARD',
-  A: 'MOVE_LEFT',
-  D: 'MOVE_RIGHT',
-  SPACE: 'FIRE_BULLET'
-};
-
-// handles input controller events and relays them to the game logic
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // EntityInput.js - Marak Squires 2023
+var DefaultInputStrategy = /*#__PURE__*/function () {
+  function DefaultInputStrategy(plugin) {
+    _classCallCheck(this, DefaultInputStrategy);
+    this.plugin = plugin;
+  }
+  _createClass(DefaultInputStrategy, [{
+    key: "init",
+    value: function init(game) {}
+  }, {
+    key: "handleInputs",
+    value: function handleInputs(entityId, _ref, sequenceNumber) {
+      var _ref$controls = _ref.controls,
+        controls = _ref$controls === void 0 ? {} : _ref$controls,
+        _ref$mouse = _ref.mouse,
+        mouse = _ref$mouse === void 0 ? {} : _ref$mouse;
+      var plugin = this.plugin;
+      var game = plugin.game;
+      game.lastProcessedInput[entityId] = sequenceNumber;
+      var moveSpeed = 5;
+      var entityMovementSystem = game.getSystem('entityMovement');
+      var _mouse$position = mouse.position,
+        position = _mouse$position === void 0 ? {
+          x: 0,
+          y: 0
+        } : _mouse$position,
+        _mouse$canvasPosition = mouse.canvasPosition,
+        canvasPosition = _mouse$canvasPosition === void 0 ? {
+          x: 0,
+          y: 0
+        } : _mouse$canvasPosition,
+        _mouse$buttons = mouse.buttons,
+        buttons = _mouse$buttons === void 0 ? {
+          LEFT: false,
+          RIGHT: false,
+          MIDDLE: false
+        } : _mouse$buttons;
+      var actions = Object.keys(controls).filter(function (key) {
+        return controls[key];
+      }).map(function (key) {
+        return plugin.defaultControlsMapping[key];
+      });
+      var entityData = game.getEntity(entityId);
+      if (entityData && entityData.position && plugin.useMouseControls) {
+        var canvasCenter = {
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2
+        };
+        var deltaX = position.x - (entityData.position.x + canvasCenter.x);
+        var deltaY = position.y - (entityData.position.y + canvasCenter.y);
+        var angle = Math.atan2(deltaY, deltaX);
+        var angleDeg = angle * (180 / Math.PI);
+        if (angleDeg >= -45 && angleDeg < 45) {
+          actions.push('MOVE_RIGHT');
+        } else if (angleDeg >= 45 && angleDeg < 135) {
+          actions.push('MOVE_BACKWARD');
+        } else if (angleDeg >= 135 || angleDeg < -135) {
+          actions.push('MOVE_LEFT');
+        } else if (angleDeg >= -135 && angleDeg < -45) {
+          actions.push('MOVE_FORWARD');
+        }
+      }
+      if (buttons.LEFT) actions.push('FIRE_BULLET');
+      if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
+      if (Date.now() - plugin.lastBulletFireTime[entityId] <= plugin.bulletCooldown) return;
+      plugin.lastBulletFireTime[entityId] = Date.now();
+      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
+      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
+      if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0);
+      if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0);
+      if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+    }
+  }]);
+  return DefaultInputStrategy;
+}();
 var EntityInputPlugin = /*#__PURE__*/function (_Plugin) {
   _inherits(EntityInputPlugin, _Plugin);
   var _super = _createSuper(EntityInputPlugin);
-  function EntityInputPlugin() {
+  function EntityInputPlugin(strategy) {
     var _this;
     _classCallCheck(this, EntityInputPlugin);
     _this = _super.call(this);
     _this.name = 'EntityInputPlugin';
-    _this.bulletCooldown = 20; // Cooldown time in milliseconds
-    _this.buttonCooldown = 20; // Cooldown time in milliseconds
-    _this.lastBulletFireTime = {}; // Store the last fire time for each entity
+    _this.bulletCooldown = 20;
+    _this.buttonCooldown = 20;
+    _this.lastBulletFireTime = {};
+    _this.useMouseControls = false;
+    _this.defaultControlsMapping = {
+      W: 'MOVE_FORWARD',
+      S: 'MOVE_BACKWARD',
+      A: 'MOVE_LEFT',
+      D: 'MOVE_RIGHT',
+      SPACE: 'FIRE_BULLET'
+    };
+    _this.strategy = strategy || new DefaultInputStrategy(_assertThisInitialized(_this));
     return _this;
   }
   _createClass(EntityInputPlugin, [{
     key: "init",
     value: function init(game) {
       console.log('EntityInputPlugin.init()');
-      this.game = game; // Store the reference to the game logic
+      this.game = game;
       this.game.systemsManager.addSystem('entityInput', this);
+      this.strategy.init(game);
+    }
+  }, {
+    key: "handleInputs",
+    value: function handleInputs(entityId, controls, sequenceNumber) {
+      this.strategy.handleInputs(entityId, controls, sequenceNumber);
     }
   }, {
     key: "update",
@@ -1767,41 +1892,6 @@ var EntityInputPlugin = /*#__PURE__*/function (_Plugin) {
   }, {
     key: "destroy",
     value: function destroy() {}
-  }, {
-    key: "handleInputs",
-    value: function handleInputs(entityId, controls, sequenceNumber) {
-      // fix signature
-      // console.log('running update in entity input plugin', deltaTime, snapshot);
-
-      this.game.lastProcessedInput[entityId] = sequenceNumber;
-      var moveSpeed = 5;
-      var entityMovementSystem = this.game.getSystem('entityMovement');
-
-      //console.log('Entity Movement System:', entityMovementSystem);
-      //console.log('Fire Bullet System:', this.game.getSystem('fireBullet'));
-
-      var actions = Object.keys(controls).filter(function (key) {
-        return controls[key];
-      }).map(function (key) {
-        return defaultControlsMapping[key];
-      });
-      if (typeof this.lastBulletFireTime[entityId] === 'undefined') {
-        this.lastBulletFireTime[entityId] = 0;
-      }
-      if (Date.now() - this.lastBulletFireTime[entityId] <= this.bulletCooldown) {
-        // console.log('waiting for cooldown')
-        return;
-      }
-      this.lastBulletFireTime[entityId] = Date.now();
-      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
-      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
-      if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0); // Might need to check these directions
-      if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0);
-      if (actions.includes('FIRE_BULLET')) {
-        var Bullet = this.game.getSystem('bullet');
-        Bullet.fireBullet(entityId);
-      }
-    }
   }]);
   return EntityInputPlugin;
 }(_Plugin2["default"]);
@@ -1829,7 +1919,7 @@ function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflec
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); } // EntityMovement.js - Marak Squires 2023
 // handles input controller events and relays them to the game logic
 var EntityMovementPlugin = /*#__PURE__*/function (_Plugin) {
   _inherits(EntityMovementPlugin, _Plugin);
@@ -1999,6 +2089,59 @@ var _default = exports["default"] = MovementStrategy;
 },{}],23:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _MovementStrategy = _interopRequireDefault(require("./MovementStrategy.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // PongMovement.js - Marak Squires 2023
+var PongMovementStrategy = /*#__PURE__*/function () {
+  function PongMovementStrategy() {
+    _classCallCheck(this, PongMovementStrategy);
+  }
+  _createClass(PongMovementStrategy, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+    }
+  }, {
+    key: "update",
+    value: function update(entityId, dx, dy) {
+      var player = this.game.bodyMap[entityId];
+      if (!player) return;
+      var MOVE_SPEED = 1; // This determines how fast the paddle moves, adjust as needed
+
+      // Use dx and dy to set the movement direction
+      var moveDirectionX = dx; // -1 for left, 1 for right, 0 for stationary
+      var moveDirectionY = dy; // -1 for up, 1 for down, 0 for stationary
+
+      // If there is any movement, update the entity's state
+      if (moveDirectionX !== 0 || moveDirectionY !== 0) {
+        var velocity = {
+          x: 0,
+          // in pong we only move on the Y axis
+          y: -MOVE_SPEED * moveDirectionY // invert the Y axis to match the game's coordinate system
+        };
+
+        // Assuming this.game.physics.Body.setVelocity() is the correct method
+        // to update the player's velocity in your physics engine.
+        this.game.physics.Body.setVelocity(player, velocity);
+      }
+    }
+  }]);
+  return PongMovementStrategy;
+}();
+var _default = exports["default"] = PongMovementStrategy;
+
+},{"./MovementStrategy.js":22}],24:[function(require,module,exports){
+"use strict";
+
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2036,7 +2179,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.engine = null;
     _this.scene = null;
     _this.camera = null;
-    // this.babylonEntities = {}; // TODO: remove this and all references to it, use game instead
     _this.entityStates = {}; // Store application-specific entity data
     _this.debug = false; // Store debug flag for later usage
     return _this;
@@ -2085,6 +2227,21 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         passive: false
       });
 
+      // remit all pointer events to the document
+      this.scene.onPointerObservable.add(function (pointerInfo) {
+        switch (pointerInfo.type) {
+          case BABYLON.PointerEventTypes.POINTERDOWN:
+          case BABYLON.PointerEventTypes.POINTERUP:
+          case BABYLON.PointerEventTypes.POINTERMOVE:
+            reEmitEvent(pointerInfo.event);
+            break;
+        }
+      });
+      function reEmitEvent(babylonEvent) {
+        var newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
+        document.dispatchEvent(newEvent);
+      }
+
       // Babylon seems to be immediately ready, versus Phaser which must wait for scene to be ready
       game.graphicsReady.push(this.name);
     }
@@ -2111,7 +2268,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       if (!entity || !entity.graphics || !entity.graphics['graphics-babylon']) {
         return;
       }
-      // TODO: auto-scope graphics-babylon to the entity, so we don't need manually reference it
       entity.graphics['graphics-babylon'].dispose();
     }
   }, {
@@ -2130,6 +2286,9 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         case 'BULLET':
           graphic = this.createSphere(entityData);
           break;
+        case 'TEXT':
+          graphic = this.createText(entityData);
+          break;
         case 'TRIANGLE':
           graphic = this.createTriangle(entityData);
           break;
@@ -2141,6 +2300,28 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // translate the graphic to the correct position in 2.5D space
       graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
       return graphic;
+    }
+  }, {
+    key: "createText",
+    value: function createText(entityData) {
+      var plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', {
+        width: entityData.width,
+        height: entityData.height
+      }, this.scene);
+      var texture = new BABYLON.DynamicTexture('dynamic texture', {
+        width: 512,
+        height: 256
+      }, this.scene);
+      var material = new BABYLON.StandardMaterial('Mat', this.scene);
+      var text = 'HELLO WORLD'; // Or use entityData.text if it contains the message
+      var font = 'bold 44px monospace';
+      texture.drawText(text, null, 40, font, 'black', 'white', true, true);
+      material.diffuseTexture = texture;
+      plane.material = material;
+
+      // Set the billboard mode so the plane always faces the camera
+      plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+      return plane;
     }
   }, {
     key: "createSphere",
@@ -2209,7 +2390,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 }(_GraphicsInterface2["default"]);
 var _default = exports["default"] = BabylonGraphics;
 
-},{"../../lib/GraphicsInterface.js":7}],24:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":7}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2223,9 +2404,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var CameraSystem = /*#__PURE__*/function () {
-  function CameraSystem(game, engine, scene) {
+  function CameraSystem() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$followPlayer = _ref.followPlayer,
+      followPlayer = _ref$followPlayer === void 0 ? false : _ref$followPlayer;
     _classCallCheck(this, CameraSystem);
     this.name = 'graphics-babylon/camera';
+    this.followPlayer = followPlayer;
   }
   _createClass(CameraSystem, [{
     key: "init",
@@ -2319,14 +2504,16 @@ var CameraSystem = /*#__PURE__*/function () {
   }, {
     key: "render",
     value: function render() {
-      var currentPlayer = this.game.getEntity(window.currentPlayerId);
-      if (currentPlayer) {
-        var graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
-        if (graphic) {
-          this.camera.target.x = graphic.position.x;
-          this.camera.target.z = graphic.position.z;
-          // why not use vector positon for camera?
-          // let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+      if (this.followPlayer) {
+        var currentPlayer = this.game.getEntity(window.currentPlayerId);
+        if (currentPlayer) {
+          var graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
+          if (graphic) {
+            this.camera.target.x = graphic.position.x;
+            this.camera.target.z = graphic.position.z;
+            // why not use vector positon for camera?
+            // let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+          }
         }
       }
     }
@@ -2345,7 +2532,7 @@ var CameraSystem = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = CameraSystem;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2426,7 +2613,235 @@ var StarField = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = StarField;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+"use strict";
+
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+var HTMLGraphics = /*#__PURE__*/function (_GraphicsInterface) {
+  _inherits(HTMLGraphics, _GraphicsInterface);
+  var _super = _createSuper(HTMLGraphics);
+  function HTMLGraphics() {
+    var _this;
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$debug = _ref.debug,
+      debug = _ref$debug === void 0 ? true : _ref$debug,
+      _ref$onlineMode = _ref.onlineMode,
+      onlineMode = _ref$onlineMode === void 0 ? true : _ref$onlineMode,
+      _ref$followPlayer = _ref.followPlayer,
+      followPlayer = _ref$followPlayer === void 0 ? false : _ref$followPlayer;
+    _classCallCheck(this, HTMLGraphics);
+    _this = _super.call(this);
+    _this.onlineMode = onlineMode;
+    _this.entityStates = {};
+    _this.debug = debug;
+    _this.name = 'graphics-html';
+    _this.followPlayer = followPlayer;
+    _this.cameraPosition = {
+      x: 0,
+      y: 0
+    };
+    return _this;
+  }
+  _createClass(HTMLGraphics, [{
+    key: "init",
+    value: function init(game) {
+      // register renderer with graphics pipeline
+      game.graphics.push(this);
+      this.game = game;
+      // Only initialize DebugGUI if debug flag is set to true
+      if (this.debug) {}
+      // leave always on ( for now )
+      // this.initDebugUI();
+
+      this.game.systemsManager.addSystem('graphics-html', this);
+
+      // let the graphics pipeline know the document is ready ( we could add document event listener here )
+      game.graphicsReady.push(self.name);
+    }
+  }, {
+    key: "initDebugUI",
+    value: function initDebugUI() {
+      // Create a debug UI container
+      this.debugUIContainer = document.createElement('div');
+      this.debugUIContainer.id = 'debugUIContainer';
+      this.debugUIContainer.style.top = '10px';
+      this.debugUIContainer.style.right = '10px';
+      this.debugUIContainer.style.width = '40vw';
+      this.debugUIContainer.style.height = '50vw';
+      this.debugUIContainer.style.background = 'rgba(0, 0, 0, 0.5)';
+      this.debugUIContainer.style.padding = '10px';
+      this.debugUIContainer.style.color = 'white';
+      this.debugUIContainer.style.zIndex = '9999';
+      this.debugUIContainer.style.position = 'absolute';
+
+      // Create a table within the debug UI container
+      this.debugTable = document.createElement('table');
+      this.debugTable.id = 'debugTable';
+      this.debugUIContainer.appendChild(this.debugTable);
+      document.body.appendChild(this.debugUIContainer);
+    }
+  }, {
+    key: "createGraphic",
+    value: function createGraphic(entityData) {
+      if (entityData.destroyed === true) {
+        // ignore, shouldn't have made it here, check upstream as well
+        return;
+      }
+      var entityElement = document.createElement('div');
+      entityElement.id = "entity-".concat(entityData.id);
+      entityElement.className = 'entity-element';
+      entityElement.style.position = 'absolute';
+      switch (entityData.type) {
+        case 'BULLET':
+          // For BULLET entities, create a circle
+          var radius = entityData.radius || 0;
+          entityElement.style.width = radius * 2 + 'px';
+          entityElement.style.height = radius * 2 + 'px';
+          entityElement.style.borderRadius = '50%'; // This will make the div a circle
+          break;
+        case 'PLAYER':
+        /*
+        // TODO
+        case 'PLAYER':
+          if (entityData.shape === 'rectangle') {
+            graphic = this.createBox(entityData);
+          } else {
+            graphic = this.createTriangle(entityData);
+          }
+          break;
+        */
+        case 'BULLET':
+          // For PLAYER entities, create a triangle
+          entityElement.style.width = '0px';
+          entityElement.style.height = '0px';
+          entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
+          entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
+          entityElement.style.borderBottom = entityData.height + 'px solid blue';
+          break;
+        case 'TEXT':
+          entityElement = this.createText(entityElement, entityData);
+          break;
+        default:
+          // For other entities, create a rectangle
+          entityElement.style.width = entityData.width + 'px';
+          entityElement.style.height = entityData.height + 'px';
+          entityElement.style.borderRadius = '10px'; // Optional: to make it rounded
+          entityElement.style.background = 'blue'; // Move this line here
+          break;
+      }
+      entityElement.style.background = 'blue';
+      document.body.appendChild(entityElement);
+
+      // Update the position of the entity element
+      this.updateEntityElementPosition(entityElement, entityData);
+      return entityElement;
+    }
+  }, {
+    key: "updateGraphic",
+    value: function updateGraphic(entityData) {
+      var entityElement = document.getElementById("entity-".concat(entityData.id));
+      if (entityElement) {
+        // Update the position of the entity element
+        return this.updateEntityElementPosition(entityElement, entityData);
+      } else {
+        // If the entity element does not exist, create it
+        return this.createGraphic(entityData);
+      }
+    }
+  }, {
+    key: "createText",
+    value: function createText(entityElement, entityData) {
+      // Create a container for the chat bubble
+      entityElement.className = 'chat-bubble-container';
+      entityElement.style.position = 'absolute';
+
+      // Create the chat bubble itself
+      var chatBubble = document.createElement('div');
+      chatBubble.className = 'chat-bubble';
+      chatBubble.style.border = '1px solid #000';
+      chatBubble.style.borderRadius = '10px';
+      chatBubble.style.padding = '10px';
+      chatBubble.style.background = '#fff';
+      chatBubble.style.maxWidth = '200px';
+      chatBubble.innerText = "entityData.text"; // Assuming entityData contains the chat text
+
+      // Append the chat bubble to the container
+      entityElement.appendChild(chatBubble);
+      console.log('aaa', entityElement);
+      // Update the position of the chat bubble container
+      //this.updateEntityElementPosition(entityElement, entityData);
+
+      return entityElement;
+    }
+  }, {
+    key: "removeGraphic",
+    value: function removeGraphic(entityId) {
+      var entity = this.game.getEntity(entityId);
+      if (!entity || !entity.graphics || !entity.graphics['graphics-html']) {
+        return;
+      }
+      if (document.contains(entity.graphics['graphics-html'])) {
+        entity.graphics['graphics-html'].remove();
+      }
+    }
+  }, {
+    key: "updateEntityElementPosition",
+    value: function updateEntityElementPosition(entityElement, _ref2) {
+      var position = _ref2.position,
+        width = _ref2.width,
+        height = _ref2.height,
+        _ref2$rotation = _ref2.rotation,
+        rotation = _ref2$rotation === void 0 ? 0 : _ref2$rotation;
+      // Adjust the position based on the camera position
+      var adjustedPosition = {
+        x: position.x - this.cameraPosition.x + window.innerWidth / 2,
+        y: position.y - this.cameraPosition.y + window.innerHeight / 2
+      };
+      var domX = adjustedPosition.x - width / 2;
+      var domY = adjustedPosition.y - height / 2;
+
+      // convert rotation to degrees
+      var angle = rotation * (180 / Math.PI);
+      // Translate and rotate the element
+      entityElement.style.transform = "\n      translate(".concat(domX, "px, ").concat(domY, "px)\n      rotate(").concat(angle, "deg)\n    ");
+      return entityElement;
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      var currentPlayer = this.game.getEntity(window.currentPlayerId);
+      if (this.followPlayer && currentPlayer && currentPlayer.position) {
+        this.cameraPosition.x = currentPlayer.position.x;
+        this.cameraPosition.y = currentPlayer.position.y;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {}
+  }]);
+  return HTMLGraphics;
+}(_GraphicsInterface2["default"]);
+var _default = exports["default"] = HTMLGraphics;
+
+},{"../../lib/GraphicsInterface.js":7}],28:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2449,32 +2864,52 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); } // assume global phaser for now
 //import Phaser from 'phaser';
-var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
-  _inherits(PhaserRenderer, _GraphicsInterface);
-  var _super = _createSuper(PhaserRenderer);
-  function PhaserRenderer(config) {
+var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
+  _inherits(PhaserGraphics, _GraphicsInterface);
+  var _super = _createSuper(PhaserGraphics);
+  function PhaserGraphics() {
     var _this;
-    _classCallCheck(this, PhaserRenderer);
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$followPlayer = _ref.followPlayer,
+      followPlayer = _ref$followPlayer === void 0 ? false : _ref$followPlayer,
+      _ref$startingZoom = _ref.startingZoom,
+      startingZoom = _ref$startingZoom === void 0 ? 0.4 : _ref$startingZoom;
+    _classCallCheck(this, PhaserGraphics);
     _this = _super.call(this);
-    _this.config = config;
+    _this.followPlayer = followPlayer;
     _this.name = 'graphics-phaser';
+    _this.startingZoom = startingZoom;
     _this.scenesReady = false;
     _this.scene = null;
     return _this;
   }
-  _createClass(PhaserRenderer, [{
+  _createClass(PhaserGraphics, [{
     key: "init",
     value: function init(game) {
+      // register renderer with graphics pipeline
       game.graphics.push(this);
       this.game = game;
       this.game.systemsManager.addSystem('graphics-phaser', this);
+      var _Main = new Phaser.Class({
+        Extends: Phaser.Scene,
+        initialize: function Main() {
+          Phaser.Scene.call(this, 'Main');
+        },
+        init: function init() {},
+        create: function create() {
+          this.cameras.main.setBackgroundColor('#000000');
+        },
+        preload: function preload() {
+          this.load.image('player', 'textures/flare.png');
+        }
+      });
       this.phaserGame = new Phaser.Game({
         type: Phaser.AUTO,
         parent: 'phaser-root',
         width: game.width,
         // TODO: config  
         height: game.height,
-        scene: [Main]
+        scene: [_Main]
       });
       var self = this;
       function loadMainScene() {
@@ -2498,6 +2933,19 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
         */
       }
 
+      var Main = new Phaser.Class({
+        Extends: Phaser.Scene,
+        initialize: function Main() {
+          Phaser.Scene.call(this, 'Main');
+        },
+        init: function init() {},
+        create: function create() {
+          this.cameras.main.setBackgroundColor('#000000');
+        },
+        preload: function preload() {
+          this.load.image('player', 'textures/flare.png');
+        }
+      });
       loadMainScene();
     }
   }, {
@@ -2524,9 +2972,13 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
         console.log('no gameobject found for', entityData.id);
         return;
       }
-      gameobject.setPosition(entityData.position.x, entityData.position.y);
-      gameobject.x = entityData.position.x;
-      gameobject.y = entityData.position.y;
+
+      // Adjust the coordinates to account for the center (0,0) world
+      var adjustedX = entityData.position.x + this.game.width / 2;
+      var adjustedY = entityData.position.y + this.game.height / 2;
+      gameobject.setPosition(adjustedX, adjustedY);
+      gameobject.x = adjustedX;
+      gameobject.y = adjustedY;
       if (entityData.rotation) {
         //  let rotated = -entityData.rotation - Math.PI / 2;
         gameobject.rotation = entityData.rotation;
@@ -2542,7 +2994,11 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
       var graphic;
       switch (entityData.type) {
         case 'PLAYER':
-          graphic = this.createTriangle(entityData);
+          if (entityData.shape === 'rectangle') {
+            graphic = this.createBox(entityData);
+          } else {
+            graphic = this.createTriangle(entityData);
+          }
           break;
         case 'BULLET':
           graphic = this.createCircle(entityData);
@@ -2553,7 +3009,9 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
         // TODO: createDefault()
       }
 
-      graphic.setPosition(entityData.position.x, entityData.position.y);
+      var adjustedX = entityData.position.x + this.game.width / 2;
+      var adjustedY = entityData.position.y + this.game.height / 2;
+      graphic.setPosition(adjustedX, adjustedY);
       return graphic;
     }
   }, {
@@ -2563,8 +3021,12 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
       box.fillStyle(0xff0000, 1);
       box.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
 
+      // Adjust the coordinates to account for the center (0,0) world
+      var adjustedX = entityData.position.x + this.game.width / 2;
+      var adjustedY = entityData.position.y + this.game.height / 2;
+
       // We use a container to easily manage origin and position
-      var container = this.scene.add.container(entityData.position.x, entityData.position.y);
+      var container = this.scene.add.container(adjustedX, adjustedY);
       container.add(box);
       return container;
     }
@@ -2612,7 +3074,7 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
       }
 
       //camera.rotation m= -Math.PI / 2;
-      sprite.setPosition(entityData.position.x, entityData.position.y);
+      // sprite.setPosition(entityData.position.x, entityData.position.y);
       this.scene.add.existing(sprite);
       return sprite;
     }
@@ -2623,8 +3085,8 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
       sprite.fillStyle(0xff0000, 1);
       sprite.fillCircle(0, 0, 50);
       sprite.setDepth(10);
-      sprite.x = entityData.position.x;
-      sprite.y = entityData.position.y;
+      //sprite.x = entityData.position.x;
+      //sprite.y = entityData.position.y;
       return sprite;
     }
   }, {
@@ -2633,20 +3095,25 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
       if (!this.scenesReady) {
         return;
       }
-      if (this.followingPlayer !== true) {
+      var camera = this.scene.cameras.main;
+      if (this.followPlayer && this.followingPlayer !== true) {
         // Camera settings
-        var camera = this.scene.cameras.main;
         var player = this.game.getEntity(window.currentPlayerId);
-        console.log("pppp", player);
         var graphics = this.game.components.graphics.get(window.currentPlayerId);
-        console.log("ggg", graphics);
         if (player && graphics) {
-          console.log('following player', player);
           camera.startFollow(player.graphics['graphics-phaser']);
-          camera.zoom = 0.4;
           this.followingPlayer = true;
         }
       }
+
+      // center camera
+      // TODO now center the camera
+      // center camera to (0,0) in game world coordinates
+      var centerX = 0;
+      var centerY = 0;
+      // console.log('centering camera', centerX, centerY)
+      camera.setPosition(centerX, centerY);
+      camera.zoom = this.startingZoom;
 
       // console.log('phaser update called', snapshot)
     }
@@ -2663,24 +3130,11 @@ var PhaserRenderer = /*#__PURE__*/function (_GraphicsInterface) {
     }
     // Implement other necessary methods or adjust according to your architecture
   }]);
-  return PhaserRenderer;
+  return PhaserGraphics;
 }(_GraphicsInterface2["default"]);
-var _default = exports["default"] = PhaserRenderer;
-var Main = new Phaser.Class({
-  Extends: Phaser.Scene,
-  initialize: function Main() {
-    Phaser.Scene.call(this, 'Main');
-  },
-  init: function init() {},
-  create: function create() {
-    this.cameras.main.setBackgroundColor('#000000');
-  },
-  preload: function preload() {
-    this.load.image('player', 'textures/flare.png');
-  }
-});
+var _default = exports["default"] = PhaserGraphics;
 
-},{"../../lib/GraphicsInterface.js":7}],27:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":7}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2713,30 +3167,27 @@ var Graphics = /*#__PURE__*/function () {
     value: function update() {}
   }, {
     key: "createGraphic",
-    value: function createGraphic(graphicData) {
+    value: function createGraphic(entityData) {
       var game = this.game;
-
-      // delegate the type of graphic to render to the graphics interface
-
       game.graphics.forEach(function (graphicsInterface) {
         // TODO: pipeline needs to assign mesh to correct scope
 
         // don't recreate same graphic if already exists on interface
-        var ent = game.getEntity(graphicData.id);
+        var ent = game.getEntity(entityData.id);
         console.log(graphicsInterface.name, "CREATING FOR ENT", ent);
         if (ent && ent.graphics && ent.graphics[graphicsInterface.name]) {
-          console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", graphicData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name]);
+          console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name]);
           return;
         }
 
         // TODO: createPolygon, createCircle, createRectangle, createTriangle
-        var graphic = graphicsInterface.createGraphic(graphicData);
+        var graphic = graphicsInterface.createGraphic(entityData);
         // Setting a nested value
         if (graphic) {
-          console.log("CREATING AND SETTING GRAPHIC", graphicData.id, graphicsInterface.name, graphic);
-          game.components.graphics.set([graphicData.id, graphicsInterface.name], graphic);
+          console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.name, graphic);
+          game.components.graphics.set([entityData.id, graphicsInterface.name], graphic);
         } else {
-          console.log("ERROR CREATING GRAPHIC", graphicData.id, graphicsInterface.name, graphic);
+          console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.name, graphic);
         }
       });
     }
@@ -2761,7 +3212,7 @@ var Graphics = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Graphics;
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2828,7 +3279,7 @@ var Lifetime = /*#__PURE__*/function (_Plugin) {
 }(_Plugin2["default"]);
 var _default = exports["default"] = Lifetime;
 
-},{"../../Plugin.js":4}],29:[function(require,module,exports){
+},{"../../Plugin.js":4}],31:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2898,6 +3349,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
             maxSpeed = body.entity.maxSpeed;
           }
           limitSpeed(body, maxSpeed);
+          _this2.lockedProperties(body);
         });
       });
 
@@ -3115,6 +3567,24 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
         }
       });
     }
+  }, {
+    key: "lockedProperties",
+    value: function lockedProperties(body) {
+      var eId = body.myEntityId;
+      var ent = this.game.getEntity(eId);
+      if (ent && ent.lockedProperties) {
+        if (ent.lockedProperties.position) {
+          var currentPosition = body.position;
+          if (typeof ent.lockedProperties.position.x === 'number') {
+            currentPosition.x = ent.lockedProperties.position.x;
+          }
+          if (typeof ent.lockedProperties.position.y === 'number') {
+            currentPosition.y = ent.lockedProperties.position.y;
+          }
+          _matterJs["default"].Body.setPosition(body, currentPosition);
+        }
+      }
+    }
   }]);
   return MatterPhysics;
 }(_PhysicsInterface2["default"]);
@@ -3209,7 +3679,7 @@ class MatterPhysics extends PhysicsInterface {
 
 */
 
-},{"./PhysicsInterface.js":30,"matter-js":33}],30:[function(require,module,exports){
+},{"./PhysicsInterface.js":32,"matter-js":36}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3311,7 +3781,7 @@ var PhysicsInterface = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = PhysicsInterface;
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3449,7 +3919,7 @@ getDecodedSnapshot(snapshotId) {
 
 */
 
-},{"./getPlayerSnapshot.js":32}],32:[function(require,module,exports){
+},{"./getPlayerSnapshot.js":34}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3541,7 +4011,154 @@ var getPlayerSnapshot = function getPlayerSnapshot(playerId) {
 };
 var _default = exports["default"] = getPlayerSnapshot;
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
+"use strict";
+
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Plugin2 = _interopRequireDefault(require("../../../Plugin.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); } // PongWorld.js - Marak Squires 2023
+// handles input controller events and relays them to the game logic
+var PongWorld = /*#__PURE__*/function (_Plugin) {
+  _inherits(PongWorld, _Plugin);
+  var _super = _createSuper(PongWorld);
+  function PongWorld(game) {
+    var _this;
+    _classCallCheck(this, PongWorld);
+    _this = _super.call(this, game);
+    _this.name = 'pong';
+    return _this;
+  }
+  _createClass(PongWorld, [{
+    key: "init",
+    value: function init(game) {
+      var leftSide = game.width / 3 * -1;
+      game.createEntity({
+        id: window.currentPlayerId,
+        // TODO: replace this
+        type: 'PLAYER',
+        shape: 'rectangle',
+        restitution: 0,
+        // bounciness
+        mass: 90000,
+        height: 300,
+        width: 40,
+        friction: 0,
+        // Default friction
+        frictionAir: 0,
+        // Default air friction
+        frictionStatic: 0,
+        // Default static friction
+        lockedProperties: {
+          position: {
+            x: leftSide
+          }
+        }
+      });
+      game.createEntity({
+        id: 'game-ball',
+        type: 'BALL',
+        x: 0,
+        y: 500,
+        height: 50,
+        width: 50,
+        velocity: {
+          // set initial velocity
+          x: 8,
+          y: 8
+        },
+        maxSpeed: 20,
+        restitution: 2.5,
+        // bounciness
+        friction: 0,
+        // Default friction
+        frictionAir: 0,
+        // Default air friction
+        frictionStatic: 0 // Default static friction
+      });
+
+      game.on('collisionStart', function (_ref) {
+        var pair = _ref.pair,
+          bodyA = _ref.bodyA,
+          bodyB = _ref.bodyB;
+        // check to see if ball and left or right walls, if so goal
+        console.log('collisionStart', bodyA.entity, bodyB.entity);
+        if (!bodyA.entity || !bodyB.entity) {
+          return;
+        }
+        if (bodyA.entity.type === 'BORDER' && bodyB.entity.type === 'BALL') {
+
+          /*
+          let invertedVelocity = {
+            x: bodyB.entity.velocity.x * 1.2,
+            y: bodyB.entity.velocity.y * 1.2
+          }
+               if (bodyB.entity.velocity.x === 0 && bodyB.entity.velocity.y === 0) {
+            invertedVelocity = {
+              x: bodyB.entity.velocity.x,
+              y: bodyB.entity.velocity.y * -1.2
+            }
+          }
+               if (bodyA.entity.id === 'border-left' || bodyA.entity.id === 'border-right') {
+            console.log(bodyA.entity.id)
+            console.log('setVelocity', bodyB.entity, invertedVelocity)
+            let resetPosition = {
+              x: 0,
+              y: 0
+            };
+            //game.physics.setPosition(bodyB, resetPosition)
+            // game.components.position.set(bodyB.entity.id, resetPosition);
+               }
+          */
+
+          // game.components.velocity.set(bodyB.entity.id, invertedVelocity);
+          // attempt to ovveride anyway
+          /*
+          game.components.velocity.set(bodyB.entity.id, {
+            x: -10,
+            y: -10
+          });
+          */
+          // console.log('current V', bodyA.velocity)
+        }
+      });
+      game.on('collisionActive', function (event) {
+        console.log('collisionActive', event);
+      });
+      game.on('collisionEnd', function (event) {
+        console.log('collisionEnd', event);
+      });
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }]);
+  return PongWorld;
+}(_Plugin2["default"]);
+var _default = exports["default"] = PongWorld;
+
+},{"../../../Plugin.js":4}],36:[function(require,module,exports){
 (function (global){(function (){
 /*!
  * matter-js 0.19.0 by @liabru

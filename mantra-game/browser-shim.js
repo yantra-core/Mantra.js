@@ -17,6 +17,7 @@ MANTRA.plugins = {
   Graphics: require('./plugins/graphics/Graphics.js').default,
   HTMLGraphics: require('./plugins/graphics-html/HTMLGraphics.js').default,
   KeyboardBrowser: require('./plugins/browser-keyboard/KeyboardBrowser.js').default,
+  // MouseBrowser: require('./plugins/browser-mouse/MouseBrowser.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js').default,
   LocalClient: require('./plugins/client-local/LocalClient.js').default,
   MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js').default,

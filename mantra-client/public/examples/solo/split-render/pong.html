@@ -4,15 +4,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AYYO Client</title>
-  <script src="/vendor/jquery.min.js"></script>
+  <title>Mantra - Split Render - Pong World</title>
+  <script src="/vendor/phaser.min.js"></script>
   <script src="/vendor/babylon.js"></script>
   <script src="/vendor/babylon.gui.min.js"></script>
   <script src="/vendor/babylonjs.materials.min.js"></script>
-  <script src="/vendor/phaser.min.js"></script>
-  <!--  TODO: separate HTML files for phaser, jquery, etc -->
 
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #renderCanvas {
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
     #output {
       max-height: 300px;
       overflow-y: auto;
@@ -46,21 +55,18 @@
       height: 100vh;
     }
   </style>
+
+
+  </style>
 </head>
 
 <body>
-  <canvas id="renderCanvas"></canvas>
-  <script type="text/javascript">
 
-  </script>
   <script type="module" src="/mantra.head.bundle.js"></script>
   <script>
 
-    setTimeout(function () {
+    document.addEventListener('DOMContentLoaded', (event) => {
       let game = new MANTRA.Game({
-        height: 600,
-        width: 800,
-        isClient: true
       });
       let Plugins = MANTRA.plugins;
 
@@ -82,11 +88,12 @@
       game
         .use(new Plugins.Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
         .use(new Plugins.BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-        .use(new Plugins.PhaserGraphics())  // PhaserGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-        .use(new Plugins.HTMLGraphics())  // HTMLGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        .use(new Plugins.PhaserGraphics())   // PhaserGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        .use(new Plugins.HTMLGraphics())     // HTMLGraphics will now recieve game.createGraphic, game.removeGraphic, etc
         .use(new Plugins.Camera())
         .use(new Plugins.StarField())
         .use(new Plugins.KeyboardBrowser())
+        // .use(new Plugins.MouseBrowser())
         .use(new Plugins.LocalClient('Bobby'));
 
       //
@@ -96,10 +103,9 @@
       game.use(new Plugins.PongWorld())
 
       game.start();
-    }, 100);
-
-
+    });
   </script>
+  <canvas id="renderCanvas"></canvas>
 </body>
 
 </html>

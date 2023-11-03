@@ -16,7 +16,7 @@ import onlineGameLoop from './lib/onlineGameLoop.js';
 import gameTick from './lib/gameTick.js';
 
 class Game {
-  constructor({ isClient, width, height, isOfflineMode, plugins, options }) {
+  constructor({ isClient, width, height, isOfflineMode, plugins, options } = {}) {
 
     this.on = eventEmitter.on;
     this.off = eventEmitter.off;

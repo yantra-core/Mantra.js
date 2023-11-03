@@ -2,12 +2,13 @@
 //import Phaser from 'phaser';
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
-class PhaserRenderer extends GraphicsInterface {
-  constructor({ followPlayer = false } = {}) {
+class PhaserGraphics extends GraphicsInterface {
+  constructor({ followPlayer = false, startingZoom = 0.4 } = {}) {
     super();
     this.followPlayer = followPlayer;
     this.name = 'graphics-phaser';
 
+    this.startingZoom = startingZoom;
     this.scenesReady = false;
     this.scene = null;
 
@@ -21,12 +22,37 @@ class PhaserRenderer extends GraphicsInterface {
 
     this.game.systemsManager.addSystem('graphics-phaser', this);
 
+
+    let _Main = new Phaser.Class({
+
+      Extends: Phaser.Scene,
+
+      initialize:
+
+        function Main() {
+          Phaser.Scene.call(this, 'Main');
+        },
+
+
+      init() {
+
+      },
+      create() {
+        this.cameras.main.setBackgroundColor('#000000');
+      },
+
+      preload: function () {
+        this.load.image('player', 'textures/flare.png');
+      }
+    });
+
+
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'phaser-root',
       width: game.width, // TODO: config  
       height: game.height,
-      scene: [Main]
+      scene: [_Main]
     });
 
     let self = this;
@@ -51,6 +77,30 @@ class PhaserRenderer extends GraphicsInterface {
       });
       */
     }
+
+
+    let Main = new Phaser.Class({
+
+      Extends: Phaser.Scene,
+
+      initialize:
+
+        function Main() {
+          Phaser.Scene.call(this, 'Main');
+        },
+
+
+      init() {
+
+      },
+      create() {
+        this.cameras.main.setBackgroundColor('#000000');
+      },
+
+      preload: function () {
+        this.load.image('player', 'textures/flare.png');
+      }
+    });
 
     loadMainScene();
 
@@ -91,7 +141,7 @@ class PhaserRenderer extends GraphicsInterface {
     gameobject.y = adjustedY;
 
     if (entityData.rotation) {
-    //  let rotated = -entityData.rotation - Math.PI / 2;
+      //  let rotated = -entityData.rotation - Math.PI / 2;
       gameobject.rotation = entityData.rotation;
     }
 
@@ -132,14 +182,14 @@ class PhaserRenderer extends GraphicsInterface {
     box.fillStyle(0xff0000, 1);
     box.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
 
-     // Adjust the coordinates to account for the center (0,0) world
-     let adjustedX = entityData.position.x + this.game.width / 2;
-     let adjustedY = entityData.position.y + this.game.height / 2;
- 
+    // Adjust the coordinates to account for the center (0,0) world
+    let adjustedX = entityData.position.x + this.game.width / 2;
+    let adjustedY = entityData.position.y + this.game.height / 2;
+
     // We use a container to easily manage origin and position
     let container = this.scene.add.container(adjustedX, adjustedY);
     container.add(box);
-  
+
     return container;
   }
 
@@ -202,7 +252,7 @@ class PhaserRenderer extends GraphicsInterface {
       // Camera settings
       let player = this.game.getEntity(window.currentPlayerId);
       let graphics = this.game.components.graphics.get(window.currentPlayerId);
-      
+
       if (player && graphics) {
         camera.startFollow(player.graphics['graphics-phaser']);
         this.followingPlayer = true;
@@ -216,7 +266,7 @@ class PhaserRenderer extends GraphicsInterface {
     let centerY = 0;
     // console.log('centering camera', centerX, centerY)
     camera.setPosition(centerX, centerY);
-    camera.zoom = 0.4;
+    camera.zoom = this.startingZoom;
 
     // console.log('phaser update called', snapshot)
   }
@@ -232,28 +282,4 @@ class PhaserRenderer extends GraphicsInterface {
   // Implement other necessary methods or adjust according to your architecture
 }
 
-export default PhaserRenderer;
-
-
-let Main = new Phaser.Class({
-
-  Extends: Phaser.Scene,
-
-  initialize:
-
-    function Main() {
-      Phaser.Scene.call(this, 'Main');
-    },
-
-
-  init() {
-
-  },
-  create() {
-    this.cameras.main.setBackgroundColor('#000000');
-  },
-
-  preload: function () {
-    this.load.image('player', 'textures/flare.png');
-  }
-});
+export default PhaserGraphics;

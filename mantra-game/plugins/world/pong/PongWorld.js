@@ -10,6 +10,9 @@ class PongWorld extends Plugin {
 
   init(game) {
 
+
+    let leftSide = game.width / 3 * -1;
+
     game.createEntity({
       id: window.currentPlayerId, // TODO: replace this
       type: 'PLAYER',
@@ -23,7 +26,7 @@ class PongWorld extends Plugin {
       frictionStatic: 0, // Default static friction
       lockedProperties: {
         position: {
-          x: -500
+          x: leftSide
         }
       }
     });

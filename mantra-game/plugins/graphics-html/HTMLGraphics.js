@@ -7,6 +7,7 @@ class HTMLGraphics extends GraphicsInterface {
     this.entityStates = {};
     this.debug = debug;
     this.name = 'graphics-html';
+    this.followPlayer = followPlayer;
     this.cameraPosition = { x: 0, y: 0 };
   }
 

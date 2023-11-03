@@ -4,8 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantra - Phaser 3 - Pong World</title>
-  <script src="/vendor/phaser.min.js"></script>
+  <title>Mantra - Babylon.js - Pong World</title>
+  <script src="/vendor/babylon.js"></script>
+  <script src="/vendor/babylon.gui.min.js"></script>
+  <script src="/vendor/babylonjs.materials.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -26,7 +29,10 @@
   <script>
 
     document.addEventListener('DOMContentLoaded', (event) => {
-      let game = new MANTRA.Game();
+      let game = new MANTRA.Game({
+        width: 1600 * 4,
+        height: 900 * 4
+      });
       let Plugins = MANTRA.plugins;
 
       //
@@ -37,7 +43,7 @@
         .use(new Plugins.Collision())
         .use(new Plugins.EntityFactory())
         .use(new Plugins.EntityInput())
-        .use(new Plugins.EntityMovement(new Plugins.PongMovement()))
+        .use(new Plugins.EntityMovement(new Plugins.AsteroidsMovement()))
         .use(new Plugins.Bullet())
         .use(new Plugins.Border());
 
@@ -45,23 +51,31 @@
       // Since this is the Client, we can add a Graphics Plugin
       //
       game
-        .use(new Plugins.Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
-        .use(new Plugins.PhaserGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-        //.use(new Plugins.Camera())
-        //.use(new Plugins.StarField())
+        .use(new Plugins.Graphics())          // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
+        .use(new Plugins.BabylonGraphics())   // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        .use(new Plugins.Camera({
+          followPlayer: true
+        }))
+        .use(new Plugins.StarField())
         .use(new Plugins.KeyboardBrowser())
         // .use(new Plugins.MouseBrowser())
         .use(new Plugins.LocalClient('Bobby'));
 
-      //
-      // Now let's attach a World
-      //
-      // You look at the code for PongWorld and see it's just calling methods on the game object
-      game.use(new Plugins.PongWorld())
+
+      game.createEntity({
+        id: 'Bobby',
+        type: 'PLAYER',
+        position: {
+          x: 0,
+          y: 0
+        }
+      });
+
 
       game.start();
     });
   </script>
+  <canvas id="renderCanvas"></canvas>
 </body>
 
 </html>
