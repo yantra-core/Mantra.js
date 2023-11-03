@@ -1,70 +1,153 @@
-import RendererInterface from '../RendererInterface.js';
+import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
-class jQueryRenderer extends RendererInterface {
-  constructor({ debug = true, onlineMode = true }) {
+class HTMLGraphics extends GraphicsInterface {
+  constructor({ debug = true, onlineMode = true } = {}) {
     super();
     this.onlineMode = onlineMode;
     this.entityStates = {};
     this.debug = debug;
+    this.name = 'graphics-html';
+    this.cameraPosition = { x: 0, y: 0 };
   }
 
-  init() {
+  init(game) {
+    // register renderer with graphics pipeline
+    game.graphics.push(this);
 
+    this.game = game;
     // Only initialize DebugGUI if debug flag is set to true
     if (this.debug) {}
     // leave always on ( for now )
-    this.initDebugUI();
+    // this.initDebugUI();
 
+    this.game.systemsManager.addSystem('graphics-html', this);
+
+    // let the graphics pipeline know the document is ready ( we could add document event listener here )
+    game.graphicsReady.push(self.name);
   }
 
   initDebugUI() {
     // Create a debug UI container
-    const debugUIContainer = document.createElement('div');
-    debugUIContainer.id = 'debugUIContainer';
-    //debugUIContainer.style.position = 'absolute';
-    debugUIContainer.style.top = '10px';
-    debugUIContainer.style.right = '10px';
-    debugUIContainer.style.width = '98vw';
-    debugUIContainer.style.height = '50vw';
+    this.debugUIContainer = document.createElement('div');
+    this.debugUIContainer.id = 'debugUIContainer';
+    this.debugUIContainer.style.top = '10px';
+    this.debugUIContainer.style.right = '10px';
+    this.debugUIContainer.style.width = '40vw';
+    this.debugUIContainer.style.height = '50vw';
+    this.debugUIContainer.style.background = 'rgba(0, 0, 0, 0.5)';
+    this.debugUIContainer.style.padding = '10px';
+    this.debugUIContainer.style.color = 'white';
+    this.debugUIContainer.style.zIndex = '9999';
+    this.debugUIContainer.style.position = 'absolute';
 
-    debugUIContainer.style.background = 'rgba(0, 0, 0, 0.5)';
-    debugUIContainer.style.padding = '10px';
-    debugUIContainer.style.color = 'white';
-    debugUIContainer.style.zIndex = '9999';
 
-    document.body.appendChild(debugUIContainer);
 
+    // Create a table within the debug UI container
+    this.debugTable = document.createElement('table');
+    this.debugTable.id = 'debugTable';
+    this.debugUIContainer.appendChild(this.debugTable);
+
+    document.body.appendChild(this.debugUIContainer);
   }
 
-  setGame(game) {
-    this.game = game;
-  }
+  createGraphic(entityData) {
 
-  render(game) {
-    // not really used for simple HTML jQuery renderer
-  }
+    if (entityData.destroyed === true) {
+      // ignore, shouldn't have made it here, check upstream as well
+      return;
+    }
+    const entityElement = document.createElement('div');
+    entityElement.id = `entity-${entityData.id}`;
+    entityElement.className = 'entity-element';
+    entityElement.style.position = 'absolute';
 
-  update(snapshot) {
-    // called each time new gametick data arrives
-      // TODO: inflate method(), which does update or create or destroy, etc
-      // TODO: better rendering of snapshots states
-      // TODO: perform JSON.stringify of snapshot.state
-      // TODO: each snapshot should be a row
-      // TODO: should truncate previous entries after 100
-      // TODO: should always be scrolled to bottom, unless
-      //       - autoscroll to bottom should disable if user manual scrolls
-
-    for (const state of snapshot.state) {
-      console.log(state)
-      const entityDebugInfo = document.createElement('div');
-      entityDebugInfo.innerHTML = `Entity ID: ${state.id}, Position: (${JSON.stringify(state, true, 2)})`;
-      // Append the entity information to the debug UI container
-      debugUIContainer.appendChild(entityDebugInfo);
-
-
+    switch (entityData.type) {
+      case 'BULLET':
+        // For BULLET entities, create a circle
+        const radius = entityData.radius || 0;
+        entityElement.style.width = (radius * 2) + 'px';
+        entityElement.style.height = (radius * 2) + 'px';
+        entityElement.style.borderRadius = '50%';  // This will make the div a circle
+        break;
+      case 'PLAYER':
+        // For PLAYER entities, create a triangle
+        entityElement.style.width = '0px';
+        entityElement.style.height = '0px';
+        entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
+        entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
+        entityElement.style.borderBottom = entityData.height + 'px solid blue';
+        break;
+      default:
+        // For other entities, create a rectangle
+        entityElement.style.width = entityData.width + 'px';
+        entityElement.style.height = entityData.height + 'px';
+        entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
+        entityElement.style.background = 'blue';  // Move this line here
+        break;
     }
 
+    entityElement.style.background = 'blue';
+    document.body.appendChild(entityElement);
+
+    // Update the position of the entity element
+    this.updateEntityElementPosition(entityElement, entityData);
+    return entityElement;
   }
+
+
+  updateGraphic(entityData) {
+    const entityElement = document.getElementById(`entity-${entityData.id}`);
+    if (entityElement) {
+      // Update the position of the entity element
+      return this.updateEntityElementPosition(entityElement, entityData);
+    } else {
+      // If the entity element does not exist, create it
+      return this.createGraphic(entityData);
+    }
+  }
+
+  removeGraphic(entityId) {
+
+    let entity = this.game.getEntity(entityId);
+
+    if (!entity || !entity.graphics || !entity.graphics['graphics-html']) {
+      return;
+    }
+    
+    if (document.contains(entity.graphics['graphics-html'])) {
+      entity.graphics['graphics-html'].remove();
+    }
+  }
+  updateEntityElementPosition(entityElement, {position, width, height, rotation = 0}) {
+    // Adjust the position based on the camera position
+    const adjustedPosition = {
+      x: position.x - this.cameraPosition.x + window.innerWidth / 2,
+      y: position.y - this.cameraPosition.y + window.innerHeight / 2
+    };
+  
+    const domX = adjustedPosition.x - width / 2;
+    const domY = adjustedPosition.y - height / 2;
+  
+    // convert rotation to degrees
+    let angle = rotation * (180 / Math.PI);
+    // Translate and rotate the element
+    entityElement.style.transform = `
+      translate(${domX}px, ${domY}px)
+      rotate(${angle}deg)
+    `;
+  
+    return entityElement;
+  }
+  
+  update () {
+    const currentPlayer = this.game.getEntity(window.currentPlayerId);
+    if (currentPlayer && currentPlayer.position) {
+      this.cameraPosition.x = currentPlayer.position.x;
+      this.cameraPosition.y = currentPlayer.position.y;
+    }
+  }
+  
+  render () {}
 }
 
-export default jQueryRenderer;
+export default HTMLGraphics;

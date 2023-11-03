@@ -1,4 +1,4 @@
-// EntityInput.js - Marak Squiers 2023
+// EntityInput.js - Marak Squires 2023
 import Plugin from '../../Plugin.js';
 
 const defaultControlsMapping = {
@@ -45,13 +45,17 @@ class EntityInputPlugin extends Plugin {
     // Extract mouse position and button states
     const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
 
-    // TODO: Process mouse position
-    //  entityMovementSystem.processMousePosition(entityId, position.x, position.y);
-
-    //console.log('Entity Movement System:', entityMovementSystem);
-    //console.log('Fire Bullet System:', this.game.getSystem('fireBullet'));
-
     const actions = Object.keys(controls).filter(key => controls[key]).map(key => defaultControlsMapping[key]);
+
+    // Map left mouse click to FIRE_BULLET action
+    if (buttons.LEFT) {
+      actions.push('FIRE_BULLET');
+    }
+
+    if (buttons.RIGHT) {
+      //actions.push('FIRE_BULLET');
+    }
+
 
     if (typeof this.lastBulletFireTime[entityId] === 'undefined') {
       this.lastBulletFireTime[entityId] = 0;

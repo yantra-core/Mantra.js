@@ -37,7 +37,6 @@ export default class BrowserMouse {
   }
 
   handleMouseDown(event) {
-    console.log("MOUSE DOWN", event)
     switch (event.button) {
       case 0:
         this.mouseButtons.LEFT = true;
@@ -73,6 +72,8 @@ export default class BrowserMouse {
       canvasPosition: this.canvasPosition, // relative position to any canvas
       buttons: this.mouseButtons
     };
-    this.game.communicationClient.sendMessage('player_input', { mouse: mouseData });
+    if (this.game.communicationClient) {
+      this.game.communicationClient.sendMessage('player_input', { mouse: mouseData });
+    }
   }
 }

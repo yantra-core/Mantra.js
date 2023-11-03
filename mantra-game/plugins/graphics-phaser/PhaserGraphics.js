@@ -16,11 +16,11 @@ class PhaserRenderer extends GraphicsInterface {
 
   init(game) {
 
+    // register renderer with graphics pipeline
     game.graphics.push(this);
     this.game = game;
 
     this.game.systemsManager.addSystem('graphics-phaser', this);
-
 
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,

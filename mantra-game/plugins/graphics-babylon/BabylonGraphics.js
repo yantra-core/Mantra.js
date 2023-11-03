@@ -64,25 +64,21 @@ class BabylonGraphics extends GraphicsInterface {
     // remit all pointer events to the document
     this.scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
-          case BABYLON.PointerEventTypes.POINTERDOWN:
-          case BABYLON.PointerEventTypes.POINTERUP:
-          case BABYLON.PointerEventTypes.POINTERMOVE:
-              reEmitEvent(pointerInfo.event);
-              break;
+        case BABYLON.PointerEventTypes.POINTERDOWN:
+        case BABYLON.PointerEventTypes.POINTERUP:
+        case BABYLON.PointerEventTypes.POINTERMOVE:
+          reEmitEvent(pointerInfo.event);
+          break;
       }
-  });
+    });
 
-  function reEmitEvent(babylonEvent) {
-    const newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
-    document.dispatchEvent(newEvent);
-}
-
-
+    function reEmitEvent(babylonEvent) {
+      const newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
+      document.dispatchEvent(newEvent);
+    }
 
     // Babylon seems to be immediately ready, versus Phaser which must wait for scene to be ready
     game.graphicsReady.push(this.name);
-
-
 
   }
 
@@ -178,7 +174,7 @@ class BabylonGraphics extends GraphicsInterface {
     // Logic for zoom handling
   }
 
-  inflate (snapshot) {} // not used?
+  inflate(snapshot) { } // not used?
 
   // called each time new gametick data arrives
   update() { // Remark: Important, this is bound to systemsUpdate, not view updates!
@@ -186,7 +182,7 @@ class BabylonGraphics extends GraphicsInterface {
     let cameraSystem = this.game.getSystem('graphics-babylon/camera');
     cameraSystem.update(); // This currently does nothing
 
-    if (this.game.systems['graphics-babylon/camera']) {}
+    if (this.game.systems['graphics-babylon/camera']) { }
 
 
   }

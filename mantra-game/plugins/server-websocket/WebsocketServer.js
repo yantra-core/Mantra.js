@@ -115,7 +115,7 @@ class WebSocketServerClass {
 
       case 'player_input':
         let entityInputSystem = game.systemsManager.getSystem('entityInput');
-        entityInputSystem.handleInputs(ws.playerEntityId, parsedMessage.controls, parsedMessage.sequenceNumber);
+        entityInputSystem.handleInputs(ws.playerEntityId, { controls:  parsedMessage.controls, mouse:  parsedMessage.mouse}, parsedMessage.sequenceNumber);
         break;
 
       case 'getSnapshot':
