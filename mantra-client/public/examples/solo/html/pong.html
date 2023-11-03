@@ -11,7 +11,6 @@
   <script src="/vendor/babylonjs.materials.min.js"></script>
   <script src="/vendor/phaser.min.js"></script>
   <!--  TODO: separate HTML files for phaser, jquery, etc -->
-  <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
 
   <style>
     #output {
@@ -22,11 +21,11 @@
       margin-top: 20px;
     }
 
-    #renderCanvas,
-    #phaser-canvas {
-      flex: 1;
+    #renderCanvas {
+      top: 0;
+      left: 0;
+      z-index: -1;
     }
-
 
     #debugUIContainer {
       position: absolute;
@@ -45,13 +44,11 @@
       position: relative;
       width: 100vw;
       height: 100vh;
-      display: flex;
     }
   </style>
 </head>
 
 <body>
-  
   <canvas id="renderCanvas"></canvas>
   <script type="text/javascript">
 
@@ -61,9 +58,9 @@
 
     setTimeout(function () {
       let game = new MANTRA.Game({
-        isClient: true,
         height: 600,
-        width: 800
+        width: 800,
+        isClient: true
       });
       let Plugins = MANTRA.plugins;
 
@@ -75,7 +72,7 @@
         .use(new Plugins.Collision())
         .use(new Plugins.EntityFactory())
         .use(new Plugins.EntityInput())
-        .use(new Plugins.EntityMovement(new Plugins.AsteroidsMovement()))
+        .use(new Plugins.EntityMovement(new Plugins.PongMovement()))
         .use(new Plugins.Bullet())
         .use(new Plugins.Border());
 
@@ -84,22 +81,20 @@
       //
       game
         .use(new Plugins.Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
-        .use(new Plugins.BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-        .use(new Plugins.PhaserGraphics()) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
-        .use(new Plugins.Camera())
-        .use(new Plugins.StarField())
+        .use(new Plugins.HTMLGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
+        //.use(new Plugins.Camera())
+        //.use(new Plugins.StarField())
         .use(new Plugins.KeyboardBrowser())
         .use(new Plugins.LocalClient('Bobby'));
 
-      game.createEntity({
-        id: "Bobby",
-        type: 'PLAYER'
-      });
+      //
+      // Now let's attach a World
+      //
+      // You look at the code for PongWorld and see it's just calling methods on the game object
+      game.use(new Plugins.PongWorld())
 
       game.start();
-
-
-    }, 400)
+    }, 100);
 
 
   </script>

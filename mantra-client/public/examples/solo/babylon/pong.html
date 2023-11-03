@@ -10,9 +10,7 @@
   <script src="/vendor/babylon.gui.min.js"></script>
   <script src="/vendor/babylonjs.materials.min.js"></script>
   <script src="/vendor/phaser.min.js"></script>
-
-  <script type="module" src="/mantra.head.bundle.js"></script>
-  <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
+  <!--  TODO: separate HTML files for phaser, jquery, etc -->
 
   <style>
     #output {
@@ -47,34 +45,21 @@
       width: 100vw;
       height: 100vh;
     }
-
-    .canvas-container {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .canvas-label {
-      text-align: center;
-      background-color: #f9f9f9;
-      /* Optional: for better visibility */
-      padding: 10px;
-    }
   </style>
 </head>
 
 <body>
-
-  
   <canvas id="renderCanvas"></canvas>
   <script type="text/javascript">
 
   </script>
+  <script type="module" src="/mantra.head.bundle.js"></script>
   <script>
-    window.currentPlayerId = "Bobby"; 
 
     setTimeout(function () {
       let game = new MANTRA.Game({
+        height: 600,
+        width: 800,
         isClient: true
       });
       let Plugins = MANTRA.plugins;
@@ -87,7 +72,7 @@
         .use(new Plugins.Collision())
         .use(new Plugins.EntityFactory())
         .use(new Plugins.EntityInput())
-        .use(new Plugins.EntityMovement(new Plugins.AsteroidsMovement()))
+        .use(new Plugins.EntityMovement(new Plugins.PongMovement()))
         .use(new Plugins.Bullet())
         .use(new Plugins.Border());
 
@@ -102,15 +87,14 @@
         .use(new Plugins.KeyboardBrowser())
         .use(new Plugins.LocalClient('Bobby'));
 
-      game.createEntity({
-        id: "Bobby",
-        type: 'PLAYER'
-      });
+      //
+      // Now let's attach a World
+      //
+      // You look at the code for PongWorld and see it's just calling methods on the game object
+      game.use(new Plugins.PongWorld())
 
       game.start();
-
-
-    }, 400)
+    }, 100);
 
 
   </script>

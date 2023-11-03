@@ -1,7 +1,6 @@
-// CollisionPlugin.js
+// Collisions.js - Marak Squires 2023
 class CollisionPlugin {
   constructor() {
-    // You can also add listeners for collisionActive and collisionEnd if needed
   }
 
   init (game) {
@@ -32,6 +31,7 @@ class CollisionPlugin {
 
     //console.log(entityA)
     //console.log(entityB)
+
     // do not process player collisions locally ( for now )
     if (this.game.isClient && entityA.type === 'PLAYER' && entityB.type === 'PLAYER') {
       //console.log("BYPASSING PLAYER COLISION ON CLIENT")
@@ -39,8 +39,10 @@ class CollisionPlugin {
       return;
     }
 
+    // iterate through all systems and see if they have a handleCollision method
     for (const [_, system] of this.game.systemsManager.systems) {
       if (typeof system.handleCollision === "function") {
+        // any system that has a handleCollision method will be called here
         system.handleCollision(pair, bodyA, bodyB);
       }
     }

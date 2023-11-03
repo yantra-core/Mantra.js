@@ -102,7 +102,12 @@ class PhaserRenderer extends GraphicsInterface {
     let graphic;
     switch (entityData.type) {
       case 'PLAYER':
-        graphic = this.createTriangle(entityData);
+
+        if (entityData.shape === 'rectangle') {
+          graphic = this.createBox(entityData);
+        } else {
+          graphic = this.createTriangle(entityData);
+        }
         break;
       case 'BULLET':
         graphic = this.createCircle(entityData);
