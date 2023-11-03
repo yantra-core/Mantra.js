@@ -6,9 +6,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const exclude = ['.DS_Store', 'package.json'];
 
-
-
-// Usage:
 const inputDirectory = path.resolve(__dirname + '/../../mantra-client/public/examples');
-const linkPath = 'https://github.com/yantra-core/mantra/tree/master/mantra-client/public/examples';
-generateDocs(inputDirectory, 'examples.html', 'examples.md', linkPath);
+const linkPath = 'https://yantra.gg/mantra/examples';
+
+generateDocs({
+  inputDir: inputDirectory,
+  htmlOutputPath: 'examples.html',
+  mdOutputPath: 'examples.md',
+  linkPathBase: linkPath,
+  exclusions: ['.DS_Store', 'package.json', 'node_modules'] // This is optional, the default is ['.DS_Store', 'package.json']
+});

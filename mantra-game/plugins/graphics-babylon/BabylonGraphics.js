@@ -17,7 +17,6 @@ class BabylonGraphics extends GraphicsInterface {
     this.engine = null;
     this.scene = null;
     this.camera = null;
-    // this.babylonEntities = {}; // TODO: remove this and all references to it, use game instead
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
   }
@@ -105,7 +104,6 @@ class BabylonGraphics extends GraphicsInterface {
     if (!entity || !entity.graphics || !entity.graphics['graphics-babylon']) {
       return;
     }
-    // TODO: auto-scope graphics-babylon to the entity, so we don't need manually reference it
     entity.graphics['graphics-babylon'].dispose();
   }
 
@@ -123,6 +121,10 @@ class BabylonGraphics extends GraphicsInterface {
       case 'BULLET':
         graphic = this.createSphere(entityData);
         break;
+      case 'TEXT':
+        graphic = this.createText(entityData);
+        break;
+  
       case 'TRIANGLE':
         graphic = this.createTriangle(entityData);
         break;
@@ -135,6 +137,26 @@ class BabylonGraphics extends GraphicsInterface {
 
     return graphic;
   }
+  createText(entityData) {
+    const plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', { width: entityData.width, height: entityData.height }, this.scene);
+    
+    const texture = new BABYLON.DynamicTexture('dynamic texture', { width: 512, height: 256 }, this.scene);
+    const material = new BABYLON.StandardMaterial('Mat', this.scene);
+    
+    const text = 'HELLO WORLD';  // Or use entityData.text if it contains the message
+    const font = 'bold 44px monospace';
+    
+    texture.drawText(text, null, 40, font, 'black', 'white', true, true);
+    
+    material.diffuseTexture = texture;
+    plane.material = material;
+
+    // Set the billboard mode so the plane always faces the camera
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+    return plane;
+}
+
 
   createSphere(entityData) {
     let sphere = BABYLON.MeshBuilder.CreateSphere('bullet', { diameter: entityData.radius * 2 }, this.scene);

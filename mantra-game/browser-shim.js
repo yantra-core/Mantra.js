@@ -15,13 +15,15 @@ MANTRA.plugins = {
   EntityInput: require('./plugins/entity-input/EntityInput.js').default,
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js').default,
   Graphics: require('./plugins/graphics/Graphics.js').default,
+  HTMLGraphics: require('./plugins/graphics-html/HTMLGraphics.js').default,
   KeyboardBrowser: require('./plugins/browser-keyboard/KeyboardBrowser.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js').default,
   LocalClient: require('./plugins/client-local/LocalClient.js').default,
   MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js').default,
   PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js').default,
   PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js').default,
-  StarField: require('./plugins/graphics-babylon/starfield/StarField.js').default
+  StarField: require('./plugins/graphics-babylon/starfield/StarField.js').default,
+  PongWorld: require('./plugins/world/pong/PongWorld.js').default,
   // ... add other plugins similarly
 };
 

@@ -1,7 +1,7 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class HTMLGraphics extends GraphicsInterface {
-  constructor({ debug = true, onlineMode = true } = {}) {
+  constructor({ debug = true, onlineMode = true, followPlayer = false } = {}) {
     super();
     this.onlineMode = onlineMode;
     this.entityStates = {};
@@ -56,7 +56,7 @@ class HTMLGraphics extends GraphicsInterface {
       // ignore, shouldn't have made it here, check upstream as well
       return;
     }
-    const entityElement = document.createElement('div');
+    let entityElement = document.createElement('div');
     entityElement.id = `entity-${entityData.id}`;
     entityElement.className = 'entity-element';
     entityElement.style.position = 'absolute';
@@ -70,12 +70,27 @@ class HTMLGraphics extends GraphicsInterface {
         entityElement.style.borderRadius = '50%';  // This will make the div a circle
         break;
       case 'PLAYER':
+      /*
+      // TODO
+      case 'PLAYER':
+        if (entityData.shape === 'rectangle') {
+          graphic = this.createBox(entityData);
+        } else {
+          graphic = this.createTriangle(entityData);
+        }
+        break;
+      */
+      case 'BULLET':
+
         // For PLAYER entities, create a triangle
         entityElement.style.width = '0px';
         entityElement.style.height = '0px';
         entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
         entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
         entityElement.style.borderBottom = entityData.height + 'px solid blue';
+        break;
+      case 'TEXT':
+        entityElement = this.createText(entityElement, entityData);
         break;
       default:
         // For other entities, create a rectangle
@@ -105,6 +120,31 @@ class HTMLGraphics extends GraphicsInterface {
       return this.createGraphic(entityData);
     }
   }
+
+  createText(entityElement, entityData) {
+    // Create a container for the chat bubble
+    entityElement.className = 'chat-bubble-container';
+    entityElement.style.position = 'absolute';
+    
+    // Create the chat bubble itself
+    const chatBubble = document.createElement('div');
+    chatBubble.className = 'chat-bubble';
+    chatBubble.style.border = '1px solid #000';
+    chatBubble.style.borderRadius = '10px';
+    chatBubble.style.padding = '10px';
+    chatBubble.style.background = '#fff';
+    chatBubble.style.maxWidth = '200px';
+    chatBubble.innerText = "entityData.text";  // Assuming entityData contains the chat text
+    
+    // Append the chat bubble to the container
+    entityElement.appendChild(chatBubble);
+    console.log('aaa', entityElement)
+    // Update the position of the chat bubble container
+    //this.updateEntityElementPosition(entityElement, entityData);
+
+    return entityElement;
+  }
+
 
   removeGraphic(entityId) {
 
@@ -141,7 +181,7 @@ class HTMLGraphics extends GraphicsInterface {
   
   update () {
     const currentPlayer = this.game.getEntity(window.currentPlayerId);
-    if (currentPlayer && currentPlayer.position) {
+    if (this.followPlayer && currentPlayer && currentPlayer.position) {
       this.cameraPosition.x = currentPlayer.position.x;
       this.cameraPosition.y = currentPlayer.position.y;
     }

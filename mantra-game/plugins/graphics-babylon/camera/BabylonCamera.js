@@ -1,6 +1,7 @@
 class CameraSystem {
-  constructor(game, engine, scene) {
+  constructor({ followPlayer = false } = {}) {
     this.name = 'graphics-babylon/camera';
+    this.followPlayer = followPlayer;
   }
 
   init (game, engine, scene) {
@@ -86,15 +87,20 @@ class CameraSystem {
   }
 
   render() {
-    let currentPlayer = this.game.getEntity(window.currentPlayerId);
-    if (currentPlayer) {
-      let graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
-      if (graphic) {
-        this.camera.target.x = graphic.position.x;
-        this.camera.target.z = graphic.position.z;
-        // why not use vector positon for camera?
-        // let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+
+
+    if (this.followPlayer) {
+      let currentPlayer = this.game.getEntity(window.currentPlayerId);
+      if (currentPlayer) {
+        let graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
+        if (graphic) {
+          this.camera.target.x = graphic.position.x;
+          this.camera.target.z = graphic.position.z;
+          // why not use vector positon for camera?
+          // let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+        }
       }
+  
     }
   }
 

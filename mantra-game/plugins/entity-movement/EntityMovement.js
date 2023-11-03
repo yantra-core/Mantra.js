@@ -1,3 +1,4 @@
+// EntityMovement.js - Marak Squires 2023
 import Plugin from '../../Plugin.js';
 import DefaultMovementStrategy from './strategies/DefaultMovement.js';
 

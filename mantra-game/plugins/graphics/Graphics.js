@@ -15,30 +15,28 @@ class Graphics {
 
   update () {}
 
-  createGraphic(graphicData) {
+  createGraphic(entityData) {
     let game = this.game;
-
-    // delegate the type of graphic to render to the graphics interface
 
     game.graphics.forEach(function (graphicsInterface) {
       // TODO: pipeline needs to assign mesh to correct scope
 
       // don't recreate same graphic if already exists on interface
-      let ent = game.getEntity(graphicData.id);
+      let ent = game.getEntity(entityData.id);
       console.log(graphicsInterface.name, "CREATING FOR ENT", ent)
       if (ent && ent.graphics && ent.graphics[graphicsInterface.name]) {
-        console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", graphicData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name])
+        console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name])
         return;
       }
 
       // TODO: createPolygon, createCircle, createRectangle, createTriangle
-      let graphic = graphicsInterface.createGraphic(graphicData);
+      let graphic = graphicsInterface.createGraphic(entityData);
       // Setting a nested value
       if (graphic) {
-        console.log("CREATING AND SETTING GRAPHIC", graphicData.id, graphicsInterface.name, graphic)
-        game.components.graphics.set([graphicData.id, graphicsInterface.name], graphic);
+        console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
+        game.components.graphics.set([entityData.id, graphicsInterface.name], graphic);
       } else {
-        console.log("ERROR CREATING GRAPHIC", graphicData.id, graphicsInterface.name, graphic)
+        console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
       }
     })
   }
@@ -56,7 +54,6 @@ class Graphics {
       graphicsInterface.updateGraphic(entityData);
     });
   }
-
 
 }
 

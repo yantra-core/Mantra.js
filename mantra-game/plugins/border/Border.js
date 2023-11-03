@@ -1,6 +1,6 @@
 // Border.js - Marak Squires 2023
 class Border {
-  constructor({ height  = 1500, width = 2500, position = { x: 0, y: 0 } } = {}) {
+  constructor({ height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
     this.name = 'border';
     this.height = height;
     this.width = width;
@@ -14,8 +14,8 @@ class Border {
     // create the border based on the game size
     this.createBorder({
       id: 'border',
-      height: this.height,
-      width: this.width,
+      height: this.game.height,
+      width: this.game.width,
       position: {
         x: this.position.x,
         y: this.position.y

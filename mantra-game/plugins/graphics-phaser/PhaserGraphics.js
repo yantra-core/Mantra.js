@@ -3,10 +3,9 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class PhaserRenderer extends GraphicsInterface {
-  constructor(config) {
+  constructor({ followPlayer = false } = {}) {
     super();
-    this.config = config;
-
+    this.followPlayer = followPlayer;
     this.name = 'graphics-phaser';
 
     this.scenesReady = false;
@@ -83,9 +82,13 @@ class PhaserRenderer extends GraphicsInterface {
       return;
     }
 
-    gameobject.setPosition(entityData.position.x, entityData.position.y);
-    gameobject.x = entityData.position.x;
-    gameobject.y = entityData.position.y;
+    // Adjust the coordinates to account for the center (0,0) world
+    let adjustedX = entityData.position.x + this.game.width / 2;
+    let adjustedY = entityData.position.y + this.game.height / 2;
+
+    gameobject.setPosition(adjustedX, adjustedY);
+    gameobject.x = adjustedX;
+    gameobject.y = adjustedY;
 
     if (entityData.rotation) {
     //  let rotated = -entityData.rotation - Math.PI / 2;
@@ -116,7 +119,11 @@ class PhaserRenderer extends GraphicsInterface {
       default:
         graphic = this.createBox(entityData); // TODO: createDefault()
     }
-    graphic.setPosition(entityData.position.x, entityData.position.y);
+
+    let adjustedX = entityData.position.x + this.game.width / 2;
+    let adjustedY = entityData.position.y + this.game.height / 2;
+
+    graphic.setPosition(adjustedX, adjustedY);
     return graphic;
   }
   createBox(entityData) {
@@ -124,9 +131,13 @@ class PhaserRenderer extends GraphicsInterface {
     let box = this.scene.add.graphics();
     box.fillStyle(0xff0000, 1);
     box.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
-  
+
+     // Adjust the coordinates to account for the center (0,0) world
+     let adjustedX = entityData.position.x + this.game.width / 2;
+     let adjustedY = entityData.position.y + this.game.height / 2;
+ 
     // We use a container to easily manage origin and position
-    let container = this.scene.add.container(entityData.position.x, entityData.position.y);
+    let container = this.scene.add.container(adjustedX, adjustedY);
     container.add(box);
   
     return container;
@@ -165,7 +176,7 @@ class PhaserRenderer extends GraphicsInterface {
     }
 
     //camera.rotation m= -Math.PI / 2;
-    sprite.setPosition(entityData.position.x, entityData.position.y);
+    // sprite.setPosition(entityData.position.x, entityData.position.y);
     this.scene.add.existing(sprite);
     return sprite;
   }
@@ -175,8 +186,8 @@ class PhaserRenderer extends GraphicsInterface {
     sprite.fillStyle(0xff0000, 1);
     sprite.fillCircle(0, 0, 50);
     sprite.setDepth(10);
-    sprite.x = entityData.position.x;
-    sprite.y = entityData.position.y;
+    //sprite.x = entityData.position.x;
+    //sprite.y = entityData.position.y;
     return sprite;
   }
 
@@ -185,18 +196,27 @@ class PhaserRenderer extends GraphicsInterface {
       return;
     }
 
-    if (this.followingPlayer !== true) {
+    let camera = this.scene.cameras.main;
+
+    if (this.followPlayer && this.followingPlayer !== true) {
       // Camera settings
-      let camera = this.scene.cameras.main;
       let player = this.game.getEntity(window.currentPlayerId);
       let graphics = this.game.components.graphics.get(window.currentPlayerId);
       
       if (player && graphics) {
         camera.startFollow(player.graphics['graphics-phaser']);
-        camera.zoom = 0.4;
         this.followingPlayer = true;
       }
     }
+
+    // center camera
+    // TODO now center the camera
+    // center camera to (0,0) in game world coordinates
+    let centerX = 0;
+    let centerY = 0;
+    // console.log('centering camera', centerX, centerY)
+    camera.setPosition(centerX, centerY);
+    camera.zoom = 0.4;
 
     // console.log('phaser update called', snapshot)
   }

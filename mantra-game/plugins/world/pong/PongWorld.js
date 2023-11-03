@@ -9,8 +9,9 @@ class PongWorld extends Plugin {
   }
 
   init(game) {
+
     game.createEntity({
-      id: "Bobby",
+      id: window.currentPlayerId, // TODO: replace this
       type: 'PLAYER',
       shape: 'rectangle',
       restitution: 0, // bounciness
@@ -22,7 +23,7 @@ class PongWorld extends Plugin {
       frictionStatic: 0, // Default static friction
       lockedProperties: {
         position: {
-          x: 0
+          x: -500
         }
       }
     });

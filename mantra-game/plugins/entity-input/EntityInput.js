@@ -24,7 +24,7 @@ class DefaultInputStrategy {
 
     let entityData = game.getEntity(entityId);
 
-    if (entityData.position && plugin.useMouseControls) {
+    if (entityData && entityData.position && plugin.useMouseControls) {
       const canvasCenter = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
       const deltaX = position.x - (entityData.position.x + canvasCenter.x);
       const deltaY = position.y - (entityData.position.y + canvasCenter.y);

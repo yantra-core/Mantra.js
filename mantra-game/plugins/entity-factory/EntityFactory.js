@@ -252,6 +252,11 @@ class EntityFactory {
       if (position) {
         this.game.physics.setPosition(body, position);
       }
+    } else {
+      this.game.bodyMap[entityId] = {
+        id: entityId
+      }
+
     }
 
     this.postCreateEntityHooks.forEach(fn => fn(entity));
