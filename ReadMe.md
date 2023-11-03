@@ -123,30 +123,34 @@ game.use(pluginInstance)
 
 | Plugin Name | Source |
 | --- | --- |
-| └&nbsp;border | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/border) |
-| └&nbsp;browser-keyboard | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/browser-keyboard) |
-| └&nbsp;bullet | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/bullet) |
-| └&nbsp;client-local | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/client-local) |
-| └&nbsp;client-websocket | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/client-websocket) |
-| └&nbsp;collisions | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/collisions) |
-| └&nbsp;entity-factory | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-factory) |
-| └&nbsp;entity-input | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-input) |
-| └&nbsp;entity-movement | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-movement) |
-|   &nbsp; └&nbsp;strategies | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-movement/strategies) |
-| └&nbsp;graphics | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics) |
-|   &nbsp; └&nbsp;camera | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics/camera) |
-| └&nbsp;graphics-babylon | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon) |
-|   &nbsp; └&nbsp;camera | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/camera) |
-|   &nbsp;   &nbsp; └&nbsp;controls-mouse | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/camera/controls-mouse) |
-|   &nbsp; └&nbsp;starfield | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/starfield) |
-| └&nbsp;graphics-html | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-html) |
-| └&nbsp;graphics-phaser | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-phaser) |
-| └&nbsp;lifetime | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/lifetime) |
-| └&nbsp;logger | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/logger) |
-| └&nbsp;physics-matter | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/physics-matter) |
-| └&nbsp;server-websocket | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/server-websocket) |
-| └&nbsp;snapshots | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots) |
-|   &nbsp; └&nbsp;SnapShotManager | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots/SnapShotManager) |
+| └ border | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/border) |
+| └ browser-keyboard | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/browser-keyboard) |
+| └ browser-mouse | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/browser-mouse) |
+| └ bullet | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/bullet) |
+| └ chat | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/chat) |
+| └ client-local | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/client-local) |
+| └ client-websocket | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/client-websocket) |
+| └ collisions | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/collisions) |
+| └ entity-factory | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-factory) |
+| └ entity-input | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-input) |
+| └ entity-movement | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-movement) |
+|         └ strategies | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-movement/strategies) |
+| └ graphics | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics) |
+|         └ camera | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics/camera) |
+| └ graphics-babylon | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon) |
+|         └ camera | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/camera) |
+|                 └ controls-mouse | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/camera/controls-mouse) |
+|         └ starfield | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/starfield) |
+| └ graphics-css | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-css) |
+| └ graphics-phaser | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-phaser) |
+| └ lifetime | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/lifetime) |
+| └ logger | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/logger) |
+| └ physics-matter | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/physics-matter) |
+| └ server-websocket | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/server-websocket) |
+| └ snapshots | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots) |
+|         └ SnapShotManager | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots/SnapShotManager) |
+| └ world | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world) |
+|         └ pong | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world/pong) |
 
 
 <a name="features"></a>

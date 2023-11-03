@@ -14,5 +14,6 @@ generateDocs({
   htmlOutputPath: 'examples.html',
   mdOutputPath: 'examples.md',
   linkPathBase: linkPath,
+  showFiles: true,
   exclusions: ['.DS_Store', 'package.json', 'node_modules'] // This is optional, the default is ['.DS_Store', 'package.json']
 });

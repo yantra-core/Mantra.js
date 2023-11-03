@@ -15,5 +15,6 @@ generateDocs({
   htmlOutputPath: 'plugins.html',
   mdOutputPath: 'plugins.md',
   linkPathBase: linkPath,
+  showFiles: false,
   exclusions: ['.DS_Store', 'package.json', 'node_modules'] // This is optional, the default is ['.DS_Store', 'package.json']
 });

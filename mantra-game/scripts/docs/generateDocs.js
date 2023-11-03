@@ -12,6 +12,7 @@ function generateDocumentation(options) {
     htmlOutputPath,
     mdOutputPath,
     linkPathBase,
+    showFiles,
     exclusions = ['.DS_Store', 'package.json'],
   } = options;
 
@@ -37,16 +38,18 @@ function generateDocumentation(options) {
           output += generateTable(filePath, depth + 1);
         }
       } else {
-        const linkUrl = `${linkPathBase}/${dir}/${file}`;
+        const linkUrl = `${linkPathBase}${dir}/${file}`;
         // remove inputDir from file path
         const linkPath = linkUrl.replace(inputDir, '');
         // remove .html extension from file name
         const displayName = file.replace('.html', '');
 
-        if (isMarkdown) {
-          output += `| ${'  '.repeat(depth * 4)}└ ${linkPath} | [📄](${linkUrl}) |\n`;
-        } else {
-          output += `<tr><td style="padding-left: ${depth * 10}px;">${file}</td><td><a href="${linkPath}" target="_blank">📄</a></td></tr>`;
+        if (showFiles) {
+          if (isMarkdown) {
+            output += `| ${'  '.repeat(depth * 4)}└ ${linkPath} | [📄](${linkUrl}) |\n`;
+          } else {
+            output += `<tr><td style="padding-left: ${depth * 10}px;">${displayName}</td><td><a href="${linkPath}" target="_blank">📄</a></td></tr>`;
+          }
         }
       }
     }

@@ -34,7 +34,7 @@ import FroggerMovement from '@yantra-core/mantra/plugins/entity-movement/strateg
 import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
 import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
 import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
-import CSSGraphics from '@yantra-core/mantra/plugins/graphics-html/CSSGraphics.js';
+import CSSGraphics from '@yantra-core/mantra/plugins/graphics-css/CSSGraphics.js';
 
 
 // TODO: create some common Plugins scope so we don't have to require like this

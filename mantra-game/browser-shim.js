@@ -15,7 +15,7 @@ MANTRA.plugins = {
   EntityInput: require('./plugins/entity-input/EntityInput.js').default,
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js').default,
   Graphics: require('./plugins/graphics/Graphics.js').default,
-  CSSGraphics: require('./plugins/graphics-html/CSSGraphics.js').default,
+  CSSGraphics: require('./plugins/graphics-css/CSSGraphics.js').default,
   KeyboardBrowser: require('./plugins/browser-keyboard/KeyboardBrowser.js').default,
   // MouseBrowser: require('./plugins/browser-mouse/MouseBrowser.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js').default,

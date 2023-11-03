@@ -1,5 +1,5 @@
 {
-  "name": "@yantra-core/graphics-html",
+  "name": "@yantra-core/graphics-css",
   "version": "1.0.1",
   "description": "",
   "main": "CSSGraphics.js",

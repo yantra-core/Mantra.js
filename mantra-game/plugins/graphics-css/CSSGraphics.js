@@ -6,7 +6,7 @@ class HTMLGraphics extends GraphicsInterface {
     this.onlineMode = onlineMode;
     this.entityStates = {};
     this.debug = debug;
-    this.name = 'graphics-html';
+    this.name = 'graphics-css';
     this.followPlayer = followPlayer;
     this.cameraPosition = { x: 0, y: 0 };
   }
@@ -21,7 +21,7 @@ class HTMLGraphics extends GraphicsInterface {
     // leave always on ( for now )
     // this.initDebugUI();
 
-    this.game.systemsManager.addSystem('graphics-html', this);
+    this.game.systemsManager.addSystem('graphics-css', this);
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     game.graphicsReady.push(self.name);
@@ -151,12 +151,12 @@ class HTMLGraphics extends GraphicsInterface {
 
     let entity = this.game.getEntity(entityId);
 
-    if (!entity || !entity.graphics || !entity.graphics['graphics-html']) {
+    if (!entity || !entity.graphics || !entity.graphics['graphics-css']) {
       return;
     }
     
-    if (document.contains(entity.graphics['graphics-html'])) {
-      entity.graphics['graphics-html'].remove();
+    if (document.contains(entity.graphics['graphics-css'])) {
+      entity.graphics['graphics-css'].remove();
     }
   }
   updateEntityElementPosition(entityElement, {position, width, height, rotation = 0}) {

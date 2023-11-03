@@ -416,7 +416,7 @@ MANTRA.plugins = {
   EntityInput: require('./plugins/entity-input/EntityInput.js')["default"],
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js')["default"],
   Graphics: require('./plugins/graphics/Graphics.js')["default"],
-  CSSGraphics: require('./plugins/graphics-html/CSSGraphics.js')["default"],
+  CSSGraphics: require('./plugins/graphics-css/CSSGraphics.js')["default"],
   KeyboardBrowser: require('./plugins/browser-keyboard/KeyboardBrowser.js')["default"],
   // MouseBrowser: require('./plugins/browser-mouse/MouseBrowser.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js')["default"],
@@ -431,7 +431,7 @@ MANTRA.plugins = {
 
 module.exports = MANTRA;
 
-},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/entity-movement/strategies/PongMovement.js":23,"./plugins/graphics-babylon/BabylonGraphics.js":24,"./plugins/graphics-babylon/camera/BabylonCamera.js":25,"./plugins/graphics-babylon/starfield/StarField.js":26,"./plugins/graphics-html/CSSGraphics.js":27,"./plugins/graphics-phaser/PhaserGraphics.js":28,"./plugins/graphics/Graphics.js":29,"./plugins/lifetime/Lifetime.js":30,"./plugins/physics-matter/MatterPhysics.js":31,"./plugins/world/pong/PongWorld.js":35}],7:[function(require,module,exports){
+},{"./Game.js":3,"./plugins/border/Border.js":12,"./plugins/browser-keyboard/KeyboardBrowser.js":13,"./plugins/bullet/Bullet.js":14,"./plugins/client-local/LocalClient.js":15,"./plugins/collisions/Collisions.js":16,"./plugins/entity-factory/EntityFactory.js":17,"./plugins/entity-input/EntityInput.js":18,"./plugins/entity-movement/EntityMovement.js":19,"./plugins/entity-movement/strategies/AsteroidsMovement.js":20,"./plugins/entity-movement/strategies/PongMovement.js":23,"./plugins/graphics-babylon/BabylonGraphics.js":24,"./plugins/graphics-babylon/camera/BabylonCamera.js":25,"./plugins/graphics-babylon/starfield/StarField.js":26,"./plugins/graphics-css/CSSGraphics.js":27,"./plugins/graphics-phaser/PhaserGraphics.js":28,"./plugins/graphics/Graphics.js":29,"./plugins/lifetime/Lifetime.js":30,"./plugins/physics-matter/MatterPhysics.js":31,"./plugins/world/pong/PongWorld.js":35}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2652,7 +2652,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.onlineMode = onlineMode;
     _this.entityStates = {};
     _this.debug = debug;
-    _this.name = 'graphics-html';
+    _this.name = 'graphics-css';
     _this.followPlayer = followPlayer;
     _this.cameraPosition = {
       x: 0,
@@ -2671,7 +2671,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // leave always on ( for now )
       // this.initDebugUI();
 
-      this.game.systemsManager.addSystem('graphics-html', this);
+      this.game.systemsManager.addSystem('graphics-css', this);
 
       // let the graphics pipeline know the document is ready ( we could add document event listener here )
       game.graphicsReady.push(self.name);
@@ -2795,11 +2795,11 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "removeGraphic",
     value: function removeGraphic(entityId) {
       var entity = this.game.getEntity(entityId);
-      if (!entity || !entity.graphics || !entity.graphics['graphics-html']) {
+      if (!entity || !entity.graphics || !entity.graphics['graphics-css']) {
         return;
       }
-      if (document.contains(entity.graphics['graphics-html'])) {
-        entity.graphics['graphics-html'].remove();
+      if (document.contains(entity.graphics['graphics-css'])) {
+        entity.graphics['graphics-css'].remove();
       }
     }
   }, {
