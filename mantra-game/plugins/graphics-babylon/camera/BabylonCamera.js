@@ -49,8 +49,14 @@ class CameraSystem {
   setupCameraControls() {
     // Detach default controls
     this.camera.attachControl(document.getElementById('gameHolder'), false);
-    return;
+  
+    // Disable the keys for camera control
+    this.camera.inputs.attached.keyboard.keysUp = []; // Disable UP arrow key
+    this.camera.inputs.attached.keyboard.keysDown = []; // Disable DOWN arrow key
+    this.camera.inputs.attached.keyboard.keysLeft = []; // Disable LEFT arrow key
+    this.camera.inputs.attached.keyboard.keysRight = []; // Disable RIGHT arrow key
   }
+  
 
   setupCameraControlsManual() {
     // Detach default controls from the canvas

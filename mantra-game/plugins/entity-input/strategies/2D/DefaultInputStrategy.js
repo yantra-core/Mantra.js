@@ -7,7 +7,7 @@ class DefaultTwoDimensionalInputStrategy {
 
   init(game) {
     this.game = game;
-    // TODO: move this to DefaultInputStrategy
+
     this.defaultControlsMapping = {
       W: 'MOVE_FORWARD',
       S: 'MOVE_BACKWARD',

@@ -1,37 +1,31 @@
-// TODO: possibly remove this file
-
-rotateBody2D(body, angle) {
+export default function rotateBody(body, angle) {
+  // Make sure the body exists
   if (!body) {
-    console.error('rotateBody requires a valid body to rotate');
-    return;
+      console.error('rotateBody requires a valid body to rotate');
+      return;
   }
 
-  // Create a quaternion representing the rotation about the Z-axis
-  const additionalRotation = new this.PhysX.PxQuat(angle, 0, 0, 1);
+  // Create a quaternion representing the additional rotation
+  // Assuming angle is in radians and we're rotating around the z-axis
+  // since we're dealing with a 2D plane in a 3D space.
+  const halfAngle = angle * 0.5;
+  const sinHalfAngle = Math.sin(halfAngle);
+  const cosHalfAngle = Math.cos(halfAngle);
+  const additionalRotation = new this.PhysX.PxQuat(sinHalfAngle, 0, 0, cosHalfAngle);
 
-  // Get the current global pose of the body
+  // Get the current transform of the body
   const transform = body.getGlobalPose();
 
-  console.log('Current quaternion:', transform.q);
-  console.log('Angle and additional rotation quaternion:', angle, additionalRotation);
+  // Perform quaternion multiplication
+  const newRotation = this.quaternionMultiply(transform.q, additionalRotation);
+  console.log('newRotation', newRotation.x)
+  // Normalize the new rotation to avoid numerical errors over time
+  //const normalizedRotation = newRotation.normalize(); // Ensure that 'normalize()' method exists or implement it.
 
-  // Assuming 'rotate' is correct, apply the additional rotation
-  const newRotation = transform.q.rotate(additionalRotation);
+  // Set the new combined rotation back into the transform
+  transform.q = newRotation;
+  //console.log('normalizedRotation', normalizedRotation.x)
 
-  console.log('New quaternion before normalization:', newRotation);
-
-  // Normalize the new quaternion
-  const normalized = newRotation.normalize();
-
-  console.log('New quaternion after normalization:', normalized);
-
-  // Update the transform with the new rotation
-  transform.q = normalized;
-
-  // Apply the updated transform to the body
-  body.setGlobalPose(transform, true);
-
-  // Retrieve and log the updated rotation for debugging
-  //let updatedRotation = this.getBodyRotation(body);
-  //console.log('Updated body rotation:', updatedRotation);
+  // Update the body's transform
+  body.setGlobalPose(transform, true); // true to wake the body up if it's asleep
 }

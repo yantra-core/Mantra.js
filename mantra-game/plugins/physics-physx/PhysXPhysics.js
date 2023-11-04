@@ -37,6 +37,7 @@ class PhysXPhysics extends PhysicsInterface {
   constructor(config) {
     super();
 
+    this.name = 'physics-physx';
     this.updateEngine = updateEngine;
     this.applyForce = applyForce;
     this.rotateBody = rotateBody;
@@ -46,6 +47,7 @@ class PhysXPhysics extends PhysicsInterface {
     this.getLinearVelocity = getLinearVelocity;
     this.scene = null;
     this.lastFrame = 0;
+    this.dimension = 3;
 
     this.namespace = 'physics';
     //this.Vector = Matter.Vector;
@@ -237,11 +239,11 @@ class PhysXPhysics extends PhysicsInterface {
       }
 
       // Lock the motion along the Z-axis
-      const lockFlags = 
-      this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_LINEAR_Z |
-      this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Z |
-      this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_X |
-      this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Y;
+      const lockFlags =
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_LINEAR_Z |
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Z |
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_X |
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Y;
       console.log('lockFlags', lockFlags)
       console.log(boxActor)
       // Not working?
@@ -358,6 +360,13 @@ class PhysXPhysics extends PhysicsInterface {
       q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z   // W
     );
   }
+
+  // Helper function to normalize a quaternion
+  normalizeQuaternion(q) {
+    const length = Math.sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+    return new this.PhysX.PxQuat(q.x / length, q.y / length, q.z / length, q.w / length);
+  }
+
 
 }
 

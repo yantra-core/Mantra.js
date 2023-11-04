@@ -2,6 +2,8 @@
 import Plugin from '../../Plugin.js';
 import DefaultMovementStrategy from './strategies/DefaultMovement.js';
 
+// TODO 3d default
+import Asteroids3DMovementStrategy from './strategies/Asteroids3DMovement.js';
 // handles input controller events and relays them to the game logic
 class EntityMovementPlugin extends Plugin {
   constructor(strategy) {
@@ -19,11 +21,36 @@ class EntityMovementPlugin extends Plugin {
 
     if (this.strategies.length === 0) {
       console.log('Warning: No movement strategies registered, using default movement strategy');
-      this.game.use(new DefaultMovementStrategy())
+
+      if (this.game.physics.dimension === 3) {
+        this.game.use(new Asteroids3DMovementStrategy())
+      } else {
+        this.game.use(new DefaultMovementStrategy())
+      }
+
     }
 
     this.strategies.forEach(function(strategy) {
       strategy.update(entityId, x, y, z); // rename to handleInputs? handleMovement?
+    });
+
+  }
+
+  rotate (entityId, x, y, z) {
+
+    if (this.strategies.length === 0) {
+      console.log('Warning: No movement strategies registered, using default movement strategy');
+
+      if (this.game.physics.dimension === 3) {
+        this.game.use(new Asteroids3DMovementStrategy())
+      } else {
+        this.game.use(new DefaultMovementStrategy())
+      }
+
+    }
+
+    this.strategies.forEach(function(strategy) {
+      strategy.rotate(entityId, x, y, z); // rename to handleInputs? handleMovement?
     });
 
   }

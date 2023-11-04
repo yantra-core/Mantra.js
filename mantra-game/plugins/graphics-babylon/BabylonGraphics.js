@@ -92,7 +92,11 @@ class BabylonGraphics extends GraphicsInterface {
     if (entityData.rotation !== undefined) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
-      graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+      // adjust cylinder rotation shape to point "forward"
+      // TODO: put in switch here for dimensions
+      graphic.rotation.y = entityData.rotation.y + -Math.PI / 2;
+      graphic.rotation.x = entityData.rotation.x 
+      graphic.rotation.z = entityData.rotation.z +  Math.PI / 2;
     }
   }
 

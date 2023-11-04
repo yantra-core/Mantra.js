@@ -4,12 +4,36 @@ class ThreeDimensionalInputStrategy {
   }
 
   init(game) {
-    // Initialize 3D input handling if needed
+    this.game = game;
+
+    // check to see if entityInput system exists, if not throw error
+    if (!game.systems.entityInput) {
+      throw new Error('ThreeDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
+    }
+
+    this.defaultControlsMapping = {
+      W: 'MOVE_FORWARD',
+      S: 'MOVE_BACKWARD',
+      A: 'MOVE_LEFT',
+      D: 'MOVE_RIGHT',
+      SPACE: 'FIRE_BULLET',
+      Q: 'MOVE_UP',
+      E: 'MOVE_DOWN',
+      Up: 'PITCH_UP',
+      Down: 'PITCH_DOWN',
+      Left: 'YAW_LEFT',
+      Right: 'YAW_RIGHT',
+      Z: 'ROLL_LEFT',
+      C: 'ROLL_RIGHT'
+    };
+
+    game.systems.entityInput.strategies.push(this);
+
   }
 
   handleInputs(entityId, { controls = {}, mouse = {} }, sequenceNumber) {
-    const plugin = this.plugin;
-    const game = plugin.game;
+    const plugin = this;
+    const game = this.game;
 
     game.lastProcessedInput[entityId] = sequenceNumber;
 
