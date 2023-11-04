@@ -248,8 +248,8 @@ class PhysXPhysics extends PhysicsInterface {
       //this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
       this.game.components.position.set(body.myEntityId, { x: bodyPosition.x, y: bodyPosition.y });
       let bodyRotation = this.getBodyRotation(body);
-      console.log('bodyRotation', bodyRotation)
-      //this.game.components.rotation.set(body.myEntityId, bodyRotation.x);
+      // console.log('bodyRotation', bodyRotation)
+      this.game.components.rotation.set(body.myEntityId, bodyRotation.x);
       //if (body.isAwake()) {}
     });
   }
@@ -369,33 +369,38 @@ class PhysXPhysics extends PhysicsInterface {
   }
 
 
-
   rotateBody(body, angle) {
     // Make sure the body exists
     if (!body) {
-      console.error('rotateBody requires a valid body to rotate');
-      return;
+        console.error('rotateBody requires a valid body to rotate');
+        return;
     }
-
-    angle = 0.5;
-    // Assuming 'PxQuat' constructor can take an angle and an axis (x, y, z)
-    // Here, we're rotating around the z-axis, which is typical for 2D rotations in a 3D space.
-    //console.log(this.PhysX)
-    const rotation = new this.PhysX.PxQuat(angle, 0, 0, 1);
-
+  
+    // Create a quaternion representing the additional rotation
+    // Assuming angle is in radians and we're rotating around the z-axis
+    // since we're dealing with a 2D plane in a 3D space.
+    const halfAngle = angle * 0.5;
+    const sinHalfAngle = Math.sin(halfAngle);
+    const cosHalfAngle = Math.cos(halfAngle);
+    const additionalRotation = new this.PhysX.PxQuat(sinHalfAngle, 0, 0, cosHalfAngle);
+  
     // Get the current transform of the body
     const transform = body.getGlobalPose();
-
-    // const newRotation = transform.q.rotate(rotation);
-
-
-    // Set the new rotation while maintaining the current position
-    transform.q = rotation;
+  
+    // Perform quaternion multiplication
+    const newRotation = this.quaternionMultiply(transform.q, additionalRotation);
+    console.log('newRotation', newRotation.x)
+    // Normalize the new rotation to avoid numerical errors over time
+    //const normalizedRotation = newRotation.normalize(); // Ensure that 'normalize()' method exists or implement it.
+  
+    // Set the new combined rotation back into the transform
+    transform.q = newRotation;
+    //console.log('normalizedRotation', normalizedRotation.x)
 
     // Update the body's transform
     body.setGlobalPose(transform, true); // true to wake the body up if it's asleep
   }
-
+  
   rotateBody2D(body, angle) {
     if (!body) {
       console.error('rotateBody requires a valid body to rotate');
@@ -508,6 +513,7 @@ class PhysXPhysics extends PhysicsInterface {
   }
 
   collisionStart(game, callback) {
+    /*
     Matter.Events.on(game.engine, 'collisionStart', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
@@ -527,9 +533,11 @@ class PhysXPhysics extends PhysicsInterface {
         callback(pair, bodyA, bodyB);
       }
     });
+    */
   }
 
   collisionActive(game, callback) {
+    /*
     Matter.Events.on(game.engine, 'collisionActive', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
@@ -538,9 +546,11 @@ class PhysXPhysics extends PhysicsInterface {
         callback(pair, bodyA, bodyB);
       }
     });
+    */
   }
 
   collisionEnd(game, callback) {
+    /*
     Matter.Events.on(game.engine, 'collisionEnd', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
@@ -549,6 +559,18 @@ class PhysXPhysics extends PhysicsInterface {
         callback(pair, bodyA, bodyB);
       }
     });
+    */
+  }
+
+
+  // Utility function to multiply two quaternions if not available in PhysX API
+  quaternionMultiply(q1, q2) {
+    return new this.PhysX.PxQuat(
+      q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,  // X
+      q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x,  // Y
+      q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w,  // Z
+      q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z   // W
+    );
   }
 
 }
@@ -625,3 +647,4 @@ function quaternionToEuler2D(quaternion) {
 
   return angle; // The angle is in radians
 }
+  
