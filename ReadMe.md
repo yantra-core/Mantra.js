@@ -31,22 +31,21 @@ Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any ques
 
 ## Examples ( more coming soon ! )
 
-| Example Name | Demo |
+| Name | Source |
 | --- | --- |
 | └ solo | [📂](https://yantra.gg/mantra/examples/solo) |
 |         └ babylon | [📂](https://yantra.gg/mantra/examples/solo/babylon) |
-|                 └ https://yantra.gg/mantra/examples/solo/babylon/asteroids.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/babylon/asteroids.html) |
-|                 └ https://yantra.gg/mantra/examples/solo/babylon/pong.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/babylon/pong.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/babylon/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/babylon/pong.html) |
 |         └ css | [📂](https://yantra.gg/mantra/examples/solo/css) |
-|                 └ https://yantra.gg/mantra/examples/solo/css/asteroids.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/css/asteroids.html) |
-|                 └ https://yantra.gg/mantra/examples/solo/css/pong.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/css/pong.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/css/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/css/pong.html) |
 |         └ phaser3 | [📂](https://yantra.gg/mantra/examples/solo/phaser3) |
-|                 └ https://yantra.gg/mantra/examples/solo/phaser3/asteroids.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/phaser3/asteroids.html) |
-|                 └ https://yantra.gg/mantra/examples/solo/phaser3/pong.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/phaser3/pong.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/phaser3/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/phaser3/pong.html) |
 |         └ split-render | [📂](https://yantra.gg/mantra/examples/solo/split-render) |
-|                 └ https://yantra.gg/mantra/examples/solo/split-render/asteroids.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/split-render/asteroids.html) |
-|                 └ https://yantra.gg/mantra/examples/solo/split-render/pong.html | [📄](https://yantra.gg/mantra/examples/Users/a_/dev/edge/ayyo/mantra-client/public/examples/solo/split-render/pong.html) |
-
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/split-render/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/split-render/pong.html) |
 
 ## Creating your first Mantra Game
 
