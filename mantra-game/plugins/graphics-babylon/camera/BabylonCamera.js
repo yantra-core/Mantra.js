@@ -91,7 +91,7 @@ class CameraSystem {
 
     if (this.followPlayer) {
       let currentPlayer = this.game.getEntity(window.currentPlayerId);
-      if (currentPlayer) {
+      if (currentPlayer && currentPlayer.graphics) {
         let graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
         if (graphic) {
           this.camera.target.x = graphic.position.x;

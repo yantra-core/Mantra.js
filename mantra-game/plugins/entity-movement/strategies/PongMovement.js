@@ -1,11 +1,17 @@
 // PongMovement.js - Marak Squires 2023
-import MovementStrategy from "./MovementStrategy.js";
-
 class PongMovementStrategy {
   constructor() { }
 
   init(game) {
     this.game = game;
+
+    // check to see if entityMovement system exists, if not throw error
+    if (!game.systems.entityMovement) {
+      throw new Error('PongMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
+    }
+
+    game.systems.entityMovement.strategies.push(this);
+
   }
 
   update(entityId, dx, dy) {

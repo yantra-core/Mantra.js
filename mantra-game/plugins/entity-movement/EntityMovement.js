@@ -7,22 +7,25 @@ class EntityMovementPlugin extends Plugin {
   constructor(strategy) {
     super();
     this.name = 'EntityMovementPlugin';
-    this.strategy = strategy || new DefaultMovementStrategy();
-
+    this.strategies = [];
   }
 
   init(game) {
-    // console.log('EntityMovementPlugin.init()');
-
     this.game = game; // Store the reference to the game logic
     this.game.systemsManager.addSystem('entityMovement', this);
-
-    this.strategy.init(game);
-
   }
 
-  update(entityId, x, y) {
-    this.strategy.update(entityId, x, y);
+  update(entityId, x, y, z) {
+
+    if (this.strategies.length === 0) {
+      console.log('Warning: No movement strategies registered, using default movement strategy');
+      this.game.use(new DefaultMovementStrategy())
+    }
+
+    this.strategies.forEach(function(strategy) {
+      strategy.update(entityId, x, y, z); // rename to handleInputs? handleMovement?
+    });
+
   }
 
   render() { }

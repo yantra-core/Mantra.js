@@ -1,11 +1,19 @@
-// PacManMovement.js
-import MovementStrategy from "./MovementStrategy.js";
-
+// PacManMovement.js - Marak Squires 2023
 class PacManMovementStrategy {
   constructor() {}
 
   init(game) {
     this.game = game;
+
+
+    // check to see if entityMovement system exists, if not throw error
+    if (!game.systems.entityMovement) {
+      throw new Error('PacManMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
+    }
+
+    game.systems.entityMovement.strategies.push(this);
+
+
   }
 
   update(entityId, dx, dy) {

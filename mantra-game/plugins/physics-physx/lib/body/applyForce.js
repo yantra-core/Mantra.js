@@ -4,7 +4,7 @@ export default function applyForce(body, position, force) {
     return;
   }
 
-  force.z = 0;
+  //force.z = 0;
 
   console.log("applyForce", body, position, force)
 

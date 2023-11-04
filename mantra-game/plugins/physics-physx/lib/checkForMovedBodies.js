@@ -11,10 +11,18 @@ export default function checkForMovedBodies() {
     let bodyPosition = this.getBodyPosition(body);
     let ent = this.game.getEntity(myEntityId);
     //console.log('ent', ent)
-    //console.log('bodyPosition', bodyPosition)
     this.game.changedEntities.add(body.myEntityId);
-    //this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-    this.game.components.position.set(body.myEntityId, { x: bodyPosition.x, y: bodyPosition.y });
+
+
+    let bodyVelocity = this.getLinearVelocity(body);
+    if (ent.type === 'BULLET') {
+      //console.log(bodyPosition)
+    }
+    //console.log('bodyVelocitybodyVelocity', bodyVelocity)
+
+    this.game.components.velocity.set(body.myEntityId, { x: bodyVelocity.x, y: bodyVelocity.y });
+    this.game.components.position.set(body.myEntityId, { x: bodyPosition.x, y: bodyPosition.y, z: bodyPosition.z });
+
     let bodyRotation = this.getBodyRotation(body);
     // console.log('bodyRotation', bodyRotation)
     this.game.components.rotation.set(body.myEntityId, bodyRotation.x);

@@ -59,7 +59,6 @@ class BabylonGraphics extends GraphicsInterface {
     window.addEventListener('resize', () => this.engine.resize());
     renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
 
-
     // remit all pointer events to the document
     this.scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
@@ -88,10 +87,8 @@ class BabylonGraphics extends GraphicsInterface {
       console.log('no previous entity found for', entityData.id);
       return;
     }
-
     let graphic = previousEntity.graphics['graphics-babylon'];
-
-    graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+    graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     if (entityData.rotation !== undefined) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
