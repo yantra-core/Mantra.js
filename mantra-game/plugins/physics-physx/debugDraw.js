@@ -52,3 +52,23 @@ function project(x, y, z) {
   const clipY = (result[1] / result[3]);
   return [(canvas.width / 2) * (1 + clipX), (canvas.height / 2) * (1 - clipY)];
 }
+
+/*
+
+colors = {
+        [PhysX.PxDebugColorEnum.eARGB_BLACK]: [0, 0, 0],
+        [PhysX.PxDebugColorEnum.eARGB_RED]: [1, 0, 0],
+        [PhysX.PxDebugColorEnum.eARGB_GREEN]: [0, 1, 0],
+        [PhysX.PxDebugColorEnum.eARGB_BLUE]: [0, 0, 1],
+        [PhysX.PxDebugColorEnum.eARGB_YELLOW]: [1, 1, 0],
+        [PhysX.PxDebugColorEnum.eARGB_MAGENTA]: [1, 0, 1],
+        [PhysX.PxDebugColorEnum.eARGB_CYAN]: [0, 1, 1],
+        [PhysX.PxDebugColorEnum.eARGB_WHITE]: [1, 1, 1],
+        [PhysX.PxDebugColorEnum.eARGB_GREY]: [0.5, 0.5, 0.5],
+        [PhysX.PxDebugColorEnum.eARGB_DARKRED]: [0.5, 0, 0],
+        [PhysX.PxDebugColorEnum.eARGB_DARKGREEN]: [0, 0.5, 0],
+        [PhysX.PxDebugColorEnum.eARGB_DARKBLUE]: [0, 0, 0.5],
+      };
+
+
+      */

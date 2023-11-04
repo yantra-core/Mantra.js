@@ -3,18 +3,19 @@
 
 import PhysicsInterface from '../physics-matter/PhysicsInterface.js'
 
-import applyForce from './lib/applyForce.js';
-import rotateBody from './lib/rotateBody.js';
-import getBodyPosition from './lib/getBodyPosition.js';
-import getBodyRotation from './lib/getBodyRotation.js';
+import updateEngine from './lib/updateEngine.js';
+import checkForMovedBodies from './lib/checkForMovedBodies.js';
+
+import applyForce from './lib/body/applyForce.js';
+import rotateBody from './lib/body/rotateBody.js';
+import getBodyPosition from './lib/body/getBodyPosition.js';
+import getBodyRotation from './lib/body/getBodyRotation.js';
 
 import quaternionToEuler from './lib/math/quaternionToEuler.js';
 
-let lastFrame = 0;
 let scene;
 let canvas;
 let context;
-let colors = {};
 
 let _physics = null;
 var lastBox = null;
@@ -30,10 +31,14 @@ class PhysXPhysics extends PhysicsInterface {
   constructor(config) {
     super();
 
+    this.updateEngine = updateEngine;
     this.applyForce = applyForce;
     this.rotateBody = rotateBody;
     this.getBodyPosition = getBodyPosition;
     this.getBodyRotation = getBodyRotation;
+    this.checkForMovedBodies = checkForMovedBodies;
+    this.scene = null;
+    this.lastFrame = 0;
 
     this.namespace = 'physics';
     //this.Vector = Matter.Vector;
@@ -53,7 +58,6 @@ class PhysXPhysics extends PhysicsInterface {
 
     this.dynamicBodies = []; // This array will store your dynamic bodies
 
-
   }
 
   init(game) {
@@ -69,23 +73,6 @@ class PhysXPhysics extends PhysicsInterface {
       console.log('PhysX loaded! Version: ' + ((version >> 24) & 0xff) + '.' + ((version >> 16) & 0xff) + '.' + ((version >> 8) & 0xff));
       game.physicsReady = true;
       // game.physicsReady.push(self.name);
-
-
-      colors = {
-        [PhysX.PxDebugColorEnum.eARGB_BLACK]: [0, 0, 0],
-        [PhysX.PxDebugColorEnum.eARGB_RED]: [1, 0, 0],
-        [PhysX.PxDebugColorEnum.eARGB_GREEN]: [0, 1, 0],
-        [PhysX.PxDebugColorEnum.eARGB_BLUE]: [0, 0, 1],
-        [PhysX.PxDebugColorEnum.eARGB_YELLOW]: [1, 1, 0],
-        [PhysX.PxDebugColorEnum.eARGB_MAGENTA]: [1, 0, 1],
-        [PhysX.PxDebugColorEnum.eARGB_CYAN]: [0, 1, 1],
-        [PhysX.PxDebugColorEnum.eARGB_WHITE]: [1, 1, 1],
-        [PhysX.PxDebugColorEnum.eARGB_GREY]: [0.5, 0.5, 0.5],
-        [PhysX.PxDebugColorEnum.eARGB_DARKRED]: [0.5, 0, 0],
-        [PhysX.PxDebugColorEnum.eARGB_DARKGREEN]: [0, 0.5, 0],
-        [PhysX.PxDebugColorEnum.eARGB_DARKBLUE]: [0, 0, 0.5],
-      };
-
 
       //
       // Init scene, allocator, foundation
@@ -106,7 +93,7 @@ class PhysXPhysics extends PhysicsInterface {
       sceneDesc.set_gravity(tmpVec);
       sceneDesc.set_cpuDispatcher(PhysX.DefaultCpuDispatcherCreate(0));
       sceneDesc.set_filterShader(PhysX.DefaultFilterShader());
-      scene = physics.createScene(sceneDesc);
+      self.scene = physics.createScene(sceneDesc);
       console.log('Created scene');
 
       // create a default material
@@ -115,38 +102,7 @@ class PhysXPhysics extends PhysicsInterface {
       // create default simulation shape flags
       var shapeFlags = new PhysX.PxShapeFlags(PhysX.PxShapeFlagEnum.eSCENE_QUERY_SHAPE | PhysX.PxShapeFlagEnum.eSIMULATION_SHAPE | PhysX.PxShapeFlagEnum.eVISUALIZATION);
 
-      /*
-      // create a few temporary objects used during setup
-      var tmpPose = new PhysX.PxTransform(PhysX.PxIDENTITYEnum.PxIdentity);
-      var tmpFilterData = new PhysX.PxFilterData(1, 1, 0, 0);
-
-      // create a large static box with size 20x1x20 as ground
-      var groundGeometry = new PhysX.PxBoxGeometry(10, 0.5, 10);   // PxBoxGeometry uses half-sizes
-      var groundShape = physics.createShape(groundGeometry, material, true, shapeFlags);
-      var ground = physics.createRigidStatic(tmpPose);
-      groundShape.setSimulationFilterData(tmpFilterData);
-      ground.attachShape(groundShape);
-      scene.addActor(ground);
-
-      // create a few dynamic boxes with size 1x1x1, which will fall on the ground
-      var boxGeometry = new PhysX.PxBoxGeometry(0.5, 0.5, 0.5);   // PxBoxGeometry uses half-sizes
-      for (var y = 0; y < 10; y++) {
-        tmpVec.set_x(0); tmpVec.set_y(y * 2 + 5); tmpVec.set_z(0);
-        tmpPose.set_p(tmpVec);
-        var boxShape = physics.createShape(boxGeometry, material, true, shapeFlags);
-        var box = physics.createRigidDynamic(tmpPose);
-        boxShape.setSimulationFilterData(tmpFilterData);
-        box.attachShape(boxShape);
-        scene.addActor(box);
-        lastBox = box;
-      }
-      PhysX.destroy(groundGeometry);
-      PhysX.destroy(boxGeometry);
-      PhysX.destroy(tmpFilterData);
-      PhysX.destroy(tmpPose);
-      PhysX.destroy(tmpVec);
-
-      */
+      
       // clean up temp objects
       PhysX.destroy(shapeFlags);
       PhysX.destroy(sceneDesc);
@@ -155,9 +111,6 @@ class PhysXPhysics extends PhysicsInterface {
 
       canvas = document.getElementById('physx-canvas');
       context = canvas.getContext('2d');
-
-      // TODO: debug view, see debugDraw.js code comments
-      // setupDebugDrawer(PhysX, scene);
 
     });
 
@@ -184,70 +137,6 @@ class PhysXPhysics extends PhysicsInterface {
   // Equivalent to World.remove()
   removeFromWorld(engine, body) {
     Matter.World.remove(engine.world, body);
-  }
-
-  // Equivalent to Engine.update()
-  updateEngine(engine) {
-
-    let hrtime = new Date().getTime();
-
-    if (!scene) {
-      return;
-    }
-
-    // Call pre-update listeners
-    for (const listener of this.preUpdateListeners) {
-      listener({ source: this });
-    }
-
-    var timeStep = Math.min(0.03, (hrtime - lastFrame));
-    // console.log('timeStep', timeStep)
-    scene.simulate(timeStep);
-    scene.fetchResults(true);
-
-    // Call post-update listeners
-    for (const listener of this.postUpdateListeners) {
-      listener({ source: this });
-    }
-
-    // Your additional logic for checking moved bodies, etc.
-    this.checkForMovedBodies();
-
-
-    // use debug drawer interface to draw boxes on a canvas.
-    // in a real world application you would query the box poses and update your graphics boxes accordingly
-    // debugDraw(this.PhysX, scene);
-
-    // var lastBoxPos = lastBox.getGlobalPose().get_p();
-    // console.log('Last box position: ' + lastBoxPos.get_x() + ", " + lastBoxPos.get_y() + ", " + lastBoxPos.get_z());
-
-    lastFrame = hrtime;
-    //requestAnimationFrame(loop);
-  }
-  // Equivalent to Bodies.rectangle()
-
-  checkForMovedBodies() {
-    // Retrieve all the dynamic bodies from the scene
-    // const dynamicBodies = scene.getDynamicBodies(); // This function will need to be implemented based on your setup
-
-    this.dynamicBodies.forEach((body) => {
-      // If the body is awake, it has potentially moved and you can broadcast its new state
-      const entityId = body.userData; // Assuming you store entityId in the userData of the body
-      let myEntityId = body.myEntityId;
-      //this.broadcastBodyState(entityId, body);
-      //console.log('eee', myEntityId, body)
-      let bodyPosition = this.getBodyPosition(body);
-      let ent = this.game.getEntity(myEntityId);
-      //console.log('ent', ent)
-      //console.log('bodyPosition', bodyPosition)
-      this.game.changedEntities.add(body.myEntityId);
-      //this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-      this.game.components.position.set(body.myEntityId, { x: bodyPosition.x, y: bodyPosition.y });
-      let bodyRotation = this.getBodyRotation(body);
-      // console.log('bodyRotation', bodyRotation)
-      this.game.components.rotation.set(body.myEntityId, bodyRotation.x);
-      //if (body.isAwake()) {}
-    });
   }
 
   // Override the createRectangle method to use PhysX
@@ -307,7 +196,7 @@ class PhysXPhysics extends PhysicsInterface {
     boxActor.attachShape(boxShape);
 
     // Add the actor to the scene
-    scene.addActor(boxActor);
+    this.scene.addActor(boxActor);
 
     // Clean up temporary objects to avoid memory leaks
     this.PhysX.destroy(boxGeometry);
