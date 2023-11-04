@@ -2,6 +2,14 @@
 // THIS FILE IS WIP - NOT COMPLETE
 
 import PhysicsInterface from '../physics-matter/PhysicsInterface.js'
+
+import applyForce from './lib/applyForce.js';
+import rotateBody from './lib/rotateBody.js';
+import getBodyPosition from './lib/getBodyPosition.js';
+import getBodyRotation from './lib/getBodyRotation.js';
+
+import quaternionToEuler from './lib/math/quaternionToEuler.js';
+
 let lastFrame = 0;
 let scene;
 let canvas;
@@ -22,6 +30,11 @@ class PhysXPhysics extends PhysicsInterface {
   constructor(config) {
     super();
 
+    this.applyForce = applyForce;
+    this.rotateBody = rotateBody;
+    this.getBodyPosition = getBodyPosition;
+    this.getBodyRotation = getBodyRotation;
+
     this.namespace = 'physics';
     //this.Vector = Matter.Vector;
     //this.Body = Matter.Body;
@@ -39,6 +52,7 @@ class PhysXPhysics extends PhysicsInterface {
     this.postUpdateListeners = [];
 
     this.dynamicBodies = []; // This array will store your dynamic bodies
+
 
   }
 
@@ -141,27 +155,9 @@ class PhysXPhysics extends PhysicsInterface {
 
       canvas = document.getElementById('physx-canvas');
       context = canvas.getContext('2d');
-      setupDebugDrawer(PhysX, scene);
 
-      // simulate forever!
-      // simulationLoop();
-
-      function setupDebugDrawer() {
-        canvas.width = 800;
-        canvas.height = 600;
-
-        // compute projection matrix
-        mat4.lookAt(viewMatrix, [12, 15, 20], [0, 0, 0], [0, 1, 0])
-        mat4.perspective(projectionMatrix, 45 * (Math.PI / 180), canvas.width / canvas.height, 0.01, 75);
-        mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
-
-        // setup debug drawer
-        const context = canvas.getContext('2d');
-        scene.setVisualizationParameter(PhysX.eSCALE, 1);
-        scene.setVisualizationParameter(PhysX.eWORLD_AXES, 1);
-        scene.setVisualizationParameter(PhysX.eACTOR_AXES, 1);
-        scene.setVisualizationParameter(PhysX.eCOLLISION_SHAPES, 1);
-      }
+      // TODO: debug view, see debugDraw.js code comments
+      // setupDebugDrawer(PhysX, scene);
 
     });
 
@@ -220,7 +216,7 @@ class PhysXPhysics extends PhysicsInterface {
 
     // use debug drawer interface to draw boxes on a canvas.
     // in a real world application you would query the box poses and update your graphics boxes accordingly
-    debugDraw(this.PhysX, scene);
+    // debugDraw(this.PhysX, scene);
 
     // var lastBoxPos = lastBox.getGlobalPose().get_p();
     // console.log('Last box position: ' + lastBoxPos.get_x() + ", " + lastBoxPos.get_y() + ", " + lastBoxPos.get_z());
@@ -323,173 +319,6 @@ class PhysXPhysics extends PhysicsInterface {
     return boxActor;
   }
 
-
-  getBodyRotation2(body) {
-    // Check if the body is valid
-    if (!body) {
-      console.error('getBodyRotation requires a valid body');
-      return null;
-    }
-
-    // Get the global pose of the body, which contains the position and orientation
-    const pose = body.getGlobalPose();
-
-    // Extract the orientation part of the pose
-    const orientation = pose.q; // Assuming 'q' is the property for orientation in the returned transform
-
-    // Convert quaternion to Euler angles or an angle-axis representation if needed
-    // Here, we'll convert it to Euler angles for simplicity.
-    // Note: PhysX may provide a way to convert quaternion to Euler directly,
-    // so please check the documentation for any such utility functions.
-    const euler = quaternionToEuler(orientation);
-
-    // Return the Euler angles as a generic object
-    // Assuming the euler object contains the rotation in radians
-    return {
-      x: euler.x,
-      y: euler.y,
-      z: euler.z
-    };
-  }
-
-  getBodyRotation(body) {
-    if (!body) {
-      console.error('getBodyRotation requires a valid body');
-      return null;
-    }
-
-    const pose = body.getGlobalPose();
-    const orientation = pose.q; // Assuming 'q' is the quaternion orientation
-
-    // Convert the quaternion to a Z-axis rotation angle
-    const angle = quaternionToEuler(orientation);
-
-    // Return the angle in radians
-    return angle;
-  }
-
-
-  rotateBody(body, angle) {
-    // Make sure the body exists
-    if (!body) {
-        console.error('rotateBody requires a valid body to rotate');
-        return;
-    }
-  
-    // Create a quaternion representing the additional rotation
-    // Assuming angle is in radians and we're rotating around the z-axis
-    // since we're dealing with a 2D plane in a 3D space.
-    const halfAngle = angle * 0.5;
-    const sinHalfAngle = Math.sin(halfAngle);
-    const cosHalfAngle = Math.cos(halfAngle);
-    const additionalRotation = new this.PhysX.PxQuat(sinHalfAngle, 0, 0, cosHalfAngle);
-  
-    // Get the current transform of the body
-    const transform = body.getGlobalPose();
-  
-    // Perform quaternion multiplication
-    const newRotation = this.quaternionMultiply(transform.q, additionalRotation);
-    console.log('newRotation', newRotation.x)
-    // Normalize the new rotation to avoid numerical errors over time
-    //const normalizedRotation = newRotation.normalize(); // Ensure that 'normalize()' method exists or implement it.
-  
-    // Set the new combined rotation back into the transform
-    transform.q = newRotation;
-    //console.log('normalizedRotation', normalizedRotation.x)
-
-    // Update the body's transform
-    body.setGlobalPose(transform, true); // true to wake the body up if it's asleep
-  }
-  
-  rotateBody2D(body, angle) {
-    if (!body) {
-      console.error('rotateBody requires a valid body to rotate');
-      return;
-    }
-
-    // Create a quaternion representing the rotation about the Z-axis
-    const additionalRotation = new this.PhysX.PxQuat(angle, 0, 0, 1);
-
-    // Get the current global pose of the body
-    const transform = body.getGlobalPose();
-
-    console.log('Current quaternion:', transform.q);
-    console.log('Angle and additional rotation quaternion:', angle, additionalRotation);
-
-    // Assuming 'rotate' is correct, apply the additional rotation
-    const newRotation = transform.q.rotate(additionalRotation);
-
-    console.log('New quaternion before normalization:', newRotation);
-
-    // Normalize the new quaternion
-    const normalized = newRotation.normalize();
-
-    console.log('New quaternion after normalization:', normalized);
-
-    // Update the transform with the new rotation
-    transform.q = normalized;
-
-    // Apply the updated transform to the body
-    body.setGlobalPose(transform, true);
-
-    // Retrieve and log the updated rotation for debugging
-    //let updatedRotation = this.getBodyRotation(body);
-    //console.log('Updated body rotation:', updatedRotation);
-  }
-
-
-  // TODO: implement method 
-  applyForce(body, position, force) {
-    if (!body || !force) {
-      console.error('applyForce requires a body and a force');
-      return;
-    }
-
-    force.z = 0;
-
-    console.log("applyForce", body, position, force)
-
-    let ogPos = this.getBodyPosition(body);
-    console.log('ogPos', ogPos);
-
-    // Convert the input force and position to a PxVec3, if they're not already.
-    const pxForce = new this.PhysX.PxVec3(force.x, force.y, force.z);
-
-    const pxPosition = position ? new this.PhysX.PxVec3(position.x, position.y, position.z) : undefined;
-    body.addForce(pxForce, this.PhysX.PxForceModeEnum.eFORCE, pxPosition);
-
-    // Check if the body is dynamic (i.e., can be moved by forces).
-    if (body.isRigidDynamic && body.isRigidDynamic()) {
-      // Add the force at the specific position. If no position is provided, it will apply the force at the center of mass.
-    } else {
-      //      console.error('applyForce can only be called on dynamic bodies');
-    }
-
-    // Clean up the created PxVec3 objects to avoid memory leaks
-    this.PhysX.destroy(pxForce);
-    if (pxPosition) this.PhysX.destroy(pxPosition);
-  }
-
-  getBodyPosition(body) {
-    if (!body) {
-      console.error('getBodyPosition requires a body');
-      return null;
-    }
-
-    // Access the global pose of the body
-    const transform = body.getGlobalPose();
-
-    // Retrieve the position from the transform
-    const position = transform.p; // 'p' typically stands for position in PhysX's PxTransform
-
-    // Return a new object with the position values
-    return {
-      x: position.x,
-      y: position.y,
-      z: position.z
-    };
-  }
-
   // Custom method to get a body's velocity
   getBodyVelocity(body) {
     return body.velocity;
@@ -562,7 +391,6 @@ class PhysXPhysics extends PhysicsInterface {
     */
   }
 
-
   // Utility function to multiply two quaternions if not available in PhysX API
   quaternionMultiply(q1, q2) {
     return new this.PhysX.PxQuat(
@@ -576,75 +404,4 @@ class PhysXPhysics extends PhysicsInterface {
 }
 
 export default PhysXPhysics;
-
-function debugDraw(PhysX, scene) {
-  if (!PhysX.NativeArrayHelpers) {
-    return;
-  }
-  if (!canvas) {
-    return;
-  }
-  canvas.width = canvas.width;    // clears the canvas
-
-  const rb = scene.getRenderBuffer();
-  for (let i = 0; i < rb.getNbLines(); i++) {
-    const line = PhysX.NativeArrayHelpers.prototype.getDebugLineAt(rb.getLines(), i);
-    const from = project(line.pos0.get_x(), line.pos0.get_y(), line.pos0.get_z());
-    const to = project(line.pos1.get_x(), line.pos1.get_y(), line.pos1.get_z());
-    drawLine(from, to, colors[line.get_color0()]);
-  }
-}
-
-
-function project(x, y, z) {
-  const result = vec4.transformMat4(tmpVec4, [x, y, z, 1], viewProjectionMatrix);
-  const clipX = (result[0] / result[3]);
-  const clipY = (result[1] / result[3]);
-  return [(canvas.width / 2) * (1 + clipX), (canvas.height / 2) * (1 - clipY)];
-}
-
-
-function drawLine(from, to, color) {
-  const [r, g, b] = color;
-
-  context.beginPath();
-  context.strokeStyle = `rgb(${255 * r}, ${255 * g}, ${255 * b})`;
-  context.moveTo(...from);
-  context.lineTo(...to);
-  context.stroke();
-}
-
-// Helper function to convert quaternion to Euler angles in radians
-function quaternionToEuler(quaternion) {
-  // Placeholder for conversion logic
-  // You'll need to implement this based on how you want to convert quaternions to Euler angles.
-  // The following is just a conceptual placeholder and may not be correct.
-  const sinr_cosp = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
-  const cosr_cosp = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
-  const roll = Math.atan2(sinr_cosp, cosr_cosp);
-
-  const sinp = 2 * (quaternion.w * quaternion.y - quaternion.z * quaternion.x);
-  let pitch;
-  if (Math.abs(sinp) >= 1)
-    pitch = Math.copySign(Math.PI / 2, sinp); // use 90 degrees if out of range
-  else
-    pitch = Math.asin(sinp);
-
-  const siny_cosp = 2 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y);
-  const cosy_cosp = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
-  const yaw = Math.atan2(siny_cosp, cosy_cosp);
-
-  return { x: roll, y: pitch, z: yaw };
-}
-
-function quaternionToEuler2D(quaternion) {
-  // Assuming the quaternion is {x, y, z, w}
-
-  // Compute the quaternion's rotation around the Z-axis (yaw)
-  const sinr_cosp = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
-  const cosr_cosp = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
-  const angle = Math.atan2(sinr_cosp, cosr_cosp);
-
-  return angle; // The angle is in radians
-}
   
