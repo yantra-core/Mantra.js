@@ -14,7 +14,7 @@ import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js
 import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
 
 import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
-
+// import PhysXPhysics from '@yantra-core/mantra/plugins/physics-physx/PhysXPhysics.js'; // WIP
 
 //
 // Game elements

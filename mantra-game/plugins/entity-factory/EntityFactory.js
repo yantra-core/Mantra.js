@@ -335,6 +335,7 @@ class EntityFactory {
           { x: config.position.x + 32, y: config.position.y + 32 }
         ];
         body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
+        // body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
         break;
     }
 

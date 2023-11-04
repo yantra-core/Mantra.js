@@ -15,15 +15,20 @@ export default class LocalClient {
     console.log('init the local client')
   }
 
-  start () {
+  start (callback) {
+
+    if (typeof callback === 'undefined') {
+      callback = function noop () {};
+    }
 
     let graphicsSystems = this.game.graphics.length;
     let graphicsReady = this.game.graphicsReady.length;
+    let physicsReady = this.game.physicsReady;
 
     let self = this;
-    if (graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
+    if (!physicsReady || graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
       setTimeout(function(){
-        self.start();
+        self.start(callback);
       }, 10)
       return
     }
@@ -32,6 +37,8 @@ export default class LocalClient {
 
     this.game.communicationClient = this;
     this.game.localGameLoopRunning = true;
+    callback(null, true);
+    
   }
   stop () {
     this.game.localGameLoopRunning = false;

@@ -10,6 +10,13 @@
   <script src="vendor/babylon.gui.min.js"></script>
   <script src="vendor/babylonjs.materials.min.js"></script>
   <script src="vendor/phaser.min.js"></script>
+
+  <!-- 
+      WIP
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/3.4.2/gl-matrix-min.js" integrity="sha512-eV9ExyTa3b+YHr99IBTYpwk4wbgDMDlfW8uTxhywO8dWb810fGUSKDgHhEv1fAqmJT4jyYnt1iWWMW4FRxeQOQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="physx-js-webidl.js"></script>
+  -->
+
   <!--  TODO: separate HTML files for phaser, jquery, etc -->
   <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
 
@@ -31,6 +38,9 @@
       top: 0;
       left: 0;
       z-index: -1;
+      width: 1000px;
+      height: 1000px;
+
     }
 
     canvas {
@@ -56,11 +66,13 @@
       width: 100vw;
       height: 100vh;
     }
+    
   </style>
 </head>
 
 <body>
   <canvas id="renderCanvas"></canvas>
+  <canvas id="physx-canvas"></canvas>
   <button id="connectButton">Connect</button>
   <button id="disconnectButton">Disconnect</button>
   <script type="text/javascript">

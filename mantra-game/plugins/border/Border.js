@@ -1,10 +1,11 @@
 // Border.js - Marak Squires 2023
 class Border {
-  constructor({ height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
+  constructor({ autoBorder = true, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
     this.name = 'border';
     this.height = height;
     this.width = width;
     this.position = position;
+    this.autoBorder = autoBorder;
   }
 
   init(game) {
@@ -12,15 +13,17 @@ class Border {
     this.game.systemsManager.addSystem('border', this);
 
     // create the border based on the game size
-    this.createBorder({
-      id: 'border',
-      height: this.game.height,
-      width: this.game.width,
-      position: {
-        x: this.position.x,
-        y: this.position.y
-      }
-    });
+    if (this.autoBorder) {
+      this.createBorder({
+        id: 'border',
+        height: this.game.height,
+        width: this.game.width,
+        position: {
+          x: this.position.x,
+          y: this.position.y
+        }
+      });
+    }
 
   }
 

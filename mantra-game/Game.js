@@ -84,6 +84,8 @@ class Game {
     // Game.connect() and Game.start() will wait for all Graphics to be ready before proceeding
     // Remark: We could use this same ready pattern for all Plugins / Systems
     this.graphicsReady = [];
+    this.physicsReady = false;
+
 
     this.gameTick = gameTick.bind(this);
     this.localGameLoop = localGameLoop.bind(this);

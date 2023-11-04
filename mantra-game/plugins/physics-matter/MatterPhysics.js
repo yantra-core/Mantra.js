@@ -13,8 +13,6 @@ class MatterPhysics extends PhysicsInterface {
     this.Composite = Matter.Composite;
     this.Events = Matter.Events;
 
-
-
     // TODO: add all collision events
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
@@ -40,6 +38,8 @@ class MatterPhysics extends PhysicsInterface {
     game.world = this.world;
 
     this.game = game;
+
+    game.physicsReady = true;
 
     this.onAfterUpdate(this.engine, (event) => {
       Matter.Composite.allBodies(this.engine.world).forEach((body) => {

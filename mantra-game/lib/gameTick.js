@@ -11,7 +11,6 @@ function gameTick() {
   // Update the physics engine
   this.physics.updateEngine(this.physics.engine, hzMS); // TODO: deltaTime
 
-
   // Loop through entities that have changed
   // TODO: Ensure we check all components properties here that could have changed
   // this seems wrong, should all be based on snapshot processing physics-matter beforeHandler
