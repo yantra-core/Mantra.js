@@ -14,7 +14,7 @@ import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js
 import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
 
 import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
-import PhysXPhysics from '@yantra-core/mantra/plugins/physics-physx/PhysXPhysics.js'; // WIP
+// import PhysXPhysics from '@yantra-core/mantra/plugins/physics-physx/PhysXPhysics.js'; // WIP
 
 //
 // Game elements
@@ -56,7 +56,7 @@ import MouseBrowser from '@yantra-core/mantra/plugins/browser-mouse/MouseBrowser
 import Camera from '@yantra-core/mantra/plugins/graphics-babylon/camera/BabylonCamera.js';
 import StarField from '@yantra-core/mantra/plugins/graphics-babylon/starfield/StarField.js';
 
-import Chat from '@yantra-core/mantra/plugins/chat/Chat.js';
+//import Chat from '@yantra-core/mantra/plugins/chat/Chat.js';
 import PongWorld from '@yantra-core/mantra/plugins/world/pong/PongWorld.js';
 
 import LocalClient from '@yantra-core/mantra/plugins/client-local/LocalClient.js';
