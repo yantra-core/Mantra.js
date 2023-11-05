@@ -26,9 +26,6 @@ jobs:
       run: |
         docker run --rm mantra:test npm test
 
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.2.3
-
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
