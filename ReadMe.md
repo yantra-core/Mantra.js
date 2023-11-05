@@ -1,5 +1,7 @@
 # `@yantra-core/mantra`
 
+![Build Status](https://github.com/yantra-core/mantra/actions/workflows/nodejs.yml/badge.svg)
+
 ## Introduction
 
 Welcome to `@yantra-core/mantra` –  a versatile Javascript game development framework
