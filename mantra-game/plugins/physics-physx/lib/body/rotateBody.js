@@ -5,6 +5,8 @@ export default function rotateBody(body, angle, axis) {
     return;
   }
 
+  console.log('performing 3d body rotation', angle, axis)
+
   // Normalize the axis vector (axis must be a unit vector)
   const axisLength = Math.sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
   const normalizedAxis = {
@@ -29,15 +31,22 @@ export default function rotateBody(body, angle, axis) {
 
   // Perform quaternion multiplication
   const newRotation = this.quaternionMultiply(transform.q, additionalRotation);
-
+  
+    console.log('newRotation', newRotation.x, newRotation.y, newRotation.z)
   // Normalize the new rotation to avoid numerical errors over time
   const normalizedRotation = this.normalizeQuaternion(newRotation);
 
   // Set the new combined rotation back into the transform
   transform.q = normalizedRotation;
 
+  // REMARK: this value looks correct, but then our value when we get the body is incorrect? is that possible?
+  console.log('normalizedRotation', normalizedRotation);
   // Update the body's transform
   body.setGlobalPose(transform, true); // true to wake the body up if it's asleep
+
+
+  let updatedRotation = this.getBodyRotation(body);
+  console.log('updatedRotation', updatedRotation.x, updatedRotation.y, updatedRotation.z)
 }
 
 // Helper function to multiply quaternions

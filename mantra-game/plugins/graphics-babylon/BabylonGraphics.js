@@ -94,9 +94,20 @@ class BabylonGraphics extends GraphicsInterface {
       // in additon, adjust by -Math.PI / 2;
       // adjust cylinder rotation shape to point "forward"
       // TODO: put in switch here for dimensions
-      graphic.rotation.y = entityData.rotation.y + -Math.PI / 2;
-      graphic.rotation.x = entityData.rotation.x 
-      graphic.rotation.z = entityData.rotation.z +  Math.PI / 2;
+      switch (this.game.physics.dimension) {
+        case 2:
+          graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+          break;
+        case 3:
+          graphic.rotation.y = entityData.rotation.y + -Math.PI / 2;
+          graphic.rotation.x = entityData.rotation.x
+          graphic.rotation.z = entityData.rotation.z + Math.PI / 2;
+          break;
+        default:
+          throw new Error('Unknown physics dimensions, cannot update graphic')
+          break;
+      }
+
     }
   }
 

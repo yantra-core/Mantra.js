@@ -28,8 +28,8 @@ import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
 //
 // Input Strategies
 //
-import TwoDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/2D/DefaultInputStrategy.js';
-import ThreeDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/3D/DefaultInputStrategy.js';
+import TwoDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
+import ThreeDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
 
 
 //
@@ -76,27 +76,32 @@ let game = new Game({
 // Use Plugins to add systems to the game
 //
 game
-  //.use(new PhysXPhysics())
-  .use(new MatterPhysics())
-  .use(new Collision())
+  //.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
+  .use(new MatterPhysics())  // Status: Operational, collisions working
+  .use(new Collision())        // TODO: make configurable like camera per physics pipeline
   .use(new EntityFactory())
   .use(new EntityInput())           // will use default 2D input strategy if none are .use() below
   // .use(new TwoDimensionalInputStrategy())
   .use(new EntityMovement())        // will use default 2D movement strategy if none are .use() below
-  // .use(new AsteroidsMovement())
+  .use(new AsteroidsMovement())
   .use(new Bullet())
 
 //
 // Since this is the Client, we can add a Graphics Plugin
 //
 game
-  .use(new Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
+  .use(new Graphics({
+    camera: {
+      followPlayer: true // applies configuration to all graphics in pipeline
+    }
+  })) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
   .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
   // .use(new CSSGraphics())
   // .use(new PhaserGraphics({ followPlayer: true })) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
-  .use(new Camera({ followPlayer: true }))
-  .use(new StarField())
-  .use(new KeyboardBrowser())
+  .use(new Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
+                                            // use default configs from Graphics plugin, then allow overrides
+  .use(new StarField())                    // camera should probably be config option in graphics plugin
+  .use(new KeyboardBrowser())             // makes sense as its mostly required for babylon, etc
   //.use(new KeyboardBrowser2())
 
   //.use(new MouseBrowser());

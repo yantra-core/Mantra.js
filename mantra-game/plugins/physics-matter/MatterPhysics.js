@@ -13,6 +13,8 @@ class MatterPhysics extends PhysicsInterface {
     this.Composite = Matter.Composite;
     this.Events = Matter.Events;
 
+    this.dimension = 2;
+
     // TODO: add all collision events
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )

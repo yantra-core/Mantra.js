@@ -1,7 +1,7 @@
 // EntityInput.js - Marak Squires 2023
 import Plugin from '../../Plugin.js';
-import DefaultInputStrategy from './strategies/2D/DefaultInputStrategy.js';
-import Default3DInputStrategy from './strategies/3D/DefaultInputStrategy.js';
+import DefaultInputStrategy from './strategies/2D/Default2DInputStrategy.js';
+import Default3DInputStrategy from './strategies/3D/Default3DInputStrategy.js';
 class EntityInputPlugin extends Plugin {
   constructor(strategy) {
     super();
