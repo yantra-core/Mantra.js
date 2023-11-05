@@ -22,6 +22,7 @@ let _physics = null;
 var lastBox = null;
 
 
+// TODO: move collisions into seperate file / plugin
 // Constants for collision layers
 const COLLISION_LAYER_1 = 1;
 const COLLISION_LAYER_2 = 2;

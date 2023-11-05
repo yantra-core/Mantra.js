@@ -1,9 +1,7 @@
 name: Mantra Monorepo CI
 
-on:
+on: 
   push:
-    paths:
-      - 'mantra-game/**'
 
 jobs:
   test:
