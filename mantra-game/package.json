@@ -5,7 +5,7 @@
   "main": "Game.js",
   "type": "module",
   "scripts": {
-    "test": "tap --coverage-report=html tests/",
+    "test": "tap --coverage-report=html --allow-incomplete-coverage tests/",
     "cover": "tap --coverage-report=html tests/"
   },
   "keywords": [],
