@@ -6,7 +6,11 @@
 
 Welcome to `@yantra-core/mantra` –  a versatile Javascript game development framework
 
-Mantra lets you focus on game logic and design without worrying about the complexities of physics simulation and high-performance netcode. Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
+Mantra lets you focus on game logic and design without worrying about the complexities of physics simulation and high-performance netcode. 
+
+You can start building a simple offline game in seconds using your favorite libraries, take this same game code, and effortlessly run it later as a high-performance authoritative game server in a serverless environment. 
+
+Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
 ### Core Features
 - ✅ **Entities, Components, Systems**: Enterprise-grade ECS for game development
