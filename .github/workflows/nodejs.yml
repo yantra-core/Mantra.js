@@ -19,5 +19,5 @@ jobs:
     - name: Install dependencies and run tests in mantra-game
       run: |
         cd mantra-game
-        npm install
+        npm install --include=dev
         npm test
