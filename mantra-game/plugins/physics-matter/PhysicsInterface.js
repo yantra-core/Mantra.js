@@ -32,8 +32,8 @@ class PhysicsInterface {
   }
 
   // Equivalent to Body.applyForce()
-  applyForceToBody(body, position, force) {
-    throw new Error('Method "applyForceToBody" must be implemented');
+  applyForce(body, position, force) {
+    throw new Error('Method "applyForce" must be implemented');
   }
 
   // Custom method to get a body's position

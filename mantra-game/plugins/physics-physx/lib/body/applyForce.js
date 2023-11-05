@@ -4,9 +4,14 @@ export default function applyForce(body, position, force) {
     return;
   }
 
-  force.z = 0;
+  //force.z = 0;
 
   console.log("applyForce", body, position, force)
+
+  if (typeof force.x === 'undefined' || typeof force.y === 'undefined' || typeof force.z === 'undefined') {
+    console.error('PhysX.applyForce requires a force with x, y, and z components');
+    return;
+  }
 
   let ogPos = this.getBodyPosition(body);
   console.log('ogPos', ogPos);

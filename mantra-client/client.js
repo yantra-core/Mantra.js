@@ -14,7 +14,7 @@ import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js
 import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
 
 import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
-// import PhysXPhysics from '@yantra-core/mantra/plugins/physics-physx/PhysXPhysics.js'; // WIP
+import PhysXPhysics from '@yantra-core/mantra/plugins/physics-physx/PhysXPhysics.js'; // WIP
 
 //
 // Game elements
@@ -24,6 +24,17 @@ import Border from '@yantra-core/mantra/plugins/border/Border.js';
 
 
 import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
+
+//
+// Input Strategies
+//
+import TwoDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
+import ThreeDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
+
+
+//
+// Movement Strategies
+//
 import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/AsteroidsMovement.js';
 import PongMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PongMovement.js';
 import PacManMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PacManMovement.js';
@@ -40,6 +51,7 @@ import CSSGraphics from '@yantra-core/mantra/plugins/graphics-css/CSSGraphics.js
 // TODO: create some common Plugins scope so we don't have to require like this
 
 import KeyboardBrowser from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser.js';
+import KeyboardBrowser2 from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser2.js';
 import MouseBrowser from '@yantra-core/mantra/plugins/browser-mouse/MouseBrowser.js';
 import Camera from '@yantra-core/mantra/plugins/graphics-babylon/camera/BabylonCamera.js';
 import StarField from '@yantra-core/mantra/plugins/graphics-babylon/starfield/StarField.js';
@@ -64,25 +76,34 @@ let game = new Game({
 // Use Plugins to add systems to the game
 //
 game
-  .use(new MatterPhysics())
-  .use(new Collision())
+  //.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
+  .use(new MatterPhysics())  // Status: Operational, collisions working
+  .use(new Collision())        // TODO: make configurable like camera per physics pipeline
   .use(new EntityFactory())
-  .use(new EntityInput())
-  .use(new EntityMovement(new AsteroidsMovement()))
+  .use(new EntityInput())           // will use default 2D input strategy if none are .use() below
+  // .use(new TwoDimensionalInputStrategy())
+  .use(new EntityMovement())        // will use default 2D movement strategy if none are .use() below
+  .use(new AsteroidsMovement())
   .use(new Bullet())
-  .use(new Border());
 
 //
 // Since this is the Client, we can add a Graphics Plugin
 //
 game
-  .use(new Graphics()) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
+  .use(new Graphics({
+    camera: {
+      followPlayer: true // applies configuration to all graphics in pipeline
+    }
+  })) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
   .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
   // .use(new CSSGraphics())
   // .use(new PhaserGraphics({ followPlayer: true })) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
-  .use(new Camera({ followPlayer: true }))
-  .use(new StarField())
-  .use(new KeyboardBrowser())
+  .use(new Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
+                                            // use default configs from Graphics plugin, then allow overrides
+  .use(new StarField())                    // camera should probably be config option in graphics plugin
+  .use(new KeyboardBrowser())             // makes sense as its mostly required for babylon, etc
+  //.use(new KeyboardBrowser2())
+
   //.use(new MouseBrowser());
 
 
@@ -94,36 +115,42 @@ const websocketClient = new WebSocketClient(playerId);
 
 // Default Mode setup based on config
 game.use(localClient);
-game.use(websocketClient);
+//game.use(websocketClient);
 
 
 // game.use(new PongWorld())
 
 // Function to switch to Online Mode
 function switchToOnline() {
-  game.removeEntity(playerId); // Destroy the local player
-  game.stop(); // Stop local client
-  game.connect('ws://192.168.1.80:8888/websocket');
+  //game.removeEntity(playerId); // Destroy the xal player
+  //game.stop(); // Stop local client
+  game.connect('ws://192.168.1.80:8787/websocket');
+  //game.connect('ws://192.168.1.80:8888/websocket');
+
 }
 
 // Function to switch to Offline Mode
 function switchToOffline() {
-
-  game.createEntity({
-    id: playerId,
-    type: 'PLAYER',
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
 
   try {
     game.disconnect(); // Disconnect online client
   } catch (err) {
 
   }
-  game.start();
+  game.start(function(){
+
+    game.use(new Border({ autoBorder: true }));
+
+    game.createEntity({
+      id: playerId,
+      type: 'PLAYER',
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+  
+  });
 }
 
 // Setup button event listeners

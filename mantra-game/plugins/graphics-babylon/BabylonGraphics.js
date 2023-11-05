@@ -59,7 +59,6 @@ class BabylonGraphics extends GraphicsInterface {
     window.addEventListener('resize', () => this.engine.resize());
     renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
 
-
     // remit all pointer events to the document
     this.scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
@@ -88,14 +87,27 @@ class BabylonGraphics extends GraphicsInterface {
       console.log('no previous entity found for', entityData.id);
       return;
     }
-
     let graphic = previousEntity.graphics['graphics-babylon'];
-
-    graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+    graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     if (entityData.rotation !== undefined) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
-      graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+      // adjust cylinder rotation shape to point "forward"
+      // TODO: put in switch here for dimensions
+      switch (this.game.physics.dimension) {
+        case 2:
+          graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+          break;
+        case 3:
+          graphic.rotation.y = entityData.rotation.y + -Math.PI / 2;
+          graphic.rotation.x = entityData.rotation.x
+          graphic.rotation.z = entityData.rotation.z + Math.PI / 2;
+          break;
+        default:
+          throw new Error('Unknown physics dimensions, cannot update graphic')
+          break;
+      }
+
     }
   }
 

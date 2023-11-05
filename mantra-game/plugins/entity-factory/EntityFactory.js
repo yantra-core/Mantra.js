@@ -128,7 +128,7 @@ class EntityFactory {
 
     if (entityData.position) {
       // If position is not lockedProperties, use the new value from entityData
-      this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y });
+      this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y, z: entityData.position.z });
     }
 
     if (typeof entityData.rotation !== 'undefined') {
@@ -146,8 +146,8 @@ class EntityFactory {
       id: entityId,
       body: true,
       shape: 'triangle',
-      position: { x: 0, y: 0 },
-      velocity: { x: 0, y: 0 },
+      position: { x: 0, y: 0, z: 0 },
+      velocity: { x: 0, y: 0, z: 0 },
       rotation: 0,
       mass: 100,
       density: 100,
@@ -293,6 +293,7 @@ class EntityFactory {
     }
 
     let updated = game.getEntity(entityData.id);
+
     if (game.systems.graphics) {
 
       // if there are no graphics, create them
@@ -334,8 +335,9 @@ class EntityFactory {
           { x: config.position.x - 32, y: config.position.y + 32 },
           { x: config.position.x + 32, y: config.position.y + 32 }
         ];
-        body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
-        // body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
+        // TODO: add this support to PhysxPlugin
+        //body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
+        body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
         break;
     }
 

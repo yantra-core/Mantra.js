@@ -13,6 +13,8 @@ class MatterPhysics extends PhysicsInterface {
     this.Composite = Matter.Composite;
     this.Events = Matter.Events;
 
+    this.dimension = 2;
+
     // TODO: add all collision events
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
@@ -75,23 +77,29 @@ class MatterPhysics extends PhysicsInterface {
             // continue; // Skip updating physics for remote players
           }
 
-          // this is the logic for updating *all* entities positions
-          // this should probably be in entity-movement plugin
-          this.game.changedEntities.add(body.myEntityId);
-          this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-          this.game.components.rotation.set(body.myEntityId, body.angle);
-          this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+          if (this.game.isClient) {
+            // this is the logic for updating *all* entities positions
+            // this should probably be in entity-movement plugin
+            this.game.changedEntities.add(body.myEntityId);
+            this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+            this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+            this.game.components.rotation.set(body.myEntityId, body.angle);
+            if (entity.type !== 'BULLET') {}
+          } else {
+            // this is the logic for updating *all* entities positions
+            // this should probably be in entity-movement plugin
+            this.game.changedEntities.add(body.myEntityId);
+            this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+            this.game.components.rotation.set(body.myEntityId, body.angle);
+            this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+
+          }
+
         }
 
       }
     });
 
-  }
-
-  setGame(game) {
-    this.game = game;
-    this.game.engine = this.engine;
-    console.log('game was set', game);
   }
 
   // TODO: add this to PhysicsInterface
@@ -123,7 +131,7 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   // Equivalent to Body.applyForce()
-  applyForceToBody(body, position, force) {
+  applyForce(body, position, force) {
     Matter.Body.applyForce(body, position, force);
   }
 
@@ -137,6 +145,9 @@ class MatterPhysics extends PhysicsInterface {
     return body.velocity;
   }
 
+  getBodyRotation(body) {
+    return body.angle;
+  }
    
   onBeforeUpdate(engine, callback) {
     Matter.Events.on(engine, 'beforeUpdate', callback);

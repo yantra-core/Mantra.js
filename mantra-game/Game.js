@@ -49,7 +49,7 @@ class Game {
     this.components = {
       type: new Component('type'),           // string type, name of Entity
       destroyed: new Component('destroyed'), // boolean, if true, entity is pending destroy and will be removed from game
-      position: new Component('position'),
+      position: new Component('position'),   // object, { x: 0, y: 0, z: 0 }
       velocity: new Component('velocity'),
       rotation: new Component('rotation'),
       mass: new Component('mass'),

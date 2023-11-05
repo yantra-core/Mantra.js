@@ -1,11 +1,18 @@
 // AsteroidsMovement.js - Marak Squires 2023
-import MovementStrategy from "./MovementStrategy.js";
-
 class AsteroidsMovementStrategy {
   constructor() {}
 
   init(game) {
     this.game = game;
+
+    // check to see if entityInput system exists, if not throw error
+    if (!game.systems.entityMovement) {
+      throw new Error('AsteroidsMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
+    }
+
+    game.systems.entityMovement.strategies.push(this);
+
+
   }
 
   update(entityId, dx, dy) {
@@ -17,17 +24,31 @@ class AsteroidsMovementStrategy {
       this.game.physics.Body.rotate(body, dx * rotationSpeed, body.position);
     }
 
+    let bodyPosition = this.game.physics.getBodyPosition(body);
+    let bodyRotation = this.game.physics.getBodyRotation(body);
+
     if (dy !== 0) { // Thrust
       const thrust = 0.05;
-      const angle = body.angle;
+      let angle = bodyRotation;
+
+      // Adjusts for 3D space, remove this for 2d asteroids movements
+      if (typeof bodyRotation.x !== 'undefined') {
+        angle = bodyRotation.x;
+      }
+
+      if (typeof angle === 'undefined') {
+        console.log("WARNING - rotation angle is undefined", entityId, bodyRotation)
+        angle = 0; // for now
+      }
 
       // Assuming angle = 0 is upwards, and increases in the clockwise direction
       const force = {
         x: Math.sin(angle) * dy * thrust,
-        y: -Math.cos(angle) * dy * thrust
+        y: -Math.cos(angle) * dy * thrust,
+        z: 0
       };
 
-      this.game.physics.Body.applyForce(body, body.position, force);
+      this.game.physics.Body.applyForce(body, bodyPosition, force);
     }
   }
 }

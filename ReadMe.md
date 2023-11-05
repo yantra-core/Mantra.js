@@ -1,22 +1,44 @@
 # `@yantra-core/mantra`
 
+![Build Status](https://github.com/yantra-core/mantra/actions/workflows/nodejs.yml/badge.svg)
+
 ## Introduction
 
-Welcome to `@yantra-core/mantra` –  a versatile framework revolutionizing game development.
+Welcome to `@yantra-core/mantra` –  a versatile Javascript game development framework
 
-Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines.
-
-Mantra currently supports Babylon.js, Phaser.js, and Matter.js. 3D Physics via wasm is [coming soon](#features)!
-
-Mantra is designed for high-performance serverless physics and multiplayer environments while still making it easy to start up and quickly develop a local offline game.
+Mantra lets you focus on game logic and design without worrying about the complexities of physics simulation and high-performance netcode. Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
 ### Core Features
-- [X] **Entities, Components, Systems**: Enterprise-grade ECS for game development
-- [X] **Modular Plugin System**: Facilitating easier extension and customization.
-- [X] **Edge Computing Compatible**: Games can run in CloudFlare Workers environments.
-- [X] **Offline Gameplay Support**: Fully functional gameplay in offline mode.
+- ✅ **Entities, Components, Systems**: Enterprise-grade ECS for game development
+- ✅ **Modular Plugin System**: Facilitating easier extension and customization
+- ✅ **Edge Computing Compatible**: Games can run in CloudFlare Workers environments
+- ✅ **Offline Gameplay Support**: Fully functional gameplay in offline mode
 
-### Alpha Software Notice
+# 3D
+## WebGPU + Babylon.js
+Mantra's default 3D graphics are rendered using WebGPU and Babylon.js
+
+## NVIDA PhysX + Web Assembly
+Mantra's default 3D physics are powered by NVIDA PhysX compiled via EMScripten
+
+# 2D and 2.5D
+Want to build a 2D or 2.5D game? We've got you covered! In Mantra, it's a one-line change to swap the graphics or physics.
+
+Mantra has built-in support for Phaser 3 and Matter.js. You can even render the same Game through [multiple graphics pipelines](https://yantra.gg/mantra/examples/solo/split-render/pong.html) at once if you need to.
+
+**How is that even possible?**
+
+## In Mantra, Everything is a Plugin!
+
+Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of our community Plugins from our growing collection to quicky extend your game. Develop something cool? Publish and share your plugins with the [community](https://discord.gg/bbyjf6MXC2)!
+
+# Offline + Serverless Physics
+
+Mantra is built from the ground up to work offline and within Serverless environments like CloudFlare Workers or Hathora.
+
+No worries! Mantra can also run on any standard hosting environment.
+
+# Alpha Software Notice
 As alpha software, `@yantra-core/mantra` is currently under active development. [Features](#Features) are being added and refined. Users should anticipate changes and potential instabilities. Your feedback and contributions at this stage are invaluable and will shape the future of this framework.
 
 Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any questions!
@@ -90,7 +112,6 @@ game
 
 game.listen(8888);
 ```
-  
   
 ## Game API
 ### Entity API

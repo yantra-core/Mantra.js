@@ -10,6 +10,7 @@ import applyForce from './lib/body/applyForce.js';
 import rotateBody from './lib/body/rotateBody.js';
 import getBodyPosition from './lib/body/getBodyPosition.js';
 import getBodyRotation from './lib/body/getBodyRotation.js';
+import getLinearVelocity from './lib/body/getLinearVelocity.js';
 
 import quaternionToEuler from './lib/math/quaternionToEuler.js';
 
@@ -19,6 +20,12 @@ let context;
 
 let _physics = null;
 var lastBox = null;
+
+
+// TODO: move collisions into seperate file / plugin
+// Constants for collision layers
+const COLLISION_LAYER_1 = 1;
+const COLLISION_LAYER_2 = 2;
 
 // setup debug drawing stuff
 const { mat4, vec4, vec3 } = glMatrix;
@@ -31,14 +38,17 @@ class PhysXPhysics extends PhysicsInterface {
   constructor(config) {
     super();
 
+    this.name = 'physics-physx';
     this.updateEngine = updateEngine;
     this.applyForce = applyForce;
     this.rotateBody = rotateBody;
     this.getBodyPosition = getBodyPosition;
     this.getBodyRotation = getBodyRotation;
     this.checkForMovedBodies = checkForMovedBodies;
+    this.getLinearVelocity = getLinearVelocity;
     this.scene = null;
     this.lastFrame = 0;
+    this.dimension = 3;
 
     this.namespace = 'physics';
     //this.Vector = Matter.Vector;
@@ -102,7 +112,7 @@ class PhysXPhysics extends PhysicsInterface {
       // create default simulation shape flags
       var shapeFlags = new PhysX.PxShapeFlags(PhysX.PxShapeFlagEnum.eSCENE_QUERY_SHAPE | PhysX.PxShapeFlagEnum.eSIMULATION_SHAPE | PhysX.PxShapeFlagEnum.eVISUALIZATION);
 
-      
+
       // clean up temp objects
       PhysX.destroy(shapeFlags);
       PhysX.destroy(sceneDesc);
@@ -140,7 +150,18 @@ class PhysXPhysics extends PhysicsInterface {
   }
 
   // Override the createRectangle method to use PhysX
-  createRectangle(x, y, width, height, options) {
+  createRectangle(x, y, width, height, options = {}) {
+
+    // Inside the createRectangle function, after creating the boxShape
+    // Define filter data for the collision layers
+    let filterData = new this.PhysX.PxFilterData(
+      1, // Word0 (own layer)
+      1, // Word1 (layer to collide with)
+      0,                 // Word2 (not used in this context)
+      0                  // Word3 (not used in this context)
+    );
+
+    console.log('createRectangle', options)
     // Ensure the PhysX instance is loaded and available
     if (!this.PhysX) {
       console.error("PhysX is not initialized.");
@@ -172,8 +193,11 @@ class PhysXPhysics extends PhysicsInterface {
     // Create the box shape
     const boxShape = _physics.createShape(boxGeometry, material, false, shapeFlags);
 
+    // Set the simulation filter data
+    boxShape.setSimulationFilterData(filterData);
+
     let boxActor;
-    options.isStatic = false;
+    // options.isStatic = false;
     // Check if the body is static or dynamic based on the 'isStatic' option
     if (options && options.isStatic) {
       // Create a static actor for the box
@@ -188,9 +212,48 @@ class PhysXPhysics extends PhysicsInterface {
 
       // If options has a density property, set the mass and inertia
       if (options && options.density) {
-        // boxActor.updateMassAndInertia(options.density);
+        // Assuming you have some way to calculate the volume or mass from density
+        // Since density = mass / volume, you would rearrange to mass = density * volume
+        // Calculate the volume of the box. For a box, volume = width * height * depth
+        let volume = width * height * 1; // Assuming '100' is your depth here
+        let mass = options.density * volume;
+        console.log('SETTING MASS', mass)
+        // Now set the mass of the dynamic actor
+        boxActor.setMass(1);
       }
+
+      if (options && options.velocity) {
+        // apply velocity
+        // is this not correct? do we need to make this a vector?
+        // You need to create a PxVec3 for the velocity
+        const velocityVec = new this.PhysX.PxVec3(
+          options.velocity.x,
+          options.velocity.y,
+          options.velocity.z || 0 // If z is not provided, assume 0
+        );
+
+        console.log('velocityVec', velocityVec)
+
+        // Use the created PxVec3 to set the linear velocity
+        boxActor.setLinearVelocity(velocityVec);
+
+      }
+
+      // Lock the motion along the Z-axis
+      const lockFlags =
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_LINEAR_Z |
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Z |
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_X |
+        this.PhysX.PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Y;
+      console.log('lockFlags', lockFlags)
+      console.log(boxActor)
+      // Not working?
+      boxActor.setRigidDynamicLockFlags(lockFlags);
+
     }
+
+
+
 
     // Attach the shape to the actor
     boxActor.attachShape(boxShape);
@@ -227,7 +290,16 @@ class PhysXPhysics extends PhysicsInterface {
   }
 
   setVelocity(body, velocity) {
-    // Matter.Body.setVelocity(body, velocity);
+
+    const velocityVec = new this.PhysX.PxVec3(
+      velocity.x,
+      velocity.y,
+      velocity.z || 0 // If z is not provided, assume 0
+    );
+
+    console.log('setVelocity', velocityVec, body)
+
+    body.setLinearVelocity(body, velocityVec);
   }
 
   collisionStart(game, callback) {
@@ -290,7 +362,13 @@ class PhysXPhysics extends PhysicsInterface {
     );
   }
 
+  // Helper function to normalize a quaternion
+  normalizeQuaternion(q) {
+    const length = Math.sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+    return new this.PhysX.PxQuat(q.x / length, q.y / length, q.z / length, q.w / length);
+  }
+
+
 }
 
 export default PhysXPhysics;
-  

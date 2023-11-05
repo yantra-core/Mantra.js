@@ -5,13 +5,14 @@
   "main": "Game.js",
   "type": "module",
   "scripts": {
-    "test": "tap tests/",
+    "test": "tap --coverage-report=lcov --allow-incomplete-coverage tests/",
     "cover": "tap --coverage-report=html tests/"
   },
   "keywords": [],
   "author": "Yantra Works 2023",
   "license": "AGPL",
   "devDependencies": {
+    "matter-js": "^0.19.0",
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "babel-loader": "^9.1.3",
