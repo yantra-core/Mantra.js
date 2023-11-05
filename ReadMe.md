@@ -38,11 +38,6 @@ Mantra is built from the ground up to work offline and within Serverless environ
 
 No worries! Mantra can also run on any standard hosting environment.
 
-# Alpha Software Notice
-As alpha software, `@yantra-core/mantra` is currently under active development. [Features](#Features) are being added and refined. Users should anticipate changes and potential instabilities. Your feedback and contributions at this stage are invaluable and will shape the future of this framework.
-
-Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any questions!
-
 # Core Packages
 
   - `@yantra-core/mantra` - Core API + Plugins
@@ -255,3 +250,8 @@ The following checklist outlines the planned features and their current status:
 - [X] **Delta Encoding**: Encoding integer changes rather than complete states
 - [ ] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
 - [ ] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
+
+# Alpha Software Notice
+As alpha software, `@yantra-core/mantra` is currently under active development. [Features](#Features) are being added and refined. Users should anticipate changes and potential instabilities. Your feedback and contributions at this stage are invaluable and will shape the future of this framework.
+
+Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any questions!
