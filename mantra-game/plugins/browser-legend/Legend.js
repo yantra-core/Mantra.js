@@ -3,6 +3,8 @@
 class Legend {
   constructor(config = {}) {
     this.name = 'LegendPlugin';
+    this.highlightedKeys = {};  // Object to keep track of highlighted keys
+
   }
 
   init(game) {
@@ -19,29 +21,50 @@ class Legend {
     $('body').append('<div id="controlsView"><span id="closeButton">X</span>' + tableHTML + '</div>');
 
     // Attach event handler to close button
-    $('#closeButton').on('click', function() {
+    $('#closeButton').on('click', function () {
       $('#controlsView').hide();
     });
 
-    game.on('entityInput::handleInputs', function(data) {
+    game.on('entityInput::handleInputs', (data) => {
       if (data[0]) {
         let currentInputs = data[1].controls;
+        // Reset the highlighting for all previously highlighted keys
+        for (let key in this.highlightedKeys) {
+          $(`#row-${key}`).css('background-color', '');
+        }
+        this.highlightedKeys = {};  // Reset highlightedKeys object for this tick
         // Iterate through the currentInputs object
         for (let key in currentInputs) {
-          // Use the unique ID to select the corresponding table row
           let row = $(`#row-${key}`);
-          // Update the background color based on the boolean value
           if (currentInputs[key]) {
             row.css('background-color', 'yellow');  // Highlight with a yellow background color
-          } else {
-            row.css('background-color', '');  // Reset background color
+            this.highlightedKeys[key] = true;  // Store this key as highlighted
           }
         }
-        console.log('entityInput::handleInputs', data[1].controls);
+        // TODO: fix data signature of EE here, update EE tests
+        // console.log('entityInput::handleInputs', data[1].controls);
       }
     });
 
+    // Set up a timer to clear highlighted keys every 700 milliseconds
+    // This is required since we only broadcast true inputs states, and assume false for all other inputs
+    this.clearHighlightsInterval = setInterval(this.clearHighlights.bind(this), 700);
+
   }
+
+  clearHighlights() {
+    // Reset the highlighting for all previously highlighted keys
+    for (let key in this.highlightedKeys) {
+      $(`#row-${key}`).css('background-color', '');
+    }
+    this.highlightedKeys = {};  // Reset highlightedKeys object
+  }
+
+  // Make sure to clear the interval when the plugin is destroyed
+  destroy() {
+    clearInterval(this.clearHighlightsInterval);
+  }
+
 }
 
 export default Legend;
