@@ -55,6 +55,11 @@ class CameraSystem {
     this.camera.inputs.attached.keyboard.keysDown = []; // Disable DOWN arrow key
     this.camera.inputs.attached.keyboard.keysLeft = []; // Disable LEFT arrow key
     this.camera.inputs.attached.keyboard.keysRight = []; // Disable RIGHT arrow key
+
+    // this.camera.inputs.attached.pointers.buttons = [1, -1, -1];
+    this.camera._panningMouseButton = 0;
+
+
   }
   
 
