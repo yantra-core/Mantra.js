@@ -49,67 +49,43 @@ No worries! Mantra can also run on any standard hosting environment.
   - `@yantra-core/edge`   - Run your authoritative server on Cloudflare Edge Workers
   - `@yantra-core/client` - Browser-based Mantra Client with offline support
 
+## API
 
-## Examples ( more coming soon ! )
+### new Game(options)
 
-| Name | Source |
-| --- | --- |
-| └ solo | [📂](https://yantra.gg/mantra/examples/solo) |
-|         └ babylon | [📂](https://yantra.gg/mantra/examples/solo/babylon) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/babylon/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/babylon/pong.html) |
-|         └ css | [📂](https://yantra.gg/mantra/examples/solo/css) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/css/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/css/pong.html) |
-|         └ phaser3 | [📂](https://yantra.gg/mantra/examples/solo/phaser3) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/phaser3/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/phaser3/pong.html) |
-|         └ split-render | [📂](https://yantra.gg/mantra/examples/solo/split-render) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/split-render/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/split-render/pong.html) |
+Returns a new game instance. `options` defaults to:
 
-## Creating your first Mantra Game
-
-**Client**
 ```js
-let game = new Game();
+{
+  physics: 'matter',      // enum, 'physx', 'matter'
+  graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
+  keyboard: true,         // boolean or `Keyboard` config object
+  mouse: true,            // boolean or `Mouse` config object
+  collisions: false,      // boolean
+  width: 1600,            // number
+  height: 900,            // number
+}
 
-// Use Plugins to add systems to the game
-game
-  .use(new MatterPhysics())
-  .use(new Collision())
-  .use(new EntityFactory())
-  .use(new EntityInput())
-  .use(new EntityMovement(new AsteroidsMovement()))
-  .use(new Bullet())
-
-// Since this is the Client, we can add Keyboard and Graphics 
-game
-  .use(new Graphics())
-  .use(new BabylonGraphics())
-  .use(new Camera())
-  .use(new StarField())
-  .use(new KeyboardBrowser());
-
-game.connect('ws://localhost:8888');
 ```
 
-**Server**
+### Local Client
+
+```js
+let game = new Game();
+game.start(); // starts local game instance
+```
+
+### Remove Client
+
+```js
+let game = new Game();
+game.connect('ws://localhost:8888'); // connects to a mantra-server instance at port 8888
+```
+
+### Server
 ```js
 let game = new Game({ isServer: true });
-
-// Use Plugins to add systems to the game
-game
-  .use(new MatterPhysics())
-  .use(new Collision())
-  .use(new EntityFactory())
-  .use(new EntityInput())
-  .use(new EntityMovement(new AsteroidsMovement()))
-  .use(new Lifetime())
-  .use(new Bullet())
-  .use(new WebSocketServer());
-
-game.listen(8888);
+game.listen(8888); // starts a listening WebSocket server on port 8888
 ```
   
 ## Game API
@@ -190,6 +166,26 @@ game.use(pluginInstance)
 |         └ SnapShotManager | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots/SnapShotManager) |
 | └ world | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world) |
 |         └ pong | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world/pong) |
+
+
+
+## Examples ( more coming soon ! )
+
+| Name | Source |
+| --- | --- |
+| └ solo | [📂](https://yantra.gg/mantra/examples/solo) |
+|         └ babylon | [📂](https://yantra.gg/mantra/examples/solo/babylon) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/babylon/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/babylon/pong.html) |
+|         └ css | [📂](https://yantra.gg/mantra/examples/solo/css) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/css/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/css/pong.html) |
+|         └ phaser3 | [📂](https://yantra.gg/mantra/examples/solo/phaser3) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/phaser3/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/phaser3/pong.html) |
+|         └ split-render | [📂](https://yantra.gg/mantra/examples/solo/split-render) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/split-render/asteroids.html) |
+| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/split-render/pong.html) |
 
 
 <a name="features"></a>
