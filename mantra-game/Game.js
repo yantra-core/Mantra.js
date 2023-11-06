@@ -21,6 +21,7 @@ class Game {
     this.on = eventEmitter.on;
     this.off = eventEmitter.off;
     this.emit = eventEmitter.emit;
+    this.onAny = eventEmitter.onAny;
 
     this.bodyMap = {};
     this.systems = {};

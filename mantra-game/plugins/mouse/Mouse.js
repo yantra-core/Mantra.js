@@ -1,4 +1,4 @@
-// BrowserMouse.js - Marak Squires 2023
+// Mouse.js - Marak Squires 2023
 export default class BrowserMouse {
   constructor(communicationClient) {
     // this.communicationClient = communicationClient;

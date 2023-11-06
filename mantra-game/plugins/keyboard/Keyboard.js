@@ -1,4 +1,4 @@
-// BrowserKeyboard.js - Marak Squires 2023
+// Keyboard.js - Marak Squires 2023
 
 
 // All key codes available to browser
