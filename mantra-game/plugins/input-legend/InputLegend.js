@@ -1,10 +1,8 @@
-// Legend.js - Marak Squires 2023
-
-class Legend {
+// InputLegend.js - Marak Squires 2023
+class InputLegend {
   constructor(config = {}) {
     this.name = 'LegendPlugin';
-    this.highlightedKeys = {};  // Object to keep track of highlighted keys
-
+    this.highlightedKeys = {};
   }
 
   init(game) {
@@ -13,78 +11,81 @@ class Legend {
   }
 
   drawTable() {
-
     let game = this.game;
-
     let entityInputSystem = game.systemsManager.getSystem('entityInput');
     let controls = entityInputSystem.controlMappings;
 
-    let tableHTML = '<table id="controlsTable"><tr><th>Key</th><th>Action</th></tr>';
-    for (let key in controls) {
-      // Assign a unique ID to each row based on the key name
-      tableHTML += `<tr id="row-${key}"><td>${key}</td><td>${controls[key]}</td></tr>`;
-    }
-    tableHTML += '</table>';
-    // Add #controlsView to the DOM
-    $('body').append('<div id="controlsView"><span id="closeButton">X</span>' + tableHTML + '</div>');
 
-    // Attach event handler to close button
-    $('#closeButton').on('click', function () {
-      $('#controlsView').hide();
+    let table = document.createElement('table');
+    table.id = "controlsTable";
+    let headerHTML = '<tr><th>Key</th><th>Action</th></tr>';
+    table.innerHTML = headerHTML;
+
+    for (let key in controls) {
+      let row = table.insertRow();
+      row.id = `row-${key}`;
+      let cellKey = row.insertCell();
+      let cellAction = row.insertCell();
+      cellKey.textContent = key;
+      cellAction.textContent = controls[key];
+    }
+
+    let controlsView = document.createElement('div');
+    controlsView.id = "controlsView";
+
+    let closeButton = document.createElement('span');
+    closeButton.id = "closeButton";
+    closeButton.textContent = 'X';
+    closeButton.addEventListener('click', function () {
+      controlsView.style.display = 'none';
     });
 
+    controlsView.appendChild(closeButton);
+    controlsView.appendChild(table);
+    document.body.appendChild(controlsView);
   }
 
   listenForEntityInput(entity) {
     let game = this.game;
     let self = this;
+
     game.on('entityInput::handleInputs', (entityId, data) => {
       if (data) {
         let currentInputs = data.controls;
-        // Reset the highlighting for all previously highlighted keys
         for (let key in this.highlightedKeys) {
-          $(`#row-${key}`).css('background-color', '');
+          document.getElementById(`row-${key}`).style.backgroundColor = '';
         }
-        this.highlightedKeys = {};  // Reset highlightedKeys object for this tick
-        // Iterate through the currentInputs object
+        this.highlightedKeys = {};
+
         for (let key in currentInputs) {
-          let row = $(`#row-${key}`);
+          let row = document.getElementById(`row-${key}`);
           if (currentInputs[key]) {
-            row.css('background-color', 'yellow');  // Highlight with a yellow background color
-            this.highlightedKeys[key] = true;  // Store this key as highlighted
+            row.style.backgroundColor = 'yellow';
+            this.highlightedKeys[key] = true;
           }
         }
-        // TODO: fix data signature of EE here, update EE tests
-        // console.log('entityInput::handleInputs', data[1].controls);
       }
     });
 
-    game.on('inputStrategyRegistered', function(strategies){
-      strategies.forEach(function(strategy){
+    game.on('inputStrategyRegistered', function (strategies) {
+      strategies.forEach(function (strategy) {
         self.drawTable();
       });
-      // if a new strategy was registered *after* Legend was loaded, we do want redraw the table
     });
 
-    // Set up a timer to clear highlighted keys every little while
-    // This is required since we only broadcast true inputs states, and assume false for all other inputs
     this.clearHighlightsInterval = setInterval(this.clearHighlights.bind(this), 500);
-
   }
 
   clearHighlights() {
-    // Reset the highlighting for all previously highlighted keys
     for (let key in this.highlightedKeys) {
-      $(`#row-${key}`).css('background-color', '');
+      document.getElementById(`row-${key}`).style.backgroundColor = '';
     }
-    this.highlightedKeys = {};  // Reset highlightedKeys object
+    this.highlightedKeys = {};
   }
 
-  // Make sure to clear the interval when the plugin is destroyed
   destroy() {
     clearInterval(this.clearHighlightsInterval);
   }
-
 }
 
-export default Legend;
+export default InputLegend;

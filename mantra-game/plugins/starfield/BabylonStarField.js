@@ -1,6 +1,6 @@
 let gameTick = 0;
 
-class StarField {
+class BabylonStarField {
   constructor(starCount = 5000, fieldSize = 10000) {
     this.starCount = starCount;
     this.fieldSize = fieldSize;
@@ -9,6 +9,7 @@ class StarField {
   }
 
   init (game, engine, scene) {
+    console.log('ffff', game, engine, scene)
     // not correct scope? is scene sent here?
     this.scene = scene;
     this.camera = scene.cameras[0];
@@ -59,9 +60,6 @@ class StarField {
     this.pcs.setParticles();
   }
 
-
-
-
 }
 
-export default StarField;
+export default BabylonStarField;

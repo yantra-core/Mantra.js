@@ -1,0 +1,26 @@
+#controlsView {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: white;
+  border: 1px solid #dddddd;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#controlsTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#controlsTable th,
+#controlsTable td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 12px;
+  font-size: 24px;
+}
+
+#controlsTable th {
+  background-color: #f2f2f2;
+}

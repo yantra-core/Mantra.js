@@ -16,7 +16,6 @@ export default class WebSocketClient {
 
   connect (url) {
 
-
     let self = this;
 
     let graphicsSystems = this.game.graphics.length;

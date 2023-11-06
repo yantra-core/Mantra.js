@@ -27,7 +27,8 @@ MANTRA.plugins = {
   PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js').default,
   PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js').default,
   PongWorld: require('./plugins/world/pong/PongWorld.js').default,
-  StarField: require('./plugins/graphics-babylon/starfield/StarField.js').default,
+  StarField: require('./plugins/starfield/StarField.js').default,
+  BabylonStarField: require('./plugins/starfield/BabylonStarField.js').default,
   // ... add other plugins similarly
 };
 

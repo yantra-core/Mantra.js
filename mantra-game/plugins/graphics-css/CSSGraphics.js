@@ -1,6 +1,6 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
-class HTMLGraphics extends GraphicsInterface {
+class CSSGraphics extends GraphicsInterface {
   constructor({ debug = true, onlineMode = true, followPlayer = false } = {}) {
     super();
     this.onlineMode = onlineMode;
@@ -25,6 +25,9 @@ class HTMLGraphics extends GraphicsInterface {
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     game.graphicsReady.push(self.name);
+
+    // Initialize the CSS render div
+    this.initCSSRenderDiv();
   }
 
   initDebugUI() {
@@ -41,16 +44,31 @@ class HTMLGraphics extends GraphicsInterface {
     this.debugUIContainer.style.zIndex = '9999';
     this.debugUIContainer.style.position = 'absolute';
 
-
-
     // Create a table within the debug UI container
     this.debugTable = document.createElement('table');
     this.debugTable.id = 'debugTable';
     this.debugUIContainer.appendChild(this.debugTable);
 
-    document.body.appendChild(this.debugUIContainer);
+    this.renderDiv.appendChild(this.debugUIContainer);
   }
 
+  initCSSRenderDiv() {
+    const gameHolder = document.getElementById('gameHolder');
+    if (!gameHolder) {
+      console.error('gameHolder not found!');
+      return;
+    }
+
+    let renderDiv = document.getElementById('css-render-div');
+    if (!renderDiv) {
+      renderDiv = document.createElement('div');
+      renderDiv.id = 'css-render-div';
+      gameHolder.appendChild(renderDiv);
+    }
+
+    this.renderDiv = renderDiv;
+  }
+  
   createGraphic(entityData) {
 
     if (entityData.destroyed === true) {
@@ -103,7 +121,7 @@ class HTMLGraphics extends GraphicsInterface {
     }
 
     entityElement.style.background = 'blue';
-    document.body.appendChild(entityElement);
+    this.renderDiv.appendChild(entityElement);
 
     // Update the position of the entity element
     this.updateEntityElementPosition(entityElement, entityData);
@@ -155,9 +173,11 @@ class HTMLGraphics extends GraphicsInterface {
       return;
     }
     
-    if (document.contains(entity.graphics['graphics-css'])) {
-      entity.graphics['graphics-css'].remove();
-    }
+   let renderDiv = document.getElementById('css-render-div');
+   if (renderDiv && renderDiv.contains(entity.graphics['graphics-css'])) {
+     entity.graphics['graphics-css'].remove();
+   }
+
   }
   updateEntityElementPosition(entityElement, {position, width, height, rotation = 0}) {
     // Adjust the position based on the camera position
@@ -191,4 +211,4 @@ class HTMLGraphics extends GraphicsInterface {
   render () {}
 }
 
-export default HTMLGraphics;
+export default CSSGraphics;

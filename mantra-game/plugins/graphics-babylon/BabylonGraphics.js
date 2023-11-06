@@ -20,6 +20,7 @@ class BabylonGraphics extends GraphicsInterface {
     this.camera = null;
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
+    this.pendingLoad = []; // queue of pending Plugins that depend on this Babylon Graphics
   }
 
   init(game) {
@@ -27,6 +28,29 @@ class BabylonGraphics extends GraphicsInterface {
     game.graphics.push(this);
     this.game = game;
     this.game.systemsManager.addSystem('graphics-babylon', this);
+
+    // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
+    if (typeof BABYLON === 'undefined') {
+      console.log('BABYLON is not defined, attempting to load it from vendor');
+
+      game.loadScripts([
+        '/vendor/babylon.js',
+        '/vendor/babylon.gui.min.js',
+        '/vendor/babylonjs.materials.min.js'
+      ], () => {
+
+        console.log('All BABYLON scripts loaded sequentially, proceeding with initialization');
+        // All scripts are loaded, proceed with initialization
+        this.babylonReady();
+      })
+    } else {
+      this.babylonReady();
+    }
+
+  }
+
+  babylonReady(){
+    let game = this.game;
 
     // Access the renderCanvas element and set its size
     let renderCanvas = document.getElementById('babylon-render-canvas');
@@ -37,7 +61,7 @@ class BabylonGraphics extends GraphicsInterface {
       renderCanvas.id = 'babylon-render-canvas';
       renderCanvas.style.width = '100%';
       renderCanvas.style.height = '100%';
-      renderCanvas.style.position = 'absolute';
+      // renderCanvas.style.position = 'absolute';
       renderCanvas.style.top = '0px';
       renderCanvas.style.left = '0px';
       // append the renderCanvas to the gameHolder
@@ -55,64 +79,53 @@ class BabylonGraphics extends GraphicsInterface {
       renderCanvas.height = game.height; // Set canvas height in pixels
     }
 
-    // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
-    if (typeof BABYLON === 'undefined') {
-      console.log('BABYLON is not defined, attempting to load it from vendor');
 
-      game.loadScripts([
-        '/vendor/babylon.js',
-        '/vendor/babylon.gui.min.js',
-        '/vendor/babylonjs.materials.min.js'
-      ], () => {
+    this.engine = new BABYLON.Engine(renderCanvas, true);
+    this.scene = new BABYLON.Scene(this.engine);
+    this.game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
+    game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
 
-        console.log('All BABYLON scripts loaded sequentially, proceeding with initialization');
-        // All scripts are loaded, proceed with initialization
+    // TODO: move this into Systems for Babylon client
+    // this.cameraSystem = new CameraSystem(this.game, this.engine, this.scene);
 
-        this.engine = new BABYLON.Engine(renderCanvas, true);
-        this.scene = new BABYLON.Scene(this.engine);
-    
-        game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
-    
-        // TODO: move this into Systems for Babylon client
-        // this.cameraSystem = new CameraSystem(this.game, this.engine, this.scene);
-    
-        // Only initialize DebugGUI if debug flag is set to true
-        if (this.debug) {
-          // this.debugGUI = new DebugGUI(this.scene);
-        }
-    
-        // Add a hemispheric light to ensure everything is illuminated
-        let light = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), this.scene);
-        light.intensity = 0.7;
-    
-        this.engine.runRenderLoop(() => this.scene.render());
-        window.addEventListener('resize', () => this.engine.resize());
-        renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
-    
-        // remit all pointer events to the document
-        this.scene.onPointerObservable.add((pointerInfo) => {
-          switch (pointerInfo.type) {
-            case BABYLON.PointerEventTypes.POINTERDOWN:
-            case BABYLON.PointerEventTypes.POINTERUP:
-            case BABYLON.PointerEventTypes.POINTERMOVE:
-              reEmitEvent(pointerInfo.event);
-              break;
-          }
-        });
-    
-        function reEmitEvent(babylonEvent) {
-          const newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
-          document.dispatchEvent(newEvent);
-        }
-
-        game.use(new plugins.Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
-
-
-        game.graphicsReady.push(this.name);
-
-      })
+    // Only initialize DebugGUI if debug flag is set to true
+    if (this.debug) {
+      // this.debugGUI = new DebugGUI(this.scene);
     }
 
+    // Add a hemispheric light to ensure everything is illuminated
+    let light = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), this.scene);
+    light.intensity = 0.7;
+
+    this.engine.runRenderLoop(() => this.scene.render());
+    window.addEventListener('resize', () => this.engine.resize());
+    renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
+
+    // remit all pointer events to the document
+    this.scene.onPointerObservable.add((pointerInfo) => {
+      switch (pointerInfo.type) {
+        case BABYLON.PointerEventTypes.POINTERDOWN:
+        case BABYLON.PointerEventTypes.POINTERUP:
+        case BABYLON.PointerEventTypes.POINTERMOVE:
+          reEmitEvent(pointerInfo.event);
+          break;
+      }
+    });
+
+    function reEmitEvent(babylonEvent) {
+      const newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
+      document.dispatchEvent(newEvent);
+    }
+
+    game.use(new plugins.Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
+
+
+    game.graphicsReady.push(this.name);
+
+
+    this.pendingLoad.forEach(function(pluginInstance){
+      game.use(pluginInstance);
+    })
 
 
   }

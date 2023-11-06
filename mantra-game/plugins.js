@@ -15,6 +15,7 @@ import Graphics from './plugins/graphics/Graphics.js';
 import BabylonGraphics from './plugins/graphics-babylon/BabylonGraphics.js';
 import Camera from './plugins/graphics-babylon/camera/BabylonCamera.js'; // TODO: rename to BabylonCamera?
 import PhaserGraphics from './plugins/graphics-phaser/PhaserGraphics.js';
+import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
 
 // Input Devices
 import Mouse from './plugins/mouse/Mouse.js';
@@ -28,7 +29,8 @@ import WebSocketClient from './plugins/client/WebSocketClient.js';
 import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import InputLegend from './plugins/input-legend/InputLegend.js';
-import StarField from './plugins/graphics-babylon/starfield/StarField.js';
+import StarField from './plugins/starfield/StarField.js';
+import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 
 /*
 // Manually require each plugin
@@ -74,10 +76,12 @@ const plugins = {
   Mouse: Mouse,
   BabylonGraphics,
   PhaserGraphics,
+  CSSGraphics,
   LocalClient,
   WebSocketClient,
   Camera,
-  StarField
+  StarField,
+  BabylonStarField
 };
 
 export default plugins;

@@ -13,7 +13,7 @@ class CameraSystem {
     // Store the initial values
     this.initialDistance = 2560;
     this.initialAlpha = 0;
-    this.initialBeta = 0.01;
+    this.initialBeta = 0.35;
 
     // Set up the camera
     this.camera = new BABYLON.ArcRotateCamera("camera", this.initialAlpha, this.initialBeta, this.initialDistance, new BABYLON.Vector3(0, 0, 0), this.scene);
