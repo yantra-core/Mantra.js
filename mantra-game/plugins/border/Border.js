@@ -1,7 +1,7 @@
 // Border.js - Marak Squires 2023
 class Border {
   constructor({ autoBorder = true, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
-    this.name = 'border';
+    this.name = 'Border';
     this.height = height;
     this.width = width;
     this.position = position;

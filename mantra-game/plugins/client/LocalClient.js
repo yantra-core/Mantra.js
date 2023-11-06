@@ -1,18 +1,19 @@
+// LocalClient.js - Marak Squires 2023
+// LocalClient is a client that runs the game loop locally, without a server
 export default class LocalClient {
   constructor(playerId) {
     this.entityName = playerId; // Remark: localClient expects player name in constructor?
     this.started = false;         // TODO: This doesn't seem ideal, we may not know the player name at this point
     // window.currentPlayerId currently used for various local client scoped auth functions, will need to be replaced with a better solution
     window.currentPlayerId = playerId;
+    this.name = 'client-local';
   }
 
   init (game) {
     this.game = game;
     this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
-    this.game.start = this.start.bind(this);
-    this.game.stop = this.stop.bind(this);
     game.localGameLoopRunning = true;
-    console.log('init the local client')
+    this.game.systemsManager.addSystem('localClient', this);
   }
 
   start (callback) {
@@ -26,6 +27,8 @@ export default class LocalClient {
     let physicsReady = this.game.physicsReady;
 
     let self = this;
+
+    // Wait for all systems to be ready before starting the game loop
     if (!physicsReady || graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
       setTimeout(function(){
         self.start(callback);
@@ -37,7 +40,7 @@ export default class LocalClient {
 
     this.game.communicationClient = this;
     this.game.localGameLoopRunning = true;
-    callback(null, true);
+     callback(null, true);
     
   }
   stop () {

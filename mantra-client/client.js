@@ -3,130 +3,132 @@ import config from './config/config.js';
 //
 // Game and Clients
 //
-//import { Game } from '@yantra-core/mantra/Game.js';
-import { Game } from '@yantra-core/mantra';
+//import { Game } from '../mantra-game/Game.js';
+import { Game, plugins } from '../mantra-game';
 
-//
-// Plugins
-//
-import EntityFactory from '@yantra-core/mantra/plugins/entity-factory/EntityFactory.js';
-import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js';
-import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
-
-import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
-// import PhysXPhysics from '@yantra-core/mantra/plugins/physics-physx/PhysXPhysics.js'; // WIP
-
-//
-// Game elements
-//
-import Bullet from '@yantra-core/mantra/plugins/bullet/Bullet.js';
-import Border from '@yantra-core/mantra/plugins/border/Border.js';
-
-
-import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
+import PhysXPhysics from '../mantra-game/plugins/physics-physx/PhysXPhysics.js'; // WIP
 
 //
 // Input Strategies
 //
-import TwoDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
-import ThreeDimensionalInputStrategy from '@yantra-core/mantra/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
+import Default2DInputStrategy from '../mantra-game/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
+import ThreeDimensionalInputStrategy from '../mantra-game/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
 
 
 //
 // Movement Strategies
 //
-import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/AsteroidsMovement.js';
-import PongMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PongMovement.js';
-import PacManMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/PacManMovement.js';
-import FroggerMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/FroggerMovement.js';
+import AsteroidsMovement from '../mantra-game/plugins/entity-movement/strategies/AsteroidsMovement.js';
+import Asteroids3DMovement from '../mantra-game/plugins/entity-movement/strategies/3D/Asteroids3DMovement.js';
+import PongMovement from '../mantra-game/plugins/entity-movement/strategies/PongMovement.js';
+import PacManMovement from '../mantra-game/plugins/entity-movement/strategies/PacManMovement.js';
+import FroggerMovement from '../mantra-game/plugins/entity-movement/strategies/FroggerMovement.js';
 
 
-// Browser / Client specific Plugins
-import Graphics from '@yantra-core/mantra/plugins/graphics/Graphics.js';
-import BabylonGraphics from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
-import PhaserGraphics from '@yantra-core/mantra/plugins/graphics-phaser/PhaserGraphics.js';
-import CSSGraphics from '@yantra-core/mantra/plugins/graphics-css/CSSGraphics.js';
+import PongWorld from '../mantra-game/plugins/world/pong/PongWorld.js';
 
 
-// TODO: create some common Plugins scope so we don't have to require like this
-
-import KeyboardBrowser from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser.js';
-import KeyboardBrowser2 from '@yantra-core/mantra/plugins/browser-keyboard/KeyboardBrowser2.js';
-import MouseBrowser from '@yantra-core/mantra/plugins/browser-mouse/MouseBrowser.js';
-import Camera from '@yantra-core/mantra/plugins/graphics-babylon/camera/BabylonCamera.js';
-import StarField from '@yantra-core/mantra/plugins/graphics-babylon/starfield/StarField.js';
-
-//import Chat from '@yantra-core/mantra/plugins/chat/Chat.js';
-import PongWorld from '@yantra-core/mantra/plugins/world/pong/PongWorld.js';
-
-import LocalClient from '@yantra-core/mantra/plugins/client-local/LocalClient.js';
-import WebSocketClient from '@yantra-core/mantra/plugins/client-websocket/WebsocketClient.js';
-
+// console.log('plugins', plugins)
 
 //
 // Creates a new game instance
 //
+/*
 let game = new Game({
-  isClient: true,
-  width: 1600 * 2,
-  height: 900 * 2,
+  isClient: true,        // can we remove this?
+  physics: 'matter',     // enum, 'physx', 'matter', default 'matter'
+  graphics: ['phaser'],  // array enum, 'phaser', 'css', 'none', default ['babylon']
+  keyboard: {            // boolean or config object, default true
+    preventDefaults: false
+  },       
+  mouse: true,           // boolean or config object, default true
+  collisions: true,      // boolean, default true
+  width: 1600 * 2,       // number, default 1600
+  height: 900 * 2,       // number, default 900
+});
+*/
+
+
+//
+// Create the Game object with default config
+//
+/*
+let defaultConfig = {
+  isClient: true,         // boolean, default true
+  isServer: false,        // boolean, default false
+  physics: 'matter',      // enum or Physics config object, 'physx', 'matter', default 'matter'
+  graphics: ['babylon'],  // array enum, 'phaser', 'css', 'none', default ['babylon']
+  mouse: true,            // boolean or Mouse config object, default true
+  keyboard: true,         // boolean or Keyboard config object, default true
+  collisions: true,       // boolean, default true
+  width: 1600,            // number, default 1600
+  height: 900,            // number, default 900
+}
+
+// Game will start with the defaultConfig, unless overridden
+
+// So for example, if you wish to disable mouse inputs, you can simply:
+let game = new Game({
+  mouse: false
+});
+
+// If you wish you customize Keyboard to disable preventDefault:
+let game = new Game({
+  keyboard: {
+    preventDefaults: false
+  }
+});
+
+*/
+
+let game = new Game({
+  mouse: false,
 });
 
 //
 // Use Plugins to add systems to the game
 //
 game
-  //.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
-  .use(new MatterPhysics())  // Status: Operational, collisions working
-  .use(new Collision())        // TODO: make configurable like camera per physics pipeline
-  .use(new EntityFactory())
-  .use(new EntityInput())           // will use default 2D input strategy if none are .use() below
-  // .use(new TwoDimensionalInputStrategy())
-  .use(new EntityMovement())        // will use default 2D movement strategy if none are .use() below
-  .use(new AsteroidsMovement())
-  .use(new Bullet())
+  .use(new plugins.Bullet())
+  .use(new plugins.InputLegend())
+  .use(new plugins.StarField())
+  .use(new plugins.Border({ autoBorder: true }));
 
-//
-// Since this is the Client, we can add a Graphics Plugin
-//
-game
-  .use(new Graphics({
-    camera: {
-      followPlayer: true // applies configuration to all graphics in pipeline
-    }
-  })) // adds Game.createGraphic, game.removeGraphic, game.createTriangle, game.systems.graphics, etc
-  .use(new BabylonGraphics())  // BabylonGraphics will now recieve game.createGraphic, game.removeGraphic, etc
-  // .use(new CSSGraphics())
-  // .use(new PhaserGraphics({ followPlayer: true })) // We can register multiple Graphics Plugins and each will recieve the same game.createGraphic, etc
-  .use(new Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
-                                            // use default configs from Graphics plugin, then allow overrides
-  .use(new StarField())                    // camera should probably be config option in graphics plugin
-  .use(new KeyboardBrowser())             // makes sense as its mostly required for babylon, etc
-  //.use(new KeyboardBrowser2())
-
-  //.use(new MouseBrowser());
-
+//.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
+//.use(new AsteroidsMovement())
+//.use(new Default2DInputStrategy())
+//.use(new ThreeDimensionalInputStrategy())
+//game.use(new PongWorld())
 
 let playerId = randomId();
 
 // Initialize both clients
-const localClient = new LocalClient(playerId);
-const websocketClient = new WebSocketClient(playerId);
+//const localClient = new plugins.LocalClient(playerId);
+//const websocketClient = new plugins.WebSocketClient(playerId);
 
 // Default Mode setup based on config
-game.use(localClient);
+game.use(new plugins.Client(playerId));
 //game.use(websocketClient);
 
 
-// game.use(new PongWorld())
+// game.start() // starts up local offline game
+// game.connect(wsUrl) // connects to websocket server
 
+/*
+  // This will listen for all events on Game instance
+  // Since all Plugin class methods are event emitters, we can watch entire Mantra Game instance and all Plugins
+  game.onAny(function(event, data){
+    console.log(event, data)
+  })
+*/
+
+/*
 // Function to switch to Online Mode
 function switchToOnline() {
   //game.removeEntity(playerId); // Destroy the xal player
   //game.stop(); // Stop local client
   game.connect('ws://192.168.1.80:8787/websocket');
   //game.connect('ws://192.168.1.80:8888/websocket');
-
 }
 
 // Function to switch to Offline Mode
@@ -137,9 +139,8 @@ function switchToOffline() {
   } catch (err) {
 
   }
-  game.start(function(){
+  game.start(function () {
 
-    game.use(new Border({ autoBorder: true }));
 
     game.createEntity({
       id: playerId,
@@ -149,17 +150,36 @@ function switchToOffline() {
         y: 0
       }
     });
-  
+
   });
 }
+*/
 
 // Setup button event listeners
-document.getElementById('connectButton').addEventListener('click', switchToOnline);
-document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
+//document.getElementById('connectButton').addEventListener('click', switchToOnline);
+//document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
 
 function randomId() {
   return Math.random().toString(36).substr(2, 9);
 }
 
-switchToOffline();
-//switchToOnline();
+// switchToOffline();
+// switchToOnline();
+
+// Single Player Offline Mode
+game.start(function () {
+  // create a single player entity
+  game.createEntity({
+    id: playerId,
+    type: 'PLAYER',
+    position: {
+      x: 0,
+      y: 0
+    }
+  });
+});
+
+//game.stop(); // stops local client
+// Connects to websocket server
+// see: @yantra-core/mantra-server
+//game.connect('ws://192.168.1.80:8888/websocket');

@@ -19,6 +19,7 @@ class SystemsManager {
     // binds system to game.systems scope for convenience
     this.game.systems[systemName] = system;
     console.log(`system.${systemName} = new ${system.name}()`);
+    //console.log(`game.use(new ${system.name}())`);
   }
 
   removeSystem(systemName) {
@@ -32,7 +33,7 @@ class SystemsManager {
     if (this.systems.has(systemName)) {
       return this.systems.get(systemName);
     }
-    throw new Error(`System with name ${systemName} does not exist!`);
+    throw new Error(`System with name ${systemName} does not exist! Perhaps try running "game.use(new plugins.${systemName}())" first?`);
   }
 
   update(deltaTime) {

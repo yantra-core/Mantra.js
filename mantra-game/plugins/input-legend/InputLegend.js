@@ -9,7 +9,9 @@ class Legend {
 
   init(game) {
     this.game = game;
-    let controls = game.systems.entityInput.controlMappings;
+
+    let entityInputSystem = game.systemsManager.getSystem('entityInput');
+    let controls = entityInputSystem.controlMappings;
 
     let tableHTML = '<table id="controlsTable"><tr><th>Key</th><th>Action</th></tr>';
     for (let key in controls) {
@@ -26,7 +28,6 @@ class Legend {
     });
 
     game.on('entityInput::handleInputs', (entityId, data) => {
-      console.log('dddd123123213',entityId, data)
       if (data) {
         let currentInputs = data.controls;
         // Reset the highlighting for all previously highlighted keys

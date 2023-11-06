@@ -1,5 +1,5 @@
 // WebSocketClient.js
-import interpolateSnapshot from './interpolateSnapshot.js';
+import interpolateSnapshot from './lib/interpolateSnapshot.js';
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {

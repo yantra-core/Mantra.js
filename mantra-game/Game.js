@@ -15,8 +15,40 @@ import onlineGameLoop from './lib/onlineGameLoop.js';
 // Main game loop / game tick
 import gameTick from './lib/gameTick.js';
 
+import plugins from './plugins.js';
+
 class Game {
-  constructor({ isClient, width, height, isOfflineMode, plugins, options } = {}) {
+  constructor({ 
+    isClient,
+    isServer = false,
+    loadPlugins = true, // will auto-load default plugins based on default config if true
+    width = 1600,
+    height = 900,
+    physics = 'matter',
+    graphics = ['babylon'],
+    collisions,
+    keyboard = true,
+    mouse = true,
+    isOfflineMode,
+    options } = {}) {
+
+    // config scope for convenience
+    const config = {
+      isClient,
+      isServer,
+      loadPlugins,
+      width,
+      height,
+      physics,
+      graphics,
+      collisions,
+      keyboard,
+      mouse,
+      isOfflineMode,
+      options
+    };
+
+    console.log(`new Game(${JSON.stringify(config, true, 2)})`);
 
     this.on = eventEmitter.on;
     this.off = eventEmitter.off;
@@ -29,8 +61,8 @@ class Game {
     this.snapshotQueue = [];
 
     // Game settings
-    this.width = width || 1600;
-    this.height = height || 900;
+    this.width = width;
+    this.height = height;
 
     // TODO: Physics pipeline
     // Remark: Currently, only (1) physics engine is supported at a time
@@ -41,6 +73,7 @@ class Game {
     this.removedEntities = new Set();
 
     this.isClient = isClient;
+    this.isServer = isServer;
 
     this.localGameLoopRunning = false;
     this.onlineGameLoopRunning = false;
@@ -76,7 +109,6 @@ class Game {
     // snapshotManager doesn't seem optional as plugin, not sure game loop can run without basic snapshots interface / api
     this.snapshotManager = new SnapshotManager(this);
 
-
     // Graphics rendering pipeline
     this.graphics = [];
 
@@ -87,10 +119,67 @@ class Game {
     this.graphicsReady = [];
     this.physicsReady = false;
 
-
     this.gameTick = gameTick.bind(this);
     this.localGameLoop = localGameLoop.bind(this);
     this.onlineGameLoop = onlineGameLoop.bind(this);
+
+    // load default plugins
+    if (loadPlugins) {
+      this.loadPluginsFromConfig({
+        physics,
+        graphics,
+        collisions,
+        keyboard,
+        mouse
+      });
+    }
+
+  }
+
+  loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse }) {
+
+    this.use(new plugins.EntityFactory())
+
+    if (physics === 'matter') {
+      this.use(new plugins.MatterPhysics());
+    }
+
+    if (physics === 'physx') {
+      this.use(new plugins.PhysXPhysics());
+    }
+
+    if (collisions) {
+      this.use(new plugins.Collision());
+    }
+
+
+    this.use(new plugins.EntityInput());
+    this.use(new plugins.EntityMovement());
+
+    if (!this.isServer) {
+
+      if (keyboard) {
+        this.use(new plugins.Keyboard(keyboard));
+      }
+
+      if (mouse) {
+        this.use(new plugins.Mouse());
+      }
+
+      if (graphics) {
+        this.use(new plugins.Graphics()); // camera configs
+        if (graphics.includes('babylon')) {
+          this.use(new plugins.BabylonGraphics());
+          this.use(new plugins.Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
+        }
+        if (graphics.includes('css')) {
+          this.use(new plugins.CSSGraphics());
+        }
+        if (graphics.includes('phaser')) {
+          this.use(new plugins.PhaserGraphics());
+        }
+      }
+    }
 
   }
 
@@ -109,8 +198,6 @@ class Game {
     return this;
   }
 
-
-  // TODO: can we encapsulate this into Component class?
   addComponent(entityId, componentType, data) {
     if (!this.components[componentType]) {
       this.components[componentType] = new Component(componentType);
@@ -121,7 +208,10 @@ class Game {
     return this.components[componentType] ? this.components[componentType].get(entityId) : null;
   }
 
-  // Helper method for getting a System by name
+  addSystem (systemName, system) {
+    return this.systemsManager.addSystem(systemName, system);
+  }
+
   getSystem(systemName) {
     return this.systemsManager.getSystem(systemName);
   }
@@ -134,4 +224,4 @@ class Game {
 
 }
 
-export { Game };
+export { Game, plugins };

@@ -5,7 +5,7 @@ import Default3DInputStrategy from './strategies/3D/Default3DInputStrategy.js';
 class EntityInputPlugin extends Plugin {
   constructor(strategy) {
     super();
-    this.name = 'EntityInputPlugin';
+    this.name = 'EntityInput';
     this.bulletCooldown = 20;
     this.buttonCooldown = 20;
     this.lastBulletFireTime = {};
@@ -23,7 +23,6 @@ class EntityInputPlugin extends Plugin {
   }
 
   init(game) {
-    console.log('EntityInputPlugin.init()');
     this.game = game;
     this.game.systemsManager.addSystem('entityInput', this);
   }
@@ -44,6 +43,7 @@ class EntityInputPlugin extends Plugin {
     this.strategies.forEach(function(strategy) {
       strategy.handleInputs(entityId, controls, sequenceNumber);
     });
+
   }
 
   update() { }

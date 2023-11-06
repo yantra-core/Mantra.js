@@ -3,7 +3,7 @@ import Entity from '../../Entity/Entity.js';
 
 class EntityFactory {
   constructor() {
-
+    this.name = 'EntityFactory'
     //this.game = game;
     this.nextEntityId = 0;
 

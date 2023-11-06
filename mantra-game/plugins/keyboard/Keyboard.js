@@ -1,6 +1,5 @@
 // Keyboard.js - Marak Squires 2023
 
-
 // All key codes available to browser
 let KEY_CODES = [
   'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
@@ -30,18 +29,23 @@ const MANTRA_KEY_MAP = Object.fromEntries(KEY_CODES.map(code => [code, transform
 // create a new object hash containing the Mantra Key Codes as keys
 const KEY_MAP = Object.fromEntries(KEY_CODES.map(code => [code, code]));
 
+/*
+Keyboard config object
+{
+  preventDefaults: true // boolean, default true, set false to gain control of browser keys again
+}
+*/
 export default class BrowserKeyboard {
-  constructor(communicationClient) {
+  constructor({ preventDefaults = true }) {
     this.controls = Object.fromEntries(Object.values(MANTRA_KEY_MAP).map(key => [key, false]));
-    this.communicationClient = communicationClient;
+    // this.communicationClient = communicationClient;
     this.inputPool = {};  // Pool to store key inputs since the last game tick
+    this.preventDefaults = preventDefaults;
   }
 
   init(game) {
     this.game = game;
-    console.log('init keyboard controls');
     this.bindInputControls();
-    this.preventDefaults = true;
 
     // register the Plugin as a system, on each update() we will send the inputPool to the server
     game.systemsManager.addSystem('browserKeyboard', this);
