@@ -11,8 +11,6 @@ class StarField {
     this.game = game;
     this.engine = engine;
     this.scene = scene;
-    // not correct scope? is scene sent here?
-    console.log('aaaa', game, engine, scene);
 
     // delegate to each Graphics system if available
     // TODO: the following pattern represents plugin dependencies, but is hard-coded to this single plugin ( for now )
@@ -33,7 +31,6 @@ class StarField {
         }
       })
     }
-
 
   }
 

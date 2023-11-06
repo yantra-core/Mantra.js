@@ -1,3 +1,48 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#gameHolder {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0;
+  margin: 0;
+}
+
+/* Combined styles for both canvas and .render-div */
+#gameHolder>canvas,
+#gameHolder>.render-div {
+  max-width: calc(50% - 20px);
+  /* Adjust this value to change the number of items per row */
+  margin: 10px;
+  /* Spacing between items */
+  background-color: #000;
+  /* Visualize the area for both canvases and divs */
+  /* You might want to set a min-height or a padding-top to maintain aspect ratio */
+  min-height: 150px;
+  /* Example fixed min-height */
+}
+
+/* If you have absolutely positioned content inside the canvas */
+#gameHolder>canvas>* {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Additional specific styles for .render-div if needed */
+#gameHolder>.render-div {
+  /* Additional styles specific to .render-div here */
+}
+
+
+/* InputLegend.js Plugin */
+
 #controlsView {
   position: fixed;
   bottom: 20px;

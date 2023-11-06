@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <link rel="stylesheet" href="/mantra.css">
+  <script type="module" src="/mantra.head.bundle.js"></script>
+  <script>
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      let game = new MANTRA.Game({
+        graphics: ['phaser', 'babylon']
+      });
+      let Plugins = MANTRA.plugins;
+
+      // Use Plugins to add systems to the game
+      game
+        .use(new Plugins.Bullet())
+        .use(new Plugins.Border());
+
+      // Now let's attach a World
+      // You look at the code for PongWorld and see it's just calling methods on the game object
+      //game.use(new Plugins.PongWorld())
+
+      let playerId = 'Bobby';
+
+      // something like this?
+      /*
+      game.use(new Plugins.TopDownInput());
+      game.use(new Plugins.TopDownMovement());
+      */
+
+      // Add a Local Client, this will provide a game.start() method
+      // TODO: should this be automatic as part of game constructor?
+      game.use(new Plugins.Client(playerId));
+
+      game.use(new Plugins.StarField());
+
+      game.use(new Plugins.InputLegend());
+
+      game.start(function () {
+
+        // create a single player entity
+        game.createEntity({
+          id: playerId,
+          type: 'PLAYER',
+          position: {
+            x: 0,
+            y: 0
+          }
+        });
+
+      });
+    });
+  </script>
+
+  <div id="gameHolder"></div>
+</body>
+
+</html>

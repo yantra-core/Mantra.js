@@ -12,7 +12,7 @@ import { Game, plugins } from '../mantra-game';
 // Input Strategies
 //
 import Default2DInputStrategy from '../mantra-game/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
-import ThreeDimensionalInputStrategy from '../mantra-game/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
+import Default3DInputStrategy from '../mantra-game/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
 
 
 //
@@ -67,6 +67,10 @@ let defaultConfig = {
 
 // Game will start with the defaultConfig, unless overridden
 
+// Game canvas(s) will be appended to <div id="gameHolder"></div>,
+// if gameHolder does not exists it will be append to body
+
+
 // So for example, if you wish to disable mouse inputs, you can simply:
 let game = new Game({
   mouse: false
@@ -83,7 +87,7 @@ let game = new Game({
 
 let game = new Game({
   mouse: false,
-  graphics: ['phaser']
+  graphics: ['babylon']
 });
 //
 // Use Plugins to add systems to the game
@@ -92,7 +96,8 @@ game
   .use(new plugins.Bullet())
   .use(new plugins.Border({ autoBorder: true }));
   //.use(new plugins.InputLegend())
-  //.use(new plugins.StarField())
+  //.use(new plugins.StarField()) // TODO: make this generic plugin that delegates
+                                  // The generic starfield should do almost nothing except delegate to other plugins
 
 //.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
 //.use(new AsteroidsMovement())
@@ -100,71 +105,41 @@ game
 //.use(new ThreeDimensionalInputStrategy())
 //game.use(new PongWorld())
 
+// for local / offline play we can use any id we want
+function randomId() {
+  return 'player_' + Math.random().toString(36).substr(2, 9);
+}
 let playerId = randomId();
 
-// Initialize both clients
-//const localClient = new plugins.LocalClient(playerId);
-//const websocketClient = new plugins.WebSocketClient(playerId);
-
-// Default Mode setup based on config
 game.use(new plugins.Client(playerId));
-//game.use(websocketClient);
+//game.use(new Default3DInputStrategy());
+//game.use(new Default2DInputStrategy());
+game.use(new plugins.InputLegend());
 
+game.use(new plugins.StarField())
 
-// game.start() // starts up local offline game
-// game.connect(wsUrl) // connects to websocket server
-
+//
+// Listen for all Game events 
+// Since all Plugin class methods are event emitters, we can watch events for entire Mantra Game instance and all Plugins
+//
 /*
-  // This will listen for all events on Game instance
-  // Since all Plugin class methods are event emitters, we can watch entire Mantra Game instance and all Plugins
   game.onAny(function(event, data){
     console.log(event, data)
   })
 */
 
-/*
 // Function to switch to Online Mode
 function switchToOnline() {
-  //game.removeEntity(playerId); // Destroy the xal player
-  //game.stop(); // Stop local client
-  game.connect('ws://192.168.1.80:8787/websocket');
-  //game.connect('ws://192.168.1.80:8888/websocket');
+  game.removeEntity(playerId); // Destroy the local player
+  game.stop(); // Stop local client
+  game.connect('ws://192.168.1.80:8888/websocket');    // @yantra-core/mantra-server
+  //game.connect('ws://192.168.1.80:8787/websocket');  // @yantra-core/mantra-edge
 }
 
-// Function to switch to Offline Mode
-function switchToOffline() {
-
-  try {
-    game.disconnect(); // Disconnect online client
-  } catch (err) {
-
-  }
-  game.start(function () {
-
-
-    game.createEntity({
-      id: playerId,
-      type: 'PLAYER',
-      position: {
-        x: 0,
-        y: 0
-      }
-    });
-
-  });
-}
-*/
 
 // Setup button event listeners
 //document.getElementById('connectButton').addEventListener('click', switchToOnline);
 //document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
-
-function randomId() {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-// switchToOffline();
-// switchToOnline();
 
 // Single Player Offline Mode
 game.start(function () {
@@ -183,3 +158,26 @@ game.start(function () {
 // Connects to websocket server
 // see: @yantra-core/mantra-server
 //game.connect('ws://192.168.1.80:8888/websocket');
+
+
+
+/*
+
+// Function to switch to Offline Mode
+function switchToOffline() {
+  try {
+    game.disconnect(); // Disconnect online client
+  } catch (err) {
+  }
+  game.start(function () {
+    game.createEntity({
+      id: playerId,
+      type: 'PLAYER',
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+  });
+}
+*/

@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mantra - Client</title>
+  <link rel="stylesheet" href="/mantra.css">
 
   <!-- includes all libraries by default ( for now )-->
   <!-- in the near future we could conditional load these based on config -->
@@ -14,91 +15,6 @@
   <!--  TODO: separate HTML files for phaser, jquery, etc -->
   <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-
-    #output {
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 20px;
-    }
-
-    #renderCanvas {
-      top: 0;
-      left: 0;
-      z-index: -1;
-      width: 100vw;
-      height: 100vh;
-
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-
-    }
-
-    #debugUIContainer {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 98vw;
-      height: 50vw;
-      overflow-y: scroll;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-      color: white;
-      z-index: 9999;
-    }
-
-    #gameHolder {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-    }
-
-    #controlsView {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: white;
-      border: 1px solid #dddddd;
-      padding: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    #controlsTable {
-      border-collapse: collapse;
-      width: 100%;
-    }
-
-    #controlsTable th,
-    #controlsTable td {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;
-    }
-
-    #controlsTable th {
-      background-color: #f2f2f2;
-    }
-
-    #closeButton {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
-    }
-  </style>
 </head>
 
 <body>
