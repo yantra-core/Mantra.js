@@ -1,4 +1,4 @@
-// WebSocketClient.js
+// WebSocketClient.js - Marak Squires 2023
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 
 export default class WebSocketClient {
