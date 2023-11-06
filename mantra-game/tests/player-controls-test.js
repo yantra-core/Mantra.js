@@ -8,7 +8,9 @@ import EntityMovement from '../plugins/entity-movement/EntityMovement.js';
 import Bullet from '../plugins/bullet/Bullet.js';
 import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
 
-const game = new Game({});
+const game = new Game({
+  loadPlugins: false
+});
 
 game.use(new PhysicsMatter());
 game.use(new EntityFactory());

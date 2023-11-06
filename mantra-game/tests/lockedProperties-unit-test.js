@@ -3,7 +3,9 @@ import { Game } from '../Game.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import EntityFactory from '../plugins/entity-factory/EntityFactory.js';
 
-const game = new Game({});
+const game = new Game({
+  loadPlugins: false
+});
 
 game.use(new PhysicsMatter());
 game.use(new EntityFactory());

@@ -5,7 +5,9 @@ import EntityFactory from '../plugins/entity-factory/EntityFactory.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
 import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
 
-const game = new Game({});
+const game = new Game({
+  loadPlugins: false
+});
 
 game.use(new PhysicsMatter());
 game.use(new EntityFactory());
