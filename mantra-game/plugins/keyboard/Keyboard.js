@@ -46,6 +46,7 @@ export default class BrowserKeyboard {
   init(game) {
     this.game = game;
     this.bindInputControls();
+    this.name = 'browserKeyboard';
 
     // register the Plugin as a system, on each update() we will send the inputPool to the server
     game.systemsManager.addSystem('browserKeyboard', this);
@@ -83,7 +84,9 @@ export default class BrowserKeyboard {
 
     // Send trueInputs if there are any
     if (Object.keys(trueInputs).length > 0) {
-      this.game.communicationClient.sendMessage('player_input', { controls: trueInputs });
+      if (this.game.communicationClient) {
+        this.game.communicationClient.sendMessage('player_input', { controls: trueInputs });
+      }
     }
 
     // Reset only the false values in the inputPool

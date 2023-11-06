@@ -9,7 +9,6 @@ class Lifetime extends Plugin {
   }
 
   init(game) {
-    console.log('Lifetime.init()');
     this.game = game; // Store the reference to the game logic
     this.game.systemsManager.addSystem('lifetime', this);
   }

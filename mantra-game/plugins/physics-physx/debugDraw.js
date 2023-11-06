@@ -1,4 +1,9 @@
 // TODO: connect this as gl-matrix-min.js renderer
+/*
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/3.4.2/gl-matrix-min.js"
+    integrity="sha512-eV9ExyTa3b+YHr99IBTYpwk4wbgDMDlfW8uTxhywO8dWb810fGUSKDgHhEv1fAqmJT4jyYnt1iWWMW4FRxeQOQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+*/
 
 function setupDebugDrawer() {
   canvas.width = 800;
