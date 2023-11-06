@@ -52,7 +52,7 @@ export default class BrowserKeyboard {
     document.addEventListener('keyup', this.handleKeyUp.bind(this));
   }
 
-  update () {
+  update() {
     this.sendInputs();
   }
 
@@ -76,12 +76,18 @@ export default class BrowserKeyboard {
     const trueInputs = Object.fromEntries(
       Object.entries(this.inputPool).filter(([key, value]) => value === true)
     );
-  
-    // Send trueInputs if there are any, or send the entire inputPool if there are no true inputs
+
+    // Send trueInputs if there are any
     if (Object.keys(trueInputs).length > 0) {
       this.game.communicationClient.sendMessage('player_input', { controls: trueInputs });
-      this.inputPool = {};  // Reset the input pool for the next game tick
+    }
+
+    // Reset only the false values in the inputPool
+    for (let key in this.inputPool) {
+      if (!this.inputPool[key]) {
+        delete this.inputPool[key];
+      }
     }
   }
-  
+
 }
