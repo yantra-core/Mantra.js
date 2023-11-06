@@ -6,7 +6,7 @@ import config from './config/config.js';
 //import { Game } from '../mantra-game/Game.js';
 import { Game, plugins } from '../mantra-game';
 
-import PhysXPhysics from '../mantra-game/plugins/physics-physx/PhysXPhysics.js'; // WIP
+// import PhysXPhysics from '../mantra-game/plugins/physics-physx/PhysXPhysics.js'; // WIP
 
 //
 // Input Strategies
@@ -83,16 +83,16 @@ let game = new Game({
 
 let game = new Game({
   mouse: false,
+  graphics: ['phaser']
 });
-
 //
 // Use Plugins to add systems to the game
 //
 game
   .use(new plugins.Bullet())
-  .use(new plugins.InputLegend())
-  .use(new plugins.StarField())
   .use(new plugins.Border({ autoBorder: true }));
+  //.use(new plugins.InputLegend())
+  //.use(new plugins.StarField())
 
 //.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
 //.use(new AsteroidsMovement())

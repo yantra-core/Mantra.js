@@ -5,27 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mantra - Client</title>
-  <script src="vendor/jquery.min.js"></script>
-  <script src="vendor/babylon.js"></script>
-  <script src="vendor/babylon.gui.min.js"></script>
-  <script src="vendor/babylonjs.materials.min.js"></script>
-  <script src="vendor/phaser.min.js"></script>
 
-  <!-- 
-      WIP
-  -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/3.4.2/gl-matrix-min.js" integrity="sha512-eV9ExyTa3b+YHr99IBTYpwk4wbgDMDlfW8uTxhywO8dWb810fGUSKDgHhEv1fAqmJT4jyYnt1iWWMW4FRxeQOQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- includes all libraries by default ( for now )-->
+  <!-- in the near future we could conditional load these based on config -->
+  <script src="vendor/jquery.min.js"></script>
   <script src="physx-js-webidl.js"></script>
 
   <!--  TODO: separate HTML files for phaser, jquery, etc -->
   <!-- TODO <script src="https://yantra.gg/release/mantra.min.js"></script> -->
 
   <style>
-
     body {
       margin: 0;
       padding: 0;
     }
+
     #output {
       max-height: 300px;
       overflow-y: auto;
@@ -38,8 +32,8 @@
       top: 0;
       left: 0;
       z-index: -1;
-      width: 1000px;
-      height: 1000px;
+      width: 100vw;
+      height: 100vh;
 
     }
 
@@ -61,23 +55,63 @@
       color: white;
       z-index: 9999;
     }
+
     #gameHolder {
       position: relative;
       width: 100vw;
       height: 100vh;
     }
-    
+
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #controlsView {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: white;
+      border: 1px solid #dddddd;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #controlsTable {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    #controlsTable th,
+    #controlsTable td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    #controlsTable th {
+      background-color: #f2f2f2;
+    }
+
+    #closeButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
 <body>
+  <!-- TODO mantraGames -->
+  <div id="gameHolder">
+
+  </div>
+  <!--
   <canvas id="renderCanvas"></canvas>
   <canvas id="physx-canvas"></canvas>
   <button id="connectButton">Connect</button>
   <button id="disconnectButton">Disconnect</button>
-  <script type="text/javascript">
-
-  </script>
+  -->
   <script type="module" src="./client.js"></script>
 </body>
 

@@ -166,11 +166,23 @@ class Game {
         this.use(new plugins.Mouse());
       }
 
+      // TODO: move to Graphics.loadFromConfig() ?
       if (graphics) {
+        if (typeof graphics === 'string') {
+          graphics = [graphics];
+        }
+
+        // Ensure the gameHolder div exists
+        let gameHolder = document.getElementById('gameHolder');
+        if (!gameHolder) {
+          gameHolder = document.createElement('div');
+          gameHolder.id = 'gameHolder';
+          document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+        }
+
         this.use(new plugins.Graphics()); // camera configs
         if (graphics.includes('babylon')) {
           this.use(new plugins.BabylonGraphics());
-          this.use(new plugins.Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
         }
         if (graphics.includes('css')) {
           this.use(new plugins.CSSGraphics());
@@ -220,6 +232,26 @@ class Game {
     this.graphics.forEach(function(graphicsInterface){
       graphicsInterface.updateGraphic(entityData);
     });
+  }
+  
+  // loads external js script files sequentially
+  loadScripts(scripts, finalCallback) {
+    const loadScript = (index) => {
+      if (index < scripts.length) {
+        let script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = scripts[index];
+        script.onload = () => {
+          console.log(`${scripts[index]} loaded`);
+          loadScript(index + 1); // Load the next script
+        };
+        document.head.appendChild(script);
+      } else {
+        finalCallback(); // All scripts have been loaded
+      }
+    };
+  
+    loadScript(0); // Start loading the first script
   }
 
 }

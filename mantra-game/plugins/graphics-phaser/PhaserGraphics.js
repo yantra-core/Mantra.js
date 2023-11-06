@@ -22,6 +22,24 @@ class PhaserGraphics extends GraphicsInterface {
 
     this.game.systemsManager.addSystem('graphics-phaser', this);
 
+    // check to see if Phaser scope is available, if not assume we need to inject it sequentially
+    if (typeof Phaser === 'undefined') {
+      console.log('Phaser is not defined, attempting to load it from vendor');
+
+      game.loadScripts([
+        '/vendor/phaser.min.js'
+      ], () => {
+        this.phaserReady(game);
+      });
+
+    } else {
+      this.phaserReady(game);
+    }
+
+  }
+
+
+  phaserReady(game) {
 
     let _Main = new Phaser.Class({
 
@@ -49,7 +67,7 @@ class PhaserGraphics extends GraphicsInterface {
 
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
-      parent: 'phaser-root',
+      parent: 'gameHolder',
       width: game.width, // TODO: config  
       height: game.height,
       scene: [_Main]
@@ -62,13 +80,16 @@ class PhaserGraphics extends GraphicsInterface {
         setTimeout(loadMainScene.bind(self), 10);
         return;
       }
+
+
+      let canvas = self.phaserGame.canvas;
+      canvas.setAttribute('id', 'phaser-render-canvas');
+      self.scene = scene;
+      let camera = scene.cameras.main;
+
       self.scenesReady = true;
       game.graphicsReady.push(self.name);
 
-      let canvas = self.phaserGame.canvas;
-      canvas.setAttribute('id', 'phaser-canvas');
-      self.scene = scene;
-      let camera = scene.cameras.main;
       // camera.rotation = -Math.PI / 2;
       /*
       // TODO: mouse wheel zoom.js
