@@ -56,7 +56,7 @@ tap.test('eventEmitter - bindClass and emit', (t) => {
   const testInstance = new TestClass();
   eventEmitter.bindClass(testInstance, 'test');
 
-  eventEmitter.emit('test.increment', 3);
+  eventEmitter.emit('test::increment', 3);
   
   t.equal(testInstance.value, 3, 'TestClass instance value should be incremented to 3');
   t.end();
@@ -146,7 +146,6 @@ tap.test('eventEmitter - exact match vs wildcard precedence', (t) => {
   t.end();
 });
 
-
 tap.test('eventEmitter - removing wildcard listeners', (t) => {
   let testValue = 0;
   function handler() { testValue = 1; }
@@ -158,8 +157,6 @@ tap.test('eventEmitter - removing wildcard listeners', (t) => {
   t.equal(testValue, 0, 'Handler should not be called after removal of wildcard listener');
   t.end();
 });
-
-
 
 tap.test('eventEmitter - namespace-like event patterns', (t) => {
   let testValue = 0;
@@ -186,3 +183,49 @@ tap.test('eventEmitter - edge cases', (t) => {
 
   t.end();
 });
+
+tap.test('eventEmitter - bindClass method should emit events with JSON data', (t) => {
+  class TestClass {
+    constructor() {
+      this.data = {};
+    }
+
+    update(data) {
+      this.data = { ...this.data, ...data };
+    }
+  }
+
+  const testInstance = new TestClass();
+  eventEmitter.bindClass(testInstance, 'test');
+
+  // The JSON object to be used as test data
+  const testData = { amount: 5, description: 'test increment' };
+
+  // Set up a listener for the event that should be emitted by the update method
+  let listenerCalled = false;
+  let receivedData = null;
+  eventEmitter.on('test::update', (data) => {
+    listenerCalled = true;
+    receivedData = data;
+  });
+
+  // Call the class method which should trigger an event emission
+  testInstance.update(testData);
+
+  // Check if the listener was called
+  t.ok(listenerCalled, 'listener should be called when class method is invoked');
+
+  // Check if the listener was called with the correct data
+  t.deepEqual(receivedData, testData, 'listener should be called with correct data');
+
+  // Assert one of the properties of the JSON object
+  t.equal(receivedData.description, testData.description, 'listener data should have correct description property');
+
+  // Clean up the listener
+  eventEmitter.off('test::update', receivedData);
+
+  t.end();
+});
+
+
+

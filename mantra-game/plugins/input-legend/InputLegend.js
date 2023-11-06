@@ -25,9 +25,10 @@ class Legend {
       $('#controlsView').hide();
     });
 
-    game.on('entityInput::handleInputs', (data) => {
-      if (data[0]) {
-        let currentInputs = data[1].controls;
+    game.on('entityInput::handleInputs', (entityId, data) => {
+      console.log('dddd123123213',entityId, data)
+      if (data) {
+        let currentInputs = data.controls;
         // Reset the highlighting for all previously highlighted keys
         for (let key in this.highlightedKeys) {
           $(`#row-${key}`).css('background-color', '');
@@ -46,9 +47,9 @@ class Legend {
       }
     });
 
-    // Set up a timer to clear highlighted keys every 700 milliseconds
+    // Set up a timer to clear highlighted keys every little while
     // This is required since we only broadcast true inputs states, and assume false for all other inputs
-    this.clearHighlightsInterval = setInterval(this.clearHighlights.bind(this), 700);
+    this.clearHighlightsInterval = setInterval(this.clearHighlights.bind(this), 500);
 
   }
 

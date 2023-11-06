@@ -1,5 +1,5 @@
 // TODO: add events
-// import eventEmitter from '../lib/eventEmitter.js';
+import eventEmitter from '../lib/eventEmitter.js';
 
 class SystemsManager {
   constructor(game) {
@@ -13,7 +13,7 @@ class SystemsManager {
     }
     // TODO: add this later
     // registers the new system in event emitter
-    // eventEmitter.bindClass(system, systemName)
+    eventEmitter.bindClass(system, systemName)
     // binds system to local instance Map
     this.systems.set(systemName, system);
     // binds system to game.systems scope for convenience

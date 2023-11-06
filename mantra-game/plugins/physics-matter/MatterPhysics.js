@@ -149,10 +149,13 @@ class MatterPhysics extends PhysicsInterface {
     return body.angle;
   }
    
+  rotateBody(body, rotation) {
+    Matter.Body.rotate(body, rotation);
+  }
+
   onBeforeUpdate(engine, callback) {
     Matter.Events.on(engine, 'beforeUpdate', callback);
   }
-
 
   onAfterUpdate(engine, callback) {
     Matter.Events.on(engine, 'afterUpdate', callback);

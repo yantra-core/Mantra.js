@@ -13,9 +13,10 @@ class DefaultTwoDimensionalInputStrategy {
       S: 'MOVE_BACKWARD',
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
-      SPACE: 'FIRE_BULLET'
+      SPACE: 'FIRE_BULLET',
+      //LEFT: 'ROTATE_LEFT',
+      //RIGHT: 'ROTATE_RIGHT'
     };
-
 
     // TODO: bulletCooldown should be a property of the bullet system
     this.bulletCooldown = 20;
@@ -29,6 +30,11 @@ class DefaultTwoDimensionalInputStrategy {
     }
 
     game.systems.entityInput.strategies.push(this);
+    // take the this.controlMappings and map them to the entityInput system
+    game.systems.entityInput.controlMappings = {
+      ...game.systems.entityInput.controlMappings,
+      ...this.defaultControlsMapping
+    };
 
   }
 
@@ -74,6 +80,11 @@ class DefaultTwoDimensionalInputStrategy {
     if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
     if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0);
     if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0);
+
+    if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
+    if (actions.includes('ROTATE_RIGHT')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);
+
+
     if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
   }
 }

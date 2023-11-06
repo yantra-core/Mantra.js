@@ -3,6 +3,16 @@ const eventEmitter = {
   wrappedFunctions: {}
 };
 
+eventEmitter.anyListeners = [];
+
+eventEmitter.onAny = function onAny(callback) {
+  eventEmitter.anyListeners.push(callback);
+};
+
+eventEmitter.offAny = function offAny(callback) {
+  eventEmitter.anyListeners = eventEmitter.anyListeners.filter(listener => listener !== callback);
+};
+
 // Utility to check if the given eventName matches the pattern
 eventEmitter._isMatch = function _isMatch(pattern, eventName) {
   const regexPattern = pattern
@@ -47,14 +57,24 @@ eventEmitter.off = function offEvent(eventPattern, callback) {
   });
 };
 
-eventEmitter.emit = function emitEvent(eventName, data) {
+eventEmitter.emit = function emitEvent(eventName, ...args) {
+
+  // Call anyListeners
+  eventEmitter.anyListeners.forEach(listener => {
+    try {
+      listener.call(null, eventName, ...args);
+    } catch (error) {
+      console.error(`Error when executing any listener for event "${eventName}":`, error);
+    }
+  });
+
+  // Call listeners matching the pattern
   Object.keys(eventEmitter.listeners).forEach(pattern => {
     if (eventEmitter._isMatch(pattern, eventName)) {
       eventEmitter.listeners[pattern].forEach(listener => {
         try {
-          listener.call(null, data);
+          listener.apply(null, args);
         } catch (error) {
-          throw error;
           console.error(`Error when executing listener for event "${eventName}":`, error);
         }
       });
@@ -62,9 +82,8 @@ eventEmitter.emit = function emitEvent(eventName, data) {
   });
 };
 
-// is this correct? do we need to emit here instead of binding?
-// i dont think we care so much about emitting to the class, althuogh we should support it
-// being able to emit is super useful for not having to import stuff actually
+
+
 // game.emit('entity-factory::create', { id: 123, type: 'PLAYER' });
 // game.createEntity({ id: 123, type: 'PLAYER' });
 // ^^alias game.entityFactor.createEntity({ id: 123, type: 'PLAYER' });
@@ -72,14 +91,27 @@ eventEmitter.bindClass = function bindClass(classInstance, namespace) {
   const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(classInstance));
   methods.forEach(method => {
     if (typeof classInstance[method] === 'function' && method !== 'constructor') {
-      const eventName = namespace + '.' + method;
-      const wrappedFunction = (...args) => {
-        classInstance[method].apply(classInstance, args);
-      };
-      this.on(eventName, wrappedFunction);
+      const eventName = namespace + '::' + method;
+      const originalMethod = classInstance[method];
+      let isEmitting = false; // flag to control the emission
 
-      // Store the wrapped function so we can remove it later
-      this.wrappedFunctions[eventName] = wrappedFunction;
+      classInstance[method] = (...args) => {
+        //console.log('aaa',args)
+
+        if (!isEmitting) {
+          isEmitting = true;
+          this.emit(eventName, ...args);
+          isEmitting = false;
+        }
+        // Execute the original method
+        return originalMethod.apply(classInstance, args);
+      };
+
+      this.on(eventName, (...args) => {
+        if (!isEmitting) {
+          classInstance[method](...args);
+        }
+      });
     }
   });
 };

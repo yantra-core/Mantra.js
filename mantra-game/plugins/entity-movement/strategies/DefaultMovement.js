@@ -14,7 +14,11 @@ class DefaultMovementStrategy {
     game.systems.entityMovement.strategies.push(this);
 
   }
-  update(entityId, dx, dy) {
+  update(entityId, dx, dy, rotation) {
+    if (!entityId) {
+      return;
+    }
+
     const position = this.game.getComponent(entityId, 'position');
     if (position) {
       const forceFactor = 0.05;
@@ -23,6 +27,15 @@ class DefaultMovementStrategy {
       this.game.physics.applyForce(body, body.position, force);
       this.game.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
     }
+
+    if (typeof rotation === 'number') {
+      const rotationSpeed = 0.022;
+      let rotationAmount = rotation * rotationSpeed;
+      const body = this.game.bodyMap[entityId];
+      this.game.physics.rotateBody(body, rotationAmount);
+
+    }
+
   }
 }
 

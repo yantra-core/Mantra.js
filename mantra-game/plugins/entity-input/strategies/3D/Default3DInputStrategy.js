@@ -19,15 +19,21 @@ class ThreeDimensionalInputStrategy {
       SPACE: 'FIRE_BULLET',
       Q: 'MOVE_UP',
       E: 'MOVE_DOWN',
-      Up: 'PITCH_UP',
-      Down: 'PITCH_DOWN',
-      Left: 'YAW_LEFT',
-      Right: 'YAW_RIGHT',
+      UP: 'PITCH_UP',
+      DOWN: 'PITCH_DOWN',
+      LEFT: 'YAW_LEFT',
+      RIGHT: 'YAW_RIGHT',
       Z: 'ROLL_LEFT',
       C: 'ROLL_RIGHT'
     };
 
     game.systems.entityInput.strategies.push(this);
+
+    // take the this.controlMappings and map them to the entityInput system
+    game.systems.entityInput.controlMappings = {
+      ...game.systems.entityInput.controlMappings,
+      ...this.defaultControlsMapping
+    };
 
   }
 
