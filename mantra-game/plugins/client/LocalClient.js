@@ -40,7 +40,8 @@ export default class LocalClient {
 
     this.game.communicationClient = this;
     this.game.localGameLoopRunning = true;
-     callback(null, true);
+    callback(null, true);
+    this.game.emit('start');
     
   }
   stop () {

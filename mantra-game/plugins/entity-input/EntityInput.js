@@ -25,19 +25,30 @@ class EntityInputPlugin extends Plugin {
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem('entityInput', this);
+    let self = this;
+    this.game.on('start', function(){
+      if (self.strategies.length === 0) {
+        self.loadDefaultStrategy();
+      }
+    })
+  }
+
+  loadDefaultStrategy() {
+    console.log('Warning: No input strategies registered, using default input strategy');
+    if (this.game.physics && this.game.physics.dimension === 3) {
+      console.log('game.use(new Default3DInputStrategy())');
+      this.game.use(new Default3DInputStrategy())
+    } else {
+      console.log('game.use(new DefaultInputStrategy())');
+      this.game.use(new DefaultInputStrategy())
+    }
+    this.game.emit('inputStrategyRegistered', this.strategies)
   }
 
   handleInputs(entityId, controls, sequenceNumber) {
 
     if (this.strategies.length === 0) {
-      console.log('Warning: No input strategies registered, using default input strategy');
-      if (this.game.physics && this.game.physics.dimension === 3) {
-        console.log('game.use(new Default3DInputStrategy())');
-        this.game.use(new Default3DInputStrategy())
-      } else {
-        console.log('game.use(new DefaultInputStrategy())');
-        this.game.use(new DefaultInputStrategy())
-      }
+      this.loadDefaultStrategy();
     }
 
     this.strategies.forEach(function(strategy) {

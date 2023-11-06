@@ -9,6 +9,12 @@ class Legend {
 
   init(game) {
     this.game = game;
+    this.listenForEntityInput();
+  }
+
+  drawTable() {
+
+    let game = this.game;
 
     let entityInputSystem = game.systemsManager.getSystem('entityInput');
     let controls = entityInputSystem.controlMappings;
@@ -27,6 +33,11 @@ class Legend {
       $('#controlsView').hide();
     });
 
+  }
+
+  listenForEntityInput(entity) {
+    let game = this.game;
+    let self = this;
     game.on('entityInput::handleInputs', (entityId, data) => {
       if (data) {
         let currentInputs = data.controls;
@@ -46,6 +57,13 @@ class Legend {
         // TODO: fix data signature of EE here, update EE tests
         // console.log('entityInput::handleInputs', data[1].controls);
       }
+    });
+
+    game.on('inputStrategyRegistered', function(strategies){
+      strategies.forEach(function(strategy){
+        self.drawTable();
+      });
+      // if a new strategy was registered *after* Legend was loaded, we do want redraw the table
     });
 
     // Set up a timer to clear highlighted keys every little while
