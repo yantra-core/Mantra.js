@@ -15,24 +15,14 @@ import getLinearVelocity from './lib/body/getLinearVelocity.js';
 import quaternionToEuler from './lib/math/quaternionToEuler.js';
 
 let scene;
-let canvas;
-let context;
 
 let _physics = null;
 var lastBox = null;
-
 
 // TODO: move collisions into seperate file / plugin
 // Constants for collision layers
 const COLLISION_LAYER_1 = 1;
 const COLLISION_LAYER_2 = 2;
-
-// setup debug drawing stuff
-const { mat4, vec4, vec3 } = glMatrix;
-const viewMatrix = mat4.create();
-const projectionMatrix = mat4.create();
-const viewProjectionMatrix = mat4.create();
-const tmpVec4 = vec4.create();
 
 class PhysXPhysics extends PhysicsInterface {
   constructor(config) {
@@ -76,12 +66,22 @@ class PhysXPhysics extends PhysicsInterface {
     this.game = game;
     let self = this;
 
+    game.loadScripts([
+      'physx-js-webidl.js'
+    ], () => {
+      this.physXReady();
+    })
+
+  }
+
+  physXReady () {
+    let game = this.game;
+    let self = this;
     PhysX().then(function (PhysX) {
       self.PhysX = PhysX;
       game.PhysX = PhysX;
       var version = PhysX.PHYSICS_VERSION;
       console.log('PhysX loaded! Version: ' + ((version >> 24) & 0xff) + '.' + ((version >> 16) & 0xff) + '.' + ((version >> 8) & 0xff));
-      game.physicsReady = true;
       // game.physicsReady.push(self.name);
 
       //
@@ -112,17 +112,17 @@ class PhysXPhysics extends PhysicsInterface {
       // create default simulation shape flags
       var shapeFlags = new PhysX.PxShapeFlags(PhysX.PxShapeFlagEnum.eSCENE_QUERY_SHAPE | PhysX.PxShapeFlagEnum.eSIMULATION_SHAPE | PhysX.PxShapeFlagEnum.eVISUALIZATION);
 
-
       // clean up temp objects
       PhysX.destroy(shapeFlags);
       PhysX.destroy(sceneDesc);
       PhysX.destroy(tolerances);
       console.log('Created scene objects');
 
-      canvas = document.getElementById('physx-canvas');
-      context = canvas.getContext('2d');
+      game.physicsReady = true;
+
 
     });
+
 
   }
 

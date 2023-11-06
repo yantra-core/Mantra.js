@@ -5,6 +5,22 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 */
 
+
+// setup debug drawing stuff
+/*
+const { mat4, vec4, vec3 } = glMatrix;
+const viewMatrix = mat4.create();
+const projectionMatrix = mat4.create();
+const viewProjectionMatrix = mat4.create();
+const tmpVec4 = vec4.create();
+*/
+
+
+let canvas;
+let context;
+canvas = document.getElementById('physx-canvas');
+context = canvas.getContext('2d');
+
 function setupDebugDrawer() {
   canvas.width = 800;
   canvas.height = 600;

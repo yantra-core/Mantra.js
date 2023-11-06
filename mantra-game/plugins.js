@@ -9,6 +9,7 @@ import Client from './plugins/client/Client.js';
 
 // Physics
 import MatterPhysics from './plugins/physics-matter/MatterPhysics.js';
+import PhysXPhysics from './plugins/physics-physx/PhysXPhysics.js';
 
 // Graphics
 import Graphics from './plugins/graphics/Graphics.js';
@@ -62,17 +63,18 @@ MANTRA.plugins = {
 */
 
 const plugins = {
-  Border: Border,
-  Bullet: Bullet,
-  Collision: Collision,
-  Client: Client,
-  EntityFactory: EntityFactory,
-  EntityInput: EntityInput,
-  EntityMovement: EntityMovement,
-  Graphics: Graphics,
-  InputLegend: InputLegend,
-  Keyboard: Keyboard,
-  MatterPhysics: MatterPhysics,
+  Border,
+  Bullet,
+  Collision,
+  Client,
+  EntityFactory,
+  EntityInput,
+  EntityMovement,
+  Graphics,
+  InputLegend,
+  Keyboard,
+  MatterPhysics,
+  PhysXPhysics,
   Mouse: Mouse,
   BabylonGraphics,
   PhaserGraphics,

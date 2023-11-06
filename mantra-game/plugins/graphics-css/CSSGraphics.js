@@ -63,6 +63,7 @@ class CSSGraphics extends GraphicsInterface {
     if (!renderDiv) {
       renderDiv = document.createElement('div');
       renderDiv.id = 'css-render-div';
+      renderDiv.className = 'render-div';
       gameHolder.appendChild(renderDiv);
     }
 
