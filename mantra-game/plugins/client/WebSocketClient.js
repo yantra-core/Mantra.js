@@ -45,11 +45,7 @@ export default class WebSocketClient {
     this.socket.onmessage = this.handleMessage.bind(this);
     this.socket.onclose = this.handleClose.bind(this);
     this.socket.onerror = this.handleError.bind(this);
-
-
-
     this.game.onlineGameLoop(this.game);
-
 
   }
   

@@ -32,10 +32,7 @@ class BulletPlugin {
 
   fireBullet(entityId) {
 
-    console.log(entityId, this.game.components.position)
     let player = this.game.getEntity(entityId);
-
-
     let playerPos = player.position;
     let playerRotation = player.rotation; // in radians
 
