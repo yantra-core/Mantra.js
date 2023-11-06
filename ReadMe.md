@@ -18,29 +18,35 @@ Let us help guide you on your game development journey, and we promise you will 
 - ✅ **Edge Computing Compatible**: Games can run in CloudFlare Workers environments
 - ✅ **Offline Gameplay Support**: Fully functional gameplay in offline mode
 
-# 3D
-## WebGPU + Babylon.js
-Mantra's default 3D graphics are rendered using WebGPU and Babylon.js
+# 3D,  2D,  2.5D
 
-## NVIDA PhysX + Web Assembly
-Mantra's default 3D physics are powered by NVIDA PhysX compiled via EMScripten
+Want to build a 3D, 2D or 2.5D JavaScript game? We've got you covered! In Mantra, it's a one-line change to swap the graphics or physics.
+##  Web Assembly + WebGPU
+### NVIDA PhysX 5.3.0 + Babylon.js
 
-# 2D and 2.5D
-Want to build a 2D or 2.5D game? We've got you covered! In Mantra, it's a one-line change to swap the graphics or physics.
+Mantra's default 3D graphics are rendered using WebGPU and Babylon.js. Mantra's default 3D physics are powered by NVIDA PhysX compiled via EMScripten
 
-Mantra has built-in support for Phaser 3 and Matter.js. You can even render the same Game through [multiple graphics pipelines](https://yantra.gg/mantra/examples/solo/split-render/pong.html) at once if you need to.
+### Matter.js + Phaser 3
 
-**How is that even possible?**
+For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to mix and match configuration options and easily add new Graphics plugins. You can even render the same Game through [multiple graphics pipelines](https://yantra.gg/mantra/examples/solo/split-render/pong.html) at once if you need to.
+
+**How is this even possible?**
 
 ## In Mantra, Everything is a Plugin!
 
 Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of our community Plugins from our growing collection to quicky extend your game. Develop something cool? Publish and share your plugins with the [community](https://discord.gg/bbyjf6MXC2)!
 
-# Offline + Serverless Physics
+## Offline First
 
-Mantra is built from the ground up to work offline and within Serverless environments like CloudFlare Workers or Hathora.
+Mantra is designed to start a full-featured local game instance immediately without any heavy dependency tree. This offline-first approach lets you quickly build your game without thinking about netcode, allowing you to connect your game's logic to Mantra's high-performance networking code when needed.
 
-No worries! Mantra can also run on any standard hosting environment.
+## Serverless Physics
+
+Mantra is architectured from the ground up to work within Serverless environments like CloudFlare Workers or [Hathora](https://hathora.dev).
+
+This unique architecture places Mantra at the forefront of Serverless Physics game engines.
+
+Are you still learning about [Serverless Physics](https://yantra.gg)? No worries! Mantra can also run on any standard hosting environment.
 
 # Core Packages
 
