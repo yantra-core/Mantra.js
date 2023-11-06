@@ -18,7 +18,7 @@ import gameTick from './lib/gameTick.js';
 import plugins from './plugins.js';
 
 class Game {
-  constructor({ 
+  constructor({
     isClient,
     isServer = false,
     loadPlugins = true, // will auto-load default plugins based on default config if true
@@ -30,7 +30,7 @@ class Game {
     keyboard = true,
     mouse = true,
     isOfflineMode,
-    options } = {}) {
+    options = {}} = {}) {
 
     // config scope for convenience
     const config = {
@@ -47,6 +47,15 @@ class Game {
       isOfflineMode,
       options
     };
+
+    // Define the scriptRoot variable for loading external scripts
+    // In most cases you will want to load from the local directory
+    this.scriptRoot = './';
+
+    // Could be CDN or other remote location, https://yantra.gg/mantra/vendor/
+    if (options.scriptRoot) {
+      this.scriptRoot = options.scriptRoot;
+    }
 
     console.log(`new Game(${JSON.stringify(config, true, 2)})`);
 
@@ -220,7 +229,7 @@ class Game {
     return this.components[componentType] ? this.components[componentType].get(entityId) : null;
   }
 
-  addSystem (systemName, system) {
+  addSystem(systemName, system) {
     return this.systemsManager.addSystem(systemName, system);
   }
 
@@ -228,19 +237,20 @@ class Game {
     return this.systemsManager.getSystem(systemName);
   }
 
-  updateGraphic (entityData) {
-    this.graphics.forEach(function(graphicsInterface){
+  updateGraphic(entityData) {
+    this.graphics.forEach(function (graphicsInterface) {
       graphicsInterface.updateGraphic(entityData);
     });
   }
-  
-  // loads external js script files sequentially
+
+  // Loads external js script files sequentially
   loadScripts(scripts, finalCallback) {
     const loadScript = (index) => {
       if (index < scripts.length) {
         let script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = scripts[index];
+        // Prepend the scriptRoot to the script src
+        script.src = this.scriptRoot + scripts[index];
         script.onload = () => {
           console.log(`${scripts[index]} loaded`);
           loadScript(index + 1); // Load the next script
@@ -250,7 +260,7 @@ class Game {
         finalCallback(); // All scripts have been loaded
       }
     };
-  
+
     loadScript(0); // Start loading the first script
   }
 

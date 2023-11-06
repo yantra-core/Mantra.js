@@ -10,13 +10,33 @@
 
 <body>
   <link rel="stylesheet" href="/mantra.css">
-  <script type="module" src="/mantra.head.bundle.js"></script>
+  <script type="module" src="/mantra.js"></script>
   <script>
 
     document.addEventListener('DOMContentLoaded', (event) => {
+
       let game = new MANTRA.Game({
-        graphics: ['phaser', 'babylon']
+        graphics: ['babylon'],
+        options: {
+          scriptRoot: 'https://yantra.gg/mantra/'
+        }
       });
+      /*
+        new Game(options) defaults to:
+        {
+          physics: 'matter',      // enum, 'physx', 'matter'
+          graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
+          keyboard: true,         // boolean or `Keyboard` config object
+          mouse: true,            // boolean or `Mouse` config object
+          collisions: false,      // boolean
+          width: 1600,            // number
+          height: 900,            // number
+        }
+      */
+
+
+
+
       let Plugins = MANTRA.plugins;
 
       // Use Plugins to add systems to the game
