@@ -91,14 +91,14 @@ Returns a new game instance. `options` defaults to:
 
 ```
 
-### Local Client
+### Start Local Game
 
 ```js
 let game = new Game();
 game.start(); // starts local game instance
 ```
 
-### Remove Client
+### Connect to Remote Game
 
 ```js
 let game = new Game();
