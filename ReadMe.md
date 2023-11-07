@@ -87,12 +87,9 @@ Returns a new game instance. `options` defaults to:
   collisions: false,       // boolean
   width: 1600,             // number
   height: 900,             // number
-  loadDefaultPlugins: true // boolean, autoload default plugins
 }
 
 ```
-
-
 
 ### Start Local Game
 
@@ -161,38 +158,9 @@ game.use(pluginInstance)
 ```
 
 <a name="plugins"></a>
+## Plugin Directory
 
-| Plugin Name | Source |
-| --- | --- |
-| └ border | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/border) |
-| └ browser-keyboard | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/browser-keyboard) |
-| └ browser-mouse | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/browser-mouse) |
-| └ bullet | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/bullet) |
-| └ chat | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/chat) |
-| └ client-local | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/client-local) |
-| └ client-websocket | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/client-websocket) |
-| └ collisions | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/collisions) |
-| └ entity-factory | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-factory) |
-| └ entity-input | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-input) |
-| └ entity-movement | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-movement) |
-|         └ strategies | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/entity-movement/strategies) |
-| └ graphics | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics) |
-|         └ camera | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics/camera) |
-| └ graphics-babylon | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon) |
-|         └ camera | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/camera) |
-|                 └ controls-mouse | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/camera/controls-mouse) |
-|         └ starfield | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-babylon/starfield) |
-| └ graphics-css | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-css) |
-| └ graphics-phaser | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/graphics-phaser) |
-| └ lifetime | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/lifetime) |
-| └ logger | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/logger) |
-| └ physics-matter | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/physics-matter) |
-| └ server-websocket | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/server-websocket) |
-| └ snapshots | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots) |
-|         └ SnapShotManager | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/snapshots/SnapShotManager) |
-| └ world | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world) |
-|         └ pong | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world/pong) |
-
+See: [https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins)
 
 <a name="features"></a>
 ## Mantra Feature Checklist
