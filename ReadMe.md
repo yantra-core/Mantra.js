@@ -23,7 +23,10 @@ Want to skip ahead? We have interactive CodePens available with default configur
 
 [Open CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr) - Matter.js + CSS Graphics
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 + Babylon.js ( Experimental Status )
+[Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 + Babylon.js ( Experimental )
+
+[Open CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz) - RenderPlex - Babylon.js + Phaser 3
+
 
 You can view any of these examples in your browser and begin modifying the game code immediately.
 
@@ -43,7 +46,7 @@ Mantra's default 3D graphics are rendered using WebGPU and Babylon.js. Mantra's 
 
 ### Matter.js + Phaser 3
 
-For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to mix and match configuration options and easily add new Graphics plugins. You can render Mantra games [entirely in CSS](https://codepen.io/Marak-Squires/pen/abXpEve). You can even render the same Game through [multiple graphics pipelines](https://yantra.gg/mantra/examples/solo/split-render/pong.html) at once if you need to.
+For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to mix and match configuration options and easily add new Graphics plugins. You can render Mantra games [entirely in CSS](https://codepen.io/Marak-Squires/pen/abXpEve). You can even render the same Game through [multiple graphics pipelines](https://codepen.io/Marak-Squires/pen/eYxgaGz) at once if you need to.
 
 **How is this even possible?**
 
