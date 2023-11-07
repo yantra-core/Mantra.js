@@ -37,7 +37,7 @@ You can view any of these examples in your browser and begin modifying the game 
 
 Want to build a 3D, 2D or 2.5D JavaScript game? We've got you covered! In Mantra, it's a one-line change to swap the graphics or physics.
 ##  Web Assembly + WebGPU
-### NVIDA PhysX 5.3.0 + Babylon.js
+### NVIDIA PhysX 5.3.0 + Babylon.js
 
 Mantra's default 3D graphics are rendered using WebGPU and Babylon.js. Mantra's default 3D physics are powered by NVIDA PhysX compiled via EMScripten
 
