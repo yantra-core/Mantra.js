@@ -67,11 +67,25 @@ class PhysXPhysics extends PhysicsInterface {
     let self = this;
 
     game.loadScripts([
-      'physx-js-webidl.js'
+      '/physx-js-webidl.js'
     ], () => {
-      this.physXReady();
-    })
+      PhysXObjectAvailable(function(){
+        self.physXReady();
+      })
+    });
 
+    // PhysXObjectAvailable may not be necessary, the PhysX() should immediately be available
+    function PhysXObjectAvailable (callback) {
+      if (typeof PhysX !== 'undefined') {
+        callback();
+      }
+      // try again in 10ms
+      else {
+        setTimeout(function () {
+          PhysXObjectAvailable(callback);
+        }, 10);
+      }
+    }
   }
 
   physXReady () {

@@ -43,7 +43,7 @@ Mantra's default 3D graphics are rendered using WebGPU and Babylon.js. Mantra's 
 
 ### Matter.js + Phaser 3
 
-For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to mix and match configuration options and easily add new Graphics plugins. You can even render the same Game through [multiple graphics pipelines](https://yantra.gg/mantra/examples/solo/split-render/pong.html) at once if you need to.
+For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to mix and match configuration options and easily add new Graphics plugins. You can render Mantra games [entirely in CSS](https://codepen.io/Marak-Squires/pen/abXpEve). You can even render the same Game through [multiple graphics pipelines](https://yantra.gg/mantra/examples/solo/split-render/pong.html) at once if you need to.
 
 **How is this even possible?**
 
@@ -57,9 +57,7 @@ Mantra is designed to start a full-featured local game instance immediately with
 
 ## Serverless Physics
 
-Mantra is architectured from the ground up to work within Serverless environments like CloudFlare Workers or [Hathora](https://hathora.dev).
-
-This unique architecture places Mantra at the forefront of Serverless Physics game engines.
+Mantra is architectured from the ground up to work within Serverless environments like [CloudFlare Workers](https://github.com/yantra-core/mantra/tree/master/mantra-edge) or [Hathora](https://hathora.dev). This unique architecture places Mantra at the forefront of Serverless Physics game engines.
 
 Are you still learning about [Serverless Physics](https://yantra.gg)? No worries! Mantra can also run on any standard hosting environment.
 
@@ -80,6 +78,7 @@ Returns a new game instance. `options` defaults to:
 {
   physics: 'matter',      // enum, 'physx', 'matter'
   graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
+  camera: 'center',       // enum, 'follow', 'center'
   keyboard: true,         // boolean or `Keyboard` config object
   mouse: true,            // boolean or `Mouse` config object
   collisions: false,      // boolean
@@ -234,7 +233,7 @@ The following checklist outlines the planned features and their current status:
 
 ### Plugin System
 - [X] **Everything is a Plugin**
-- [ ] **All Plugin methods are event emitters**
+- [X] **All Plugin methods are event emitters**
 - [ ] **All Plugin events have hooks**
 
 ## Mod Support

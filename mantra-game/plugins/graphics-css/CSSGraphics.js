@@ -1,13 +1,17 @@
+// CSSGraphics.js - Marak Squires 2023
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class CSSGraphics extends GraphicsInterface {
-  constructor({ debug = true, onlineMode = true, followPlayer = false } = {}) {
+  constructor({ camera } = {}) {
     super();
-    this.onlineMode = onlineMode;
-    this.entityStates = {};
-    this.debug = debug;
+  
+    // config scope for convenience
+    let config = {
+      camera
+    };
+    this.config = config;
+
     this.name = 'graphics-css';
-    this.followPlayer = followPlayer;
     this.cameraPosition = { x: 0, y: 0 };
   }
 
@@ -16,40 +20,15 @@ class CSSGraphics extends GraphicsInterface {
     game.graphics.push(this);
 
     this.game = game;
-    // Only initialize DebugGUI if debug flag is set to true
-    if (this.debug) {}
-    // leave always on ( for now )
-    // this.initDebugUI();
 
     this.game.systemsManager.addSystem('graphics-css', this);
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
+    // Remark: CSSGraphics current requires no async external loading scripts
     game.graphicsReady.push(self.name);
 
     // Initialize the CSS render div
     this.initCSSRenderDiv();
-  }
-
-  initDebugUI() {
-    // Create a debug UI container
-    this.debugUIContainer = document.createElement('div');
-    this.debugUIContainer.id = 'debugUIContainer';
-    this.debugUIContainer.style.top = '10px';
-    this.debugUIContainer.style.right = '10px';
-    this.debugUIContainer.style.width = '40vw';
-    this.debugUIContainer.style.height = '50vw';
-    this.debugUIContainer.style.background = 'rgba(0, 0, 0, 0.5)';
-    this.debugUIContainer.style.padding = '10px';
-    this.debugUIContainer.style.color = 'white';
-    this.debugUIContainer.style.zIndex = '9999';
-    this.debugUIContainer.style.position = 'absolute';
-
-    // Create a table within the debug UI container
-    this.debugTable = document.createElement('table');
-    this.debugTable.id = 'debugTable';
-    this.debugUIContainer.appendChild(this.debugTable);
-
-    this.renderDiv.appendChild(this.debugUIContainer);
   }
 
   initCSSRenderDiv() {
@@ -101,7 +80,6 @@ class CSSGraphics extends GraphicsInterface {
         break;
       */
       case 'BULLET':
-
         // For PLAYER entities, create a triangle
         entityElement.style.width = '0px';
         entityElement.style.height = '0px';
@@ -128,7 +106,6 @@ class CSSGraphics extends GraphicsInterface {
     this.updateEntityElementPosition(entityElement, entityData);
     return entityElement;
   }
-
 
   updateGraphic(entityData) {
     const entityElement = document.getElementById(`entity-${entityData.id}`);
@@ -165,7 +142,6 @@ class CSSGraphics extends GraphicsInterface {
     return entityElement;
   }
 
-
   removeGraphic(entityId) {
 
     let entity = this.game.getEntity(entityId);
@@ -180,7 +156,9 @@ class CSSGraphics extends GraphicsInterface {
    }
 
   }
+  
   updateEntityElementPosition(entityElement, {position, width, height, rotation = 0}) {
+   
     // Adjust the position based on the camera position
     const adjustedPosition = {
       x: position.x - this.cameraPosition.x + window.innerWidth / 2,
@@ -200,15 +178,17 @@ class CSSGraphics extends GraphicsInterface {
   
     return entityElement;
   }
-  
+
   update () {
     const currentPlayer = this.game.getEntity(window.currentPlayerId);
-    if (this.followPlayer && currentPlayer && currentPlayer.position) {
-      this.cameraPosition.x = currentPlayer.position.x;
-      this.cameraPosition.y = currentPlayer.position.y;
+    if (this.config.camera && this.config.camera === 'follow' && currentPlayer) {
+      if (currentPlayer.position) {
+        this.cameraPosition.x = currentPlayer.position.x;
+        this.cameraPosition.y = currentPlayer.position.y;
+      }
     }
   }
-  
+
   render () {}
 }
 

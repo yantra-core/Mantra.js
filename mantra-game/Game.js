@@ -27,6 +27,7 @@ class Game {
     physics = 'matter',
     graphics = ['babylon'],
     collisions,
+    camera = 'follow',
     keyboard = true,
     mouse = true,
     isOfflineMode,
@@ -42,17 +43,20 @@ class Game {
       physics,
       graphics,
       collisions,
+      camera,
       keyboard,
       mouse,
       isOfflineMode,
       options
     };
+    this.config = config;
 
     // Define the scriptRoot variable for loading external scripts
-    // In most cases you will want to load from the local directory
-    this.scriptRoot = './';
+    // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
+    this.scriptRoot = 'https://yantra.gg/mantra';
 
-    // Could be CDN or other remote location, https://yantra.gg/mantra/vendor/
+    // Could be another CDN or other remote location
+    // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
       this.scriptRoot = options.scriptRoot;
     }
@@ -194,7 +198,9 @@ class Game {
           this.use(new plugins.BabylonGraphics());
         }
         if (graphics.includes('css')) {
-          this.use(new plugins.CSSGraphics());
+          this.use(new plugins.CSSGraphics({
+            camera: this.config.camera
+          }));
         }
         if (graphics.includes('phaser')) {
           this.use(new plugins.PhaserGraphics());
