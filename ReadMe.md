@@ -188,26 +188,6 @@ game.use(pluginInstance)
 |         └ pong | [📂](https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins/world/pong) |
 
 
-
-## Examples ( more coming soon ! )
-
-| Name | Source |
-| --- | --- |
-| └ solo | [📂](https://yantra.gg/mantra/examples/solo) |
-|         └ babylon | [📂](https://yantra.gg/mantra/examples/solo/babylon) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/babylon/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/babylon/pong.html) |
-|         └ css | [📂](https://yantra.gg/mantra/examples/solo/css) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/css/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/css/pong.html) |
-|         └ phaser3 | [📂](https://yantra.gg/mantra/examples/solo/phaser3) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/phaser3/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/phaser3/pong.html) |
-|         └ split-render | [📂](https://yantra.gg/mantra/examples/solo/split-render) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ asteroids | [📄](https://yantra.gg/mantra/examples/solo/split-render/asteroids.html) |
-| &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;└ pong | [📄](https://yantra.gg/mantra/examples/solo/split-render/pong.html) |
-
-
 <a name="features"></a>
 ## Mantra Feature Checklist
 
