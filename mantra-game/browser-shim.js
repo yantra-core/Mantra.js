@@ -29,6 +29,8 @@ MANTRA.plugins = {
   PongWorld: require('./plugins/world/pong/PongWorld.js').default,
   StarField: require('./plugins/starfield/StarField.js').default,
   BabylonStarField: require('./plugins/starfield/BabylonStarField.js').default,
+  FroggerMovement: require('./plugins/entity-movement/strategies/FroggerMovement.js').default,
+  PacManMovement: require('./plugins/entity-movement/strategies/PacManMovement.js').default,
   // ... add other plugins similarly
 };
 

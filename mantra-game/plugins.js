@@ -33,6 +33,10 @@ import InputLegend from './plugins/input-legend/InputLegend.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 
+// Movement Strategies
+import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovement.js';
+import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.js';
+
 /*
 // Manually require each plugin
 MANTRA.plugins = {
@@ -83,7 +87,9 @@ const plugins = {
   WebSocketClient,
   Camera,
   StarField,
-  BabylonStarField
+  BabylonStarField,
+  MovementFrogger,
+  MovementPacman
 };
 
 export default plugins;

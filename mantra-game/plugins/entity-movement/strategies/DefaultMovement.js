@@ -1,6 +1,7 @@
 // DefaultMovementStrategy.js - Marak Squires 2023
 class DefaultMovementStrategy {
   constructor() {
+    this.name = 'DefaultMovementStrategy';
   }
 
   init(game) {

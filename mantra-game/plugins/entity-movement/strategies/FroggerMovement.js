@@ -10,7 +10,7 @@ class FroggerMovementStrategy {
       throw new Error('FroggerMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
     }
 
-    game.systems.entityMovement.strategies.push(this);
+    game.systems.entityMovement.addStrategy(this);
 
   }
 

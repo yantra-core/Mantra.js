@@ -11,13 +11,15 @@ class PacManMovementStrategy {
       throw new Error('PacManMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
     }
 
-    game.systems.entityMovement.strategies.push(this);
-
+    game.systems.entityMovement.addStrategy(this);
 
   }
 
   update(entityId, dx, dy) {
     const entity = this.game.bodyMap[entityId];
+
+    // ensure the friction of the entity is set to 0
+
     if (!entity) return;
 
     const MOVE_SPEED = 0.5; // Adjust as needed
