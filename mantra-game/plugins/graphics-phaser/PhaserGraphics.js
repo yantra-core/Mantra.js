@@ -3,10 +3,16 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class PhaserGraphics extends GraphicsInterface {
-  constructor({ followPlayer = false, startingZoom = 0.4 } = {}) {
+  constructor({ camera = {}, startingZoom = 0.4 } = {}) {
     super();
-    this.followPlayer = followPlayer;
     this.name = 'graphics-phaser';
+
+    let config = {
+      camera,
+      startingZoom
+    };
+    // config scope for convenience
+    this.config = config;
 
     this.startingZoom = startingZoom;
     this.scenesReady = false;
@@ -80,7 +86,6 @@ class PhaserGraphics extends GraphicsInterface {
         setTimeout(loadMainScene.bind(self), 10);
         return;
       }
-
 
       let canvas = self.phaserGame.canvas;
       canvas.setAttribute('id', 'phaser-render-canvas');
@@ -268,8 +273,9 @@ class PhaserGraphics extends GraphicsInterface {
     }
 
     let camera = this.scene.cameras.main;
+    if (this.config.camera && this.config.camera === 'follow') {
 
-    if (this.followPlayer && this.followingPlayer !== true) {
+//    if (this.followPlayer && this.followingPlayer !== true) {
       // Camera settings
       let player = this.game.getEntity(window.currentPlayerId);
       let graphics = this.game.components.graphics.get(window.currentPlayerId);

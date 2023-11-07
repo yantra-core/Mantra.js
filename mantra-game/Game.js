@@ -200,7 +200,7 @@ class Game {
           this.use(new plugins.CSSGraphics({ camera: this.config.camera }));
         }
         if (graphics.includes('phaser')) {
-          this.use(new plugins.PhaserGraphics());
+          this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
         }
       }
     }
