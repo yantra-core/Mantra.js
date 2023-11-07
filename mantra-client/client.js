@@ -87,7 +87,12 @@ let game = new Game({
 
 let game = new Game({
   mouse: false,
-  graphics: ['babylon']
+  physics : 'matter',
+  graphics: ['babylon'],
+  camera: 'follow',
+  options: {
+    scriptRoot: './' // use local scripts instead of default yantra.gg CDN
+  }
 });
 //
 // Use Plugins to add systems to the game
@@ -95,28 +100,20 @@ let game = new Game({
 game
   .use(new plugins.Bullet())
   .use(new plugins.Border({ autoBorder: true }));
-  //.use(new plugins.InputLegend())
-  //.use(new plugins.StarField()) // TODO: make this generic plugin that delegates
-                                  // The generic starfield should do almost nothing except delegate to other plugins
 
-//.use(new PhysXPhysics())     // Status: 3D WIP / Experimental
+
+game.use(new plugins.InputLegend());
+game.use(new plugins.StarField())
+
+game.use(new plugins.MovementFrogger())
+//game.use(new plugins.MovementPacman())
+
+//game.use(new Default3DInputStrategy());
+//game.use(new Default2DInputStrategy());
 //.use(new AsteroidsMovement())
 //.use(new Default2DInputStrategy())
 //.use(new ThreeDimensionalInputStrategy())
 //game.use(new PongWorld())
-
-// for local / offline play we can use any id we want
-function randomId() {
-  return 'player_' + Math.random().toString(36).substr(2, 9);
-}
-let playerId = randomId();
-
-game.use(new plugins.Client(playerId));
-//game.use(new Default3DInputStrategy());
-//game.use(new Default2DInputStrategy());
-game.use(new plugins.InputLegend());
-
-game.use(new plugins.StarField())
 
 //
 // Listen for all Game events 
@@ -128,6 +125,15 @@ game.use(new plugins.StarField())
   })
 */
 
+
+// for local / offline play we can use any id we want
+function randomId() {
+  return 'player_' + Math.random().toString(36).substr(2, 9);
+}
+let playerId = randomId();
+
+game.use(new plugins.Client(playerId));
+
 // Function to switch to Online Mode
 function switchToOnline() {
   game.removeEntity(playerId); // Destroy the local player
@@ -135,7 +141,6 @@ function switchToOnline() {
   game.connect('ws://192.168.1.80:8888/websocket');    // @yantra-core/mantra-server
   //game.connect('ws://192.168.1.80:8787/websocket');  // @yantra-core/mantra-edge
 }
-
 
 // Setup button event listeners
 //document.getElementById('connectButton').addEventListener('click', switchToOnline);
@@ -150,7 +155,10 @@ game.start(function () {
     position: {
       x: 0,
       y: 0
-    }
+    },
+    friction: 0.,  // Default friction
+    frictionAir: 0, // Default air friction
+    frictionStatic: 0, // Default static friction
   });
 });
 

@@ -1,7 +1,13 @@
 class CameraSystem {
-  constructor({ followPlayer = false } = {}) {
+  constructor({ camera } = {}) {
     this.name = 'graphics-babylon/camera';
-    this.followPlayer = followPlayer;
+
+    // config scope for convenience
+    let config = {
+      camera
+    };
+    this.config = config;
+
   }
 
   init (game, engine, scene) {
@@ -99,8 +105,7 @@ class CameraSystem {
 
   render() {
 
-
-    if (this.followPlayer) {
+    if (this.config.camera && this.config.camera === 'follow') {
       let currentPlayer = this.game.getEntity(window.currentPlayerId);
       if (currentPlayer && currentPlayer.graphics) {
         let graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this

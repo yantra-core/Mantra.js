@@ -12,7 +12,7 @@ import plugins from '../../plugins.js';
 let lastKnownStates = {};
 
 class BabylonGraphics extends GraphicsInterface {
-  constructor() {
+  constructor({ camera } = {}) {
     super();
     this.name = 'graphics-babylon';
     this.engine = null;
@@ -21,6 +21,13 @@ class BabylonGraphics extends GraphicsInterface {
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
     this.pendingLoad = []; // queue of pending Plugins that depend on this Babylon Graphics
+
+    // config scope for convenience
+    let config = {
+      camera
+    };
+    this.config = config;
+
   }
 
   init(game) {
@@ -117,16 +124,15 @@ class BabylonGraphics extends GraphicsInterface {
       document.dispatchEvent(newEvent);
     }
 
-    game.use(new plugins.Camera({ followPlayer: true })) // TODO: camera needs to be scoped to graphics pipeline
-
+    // TODO: Should we have generic Camera plugin scoped to graphics pipeline?
+    //       see how StarField.js is implemented for reference
+    game.use(new plugins.Camera({ camera: this.config.camera }));
 
     game.graphicsReady.push(this.name);
-
 
     this.pendingLoad.forEach(function(pluginInstance){
       game.use(pluginInstance);
     })
-
 
   }
 

@@ -35,6 +35,7 @@ class InputLegend {
 
     let closeButton = document.createElement('span');
     closeButton.id = "closeButton";
+    closeButton.className = "closeButton";
     closeButton.textContent = 'X';
     closeButton.addEventListener('click', function () {
       controlsView.style.display = 'none';

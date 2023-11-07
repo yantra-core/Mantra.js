@@ -36,6 +36,7 @@ import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 // Movement Strategies
 import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovement.js';
 import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.js';
+import MovementPong from './plugins/entity-movement/strategies/PongMovement.js';
 
 /*
 // Manually require each plugin
@@ -89,7 +90,8 @@ const plugins = {
   StarField,
   BabylonStarField,
   MovementFrogger,
-  MovementPacman
+  MovementPacman,
+  MovementPong
 };
 
 export default plugins;

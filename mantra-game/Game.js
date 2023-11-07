@@ -165,7 +165,6 @@ class Game {
       this.use(new plugins.Collision());
     }
 
-
     this.use(new plugins.EntityInput());
     this.use(new plugins.EntityMovement());
 
@@ -195,12 +194,10 @@ class Game {
 
         this.use(new plugins.Graphics()); // camera configs
         if (graphics.includes('babylon')) {
-          this.use(new plugins.BabylonGraphics());
+          this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
         }
         if (graphics.includes('css')) {
-          this.use(new plugins.CSSGraphics({
-            camera: this.config.camera
-          }));
+          this.use(new plugins.CSSGraphics({ camera: this.config.camera }));
         }
         if (graphics.includes('phaser')) {
           this.use(new plugins.PhaserGraphics());
