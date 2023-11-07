@@ -79,17 +79,20 @@ Returns a new game instance. `options` defaults to:
 
 ```js
 {
-  physics: 'matter',      // enum, 'physx', 'matter'
-  graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
-  camera: 'center',       // enum, 'follow', 'center'
-  keyboard: true,         // boolean or `Keyboard` config object
-  mouse: true,            // boolean or `Mouse` config object
-  collisions: false,      // boolean
-  width: 1600,            // number
-  height: 900,            // number
+  physics: 'matter',       // enum, 'physx', 'matter'
+  graphics: ['babylon'],   // array enum, 'babylon', 'phaser', 'css'
+  camera: 'center',        // enum, 'follow', 'center'
+  keyboard: true,          // boolean or `Keyboard` config object
+  mouse: true,             // boolean or `Mouse` config object
+  collisions: false,       // boolean
+  width: 1600,             // number
+  height: 900,             // number
+  loadDefaultPlugins: true // boolean, autoload default plugins
 }
 
 ```
+
+
 
 ### Start Local Game
 

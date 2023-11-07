@@ -6,7 +6,7 @@ import EntityInput from '../plugins/entity-input/EntityInput.js';
 import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
 
 const game = new Game({
-  loadPlugins: false
+  loadDefaultPlugins: false
 });
 
 game.use(new PhysicsMatter());

@@ -15,13 +15,15 @@ import onlineGameLoop from './lib/onlineGameLoop.js';
 // Main game loop / game tick
 import gameTick from './lib/gameTick.js';
 
+// Plugins
+import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
 import plugins from './plugins.js';
 
 class Game {
   constructor({
     isClient,
     isServer = false,
-    loadPlugins = true, // will auto-load default plugins based on default config if true
+    loadDefaultPlugins = true, // will auto-load default plugins based on default config if true
     width = 1600,
     height = 900,
     physics = 'matter',
@@ -37,7 +39,7 @@ class Game {
     const config = {
       isClient,
       isServer,
-      loadPlugins,
+      loadDefaultPlugins,
       width,
       height,
       physics,
@@ -135,9 +137,11 @@ class Game {
     this.gameTick = gameTick.bind(this);
     this.localGameLoop = localGameLoop.bind(this);
     this.onlineGameLoop = onlineGameLoop.bind(this);
+    this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
 
+    this.plugins = plugins;
     // load default plugins
-    if (loadPlugins) {
+    if (loadDefaultPlugins) {
       this.loadPluginsFromConfig({
         physics,
         graphics,
@@ -145,64 +149,6 @@ class Game {
         keyboard,
         mouse
       });
-    }
-
-  }
-
-  loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse }) {
-
-    this.use(new plugins.EntityFactory())
-
-    if (physics === 'matter') {
-      this.use(new plugins.MatterPhysics());
-    }
-
-    if (physics === 'physx') {
-      this.use(new plugins.PhysXPhysics());
-    }
-
-    if (collisions) {
-      this.use(new plugins.Collision());
-    }
-
-    this.use(new plugins.EntityInput());
-    this.use(new plugins.EntityMovement());
-
-    if (!this.isServer) {
-
-      if (keyboard) {
-        this.use(new plugins.Keyboard(keyboard));
-      }
-
-      if (mouse) {
-        this.use(new plugins.Mouse());
-      }
-
-      // TODO: move to Graphics.loadFromConfig() ?
-      if (graphics) {
-        if (typeof graphics === 'string') {
-          graphics = [graphics];
-        }
-
-        // Ensure the gameHolder div exists
-        let gameHolder = document.getElementById('gameHolder');
-        if (!gameHolder) {
-          gameHolder = document.createElement('div');
-          gameHolder.id = 'gameHolder';
-          document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
-        }
-
-        this.use(new plugins.Graphics()); // camera configs
-        if (graphics.includes('babylon')) {
-          this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
-        }
-        if (graphics.includes('css')) {
-          this.use(new plugins.CSSGraphics({ camera: this.config.camera }));
-        }
-        if (graphics.includes('phaser')) {
-          this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
-        }
-      }
     }
 
   }

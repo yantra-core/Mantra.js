@@ -9,7 +9,7 @@ import Bullet from '../plugins/bullet/Bullet.js';
 import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
 
 const game = new Game({
-  loadPlugins: false
+  loadDefaultPlugins: false
 });
 
 game.use(new PhysicsMatter());
