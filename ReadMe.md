@@ -12,6 +12,21 @@ You can start building a simple offline game in seconds using your favorite libr
 
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
+Want to skip ahead? We have interactive CodePens available with default configurations here:
+
+
+## Demos
+
+[Open CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM) - Matter.js + Babylon.js
+
+[Open CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr) - Matter.js + Phaser 3
+
+[Open CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr) - Matter.js + CSS Graphics
+
+[Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 + Babylon.js ( Experimental Status )
+
+You can view any of these examples in your browser and begin modifying the game code immediately.
+
 ### Core Features
 - ✅ **Entities, Components, Systems**: Enterprise-grade ECS for game development
 - ✅ **Modular Plugin System**: Facilitating easier extension and customization
