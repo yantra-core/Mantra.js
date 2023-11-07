@@ -1,4 +1,4 @@
-# `@yantra-core/mantra`
+# `@yantra-core/mantra` -  [v1 Alpha](#alpha-notice)
 
 ![Build Status](https://github.com/yantra-core/mantra/actions/workflows/nodejs.yml/badge.svg)
 
@@ -251,7 +251,10 @@ The following checklist outlines the planned features and their current status:
 - [ ] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
 - [ ] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
 
+<a name="alpha-notice"></a>
 # Alpha Software Notice
-As alpha software, `@yantra-core/mantra` is currently under active development. [Features](#Features) are being added and refined. Users should anticipate changes and potential instabilities. Your feedback and contributions at this stage are invaluable and will shape the future of this framework.
+As v1 alpha software, `@yantra-core/mantra` is currently under active development. [Features](#Features) are being added and refined. Users should anticipate changes and potential instabilities. Your feedback and contributions at this stage are invaluable and will shape the future of this framework.
+
+Mantra follows an odd / even version release schedule for stable / unstable versions. v1 is considered unstabled. v2 will be considered stable.
 
 Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any questions!
