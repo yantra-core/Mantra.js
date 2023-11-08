@@ -173,7 +173,7 @@ class PhaserGraphics extends GraphicsInterface {
     gameobject.y = adjustedY;
 
     // TODO: move this to common 3D-2.5D transform function(s)
-    if (typeof entityData.rotation !== 'undefined') { // Remark: shouldn't this be default 0?
+    if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
       if (typeof entityData.rotation === 'object') {
         // transform 3d to 2.5d
         gameobject.rotation = entityData.rotation.x;
