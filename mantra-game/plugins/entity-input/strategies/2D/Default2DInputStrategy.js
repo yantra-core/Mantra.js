@@ -18,10 +18,14 @@ class DefaultTwoDimensionalInputStrategy {
       //RIGHT: 'ROTATE_RIGHT'
     };
 
-    // TODO: bulletCooldown should be a property of the bullet system
-    this.bulletCooldown = 20;
-    this.buttonCooldown = 20;
-    this.lastBulletFireTime = {};
+    // Remark: Button / Input cooldown has been removed in favor of input pooling on gametick
+    // the new approach is to pool all inputs for a given tick, and send them to the server
+    // this implies a button cool down of 1 tick, which is the same as no cooldown
+    // Remark: bulletCooldown should be a property of the bullet system, not input system
+        // this.bulletCooldown = 1;
+        // this.buttonCooldown = 1;
+        // this.lastBulletFireTime = {};
+
     this.useMouseControls = false;
     
     // check to see if entityInput system exists, if not throw error
@@ -72,10 +76,15 @@ class DefaultTwoDimensionalInputStrategy {
     }
 
     if (buttons.LEFT) actions.push('FIRE_BULLET');
-    if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
-    if (Date.now() - plugin.lastBulletFireTime[entityId] <= plugin.bulletCooldown) return;
-    plugin.lastBulletFireTime[entityId] = Date.now();
 
+    /* Remark: Removes in favor of input pooling on gametick
+    if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
+    if (Date.now() - plugin.lastBulletFireTime[entityId] <= plugin.bulletCooldown) {
+      console.log('bullet cooldown', Date.now() - plugin.lastBulletFireTime[entityId]);
+      return;
+    };
+    plugin.lastBulletFireTime[entityId] = Date.now();
+    */
     if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
     if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
     if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0);

@@ -189,7 +189,6 @@ class PhaserGraphics extends GraphicsInterface {
 
   createGraphic(entityData) {
 
-    console.log('createGraphic', entityData)
     // switch case based on entityData.type
     let graphic;
     switch (entityData.type) {

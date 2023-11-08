@@ -89,7 +89,7 @@ let game = new Game({
 let game = new Game({
   isClient: true,
   mouse: false,
-  physics : 'matter',
+  physics : 'matter', // 'matter', 'physx'
   graphics: ['babylon'],
   collisions: true,
   camera: 'center',
@@ -103,7 +103,6 @@ window.game = game;
 //
 game
   .use(new plugins.Bullet())
-  .use(new plugins.Border({ autoBorder: true }));
 
 
 game.use(new plugins.InputLegend());
@@ -174,6 +173,10 @@ game.start(function () {
     frictionAir: 0, // Default air friction
     frictionStatic: 0, // Default static friction
   });
+
+  game.use(new plugins.Border({ autoBorder: true }));
+
+
 });
 
 

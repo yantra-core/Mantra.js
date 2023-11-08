@@ -15,7 +15,6 @@ class InputLegend {
     let entityInputSystem = game.systemsManager.getSystem('entityInput');
     let controls = entityInputSystem.controlMappings;
 
-
     let table = document.createElement('table');
     table.id = "controlsTable";
     let headerHTML = '<tr><th>Key</th><th>Action</th></tr>';
@@ -60,7 +59,7 @@ class InputLegend {
 
         for (let key in currentInputs) {
           let row = document.getElementById(`row-${key}`);
-          if (currentInputs[key]) {
+          if (row && currentInputs[key]) {
             row.style.backgroundColor = 'yellow';
             this.highlightedKeys[key] = true;
           }

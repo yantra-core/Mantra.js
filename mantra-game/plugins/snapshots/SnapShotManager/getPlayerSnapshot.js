@@ -46,7 +46,7 @@ const getPlayerSnapshot = function (playerId) {
         delete playerStateCache[playerId][state.id];
         delete playerStateCache[state.id];
       }
-      console.log("NOT SENDING DESTROYED ENTITY", state.id)
+      // console.log("NOT SENDING DESTROYED ENTITY", state.id)
       continue;
     }
     

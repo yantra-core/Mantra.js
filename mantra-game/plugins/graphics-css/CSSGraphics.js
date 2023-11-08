@@ -204,7 +204,6 @@ class CSSGraphics extends GraphicsInterface {
       let ent = this.game.entities[eId];
       if (ent.type !== 'BORDER') { // TODO: remove this
         this.updateGraphic(ent, alpha);
-        console.log('upping the ent', ent)
       }
     }
   }
