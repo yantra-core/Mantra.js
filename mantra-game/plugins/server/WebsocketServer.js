@@ -32,7 +32,8 @@ class WebSocketServerClass {
     this.game = game;
     console.log("calling websocket init");
     this.game.listen = this.listen.bind(this);
-    setInterval(this.gameUpdate.bind(this), FIXED_DT);
+    this.lastTimestamp = Date.now();
+    this.gameUpdate(); // start the game loop
   }
 
   listen (port) {
@@ -136,26 +137,32 @@ class WebSocketServerClass {
   }
 
   gameUpdate() {
-    let game = this.game;
-    let self = this;
-
-    if (typeof lastTimestamp === 'undefined') {
-      lastTimestamp = Date.now();
-    }
     const now = Date.now();
-    const deltaTime = now - lastTimestamp;
+    const deltaTime = now - this.lastTimestamp;
+    this.lastTimestamp = now;
     accumulatedTime += deltaTime;
 
+    // Execute game logic updates based on the accumulated time
     while (accumulatedTime >= FIXED_DT) {
-      game.gameTick();
+      this.game.gameTick();
       accumulatedTime -= FIXED_DT;
     }
 
+    this.sendUpdates();
+
+    // Schedule next update. The delay ensures we run the loop at approximately the correct rate.
+    const nextTick = FIXED_DT - (accumulatedTime % FIXED_DT);
+    setTimeout(() => this.gameUpdate(), nextTick); // Use arrow function for cleaner syntax
+  }
+  
+  sendUpdates () {
+    let game = this.game;
     // Send updated data to clients after all the updates
     // TODO: systems.ws.broadcastAll('gametick', game.getSnapshot()); // something like this
     //
     // Remark: We are missing data-compression plugin here, ecapsulate the encoding layers
     //
+    // console.log('sendUpdates')
     let count = 0;
     if (!this.server || !this.server.clients) {
       console.error('no server')
@@ -198,13 +205,8 @@ class WebSocketServerClass {
       }
     });
 
-    game.removedEntities.clear(); // TODO: move this to Game.js
-    // Clear the lastProcessedInput for all entities
-    this.lastProcessedInput = {};
-    lastTimestamp = now;
-
   }
-
+  
 }
 
 export default WebSocketServerClass;

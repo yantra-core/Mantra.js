@@ -1,56 +1,52 @@
 let started = false;
-let lastRenderedSnapshotId = null; // Add a variable to track the ID of the last rendered snapshot
-let hzMS = 16.666; // TODO: game config FPS
-function onlineGameLoop(game) {
+let lastRenderedSnapshotId = null;
+let hzMS = 16.666;
+let accumulator = 0;
+let lastGameTick = Date.now();
 
+function onlineGameLoop(game) {
   if (!started) {
     started = true;
-    // This will run the game logic at the fixed interval
-    setInterval(() => {
-      if (game.onlineGameLoopRunning) {
-        game.gameTick();
-      }
-    }, hzMS); // hzMS matches the server's update rate
+    lastGameTick = Date.now(); // Set the last game tick to the current time to start
   }
+  game.onlineGameLoopRunning = true;
 
-  // Check if there's a new snapshot and it's different from the last rendered one
+  // Calculate deltaTime in seconds
+  let currentTime = Date.now();
+  let deltaTime = (currentTime - lastGameTick) / 1000.0; // Convert milliseconds to seconds
+  lastGameTick = currentTime;
+
+  // Accumulate time since the last game logic update
+  accumulator += deltaTime;
+
+  // If there is a new snapshot, process it
   if (game.latestSnapshot && game.latestSnapshot.id !== lastRenderedSnapshotId) {
-    // data encoding layers go here...
-    // this will eventually be SnapShotManager.update()
-    if (game.deltaCompression) {
-      let deltaCompressedSnapshot = deltaCompression.decompress(game.latestSnapshot);
-      if (deltaCompressedSnapshot) {
-        //deltaCompressedSnapshot.state.forEach(game.inflateEntity);
-        lastRenderedSnapshotId = game.latestSnapshot.id; // Update the last rendered snapshot ID
-      }
-    } else {
-      lastRenderedSnapshotId = game.latestSnapshot.id; // Update the last rendered snapshot ID
-    }
-
     while (game.snapshotQueue.length > 0) {
       let snapshot = game.snapshotQueue.shift();
       snapshot.state.forEach(function (state) {
         game.inflateEntity(state);
       });
+      lastRenderedSnapshotId = snapshot.id; // Update the last rendered snapshot ID
     }
-
-  } else {
-    // console.log("No new data or snapshot already rendered");
   }
 
+  // Run game logic updates based on the accumulated time
+  while (accumulator >= hzMS / 1000.0) {
+    game.gameTick(); // Run the game logic update
+    accumulator -= hzMS / 1000.0; // Decrease accumulator by the fixed timestep
+  }
+
+  // Render the snapshot with the current state
   game.graphics.forEach(function (graphicsInterface) {
-    graphicsInterface.render(game);
+    graphicsInterface.render(game); // Render without alpha, as this is the most current state
   });
 
-  // game.gameTick(false);
-
-  requestAnimationFrame(function () {
-    if (game.onlineGameLoopRunning) {
+  // Schedule the next iteration of the loop using requestAnimationFrame
+  if (game.onlineGameLoopRunning) {
+    requestAnimationFrame(function () {
       onlineGameLoop(game);
-    }
-
-  });
-
+    });
+  }
 }
 
 export default onlineGameLoop;
