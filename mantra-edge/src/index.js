@@ -1,19 +1,5 @@
-import { Game } from '@yantra-core/mantra/Game.js';
-
+import { Game, plugins } from '../../mantra-game/Game.js';
 import deltaEncoding from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaEncoding.js';
-
-
-import EntityFactory from '@yantra-core/mantra/plugins/entity-factory/EntityFactory.js';
-import EntityInput from '@yantra-core/mantra/plugins/entity-input/EntityInput.js';
-import EntityMovement from '@yantra-core/mantra/plugins/entity-movement/EntityMovement.js';
-import Lifetime from '@yantra-core/mantra/plugins/lifetime/Lifetime';
-import BabylonRenderer from '@yantra-core/mantra/plugins/graphics-babylon/BabylonGraphics.js';
-import MatterPhysics from '@yantra-core/mantra/plugins/physics-matter/MatterPhysics.js';
-
-import Bullet from '@yantra-core/mantra/plugins/bullet/Bullet.js';
-import Collision from '@yantra-core/mantra/plugins/collisions/Collisions.js';
-import AsteroidsMovement from '@yantra-core/mantra/plugins/entity-movement/strategies/AsteroidsMovement.js';
-
 
 // Worker code
 export default {
@@ -33,21 +19,22 @@ export class Ayyo {
     this.env = env;
     this.connectedPlayers = {}; // Store connected players with their websockets
 
-    // let physicsMatter = new PhysicsMatter();
-
-
     // Initializing the systems
-    this.gameLogic = new Game({});
+    this.gameLogic = new Game({
+      isServer: true,
+      loadDefaultPlugins: false
+
+    });
 
     // Use Plugins to add systems to the game
     this.gameLogic
-      .use(new MatterPhysics())
-      .use(new Collision())
-      .use(new EntityFactory())
-      .use(new EntityInput())
-      .use(new EntityMovement(new AsteroidsMovement()))
-      .use(new Lifetime())
-      .use(new Bullet())
+      .use(new plugins.MatterPhysics())
+      .use(new plugins.Collision())
+      .use(new plugins.EntityFactory())
+      .use(new plugins.EntityInput())
+      .use(new plugins.EntityMovement())
+      //.use(new plugins.Lifetime())
+      .use(new plugins.Bullet())
 
 
   }
@@ -65,7 +52,7 @@ export class Ayyo {
     // Generate a unique player ID for this connection
     // remark: replace with global entity counter that is INT
     const playerEntityId = 'player_' + Math.random().toString(36).substr(2, 9);
-
+    console.log('handleSession', playerEntityId)
     // Store the connected player with its WebSocket
     this.connectedPlayers[playerEntityId] = websocket;
 
@@ -91,6 +78,11 @@ export class Ayyo {
 
     }
 
+    // Check if a new ticker needs to be elected
+    if (!this.tickerId) {
+      this.electNewTicker(playerEntityId);
+    }
+
     // Handle WebSocket close event
     websocket.addEventListener('close', event => {
       console.log('WebSocket is closed:', event);
@@ -98,6 +90,13 @@ export class Ayyo {
       // Remove the player from the connected players list and from the game state
       delete this.connectedPlayers[playerEntityId];
       this.gameLogic.removeEntity(playerEntityId);  // You need to implement this method in Game.js
+
+
+      if (playerEntityId === this.tickerId) {
+        this.tickerId = null; // Clear the tickerId
+        this.electNewTicker(Object.keys(this.connectedPlayers)[0]); // Elect a new ticker
+      }
+
     });
 
 
@@ -113,6 +112,12 @@ export class Ayyo {
       // Perform the requested action based on the "action" property of the message
       switch (message.action) {
         case 'gameTick':
+
+          if (this.tickerId !== playerEntityId) {
+            console.log('will not accept gameTick from', playerEntityId, 'because', this.tickerId, 'is the current ticker');
+            return;
+          }
+
           this.gameLogic.gameTick();
           Object.keys(this.connectedPlayers).forEach(playerId => {
             const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
@@ -180,6 +185,17 @@ export class Ayyo {
     });
   }
 
+   // Elect a new ticker when a player connects or when the current ticker disconnects
+   electNewTicker(newTickerId) {
+    this.tickerId = newTickerId;
+    const tickerWs = this.connectedPlayers[newTickerId];
+    if (tickerWs) {
+      tickerWs.send(JSON.stringify({
+        action: 'become_ticker'
+      }));
+    }
+  }
+
   async fetch(request) {
     await this.initialize();  // Ensure initialization is complete before handling the request
 
@@ -224,7 +240,6 @@ export class Ayyo {
         });
       case '/getEntities':
         const entities = this.gameLogic.getEntities();
-        console.log('entities', entities)
         return new Response(JSON.stringify(entities), {
           headers: { 'Content-Type': 'application/json' },
         });

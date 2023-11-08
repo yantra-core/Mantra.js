@@ -31,7 +31,6 @@ export default class WebSocketClient {
       return
     } 
 
-
     this.inputBuffer = {};
     this.inputSequenceNumber = 0;
     this.latestSnapshot = null;
@@ -86,6 +85,10 @@ export default class WebSocketClient {
       this.entityName = data.playerId;
     }
 
+    if (data.action === 'become_ticker') {
+      startTicking(this.socket);
+    }
+
     if (data.action === "gametick") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
@@ -136,4 +139,12 @@ export default class WebSocketClient {
     return interpolateSnapshot.call(this, alpha);
   }
   
+}
+
+let hzMS = 40; // TODO: config with Game.fps
+function startTicking(socket) {
+  setInterval(function () {
+    const tickMessage = JSON.stringify({ action: 'gameTick' });
+    socket.send(tickMessage);
+  }, hzMS);
 }
