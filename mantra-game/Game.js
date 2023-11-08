@@ -149,7 +149,8 @@ class Game {
         graphics,
         collisions,
         keyboard,
-        mouse
+        mouse,
+        lifetime
       });
     }
 

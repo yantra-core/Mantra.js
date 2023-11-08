@@ -17,6 +17,11 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   this.use(new plugins.EntityInput());
   this.use(new plugins.EntityMovement());
 
+  if (lifetime) {
+    this.use(new plugins.Lifetime());
+  }
+
+
   if (!this.isServer) {
 
     if (keyboard) {
@@ -25,10 +30,6 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     if (mouse) {
       this.use(new plugins.Mouse());
-    }
-
-    if (lifetime) {
-      this.use(new plugins.Lifetime());
     }
 
     // TODO: move to Graphics.loadFromConfig() ?

@@ -22,6 +22,9 @@ import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
 import Mouse from './plugins/mouse/Mouse.js';
 import Keyboard from './plugins/keyboard/Keyboard.js';
 
+// Entity Component Systems
+import Lifetime from './plugins/lifetime/Lifetime.js';
+
 // Game Objects
 import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
@@ -74,6 +77,7 @@ const plugins = {
   Graphics,
   InputLegend,
   Keyboard,
+  Lifetime,
   MatterPhysics,
   PhysXPhysics,
   Mouse: Mouse,
