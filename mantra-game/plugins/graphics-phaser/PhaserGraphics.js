@@ -172,9 +172,14 @@ class PhaserGraphics extends GraphicsInterface {
     gameobject.x = adjustedX;
     gameobject.y = adjustedY;
 
-    if (entityData.rotation) {
-      //  let rotated = -entityData.rotation - Math.PI / 2;
-      gameobject.rotation = entityData.rotation;
+    // TODO: move this to common 3D-2.5D transform function(s)
+    if (typeof entityData.rotation !== 'undefined') { // Remark: shouldn't this be default 0?
+      if (typeof entityData.rotation === 'object') {
+        // transform 3d to 2.5d
+        gameobject.rotation = entityData.rotation.x;
+      } else {
+        gameobject.rotation = entityData.rotation;
+      }
     }
 
     // console.log('updating position', entityData.position)
@@ -183,6 +188,8 @@ class PhaserGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
+
+    console.log('createGraphic', entityData)
     // switch case based on entityData.type
     let graphic;
     switch (entityData.type) {
@@ -251,12 +258,16 @@ class PhaserGraphics extends GraphicsInterface {
     sprite.fillTriangle(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
     sprite.setDepth(10);
 
-    // rotate sprite by -Math.PI / 2;
+    // TODO: move this to common 3D-2.5D transform function(s)
     if (typeof entityData.rotation !== 'undefined') { // Remark: shouldn't this be default 0?
-      sprite.rotation = entityData.rotation;
+      if (typeof rotation === 'object') {
+        // transform 3d to 2.5d
+        sprite.rotation = entityData.rotation.x;
+      } else {
+        sprite.rotation = entityData.rotation;
+      }
     }
-
-    //camera.rotation m= -Math.PI / 2;
+    // setPosition not needed immediately after create?
     // sprite.setPosition(entityData.position.x, entityData.position.y);
     this.scene.add.existing(sprite);
     return sprite;
@@ -280,7 +291,7 @@ class PhaserGraphics extends GraphicsInterface {
     let camera = this.scene.cameras.main;
     if (this.config.camera && this.config.camera === 'follow') {
 
-//    if (this.followPlayer && this.followingPlayer !== true) {
+      //    if (this.followPlayer && this.followingPlayer !== true) {
       // Camera settings
       let player = this.game.getEntity(window.currentPlayerId);
       let graphics = this.game.components.graphics.get(window.currentPlayerId);

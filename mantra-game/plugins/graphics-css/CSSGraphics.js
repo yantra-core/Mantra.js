@@ -60,6 +60,16 @@ class CSSGraphics extends GraphicsInterface {
     entityElement.className = 'entity-element';
     entityElement.style.position = 'absolute';
 
+
+    if (typeof entityData.rotation !== 'undefined') { // Remark: shouldn't this be default 0?
+      if (typeof entityData.rotation === 'object') {
+        // transform 3d to 2.5d
+        entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
+      } else {
+        entityData.rotation = entityData.rotation;
+      }
+    }
+
     switch (entityData.type) {
       case 'BULLET':
         // For BULLET entities, create a circle
@@ -97,6 +107,17 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   updateGraphic(entityData) {
+
+    // TODO: move this to common 3D-2.5D transform function(s)
+    if (typeof entityData.rotation !== 'undefined') { // Remark: shouldn't this be default 0?
+      if (typeof entityData.rotation === 'object') {
+        // transform 3d to 2.5d
+        entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
+      } else {
+        entityData.rotation = entityData.rotation;
+      }
+    }
+
     const entityElement = document.getElementById(`entity-${entityData.id}`);
     if (entityElement) {
       // Update the position of the entity element
