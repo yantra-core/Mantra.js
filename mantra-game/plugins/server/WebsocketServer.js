@@ -14,7 +14,7 @@ let accumulatedTime = 0;
 let lastTimestamp;
 
 class WebSocketServerClass {
-  constructor(config) {
+  constructor(config = {}) {
     this.config = config;
 
     if (typeof config.player === 'undefined') {
@@ -44,6 +44,7 @@ class WebSocketServerClass {
     const playerEntityId = 'player_' + nanoid(7);
     ws.playerEntityId = playerEntityId;
     
+    console.log("PLAYER JOINED")
     this.game.createEntity({
       id: playerEntityId,
       type: 'PLAYER',
@@ -69,7 +70,7 @@ class WebSocketServerClass {
   }
 
   handleClose(ws) {
-    console.log('WebSocket connection closed');
+    console.log('aWebSocket connection closed');
     this.game.removeEntity(ws.playerEntityId);
   }
 
