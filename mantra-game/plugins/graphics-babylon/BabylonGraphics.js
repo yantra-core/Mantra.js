@@ -285,7 +285,7 @@ class BabylonGraphics extends GraphicsInterface {
 
     for (let eId in this.game.entities) {
       let ent = this.game.entities[eId];
-      if (ent.type !== 'BORDER') {
+      if (ent.type !== 'BORDER') { // TODO: remove this
         this.updateGraphic(ent, alpha);
       }
     }

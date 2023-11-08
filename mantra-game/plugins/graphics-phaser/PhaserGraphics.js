@@ -312,7 +312,9 @@ class PhaserGraphics extends GraphicsInterface {
 
     for (let eId in this.game.entities) {
       let ent = this.game.entities[eId];
-      this.updateGraphic(ent, alpha);
+      if (ent.type !== 'BORDER') { // TODO: remove this
+        this.updateGraphic(ent, alpha);
+      }
     }
   }
 

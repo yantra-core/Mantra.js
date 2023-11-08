@@ -4,7 +4,7 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 class CSSGraphics extends GraphicsInterface {
   constructor({ camera } = {}) {
     super();
-  
+
     // config scope for convenience
     let config = {
       camera
@@ -48,7 +48,7 @@ class CSSGraphics extends GraphicsInterface {
 
     this.renderDiv = renderDiv;
   }
-  
+
   createGraphic(entityData) {
 
     if (entityData.destroyed === true) {
@@ -69,16 +69,13 @@ class CSSGraphics extends GraphicsInterface {
         entityElement.style.borderRadius = '50%';  // This will make the div a circle
         break;
       case 'PLAYER':
-      /*
-      // TODO
-      case 'PLAYER':
-        if (entityData.shape === 'rectangle') {
-          graphic = this.createBox(entityData);
-        } else {
-          graphic = this.createTriangle(entityData);
-        }
+        // For PLAYER entities, create a triangle
+        entityElement.style.width = '0px';
+        entityElement.style.height = '0px';
+        entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
+        entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
+        entityElement.style.borderBottom = entityData.height + 'px solid blue';
         break;
-      */
       case 'TEXT':
         entityElement = this.createText(entityElement, entityData);
         break;
@@ -114,7 +111,7 @@ class CSSGraphics extends GraphicsInterface {
     // Create a container for the chat bubble
     entityElement.className = 'chat-bubble-container';
     entityElement.style.position = 'absolute';
-    
+
     // Create the chat bubble itself
     const chatBubble = document.createElement('div');
     chatBubble.className = 'chat-bubble';
@@ -124,7 +121,7 @@ class CSSGraphics extends GraphicsInterface {
     chatBubble.style.background = '#fff';
     chatBubble.style.maxWidth = '200px';
     chatBubble.innerText = "entityData.text";  // Assuming entityData contains the chat text
-    
+
     // Append the chat bubble to the container
     entityElement.appendChild(chatBubble);
     console.log('aaa', entityElement)
@@ -141,25 +138,25 @@ class CSSGraphics extends GraphicsInterface {
     if (!entity || !entity.graphics || !entity.graphics['graphics-css']) {
       return;
     }
-    
-   let renderDiv = document.getElementById('css-render-div');
-   if (renderDiv && renderDiv.contains(entity.graphics['graphics-css'])) {
-     entity.graphics['graphics-css'].remove();
-   }
+
+    let renderDiv = document.getElementById('css-render-div');
+    if (renderDiv && renderDiv.contains(entity.graphics['graphics-css'])) {
+      entity.graphics['graphics-css'].remove();
+    }
 
   }
-  
-  updateEntityElementPosition(entityElement, {position, width, height, rotation = 0}) {
-   
+
+  updateEntityElementPosition(entityElement, { position, width, height, rotation = 0 }) {
+
     // Adjust the position based on the camera position
     const adjustedPosition = {
       x: position.x - this.cameraPosition.x + window.innerWidth / 2,
       y: position.y - this.cameraPosition.y + window.innerHeight / 2
     };
-  
+
     const domX = adjustedPosition.x - width / 2;
     const domY = adjustedPosition.y - height / 2;
-  
+
     // convert rotation to degrees
     let angle = rotation * (180 / Math.PI);
     // Translate and rotate the element
@@ -167,11 +164,11 @@ class CSSGraphics extends GraphicsInterface {
       translate(${domX}px, ${domY}px)
       rotate(${angle}deg)
     `;
-  
+
     return entityElement;
   }
 
-  update () {
+  update() {
     const currentPlayer = this.game.getEntity(window.currentPlayerId);
     if (this.config.camera && this.config.camera === 'follow' && currentPlayer) {
       if (currentPlayer.position) {
@@ -181,7 +178,15 @@ class CSSGraphics extends GraphicsInterface {
     }
   }
 
-  render () {}
+  render(game, alpha) {
+    for (let eId in this.game.entities) {
+      let ent = this.game.entities[eId];
+      if (ent.type !== 'BORDER') { // TODO: remove this
+        this.updateGraphic(ent, alpha);
+        console.log('upping the ent', ent)
+      }
+    }
+  }
 }
 
 export default CSSGraphics;
