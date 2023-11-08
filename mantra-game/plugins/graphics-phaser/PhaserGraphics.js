@@ -322,9 +322,20 @@ class PhaserGraphics extends GraphicsInterface {
 
     for (let eId in this.game.entities) {
       let ent = this.game.entities[eId];
-      if (ent.type !== 'BORDER') { // TODO: remove this
-        this.updateGraphic(ent, alpha);
-      }
+      this.inflateEntity(ent, alpha);
+    }
+  }
+
+  inflateEntity(entity, alpha) {
+
+    if (entity.graphics) {
+      let graphic = entity.graphics['graphics-phaser'];
+      this.updateGraphic(entity, alpha);
+
+    } else {
+      let graphic = this.createGraphic(entity);
+      this.game.components.graphics.set([entity.id, 'graphics-phaser'], graphic);
+
     }
   }
 

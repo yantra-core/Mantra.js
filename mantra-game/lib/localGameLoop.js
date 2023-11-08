@@ -1,4 +1,3 @@
-
 let started = false;
 let hzMS = 16.666;
 let accumulator = 0;
@@ -8,53 +7,39 @@ function localGameLoop(game, playerId) {
 
   if (!started) {
     started = true;
-    // This will run the game logic at the fixed interval
-    setInterval(() => {
-      if (game.localGameLoopRunning) {
-        game.gameTick(lastGameTick, accumulator);
-      }
-    }, hzMS); // hzMS matches the server's update rate
+    lastGameTick = Date.now(); // Ensure we start with the current time
   }
-
-  // Get the current time
+  game.localGameLoopRunning = true;
+  // Calculate deltaTime in seconds
   let currentTime = Date.now();
-  if (!game.previousRenderTime) {
-    game.previousRenderTime = currentTime;
-  }
-  let deltaTime = (currentTime - game.previousRenderTime) / 1000.0; // seconds
-  game.previousRenderTime = currentTime;
+  let deltaTime = (currentTime - lastGameTick) / 1000.0; // seconds
+  lastGameTick = currentTime;
 
   // Accumulate time since the last game logic update
   accumulator += deltaTime;
 
-  // console.log('localGameLoop deltaTime', deltaTime)
+  // Calculate how many full timesteps have passed
+  let fixedStep = hzMS / 1000.0;
 
-  // Get local snapshot and update entity states
-  let snapshot = game.getPlayerSnapshot(playerId, false);
-  snapshot.state.forEach(function (state) {
-    game.inflateEntity(state);
-  });
-
-  // Calculate alpha based on the accumulated time and fixed timestep
-  let alpha = accumulator / (hzMS / 1000.0);
-  if (alpha > 1) {
-    // Clamp alpha and reset accumulator if it exceeds 1
-    alpha = 1;
-    accumulator = 0;
+  while (accumulator >= fixedStep) {
+    game.gameTick();
+    accumulator -= fixedStep; // Decrease accumulator by a fixed timestep
   }
+
+  // Calculate alpha based on the remaining accumulated time for interpolation
+  let alpha = accumulator / fixedStep;
 
   // Render the local snapshot with interpolation
   game.graphics.forEach(function (graphicsInterface) {
     graphicsInterface.render(game, alpha); // Pass the alpha to the render method
   });
 
-  // Call the next iteration of the loop
-  requestAnimationFrame(function () {
-    if (game.localGameLoopRunning) {
+  // Call the next iteration of the loop using requestAnimationFrame
+  if (game.localGameLoopRunning) {
+    requestAnimationFrame(function () {
       localGameLoop(game, playerId);
-    }
-  });
-
+    });
+  }
 }
 
 export default localGameLoop;

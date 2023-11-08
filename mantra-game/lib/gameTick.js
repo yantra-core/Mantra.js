@@ -1,7 +1,7 @@
 let lastTick = Date.now();
 let hzMS = 16.666; // 60 FPS
 
-function gameTick(lastGameTick, accumulator) {
+function gameTick() {
 
   // Calculate deltaTime in milliseconds
   let now = Date.now();
@@ -15,20 +15,12 @@ function gameTick(lastGameTick, accumulator) {
   if (this.systemsManager) {
     this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
   }
-
   // Update the physics engine
-  this.physics.updateEngine(this.physics.engine, hzMS); // TODO: deltaTime
+  this.physics.updateEngine(this.physics.engine, deltaTimeMS);
 
   // Loop through entities that have changed
+  // TODO: move rendering logic out of gameTick
   for (let entityId of this.changedEntities) {
-    const body = this.bodyMap[entityId];
-    // TODO: entities that can exist outside of physics engine / aka bodyMap
-
-    if (!body) {
-      console.error(`No body found for entity ${entityId}`);
-      continue;
-    }
-
     // TODO: move this to Bullet plugin
     let entity = this.getEntity(entityId);
     // kinematic bullet movements on client
@@ -56,11 +48,6 @@ function gameTick(lastGameTick, accumulator) {
 
 
   // TODO: THESE should / could all be hooks, after::gameTick
-
-  // Reset the accumulator on each game logic update
-  accumulator = 0;
-  lastGameTick = Date.now();
-
 
 }
 

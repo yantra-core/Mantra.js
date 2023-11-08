@@ -172,7 +172,6 @@ class BabylonGraphics extends GraphicsInterface {
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     }
 
-
     if (entityData.rotation !== undefined) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
@@ -285,9 +284,22 @@ class BabylonGraphics extends GraphicsInterface {
 
     for (let eId in this.game.entities) {
       let ent = this.game.entities[eId];
-      if (ent.type !== 'BORDER') { // TODO: remove this
-        this.updateGraphic(ent, alpha);
+      this.inflateEntity(ent, alpha);
+    }
+  }
+
+  // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
+  inflateEntity(entity, alpha) {
+
+    if (entity.graphics) {
+      let graphic = entity.graphics['graphics-babylon'];
+      if (entity.type !== 'BORDER') { // TODO: remove this
+        this.updateGraphic(entity, alpha);
       }
+    } else {
+      let graphic = this.createGraphic(entity);
+      this.game.components.graphics.set([entity.id, 'graphics-babylon'], graphic);
+
     }
   }
 
