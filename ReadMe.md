@@ -84,7 +84,8 @@ Returns a new game instance. `options` defaults to:
   camera: 'center',        // enum, 'follow', 'center'
   keyboard: true,          // boolean or `Keyboard` config object
   mouse: true,             // boolean or `Mouse` config object
-  collisions: false,       // boolean
+  collisions: false,       // boolean, toggles global entity collisions
+  lifetime: true,          // boolean, enables `lifetime` property
   width: 1600,             // number
   height: 900,             // number
 }

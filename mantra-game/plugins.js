@@ -22,10 +22,6 @@ import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
 import Mouse from './plugins/mouse/Mouse.js';
 import Keyboard from './plugins/keyboard/Keyboard.js';
 
-// Clients
-import LocalClient from './plugins/client/LocalClient.js';
-import WebSocketClient from './plugins/client/WebSocketClient.js';
-
 // Game Objects
 import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
@@ -84,8 +80,6 @@ const plugins = {
   BabylonGraphics,
   PhaserGraphics,
   CSSGraphics,
-  LocalClient,
-  WebSocketClient,
   Camera,
   StarField,
   BabylonStarField,

@@ -32,6 +32,7 @@ class Game {
     camera = 'follow',
     keyboard = true,
     mouse = true,
+    lifetime = true,
     isOfflineMode,
     options = {}} = {}) {
 
@@ -48,6 +49,7 @@ class Game {
       camera,
       keyboard,
       mouse,
+      lifetime,
       isOfflineMode,
       options
     };
