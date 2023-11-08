@@ -98,27 +98,28 @@ class Game {
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
     this.components = {
-      type: new Component('type'),           // string type, name of Entity
-      destroyed: new Component('destroyed'), // boolean, if true, entity is pending destroy and will be removed from game
-      position: new Component('position'),   // object, { x: 0, y: 0, z: 0 }
-      velocity: new Component('velocity'),
-      rotation: new Component('rotation'),
-      mass: new Component('mass'),
-      density: new Component('density'),
-      width: new Component('width'),
-      height: new Component('height'),
-      radius: new Component('radius'),
-      owner: new Component('owner'), // is this actually required property?
+      type: new Component('type', this),           // string type, name of Entity
+      destroyed: new Component('destroyed', this), // boolean, if true, entity is pending destroy and will be removed from game
+      position: new Component('position', this),   // object, { x: 0, y: 0, z: 0 }
+      velocity: new Component('velocity', this),
+      rotation: new Component('rotation', this),
+      mass: new Component('mass', this),
+      density: new Component('density', this),
+      width: new Component('width', this),
+      height: new Component('height', this),
+      radius: new Component('radius', this),
+      isSensor: new Component('isSensor', this),
+      owner: new Component('owner', this)
     };
 
     // define additional components for the game
-    this.components.health = new Component('health');
-    this.components.target = new Component('target');
-    this.components.lifetime = new Component('lifetime');
-    this.components.creationTime = new Component('creationTime');
-    this.components.BulletComponent = new Component('BulletComponent');
-    this.components.graphics = new Component('graphics');
-    this.components.lockedProperties = new Component('lockedProperties');
+    this.components.health = new Component('health', this);
+    this.components.target = new Component('target', this);
+    this.components.lifetime = new Component('lifetime', this);
+    this.components.creationTime = new Component('creationTime', this);
+    this.components.BulletComponent = new Component('BulletComponent', this);
+    this.components.graphics = new Component('graphics', this);
+    this.components.lockedProperties = new Component('lockedProperties', this);
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);

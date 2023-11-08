@@ -17,10 +17,10 @@ class PhaserGraphics extends GraphicsInterface {
     this.startingZoom = startingZoom;
     this.scenesReady = false;
     this.scene = null;
-
   }
 
   init(game) {
+    // console.log('PhaserGraphics.init()');
 
     // register renderer with graphics pipeline
     game.graphics.push(this);
@@ -147,9 +147,15 @@ class PhaserGraphics extends GraphicsInterface {
 
     let previousEntity = this.game.getEntity(entityData.id);
     if (!previousEntity || !previousEntity.graphics) {
-      console.log('no previous entity found for', entityData.id);
       return;
     }
+
+    if (previousEntity.position.x === entityData.position.x && previousEntity.position.y === entityData.position.y) {
+      // TODO: we shouldn't need to do this as getPlayerSnapshot() should only return diff state
+      // There may be an issue with how delta encoding works for offline mode, needs tests
+      // return;
+    }
+    // console.log('updating graphic', entityData.id, entityData.position)
 
     let gameobject = previousEntity.graphics['graphics-phaser'];
 
@@ -181,7 +187,6 @@ class PhaserGraphics extends GraphicsInterface {
     let graphic;
     switch (entityData.type) {
       case 'PLAYER':
-
         if (entityData.shape === 'rectangle') {
           graphic = this.createBox(entityData);
         } else {
@@ -302,10 +307,15 @@ class PhaserGraphics extends GraphicsInterface {
     console.log(snapshot)
   }
 
-  render(game) {
+  render(game, alpha) {
+    let self = this;
 
-    // console.log('phaser render called', game)
+    for (let eId in this.game.entities) {
+      let ent = this.game.entities[eId];
+      this.updateGraphic(ent, alpha);
+    }
   }
+
   // Implement other necessary methods or adjust according to your architecture
 }
 

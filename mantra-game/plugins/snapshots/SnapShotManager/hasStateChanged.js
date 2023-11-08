@@ -6,6 +6,10 @@ const hasStateChanged = (currentState, lastKnownState) => {
   if (typeof currentState !== 'object' || typeof lastKnownState !== 'object') {
     return currentState !== lastKnownState;
   }
+
+  if (currentState === null && lastKnownState === null) {
+    return false;
+  }
   const currentKeys = Object.keys(currentState);
   const lastKnownKeys = Object.keys(lastKnownState);
   if (currentKeys.length !== lastKnownKeys.length) {

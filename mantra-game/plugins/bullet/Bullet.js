@@ -120,6 +120,7 @@ class BulletPlugin {
 
 
   handleCollision(pair, bodyA, bodyB) {
+    return;
     if (bodyA.myEntityId && bodyB.myEntityId) {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;
@@ -141,7 +142,8 @@ class BulletPlugin {
       }
 
       // Check if bullets have the same owner
-      if (entityA && entityB && entityA.id === entityB.owner) {
+      if (entityA && entityB && entityA.owner === entityB.owner) {
+        //console.log("SAME OWNER")
         return;
       }
 
@@ -195,7 +197,7 @@ class BulletPlugin {
         */
         //game.systems.health.applyDamage(entityIdB, bulletA.damage);
         if (this.game.systems.graphics) {
-          this.game.removeGraphic(entityIdB);
+          // this.game.removeGraphic(entityIdB);
         }
         this.game.removeEntity(entityIdB);
       }

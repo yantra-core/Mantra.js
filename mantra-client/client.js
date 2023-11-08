@@ -61,6 +61,7 @@ let defaultConfig = {
   mouse: true,            // boolean or Mouse config object, default true
   keyboard: true,         // boolean or Keyboard config object, default true
   collisions: true,       // boolean, default true
+  lifetime: true,         // boolean, enables lifetime property, default true
   width: 1600,            // number, default 1600
   height: 900,            // number, default 900
 }
@@ -86,14 +87,17 @@ let game = new Game({
 */
 
 let game = new Game({
+  isClient: true,
   mouse: false,
   physics : 'matter',
   graphics: ['babylon'],
-  camera: 'follow',
+  collisions: true,
+  camera: 'center',
   options: {
     scriptRoot: './' // use local scripts instead of default yantra.gg CDN
   }
 });
+window.game = game;
 //
 // Use Plugins to add systems to the game
 //
@@ -105,8 +109,8 @@ game
 game.use(new plugins.InputLegend());
 game.use(new plugins.StarField())
 
-game.use(new plugins.MovementFrogger())
-//game.use(new plugins.MovementPacman())
+// game.use(new plugins.MovementFrogger())
+// game.use(new plugins.MovementPacman())
 
 //game.use(new Default3DInputStrategy());
 //game.use(new Default2DInputStrategy());
@@ -138,15 +142,25 @@ game.use(new plugins.Client(playerId));
 function switchToOnline() {
   game.removeEntity(playerId); // Destroy the local player
   game.stop(); // Stop local client
-  game.connect('ws://192.168.1.80:8888/websocket');    // @yantra-core/mantra-server
-  //game.connect('ws://192.168.1.80:8787/websocket');  // @yantra-core/mantra-edge
+  //game.connect('ws://0.0.0.0:8888/websocket');    // @yantra-core/mantra-server
+  game.connect('ws://0.0.0.0:8787/websocket');  // @yantra-core/mantra-edge
 }
 
 // Setup button event listeners
 //document.getElementById('connectButton').addEventListener('click', switchToOnline);
 //document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
 
+
+
+// game.connect('ws://0.0.0.0:8787/websocket');  // @yantra-core/mantra-edge
+// game.connect('ws://0.0.0.0:8888/websocket');  // @yantra-core/mantra-edge
+
+/**/
+
 // Single Player Offline Mode
+/**/
+
+
 game.start(function () {
   // create a single player entity
   game.createEntity({
@@ -162,12 +176,12 @@ game.start(function () {
   });
 });
 
+
+
 //game.stop(); // stops local client
 // Connects to websocket server
 // see: @yantra-core/mantra-server
-//game.connect('ws://192.168.1.80:8888/websocket');
-
-
+// game.connect('ws://0.0.0.0:8888/websocket');
 
 /*
 

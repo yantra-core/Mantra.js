@@ -9,8 +9,6 @@ class BabylonStarField {
   }
 
   init (game, engine, scene) {
-    console.log('ffff', game, engine, scene)
-    // not correct scope? is scene sent here?
     this.scene = scene;
     this.camera = scene.cameras[0];
     this.initialize(); // TODO: rename

@@ -79,14 +79,6 @@ class CSSGraphics extends GraphicsInterface {
         }
         break;
       */
-      case 'BULLET':
-        // For PLAYER entities, create a triangle
-        entityElement.style.width = '0px';
-        entityElement.style.height = '0px';
-        entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
-        entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
-        entityElement.style.borderBottom = entityData.height + 'px solid blue';
-        break;
       case 'TEXT':
         entityElement = this.createText(entityElement, entityData);
         break;

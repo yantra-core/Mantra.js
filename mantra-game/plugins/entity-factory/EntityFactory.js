@@ -1,4 +1,3 @@
-// TODO: decouple matter.js from EntityFactory, see code comments
 import Entity from '../../Entity/Entity.js';
 
 class EntityFactory {
@@ -19,6 +18,9 @@ class EntityFactory {
     // bind game scope to this.game
     this.game = game;
 
+    // init an empty array to hold all entities
+    game.entities = {};
+
     this.game.systemsManager.addSystem('entityFactory', this);
 
     // Bind some methods to parent Game scope for convenience
@@ -38,29 +40,22 @@ class EntityFactory {
     for (let entityId in destroyedComponentData) {
       if (destroyedComponentData[entityId]) {
 
-        // Remove entity from physics world
-        let body = this.game.bodyMap[entityId];
-        if (body) {
-          // i think we need to uncomment this?
-          //this.game.physics.removeFromWorld(this.game.engine, this.game.bodyMap[entityId]);
-        } else {
-          console.log('no body found for entity', entityId, 'cannot remove from world');
-        }
         // Delete associated components for the entity using Component's remove method
         for (let componentType in this.game.components) {
           this.game.components[componentType].remove(entityId);
         }
-
         // Delete the entity from bodyMap
-        delete this.game.bodyMap[entityId];
-
-
+        delete this.game.entities[entityId];
       }
     }
   }
 
   getEntity(entityId) {
-    if (!this.game.bodyMap[entityId]) return null;
+
+    if (!this.game.entities[entityId]) {
+      // console.log('No such entity', entityId);
+      return null;
+    }
 
     const entity = {
       id: entityId
@@ -74,34 +69,34 @@ class EntityFactory {
       }
     }
 
+
     return entity;
+
   }
 
   removeEntity(entityId) {
-    let ent = this.game.getEntity(entityId);
 
-    // console.log(this.game.bodyMap)
-    this.game.removedEntities.add(entityId)
+    let ent = this.game.entities[entityId];
+
+    this.game.removedEntities.add({
+      id: entityId, // Remark: Instead of just id and type, we could add the entire entity here
+      type: ent.type
+    })
 
     if (ent && this.game.systems.graphics && ent.graphics) {
+      // Is this best done here? or in the graphics plugin?
       this.game.systems.graphics.removeGraphic(entityId);
     }
 
-    let body = this.game.bodyMap[entityId];
-    if (body) {
-      this.game.components.destroyed.set(entityId, true);
-      // We'll actually remove the entity in cleanupDestroyedEntities() function
-    }
+    this.game.components.destroyed.set(entityId, true);
+
+    // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
+
   }
 
+  // Update the getEntities method to return the game.entities
   getEntities() {
-    const entities = {};
-
-    for (const entityId in this.bodyMap) { // Remark: This assumes all entities are physics bodies, will need to changes this later
-      entities[entityId] = this.getEntity(entityId);
-    }
-
-    return entities;
+    return this.game.entities;
   }
 
   updateEntity(entityData) {
@@ -240,6 +235,7 @@ class EntityFactory {
     }
 
     if (config.body) {
+
       let body = this.createBody(config);
       body.myEntityId = entityId;
       this.game.physics.addToWorld(this.game.engine, body);
@@ -261,8 +257,18 @@ class EntityFactory {
 
     this.postCreateEntityHooks.forEach(fn => fn(entity));
 
+
+    // Add the entity to the game entities scope
+    // TODO: new Entity() should do this
+    this.game.entities[entityId] = {
+      id: entityId
+    }
+
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);
+
+    // Add the entity to the game entities scope
+    this.game.entities[entityId] = updatedEntity;
 
     return updatedEntity;
   }
@@ -273,7 +279,6 @@ class EntityFactory {
 
     // takes outside state and performs update/destroy/create depending
     // on the current local state of the entity and incoming state
-
     // if the incoming state is pending destroy, just remove it immediately and return
     if (entityData.destroyed === true) {
       game.removeEntity(entityData.id);
@@ -282,7 +287,7 @@ class EntityFactory {
     }
 
     // this isn't a destroyed state, attempt to get a copy of the local state by id
-    let localEntity = game.getEntity(entityData.id);
+    let localEntity = game.entities[entityData.id];
 
     if (!localEntity) {
       // no local copy of the state exists, create a new entity
@@ -292,7 +297,7 @@ class EntityFactory {
       game.updateEntity(entityData);
     }
 
-    let updated = game.getEntity(entityData.id);
+    let updated = game.entities[entityData.id];
 
     if (game.systems.graphics) {
 
@@ -300,7 +305,9 @@ class EntityFactory {
       if (!updated.graphics) {
         game.createGraphic(entityData);
       } else {
-        game.updateGraphic(updated);
+        // Remark: This is now handled by render() loop
+        // TODO: remove all grapics references from this file
+        // game.updateGraphic(updated);
       }
     }
 
@@ -366,23 +373,5 @@ export default EntityFactory;
 /*
 import Entity from './Entity.js';
 const entity = new Entity(entityId);
-
-class CustomPhysicsFactory {
-  // Add methods as per the physics library
-  createBody(entityConfig) {
-    // Mantra specicfic implementation
-  }
-
-  updateBody(body) {
-    // Mantra specicfic implementation
-  }
-
-  setPosition(body) {
-    // Mantra specicfic implementation
-    // setPosition() is in matter.js could be diff elsewhere
-  }
-
-}
-
 
 */

@@ -59,7 +59,7 @@ class Border {
 
       this.game.createEntity({
         id: entityData.id + '-' + b,
-        type: 'BODY',
+        type: 'BORDER',
         shape: 'rectangle',
         isStatic: true,
         position: {

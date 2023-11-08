@@ -4,7 +4,7 @@ import hasStateChanged from "./hasStateChanged.js";
 let playerStateCache = {};
 
 const deltaEncoding = {};
-const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'radius'];
+const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor'];
 
 deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
 
@@ -58,8 +58,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
             deltaState[component] = currentComponentValue; // Use absolute position in offline mode
             break;
 
-
-          case 'velocity':
+            case 'velocity':
             //console.log('currentComponentValue', currentComponentValue, lastKnownComponentValue)
 
             deltaState[component] = currentComponentValue;

@@ -1,4 +1,3 @@
-
 // Graphics.js
 class Graphics {
   constructor() {
@@ -17,9 +16,7 @@ class Graphics {
 
   createGraphic(entityData) {
     let game = this.game;
-
     game.graphics.forEach(function (graphicsInterface) {
-
       // don't recreate same graphic if already exists on interface
       let ent = game.getEntity(entityData.id);
       // console.log(graphicsInterface.name, "CREATING FOR ENT", ent)
@@ -27,9 +24,17 @@ class Graphics {
         // console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name])
         return;
       }
-
       // TODO: createPolygon, createCircle, createRectangle, createTriangle
+      // console.log('Graphics.createGraphic', entityData.position);
+
       let graphic = graphicsInterface.createGraphic(entityData);
+      // Remark: TODO: make this into Graphic() class
+      /*
+      let graphic = {
+        setPosition: function () {},
+        destroy: function () {}
+      }
+      */
       // Setting a nested value
       if (graphic) {
         // console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
@@ -37,7 +42,7 @@ class Graphics {
       } else {
         // console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
       }
-    })
+    });
   }
 
   removeGraphic(entityId) {

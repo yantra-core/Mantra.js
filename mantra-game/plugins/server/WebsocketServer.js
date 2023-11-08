@@ -9,7 +9,7 @@ config.deltaCompression = false; // Toggle this to enable delta compression
 
 config.deltaEncoding = true; // Toggle this to enable delta compression
 
-const FIXED_DT = 40; // 25 FPS
+const FIXED_DT = 16.666; // 25 FPS
 let accumulatedTime = 0;
 let lastTimestamp;
 
@@ -168,13 +168,13 @@ class WebSocketServerClass {
       //console.log('client.readyState', count, client.readyState)
       if (client.playerEntityId && client.readyState === WebSocket.OPEN) {
         const lastProcessedInput = game.lastProcessedInput[client.playerEntityId];  // Get the lastProcessedInput for this client's player entity
-
         const playerSnapshot = game.getPlayerSnapshot(client.playerEntityId);
 
         if (playerSnapshot) {
           // TODO: data encoding layers go here...
           // TODO: this should be call into some data encoding layer with config
           if (config.deltaEncoding) {
+            // TODO: put float encoding flag here
             //let deltaCompressedSnapshot = deltaCompression.compress(playerSnapshot);
             // let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, deltaCompressedSnapshot);
             let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, playerSnapshot);

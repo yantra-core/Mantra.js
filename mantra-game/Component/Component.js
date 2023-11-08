@@ -2,12 +2,15 @@
 // // Setting a nested value
 // graphicsComponent.set(['entity1', 'systemA'], { x: 100, y: 200 });
 class Component {
-  constructor(name) {
+  constructor(name, game) {
     this.name = name;
     this.data = {};
+    this.game = game;
   }
 
   set(key, value) {
+    const entityId = Array.isArray(key) ? key[0] : key;
+
     if (Array.isArray(key)) {
       // Ensure nested structure exists
       let current = this.data;
@@ -21,6 +24,12 @@ class Component {
     } else {
       this.data[key] = value;
     }
+
+    // After setting the value, update the corresponding entity in the game.entities
+    if (this.game && this.game.entities && this.game.entities[entityId]) {
+      this.game.entities[entityId][this.name] = this.get(entityId);
+    }
+
   }
 
   get(key) {
@@ -49,6 +58,13 @@ class Component {
       delete current[key[key.length - 1]];
     } else {
       delete this.data[key];
+    }
+
+
+    // After removing the component data, update the entity in game.entities if necessary
+    const entityId = Array.isArray(key) ? key[0] : key;
+    if (this.game && this.game.entities && this.game.entities[entityId]) {
+      delete this.game.entities[entityId][this.name];
     }
   }
 }

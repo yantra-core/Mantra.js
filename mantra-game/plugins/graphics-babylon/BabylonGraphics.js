@@ -56,7 +56,7 @@ class BabylonGraphics extends GraphicsInterface {
 
   }
 
-  babylonReady(){
+  babylonReady() {
     let game = this.game;
 
     // Access the renderCanvas element and set its size
@@ -130,21 +130,49 @@ class BabylonGraphics extends GraphicsInterface {
 
     game.graphicsReady.push(this.name);
 
-    this.pendingLoad.forEach(function(pluginInstance){
+    this.pendingLoad.forEach(function (pluginInstance) {
       game.use(pluginInstance);
     })
 
   }
 
-  updateGraphic(entityData) {
-
+  updateGraphic(entityData, alpha) {
+    // console.log('setting position', entityData.position)
     let previousEntity = this.game.getEntity(entityData.id);
     if (!previousEntity || !previousEntity.graphics) {
       console.log('no previous entity found for', entityData.id);
       return;
     }
+
     let graphic = previousEntity.graphics['graphics-babylon'];
-    graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
+
+    // alpha value will be present if snapshot interpolation is enabled
+    if (typeof alpha === 'number') {
+      if (typeof previousEntity.position.z !== 'number') {
+        previousEntity.position.z = 0;
+      }
+      if (typeof entityData.position.z !== 'number') {
+        entityData.position.z = 0;
+      }
+
+      // Perform interpolation between the previous and current state
+      let previousVector = new BABYLON.Vector3(previousEntity.position.x, previousEntity.position.y, previousEntity.position.z);
+      let currentVector = new BABYLON.Vector3(entityData.position.x, entityData.position.y, entityData.position.z);
+      const interpolatedPosition = BABYLON.Vector3.Lerp(previousVector, currentVector, alpha);
+      // TODO: add rotation interpolation
+      // const interpolatedRotation = BABYLON.Quaternion.Slerp(previousEntity.rotation, entityData.rotation, alpha);
+
+      // Update the entity's graphical representation with the interpolated state
+      graphic.position = new BABYLON.Vector3(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
+
+    } else {
+      //
+      // Snapshot interpolation is not enabled, use exact position values from the snapshot
+      //
+      graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
+    }
+
+
     if (entityData.rotation !== undefined) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
@@ -192,7 +220,7 @@ class BabylonGraphics extends GraphicsInterface {
       case 'TEXT':
         graphic = this.createText(entityData);
         break;
-  
+
       case 'TRIANGLE':
         graphic = this.createTriangle(entityData);
         break;
@@ -207,15 +235,15 @@ class BabylonGraphics extends GraphicsInterface {
   }
   createText(entityData) {
     const plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', { width: entityData.width, height: entityData.height }, this.scene);
-    
+
     const texture = new BABYLON.DynamicTexture('dynamic texture', { width: 512, height: 256 }, this.scene);
     const material = new BABYLON.StandardMaterial('Mat', this.scene);
-    
+
     const text = 'HELLO WORLD';  // Or use entityData.text if it contains the message
     const font = 'bold 44px monospace';
-    
+
     texture.drawText(text, null, 40, font, 'black', 'white', true, true);
-    
+
     material.diffuseTexture = texture;
     plane.material = material;
 
@@ -223,7 +251,7 @@ class BabylonGraphics extends GraphicsInterface {
     plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
     return plane;
-}
+  }
 
 
   createSphere(entityData) {
@@ -250,13 +278,16 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   // called as much as the client requires in order to render
-  render(game) {
+  render(game, alpha) {
     let self = this;
     let cameraSystem = game.getSystem('graphics-babylon/camera');
     cameraSystem.render();
 
-    if (this.game.systems['graphics-babylon/camera']) {
-
+    for (let eId in this.game.entities) {
+      let ent = this.game.entities[eId];
+      if (ent.type !== 'BORDER') {
+        this.updateGraphic(ent, alpha);
+      }
     }
   }
 

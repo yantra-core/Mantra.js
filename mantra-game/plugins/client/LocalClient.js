@@ -12,7 +12,7 @@ export default class LocalClient {
   init (game) {
     this.game = game;
     this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
-    game.localGameLoopRunning = true;
+    game.localGameLoopRunning = false;
     this.game.systemsManager.addSystem('localClient', this);
   }
 

@@ -25,7 +25,6 @@ class MatterPhysics extends PhysicsInterface {
     // collisionEnd is currently not being used
     //
 
-
   }
 
   init (game) {
@@ -58,9 +57,6 @@ class MatterPhysics extends PhysicsInterface {
     // i would assume we want that data *after* the update?
     this.onBeforeUpdate(this.engine, (event) => {
 
-      if (this.game.isClient) {
-        // return;
-      }
       // Remark: should this and bodyMap be replaced with a more generic mapping
       // in order to allow non-physics backed entities to exist in the game?
       for (const body of event.source.world.bodies) {
@@ -80,18 +76,27 @@ class MatterPhysics extends PhysicsInterface {
           if (this.game.isClient) {
             // this is the logic for updating *all* entities positions
             // this should probably be in entity-movement plugin
-            this.game.changedEntities.add(body.myEntityId);
-            this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-            this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
-            this.game.components.rotation.set(body.myEntityId, body.angle);
-            if (entity.type !== 'BULLET') {}
+            /*            */
+            // console.log(body.myEntityId, body.position)
+            let ent = this.game.entities[body.myEntityId];
+            // console.log('client ent', ent.id ,body.position)
+            // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
+            if (this.game.localGameLoopRunning || entity.type === 'BULLET') {
+              this.game.changedEntities.add(body.myEntityId);
+              this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+              this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+              this.game.components.rotation.set(body.myEntityId, body.angle);
+            }
           } else {
             // this is the logic for updating *all* entities positions
             // this should probably be in entity-movement plugin
+
+            let ent = this.game.getEntity(body.myEntityId);
+            //console.log('server ent', ent)
             this.game.changedEntities.add(body.myEntityId);
             this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-            this.game.components.rotation.set(body.myEntityId, body.angle);
             this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+            this.game.components.rotation.set(body.myEntityId, body.angle);
 
           }
 

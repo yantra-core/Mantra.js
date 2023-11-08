@@ -25,7 +25,7 @@ class CollisionPlugin {
     const entityB = this.game.getEntity(entityIdB);
 
     if (!entityA || !entityB) {
-      console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
+      // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
       return;
     }
 

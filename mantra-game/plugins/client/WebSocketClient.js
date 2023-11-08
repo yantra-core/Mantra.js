@@ -1,5 +1,6 @@
 // WebSocketClient.js - Marak Squires 2023
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
+let hzMS = 16.666; // TODO: config with Game.fps
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
@@ -59,11 +60,16 @@ export default class WebSocketClient {
       let entityInput = this.game.getSystem('entityInput');
       //
       // TODO: switch flag config for isClientSidePredictionEnabled
+      //
+      // Remark: In order to enable client-side prediction we'll need to uncomment the following line:
+      // Remark: Client-side prediction is close; however we were seeing some ghosting issues
+      //         More unit tests and test coverage is required for: snapshots, interpolation, and prediction
+      /*
       entityInput.handleInputs(this.entityName, {
         controls: data.controls,
         mouse: data.mouse
       }, this.inputSequenceNumber);
-      //
+      */
       var message = JSON.stringify(Object.assign({ action: action, sequenceNumber: this.inputSequenceNumber }, data));
       this.socket.send(message);
     } else {
@@ -141,7 +147,6 @@ export default class WebSocketClient {
   
 }
 
-let hzMS = 40; // TODO: config with Game.fps
 function startTicking(socket) {
   setInterval(function () {
     const tickMessage = JSON.stringify({ action: 'gameTick' });
