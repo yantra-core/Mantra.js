@@ -32,6 +32,7 @@ class Game {
     camera = 'follow',
     keyboard = true,
     mouse = true,
+    gamepad = true,
     lifetime = true,
     isOfflineMode,
     options = {}} = {}) {
@@ -49,6 +50,7 @@ class Game {
       camera,
       keyboard,
       mouse,
+      gamepad,
       lifetime,
       isOfflineMode,
       options
@@ -151,6 +153,7 @@ class Game {
         collisions,
         keyboard,
         mouse,
+        gamepad,
         lifetime
       });
     }

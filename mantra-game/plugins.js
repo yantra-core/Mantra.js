@@ -22,6 +22,7 @@ import ThreeGraphics from './plugins/graphics-three/ThreeGraphics.js';
 // Input Devices
 import Mouse from './plugins/mouse/Mouse.js';
 import Keyboard from './plugins/keyboard/Keyboard.js';
+import Gamepad from './plugins/gamepad/Gamepad.js';
 
 // Entity Component Systems
 import Lifetime from './plugins/lifetime/Lifetime.js';
@@ -75,6 +76,7 @@ const plugins = {
   EntityFactory,
   EntityInput,
   EntityMovement,
+  Gamepad,
   Graphics,
   InputLegend,
   Keyboard,

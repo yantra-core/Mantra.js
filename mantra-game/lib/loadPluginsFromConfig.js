@@ -1,4 +1,4 @@
-export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, lifetime }) {
+export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, lifetime }) {
   let plugins = this.plugins;
   this.use(new plugins.EntityFactory())
 
@@ -30,6 +30,10 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     if (mouse) {
       this.use(new plugins.Mouse());
+    }
+
+    if (gamepad) {
+      this.use(new plugins.Gamepad());
     }
 
     // TODO: move to Graphics.loadFromConfig() ?

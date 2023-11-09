@@ -17,6 +17,7 @@ MANTRA.plugins = {
   EntityFactory: require('./plugins/entity-factory/EntityFactory.js').default,
   EntityInput: require('./plugins/entity-input/EntityInput.js').default,
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js').default,
+  Gamepad: require('./plugins/gamepad/Gamepad.js').default,
   Graphics: require('./plugins/graphics/Graphics.js').default,
   InputLegend: require('./plugins/input-legend/InputLegend.js').default,
   Keyboard: require('./plugins/keyboard/Keyboard.js').default,
