@@ -23,7 +23,7 @@ Want to skip ahead? We have interactive CodePens available with default configur
 
 [Open CodePen](https://codepen.io/Marak-Squires/pen/abXpEve) - Matter.js + CSS Graphics
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 + Babylon.js ( Experimental )
+[Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 ( Experimental ) + Babylon.js
 
 [Open CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz) - RenderPlex - Matter.js + Babylon.js + Phaser 3
 
