@@ -295,7 +295,7 @@ class PhaserGraphics extends GraphicsInterface {
       let player = this.game.getEntity(window.currentPlayerId);
       let graphics = this.game.components.graphics.get(window.currentPlayerId);
 
-      if (player && graphics) {
+      if (player && graphics && player.graphics['graphics-phaser']) {
         camera.startFollow(player.graphics['graphics-phaser']);
         this.followingPlayer = true;
       }
@@ -328,7 +328,7 @@ class PhaserGraphics extends GraphicsInterface {
 
   inflateEntity(entity, alpha) {
 
-    if (entity.graphics) {
+    if (entity.graphics && entity.graphics['graphics-phaser']) {
       let graphic = entity.graphics['graphics-phaser'];
       this.updateGraphic(entity, alpha);
 

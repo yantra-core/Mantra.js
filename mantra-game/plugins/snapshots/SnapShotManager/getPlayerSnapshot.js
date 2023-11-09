@@ -17,7 +17,8 @@ let config = {
 const getPlayerSnapshot = function (playerId) {
   const differentialSnapshotState = [];
   let playerState = [];
-  const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor'];
+  // TODO: auto-generate this list from the components
+  const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor', 'lifetime'];
 
   // console.log('getPlayerSnapshot, this.removedEntities', this.removedEntities);
 

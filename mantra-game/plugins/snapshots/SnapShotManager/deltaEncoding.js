@@ -1,13 +1,16 @@
+// deltaEncoding.js - Marak Squires 2023
 import hasStateChanged from "./hasStateChanged.js";
 
 //let stateCache = {};
 let playerStateCache = {};
 
 const deltaEncoding = {};
-const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor'];
+
+// TODO: auto-generate this list from the components
+const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor', 'lifetime'];
 
 deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
-
+  // console.log('playerStateCache', Object.keys(playerStateCache).length)
   // builds a differential snapshot state for a given snapshot
   // uses the existing stateCache to compare previous known states against the current snapshot
   const differentialSnapshotState = [];

@@ -136,7 +136,7 @@ class BabylonGraphics extends GraphicsInterface {
 
   }
 
-  updateGraphic(entityData, alpha) {
+  updateGraphic(entityData /*, alpha*/) {
     // console.log('setting position', entityData.position)
     let previousEntity = this.game.getEntity(entityData.id);
     if (!previousEntity || !previousEntity.graphics) {
@@ -190,7 +190,6 @@ class BabylonGraphics extends GraphicsInterface {
           throw new Error('Unknown physics dimensions, cannot update graphic')
           break;
       }
-
     }
   }
 
@@ -291,7 +290,7 @@ class BabylonGraphics extends GraphicsInterface {
   // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
   inflateEntity(entity, alpha) {
 
-    if (entity.graphics) {
+    if (entity.graphics && entity.graphics['graphics-babylon']) {
       let graphic = entity.graphics['graphics-babylon'];
       if (entity.type !== 'BORDER') { // TODO: remove this
         this.updateGraphic(entity, alpha);

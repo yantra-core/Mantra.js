@@ -208,7 +208,7 @@ class CSSGraphics extends GraphicsInterface {
 
   inflateEntity(entity, alpha) {
 
-    if (entity.graphics) {
+    if (entity.graphics && entity.graphics['graphics-css']) {
       let graphic = entity.graphics['graphics-css'];
       this.updateGraphic(entity, alpha);
 

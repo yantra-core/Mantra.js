@@ -171,7 +171,7 @@ class ThreeGraphics extends GraphicsInterface {
   }
 
   inflateEntity(entity, alpha) {
-    if (entity.graphics) {
+    if (entity.graphics && entity.graphics['graphics-three']) {
       let graphic = entity.graphics['graphics-three'];
       if (entity.type !== 'BORDER') { // TODO: remove this
         this.updateGraphic(entity, alpha);

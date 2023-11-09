@@ -196,6 +196,7 @@ class Game {
     });
   }
 
+  // TODO: move to separate function
   // Loads external js script files sequentially
   loadScripts(scripts, finalCallback) {
     const loadScript = (index) => {
