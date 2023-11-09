@@ -104,7 +104,9 @@ class BabylonGraphics extends GraphicsInterface {
     let light = new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 1, 0), this.scene);
     light.intensity = 0.7;
 
-    this.engine.runRenderLoop(() => this.scene.render());
+    // Remark: This has been removed, as we are using a custom game loop and RequestAnimationFrame
+    // this.scene.render() is instead called in the render() method of this class
+    // this.engine.runRenderLoop(() => this.scene.render());
     window.addEventListener('resize', () => this.engine.resize());
     renderCanvas.addEventListener('wheel', this.handleZoom.bind(this), { passive: false });
 
@@ -279,17 +281,24 @@ class BabylonGraphics extends GraphicsInterface {
   render(game, alpha) {
     let self = this;
     let cameraSystem = game.getSystem('graphics-babylon/camera');
-    cameraSystem.render();
 
     for (let eId in this.game.entities) {
       let ent = this.game.entities[eId];
       this.inflateEntity(ent, alpha);
     }
+    this.scene.render();
+  }
+
+  // called each time new gametick data arrives
+  update() {
+    let game = this.game;
+    let cameraSystem = this.game.getSystem('graphics-babylon/camera');
+    cameraSystem.update(); // is cameraSystem.update() required here?
+    cameraSystem.render();
   }
 
   // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
   inflateEntity(entity, alpha) {
-
     if (entity.graphics && entity.graphics['graphics-babylon']) {
       let graphic = entity.graphics['graphics-babylon'];
       if (entity.type !== 'BORDER') { // TODO: remove this
@@ -298,7 +307,6 @@ class BabylonGraphics extends GraphicsInterface {
     } else {
       let graphic = this.createGraphic(entity);
       this.game.components.graphics.set([entity.id, 'graphics-babylon'], graphic);
-
     }
   }
 
@@ -308,16 +316,6 @@ class BabylonGraphics extends GraphicsInterface {
 
   inflate(snapshot) { } // not used?
 
-  // called each time new gametick data arrives
-  update() { // Remark: Important, this is bound to systemsUpdate, not view updates!
-    let game = this.game;
-    let cameraSystem = this.game.getSystem('graphics-babylon/camera');
-    cameraSystem.update(); // This currently does nothing
-
-    if (this.game.systems['graphics-babylon/camera']) { }
-
-
-  }
 
 }
 

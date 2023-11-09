@@ -35,7 +35,7 @@ Keyboard config object
   preventDefaults: true // boolean, default true, set false to gain control of browser keys again
 }
 */
-export default class BrowserKeyboard {
+export default class Keyboard {
   constructor({ preventDefaults = true }) {
     this.controls = Object.fromEntries(Object.values(MANTRA_KEY_MAP).map(key => [key, false]));
     // this.communicationClient = communicationClient;
@@ -46,10 +46,10 @@ export default class BrowserKeyboard {
   init(game) {
     this.game = game;
     this.bindInputControls();
-    this.name = 'browserKeyboard';
+    this.name = 'keyboard';
 
     // register the Plugin as a system, on each update() we will send the inputPool to the server
-    game.systemsManager.addSystem('browserKeyboard', this);
+    game.systemsManager.addSystem('keyboard', this);
   }
 
   bindInputControls() {

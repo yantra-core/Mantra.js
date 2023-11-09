@@ -1,3 +1,4 @@
+// onlineGameLoop.js - Marak Squires 2023
 let started = false;
 let lastRenderedSnapshotId = null;
 let hzMS = 16.666;

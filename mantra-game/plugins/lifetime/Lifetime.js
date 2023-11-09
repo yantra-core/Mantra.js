@@ -12,7 +12,7 @@ class Lifetime {
     const now = Date.now();
     for (let entityId in this.game.components.creationTime.data) {
       let ent = this.game.getEntity(entityId);
-      if (this.game.components.lifetime[entityId] !== Infinity) {
+      if (ent && this.game.components.lifetime[entityId] !== Infinity) {
         const elapsedTime = now - ent.creationTime; 
         if (elapsedTime > ent.lifetime) {
           this.game.removeEntity(entityId);

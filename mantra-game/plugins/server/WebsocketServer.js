@@ -1,3 +1,4 @@
+// WebsocketServer.js - Marak Squires 2023
 import WebSocket, { WebSocketServer } from 'ws';
 import { nanoid } from 'nanoid';
 
@@ -9,7 +10,7 @@ config.deltaCompression = false; // Toggle this to enable delta compression
 
 config.deltaEncoding = true; // Toggle this to enable delta compression
 
-const FIXED_DT = 16.666; // 25 FPS
+const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
 let lastTimestamp;
 
@@ -150,9 +151,17 @@ class WebSocketServerClass {
 
     this.sendUpdates();
 
-    // Schedule next update. The delay ensures we run the loop at approximately the correct rate.
-    const nextTick = FIXED_DT - (accumulatedTime % FIXED_DT);
-    setTimeout(() => this.gameUpdate(), nextTick); // Use arrow function for cleaner syntax
+    // Calculate the time until the next game logic update
+    let timeUntilNextUpdate = FIXED_DT - accumulatedTime;
+    const timeSpent = Date.now() - now; // Time spent in current update
+    // console.log('timeSpent', timeSpent)
+
+    // Ensure we don't schedule with negative delay, should not happen unless frame drop
+    timeUntilNextUpdate = Math.max(timeUntilNextUpdate - timeSpent, 0);
+    //console.log('timeUntilNextUpdate', timeUntilNextUpdate)
+
+    // Schedule next update after the remaining time until the next fixed time step
+    setTimeout(() => this.gameUpdate(), timeUntilNextUpdate);
   }
   
   sendUpdates () {

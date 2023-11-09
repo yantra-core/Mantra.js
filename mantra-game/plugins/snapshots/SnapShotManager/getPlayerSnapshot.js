@@ -76,7 +76,7 @@ const getPlayerSnapshot = function (playerId) {
     }
 
     // TODO: move float truncation to separate function
-    if (false) {
+    if (true) {
       if (typeof state.position !== 'undefined' && typeof state.position.x === 'number' && typeof state.position.y === 'number') {
         state.position.x = truncateToPrecision(state.position.x);
         state.position.y = truncateToPrecision(state.position.y);
@@ -84,6 +84,15 @@ const getPlayerSnapshot = function (playerId) {
           state.position.z = truncateToPrecision(state.position.z);
         }
       }
+
+      if (typeof state.velocity !== 'undefined' && typeof state.velocity.x === 'number' && typeof state.velocity.y === 'number') {
+        state.velocity.x = truncateToPrecision(state.velocity.x);
+        state.velocity.y = truncateToPrecision(state.velocity.y);
+        if (typeof state.velocity.z === 'number') {
+          state.velocity.z = truncateToPrecision(state.velocity.z);
+        }
+      }
+
     }
 
     // console.log('state', state.position)

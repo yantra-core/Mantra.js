@@ -11,12 +11,14 @@ function gameTick() {
   // Clamp deltaTime to avoid time spiral and ensure stability
   deltaTimeMS = Math.min(deltaTimeMS, hzMS);
 
-  // at the start of the game tick, run the .update() method of all registered systems
+  // Update the physics engine
+  this.physics.updateEngine(this.physics.engine, deltaTimeMS);
+
+
+  // run the .update() method of all registered systems
   if (this.systemsManager) {
     this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
   }
-  // Update the physics engine
-  this.physics.updateEngine(this.physics.engine, deltaTimeMS);
 
   // Loop through entities that have changed
   // TODO: move rendering logic out of gameTick

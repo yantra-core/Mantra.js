@@ -120,7 +120,8 @@ class ThreeGraphics extends GraphicsInterface {
       // 2D / 2.5D
       mesh.rotation.set(0, entityData.rotation, 0);
     }
-
+    
+    // TODO: Add support for 3D position with entityData.position.z if available
     mesh.position.set(entityData.position.x, 1, entityData.position.y);
 
   }
