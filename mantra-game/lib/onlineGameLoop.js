@@ -37,9 +37,13 @@ function onlineGameLoop(game) {
     accumulator -= hzMS / 1000.0; // Decrease accumulator by the fixed timestep
   }
 
+   // Calculate alpha based on the remaining accumulated time for interpolation
+   let fixedStep = hzMS / 1000.0;
+   let alpha = accumulator / fixedStep;
+
   // Render the snapshot with the current state
   game.graphics.forEach(function (graphicsInterface) {
-    graphicsInterface.render(game); // Render without alpha, as this is the most current state
+    graphicsInterface.render(game, alpha);
   });
 
   // Schedule the next iteration of the loop using requestAnimationFrame

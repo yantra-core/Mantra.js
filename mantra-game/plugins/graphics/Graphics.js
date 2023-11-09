@@ -52,10 +52,10 @@ class Graphics {
     });
   }
 
-  updateGraphic(entityData) {
+  updateGraphic(entityData, alpha) {
     let game = this.game;
     game.graphics.forEach(function (graphicsInterface) {
-      graphicsInterface.updateGraphic(entityData);
+      graphicsInterface.updateGraphic(entityData, alpha);
     });
   }
 

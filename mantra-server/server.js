@@ -9,6 +9,8 @@ const game = new Game({
 });
 
 game.use(new plugins.Bullet());
+game.use(new plugins.Border({ autoBorder: true }));
+
 
 game.use(new WebsocketServer());
 

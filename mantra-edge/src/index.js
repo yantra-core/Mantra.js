@@ -36,9 +36,8 @@ export class Ayyo {
       .use(new plugins.EntityFactory())
       .use(new plugins.EntityInput())
       .use(new plugins.EntityMovement())
-      //.use(new plugins.Lifetime())
-      .use(new plugins.Bullet())
-
+      .use(new plugins.Lifetime())
+      //.use(new plugins.Bullet())
 
   }
 
@@ -47,6 +46,17 @@ export class Ayyo {
       this.initializePromise = Promise.resolve();  // You can add any async initialization here.
     }
     await this.initializePromise;
+  }
+
+  async reset() {
+    // Reset in-memory state
+    this.state = { entities: {}, snapshots: [] };
+    this.connectedPlayers = {};
+    this.tickBuffer = [];
+    this.lastProcessedTickTime = 0;
+
+
+    // await this.initialize();
   }
 
   async handleSession(websocket) {
@@ -253,6 +263,10 @@ export class Ayyo {
 
     const url = new URL(request.url);
     switch (url.pathname) {
+      case '/reset':
+        await this.reset();
+        return new Response('Game state reset', { status: 200 });
+        break;
       case '/websocket':
         if (request.headers.get("Upgrade") != "websocket") {
           return new Response("Expected websocket", { status: 406 });

@@ -163,7 +163,7 @@ class BabylonGraphics extends GraphicsInterface {
       const interpolatedPosition = BABYLON.Vector3.Lerp(previousVector, currentVector, alpha);
       // TODO: add rotation interpolation
       // const interpolatedRotation = BABYLON.Quaternion.Slerp(previousEntity.rotation, entityData.rotation, alpha);
-
+      // console.log(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
       // Update the entity's graphical representation with the interpolated state
       graphic.position = new BABYLON.Vector3(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
 
@@ -171,6 +171,7 @@ class BabylonGraphics extends GraphicsInterface {
       //
       // Snapshot interpolation is not enabled, use exact position values from the snapshot
       //
+      // console.log(-entityData.position.x, entityData.position.z, entityData.position.y);
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     }
 
@@ -286,7 +287,10 @@ class BabylonGraphics extends GraphicsInterface {
       let ent = this.game.entities[eId];
       this.inflateEntity(ent, alpha);
     }
+
+    cameraSystem.render();
     this.scene.render();
+
   }
 
   // called each time new gametick data arrives
@@ -294,7 +298,6 @@ class BabylonGraphics extends GraphicsInterface {
     let game = this.game;
     let cameraSystem = this.game.getSystem('graphics-babylon/camera');
     cameraSystem.update(); // is cameraSystem.update() required here?
-    cameraSystem.render();
   }
 
   // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins

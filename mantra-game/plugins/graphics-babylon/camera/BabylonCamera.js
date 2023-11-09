@@ -104,22 +104,36 @@ class CameraSystem {
   }
 
   render() {
-
     if (this.config.camera && this.config.camera === 'follow') {
       let currentPlayer = this.game.getEntity(window.currentPlayerId);
       if (currentPlayer && currentPlayer.graphics) {
-        let graphic = currentPlayer.graphics['graphics-babylon']; // TODO helper function for this
+        let graphic = currentPlayer.graphics['graphics-babylon'];
         if (graphic) {
-          this.camera.target.x = graphic.position.x;
-          this.camera.target.z = graphic.position.z;
-          // why not use vector positon for camera?
-          // let pos = new BABYLON.Vector3(currentPlayer.position.x, 0, currentPlayer.position.y);
+          // Interpolating camera position
+          let smoothness = 1; // Value between 0 and 1, where 1 is instant
+          this.camera.target.x += (graphic.position.x - this.camera.target.x) * smoothness;
+          this.camera.target.z += (graphic.position.z - this.camera.target.z) * smoothness;
         }
       }
-  
     }
   }
 
+  renderLerp() { // TODO: use this instead on render(), uses built in lerp
+    if (this.config.camera && this.config.camera === 'follow') {
+      let currentPlayer = this.game.getEntity(window.currentPlayerId);
+      if (currentPlayer && currentPlayer.graphics) {
+        let graphic = currentPlayer.graphics['graphics-babylon'];
+        let smoothness = 1; // Value between 0 and 1, where 1 is instant
+
+        if (graphic) {
+          // Smooth camera follow using Vector3.Lerp
+          let targetPosition = new BABYLON.Vector3(graphic.position.x, this.camera.target.y, graphic.position.z);
+          this.camera.target = BABYLON.Vector3.Lerp(this.camera.target, targetPosition, smoothness);
+        }
+      }
+    }
+  }
+  
   update() {
     // console.log('camera update')
     /*  // TODO: use this instead of the camera target?
