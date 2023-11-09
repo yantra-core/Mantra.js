@@ -8,7 +8,7 @@ The `mantra-edge` server is hosted on Cloudflare Workers and operates differentl
 
 In traditional game server setups, the server would run a game loop that ticks at a set interval (`hzMS`), updating game state and sending out state snapshots to clients at each tick. 
 
-In `mantra-edge`, using Cloudflare Workers, the server advances the game state when it receives a `gameTick` message from a client, which means the timing of the game state updates is driven externally by the client messages.
+Since Cloudflare Workers are stateless and do not have access to timers, the `mantra-edge` server advances the game state when it receives a `gameTick` message from a client, which means the timing of the game state updates is driven externally by the client messages.
 
 To progress the game state forward, `mantra-edge` elects the best client as the `ticker,` responsible for maintaining the game's time synchronization. For games with strict timing requirements, a serverless physics orchestration service like [https://yantra.gg](https://yantra.gg) can provide dedicated high-precision, low-latency clock synchronization services for Cloudflare.
 
