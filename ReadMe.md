@@ -25,7 +25,7 @@ Want to skip ahead? We have interactive CodePens available with default configur
 
 [Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 + Babylon.js ( Experimental )
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz) - RenderPlex - Babylon.js + Phaser 3
+[Open CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz) - RenderPlex - Matter.js + Babylon.js + Phaser 3
 
 
 You can view any of these examples in your browser and begin modifying the game code immediately.
@@ -61,7 +61,7 @@ Develop something cool? Publish and share your plugins with the [community](http
 
 ## Offline First
 
-Mantra is designed to start a full-featured local game instance in seconds from a CDN without any heavy dependency tree. This offline-first approach lets you quickly build your game without thinking about netcode, allowing you to connect your game's logic to Mantra's high-performance networking code when needed.
+Mantra is designed to start a full-featured local game instance in seconds from a CDN without the need for a heavy dependency tree. This offline-first approach lets you quickly build your game without thinking about netcode, allowing you to connect your game's logic to Mantra's high-performance networking code when needed.
 
 ## Serverless Physics
 
