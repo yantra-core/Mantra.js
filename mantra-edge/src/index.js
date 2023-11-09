@@ -1,6 +1,8 @@
 import { Game, plugins } from '../../mantra-game/Game.js';
 import deltaEncoding from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaEncoding.js';
 
+// let lastMessageTime = 0;
+
 // Worker code
 export default {
   async fetch(request, env) {
@@ -18,12 +20,13 @@ export class Ayyo {
     this.state = { entities: {}, snapshots: [] };
     this.env = env;
     this.connectedPlayers = {}; // Store connected players with their websockets
-
+    this.tickBuffer = [];
+    // Add a new property to track the time of the last processed tick
+    this.lastProcessedTickTime = 0;
     // Initializing the systems
     this.gameLogic = new Game({
       isServer: true,
       loadDefaultPlugins: false
-
     });
 
     // Use Plugins to add systems to the game
@@ -112,39 +115,21 @@ export class Ayyo {
       // Perform the requested action based on the "action" property of the message
       switch (message.action) {
         case 'gameTick':
+          //let now = Date.now();
+          //let diff = now - lastMessageTime;
+          //lastMessageTime = now;
+          // console.log('gameTick', diff, 'ms since last message');
+
+          this.bufferGameTick(message, playerEntityId);
 
           if (this.tickerId !== playerEntityId) {
             console.log('will not accept gameTick from', playerEntityId, 'because', this.tickerId, 'is the current ticker');
             return;
           }
-
-          this.gameLogic.gameTick();
-          Object.keys(this.connectedPlayers).forEach(playerId => {
-            const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
-            const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];  // Get the lastProcessedInput for this client's player entity
-
-            // Include the lastProcessedInput in the message
-
-            if (playerSnapshot) {
-              try {
-                let deltaEncoded = deltaEncoding.encode(playerId, playerSnapshot);
-                if (deltaEncoded) {
-                  const ws = this.connectedPlayers[playerId];
-                  // console.log(JSON.stringify(playerSnapshot, true, 2))
-                  ws.send(JSON.stringify({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput }));
-                }
-
-              } catch (err) {
-                console.log(err)
-              }
-            }
-          });
-          this.gameLogic.removedEntities.clear(); // TODO: move this to Game.js
-
           break;
 
         case 'player_input':
-          this.gameLogic.systems.entityInput.handleInputs(playerEntityId, message.controls);
+          this.gameLogic.systems.entityInput.handleInputs(playerEntityId, { controls: message.controls });
           break;
 
         case 'createEntity':
@@ -185,8 +170,8 @@ export class Ayyo {
     });
   }
 
-   // Elect a new ticker when a player connects or when the current ticker disconnects
-   electNewTicker(newTickerId) {
+  // Elect a new ticker when a player connects or when the current ticker disconnects
+  electNewTicker(newTickerId) {
     this.tickerId = newTickerId;
     const tickerWs = this.connectedPlayers[newTickerId];
     if (tickerWs) {
@@ -194,6 +179,73 @@ export class Ayyo {
         action: 'become_ticker'
       }));
     }
+  }
+
+  bufferGameTick(message, playerId) {
+    const now = Date.now();
+    const tickTime = message.clientTickTime; // Assuming client sends this
+
+    // Check if the tick is too early
+    if (tickTime > now) {
+      // Add to the buffer
+      this.tickBuffer.push({ tickTime, playerId });
+      // Sort the buffer by tick time
+      this.tickBuffer.sort((a, b) => a.tickTime - b.tickTime);
+    } else {
+      // Process immediately if it's time to do so
+      this.processGameTick();
+    }
+  }
+
+  // Call this method to process the buffered game ticks
+  processGameTicks() {
+    const now = Date.now();
+
+    // Process ticks that are due
+    while (this.tickBuffer.length > 0 && this.tickBuffer[0].tickTime <= now) {
+      const tickInfo = this.tickBuffer.shift();
+      this.lastProcessedTickTime = tickInfo.tickTime; // Update the last processed tick time
+      this.processGameTick(tickInfo.playerId);
+    }
+
+    // Send updates after processing game ticks
+    this.sendUpdatesToAllClients();
+  }
+  processGameTick(playerId) {
+    // Process the game tick for the player
+    this.gameLogic.gameTick();
+    // Send updates to all clients, etc.
+
+
+    this.gameLogic.gameTick();
+    Object.keys(this.connectedPlayers).forEach(playerId => {
+      const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
+      const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];  // Get the lastProcessedInput for this client's player entity
+
+      // Include the lastProcessedInput in the message
+
+      if (playerSnapshot) {
+        try {
+          let deltaEncoded = deltaEncoding.encode(playerId, playerSnapshot);
+          if (deltaEncoded) {
+            const ws = this.connectedPlayers[playerId];
+            // console.log(JSON.stringify(playerSnapshot, true, 2))
+            ws.send(JSON.stringify({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput }));
+          }
+
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    });
+    this.gameLogic.removedEntities.clear(); // TODO: move this to Game.js
+
+  }
+
+  // Call this method regularly to process the buffered ticks
+  async processBufferedTicks() {
+    await this.initialize();
+    this.processGameTicks();
   }
 
   async fetch(request) {
