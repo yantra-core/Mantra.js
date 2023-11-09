@@ -25,6 +25,7 @@ MANTRA.plugins = {
   MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js').default,
   Mouse: require('./plugins/mouse/Mouse.js').default,
   PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js').default,
+  ThreeGraphics: require('./plugins/graphics-three/ThreeGraphics.js').default,
   PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js').default,
   PongWorld: require('./plugins/world/pong/PongWorld.js').default,
   StarField: require('./plugins/starfield/StarField.js').default,

@@ -78,10 +78,12 @@ class EntityFactory {
 
     let ent = this.game.entities[entityId];
 
-    this.game.removedEntities.add({
-      id: entityId, // Remark: Instead of just id and type, we could add the entire entity here
-      type: ent.type
-    })
+    if (ent) {
+      this.game.removedEntities.add({
+        id: entityId, // Remark: Instead of just id and type, we could add the entire entity here
+        type: ent.type
+      });
+    }
 
     if (ent && this.game.systems.graphics && ent.graphics) {
       // Is this best done here? or in the graphics plugin?

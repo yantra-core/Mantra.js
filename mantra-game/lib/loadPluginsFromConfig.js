@@ -57,6 +57,9 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       if (graphics.includes('phaser')) {
         this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
       }
+      if (graphics.includes('three')) {
+        this.use(new plugins.ThreeGraphics({ camera: this.config.camera }));
+      }
     }
   }
 }

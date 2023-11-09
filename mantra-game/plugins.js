@@ -17,6 +17,7 @@ import BabylonGraphics from './plugins/graphics-babylon/BabylonGraphics.js';
 import Camera from './plugins/graphics-babylon/camera/BabylonCamera.js'; // TODO: rename to BabylonCamera?
 import PhaserGraphics from './plugins/graphics-phaser/PhaserGraphics.js';
 import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
+import ThreeGraphics from './plugins/graphics-three/ThreeGraphics.js';
 
 // Input Devices
 import Mouse from './plugins/mouse/Mouse.js';
@@ -83,6 +84,7 @@ const plugins = {
   Mouse: Mouse,
   BabylonGraphics,
   PhaserGraphics,
+  ThreeGraphics,
   CSSGraphics,
   Camera,
   StarField,
