@@ -55,7 +55,7 @@ Running either `wrangler dev` or `wrangler publish` will return a websocket conn
 
 [Mantra Client connect example code](https://codepen.io/Marak-Squires/pen/mdvmEMg)
 
-"`js
+```js
 let game = new MANTRA.Game();
 game.connect('wss://0.0.0.0:8787/websocket')
 ```
