@@ -1,17 +1,44 @@
-# `@yantra-core/edge`
+# `@yantra-core/mantra-edge`
 
 ## Deploy Mantra Games to Cloudflare Edge
 
-### Usage
+### Demo [CodePen](https://codepen.io/Marak-Squires/pen/mdvmEMg)
 
-You will need to register an account with Cloudflare and install [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/).
+The `mantra-edge` server is hosted on Cloudflare Workers and operates differently from traditional game servers.
 
-### Configuring FPS and Clock Source
-An outside clock service is required to progress the game state forward. The `gameTick` event must be called at your desired framerate from a third-party source to trigger the event within the Cloudflare Worker.
+In traditional game server setups, the server would run a game loop that ticks at a set interval (`hzMS`), updating game state and sending out state snapshots to clients at each tick. 
 
-In development testing, you can add a `setInterval()` inside your client code to progress the game loop. For production, we recommend using a service like https://yantra.gg to orchestrate your serverless physics.
+In `mantra-edge`, using Cloudflare Workers, the server advances the game state when it receives a `gameTick` message from a client, which means the timing of the game state updates is driven externally by the client messages.
 
-Once you have Wrangler setup you can run Mantra Game instance locally with:
+To progress the game state forward, `mantra-edge` elects the best client as the `ticker,` responsible for maintaining the game's time synchronization. For games with strict timing requirements, a serverless physics orchestration service like [https://yantra.gg](https://yantra.gg) can provide dedicated high-precision, low-latency clock synchronization services for Cloudflare.
+
+
+## Key Concepts
+
+### Statelessness / Client-Driven Ticks
+
+- Cloudflare Workers are stateless and react to events.
+- The server does not tick at a fixed internal rate; client requests drive it.
+- The game state is advanced upon receiving `gameTick` messages from the client.
+
+### Client Synchronization / Buffer System / RTT Compensation
+
+- Clients are tasked with sending `gameTick` messages in alignment with the game's expected tick rate.
+- A buffer system is implemented to queue `gameTick` messages.
+- The server processes these messages based on their intended execution timestamps, ensuring proper order and timing.
+- Clients adjust their tick rate to compensate for network latency (Round-Trip Time).
+
+### Server Responsibilities / Durable Objects
+
+- The server's role is to process `gameTick` messages accurately and efficiently.
+- It maintains game state consistency and broadcasts the updated state to all clients.
+- Gamestate is stored in Cloudflare Durable Objects
+
+# Usage
+
+You must register an account with Cloudflare and install [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/).
+
+Once you have Wrangler setup, you can run Mantra Game instance locally with:
 
 ```bash
 wrangler dev
@@ -22,9 +49,20 @@ Deploy Mantra Game instance to Cloudflare Edge
 wrangler publish
 ```
 
+## Connecting `mantra-client` to edge worker
+
+Running either `wrangler dev` or `wrangler publish` will return a websocket connection string, which you can connect using `game.connect(wsConnectionString)`:
+
+[Mantra Client connect example code](https://codepen.io/Marak-Squires/pen/mdvmEMg)
+
+"`js
+let game = new MANTRA.Game();
+game.connect('wss://0.0.0.0:8787/websocket')
+```
+
 ### CloudFlare Wrangler Documentation
 
-Developing on Cloudflare Workers and Durable Objects locally can be streamlined with the use of Cloudflare's official command-line tool, `wrangler`. Wrangler includes a dev server which allows you to test your Workers and Durable Objects locally before deploying them to Cloudflare's infrastructure. Here’s a basic outline of how you might set up and use a local development environment for Cloudflare:
+Developing on Cloudflare Workers and Durable Objects locally can be streamlined with the use of Cloudflare's official command-line tool, `wrangler`. Wrangler includes a dev server that allows you to test your Workers and Durable Objects locally before deploying them to Cloudflare's infrastructure. Here's a basic outline of how you might set up and use a local development environment for Cloudflare:
 
 1. **Install Wrangler**:
    First, you'll need to install Wrangler globally via npm:

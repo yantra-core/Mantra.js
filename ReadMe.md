@@ -36,13 +36,16 @@ You can view any of these examples in your browser and begin modifying the game 
 - ✅ **Edge Computing Compatible**: Games can run in CloudFlare Workers environments
 - ✅ **Offline Gameplay Support**: Fully functional gameplay in offline mode
 
-# 3D,  2D,  2.5D
+# 3D, 2.5D, 2D
 
-Want to build a 3D, 2D or 2.5D JavaScript game? We've got you covered! In Mantra, it's a one-line change to swap the graphics or physics.
+Want to build a 3D, 2.5D, or 2D JavaScript game? 
+
+We've got you covered! In Mantra, it's a one-line change to swap the graphics or physics.
 ##  Web Assembly + WebGPU
 ### NVIDIA PhysX 5.3.0 + Babylon.js
 
-Mantra's default 3D graphics are rendered using WebGPU and Babylon.js. Mantra's default 3D physics are powered by NVIDA PhysX compiled via EMScripten
+Mantra's default 3D graphics are rendered using Babylon.js with WebGPU support
+Mantra's default 3D physics are powered by NVIDA PhysX compiled to WebAssembly via EMScripten
 
 ### Matter.js + Phaser 3
 
@@ -52,11 +55,13 @@ For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to
 
 ## In Mantra, Everything is a Plugin!
 
-Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of our community Plugins from our growing collection to quicky extend your game. Develop something cool? Publish and share your plugins with the [community](https://discord.gg/bbyjf6MXC2)!
+Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of our Plugins from our growing collection to quicky extend your game.
+
+Develop something cool? Publish and share your plugins with the [community](https://discord.gg/bbyjf6MXC2)!
 
 ## Offline First
 
-Mantra is designed to start a full-featured local game instance immediately without any heavy dependency tree. This offline-first approach lets you quickly build your game without thinking about netcode, allowing you to connect your game's logic to Mantra's high-performance networking code when needed.
+Mantra is designed to start a full-featured local game instance in seconds from a CDN without any heavy dependency tree. This offline-first approach lets you quickly build your game without thinking about netcode, allowing you to connect your game's logic to Mantra's high-performance networking code when needed.
 
 ## Serverless Physics
 
