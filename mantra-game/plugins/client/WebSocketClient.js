@@ -9,6 +9,7 @@ export default class WebSocketClient {
     this.isServerSideReconciliationEnabled = isServerSideReconciliationEnabled;
     this.pingIntervalId = null;
     this.rtt = undefined;
+    this.rttMeasurements = [];
   }
 
   init(game) {
@@ -56,17 +57,20 @@ export default class WebSocketClient {
   startRttMeasurement() {
     this.pingIntervalId = setInterval(() => {
       const start = Date.now();
+      this.lastPingTime = Date.now();
       this.socket.send(JSON.stringify({ action: 'ping' }));
       this.on('pong', () => {
         const end = Date.now();
         const rtt = end - start;
-        rttMeasurements.push(rtt);
-        if (rttMeasurements.length > 10) { // Use the last 10 measurements to get an average
-          rttMeasurements.shift(); // Remove the oldest measurement
+        this.rttMeasurements.push(rtt);
+        if (this.rttMeasurements.length > 10) { // Use the last 10 measurements to get an average
+          this.rttMeasurements.shift(); // Remove the oldest measurement
         }
-        this.rtt = rttMeasurements.reduce((a, b) => a + b, 0) / rttMeasurements.length;
+        this.rtt = this.rttMeasurements.reduce((a, b) => a + b, 0) / this.rttMeasurements.length;
+        // Emit the 'pingtime' event with the current RTT
+        this.game.emit('pingtime', this.rtt);
       });
-    }, 5000); // Send a ping every 5 seconds
+    }, 1000); // Send a ping every 5 seconds
   }
 
   // Call this method when the WebSocket is closed
@@ -133,6 +137,14 @@ export default class WebSocketClient {
       this.startTicking(this.socket);
     }
 
+    if (data.action === 'pong') {
+      const end = Date.now();
+      this.rtt = end - this.lastPingTime;
+      if (this.listeners['pong']) {
+        this.listeners['pong'](this.rtt);
+      }
+    }
+
     if (data.action === "gametick") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
@@ -168,6 +180,7 @@ export default class WebSocketClient {
 
   handleClose(event) {
     console.log('WebSocket is closed:', event);
+    this.stopRttMeasurement();
   }
 
   handleError(error) {
@@ -184,18 +197,3 @@ export default class WebSocketClient {
   }
 
 }
-
-/*
-function startTicking(socket) {
-  // Assume RTT has been measured and is available here
-  const averageRTT = 10; // TODO: measure this
-
-  // Calculate the interval to send ticks slightly faster than hzMS
-  const adjustedInterval = hzMS - (averageRTT / 2);
-
-  setInterval(function () {
-    const tickMessage = JSON.stringify({ action: 'gameTick' });
-    socket.send(tickMessage);
-  }, adjustedInterval > 0 ? adjustedInterval : hzMS);
-}
-*/

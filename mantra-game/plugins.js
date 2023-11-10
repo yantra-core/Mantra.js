@@ -33,6 +33,7 @@ import Bullet from './plugins/bullet/Bullet.js';
 import InputLegend from './plugins/input-legend/InputLegend.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
+import PingTime from './plugins/ping-time/PingTIme.js';
 
 // Movement Strategies
 import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovement.js';
@@ -83,6 +84,7 @@ const plugins = {
   Lifetime,
   MatterPhysics,
   PhysXPhysics,
+  PingTime,
   Mouse: Mouse,
   BabylonGraphics,
   PhaserGraphics,

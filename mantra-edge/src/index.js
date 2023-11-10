@@ -142,6 +142,10 @@ export class Ayyo {
           this.gameLogic.systems.entityInput.handleInputs(playerEntityId, { controls: message.controls });
           break;
 
+        case 'ping':
+          websocket.send(JSON.stringify({ action: 'pong' }));
+          break;
+
         case 'createEntity':
           this.gameLogic.createEntity(message.entityId);
           this.gameLogic.addComponent(message.entityId, 'position', { x: message.x, y: message.y });

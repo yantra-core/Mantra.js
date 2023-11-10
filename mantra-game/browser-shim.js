@@ -20,6 +20,7 @@ MANTRA.plugins = {
   Gamepad: require('./plugins/gamepad/Gamepad.js').default,
   Graphics: require('./plugins/graphics/Graphics.js').default,
   InputLegend: require('./plugins/input-legend/InputLegend.js').default,
+  PingTime: require('./plugins/ping-time/PingTime.js').default,
   Keyboard: require('./plugins/keyboard/Keyboard.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js').default,
   LocalClient: require('./plugins/client/LocalClient.js').default,

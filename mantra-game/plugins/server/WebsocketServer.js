@@ -37,7 +37,7 @@ class WebSocketServerClass {
     this.gameUpdate(); // start the game loop
   }
 
-  listen (port) {
+  listen(port) {
     this.server = new WebSocketServer({ port: port });
     this.server.on('connection', (ws) => this.handleConnection(ws));
   }
@@ -45,7 +45,7 @@ class WebSocketServerClass {
   handleConnection(ws) {
     const playerEntityId = 'player_' + nanoid(7);
     ws.playerEntityId = playerEntityId;
-    
+
     console.log("PLAYER JOINED")
     this.game.createEntity({
       id: playerEntityId,
@@ -53,7 +53,7 @@ class WebSocketServerClass {
       friction: this.config.player.friction,  // Default friction
       frictionAir: this.config.player.frictionAir, // Default air friction
       frictionStatic: this.config.player.frictionStatic, // Default static friction
-  
+
     });
 
     ws.send(JSON.stringify({
@@ -88,6 +88,11 @@ class WebSocketServerClass {
         game.addComponent(parsedMessage.entityId, 'type', parsedMessage.type);
         ws.send(JSON.stringify({ status: 'Entity created' }));
         break;
+
+      case 'ping':
+        ws.send(JSON.stringify({ action: 'pong' }));
+        break;
+
       case 'creator_json':
         let states = parsedMessage.json.state;
         // do a quick massage of the old api into new
@@ -118,7 +123,7 @@ class WebSocketServerClass {
 
       case 'player_input':
         let entityInputSystem = game.systemsManager.getSystem('entityInput');
-        entityInputSystem.handleInputs(ws.playerEntityId, { controls:  parsedMessage.controls, mouse:  parsedMessage.mouse}, parsedMessage.sequenceNumber);
+        entityInputSystem.handleInputs(ws.playerEntityId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
         break;
 
       case 'getSnapshot':
@@ -163,8 +168,8 @@ class WebSocketServerClass {
     // Schedule next update after the remaining time until the next fixed time step
     setTimeout(() => this.gameUpdate(), timeUntilNextUpdate);
   }
-  
-  sendUpdates () {
+
+  sendUpdates() {
     let game = this.game;
     // Send updated data to clients after all the updates
     // TODO: systems.ws.broadcastAll('gametick', game.getSnapshot()); // something like this
@@ -215,7 +220,7 @@ class WebSocketServerClass {
     });
 
   }
-  
+
 }
 
 export default WebSocketServerClass;
