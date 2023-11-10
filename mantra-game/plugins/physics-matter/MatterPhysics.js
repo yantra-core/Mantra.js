@@ -43,7 +43,8 @@ class MatterPhysics extends PhysicsInterface {
     game.physicsReady = true;
 
     this.onAfterUpdate(this.engine, (event) => {
-      Matter.Composite.allBodies(this.engine.world).forEach((body) => {
+      let allBodies = Matter.Composite.allBodies(this.engine.world);
+      allBodies.forEach((body) => {
         let maxSpeed = 10;
         if (body.entity && body.entity.maxSpeed) {
           maxSpeed = body.entity.maxSpeed;
@@ -120,6 +121,10 @@ class MatterPhysics extends PhysicsInterface {
     Matter.World.add(engine.world, body);
   }
 
+  removeBody (body) {
+    Matter.World.remove(this.engine.world, body);
+  }
+
   // Equivalent to World.remove()
   removeFromWorld(engine, body) {
     Matter.World.remove(engine.world, body);
@@ -179,7 +184,6 @@ class MatterPhysics extends PhysicsInterface {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-
 
         const entityIdA = bodyA.myEntityId;
         const entityIdB = bodyB.myEntityId;

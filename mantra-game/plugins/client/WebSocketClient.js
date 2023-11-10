@@ -1,6 +1,6 @@
 // WebSocketClient.js - Marak Squires 2023
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
-import bytes from './vendor/bytes.js';
+import bytes from './vendor/bytes/bytes.js';
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 
@@ -16,7 +16,6 @@ export default class WebSocketClient {
     this.totalSnapshotSize = 0; // Total size of all snapshots
     this.snapshotCount = 0; // Number of snapshots received
     this.reportFrequency = 10; // for example, report every 10 game ticks
-
   }
 
   init(game) {
@@ -226,7 +225,7 @@ export default class WebSocketClient {
     // Emit the 'snapshotsize' event with the current average size
     if (this.snapshotCount > 0 && this.snapshotCount % this.reportFrequency === 0) {
       let averageSize = this.totalSnapshotSize / this.snapshotCount;
-      console.log('average snapshot size', averageSize, bytes(averageSize))
+      // console.log('average snapshot size', averageSize, bytes(averageSize))
       this.game.emit('snapshotsize', averageSize);
     }
   }

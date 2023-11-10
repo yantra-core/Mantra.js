@@ -35,6 +35,7 @@ import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 import PingTime from './plugins/ping-time/PingTime.js';
 import SnapshotSize from './plugins/snapshot-size/SnapshotSize.js';
+import CurrentFPS from './plugins/current-fps/CurrentFPS.js';
 
 // Movement Strategies
 import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovement.js';
@@ -87,6 +88,7 @@ const plugins = {
   PhysXPhysics,
   PingTime,
   SnapshotSize,
+  CurrentFPS,
   Mouse: Mouse,
   BabylonGraphics,
   PhaserGraphics,

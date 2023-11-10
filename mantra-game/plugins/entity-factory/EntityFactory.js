@@ -44,6 +44,10 @@ class EntityFactory {
         for (let componentType in this.game.components) {
           this.game.components[componentType].remove(entityId);
         }
+        // Removes the body from the physics engine
+        if (typeof this.game.physics.removeBody === 'function') {
+          this.game.physics.removeBody(this.game.bodyMap[entityId]);
+        }
         // Delete the entity from bodyMap
         delete this.game.entities[entityId];
       }
