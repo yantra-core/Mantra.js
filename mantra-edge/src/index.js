@@ -25,19 +25,46 @@ export class Ayyo {
     // Initializing the systems
     this.gameLogic = new Game({
       isServer: true,
-      loadDefaultPlugins: false
+ //     loadDefaultPlugins: false
     });
 
     // Use Plugins to add systems to the game
     this.gameLogic
-      .use(new plugins.MatterPhysics())
-      .use(new plugins.Collision())
-      .use(new plugins.EntityFactory())
-      .use(new plugins.EntityInput())
-      .use(new plugins.EntityMovement())
-      .use(new plugins.Lifetime())
+      //.use(new plugins.MatterPhysics())
+      //.use(new plugins.EntityFactory())
+ //     .use(new plugins.EntityInput())
+ //     .use(new plugins.EntityMovement())
+//      .use(new plugins.Lifetime())
       .use(new plugins.Bullet())
-      .use(new plugins.Border())
+      .use(new plugins.Block())
+      .use(new plugins.Collision())
+
+      //.use(new plugins.Border())
+
+
+    // create a single player entity
+    this.gameLogic.createEntity({
+      type: 'BLOCK',
+      width: 500,
+      height: 500,
+      position: {
+        x: -500,
+        y: 500
+      },
+    });
+
+
+    // create a single player entity
+    this.gameLogic.createEntity({
+      type: 'BLOCK',
+      width: 500,
+      height: 500,
+      position: {
+        x: 500,
+        y: 500
+      },
+    });
+
 
   }
 

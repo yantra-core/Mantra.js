@@ -33,7 +33,7 @@ class Border {
 
     let height = entityData.height;
     let width = entityData.width;
-    let WALL_THICKNESS = 100;
+    let WALL_THICKNESS = 200;
 
     const borders = {
       top: {
@@ -68,7 +68,7 @@ class Border {
         },
         width: border.size.width,
         height: border.size.height,
-        thickness: 80
+        depth: 80
       });
     }
 

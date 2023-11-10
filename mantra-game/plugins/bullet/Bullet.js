@@ -117,7 +117,6 @@ class BulletPlugin {
   }
 
   handleCollision(pair, bodyA, bodyB) {
-
     if (bodyA.myEntityId && bodyB.myEntityId) {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;
@@ -137,6 +136,20 @@ class BulletPlugin {
         return;
       }
 
+      //
+      // Bullets are destroyed if they hit a border
+      //
+      if (entityA.type === 'BULLET' && entityB.type === 'BORDER') {
+        // destroy the bullet if it hits a border wall
+        this.game.removeEntity(entityIdA);
+        return;
+      }
+      if (entityA.type === 'BORDER' && entityB.type === 'BULLET') {
+        // destroy the bullet if it hits a border wall
+        this.game.removeEntity(entityIdB);
+        return;
+      }
+
       // Check if bullets have the same owner
       if ((entityA.type === 'BULLET' || entityB.type === 'BULLET') && entityA && entityB && entityA.owner === entityB.owner) {
         // console.log("SAME OWNER", entityA.owner, entityB.owner)
@@ -146,9 +159,7 @@ class BulletPlugin {
       // console.log('bullet collides', entityIdA, entityIdB);
 
       if (entityA && entityA.id !== entityB.owner) {
-
         /* TODO: move this to BabylonGraphics and Graphics Plugins
-
         if (entityA.type === 'PLAYER') {
           let playerGraphics = entityA.graphics;
           if (playerGraphics) {
