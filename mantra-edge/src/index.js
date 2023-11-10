@@ -36,7 +36,7 @@ export class Ayyo {
       .use(new plugins.EntityInput())
       .use(new plugins.EntityMovement())
       .use(new plugins.Lifetime())
-      // .use(new plugins.Bullet())
+      .use(new plugins.Bullet())
       .use(new plugins.Border())
 
   }
