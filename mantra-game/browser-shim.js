@@ -8,6 +8,7 @@ MANTRA.plugins = {
   AsteroidsMovement: require('./plugins/entity-movement/strategies/AsteroidsMovement.js').default,
   BabylonCamera: require('./plugins/graphics-babylon/camera/BabylonCamera.js').default,
   BabylonGraphics: require('./plugins/graphics-babylon/BabylonGraphics.js').default,
+  Block: require('./plugins/block/Block.js').default,
   Border: require('./plugins/border/Border.js').default,
   Bullet: require('./plugins/bullet/Bullet.js').default,
   CSSGraphics: require('./plugins/graphics-css/CSSGraphics.js').default,

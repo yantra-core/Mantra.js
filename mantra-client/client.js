@@ -90,7 +90,7 @@ let game = new Game({
   isClient: true,
   mouse: false,
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['babylon'], // 'babylon', 'css', 'phaser'
+  graphics: ['phaser'], // 'babylon', 'css', 'phaser'
   collisions: true,
   camera: 'follow',
   options: {
@@ -111,7 +111,6 @@ game.use(new plugins.PingTime());
 game.use(new plugins.SnapshotSize());
 game.use(new plugins.CurrentFPS());
 
-game.use(new plugins.StarField())
 
 // game.use(new plugins.MovementFrogger())
 // game.use(new plugins.MovementPacman())
@@ -180,11 +179,14 @@ if (mode === 'online') {
   }
   // Connects to websocket server
   // see: @yantra-core/mantra-server
+  game.use(new plugins.StarField())
 
 
 } else {
   // Single Player Offline Mode
   game.start(function () {
+    game.use(new plugins.StarField())
+
     // create a single player entity
     game.createEntity({
       id: playerId,

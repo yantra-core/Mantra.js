@@ -171,6 +171,26 @@ class Game {
     this.systemsManager.render();
   }
 
+  start(cb){
+    let client = this.getSystem('client');
+    client.start(cb);
+  }
+
+  stop () {
+    let client = this.getSystem('client');
+    client.stop();
+  }
+
+  connect () {
+    let client = this.getSystem('client');
+    client.connect();
+  }
+
+  disconnect () {
+    let client = this.getSystem('client');
+    client.disconnect();
+  }
+
   use(pluginInstance) {
     pluginInstance.init(this, this.engine, this.scene);
     return this;

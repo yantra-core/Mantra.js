@@ -10,9 +10,18 @@ class Graphics {
     this.game.createGraphic = this.createGraphic.bind(this);
     this.game.removeGraphic = this.removeGraphic.bind(this);
     this.game.updateGraphic = this.updateGraphic.bind(this);
+
+    // Ensure the gameHolder div exists
+    let gameHolder = document.getElementById('gameHolder');
+    if (!gameHolder) {
+      gameHolder = document.createElement('div');
+      gameHolder.id = 'gameHolder';
+      document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+    }
+
   }
 
-  update () {}
+  update() { }
 
   createGraphic(entityData) {
     let game = this.game;

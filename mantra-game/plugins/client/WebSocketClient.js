@@ -6,6 +6,7 @@ let hzMS = 16.666; // TODO: config with Game.fps
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
+    this.name = 'WebSocketClient';
     this.listeners = {};
     this.entityName = entityName;
     this.isServerSideReconciliationEnabled = isServerSideReconciliationEnabled;
@@ -22,6 +23,7 @@ export default class WebSocketClient {
     this.game = game;
     this.game.connect = this.connect.bind(this);
     this.game.disconnect = this.disconnect.bind(this);
+    this.game.systemsManager.addSystem('websocketClient', this);
   }
 
   connect(url) {

@@ -41,15 +41,6 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
         graphics = [graphics];
       }
 
-      // Ensure the gameHolder div exists
-      // TODO: move to graphics.init()
-      let gameHolder = document.getElementById('gameHolder');
-      if (!gameHolder) {
-        gameHolder = document.createElement('div');
-        gameHolder.id = 'gameHolder';
-        document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
-      }
-
       this.use(new plugins.Graphics()); // camera configs
       if (graphics.includes('babylon')) {
         this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
