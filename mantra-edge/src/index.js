@@ -2,6 +2,7 @@ import { Game, plugins } from '../../mantra-game/Game.js';
 import deltaEncoding from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaEncoding.js';
 
 // let lastMessageTime = 0;
+const MAX_BUFFER_SIZE = 100;
 
 // Worker code
 export default {
@@ -25,46 +26,43 @@ export class Ayyo {
     // Initializing the systems
     this.gameLogic = new Game({
       isServer: true,
- //     loadDefaultPlugins: false
     });
 
     // Use Plugins to add systems to the game
     this.gameLogic
-      //.use(new plugins.MatterPhysics())
-      //.use(new plugins.EntityFactory())
- //     .use(new plugins.EntityInput())
- //     .use(new plugins.EntityMovement())
-//      .use(new plugins.Lifetime())
       .use(new plugins.Bullet())
       .use(new plugins.Block())
       .use(new plugins.Collision())
+      .use(new plugins.Border({ autoBorder: false }))
 
-      //.use(new plugins.Border())
+        // create a single player entity
+        this.gameLogic.createEntity({
+          type: 'BLOCK',
+          width: 500,
+          height: 500,
+          position: {
+            x: -500,
+            y: 500
+          },
+        });
+    
+    
+        // create a single player entity
+        this.gameLogic.createEntity({
+          type: 'BLOCK',
+          width: 500,
+          height: 500,
+          position: {
+            x: 500,
+            y: 500
+          },
+        });
 
-
-    // create a single player entity
-    this.gameLogic.createEntity({
-      type: 'BLOCK',
-      width: 500,
-      height: 500,
-      position: {
-        x: -500,
-        y: 500
-      },
-    });
-
-
-    // create a single player entity
-    this.gameLogic.createEntity({
-      type: 'BLOCK',
-      width: 500,
-      height: 500,
-      position: {
-        x: 500,
-        y: 500
-      },
-    });
-
+        this.gameLogic.systems.border.createBorder({
+          height: 2000,
+          width: 2000,
+        });
+    
 
   }
 
@@ -152,10 +150,6 @@ export class Ayyo {
       // Perform the requested action based on the "action" property of the message
       switch (message.action) {
         case 'gameTick':
-          //let now = Date.now();
-          //let diff = now - lastMessageTime;
-          //lastMessageTime = now;
-          // console.log('gameTick', diff, 'ms since last message');
 
           this.bufferGameTick(message, playerEntityId);
 
@@ -226,36 +220,59 @@ export class Ayyo {
     const now = Date.now();
     const tickTime = message.clientTickTime; // Assuming client sends this
 
-    // Check if the tick is too early
-    if (tickTime > now) {
-      // Add to the buffer
-      this.tickBuffer.push({ tickTime, playerId });
-      // Sort the buffer by tick time
-      this.tickBuffer.sort((a, b) => a.tickTime - b.tickTime);
-    } else {
-      // Process immediately if it's time to do so
-      this.processGameTick();
+    // Add to the buffer
+    this.tickBuffer.push({ tickTime, playerId, message });
+
+    // Sort the buffer by tick time
+    this.tickBuffer.sort((a, b) => a.tickTime - b.tickTime);
+
+    // Process ticks if it's time to do so
+    this.processBufferedTicks();
+  }
+
+  processBufferedTicks() {
+    const now = Date.now();
+  
+    // Process ticks
+    while (this.tickBuffer.length > 0 && this.tickBuffer[0].tickTime <= now) {
+      const { playerId, message } = this.tickBuffer.shift();
+      this.processGameTick(playerId, message);
+    }
+  
+    // Check for buffer overflow and handle it
+    if (this.tickBuffer.length > MAX_BUFFER_SIZE) {
+      console.log("WARNING, tick buffer is overflowing. MAX_BUFFER_SIZE has capped buffer growth.");
+      console.log('This is an indication that the client is sending the wrong amount of ticks per second.');
+      // Drop the oldest ticks to prevent buffer overflow
+      this.tickBuffer.splice(0, this.tickBuffer.length - MAX_BUFFER_SIZE);
     }
   }
 
-  processGameTick(playerId) {
+  processGameTick(playerId, message) {
+    // playerId and message here represent the incoming gameTick clock source
+    // they aren't currently used inside the Game.gameTick() metho
+
+    // Process the game tick logic here
     this.gameLogic.gameTick();
+
+    // Send updates to clients
+    this.sendPlayerSnapshots();
+  }
+
+  sendPlayerSnapshots() {
     Object.keys(this.connectedPlayers).forEach(playerId => {
       const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
-      const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];  // Get the lastProcessedInput for this client's player entity
-      // Include the lastProcessedInput in the message
+      const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];
 
       if (playerSnapshot) {
         try {
           let deltaEncoded = deltaEncoding.encode(playerId, playerSnapshot);
           if (deltaEncoded) {
             const ws = this.connectedPlayers[playerId];
-            // console.log(JSON.stringify(playerSnapshot, true, 2))
             ws.send(JSON.stringify({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput }));
           }
-
         } catch (err) {
-          console.log(err)
+          console.log(err);
         }
       }
     });

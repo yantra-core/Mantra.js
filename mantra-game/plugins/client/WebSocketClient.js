@@ -21,8 +21,8 @@ export default class WebSocketClient {
 
   init(game) {
     this.game = game;
-    this.game.connect = this.connect.bind(this);
-    this.game.disconnect = this.disconnect.bind(this);
+    //this.game.connect = this.connect.bind(this);
+    //this.game.disconnect = this.disconnect.bind(this);
     this.game.systemsManager.addSystem('websocketClient', this);
   }
 

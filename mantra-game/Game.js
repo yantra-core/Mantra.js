@@ -210,9 +210,9 @@ class Game {
     client.stop();
   }
 
-  connect () {
+  connect (url) {
     let client = this.getSystem('client');
-    client.connect();
+    client.connect(url);
   }
 
   disconnect () {
