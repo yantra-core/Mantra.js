@@ -8,6 +8,8 @@ const game = new Game({
   isServer: true
 });
 
+game.use(new plugins.Collision());
+
 game.use(new plugins.Bullet());
 game.use(new plugins.Border({ autoBorder: true }));
 

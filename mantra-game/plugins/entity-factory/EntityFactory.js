@@ -136,7 +136,6 @@ class EntityFactory {
   createEntity(config) {
 
     this.preCreateEntityHooks.forEach(fn => fn(entityData));
-
     let entityId = this._generateId();
 
     let defaultConfig = {
@@ -204,7 +203,6 @@ class EntityFactory {
     this.game.addComponent(entityId, 'isSensor', isSensor);
     this.game.addComponent(entityId, 'isStatic', isStatic);
     this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
-
     // iterate through props of lockedProperties and for each prop we find, use as key name
     // to lookup the current entity value and set it to the lockedProperties value
     // we will later reference this lockedProperties value when updating the entity

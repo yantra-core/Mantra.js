@@ -77,7 +77,6 @@ class BulletPlugin {
       radius: 33,
       damage: 10,
     };
-
     this.game.createEntity(bulletDirectionConfig);
 
     if (this.game.isClient) {
@@ -120,7 +119,7 @@ class BulletPlugin {
 
 
   handleCollision(pair, bodyA, bodyB) {
-    return;
+
     if (bodyA.myEntityId && bodyB.myEntityId) {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;
@@ -130,7 +129,6 @@ class BulletPlugin {
 
       // entityA is player ( for now )
       // console.log('types', entityA.type, entityB.type);
-
       if (!entityA || !entityB) {
         console.log('Bullet.handleCollision no entity found. Skipping...', entityA, entityB);
         return;
@@ -143,7 +141,7 @@ class BulletPlugin {
 
       // Check if bullets have the same owner
       if (entityA && entityB && entityA.owner === entityB.owner) {
-        //console.log("SAME OWNER")
+        // console.log("SAME OWNER", entityA.owner, entityB.owner)
         return;
       }
 

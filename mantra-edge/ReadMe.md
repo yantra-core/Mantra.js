@@ -10,7 +10,7 @@ In traditional game server setups, the server would run a game loop that ticks a
 
 Since Cloudflare Workers are stateless and do not have access to timers, the `mantra-edge` server advances the game state when it receives a `gameTick` message from a client, which means the timing of the game state updates is driven externally by the client messages.
 
-To progress the game state forward, `mantra-edge` elects the best client as the `ticker,` responsible for maintaining the game's time synchronization. For games with trusted timing requirements, a serverless physics orchestration service like [https://yantra.gg](https://yantra.gg) can provide dedicated high-precision, low-latency clock synchronization services for Cloudflare.
+To progress the game state forward, `mantra-edge` elects the best client as the `ticker,` responsible for maintaining the game's time synchronization. For games with trusted timing requirements, a serverless physics orchestration service like [Yantra](https://yantra.gg) can provide dedicated high-precision, low-latency clock synchronization services for Cloudflare.
 
 
 ## Key Concepts
@@ -57,7 +57,7 @@ Running either `wrangler dev` or `wrangler publish` will return a websocket conn
 
 ```js
 let game = new MANTRA.Game();
-game.connect('wss://0.0.0.0:8787/websocket')
+game.connect('ws://0.0.0.0:8787/websocket')
 ```
 
 ### CloudFlare Wrangler Documentation
