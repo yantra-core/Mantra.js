@@ -14,7 +14,7 @@ let config = {
 };
 
 // TODO: auto-generate this list from the components
-const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor', 'lifetime', 'owner'];
+const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner'];
 
 const getPlayerSnapshot = function (playerId) {
   const differentialSnapshotState = [];

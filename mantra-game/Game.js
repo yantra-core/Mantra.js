@@ -109,6 +109,7 @@ class Game {
       density: new Component('density', this),
       width: new Component('width', this),
       height: new Component('height', this),
+      depth: new Component('depth', this),
       radius: new Component('radius', this),
       isSensor: new Component('isSensor', this),
       owner: new Component('owner', this)

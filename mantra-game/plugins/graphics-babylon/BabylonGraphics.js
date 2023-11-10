@@ -229,7 +229,6 @@ class BabylonGraphics extends GraphicsInterface {
         graphic = this.createBox(entityData); // TODO: createDefault()
     }
 
-    // translate the graphic to the correct position in 2.5D space
     graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
 
     return graphic;
@@ -261,7 +260,7 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createBox(entityData) {
-    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: 300, depth: entityData.height }, this.scene);
+    let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.depth, depth: entityData.height }, this.scene);
     return box;
   }
 

@@ -32,7 +32,6 @@ function onlineGameLoop(game) {
     if (frameCount % fpsReportFrequency === 0) {
       let sumFPS = fpsMeasurements.reduce((a, b) => a + b, 0);
       let averageFPS = sumFPS / fpsMeasurements.length;
-      console.log('average fps', averageFPS);
       game.emit('fps', averageFPS); // Emit the 'fps' event with the average FPS
       fpsMeasurements = []; // Reset the measurements array after reporting
     }

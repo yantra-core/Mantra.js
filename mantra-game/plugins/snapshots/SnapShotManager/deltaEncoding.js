@@ -7,7 +7,7 @@ let playerStateCache = {};
 const deltaEncoding = {};
 
 // TODO: auto-generate this list from the components
-const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor', 'lifetime', 'owner'];
+const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner'];
 
 deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
   // console.log('playerStateCache', Object.keys(playerStateCache).length)

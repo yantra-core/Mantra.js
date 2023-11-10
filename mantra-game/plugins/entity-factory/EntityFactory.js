@@ -157,6 +157,7 @@ class EntityFactory {
       health: 100,
       height: 100,
       width: 100,
+      depth: 10,
       lifetime: Infinity,
       maxSpeed: 9999,
       isStatic: false,
@@ -177,7 +178,7 @@ class EntityFactory {
     entityId = config.id;
     const entity = new Entity(entityId);
 
-    const { type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, radius, shape, maxSpeed, health, owner, lifetime } = config;
+    const { type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, maxSpeed, health, owner, lifetime } = config;
     let { x, y } = position;
 
     /*
@@ -199,6 +200,7 @@ class EntityFactory {
     this.game.addComponent(entityId, 'health', health);
     this.game.addComponent(entityId, 'width', width);
     this.game.addComponent(entityId, 'height', height);
+    this.game.addComponent(entityId, 'depth', depth);
     this.game.addComponent(entityId, 'radius', radius);
     this.game.addComponent(entityId, 'shape', shape);
     this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
