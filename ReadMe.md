@@ -44,8 +44,9 @@ We've got you covered! In Mantra, it's a one-line change to swap the graphics or
 ##  Web Assembly + WebGPU
 ### NVIDIA PhysX 5.3.0 + Babylon.js
 
-Mantra's default 3D graphics are rendered using Babylon.js with WebGPU support
-Mantra's default 3D physics are powered by NVIDA PhysX compiled to WebAssembly via EMScripten
+Mantra's default 3D graphics are rendered using Babylon.js with WebGPU support.
+
+Mantra's default 3D physics are powered by NVIDA PhysX compiled to WebAssembly via EMScripten.
 
 ### Matter.js + Phaser 3
 
@@ -55,13 +56,27 @@ For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to
 
 ## In Mantra, Everything is a Plugin!
 
-Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of our Plugins from our growing collection to quicky extend your game.
+Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of the Plugins from our growing collection to quicky extend your game.
 
 Develop something cool? Publish and share your plugins with the [community](https://discord.gg/bbyjf6MXC2)!
 
-## Offline First
+## Super Simple Offline First
 
-Mantra is designed to start a full-featured local game instance in seconds from a CDN without the need for a heavy dependency tree. This offline-first approach lets you quickly build your game without thinking about netcode, allowing you to connect your game's logic to Mantra's high-performance networking code when needed.
+Mantra is designed to start a full-featured local game instance in seconds using a simple:
+
+```html
+<script src="https://yantra.gg/mantra.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    let game = new MANTRA.Game();
+    game.start();
+  });
+</script>
+  ```
+
+You can just as easily copy the `mantra.js` file to your local system.
+
+This offline-first approach lets you quickly build your game without worrying about complex physics or netcode, allowing you to focus on game development.
 
 ## Serverless Physics
 
@@ -212,16 +227,17 @@ The following checklist outlines the planned features and their current status:
     - [ ] **Data Encoding**
 
 ### Graphics and Physics
-- [x] **Pluggable Graphics**: Plug in any rendering engine.
-  - [x] **HTML**: Simple HTML Game State debugger
-  - [x] **Babylon.js**: 3D browser client. Supported.
-  - [X] **Phaser 3**: 2D browser client. Experimental Support. 
+- [X] **Pluggable Graphics**: Plug in any rendering engine.
+  - [X] **CSS**: Simple CSS browser client.
+  - [X] **Babylon.js**: 3D browser client.
+  - [X] **Phaser 3**: 2D browser client.
+  - [X] **THREE.js**: 2D browser client. Experimental Support. 
   - [ ] **YourFavoriteGraphicsEngine**: You tell us!
 
-- [x] **Pluggable Physics**: Compatibility with various physics engines.
-  - [x] **Matter.js**: 2D Physics engine.
-  - [ ] **PhysicsX.wasm**: 3d Physics engine
-  - [ ] **Rapier.wasm**: 3d Physics engine
+- [X] **Pluggable Physics**: Compatibility with various physics engines.
+  - [X] **Matter.js**: 2D Physics
+  - [X] **PhysX.wasm**: 3D NVIDIA PhysX 5.30 Experimental Support. 
+  - [ ] **Rapier.wasm**: 3d Physics
   - [ ] **YourFavoritePhysicsEngine.wasm**: You tell us!
 
 ### Data Compression and Optimization
