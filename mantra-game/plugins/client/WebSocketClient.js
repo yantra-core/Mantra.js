@@ -1,5 +1,7 @@
 // WebSocketClient.js - Marak Squires 2023
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
+import bytes from './vendor/bytes.js';
+let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 
 export default class WebSocketClient {
@@ -10,6 +12,11 @@ export default class WebSocketClient {
     this.pingIntervalId = null;
     this.rtt = undefined;
     this.rttMeasurements = [];
+    this.snapshotSizeMeasurements = []; // Array to store snapshot sizes
+    this.totalSnapshotSize = 0; // Total size of all snapshots
+    this.snapshotCount = 0; // Number of snapshots received
+    this.reportFrequency = 10; // for example, report every 10 game ticks
+
   }
 
   init(game) {
@@ -93,6 +100,10 @@ export default class WebSocketClient {
   disconnect() {
     this.socket.close();
     this.game.onlineGameLoopRunning = false;
+    // clear snapshot size tracking
+    this.totalSnapshotSize = 0;
+    this.snapshotCount = 0;
+    this.snapshotSizeMeasurements = [];
   }
 
   sendMessage(action, data = {}) {
@@ -126,6 +137,9 @@ export default class WebSocketClient {
 
   handleMessage(event) {
     let game = this.game;
+
+    // Track the size of the snapshot
+    this.trackSnapshotSize(event.data);
     let data = JSON.parse(event.data);
 
     if (data.action === "assign_id") {
@@ -150,6 +164,7 @@ export default class WebSocketClient {
       this.game.previousSnapshot = this.game.latestSnapshot;
       this.game.latestSnapshot = data.snapshot;
       game.snapshotQueue.push(data.snapshot);
+
 
       // TODO: add config flag here for snapshot interpolation
       // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);
@@ -194,6 +209,26 @@ export default class WebSocketClient {
   getInterpolatedSnapshot(alpha) {
     // bind this scope to interpolateSnapshot
     return interpolateSnapshot.call(this, alpha);
+  }
+
+  // This method tracks the size of each snapshot and calculates the average
+  trackSnapshotSize(dataString) {
+    // console.log(dataString)
+    // In a browser environment, create a new Blob and get its size
+
+    let buffer = encoder.encode(dataString);
+    let size = buffer.byteLength;
+
+    this.totalSnapshotSize += size;
+    this.snapshotCount++;
+    this.snapshotSizeMeasurements.push(size);
+
+    // Emit the 'snapshotsize' event with the current average size
+    if (this.snapshotCount > 0 && this.snapshotCount % this.reportFrequency === 0) {
+      let averageSize = this.totalSnapshotSize / this.snapshotCount;
+      console.log('average snapshot size', averageSize, bytes(averageSize))
+      this.game.emit('snapshotsize', averageSize);
+    }
   }
 
 }

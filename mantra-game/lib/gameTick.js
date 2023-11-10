@@ -45,7 +45,7 @@ function gameTick() {
 
   // Clear changed entities
   this.changedEntities.clear();
-  
+  this.removedEntities.clear();
   this.systems.entityFactory.cleanupDestroyedEntities();
 
 

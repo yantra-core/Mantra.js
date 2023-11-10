@@ -17,7 +17,6 @@ export default {
 // Define the Durable Object class for the Game
 export class Ayyo {
   constructor(state, env) {
-    this.state = { entities: {}, snapshots: [] };
     this.env = env;
     this.connectedPlayers = {}; // Store connected players with their websockets
     this.tickBuffer = [];
@@ -37,7 +36,8 @@ export class Ayyo {
       .use(new plugins.EntityInput())
       .use(new plugins.EntityMovement())
       .use(new plugins.Lifetime())
-      //.use(new plugins.Bullet())
+      // .use(new plugins.Bullet())
+      .use(new plugins.Border())
 
   }
 
@@ -211,31 +211,11 @@ export class Ayyo {
     }
   }
 
-  // Call this method to process the buffered game ticks
-  processGameTicks() {
-    const now = Date.now();
-
-    // Process ticks that are due
-    while (this.tickBuffer.length > 0 && this.tickBuffer[0].tickTime <= now) {
-      const tickInfo = this.tickBuffer.shift();
-      this.lastProcessedTickTime = tickInfo.tickTime; // Update the last processed tick time
-      this.processGameTick(tickInfo.playerId);
-    }
-
-    // Send updates after processing game ticks
-    this.sendUpdatesToAllClients();
-  }
   processGameTick(playerId) {
-    // Process the game tick for the player
-    this.gameLogic.gameTick();
-    // Send updates to all clients, etc.
-
-
     this.gameLogic.gameTick();
     Object.keys(this.connectedPlayers).forEach(playerId => {
       const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
       const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];  // Get the lastProcessedInput for this client's player entity
-
       // Include the lastProcessedInput in the message
 
       if (playerSnapshot) {
@@ -252,14 +232,6 @@ export class Ayyo {
         }
       }
     });
-    this.gameLogic.removedEntities.clear(); // TODO: move this to Game.js
-
-  }
-
-  // Call this method regularly to process the buffered ticks
-  async processBufferedTicks() {
-    await this.initialize();
-    this.processGameTicks();
   }
 
   async fetch(request) {
