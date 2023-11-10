@@ -9,18 +9,16 @@ let playerStateCache = {};
 let playerSnapshotCounts = {};
 let snapshotCount = 0;
 
-
 let config = {
   clientSidePrediction: true
 };
 
+// TODO: auto-generate this list from the components
+const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor', 'lifetime', 'owner'];
+
 const getPlayerSnapshot = function (playerId) {
   const differentialSnapshotState = [];
   let playerState = [];
-  // TODO: auto-generate this list from the components
-  const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'radius', 'isSensor', 'lifetime', 'owner'];
-
-  // console.log('getPlayerSnapshot, this.removedEntities', this.removedEntities);
 
   for (const removedEnt of this.removedEntities) { // TODO: spatially zone removed entities
     // console.log('pushing removed to clientattempt to destroy', eId)
@@ -72,6 +70,7 @@ const getPlayerSnapshot = function (playerId) {
     playerStateCache[playerId][state.id] = state;
 
     if (typeof playerSnapshotCounts[playerId] === 'undefined') {
+      // TODO: playerSnapshotCounts is accumulating state, should be reset on player disconnect
       playerSnapshotCounts[playerId] = 0;
     }
 
@@ -94,8 +93,6 @@ const getPlayerSnapshot = function (playerId) {
       }
 
     }
-
-    // console.log('state', state.position)
 
     playerState.push(state);
 

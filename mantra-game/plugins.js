@@ -33,6 +33,9 @@ import Bullet from './plugins/bullet/Bullet.js';
 import InputLegend from './plugins/input-legend/InputLegend.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
+import Block from './plugins/block/Block.js';
+
+// Utility
 import PingTime from './plugins/ping-time/PingTime.js';
 import SnapshotSize from './plugins/snapshot-size/SnapshotSize.js';
 import CurrentFPS from './plugins/current-fps/CurrentFPS.js';
@@ -72,6 +75,7 @@ MANTRA.plugins = {
 */
 
 const plugins = {
+  Block,
   Border,
   Bullet,
   Collision,

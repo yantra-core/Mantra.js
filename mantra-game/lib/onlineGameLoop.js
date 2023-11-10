@@ -15,6 +15,7 @@ function onlineGameLoop(game) {
     lastGameTick = Date.now(); // Set the last game tick to the current time to start
   }
   game.onlineGameLoopRunning = true;
+  game.mode = 'online';
   let currentTime = Date.now();
   let deltaTime = (currentTime - lastGameTick) / 1000.0; // Convert milliseconds to seconds
 

@@ -1,3 +1,4 @@
+// EntityFactory.js - Marak Squires 2023
 import Entity from '../../Entity/Entity.js';
 
 class EntityFactory {
@@ -48,7 +49,7 @@ class EntityFactory {
         if (typeof this.game.physics.removeBody === 'function') {
           this.game.physics.removeBody(this.game.bodyMap[entityId]);
         }
-        // Delete the entity from bodyMap
+        // Delete the entity from entities map
         delete this.game.entities[entityId];
       }
     }
@@ -79,8 +80,10 @@ class EntityFactory {
   }
 
   removeEntity(entityId) {
-
     let ent = this.game.entities[entityId];
+    if (ent.type === 'BLOCK') {
+      // console.log('removeEntity', entityId, ent.type)
+    }
 
     if (ent) {
       this.game.removedEntities.add({
@@ -94,6 +97,9 @@ class EntityFactory {
       this.game.systems.graphics.removeGraphic(entityId);
     }
 
+    if (ent.type === 'BLOCK') {
+      // console.log('setting ent to estroyed', entityId, ent.type);
+    }
     this.game.components.destroyed.set(entityId, true);
 
     // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
@@ -106,10 +112,6 @@ class EntityFactory {
   }
 
   updateEntity(entityData) {
-
-    // console.log(this.game)
-    // let allBodies = this.game.physics.Composite.allBodies(this.game.engine.world);
-    //console.log('bodyMap', this.game.bodyMap)
 
     const entityId = entityData.id;
 
@@ -141,6 +143,7 @@ class EntityFactory {
 
     this.preCreateEntityHooks.forEach(fn => fn(entityData));
     let entityId = this._generateId();
+    // console.log('createEntity', entityId, config, config.width, config.height)
 
     let defaultConfig = {
       id: entityId,
@@ -239,7 +242,6 @@ class EntityFactory {
     }
 
     if (config.body) {
-
       let body = this.createBody(config);
       body.myEntityId = entityId;
       this.game.physics.addToWorld(this.game.engine, body);
@@ -252,11 +254,6 @@ class EntityFactory {
       if (position) {
         this.game.physics.setPosition(body, position);
       }
-    } else {
-      this.game.bodyMap[entityId] = {
-        id: entityId
-      }
-
     }
 
     this.postCreateEntityHooks.forEach(fn => fn(entity));
@@ -278,7 +275,6 @@ class EntityFactory {
   }
 
   inflateEntity(entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps
-
     let game = this.game;
 
     // takes outside state and performs update/destroy/create depending
@@ -290,11 +286,25 @@ class EntityFactory {
       return;
     }
 
+    // Check if the entity is marked for local removal
+    // This could happen if client-side prediction has removed an entity,
+    // and the server still has an update for it in the queue
+    if (this.game.removedEntities.has(entityData.id)) {
+      console.log('Skipping update for locally removed entity:', entityData.id);
+      return;
+    }
+
     // this isn't a destroyed state, attempt to get a copy of the local state by id
     let localEntity = game.entities[entityData.id];
-
     if (!localEntity) {
       // no local copy of the state exists, create a new entity
+      if (typeof entityData.height === 'undefined' || typeof entityData.width === 'undefined') {
+        // Remark: This shouldn't happen, there is an issue where local destroyed entities are still being considered updated
+        // and the local system thinks we should create a new entity on the state update; however the state is stale and
+        // the entity is already destroyed, so we do not wish to update the state, skip for now
+        // TODO: we should resolve this with unit tests and ensure syncronization between server and client
+        return;
+      }
       let ent = game.createEntity(entityData);
     } else {
       // a local copy of the state exists, update it

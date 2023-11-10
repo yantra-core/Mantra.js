@@ -1,5 +1,4 @@
 // Bullet.js - Marak Squires 2023
-
 class BulletPlugin {
   constructor(config = {}) {
     this.name = 'BulletPlugin';
@@ -117,7 +116,6 @@ class BulletPlugin {
     return entity.graphics['graphics-babylon'].material && entity.graphics['graphics-babylon'].material.name === "redGlow";
   }
 
-
   handleCollision(pair, bodyA, bodyB) {
 
     if (bodyA.myEntityId && bodyB.myEntityId) {
@@ -140,7 +138,7 @@ class BulletPlugin {
       }
 
       // Check if bullets have the same owner
-      if (entityA && entityB && entityA.owner === entityB.owner) {
+      if ((entityA.type === 'BULLET' || entityB.type === 'BULLET') && entityA && entityB && entityA.owner === entityB.owner) {
         // console.log("SAME OWNER", entityA.owner, entityB.owner)
         return;
       }
@@ -197,7 +195,7 @@ class BulletPlugin {
         if (this.game.systems.graphics) {
           // this.game.removeGraphic(entityIdB);
         }
-        this.game.removeEntity(entityIdB);
+        //this.game.removeEntity(entityIdB);
       }
 
     }

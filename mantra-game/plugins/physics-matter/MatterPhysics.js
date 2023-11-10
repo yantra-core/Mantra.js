@@ -1,4 +1,4 @@
-
+// MatterPhysics.js - Marak Squires 2023
 import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 
@@ -42,21 +42,10 @@ class MatterPhysics extends PhysicsInterface {
 
     game.physicsReady = true;
 
-    this.onAfterUpdate(this.engine, (event) => {
-      let allBodies = Matter.Composite.allBodies(this.engine.world);
-      allBodies.forEach((body) => {
-        let maxSpeed = 10;
-        if (body.entity && body.entity.maxSpeed) {
-          maxSpeed = body.entity.maxSpeed;
-        }
-        limitSpeed(body, maxSpeed);
-        this.lockedProperties(body);
-      });
-    });
-    
+
     // should this be onAfterUpdate? since we are serializing the state of the world?
     // i would assume we want that data *after* the update?
-    this.onBeforeUpdate(this.engine, (event) => {
+    this.onAfterUpdate(this.engine, (event) => {
 
       // Remark: should this and bodyMap be replaced with a more generic mapping
       // in order to allow non-physics backed entities to exist in the game?
@@ -65,6 +54,20 @@ class MatterPhysics extends PhysicsInterface {
         let entity = this.game.getEntity(body.myEntityId);
 
         if (entity && body.isSleeping !== true && body.myEntityId) {
+
+          //
+          // Clamp max speed
+          //
+          let maxSpeed = 10;
+          if (entity.maxSpeed) {
+            maxSpeed = entity.maxSpeed;
+          }
+          limitSpeed(body, maxSpeed);
+
+          //
+          // Apply locked properties  ( like entity cannot move x or y position, etc )
+          //
+          this.lockedProperties(body);
 
           // If this is the client and we are in online mode,
           // do not update local physics for remote players, only update local physics for the local player
@@ -108,8 +111,9 @@ class MatterPhysics extends PhysicsInterface {
 
   }
 
-  // TODO: add this to PhysicsInterface
-  createBody(options) {}
+  createBody(options) {
+    return Matter.Body.create(options);
+  }
 
   // Equivalent to Engine.create()
   createEngine(options) {

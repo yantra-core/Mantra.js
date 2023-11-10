@@ -164,7 +164,6 @@ export default class WebSocketClient {
       this.game.latestSnapshot = data.snapshot;
       game.snapshotQueue.push(data.snapshot);
 
-
       // TODO: add config flag here for snapshot interpolation
       // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);
       // console.log(inter)

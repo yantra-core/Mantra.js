@@ -72,7 +72,7 @@ class WebSocketServerClass {
   }
 
   handleClose(ws) {
-    console.log('aWebSocket connection closed');
+    console.log('WebSocket connection closed');
     this.game.removeEntity(ws.playerEntityId);
   }
 

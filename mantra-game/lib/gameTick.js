@@ -11,9 +11,12 @@ function gameTick() {
   // Clamp deltaTime to avoid time spiral and ensure stability
   deltaTimeMS = Math.min(deltaTimeMS, hzMS);
 
+  // Clear changed entities
+  this.changedEntities.clear();
+  this.removedEntities.clear();
+
   // Update the physics engine
   this.physics.updateEngine(this.physics.engine, deltaTimeMS);
-
 
   // run the .update() method of all registered systems
   if (this.systemsManager) {
@@ -43,9 +46,6 @@ function gameTick() {
   // Save the game snapshot
   this.saveSnapshot(this.getEntities(), this.lastProcessedInput);
 
-  // Clear changed entities
-  this.changedEntities.clear();
-  this.removedEntities.clear();
   this.systems.entityFactory.cleanupDestroyedEntities();
 
 

@@ -21,7 +21,6 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
     this.use(new plugins.Lifetime());
   }
 
-
   if (!this.isServer) {
 
     if (keyboard) {
