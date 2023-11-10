@@ -6,15 +6,15 @@ import WebSocketClient from "./WebSocketClient.js";
 export default class Client {
   constructor(playerId) {
     this.name = 'Client';
-    this.entityName = playerId; // Remark: localClient expects player name in constructor?
+    this.playerId = playerId; // Remark: localClient expects player name in constructor?
   }
 
   init (game) {
     this.game = game;
     // Load all known client plugins
     // For now, this is just localClient and websocketClient
-    game.use(new LocalClient(this.entityName));
-    game.use(new WebSocketClient(this.entityName)); // does websocket require entityName? will server assign it?
+    game.use(new LocalClient(this.playerId));
+    game.use(new WebSocketClient(this.playerId)); // does websocket require playerId? will server assign it?
     game.systemsManager.addSystem('client', this);
   }
 

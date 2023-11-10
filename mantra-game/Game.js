@@ -28,7 +28,7 @@ class Game {
     height = 900,
     physics = 'matter',
     graphics = ['babylon'],
-    collisions,
+    collisions = true,
     camera = 'follow',
     keyboard = true,
     mouse = true,
@@ -172,6 +172,35 @@ class Game {
   }
 
   start(cb){
+    let game = this;
+    if (typeof cb !== 'function') {
+      console.log('No game.start() was callback provided. Using default callback.');
+      console.log("You can provide a callback to game.start() to create your game's entities and systems.");
+      // Default local game start function if none provided
+      // Will create a single player and border
+      // TODO: move this to separate file
+      cb = function defaultLocalGameStart () {
+        // create a single player entity
+        game.createEntity({
+          id: game.systems.client.playerId,
+          type: 'PLAYER',
+          position: {
+            x: 0,
+            y: 0
+          }
+        });
+        game.use(new plugins.Border({ autoBorder: false }));
+        game.systems.border.createBorder({
+          height: 2000,
+          width: 2000,
+        });
+      }
+    }
+
+    if (!this.systems.client) {
+      game.use(new plugins.Client('Bunny'));
+    }
+
     let client = this.getSystem('client');
     client.start(cb);
   }

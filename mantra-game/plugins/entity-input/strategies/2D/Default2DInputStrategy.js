@@ -93,8 +93,9 @@ class DefaultTwoDimensionalInputStrategy {
     if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
     if (actions.includes('ROTATE_RIGHT')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);
 
-
-    if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+    if (game.systems.bullet) {
+      if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+    }
   }
 }
 
