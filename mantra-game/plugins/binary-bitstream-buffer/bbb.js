@@ -4,6 +4,10 @@ import BitStream from './binary/BitStream.js';
 // Enum mapping for player types
 const entityTypes = {
   'PLAYER': 0,
+  'BULLET': 1,
+  'BLOCK': 2,
+  'BORDER': 3,
+  'BODY': 4
   // ... other types
 };
 
@@ -15,13 +19,19 @@ const actionTypes = {
 
 // Define schema with type declarations
 const schema = {
-  id: 'UInt16',
+  id: 'UInt32',
   type: 'UInt8',
   positionX: 'Float64',
   positionY: 'Float64',
   velocityX: 'Float64',
   velocityY: 'Float64',
   rotation: 'Float64',
+  mass: 'Float64',
+  health: 'Float64',
+  width: 'Float64',
+  height: 'Float64',
+  depth: 'Float64',
+  lifetime: 'Float64'
 };
 
 class PlayerCodec {
@@ -62,7 +72,7 @@ class PlayerCodec {
     }
 
     // Write bitmask first
-    localStream.writeUInt8(bitmask);
+    localStream.writeUInt16(bitmask);
 
     // Write player data based on bitmask, excluding null values
     index = 0;
@@ -79,12 +89,11 @@ class PlayerCodec {
     return finalBuffer;
   }
 
-
   decodePlayer(buffer) {
     this.stream = new BitStream(buffer);
     this.stream.offset = 0;
     let player = {};
-    let bitmask = this.stream.readUInt8();
+    let bitmask = this.stream.readUInt16();
 
     // Read player data based on bitmask
     let index = 0;
