@@ -22,6 +22,8 @@ const actionTypes = {
 let bufferSize = 1024 * 256;
 
 // Define schema with type declarations
+// TODO: flatten / truncate the float64 values into smaller ints with fixed precision
+// see: Float2Int.js from AYYO Games
 const schema = {
   id: 'UInt32',
   name: 'UTF8String',
@@ -37,14 +39,13 @@ const schema = {
   health: 'Float64',
   depth: 'Float64',
   lifetime: 'Float64',
-  health: 'Float64',
   radius: 'Float64',
   isSensor: 'Boolean',
   isStatic: 'Boolean',
   destroyed: 'Boolean',
   owner: 'ASCIIString',
   maxSpeed: 'Float64'
-  };
+};
 
 class PlayerCodec {
   constructor() {
@@ -138,22 +139,19 @@ class PlayerCodec {
 
     // Inside decodePlayer method
     for (let key in schema) {
-
-      if (bitmask & (1 << index)) { // this is returning false when it should be true for some keys
+      if (bitmask & (1 << index)) {
         if (schema[key] === 'Boolean') {
-          player[key] = this.stream.readUInt8() === 1;  // Convert 0 or 1 back to Boolean
-
-        } 
+          player[key] = this.stream.readUInt8() === 1;
+        }
         else if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
-          // Read the length of the string
           let length = this.stream.readUInt8();
-          // Read each byte of the string
-          let stringBytes = [];
+          let stringBytes = new Uint8Array(length);
           for (let i = 0; i < length; i++) {
-            stringBytes.push(this.stream.readUInt8());
+            stringBytes[i] = this.stream.readUInt8();
           }
-          // Convert byte array back to string
-          player[key] = Buffer.from(stringBytes).toString('utf8'); // Use 'utf8' for UTF8String
+          // Convert byte array back to string using TextDecoder
+          const decoder = new TextDecoder('utf-8');
+          player[key] = decoder.decode(stringBytes);
         } else {
           player[key] = this.stream[`read${schema[key]}`]();
         }

@@ -1,5 +1,9 @@
 import { Game, plugins } from '../../mantra-game/Game.js';
 import deltaEncoding from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaEncoding.js';
+import bbb from '../../mantra-game/plugins/binary-bitstream-buffer/bbb.js'
+
+let config = {};
+config.bbb = true;
 
 // let lastMessageTime = 0;
 const MAX_BUFFER_SIZE = 100;
@@ -39,7 +43,6 @@ export class Ayyo {
       .use(new plugins.Collision())
       .use(new plugins.Border({ autoBorder: false }))
 
-
   }
 
   async initialize() {
@@ -56,7 +59,8 @@ export class Ayyo {
       width: 2000,
     });
 
-    /* TODO: better data compression / client-side prediction
+    /* TODO: better data compression / client-side prediction     */
+
     // Your game start-up logic goes here
     this.gameLogic.createEntity({
       type: 'BLOCK',
@@ -68,8 +72,7 @@ export class Ayyo {
         y: -500
       },
     });
-    */
-    
+
   }
 
   async reset() {
@@ -94,16 +97,16 @@ export class Ayyo {
 
     // Generate a unique player ID for this connection
     // remark: replace with global entity counter that is INT
-    const playerEntityId = 'player_' + Math.random().toString(36).substr(2, 9);
+    //const playerEntityId = 'player_' + Math.random().toString(36).substr(2, 9);
+    let playerEntityId;
+    const playerName = 'player_' + Math.random().toString(36).substr(2, 9);
     console.log('handleSession', playerEntityId)
-    // Store the connected player with its WebSocket
-    this.connectedPlayers[playerEntityId] = websocket;
-
+    let ent;
     // Create the player entity in the game logic
     try {
       // Create a new player with a unique ID
-      this.gameLogic.createEntity({
-        id: playerEntityId,
+      ent = this.gameLogic.createEntity({
+        name: playerName,
         type: 'PLAYER',
       });
       // this.gameLogic.systems.playerCreation.createPlayer(playerEntityId);
@@ -111,10 +114,18 @@ export class Ayyo {
       console.log("ERROR", err)
     }
 
+
+    playerEntityId = ent.id;
+    // Store the connected player with its WebSocket
+    this.connectedPlayers[playerEntityId] = websocket;
+
+
     try {
       websocket.send(JSON.stringify({
         action: 'assign_id',
-        playerId: playerEntityId
+        playerName: playerName,
+        playerId: ent.id
+
       }));
     } catch (err) {
       console.log(err)
@@ -123,6 +134,7 @@ export class Ayyo {
 
     // Check if a new ticker needs to be elected
     if (!this.tickerId) {
+      console.log("ELECT NEW TICKER", playerEntityId)
       this.electNewTicker(playerEntityId);
     }
 
@@ -155,7 +167,7 @@ export class Ayyo {
       // Perform the requested action based on the "action" property of the message
       switch (message.action) {
         case 'gameTick':
-
+          // console.log('got game tick')
           this.bufferGameTick(message, playerEntityId);
 
           if (this.tickerId !== playerEntityId) {
@@ -165,6 +177,7 @@ export class Ayyo {
           break;
 
         case 'player_input':
+          // console.log('ahhhh', playerEntityId, message.controls)
           this.gameLogic.systems.entityInput.handleInputs(playerEntityId, { controls: message.controls });
           break;
 
@@ -213,6 +226,7 @@ export class Ayyo {
   // Elect a new ticker when a player connects or when the current ticker disconnects
   electNewTicker(newTickerId) {
     this.tickerId = newTickerId;
+    console.log("FUDGE", this.connectedPlayers, newTickerId)
     const tickerWs = this.connectedPlayers[newTickerId];
     if (tickerWs) {
       tickerWs.send(JSON.stringify({
@@ -273,8 +287,22 @@ export class Ayyo {
         try {
           let deltaEncoded = deltaEncoding.encode(playerId, playerSnapshot);
           if (deltaEncoded) {
-            const ws = this.connectedPlayers[playerId];
-            ws.send(JSON.stringify({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput }));
+
+            if (config.bbb) {
+              let BBB = new bbb();
+              // TODO: add data encoding layer here
+              let bbbEncoded = BBB.encodeMessage({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput });
+
+              const ws = this.connectedPlayers[playerId];
+              ws.send(bbbEncoded.byteArray);
+
+
+            } else {
+              const ws = this.connectedPlayers[playerId];
+              ws.send(JSON.stringify({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput }));
+            }
+
+
           }
         } catch (err) {
           console.log(err);
