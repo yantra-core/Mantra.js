@@ -9,10 +9,11 @@ import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
 import bbb from '../binary-bitstream-buffer/bbb.js';
 
 let config = {};
-config.deltaEncoding = true; // Toggle this to enable delta compression
-config.deltaCompression = false; // Toggle this to enable delta compression
-config.msgpack = false;
-config.bbb = true;
+config.deltaEncoding = true;       // only sends changed states and property values
+config.deltaCompression = false;   // only send differences between int values
+config.bbb = true;                 // see: @yantra-core/binary-bitstream-buffer
+config.msgpack = false;            // `msgpack` not being used in favor of `bbb`
+
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
@@ -133,7 +134,7 @@ class WebSocketServerClass {
       case 'player_input':
         let entityInputSystem = game.systemsManager.getSystem('entityInput');
         //console.log('ws.playerEntityId', ws.playerEntityId)
-        //console.log('ws.playerId', ws.playerId)
+        console.log('ws.playerId', ws.playerId)
 
         entityInputSystem.handleInputs(ws.playerId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
         break;
@@ -195,102 +196,60 @@ class WebSocketServerClass {
       return;
     }
 
-    // TODO: move this to broadcastAll
+    // Usage in your server context
     this.server.clients.forEach(client => {
-      count++;
-      //console.log('client.readyState', count, client.readyState)
-      if (client.playerEntityId && client.readyState === WebSocket.OPEN) {
-        const lastProcessedInput = game.lastProcessedInput[client.playerEntityId];  // Get the lastProcessedInput for this client's player entity
-        const playerSnapshot = game.getPlayerSnapshot(client.playerEntityId);
-        if (playerSnapshot) {
-          // TODO: Replace these calls with SnapshotManager calls
-          // TODO: this should be call into some data encoding layer with config
-          // TODO: refactor this large if / else statement with data encoder ( see SnapShotManager code )
-          if (config.deltaEncoding) {
-            let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, playerSnapshot);
-            if (deltaEncodedSnapshot) {
-
-
-              if (config.deltaCompression) {
-                let deltaCompressedSnapshot = deltaCompression.compress(deltaEncodedSnapshot);
-                if (config.bbb) {
-                  // TODO: add data encoding layer here
-                  let bbbEncoded = encode({
-                    action: 'gametick',
-                    snapshot: deltaCompressedSnapshot,
-                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-                  });
-                  client.send(msgPacked);
-                } else {
-                  console.log(deltaCompressedSnapshot)
-                  client.send(JSON.stringify({
-                    action: 'gametick',
-                    snapshot: deltaCompressedSnapshot,
-                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-                  }));
-                }
-
-
-                /*
-                if (config.msgpack) {
-                  // TODO: add data encoding layer here
-                  let msgPacked = encode({
-                    action: 'gametick',
-                    snapshot: deltaCompressedSnapshot,
-                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-                  });
-                  client.send(msgPacked);
-                } else {
-                  client.send(JSON.stringify({
-                    action: 'gametick',
-                    snapshot: deltaCompressedSnapshot,
-                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-                  }));
-                }
-                */
-              } else {
-                if (config.bbb) {
-                  // TODO: add data encoding layer here
-                  let BBB = new bbb();
-                  deltaEncodedSnapshot.state = deltaEncodedSnapshot.state.map((item) => {
-                    delete item.owner;
-                    return item;
-                  })
-                  let sendTo = {
-                    action: 'gametick',
-                    snapshot: deltaEncodedSnapshot,
-                    lastProcessedInput: lastProcessedInput || 0  // Include the lastProcessedInput in the message
-                  };
-
-                  //console.log(JSON.stringify(sendTo, true, 2))
-                  let bbbEncoded = BBB.encodeMessage(sendTo);
-                  
-                  client.send(bbbEncoded.byteArray);
-                } else {
-                  //console.log(deltaEncodedSnapshot)
-                  client.send(JSON.stringify({
-                    action: 'gametick',
-                    snapshot: deltaEncodedSnapshot,
-                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-                  }));
-                }
-              }
-
-
-            }
-          } else {
-            client.send(JSON.stringify({
-              action: 'gametick',
-              snapshot: playerSnapshot,
-              lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-            }));
-
-          }
-
-        }
-      }
+      this.processClient(client, game, config);
     });
 
+
+  }
+
+  sendSnapshot(client, snapshot, lastProcessedInput, encoder = null) {
+    let message = {
+      action: 'gametick',
+      snapshot: snapshot,
+      lastProcessedInput: lastProcessedInput
+    };
+
+    if (encoder) {
+      let encodedMessage = encoder.encodeMessage(message);
+      client.send(encodedMessage.byteArray || encodedMessage);
+    } else {
+      client.send(JSON.stringify(message));
+    }
+  }
+
+  processClient(client, game, config) {
+    if (!client.playerEntityId || client.readyState !== WebSocket.OPEN) return;
+
+    const lastProcessedInput = game.lastProcessedInput[client.playerEntityId];
+    const playerSnapshot = game.getPlayerSnapshot(client.playerEntityId);
+
+    if (!playerSnapshot) return;
+
+    let snapshotToSend = playerSnapshot;
+    let encoder = null;
+
+    if (config.deltaCompression) {
+      snapshotToSend = deltaCompression.compress(snapshotToSend);
+    }
+
+    if (config.deltaEncoding) {
+      let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, playerSnapshot);
+      if (!deltaEncodedSnapshot) return;
+
+      snapshotToSend = deltaEncodedSnapshot;
+    }
+
+
+    if (config.bbb) {
+      encoder = new bbb();
+    } else if (config.msgpack) {
+      encoder = msgpack; // Assuming msgpack is a global encoder object
+    }
+
+
+    this.sendSnapshot(client, snapshotToSend, lastProcessedInput, encoder);
   }
 
 }
