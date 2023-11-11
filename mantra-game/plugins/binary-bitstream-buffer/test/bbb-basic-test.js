@@ -1,5 +1,29 @@
-import tap from 'tap';
-import PlayerCodec from '../api.js';
+import tap from 'tape';
+import PlayerCodec from '../bbb.js';
+
+let players = [
+  {
+    id: 1,
+    type: 'PLAYER',
+    position: { x: 10, y: 20 },
+    velocity: { x: 1, y: 1.5 },
+    rotation: 0
+  },
+  {
+    id: 2,
+    type: 'PLAYER',
+    position: { x: 30, y: 40 },
+    velocity: { x: 2, y: 2.5 },
+    rotation: 1.57
+  },
+  {
+    id: 3,
+    type: 'PLAYER',
+    position: { x: 50, y: 60 },
+    velocity: { x: 3, y: 3.5 },
+    rotation: 3.14
+  }
+];
 
 // Test encoding and decoding a single player
 tap.test('Encode and Decode Single Player', async (t) => {
@@ -27,31 +51,8 @@ tap.test('Encode and Decode Single Player', async (t) => {
 tap.test('Encode and Decode Multiple Players', async (t) => {
   const playerCodec = new PlayerCodec();
 
-  let players = [
-    {
-      id: 1,
-      type: 'PLAYER',
-      position: { x: 10, y: 20 },
-      velocity: { x: 1, y: 1.5 },
-      rotation: 0
-    },
-    {
-      id: 2,
-      type: 'PLAYER',
-      position: { x: 30, y: 40 },
-      velocity: { x: 2, y: 2.5 },
-      rotation: 1.57
-    },
-    {
-      id: 3,
-      type: 'PLAYER',
-      position: { x: 50, y: 60 },
-      velocity: { x: 3, y: 3.5 },
-      rotation: 3.14
-    }
-  ];
-  
-  const encodedBuffer = playerCodec.encodePlayers(players);
+
+const encodedBuffer = playerCodec.encodePlayers(players);
   const decodedPlayers = playerCodec.decodePlayers(encodedBuffer);
 
   t.equal(decodedPlayers.length, players.length, 'Correct number of players decoded');
@@ -78,5 +79,31 @@ tap.test('Handle Missing Properties', async (t) => {
   t.notOk(decodedPlayer.rotation, 'Rotation should be null or undefined');
   t.notOk(decodedPlayer.position, 'Position should be null or undefined');
   t.notOk(decodedPlayer.velocity, 'Velocity should be null or undefined');
+  t.end();
+});
+// Test for snapshot structure
+tap.test('Wrap player array in snapshot object', async (t) => {
+  const playerCodec = new PlayerCodec();
+
+  const msg = {
+    action: 'GAMETICK',
+    lastProcessedInput: 0,
+    snapshot: {
+      id: 1,
+      state: players
+    }
+  }
+
+  const finalBuffer = playerCodec.encodeMessage(msg);
+
+  const decodedMessage = playerCodec.decodeMessage(finalBuffer);
+
+  console.log(decodedMessage)
+  t.equal(decodedMessage.action, msg.action, 'Action matches');
+  t.equal(decodedMessage.lastProcessedInput, msg.lastProcessedInput, 'Last processed input matches');
+  t.equal(decodedMessage.snapshot.id, msg.snapshot.id, 'Snapshot ID matches');
+  t.equal(decodedMessage.snapshot.state.length, msg.snapshot.state.length, 'Correct number of players decoded');
+  console.log('decodedMessage.snapshot.state', decodedMessage.snapshot.state)
+  // test that the message is decoded correctly
   t.end();
 });
