@@ -309,13 +309,13 @@ class EntityFactory {
         // TODO: we should resolve this with unit tests and ensure syncronization between server and client
         return;
       }
+      game.createEntity(entityData);
     } else {
       // a local copy of the state exists, update it
       game.updateEntity(entityData);
     }
 
     let updated = game.entities[entityData.id];
-    // console.log('updatedupdatedupdated' ,updated)
     if (game.systems.graphics) {
 
       // if there are no graphics, create them
