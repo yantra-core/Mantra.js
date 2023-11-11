@@ -44,13 +44,19 @@ class EntityFactory {
     for (let entityId in destroyedComponentData) {
       if (destroyedComponentData[entityId]) {
 
+        // Removes the body from the physics engine
+        if (typeof this.game.physics.removeBody === 'function') {
+          // TODO: fix this
+          if (this.game.bodyMap[entityId]) {
+            this.game.physics.removeBody(this.game.bodyMap[entityId]);
+          } else {
+            console.log('No body found for entityId', entityId);
+          }
+        }
+
         // Delete associated components for the entity using Component's remove method
         for (let componentType in this.game.components) {
           this.game.components[componentType].remove(entityId);
-        }
-        // Removes the body from the physics engine
-        if (typeof this.game.physics.removeBody === 'function') {
-          this.game.physics.removeBody(this.game.bodyMap[entityId]);
         }
         // Delete the entity from entities map
         delete this.game.entities[entityId];
@@ -139,7 +145,7 @@ class EntityFactory {
   }
 
   createEntity(config) {
-
+    // console.log('createEntity', config)
     this.preCreateEntityHooks.forEach(fn => fn(entityData));
     let entityId = this._generateId();
 
@@ -258,7 +264,6 @@ class EntityFactory {
 
     this.postCreateEntityHooks.forEach(fn => fn(entity));
 
-
     // Add the entity to the game entities scope
     // TODO: new Entity() should do this
     this.game.entities[entityId] = {
@@ -268,7 +273,6 @@ class EntityFactory {
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);
 
-    // Add the entity to the game entities scope
     this.game.entities[entityId] = updatedEntity;
 
     return updatedEntity;
@@ -276,7 +280,7 @@ class EntityFactory {
 
   inflateEntity(entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps
     let game = this.game;
-
+    // console.log('inflateEntity', entityData)
     // takes outside state and performs update/destroy/create depending
     // on the current local state of the entity and incoming state
     // if the incoming state is pending destroy, just remove it immediately and return
@@ -305,14 +309,13 @@ class EntityFactory {
         // TODO: we should resolve this with unit tests and ensure syncronization between server and client
         return;
       }
-      let ent = game.createEntity(entityData);
     } else {
       // a local copy of the state exists, update it
       game.updateEntity(entityData);
     }
 
     let updated = game.entities[entityData.id];
-
+    // console.log('updatedupdatedupdated' ,updated)
     if (game.systems.graphics) {
 
       // if there are no graphics, create them
@@ -341,6 +344,11 @@ class EntityFactory {
       frictionStatic: config.frictionStatic
     };
 
+    if (config.type === "BULLET") {
+      config.shape = 'circle';
+    }
+
+    // console.log("CREATING NEW BODY", config)
     let body;
     switch (config.shape) {
       case 'rectangle':

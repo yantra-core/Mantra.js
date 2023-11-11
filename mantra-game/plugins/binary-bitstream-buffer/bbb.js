@@ -19,12 +19,12 @@ const actionTypes = {
   // ... other action types
 };
 
-let bufferSize = 1024 * 128;
+let bufferSize = 1024 * 256;
 
 // Define schema with type declarations
 const schema = {
   id: 'UInt32',
-  name: 'ASCIIString',
+  name: 'UTF8String',
   type: 'UInt8',
   positionX: 'Float64',
   positionY: 'Float64',
@@ -32,12 +32,19 @@ const schema = {
   velocityY: 'Float64',
   rotation: 'Float64',
   mass: 'Float64',
-  health: 'Float64',
   width: 'Float64',
   height: 'Float64',
+  health: 'Float64',
   depth: 'Float64',
-  lifetime: 'Float64'
-};
+  lifetime: 'Float64',
+  health: 'Float64',
+  radius: 'Float64',
+  isSensor: 'Boolean',
+  isStatic: 'Boolean',
+  destroyed: 'Boolean',
+  owner: 'ASCIIString',
+  maxSpeed: 'Float64'
+  };
 
 class PlayerCodec {
   constructor() {
@@ -85,7 +92,7 @@ class PlayerCodec {
 
 
     // Write bitmask first
-    localStream.writeUInt16(bitmask);
+    localStream.writeUInt32(bitmask);
 
     // Write player data based on bitmask, excluding null values
     index = 0;
@@ -93,9 +100,13 @@ class PlayerCodec {
     // Inside encodePlayer method
     for (let key in schema) {
       if (bitmask & (1 << index) && player[key] !== null) {
-        if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
+        if (schema[key] === 'Boolean') {
+          localStream.writeUInt8(player[key] ? 1 : 0);  // Convert Boolean to 0 or 1
+        }
+        else if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
           // Convert string to bytes
           let stringBytes = Buffer.from(player[key], 'utf8'); // Use 'utf8' for UTF8String
+          // console.log('writing stringBytes', player[key], stringBytes.length)
           // Write the length of the string
           localStream.writeUInt8(stringBytes.length);
           // Write each byte of the string
@@ -109,8 +120,6 @@ class PlayerCodec {
       index++;
     }
 
-
-
     let bytesUsed = Math.ceil(localStream.offset / 8);
     let finalBuffer = new BitBuffer(bytesUsed * 8);
     finalBuffer.byteArray.set(localStream.bitBuffer.byteArray.subarray(0, bytesUsed));
@@ -122,15 +131,20 @@ class PlayerCodec {
     this.stream = new BitStream(buffer);
     this.stream.offset = 0;
     let player = {};
-    let bitmask = this.stream.readUInt16();
+    let bitmask = this.stream.readUInt32();
 
     // Read player data based on bitmask
     let index = 0;
 
     // Inside decodePlayer method
     for (let key in schema) {
-      if (bitmask & (1 << index)) {
-        if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
+
+      if (bitmask & (1 << index)) { // this is returning false when it should be true for some keys
+        if (schema[key] === 'Boolean') {
+          player[key] = this.stream.readUInt8() === 1;  // Convert 0 or 1 back to Boolean
+
+        } 
+        else if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
           // Read the length of the string
           let length = this.stream.readUInt8();
           // Read each byte of the string

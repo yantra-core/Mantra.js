@@ -6,10 +6,13 @@ import { encode } from "@msgpack/msgpack";
 import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
 import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
 
+import bbb from '../binary-bitstream-buffer/bbb.js';
+
 let config = {};
 config.deltaEncoding = true; // Toggle this to enable delta compression
 config.deltaCompression = false; // Toggle this to enable delta compression
-config.msgpack = true;
+config.msgpack = false;
+config.bbb = true;
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
@@ -49,8 +52,9 @@ class WebSocketServerClass {
     ws.playerEntityId = playerEntityId;
 
     console.log("PLAYER JOINED")
-    this.game.createEntity({
-      id: playerEntityId,
+    let ent = this.game.createEntity({
+      // id: playerEntityId,
+      name: playerEntityId,
       type: 'PLAYER',
       friction: this.config.player.friction,  // Default friction
       frictionAir: this.config.player.frictionAir, // Default air friction
@@ -58,9 +62,12 @@ class WebSocketServerClass {
 
     });
 
+    ws.playerId = ent.id;
+
     ws.send(JSON.stringify({
       action: 'assign_id',
-      playerId: playerEntityId
+      playerName: playerEntityId,
+      playerId: ent.id
     }));
 
     ws.on('error', (error) => this.handleError(ws, error));
@@ -125,7 +132,10 @@ class WebSocketServerClass {
 
       case 'player_input':
         let entityInputSystem = game.systemsManager.getSystem('entityInput');
-        entityInputSystem.handleInputs(ws.playerEntityId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
+        //console.log('ws.playerEntityId', ws.playerEntityId)
+        //console.log('ws.playerId', ws.playerId)
+
+        entityInputSystem.handleInputs(ws.playerId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
         break;
 
       case 'getSnapshot':
@@ -192,7 +202,6 @@ class WebSocketServerClass {
       if (client.playerEntityId && client.readyState === WebSocket.OPEN) {
         const lastProcessedInput = game.lastProcessedInput[client.playerEntityId];  // Get the lastProcessedInput for this client's player entity
         const playerSnapshot = game.getPlayerSnapshot(client.playerEntityId);
-
         if (playerSnapshot) {
           // TODO: Replace these calls with SnapshotManager calls
           // TODO: this should be call into some data encoding layer with config
@@ -204,40 +213,66 @@ class WebSocketServerClass {
 
               if (config.deltaCompression) {
                 let deltaCompressedSnapshot = deltaCompression.compress(deltaEncodedSnapshot);
-
-                if (config.msgpack) {
+                if (config.bbb) {
                   // TODO: add data encoding layer here
-                  let msgPacked = encode({
+                  let bbbEncoded = encode({
                     action: 'gametick',
                     snapshot: deltaCompressedSnapshot,
                     lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
                   });
                   client.send(msgPacked);
                 } else {
+                  console.log(deltaCompressedSnapshot)
                   client.send(JSON.stringify({
                     action: 'gametick',
                     snapshot: deltaCompressedSnapshot,
                     lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
                   }));
-  
                 }
-              } else {
 
+
+                /*
                 if (config.msgpack) {
                   // TODO: add data encoding layer here
                   let msgPacked = encode({
                     action: 'gametick',
-                    snapshot: deltaEncodedSnapshot,
+                    snapshot: deltaCompressedSnapshot,
                     lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
                   });
                   client.send(msgPacked);
                 } else {
                   client.send(JSON.stringify({
                     action: 'gametick',
+                    snapshot: deltaCompressedSnapshot,
+                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
+                  }));
+                }
+                */
+              } else {
+                if (config.bbb) {
+                  // TODO: add data encoding layer here
+                  let BBB = new bbb();
+                  deltaEncodedSnapshot.state = deltaEncodedSnapshot.state.map((item) => {
+                    delete item.owner;
+                    return item;
+                  })
+                  let sendTo = {
+                    action: 'gametick',
+                    snapshot: deltaEncodedSnapshot,
+                    lastProcessedInput: lastProcessedInput || 0  // Include the lastProcessedInput in the message
+                  };
+
+                  //console.log(JSON.stringify(sendTo, true, 2))
+                  let bbbEncoded = BBB.encodeMessage(sendTo);
+                  
+                  client.send(bbbEncoded.byteArray);
+                } else {
+                  //console.log(deltaEncodedSnapshot)
+                  client.send(JSON.stringify({
+                    action: 'gametick',
                     snapshot: deltaEncodedSnapshot,
                     lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
                   }));
-  
                 }
               }
 

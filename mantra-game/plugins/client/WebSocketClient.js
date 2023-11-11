@@ -2,11 +2,14 @@
 import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
+import bbb from '../binary-bitstream-buffer/bbb.js';
+import BitBuffer from '../binary-bitstream-buffer/binary/BitBuffer.js';
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
-config.msgpack = true;
+config.msgpack = false;
 config.deltaCompression = false;
+config.bbb = true;
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
@@ -180,6 +183,15 @@ export default class WebSocketClient {
       data = await decodeFromBlob(data);
     }
 
+    if (config.bbb) {
+      const byteArray = await decodeBlob(data);
+      let receivedBuffer = new BitBuffer(byteArray.length * 8); // Create a new BitBuffer
+      receivedBuffer.byteArray = byteArray; // Set the byteArray
+      let BBB = new bbb();
+      let bbbDecoded = BBB.decodeMessage(receivedBuffer);
+      data = bbbDecoded;
+    }
+
     if (config.deltaCompression) {
       data.snapshot = deltaCompression.decompress(data.snapshot);
     }
@@ -187,7 +199,7 @@ export default class WebSocketClient {
     if (data.action === "gametick") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
-
+      // console.log(data.snapshot.state);
       this.game.latestSnapshot = data.snapshot;
       game.snapshotQueue.push(data.snapshot);
 
@@ -271,4 +283,20 @@ async function decodeFromBlob(blob) {
     // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
     return decode(await blob.arrayBuffer());
   }
+}
+
+function blobToArrayBuffer(blob) {
+  return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(blob);
+  });
+}
+
+async function decodeBlob(blob) {
+  const arrayBuffer = await blobToArrayBuffer(blob);
+  const byteArray = new Uint8Array(arrayBuffer);
+  // Now you can use this byteArray to reconstruct your BitBuffer
+  return byteArray;
 }

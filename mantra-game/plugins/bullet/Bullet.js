@@ -57,11 +57,9 @@ class BulletPlugin {
     // Compute the bullet's direction based on player's rotation
     const directionX = Math.sin(playerRotation);
     const directionY = -Math.cos(playerRotation);
-    const bulletId = `bullet_${this.bulletCount.toString()}`; // for now, debugging is easier to have string id
 
     this.bulletCount++;
     const bulletDirectionConfig = {
-      id: bulletId,
       type: 'BULLET',
       mass: 1,
       position: bulletStartPosition,
@@ -76,6 +74,7 @@ class BulletPlugin {
       radius: 33,
       damage: 10,
     };
+    // console.log('using bulletDirectionConfig', bulletDirectionConfig)
     this.game.createEntity(bulletDirectionConfig);
 
     if (this.game.isClient) {

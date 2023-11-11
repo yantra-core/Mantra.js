@@ -4,7 +4,7 @@
 
 ## ALPHA STATUS
 
-`bbb` is the theoretically best way to encode and compress typed data in JavaScript over the wire.
+`bbb` is the theoretically most data efficient way to encode and compress typed data in JavaScript over the wire.
 
 Most of this code was originally from: 
 

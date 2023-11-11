@@ -86,7 +86,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
       }
     }
 
-    deltaState.type = state.type;
+    // deltaState.type = state.type;
 
     if (hasChanges) {
       differentialSnapshotState.push(deltaState);
@@ -102,7 +102,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
   // console.log('deltaEncodedSnapshotState', differentialSnapshotState)
   if (differentialSnapshotState.length > 0) {
     return {
-      id: Date.now(),
+      id: snapshot.id,
       state: JSON.parse(JSON.stringify(differentialSnapshotState))
     };
   }

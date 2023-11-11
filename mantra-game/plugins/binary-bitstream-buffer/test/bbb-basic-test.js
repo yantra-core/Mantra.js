@@ -1,7 +1,6 @@
 import tap from 'tape';
 import PlayerCodec from '../bbb.js';
 
-
 let players = [
   {
     id: 1,
@@ -10,12 +9,19 @@ let players = [
     position: { x: 10, y: 20 },
     velocity: { x: 1, y: 1.5 },
     rotation: 0,
-    health: 100,
     mass: 100,
     width: 100,
     height: 100,
-    depth: 100,
-    lifetime: 1000
+    depth: 10,
+    lifetime: 1000,
+    health: 100,
+    radius: 100,
+    isSensor: true,
+    isStatic: true,
+    destroyed: true,
+    owner: 'test',
+    maxSpeed: 100,
+  
   },
   {
     id: 2,
@@ -27,6 +33,8 @@ let players = [
   },
   {
     id: 3,
+    name: 'Turtle',
+
     type: 'PLAYER',
     position: { x: 50, y: 60 },
     velocity: { x: 3, y: 3.5 },
