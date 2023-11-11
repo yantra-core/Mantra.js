@@ -145,7 +145,6 @@ class CSSGraphics extends GraphicsInterface {
 
     // Append the chat bubble to the container
     entityElement.appendChild(chatBubble);
-    console.log('aaa', entityElement)
     // Update the position of the chat bubble container
     //this.updateEntityElementPosition(entityElement, entityData);
 

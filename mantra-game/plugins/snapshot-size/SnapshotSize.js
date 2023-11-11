@@ -1,4 +1,5 @@
 // SnapshotSize.js - Marak Squires 2023
+import bytes from './vendor/bytes/bytes.js';
 class SnapshotSize {
   constructor(config = {}) {
     this.name = 'SnapshotSizePlugin';
@@ -35,7 +36,7 @@ class SnapshotSize {
 
   displaySnapshotSize() {
     if(this.displayElement) {
-      this.displayElement.textContent = `Snapshot Size: ${this.averageSnapshotSize} bytes`;
+      this.displayElement.textContent = `Snapshot Size: ${bytes(this.averageSnapshotSize)}`;
       // Optional: Add logic to change color based on snapshot size
       if(this.averageSnapshotSize < 1024) {
         this.displayElement.style.color = 'green';

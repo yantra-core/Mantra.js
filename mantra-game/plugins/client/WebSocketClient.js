@@ -1,8 +1,12 @@
 // WebSocketClient.js - Marak Squires 2023
+import { decode, decodeAsync } from "@msgpack/msgpack";
+import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
-import bytes from './vendor/bytes/bytes.js';
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
+let config = {};
+config.msgpack = true;
+config.deltaCompression = false;
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
@@ -136,20 +140,31 @@ export default class WebSocketClient {
     console.log('WebSocket is connected:', event);
   }
 
-  handleMessage(event) {
+  async handleMessage(event) {
     let game = this.game;
 
+
+    let data = event.data;
+
     // Track the size of the snapshot
-    this.trackSnapshotSize(event.data);
-    let data = JSON.parse(event.data);
+    this.trackSnapshotSize(data);
+
+
+    if (typeof event.data === 'string') {
+      data = JSON.parse(event.data);
+    }
 
     if (data.action === "assign_id") {
       window.currentPlayerId = data.playerId;
       this.entityName = data.playerId;
+      return;
+
     }
 
     if (data.action === 'become_ticker') {
       this.startTicking(this.socket);
+      return;
+
     }
 
     if (data.action === 'pong') {
@@ -158,11 +173,21 @@ export default class WebSocketClient {
       if (this.listeners['pong']) {
         this.listeners['pong'](this.rtt);
       }
+      return;
+    }
+
+    if (config.msgpack) {
+      data = await decodeFromBlob(data);
+    }
+
+    if (config.deltaCompression) {
+      data.snapshot = deltaCompression.decompress(data.snapshot);
     }
 
     if (data.action === "gametick") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
+
       this.game.latestSnapshot = data.snapshot;
       game.snapshotQueue.push(data.snapshot);
 
@@ -216,8 +241,14 @@ export default class WebSocketClient {
     // console.log(dataString)
     // In a browser environment, create a new Blob and get its size
 
-    let buffer = encoder.encode(dataString);
-    let size = buffer.byteLength;
+    let size;
+
+    if (typeof dataString === 'string') {
+      let buffer = encoder.encode(dataString);
+      size = buffer.byteLength;
+      } else {
+        size = dataString.size;
+    }
 
     this.totalSnapshotSize += size;
     this.snapshotCount++;
@@ -226,9 +257,18 @@ export default class WebSocketClient {
     // Emit the 'snapshotsize' event with the current average size
     if (this.snapshotCount > 0 && this.snapshotCount % this.reportFrequency === 0) {
       let averageSize = this.totalSnapshotSize / this.snapshotCount;
-      // console.log('average snapshot size', averageSize, bytes(averageSize))
       this.game.emit('snapshotsize', averageSize);
     }
   }
 
+}
+
+async function decodeFromBlob(blob) {
+  if (blob.stream) {
+    // Blob#stream(): ReadableStream<Uint8Array> (recommended)
+    return await decodeAsync(blob.stream());
+  } else {
+    // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
+    return decode(await blob.arrayBuffer());
+  }
 }

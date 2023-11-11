@@ -1,6 +1,6 @@
 // Border.js - Marak Squires 2023
 class Border {
-  constructor({ autoBorder = true, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
+  constructor({ autoBorder = false, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
     this.name = 'Border';
     this.height = height;
     this.width = width;
@@ -56,7 +56,9 @@ class Border {
 
     for (let b in borders) {
       let border = borders[b];
-
+      if (typeof entityData.id === 'undefined') {
+        entityData.id = 'border';
+      }
       this.game.createEntity({
         id: entityData.id + '-' + b,
         type: 'BORDER',

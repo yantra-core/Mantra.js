@@ -1,14 +1,15 @@
 // WebsocketServer.js - Marak Squires 2023
 import WebSocket, { WebSocketServer } from 'ws';
 import { nanoid } from 'nanoid';
+import { encode } from "@msgpack/msgpack";
 
 import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
 import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
 
 let config = {};
-config.deltaCompression = false; // Toggle this to enable delta compression
-
 config.deltaEncoding = true; // Toggle this to enable delta compression
+config.deltaCompression = false; // Toggle this to enable delta compression
+config.msgpack = true;
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
@@ -40,6 +41,7 @@ class WebSocketServerClass {
   listen(port) {
     this.server = new WebSocketServer({ port: port });
     this.server.on('connection', (ws) => this.handleConnection(ws));
+    this.game.emit('listening', port);
   }
 
   handleConnection(ws) {
@@ -192,19 +194,54 @@ class WebSocketServerClass {
         const playerSnapshot = game.getPlayerSnapshot(client.playerEntityId);
 
         if (playerSnapshot) {
-          // TODO: data encoding layers go here...
+          // TODO: Replace these calls with SnapshotManager calls
           // TODO: this should be call into some data encoding layer with config
+          // TODO: refactor this large if / else statement with data encoder ( see SnapShotManager code )
           if (config.deltaEncoding) {
-            // TODO: put float encoding flag here
-            //let deltaCompressedSnapshot = deltaCompression.compress(playerSnapshot);
-            // let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, deltaCompressedSnapshot);
             let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, playerSnapshot);
             if (deltaEncodedSnapshot) {
-              client.send(JSON.stringify({
-                action: 'gametick',
-                snapshot: deltaEncodedSnapshot,
-                lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
-              }));
+
+
+              if (config.deltaCompression) {
+                let deltaCompressedSnapshot = deltaCompression.compress(deltaEncodedSnapshot);
+
+                if (config.msgpack) {
+                  // TODO: add data encoding layer here
+                  let msgPacked = encode({
+                    action: 'gametick',
+                    snapshot: deltaCompressedSnapshot,
+                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
+                  });
+                  client.send(msgPacked);
+                } else {
+                  client.send(JSON.stringify({
+                    action: 'gametick',
+                    snapshot: deltaCompressedSnapshot,
+                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
+                  }));
+  
+                }
+              } else {
+
+                if (config.msgpack) {
+                  // TODO: add data encoding layer here
+                  let msgPacked = encode({
+                    action: 'gametick',
+                    snapshot: deltaEncodedSnapshot,
+                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
+                  });
+                  client.send(msgPacked);
+                } else {
+                  client.send(JSON.stringify({
+                    action: 'gametick',
+                    snapshot: deltaEncodedSnapshot,
+                    lastProcessedInput: lastProcessedInput  // Include the lastProcessedInput in the message
+                  }));
+  
+                }
+              }
+
+
             }
           } else {
             client.send(JSON.stringify({

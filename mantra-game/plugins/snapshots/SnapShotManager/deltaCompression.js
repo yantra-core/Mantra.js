@@ -3,6 +3,13 @@ let accumulatedStateCache = {};
 
 const deltaCompression = {};
 
+deltaCompression.removeState = function removeState(id) {
+  delete stateCache[id];
+  delete accumulatedStateCache[id];
+}
+
+deltaCompression.accumulatedStateCache = accumulatedStateCache;
+
 deltaCompression.compress = function decompressDeltas(snapshot) {
   let _snapshot = null;
 

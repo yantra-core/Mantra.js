@@ -14,31 +14,7 @@ game.use(new plugins.Collision());
 
 //game.use(new plugins.Border({ autoBorder: true }));
 
-
 game.use(new WebsocketServer());
-
-game.createEntity({
-  type: 'BLOCK',
-  shape: 'rectangle',
-  width: 500,
-  height: 500,
-  position: {
-    x: 500,
-    y: -500
-  },
-});
-
-game.createEntity({
-  type: 'BLOCK',
-  shape: 'rectangle',
-  width: 500,
-  height: 500,
-  position: {
-    x: -500,
-    y: -500
-  },
-});
-
 
 game.use(new plugins.Border({ autoBorder: false }));
 
@@ -47,5 +23,32 @@ game.systems.border.createBorder({
   width: 4000,
 });
 
+game.on('listening', function (port) {
+
+  game.createEntity({
+    type: 'BLOCK',
+    shape: 'rectangle',
+    width: 500,
+    height: 500,
+    position: {
+      x: 500,
+      y: -500
+    },
+  });
+
+  game.createEntity({
+    type: 'BLOCK',
+    shape: 'rectangle',
+    width: 500,
+    height: 500,
+    position: {
+      x: -500,
+      y: -500
+    },
+  });
+
+})
+
 game.listen(8888);
+
 console.log('WebSocket server started on port 8888');

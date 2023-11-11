@@ -38,9 +38,7 @@ export default class Client {
   }
 
   sendMessage(action, data) {
-
     let localClient = this.game.getSystem('localClient');
     localClient.sendMessage(action, data);
-
   }
 }

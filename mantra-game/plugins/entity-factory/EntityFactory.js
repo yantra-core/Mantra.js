@@ -1,6 +1,9 @@
 // EntityFactory.js - Marak Squires 2023
 import Entity from '../../Entity/Entity.js';
 
+// TODO: move this to snapshot plugin
+// import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
+
 class EntityFactory {
   constructor() {
     this.name = 'EntityFactory'
@@ -81,9 +84,6 @@ class EntityFactory {
 
   removeEntity(entityId) {
     let ent = this.game.entities[entityId];
-    if (ent.type === 'BLOCK') {
-      // console.log('removeEntity', entityId, ent.type)
-    }
 
     if (ent) {
       this.game.removedEntities.add({
@@ -97,10 +97,9 @@ class EntityFactory {
       this.game.systems.graphics.removeGraphic(entityId);
     }
 
-    if (ent.type === 'BLOCK') {
-      // console.log('setting ent to estroyed', entityId, ent.type);
-    }
     this.game.components.destroyed.set(entityId, true);
+
+    // deltaCompression.removeState(entityId);
 
     // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
 
@@ -143,7 +142,6 @@ class EntityFactory {
 
     this.preCreateEntityHooks.forEach(fn => fn(entityData));
     let entityId = this._generateId();
-    // console.log('createEntity', entityId, config, config.width, config.height)
 
     let defaultConfig = {
       id: entityId,

@@ -21,6 +21,10 @@ export class Ayyo {
     this.env = env;
     this.connectedPlayers = {}; // Store connected players with their websockets
     this.tickBuffer = [];
+
+    // Flag to track if the start-up code has been run
+    this.startupExecuted = false;
+
     // Add a new property to track the time of the last processed tick
     this.lastProcessedTickTime = 0;
     // Initializing the systems
@@ -35,34 +39,6 @@ export class Ayyo {
       .use(new plugins.Collision())
       .use(new plugins.Border({ autoBorder: false }))
 
-        // create a single player entity
-        this.gameLogic.createEntity({
-          type: 'BLOCK',
-          width: 500,
-          height: 500,
-          position: {
-            x: -500,
-            y: 500
-          },
-        });
-    
-    
-        // create a single player entity
-        this.gameLogic.createEntity({
-          type: 'BLOCK',
-          width: 500,
-          height: 500,
-          position: {
-            x: 500,
-            y: 500
-          },
-        });
-
-        this.gameLogic.systems.border.createBorder({
-          height: 2000,
-          width: 2000,
-        });
-    
 
   }
 
@@ -70,7 +46,30 @@ export class Ayyo {
     if (!this.initializePromise) {
       this.initializePromise = Promise.resolve();  // You can add any async initialization here.
     }
+
     await this.initializePromise;
+  }
+
+  startGame() {
+    this.gameLogic.systems.border.createBorder({
+      height: 2000,
+      width: 2000,
+    });
+
+    /* TODO: better data compression / client-side prediction
+    // Your game start-up logic goes here
+    this.gameLogic.createEntity({
+      type: 'BLOCK',
+      shape: 'rectangle',
+      width: 500,
+      height: 500,
+      position: {
+        x: -500,
+        y: -500
+      },
+    });
+    */
+    
   }
 
   async reset() {
@@ -86,6 +85,12 @@ export class Ayyo {
 
   async handleSession(websocket) {
     websocket.accept();
+
+    // Run the start-up code if it hasn't been executed yet
+    if (!this.startupExecuted) {
+      this.startGame();
+      this.startupExecuted = true; // Set the flag to true
+    }
 
     // Generate a unique player ID for this connection
     // remark: replace with global entity counter that is INT
@@ -232,13 +237,13 @@ export class Ayyo {
 
   processBufferedTicks() {
     const now = Date.now();
-  
+
     // Process ticks
     while (this.tickBuffer.length > 0 && this.tickBuffer[0].tickTime <= now) {
       const { playerId, message } = this.tickBuffer.shift();
       this.processGameTick(playerId, message);
     }
-  
+
     // Check for buffer overflow and handle it
     if (this.tickBuffer.length > MAX_BUFFER_SIZE) {
       console.log("WARNING, tick buffer is overflowing. MAX_BUFFER_SIZE has capped buffer growth.");
