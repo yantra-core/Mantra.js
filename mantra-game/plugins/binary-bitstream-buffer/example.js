@@ -1,4 +1,4 @@
-import PlayerCodec from './api.js';
+import PlayerCodec from './bbb.js';
 
 // Usage example
 let playerData = {

@@ -12,14 +12,19 @@ const entityTypes = {
 };
 
 const actionTypes = {
-  'GAMETICK': 0,
+  'gametick': 0,
+  'assign_id': 1,
+  'become_ticker': 2,
+  'pong': 3
   // ... other action types
 };
 
+let bufferSize = 1024 * 128;
 
 // Define schema with type declarations
 const schema = {
   id: 'UInt32',
+  name: 'ASCIIString',
   type: 'UInt8',
   positionX: 'Float64',
   positionY: 'Float64',
@@ -35,17 +40,16 @@ const schema = {
 };
 
 class PlayerCodec {
-  constructor(bufferSize = 1024 * 2) {
+  constructor() {
     this.buffer = new BitBuffer(bufferSize);
     this.stream = new BitStream(this.buffer);
   }
 
   encodePlayer(originalPlayer, stream = null) {
 
-    let localStream = stream || new BitStream(new BitBuffer(1024 * 2));
+    let localStream = stream || new BitStream(new BitBuffer(bufferSize));
     localStream.offset = 0;
 
-    console.log('streamstreamstream', localStream)
     let bitmask = 0;
     let index = 0;
     // Create a shallow copy of the player object
@@ -63,6 +67,14 @@ class PlayerCodec {
       delete player.velocity;
     }
 
+    // Convert the 'type' field from string to its numeric value
+    if (typeof player.type !== undefined && entityTypes[player.type] !== undefined) {
+      player.type = entityTypes[player.type];
+    } else {
+      // console.error("Invalid entity type:", player.type);
+      // Handle the error or set a default value
+    }
+
     // Calculate bitmask, excluding properties with null values
     for (let key in schema) {
       if (player[key] !== undefined && player[key] !== null) {
@@ -71,17 +83,34 @@ class PlayerCodec {
       index++;
     }
 
+
     // Write bitmask first
     localStream.writeUInt16(bitmask);
 
     // Write player data based on bitmask, excluding null values
     index = 0;
+
+    // Inside encodePlayer method
     for (let key in schema) {
       if (bitmask & (1 << index) && player[key] !== null) {
-        localStream[`write${schema[key]}`](player[key]);
+        if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
+          // Convert string to bytes
+          let stringBytes = Buffer.from(player[key], 'utf8'); // Use 'utf8' for UTF8String
+          // Write the length of the string
+          localStream.writeUInt8(stringBytes.length);
+          // Write each byte of the string
+          for (let i = 0; i < stringBytes.length; i++) {
+            localStream.writeUInt8(stringBytes[i]);
+          }
+        } else {
+          localStream[`write${schema[key]}`](player[key]);
+        }
       }
       index++;
     }
+
+
+
     let bytesUsed = Math.ceil(localStream.offset / 8);
     let finalBuffer = new BitBuffer(bytesUsed * 8);
     finalBuffer.byteArray.set(localStream.bitBuffer.byteArray.subarray(0, bytesUsed));
@@ -97,11 +126,24 @@ class PlayerCodec {
 
     // Read player data based on bitmask
     let index = 0;
+
+    // Inside decodePlayer method
     for (let key in schema) {
       if (bitmask & (1 << index)) {
-        player[key] = this.stream[`read${schema[key]}`]();
+        if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
+          // Read the length of the string
+          let length = this.stream.readUInt8();
+          // Read each byte of the string
+          let stringBytes = [];
+          for (let i = 0; i < length; i++) {
+            stringBytes.push(this.stream.readUInt8());
+          }
+          // Convert byte array back to string
+          player[key] = Buffer.from(stringBytes).toString('utf8'); // Use 'utf8' for UTF8String
+        } else {
+          player[key] = this.stream[`read${schema[key]}`]();
+        }
       } else {
-        // If the property was not encoded, do not include it in the final object
         delete player[key];
       }
       index++;
@@ -131,7 +173,7 @@ class PlayerCodec {
     let encodedPlayersData = [];
 
     players.forEach(player => {
-      let tempStream = new BitStream(new BitBuffer(1024 * 2));
+      let tempStream = new BitStream(new BitBuffer(1024 * 4));
       let encodedPlayer = this.encodePlayer(player, tempStream);
       encodedPlayersData.push(encodedPlayer);
       totalSize += encodedPlayer.byteLength + 2; // +2 for player size
@@ -157,7 +199,6 @@ class PlayerCodec {
     let stream = new BitStream(buffer);
     let players = [];
     let playerCount = stream.readUInt16();
-    console.log('playerCount', playerCount)
     for (let i = 0; i < playerCount; i++) {
       let playerSize = stream.readUInt16();
       let playerBuffer = new BitBuffer(playerSize * 8);
@@ -175,7 +216,7 @@ class PlayerCodec {
   }
 
   encodeMessage(msg) {
-    let localBuffer = new BitBuffer(1024 * 2);
+    let localBuffer = new BitBuffer(bufferSize);
     let localStream = new BitStream(localBuffer);
 
     // Encoding 'action' as an enum

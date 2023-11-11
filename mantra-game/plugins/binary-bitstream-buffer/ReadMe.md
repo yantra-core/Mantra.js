@@ -11,6 +11,8 @@ Most of this code was originally from:
  - https://github.com/timetocode/nengi/tree/master/core/binary
  - https://github.com/inolen/bit-buffer
 
+ The previous core binary bitstream buffer implementations remain the same, we have extended the code to support typed objected arrays and schema definitions.
+
 ## Tests
 
-None yet. Coming soon.
+see: `./test` folder
