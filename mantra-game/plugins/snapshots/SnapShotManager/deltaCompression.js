@@ -7,11 +7,12 @@ let localPlayerStateCache = {};
 
 const deltaCompression = {}; // deltaCompression module scope
 
-// TODO: move this config to instance scope of SnapShotManager
+// this config could be part of instance scope in SnapShotManager
 let config = deltaCompression.config = {
   // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
   //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline
   //         Where as the deltaEncoding pipeline is only used on the server
+  floatProperties: ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed'], // extend this array with other float property names
   float2Int: true // encode float values as integers
 };
 
@@ -53,7 +54,7 @@ deltaCompression.compress = function compress(playerId, snapshot) {
         return;
       }
 
-      let lastKnownState = playerStateCache[playerId].stateCache[state.id] || { position: { x: 0, y: 0 }, rotation: 0 };
+      let lastKnownState = playerStateCache[playerId].stateCache[state.id] || { position: { x: 0, y: 0 }, rotation: 0, width: 0, height: 0, mass: 0, health: 0, lifetime: 0, maxSpeed: 0 };
       let clonedState = { ...state };
 
       if (typeof clonedState.position !== 'undefined') {
@@ -77,6 +78,17 @@ deltaCompression.compress = function compress(playerId, snapshot) {
         }
       }
 
+      config.floatProperties.forEach(prop => {
+        if (typeof clonedState[prop] !== 'undefined') {
+          let delta = getDelta(clonedState[prop], lastKnownState[prop]);
+          if (config.float2Int) {
+            clonedState[prop] = float2Int.encode(delta);
+          } else {
+            clonedState[prop] = delta;
+          }
+        }
+      });
+
       playerStateCache[playerId].stateCache[state.id] = { ...state };
       _snapshot.state.push(clonedState);
     });
@@ -96,7 +108,7 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
 
       // Initialize accumulatedState if it's a new state
       if (!accumulatedState) {
-        accumulatedState = { id: state.id, position: { x: 0, y: 0 }, rotation: 0 };
+        accumulatedState = { id: state.id, position: { x: 0, y: 0 }, rotation: 0, width: 0, height: 0, mass: 0, health: 0, lifetime: 0, maxSpeed: 0 };
       }
 
       // Apply updates from the current state
@@ -110,8 +122,19 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
           let rotationDelta = config.float2Int ? float2Int.decode(state.rotation) : state.rotation;
           accumulatedState.rotation += rotationDelta;
         } else {
-          // For all other properties, just copy/update them as is
-          accumulatedState[prop] = state[prop];
+          if (config.floatProperties.indexOf(prop) !== -1) {
+            let delta;
+            if(config.float2Int) {
+              delta = float2Int.decode(state[prop])
+            } else {
+              delta = state[prop];
+            }
+            accumulatedState[prop] += delta;
+          } else {
+            // For all other properties, just copy/update them as is
+            accumulatedState[prop] = state[prop];
+          }
+
         }
       });
 
@@ -151,6 +174,14 @@ const getRotationDelta = (currentRotation, lastKnownRotation) => {
 
   let deltaRotation = currentRotation - lastKnownRotation;
   return truncateToPrecision(deltaRotation);
+};
+
+const getDelta = (currentValue, lastKnownValue) => {
+  if (typeof lastKnownValue === 'undefined') {
+    return currentValue;
+  }
+  let delta = currentValue - lastKnownValue;
+  return truncateToPrecision(delta);
 };
 
 

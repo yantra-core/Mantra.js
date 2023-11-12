@@ -24,7 +24,7 @@ const entityTypes = {
 };
 
 const schema = {
-  id: { type: 'UInt12' },
+  id: { type: 'UInt16' },
   name: { type: 'UTF8String' },
   type: { type: 'Enum', enum: entityTypes },
   position: {
@@ -41,43 +41,21 @@ const schema = {
       y: { type: 'Int32' }
     }
   },
-  rotation: { type: 'Int32' },
-  mass: { type: 'Float64' },
-  width: { type: 'Float64' },
-  height: { type: 'Float64' },
-  health: { type: 'Float64' },
+  width: { type: 'Int32' },
+  height: { type: 'Int32' },
+  rotation: { type: 'Int32' }, // TODO: special case with radians->bytes optimization
+  mass: { type: 'Int32' },
+  health: { type: 'Int32' },
   depth: { type: 'Float64' },
-  lifetime: { type: 'Float64' },
+  lifetime: { type: 'Int32' },
   radius: { type: 'Float64' },
   isSensor: { type: 'Boolean' },
   isStatic: { type: 'Boolean' },
   destroyed: { type: 'Boolean' },
-  owner: { type: 'ASCIIString' },
-  maxSpeed: { type: 'Float64' }
+  owner: { type: 'UInt16' },
+  maxSpeed: { type: 'Int32' }
 
 };
-
-let playerData = {
-  id: 1,
-  name: 'Bunny',
-  type: 'BLOCK',
-  position: { x: 10, y: 20 },
-  velocity: { x: 1, y: 1 },
-  rotation: 0,
-  //mass: 100,
-  width: 100,
-  height: 100,
-  health: 100,
-  depth: 10,
-  lifetime: 1000,
-  radius: 100,
-  isSensor: true,
-  isStatic: true,
-  destroyed: true,
-  owner: 'test',
-  maxSpeed: 100,
-}
-
 
 class PlayerCodec {
   constructor() {
@@ -191,7 +169,6 @@ class PlayerCodec {
     return keys;
   }
 
-
   reconstructObject(flattened) {
     let reconstructed = {};
 
@@ -235,8 +212,17 @@ class PlayerCodec {
 
         // Handle writing data based on the determined type
         switch (type) {
+          case 'Int10':
+            stream.writeInt10(flattenedObject[key]);
+            break;
+          case 'UInt10':
+            stream.writeUInt10(flattenedObject[key]);
+            break;
           case 'UInt12':
             stream.writeUInt12(flattenedObject[key]);
+            break;
+          case 'UInt16':
+            stream.writeUInt16(flattenedObject[key]);
             break;
           case 'UTF8String':
             let utf8Bytes = Buffer.from(flattenedObject[key], 'utf8');
@@ -288,8 +274,17 @@ class PlayerCodec {
 
         // Handle reading data based on the determined type
         switch (type) {
+          case 'Int10':
+            flattenedObject[key] = stream.readInt10();
+            break;
+          case 'UInt10':
+            flattenedObject[key] = stream.readUInt10();
+            break;
           case 'UInt12':
             flattenedObject[key] = stream.readUInt12();
+            break;
+          case 'UInt16':
+            flattenedObject[key] = stream.readUInt16();
             break;
           case 'UTF8String':
             let length = stream.readUInt8();
@@ -468,38 +463,5 @@ class PlayerCodec {
   }
 
 }
-
-
-
-
-
-let playerData2 = {
-  id: 1,
-  type: 'BLOCK',
-  name: 'Bunny',
-}
-
-playerData2 = playerData;
-
-/*
-const playerCodec2 = new PlayerCodec();
-
-const finalBuffer2 = playerCodec2.encodePlayer(playerData2);
-console.log("Buffer contents after encoding:", finalBuffer2.byteArray);
-console.log(playerData2)
-const decodedPlayer2 = playerCodec2.decodePlayer(finalBuffer2);
-console.log('why type returning PLAYER instead of BLOCK?', decodedPlayer2)
-*/
-
-
-
-//const playerCodec = new PlayerCodec();
-
-//const finalBuffer = playerCodec.encodePlayer(playerData);
-//console.log("Buffer contents after encoding:", finalBuffer.byteArray);
-//console.log(playerData)
-//const decodedPlayer = playerCodec.decodePlayer(finalBuffer);
-//console.log('works as expected', decodedPlayer)
-
 
 export default PlayerCodec;

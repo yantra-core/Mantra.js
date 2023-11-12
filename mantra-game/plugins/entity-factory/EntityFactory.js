@@ -8,7 +8,7 @@ class EntityFactory {
   constructor() {
     this.name = 'EntityFactory'
     //this.game = game;
-    this.nextEntityId = 0;
+    this.nextEntityId = 1; // 0 is reserved for server
 
     this.preCreateEntityHooks = [];
     this.postCreateEntityHooks = [];
@@ -167,7 +167,7 @@ class EntityFactory {
       isStatic: false,
       isSensor: false,
       restitution: 0,
-      owner: 'server',
+      owner: 0, // 0 = server
       destroyed: false,
       type: 'PLAYER',
       friction: 0.1,  // Default friction

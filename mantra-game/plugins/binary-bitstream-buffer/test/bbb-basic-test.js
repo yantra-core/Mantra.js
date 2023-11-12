@@ -20,7 +20,7 @@ let players = [
   isSensor: true,
   isStatic: true,
   destroyed: true,
-  owner: 'test',
+  owner: 0,
   maxSpeed: 100,
   },
   {
