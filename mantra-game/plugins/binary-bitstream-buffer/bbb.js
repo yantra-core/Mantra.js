@@ -1,17 +1,7 @@
 import BitBuffer from './binary/BitBuffer.js';
 import BitStream from './binary/BitStream.js';
-
-// TODO: enum and schema definitions should be dynamic through contructor
-// Enum mapping for player types
-const entityTypes = {
-  'PLAYER': 0,
-  'BULLET': 1,
-  'BLOCK': 2,
-  'BORDER': 3,
-  'BODY': 4
-  // ... other types
-};
-
+let encoder = new TextEncoder();
+let decoder = new TextDecoder('utf-8');
 const actionTypes = {
   'gametick': 0,
   'assign_id': 1,
@@ -22,31 +12,72 @@ const actionTypes = {
 
 let bufferSize = 1024 * 512;
 
-// Define schema with type declarations
-// TODO: flatten / truncate the float64 values into smaller ints with fixed precision
-// see: Float2Int.js from AYYO Games
-const schema = {
-  id: 'UInt12',
-  name: 'UTF8String',
-  type: 'UInt8',
-  positionX: 'Int32',
-  positionY: 'Int32',
-  velocityX: 'Int32',
-  velocityY: 'Int32',
-  rotation: 'Int32',
-  mass: 'Float64',
-  width: 'Float64',
-  height: 'Float64',
-  health: 'Float64',
-  depth: 'Float64',
-  lifetime: 'Float64',
-  radius: 'Float64',
-  isSensor: 'Boolean',
-  isStatic: 'Boolean',
-  destroyed: 'Boolean',
-  owner: 'ASCIIString',
-  maxSpeed: 'Float64'
+// TODO: we'd expect these values to be in the schema as well
+// Enum mapping for player types
+const entityTypes = {
+  'PLAYER': 0,
+  'BULLET': 1,
+  'BLOCK': 2,
+  'BORDER': 3,
+  'BODY': 4
+  // ... other types
 };
+
+const schema = {
+  id: { type: 'UInt12' },
+  name: { type: 'UTF8String' },
+  type: { type: 'Enum', enum: entityTypes },
+  position: {
+    type: 'Record',
+    schema: {
+      x: { type: 'Int32' },
+      y: { type: 'Int32' }
+    }
+  },
+  velocity: {
+    type: 'Record',
+    schema: {
+      x: { type: 'Int32' },
+      y: { type: 'Int32' }
+    }
+  },
+  rotation: { type: 'Int32' },
+  mass: { type: 'Float64' },
+  width: { type: 'Float64' },
+  height: { type: 'Float64' },
+  health: { type: 'Float64' },
+  depth: { type: 'Float64' },
+  lifetime: { type: 'Float64' },
+  radius: { type: 'Float64' },
+  isSensor: { type: 'Boolean' },
+  isStatic: { type: 'Boolean' },
+  destroyed: { type: 'Boolean' },
+  owner: { type: 'ASCIIString' },
+  maxSpeed: { type: 'Float64' }
+
+};
+
+let playerData = {
+  id: 1,
+  name: 'Bunny',
+  type: 'BLOCK',
+  position: { x: 10, y: 20 },
+  velocity: { x: 1, y: 1 },
+  rotation: 0,
+  //mass: 100,
+  width: 100,
+  height: 100,
+  health: 100,
+  depth: 10,
+  lifetime: 1000,
+  radius: 100,
+  isSensor: true,
+  isStatic: true,
+  destroyed: true,
+  owner: 'test',
+  maxSpeed: 100,
+}
+
 
 class PlayerCodec {
   constructor() {
@@ -55,131 +86,284 @@ class PlayerCodec {
   }
 
   encodePlayer(originalPlayer, stream = null) {
-
     let localStream = stream || new BitStream(new BitBuffer(bufferSize));
     localStream.offset = 0;
 
-    let bitmask = 0;
-    let index = 0;
-    // Create a shallow copy of the player object
-    let player = { ...originalPlayer };
+    // Flatten nested properties and handle enums
+    let player = this.flattenObject(originalPlayer);
 
-    // Flatten nested properties
-    if (player.position) {
-      player.positionX = player.position.x;
-      player.positionY = player.position.y;
-      delete player.position;
-    }
-    if (player.velocity) {
-      player.velocityX = player.velocity.x;
-      player.velocityY = player.velocity.y;
-      delete player.velocity;
-    }
-
-    // Convert the 'type' field from string to its numeric value
-    if (typeof player.type !== undefined && entityTypes[player.type] !== undefined) {
-      player.type = entityTypes[player.type];
-    } else {
-      // console.error("Invalid entity type:", player.type);
-      // Handle the error or set a default value
-    }
+    // Convert Enums
+    player = this.flattenAndConvertEnums(player, schema);
 
     // Calculate bitmask, excluding properties with null values
-    for (let key in schema) {
-      if (player[key] !== undefined && player[key] !== null) {
-        bitmask |= 1 << index;
-      }
-      index++;
-    }
+    let bitmask = this.calculateBitmask(player, schema);
 
+    // Write bitmask and player data
+    this.writePlayerData(localStream, player, schema, bitmask);
 
-    // Write bitmask first
-    localStream.writeUInt32(bitmask);
-
-    // Write player data based on bitmask, excluding null values
-    index = 0;
-
-    // Inside encodePlayer method
-    for (let key in schema) {
-      if (bitmask & (1 << index) && player[key] !== null) {
-        if (schema[key] === 'Boolean') {
-          localStream.writeUInt8(player[key] ? 1 : 0);  // Convert Boolean to 0 or 1
-        }
-        else if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
-          // Convert string to bytes
-          let stringBytes = Buffer.from(player[key], 'utf8'); // Use 'utf8' for UTF8String
-          // console.log('writing stringBytes', player[key], stringBytes.length)
-          // Write the length of the string
-          localStream.writeUInt8(stringBytes.length);
-          // Write each byte of the string
-          for (let i = 0; i < stringBytes.length; i++) {
-            localStream.writeUInt8(stringBytes[i]);
-          }
-        } else {
-          localStream[`write${schema[key]}`](player[key]);
-        }
-      }
-      index++;
-    }
-
-    let bytesUsed = Math.ceil(localStream.offset / 8);
-    let finalBuffer = new BitBuffer(bytesUsed * 8);
-    finalBuffer.byteArray.set(localStream.bitBuffer.byteArray.subarray(0, bytesUsed));
-
-    return finalBuffer;
+    // Create final buffer
+    return this.createFinalBuffer(localStream);
   }
 
   decodePlayer(buffer) {
     this.stream = new BitStream(buffer);
     this.stream.offset = 0;
-    let player = {};
     let bitmask = this.stream.readUInt32();
 
-    // Read player data based on bitmask
-    let index = 0;
+    let player = this.readPlayerData(this.stream, schema, bitmask);
 
-    // Inside decodePlayer method
-    for (let key in schema) {
-      if (bitmask & (1 << index)) {
-        if (schema[key] === 'Boolean') {
-          player[key] = this.stream.readUInt8() === 1;
-        }
-        else if (schema[key] === 'ASCIIString' || schema[key] === 'UTF8String') {
-          let length = this.stream.readUInt8();
-          let stringBytes = new Uint8Array(length);
-          for (let i = 0; i < length; i++) {
-            stringBytes[i] = this.stream.readUInt8();
-          }
-          // Convert byte array back to string using TextDecoder
-          const decoder = new TextDecoder('utf-8');
-          player[key] = decoder.decode(stringBytes);
+    // Reconstruct nested structures
+    return this.reconstructObject(player);
+  }
+
+  flattenObject(object, prefix = '') {
+    let flattened = {};
+  
+    for (let key in object) {
+      let prefixedKey = prefix ? `${prefix}.${key}` : key;
+      if (object[key] !== null && typeof object[key] === 'object' && !(object[key] instanceof Array)) {
+        Object.assign(flattened, this.flattenObject(object[key], prefixedKey));
+      } else {
+        flattened[prefixedKey] = object[key];
+      }
+    }
+  
+    // Sort flattened keys based on schema order
+    const schemaOrderedKeys = this.getFlattenedKeys(schema);
+    let sortedFlattened = {};
+    schemaOrderedKeys.forEach(key => {
+      if (key in flattened) {
+        sortedFlattened[key] = flattened[key];
+      }
+    });
+  
+    return sortedFlattened;
+  }
+  
+  flattenAndConvertEnums(flattenedObject, schema) {
+    let converted = {};
+  
+    // Add missing properties from schema with null values and sort
+    const flattenedKeys = this.getFlattenedKeys(schema);
+    flattenedKeys.forEach(key => {
+      if (!(key in flattenedObject)) {
+        flattenedObject[key] = null;
+      }
+    });
+  
+    // Sort flattenedObject keys based on schema order
+    let sortedFlattenedObject = {};
+    flattenedKeys.forEach(key => {
+      sortedFlattenedObject[key] = flattenedObject[key];
+    });
+  
+    for (let key in sortedFlattenedObject) {
+      // Process enum conversion and other values
+      let schemaKey = key.split('.')[0];
+      if (schema[schemaKey] && schema[schemaKey].type === 'Enum') {
+        if (sortedFlattenedObject[key] !== undefined && sortedFlattenedObject[key] in schema[schemaKey].enum) {
+          converted[key] = schema[schemaKey].enum[sortedFlattenedObject[key]];
         } else {
-          player[key] = this.stream[`read${schema[key]}`]();
+          converted[key] = sortedFlattenedObject[key];
         }
       } else {
-        delete player[key];
+        converted[key] = sortedFlattenedObject[key];
+      }
+    }
+  
+    return converted;
+  }
+  
+
+  getFlattenedKeys(schema, prefix = '') {
+    let keys = [];
+
+    for (let key in schema) {
+      let prefixedKey = prefix ? `${prefix}.${key}` : key;
+
+      if (schema[key].type === 'Record') {
+        keys = keys.concat(this.getFlattenedKeys(schema[key].schema, prefixedKey));
+      } else {
+        keys.push(prefixedKey);
+      }
+    }
+
+    return keys;
+  }
+
+
+  reconstructObject(flattened) {
+    let reconstructed = {};
+
+    for (let key in flattened) {
+      let parts = key.split('.');
+      let last = parts.pop();
+      let deep = parts.reduce((acc, val) => acc[val] = acc[val] || {}, reconstructed);
+      deep[last] = flattened[key];
+    }
+
+    return reconstructed;
+  }
+
+  calculateBitmask(flattenedObject, schema) {
+    let bitmask = 0;
+    let index = 0;
+  
+    const flattenedKeys = this.getFlattenedKeys(schema);
+  
+    for (let key of flattenedKeys) {
+      if (key in flattenedObject && flattenedObject[key] !== null) {
+        bitmask |= 1 << index;
+      }
+      index++;
+    }
+    return bitmask;
+  }
+
+  writePlayerData(stream, flattenedObject, schema, bitmask) {
+
+    stream.writeUInt32(bitmask);
+    let index = 0;
+
+    for (let key in flattenedObject) {
+      // console.log("flattenedObject[key]", flattenedObject[key])
+      if (bitmask & (1 << index) && key in flattenedObject) {
+        // Determine the type based on the key
+        // You might need a function to determine the type based on the flattened key
+        let type = this.determineType(key);
+        // console.log("Writing key:", key, "type:", type, "value:", flattenedObject[key]); // Inside writePlayerData
+
+        // Handle writing data based on the determined type
+        switch (type) {
+          case 'UInt12':
+            stream.writeUInt12(flattenedObject[key]);
+            break;
+          case 'UTF8String':
+            let utf8Bytes = Buffer.from(flattenedObject[key], 'utf8');
+            stream.writeUInt8(utf8Bytes.length);
+            for (let byte of utf8Bytes) {
+              stream.writeUInt8(byte);
+            }
+            break;
+          case 'Enum':
+            stream.writeUInt8(flattenedObject[key]);
+            break;
+          case 'Boolean':
+            stream.writeUInt8(flattenedObject[key] ? 1 : 0);
+            break;
+          case 'Int32':
+            stream.writeInt32(flattenedObject[key]);
+            break;
+          case 'Float64':
+            stream.writeFloat64(flattenedObject[key]);
+            break;
+          case 'ASCIIString':
+            let asciiBytes = Buffer.from(flattenedObject[key], 'ascii');
+            stream.writeUInt8(asciiBytes.length);
+            for (let byte of asciiBytes) {
+              stream.writeUInt8(byte);
+            }
+            break;
+
+          // ... other cases ...
+        }
+      }
+      index++;
+    }
+  }
+
+  readPlayerData(stream, schema, bitmask) {
+    let flattenedObject = {};
+    let index = 0;
+
+    // Assuming you have a way to get all flattened keys
+    let flattenedKeys = this.getFlattenedKeys(schema);
+    // console.log("Flattened keys used:", flattenedKeys); // In readPlayerData
+
+    for (let key of flattenedKeys) {
+      if (bitmask & (1 << index)) {
+        // Determine the type based on the key
+        let type = this.determineType(key);
+        // console.log("Reading key:", key, "type:", type); // Inside readPlayerData
+
+        // Handle reading data based on the determined type
+        switch (type) {
+          case 'UInt12':
+            flattenedObject[key] = stream.readUInt12();
+            break;
+          case 'UTF8String':
+            let length = stream.readUInt8();
+            let utf8Bytes = new Uint8Array(length);
+            for (let i = 0; i < length; i++) {
+              utf8Bytes[i] = stream.readUInt8();
+            }
+            flattenedObject[key] = decoder.decode(utf8Bytes);
+            break;
+          case 'Enum':
+            let enumValue = stream.readUInt8();
+            flattenedObject[key] = this.getKeyByValue(schema[key].enum, enumValue);
+            break;
+          case 'Boolean':
+            flattenedObject[key] = stream.readUInt8() === 1;
+            break;
+          case 'Int32':
+            flattenedObject[key] = stream.readInt32();
+            break;
+          case 'Float64':
+            flattenedObject[key] = stream.readFloat64();
+            break;
+          case 'ASCIIString':
+            let asciiLength = stream.readUInt8();
+            let asciiBytes = new Uint8Array(asciiLength);
+            for (let i = 0; i < asciiLength; i++) {
+              asciiBytes[i] = stream.readUInt8();
+            }
+            flattenedObject[key] = decoder.decode(asciiBytes);
+
+            // flattenedObject[key] = Buffer.from(asciiBytes).toString('ascii');
+            break;
+        }
+      } else {
+        // flattenedObject[key] = null;
       }
       index++;
     }
 
-    // Reconstruct nested structures
-    // TODO: remove hard-coded reference to position and velocity
-    if (player.positionX !== undefined && player.positionY !== undefined) {
-      player.position = { x: player.positionX, y: player.positionY };
-      delete player.positionX;
-      delete player.positionY;
-    }
-    if (player.velocityX !== undefined && player.velocityY !== undefined) {
-      player.velocity = { x: player.velocityX, y: player.velocityY };
-      delete player.velocityX;
-      delete player.velocityY;
-    }
-    // TODO: make this work for multiple enum properties, not just type
-    if (player.type !== undefined) {
-      player.type = Object.keys(entityTypes)[player.type];
-    }
-    return player;
+    return flattenedObject;
   }
+
+
+  createFinalBuffer(stream) {
+    let bytesUsed = Math.ceil(stream.offset / 8);
+    let finalBuffer = new BitBuffer(bytesUsed * 8);
+    finalBuffer.byteArray.set(stream.bitBuffer.byteArray.subarray(0, bytesUsed));
+
+    return finalBuffer;
+  }
+
+  
+  determineType(flattenedKey) {
+    // console.log('determineType', flattenedKey)
+    let parts = flattenedKey.split('.');
+    let currentSchema = schema;
+    for (let part of parts) {
+      if (currentSchema[part]) {
+        if (currentSchema[part].type === 'Record') {
+          currentSchema = currentSchema[part].schema;
+        } else {
+          // console.log('returning type', currentSchema[part].type)
+          return currentSchema[part].type;
+        }
+      } else {
+        return null; // Or handle error
+      }
+    }
+  }
+
+  getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+  }
+  
 
   encodePlayers(players) {
     let totalSize = 0;
@@ -284,5 +468,38 @@ class PlayerCodec {
   }
 
 }
+
+
+
+
+
+let playerData2 = {
+  id: 1,
+  type: 'BLOCK',
+  name: 'Bunny',
+}
+
+playerData2 = playerData;
+
+/*
+const playerCodec2 = new PlayerCodec();
+
+const finalBuffer2 = playerCodec2.encodePlayer(playerData2);
+console.log("Buffer contents after encoding:", finalBuffer2.byteArray);
+console.log(playerData2)
+const decodedPlayer2 = playerCodec2.decodePlayer(finalBuffer2);
+console.log('why type returning PLAYER instead of BLOCK?', decodedPlayer2)
+*/
+
+
+
+//const playerCodec = new PlayerCodec();
+
+//const finalBuffer = playerCodec.encodePlayer(playerData);
+//console.log("Buffer contents after encoding:", finalBuffer.byteArray);
+//console.log(playerData)
+//const decodedPlayer = playerCodec.decodePlayer(finalBuffer);
+//console.log('works as expected', decodedPlayer)
+
 
 export default PlayerCodec;

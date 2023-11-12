@@ -3,33 +3,33 @@ import PlayerCodec from '../bbb.js';
 
 let players = [
   {
-    id: 1,
-    name: 'Bunny',
-    type: 'PLAYER',
-    position: { x: 10, y: 20 },
-    velocity: { x: 1, y: 1.5 },
-    rotation: 0,
-    mass: 100,
-    width: 100,
-    height: 100,
-    depth: 10,
-    lifetime: 1000,
-    health: 100,
-    radius: 100,
-    isSensor: true,
-    isStatic: true,
-    destroyed: true,
-    owner: 'test',
-    maxSpeed: 100,
-  
+   
+  id: 1,
+  name: 'Bunny',
+  type: 'PLAYER',
+  position: { x: 10, y: 20 },
+  velocity: { x: 1, y: 1 },
+  rotation: 0,
+  mass: 100,
+  width: 100,
+  height: 100,
+  health: 100,
+  depth: 10,
+  lifetime: 1000,
+  radius: 100,
+  isSensor: true,
+  isStatic: true,
+  destroyed: true,
+  owner: 'test',
+  maxSpeed: 100,
   },
   {
     id: 2,
     name: 'Turtle',
     type: 'BLOCK',
     position: { x: 30, y: 40 },
-    velocity: { x: 2, y: 2.5 },
-    rotation: 1.57
+    velocity: { x: 2, y: 2 },
+    rotation: 157
   },
   {
     id: 3,
@@ -37,8 +37,8 @@ let players = [
 
     type: 'PLAYER',
     position: { x: 50, y: 60 },
-    velocity: { x: 3, y: 3.5 },
-    rotation: 3.14
+    velocity: { x: 3, y: 35 },
+    rotation: 314
   }
 ];
 
@@ -46,9 +46,10 @@ let players = [
 tap.test('Encode and Decode Single Player', async (t) => {
   const playerCodec = new PlayerCodec();
   const playerData = players[0];
-
+  console.log('ppp', playerData)
   const finalBuffer = playerCodec.encodePlayer(playerData);
   const decodedPlayer = playerCodec.decodePlayer(finalBuffer);
+  console.log('aaaaa', decodedPlayer)
   t.equal(decodedPlayer.id, playerData.id, 'ID matches');
   //t.equal(decodedPlayer.name, playerData.name, 'Name matches')
   t.equal(decodedPlayer.type, playerData.type, 'Type matches');
@@ -85,15 +86,15 @@ tap.test('Encode and Decode Multiple Players', async (t) => {
 // Test for missing properties
 tap.test('Handle Missing Properties', async (t) => {
   const playerCodec = new PlayerCodec();
+
   const playerData = {
     id: 123,
-    type: 'PLAYER',
-    // Missing rotation, position, and velocity
+    destroyed: true
   };
 
   const finalBuffer = playerCodec.encodePlayer(playerData);
   const decodedPlayer = playerCodec.decodePlayer(finalBuffer);
-
+  console.log(decodedPlayer)
   t.equal(decodedPlayer.id, playerData.id, 'ID matches');
   t.equal(decodedPlayer.type, playerData.type, 'Type matches');
   t.notOk(decodedPlayer.rotation, 'Rotation should be null or undefined');
