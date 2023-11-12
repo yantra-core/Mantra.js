@@ -10,7 +10,7 @@ import bbb from '../binary-bitstream-buffer/bbb.js';
 
 let config = {};
 config.deltaEncoding = true;       // only sends changed states and property values
-config.deltaCompression = false;   // only send differences between int values
+config.deltaCompression = true;   // only send differences between int values
 config.bbb = true;                 // see: @yantra-core/binary-bitstream-buffer
 config.msgpack = false;            // `msgpack` not being used in favor of `bbb`
 
@@ -235,19 +235,16 @@ class WebSocketServerClass {
     }
 
     if (config.deltaEncoding) {
-      let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, playerSnapshot);
+      let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, snapshotToSend);
       if (!deltaEncodedSnapshot) return;
-
       snapshotToSend = deltaEncodedSnapshot;
     }
-
 
     if (config.bbb) {
       encoder = new bbb();
     } else if (config.msgpack) {
       encoder = msgpack; // Assuming msgpack is a global encoder object
     }
-
 
     this.sendSnapshot(client, snapshotToSend, lastProcessedInput, encoder);
   }

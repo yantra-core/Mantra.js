@@ -8,7 +8,7 @@ let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
 config.msgpack = false;
-config.deltaCompression = false;
+config.deltaCompression = true;
 config.bbb = true;
 
 export default class WebSocketClient {
@@ -167,7 +167,6 @@ export default class WebSocketClient {
     if (data.action === 'become_ticker') {
       this.startTicking(this.socket);
       return;
-
     }
 
     if (data.action === 'pong') {
@@ -199,7 +198,6 @@ export default class WebSocketClient {
     if (data.action === "gametick") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
-      // console.log(data.snapshot.state);
       this.game.latestSnapshot = data.snapshot;
       game.snapshotQueue.push(data.snapshot);
 
