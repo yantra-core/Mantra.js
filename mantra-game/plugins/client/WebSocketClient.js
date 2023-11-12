@@ -192,7 +192,10 @@ export default class WebSocketClient {
     }
 
     if (config.deltaCompression) {
-      data.snapshot = deltaCompression.decompress(data.snapshot);
+      // console.log('before', data.snapshot.state)
+      // "player1" can be any string, as long as its consistent on the local client
+      data.snapshot = deltaCompression.decompress('player1', data.snapshot);
+      //console.log('after', data.snapshot.state)
     }
 
     if (data.action === "gametick") {

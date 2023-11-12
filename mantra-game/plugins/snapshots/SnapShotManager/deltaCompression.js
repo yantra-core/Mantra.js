@@ -1,98 +1,97 @@
-let stateCache = {};
-let accumulatedStateCache = {};
+let playerStateCache = {};
+
+let localPlayerStateCache = {};
 
 const deltaCompression = {};
 
+deltaCompression.resetState = function resetState(playerId) {
+  if (playerStateCache[playerId]) {
+    playerStateCache[playerId].stateCache = {};
+    playerStateCache[playerId].accumulatedStateCache = {};
+  }
+  if (localPlayerStateCache[playerId]) {
+    localPlayerStateCache[playerId].stateCache = {};
+    localPlayerStateCache[playerId].accumulatedStateCache = {};
+  }
+};
 
-deltaCompression.resetState = function resetState() {
-  stateCache = {};
-  accumulatedStateCache = {};
-}
+deltaCompression.removeState = function removeState(playerId, id) {
+  if (playerStateCache[playerId]) {
+    delete playerStateCache[playerId].stateCache[id.toString()];
+    delete playerStateCache[playerId].accumulatedStateCache[id.toString()];
+  }
+  if (localPlayerStateCache[playerId]) {
+    delete localPlayerStateCache[playerId].stateCache[id.toString()];
+    delete localPlayerStateCache[playerId].accumulatedStateCache[id.toString()];
+  }
+};
 
-
-deltaCompression.removeState = function removeState(id) {
-  delete stateCache[id];
-  delete accumulatedStateCache[id];
-}
-
-deltaCompression.accumulatedStateCache = accumulatedStateCache;
-
-deltaCompression.compress = function decompressDeltas(snapshot) {
+deltaCompression.compress = function compress(playerId, snapshot) {
   let _snapshot = null;
+
+  if (!playerStateCache[playerId]) {
+    playerStateCache[playerId] = { stateCache: {}, accumulatedStateCache: {} };
+  }
 
   if (snapshot && snapshot.state) {
     _snapshot = { id: snapshot.id, state: [] };
 
-    // For each incoming snapshot state
     snapshot.state.forEach(function (state) {
-      // If the state is marked for destruction, remove it from the stateCache
       if (state.destroy) {
-        delete stateCache[state.id];
+        delete playerStateCache[playerId].stateCache[state.id];
         return;
       }
 
-      // Get the last known state for this id
-      let lastKnownState = stateCache[state.id];
-
-      // If this is a new state, initialize lastKnownState with zeros
-      if (typeof lastKnownState === 'undefined') {
-        lastKnownState = { position: { x: 0, y: 0 }, rotation: 0 };
-      }
-
-      // Clone the state to avoid mutating the original state object
+      let lastKnownState = playerStateCache[playerId].stateCache[state.id] || { position: { x: 0, y: 0 }, rotation: 0 };
       let clonedState = { ...state };
 
-      // Delta encode the position if it exists in the state
       if (typeof clonedState.position !== 'undefined') {
         clonedState.position = getPositionDelta(clonedState.position, lastKnownState.position);
       }
 
-      // Delta encode the rotation if it exists in the state
       if (typeof clonedState.rotation !== 'undefined') {
         clonedState.rotation = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
       }
 
-      // Update the stateCache with the original state values, not the deltas
-      stateCache[state.id] = { ...state };
-
+      playerStateCache[playerId].stateCache[state.id] = { ...state };
       _snapshot.state.push(clonedState);
     });
   }
   return _snapshot;
 };
 
-deltaCompression.decompress = function compressDeltas(snapshot) {
+deltaCompression.decompress = function decompress(playerId, snapshot) {
+  if (!localPlayerStateCache[playerId]) {
+    localPlayerStateCache[playerId] = { stateCache: {}, accumulatedStateCache: {} };
+  }
 
   if (snapshot && snapshot.state) {
     let states = [];
     snapshot.state.forEach(function (state) {
-      let accumulatedState = accumulatedStateCache[state.id];
+      let accumulatedState = localPlayerStateCache[playerId].accumulatedStateCache[state.id];
 
-      if (typeof accumulatedState === 'undefined') {
-        accumulatedState = { ...state };
-      } else {
-        // Reverse the delta encoding for position if it exists in the state
+      if (typeof accumulatedState !== 'undefined') {
         if (state.position) {
           accumulatedState.position.x += state.position.x;
           accumulatedState.position.y += state.position.y;
         }
-
-        // Reverse the delta encoding for rotation if it exists in the state
+  
         if (typeof state.rotation !== 'undefined') {
           accumulatedState.rotation += state.rotation;
         }
+    
+      } else {
+        accumulatedState = { ...state };
+
       }
-
-      accumulatedStateCache[state.id] = accumulatedState;
-
-      // Update the state with the accumulated values
+      
+      localPlayerStateCache[playerId].accumulatedStateCache[state.id] = accumulatedState;
       states.push(accumulatedState);
-
     });
     snapshot.state = states;
   }
   return snapshot;
-}
+};
 
 const truncateToPrecision = (value, precision = 3) => {
   return Number(value.toFixed(precision));

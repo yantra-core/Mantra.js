@@ -3,20 +3,20 @@ import deltaCompression from '../plugins/snapshots/SnapShotManager/deltaCompress
 
 tap.test('compress function should return null when snapshot is null', (t) => {
   const snapshot = null;
-  const result = deltaCompression.compress(snapshot);
+  const result = deltaCompression.compress('player1', snapshot);
   t.equal(result, null);
   t.end();
 });
 
 tap.test('compress function should return null when snapshot has no state property', (t) => {
   const snapshot = {};
-  const result = deltaCompression.compress(snapshot);
+  const result = deltaCompression.compress('player1', snapshot);
   t.equal(result, null);
   t.end();
 });
 
 tap.test('compress function should compress state correctly', (t) => {
-  deltaCompression.resetState();
+  deltaCompression.resetState('player1');
   const state1 = {
     id: 1,
     position: { x: 2, y: 3 },
@@ -35,7 +35,7 @@ tap.test('compress function should compress state correctly', (t) => {
 
 
   // runs the first compression, should return the same data
-  const result = deltaCompression.compress(snapshot);
+  const result = deltaCompression.compress('player1', snapshot);
   t.equal(result.state.length, 2, 'Result state should have 2 items');
 
   const compressedState1 = result.state[0];
@@ -48,7 +48,7 @@ tap.test('compress function should compress state correctly', (t) => {
 
 
   // re-running the same compression should result in all zeros
-  const result2 = deltaCompression.compress(snapshot);
+  const result2 = deltaCompression.compress('player1', snapshot);
 
   const compressedState3 = result2.state[0];
   t.same(compressedState3.position, { x: 0, y: 0 }, 'Position should be the same when there is no previous state');
@@ -67,7 +67,7 @@ tap.test('compress function should compress state correctly', (t) => {
     rotation: 8,
   };
 
-  const result3 = deltaCompression.compress({ state: [state3] });
+  const result3 = deltaCompression.compress('player1', { state: [state3] });
 
   const compressedState5 = result3.state[0];
   t.same(compressedState5.position, { x: 4, y: 4 }, 'Position should be show delta');
@@ -78,7 +78,7 @@ tap.test('compress function should compress state correctly', (t) => {
 
 // Repeated State Changes Test
 tap.test('compress and decompress should handle repeated state changes correctly', (t) => {
-  deltaCompression.resetState();
+  deltaCompression.resetState('player1');
 
   const initialState = {
     id: 1,
@@ -93,11 +93,10 @@ tap.test('compress and decompress should handle repeated state changes correctly
   };
 
   let snapshot = { state: [initialState] };
-  let result = deltaCompression.compress(snapshot);
-  result = deltaCompression.decompress(result);
+  let result = deltaCompression.compress('player1', snapshot);
+  result = deltaCompression.decompress('player1', result);
   t.equal(result.state[0].position.x, 10, 'X position should have default state');
-
-  let second = deltaCompression.compress({ state: [secondState] });
+  let second = deltaCompression.compress('player1', { state: [secondState] });
 
   t.equal(second.state[0].position.x, 0, 'X position should be zero since no new changes');
   t.equal(second.state[0].rotation, -4, 'rotation show delta change');
@@ -107,7 +106,7 @@ tap.test('compress and decompress should handle repeated state changes correctly
 
 // Edge Case Values Test
 tap.test('compress function should handle float precision to 3', (t) => {
-  deltaCompression.resetState();
+  deltaCompression.resetState('player1');
 
   const state = {
     id: 1,
@@ -116,8 +115,8 @@ tap.test('compress function should handle float precision to 3', (t) => {
   };
 
   let snapshot = { state: [state] };
-  let compressed = deltaCompression.compress(snapshot);
-  let decompressed = deltaCompression.decompress(compressed);
+  let compressed = deltaCompression.compress('player1', snapshot);
+  let decompressed = deltaCompression.decompress('player1', compressed);
 
   t.same(decompressed.state[0].position, state.position, 'Position should not be lost due to precision truncation');
   t.equal(decompressed.state[0].rotation, state.rotation, 'Rotation should not be lost due to precision truncation');
@@ -127,7 +126,7 @@ tap.test('compress function should handle float precision to 3', (t) => {
 
 // State Deletion Test
 tap.test('compress function should handle state deletions correctly', (t) => {
-  deltaCompression.resetState();
+  deltaCompression.resetState('player1');
 
   const state = {
     id: 1,
@@ -137,13 +136,13 @@ tap.test('compress function should handle state deletions correctly', (t) => {
   };
 
   let snapshot = { state: [state] };
-  deltaCompression.compress(snapshot);
+  deltaCompression.compress('player1', snapshot);
   deltaCompression.removeState(1);
 
   // Attempt to compress a new state with the same id after deletion
   const newState = { ...state, destroy: false };
   snapshot = { state: [newState] };
-  let result = deltaCompression.compress(snapshot);
+  let result = deltaCompression.compress('player1', snapshot);
 
   // New state should be treated as a new entity, not a continuation
   t.same(result.state[0].position, newState.position, 'Position should be treated as new after deletion');
@@ -154,16 +153,16 @@ tap.test('compress function should handle state deletions correctly', (t) => {
 
 // Robustness Against Invalid Inputs
 tap.test('compress and decompress functions should handle invalid inputs gracefully', (t) => {
-  deltaCompression.resetState();
+  deltaCompression.resetState('player1');
 
   let invalidSnapshot = { state: [{ id: 1 }] }; // Missing position and rotation
-  let result = deltaCompression.compress(invalidSnapshot);
+  let result = deltaCompression.compress('player1', invalidSnapshot);
 
   t.notOk(result.state[0].hasOwnProperty('position'), 'Should handle missing position gracefully');
   t.notOk(result.state[0].hasOwnProperty('rotation'), 'Should handle missing rotation gracefully');
 
   invalidSnapshot = { state: [{ id: 2, position: { x: NaN, y: NaN }, rotation: NaN }] }; // Corrupted data
-  result = deltaCompression.compress(invalidSnapshot);
+  result = deltaCompression.compress('player1', invalidSnapshot);
 
   t.ok(isNaN(result.state[0].position.x) && isNaN(result.state[0].position.y), 'Should handle NaN values gracefully');
   t.ok(isNaN(result.state[0].rotation), 'Should handle NaN rotation gracefully');
@@ -173,7 +172,7 @@ tap.test('compress and decompress functions should handle invalid inputs gracefu
 
 // Accumulation Consistency Test
 tap.test('compress and decompress should maintain consistent accumulation over cycles', (t) => {
-  deltaCompression.resetState();
+  deltaCompression.resetState('player1');
 
   const state = {
     id: 1,
@@ -186,8 +185,11 @@ tap.test('compress and decompress should maintain consistent accumulation over c
 
   // Compress and decompress multiple times
   for (let i = 0; i < 5; i++) {
-    result = deltaCompression.compress(snapshot);
-    result = deltaCompression.decompress(result);
+    result = deltaCompression.compress('player1', snapshot);
+    console.log('a', result.state)
+    result = deltaCompression.decompress('player1', result);
+    console.log('b', result.state)
+
   }
 
   t.same(result.state[0].position, state.position, 'Position should remain consistent after multiple cycles');
