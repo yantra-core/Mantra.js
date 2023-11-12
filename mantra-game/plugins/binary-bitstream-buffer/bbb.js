@@ -26,14 +26,14 @@ let bufferSize = 1024 * 512;
 // TODO: flatten / truncate the float64 values into smaller ints with fixed precision
 // see: Float2Int.js from AYYO Games
 const schema = {
-  id: 'UInt32',
+  id: 'UInt12',
   name: 'UTF8String',
   type: 'UInt8',
-  positionX: 'Float64',
-  positionY: 'Float64',
-  velocityX: 'Float64',
-  velocityY: 'Float64',
-  rotation: 'Float64',
+  positionX: 'Int32',
+  positionY: 'Int32',
+  velocityX: 'Int32',
+  velocityY: 'Int32',
+  rotation: 'Int32',
   mass: 'Float64',
   width: 'Float64',
   height: 'Float64',

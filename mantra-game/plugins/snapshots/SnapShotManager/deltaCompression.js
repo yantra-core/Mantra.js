@@ -12,7 +12,7 @@ let config = deltaCompression.config = {
   // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
   //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline
   //         Where as the deltaEncoding pipeline is only used on the server
-  float2Int: false // encode float values as integers
+  float2Int: true // encode float values as integers
 };
 
 deltaCompression.resetState = function resetState(playerId) {
