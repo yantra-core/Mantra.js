@@ -1,8 +1,19 @@
-let playerStateCache = {};
+// deltaCompression.js - Marak Squires 2023
+import float2Int from './float2Int.js'; // Assuming float2Int.js is in the same directory
 
+
+let playerStateCache = {};
 let localPlayerStateCache = {};
 
-const deltaCompression = {};
+const deltaCompression = {}; // deltaCompression module scope
+
+// TODO: move this config to instance scope of SnapShotManager
+let config = deltaCompression.config = {
+  // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
+  //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline
+  //         Where as the deltaEncoding pipeline is only used on the server
+  float2Int: false // encode float values as integers
+};
 
 deltaCompression.resetState = function resetState(playerId) {
   if (playerStateCache[playerId]) {
@@ -46,11 +57,24 @@ deltaCompression.compress = function compress(playerId, snapshot) {
       let clonedState = { ...state };
 
       if (typeof clonedState.position !== 'undefined') {
-        clonedState.position = getPositionDelta(clonedState.position, lastKnownState.position);
+        let positionDelta = getPositionDelta(clonedState.position, lastKnownState.position);
+        if (config.float2Int) {
+          clonedState.position = {
+            x: float2Int.encode(positionDelta.x),
+            y: float2Int.encode(positionDelta.y)
+          };
+        } else {
+          clonedState.position = { ...positionDelta };
+        }
       }
 
       if (typeof clonedState.rotation !== 'undefined') {
-        clonedState.rotation = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
+        let rotationDelta = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
+        if (config.float2Int) {
+          clonedState.rotation = float2Int.encode(rotationDelta);
+        } else {
+          clonedState.rotation = rotationDelta;
+        }
       }
 
       playerStateCache[playerId].stateCache[state.id] = { ...state };
@@ -70,21 +94,27 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
     snapshot.state.forEach(function (state) {
       let accumulatedState = localPlayerStateCache[playerId].accumulatedStateCache[state.id];
 
-      if (typeof accumulatedState !== 'undefined') {
-        if (state.position) {
-          accumulatedState.position.x += state.position.x;
-          accumulatedState.position.y += state.position.y;
-        }
-  
-        if (typeof state.rotation !== 'undefined') {
-          accumulatedState.rotation += state.rotation;
-        }
-    
-      } else {
-        accumulatedState = { ...state };
-
+      // Initialize accumulatedState if it's a new state
+      if (!accumulatedState) {
+        accumulatedState = { id: state.id, position: { x: 0, y: 0 }, rotation: 0 };
       }
-      
+
+      // Apply updates from the current state
+      Object.keys(state).forEach(prop => {
+        if (prop === 'position' && state.position) {
+          let positionDeltaX = config.float2Int ? float2Int.decode(state.position.x) : state.position.x;
+          let positionDeltaY = config.float2Int ? float2Int.decode(state.position.y) : state.position.y;
+          accumulatedState.position.x += positionDeltaX;
+          accumulatedState.position.y += positionDeltaY;
+        } else if (prop === 'rotation' && typeof state.rotation !== 'undefined') {
+          let rotationDelta = config.float2Int ? float2Int.decode(state.rotation) : state.rotation;
+          accumulatedState.rotation += rotationDelta;
+        } else {
+          // For all other properties, just copy/update them as is
+          accumulatedState[prop] = state[prop];
+        }
+      });
+
       localPlayerStateCache[playerId].accumulatedStateCache[state.id] = accumulatedState;
       states.push(accumulatedState);
     });
@@ -93,26 +123,19 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
   return snapshot;
 };
 
+
 const truncateToPrecision = (value, precision = 3) => {
   return Number(value.toFixed(precision));
 };
 
 const getPositionDelta = (currentState, lastKnownState) => {
-  let deltaX = 0;
-  let deltaY = 0;
-
-  // Check if lastKnownState is defined and has properties x and y
-  if (lastKnownState && typeof lastKnownState.x !== 'undefined') {
-    deltaX = currentState.x - lastKnownState.x;
-  } else {
-    deltaX = currentState.x;
+  // If this is a new state, return zero deltas
+  if (typeof lastKnownState === 'undefined') {
+    return { x: 0, y: 0 };
   }
 
-  if (lastKnownState && typeof lastKnownState.y !== 'undefined') {
-    deltaY = currentState.y - lastKnownState.y;
-  } else {
-    deltaY = currentState.y;
-  }
+  let deltaX = currentState.x - lastKnownState.x;
+  let deltaY = currentState.y - lastKnownState.y;
 
   return {
     x: truncateToPrecision(deltaX),
@@ -121,13 +144,14 @@ const getPositionDelta = (currentState, lastKnownState) => {
 };
 
 const getRotationDelta = (currentRotation, lastKnownRotation) => {
-  let deltaRotation = 0;
-
-  if (typeof lastKnownRotation !== 'undefined') {
-    deltaRotation = currentRotation - lastKnownRotation;
+  // If this is a new state, return zero delta
+  if (typeof lastKnownRotation === 'undefined') {
+    return 0;
   }
 
+  let deltaRotation = currentRotation - lastKnownRotation;
   return truncateToPrecision(deltaRotation);
 };
+
 
 export default deltaCompression;

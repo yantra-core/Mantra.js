@@ -1,6 +1,9 @@
 import tap from 'tape'
 import deltaCompression from '../plugins/snapshots/SnapShotManager/deltaCompression.js'
 
+// TODO: add test suite for float2Int.js and integration test for deltaCompression
+deltaCompression.config.float2Int = false;
+
 tap.test('compress function should return null when snapshot is null', (t) => {
   const snapshot = null;
   const result = deltaCompression.compress('player1', snapshot);
@@ -186,14 +189,87 @@ tap.test('compress and decompress should maintain consistent accumulation over c
   // Compress and decompress multiple times
   for (let i = 0; i < 5; i++) {
     result = deltaCompression.compress('player1', snapshot);
-    console.log('a', result.state)
     result = deltaCompression.decompress('player1', result);
-    console.log('b', result.state)
-
   }
 
   t.same(result.state[0].position, state.position, 'Position should remain consistent after multiple cycles');
   t.equal(result.state[0].rotation, state.rotation, 'Rotation should remain consistent after multiple cycles');
+
+  t.end();
+});
+
+// Test for Initial State Compression and Subsequent Compressions
+tap.test('compress function should handle initial state compression correctly', (t) => {
+  deltaCompression.resetState('player1');
+
+  // Initial state
+  const initialState = {
+    id: 1,
+    position: { x: 10, y: 20 },
+    rotation: 5
+  };
+
+  // Compress the initial state
+  let initialCompression = deltaCompression.compress('player1', { state: [initialState] });
+  let initialDecompression = deltaCompression.decompress('player1', initialCompression);
+
+  // Verify that the initial compression does not double the values
+  t.same(initialDecompression.state[0].position, initialState.position, 'Initial compression should not double position values');
+  t.equal(initialDecompression.state[0].rotation, initialState.rotation, 'Initial compression should not double rotation values');
+
+  // Apply a small change to the state
+  const updatedState = {
+    id: 1,
+    position: { x: 11, y: 21 },
+    rotation: 6
+  };
+
+  // Compress the updated state
+  let updatedCompression = deltaCompression.compress('player1', { state: [updatedState] });
+  let updatedDecompression = deltaCompression.decompress('player1', updatedCompression);
+
+  // Verify that subsequent compressions handle deltas correctly
+  t.equal(updatedDecompression.state[0].position.x, 11, 'Updated X position should be correct');
+  t.equal(updatedDecompression.state[0].position.y, 21, 'Updated Y position should be correct');
+  t.equal(updatedDecompression.state[0].rotation, 6, 'Updated rotation should be correct');
+
+  t.end();
+});
+
+
+// Test for destroyed property only change
+tap.test('compress function should handle initial state compression correctly', (t) => {
+  deltaCompression.resetState('player1');
+
+  // Initial state
+  const initialState = {
+    id: 1,
+    position: { x: 10, y: 20 },
+    rotation: 5
+  };
+
+  // Compress the initial state
+  let initialCompression = deltaCompression.compress('player1', { state: [initialState] });
+  let initialDecompression = deltaCompression.decompress('player1', initialCompression);
+
+  // Verify that the initial compression does not double the values
+  t.same(initialDecompression.state[0].position, initialState.position, 'Initial compression should not double position values');
+  t.equal(initialDecompression.state[0].rotation, initialState.rotation, 'Initial compression should not double rotation values');
+
+  // Apply a small change to the state
+  const updatedState = {
+    id: 1,
+    destroyed: true
+  };
+
+  // Compress the updated state
+  let updatedCompression = deltaCompression.compress('player1', { state: [updatedState] });
+  let updatedDecompression = deltaCompression.decompress('player1', updatedCompression);
+
+  // Verify that subsequent compressions handle deltas correctly
+  // This test fails
+  console.log('updatedDecompression', JSON.stringify(updatedDecompression, true, 2))
+  t.equal(updatedDecompression.state[0].destroyed, true, 'Updated destroyed should be correct');
 
   t.end();
 });

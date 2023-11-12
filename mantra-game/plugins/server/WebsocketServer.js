@@ -83,7 +83,8 @@ class WebSocketServerClass {
 
   handleClose(ws) {
     console.log('WebSocket connection closed');
-    this.game.removeEntity(ws.playerEntityId);
+    deltaCompression.resetState(ws.playerId);
+    this.game.removeEntity(ws.playerId);
   }
 
   handleMessage(ws, message) {
@@ -134,8 +135,6 @@ class WebSocketServerClass {
       case 'player_input':
         let entityInputSystem = game.systemsManager.getSystem('entityInput');
         //console.log('ws.playerEntityId', ws.playerEntityId)
-        console.log('ws.playerId', ws.playerId)
-
         entityInputSystem.handleInputs(ws.playerId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
         break;
 
@@ -231,7 +230,7 @@ class WebSocketServerClass {
     let encoder = null;
 
     if (config.deltaCompression) {
-      snapshotToSend = deltaCompression.compress(snapshotToSend);
+      snapshotToSend = deltaCompression.compress(client.playerId, snapshotToSend);
     }
 
     if (config.deltaEncoding) {
@@ -245,7 +244,7 @@ class WebSocketServerClass {
     } else if (config.msgpack) {
       encoder = msgpack; // Assuming msgpack is a global encoder object
     }
-
+    // console.log(JSON.stringify(snapshotToSend, true, 2))
     this.sendSnapshot(client, snapshotToSend, lastProcessedInput, encoder);
   }
 

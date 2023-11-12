@@ -1,6 +1,7 @@
 import BitBuffer from './binary/BitBuffer.js';
 import BitStream from './binary/BitStream.js';
 
+// TODO: enum and schema definitions should be dynamic through contructor
 // Enum mapping for player types
 const entityTypes = {
   'PLAYER': 0,
@@ -19,7 +20,7 @@ const actionTypes = {
   // ... other action types
 };
 
-let bufferSize = 1024 * 256;
+let bufferSize = 1024 * 512;
 
 // Define schema with type declarations
 // TODO: flatten / truncate the float64 values into smaller ints with fixed precision
