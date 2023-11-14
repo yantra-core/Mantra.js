@@ -3,7 +3,7 @@ import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 import messageSchema from "../server/messageSchema.js";
-import bbb from '../binary-bitstream-buffer/lib/index.js';
+import bbb from '@yantra-core/supreme';
 import BitBuffer from '../binary-bitstream-buffer/binary/BitBuffer.js';
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
