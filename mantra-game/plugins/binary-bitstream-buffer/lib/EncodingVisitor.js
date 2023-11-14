@@ -1,10 +1,10 @@
+// EncodingVisitor.js - Marak Squires 2023
 import Visitor from './Visitor.js';
 import BitStream from '../binary/BitStream.js';
 import BitBuffer from '../binary/BitBuffer.js';
 let bufferSize = 1024 * 512;
 
-let logger = console.log;
-logger = function noop () {};
+let logger = function noop () {};
 class EncodingVisitor extends Visitor {
   constructor() {
     super();
@@ -244,7 +244,6 @@ class EncodingVisitor extends Visitor {
     return this.stream.bitBuffer;
   }
 
-  // Additional methods like encodeInt32, encodeString, etc., can be added here
 }
 
 export default EncodingVisitor;

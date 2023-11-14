@@ -1,8 +1,8 @@
+// DecodingVisitor.js - Marak Squires 2023
 import Visitor from './Visitor.js';
 import BitStream from '../binary/BitStream.js'; // Import BitStream
 
-let logger = console.log;
-//logger = function noop () {};
+let logger = function noop () {};
 
 class DecodingVisitor extends Visitor {
   constructor(buffer) {

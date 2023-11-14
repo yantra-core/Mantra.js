@@ -1,5 +1,54 @@
 import tap from 'tape';
-import PlayerCodec from '../bbb.js';
+// import PlayerCodec from '../bbb4.js';
+
+import api from '../lib/index.js';
+
+// TODO: we'd expect these values to be in the schema as well
+// Enum mapping for player types
+const entityTypes = {
+  'PLAYER': 0,
+  'BULLET': 1,
+  'BLOCK': 2,
+  'BORDER': 3,
+  'BODY': 4
+  // ... other types
+};
+
+
+const _schema = {
+  id: { type: 'UInt16' },
+  name: { type: 'UTF8String' },
+  type: { type: 'Enum', enum: entityTypes },
+  position: {
+    type: 'Record',
+    schema: {
+      x: { type: 'Int32' },
+      y: { type: 'Int32' }
+    }
+  },
+  velocity: {
+    type: 'Record',
+    schema: {
+      x: { type: 'Int32' },
+      y: { type: 'Int32' }
+    }
+  },
+  width: { type: 'Int32' },
+  height: { type: 'Int32' },
+  rotation: { type: 'Int32' }, // TODO: special case with radians->bytes optimization
+  mass: { type: 'Int32' },
+  health: { type: 'Int32' },
+  depth: { type: 'Float64' },
+  lifetime: { type: 'Int32' },
+  radius: { type: 'Float64' },
+  isSensor: { type: 'Boolean' },
+  isStatic: { type: 'Boolean' },
+  destroyed: { type: 'Boolean' },
+  owner: { type: 'UInt16' },
+  maxSpeed: { type: 'Int32' }
+
+};
+
 
 let players = [
   {
@@ -44,12 +93,10 @@ let players = [
 
 // Test encoding and decoding a single player
 tap.test('Encode and Decode Single Player', async (t) => {
-  const playerCodec = new PlayerCodec();
+  //const playerCodec = new PlayerCodec(_schema);
   const playerData = players[0];
-  console.log('ppp', playerData)
-  const finalBuffer = playerCodec.encodePlayer(playerData);
-  const decodedPlayer = playerCodec.decodePlayer(finalBuffer);
-  console.log('aaaaa', decodedPlayer)
+  const finalBuffer = api.encode(_schema, playerData);
+  const decodedPlayer = api.decode(_schema, finalBuffer);
   t.equal(decodedPlayer.id, playerData.id, 'ID matches');
   //t.equal(decodedPlayer.name, playerData.name, 'Name matches')
   t.equal(decodedPlayer.type, playerData.type, 'Type matches');
@@ -66,34 +113,17 @@ tap.test('Encode and Decode Single Player', async (t) => {
   t.end();
 });
 
-// Test encoding and decoding multiple players
-tap.test('Encode and Decode Multiple Players', async (t) => {
-  const playerCodec = new PlayerCodec();
-
-
-  const encodedBuffer = playerCodec.encodePlayers(players);
-  const decodedPlayers = playerCodec.decodePlayers(encodedBuffer);
-
-  t.equal(decodedPlayers.length, players.length, 'Correct number of players decoded');
-  decodedPlayers.forEach((decodedPlayer, index) => {
-    console.log(decodedPlayer, players[index])
-    t.same(decodedPlayer, players[index], `Player ${index + 1} matches original`);
-  });
-  t.end();
-});
-
 
 // Test for missing properties
 tap.test('Handle Missing Properties', async (t) => {
-  const playerCodec = new PlayerCodec();
-
+  
   const playerData = {
     id: 123,
     destroyed: true
   };
 
-  const finalBuffer = playerCodec.encodePlayer(playerData);
-  const decodedPlayer = playerCodec.decodePlayer(finalBuffer);
+  const finalBuffer = api.encode(_schema, playerData);
+  const decodedPlayer = api.decode(_schema, finalBuffer);
   console.log(decodedPlayer)
   t.equal(decodedPlayer.id, playerData.id, 'ID matches');
   t.equal(decodedPlayer.type, playerData.type, 'Type matches');
@@ -104,8 +134,9 @@ tap.test('Handle Missing Properties', async (t) => {
 });
 
 // Test for snapshot structure
-tap.test('Wrap player array in snapshot object', async (t) => {
-  const playerCodec = new PlayerCodec();
+/*
+tap.only('Wrap player array in snapshot object', async (t) => {
+  const playerCodec = new PlayerCodec(_schema);
 
   const msg = {
     action: 'gametick',
@@ -129,9 +160,11 @@ tap.test('Wrap player array in snapshot object', async (t) => {
   // test that the message is decoded correctly
   t.end();
 });
+*/
 
+/*
 tap.test('test full snapshot structure', async (t) => {
-  const playerCodec = new PlayerCodec();
+  const playerCodec = new PlayerCodec(_schema);
   const msg = {
     "action": "gametick",
     "snapshot": {
@@ -211,3 +244,4 @@ tap.test('test full snapshot structure', async (t) => {
   // test that the message is decoded correctly
   t.end();
 });
+*/

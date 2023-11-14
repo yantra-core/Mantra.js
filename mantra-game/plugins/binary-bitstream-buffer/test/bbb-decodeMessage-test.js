@@ -1,5 +1,6 @@
 import tap from 'tape';
-import PlayerCodec from '../bbb4.js';
+// import PlayerCodec from '../bbb4.js';
+import api from '../lib/index.js';
 import BitBuffer from '../binary/BitBuffer.js';
 import BitStream from '../binary/BitStream.js';
 
@@ -15,7 +16,7 @@ const entityTypes = {
 const entitySchema = {
   id: { type: 'UInt16' },
   name: { type: 'UTF8String' },
-  type: { type: 'Enum', enum: entityTypes }
+  type: { type: 'Enum', enum: entityTypes },
 }
 
 const snapshotSchema = {
@@ -27,7 +28,7 @@ const snapshotSchema = {
 }
 
 // Create a new instance of PlayerCodec with the test schema
-const codec = new PlayerCodec(snapshotSchema);
+// const codec = new PlayerCodec(snapshotSchema);
 
 tap.test('decodeMessage should correctly decode various data types', (t) => {
   // Test with a message containing various data types
@@ -40,8 +41,8 @@ tap.test('decodeMessage should correctly decode various data types', (t) => {
   };
 
   // Encode and then decode the message
-  const encodedBuffer = codec.encodeMessage(testMessage);
-  const decodedMessage = codec.decodeMessage(encodedBuffer);
+  const encodedBuffer = api.encode(snapshotSchema, testMessage);
+  const decodedMessage = api.decode(snapshotSchema, encodedBuffer);
 
   // Check if the decoded message matches the original message
   t.deepEqual(decodedMessage, testMessage, 'Decoded message should match the original message');

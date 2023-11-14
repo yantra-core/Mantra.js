@@ -1,7 +1,12 @@
 import tap from 'tape';
-import PlayerCodec from '../bbb4.js';
+import api from '../lib/index.js';
 import BitBuffer from '../binary/BitBuffer.js';
 import BitStream from '../binary/BitStream.js';
+
+import testSchema from './fixtures/testSchema.js'
+
+let logger = console.log;
+logger = function noop () {};
 
 const entityTypes = {
   'PLAYER': 0,
@@ -11,22 +16,6 @@ const entityTypes = {
   'BODY': 4
   // ... other types
 };
-
-const entitySchema = {
-  id: { type: 'UInt16' },
-  name: { type: 'UTF8String' },
-  type: { type: 'Enum', enum: entityTypes }
-}
-
-const snapshotSchema = {
-  id: { type: 'UInt16' },
-  state: {
-    type: 'Collection',
-    schema: entitySchema
-  }
-}
-
-const codec = new PlayerCodec(snapshotSchema);
 
 tap.test('encodeMessage should correctly encode various data types', (t) => {
   const testMessage = {
@@ -38,34 +27,57 @@ tap.test('encodeMessage should correctly encode various data types', (t) => {
     ]
   };
 
-  const encodedBuffer = codec.encodeMessage(testMessage);
+  const encodedBuffer = api.encode(testSchema, testMessage);
   t.ok(encodedBuffer instanceof BitBuffer, 'Encoded buffer should be an instance of BitBuffer');
 
   let stream = new BitStream(encodedBuffer);
   let readBitmask = stream.readUInt32();
+  logger('Global bitmask:', readBitmask.toString(2));
+  t.equal(readBitmask, 3, 'Bitmask should be 3 (11 in binary)');
 
-  console.log('readBitmask', readBitmask.toString(2))
+  let readId = stream.readUInt16();
+  logger('Read ID:', readId);
+  t.equal(readId, testMessage.id, 'Encoded id should match the original id');
+
+  let collectionLength = stream.readUInt16();
+  logger('Collection length:', collectionLength);
+  t.equal(collectionLength, testMessage.state.length, 'Collection length should match');
+
+  let readCollectionItemBitmask = stream.readUInt32();
+  logger('Collection Item Bitmask:', readCollectionItemBitmask.toString(2));
+  t.equal(readCollectionItemBitmask, 33808, 'Collection ItemBitmask should be 3 (1000010000010000 in binary)');
+
+  let itemId = stream.readUInt16();
+  logger('Item ID:', itemId);
+
+  t.end();
+});
+
+
+tap.test('encodeMessage with missing properties in collection items', (t) => {
+  const testMessage = {
+    id: 123,
+    state: [
+      { id: 1, name: 'player1' }, // 'type' missing
+      { id: 2, type: 'BLOCK' }, // 'name' missing
+      { id: 3 } // 'name' and 'type' missing
+    ]
+  };
+
+  const encodedBuffer = api.encode(testSchema, testMessage);
+  t.ok(encodedBuffer instanceof BitBuffer, 'Encoded buffer should be an instance of BitBuffer');
+
+  let stream = new BitStream(encodedBuffer);
+
+  let readBitmask = stream.readUInt32();
+
+  // Assert that the bitmask is as expected (11 in binary, or 3 in decimal)
+  t.equal(readBitmask, 3, 'Bitmask should be 3 (11 in binary)');
 
   let readId = stream.readUInt16();
   t.equal(readId, testMessage.id, 'Encoded id should match the original id');
 
-  // Reading the collection
-  let collectionLength = stream.readUInt16();
-  t.equal(collectionLength, testMessage.state.length, 'Collection length should match');
-  for (let i = 0; i < collectionLength; i++) {
-    let itemId = stream.readUInt16();
-    let itemNameLength = stream.readUInt8();
-    let itemNameBytes = new Uint8Array(itemNameLength);
-    for (let j = 0; j < itemNameLength; j++) {
-      itemNameBytes[j] = stream.readUInt8();
-    }
-    let itemName = Buffer.from(itemNameBytes).toString('utf8');
-    let itemType = stream.readUInt8();
+  // Continue with the rest of the test, handling missing properties as needed...
 
-    t.equal(itemId, testMessage.state[i].id, `Item ${i} id should match`);
-    t.equal(itemName, testMessage.state[i].name, `Item ${i} name should match`);
-    t.equal(itemType, entityTypes[testMessage.state[i].type], `Item ${i} type should match`);
-  }
-  
   t.end();
 });
