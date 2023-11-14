@@ -2,7 +2,8 @@
 import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
-import bbb from '../binary-bitstream-buffer/bbb.js';
+import messageSchema from "../server/messageSchema.js";
+import bbb from '../binary-bitstream-buffer/lib/index.js';
 import BitBuffer from '../binary-bitstream-buffer/binary/BitBuffer.js';
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
@@ -186,8 +187,7 @@ export default class WebSocketClient {
       const byteArray = await decodeBlob(data);
       let receivedBuffer = new BitBuffer(byteArray.length * 8); // Create a new BitBuffer
       receivedBuffer.byteArray = byteArray; // Set the byteArray
-      let BBB = new bbb();
-      let bbbDecoded = BBB.decodeMessage(receivedBuffer);
+      let bbbDecoded = bbb.decode(messageSchema, receivedBuffer);
       data = bbbDecoded;
     }
 

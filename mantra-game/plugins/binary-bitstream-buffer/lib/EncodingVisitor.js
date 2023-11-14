@@ -40,7 +40,6 @@ class EncodingVisitor extends Visitor {
     for (const key of sortedKeys) {
       const field = schema[key];
       const fieldValue = object[key];
-      // console.log('ffff', field, key, object)
       if (fieldValue !== undefined) {
         logger(`[calculateBitmask] Key: ${key}, Bit Position: ${bitPosition}, Field Value:`, fieldValue, `Updated Bitmask: ${localBitmask.toString(2)} offset ${this.stream.offset}`);
         localBitmask |= (1 << bitPosition);
@@ -240,8 +239,10 @@ class EncodingVisitor extends Visitor {
 
   getBitBuffer() {
     logger(`Returning BitBuffer instance`);
-
-    return this.stream.bitBuffer;
+    let bytesUsed = Math.ceil(this.stream.offset / 8);
+    let finalBuffer = new BitBuffer(bytesUsed * 8);
+    finalBuffer.byteArray.set(this.stream.bitBuffer.byteArray.subarray(0, bytesUsed));
+    return finalBuffer;
   }
 
 }

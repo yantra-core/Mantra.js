@@ -44,7 +44,7 @@ class DecodingVisitor extends Visitor {
     if (field.type === 'Record') {
       logger("Decoding nested Record");
       const nestedVisitor = new DecodingVisitor(this.stream);
-      console.log('nestedVisitor field.schema', field.schema)
+      logger('nestedVisitor field.schema', field.schema)
       return nestedVisitor.visitObject(field.schema);
     } else if (field.type === 'Collection') {
       return this.decodeCollection(field.schema);

@@ -6,7 +6,8 @@ import { encode } from "@msgpack/msgpack";
 import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
 import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
 
-import bbb from '../binary-bitstream-buffer/bbb.js';
+import messageSchema from './messageSchema.js';
+import bbb from '../binary-bitstream-buffer/lib/index.js';
 
 let config = {};
 config.deltaEncoding = true;       // only sends changed states and property values
@@ -211,7 +212,7 @@ class WebSocketServerClass {
     };
 
     if (encoder) {
-      let encodedMessage = encoder.encodeMessage(message);
+      let encodedMessage = bbb.encode(messageSchema, message);
       client.send(encodedMessage.byteArray || encodedMessage);
     } else {
       client.send(JSON.stringify(message));
@@ -240,7 +241,7 @@ class WebSocketServerClass {
     }
 
     if (config.bbb) {
-      encoder = new bbb();
+      encoder = bbb.encode;
     } else if (config.msgpack) {
       encoder = msgpack; // Assuming msgpack is a global encoder object
     }
