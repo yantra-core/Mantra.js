@@ -206,8 +206,9 @@ class WebSocketServerClass {
 
   sendSnapshot(client, snapshot, lastProcessedInput, encoder = null) {
     let message = {
+      id: snapshot.id,
       action: 'gametick',
-      snapshot: snapshot,
+      state: snapshot.state,
       lastProcessedInput: lastProcessedInput
     };
 

@@ -4,7 +4,7 @@ import BitStream from '../binary/BitStream.js';
 import BitBuffer from '../binary/BitBuffer.js';
 let bufferSize = 1024 * 512;
 
-let logger = function noop () {};
+// let // logger = function noop () {};
 class EncodingVisitor extends Visitor {
   constructor() {
     super();
@@ -19,7 +19,7 @@ class EncodingVisitor extends Visitor {
 
     // First pass: Calculate bitmask
     let localBitmask = this.calculateBitmask(object, schema);
-    logger(`[visitObject] Calculated bitmask: ${localBitmask.toString(2)}`);
+    // logger(`[visitObject] Calculated bitmask: ${localBitmask.toString(2)}`);
 
     // Write bitmask to stream
     this.writeBitmaskToLocalStream(localBitmask);
@@ -41,16 +41,16 @@ class EncodingVisitor extends Visitor {
       const field = schema[key];
       const fieldValue = object[key];
       if (fieldValue !== undefined) {
-        logger(`[calculateBitmask] Key: ${key}, Bit Position: ${bitPosition}, Field Value:`, fieldValue, `Updated Bitmask: ${localBitmask.toString(2)} offset ${this.stream.offset}`);
+        // logger(`[calculateBitmask] Key: ${key}, Bit Position: ${bitPosition}, Field Value:`, fieldValue, `Updated Bitmask: ${localBitmask.toString(2)} offset ${this.stream.offset}`);
         localBitmask |= (1 << bitPosition);
       } else {
-        logger(`[calculateBitmask] Skipping Key: ${key}, Bit Position: ${bitPosition}, Field Value:`, fieldValue, `Updated Bitmask: ${localBitmask.toString(2)}`);
+        // logger(`[calculateBitmask] Skipping Key: ${key}, Bit Position: ${bitPosition}, Field Value:`, fieldValue, `Updated Bitmask: ${localBitmask.toString(2)}`);
       }
 
       bitPosition++;
     }
 
-    logger(`[calculateBitmask] End: Calculated bitmask: ${localBitmask.toString(2)}`);
+    // logger(`[calculateBitmask] End: Calculated bitmask: ${localBitmask.toString(2)}`);
     return localBitmask;
   }
 
@@ -64,15 +64,15 @@ class EncodingVisitor extends Visitor {
       const fieldValue = object[key];
 
       if (fieldValue !== undefined) {
-        logger(`[encodeFields] Field: ${key}, Bit Position: ${this.bitPosition}, Field Value:`, fieldValue);
+        // logger(`[encodeFields] Field: ${key}, Bit Position: ${this.bitPosition}, Field Value:`, fieldValue);
         this.visitField(field, fieldValue);
       } else {
-        logger(`[encodeFields] Skipping Field: ${key}, Bit Position: ${this.bitPosition}`);
+        // logger(`[encodeFields] Skipping Field: ${key}, Bit Position: ${this.bitPosition}`);
       }
 
       this.bitPosition++;
     }
-    logger(`[encodeFields] End`);
+    // logger(`[encodeFields] End`);
   }
 
   visitField(field, fieldValue) {
@@ -99,47 +99,48 @@ class EncodingVisitor extends Visitor {
   }
 
   writeBitmaskToLocalStream(bitmask) {
-    logger(`Writing bitmask ${bitmask.toString(2)} to stream at offset ${this.stream.offset}`);
+    // logger(`Writing bitmask ${bitmask.toString(2)} to stream at offset ${this.stream.offset}`);
     this.stream.writeUInt32(bitmask >>> 0);
   }
 
   encodeNestedStructure(object, schema) {
-    logger("Encoding nested structure:", object);
+    // logger("Encoding nested structure:", object);
 
     const nestedVisitor = new EncodingVisitor();
     nestedVisitor.visitObject(object, schema);
-    logger('appendToStream offset', nestedVisitor.stream.offset)
+    // logger('appendToStream offset', nestedVisitor.stream.offset)
     this.appendToStream(nestedVisitor.stream);
   }
 
   encodeCollection(collection, schema) {
-    logger('Current offset', this.stream.offset)
-    logger("Encoding collection of length:", collection.length)
+    // logger('Current offset', this.stream.offset)
+    // logger("Encoding collection of length:", collection.length)
   
     // Write the length of the collection
-    logger('Offset before writing collection length', this.stream.offset);
+    // logger('Offset before writing collection length', this.stream.offset);
 
-    logger('writing collection.length', collection.length)
+    // logger('writing collection.length', collection.length)
     this.stream.writeUInt16(collection.length);
-    logger('Offset after writing collection length', this.stream.offset);
+    // logger('Offset after writing collection length', this.stream.offset);
   
-    collection.forEach(item => {
+    for (let i = 0; i < collection.length; i++) {
       // Create a new visitor for each item to generate its bitmask
+      const item = collection[i];
       const itemVisitor = new EncodingVisitor();
       const itemBitmask = itemVisitor.createBitmask(item, schema);
       
       // Write the bitmask for the item
-      logger(`Writing item bitmask ${itemBitmask.toString(2)} to stream`);
+      // logger(`Writing item bitmask ${itemBitmask.toString(2)} to stream`);
       this.stream.writeUInt32(itemBitmask >>> 0);
   
       // Now encode the item itself
       this.encodeNestedStructure(item, schema);
-    });
+    }
   }
   
   appendToStream(otherStream) {
-    logger('otherStream.offset', otherStream.offset);
-    logger('this.stream.offset', this.stream.offset);
+    // logger('otherStream.offset', otherStream.offset);
+    // logger('this.stream.offset', this.stream.offset);
 
     // Calculate the number of bits to append
     const bitsToAppend = otherStream.offset;
@@ -157,9 +158,9 @@ class EncodingVisitor extends Visitor {
 
   encodeField(value, type, fullSchema) {
     let stream = this.stream;
-    logger(`[encodeField] Start: type = ${type}, value =`, value, `Pre-offset: ${stream.offset}`);
+    // logger(`[encodeField] Start: type = ${type}, value =`, value, `Pre-offset: ${stream.offset}`);
 
-    logger(`Encoding field of type ${type} with value:`, value);
+    // logger(`Encoding field of type ${type} with value:`, value);
     switch (type) {
       case 'Int10':
         stream.writeInt10(value);
@@ -176,18 +177,18 @@ class EncodingVisitor extends Visitor {
       case 'UTF8String':
         let utf8Bytes = Buffer.from(value, 'utf8');
         stream.writeUInt8(utf8Bytes.length);
-        for (let byte of utf8Bytes) {
-          stream.writeUInt8(byte);
+        for (let i = 0; i < utf8Bytes.length; i++) {
+          stream.writeUInt8(utf8Bytes[i]);
         }
         break;
       // In encodeField, when handling an Enum
       case 'Enum':
         //const enumSchema = (index !== null) ? itemSchema : schema;
         //const enumValue = this.getEnumValue(value, enumSchema);
-        //logger("WRITING ENUM value", key, enumValue);
+        //// logger("WRITING ENUM value", key, enumValue);
         // logger('itemSchema', fullSchema, type, value)
         let enumValue = fullSchema.enum[value];
-        logger("WRITING", enumValue)
+        // logger("WRITING", enumValue)
         stream.writeUInt8(enumValue);
         break;
       case 'Boolean':
@@ -202,18 +203,17 @@ class EncodingVisitor extends Visitor {
       case 'ASCIIString':
         let asciiBytes = Buffer.from(value, 'ascii');
         stream.writeUInt8(asciiBytes.length);
-        for (let byte of asciiBytes) {
-          stream.writeUInt8(byte);
+        for (let i = 0; i < asciiBytes.length; i++) {
+          stream.writeUInt8(asciiBytes[i]);
         }
         break;
 
       // ... other cases ...
     }
 
-    logger(`[encodeField] End: type = ${type}, value =`, value, `Post-offset: ${stream.offset}`);
+    // logger(`[encodeField] End: type = ${type}, value =`, value, `Post-offset: ${stream.offset}`);
 
   }
-
 
   getEnumValue(value, enumSchema) {
     if (value in enumSchema.enum) {
@@ -231,14 +231,14 @@ class EncodingVisitor extends Visitor {
   }
 
   getEncodedBuffer() {
-    logger(`Returning encoded buffer with length: ${this.stream.offset}`);
+    // logger(`Returning encoded buffer with length: ${this.stream.offset}`);
 
     // Return the portion of the buffer that has been used
     return this.stream.bitBuffer.byteArray.slice(0, this.stream.offset);
   }
 
   getBitBuffer() {
-    logger(`Returning BitBuffer instance`);
+    // logger(`Returning BitBuffer instance`);
     let bytesUsed = Math.ceil(this.stream.offset / 8);
     let finalBuffer = new BitBuffer(bytesUsed * 8);
     finalBuffer.byteArray.set(this.stream.bitBuffer.byteArray.subarray(0, bytesUsed));

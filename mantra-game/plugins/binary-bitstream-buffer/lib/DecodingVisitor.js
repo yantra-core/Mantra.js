@@ -2,7 +2,7 @@
 import Visitor from './Visitor.js';
 import BitStream from '../binary/BitStream.js'; // Import BitStream
 
-let logger = function noop () {};
+// let // logger = function noop () {};
 
 class DecodingVisitor extends Visitor {
   constructor(buffer) {
@@ -10,14 +10,15 @@ class DecodingVisitor extends Visitor {
     this.buffer = buffer;  // Buffer containing the encoded data
     this.bitPosition = 0;
     this.stream = new BitStream(buffer); // Use BitStream
-
+    // Initialize a Map cache for enum lookups
+    this.enumCache = new Map();
   }
 
   visitObject(schema) {
     // logger("Visiting Object with schema:", schema);
     let decodedObject = {};
     let localBitmask = this.readBitmask();
-    logger("Decoded Bitmask:", localBitmask.toString(2));
+    // logger("Decoded Bitmask:", localBitmask.toString(2));
 
     const sortedKeys = Object.keys(schema).sort();
     // logger("Sorted Keys:", sortedKeys);
@@ -25,26 +26,26 @@ class DecodingVisitor extends Visitor {
     for (const key of sortedKeys) {
       // logger(`Visiting field: ${key}, Bit Position: ${this.bitPosition}`);
       if (this.isFieldPresent(localBitmask, this.bitPosition)) {
-        logger(`Field ${key} is present, decoding.`);
+        // logger(`Field ${key} is present, decoding.`);
         decodedObject[key] = this.visitField(schema[key]);
-        logger(`Decoded field [${key}]:`, decodedObject[key]);
+        // logger(`Decoded field [${key}]:`, decodedObject[key]);
       } else {
-        logger(`Field ${key} is not present, skipping.`);
+        // logger(`Field ${key} is not present, skipping.`);
       }
 
       this.bitPosition++;
     }
 
-    logger("Decoded object:", decodedObject);
+    // logger("Decoded object:", decodedObject);
     return decodedObject;
   }
 
   visitField(field) {
     // logger("Visiting Field:", field);
     if (field.type === 'Record') {
-      logger("Decoding nested Record");
+      // logger("Decoding nested Record");
       const nestedVisitor = new DecodingVisitor(this.stream);
-      logger('nestedVisitor field.schema', field.schema)
+      // logger('nestedVisitor field.schema', field.schema)
       return nestedVisitor.visitObject(field.schema);
     } else if (field.type === 'Collection') {
       return this.decodeCollection(field.schema);
@@ -54,9 +55,9 @@ class DecodingVisitor extends Visitor {
   }
 
   readBitmask() {
-    logger("Reading bitmask");
+    // logger("Reading bitmask");
     const bitmask = this.stream.readUInt32(); // Use BitStream to read bitmask
-    logger("Read Bitmask:", bitmask.toString(2));
+    // logger("Read Bitmask:", bitmask.toString(2));
     return bitmask;
   }
 
@@ -65,31 +66,18 @@ class DecodingVisitor extends Visitor {
   }
 
   decodeCollection(schema) {
-    logger("Decoding collection");
     const length = this.stream.readUInt16();
-    logger(`Collection length read as: ${length}`);
     let collection = [];
-
     for (let i = 0; i < length; i++) {
-      logger(`Decoding item ${i + 1}/${length} of the collection.`);
-      // Read the bitmask for the current item
       const itemBitmask = this.stream.readUInt32();
-      logger(`Item bitmask read as: ${itemBitmask.toString(2)}`);
-
-      // Create a new DecodingVisitor for the item
-      const itemVisitor = new DecodingVisitor(this.stream);
-      const item = itemVisitor.visitObject(schema, itemBitmask);
-
-      collection.push(item);
-      logger(`Item ${i + 1} decoded`);
+      this.bitPosition = 0; // Reset bit position for each item
+      collection.push(this.visitObject(schema));
     }
-
-    logger(`Decoded collection:`, collection);
     return collection;
   }
 
   decodeField(type, fieldSchema) {
-    logger(`Decoding field of type: ${type}, at offset: ${this.offset}`);
+    // logger(`Decoding field of type: ${type}, at offset: ${this.offset}`);
 
     switch (type) {
       case 'Int10':
@@ -132,17 +120,32 @@ class DecodingVisitor extends Visitor {
       default:
         throw new Error(`Unrecognized field type: ${type}`);
     }
-    logger(`Field decoded, new offset: ${this.offset}`);
+    // logger(`Field decoded, new offset: ${this.offset}`);
 
   }
 
   getEnumKeyByValue(enumObj, value) {
-    return Object.keys(enumObj).find(key => enumObj[key] === value);
+    // Check if the cache for this specific enum object exists
+    if (!this.enumCache.has(enumObj)) {
+      this.enumCache.set(enumObj, new Map());
+    }
+
+    let enumValueCache = this.enumCache.get(enumObj);
+
+    // If the value has been cached, return it directly
+    if (enumValueCache.has(value)) {
+      return enumValueCache.get(value);
+    }
+
+    // Otherwise, find the key, cache it, and return it
+    const key = Object.keys(enumObj).find(key => enumObj[key] === value);
+    enumValueCache.set(value, key);
+    return key;
   }
 
   // Entry function for decoding
   decode(schema) {
-    logger("Starting decoding process");
+    // logger("Starting decoding process");
 
     return this.visitObject(schema);
   }

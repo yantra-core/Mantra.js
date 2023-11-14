@@ -193,14 +193,14 @@ export default class WebSocketClient {
 
     if (config.deltaCompression) {
       // "player1" can be any string, as long as its consistent on the local client
-      data.snapshot = deltaCompression.decompress('player1', data.snapshot);
+      data = deltaCompression.decompress('player1', data);
     }
 
     if (data.action === "gametick") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
-      this.game.latestSnapshot = data.snapshot;
-      game.snapshotQueue.push(data.snapshot);
+      this.game.latestSnapshot = data;
+      game.snapshotQueue.push(data);
 
       // TODO: add config flag here for snapshot interpolation
       // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);

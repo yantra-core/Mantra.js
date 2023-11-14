@@ -50,19 +50,12 @@ const playerSchema = {
 
 };
 
-const snapshotSchema = {
+const messageSchema = {
   id: { type: 'UInt16' },
+  action: { type: 'Enum', enum: actionTypes },
   state: {
     type: 'Collection',
     schema: playerSchema
-  }
-}
-
-const messageSchema = {
-  action: { type: 'Enum', enum: actionTypes },
-  snapshot: {
-    type: 'Record',
-    schema: snapshotSchema
   },
   lastProcessedInput: { type: 'UInt16' },
 };
