@@ -3,11 +3,12 @@ import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 import messageSchema from "../server/messageSchema.js";
+import gameTick from "../../lib/gameTick.js";
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
 config.msgpack = false;
-config.deltaCompression = true;
+config.deltaCompression = false;
 config.bbb = false;
 config.protobuf = true;
 
@@ -127,11 +128,13 @@ export default class WebSocketClient {
       // Remark: Client-side prediction is close; however we were seeing some ghosting issues
       //         More unit tests and test coverage is required for: snapshots, interpolation, and prediction
       /*
-      entityInput.handleInputs(this.entityName, {
+        entityInput.handleInputs(this.entityName, {
         controls: data.controls,
         mouse: data.mouse
       }, this.inputSequenceNumber);
+
       */
+
       var message = JSON.stringify(Object.assign({ action: action, sequenceNumber: this.inputSequenceNumber }, data));
       this.socket.send(message);
     } else {
@@ -211,9 +214,9 @@ export default class WebSocketClient {
     }
 
     if (data.action === "GAMETICK") {
-
       this.game.previousSnapshot = this.game.latestSnapshot;
       this.game.latestSnapshot = data;
+
       game.snapshotQueue.push(data);
 
       // TODO: add config flag here for snapshot interpolation

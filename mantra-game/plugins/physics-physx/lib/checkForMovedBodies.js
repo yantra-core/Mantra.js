@@ -9,7 +9,7 @@ export default function checkForMovedBodies() {
     //this.broadcastBodyState(entityId, body);
     //console.log('eee', myEntityId, body)
     let bodyPosition = this.getBodyPosition(body);
-    let ent = this.game.entities[myEntityId];
+    let ent = this.game.entities.get(myEntityId);
     //console.log('ent', ent)
 
     if (!ent) {

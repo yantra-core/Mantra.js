@@ -147,8 +147,8 @@ class ThreeGraphics extends GraphicsInterface {
     // Update the controls on each frame
     // this.controls.update();
     // Follow the player entity with the camera
-    for (let eId in this.game.entities) {
-      let ent = this.game.entities[eId];
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
       this.inflateEntity(ent, alpha);
     }
     this.renderer.render(this.scene, this.camera);

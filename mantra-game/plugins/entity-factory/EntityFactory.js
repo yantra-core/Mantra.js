@@ -22,8 +22,8 @@ class EntityFactory {
     // bind game scope to this.game
     this.game = game;
 
-    // init an empty array to hold all entities
-    game.entities = {};
+    // init a new Map to store entities
+    game.entities = new Map();
 
     this.game.systemsManager.addSystem('entityFactory', this);
 
@@ -36,6 +36,53 @@ class EntityFactory {
     this.game.getEntities = this.getEntities.bind(this);
     this.game.updateEntity = this.updateEntity.bind(this);
     this.game.inflateEntity = this.inflateEntity.bind(this);
+
+  }
+
+  
+
+  getEntity(entityId) {
+    if (typeof this.game.entities.get(entityId) === 'undefined') {
+      // console.log('No such entity', entityId);
+      return null;
+    }
+
+    const entity = {
+      id: entityId
+    };
+
+    // Iterate over all registered components and fetch their data if available
+    for (const componentType in this.game.components) {
+      const componentData = this.game.getComponent(entityId, componentType);
+      if (componentData) {
+        entity[componentType] = componentData;
+      }
+    }
+
+
+    return entity;
+
+  }
+
+  removeEntity(entityId) {
+
+    let ent = this.game.entities.get(entityId);;
+
+    if (ent && this.game.systems.graphics && ent.graphics) {
+      // Is this best done here? or in the graphics plugin?
+      this.game.systems.graphics.removeGraphic(entityId);
+    }
+
+    if (ent) {
+      this.game.components.destroyed.set(entityId, true);
+      // update the entity with the destroyed state
+      let updatedEntity = this.game.getEntity(entityId);
+      this.game.entities.set(entityId, updatedEntity);
+    }
+
+    // deltaCompression.removeState(entityId);
+
+    // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
 
   }
 
@@ -59,56 +106,9 @@ class EntityFactory {
           this.game.components[componentType].remove(entityId);
         }
         // Delete the entity from entities map
-        delete this.game.entities[entityId];
+        this.game.entities.delete(entityId);
       }
     }
-  }
-
-  getEntity(entityId) {
-
-    if (!this.game.entities[entityId]) {
-      // console.log('No such entity', entityId);
-      return null;
-    }
-
-    const entity = {
-      id: entityId
-    };
-
-    // Iterate over all registered components and fetch their data if available
-    for (const componentType in this.game.components) {
-      const componentData = this.game.getComponent(entityId, componentType);
-      if (componentData) {
-        entity[componentType] = componentData;
-      }
-    }
-
-
-    return entity;
-
-  }
-
-  removeEntity(entityId) {
-    let ent = this.game.entities[entityId];
-
-    if (ent) {
-      this.game.removedEntities.add({
-        id: entityId, // Remark: Instead of just id and type, we could add the entire entity here
-        type: ent.type
-      });
-    }
-
-    if (ent && this.game.systems.graphics && ent.graphics) {
-      // Is this best done here? or in the graphics plugin?
-      this.game.systems.graphics.removeGraphic(entityId);
-    }
-
-    this.game.components.destroyed.set(entityId, true);
-
-    // deltaCompression.removeState(entityId);
-
-    // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
-
   }
 
   // Update the getEntities method to return the game.entities
@@ -266,14 +266,13 @@ class EntityFactory {
 
     // Add the entity to the game entities scope
     // TODO: new Entity() should do this
-    this.game.entities[entityId] = {
+    this.game.entities.set(entityId, {
       id: entityId
-    }
+    });
 
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);
-
-    this.game.entities[entityId] = updatedEntity;
+    this.game.entities.set(entityId, updatedEntity);
 
     return updatedEntity;
   }
@@ -285,8 +284,8 @@ class EntityFactory {
     // on the current local state of the entity and incoming state
     // if the incoming state is pending destroy, just remove it immediately and return
     if (entityData.destroyed === true) {
-      game.removeEntity(entityData.id);
       game.removeGraphic(entityData.id);
+      game.removeEntity(entityData.id);
       return;
     }
 
@@ -299,7 +298,7 @@ class EntityFactory {
     }
 
     // this isn't a destroyed state, attempt to get a copy of the local state by id
-    let localEntity = game.entities[entityData.id];
+    let localEntity = game.entities.get(entityData.id);
     if (!localEntity) {
       // no local copy of the state exists, create a new entity
       if (typeof entityData.height === 'undefined' || typeof entityData.width === 'undefined') {
@@ -315,7 +314,7 @@ class EntityFactory {
       game.updateEntity(entityData);
     }
 
-    let updated = game.entities[entityData.id];
+    let updated = game.entities.get(entityData.id);
     if (game.systems.graphics) {
 
       // if there are no graphics, create them

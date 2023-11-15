@@ -136,7 +136,7 @@ class BulletPlugin {
       }
 
       //
-      // Bullets are destroyed if they hit a border
+      // Bullets are destroyed if they hit a BORDER
       //
       if (entityA.type === 'BULLET' && entityB.type === 'BORDER') {
         // destroy the bullet if it hits a border wall
@@ -144,6 +144,20 @@ class BulletPlugin {
         return;
       }
       if (entityA.type === 'BORDER' && entityB.type === 'BULLET') {
+        // destroy the bullet if it hits a border wall
+        this.game.removeEntity(entityIdB);
+        return;
+      }
+
+      //
+      // Bullets are destroyed if they hit a BLOCK
+      //
+      if (entityA.type === 'BULLET' && entityB.type === 'BLOCK') {
+        // destroy the bullet if it hits a border wall
+        this.game.removeEntity(entityIdA);
+        return;
+      }
+      if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
         // destroy the bullet if it hits a border wall
         this.game.removeEntity(entityIdB);
         return;

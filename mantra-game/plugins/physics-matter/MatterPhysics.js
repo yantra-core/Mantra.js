@@ -82,7 +82,7 @@ class MatterPhysics extends PhysicsInterface {
             // this should probably be in entity-movement plugin
             /*            */
             // console.log(body.myEntityId, body.position)
-            let ent = this.game.entities[body.myEntityId];
+            let ent = this.game.entities.get(body.myEntityId);
             // console.log('client ent', ent.id ,body.position)
             // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
             if (this.game.localGameLoopRunning || entity.type === 'BULLET') {

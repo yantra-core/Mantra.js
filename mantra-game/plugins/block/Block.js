@@ -22,8 +22,8 @@ class Block {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;
 
-      const entityA = this.game.entities[entityIdA];
-      const entityB = this.game.entities[entityIdB];
+      const entityA = this.game.entities.get(entityIdA);
+      const entityB = this.game.entities.get(entityIdB);
 
       if (!entityA || !entityB) {
         console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
