@@ -184,5 +184,12 @@ const getDelta = (currentValue, lastKnownValue) => {
   return truncateToPrecision(delta);
 };
 
+function initializeDefaultState(id) {
+  let defaultState = { id: id };
+  config.floatProperties.forEach(prop => {
+    defaultState[prop] = 0; // Initialize all float properties with default value 0
+  });
+  return defaultState;
+}
 
 export default deltaCompression;

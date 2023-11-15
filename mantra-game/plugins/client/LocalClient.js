@@ -29,6 +29,7 @@ export default class LocalClient {
     let self = this;
 
     // Wait for all systems to be ready before starting the game loop
+    // TODO: replace this with general 'ready' event
     if (!physicsReady || graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
       setTimeout(function(){
         self.start(callback);

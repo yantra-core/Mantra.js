@@ -5,6 +5,7 @@ class Block {
     // Assuming the config includes width and height properties
     this.width = config.width || 40; // Default size if none provided
     this.height = config.height || 40; // Default size if none provided
+    this.MIN_BLOCK_SIZE = 50;
   }
 
   init(game) {
@@ -49,7 +50,7 @@ class Block {
       this.game.removeEntity(entityIdB);
 
       // Check if the block is big enough to split
-      if (entityA.width <= 100 && entityA.height <= 100) {
+      if (entityA.width <= this.MIN_BLOCK_SIZE && entityA.height <= this.MIN_BLOCK_SIZE) {
         this.game.removeEntity(entityIdA);
         return;
       }

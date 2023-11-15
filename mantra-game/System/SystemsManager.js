@@ -11,9 +11,13 @@ class SystemsManager {
     if (this.systems.has(systemName)) {
       throw new Error(`System with name ${systemName} already exists!`);
     }
-    // TODO: add this later
+    // Remark: Defaulting all plugins as EE has been disabled for now
+    // Remark: We need to piece meal this / granularize it so that the wildcard regex
     // registers the new system in event emitter
-    eventEmitter.bindClass(system, systemName)
+    // the best option we can do is have the event binding be default off
+    // then setup defaults for the required default systems ( possibly listening event / etc )
+    // eventEmitter.bindClass(system, systemName)
+
     // binds system to local instance Map
     this.systems.set(systemName, system);
     // binds system to game.systems scope for convenience
