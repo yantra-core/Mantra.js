@@ -7,16 +7,17 @@ import WebsocketServer from '../mantra-game/plugins/server/WebsocketServer.js';
 const game = new Game({
   isServer: true
 });
+
+game.use(new plugins.Schema());
+
 game.use(new plugins.Bullet());
 game.use(new plugins.Block());
-
-game.use(new plugins.Collision());
 
 //game.use(new plugins.Border({ autoBorder: true }));
 
 game.use(new WebsocketServer());
 
- game.use(new plugins.Border({ autoBorder: false }));
+game.use(new plugins.Border({ autoBorder: false }));
 
 game.on('listening', function (port) {
 

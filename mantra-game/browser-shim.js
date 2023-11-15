@@ -23,6 +23,7 @@ MANTRA.plugins = {
   InputLegend: require('./plugins/input-legend/InputLegend.js').default,
   PingTime: require('./plugins/ping-time/PingTime.js').default,
   SnapshotSize: require('./plugins/snapshot-size/SnapshotSize.js').default,
+  Schema: require('./plugins/schema/Schema.js').default,
   CurrentFPS: require('./plugins/current-fps/CurrentFPS.js').default,
   Keyboard: require('./plugins/keyboard/Keyboard.js').default,
   Lifetime: require('./plugins/lifetime/Lifetime.js').default,

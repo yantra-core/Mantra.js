@@ -3,14 +3,13 @@ import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 import messageSchema from "../server/messageSchema.js";
-import bbb from '@yantra-core/supreme';
-import BitBuffer from '../binary-bitstream-buffer/binary/BitBuffer.js';
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
 config.msgpack = false;
 config.deltaCompression = true;
-config.bbb = true;
+config.bbb = false;
+config.protobuf = true;
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
@@ -59,6 +58,7 @@ export default class WebSocketClient {
     this.game.communicationClient = this;
     this.game.onlineGameLoopRunning = true;
     this.socket = new WebSocket(url);
+    this.socket.binaryType = 'arraybuffer';
     this.socket.onopen = this.handleOpen.bind(this);
     this.socket.onmessage = this.handleMessage.bind(this);
     this.socket.onclose = this.handleClose.bind(this);
@@ -191,12 +191,26 @@ export default class WebSocketClient {
       data = bbbDecoded;
     }
 
+    if (config.protobuf) {
+      // data is current blog, needs to be converted to buffer?
+      let uint8Array = new Uint8Array(data);
+      var message = game.Message.decode(uint8Array);
+      // Convert the message back to a plain object
+      var object = game.Message.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+        // see ConversionOptions
+      });
+      data = object;
+    }
+
     if (config.deltaCompression) {
       // "player1" can be any string, as long as its consistent on the local client
       data = deltaCompression.decompress('player1', data);
     }
 
-    if (data.action === "gametick") {
+    if (data.action === "GAMETICK") {
 
       this.game.previousSnapshot = this.game.latestSnapshot;
       this.game.latestSnapshot = data;
@@ -248,18 +262,13 @@ export default class WebSocketClient {
   }
 
   // This method tracks the size of each snapshot and calculates the average
-  trackSnapshotSize(dataString) {
+  trackSnapshotSize(data) {
+
+    let uint8Array = new Uint8Array(data);
+    let size = uint8Array.length;
     // console.log(dataString)
     // In a browser environment, create a new Blob and get its size
 
-    let size;
-
-    if (typeof dataString === 'string') {
-      let buffer = encoder.encode(dataString);
-      size = buffer.byteLength;
-      } else {
-        size = dataString.size;
-    }
 
     this.totalSnapshotSize += size;
     this.snapshotCount++;

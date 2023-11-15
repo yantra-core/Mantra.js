@@ -14,7 +14,7 @@ config.deltaEncoding = true;       // only sends changed states and property val
 config.deltaCompression = true;   // only send differences between int values
 config.bbb = true;                 // see: @yantra-core/binary-bitstream-buffer
 config.msgpack = false;            // `msgpack` not being used in favor of `bbb`
-
+config.protobuf = true;            // `protobuf` via protobufjs
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
@@ -207,14 +207,13 @@ class WebSocketServerClass {
   sendSnapshot(client, snapshot, lastProcessedInput, encoder = null) {
     let message = {
       id: snapshot.id,
-      action: 'gametick',
+      action: 'GAMETICK',
       state: snapshot.state,
       lastProcessedInput: lastProcessedInput
     };
-
     if (encoder) {
-      let encodedMessage = bbb.encode(messageSchema, message);
-      client.send(encodedMessage.byteArray || encodedMessage);
+      let encodedMessage = encoder.encode(messageSchema, message);
+      client.send(encodedMessage);
     } else {
       client.send(JSON.stringify(message));
     }
@@ -241,8 +240,16 @@ class WebSocketServerClass {
       snapshotToSend = deltaEncodedSnapshot;
     }
 
-    if (config.bbb) {
-      encoder = bbb.encode;
+    if (config.protobuf) {
+      encoder = {
+        encode: function (schema, message) {
+          // Create a new message
+          let _message = game.Message.fromObject(message); // or use .fromObject if conversion is necessary
+          // Encode a message to an Uint8Array (browser) or Buffer (node)
+          let buffer = game.Message.encode(_message).finish();
+          return buffer;
+        }
+      };
     } else if (config.msgpack) {
       encoder = msgpack; // Assuming msgpack is a global encoder object
     }

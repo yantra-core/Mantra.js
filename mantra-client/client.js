@@ -105,6 +105,7 @@ game
   .use(new plugins.Bullet())
   .use(new plugins.Block())
 
+game.use(new plugins.Schema());
 
 game.use(new plugins.InputLegend());
 game.use(new plugins.PingTime());
@@ -161,7 +162,7 @@ function switchToOnline() {
 /**/
 
 
-let mode = 'offline';
+let mode = 'online';
 let env = 'local'; // local / prod
 
 if (mode === 'online') {
@@ -208,7 +209,7 @@ if (mode === 'online') {
       depth: 200,
       position: {
         x: 0,
-        y: -500
+        y: -1000
       },
     });
 
