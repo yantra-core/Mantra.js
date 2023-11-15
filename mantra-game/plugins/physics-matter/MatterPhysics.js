@@ -58,7 +58,7 @@ class MatterPhysics extends PhysicsInterface {
           //
           // Clamp max speed
           //
-          let maxSpeed = 10;
+          let maxSpeed = 100; // TODO: move to config
           if (entity.maxSpeed) {
             maxSpeed = entity.maxSpeed;
           }
@@ -85,12 +85,21 @@ class MatterPhysics extends PhysicsInterface {
             let ent = this.game.entities.get(body.myEntityId);
             // console.log('client ent', ent.id ,body.position)
             // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
-            if (this.game.localGameLoopRunning || entity.type === 'BULLET') {
+            if (this.game.localGameLoopRunning) {
               this.game.changedEntities.add(body.myEntityId);
               this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
               this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
               this.game.components.rotation.set(body.myEntityId, body.angle);
             }
+
+            if (ent.type === 'BULLET') {
+              this.game.changedEntities.add(body.myEntityId);
+              this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+              this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+              this.game.components.rotation.set(body.myEntityId, body.angle);
+            }
+
+
           } else {
             // this is the logic for updating *all* entities positions
             // this should probably be in entity-movement plugin

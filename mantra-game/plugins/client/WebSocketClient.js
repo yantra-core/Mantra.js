@@ -8,7 +8,7 @@ let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
 config.msgpack = false;
-config.deltaCompression = false;
+config.deltaCompression = true;
 config.bbb = false;
 config.protobuf = true;
 

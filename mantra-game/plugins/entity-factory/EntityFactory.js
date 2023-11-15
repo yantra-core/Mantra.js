@@ -252,11 +252,9 @@ class EntityFactory {
       body.myEntityId = entityId;
       this.game.physics.addToWorld(this.game.engine, body);
       this.game.bodyMap[entityId] = body;
-
       if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
         this.game.physics.setVelocity(body, velocity);
       }
-
       if (position) {
         this.game.physics.setPosition(body, position);
       }
@@ -312,19 +310,6 @@ class EntityFactory {
     } else {
       // a local copy of the state exists, update it
       game.updateEntity(entityData);
-    }
-
-    let updated = game.entities.get(entityData.id);
-    if (game.systems.graphics) {
-
-      // if there are no graphics, create them
-      if (!updated.graphics) {
-        game.createGraphic(entityData);
-      } else {
-        // Remark: This is now handled by render() loop
-        // TODO: remove all grapics references from this file
-        // game.updateGraphic(updated);
-      }
     }
 
   }

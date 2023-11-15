@@ -1,6 +1,17 @@
 // deltaCompression.js - Marak Squires 2023
 import float2Int from './float2Int.js'; // Assuming float2Int.js is in the same directory
 
+const DEFAULTS = {
+  position: { x: 0, y: 0 },
+  velocity: { x: 0, y: 0 },
+  rotation: 0,
+  width: 0,
+  height: 0,
+  mass: 0,
+  health: 0,
+  lifetime: 0,
+  maxSpeed: 0
+};
 
 let playerStateCache = {};
 let localPlayerStateCache = {};
@@ -54,9 +65,12 @@ deltaCompression.compress = function compress(playerId, snapshot) {
         return;
       }
 
-      let lastKnownState = playerStateCache[playerId].stateCache[state.id] || { position: { x: 0, y: 0 }, rotation: 0, width: 0, height: 0, mass: 0, health: 0, lifetime: 0, maxSpeed: 0 };
+      let lastKnownState = playerStateCache[playerId].stateCache[state.id] || DEFAULTS;
       let clonedState = { ...state };
 
+      //
+      // Position
+      //
       if (typeof clonedState.position !== 'undefined') {
         let positionDelta = getPositionDelta(clonedState.position, lastKnownState.position);
         if (config.float2Int) {
@@ -68,6 +82,22 @@ deltaCompression.compress = function compress(playerId, snapshot) {
           clonedState.position = { ...positionDelta };
         }
       }
+
+      //
+      // Velocity
+      //
+      if (typeof clonedState.velocity !== 'undefined') {
+        let velocityDelta = getPositionDelta(clonedState.velocity, lastKnownState.velocity);
+        if (config.float2Int) {
+          clonedState.velocity = {
+            x: float2Int.encode(velocityDelta.x),
+            y: float2Int.encode(velocityDelta.y)
+          };
+        } else {
+          clonedState.velocity = { ...velocityDelta };
+        }
+      }
+
 
       if (typeof clonedState.rotation !== 'undefined') {
         let rotationDelta = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
@@ -108,18 +138,23 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
 
       // Initialize accumulatedState if it's a new state
       if (!accumulatedState) {
-        accumulatedState = { id: state.id, position: { x: 0, y: 0 }, rotation: 0, width: 0, height: 0, mass: 0, health: 0, lifetime: 0, maxSpeed: 0 };
+        accumulatedState = { id: state.id, velocity: { x: 0, y: 0 }, position: { x: 0, y: 0 }, rotation: 0, width: 0, height: 0, mass: 0, health: 0, lifetime: 0, maxSpeed: 0 };
       }
 
       // Apply updates from the current state
       Object.keys(state).forEach(prop => {
         if (prop === 'position' && state.position) {
-          let positionDeltaX = config.float2Int ? float2Int.decode(state.position.x) : state.position.x;
-          let positionDeltaY = config.float2Int ? float2Int.decode(state.position.y) : state.position.y;
+          let positionDeltaX = float2Int.decode(state.position.x);
+          let positionDeltaY = float2Int.decode(state.position.y);
           accumulatedState.position.x += positionDeltaX;
           accumulatedState.position.y += positionDeltaY;
+        } else if (prop === 'velocity' && state.velocity) {
+          let velocityDeltaX = float2Int.decode(state.velocity.x);
+          let velocityDeltaY = float2Int.decode(state.velocity.y);
+          accumulatedState.velocity.x += velocityDeltaX;
+          accumulatedState.velocity.y += velocityDeltaY;
         } else if (prop === 'rotation' && typeof state.rotation !== 'undefined') {
-          let rotationDelta = config.float2Int ? float2Int.decode(state.rotation) : state.rotation;
+          let rotationDelta = float2Int.decode(state.rotation);
           accumulatedState.rotation += rotationDelta;
         } else {
           if (config.floatProperties.indexOf(prop) !== -1) {

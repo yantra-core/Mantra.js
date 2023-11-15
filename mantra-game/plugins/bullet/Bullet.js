@@ -15,19 +15,7 @@ class BulletPlugin {
     this.game.systemsManager.addSystem('bullet', this);
   }
 
-  update() {
-    for (let entityId in this.game.components.position) {
-      const bullet = this.game.getComponent(entityId, 'BulletComponent');
-      if (bullet) {
-        const position = this.game.getComponent(entityId, 'position');
-        const velocity = this.game.getComponent(entityId, 'velocity'); // Get the bullet's velocity
-
-        if (position && velocity) {
-          // Movement and physics update logic goes here
-        }
-      }
-    }
-  }
+  update() {} // not used, physics engine updates bullets based on velocity
 
   fireBullet(entityId) {
 
@@ -76,11 +64,6 @@ class BulletPlugin {
     };
     // console.log('using bulletDirectionConfig', bulletDirectionConfig)
     this.game.createEntity(bulletDirectionConfig);
-
-    if (this.game.isClient) {
-      // will delegate what gets renderered based on type property
-      let graphic = this.game.createGraphic(bulletDirectionConfig);
-    }
 
   }
 

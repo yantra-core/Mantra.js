@@ -1,28 +1,22 @@
-const float2Int = {};
+const float2Int = {
+  encode(value, precision = 3) {
+    if (value === null || typeof value === 'undefined') {
+      return null;
+    }
+    if (value === 0) {
+      return 0;
+    }
+    return Math.round(value * Math.pow(10, precision));
+  },
 
-float2Int.encode = function encodeFloatToInteger (value, precision) {
-  if (typeof precision === 'undefined') {
-    precision = 3;
-  }
-  if (typeof value === 'undefined' || value === null) {
-    return null;
-  }
-  if (value === 0) {
-    return 0;
-  }
-  //console.log('value', value)
-  let x = value.toFixed(precision);
-  //console.log('x', x)
-  let y = Math.round(Number(x * (1000)));
-  //console.log('y', y)
-  return y;
-}
+  decode(value, precision = 3) {
+    return this.truncateToPrecision(value / 1000, precision);
+  },
 
-float2Int.decode = function decodeFloatFromInteger (value, precision) {
-  if (typeof precision === 'undefined') {
-    precision = 3;
+  truncateToPrecision(value, precision) {
+    const factor = Math.pow(10, precision);
+    return Math.round(value * factor) / factor;
   }
-  return value / 1000;
-}
+};
 
 export default float2Int;
