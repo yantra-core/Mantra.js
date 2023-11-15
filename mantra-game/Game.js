@@ -79,6 +79,8 @@ class Game {
 
     this.snapshotQueue = [];
 
+    this.tick = 0;
+
     // Game settings
     this.width = width;
     this.height = height;
@@ -252,6 +254,9 @@ class Game {
   // TODO: move to separate function
   // Loads external js script files sequentially
   loadScripts(scripts, finalCallback) {
+    if (this.isServer) {
+      return;
+    }
     const loadScript = (index) => {
       if (index < scripts.length) {
         let script = document.createElement('script');

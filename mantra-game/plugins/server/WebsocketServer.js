@@ -12,7 +12,7 @@ import bbb from '@yantra-core/supreme';
 let config = {};
 config.deltaEncoding = true;       // only sends changed states and property values
 config.deltaCompression = true;   // only send differences between int values
-config.bbb = true;                 // see: @yantra-core/binary-bitstream-buffer
+config.bbb = false;                 // see: @yantra-core/binary-bitstream-buffer
 config.msgpack = false;            // `msgpack` not being used in favor of `bbb`
 config.protobuf = true;            // `protobuf` via protobufjs
 
@@ -185,7 +185,7 @@ class WebSocketServerClass {
   sendUpdates() {
     let game = this.game;
     // Send updated data to clients after all the updates
-    // TODO: systems.ws.broadcastAll('gametick', game.getSnapshot()); // something like this
+    // TODO: systems.ws.broadcastAll('GAMETICK', game.getSnapshot()); // something like this
     //
     // Remark: We are missing data-compression plugin here, ecapsulate the encoding layers
     //
@@ -230,14 +230,14 @@ class WebSocketServerClass {
     let snapshotToSend = playerSnapshot;
     let encoder = null;
 
-    if (config.deltaCompression) {
-      snapshotToSend = deltaCompression.compress(client.playerId, snapshotToSend);
-    }
-
     if (config.deltaEncoding) {
       let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, snapshotToSend);
       if (!deltaEncodedSnapshot) return;
       snapshotToSend = deltaEncodedSnapshot;
+    }
+
+    if (config.deltaCompression) {
+      snapshotToSend = deltaCompression.compress(client.playerId, snapshotToSend);
     }
 
     if (config.protobuf) {
@@ -251,7 +251,11 @@ class WebSocketServerClass {
         }
       };
     } else if (config.msgpack) {
-      encoder = msgpack; // Assuming msgpack is a global encoder object
+      encoder = {
+        encode: function (schema, message) {
+          return encode(message);
+        } 
+      }; // Assuming msgpack is a global encoder object
     }
     // console.log(JSON.stringify(snapshotToSend, true, 2))
     this.sendSnapshot(client, snapshotToSend, lastProcessedInput, encoder);

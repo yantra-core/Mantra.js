@@ -7,10 +7,15 @@ import gameTick from "../../lib/gameTick.js";
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
-config.msgpack = false;
+
+
+// cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
+// should be resolved soon, but for now we need to use msgpack
+config.msgpack = true;
 config.deltaCompression = true;
-config.bbb = false;
-config.protobuf = true;
+
+// default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
+config.protobuf = false;
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
@@ -68,6 +73,18 @@ export default class WebSocketClient {
 
     // Start measuring RTT
     this.startRttMeasurement();
+
+    // start a clock for cloudflare edge games, if we haven't much forward in gamestate, send a gametick event
+    // to server in attempt to restart paused game
+    /* TODO: add this as part of edge server ticker election in case of lockup
+    setTimeout(function(){
+      // check to see the gameTick count is above 3
+      if (self.game.tick > 120) {
+        console.log("GOT TICKS")
+        // alert('got 120 ticks')
+      }
+    }, 5000)
+    */
 
   }
 
@@ -183,9 +200,10 @@ export default class WebSocketClient {
     }
 
     if (config.msgpack) {
-      data = await decodeFromBlob(data);
+      data = decode(data);
     }
 
+    /*
     if (config.bbb) {
       const byteArray = await decodeBlob(data);
       let receivedBuffer = new BitBuffer(byteArray.length * 8); // Create a new BitBuffer
@@ -193,6 +211,7 @@ export default class WebSocketClient {
       let bbbDecoded = bbb.decode(messageSchema, receivedBuffer);
       data = bbbDecoded;
     }
+    */
 
     if (config.protobuf) {
       // data is current blog, needs to be converted to buffer?
@@ -216,7 +235,6 @@ export default class WebSocketClient {
     if (data.action === "GAMETICK") {
       this.game.previousSnapshot = this.game.latestSnapshot;
       this.game.latestSnapshot = data;
-
       game.snapshotQueue.push(data);
 
       // TODO: add config flag here for snapshot interpolation
@@ -266,6 +284,13 @@ export default class WebSocketClient {
 
   // This method tracks the size of each snapshot and calculates the average
   trackSnapshotSize(data) {
+
+
+    // if data is string convert to blob
+    // in most cases message with be binary blob already
+    if (typeof data === 'string') {
+      data = encoder.encode(data);
+    }
 
     let uint8Array = new Uint8Array(data);
     let size = uint8Array.length;

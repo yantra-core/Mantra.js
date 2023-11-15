@@ -1,11 +1,11 @@
 // Block.js - Marak Squires 2023
 class Block {
-  constructor(config = {}) {
+  constructor({ MIN_BLOCK_SIZE = 50, width = 40, height = 40 } = {}) {
     this.name = 'Block';
     // Assuming the config includes width and height properties
-    this.width = config.width || 40; // Default size if none provided
-    this.height = config.height || 40; // Default size if none provided
-    this.MIN_BLOCK_SIZE = 50;
+    this.width = width; // Default size if none provided
+    this.height = height; // Default size if none provided
+    this.MIN_BLOCK_SIZE = MIN_BLOCK_SIZE;
   }
 
   init(game) {
