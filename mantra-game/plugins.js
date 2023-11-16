@@ -33,7 +33,9 @@ import Lifetime from './plugins/lifetime/Lifetime.js';
 // Game Objects
 import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
+// TODO: gui-legend
 import InputLegend from './plugins/input-legend/InputLegend.js';
+import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 import Block from './plugins/block/Block.js';
@@ -62,6 +64,7 @@ const plugins = {
   InputLegend,
   Keyboard,
   Lifetime,
+  PluginsGUI,
   MatterPhysics,
   PhysXPhysics,
   PingTime,

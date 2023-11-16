@@ -41,3 +41,65 @@ body {
 #controlsTable th {
   background-color: #f2f2f2;
 }
+
+#pluginView {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 20%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid black;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#pluginContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.pluginCard {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.pluginCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pluginName {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.closeButton {
+  cursor: pointer;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-weight: bold;
+}
+
+/* Scrollbar Styles */
+#pluginView::-webkit-scrollbar {
+  width: 6px;
+}
+
+#pluginView::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 10px;
+}
+
+#pluginView::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
