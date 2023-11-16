@@ -30,6 +30,11 @@ class SystemsManager {
     if (!this.systems.has(systemName)) {
       throw new Error(`System with name ${systemName} does not exist!`);
     }
+    // call the system.unload method if it exists
+    const system = this.systems.get(systemName);
+    if (typeof system.unload === "function") {
+      system.unload();
+    }
     this.systems.delete(systemName);
   }
 

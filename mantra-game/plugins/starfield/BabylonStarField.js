@@ -5,6 +5,7 @@ class BabylonStarField {
     this.starCount = starCount;
     this.fieldSize = fieldSize;
     this.particles = [];
+    this.name = 'starfield';
 
   }
 

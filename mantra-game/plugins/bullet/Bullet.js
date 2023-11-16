@@ -1,7 +1,7 @@
 // Bullet.js - Marak Squires 2023
 class BulletPlugin {
   constructor(config = {}) {
-    this.name = 'BulletPlugin';
+    this.name = 'bullet';
     this.bulletCount = 0;
     this.redGlowMaterial = null; // Used for caching the material
     this.speed = config.speed || 22; // or 22?

@@ -1,7 +1,7 @@
 // PingTime.js - Marak Squires 2023
 class PingTime {
   constructor(config = {}) {
-    this.name = 'PingTimePlugin';
+    this.name = 'ping-time';
     this.pingTime = null;
     this.displayElement = null;
   }

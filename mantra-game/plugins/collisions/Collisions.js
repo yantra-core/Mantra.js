@@ -1,6 +1,7 @@
 // Collisions.js - Marak Squires 2023
 class CollisionPlugin {
   constructor() {
+    this.name = 'collisions';
   }
 
   init (game) {

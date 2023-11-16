@@ -1,6 +1,6 @@
 class CameraSystem {
   constructor({ camera } = {}) {
-    this.name = 'graphics-babylon/camera';
+    this.name = 'graphics-babylon-camera';
 
     // config scope for convenience
     let config = {

@@ -148,6 +148,7 @@ class Game {
     this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
 
     this.plugins = plugins;
+    this.loadedPlugins = [];
     // load default plugins
     if (loadDefaultPlugins) {
       this.loadPluginsFromConfig({
@@ -223,6 +224,8 @@ class Game {
   }
 
   use(pluginInstance) {
+    this.loadedPlugins.push(pluginInstance.name);
+    this.emit('plugin::loaded', pluginInstance.name);
     pluginInstance.init(this, this.engine, this.scene);
     return this;
   }
@@ -243,6 +246,10 @@ class Game {
 
   getSystem(systemName) {
     return this.systemsManager.getSystem(systemName);
+  }
+
+  removeSystem(systemName) {
+    return this.systemsManager.removeSystem(systemName.toLowerCase());
   }
 
   updateGraphic(entityData) {

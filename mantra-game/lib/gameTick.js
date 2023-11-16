@@ -24,13 +24,16 @@ function gameTick() {
   }
 
   // Loop through entities that have changed
-  // TODO: move rendering logic out of gameTick
+  // TODO: move rendering logic out of gameTick to Graphics.js
   for (let entityId of this.changedEntities) {
 
+    // we need a way for the local game mode to know when to render entities
     if (this.isClient && this.isOnline === false) {
-      // not a component property yet, just ad-hoc on client
       let ent = this.entities.get(entityId);
+      // pendingRender is not a component property yet, just ad-hoc on client
       ent.pendingRender = {};
+      // flag each graphics interface as needing to render this entity
+      // remark: this is local game mode only
       this.graphics.forEach(function (graphicsInterface) {
         ent.pendingRender[graphicsInterface.name] = true;
       });

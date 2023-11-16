@@ -1,6 +1,7 @@
 // Mouse.js - Marak Squires 2023
-export default class BrowserMouse {
+export default class Mouse {
   constructor(communicationClient) {
+    this.name = 'mouse';
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };

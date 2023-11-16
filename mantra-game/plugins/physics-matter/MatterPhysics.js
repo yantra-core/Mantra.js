@@ -6,6 +6,7 @@ class MatterPhysics extends PhysicsInterface {
   constructor(config) {
     super();
 
+    this.name = 'physics-matter';
     this.namespace = 'physics';
     this.Vector = Matter.Vector;
     this.Body = Matter.Body;

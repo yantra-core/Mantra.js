@@ -283,7 +283,7 @@ class BabylonGraphics extends GraphicsInterface {
   // called as much as the client requires in order to render
   render(game, alpha) {
     let self = this;
-    let cameraSystem = game.getSystem('graphics-babylon/camera');
+    let cameraSystem = game.getSystem('graphics-babylon-camera');
 
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
@@ -301,7 +301,7 @@ class BabylonGraphics extends GraphicsInterface {
   // called each time new gametick data arrives
   update() {
     let game = this.game;
-    let cameraSystem = this.game.getSystem('graphics-babylon/camera');
+    let cameraSystem = this.game.getSystem('graphics-babylon-camera');
     cameraSystem.update(); // is cameraSystem.update() required here?
   }
 

@@ -1,7 +1,7 @@
 // CurrentFPS.js - Marak Squires 2023
 class CurrentFPS {
   constructor(config = {}) {
-    this.name = 'CurrentFPSPlugin';
+    this.name = 'current-fps';
     this.currentFPS = null;
     this.displayElement = null;
   }

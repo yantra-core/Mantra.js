@@ -2,7 +2,7 @@
 import bytes from './vendor/bytes/bytes.js';
 class SnapshotSize {
   constructor(config = {}) {
-    this.name = 'SnapshotSizePlugin';
+    this.name = 'snapshot-size';
     this.averageSnapshotSize = null;
     this.displayElement = null;
   }

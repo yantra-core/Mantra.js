@@ -36,7 +36,9 @@ Keyboard config object
 }
 */
 export default class Keyboard {
-  constructor({ preventDefaults = true }) {
+  constructor({ preventDefaults = true } = {}) {
+    this.name = 'keyboard';
+
     this.controls = Object.fromEntries(Object.values(MANTRA_KEY_MAP).map(key => [key, false]));
     // this.communicationClient = communicationClient;
     this.inputPool = {};  // Pool to store key inputs since the last game tick
@@ -95,6 +97,12 @@ export default class Keyboard {
         delete this.inputPool[key];
       }
     }
+  }
+
+  unload () {
+    // remove all event listeners
+    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('keyup', this.handleKeyUp);
   }
 
 }

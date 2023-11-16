@@ -1,7 +1,7 @@
 // Block.js - Marak Squires 2023
 class Block {
   constructor({ MIN_BLOCK_SIZE = 50, width = 40, height = 40 } = {}) {
-    this.name = 'Block';
+    this.name = 'block';
     // Assuming the config includes width and height properties
     this.width = width; // Default size if none provided
     this.height = height; // Default size if none provided

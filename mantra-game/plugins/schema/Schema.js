@@ -3,7 +3,7 @@ import protobuf from 'protobufjs';
 import messageSchema from './Message.js';
 export default class Schema {
   constructor() {
-   
+    this.name = 'schema';
   }
 
   init(game) {

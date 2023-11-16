@@ -1,6 +1,4 @@
-// Component.js class
-// // Setting a nested value
-// graphicsComponent.set(['entity1', 'systemA'], { x: 100, y: 200 });
+// Component.js - Marak Squires 2023
 class Component {
   constructor(name, game) {
     this.name = name;
