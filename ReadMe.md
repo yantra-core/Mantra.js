@@ -12,8 +12,21 @@ You can start building a simple offline game in seconds using your favorite libr
 
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
-Want to skip ahead? We have interactive CodePens available with default configurations here:
+## Super Simple Offline First
 
+Mantra is designed to start a full-featured local game instance in seconds using a simple:
+
+```html
+<script src="https://yantra.gg/mantra.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    let game = new MANTRA.Game();
+    game.start();
+  });
+</script>
+  ```
+
+You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode. 
 
 ## Demos
 
@@ -59,24 +72,6 @@ For 2D, Mantra has built-in support for Phaser 3 and Matter.js. It's possible to
 Everything in Mantra is a [Plugin](#plugins), including the Physics and Graphics pipelines. You can use any of the Plugins from our growing collection to quicky extend your game.
 
 Develop something cool? Publish and share your plugins with the [community](https://discord.gg/bbyjf6MXC2)!
-
-## Super Simple Offline First
-
-Mantra is designed to start a full-featured local game instance in seconds using a simple:
-
-```html
-<script src="https://yantra.gg/mantra.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', (event) => {
-    let game = new MANTRA.Game();
-    game.start();
-  });
-</script>
-  ```
-
-You can just as easily copy the `mantra.js` file to your local system.
-
-This offline-first approach lets you quickly build your game without worrying about complex physics or netcode, allowing you to focus on game development.
 
 ## Serverless Physics
 
@@ -245,7 +240,7 @@ The following checklist outlines the planned features and their current status:
 - [X] **Delta Compression**: Transmit only the changes between the current and previous game states
 - [X] **Delta Encoding**: Encoding integer changes rather than complete states
 - [ ] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
-- [ ] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
+- [X] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
 
 <a name="alpha-notice"></a>
 # Alpha Software Notice
