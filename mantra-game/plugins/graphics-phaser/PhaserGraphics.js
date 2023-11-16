@@ -146,10 +146,9 @@ class PhaserGraphics extends GraphicsInterface {
   updateGraphic(entityData) {
 
     let previousEntity = this.game.getEntity(entityData.id);
-    if (!previousEntity || !previousEntity.graphics) {
+    if (!previousEntity || !previousEntity.graphics || !previousEntity.position) {
       return;
     }
-
     if (previousEntity.position.x === entityData.position.x && previousEntity.position.y === entityData.position.y) {
       // TODO: we shouldn't need to do this as getPlayerSnapshot() should only return diff state
       // There may be an issue with how delta encoding works for offline mode, needs tests
@@ -164,6 +163,7 @@ class PhaserGraphics extends GraphicsInterface {
       return;
     }
 
+    /*
     // Adjust the coordinates to account for the center (0,0) world
     let adjustedX = entityData.position.x + this.game.width / 2;
     let adjustedY = entityData.position.y + this.game.height / 2;
@@ -171,6 +171,8 @@ class PhaserGraphics extends GraphicsInterface {
     gameobject.setPosition(adjustedX, adjustedY);
     gameobject.x = adjustedX;
     gameobject.y = adjustedY;
+    */
+   gameobject.setPosition(entityData.position.x, entityData.position.y);
 
     // TODO: move this to common 3D-2.5D transform function(s)
     if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
@@ -320,8 +322,8 @@ class PhaserGraphics extends GraphicsInterface {
   render(game, alpha) {
     let self = this;
 
-    for (let eId in this.game.entities) {
-      let ent = this.game.entities[eId];
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
       this.inflateEntity(ent, alpha);
     }
   }
@@ -330,9 +332,26 @@ class PhaserGraphics extends GraphicsInterface {
 
     if (entity.graphics && entity.graphics['graphics-phaser']) {
       let graphic = entity.graphics['graphics-phaser'];
-      this.updateGraphic(entity, alpha);
+
+      if (entity.type === 'BULLET') {
+      } else {
+        this.updateGraphic(entity, alpha);
+      }
 
     } else {
+
+
+      // Adjust the coordinates to account for the center (0,0) world
+      let adjustedX = entity.position.x + this.game.width / 2;
+      let adjustedY = entity.position.y + this.game.height / 2;
+
+      //gameobject.setPosition(adjustedX, adjustedY);
+      //gameobject.x = adjustedX;
+      //gameobject.y = adjustedY;
+
+      //entity.position.x = adjustedX;
+      //entity.position.y = adjustedY;
+      // console.log('creating', entity.position)
       let graphic = this.createGraphic(entity);
       this.game.components.graphics.set([entity.id, 'graphics-phaser'], graphic);
 
