@@ -3,10 +3,11 @@ import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 
 class MatterPhysics extends PhysicsInterface {
+  static id = 'physics-matter';
   constructor(config) {
     super();
 
-    this.name = 'physics-matter';
+    this.id = MatterPhysics.id;
     this.namespace = 'physics';
     this.Vector = Matter.Vector;
     this.Body = Matter.Body;

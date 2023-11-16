@@ -1,6 +1,9 @@
-class CameraSystem {
+class BabylonCamera {
+
+  static id = 'graphics-babylon-camera';
+
   constructor({ camera } = {}) {
-    this.name = 'graphics-babylon-camera';
+    this.id = BabylonCamera.id;
 
     // config scope for convenience
     let config = {
@@ -26,7 +29,7 @@ class CameraSystem {
 
     game.camera = this.camera;
 
-    this.game.systemsManager.addSystem(this.name, this);
+    this.game.systemsManager.addSystem(this.id, this);
 
     // this.camera.attachControl(document.getElementById('renderCanvas'), true);
     // Setup custom camera controls
@@ -147,4 +150,4 @@ class CameraSystem {
   }
 }
 
-export default CameraSystem;
+export default BabylonCamera;

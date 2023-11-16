@@ -25,10 +25,11 @@ const COLLISION_LAYER_1 = 1;
 const COLLISION_LAYER_2 = 2;
 
 class PhysXPhysics extends PhysicsInterface {
+  static id = 'physics-physx';
   constructor(config) {
     super();
 
-    this.name = 'physics-physx';
+    this.id = PhysXPhysics.id;
     this.updateEngine = updateEngine;
     this.applyForce = applyForce;
     this.rotateBody = rotateBody;

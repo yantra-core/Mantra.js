@@ -3,9 +3,10 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class PhaserGraphics extends GraphicsInterface {
+  static id = 'graphics-phaser';
   constructor({ camera = {}, startingZoom = 0.4 } = {}) {
     super();
-    this.name = 'graphics-phaser';
+    this.id = 'graphics-phaser';
 
     let config = {
       camera,

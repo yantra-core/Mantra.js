@@ -1,10 +1,13 @@
 // SnapshotSize.js - Marak Squires 2023
 import bytes from './vendor/bytes/bytes.js';
 class SnapshotSize {
+
+  static id = 'snapshot-size';
+
   constructor(config = {}) {
-    this.name = 'snapshot-size';
     this.averageSnapshotSize = null;
     this.displayElement = null;
+    this.id = SnapshotSize.id;
   }
 
   init(game) {

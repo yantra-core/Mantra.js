@@ -1,6 +1,9 @@
-export default class BrowserGamepad {
+export default class Gamepad {
+
+  static id = 'gamepad';
+
   constructor() {
-    this.name = 'browserGamepad';
+    this.id = Gamepad.id;
     this.gamepads = {};
   }
 

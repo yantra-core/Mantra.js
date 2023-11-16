@@ -36,13 +36,21 @@ Keyboard config object
 }
 */
 export default class Keyboard {
+
+  static id = 'keyboard';
+
   constructor({ preventDefaults = true } = {}) {
-    this.name = 'keyboard';
+    this.id = Keyboard.id;
 
     this.controls = Object.fromEntries(Object.values(MANTRA_KEY_MAP).map(key => [key, false]));
     // this.communicationClient = communicationClient;
     this.inputPool = {};  // Pool to store key inputs since the last game tick
     this.preventDefaults = preventDefaults;
+
+    // Bind methods and store them as class properties
+    this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+    this.boundHandleKeyUp = this.handleKeyUp.bind(this);
+
   }
 
   init(game) {
@@ -53,10 +61,10 @@ export default class Keyboard {
     // register the Plugin as a system, on each update() we will send the inputPool to the server
     game.systemsManager.addSystem('keyboard', this);
   }
-
+  
   bindInputControls() {
-    document.addEventListener('keydown', this.handleKeyDown.bind(this));
-    document.addEventListener('keyup', this.handleKeyUp.bind(this));
+    document.addEventListener('keydown', this.boundHandleKeyDown);
+    document.addEventListener('keyup', this.boundHandleKeyUp);
   }
 
   update() {
@@ -99,10 +107,10 @@ export default class Keyboard {
     }
   }
 
-  unload () {
-    // remove all event listeners
-    document.removeEventListener('keydown', this.handleKeyDown);
-    document.removeEventListener('keyup', this.handleKeyUp);
+  unload() {
+    // remove all event listeners using the bound functions
+    document.removeEventListener('keydown', this.boundHandleKeyDown);
+    document.removeEventListener('keyup', this.boundHandleKeyUp);
   }
 
 }

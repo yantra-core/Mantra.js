@@ -1,7 +1,8 @@
 // Bullet.js - Marak Squires 2023
-class BulletPlugin {
+class Bullet {
+  static id = 'bullet';
   constructor(config = {}) {
-    this.name = 'bullet';
+    this.id = Bullet.id;
     this.bulletCount = 0;
     this.redGlowMaterial = null; // Used for caching the material
     this.speed = config.speed || 22; // or 22?
@@ -209,4 +210,4 @@ class BulletPlugin {
   }
 }
 
-export default BulletPlugin;
+export default Bullet;

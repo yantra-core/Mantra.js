@@ -1,7 +1,11 @@
 import plugins from "../../plugins.js";
 
 class StarField {
+
+  static id = 'starfield';
+
   constructor(starCount = 5000, fieldSize = 10000) { // TODO: pass this to individual graphics plugins as options
+    this.id = StarField.id;
     this.starCount = starCount;
     this.fieldSize = fieldSize;
     this.particles = [];
@@ -18,7 +22,7 @@ class StarField {
     if (game.graphicsReady.length > 0 && game.graphicsReady.length === game.graphics.length) {
       // Since the graphics are ready, we can initialize this plugin immediately
       game.graphics.forEach(function(graphicInterface){
-        if (graphicInterface.name === 'graphics-babylon') { // hard-code per graphics pipeline for now
+        if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
           game.use(new plugins.BabylonStarField());
         }
       })
@@ -26,7 +30,7 @@ class StarField {
       // since the graphics are not yet ready, we add the plugin instance to the pendingLoad queue
       // once the graphics reports read, the array of pendingLoad plugins will be initialized
       game.graphics.forEach(function(graphicInterface){
-        if (graphicInterface.name === 'graphics-babylon') { // hard-code per graphics pipeline for now
+        if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
           graphicInterface.pendingLoad.push(new plugins.BabylonStarField());
         }
       })

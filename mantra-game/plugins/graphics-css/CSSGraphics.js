@@ -2,6 +2,8 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class CSSGraphics extends GraphicsInterface {
+
+  static id = 'graphics-css';
   constructor({ camera } = {}) {
     super();
 
@@ -11,7 +13,7 @@ class CSSGraphics extends GraphicsInterface {
     };
     this.config = config;
 
-    this.name = 'graphics-css';
+    this.id = CSSGraphics.id;
     this.cameraPosition = { x: 0, y: 0 };
   }
 

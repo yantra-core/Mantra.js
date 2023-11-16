@@ -5,8 +5,11 @@ import Entity from '../../Entity/Entity.js';
 // import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
 
 class EntityFactory {
+
+  static id = 'entity-factory';
+
   constructor() {
-    this.name = 'EntityFactory'
+    this.id = EntityFactory.id;
     //this.game = game;
     this.nextEntityId = 1; // 0 is reserved for server
 
@@ -25,7 +28,7 @@ class EntityFactory {
     // init a new Map to store entities
     game.entities = new Map();
 
-    this.game.systemsManager.addSystem('entityFactory', this);
+    this.game.systemsManager.addSystem(this.id, this);
 
     // Bind some methods to parent Game scope for convenience
     // The most useful and common System methods are expected to be bound to Game
@@ -144,7 +147,7 @@ class EntityFactory {
     // not a component property yet, just ad-hoc on client
     ent.pendingRender = {};
     this.game.graphics.forEach(function (graphicsInterface) {
-      ent.pendingRender[graphicsInterface.name] = true;
+      ent.pendingRender[graphicsInterface.id] = true;
     });
 
     if (entityData.position) {
@@ -288,7 +291,7 @@ class EntityFactory {
       updatedEntity.pendingRender = {};
     }
     this.game.graphics.forEach(function (graphicsInterface) {
-      updatedEntity.pendingRender[graphicsInterface.name] = true;
+      updatedEntity.pendingRender[graphicsInterface.id] = true;
     });
 
     this.game.entities.set(entityId, updatedEntity);

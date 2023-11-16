@@ -11,15 +11,16 @@ let config = {};
 
 // cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
 // should be resolved soon, but for now we need to use msgpack
-config.msgpack = true;
+config.msgpack = false;
 config.deltaCompression = true;
 
 // default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
-config.protobuf = false;
+config.protobuf = true;
 
 export default class WebSocketClient {
+  static id = 'websocket-client';
   constructor(entityName, isServerSideReconciliationEnabled) {
-    this.name = 'WebSocketClient';
+    this.id = WebSocketClient.id;
     this.listeners = {};
     this.entityName = entityName;
     this.isServerSideReconciliationEnabled = isServerSideReconciliationEnabled;
@@ -236,7 +237,6 @@ export default class WebSocketClient {
       this.game.previousSnapshot = this.game.latestSnapshot;
       this.game.latestSnapshot = data;
       game.snapshotQueue.push(data);
-
       // TODO: add config flag here for snapshot interpolation
       // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);
       // console.log(inter)

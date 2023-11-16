@@ -1,7 +1,10 @@
 // PingTime.js - Marak Squires 2023
 class PingTime {
+
+  static id = 'ping-time';
+
   constructor(config = {}) {
-    this.name = 'ping-time';
+    this.id = PingTime.id;
     this.pingTime = null;
     this.displayElement = null;
   }
@@ -58,5 +61,6 @@ class PingTime {
 const truncateToPrecision = (value, precision = 2) => {
   return Number(value.toFixed(precision));
 };
+
 
 export default PingTime;

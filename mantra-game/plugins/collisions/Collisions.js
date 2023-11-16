@@ -1,7 +1,10 @@
 // Collisions.js - Marak Squires 2023
-class CollisionPlugin {
+class Collisions {
+
+  static id = 'collisions';
+
   constructor() {
-    this.name = 'collisions';
+    this.id = Collisions.id;
   }
 
   init (game) {
@@ -51,4 +54,4 @@ class CollisionPlugin {
 
 }
 
-export default CollisionPlugin;
+export default Collisions;

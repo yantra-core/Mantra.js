@@ -2,10 +2,11 @@
 import Plugin from '../../Plugin.js';
 import DefaultInputStrategy from './strategies/2D/Default2DInputStrategy.js';
 import Default3DInputStrategy from './strategies/3D/Default3DInputStrategy.js';
-class EntityInputPlugin extends Plugin {
+class EntityInput extends Plugin {
+  static id = 'entity-input';
   constructor(strategy) {
     super();
-    this.name = 'EntityInput';
+    this.id = 'entity-input';
     this.bulletCooldown = 20;
     this.buttonCooldown = 20;
     this.lastBulletFireTime = {};
@@ -64,4 +65,4 @@ class EntityInputPlugin extends Plugin {
   destroy() { }
 }
 
-export default EntityInputPlugin;
+export default EntityInput;

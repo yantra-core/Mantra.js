@@ -147,7 +147,12 @@ class Game {
     this.onlineGameLoop = onlineGameLoop.bind(this);
     this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
 
+    // this.plugins represents all possible plugins the Game has access to
     this.plugins = plugins;
+
+    // this._plugins represents all plugin instances that have been loaded
+    this._plugins = {};
+
     this.loadedPlugins = [];
     // load default plugins
     if (loadDefaultPlugins) {
@@ -223,11 +228,31 @@ class Game {
     client.disconnect();
   }
 
+  // All Systems are Plugins, but not all Plugins are Systems
   use(pluginInstance) {
-    this.loadedPlugins.push(pluginInstance.name);
-    this.emit('plugin::loaded', pluginInstance.name);
+    if (typeof pluginInstance.id === 'undefined') {
+      throw new Error('All plugins must have a static id property');
+    }
+    this.loadedPlugins.push(pluginInstance.id);
+    this.emit('plugin::loaded', pluginInstance.id);
     pluginInstance.init(this, this.engine, this.scene);
+    this._plugins[pluginInstance.id] = pluginInstance;
     return this;
+  }
+
+  removePlugin (pluginName) {
+    let plugin = this._plugins[pluginName];
+    if (plugin) {
+      // check to see if plugin is a system, if so remove the system
+      if (this.systems[plugin.id]) {
+        this.removeSystem(plugin.id);
+      }
+      // next see if plugin has unload method, if so call it
+      if (typeof plugin.unload === 'function') {
+        plugin.unload();
+      }
+      delete this._plugins[pluginName];
+    }
   }
 
   addComponent(entityId, componentType, data) {
@@ -251,6 +276,7 @@ class Game {
   removeSystem(systemName) {
     return this.systemsManager.removeSystem(systemName.toLowerCase());
   }
+
 
   updateGraphic(entityData) {
     this.graphics.forEach(function (graphicsInterface) {

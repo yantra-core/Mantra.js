@@ -7,10 +7,11 @@ class SystemsManager {
     this.systems = new Map();
   }
 
-  addSystem(systemName, system) {
-    if (this.systems.has(systemName)) {
-      throw new Error(`System with name ${systemName} already exists!`);
+  addSystem(systemId, system) {
+    if (this.systems.has(systemId)) {
+      throw new Error(`System with name ${systemId} already exists!`);
     }
+    // console.log('adding system', systemId, system, this.game.plugins);
     // Remark: Defaulting all plugins as EE has been disabled for now
     // Remark: We need to piece meal this / granularize it so that the wildcard regex
     // registers the new system in event emitter
@@ -19,30 +20,30 @@ class SystemsManager {
     // eventEmitter.bindClass(system, systemName)
 
     // binds system to local instance Map
-    this.systems.set(systemName, system);
+    this.systems.set(systemId, system);
     // binds system to game.systems scope for convenience
-    this.game.systems[systemName] = system;
-    console.log(`system.${systemName} = new ${system.name}()`);
+    this.game.systems[systemId] = system;
+    //console.log(`system[${systemId}] = new ${system.name}()`);
     //console.log(`game.use(new ${system.name}())`);
   }
 
-  removeSystem(systemName) {
-    if (!this.systems.has(systemName)) {
-      throw new Error(`System with name ${systemName} does not exist!`);
+  removeSystem(systemId) {
+    if (!this.systems.has(systemId)) {
+      throw new Error(`System with name ${systemId} does not exist!`);
     }
     // call the system.unload method if it exists
-    const system = this.systems.get(systemName);
+    const system = this.systems.get(systemId);
     if (typeof system.unload === "function") {
       system.unload();
     }
-    this.systems.delete(systemName);
+    this.systems.delete(systemId);
   }
 
-  getSystem(systemName) {
-    if (this.systems.has(systemName)) {
-      return this.systems.get(systemName);
+  getSystem(systemId) {
+    if (this.systems.has(systemId)) {
+      return this.systems.get(systemId);
     }
-    throw new Error(`System with name ${systemName} does not exist! Perhaps try running "game.use(new plugins.${systemName}())" first?`);
+    throw new Error(`System with name ${systemId} does not exist! Perhaps try running "game.use(new plugins.${systemId}())" first?`);
   }
 
   update(deltaTime) {

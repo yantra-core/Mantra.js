@@ -4,8 +4,9 @@ import LocalClient from "./LocalClient.js";
 import WebSocketClient from "./WebSocketClient.js";
 
 export default class Client {
+  static id = 'client';
   constructor(playerId) {
-    this.name = 'Client';
+    this.id = Client.id;
     this.playerId = playerId; // Remark: localClient expects player name in constructor?
   }
 

@@ -1,5 +1,5 @@
 // PacManMovement.js - Marak Squires 2023
-class PacManMovementStrategy {
+class PacManMovement {
   constructor() {}
 
   init(game) {
@@ -35,4 +35,4 @@ class PacManMovementStrategy {
   }
 }
 
-export default PacManMovementStrategy;
+export default PacManMovement;

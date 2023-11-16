@@ -12,9 +12,12 @@ import plugins from '../../plugins.js';
 let lastKnownStates = {};
 
 class BabylonGraphics extends GraphicsInterface {
+
+  static id = 'graphics-babylon';
+
   constructor({ camera } = {}) {
     super();
-    this.name = 'graphics-babylon';
+    this.id = BabylonGraphics.id;
     this.engine = null;
     this.scene = null;
     this.camera = null;

@@ -1,7 +1,8 @@
 // Graphics.js
 class Graphics {
+  static id = 'graphics';
   constructor() {
-    this.name = 'graphics';
+    this.id = Graphics.id;
   }
 
   init(game) {
@@ -30,17 +31,17 @@ class Graphics {
     game.graphics.forEach(function (graphicsInterface) {
       // don't recreate same graphic if already exists on interface
       let ent = game.getEntity(entityData.id);
-      // console.log(graphicsInterface.name, "CREATING FOR ENT", ent)
-      if (ent && ent.graphics && ent.graphics[graphicsInterface.name]) {
-        // console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name])
+      // console.log(graphicsInterface.id, "CREATING FOR ENT", ent)
+      if (ent && ent.graphics && ent.graphics[graphicsInterface.id]) {
+        // console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.id, ent.graphics[graphicsInterface.id])
         return;
       }
       let graphic = graphicsInterface.createGraphic(entityData);
       if (graphic) {
-        // console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
-        game.components.graphics.set([entityData.id, graphicsInterface.name], graphic);
+        // console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.id, graphic)
+        game.components.graphics.set([entityData.id, graphicsInterface.id], graphic);
       } else {
-        // console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
+        // console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.id, graphic)
       }
     });
   }

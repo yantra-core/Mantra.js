@@ -1,3 +1,8 @@
+let mode = 'offline'; // online / offline
+let env = 'local'; // local / prod
+
+// cloudflare / cloudflare-local / local
+
 import config from './config/config.js';
 
 //
@@ -88,7 +93,7 @@ let game = new Game({
 
 let game = new Game({
   isClient: true,
-  mouse: false,
+  mouse: true,
   physics: 'matter', // 'matter', 'physx'
   graphics: ['babylon'], // 'babylon', 'css', 'phaser'
   collisions: true,
@@ -111,6 +116,7 @@ game.use(new plugins.InputLegend());
 game.use(new plugins.PingTime());
 game.use(new plugins.SnapshotSize());
 game.use(new plugins.CurrentFPS());
+game.use(new plugins.PluginsGUI());
 
 
 // game.use(new plugins.MovementFrogger())
@@ -161,9 +167,6 @@ function switchToOnline() {
 
 /**/
 
-
-let mode = 'offline';
-let env = 'local'; // local / prod
 
 if (mode === 'online') {
 

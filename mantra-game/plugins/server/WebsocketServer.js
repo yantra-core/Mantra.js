@@ -20,6 +20,7 @@ let accumulatedTime = 0;
 let lastTimestamp;
 
 class WebSocketServerClass {
+  static id = 'server-websocket';
   constructor(config = {}) {
     this.config = config;
 
@@ -36,6 +37,7 @@ class WebSocketServerClass {
 
   init(game) {
     this.game = game;
+    this.id = WebSocketServerClass.id;
     console.log("calling websocket init");
     this.game.listen = this.listen.bind(this);
     this.lastTimestamp = Date.now();
@@ -231,7 +233,9 @@ class WebSocketServerClass {
 
     if (config.deltaEncoding) {
       let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, snapshotToSend);
-      if (!deltaEncodedSnapshot) return;
+      if (!deltaEncodedSnapshot) {
+        return;
+      }
       snapshotToSend = deltaEncodedSnapshot;
     }
 

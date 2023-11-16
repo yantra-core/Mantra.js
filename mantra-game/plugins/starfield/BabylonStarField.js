@@ -1,12 +1,14 @@
 let gameTick = 0;
 
 class BabylonStarField {
+
+  static id = 'babylon-starfield'
+
   constructor(starCount = 5000, fieldSize = 10000) {
+    this.id = BabylonStarField.id;
     this.starCount = starCount;
     this.fieldSize = fieldSize;
     this.particles = [];
-    this.name = 'starfield';
-
   }
 
   init (game, engine, scene) {

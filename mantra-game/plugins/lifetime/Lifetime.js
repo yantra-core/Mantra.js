@@ -1,6 +1,9 @@
 class Lifetime {
+
+  static id = 'lifetime';
+
   constructor() {
-    this.name = 'lifetime';
+    this.id = Lifetime.id;
   }
 
   init(game) {

@@ -3,16 +3,24 @@ import Plugin from '../../../Plugin.js';
 
 // handles input controller events and relays them to the game logic
 class PongWorld extends Plugin {
+  static id = 'pong-world';
   constructor(game) {
     super(game);
-    this.name = 'pong';
+    this.id = PongWorld.id;
   }
 
   init(game) {
 
+    game.systems.entityInput.controlMappings = {
+      W: 'MOVE_FORWARD',
+      S: 'MOVE_BACKWARD'
+    };
 
     let leftSide = game.width / 3 * -1;
 
+    //
+    // Create the Player
+    //
     game.createEntity({
       id: window.currentPlayerId, // TODO: replace this
       type: 'PLAYER',
@@ -31,6 +39,9 @@ class PongWorld extends Plugin {
       }
     });
 
+    //
+    // Create the Ball
+    //
     game.createEntity({
       id: 'game-ball',
       type: 'BALL',
@@ -49,6 +60,7 @@ class PongWorld extends Plugin {
       frictionStatic: 0, // Default static friction
     });
 
+    // Register collision events
     game.on('collisionStart', ({ pair, bodyA, bodyB }) => {
       // check to see if ball and left or right walls, if so goal
       console.log('collisionStart', bodyA.entity, bodyB.entity)

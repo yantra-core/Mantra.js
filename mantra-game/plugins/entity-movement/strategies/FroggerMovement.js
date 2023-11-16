@@ -1,13 +1,15 @@
 // FroggerMovement.js - Marak Squires 2023
-class FroggerMovementStrategy {
+class FroggerMovement {
+  static id = 'frogger-movement';
   constructor() {}
 
   init(game) {
     this.game = game;
+    this.id = FroggerMovement.id;
 
     // check to see if entityMovement system exists, if not throw error
-    if (!game.systems.entityMovement) {
-      throw new Error('FroggerMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
+    if (!game.systems['entity-movement']) {
+      throw new Error('FroggerMovement requires an entity-movement system to be registered! Please game.use(new EntityMovement())');
     }
 
     game.systems.entityMovement.addStrategy(this);
@@ -33,4 +35,4 @@ class FroggerMovementStrategy {
 
 }
 
-export default FroggerMovementStrategy;
+export default FroggerMovement;

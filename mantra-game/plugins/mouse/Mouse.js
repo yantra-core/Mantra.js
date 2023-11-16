@@ -1,7 +1,10 @@
 // Mouse.js - Marak Squires 2023
 export default class Mouse {
+
+  static id = 'mouse';
+
   constructor(communicationClient) {
-    this.name = 'mouse';
+    this.id = Mouse.id;
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };
@@ -10,6 +13,11 @@ export default class Mouse {
       RIGHT: false,
       MIDDLE: false
     };
+
+    this.boundHandleMouseMove = this.handleMouseMove.bind(this);
+    this.boundHandleMouseDown = this.handleMouseDown.bind(this);
+    this.boundHandleMouseUp = this.handleMouseUp.bind(this);
+
   }
 
   init(game) {
@@ -19,9 +27,9 @@ export default class Mouse {
   }
 
   bindMouseControls() {
-    document.addEventListener('pointermove', this.handleMouseMove.bind(this));
-    document.addEventListener('pointerdown', this.handleMouseDown.bind(this));
-    document.addEventListener('pointerup', this.handleMouseUp.bind(this));
+    document.addEventListener('pointermove', this.boundHandleMouseMove);
+    document.addEventListener('pointerdown', this.boundHandleMouseDown);
+    document.addEventListener('pointerup', this.boundHandleMouseUp);
   }
 
   handleMouseMove(event) {
@@ -77,4 +85,12 @@ export default class Mouse {
       this.game.communicationClient.sendMessage('player_input', { mouse: mouseData });
     }
   }
+
+  unload() {
+    // unbind all events
+    document.removeEventListener('pointermove', this.boundHandleMouseMove);
+    document.removeEventListener('pointerdown', this.boundHandleMouseDown);
+    document.removeEventListener('pointerup', this.boundHandleMouseUp);
+  }
+
 }

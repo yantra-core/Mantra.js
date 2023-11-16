@@ -7,8 +7,8 @@ body {
 
 #controlsView {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  top: 20px;
+  left: 20px;
   background-color: white;
   border: 1px solid #dddddd;
   padding: 10px;
@@ -42,24 +42,43 @@ body {
   background-color: #f2f2f2;
 }
 
+
 #pluginView {
   position: fixed;
-  top: 10px;
-  left: 10px;
-  width: 20%;
-  max-height: 90vh;
-  overflow-y: auto;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px; /* Default height */
   background-color: white;
-  border: 1px solid black;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-top: 1px solid black;
+  transition: height 0.3s ease-in-out;
+  cursor: pointer;
+  overflow: hidden;
 }
 
-#pluginContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
+#pluginView.expanded {
+  height: 20vh; /* Expanded height */
+  max-height: 90vh;
+  overflow-y: auto;
 }
+
+
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) {
+  #pluginView {
+    width: 40%; /* Wider on smaller screens */
+  }
+}
+
+
+#pluginContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
 
 .pluginCard {
   border: 1px solid #ddd;
@@ -71,15 +90,24 @@ body {
   justify-content: space-between;
   transition: box-shadow 0.3s ease-in-out;
   cursor: pointer;
+  flex-basis: calc(100% / 12 - 20px); /* Adjust according to your design preference */
+
 }
 
 .pluginCard:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+.pluginCard.active {
+  background-color: #e0f7fa; /* Light blue background for active plugins */
+}
+
 .pluginName {
   font-size: 14px;
   font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .closeButton {
@@ -102,4 +130,19 @@ body {
 
 #pluginView::-webkit-scrollbar-thumb:hover {
   background: #555; 
+}
+
+
+.toolbarHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.arrowIndicator {
+  display: inline-block;
+  margin-left: 5px;
+  user-select: none; /* Prevent text selection */
 }

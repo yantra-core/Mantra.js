@@ -1,7 +1,9 @@
 // InputLegend.js - Marak Squires 2023
 class InputLegend {
+  static id = 'input-legend';
+
   constructor(config = {}) {
-    this.name = 'LegendPlugin';
+    this.id = InputLegend.id;
     this.highlightedKeys = {};
   }
 

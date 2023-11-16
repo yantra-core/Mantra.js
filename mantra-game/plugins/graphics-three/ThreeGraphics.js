@@ -2,9 +2,10 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class ThreeGraphics extends GraphicsInterface {
+  static id = 'graphics-three';
   constructor({ camera, cameraConfig } = {}) {
     super();
-    this.name = 'graphics-three';
+    this.id = ThreeGraphics.id;
     this.renderer = null;
     this.camera = null;
 

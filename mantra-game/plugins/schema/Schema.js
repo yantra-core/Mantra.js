@@ -2,8 +2,9 @@
 import protobuf from 'protobufjs';
 import messageSchema from './Message.js';
 export default class Schema {
+  static id = 'schema';
   constructor() {
-    this.name = 'schema';
+    this.id = Schema.id;
   }
 
   init(game) {

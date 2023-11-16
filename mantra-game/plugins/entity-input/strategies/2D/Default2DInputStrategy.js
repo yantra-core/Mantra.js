@@ -1,13 +1,14 @@
 // DefaultTwoDimensionalInputStrategy.js - Marak Squires 2023
 // This input strategy is suitable for most top-down 2D games
 class DefaultTwoDimensionalInputStrategy {
+  static id = 'default-2d-input-strategy';
   constructor(plugin) {
+    this.id = DefaultTwoDimensionalInputStrategy.id;
     this.plugin = plugin;
   }
 
   init(game) {
     this.game = game;
-
     this.defaultControlsMapping = {
       W: 'MOVE_FORWARD',
       S: 'MOVE_BACKWARD',
@@ -49,7 +50,7 @@ class DefaultTwoDimensionalInputStrategy {
     game.lastProcessedInput[entityId] = sequenceNumber;
 
     const moveSpeed = 5;
-    let entityMovementSystem = game.getSystem('entityMovement');
+    let entityMovementSystem = game.getSystem('entity-movement');
 
     const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
 

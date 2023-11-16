@@ -1,19 +1,20 @@
 // EntityMovement.js - Marak Squires 2023
 import Plugin from '../../Plugin.js';
 import DefaultMovementStrategy from './strategies/DefaultMovement.js';
-
 import Asteroids3DMovementStrategy from './strategies/3D/Asteroids3DMovement.js';
+
 // handles input controller events and relays them to the game logic
-class EntityMovementPlugin extends Plugin {
+class EntityMovement extends Plugin {
+  static id = 'entity-movement';
   constructor(strategy) {
     super();
-    this.name = 'EntityMovementPlugin';
+    this.id = EntityMovement.id;
     this.strategies = [];
   }
 
   init(game) {
     this.game = game; // Store the reference to the game logic
-    this.game.systemsManager.addSystem('entityMovement', this);
+    this.game.systemsManager.addSystem(this.id, this);
   }
 
   addStrategy (strategy) {
@@ -70,4 +71,4 @@ class EntityMovementPlugin extends Plugin {
 
 }
 
-export default EntityMovementPlugin;
+export default EntityMovement;
