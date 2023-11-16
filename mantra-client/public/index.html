@@ -76,7 +76,7 @@
       socket.onmessage = function (event) {
         count++;
         let data = JSON.parse(event.data);
-        if (data.action !== 'gametick') {
+        if (data.action !== 'GAMETICK') {
           console.log('WebSocket message received:', event.data);
           $('#output').append('<p>' + event.data + '</p>');
         } else {

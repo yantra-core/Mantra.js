@@ -11,10 +11,9 @@ import bbb from '@yantra-core/supreme';
 
 let config = {};
 config.deltaEncoding = true;       // only sends changed states and property values
-config.deltaCompression = true;   // only send differences between int values
-config.bbb = false;                 // see: @yantra-core/binary-bitstream-buffer
-config.msgpack = false;            // `msgpack` not being used in favor of `bbb`
-config.protobuf = true;            // `protobuf` via protobufjs
+config.deltaCompression = true;    // only send differences between int values
+config.msgpack = false;            // `msgpack` encoding
+config.protobuf = true;            // `protobuf` encoding
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;

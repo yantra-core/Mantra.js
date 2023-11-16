@@ -90,7 +90,7 @@ let game = new Game({
   isClient: true,
   mouse: false,
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['phaser'], // 'babylon', 'css', 'phaser'
+  graphics: ['babylon'], // 'babylon', 'css', 'phaser'
   collisions: true,
   camera: 'follow',
   options: {
@@ -162,7 +162,7 @@ function switchToOnline() {
 /**/
 
 
-let mode = 'online';
+let mode = 'offline';
 let env = 'local'; // local / prod
 
 if (mode === 'online') {

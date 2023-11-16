@@ -65,7 +65,6 @@ class EntityFactory {
   }
 
   removeEntity(entityId) {
-
     let ent = this.game.entities.get(entityId);;
 
     if (ent && this.game.systems.graphics && ent.graphics) {
@@ -80,6 +79,7 @@ class EntityFactory {
       this.game.entities.set(entityId, updatedEntity);
     }
 
+    // TODO: add this back or remove it?
     // deltaCompression.removeState(entityId);
 
     // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
@@ -90,7 +90,12 @@ class EntityFactory {
     const destroyedComponentData = this.game.components.destroyed.data;
     for (let entityId in destroyedComponentData) {
       if (destroyedComponentData[entityId]) {
-
+        // This is side effect of Component.js set() method not using Map() for data
+        // Using numbers are object keys is not recommended
+        // TODO: switch Component.js to use Maps
+        if (typeof entityId === 'string') {
+          entityId = parseInt(entityId);
+        }
         // Removes the body from the physics engine
         if (typeof this.game.physics.removeBody === 'function') {
           // TODO: fix this
@@ -105,7 +110,6 @@ class EntityFactory {
         for (let componentType in this.game.components) {
           this.game.components[componentType].remove(entityId);
         }
-        // Delete the entity from entities map
         this.game.entities.delete(entityId);
       }
     }
