@@ -35,7 +35,7 @@ function gameTick() {
       // flag each graphics interface as needing to render this entity
       // remark: this is local game mode only
       this.graphics.forEach(function (graphicsInterface) {
-        ent.pendingRender[graphicsInterface.name] = true;
+        ent.pendingRender[graphicsInterface.id] = true;
       });
     }
 
@@ -60,7 +60,8 @@ function gameTick() {
   // Save the game snapshot
   this.saveSnapshot(this.getEntities(), this.lastProcessedInput);
 
-  this.systems.entityFactory.cleanupDestroyedEntities();
+  // TODO: getSystem to be safe?, check existence of method?
+  this.systems['entity-factory'].cleanupDestroyedEntities();
 
 
   // TODO: THESE should / could all be hooks, after::gameTick
