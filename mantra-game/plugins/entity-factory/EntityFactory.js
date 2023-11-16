@@ -143,7 +143,7 @@ class EntityFactory {
 
     // not a component property yet, just ad-hoc on client
     ent.pendingRender = {};
-    game.graphics.forEach(function (graphicsInterface) {
+    this.game.graphics.forEach(function (graphicsInterface) {
       ent.pendingRender[graphicsInterface.name] = true;
     });
 
