@@ -324,17 +324,29 @@ class PhaserGraphics extends GraphicsInterface {
 
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
-      this.inflateEntity(ent, alpha);
+      if (ent.pendingRender['graphics-phaser']) {
+        this.inflateEntity(ent, alpha);
+        ent.pendingRender['graphics-phaser'] = false;
+      }
     }
   }
 
   inflateEntity(entity, alpha) {
-
+    if (entity.type === 'BULLET') {
+      //console.log("FUUUUU")
+      //return;
+    }
     if (entity.graphics && entity.graphics['graphics-phaser']) {
       let graphic = entity.graphics['graphics-phaser'];
+      
 
       if (entity.type === 'BULLET') {
       } else {
+        let adjustedX = entity.position.x + this.game.width / 2;
+        let adjustedY = entity.position.y + this.game.height / 2;
+        //entity.position.x = adjustedX;
+        //entity.position.y = adjustedY;
+
         this.updateGraphic(entity, alpha);
       }
 
@@ -344,16 +356,14 @@ class PhaserGraphics extends GraphicsInterface {
       // Adjust the coordinates to account for the center (0,0) world
       let adjustedX = entity.position.x + this.game.width / 2;
       let adjustedY = entity.position.y + this.game.height / 2;
-
-      //gameobject.setPosition(adjustedX, adjustedY);
-      //gameobject.x = adjustedX;
-      //gameobject.y = adjustedY;
-
       //entity.position.x = adjustedX;
       //entity.position.y = adjustedY;
       // console.log('creating', entity.position)
       let graphic = this.createGraphic(entity);
+      // TODO: remove this line, there is bug somewhere in code here
+      // or near MatterPhyics which is causing a double render / initial render to be in wrong position
       this.game.components.graphics.set([entity.id, 'graphics-phaser'], graphic);
+      //this.game.components.position.set(entity.id, entity.position);
 
     }
   }

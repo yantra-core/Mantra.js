@@ -65,6 +65,7 @@ class EntityFactory {
   }
 
   removeEntity(entityId) {
+
     let ent = this.game.entities.get(entityId);;
 
     if (ent && this.game.systems.graphics && ent.graphics) {
@@ -137,6 +138,14 @@ class EntityFactory {
       this.removeEntity(entityId);
       return;
     }
+
+    let ent = this.game.entities.get(entityId);
+
+    // not a component property yet, just ad-hoc on client
+    ent.pendingRender = {};
+    game.graphics.forEach(function (graphicsInterface) {
+      ent.pendingRender[graphicsInterface.name] = true;
+    });
 
     if (entityData.position) {
       // If position is not lockedProperties, use the new value from entityData
@@ -274,6 +283,14 @@ class EntityFactory {
 
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);
+
+    if (typeof updatedEntity.pendingRender === 'undefined') {
+      updatedEntity.pendingRender = {};
+    }
+    this.game.graphics.forEach(function (graphicsInterface) {
+      updatedEntity.pendingRender[graphicsInterface.name] = true;
+    });
+
     this.game.entities.set(entityId, updatedEntity);
 
     return updatedEntity;

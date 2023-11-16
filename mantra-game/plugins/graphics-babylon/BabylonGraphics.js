@@ -136,7 +136,7 @@ class BabylonGraphics extends GraphicsInterface {
 
     this.pendingLoad.forEach(function (pluginInstance) {
       game.use(pluginInstance);
-    })
+    });
 
   }
 
@@ -287,7 +287,10 @@ class BabylonGraphics extends GraphicsInterface {
 
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
-      this.inflateEntity(ent, alpha);
+      if (ent.pendingRender['graphics-babylon']) {
+        this.inflateEntity(ent, alpha);
+        ent.pendingRender['graphics-babylon'] = false;
+      }
     }
 
     cameraSystem.render();
