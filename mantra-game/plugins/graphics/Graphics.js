@@ -23,6 +23,8 @@ class Graphics {
 
   update() { }
 
+  // Remark: Graphics.createGraphic() currently isn't used as each Graphics Interface is responsible for creating its own graphics
+  //         By iterating through game.entities Map in the interfaces .render() method
   createGraphic(entityData) {
     let game = this.game;
     game.graphics.forEach(function (graphicsInterface) {
@@ -33,18 +35,7 @@ class Graphics {
         // console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.name, ent.graphics[graphicsInterface.name])
         return;
       }
-      // TODO: createPolygon, createCircle, createRectangle, createTriangle
-      // console.log('Graphics.createGraphic', entityData.position);
-
       let graphic = graphicsInterface.createGraphic(entityData);
-      // Remark: TODO: make this into Graphic() class
-      /*
-      let graphic = {
-        setPosition: function () {},
-        destroy: function () {}
-      }
-      */
-      // Setting a nested value
       if (graphic) {
         // console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.name, graphic)
         game.components.graphics.set([entityData.id, graphicsInterface.name], graphic);

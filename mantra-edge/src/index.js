@@ -1,5 +1,13 @@
 import { Game, plugins } from '../../mantra-game/Game.js';
 import deltaEncoding from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaEncoding.js';
+import deltaCompression from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaCompression.js';
+import { encode } from "@msgpack/msgpack";
+
+let config = {};
+config.msgpack = true;
+config.bbb = false;
+config.protobuf = false; // see: https://github.com/protobufjs/protobuf.js/pull/1941
+config.deltaCompression = true;   // only send differences between int values
 
 // let lastMessageTime = 0;
 const MAX_BUFFER_SIZE = 100;
@@ -34,12 +42,11 @@ export class Ayyo {
 
     // Use Plugins to add systems to the game
     this.gameLogic
+      // .use(new plugins.Schema())
       .use(new plugins.Bullet())
-      .use(new plugins.Block())
+      .use(new plugins.Block({ MIN_BLOCK_SIZE: 200 }))
       .use(new plugins.Collision())
       .use(new plugins.Border({ autoBorder: false }))
-
-
   }
 
   async initialize() {
@@ -56,7 +63,8 @@ export class Ayyo {
       width: 2000,
     });
 
-    /* TODO: better data compression / client-side prediction
+    /* TODO: better data compression / client-side prediction     */
+
     // Your game start-up logic goes here
     this.gameLogic.createEntity({
       type: 'BLOCK',
@@ -68,8 +76,7 @@ export class Ayyo {
         y: -500
       },
     });
-    */
-    
+
   }
 
   async reset() {
@@ -94,16 +101,15 @@ export class Ayyo {
 
     // Generate a unique player ID for this connection
     // remark: replace with global entity counter that is INT
-    const playerEntityId = 'player_' + Math.random().toString(36).substr(2, 9);
-    console.log('handleSession', playerEntityId)
-    // Store the connected player with its WebSocket
-    this.connectedPlayers[playerEntityId] = websocket;
-
+    //const playerEntityId = 'player_' + Math.random().toString(36).substr(2, 9);
+    let playerEntityId;
+    const playerName = 'player_' + Math.random().toString(36).substr(2, 9);
+    let ent;
     // Create the player entity in the game logic
     try {
       // Create a new player with a unique ID
-      this.gameLogic.createEntity({
-        id: playerEntityId,
+      ent = this.gameLogic.createEntity({
+        name: playerName,
         type: 'PLAYER',
       });
       // this.gameLogic.systems.playerCreation.createPlayer(playerEntityId);
@@ -111,10 +117,18 @@ export class Ayyo {
       console.log("ERROR", err)
     }
 
+
+    playerEntityId = ent.id;
+    // Store the connected player with its WebSocket
+    this.connectedPlayers[playerEntityId] = websocket;
+
+
     try {
       websocket.send(JSON.stringify({
         action: 'assign_id',
-        playerId: playerEntityId
+        playerName: playerName,
+        playerId: ent.id
+
       }));
     } catch (err) {
       console.log(err)
@@ -123,6 +137,7 @@ export class Ayyo {
 
     // Check if a new ticker needs to be elected
     if (!this.tickerId) {
+      // console.log("ELECT NEW TICKER", playerEntityId)
       this.electNewTicker(playerEntityId);
     }
 
@@ -134,6 +149,9 @@ export class Ayyo {
       delete this.connectedPlayers[playerEntityId];
       this.gameLogic.removeEntity(playerEntityId);  // You need to implement this method in Game.js
 
+      if (config.deltaCompression) {
+        deltaCompression.resetState(playerEntityId);
+      }
 
       if (playerEntityId === this.tickerId) {
         this.tickerId = null; // Clear the tickerId
@@ -155,7 +173,7 @@ export class Ayyo {
       // Perform the requested action based on the "action" property of the message
       switch (message.action) {
         case 'gameTick':
-
+          // console.log('got game tick')
           this.bufferGameTick(message, playerEntityId);
 
           if (this.tickerId !== playerEntityId) {
@@ -165,6 +183,7 @@ export class Ayyo {
           break;
 
         case 'player_input':
+          // console.log('ahhhh', playerEntityId, message.controls)
           this.gameLogic.systems.entityInput.handleInputs(playerEntityId, { controls: message.controls });
           break;
 
@@ -213,6 +232,7 @@ export class Ayyo {
   // Elect a new ticker when a player connects or when the current ticker disconnects
   electNewTicker(newTickerId) {
     this.tickerId = newTickerId;
+    // console.log("electNewTicker", this.connectedPlayers, newTickerId)
     const tickerWs = this.connectedPlayers[newTickerId];
     if (tickerWs) {
       tickerWs.send(JSON.stringify({
@@ -261,20 +281,63 @@ export class Ayyo {
     this.gameLogic.gameTick();
 
     // Send updates to clients
-    this.sendPlayerSnapshots();
+    try  {
+      this.sendPlayerSnapshots();
+    } catch (err) {
+      console.log('ERROR this.sendPlayerSnapshots()')
+      console.log(err.message);
+
+    }
   }
 
   sendPlayerSnapshots() {
+
     Object.keys(this.connectedPlayers).forEach(playerId => {
+
       const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
       const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];
 
       if (playerSnapshot) {
         try {
+
+
           let deltaEncoded = deltaEncoding.encode(playerId, playerSnapshot);
           if (deltaEncoded) {
-            const ws = this.connectedPlayers[playerId];
-            ws.send(JSON.stringify({ action: 'gametick', snapshot: deltaEncoded, lastProcessedInput: lastProcessedInput }));
+            let newSnapshot;
+
+            if (config.deltaCompression) {
+              newSnapshot = deltaCompression.compress(playerId, deltaEncoded);
+            } else {
+              newSnapshot = playerSnapshot;
+            }
+
+            if (config.protobuf) {
+                // Create a new message
+                let _message = this.gameLogic.Message.fromObject({ id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput }); // or use .fromObject if conversion is necessary
+                // Encode a message to an Uint8Array (browser) or Buffer (node)
+                let buffer = game.Message.encode(_message).finish();
+                const ws = this.connectedPlayers[playerId];
+                ws.send(buffer);
+            } else if (config.bbb) {
+              let BBB = new bbb();
+              // TODO: add data encoding layer here
+              let bbbEncoded = BBB.encodeMessage({ id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput });
+
+              const ws = this.connectedPlayers[playerId];
+              ws.send(bbbEncoded.byteArray);
+            } else if (config.msgpack) {
+              const ws = this.connectedPlayers[playerId];
+              let msg = { id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput };
+              let buffer = encode(msg);
+              ws.send(buffer);
+
+            }
+            else {
+              const ws = this.connectedPlayers[playerId];
+              ws.send(JSON.stringify({ id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput }));
+            }
+
+
           }
         } catch (err) {
           console.log(err);
@@ -311,7 +374,7 @@ export class Ayyo {
           const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
           if (playerSnapshot) {
             const ws = this.connectedPlayers[playerId];
-            ws.send(JSON.stringify({ action: 'gametick', snapshot: playerSnapshot }));
+            ws.send(JSON.stringify({ action: 'GAMETICK', state: playerSnapshot.state }));
           }
         });
         return new Response('Game ticked', { status: 200 });

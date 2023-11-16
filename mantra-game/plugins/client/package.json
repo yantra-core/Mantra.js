@@ -1,5 +1,5 @@
 {
-  "name": "@yantra-core/client",
+  "name": "@yantra-core/client-plugin",
   "version": "1.0.0",
   "description": "",
   "main": "Client.js",

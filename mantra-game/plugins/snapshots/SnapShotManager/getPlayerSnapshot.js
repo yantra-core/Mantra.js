@@ -5,6 +5,10 @@
  plus some additional netcode game logic for excluding certain entities from the snapshot
 
 */
+
+// playerStateCache is not directly related to deltaCompression
+// playerStateCache is used to track kinematic entities (bullets) for client-side prediction
+// playerStateCache is legacy API and can be removed soon
 let playerStateCache = {};
 let playerSnapshotCounts = {};
 let snapshotCount = 0;
@@ -20,33 +24,16 @@ const getPlayerSnapshot = function (playerId) {
   const differentialSnapshotState = [];
   let playerState = [];
 
-  for (const removedEnt of this.removedEntities) { // TODO: spatially zone removed entities
-    // console.log('pushing removed to clientattempt to destroy', eId)
-    if (removedEnt.type !== 'BULLET') { // TODO: this could be treated at kinematic instead of hard-coded to bullets
-      // don't send bullets that have been destroyed to the client
-      // as the client will predicted their destruction
-      playerState.push({
-        id: removedEnt.id,
-        destroyed: true
-      });
-    }
-  }
-
   // TODO: this should be using a spatial search instead of just returning the entire world
   // use FIELD_OF_VIEW and RENDER_DISTANCE to limit the number of entities returned
-  for (const eId in this.entities) { // TODO: this.bodyMap should be RBush search
-    //console.log("eId", eId, this.entities)
-    let state = this.entities[eId];
-    
-    // let state = this.getEntity(eId);
+  for (let [eId, state] of this.entities.entries()) { // TODO: this.bodyMap should be RBush search
+
     if (state.destroyed) {
       delete playerStateCache[playerId][state.id];
       if (state.type === 'PLAYER') {
         delete playerStateCache[playerId][state.id];
         delete playerStateCache[state.id];
       }
-      // console.log("NOT SENDING DESTROYED ENTITY", state.id)
-      continue;
     }
     
     if (typeof playerStateCache[playerId] === 'undefined') {
@@ -60,7 +47,7 @@ const getPlayerSnapshot = function (playerId) {
         // TODO: uncomment with client-side prediction
         // continue;
       }
-    }
+    } 
 
     // bullets are kinematic, so we only send their initial state with velocity vector
     if (state.type === 'BULLET' && typeof playerStateCache[playerId] !== 'undefined' && typeof playerStateCache[playerId][state.id] !== 'undefined') {

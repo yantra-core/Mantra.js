@@ -26,8 +26,9 @@ class Component {
     }
 
     // After setting the value, update the corresponding entity in the game.entities
-    if (this.game && this.game.entities && this.game.entities[entityId]) {
-      this.game.entities[entityId][this.name] = this.get(entityId);
+    if (this.game && this.game.entities && this.game.entities.has(entityId)) {
+      let existing = this.game.entities.get(entityId);
+      existing[this.name] = this.get(entityId);
     }
 
   }
@@ -60,12 +61,13 @@ class Component {
       delete this.data[key];
     }
 
-
+    /* Removed 11/15/23, do we need to do this, or will entity update by reference?
     // After removing the component data, update the entity in game.entities if necessary
     const entityId = Array.isArray(key) ? key[0] : key;
     if (this.game && this.game.entities && this.game.entities[entityId]) {
       delete this.game.entities[entityId][this.name];
     }
+    */
   }
 }
 

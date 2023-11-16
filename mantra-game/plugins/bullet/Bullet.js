@@ -15,19 +15,7 @@ class BulletPlugin {
     this.game.systemsManager.addSystem('bullet', this);
   }
 
-  update() {
-    for (let entityId in this.game.components.position) {
-      const bullet = this.game.getComponent(entityId, 'BulletComponent');
-      if (bullet) {
-        const position = this.game.getComponent(entityId, 'position');
-        const velocity = this.game.getComponent(entityId, 'velocity'); // Get the bullet's velocity
-
-        if (position && velocity) {
-          // Movement and physics update logic goes here
-        }
-      }
-    }
-  }
+  update() {} // not used, physics engine updates bullets based on velocity
 
   fireBullet(entityId) {
 
@@ -57,11 +45,9 @@ class BulletPlugin {
     // Compute the bullet's direction based on player's rotation
     const directionX = Math.sin(playerRotation);
     const directionY = -Math.cos(playerRotation);
-    const bulletId = `bullet_${this.bulletCount.toString()}`; // for now, debugging is easier to have string id
 
     this.bulletCount++;
     const bulletDirectionConfig = {
-      id: bulletId,
       type: 'BULLET',
       mass: 1,
       position: bulletStartPosition,
@@ -76,12 +62,8 @@ class BulletPlugin {
       radius: 33,
       damage: 10,
     };
+    // console.log('using bulletDirectionConfig', bulletDirectionConfig)
     this.game.createEntity(bulletDirectionConfig);
-
-    if (this.game.isClient) {
-      // will delegate what gets renderered based on type property
-      let graphic = this.game.createGraphic(bulletDirectionConfig);
-    }
 
   }
 
@@ -137,7 +119,7 @@ class BulletPlugin {
       }
 
       //
-      // Bullets are destroyed if they hit a border
+      // Bullets are destroyed if they hit a BORDER
       //
       if (entityA.type === 'BULLET' && entityB.type === 'BORDER') {
         // destroy the bullet if it hits a border wall
@@ -145,6 +127,20 @@ class BulletPlugin {
         return;
       }
       if (entityA.type === 'BORDER' && entityB.type === 'BULLET') {
+        // destroy the bullet if it hits a border wall
+        this.game.removeEntity(entityIdB);
+        return;
+      }
+
+      //
+      // Bullets are destroyed if they hit a BLOCK
+      //
+      if (entityA.type === 'BULLET' && entityB.type === 'BLOCK') {
+        // destroy the bullet if it hits a border wall
+        this.game.removeEntity(entityIdA);
+        return;
+      }
+      if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
         // destroy the bullet if it hits a border wall
         this.game.removeEntity(entityIdB);
         return;

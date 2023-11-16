@@ -1,112 +1,183 @@
-let stateCache = {};
-let accumulatedStateCache = {};
+// deltaCompression.js - Marak Squires 2023
+import float2Int from './float2Int.js'; // Assuming float2Int.js is in the same directory
 
-const deltaCompression = {};
+const DEFAULTS = {
+  position: { x: 0, y: 0 },
+  velocity: { x: 0, y: 0 },
+  rotation: 0,
+  width: 0,
+  height: 0,
+  mass: 0,
+  health: 0,
+  lifetime: 0,
+  maxSpeed: 0
+};
 
-deltaCompression.removeState = function removeState(id) {
-  delete stateCache[id];
-  delete accumulatedStateCache[id];
-}
+let playerStateCache = {};
+let localPlayerStateCache = {};
 
-deltaCompression.accumulatedStateCache = accumulatedStateCache;
+const deltaCompression = {}; // deltaCompression module scope
 
-deltaCompression.compress = function decompressDeltas(snapshot) {
+// this config could be part of instance scope in SnapShotManager
+let config = deltaCompression.config = {
+  // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
+  //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline
+  //         Where as the deltaEncoding pipeline is only used on the server
+  truncateFloats: true, // truncate float values to this precision
+  truncateToPrecision: 3, // truncate float values to this precision
+  floatProperties: ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed'], // extend this array with other float property names
+  float2Int: true // encode float values as integers
+};
+
+deltaCompression.resetState = function resetState(playerId) {
+  if (playerStateCache[playerId]) {
+    playerStateCache[playerId].stateCache = {};
+    playerStateCache[playerId].accumulatedStateCache = {};
+  }
+  if (localPlayerStateCache[playerId]) {
+    localPlayerStateCache[playerId].stateCache = {};
+    localPlayerStateCache[playerId].accumulatedStateCache = {};
+  }
+};
+
+deltaCompression.removeState = function removeState(playerId, id) {
+  if (playerStateCache[playerId]) {
+    delete playerStateCache[playerId].stateCache[id.toString()];
+    delete playerStateCache[playerId].accumulatedStateCache[id.toString()];
+  }
+  if (localPlayerStateCache[playerId]) {
+    delete localPlayerStateCache[playerId].stateCache[id.toString()];
+    delete localPlayerStateCache[playerId].accumulatedStateCache[id.toString()];
+  }
+};
+
+deltaCompression.compress = function compress(playerId, snapshot) {
   let _snapshot = null;
+
+  if (!playerStateCache[playerId]) {
+    playerStateCache[playerId] = { stateCache: {}, accumulatedStateCache: {} };
+  }
 
   if (snapshot && snapshot.state) {
     _snapshot = { id: snapshot.id, state: [] };
 
-    // For each incoming snapshot state
     snapshot.state.forEach(function (state) {
-      // If the state is marked for destruction, remove it from the stateCache
       if (state.destroy) {
-        delete stateCache[state.id];
+        delete playerStateCache[playerId].stateCache[state.id];
         return;
       }
 
-      // Get the last known state for this id
-      let lastKnownState = stateCache[state.id];
-
-      // If this is a new state, initialize lastKnownState with zeros
-      if (typeof lastKnownState === 'undefined') {
-        lastKnownState = { position: { x: 0, y: 0 }, rotation: 0 };
-      }
-
-      // Clone the state to avoid mutating the original state object
+      let lastKnownState = playerStateCache[playerId].stateCache[state.id] || DEFAULTS;
       let clonedState = { ...state };
 
-      // Delta encode the position if it exists in the state
+      //
+      // Position
+      //
       if (typeof clonedState.position !== 'undefined') {
-        clonedState.position = getPositionDelta(clonedState.position, lastKnownState.position);
+        let positionDelta = getPositionDelta(clonedState.position, lastKnownState.position);
+        clonedState.position = {
+          x: float2Int.encode(positionDelta.x),
+          y: float2Int.encode(positionDelta.y)
+        };
       }
 
-      // Delta encode the rotation if it exists in the state
+      //
+      // Velocity
+      //
+      if (typeof clonedState.velocity !== 'undefined') {
+        let velocityDelta = getPositionDelta(clonedState.velocity, lastKnownState.velocity);
+        clonedState.velocity = {
+          x: float2Int.encode(velocityDelta.x),
+          y: float2Int.encode(velocityDelta.y)
+        };
+      }
+
       if (typeof clonedState.rotation !== 'undefined') {
-        clonedState.rotation = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
+        let rotationDelta = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
+        clonedState.rotation = float2Int.encode(rotationDelta);
       }
 
-      // Update the stateCache with the original state values, not the deltas
-      stateCache[state.id] = { ...state };
+      config.floatProperties.forEach(prop => {
+        if (typeof clonedState[prop] !== 'undefined') {
+          let delta = getDelta(clonedState[prop], lastKnownState[prop]);
+          clonedState[prop] = float2Int.encode(delta);
+        }
+      });
 
+      playerStateCache[playerId].stateCache[state.id] = { ...state };
       _snapshot.state.push(clonedState);
     });
   }
   return _snapshot;
 };
 
-deltaCompression.decompress = function compressDeltas(snapshot) {
+deltaCompression.decompress = function decompress(playerId, snapshot) {
+  if (!localPlayerStateCache[playerId]) {
+    localPlayerStateCache[playerId] = { stateCache: {}, accumulatedStateCache: {} };
+  }
 
   if (snapshot && snapshot.state) {
     let states = [];
     snapshot.state.forEach(function (state) {
-      let accumulatedState = accumulatedStateCache[state.id];
+      let accumulatedState = localPlayerStateCache[playerId].accumulatedStateCache[state.id];
 
-      if (typeof accumulatedState === 'undefined') {
-        accumulatedState = { ...state };
-      } else {
-        // Reverse the delta encoding for position if it exists in the state
-        if (state.position) {
-          accumulatedState.position.x += state.position.x;
-          accumulatedState.position.y += state.position.y;
-        }
-
-        // Reverse the delta encoding for rotation if it exists in the state
-        if (typeof state.rotation !== 'undefined') {
-          accumulatedState.rotation += state.rotation;
-        }
+      // Initialize accumulatedState if it's a new state
+      if (!accumulatedState) {
+        accumulatedState = { id: state.id, velocity: { x: 0, y: 0 }, position: { x: 0, y: 0 }, rotation: 0, width: 0, height: 0, mass: 0, health: 0, lifetime: 0, maxSpeed: 0 };
       }
 
-      accumulatedStateCache[state.id] = accumulatedState;
+      // Apply updates from the current state
+      Object.keys(state).forEach(prop => {
+        if (prop === 'position' && state.position) {
+          let positionDeltaX = float2Int.decode(state.position.x);
+          let positionDeltaY = float2Int.decode(state.position.y);
+          accumulatedState.position.x += positionDeltaX;
+          accumulatedState.position.y += positionDeltaY;
+        } else if (prop === 'velocity' && state.velocity) {
+          let velocityDeltaX = float2Int.decode(state.velocity.x);
+          let velocityDeltaY = float2Int.decode(state.velocity.y);
+          accumulatedState.velocity.x += velocityDeltaX;
+          accumulatedState.velocity.y += velocityDeltaY;
+        } else if (prop === 'rotation' && typeof state.rotation !== 'undefined') {
+          let rotationDelta = float2Int.decode(state.rotation);
+          accumulatedState.rotation += rotationDelta;
+        } else {
+          if (config.floatProperties.indexOf(prop) !== -1) {
+            let delta;
+            delta = float2Int.decode(state[prop])
+            accumulatedState[prop] += delta;
+          } else {
+            // For all other properties, just copy/update them as is
+            accumulatedState[prop] = state[prop];
+          }
 
-      // Update the state with the accumulated values
+        }
+      });
+
+      localPlayerStateCache[playerId].accumulatedStateCache[state.id] = accumulatedState;
       states.push(accumulatedState);
-
     });
     snapshot.state = states;
   }
   return snapshot;
-}
+};
 
-const truncateToPrecision = (value, precision = 3) => {
+
+const truncateToPrecision = (value, precision = config.truncateToPrecision) => {
+  if (!config.truncateFloats) {
+    return value;
+  }
   return Number(value.toFixed(precision));
 };
 
 const getPositionDelta = (currentState, lastKnownState) => {
-  let deltaX = 0;
-  let deltaY = 0;
-
-  // Check if lastKnownState is defined and has properties x and y
-  if (lastKnownState && typeof lastKnownState.x !== 'undefined') {
-    deltaX = currentState.x - lastKnownState.x;
-  } else {
-    deltaX = currentState.x;
+  // If this is a new state, return zero deltas
+  if (typeof lastKnownState === 'undefined') {
+    return { x: 0, y: 0 };
   }
 
-  if (lastKnownState && typeof lastKnownState.y !== 'undefined') {
-    deltaY = currentState.y - lastKnownState.y;
-  } else {
-    deltaY = currentState.y;
-  }
+  let deltaX = currentState.x - lastKnownState.x;
+  let deltaY = currentState.y - lastKnownState.y;
 
   return {
     x: truncateToPrecision(deltaX),
@@ -115,13 +186,29 @@ const getPositionDelta = (currentState, lastKnownState) => {
 };
 
 const getRotationDelta = (currentRotation, lastKnownRotation) => {
-  let deltaRotation = 0;
-
-  if (typeof lastKnownRotation !== 'undefined') {
-    deltaRotation = currentRotation - lastKnownRotation;
+  // If this is a new state, return zero delta
+  if (typeof lastKnownRotation === 'undefined') {
+    return 0;
   }
 
+  let deltaRotation = currentRotation - lastKnownRotation;
   return truncateToPrecision(deltaRotation);
 };
+
+const getDelta = (currentValue, lastKnownValue) => {
+  if (typeof lastKnownValue === 'undefined') {
+    return currentValue;
+  }
+  let delta = currentValue - lastKnownValue;
+  return truncateToPrecision(delta);
+};
+
+function initializeDefaultState(id) {
+  let defaultState = { id: id };
+  config.floatProperties.forEach(prop => {
+    defaultState[prop] = 0; // Initialize all float properties with default value 0
+  });
+  return defaultState;
+}
 
 export default deltaCompression;

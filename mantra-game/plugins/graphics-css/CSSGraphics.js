@@ -199,8 +199,8 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   render(game, alpha) {
-    for (let eId in this.game.entities) {
-      let ent = this.game.entities[eId];
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
       this.inflateEntity(ent, alpha);
     }
   }

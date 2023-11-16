@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+// Enums
+enum ActionTypes {
+  GAMETICK = 0;
+  ASSIGN_ID = 1;
+  BECOME_TICKER = 2;
+  PONG = 3;
+  // ... other action types
+}
+
+enum EntityTypes {
+  PLAYER = 0;
+  BULLET = 1;
+  BLOCK = 2;
+  BORDER = 3;
+  BODY = 4;
+  // ... other types
+}
+
+// Messages
+message Position {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Velocity {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Player {
+  uint32 id = 1; // Changed to uint32
+  string name = 2; // String size limit can be enforced in application logic
+  EntityTypes type = 3;
+  Position position = 4;
+  Velocity velocity = 5;
+  int32 width = 6;
+  int32 height = 7;
+  int32 rotation = 8; // Special case with radians->bytes optimization
+  int32 mass = 9;
+  int32 health = 10;
+  double depth = 11;
+  int32 lifetime = 12;
+  double radius = 13;
+  bool isSensor = 14;
+  bool isStatic = 15;
+  bool destroyed = 16;
+  uint32 owner = 17; // Changed to uint32
+  int32 maxSpeed = 18;
+}
+
+message Message {
+  uint32 id = 1; // Changed to uint32
+  ActionTypes action = 2;
+  repeated Player state = 3;
+  uint32 lastProcessedInput = 4; // Changed to uint32
+}

@@ -2,11 +2,20 @@
 import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
+import messageSchema from "../server/messageSchema.js";
+import gameTick from "../../lib/gameTick.js";
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
+
+
+// cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
+// should be resolved soon, but for now we need to use msgpack
 config.msgpack = true;
-config.deltaCompression = false;
+config.deltaCompression = true;
+
+// default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
+config.protobuf = false;
 
 export default class WebSocketClient {
   constructor(entityName, isServerSideReconciliationEnabled) {
@@ -55,6 +64,7 @@ export default class WebSocketClient {
     this.game.communicationClient = this;
     this.game.onlineGameLoopRunning = true;
     this.socket = new WebSocket(url);
+    this.socket.binaryType = 'arraybuffer';
     this.socket.onopen = this.handleOpen.bind(this);
     this.socket.onmessage = this.handleMessage.bind(this);
     this.socket.onclose = this.handleClose.bind(this);
@@ -63,6 +73,18 @@ export default class WebSocketClient {
 
     // Start measuring RTT
     this.startRttMeasurement();
+
+    // start a clock for cloudflare edge games, if we haven't much forward in gamestate, send a gametick event
+    // to server in attempt to restart paused game
+    /* TODO: add this as part of edge server ticker election in case of lockup
+    setTimeout(function(){
+      // check to see the gameTick count is above 3
+      if (self.game.tick > 120) {
+        console.log("GOT TICKS")
+        // alert('got 120 ticks')
+      }
+    }, 5000)
+    */
 
   }
 
@@ -123,11 +145,13 @@ export default class WebSocketClient {
       // Remark: Client-side prediction is close; however we were seeing some ghosting issues
       //         More unit tests and test coverage is required for: snapshots, interpolation, and prediction
       /*
-      entityInput.handleInputs(this.entityName, {
+        entityInput.handleInputs(this.entityName, {
         controls: data.controls,
         mouse: data.mouse
       }, this.inputSequenceNumber);
+
       */
+
       var message = JSON.stringify(Object.assign({ action: action, sequenceNumber: this.inputSequenceNumber }, data));
       this.socket.send(message);
     } else {
@@ -164,7 +188,6 @@ export default class WebSocketClient {
     if (data.action === 'become_ticker') {
       this.startTicking(this.socket);
       return;
-
     }
 
     if (data.action === 'pong') {
@@ -177,19 +200,42 @@ export default class WebSocketClient {
     }
 
     if (config.msgpack) {
-      data = await decodeFromBlob(data);
+      data = decode(data);
+    }
+
+    /*
+    if (config.bbb) {
+      const byteArray = await decodeBlob(data);
+      let receivedBuffer = new BitBuffer(byteArray.length * 8); // Create a new BitBuffer
+      receivedBuffer.byteArray = byteArray; // Set the byteArray
+      let bbbDecoded = bbb.decode(messageSchema, receivedBuffer);
+      data = bbbDecoded;
+    }
+    */
+
+    if (config.protobuf) {
+      // data is current blog, needs to be converted to buffer?
+      let uint8Array = new Uint8Array(data);
+      var message = game.Message.decode(uint8Array);
+      // Convert the message back to a plain object
+      var object = game.Message.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+        // see ConversionOptions
+      });
+      data = object;
     }
 
     if (config.deltaCompression) {
-      data.snapshot = deltaCompression.decompress(data.snapshot);
+      // "player1" can be any string, as long as its consistent on the local client
+      data = deltaCompression.decompress('player1', data);
     }
 
-    if (data.action === "gametick") {
-
+    if (data.action === "GAMETICK") {
       this.game.previousSnapshot = this.game.latestSnapshot;
-
-      this.game.latestSnapshot = data.snapshot;
-      game.snapshotQueue.push(data.snapshot);
+      this.game.latestSnapshot = data;
+      game.snapshotQueue.push(data);
 
       // TODO: add config flag here for snapshot interpolation
       // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);
@@ -237,18 +283,20 @@ export default class WebSocketClient {
   }
 
   // This method tracks the size of each snapshot and calculates the average
-  trackSnapshotSize(dataString) {
+  trackSnapshotSize(data) {
+
+
+    // if data is string convert to blob
+    // in most cases message with be binary blob already
+    if (typeof data === 'string') {
+      data = encoder.encode(data);
+    }
+
+    let uint8Array = new Uint8Array(data);
+    let size = uint8Array.length;
     // console.log(dataString)
     // In a browser environment, create a new Blob and get its size
 
-    let size;
-
-    if (typeof dataString === 'string') {
-      let buffer = encoder.encode(dataString);
-      size = buffer.byteLength;
-      } else {
-        size = dataString.size;
-    }
 
     this.totalSnapshotSize += size;
     this.snapshotCount++;
@@ -271,4 +319,20 @@ async function decodeFromBlob(blob) {
     // Blob#arrayBuffer(): Promise<ArrayBuffer> (if stream() is not available)
     return decode(await blob.arrayBuffer());
   }
+}
+
+function blobToArrayBuffer(blob) {
+  return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(blob);
+  });
+}
+
+async function decodeBlob(blob) {
+  const arrayBuffer = await blobToArrayBuffer(blob);
+  const byteArray = new Uint8Array(arrayBuffer);
+  // Now you can use this byteArray to reconstruct your BitBuffer
+  return byteArray;
 }

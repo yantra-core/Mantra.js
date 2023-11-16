@@ -1,5 +1,6 @@
 // deltaEncoding.js - Marak Squires 2023
 import hasStateChanged from "./hasStateChanged.js";
+import float2Int from "./float2Int.js";
 
 //let stateCache = {};
 let playerStateCache = {};
@@ -33,7 +34,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
     // Check and load last known state if available
     if (typeof playerStateCache[playerId][state.id] !== 'undefined') {
       lastKnownState = playerStateCache[playerId][state.id];
-    } 
+    }
 
     // keeps track of all the properties that have changed
     let changedProps = [];
@@ -61,16 +62,15 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
             deltaState[component] = currentComponentValue; // Use absolute position in offline mode
             break;
 
-            case 'velocity':
+          case 'velocity':
             //console.log('currentComponentValue', currentComponentValue, lastKnownComponentValue)
-
             deltaState[component] = currentComponentValue;
-
             break;
 
           case 'rotation':
-            deltaState[component] = currentComponentValue; // Use absolute rotation in offline mode
-            break;
+
+            deltaState[component] = currentComponentValue;
+          break;
 
           default:
             deltaState[component] = currentComponentValue;
@@ -86,7 +86,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
       }
     }
 
-    deltaState.type = state.type;
+    // deltaState.type = state.type;
 
     if (hasChanges) {
       differentialSnapshotState.push(deltaState);
@@ -94,7 +94,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
 
     // Update the player cache
     playerStateCache[playerId][state.id] = {
-      ... playerStateCache[playerId][state.id],
+      ...playerStateCache[playerId][state.id],
       ...state
     };
   })
@@ -102,7 +102,7 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
   // console.log('deltaEncodedSnapshotState', differentialSnapshotState)
   if (differentialSnapshotState.length > 0) {
     return {
-      id: Date.now(),
+      id: snapshot.id,
       state: JSON.parse(JSON.stringify(differentialSnapshotState))
     };
   }
@@ -117,6 +117,6 @@ deltaEncoding.decode = function decodeDelta(snapshot) {
   // In the future we could implement deltaEncoding.cache to represent
   // The currently world state as seen by the deltaEncoder
   return snapshot;
- }
+}
 
 export default deltaEncoding;

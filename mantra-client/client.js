@@ -90,7 +90,7 @@ let game = new Game({
   isClient: true,
   mouse: false,
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['phaser'], // 'babylon', 'css', 'phaser'
+  graphics: ['babylon'], // 'babylon', 'css', 'phaser'
   collisions: true,
   camera: 'follow',
   options: {
@@ -105,6 +105,7 @@ game
   .use(new plugins.Bullet())
   .use(new plugins.Block())
 
+game.use(new plugins.Schema());
 
 game.use(new plugins.InputLegend());
 game.use(new plugins.PingTime());
@@ -208,7 +209,7 @@ if (mode === 'online') {
       depth: 200,
       position: {
         x: 0,
-        y: -500
+        y: -1000
       },
     });
 

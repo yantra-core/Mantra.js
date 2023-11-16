@@ -4,6 +4,7 @@ class SnapshotManager {
   constructor(game) {
     game.lastProcessedInput = {};
     this.game = game;
+    this.snapshotCount = 0;
     this.snapshotBuffer = [];
     
     // Bind some methods to parent Game scope for convenience
@@ -16,7 +17,8 @@ class SnapshotManager {
   }
 
   saveSnapshot(entities, lastProcessedInput) {
-    const snapshotId = Date.now();
+    this.snapshotCount++;
+    const snapshotId = this.snapshotCount;
     const snapshotState = Object.values(entities);
     const snapshot = {
       state: snapshotState,

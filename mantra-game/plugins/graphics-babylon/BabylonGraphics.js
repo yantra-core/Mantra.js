@@ -56,7 +56,7 @@ class BabylonGraphics extends GraphicsInterface {
 
   }
 
-  babylonReady() {
+  async babylonReady() {
     let game = this.game;
 
     // Access the renderCanvas element and set its size
@@ -86,8 +86,10 @@ class BabylonGraphics extends GraphicsInterface {
       renderCanvas.height = game.height; // Set canvas height in pixels
     }
 
-
     this.engine = new BABYLON.Engine(renderCanvas, true);
+    // TODO: enabled WebGPU by default
+    //this.engine = new BABYLON.WebGPUEngine(renderCanvas, true);
+    // await this.engine.initAsync();
     this.scene = new BABYLON.Scene(this.engine);
     this.game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
     game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
@@ -142,7 +144,6 @@ class BabylonGraphics extends GraphicsInterface {
     // console.log('setting position', entityData.position)
     let previousEntity = this.game.getEntity(entityData.id);
     if (!previousEntity || !previousEntity.graphics) {
-      console.log('no previous entity found for', entityData.id);
       return;
     }
 
@@ -197,6 +198,8 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   removeGraphic(entityId) {
+    //console.log('this.game.entities', this.game.entities);
+    //console.log('this.game.entities[entityId]', this.game.entities[entityId])
     let entity = this.game.getEntity(entityId);
     if (!entity || !entity.graphics || !entity.graphics['graphics-babylon']) {
       return;
@@ -282,8 +285,8 @@ class BabylonGraphics extends GraphicsInterface {
     let self = this;
     let cameraSystem = game.getSystem('graphics-babylon/camera');
 
-    for (let eId in this.game.entities) {
-      let ent = this.game.entities[eId];
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
       this.inflateEntity(ent, alpha);
     }
 
@@ -307,8 +310,12 @@ class BabylonGraphics extends GraphicsInterface {
         this.updateGraphic(entity, alpha);
       }
     } else {
-      let graphic = this.createGraphic(entity);
-      this.game.components.graphics.set([entity.id, 'graphics-babylon'], graphic);
+      if (entity.destroyed) {
+        // shouldnt happen got destroy event for already removed ent
+      } else {
+        let graphic = this.createGraphic(entity);
+        this.game.components.graphics.set([entity.id, 'graphics-babylon'], graphic);
+      }
     }
   }
 

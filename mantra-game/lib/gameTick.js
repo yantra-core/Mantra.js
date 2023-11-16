@@ -2,7 +2,7 @@ let lastTick = Date.now();
 let hzMS = 16.666; // 60 FPS
 
 function gameTick() {
-
+  this.tick++;
   // Calculate deltaTime in milliseconds
   let now = Date.now();
   let deltaTimeMS = now - lastTick; // Delta time in milliseconds

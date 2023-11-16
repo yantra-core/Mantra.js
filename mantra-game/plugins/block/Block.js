@@ -1,10 +1,11 @@
 // Block.js - Marak Squires 2023
 class Block {
-  constructor(config = {}) {
+  constructor({ MIN_BLOCK_SIZE = 50, width = 40, height = 40 } = {}) {
     this.name = 'Block';
     // Assuming the config includes width and height properties
-    this.width = config.width || 40; // Default size if none provided
-    this.height = config.height || 40; // Default size if none provided
+    this.width = width; // Default size if none provided
+    this.height = height; // Default size if none provided
+    this.MIN_BLOCK_SIZE = MIN_BLOCK_SIZE;
   }
 
   init(game) {
@@ -21,8 +22,8 @@ class Block {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;
 
-      const entityA = this.game.entities[entityIdA];
-      const entityB = this.game.entities[entityIdB];
+      const entityA = this.game.entities.get(entityIdA);
+      const entityB = this.game.entities.get(entityIdB);
 
       if (!entityA || !entityB) {
         console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
@@ -49,7 +50,7 @@ class Block {
       this.game.removeEntity(entityIdB);
 
       // Check if the block is big enough to split
-      if (entityA.width <= 100 && entityA.height <= 100) {
+      if (entityA.width <= this.MIN_BLOCK_SIZE && entityA.height <= this.MIN_BLOCK_SIZE) {
         this.game.removeEntity(entityIdA);
         return;
       }
