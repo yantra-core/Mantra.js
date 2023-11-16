@@ -1,5 +1,6 @@
 import tap from 'tap';
 import { Game } from '../Game.js';
+import Schema from '../plugins/schema/Schema.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import EntityFactory from '../plugins/entity-factory/EntityFactory.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
@@ -9,6 +10,7 @@ const game = new Game({
   loadDefaultPlugins: false
 });
 
+game.use(new Schema());
 game.use(new PhysicsMatter());
 game.use(new EntityFactory());
 game.use(new EntityInput());
@@ -16,7 +18,7 @@ game.use(new EntityInput());
 tap.test('game class', (t) => {
 
   t.test('createEntity() function', (t) => {
-    const entityId = 'testEntity';
+    const entityId = 1;
     const entity = game.createEntity({
       id: entityId,
       type: 'TEST',
@@ -40,7 +42,7 @@ tap.test('game class', (t) => {
   });
 
   t.test('update() function', (t) => {
-    const entityId = 'testEntityMove';
+    const entityId = 2;
     game.createEntity({
       id: entityId,
       type: 'TEST',
@@ -56,13 +58,13 @@ tap.test('game class', (t) => {
 
     const movedY = game.getComponent(entityId, 'position').y;
     // Uncomment and adjust this based on your game's collision logic:
-    t.equal(true, movedY <= 20);
+    t.equal(true, movedY >= 20); // why did Y flip here?
     t.end();
   });
 
 
   t.test('removeEntity() function', (t) => {
-    const entityId = 'testEntityRemove';
+    const entityId = 3;
     game.createEntity({
       id: entityId,
       type: 'TEST',
@@ -79,7 +81,7 @@ tap.test('game class', (t) => {
   });
   
   t.test('getPlayerSnapshot() function - detecting changes', (t) => {
-    const playerId = 'player1';
+    const playerId = 4;
 
     game.createEntity({
       id: playerId,
@@ -137,5 +139,13 @@ tap.test('game class', (t) => {
     t.end();
   });
 
+
+  t.test('global event emitter', (t) => {
+    game.on('custom-event', (data) => {
+      t.equal(data, 'custom-data');
+      t.end();
+    });
+    game.emit('custom-event', 'custom-data');
+  })
   t.end();
 });

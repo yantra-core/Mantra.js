@@ -23,6 +23,8 @@ let config = deltaCompression.config = {
   // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
   //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline
   //         Where as the deltaEncoding pipeline is only used on the server
+  truncateFloats: true, // truncate float values to this precision
+  truncateToPrecision: 3, // truncate float values to this precision
   floatProperties: ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed'], // extend this array with other float property names
   float2Int: true // encode float values as integers
 };
@@ -73,14 +75,10 @@ deltaCompression.compress = function compress(playerId, snapshot) {
       //
       if (typeof clonedState.position !== 'undefined') {
         let positionDelta = getPositionDelta(clonedState.position, lastKnownState.position);
-        if (config.float2Int) {
-          clonedState.position = {
-            x: float2Int.encode(positionDelta.x),
-            y: float2Int.encode(positionDelta.y)
-          };
-        } else {
-          clonedState.position = { ...positionDelta };
-        }
+        clonedState.position = {
+          x: float2Int.encode(positionDelta.x),
+          y: float2Int.encode(positionDelta.y)
+        };
       }
 
       //
@@ -88,34 +86,21 @@ deltaCompression.compress = function compress(playerId, snapshot) {
       //
       if (typeof clonedState.velocity !== 'undefined') {
         let velocityDelta = getPositionDelta(clonedState.velocity, lastKnownState.velocity);
-        if (config.float2Int) {
-          clonedState.velocity = {
-            x: float2Int.encode(velocityDelta.x),
-            y: float2Int.encode(velocityDelta.y)
-          };
-        } else {
-          clonedState.velocity = { ...velocityDelta };
-        }
+        clonedState.velocity = {
+          x: float2Int.encode(velocityDelta.x),
+          y: float2Int.encode(velocityDelta.y)
+        };
       }
-
 
       if (typeof clonedState.rotation !== 'undefined') {
         let rotationDelta = getRotationDelta(clonedState.rotation, lastKnownState.rotation);
-        if (config.float2Int) {
-          clonedState.rotation = float2Int.encode(rotationDelta);
-        } else {
-          clonedState.rotation = rotationDelta;
-        }
+        clonedState.rotation = float2Int.encode(rotationDelta);
       }
 
       config.floatProperties.forEach(prop => {
         if (typeof clonedState[prop] !== 'undefined') {
           let delta = getDelta(clonedState[prop], lastKnownState[prop]);
-          if (config.float2Int) {
-            clonedState[prop] = float2Int.encode(delta);
-          } else {
-            clonedState[prop] = delta;
-          }
+          clonedState[prop] = float2Int.encode(delta);
         }
       });
 
@@ -159,11 +144,7 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
         } else {
           if (config.floatProperties.indexOf(prop) !== -1) {
             let delta;
-            if(config.float2Int) {
-              delta = float2Int.decode(state[prop])
-            } else {
-              delta = state[prop];
-            }
+            delta = float2Int.decode(state[prop])
             accumulatedState[prop] += delta;
           } else {
             // For all other properties, just copy/update them as is
@@ -182,7 +163,10 @@ deltaCompression.decompress = function decompress(playerId, snapshot) {
 };
 
 
-const truncateToPrecision = (value, precision = 3) => {
+const truncateToPrecision = (value, precision = config.truncateToPrecision) => {
+  if (!config.truncateFloats) {
+    return value;
+  }
   return Number(value.toFixed(precision));
 };
 

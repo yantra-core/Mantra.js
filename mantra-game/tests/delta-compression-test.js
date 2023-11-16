@@ -2,7 +2,7 @@ import tap from 'tape'
 import deltaCompression from '../plugins/snapshots/SnapShotManager/deltaCompression.js'
 
 // TODO: add test suite for float2Int.js and integration test for deltaCompression
-deltaCompression.config.float2Int = false;
+deltaCompression.config.float2Int = true;
 
 tap.test('compress function should return null when snapshot is null', (t) => {
   const snapshot = null;
@@ -42,12 +42,12 @@ tap.test('compress function should compress state correctly', (t) => {
   t.equal(result.state.length, 2, 'Result state should have 2 items');
 
   const compressedState1 = result.state[0];
-  t.same(compressedState1.position, { x: 2, y: 3 }, 'Position should be the same when there is no previous state');
-  t.equal(compressedState1.rotation, 1, 'Rotation should be the same when there is no previous state');
+  t.same(compressedState1.position, { x: 2000, y: 3000 }, 'Position should be float compressed when there is no previous state');
+  t.equal(compressedState1.rotation, 1000, 'Rotation should be float compressed when there is no previous state');
 
   const compressedState2 = result.state[1];
-  t.same(compressedState2.position, { x: 5, y: 6 }, 'Position should be correctly compressed');
-  t.equal(compressedState2.rotation, -7, 'Rotation should be correctly compressed');
+  t.same(compressedState2.position, { x: 5000, y: 6000 }, 'Position should be correctly compressed');
+  t.equal(compressedState2.rotation, -7000, 'Rotation should be correctly compressed');
 
 
   // re-running the same compression should result in all zeros
@@ -73,8 +73,8 @@ tap.test('compress function should compress state correctly', (t) => {
   const result3 = deltaCompression.compress('player1', { state: [state3] });
 
   const compressedState5 = result3.state[0];
-  t.same(compressedState5.position, { x: 4, y: 4 }, 'Position should be show delta');
-  t.equal(compressedState5.rotation, 7, 'Rotation should show delta');
+  t.same(compressedState5.position, { x: 4000, y: 4000 }, 'Position should be show compressed delta');
+  t.equal(compressedState5.rotation, 7000, 'Rotation should show compressed delta');
 
   t.end();
 });
@@ -99,10 +99,11 @@ tap.test('compress and decompress should handle repeated state changes correctly
   let result = deltaCompression.compress('player1', snapshot);
   result = deltaCompression.decompress('player1', result);
   t.equal(result.state[0].position.x, 10, 'X position should have default state');
+  
   let second = deltaCompression.compress('player1', { state: [secondState] });
 
   t.equal(second.state[0].position.x, 0, 'X position should be zero since no new changes');
-  t.equal(second.state[0].rotation, -4, 'rotation show delta change');
+  t.equal(second.state[0].rotation, -4000, 'rotation show delta change');
   t.end();
 
 });
@@ -147,9 +148,8 @@ tap.test('compress function should handle state deletions correctly', (t) => {
   snapshot = { state: [newState] };
   let result = deltaCompression.compress('player1', snapshot);
 
-  // New state should be treated as a new entity, not a continuation
-  t.same(result.state[0].position, newState.position, 'Position should be treated as new after deletion');
-  t.equal(result.state[0].rotation, newState.rotation, 'Rotation should be treated as new after deletion');
+  t.same(state.position, newState.position, 'Position should decompress correct value');
+  t.equal(state.rotation, newState.rotation, 'Rotation should decompress correct value');
 
   t.end();
 });
@@ -268,8 +268,6 @@ tap.test('compress function should handle initial state compression correctly', 
 
   // Verify that subsequent compressions handle deltas correctly
   // This test fails
-  console.log('updatedDecompression', JSON.stringify(updatedDecompression, true, 2))
   t.equal(updatedDecompression.state[0].destroyed, true, 'Updated destroyed should be correct');
-
   t.end();
 });

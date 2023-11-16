@@ -9,19 +9,8 @@ export default class Schema {
   init(game) {
     this.game = game;
     game.schemaReady = true;
-    console.log('messageSchema', messageSchema)
     let root = protobuf.Root.fromJSON(messageSchema);
-    console.log(root);
     game.Message = root.lookupType("Message");
-    console.log(game.Message);
-    /*
-      // TODO: replace with general 'ready' event
-      game.schemaReady = true;
-
-      var Message = root.lookupType("Message");
-      game.Message = Message;
-    */
-    
   }
 
 }
