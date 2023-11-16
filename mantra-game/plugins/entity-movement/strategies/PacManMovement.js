@@ -1,6 +1,11 @@
 // PacManMovement.js - Marak Squires 2023
 class PacManMovement {
-  constructor() {}
+
+  static id = 'pacman-movement';
+  
+  constructor() {
+    this.id = PacManMovement.id;
+  }
 
   init(game) {
     this.game = game;

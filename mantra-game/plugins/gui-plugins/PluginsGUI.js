@@ -19,7 +19,7 @@ class PluginsGUI {
     pluginView.id = 'pluginView';
     pluginView.addEventListener('click', () => this.togglePluginView());
     document.body.appendChild(pluginView);
-  
+
     const toolbarHeader = document.createElement('div');
     toolbarHeader.className = 'toolbarHeader';
     toolbarHeader.textContent = 'Open Plugins';
@@ -27,42 +27,49 @@ class PluginsGUI {
     arrowIndicator.className = 'arrowIndicator';
     toolbarHeader.appendChild(arrowIndicator);
     pluginView.appendChild(toolbarHeader);
-  
+
     const pluginContainer = document.createElement('div');
     pluginContainer.id = 'pluginContainer';
     pluginView.appendChild(pluginContainer);
   }
-  
+
 
   drawPluginTable() {
     let game = this.game;
     let plugins = game.plugins;
     let loadedPlugins = game.loadedPlugins;
-  
+
     let pluginContainer = document.querySelector('#pluginContainer');
     if (!pluginContainer) {
       pluginContainer = document.createElement('div');
       pluginContainer.id = "pluginContainer";
       document.body.appendChild(pluginContainer); // Append only if it doesn't exist
     }
-  
+
     // Create a set for quick lookups
     console.log('loadedPlugins', loadedPlugins)
 
     let loadedPluginSet = new Set(loadedPlugins.map(name => name.toLowerCase()));
-  
-    // Sort the plugin names alphabetically and by activated status
-    let pluginNames = Object.keys(plugins).sort((a, b) => {
-      let aActive = loadedPluginSet.has(a.toLowerCase());
-      let bActive = loadedPluginSet.has(b.toLowerCase());
-      if (aActive === bActive) return a.localeCompare(b);
-      return aActive ? -1 : 1;
+
+    // Sort entries first by active status, then by ID
+    let pluginEntries = Object.entries(plugins).sort((a, b) => {
+      let [aName, aPlugin] = a;
+      let [bName, bPlugin] = b;
+      let aId = aPlugin.id.toLowerCase();
+      let bId = bPlugin.id.toLowerCase();
+      let aActive = loadedPluginSet.has(aId);
+      let bActive = loadedPluginSet.has(bId);
+
+      if (aActive && !bActive) return -1;
+      if (!aActive && bActive) return 1;
+      return aId.localeCompare(bId);
     });
-  
-    pluginNames.forEach(pluginName => {
-      let pluginId = plugins[pluginName].id || pluginName;
+
+    pluginEntries.forEach(entry => {
+      let [pluginName, plugin] = entry;
+      let pluginId = plugin.id || pluginName;
       let pluginCard = document.querySelector(`#card-${pluginId}`);
-      
+
       if (!pluginCard) {
         // Create and append new plugin card
         pluginCard = this.createPluginCard(pluginName, pluginId, loadedPluginSet.has(pluginId.toLowerCase()));
@@ -76,7 +83,7 @@ class PluginsGUI {
       }
     });
   }
-  
+
   createPluginCard(pluginName, pluginId, isChecked) {
     let loadedPlugins = game.loadedPlugins;
 
@@ -102,13 +109,13 @@ class PluginsGUI {
       }
       e.stopPropagation();
     });
-    
+
     // Add an event listener to the checkbox
     checkbox.addEventListener('click', (e) => {
       e.stopPropagation(); // Stop the event from bubbling up to the pluginCard
       this.togglePlugin(checkbox, pluginName);
     });
-    
+
     pluginCard.appendChild(pluginNameElement);
     pluginCard.appendChild(checkbox);
     //pluginContainer.appendChild(pluginCard);

@@ -1,6 +1,9 @@
 // PongMovement.js - Marak Squires 2023
 class PongMovementStrategy {
-  constructor() { }
+  static id = 'pong-movement';
+  constructor() {
+    this.id = PongMovementStrategy.id;
+  }
 
   init(game) {
     this.game = game;
