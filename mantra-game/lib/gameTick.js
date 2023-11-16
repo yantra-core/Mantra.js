@@ -26,6 +26,17 @@ function gameTick() {
   // Loop through entities that have changed
   // TODO: move rendering logic out of gameTick
   for (let entityId of this.changedEntities) {
+
+    if (this.isClient && this.isOnline === false) {
+      // not a component property yet, just ad-hoc on client
+      let ent = this.entities.get(entityId);
+      ent.pendingRender = {};
+      this.graphics.forEach(function (graphicsInterface) {
+        ent.pendingRender[graphicsInterface.name] = true;
+      });
+    }
+
+
     // TODO: move this to Bullet plugin
     let entity = this.getEntity(entityId);
     // kinematic bullet movements on client

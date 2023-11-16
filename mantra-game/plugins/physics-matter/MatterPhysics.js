@@ -86,7 +86,24 @@ class MatterPhysics extends PhysicsInterface {
             // console.log('client ent', ent.id ,body.position)
             // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
             if (this.game.localGameLoopRunning) {
-              this.game.changedEntities.add(body.myEntityId);
+              // check if body position has changed
+
+              let bodyPosition = {
+                x: truncateToStringWithPrecision(body.position.x, 3),
+                y: truncateToStringWithPrecision(body.position.y, 3)
+              };
+              let entPosition = {
+                x: truncateToStringWithPrecision(ent.position.x, 3),
+                y: truncateToStringWithPrecision(ent.position.y, 3)
+              }
+
+              // TODO: add this same kind of logic for server as well?
+              // delta encoding will filter this; however it would be better to do it here as well
+              if (bodyPosition.x !== entPosition.x || bodyPosition.y !== entPosition.y) {
+                this.game.changedEntities.add(body.myEntityId);
+              }
+              // TODO: rotation / velocity as well, use flag isChanged
+
               this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
               this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
               this.game.components.rotation.set(body.myEntityId, body.angle);
@@ -347,3 +364,7 @@ class MatterPhysics extends PhysicsInterface {
 
 
 */
+
+const truncateToStringWithPrecision = (value, precision = 3) => {
+  return value.toFixed(precision);
+};
