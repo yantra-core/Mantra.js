@@ -28,16 +28,12 @@ YANTRA.serverDiscovery = {
 
     try {
       const serverInfo = await this.findBestServers(region, mode, owner, settings);
-      if (Array.isArray(serverInfo) && serverInfo.length) {
-        let item1 = serverInfo[0];
-        if (item1.processInfo) {
-          console.log("got back at least one server with process info", serverInfo);
-          this.isPolling = false;
-        }
+      if (Array.isArray(serverInfo) && serverInfo.length && serverInfo[0].processInfo) {
+        console.log("got back at least one server with process info", serverInfo);
+        this.isPolling = false;
         return serverInfo;
       } else {
         console.log('server not ready', serverInfo);
-        
         // Wrap the recursive call in a new Promise
         return new Promise(resolve => {
           setTimeout(async () => {
@@ -51,7 +47,6 @@ YANTRA.serverDiscovery = {
       throw error;
     }
   },
-
 
   async connectToBestServer(gameConfig) {
     console.log("gameConfig", gameConfig)

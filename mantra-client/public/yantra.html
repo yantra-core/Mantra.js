@@ -76,9 +76,12 @@
       game.use(new Plugins.StarField());
 
       game.use(new Plugins.InputLegend());
-      // game.use(new Plugins.CurrentFPS());
+   
+
+      // game.use(new Plugins.PluginsGUI());
+
       game.use(new Plugins.Block());
-      //game.connect('wss://ayyo.cloudflare1973.workers.dev/websocket');  // cloudflare production
+
       let mode = 'fun';
       let owner = 'Marak'
 
@@ -86,7 +89,6 @@
         console.log("setting mode from query param", queryParams.mode);
         mode = queryParams.mode;
       }
-
       if (queryParams.owner) {
         console.log("setting owner from query param", queryParams.owner);
         owner = queryParams.owner;
@@ -96,15 +98,14 @@
       console.log("bestRegion", bestRegion)
       // TODO: optionally cache this in localstorage for some time or unti ip changes
       let bestServers = await YANTRA.serverDiscovery.connectToBestServer({ region:bestRegion, mode, owner});
-      console.log("findBestServer", bestServers);
-      /*
-      if (!Array.isArray(bestServers) && bestServers.error) {
-        alert(bestServers.error);
-      }
-      */
+      console.log("bestServers", bestServers);
       let bestServer = bestServers[0];
       let wsConnectionString = bestServer.processInfo.wsConnectionString;
       game.connect(wsConnectionString);
+
+      game.use(new Plugins.CurrentFPS());
+      game.use(new Plugins.SnapshotSize());
+      game.use(new Plugins.PingTime());
 
     });
   </script>
