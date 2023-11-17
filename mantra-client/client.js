@@ -1,7 +1,11 @@
 let mode = 'offline'; // online / offline
-let env = 'local'; // local / prod
+let env = 'cloudflare-local'; // cloudflare / cloudflare-local / local
 
-// cloudflare / cloudflare-local / local
+let isEdgeClient = false;
+
+if (env === 'cloudflare' || env === 'cloudflare-local') {
+  isEdgeClient = true;
+}
 
 import config from './config/config.js';
 
@@ -94,6 +98,7 @@ let game = new Game({
 let game = new Game({
   isClient: true,
   mouse: true,
+  isEdgeClient: isEdgeClient,
   physics: 'matter', // 'matter', 'physx'
   graphics: ['babylon'], // 'babylon', 'css', 'phaser'
   collisions: true,

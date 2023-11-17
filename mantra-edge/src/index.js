@@ -4,10 +4,10 @@ import deltaCompression from '@yantra-core/mantra/plugins/snapshots/SnapShotMana
 import { encode } from "@msgpack/msgpack";
 
 let config = {};
-config.msgpack = true;
+config.msgpack = false;
 config.bbb = false;
 config.protobuf = false; // see: https://github.com/protobufjs/protobuf.js/pull/1941
-config.deltaCompression = true;   // only send differences between int values
+config.deltaCompression = false;   // only send differences between int values
 
 // let lastMessageTime = 0;
 const MAX_BUFFER_SIZE = 100;
@@ -37,7 +37,7 @@ export class Ayyo {
     this.lastProcessedTickTime = 0;
     // Initializing the systems
     this.gameLogic = new Game({
-      isServer: true,
+      isServer: true
     });
 
     // Use Plugins to add systems to the game
@@ -122,10 +122,9 @@ export class Ayyo {
     // Store the connected player with its WebSocket
     this.connectedPlayers[playerEntityId] = websocket;
 
-
     try {
       websocket.send(JSON.stringify({
-        action: 'assign_id',
+        action: 'ASSIGN_ID',
         playerName: playerName,
         playerId: ent.id
 
@@ -172,23 +171,28 @@ export class Ayyo {
       const message = JSON.parse(event.data);
       // Perform the requested action based on the "action" property of the message
       switch (message.action) {
-        case 'gameTick':
-          // console.log('got game tick')
-          this.bufferGameTick(message, playerEntityId);
-
-          if (this.tickerId !== playerEntityId) {
-            console.log('will not accept gameTick from', playerEntityId, 'because', this.tickerId, 'is the current ticker');
-            return;
+        case 'GAMETICK':
+          try  {
+            if (this.tickerId !== playerEntityId) {
+              console.log('will not accept gameTick from', playerEntityId, 'because', this.tickerId, 'is the current ticker');
+              return;
+            }
+            this.bufferGameTick(message, playerEntityId);
+          } catch (err) {
+            console.log("ERROR PRINTING")
+            console.log(err.message)
+          }
+          break;
+        case 'player_input':
+          try {
+            this.gameLogic.systems['entity-input'].handleInputs(playerEntityId, { controls: message.controls });
+          } catch (err) {
+            console.log('ERROR IN player_input', err.message)
           }
           break;
 
-        case 'player_input':
-          // console.log('ahhhh', playerEntityId, message.controls)
-          this.gameLogic.systems.entityInput.handleInputs(playerEntityId, { controls: message.controls });
-          break;
-
-        case 'ping':
-          websocket.send(JSON.stringify({ action: 'pong' }));
+        case 'PING':
+          websocket.send(JSON.stringify({ action: 'PONG' }));
           break;
 
         case 'createEntity':
@@ -219,7 +223,7 @@ export class Ayyo {
           websocket.send(JSON.stringify({ snapshot }));
           break;
         default:
-          console.error('Unknown action:', event);
+          console.error('Unknown action:', event.data);
       }
     });
 
@@ -236,7 +240,7 @@ export class Ayyo {
     const tickerWs = this.connectedPlayers[newTickerId];
     if (tickerWs) {
       tickerWs.send(JSON.stringify({
-        action: 'become_ticker'
+        action: 'BECOME_TICKER'
       }));
     }
   }
@@ -276,7 +280,6 @@ export class Ayyo {
   processGameTick(playerId, message) {
     // playerId and message here represent the incoming gameTick clock source
     // they aren't currently used inside the Game.gameTick() metho
-
     // Process the game tick logic here
     this.gameLogic.gameTick();
 
@@ -291,9 +294,7 @@ export class Ayyo {
   }
 
   sendPlayerSnapshots() {
-
     Object.keys(this.connectedPlayers).forEach(playerId => {
-
       const playerSnapshot = this.gameLogic.getPlayerSnapshot(playerId);
       const lastProcessedInput = this.gameLogic.lastProcessedInput[playerId];
 
@@ -318,28 +319,21 @@ export class Ayyo {
                 let buffer = game.Message.encode(_message).finish();
                 const ws = this.connectedPlayers[playerId];
                 ws.send(buffer);
-            } else if (config.bbb) {
-              let BBB = new bbb();
-              // TODO: add data encoding layer here
-              let bbbEncoded = BBB.encodeMessage({ id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput });
-
-              const ws = this.connectedPlayers[playerId];
-              ws.send(bbbEncoded.byteArray);
             } else if (config.msgpack) {
               const ws = this.connectedPlayers[playerId];
               let msg = { id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput };
               let buffer = encode(msg);
               ws.send(buffer);
-
             }
             else {
               const ws = this.connectedPlayers[playerId];
               ws.send(JSON.stringify({ id: newSnapshot.id, action: 'GAMETICK', state: newSnapshot.state, lastProcessedInput: lastProcessedInput }));
             }
-
-
+          } else {
+            // nothing to send back
           }
         } catch (err) {
+          console.log("ERROR PRINTING")
           console.log(err);
         }
       }

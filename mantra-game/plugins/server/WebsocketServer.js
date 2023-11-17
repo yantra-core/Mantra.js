@@ -1,5 +1,5 @@
 // WebsocketServer.js - Marak Squires 2023
-import WebSocket, { WebSocketServer } from 'ws';
+import WebSocket, { WebSocketServer as WebSocketServerActual } from 'ws';
 import { nanoid } from 'nanoid';
 import { encode } from "@msgpack/msgpack";
 
@@ -19,10 +19,13 @@ const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
 let lastTimestamp;
 
-class WebSocketServerClass {
+class WebSocketServer {
+
   static id = 'server-websocket';
+
   constructor(config = {}) {
     this.config = config;
+    this.id = WebSocketServer.id;
 
     if (typeof config.player === 'undefined') {
       // TODO: move defaults elsewhere
@@ -37,7 +40,6 @@ class WebSocketServerClass {
 
   init(game) {
     this.game = game;
-    this.id = WebSocketServerClass.id;
     console.log("calling websocket init");
     this.game.listen = this.listen.bind(this);
     this.lastTimestamp = Date.now();
@@ -45,7 +47,7 @@ class WebSocketServerClass {
   }
 
   listen(port) {
-    this.server = new WebSocketServer({ port: port });
+    this.server = new WebSocketServerActual({ port: port });
     this.server.on('connection', (ws) => this.handleConnection(ws));
     this.game.emit('listening', port);
   }
@@ -68,7 +70,7 @@ class WebSocketServerClass {
     ws.playerId = ent.id;
 
     ws.send(JSON.stringify({
-      action: 'assign_id',
+      action: 'ASSIGN_ID',
       playerName: playerEntityId,
       playerId: ent.id
     }));
@@ -102,8 +104,8 @@ class WebSocketServerClass {
         ws.send(JSON.stringify({ status: 'Entity created' }));
         break;
 
-      case 'ping':
-        ws.send(JSON.stringify({ action: 'pong' }));
+      case 'PING':
+        ws.send(JSON.stringify({ action: 'PONG' }));
         break;
 
       case 'creator_json':
@@ -266,4 +268,4 @@ class WebSocketServerClass {
 
 }
 
-export default WebSocketServerClass;
+export default WebSocketServer;

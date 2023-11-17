@@ -93,8 +93,8 @@ export default class WebSocketClient {
     this.pingIntervalId = setInterval(() => {
       const start = Date.now();
       this.lastPingTime = Date.now();
-      this.socket.send(JSON.stringify({ action: 'ping' }));
-      this.on('pong', () => {
+      this.socket.send(JSON.stringify({ action: 'PING' }));
+      this.on('PONG', () => {
         const end = Date.now();
         const rtt = end - start;
         this.rttMeasurements.push(rtt);
@@ -120,7 +120,7 @@ export default class WebSocketClient {
     setInterval(() => {
       // Include the clientTickTime based on the current time and RTT
       const clientTickTime = Date.now() + this.rtt;
-      const tickMessage = JSON.stringify({ action: 'gameTick', clientTickTime });
+      const tickMessage = JSON.stringify({ action: 'GAMETICK', clientTickTime });
       this.socket.send(tickMessage);
     }, tickInterval);
   }
@@ -167,8 +167,6 @@ export default class WebSocketClient {
 
   async handleMessage(event) {
     let game = this.game;
-
-
     let data = event.data;
 
     // Track the size of the snapshot
@@ -179,23 +177,22 @@ export default class WebSocketClient {
       data = JSON.parse(event.data);
     }
 
-    if (data.action === "assign_id") {
+    if (data.action === "ASSIGN_ID") {
       window.currentPlayerId = data.playerId;
       this.entityName = data.playerId;
       return;
-
     }
 
-    if (data.action === 'become_ticker') {
+    if (data.action === 'BECOME_TICKER') {
       this.startTicking(this.socket);
       return;
     }
 
-    if (data.action === 'pong') {
+    if (data.action === 'PONG') {
       const end = Date.now();
       this.rtt = end - this.lastPingTime;
-      if (this.listeners['pong']) {
-        this.listeners['pong'](this.rtt);
+      if (this.listeners['PONG']) {
+        this.listeners['PONG'](this.rtt);
       }
       return;
     }

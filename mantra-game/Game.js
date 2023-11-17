@@ -22,6 +22,7 @@ import plugins from './plugins.js';
 class Game {
   constructor({
     isClient,
+    isEdgeClient = false,
     isServer = false,
     loadDefaultPlugins = true, // will auto-load default plugins based on default config if true
     width = 1600,
@@ -40,6 +41,7 @@ class Game {
     // config scope for convenience
     const config = {
       isClient,
+      isEdgeClient,
       isServer,
       loadDefaultPlugins,
       width,
@@ -94,6 +96,7 @@ class Game {
     this.removedEntities = new Set();
 
     this.isClient = isClient;
+    this.isEdgeClient = isEdgeClient;
     this.isServer = isServer;
 
     this.localGameLoopRunning = false;
@@ -231,6 +234,7 @@ class Game {
   // All Systems are Plugins, but not all Plugins are Systems
   use(pluginInstance) {
     if (typeof pluginInstance.id === 'undefined') {
+      console.log('Error with pluginInstance', pluginInstance)
       throw new Error('All plugins must have a static id property');
     }
     this.loadedPlugins.push(pluginInstance.id);
