@@ -66,7 +66,6 @@ class WebSocketServer {
     if (!this.expressApp) {
       this.expressApp = express();
       this.server = http.createServer(this.expressApp);
-
       // Serve static content if path is provided
       if (this.staticContentPath) {
         this.expressApp.use(express.static(this.staticContentPath));
@@ -231,24 +230,17 @@ class WebSocketServer {
 
   sendUpdates() {
     let game = this.game;
-    // Send updated data to clients after all the updates
-    // TODO: systems.ws.broadcastAll('GAMETICK', game.getSnapshot()); // something like this
-    //
-    // Remark: We are missing data-compression plugin here, ecapsulate the encoding layers
-    //
-    // console.log('sendUpdates')
-    let count = 0;
-    if (!this.server || !this.server.clients) {
-      console.error('no server')
+    if (!this.wsServer || !this.wsServer.clients) {
+      console.error('no server');
       return;
     }
 
     // Usage in your server context
-    this.server.clients.forEach(client => {
+    this.wsServer.clients.forEach(client => {
       this.processClient(client, game, this.config);
     });
+}
 
-  }
 
   sendSnapshot(client, snapshot, lastProcessedInput, encoder = null) {
     let message = {
