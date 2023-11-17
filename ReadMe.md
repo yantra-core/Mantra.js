@@ -103,6 +103,10 @@ Returns a new game instance. `options` defaults to:
   lifetime: true,          // boolean, enables `lifetime` property
   width: 1600,             // number
   height: 900,             // number
+  protobuf: false,         // boolean, toggles protobuf compressions
+  msgpack:  false,         // boolean, toogles msgpack compressions
+  deltaCompression: false, // boolean
+  deltaEncoding: true      // boolean
 }
 
 ```
@@ -184,31 +188,38 @@ See: [https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins](htt
 The following checklist outlines the planned features and their current status:
 
 ### Core Features
-- [x] **Entity Management**: Creation, modification, and deletion of entities.
-- [x] **Component System**: Flexible definition and management of entity properties.
-- [x] **System-based Logic**: Framework for implementing custom game logic.
-- [x] **Universal Plugin System** ( everything is a Plugin, all Systems are Plugins )
-- [x] **Offline Support**
-- [x] **Online Multiplayer Support**
-- [x] **Edge Support**
+- ✅ **Entity Management**: Creation, modification, and deletion of entities.
+- ✅ **Component System**: Flexible definition and management of entity properties.
+- ✅ **System-based Logic**: Framework for implementing custom game logic.
+- ✅ **Universal Plugin System** ( everything is a Plugin, all Systems are Plugins )
+- ✅ **Offline Support**
+- ✅ **Online Multiplayer Support**
+- ✅ **Edge Support**
 
 ### Multiplayer Netcode Support
-- [x] **Snapshot Management**: For state synchronization and time-travel features.
-- [X] **Predictive Client-Side Logic**: To minimize lag in client actions (in progress).
+- ✅ **Snapshot Management**: For state synchronization and time-travel features.
+- ✅ **Predictive Client-Side Logic**: To minimize lag in client actions (in progress).
 - [ ] **Snapshot Interpolation**: For smooth rendering of state changes in multiplayer.
 - [ ] **Server Reconciliation**: Correcting client-side predictions with server data.
 - [ ] **Lag Compensation**: Techniques to handle network latency in gameplay.
 - [ ] **Time Travel**: Rewind entities to previous states
 - [ ] **Enhanced Network Security**: Measures to secure game state and data transfer.
 
+### Data Compression and Optimization
+
+- ✅ **Delta Compression**: Transmit only the changes between the current and previous game states
+- ✅ **Delta Encoding**: Encoding integer changes rather than complete states
+- ✅ **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
+- ✅ **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
+
 ### Plugin System
-- [X] **Everything is a Plugin**
-- [X] **All Plugin methods are event emitters**
-- [ ] **All Plugin events have hooks**
+- ✅ **Everything is a Plugin**
+- ✅ **Plugins can be loaded / unloaded in-game**
+- [ ] **Plugin code can be edited in-game**
 
 ## Mod Support
 
-- [X] **Creator JSON API**: Manage game state remotely via JSON messages
+- ✅ **Creator JSON API**: Manage game state remotely via JSON messages
 - [ ] **Enhanced Event Hooks**: Wildcard splats, regex search, before/after/first/last
 - [ ] **Custom Resource Packs**: Manage game pack resources via API
 
@@ -222,25 +233,18 @@ The following checklist outlines the planned features and their current status:
     - [ ] **Data Encoding**
 
 ### Graphics and Physics
-- [X] **Pluggable Graphics**: Plug in any rendering engine.
-  - [X] **CSS**: Simple CSS browser client.
-  - [X] **Babylon.js**: 3D browser client.
-  - [X] **Phaser 3**: 2D browser client.
-  - [X] **THREE.js**: 2D browser client. Experimental Support. 
+- ✅ **Pluggable Graphics**: Plug in any rendering engine.
+  - ✅ **CSS**: Simple CSS browser client.
+  - ✅ **Babylon.js**: 3D browser client.
+  - ✅ **Phaser 3**: 2D browser client.
+  - ✅ **THREE.js**: 2D browser client. Experimental Support. 
   - [ ] **YourFavoriteGraphicsEngine**: You tell us!
 
-- [X] **Pluggable Physics**: Compatibility with various physics engines.
-  - [X] **Matter.js**: 2D Physics
-  - [X] **PhysX.wasm**: 3D NVIDIA PhysX 5.30 Experimental Support. 
+- ✅ **Pluggable Physics**: Compatibility with various physics engines.
+  - ✅ **Matter.js**: 2D Physics
+  - ✅ **PhysX.wasm**: 3D NVIDIA PhysX 5.30 Experimental Support. 
   - [ ] **Rapier.wasm**: 3d Physics
   - [ ] **YourFavoritePhysicsEngine.wasm**: You tell us!
-
-### Data Compression and Optimization
-
-- [X] **Delta Compression**: Transmit only the changes between the current and previous game states
-- [X] **Delta Encoding**: Encoding integer changes rather than complete states
-- [ ] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
-- [X] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
 
 <a name="alpha-notice"></a>
 # Alpha Software Notice
