@@ -5,9 +5,7 @@ import { encode } from "@msgpack/msgpack";
 
 import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
 import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
-
 import messageSchema from './messageSchema.js';
-import bbb from '@yantra-core/supreme';
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
