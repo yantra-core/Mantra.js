@@ -44,10 +44,10 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 You can view any of these examples in your browser and begin modifying the game code immediately.
 
 ### Core Features
-- ✅ **Entities, Components, Systems**: Enterprise-grade ECS for game development
-- ✅ **Modular Plugin System**: Facilitating easier extension and customization
-- ✅ **Edge Computing Compatible**: Games can run in CloudFlare Workers environments
-- ✅ **Offline Gameplay Support**: Fully functional gameplay in offline mode
+- [✅] **Entities, Components, Systems**: Enterprise-grade ECS for game development
+- [✅] **Modular Plugin System**: Facilitating easier extension and customization
+- [✅] **Edge Computing Compatible**: Games can run in CloudFlare Workers environments
+- [✅] **Offline Gameplay Support**: Fully functional gameplay in offline mode
 
 # 3D, 2.5D, 2D
 
@@ -188,63 +188,63 @@ See: [https://github.com/yantra-core/mantra/tree/master/mantra-game/plugins](htt
 The following checklist outlines the planned features and their current status:
 
 ### Core Features
-- ✅ **Entity Management**: Creation, modification, and deletion of entities.
-- ✅ **Component System**: Flexible definition and management of entity properties.
-- ✅ **System-based Logic**: Framework for implementing custom game logic.
-- ✅ **Universal Plugin System** ( everything is a Plugin, all Systems are Plugins )
-- ✅ **Offline Support**
-- ✅ **Online Multiplayer Support**
-- ✅ **Edge Support**
+- [✅] **Entity Management**: Creation, modification, and deletion of entities.
+- [✅] **Component System**: Flexible definition and management of entity properties.
+- [✅] **System-based Logic**: Framework for implementing custom game logic.
+- [✅] **Universal Plugin System** ( everything is a Plugin, all Systems are Plugins )
+- [✅] **Offline Support**
+- [✅] **Online Multiplayer Support**
+- [✅] **Edge Support**
 
 ### Multiplayer Netcode Support
-- ✅ **Snapshot Management**: For state synchronization and time-travel features.
-- ✅ **Predictive Client-Side Logic**: To minimize lag in client actions (in progress).
-- [ ] **Snapshot Interpolation**: For smooth rendering of state changes in multiplayer.
-- [ ] **Server Reconciliation**: Correcting client-side predictions with server data.
-- [ ] **Lag Compensation**: Techniques to handle network latency in gameplay.
-- [ ] **Time Travel**: Rewind entities to previous states
-- [ ] **Enhanced Network Security**: Measures to secure game state and data transfer.
+- [✅] **Snapshot Management**: For state synchronization and time-travel features.
+- [✅] **Predictive Client-Side Logic**: To minimize lag in client actions (in progress).
+- [❌] **Snapshot Interpolation**: For smooth rendering of state changes in multiplayer.
+- [❌] **Server Reconciliation**: Correcting client-side predictions with server data.
+- [❌] **Lag Compensation**: Techniques to handle network latency in gameplay.
+- [❌] **Time Travel**: Rewind entities to previous states
+- [❌] **Enhanced Network Security**: Measures to secure game state and data transfer.
 
 ### Data Compression and Optimization
 
-- ✅ **Delta Compression**: Transmit only the changes between the current and previous game states
-- ✅ **Delta Encoding**: Encoding integer changes rather than complete states
-- ✅ **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
-- ✅ **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
+- [✅] **Delta Compression**: Transmit only the changes between the current and previous game states
+- [✅] **Delta Encoding**: Encoding integer changes rather than complete states
+- [✅] **Float Precision Encoding**: Customizable float precision to balance between accuracy and data size
+- [✅] **Binary Bitstream Encoding**: Utilizes binary format for data encoding to reduce the size and improve the performance of data transmission.
 
 ### Plugin System
-- ✅ **Everything is a Plugin**
-- ✅ **Plugins can be loaded / unloaded in-game**
-- [ ] **Plugin code can be edited in-game**
+- [✅] **Everything is a Plugin**
+- [✅] **Plugins can be loaded / unloaded in-game**
+- [❌] **Plugin code can be edited in-game**
 
 ## Mod Support
 
-- ✅ **Creator JSON API**: Manage game state remotely via JSON messages
-- [ ] **Enhanced Event Hooks**: Wildcard splats, regex search, before/after/first/last
-- [ ] **Custom Resource Packs**: Manage game pack resources via API
+- [✅] **Creator JSON API**: Manage game state remotely via JSON messages
+- [❌] **Enhanced Event Hooks**: Wildcard splats, regex search, before/after/first/last
+- [❌] **Custom Resource Packs**: Manage game pack resources via API
 
 ## Multicore Performance Optimizations
 
-- [ ] **Spatially Based Zones**: Entities can Enter / Exit Game processes per zone
-- [ ] **Infinite map size**: Never ending maps with infinite* coordinate space
-- [ ] **Worker processes**: Run systems in separate processes
-    - [ ] **Game Logic**
-    - [ ] **Physics**
-    - [ ] **Data Encoding**
+- [❌] **Spatially Based Zones**: Entities can Enter / Exit Game processes per zone
+- [❌] **Infinite map size**: Never ending maps with infinite* coordinate space
+- [❌] **Worker processes**: Run systems in separate processes
+    - [❌] **Game Logic**
+    - [❌] **Physics**
+    - [❌] **Data Encoding**
 
 ### Graphics and Physics
-- ✅ **Pluggable Graphics**: Plug in any rendering engine.
-  - ✅ **CSS**: Simple CSS browser client.
-  - ✅ **Babylon.js**: 3D browser client.
-  - ✅ **Phaser 3**: 2D browser client.
-  - ✅ **THREE.js**: 2D browser client. Experimental Support. 
-  - [ ] **YourFavoriteGraphicsEngine**: You tell us!
+- [✅] **Pluggable Graphics**: Plug in any rendering engine.
+  - [✅] **CSS**: Simple CSS browser client.
+  - [✅] **Babylon.js**: 3D browser client.
+  - [✅] **Phaser 3**: 2D browser client.
+  - [✅] **THREE.js**: 2D browser client. Experimental Support. 
+  - [❌] **YourFavoriteGraphicsEngine**: You tell us!
 
-- ✅ **Pluggable Physics**: Compatibility with various physics engines.
-  - ✅ **Matter.js**: 2D Physics
-  - ✅ **PhysX.wasm**: 3D NVIDIA PhysX 5.30 Experimental Support. 
-  - [ ] **Rapier.wasm**: 3d Physics
-  - [ ] **YourFavoritePhysicsEngine.wasm**: You tell us!
+- [✅] **Pluggable Physics**: Compatibility with various physics engines.
+  - [✅] **Matter.js**: 2D Physics
+  - [✅] **PhysX.wasm**: 3D NVIDIA PhysX 5.30 Experimental Support. 
+  - [❌] **Rapier.wasm**: 3d Physics
+  - [❌] **YourFavoritePhysicsEngine.wasm**: You tell us!
 
 <a name="alpha-notice"></a>
 # Alpha Software Notice
