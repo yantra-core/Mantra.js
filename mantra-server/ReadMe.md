@@ -26,4 +26,7 @@ game.listen(8888);
 console.log('WebSocket server started on port 8888');
 ```
   
-  
+### Docker
+```bash
+docker build . -t mantra && docker run -p 80:80 mantra
+```
