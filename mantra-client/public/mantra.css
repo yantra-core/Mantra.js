@@ -8,7 +8,7 @@ body {
 #controlsView {
   position: fixed;
   top: 20px;
-  left: 20px;
+  left: 40px;
   background-color: white;
   border: 1px solid #dddddd;
   padding: 10px;
@@ -17,12 +17,15 @@ body {
 
 #controlsView .closeButton {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 5px;
+  left: 320px;
   padding: 10px;
   font-size: 22px;
   font-weight: bold;
   cursor: pointer;
+}
+
+#controlsView .closeButton:hover {
 }
 
 #controlsTable {
@@ -62,15 +65,12 @@ body {
   overflow-y: auto;
 }
 
-
-
 /* Responsive Design Adjustments */
 @media (max-width: 768px) {
   #pluginView {
     width: 40%; /* Wider on smaller screens */
   }
 }
-
 
 #pluginContainer {
   display: flex;

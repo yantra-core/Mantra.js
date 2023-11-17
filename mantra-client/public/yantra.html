@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Yantra Hosted Online Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <link rel="stylesheet" href="/mantra.css">
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/yantra.js"></script>
+
+  <script>
+
+    document.addEventListener('DOMContentLoaded', async (event) => {
+
+      let game = new MANTRA.Game({
+        isClient: true, // TODO: remove this
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: './'
+        }
+      });
+
+      /*
+        new Game(options) defaults to:
+        {
+          physics: 'matter',      // enum, 'physx', 'matter'
+          graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
+          camera: 'follow',       // enum, 'follow', 'center' or `Camera` config object
+          keyboard: true,         // boolean or `Keyboard` config object
+          mouse: true,            // boolean or `Mouse` config object
+          collisions: false,      // boolean
+          width: 1600,            // number
+          height: 900,            // number
+        }
+      */
+
+      let Plugins = MANTRA.plugins;
+
+      // Use Plugins to add systems to the game
+      game.use(new Plugins.Bullet())
+      game.use(new Plugins.Schema())
+
+      let playerId = 'Bobby';
+      let clientConfig = {
+        protobuf: true,
+        msgpack: false,
+        deltaCompression: true
+      };
+
+      // Add a Client, this will provide a game.connect() method for remote
+      // and a game.start() method for local offline
+      game.use(new Plugins.Client(playerId, clientConfig));
+
+      game.use(new Plugins.StarField());
+
+      game.use(new Plugins.InputLegend());
+      // game.use(new Plugins.CurrentFPS());
+      game.use(new Plugins.Block());
+      //game.connect('wss://ayyo.cloudflare1973.workers.dev/websocket');  // cloudflare production
+      let mode = 'fun';
+      let owner = 'Marak'
+
+      let bestRegion = await YANTRA.regionDiscovery.findFastestRegion();
+      console.log("bestRegion", bestRegion)
+      // TODO: optionally cache this in localstorage for some time or unti ip changes
+      let bestServers = await YANTRA.serverDiscovery.findBestServers(bestRegion, mode, owner);
+      console.log("findBestServer", bestServers);
+      let bestServer = bestServers[0];
+      let wsConnectionString = bestServer.processInfo.wsConnectionString;
+      game.connect(wsConnectionString); 
+     
+    });
+  </script>
+
+  <div id="gameHolder"></div>
+</body>
+
+</html>

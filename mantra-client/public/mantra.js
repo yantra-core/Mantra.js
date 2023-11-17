@@ -208,7 +208,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
       options: options
     };
     this.config = config;
-    console.log("FUDGE", this.config);
 
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
@@ -26831,7 +26830,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
-          if (ent.pendingRender['graphics-css']) {
+          if (ent.pendingRender && ent.pendingRender['graphics-css']) {
             this.inflateEntity(ent, alpha);
             ent.pendingRender['graphics-css'] = false;
           }
@@ -27199,7 +27198,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
-          if (ent.pendingRender['graphics-phaser']) {
+          if (ent.pendingRender && ent.pendingRender['graphics-phaser']) {
             this.inflateEntity(ent, alpha);
             ent.pendingRender['graphics-phaser'] = false;
           }
@@ -27441,7 +27440,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
-          if (ent.pendingRender['graphics-three']) {
+          if (ent.pendingRender && ent.pendingRender['graphics-three']) {
             this.inflateEntity(ent, alpha);
             ent.pendingRender['graphics-three'] = false;
           }
