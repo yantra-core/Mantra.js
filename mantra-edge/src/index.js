@@ -4,10 +4,10 @@ import deltaCompression from '@yantra-core/mantra/plugins/snapshots/SnapShotMana
 import { encode } from "@msgpack/msgpack";
 
 let config = {};
-config.msgpack = false;
+config.msgpack = true;
 config.bbb = false;
 config.protobuf = false; // see: https://github.com/protobufjs/protobuf.js/pull/1941
-config.deltaCompression = false;   // only send differences between int values
+config.deltaCompression = true;   // only send differences between int values
 
 // let lastMessageTime = 0;
 const MAX_BUFFER_SIZE = 100;
@@ -37,7 +37,11 @@ export class Ayyo {
     this.lastProcessedTickTime = 0;
     // Initializing the systems
     this.gameLogic = new Game({
-      isServer: true
+      isServer: true,
+      msgpack: true,
+      protobuf: false,
+      deltaCompression: true,
+      deltaEncoding: true
     });
 
     // Use Plugins to add systems to the game
@@ -131,7 +135,6 @@ export class Ayyo {
       }));
     } catch (err) {
       console.log(err)
-
     }
 
     // Check if a new ticker needs to be elected
@@ -158,7 +161,6 @@ export class Ayyo {
       }
 
     });
-
 
     websocket.addEventListener('error', error => {
       console.error('WebSocket encountered an error:', error);

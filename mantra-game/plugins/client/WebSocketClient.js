@@ -7,23 +7,30 @@ import gameTick from "../../lib/gameTick.js";
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
-
-
+// default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
 // cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
 // should be resolved soon, but for now we need to use msgpack
-config.msgpack = false;
-config.deltaCompression = true;
-
-// default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
-config.protobuf = true;
 
 export default class WebSocketClient {
   static id = 'websocket-client';
-  constructor(entityName, isServerSideReconciliationEnabled) {
+  constructor(entityName, {
+    protobuf = false,
+    msgpack = false,
+    deltaCompression = false
+  }) {
+
     this.id = WebSocketClient.id;
+
+    // For convenience, separate from game.config scope
+    this.config = {
+      protobuf,
+      msgpack,
+      deltaCompression
+    };
+
+    console.log("CLIENT CONFIG", this.config)
     this.listeners = {};
     this.entityName = entityName;
-    this.isServerSideReconciliationEnabled = isServerSideReconciliationEnabled;
     this.pingIntervalId = null;
     this.rtt = undefined;
     this.rttMeasurements = [];
@@ -197,7 +204,7 @@ export default class WebSocketClient {
       return;
     }
 
-    if (config.msgpack) {
+    if (this.config.msgpack) {
       data = decode(data);
     }
 
@@ -211,7 +218,7 @@ export default class WebSocketClient {
     }
     */
 
-    if (config.protobuf) {
+    if (this.config.protobuf) {
       // data is current blog, needs to be converted to buffer?
       let uint8Array = new Uint8Array(data);
       var message = game.Message.decode(uint8Array);
@@ -225,7 +232,7 @@ export default class WebSocketClient {
       data = object;
     }
 
-    if (config.deltaCompression) {
+    if (this.config.deltaCompression) {
       // "player1" can be any string, as long as its consistent on the local client
       data = deltaCompression.decompress('player1', data);
     }

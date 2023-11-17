@@ -7,17 +7,31 @@ export default class Client {
   static id = 'client';
   static removable = false;
 
-  constructor(playerId) {
+  constructor(playerId, { protobuf = false, msgpack = false, deltaEncoding = true, deltaCompression = false } = {}) {
     this.id = Client.id;
     this.playerId = playerId; // Remark: localClient expects player name in constructor?
+    // for convenience, separate fro game.config scope
+    this.config = {
+      protobuf,
+      msgpack,
+      deltaEncoding,
+      deltaCompression
+    };
   }
 
   init (game) {
     this.game = game;
     // Load all known client plugins
     // For now, this is just localClient and websocketClient
+    // Remark: We load both of them to allow for switching of local / remote modes
+    // We could change this to only load WebSocketClient if .connect() is called
     game.use(new LocalClient(this.playerId));
-    game.use(new WebSocketClient(this.playerId)); // does websocket require playerId? will server assign it?
+    game.use(new WebSocketClient(this.playerId, {
+      protobuf: this.config.protobuf,
+      msgpack: this.config.msgpack,
+      deltaCompression: this.config.deltaCompression,
+      deltaEncoding: this.config.deltaEncoding
+    })); // does websocket require playerId? will server assign it?
     game.systemsManager.addSystem('client', this);
   }
 

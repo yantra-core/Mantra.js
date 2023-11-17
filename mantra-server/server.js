@@ -15,7 +15,12 @@ game.use(new plugins.Block());
 
 //game.use(new plugins.Border({ autoBorder: true }));
 
-game.use(new WebsocketServer());
+game.use(new WebsocketServer({
+  protobuf: true,
+  msgpack: false,
+  deltaCompression: true,
+  deltaEncoding: true
+}));
 
 game.use(new plugins.Border({ autoBorder: false }));
 

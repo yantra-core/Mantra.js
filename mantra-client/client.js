@@ -1,10 +1,28 @@
 let mode = 'offline'; // online / offline
-let env = 'cloudflare-local'; // cloudflare / cloudflare-local / local
+let env = 'local'; // cloudflare / cloudflare-local / local
+
+// default values for offline mode, no compression
+let clientConfig = {
+  protobuf: false,
+  msgpack: false,
+  deltaCompression: false
+};
 
 let isEdgeClient = false;
 
-if (env === 'cloudflare' || env === 'cloudflare-local') {
+// cloudflare modes, currently require msgpack
+if (mode === 'online' && (env === 'cloudflare' || env === 'cloudflare-local')) {
   isEdgeClient = true;
+  clientConfig.msgpack = true;
+  clientConfig.deltaCompression = true;
+  clientConfig.protobuf = false;
+}
+
+// default online mode, use protobuf and delta compression
+if (mode === 'online' && env === 'local') {
+  clientConfig.protobuf = true;
+  clientConfig.deltaCompression = true;
+  clientConfig.msgpack = false;
 }
 
 import config from './config/config.js';
@@ -103,6 +121,9 @@ let game = new Game({
   graphics: ['babylon'], // 'babylon', 'css', 'phaser'
   collisions: true,
   camera: 'follow',
+  protobuf: clientConfig.protobuf,
+  msgpack: clientConfig.msgpack,
+  deltaCompression: clientConfig.deltaCompression,
   options: {
     scriptRoot: './' // use local scripts instead of default yantra.gg CDN
   }
@@ -151,7 +172,7 @@ function randomId() {
 }
 let playerId = randomId();
 
-game.use(new plugins.Client(playerId));
+game.use(new plugins.Client(playerId, clientConfig));
 
 // Function to switch to Online Mode
 function switchToOnline() {

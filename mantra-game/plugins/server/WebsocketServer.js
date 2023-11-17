@@ -9,12 +9,6 @@ import deltaEncoding from '../snapshots/SnapShotManager/deltaEncoding.js';
 import messageSchema from './messageSchema.js';
 import bbb from '@yantra-core/supreme';
 
-let config = {};
-config.deltaEncoding = true;       // only sends changed states and property values
-config.deltaCompression = true;    // only send differences between int values
-config.msgpack = false;            // `msgpack` encoding
-config.protobuf = true;            // `protobuf` encoding
-
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
 let lastTimestamp;
@@ -23,10 +17,26 @@ class WebSocketServer {
 
   static id = 'server-websocket';
 
-  constructor(config = {}) {
-    this.config = config;
+  constructor({
+    protobuf = false,
+    msgpack = false,
+    deltaEncoding = true,
+    deltaCompression = false
+  
+  } = {}) {
     this.id = WebSocketServer.id;
 
+    let config = {
+      protobuf,
+      msgpack,
+      deltaEncoding,
+      deltaCompression
+    };
+
+    // for convenience, separate from game.config scope
+    this.config = config;
+
+    console.log('websocket server', this.config)
     if (typeof config.player === 'undefined') {
       // TODO: move defaults elsewhere
       config.player = {
@@ -201,9 +211,8 @@ class WebSocketServer {
 
     // Usage in your server context
     this.server.clients.forEach(client => {
-      this.processClient(client, game, config);
+      this.processClient(client, game, this.config);
     });
-
 
   }
 
@@ -233,7 +242,7 @@ class WebSocketServer {
     let snapshotToSend = playerSnapshot;
     let encoder = null;
 
-    if (config.deltaEncoding) {
+    if (this.config.deltaEncoding) {
       let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, snapshotToSend);
       if (!deltaEncodedSnapshot) {
         return;
@@ -241,11 +250,11 @@ class WebSocketServer {
       snapshotToSend = deltaEncodedSnapshot;
     }
 
-    if (config.deltaCompression) {
+    if (this.config.deltaCompression) {
       snapshotToSend = deltaCompression.compress(client.playerId, snapshotToSend);
     }
 
-    if (config.protobuf) {
+    if (this.config.protobuf) {
       encoder = {
         encode: function (schema, message) {
           // Create a new message
@@ -255,7 +264,7 @@ class WebSocketServer {
           return buffer;
         }
       };
-    } else if (config.msgpack) {
+    } else if (this.config.msgpack) {
       encoder = {
         encode: function (schema, message) {
           return encode(message);

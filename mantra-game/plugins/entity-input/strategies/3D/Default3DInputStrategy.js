@@ -7,7 +7,7 @@ class ThreeDimensionalInputStrategy {
     this.game = game;
 
     // check to see if entityInput system exists, if not throw error
-    if (!game.systems.entityInput) {
+    if (!game.systems['entity-input']) {
       throw new Error('ThreeDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
     }
 
@@ -27,11 +27,11 @@ class ThreeDimensionalInputStrategy {
       C: 'ROLL_RIGHT'
     };
 
-    game.systems.entityInput.strategies.push(this);
+    game.systems['entity-input'].strategies.push(this);
 
     // take the this.controlMappings and map them to the entityInput system
-    game.systems.entityInput.controlMappings = {
-      ...game.systems.entityInput.controlMappings,
+    game.systems['entity-input'].controlMappings = {
+      ...game.systems['entity-input'].controlMappings,
       ...this.defaultControlsMapping
     };
 

@@ -21,12 +21,16 @@ import plugins from './plugins.js';
 
 class Game {
   constructor({
+    // game modes
     isClient,
     isEdgeClient = false,
     isServer = false,
-    loadDefaultPlugins = true, // will auto-load default plugins based on default config if true
+    isOfflineMode,
+    // game options
+    loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
     width = 1600,
     height = 900,
+    // game systems / auto-load based on pluginsConfig
     physics = 'matter',
     graphics = ['babylon'],
     collisions = true,
@@ -35,7 +39,11 @@ class Game {
     mouse = true,
     gamepad = true,
     lifetime = true,
-    isOfflineMode,
+    // data compression
+    protobuf = false,
+    msgpack = false,
+    deltaCompression = false,
+    deltaEncoding = true,
     options = {}} = {}) {
 
     // config scope for convenience
@@ -55,9 +63,15 @@ class Game {
       gamepad,
       lifetime,
       isOfflineMode,
+      protobuf,
+      msgpack,
+      deltaCompression,
+      deltaEncoding,
       options
     };
     this.config = config;
+
+    console.log("FUDGE", this.config)
 
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
@@ -209,7 +223,7 @@ class Game {
     }
 
     if (!this.systems.client) {
-      game.use(new plugins.Client('Bunny'));
+      game.use(new plugins.Client('Bunny', game.config));
     }
 
     let client = this.getSystem('client');
