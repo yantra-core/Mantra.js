@@ -7,7 +7,11 @@ import EntityInput from '../plugins/entity-input/EntityInput.js';
 import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
 
 const game = new Game({
-  loadDefaultPlugins: false
+  loadDefaultPlugins: false,
+  msgpack: false,
+  deltaCompression: false,
+  protobuf: false,
+  deltaEncoding: true
 });
 
 game.use(new Schema());
@@ -74,6 +78,11 @@ tap.test('game class', (t) => {
     game.removeEntity(entityId);
 
     game.gameTick();
+
+    const pendingRemoval = game.getEntity(entityId);
+    t.equal(pendingRemoval.destroyed, true);
+
+    game.systems['entity-factory'].cleanupDestroyedEntities();
 
     const removedEntity = game.getEntity(entityId);
     t.equal(removedEntity, null);
