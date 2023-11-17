@@ -1,5 +1,5 @@
 # Use a Debian-based Node.js image as the base image
-FROM node:16.16.0-buster-slim
+FROM node:20.9.0-buster-slim
 
 # Set working directory
 WORKDIR /app
@@ -42,6 +42,9 @@ RUN npm install
 
 # Set work directory back to /app
 WORKDIR /app
+
+# Set a production port environment variable
+ENV PRODUCTION_PORT=8888
 
 # Specify the command to run your application
 CMD ["node", "./mantra-server/server.js"]
