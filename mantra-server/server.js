@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 // Initialize Express app and serve static HTML content
 const app = express();
 const staticContentPath = path.join(__dirname, '/../mantra-client/public'); // Define the path to your static content
+console.log('server staticContentPath', staticContentPath)
 app.use(express.static(staticContentPath));
 
 // Initializing the Game

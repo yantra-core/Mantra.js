@@ -40,11 +40,14 @@ RUN npm install
 WORKDIR /app/mantra-server
 RUN npm install
 
+# Copy mantra-client directory for static serving
+COPY mantra-client /app/mantra-client
+
 # Set work directory back to /app
 WORKDIR /app
 
 # Set a production port environment variable
-ENV PRODUCTION_PORT=8888
+ENV PRODUCTION_PORT=80
 
 # Specify the command to run your application
 CMD ["node", "./mantra-server/server.js"]
