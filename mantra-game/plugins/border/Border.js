@@ -3,7 +3,7 @@ class Border {
 
   static id = 'border';
 
-  constructor({ autoBorder = false, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
+  constructor({ autoBorder = true, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
     this.id = Border.id;
     this.height = height;
     this.width = width;
@@ -77,6 +77,15 @@ class Border {
       });
     }
 
+  }
+
+  unload () {
+    // remove any border types from the game
+    for (let [eId, state] of this.game.entities.entries()) {
+      if (state.type === 'BORDER') {
+        this.game.removeEntity(eId);
+      }
+    }
   }
 
 }

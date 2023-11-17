@@ -47,8 +47,6 @@ class PluginsGUI {
     }
 
     // Create a set for quick lookups
-    console.log('loadedPlugins', loadedPlugins)
-
     let loadedPluginSet = new Set(loadedPlugins.map(name => name.toLowerCase()));
 
     let pluginEntries = Object.entries(plugins).sort((a, b) => {
@@ -104,6 +102,7 @@ class PluginsGUI {
   }
 
   createPluginCard(pluginName, pluginId, isChecked) {
+    let game = this.game;
     let pluginClass = this.game.plugins[pluginName];
     let loadedPlugins = game.loadedPlugins;
     let pluginCard = document.createElement('div');
@@ -114,7 +113,7 @@ class PluginsGUI {
     let pluginNameElement = document.createElement('div');
     pluginNameElement.className = 'pluginName';
     pluginNameElement.textContent = pluginName;
-    //console.log('loadedPlugins', loadedPlugins)
+
     let checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = loadedPlugins.includes(pluginId.toLowerCase());
@@ -130,7 +129,6 @@ class PluginsGUI {
 
 
     pluginCard.addEventListener('click', (e) => {
-      console.log('clicked', e.target, checkbox);
       // Only toggle if the clicked element is not the checkbox
       if (e.target !== checkbox) {
         // check if the checkbox is disabled
@@ -157,34 +155,25 @@ class PluginsGUI {
 
 
   togglePlugin(checkbox, pluginName, pluginId) {
-    console.log('ppppp', pluginId, pluginName)
     if (checkbox.checked) {
-      console.log('USING NEW PLUGIN', pluginName);
-
       // check to see if the plugin is already loaded
       // if so, just call reload
       if (this.game._plugins[pluginId]) {
         this.game._plugins[pluginId].reload();
       } else {
         let pluginInstance = new this.game.plugins[pluginName]();
-        console.log('Plugin instance:', pluginInstance)
         this.game.use(pluginInstance);
       }
-
     } else {
-      console.log('REMOVING PLUGIN', this.game.plugins[pluginName].id);
       // this.game.removeSystem(this.game.plugins[pluginName].id);
       this.game.removePlugin(this.game.plugins[pluginName].id);
-
     }
   }
 
   subscribeToPluginUpdates() {
     this.game.on('plugin::loaded', (pluginName) => {
       // check the checkbox
-      console.log('pluginName', pluginName)
       let checkbox = document.querySelector(`#card-${pluginName} input`);
-
       if (!checkbox) {
         // if the plugin has not yet been rendered, we need to render it
         // redraw the plugin table
