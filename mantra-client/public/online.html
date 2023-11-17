@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Online Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <link rel="stylesheet" href="/mantra.css">
+  <script type="module" src="/mantra.js"></script>
+  <script>
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+      let game = new MANTRA.Game({
+        isClient: true, // TODO: remove this
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: './'
+        }
+      });
+
+      /*
+        new Game(options) defaults to:
+        {
+          physics: 'matter',      // enum, 'physx', 'matter'
+          graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
+          camera: 'follow',       // enum, 'follow', 'center' or `Camera` config object
+          keyboard: true,         // boolean or `Keyboard` config object
+          mouse: true,            // boolean or `Mouse` config object
+          collisions: false,      // boolean
+          width: 1600,            // number
+          height: 900,            // number
+        }
+      */
+
+      let Plugins = MANTRA.plugins;
+
+      // Use Plugins to add systems to the game
+      game.use(new Plugins.Bullet())
+      game.use(new Plugins.Schema())
+
+      // Now let's attach a World
+      // You look at the code for PongWorld and see it's just calling methods on the game object
+      //game.use(new Plugins.PongWorld())
+
+      let playerId = 'Bobby';
+      let clientConfig = {
+        protobuf: true,
+        msgpack: false,
+        deltaCompression: true
+      };
+
+      //game.use(new Plugins.MovementFrogger())
+      //game.use(new Plugins.MovementPacman())
+      //game.use(new Plugins.MovementPong());
+      //game.use(new Plugins.MovementAsteroids());
+
+      // Add a Local Client, this will provide a game.start() method
+      // TODO: should this be automatic as part of game constructor?
+      game.use(new Plugins.Client(playerId, clientConfig));
+
+      game.use(new Plugins.StarField());
+
+      game.use(new Plugins.InputLegend());
+      // game.use(new Plugins.CurrentFPS());
+      game.use(new Plugins.Block());
+      //game.connect('wss://ayyo.cloudflare1973.workers.dev/websocket');  // cloudflare production
+
+      game.connect('ws://192.168.1.80:8888/websocket'); 
+     
+    });
+  </script>
+
+  <div id="gameHolder"></div>
+</body>
+
+</html>

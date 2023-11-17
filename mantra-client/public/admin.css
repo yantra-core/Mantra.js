@@ -1,0 +1,42 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #1e1e1e; /* Dark background */
+  margin: 0;
+  padding: 20px;
+  color: #ddd; /* Lighter text for better readability on dark background */
+}
+
+.container {
+  width: 80%;
+  margin: auto;
+  overflow: hidden;
+}
+
+h1 {
+  color: #9a9cff; /* Light purple color for headings */
+  text-align: center;
+}
+
+.demo-section {
+  background: #2a2a2a; /* Slightly lighter dark shade for sections */
+  margin: 20px 0;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Darker shadow for depth */
+  text-align: center;
+}
+
+.demo-link {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: #4a6bff; /* Royal blue color for links */
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.demo-link:hover {
+  background-color: #3949ab; /* Darker shade of blue on hover */
+}

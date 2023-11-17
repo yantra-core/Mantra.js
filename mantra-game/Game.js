@@ -71,8 +71,6 @@ class Game {
     };
     this.config = config;
 
-    console.log("FUDGE", this.config)
-
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
     this.scriptRoot = 'https://yantra.gg/mantra';

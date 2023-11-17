@@ -1,5 +1,7 @@
 // WebsocketServer.js - Marak Squires 2023
+import express from 'express';
 import WebSocket, { WebSocketServer as WebSocketServerActual } from 'ws';
+import http from 'http';
 import { nanoid } from 'nanoid';
 import { encode } from "@msgpack/msgpack";
 
@@ -19,8 +21,10 @@ class WebSocketServer {
     protobuf = false,
     msgpack = false,
     deltaEncoding = true,
-    deltaCompression = false
-  
+    deltaCompression = false,
+    expressApp = null, // Accept an express app instance
+    staticContentPath = null // Path to serve static content
+
   } = {}) {
     this.id = WebSocketServer.id;
 
@@ -35,6 +39,10 @@ class WebSocketServer {
     this.config = config;
 
     console.log('websocket server', this.config)
+
+    this.expressApp = expressApp;
+    this.staticContentPath = staticContentPath;
+
     if (typeof config.player === 'undefined') {
       // TODO: move defaults elsewhere
       config.player = {
@@ -52,13 +60,37 @@ class WebSocketServer {
     this.game.listen = this.listen.bind(this);
     this.lastTimestamp = Date.now();
     this.gameUpdate(); // start the game loop
+
+    // Create an Express app if none is provided
+    if (!this.expressApp) {
+      this.expressApp = express();
+      this.server = http.createServer(this.expressApp);
+      // Serve static content if path is provided
+      if (this.staticContentPath) {
+        this.expressApp.use(express.static(this.staticContentPath));
+      }
+    } else {
+      this.server = http.createServer(this.expressApp);
+    }
+
+    this.game.listen = this.listen.bind(this);
+
+
   }
 
   listen(port) {
-    this.server = new WebSocketServerActual({ port: port });
-    this.server.on('connection', (ws) => this.handleConnection(ws));
-    this.game.emit('listening', port);
+    // Use the existing HTTP server for WebSocket
+    this.wsServer = new WebSocketServerActual({ server: this.server });
+
+    // Start listening on the provided port
+    this.server.listen(port, () => {
+      console.log(`HTTP and WebSocket server listening on port ${port}`);
+      this.game.emit('listening', port);
+    });
+
+    this.wsServer.on('connection', (ws) => this.handleConnection(ws));
   }
+
 
   handleConnection(ws) {
     const playerEntityId = 'player_' + nanoid(7);
@@ -197,24 +229,17 @@ class WebSocketServer {
 
   sendUpdates() {
     let game = this.game;
-    // Send updated data to clients after all the updates
-    // TODO: systems.ws.broadcastAll('GAMETICK', game.getSnapshot()); // something like this
-    //
-    // Remark: We are missing data-compression plugin here, ecapsulate the encoding layers
-    //
-    // console.log('sendUpdates')
-    let count = 0;
-    if (!this.server || !this.server.clients) {
-      console.error('no server')
+    if (!this.wsServer || !this.wsServer.clients) {
+      console.error('no server');
       return;
     }
 
     // Usage in your server context
-    this.server.clients.forEach(client => {
+    this.wsServer.clients.forEach(client => {
       this.processClient(client, game, this.config);
     });
+}
 
-  }
 
   sendSnapshot(client, snapshot, lastProcessedInput, encoder = null) {
     let message = {
@@ -268,7 +293,7 @@ class WebSocketServer {
       encoder = {
         encode: function (schema, message) {
           return encode(message);
-        } 
+        }
       }; // Assuming msgpack is a global encoder object
     }
     // console.log(JSON.stringify(snapshotToSend, true, 2))
