@@ -43,6 +43,16 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 
 You can view any of these examples in your browser and begin modifying the game code immediately.
 
+## Start Local Websocket Server
+
+```bash
+git clone https://github.com/yantra-core/mantra
+cd mantra
+docker build . -t mantra && docker run -p 80:80 mantra
+```
+
+^^^ This will start webserver on port `80` with demo clients
+
 ### Core Features
 - [✅] **Entities, Components, Systems**: Enterprise-grade ECS for game development
 - [✅] **Modular Plugin System**: Facilitating easier extension and customization
