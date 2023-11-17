@@ -15,6 +15,11 @@ function gameTick() {
   this.changedEntities.clear();
   this.removedEntities.clear();
 
+  if (this.isClient) {
+    // TODO: move to localGameLoop?
+    this.systems['entity-factory'].cleanupDestroyedEntities();
+  }
+
   // Update the physics engine
   this.physics.updateEngine(this.physics.engine, deltaTimeMS);
 
@@ -59,9 +64,6 @@ function gameTick() {
 
   // Save the game snapshot
   this.saveSnapshot(this.getEntities(), this.lastProcessedInput);
-
-  // TODO: getSystem to be safe?, check existence of method?
-  this.systems['entity-factory'].cleanupDestroyedEntities();
 
 
   // TODO: THESE should / could all be hooks, after::gameTick

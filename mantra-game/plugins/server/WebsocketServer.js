@@ -182,6 +182,8 @@ class WebSocketServer {
 
     this.sendUpdates();
 
+    this.game.systems['entity-factory'].cleanupDestroyedEntities();
+
     // Calculate the time until the next game logic update
     let timeUntilNextUpdate = FIXED_DT - accumulatedTime;
     const timeSpent = Date.now() - now; // Time spent in current update

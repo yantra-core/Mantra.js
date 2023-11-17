@@ -34,6 +34,10 @@ const getPlayerSnapshot = function (playerId) {
         delete playerStateCache[playerId][state.id];
         delete playerStateCache[state.id];
       }
+      // no need to further process this entity ( for now )
+      // TODO: remove this push and continue to allow client-side prediction
+      playerState.push(state);
+      continue;
     }
     
     if (typeof playerStateCache[playerId] === 'undefined') {

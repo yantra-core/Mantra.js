@@ -11,6 +11,9 @@ import plugins from '../../plugins.js';
 
 let lastKnownStates = {};
 
+const POOL_SIZE_BLOCK = 3000;
+const POOL_SIZE_BULLET = 1000;
+
 class BabylonGraphics extends GraphicsInterface {
 
   static id = 'graphics-babylon';
@@ -31,6 +34,11 @@ class BabylonGraphics extends GraphicsInterface {
       camera
     };
     this.config = config;
+
+    this.mantraPools = {
+      block: [],
+      bullet: []
+    };
 
   }
 
@@ -97,6 +105,9 @@ class BabylonGraphics extends GraphicsInterface {
     this.scene = new BABYLON.Scene(this.engine);
     this.game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
     game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
+
+
+    this.initializeObjectPools(3000);
 
     // TODO: move this into Systems for Babylon client
     // this.cameraSystem = new CameraSystem(this.game, this.engine, this.scene);
@@ -208,7 +219,18 @@ class BabylonGraphics extends GraphicsInterface {
     if (!entity || !entity.graphics || !entity.graphics['graphics-babylon']) {
       return;
     }
-    entity.graphics['graphics-babylon'].dispose();
+    if (entity.graphics['graphics-babylon'].mantraPools) {
+      // TODO: delegate here instead of if / else
+      if (entity.type === 'BULLET') {
+        this.releaseBullet(entity.graphics['graphics-babylon']);
+      }
+      if (entity.type === 'BLOCK') {
+        this.releaseBlock(entity.graphics['graphics-babylon']);
+      }
+    } else {
+      entity.graphics['graphics-babylon'].dispose();
+    }
+
   }
 
   createGraphic(entityData) {
@@ -223,12 +245,17 @@ class BabylonGraphics extends GraphicsInterface {
         }
         break;
       case 'BULLET':
-        graphic = this.createSphere(entityData);
+        graphic = this.getBullet(entityData);
         break;
       case 'TEXT':
         graphic = this.createText(entityData);
         break;
-
+      case 'BORDER':
+        graphic = this.createBox(entityData);
+        break;
+      case 'BLOCK':
+        graphic = this.getBlock(entityData);
+        break;
       case 'TRIANGLE':
         graphic = this.createTriangle(entityData);
         break;
@@ -240,6 +267,73 @@ class BabylonGraphics extends GraphicsInterface {
 
     return graphic;
   }
+
+  initializeObjectPools(size) {
+    for (let i = 0; i < POOL_SIZE_BLOCK; i++) {
+      let block = BABYLON.MeshBuilder.CreateBox('box', {width: 1, height: 1, depth: 1}, this.scene);
+      block.isVisible = false; // Start with the box hidden
+      block.mantraPools = true;
+      this.mantraPools.block.push(block);
+    }
+
+    for (let i = 0; i < POOL_SIZE_BULLET; i++) {
+      let bullet = BABYLON.MeshBuilder.CreateSphere('box', {width: 1, height: 1, depth: 1}, this.scene);
+      bullet.isVisible = false; // Start with the box hidden
+      bullet.mantraPools = true;
+      this.mantraPools.bullet.push(bullet);
+    }
+
+  }
+
+  getBlock(entityData) {
+    let block = this.mantraPools.block.find(b => !b.isVisible);
+    if (block) {
+      block.isVisible = true;
+      // set height and width
+      block.scaling.x = entityData.width;
+      block.scaling.z = entityData.height;
+      block.scaling.y = entityData.depth;
+      // set position
+      block.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+
+      return block;
+    }
+
+    return this.createBox(entityData);
+    // Optional: Create new box if none are available
+  }
+
+  releaseBlock(block) {
+    block.isVisible = false;
+    // Reset block properties if necessary
+  }
+
+  getBullet(entityData) {
+    let bullet = this.mantraPools.bullet.find(b => !b.isVisible);
+    if (bullet) {
+      bullet.isVisible = true;
+  
+      // Assuming the original diameter of the bullet is known. 
+      // Replace `originalDiameter` with the actual value.
+      let originalDiameter = 1; // Example value
+      let scale = (entityData.radius * 2) / originalDiameter;
+  
+      bullet.scaling.x = scale;
+      bullet.scaling.y = scale;
+      bullet.scaling.z = scale;
+  
+      bullet.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+  
+      return bullet;
+    }
+    return this.createSphere(entityData);
+  }
+  
+  releaseBullet(bullet) {
+    bullet.isVisible = false;
+    // Reset bullet properties if necessary
+  }
+
   createText(entityData) {
     const plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', { width: entityData.width, height: entityData.height }, this.scene);
 
@@ -291,7 +385,7 @@ class BabylonGraphics extends GraphicsInterface {
 
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
-      if (ent.pendingRender['graphics-babylon']) {
+      if (ent.pendingRender && ent.pendingRender['graphics-babylon']) {
         this.inflateEntity(ent, alpha);
         ent.pendingRender['graphics-babylon'] = false;
       }
