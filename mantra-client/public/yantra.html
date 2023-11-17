@@ -96,9 +96,9 @@
 
       let bestRegion = await YANTRA.regionDiscovery.findFastestRegion();
       console.log("bestRegion", bestRegion)
-      // TODO: optionally cache this in localstorage for some time or unti ip changes
       let bestServers = await YANTRA.serverDiscovery.connectToBestServer({ region:bestRegion, mode, owner});
       console.log("bestServers", bestServers);
+
       let bestServer = bestServers[0];
       let wsConnectionString = bestServer.processInfo.wsConnectionString;
       game.connect(wsConnectionString);
