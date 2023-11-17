@@ -26,6 +26,7 @@ const COLLISION_LAYER_2 = 2;
 
 class PhysXPhysics extends PhysicsInterface {
   static id = 'physics-physx';
+  static removable = false;
   constructor(config) {
     super();
 

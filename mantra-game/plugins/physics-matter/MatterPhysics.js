@@ -3,7 +3,10 @@ import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 
 class MatterPhysics extends PhysicsInterface {
+
   static id = 'physics-matter';
+  static removable = false;
+
   constructor(config) {
     super();
 
@@ -252,6 +255,20 @@ class MatterPhysics extends PhysicsInterface {
         callback(pair, bodyA, bodyB);
       }
     });
+  }
+
+  // Remark: This may not work as expected, since the callback is not the same function reference
+  // TODO: remove anonymous functions for collision handlers and have them be returned named functions
+  removeCollisionStart(game, callback) {
+    Matter.Events.off(game.engine, 'collisionStart', callback);
+  }
+
+  removeCollisionActive(game, callback) {
+    Matter.Events.off(game.engine, 'collisionActive', callback);
+  }
+
+  removeCollisionEnd(game, callback) {
+    Matter.Events.off(game.engine, 'collisionEnd', callback);
   }
 
   lockedProperties(body) {

@@ -7,6 +7,7 @@ import Entity from '../../Entity/Entity.js';
 class EntityFactory {
 
   static id = 'entity-factory';
+  static removable = false;
 
   constructor() {
     this.id = EntityFactory.id;

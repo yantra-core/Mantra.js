@@ -1,6 +1,8 @@
 // Graphics.js
 class Graphics {
   static id = 'graphics';
+  static removable = false;
+
   constructor() {
     this.id = Graphics.id;
   }

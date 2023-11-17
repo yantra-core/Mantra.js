@@ -200,9 +200,6 @@ class Bullet {
         }
         */
         //game.systems.health.applyDamage(entityIdB, bulletA.damage);
-        if (this.game.systems.graphics) {
-          // this.game.removeGraphic(entityIdB);
-        }
         //this.game.removeEntity(entityIdB);
       }
 

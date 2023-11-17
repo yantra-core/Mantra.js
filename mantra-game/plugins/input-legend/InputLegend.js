@@ -14,7 +14,13 @@ class InputLegend {
 
   drawTable() {
     let game = this.game;
-    let entityInputSystem = game.systemsManager.getSystem('entityInput');
+
+    if (!game.systems['entity-input']) {
+      console.log('entity-input system not found, skipping drawTable');
+      return;
+    }
+
+    let entityInputSystem = game.systemsManager.getSystem('entity-input');
     let controls = entityInputSystem.controlMappings;
 
     let table = document.createElement('table');

@@ -14,6 +14,7 @@ let lastKnownStates = {};
 class BabylonGraphics extends GraphicsInterface {
 
   static id = 'graphics-babylon';
+  static removable = false;
 
   constructor({ camera } = {}) {
     super();

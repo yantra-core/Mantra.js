@@ -51,7 +51,6 @@ class PluginsGUI {
 
     let loadedPluginSet = new Set(loadedPlugins.map(name => name.toLowerCase()));
 
-    // Sort entries first by active status, then by ID
     let pluginEntries = Object.entries(plugins).sort((a, b) => {
       let [aName, aPlugin] = a;
       let [bName, bPlugin] = b;
@@ -59,15 +58,35 @@ class PluginsGUI {
       let bId = bPlugin.id.toLowerCase();
       let aActive = loadedPluginSet.has(aId);
       let bActive = loadedPluginSet.has(bId);
-
+    
+      // Check for non-removable status
+      let aNonRemovable = aPlugin.removable === false;
+      let bNonRemovable = bPlugin.removable === false;
+    
+      // Sort non-removable plugins to the top
+      if (aNonRemovable && !bNonRemovable) return -1;
+      if (!aNonRemovable && bNonRemovable) return 1;
+    
+      // Then sort by active status
       if (aActive && !bActive) return -1;
       if (!aActive && bActive) return 1;
+    
+      // Finally, sort by ID
       return aId.localeCompare(bId);
     });
+    
 
     pluginEntries.forEach(entry => {
       let [pluginName, plugin] = entry;
       let pluginId = plugin.id || pluginName;
+      let pluginClass = this.game.plugins[pluginName];
+
+      // check to see if the plug is not removable and not active
+      // if so, do not show in list ( for now )
+      if (pluginClass.removable === false && !loadedPluginSet.has(pluginId.toLowerCase())) {
+        return;
+      }
+
       let pluginCard = document.querySelector(`#card-${pluginId}`);
 
       if (!pluginCard) {
@@ -85,8 +104,8 @@ class PluginsGUI {
   }
 
   createPluginCard(pluginName, pluginId, isChecked) {
+    let pluginClass = this.game.plugins[pluginName];
     let loadedPlugins = game.loadedPlugins;
-
     let pluginCard = document.createElement('div');
 
     pluginCard.className = 'pluginCard';
@@ -100,12 +119,25 @@ class PluginsGUI {
     checkbox.type = 'checkbox';
     checkbox.checked = loadedPlugins.includes(pluginId.toLowerCase());
 
+    if (pluginClass.removable === false) {
+      // disable the checkbox
+      checkbox.disabled = true;
+      // add title indicating that live plugin reloading not available for this plugin
+      let altText = 'Live plugin reloading not available for this plugin';
+      pluginCard.title = altText;
+      checkbox.title = altText;
+    }
+
+
     pluginCard.addEventListener('click', (e) => {
       console.log('clicked', e.target, checkbox);
       // Only toggle if the clicked element is not the checkbox
       if (e.target !== checkbox) {
-        checkbox.checked = !checkbox.checked;
-        this.togglePlugin(checkbox, pluginName);
+        // check if the checkbox is disabled
+        if (!checkbox.disabled) {
+          checkbox.checked = !checkbox.checked;
+          this.togglePlugin(checkbox, pluginName, pluginId);
+        }
       }
       e.stopPropagation();
     });
@@ -124,13 +156,21 @@ class PluginsGUI {
   }
 
 
-  togglePlugin(checkbox, pluginName) {
-    console.log('ppppp', pluginName)
+  togglePlugin(checkbox, pluginName, pluginId) {
+    console.log('ppppp', pluginId, pluginName)
     if (checkbox.checked) {
       console.log('USING NEW PLUGIN', pluginName);
-      let pluginInstance = new this.game.plugins[pluginName]();
-      console.log('Plugin instance:', pluginInstance)
-      this.game.use(pluginInstance);
+
+      // check to see if the plugin is already loaded
+      // if so, just call reload
+      if (this.game._plugins[pluginId]) {
+        this.game._plugins[pluginId].reload();
+      } else {
+        let pluginInstance = new this.game.plugins[pluginName]();
+        console.log('Plugin instance:', pluginInstance)
+        this.game.use(pluginInstance);
+      }
+
     } else {
       console.log('REMOVING PLUGIN', this.game.plugins[pluginName].id);
       // this.game.removeSystem(this.game.plugins[pluginName].id);
@@ -166,6 +206,14 @@ class PluginsGUI {
 
   unload() {
     // Cleanup if needed
+    // removes all elements that were created
+    // console.log('unloading plugins gui');
+    const pluginView = document.getElementById('pluginView');
+    if (pluginView) {
+      pluginView.remove();
+    }
+    // unbind all events
+    // this.game.off('plugin::loaded');
   }
 }
 

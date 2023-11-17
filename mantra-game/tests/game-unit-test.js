@@ -49,7 +49,7 @@ tap.test('game class', (t) => {
       position: { x: 10, y: 20 }
     });
 
-    let entityInputSystem = game.systemsManager.getSystem('entityInput');
+    let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.update(entityId, { W: true });
 
     for (let i = 0; i < 10; i++) {
@@ -90,7 +90,7 @@ tap.test('game class', (t) => {
     });
     console.log(game.components)
     
-    let entityInputSystem = game.systemsManager.getSystem('entityInput');
+    let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.update(playerId, { D: true });
 
 

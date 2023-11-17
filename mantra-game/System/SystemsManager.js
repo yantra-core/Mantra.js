@@ -37,6 +37,8 @@ class SystemsManager {
       system.unload();
     }
     this.systems.delete(systemId);
+    // we may want to remove the extra game.systems scope? or reference directly to the map?
+    delete this.game.systems[systemId];
   }
 
   getSystem(systemId) {

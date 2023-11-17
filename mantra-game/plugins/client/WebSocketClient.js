@@ -138,7 +138,7 @@ export default class WebSocketClient {
     if (action === 'player_input') {
       this.inputSequenceNumber++;
       this.inputBuffer[this.inputSequenceNumber] = data;
-      let entityInput = this.game.getSystem('entityInput');
+      let entityInput = this.game.getSystem('entity-input');
       //
       // TODO: switch flag config for isClientSidePredictionEnabled
       //
@@ -247,7 +247,7 @@ export default class WebSocketClient {
         if (lastProcessedInput < this.inputSequenceNumber) {
           for (let i = lastProcessedInput + 1; i <= this.inputSequenceNumber; i++) {
             let input = this.inputBuffer[i];
-            let entityInput = this.game.getSystem('entityInput');
+            let entityInput = this.game.getSystem('entity-input');
             entityInput.handleInputs(this.entityName, { controls: input.controls, mouse: input.controls }, i);
           }
         }

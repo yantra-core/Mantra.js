@@ -3,6 +3,8 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
+  static removable = false;
+
   constructor({ camera, cameraConfig } = {}) {
     super();
     this.id = ThreeGraphics.id;

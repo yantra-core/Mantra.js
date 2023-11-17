@@ -37,7 +37,7 @@ tap.test('player movement and controls', (t) => {
   t.test('Presses MOVE_FORWARD to move player', (t) => {
     let player = game.getEntity('Bobby');
     console.log('game.systems', game.systems)
-    let entityInputSystem = game.systemsManager.getSystem('entityInput');
+    let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.update(player.id, { W: true });
     for (let i = 0; i < 10; i++) {
       game.gameTick();
@@ -55,7 +55,7 @@ tap.test('player movement and controls', (t) => {
   t.test('Presses FIRE_BULLET to shoot a bullet', (t) => {
     let player = game.getEntity('Bobby');
 
-    let entityInputSystem = game.systemsManager.getSystem('entityInput');
+    let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.handleInputs(player.id, {
       controls: { SPACE: true }
     }, 1);

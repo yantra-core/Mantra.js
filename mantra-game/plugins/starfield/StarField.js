@@ -3,6 +3,7 @@ import plugins from "../../plugins.js";
 class StarField {
 
   static id = 'starfield';
+  static removable = false;
 
   constructor(starCount = 5000, fieldSize = 10000) { // TODO: pass this to individual graphics plugins as options
     this.id = StarField.id;
@@ -38,6 +39,16 @@ class StarField {
 
   }
 
+  unload () {
+    // removes the babylon starfield from the scene
+    /*
+    game.graphics.forEach(function(graphicInterface){
+      if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
+
+      }
+    });
+    */
+  }
 
 }
 

@@ -54,7 +54,11 @@ export default class LocalClient {
 
   sendMessage(action, data) {
     if (action === 'player_input') {
-      let entityInput = this.game.getSystem('entityInput');
+      if (!this.game.systems['entity-input']) {
+        console.log('entity-input system not found, skipping player_input action to sendMessage');
+        return;
+      }
+      let entityInput = this.game.getSystem('entity-input');
       entityInput.handleInputs(this.entityName, { controls:  data.controls, mouse: data.mouse });
     }
   }

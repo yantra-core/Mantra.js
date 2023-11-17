@@ -2,6 +2,7 @@
 class Collisions {
 
   static id = 'collisions';
+  static removable = false;
 
   constructor() {
     this.id = Collisions.id;

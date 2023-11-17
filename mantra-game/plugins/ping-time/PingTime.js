@@ -1,7 +1,7 @@
 // PingTime.js - Marak Squires 2023
 class PingTime {
 
-  static id = 'ping-time';
+  static id = 'gui-ping-time';
 
   constructor(config = {}) {
     this.id = PingTime.id;
@@ -50,12 +50,13 @@ class PingTime {
     }
   }
 
-  destroy() {
+  unload() {
     if(this.displayElement && this.displayElement.parentNode) {
       this.displayElement.parentNode.removeChild(this.displayElement);
     }
     this.displayElement = null;
   }
+  
 }
 
 const truncateToPrecision = (value, precision = 2) => {

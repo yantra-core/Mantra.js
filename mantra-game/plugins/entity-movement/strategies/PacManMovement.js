@@ -12,11 +12,11 @@ class PacManMovement {
 
 
     // check to see if entityMovement system exists, if not throw error
-    if (!game.systems.entityMovement) {
+    if (!game.systems['entity-movement']) {
       throw new Error('PacManMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
     }
 
-    game.systems.entityMovement.addStrategy(this);
+    game.systems['entity-movement'].addStrategy(this);
 
   }
 
@@ -38,6 +38,17 @@ class PacManMovement {
     // Update the entity's velocity
     this.game.physics.Body.setVelocity(entity, velocity);
   }
+
+  unload () {
+    let self = this;
+    // removes self from the entityMovement system
+    // TODO: we could move this to commoon function on entityMovement system
+    game.systems['entity-movement'].strategies = game.systems['entity-movement'].strategies.filter(function(strategy){
+      return strategy.id !== self.id;
+    });
+  }
+
+
 }
 
 export default PacManMovement;

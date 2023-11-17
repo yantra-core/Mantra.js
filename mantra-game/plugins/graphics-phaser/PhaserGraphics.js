@@ -4,6 +4,8 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 class PhaserGraphics extends GraphicsInterface {
   static id = 'graphics-phaser';
+  static removable = false;
+
   constructor({ camera = {}, startingZoom = 0.4 } = {}) {
     super();
     this.id = 'graphics-phaser';

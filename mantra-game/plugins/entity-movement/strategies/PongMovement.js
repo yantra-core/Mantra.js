@@ -7,13 +7,14 @@ class PongMovementStrategy {
 
   init(game) {
     this.game = game;
-
+    
     // check to see if entityMovement system exists, if not throw error
-    if (!game.systems.entityMovement) {
+    if (!game.systems['entity-movement']) {
       throw new Error('PongMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
     }
 
-    game.systems.entityMovement.strategies.push(this);
+    game.systemsManager.addSystem(this.id, this);
+    game.systems['entity-movement'].strategies.push(this);
 
   }
 
@@ -39,6 +40,14 @@ class PongMovementStrategy {
       this.game.physics.Body.setVelocity(player, velocity);
 
     }
+  }
+
+  unload () {
+    let self = this;
+    // removes self from the entityMovement system
+    game.systems['entity-movement'].strategies = game.systems['entity-movement'].strategies.filter(function(strategy){
+      return strategy.id !== self.id;
+    });
   }
 }
 

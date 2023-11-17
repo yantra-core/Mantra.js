@@ -3,6 +3,7 @@ import protobuf from 'protobufjs';
 import messageSchema from './Message.js';
 export default class Schema {
   static id = 'schema';
+  static removable = false;
   constructor() {
     this.id = Schema.id;
   }

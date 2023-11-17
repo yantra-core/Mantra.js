@@ -3,6 +3,8 @@ let gameTick = 0;
 class BabylonStarField {
 
   static id = 'babylon-starfield'
+  static removable = false;
+
 
   constructor(starCount = 5000, fieldSize = 10000) {
     this.id = BabylonStarField.id;

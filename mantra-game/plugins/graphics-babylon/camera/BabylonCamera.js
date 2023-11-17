@@ -1,6 +1,8 @@
 class BabylonCamera {
 
   static id = 'graphics-babylon-camera';
+  static removable = false;
+
 
   constructor({ camera } = {}) {
     this.id = BabylonCamera.id;

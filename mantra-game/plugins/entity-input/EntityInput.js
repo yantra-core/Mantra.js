@@ -21,17 +21,20 @@ class EntityInput extends Plugin {
     // so the last strategy to register a control mapping will be the one that is used
     this.controlMappings = {};
 
+
+
+
   }
 
   init(game) {
     this.game = game;
-    this.game.systemsManager.addSystem('entityInput', this);
+    this.game.systemsManager.addSystem('entity-input', this);
     let self = this;
     this.game.on('start', function(){
       if (self.strategies.length === 0) {
         self.loadDefaultStrategy();
       }
-    })
+    });
   }
 
   loadDefaultStrategy() {
@@ -63,6 +66,10 @@ class EntityInput extends Plugin {
   render() { }
 
   destroy() { }
+
+  unload () {
+  }
+
 }
 
 export default EntityInput;

@@ -2,7 +2,7 @@
 import bytes from './vendor/bytes/bytes.js';
 class SnapshotSize {
 
-  static id = 'snapshot-size';
+  static id = 'gui-snapshot-size';
 
   constructor(config = {}) {
     this.averageSnapshotSize = null;
@@ -51,7 +51,7 @@ class SnapshotSize {
     }
   }
 
-  destroy() {
+  unload() {
     if(this.displayElement && this.displayElement.parentNode) {
       this.displayElement.parentNode.removeChild(this.displayElement);
     }

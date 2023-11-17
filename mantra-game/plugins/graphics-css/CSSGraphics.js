@@ -4,6 +4,8 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 class CSSGraphics extends GraphicsInterface {
 
   static id = 'graphics-css';
+  static removable = false;
+
   constructor({ camera } = {}) {
     super();
 

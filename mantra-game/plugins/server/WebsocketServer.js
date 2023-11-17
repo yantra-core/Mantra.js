@@ -120,7 +120,7 @@ class WebSocketServerClass {
         console.log('set_config', parsedMessage)
         break;
       case 'moveEntity':
-        game.systems.entityMovement.update(parsedMessage.entityId, parsedMessage.dx, parsedMessage.dy);
+        game.systems['entity-movement'].update(parsedMessage.entityId, parsedMessage.dx, parsedMessage.dy);
         ws.send(JSON.stringify({ status: 'Entity moved' }));
         break;
 
@@ -135,7 +135,7 @@ class WebSocketServerClass {
         break;
 
       case 'player_input':
-        let entityInputSystem = game.systemsManager.getSystem('entityInput');
+        let entityInputSystem = game.systemsManager.getSystem('entity-input');
         //console.log('ws.playerEntityId', ws.playerEntityId)
         entityInputSystem.handleInputs(ws.playerId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
         break;

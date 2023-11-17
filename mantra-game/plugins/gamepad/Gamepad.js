@@ -9,8 +9,8 @@ export default class Gamepad {
 
   init(game) {
     this.game = game;
-    this.name = 'browserGamepad';
-    game.systemsManager.addSystem('browserGamepad', this);
+    this.id = Gamepad.id;
+    game.systemsManager.addSystem('gamepad', this);
     window.addEventListener("gamepadconnected", (event) => this.connectHandler(event));
     window.addEventListener("gamepaddisconnected", (event) => this.disconnectHandler(event));
   }

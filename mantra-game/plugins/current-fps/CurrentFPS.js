@@ -1,7 +1,7 @@
 // CurrentFPS.js - Marak Squires 2023
 class CurrentFPS {
 
-  static id = 'current-fps';
+  static id = 'gui-current-fps';
 
   constructor(config = {}) {
     this.id = CurrentFPS.id;
@@ -50,7 +50,7 @@ class CurrentFPS {
     }
   }
 
-  destroy() {
+  unload() {
     if(this.displayElement && this.displayElement.parentNode) {
       this.displayElement.parentNode.removeChild(this.displayElement);
     }

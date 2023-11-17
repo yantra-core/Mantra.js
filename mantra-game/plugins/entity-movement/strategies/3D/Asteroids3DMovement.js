@@ -16,11 +16,11 @@ class AsteroidsMovementStrategy {
     this.game = game;
 
     // check to see if entityMovement system exists, if not throw error
-    if (!game.systems.entityMovement) {
+    if (!game.systems['entity-movement']) {
       throw new Error('AsteroidsMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');
     }
 
-    game.systems.entityMovement.strategies.push(this);
+    game.systems['entity-movement'].strategies.push(this);
   }
 
   getForwardDirection(body) {

@@ -12,7 +12,7 @@ class FroggerMovement {
       throw new Error('FroggerMovement requires an entity-movement system to be registered! Please game.use(new EntityMovement())');
     }
 
-    game.systems.entityMovement.addStrategy(this);
+    game.systems['entity-movement'].addStrategy(this);
 
   }
 
@@ -32,6 +32,16 @@ class FroggerMovement {
     this.game.physics.Body.setPosition(body, newPosition);
 
   }
+
+  unload () {
+    let self = this;
+    // removes self from the entityMovement system
+    // TODO: we could move this to commoon function on entityMovement system
+    game.systems['entity-movement'].strategies = game.systems['entity-movement'].strategies.filter(function(strategy){
+      return strategy.id !== self.id;
+    });
+  }
+
 
 }
 

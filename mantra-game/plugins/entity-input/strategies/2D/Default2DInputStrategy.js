@@ -30,14 +30,15 @@ class DefaultTwoDimensionalInputStrategy {
     this.useMouseControls = false;
     
     // check to see if entityInput system exists, if not throw error
-    if (!game.systems.entityInput) {
+    if (!game.systems['entity-input']) {
       throw new Error('DefaultTwoDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
     }
 
-    game.systems.entityInput.strategies.push(this);
+    game.systemsManager.addSystem(this.id, this);
+    game.systems['entity-input'].strategies.push(this);
     // take the this.controlMappings and map them to the entityInput system
-    game.systems.entityInput.controlMappings = {
-      ...game.systems.entityInput.controlMappings,
+    game.systems['entity-input'].controlMappings = {
+      ...game.systems['entity-input'].controlMappings,
       ...this.defaultControlsMapping
     };
 
