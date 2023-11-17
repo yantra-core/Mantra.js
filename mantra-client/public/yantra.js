@@ -1,9 +1,9 @@
 const YANTRA = {};
-const PING_CHECK_TIMEOUT = 5 * 1000;
+const PING_CHECK_TIMEOUT = 120 * 1000;
 YANTRA.serverDiscovery = {
   etherspaceEndpoint: 'https://etherspace.ayyo.gg',
-  pollIntervalMs: 1000,
-  maxPollCount: 10,
+  pollIntervalMs: 500,
+  maxPollCount: 99999,
   pollCount: 0,
   isPolling: false,
 
@@ -21,29 +21,40 @@ YANTRA.serverDiscovery = {
     if (this.pollCount > this.maxPollCount) {
       throw new Error('Max polling attempts reached');
     }
-    console.log("pollForServer")
+
+    console.log("pollForServer");
     this.pollCount++;
     this.isPolling = true;
 
     try {
       const serverInfo = await this.findBestServers(region, mode, owner, settings);
-      if (serverInfo && serverInfo.processInfo) {
-        console.log("GOT BACK BEST SERVER", serverInfo)
-        this.isPolling = false;
+      if (Array.isArray(serverInfo) && serverInfo.length) {
+        let item1 = serverInfo[0];
+        if (item1.processInfo) {
+          console.log("got back at least one server with process info", serverInfo);
+          this.isPolling = false;
+        }
         return serverInfo;
       } else {
-        console.log('starting poll')
-        setTimeout(() => this.pollForServer(region, mode, owner, settings), this.pollIntervalMs);
+        console.log('server not ready', serverInfo);
+        
+        // Wrap the recursive call in a new Promise
+        return new Promise(resolve => {
+          setTimeout(async () => {
+            resolve(await this.pollForServer(region, mode, owner, settings));
+          }, this.pollIntervalMs);
+        });
       }
     } catch (error) {
       console.error('Error in polling for server:', error);
       this.isPolling = false;
       throw error;
     }
-    console.log('did not catch...going to return too early')
   },
 
+
   async connectToBestServer(gameConfig) {
+    console.log("gameConfig", gameConfig)
     this.pollCount = 0;
     const region = gameConfig.region || 'defaultRegion';
     const mode = gameConfig.mode || 'defaultMode';

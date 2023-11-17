@@ -15,6 +15,18 @@
 
   <script>
 
+    function getQueryParams() {
+      const params = {};
+      const searchParams = new URLSearchParams(window.location.search);
+      for (let param of searchParams) {
+        const [key, value] = param;
+        params[key] = value;
+      }
+      return params;
+    }
+
+    let queryParams = getQueryParams();
+
     document.addEventListener('DOMContentLoaded', async (event) => {
 
       let game = new MANTRA.Game({
@@ -44,6 +56,8 @@
 
       let Plugins = MANTRA.plugins;
 
+
+
       // Use Plugins to add systems to the game
       game.use(new Plugins.Bullet())
       game.use(new Plugins.Schema())
@@ -68,15 +82,30 @@
       let mode = 'fun';
       let owner = 'Marak'
 
+      if (queryParams.mode) {
+        console.log("setting mode from query param", queryParams.mode);
+        mode = queryParams.mode;
+      }
+
+      if (queryParams.owner) {
+        console.log("setting owner from query param", queryParams.owner);
+        owner = queryParams.owner;
+      }
+
       let bestRegion = await YANTRA.regionDiscovery.findFastestRegion();
       console.log("bestRegion", bestRegion)
       // TODO: optionally cache this in localstorage for some time or unti ip changes
-      let bestServers = await YANTRA.serverDiscovery.findBestServers(bestRegion, mode, owner);
+      let bestServers = await YANTRA.serverDiscovery.connectToBestServer({ region:bestRegion, mode, owner});
       console.log("findBestServer", bestServers);
+      /*
+      if (!Array.isArray(bestServers) && bestServers.error) {
+        alert(bestServers.error);
+      }
+      */
       let bestServer = bestServers[0];
       let wsConnectionString = bestServer.processInfo.wsConnectionString;
-      game.connect(wsConnectionString); 
-     
+      game.connect(wsConnectionString);
+
     });
   </script>
 
