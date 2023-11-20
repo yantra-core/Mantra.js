@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <link rel="stylesheet" href="/mantra.css">
+  <script type="module" src="/mantra.js"></script>
+  <script>
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+      let game = new MANTRA.Game({
+        isClient: true, // TODO: remove this
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: './'
+        }
+      });
+
+      /*
+        new Game(options) defaults to:
+        {
+          physics: 'matter',      // enum, 'physx', 'matter'
+          graphics: ['babylon'],  // array enum, 'babylon', 'phaser', 'css'
+          camera: 'follow',       // enum, 'follow', 'center' or `Camera` config object
+          keyboard: true,         // boolean or `Keyboard` config object
+          mouse: true,            // boolean or `Mouse` config object
+          collisions: false,      // boolean
+          width: 1600,            // number
+          height: 900,            // number
+        }
+      */
+
+      let Plugins = MANTRA.plugins;
+
+      // Use Plugins to add systems to the game
+      game.use(new Plugins.Bullet())
+
+      // Now let's attach a World
+      // You look at the code for PongWorld and see it's just calling methods on the game object
+      //game.use(new Plugins.PongWorld())
+
+      let playerId = 'Bobby';
+
+      //game.use(new Plugins.MovementFrogger())
+      //game.use(new Plugins.MovementPacman())
+      //game.use(new Plugins.MovementPong());
+      //game.use(new Plugins.MovementAsteroids());
+
+      // Add a Local Client, this will provide a game.start() method
+      // TODO: should this be automatic as part of game constructor?
+      game.use(new Plugins.Client(playerId));
+
+      game.use(new Plugins.StarField());
+
+      game.use(new Plugins.InputLegend());
+      // game.use(new Plugins.CurrentFPS());
+      game.use(new Plugins.Block());
+
+      game.start(function () {
+
+        // create a single player entity
+        game.createEntity({
+          id: playerId,
+          type: 'PLAYER',
+          position: {
+            x: 0,
+            y: 0
+          }
+        });
+
+        // create a single player entity
+        game.createEntity({
+          type: 'BLOCK',
+          width: 500,
+          height: 500,
+          depth: 200,
+          position: {
+            x: 0,
+            y: -500
+          },
+        });
+
+        game.use(new Plugins.Border({ autoBorder: false }));
+
+        game.systems.border.createBorder({
+          height: 2000,
+          width: 2000,
+        });
+
+
+        // game.use(new Plugins.Border());
+
+      });
+
+      /*
+      
+      */
+    });
+  </script>
+
+  <div id="gameHolder"></div>
+</body>
+
+</html>

@@ -12,6 +12,7 @@ class PluginsGUI {
     this.createPluginView();
     this.drawPluginTable();
     this.subscribeToPluginUpdates();
+    this.game.addSystem(this.id, this);
   }
 
   createPluginView() {
@@ -191,7 +192,6 @@ class PluginsGUI {
     pluginView.classList.toggle('expanded', !isExpanded);
     arrowIndicator.textContent = isExpanded ? '▲' : '▼'; // Change arrow direction
   }
-
 
   unload() {
     // Cleanup if needed

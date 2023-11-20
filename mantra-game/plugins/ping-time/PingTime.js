@@ -19,8 +19,9 @@ class PingTime {
     this.displayElement = document.createElement('div');
     this.displayElement.id = "pingTimeDisplay";
     this.displayElement.style.position = 'absolute';
-    this.displayElement.style.top = '10px';
-    this.displayElement.style.right = '10px';
+    this.displayElement.style.top = '8px';
+    this.displayElement.style.right = '85px';
+    this.displayElement.style.zIndex = '1000';
     this.displayElement.style.padding = '5px';
     this.displayElement.style.border = '1px solid #ddd';
     this.displayElement.style.borderRadius = '4px';

@@ -1,3 +1,5 @@
+// plugins.js - Marak Squires 2023
+
 // Core plugins
 import Collision from './plugins/collisions/Collisions.js';
 import EntityFactory from './plugins/entity-factory/EntityFactory.js';
@@ -33,12 +35,16 @@ import Lifetime from './plugins/lifetime/Lifetime.js';
 // Game Objects
 import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
+import Block from './plugins/block/Block.js';
+
 // TODO: gui-legend
 import InputLegend from './plugins/input-legend/InputLegend.js';
 import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
-import Block from './plugins/block/Block.js';
+import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
+import Editor from './plugins/gui-editor/Editor.js';
+
 
 // Utility
 import PingTime from './plugins/ping-time/PingTime.js';
@@ -56,6 +62,7 @@ const plugins = {
   Bullet,
   Collision,
   Client,
+  Editor,
   EntityFactory,
   EntityInput,
   EntityMovement,

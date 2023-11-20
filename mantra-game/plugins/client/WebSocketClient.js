@@ -30,7 +30,8 @@ export default class WebSocketClient {
 
     console.log("CLIENT CONFIG", this.config)
     this.listeners = {};
-    this.entityName = entityName;
+    this.entityName = entityName; // player name
+    this.connected = false;
     this.pingIntervalId = null;
     this.rtt = undefined;
     this.rttMeasurements = [];
@@ -68,7 +69,7 @@ export default class WebSocketClient {
     this.inputSequenceNumber = 0;
     this.latestSnapshot = null;
     this.previousSnapshot = null;
-
+    this.connected = true;
     this.game.communicationClient = this;
     this.game.onlineGameLoopRunning = true;
     this.socket = new WebSocket(url);
@@ -142,6 +143,11 @@ export default class WebSocketClient {
   }
 
   sendMessage(action, data = {}) {
+
+    if (!this.connected) {
+      console.error('not connected will not attempt to send message', action, data);
+      return;
+    }
     if (action === 'player_input') {
       this.inputSequenceNumber++;
       this.inputBuffer[this.inputSequenceNumber] = data;

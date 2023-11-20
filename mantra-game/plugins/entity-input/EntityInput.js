@@ -59,6 +59,8 @@ class EntityInput extends Plugin {
       strategy.handleInputs(entityId, controls, sequenceNumber);
     });
 
+    this.game.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
+
   }
 
   update() { }

@@ -20,9 +20,10 @@ class SnapshotSize {
     this.displayElement = document.createElement('div');
     this.displayElement.id = "snapshotSizeDisplay";
     this.displayElement.style.position = 'absolute';
-    this.displayElement.style.top = '50px';
-    this.displayElement.style.right = '10px';
+    this.displayElement.style.top = '8px';
+    this.displayElement.style.right = '175px';
     this.displayElement.style.padding = '5px';
+    this.displayElement.style.zIndex = '1000';
     this.displayElement.style.border = '1px solid #ddd';
     this.displayElement.style.borderRadius = '4px';
     this.displayElement.style.backgroundColor = '#f8f8f8';

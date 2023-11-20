@@ -57,7 +57,7 @@ class InputLegend {
     let game = this.game;
     let self = this;
 
-    game.on('entityInput::handleInputs', (entityId, data) => {
+    game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
       if (data) {
         let currentInputs = data.controls;
         for (let key in this.highlightedKeys) {
@@ -68,7 +68,7 @@ class InputLegend {
         for (let key in currentInputs) {
           let row = document.getElementById(`row-${key}`);
           if (row && currentInputs[key]) {
-            row.style.backgroundColor = 'yellow';
+            row.style.backgroundColor = '#00ff00';
             this.highlightedKeys[key] = true;
           }
         }

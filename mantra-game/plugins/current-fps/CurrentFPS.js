@@ -19,18 +19,25 @@ class CurrentFPS {
     this.displayElement = document.createElement('div');
     this.displayElement.id = "fpsDisplay";
     this.displayElement.style.position = 'absolute';
-    this.displayElement.style.top = '90px'; // Adjusted from SnapshotSize plugin for spacing
+    this.displayElement.style.top = '8px'; // Adjusted from SnapshotSize plugin for spacing
     this.displayElement.style.right = '10px';
+    this.displayElement.style.zIndex = '1000';
     this.displayElement.style.padding = '5px';
     this.displayElement.style.border = '1px solid #ddd';
     this.displayElement.style.borderRadius = '4px';
     this.displayElement.style.backgroundColor = '#f8f8f8';
     this.displayElement.textContent = 'FPS: -';
+    // hidden
+    this.displayElement.style.display = 'none';
     document.body.appendChild(this.displayElement);
   }
 
-  subscribeToFPSEvent() {
+  subscribeToFPSEvent() { 
     this.game.on('fps', (fps) => {
+      // check if hidden, if so show
+      if(this.displayElement.style.display === 'none') {
+        this.displayElement.style.display = 'block';
+      }
       this.currentFPS = truncateToPrecision(fps);
       this.displayFPS();
     });
