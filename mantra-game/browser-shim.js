@@ -23,6 +23,8 @@ MANTRA.plugins = {
   InputLegend: require('./plugins/input-legend/InputLegend.js').default,
   PingTime: require('./plugins/ping-time/PingTime.js').default,
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js').default,
+  YantraGUI: require('./plugins/gui-yantra/YantraGUI.js').default,
+  Editor: require('./plugins/gui-editor/Editor.js').default,
   SnapshotSize: require('./plugins/snapshot-size/SnapshotSize.js').default,
   Schema: require('./plugins/schema/Schema.js').default,
   CurrentFPS: require('./plugins/current-fps/CurrentFPS.js').default,
