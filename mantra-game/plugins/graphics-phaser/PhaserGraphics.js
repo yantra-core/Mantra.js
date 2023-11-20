@@ -320,7 +320,7 @@ class PhaserGraphics extends GraphicsInterface {
     let self = this;
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
-      if (ent.pendingRender['graphics-phaser']) {
+      if (ent.pendingRender && ent.pendingRender['graphics-phaser']) {
         this.inflateEntity(ent, alpha);
         ent.pendingRender['graphics-phaser'] = false;
       }
