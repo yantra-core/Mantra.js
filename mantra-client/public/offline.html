@@ -49,7 +49,6 @@
       // You look at the code for PongWorld and see it's just calling methods on the game object
       //game.use(new Plugins.PongWorld())
 
-      let playerId = 'Bobby';
 
       //game.use(new Plugins.MovementFrogger())
       //game.use(new Plugins.MovementPacman())
@@ -58,7 +57,7 @@
 
       // Add a Local Client, this will provide a game.start() method
       // TODO: should this be automatic as part of game constructor?
-      game.use(new Plugins.Client(playerId));
+      game.use(new Plugins.Client());
 
       game.use(new Plugins.StarField());
 
@@ -66,17 +65,24 @@
       // game.use(new Plugins.CurrentFPS());
       game.use(new Plugins.Block());
 
-      game.start(function () {
+      // could support multiple players in one local game browser
+      game.on('player::joined', function (playerData) {
 
-        // create a single player entity
-        game.createEntity({
-          id: playerId,
+        // create player entity
+        let player = game.createEntity({
+          id: playerData.id,
           type: 'PLAYER',
           position: {
-            x: 0,
+            x: -100,
             y: 0
           }
         });
+
+        game.emit('player::created', player);
+
+      });
+
+      game.start(function () {
 
         // create a single player entity
         game.createEntity({

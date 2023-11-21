@@ -44,7 +44,7 @@ class Game {
     msgpack = false,
     deltaCompression = false,
     deltaEncoding = true,
-    options = {}} = {}) {
+    options = {} } = {}) {
 
     // config scope for convenience
     const config = {
@@ -83,10 +83,13 @@ class Game {
 
     console.log(`new Game(${JSON.stringify(config, true, 2)})`);
 
-    this.on = eventEmitter.on;
-    this.off = eventEmitter.off;
-    this.emit = eventEmitter.emit;
-    this.onAny = eventEmitter.onAny;
+    // Bind eventEmitter methods to maintain correct scope
+    this.on = eventEmitter.on.bind(eventEmitter);
+    this.off = eventEmitter.off.bind(eventEmitter);
+    this.once = eventEmitter.once.bind(eventEmitter);
+    this.emit = eventEmitter.emit.bind(eventEmitter);
+    this.onAny = eventEmitter.onAny.bind(eventEmitter);
+    this.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
 
     this.bodyMap = {};
     this.systems = {};
@@ -196,7 +199,7 @@ class Game {
     this.systemsManager.render();
   }
 
-  start(cb){
+  start(cb) {
     let game = this;
     if (typeof cb !== 'function') {
       console.log('No game.start() was callback provided. Using default callback.');
@@ -204,7 +207,7 @@ class Game {
       // Default local game start function if none provided
       // Will create a single player and border
       // TODO: move this to separate file
-      cb = function defaultLocalGameStart () {
+      cb = function defaultLocalGameStart() {
         // create a single player entity
         game.createEntity({
           id: game.systems.client.playerId,
@@ -230,17 +233,17 @@ class Game {
     client.start(cb);
   }
 
-  stop () {
+  stop() {
     let client = this.getSystem('client');
     client.stop();
   }
 
-  connect (url) {
+  connect(url) {
     let client = this.getSystem('client');
     client.connect(url);
   }
 
-  disconnect () {
+  disconnect() {
     let client = this.getSystem('client');
     client.disconnect();
   }
@@ -258,7 +261,7 @@ class Game {
     return this;
   }
 
-  removePlugin (pluginName) {
+  removePlugin(pluginName) {
     let plugin = this._plugins[pluginName];
     if (plugin) {
       // check to see if plugin is a system, if so remove the system
@@ -295,10 +298,42 @@ class Game {
     return this.systemsManager.removeSystem(systemName.toLowerCase());
   }
 
-
   updateGraphic(entityData) {
     this.graphics.forEach(function (graphicsInterface) {
       graphicsInterface.updateGraphic(entityData);
+    });
+  }
+
+  // allows for custom player creation logic, or default player creation logic
+  createPlayer(playerConfig) {
+    return new Promise((resolve, reject) => {
+      console.log(this.listenerCount('player::joined'))
+      if (this.listenerCount('player::joined') === 0) {
+        let result = this.defaultCreatePlayer(playerConfig);
+        resolve(result);
+      } else {
+        // Attach a one-time listener for handling the response
+        this.once('player::created', (entity) => {
+          resolve(entity);
+        });
+        // Emit the player::joined event
+        this.emit('player::joined', playerConfig);
+      }
+    });
+  }
+
+  defaultCreatePlayer(playerConfig) {
+    console.log('creating default player')
+
+    return this.createEntity({
+      type: 'PLAYER',
+      shape: 'triangle',
+      width: 200,
+      height: 200,
+      position: {
+        x: 0,
+        y: 0
+      },
     });
   }
 

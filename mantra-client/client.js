@@ -1,4 +1,4 @@
-let mode = 'offline'; // online / offline
+let mode = 'online'; // online / offline
 let env = 'local'; // cloudflare / cloudflare-local / local
 
 // default values for offline mode, no compression
@@ -52,7 +52,8 @@ import PacManMovement from '../mantra-game/plugins/entity-movement/strategies/Pa
 import FroggerMovement from '../mantra-game/plugins/entity-movement/strategies/FroggerMovement.js';
 
 
-import PongWorld from '../mantra-game/plugins/world/pong/PongWorld.js';
+// import PongWorld from '../mantra-game/plugins/world/pong/PongWorld.js';
+import Pong from '../mantra-worlds/Pong/Pong.js';
 
 
 // console.log('plugins', plugins)
@@ -139,31 +140,20 @@ game
 game.use(new plugins.Schema());
 
 game.use(new plugins.InputLegend());
-game.use(new plugins.PingTime());
-game.use(new plugins.SnapshotSize());
+
+// Only show Ping Times and Snapshot Size in Online Mode
+if (game.isOnline) {
+  game.use(new plugins.PingTime());
+  game.use(new plugins.SnapshotSize());
+}
+// Always show FPS
 game.use(new plugins.CurrentFPS());
+
+
 game.use(new plugins.PluginsGUI());
+game.use(new plugins.Editor());
 
-
-// game.use(new plugins.MovementFrogger())
-// game.use(new plugins.MovementPacman())
-
-//game.use(new Default3DInputStrategy());
-//game.use(new Default2DInputStrategy());
-//.use(new AsteroidsMovement())
-//.use(new Default2DInputStrategy())
-//.use(new ThreeDimensionalInputStrategy())
-//game.use(new PongWorld())
-
-//
-// Listen for all Game events 
-// Since all Plugin class methods are event emitters, we can watch events for entire Mantra Game instance and all Plugins
-//
-/*
-  game.onAny(function(event, data){
-    console.log(event, data)
-  })
-*/
+// game.use(new Pong());
 
 
 // for local / offline play we can use any id we want
@@ -171,7 +161,6 @@ function randomId() {
   return 'player_' + Math.random().toString(36).substr(2, 9);
 }
 let playerId = randomId();
-
 game.use(new plugins.Client(playerId, clientConfig));
 
 // Function to switch to Online Mode
@@ -199,7 +188,7 @@ if (mode === 'online') {
   if (env === 'cloudflare') {
     game.connect('wss://ayyo.cloudflare1973.workers.dev/websocket');  // cloudflare production
   }
-  
+
   if (env === 'cloudflare-local') {
     game.connect('ws://192.168.1.80:8787/websocket');                 // cloudflare wranger local dev
   }
@@ -215,20 +204,12 @@ if (mode === 'online') {
 } else {
   // Single Player Offline Mode
   game.start(function () {
+
     game.use(new plugins.StarField())
 
-    // create a single player entity
-    game.createEntity({
-      id: playerId,
-      type: 'PLAYER',
-      position: {
-        x: 0,
-        y: 0
-      },
-      friction: 0.,  // Default friction
-      frictionAir: 0, // Default air friction
-      frictionStatic: 0, // Default static friction
-    });
+    /*
+
+
 
     // create a single player entity
     game.createEntity({
@@ -248,6 +229,7 @@ if (mode === 'online') {
       height: 2000,
       width: 2000,
     });
+    */
 
 
 

@@ -2,8 +2,7 @@
 // LocalClient is a client that runs the game loop locally, without a server
 export default class LocalClient {
   static id = 'client-local';
-  constructor(playerId) {
-    this.playerId = playerId; // Remark: localClient expects player name in constructor?
+  constructor() {
     this.started = false;         // TODO: This doesn't seem ideal, we may not know the player name at this point
     this.id = LocalClient.id;
   }
@@ -11,13 +10,12 @@ export default class LocalClient {
   init (game) {
     this.game = game;
     this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
-    this.game.setPlayerId(this.playerId);
     game.localGameLoopRunning = false;
     this.game.systemsManager.addSystem('localClient', this);
   }
 
   start (callback) {
-
+    let game = this.game;
     if (typeof callback === 'undefined') {
       callback = function noop () {};
     }
@@ -39,10 +37,17 @@ export default class LocalClient {
       return
     }
 
-    this.game.localGameLoop(this.game, this.playerId);  // Start the local game loop when offline
+    this.game.localGameLoop(this.game);  // Start the local game loop when offline
 
     this.game.communicationClient = this;
     this.game.localGameLoopRunning = true;
+
+    this.game.createPlayer({
+      type: 'PLAYER'
+    }).then(function (ent) {
+      game.setPlayerId(ent.id);
+    });
+
     callback(null, true);
     this.game.emit('start');
     
@@ -58,7 +63,7 @@ export default class LocalClient {
         return;
       }
       let entityInput = this.game.getSystem('entity-input');
-      entityInput.handleInputs(this.playerId, { controls:  data.controls, mouse: data.mouse });
+      entityInput.handleInputs(this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse });
     }
   }
 }

@@ -3,6 +3,8 @@ import path from 'path';
 import { Game, plugins } from '../mantra-game/Game.js';
 import WebsocketServer from '../mantra-game/plugins/server/WebsocketServer.js';
 
+
+import Pong from '../mantra-worlds/Pong/Pong.js';
 import { fileURLToPath, pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,13 +37,34 @@ game.use(new WebsocketServer({
 }));
 
 game.use(new plugins.Border({ autoBorder: false }));
+// game.use(new Pong());
+/*
+// custom player join logic
+game.on('player::joined', function (playerData) {
+  console.log('a player has joined the server', playerData);
+  let player = game.createEntity({
+    type: 'PLAYER}',
+    shape: 'rectangle',
+    width: 500,
+    height: 500,
+    position: {
+      x: 0,
+      y: 0
+    },
+  });
+
+  // make sure to let the game know that the player has been created
+  game.emit('player::created', player);
+
+});
+*/
 
 game.on('listening', function (port) {
 
-game.systems.border.createBorder({
-  height: 4000,
-  width: 4000,
-});
+  game.systems.border.createBorder({
+    height: 4000,
+    width: 4000,
+  });
 
   game.createEntity({
     type: 'BLOCK',

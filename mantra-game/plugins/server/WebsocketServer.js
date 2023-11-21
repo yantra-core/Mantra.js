@@ -92,28 +92,22 @@ class WebSocketServer {
   }
 
 
-  handleConnection(ws) {
+  async handleConnection(ws) {
+
     const playerEntityId = 'player_' + nanoid(7);
     ws.playerEntityId = playerEntityId;
 
-    console.log("PLAYER JOINED")
-    let ent = this.game.createEntity({
-      // id: playerEntityId,
-      name: playerEntityId,
+    this.game.createPlayer({
+      id: playerEntityId,
       type: 'PLAYER',
-      friction: this.config.player.friction,  // Default friction
-      frictionAir: this.config.player.frictionAir, // Default air friction
-      frictionStatic: this.config.player.frictionStatic, // Default static friction
-
+    }).then((ent) => {
+      ws.playerId = ent.id;
+      ws.send(JSON.stringify({
+        action: 'ASSIGN_ID',
+        playerName: playerEntityId,
+        playerId: ent.id
+      }));
     });
-
-    ws.playerId = ent.id;
-
-    ws.send(JSON.stringify({
-      action: 'ASSIGN_ID',
-      playerName: playerEntityId,
-      playerId: ent.id
-    }));
 
     ws.on('error', (error) => this.handleError(ws, error));
     ws.on('close', () => this.handleClose(ws));

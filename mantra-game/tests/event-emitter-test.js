@@ -29,6 +29,52 @@ tap.test('eventEmitter - off', (t) => {
   t.end();
 });
 
+tap.test('eventEmitter - listenerCount', (t) => {
+  // Reset the eventEmitter's listeners for a clean start
+  eventEmitter.listeners = {};
+
+  function dummyHandler1() {}
+  function dummyHandler2() {}
+
+  // No listeners added yet
+  t.equal(eventEmitter.listenerCount('testEvent'), 0, 'Should return 0 when no listeners are added');
+
+  // Add a listener
+  eventEmitter.on('testEvent', dummyHandler1);
+  t.equal(eventEmitter.listenerCount('testEvent'), 1, 'Should return 1 after adding one listener');
+
+  // Add another listener
+  eventEmitter.on('testEvent', dummyHandler2);
+  t.equal(eventEmitter.listenerCount('testEvent'), 2, 'Should return 2 after adding two listeners');
+
+  // Remove a listener
+  eventEmitter.off('testEvent', dummyHandler1);
+  t.equal(eventEmitter.listenerCount('testEvent'), 1, 'Should return 1 after removing one listener');
+
+  t.end();
+});
+
+tap.test('eventEmitter - once handler', (t) => {
+  let testValue = 0;
+  function testHandler() {
+    testValue += 1;
+  }
+
+  // Reset the eventEmitter's listeners for a clean start
+  eventEmitter.listeners = {};
+
+  // Add the handler with 'once'
+  eventEmitter.once('testEvent', testHandler);
+
+  // Emit 'testEvent' twice
+  eventEmitter.emit('testEvent');
+  eventEmitter.emit('testEvent');
+
+  // testValue should only have been incremented once
+  t.equal(testValue, 1, 'Handler should have been called only once');
+  t.end();
+});
+
 tap.test('eventEmitter - multiple handlers', (t) => {
   let accumulator = 0;
   function handlerOne() { accumulator += 1; }
@@ -116,21 +162,6 @@ tap.test('eventEmitter - multi-level wildcard pattern', (t) => {
   t.equal(testValue, 1, 'Wildcard ** should catch events with any depth of names after namespace');
   t.end();
 });
-
-/*
-// not working, investigate is this correct API usage still?
-tap.test('eventEmitter - mixed wildcard patterns', (t) => {
-  let testValue = 0;
-  function handler() { testValue += 1; }
-
-  eventEmitter.on('namespace::subnamespace:**', handler);
-  eventEmitter.on('namespace::**', handler);
-  eventEmitter.emit('namespace::subnamespace::testEvent');
-
-  t.equal(testValue, 2, 'Both single-level and multi-level wildcards should be triggered appropriately');
-  t.end();
-});
-*/
 
 tap.test('eventEmitter - exact match vs wildcard precedence', (t) => {
   let exactMatchCalled = false;
@@ -232,3 +263,18 @@ tap.test('eventEmitter - bindClass method should emit events with JSON data', (t
 
 
 
+
+/*
+// not working, investigate is this correct API usage still?
+tap.test('eventEmitter - mixed wildcard patterns', (t) => {
+  let testValue = 0;
+  function handler() { testValue += 1; }
+
+  eventEmitter.on('namespace::subnamespace:**', handler);
+  eventEmitter.on('namespace::**', handler);
+  eventEmitter.emit('namespace::subnamespace::testEvent');
+
+  t.equal(testValue, 2, 'Both single-level and multi-level wildcards should be triggered appropriately');
+  t.end();
+});
+*/

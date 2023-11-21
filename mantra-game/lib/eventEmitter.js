@@ -42,6 +42,20 @@ eventEmitter.after = function afterEvent(eventPattern, callback) {
   eventEmitter.listeners[eventPattern].push(callback);
 };
 
+eventEmitter.once = function onceEvent(eventPattern, callback) {
+  // Wrap the original callback
+  const onceWrapper = (...args) => {
+    // Remove the wrapper after being called
+    this.off(eventPattern, onceWrapper);
+    // Execute the original callback
+    callback.apply(null, args);
+  };
+
+  // Add the wrapper as a listener
+  this.on(eventPattern, onceWrapper);
+};
+
+
 eventEmitter.on = function onEvent(eventPattern, callback) {
   if (!eventEmitter.listeners[eventPattern]) {
     eventEmitter.listeners[eventPattern] = [];
@@ -110,6 +124,14 @@ eventEmitter.bindClass = function bindClass(classInstance, namespace) {
     }
   });
 };
+
+eventEmitter.listenerCount = function(eventPattern) {
+  if (this.listeners[eventPattern]) {
+    return this.listeners[eventPattern].length;
+  }
+  return 0;
+};
+
 
 eventEmitter.unbindClass = function unbindClass(classInstance, namespace) {
   const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(classInstance));
