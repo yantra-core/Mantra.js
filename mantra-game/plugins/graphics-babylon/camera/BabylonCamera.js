@@ -109,8 +109,9 @@ class BabylonCamera {
   }
 
   render() {
+    let game = this.game;
     if (this.config.camera && this.config.camera === 'follow') {
-      let currentPlayer = this.game.getEntity(window.currentPlayerId);
+      let currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (currentPlayer && currentPlayer.graphics) {
         let graphic = currentPlayer.graphics['graphics-babylon'];
         if (graphic) {
@@ -124,8 +125,9 @@ class BabylonCamera {
   }
 
   renderLerp() { // TODO: use this instead on render(), uses built in lerp
+    let game = this.game;
     if (this.config.camera && this.config.camera === 'follow') {
-      let currentPlayer = this.game.getEntity(window.currentPlayerId);
+      let currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (currentPlayer && currentPlayer.graphics) {
         let graphic = currentPlayer.graphics['graphics-babylon'];
         let smoothness = 1; // Value between 0 and 1, where 1 is instant

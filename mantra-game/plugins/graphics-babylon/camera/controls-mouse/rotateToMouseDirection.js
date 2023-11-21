@@ -1,5 +1,6 @@
 handleMouseDirection(mouseX, mouseY) {
-  let player = this.game.getEntity(window.currentPlayerId);
+  let game = this.game;
+  let player = this.game.getEntity(game.currentPlayerId);
   if (player && player.mesh) {
     let worldCoords = this.screenToWorld(mouseX, mouseY);
     let playerPos2D = new BABYLON.Vector3(player.mesh.position.x, 0, player.mesh.position.z);
@@ -12,13 +13,14 @@ handleMouseDirection(mouseX, mouseY) {
     let targetAngle = Math.atan2(direction2D.z, direction2D.x);
     // If player's forward direction is along the positive Z-axis, you might need to adjust the angle calculation
     targetAngle = targetAngle + Math.PI; // Rotate by 180 degrees
-    this.game.components.target.set(window.currentPlayerId, {
+    this.game.components.target.set(game.currentPlayerId, {
       angle: -targetAngle // Set the angle directly
     });
   }
 }
 updatePlayerRotation(deltaTime) {
-  let player = this.game.getEntity(window.currentPlayerId);
+  let game = this.game;
+  let player = this.game.getEntity(game.currentPlayerId);
   if (player && player.mesh && player.target !== undefined) {
     // Smoothly interpolate the rotation
     let lerpFactor = 0.001; // Adjust this factor for smoother or quicker rotation

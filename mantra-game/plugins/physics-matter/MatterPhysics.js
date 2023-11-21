@@ -77,7 +77,7 @@ class MatterPhysics extends PhysicsInterface {
           // If this is the client and we are in online mode,
           // do not update local physics for remote players, only update local physics for the local player
           // This may be changed in the future or through configuration
-          if (this.game.isClient && this.game.onlineMode && entity.type === 'PLAYER' && entity.id !== window.currentPlayerId) {
+          if (this.game.isClient && this.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
             // In online mode, if the entity is a player and that player is not the current player, skip updating physics
             // continue; // Skip updating physics for remote players
           }

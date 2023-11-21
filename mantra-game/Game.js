@@ -114,6 +114,8 @@ class Game {
     this.localGameLoopRunning = false;
     this.onlineGameLoopRunning = false;
 
+    this.currentPlayerId = null;
+
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
     this.components = {
@@ -298,6 +300,10 @@ class Game {
     this.graphics.forEach(function (graphicsInterface) {
       graphicsInterface.updateGraphic(entityData);
     });
+  }
+
+  setPlayerId(playerId) {
+    this.currentPlayerId = playerId;
   }
 
   // TODO: move to separate function

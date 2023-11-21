@@ -13,7 +13,7 @@ let config = {};
 
 export default class WebSocketClient {
   static id = 'websocket-client';
-  constructor(entityName, {
+  constructor(playerId, {
     protobuf = false,
     msgpack = false,
     deltaCompression = false
@@ -30,7 +30,7 @@ export default class WebSocketClient {
 
     console.log("CLIENT CONFIG", this.config)
     this.listeners = {};
-    this.entityName = entityName; // player name
+    this.playerId = playerId; // player name
     this.connected = false;
     this.pingIntervalId = null;
     this.rtt = undefined;
@@ -159,7 +159,7 @@ export default class WebSocketClient {
       // Remark: Client-side prediction is close; however we were seeing some ghosting issues
       //         More unit tests and test coverage is required for: snapshots, interpolation, and prediction
       /*
-        entityInput.handleInputs(this.entityName, {
+        entityInput.handleInputs(this.playerId, {
         controls: data.controls,
         mouse: data.mouse
       }, this.inputSequenceNumber);
@@ -191,8 +191,9 @@ export default class WebSocketClient {
     }
 
     if (data.action === "ASSIGN_ID") {
-      window.currentPlayerId = data.playerId;
-      this.entityName = data.playerId;
+      // in client mode will set the authorized player id
+      game.setPlayerId(data.playerId);
+      this.playerId = data.playerId;
       return;
     }
 
@@ -252,13 +253,13 @@ export default class WebSocketClient {
       // console.log(inter)
 
       if (this.isServerSideReconciliationEnabled && typeof data.lastProcessedInput !== 'undefined') {
-        let lastProcessedInput = data.lastProcessedInput[this.entityName];
+        let lastProcessedInput = data.lastProcessedInput[this.playerId];
 
         if (lastProcessedInput < this.inputSequenceNumber) {
           for (let i = lastProcessedInput + 1; i <= this.inputSequenceNumber; i++) {
             let input = this.inputBuffer[i];
             let entityInput = this.game.getSystem('entity-input');
-            entityInput.handleInputs(this.entityName, { controls: input.controls, mouse: input.controls }, i);
+            entityInput.handleInputs(this.playerId, { controls: input.controls, mouse: input.controls }, i);
           }
         }
         // Clear the already processed inputs from the inputBuffer

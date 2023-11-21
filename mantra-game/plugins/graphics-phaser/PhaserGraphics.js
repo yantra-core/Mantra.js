@@ -282,6 +282,7 @@ class PhaserGraphics extends GraphicsInterface {
   }
 
   update(entitiesData) {
+    let game = this.game;
     if (!this.scenesReady) {
       return;
     }
@@ -291,8 +292,8 @@ class PhaserGraphics extends GraphicsInterface {
 
       //    if (this.followPlayer && this.followingPlayer !== true) {
       // Camera settings
-      let player = this.game.getEntity(window.currentPlayerId);
-      let graphics = this.game.components.graphics.get(window.currentPlayerId);
+      let player = this.game.getEntity(game.currentPlayerId);
+      let graphics = this.game.components.graphics.get(game.currentPlayerId);
 
       if (player && graphics && player.graphics['graphics-phaser']) {
         camera.startFollow(player.graphics['graphics-phaser']);

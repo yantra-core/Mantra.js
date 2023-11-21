@@ -3,16 +3,15 @@
 export default class LocalClient {
   static id = 'client-local';
   constructor(playerId) {
-    this.entityName = playerId; // Remark: localClient expects player name in constructor?
+    this.playerId = playerId; // Remark: localClient expects player name in constructor?
     this.started = false;         // TODO: This doesn't seem ideal, we may not know the player name at this point
-    // window.currentPlayerId currently used for various local client scoped auth functions, will need to be replaced with a better solution
-    window.currentPlayerId = playerId;
     this.id = LocalClient.id;
   }
 
   init (game) {
     this.game = game;
     this.game.isClient = true; // We may be able to remove this? It's currently not being used anywhere
+    this.game.setPlayerId(this.playerId);
     game.localGameLoopRunning = false;
     this.game.systemsManager.addSystem('localClient', this);
   }
@@ -40,7 +39,7 @@ export default class LocalClient {
       return
     }
 
-    this.game.localGameLoop(this.game, this.entityName);  // Start the local game loop when offline
+    this.game.localGameLoop(this.game, this.playerId);  // Start the local game loop when offline
 
     this.game.communicationClient = this;
     this.game.localGameLoopRunning = true;
@@ -59,7 +58,7 @@ export default class LocalClient {
         return;
       }
       let entityInput = this.game.getSystem('entity-input');
-      entityInput.handleInputs(this.entityName, { controls:  data.controls, mouse: data.mouse });
+      entityInput.handleInputs(this.playerId, { controls:  data.controls, mouse: data.mouse });
     }
   }
 }

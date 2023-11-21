@@ -193,7 +193,8 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   update() {
-    const currentPlayer = this.game.getEntity(window.currentPlayerId);
+    let game = this.game;
+    const currentPlayer = this.game.getEntity(game.currentPlayerId);
     if (this.config.camera && this.config.camera === 'follow' && currentPlayer) {
       if (currentPlayer.position) {
         this.cameraPosition.x = currentPlayer.position.x;

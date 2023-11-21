@@ -161,10 +161,11 @@ class ThreeGraphics extends GraphicsInterface {
   }
 
   updateCameraFollow() {
+    let game = this.game;
     // Follow the player entity with the camera
-    const currentPlayer = this.game.getEntity(window.currentPlayerId);
+    const currentPlayer = this.game.getEntity(game.currentPlayerId);
     if (currentPlayer) {
-      const playerGraphic = this.game.components.graphics.get([window.currentPlayerId, 'graphics-three']);
+      const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
       if (playerGraphic) {
         // Calculate the new camera position with a slight offset above and behind the player
         const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 50, -100));
