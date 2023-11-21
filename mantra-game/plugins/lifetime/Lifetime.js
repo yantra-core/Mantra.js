@@ -18,7 +18,7 @@ class Lifetime {
       if (ent && this.game.components.lifetime[entityId] !== Infinity) {
         const elapsedTime = now - ent.creationTime; 
         if (elapsedTime > ent.lifetime) {
-          this.game.removeEntity(entityId);
+          this.game.removeEntity(Number(entityId)); // TODO: remove Number(), refactor Components to use Map
         }
       }
     }

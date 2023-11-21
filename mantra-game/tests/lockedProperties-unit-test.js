@@ -13,7 +13,7 @@ game.use(new EntityFactory());
 tap.test('locked properties functionality', (t) => {
 
   t.test('locked position property', (t) => {
-    const entityId = 'testEntityLockPosition';
+    const entityId = 1;
     game.createEntity({
       id: entityId,
       type: 'TEST',
@@ -42,7 +42,7 @@ tap.test('locked properties functionality', (t) => {
   });
 
   t.test('unlocked position property', (t) => {
-    const entityId = 'testEntityUnlockPosition';
+    const entityId = 2;
     game.createEntity({
       id: entityId,
       type: 'TEST',
@@ -63,7 +63,7 @@ tap.test('locked properties functionality', (t) => {
   });
 
   t.test('locked and unlocked properties together', (t) => {
-    const entityId = 'testEntityMixedLock';
+    const entityId = 3;
     game.createEntity({
       id: entityId,
       type: 'TEST',

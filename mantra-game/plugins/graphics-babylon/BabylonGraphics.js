@@ -404,6 +404,7 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
+  // TODO: rename to inflateGraphic
   inflateEntity(entity, alpha) {
     if (entity.graphics && entity.graphics['graphics-babylon']) {
       let graphic = entity.graphics['graphics-babylon'];

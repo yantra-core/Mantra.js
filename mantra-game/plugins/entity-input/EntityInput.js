@@ -21,9 +21,6 @@ class EntityInput extends Plugin {
     // so the last strategy to register a control mapping will be the one that is used
     this.controlMappings = {};
 
-
-
-
   }
 
   init(game) {

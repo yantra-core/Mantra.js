@@ -1,9 +1,6 @@
 // EntityFactory.js - Marak Squires 2023
 import Entity from '../../Entity/Entity.js';
 
-// TODO: move this to snapshot plugin
-// import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
-
 class EntityFactory {
 
   static id = 'entity-factory';
@@ -11,14 +8,7 @@ class EntityFactory {
 
   constructor() {
     this.id = EntityFactory.id;
-    //this.game = game;
     this.nextEntityId = 1; // 0 is reserved for server
-
-    this.preCreateEntityHooks = [];
-    this.postCreateEntityHooks = [];
-    this.preUpdateEntityHooks = [];
-    this.postUpdateEntityHooks = [];
-
   }
 
   init(game) {
@@ -40,14 +30,15 @@ class EntityFactory {
     this.game.getEntities = this.getEntities.bind(this);
     this.game.updateEntity = this.updateEntity.bind(this);
     this.game.inflateEntity = this.inflateEntity.bind(this);
-
   }
 
-  
-
   getEntity(entityId) {
-    if (typeof this.game.entities.get(entityId) === 'undefined') {
-      // console.log('No such entity', entityId);
+    
+    if (typeof entityId === 'string') {
+      entityId = parseInt(entityId); // for now, this can be removed when we switch Component.js to use Maps
+    }
+
+    if (!this.game.entities.has(entityId)) {
       return null;
     }
 
@@ -63,32 +54,22 @@ class EntityFactory {
       }
     }
 
-
     return entity;
 
   }
 
   removeEntity(entityId) {
-
-    let ent = this.game.entities.get(entityId);;
-
+    let ent = this.game.entities.get(entityId);
     if (ent && this.game.systems.graphics && ent.graphics) {
       // Is this best done here? or in the graphics plugin?
       this.game.systems.graphics.removeGraphic(entityId);
     }
-
     if (ent) {
       this.game.components.destroyed.set(entityId, true);
       // update the entity with the destroyed state
       let updatedEntity = this.game.getEntity(entityId);
       this.game.entities.set(entityId, updatedEntity);
     }
-
-    // TODO: add this back or remove it?
-    // deltaCompression.removeState(entityId);
-
-    // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
-
   }
 
   cleanupDestroyedEntities() {
@@ -163,7 +144,6 @@ class EntityFactory {
 
   createEntity(config) {
     // console.log('createEntity', config)
-    this.preCreateEntityHooks.forEach(fn => fn(entityData));
     let entityId = this._generateId();
 
     let defaultConfig = {
@@ -277,10 +257,10 @@ class EntityFactory {
       }
     }
 
-    this.postCreateEntityHooks.forEach(fn => fn(entity));
 
     // Add the entity to the game entities scope
     // TODO: new Entity() should do this
+    // console.log('setting id', entityId, 'to entity')
     this.game.entities.set(entityId, {
       id: entityId
     });

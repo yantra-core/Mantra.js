@@ -1,4 +1,4 @@
-let mode = 'online'; // online / offline
+let mode = 'offline'; // online / offline
 let env = 'local'; // cloudflare / cloudflare-local / local
 
 // default values for offline mode, no compression
