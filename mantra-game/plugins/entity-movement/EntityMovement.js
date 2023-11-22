@@ -6,6 +6,7 @@ import Asteroids3DMovementStrategy from './strategies/3D/Asteroids3DMovement.js'
 // handles input controller events and relays them to the game logic
 class EntityMovement extends Plugin {
   static id = 'entity-movement';
+  static removable = false;
   constructor(strategy) {
     super();
     this.id = EntityMovement.id;

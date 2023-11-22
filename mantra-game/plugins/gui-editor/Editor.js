@@ -13,18 +13,24 @@ class Editor {
     // Check for jQuery
     if (typeof $ === 'undefined') {
       console.log('$ is not defined, attempting to load jQuery from vendor');
-      game.loadScripts(['/vendor/jquery.min.js'], () => {
+      game.loadScripts([
+        '/vendor/jquery.min.js'
+      ], () => {
         console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
         this.jqueryReady();
       });
     } else {
       this.jqueryReady();
     }
+    game.use(new this.game.plugins.PluginsGUI());
+
   }
 
   jqueryReady() {
     this.createToolbar();
     this.setupGlobalClickListener();
+    // this.createViewSourceModal();
+
   }
 
   createToolbar() {
@@ -33,15 +39,16 @@ class Editor {
     // Create menus
     const $fileMenu = this.createMenu('File');
     const $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
-    const $aboutMenu = this.createMenu('About');
+    // const $aboutMenu = this.createMenu('About');
 
     // Populate menus
     this.populateFileMenu($fileMenu);
     this.populatePluginsMenu($pluginsMenu);
-    this.populateAboutMenu($aboutMenu);
+    // TODO: about links
+    //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu, $aboutMenu);
+    $toolbar.append($fileMenu, $pluginsMenu/*, $aboutMenu*/);
 
     // Append the toolbar to the body
     $('body').append($toolbar);
@@ -83,16 +90,17 @@ class Editor {
 
   populateFileMenu($menu) {
     const $dropdownContent = $menu.find('.dropdown-content');
-    const $newItem = $('<a>', { href: '#', text: 'Deploy to Yantra Cloud' });
-    $dropdownContent.append($newItem);
 
     const $viewSource = $('<a>', { href: '#', text: 'View Source' });
+    $viewSource.on('click', () => this.showSourceCode()); // Add click handler
     $dropdownContent.append($viewSource);
 
-    const $aboutMantra = $('<a>', { href: '#', text: 'About Mantra' });
+    const $deployWorld = $('<a>', { href: 'https://yantra.gg/deploy', text: 'Deploy to Yantra Cloud', target: '_blank' });
+    $dropdownContent.append($deployWorld);
+
+    const $aboutMantra = $('<a>', { href: 'https://github.com/yantra-core/mantra', text: 'About Mantra', target: '_blank' });
     $dropdownContent.append($aboutMantra);
 
-    // Repeat for other File menu items...
   }
 
   populatePluginsMenu($menu) {
@@ -135,12 +143,45 @@ class Editor {
   }
 
   showPluginsGUI() {
+    let game = this.game;
+    if (typeof game.systems['gui-plugins'] === 'undefined') {
+      game.use(new this.game.plugins.PluginsGUI());
+    }
     // Functionality to show plugins GUI
-    console.log('tttt', this.game)
     if (this.game.systems['gui-plugins']) {
       this.game.systems['gui-plugins'].togglePluginView();
     }
   }
+
+  createViewSourceModal() {
+    // Create modal structure
+    const $modal = $('<div>', { id: 'sourceCodeModal', class: 'modal' });
+    const $modalContent = $('<div>', { class: 'modal-content' });
+    const $closeSpan = $('<span>', { class: 'close', text: '×' });
+    const $sourcePre = $('<pre>', { id: 'sourceCode' });
+
+    $modalContent.append($closeSpan, $sourcePre);
+    $modal.append($modalContent);
+
+    // Append the modal to the body
+    $('body').append($modal);
+
+    // Close event
+    $closeSpan.on('click', () => $modal.hide());
+    $(window).on('click', (event) => {
+      if ($(event.target).is($modal)) {
+        $modal.hide();
+      }
+    });
+  }
+
+  showSourceCode() {
+    const sourceCode = document.documentElement.outerHTML;
+    console.log(sourceCode)
+    $('#sourceCode').text(sourceCode);
+    $('#sourceCodeModal').show();
+  }
+
 }
 
 export default Editor;

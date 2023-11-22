@@ -1,11 +1,12 @@
 // FroggerMovement.js - Marak Squires 2023
 class FroggerMovement {
   static id = 'frogger-movement';
-  constructor() {}
+  constructor() {
+    this.id = FroggerMovement.id;
+  }
 
   init(game) {
     this.game = game;
-    this.id = FroggerMovement.id;
 
     // check to see if entityMovement system exists, if not throw error
     if (!game.systems['entity-movement']) {

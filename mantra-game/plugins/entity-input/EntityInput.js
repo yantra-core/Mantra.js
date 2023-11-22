@@ -4,6 +4,7 @@ import DefaultInputStrategy from './strategies/2D/Default2DInputStrategy.js';
 import Default3DInputStrategy from './strategies/3D/Default3DInputStrategy.js';
 class EntityInput extends Plugin {
   static id = 'entity-input';
+  static removable = false;
   constructor(strategy) {
     super();
     this.id = 'entity-input';

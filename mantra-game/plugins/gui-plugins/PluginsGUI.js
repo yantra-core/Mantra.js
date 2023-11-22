@@ -23,7 +23,7 @@ class PluginsGUI {
 
     const toolbarHeader = document.createElement('div');
     toolbarHeader.className = 'toolbarHeader';
-    toolbarHeader.textContent = 'Open Plugins';
+    toolbarHeader.textContent = 'Open Plugins ▲';
     const arrowIndicator = document.createElement('span');
     arrowIndicator.className = 'arrowIndicator';
     toolbarHeader.appendChild(arrowIndicator);
@@ -154,7 +154,6 @@ class PluginsGUI {
     return pluginCard;
   }
 
-
   togglePlugin(checkbox, pluginName, pluginId) {
     if (checkbox.checked) {
       // check to see if the plugin is already loaded
@@ -189,8 +188,12 @@ class PluginsGUI {
     const pluginView = document.getElementById('pluginView');
     const arrowIndicator = document.querySelector('.arrowIndicator');
     const isExpanded = pluginView.classList.contains('expanded');
+    const toolbarHeader = document.querySelector('.toolbarHeader');
+
+    toolbarHeader.textContent = isExpanded ? 'Open Plugins ▲' : 'Close Plugins ▼';
     pluginView.classList.toggle('expanded', !isExpanded);
-    arrowIndicator.textContent = isExpanded ? '▲' : '▼'; // Change arrow direction
+    
+    //arrowIndicator.textContent = isExpanded ? '▲' : '▼'; // Change arrow direction
   }
 
   unload() {

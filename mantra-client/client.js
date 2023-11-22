@@ -76,7 +76,6 @@ let game = new Game({
 });
 */
 
-
 //
 // Create the Game object with default config
 //
@@ -98,7 +97,6 @@ let defaultConfig = {
 
 // Game canvas(s) will be appended to <div id="gameHolder"></div>,
 // if gameHolder does not exists it will be append to body
-
 
 // So for example, if you wish to disable mouse inputs, you can simply:
 let game = new Game({
@@ -138,7 +136,6 @@ game
   .use(new plugins.Block())
 
 game.use(new plugins.Schema());
-
 game.use(new plugins.InputLegend());
 
 // Only show Ping Times and Snapshot Size in Online Mode
@@ -148,9 +145,6 @@ if (game.isOnline) {
 }
 // Always show FPS
 game.use(new plugins.CurrentFPS());
-
-
-game.use(new plugins.PluginsGUI());
 game.use(new plugins.Editor());
 
 // game.use(new Pong());
@@ -179,8 +173,6 @@ function switchToOnline() {
 // game.connect('ws://0.0.0.0:8787/websocket');  // @yantra-core/mantra-edge
 // game.connect('ws://0.0.0.0:8888/websocket');  // @yantra-core/mantra-edge
 
-/**/
-
 
 if (mode === 'online') {
 
@@ -193,10 +185,11 @@ if (mode === 'online') {
   }
 
   if (env === 'local') {
+    // Connects to websocket server
+    // see: @yantra-core/mantra-server
+
     game.connect('ws://192.168.1.80:8888/websocket');                   // websocket server
   }
-  // Connects to websocket server
-  // see: @yantra-core/mantra-server
   game.use(new plugins.StarField())
 
 
@@ -205,10 +198,6 @@ if (mode === 'online') {
   game.start(function () {
 
     game.use(new plugins.StarField())
-
-    /*
-
-
 
     // create a single player entity
     game.createEntity({
@@ -228,7 +217,6 @@ if (mode === 'online') {
       height: 2000,
       width: 2000,
     });
-    */
 
 
 

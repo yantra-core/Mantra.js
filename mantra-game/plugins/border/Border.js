@@ -3,10 +3,8 @@ class Border {
 
   static id = 'border';
 
-  constructor({ autoBorder = true, height  = 600, width = 800, position = { x: 0, y: 0 } } = {}) {
+  constructor({ autoBorder = true, position = { x: 0, y: 0 } } = {}) {
     this.id = Border.id;
-    this.height = height;
-    this.width = width;
     this.position = position;
     this.autoBorder = autoBorder;
   }
@@ -33,7 +31,6 @@ class Border {
   update() {}
 
   createBorder(entityData) {
-
     let height = entityData.height;
     let width = entityData.width;
     let WALL_THICKNESS = 200;
