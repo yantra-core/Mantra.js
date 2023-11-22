@@ -30,15 +30,24 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 
 ## Demos
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM) - Matter.js + Babylon.js
+[View All Demos on Yantra.gg](https://yantra.gg/mantra)
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr) - Matter.js + Phaser 3
+### Online
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/abXpEve) - Matter.js + CSS Graphics
+| Libraries        | Demo Link                                                                      |
+|----------------------------|--------------------------------------------------------------------------------|
+| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/online/matter-babylon.html)         |
+| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/online/matter-phaser.html)          |
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR) - NVIDIA PhysX 5.3.0 ( Experimental ) + Babylon.js
+### Offline
 
-[Open CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz) - RenderPlex - Matter.js + Babylon.js + Phaser 3
+| Libraries        | Demo Link                                                                      | CodePen Link                                                                |
+|----------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/offline/matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM)                     |
+| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/offline/matter-phaser.html)       | [CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr)                |
+| Matter.js + CSS Graphics   | [Yantra](https://yantra.gg/mantra/examples/offline/matter-css.html)                                                                                | [CodePen](https://codepen.io/Marak-Squires/pen/abXpEve)                |
+| NVIDIA PhysX 5.3.0 + Babylon.js | [Yantra](https://yantra.gg/mantra/examples/offline/physx-babylon.html)                                                                            | [CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR)                |
+| RenderPlex - Matter.js + Babylon.js + Phaser 3 | [Yantra](https://yantra.gg/mantra/examples/offline/renderplex.html)                                                          | [CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz)                |
 
 
 You can view any of these examples in your browser and begin modifying the game code immediately.
