@@ -1,12 +1,13 @@
 // Block.js - Marak Squires 2023
 class Block {
   static id = 'block';
-  constructor({ MIN_BLOCK_SIZE = 100, width = 40, height = 40 } = {}) {
+  constructor({ MIN_BLOCK_SIZE = 1000, width = 40, height = 40 } = {}) {
     this.id = Block.id;
     // Assuming the config includes width and height properties
     this.width = width; // Default size if none provided
     this.height = height; // Default size if none provided
     this.MIN_BLOCK_SIZE = MIN_BLOCK_SIZE;
+    this.splits = 0;
   }
 
   init(game) {
@@ -30,6 +31,10 @@ class Block {
         console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
         return;
       }
+      //console.log("entityA", entityA)
+      //console.log("entityB", entityB)
+      // do not process blocks that are already destroyed
+
       // console.log('aaaa', entityA.type, entityB.type)
       if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
         this.blockBulletCollision(entityIdA, entityIdB, entityA, entityB);
@@ -42,51 +47,44 @@ class Block {
   }
 
   blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
-
-    // if (!this.game.isClient && this.game.onlineMode)
-    // for now, don't perform block split logic on client
-  
     if (this.game.mode === 'local' || !this.game.isClient) {
+
+      if (entityA.destroyed) {
+        return;
+      }
 
       this.game.removeEntity(entityIdB);
 
-      // Check if the block is big enough to split
-      if (entityA.width <= this.MIN_BLOCK_SIZE && entityA.height <= this.MIN_BLOCK_SIZE) {
+      if (entityA.width * entityA.height <= this.MIN_BLOCK_SIZE || entityA.splits >= Block.MAX_SPLITS) {
         this.game.removeEntity(entityIdA);
         return;
       }
 
-      // Calculate the size of the smaller blocks
       const newWidth = entityA.width / 2;
       const newHeight = entityA.height / 2;
+      const newSplits = entityA.splits + 1;
 
-      // Create 4 smaller blocks
       for (let i = 0; i < 4; i++) {
         const xOffset = (i % 2) * newWidth;
         const yOffset = Math.floor(i / 2) * newHeight;
         this.game.createEntity({
           type: 'BLOCK',
-          // Position the new blocks relative to the position of the original block
           position: {
-            x: entityA.position.x + xOffset - entityA.width / 4,
-            y: entityA.position.y + yOffset - entityA.height / 4
+            x: entityA.position.x + xOffset,
+            y: entityA.position.y + yOffset
           },
           velocity: {
-            // Generate random velocities in both positive and negative directions
-            x: (Math.random() * 2 - 1) * 22.22,
-            y: (Math.random() * 2 - 1) * 22.22
+            x: (Math.random() * 2 - 1) * 10, // Adjusted for less extreme velocities
+            y: (Math.random() * 2 - 1) * 10
           },
           width: newWidth,
-          height: newHeight
+          height: newHeight,
+          splits: newSplits
         });
       }
 
-      // Destroy the original block
       this.game.removeEntity(entityIdA);
-
-
     }
-
   }
 
 }
