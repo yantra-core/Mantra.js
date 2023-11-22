@@ -79,6 +79,7 @@ export default class WebSocketClient {
     this.socket.onerror = this.handleError.bind(this);
     this.game.onlineGameLoop(this.game);
 
+    this.game.emit('connected');
     // Start measuring RTT
     this.startRttMeasurement();
 
@@ -257,7 +258,7 @@ export default class WebSocketClient {
           for (let i = lastProcessedInput + 1; i <= this.inputSequenceNumber; i++) {
             let input = this.inputBuffer[i];
             let entityInput = this.game.getSystem('entity-input');
-            entityInput.handleInputs(this.playerId, { controls: input.controls, mouse: input.controls }, i);
+            entityInput.handleInputs(this.game.currentPlayerId, { controls: input.controls, mouse: input.controls }, i);
           }
         }
         // Clear the already processed inputs from the inputBuffer

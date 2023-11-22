@@ -20,8 +20,23 @@ class YantraGUI {
     });
     game.on('server::discovery::best-server', function(data){
       console.log('server::discovery::best-server', data);
-      self.updateLog(data.message);
-      self.updateMetadata(data.data);
+      console.log('data', data)
+      let bestServer = data.data[0];
+      let filteredData = {
+        region: bestServer.region,
+        activePlayers: bestServer.activePlayers,
+        processId: bestServer.processId,
+        hostId: bestServer.hostId,
+        mode: bestServer.mode,
+        settings: bestServer.settings
+      };
+      self.updateLog(JSON.stringify(filteredData, true, 2));
+
+      setTimeout(function(){
+        // hide the logContainer
+        self.logContainer.style.display = 'none';
+      }, 5000)
+      // self.updateMetadata(data.data);
     });
 
   }
@@ -51,6 +66,7 @@ class YantraGUI {
     });
 
     // Create and style the metadata container
+    /*
     this.metadataContainer = document.createElement('div');
     this.metadataContainer.id = 'yantraMetadataContainer';
     this.applyStyles(this.metadataContainer, {
@@ -60,10 +76,11 @@ class YantraGUI {
       padding: '10px',
       boxSizing: 'border-box'
     });
+    */
 
     // Append elements to the log container and then to the body
     this.logContainer.appendChild(this.logTextArea);
-    this.logContainer.appendChild(this.metadataContainer);
+    // this.logContainer.appendChild(this.metadataContainer);
     document.body.appendChild(this.logContainer);
   }
 

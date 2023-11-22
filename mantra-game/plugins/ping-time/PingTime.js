@@ -27,11 +27,17 @@ class PingTime {
     this.displayElement.style.borderRadius = '4px';
     this.displayElement.style.backgroundColor = '#f8f8f8';
     this.displayElement.textContent = 'Ping: - ms';
+    // hide
+    this.displayElement.style.display = 'none';
     document.body.appendChild(this.displayElement);
   }
 
   subscribeToPingTimeEvent() {
     this.game.on('pingtime', (pingTime) => {
+        // check if hidden, if so show
+        if(this.displayElement.style.display === 'none') {
+        this.displayElement.style.display = 'block';
+      }
       this.pingTime = truncateToPrecision(pingTime);
       this.displayPingTime();
     });

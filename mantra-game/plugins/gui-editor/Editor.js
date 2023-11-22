@@ -2,8 +2,9 @@ class Editor {
 
   static id = 'gui-editor';
 
-  constructor() {
+  constructor({ sourceCode }) {
     this.id = Editor.id;
+    this.sourceCode = sourceCode;
   }
 
   init(game) {
@@ -178,8 +179,10 @@ class Editor {
   showSourceCode() {
     const sourceCode = document.documentElement.outerHTML;
     console.log(sourceCode)
-    $('#sourceCode').text(sourceCode);
-    $('#sourceCodeModal').show();
+    // open new link to github
+    window.open(this.sourceCode, '_blank');
+    //$('#sourceCode').text(sourceCode);
+    //$('#sourceCodeModal').show();
   }
 
 }

@@ -21,18 +21,24 @@ class SnapshotSize {
     this.displayElement.id = "snapshotSizeDisplay";
     this.displayElement.style.position = 'absolute';
     this.displayElement.style.top = '8px';
-    this.displayElement.style.right = '175px';
+    this.displayElement.style.right = '350px';
     this.displayElement.style.padding = '5px';
     this.displayElement.style.zIndex = '1000';
     this.displayElement.style.border = '1px solid #ddd';
     this.displayElement.style.borderRadius = '4px';
     this.displayElement.style.backgroundColor = '#f8f8f8';
     this.displayElement.textContent = 'Snapshot Size: - bytes';
+    // hide
+    this.displayElement.style.display = 'none';
     document.body.appendChild(this.displayElement);
   }
 
   subscribeToSnapshotSizeEvent() {
     this.game.on('snapshotsize', (size) => {
+        // check if hidden, if so show
+        if(this.displayElement.style.display === 'none') {
+        this.displayElement.style.display = 'block';
+      }
       this.averageSnapshotSize = truncateToPrecision(size);
       this.displaySnapshotSize();
     });
