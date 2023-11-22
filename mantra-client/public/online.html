@@ -36,11 +36,16 @@
       game.use(new Plugins.StarField());
       game.use(new Plugins.InputLegend());
       game.use(new Plugins.Block());
+      game.use(new Plugins.Editor({
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/online.html'
+      }));
 
-      // game.use(new Plugins.CurrentFPS());
+      game.use(new Plugins.CurrentFPS());
+      game.use(new Plugins.PingTime());
+      game.use(new Plugins.SnapshotSize());
 
       //game.connect('wss://ayyo.cloudflare1973.workers.dev/websocket');  // cloudflare production
-      game.connect('ws://127.0.0.1:8888/websocket'); 
+      game.connect('ws://192.168.1.80:8888/websocket'); 
      
     });
   </script>

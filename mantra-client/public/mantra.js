@@ -23,6 +23,16 @@ var Component = /*#__PURE__*/function () {
     key: "set",
     value: function set(key, value) {
       var entityId = Array.isArray(key) ? key[0] : key;
+
+      // Check if the property is locked
+      if (this.game) {
+        var lockedProps = this.game.components['lockedProperties'].get(entityId);
+        if (this.isLocked(lockedProps, this.name)) {
+          // console.log(`Property ${key} is locked and cannot be updated.`);
+          return; // Do not update if the property is locked
+        }
+      }
+
       if (Array.isArray(key)) {
         // Ensure nested structure exists
         var current = this.data;
@@ -73,14 +83,26 @@ var Component = /*#__PURE__*/function () {
       } else {
         delete this.data[key];
       }
+    }
 
-      /* Removed 11/15/23, do we need to do this, or will entity update by reference?
-      // After removing the component data, update the entity in game.entities if necessary
-      const entityId = Array.isArray(key) ? key[0] : key;
-      if (this.game && this.game.entities && this.game.entities[entityId]) {
-        delete this.game.entities[entityId][this.name];
+    // Helper method to check if a property or sub-property is locked
+  }, {
+    key: "isLocked",
+    value: function isLocked(lockedProps, key) {
+      if (!lockedProps) return false;
+      if (Array.isArray(key)) {
+        var current = lockedProps;
+        for (var i = 0; i < key.length; i++) {
+          if (current[key[i]] === undefined) {
+            return false; // Property not locked
+          }
+
+          current = current[key[i]];
+        }
+        return true; // Property is locked
       }
-      */
+
+      return lockedProps[key] !== undefined;
     }
   }]);
   return Component;
@@ -145,7 +167,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var Game = exports.Game = /*#__PURE__*/function () {
   function Game() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      isClient = _ref.isClient,
+      _ref$isClient = _ref.isClient,
+      isClient = _ref$isClient === void 0 ? true : _ref$isClient,
       _ref$isEdgeClient = _ref.isEdgeClient,
       isEdgeClient = _ref$isEdgeClient === void 0 ? false : _ref$isEdgeClient,
       _ref$isServer = _ref.isServer,
@@ -184,6 +207,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$options = _ref.options,
       options = _ref$options === void 0 ? {} : _ref$options;
     _classCallCheck(this, Game);
+    if (isServer) {
+      // override default
+      isClient = false;
+    }
+
     // config scope for convenience
     var config = {
       isClient: isClient,
@@ -219,10 +247,14 @@ var Game = exports.Game = /*#__PURE__*/function () {
       this.scriptRoot = options.scriptRoot;
     }
     console.log("new Game(".concat(JSON.stringify(config, true, 2), ")"));
-    this.on = _eventEmitter["default"].on;
-    this.off = _eventEmitter["default"].off;
-    this.emit = _eventEmitter["default"].emit;
-    this.onAny = _eventEmitter["default"].onAny;
+
+    // Bind eventEmitter methods to maintain correct scope
+    this.on = _eventEmitter["default"].on.bind(_eventEmitter["default"]);
+    this.off = _eventEmitter["default"].off.bind(_eventEmitter["default"]);
+    this.once = _eventEmitter["default"].once.bind(_eventEmitter["default"]);
+    this.emit = _eventEmitter["default"].emit.bind(_eventEmitter["default"]);
+    this.onAny = _eventEmitter["default"].onAny.bind(_eventEmitter["default"]);
+    this.listenerCount = _eventEmitter["default"].listenerCount.bind(_eventEmitter["default"]);
     this.bodyMap = {};
     this.systems = {};
     this.snapshotQueue = [];
@@ -244,6 +276,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.isServer = isServer;
     this.localGameLoopRunning = false;
     this.onlineGameLoopRunning = false;
+    this.currentPlayerId = null;
 
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
@@ -414,7 +447,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "addComponent",
     value: function addComponent(entityId, componentType, data) {
       if (!this.components[componentType]) {
-        this.components[componentType] = new _Component["default"](componentType);
+        this.components[componentType] = new _Component["default"](componentType, this);
       }
       this.components[componentType].set(entityId, data);
     }
@@ -446,12 +479,54 @@ var Game = exports.Game = /*#__PURE__*/function () {
       });
     }
 
+    // allows for custom player creation logic, or default player creation logic
+  }, {
+    key: "createPlayer",
+    value: function createPlayer(playerConfig) {
+      var _this = this;
+      return new Promise(function (resolve, reject) {
+        console.log(_this.listenerCount('player::joined'));
+        if (_this.listenerCount('player::joined') === 0) {
+          var result = _this.defaultCreatePlayer(playerConfig);
+          resolve(result);
+        } else {
+          // Attach a one-time listener for handling the response
+          _this.once('player::created', function (entity) {
+            resolve(entity);
+          });
+          // Emit the player::joined event
+          _this.emit('player::joined', playerConfig);
+        }
+      });
+    }
+  }, {
+    key: "defaultCreatePlayer",
+    value: function defaultCreatePlayer(playerConfig) {
+      console.log('creating default player');
+      return this.createEntity({
+        type: 'PLAYER',
+        shape: 'triangle',
+        width: 200,
+        height: 200,
+        position: {
+          x: 0,
+          y: 0
+        }
+      });
+    }
+  }, {
+    key: "setPlayerId",
+    value: function setPlayerId(playerId) {
+      // console.log('setting playerID', playerId)
+      this.currentPlayerId = playerId;
+    }
+
     // TODO: move to separate function
     // Loads external js script files sequentially
   }, {
     key: "loadScripts",
     value: function loadScripts(scripts, finalCallback) {
-      var _this = this;
+      var _this2 = this;
       if (this.isServer) {
         return;
       }
@@ -460,7 +535,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
           var script = document.createElement('script');
           script.type = 'text/javascript';
           // Prepend the scriptRoot to the script src
-          script.src = _this.scriptRoot + scripts[index];
+          script.src = _this2.scriptRoot + scripts[index];
           script.onload = function () {
             console.log("".concat(scripts[index], " loaded"));
             loadScript(index + 1); // Load the next script
@@ -478,7 +553,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   return Game;
 }();
 
-},{"./Component/Component.js":1,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/loadPluginsFromConfig.js":10,"./lib/localGameLoop.js":11,"./lib/onlineGameLoop.js":12,"./plugins.js":58,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":124}],4:[function(require,module,exports){
+},{"./Component/Component.js":1,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/loadPluginsFromConfig.js":10,"./lib/localGameLoop.js":11,"./lib/onlineGameLoop.js":12,"./plugins.js":58,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":126}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -667,6 +742,8 @@ MANTRA.plugins = {
   InputLegend: require('./plugins/input-legend/InputLegend.js')["default"],
   PingTime: require('./plugins/ping-time/PingTime.js')["default"],
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js')["default"],
+  YantraGUI: require('./plugins/gui-yantra/YantraGUI.js')["default"],
+  Editor: require('./plugins/gui-editor/Editor.js')["default"],
   SnapshotSize: require('./plugins/snapshot-size/SnapshotSize.js')["default"],
   Schema: require('./plugins/schema/Schema.js')["default"],
   CurrentFPS: require('./plugins/current-fps/CurrentFPS.js')["default"],
@@ -690,7 +767,7 @@ MANTRA.plugins = {
 
 module.exports = MANTRA;
 
-},{"./Game.js":3,"./plugins/block/Block.js":59,"./plugins/border/Border.js":60,"./plugins/bullet/Bullet.js":61,"./plugins/client/Client.js":62,"./plugins/client/LocalClient.js":63,"./plugins/collisions/Collisions.js":82,"./plugins/current-fps/CurrentFPS.js":83,"./plugins/entity-factory/EntityFactory.js":84,"./plugins/entity-input/EntityInput.js":85,"./plugins/entity-movement/EntityMovement.js":88,"./plugins/entity-movement/strategies/AsteroidsMovement.js":90,"./plugins/entity-movement/strategies/FroggerMovement.js":92,"./plugins/entity-movement/strategies/PacManMovement.js":93,"./plugins/entity-movement/strategies/PongMovement.js":94,"./plugins/gamepad/Gamepad.js":95,"./plugins/graphics-babylon/BabylonGraphics.js":96,"./plugins/graphics-babylon/camera/BabylonCamera.js":97,"./plugins/graphics-css/CSSGraphics.js":98,"./plugins/graphics-phaser/PhaserGraphics.js":99,"./plugins/graphics-three/ThreeGraphics.js":100,"./plugins/graphics/Graphics.js":101,"./plugins/gui-plugins/PluginsGUI.js":102,"./plugins/input-legend/InputLegend.js":103,"./plugins/keyboard/Keyboard.js":104,"./plugins/lifetime/Lifetime.js":105,"./plugins/mouse/Mouse.js":106,"./plugins/physics-matter/MatterPhysics.js":107,"./plugins/ping-time/PingTime.js":118,"./plugins/schema/Schema.js":120,"./plugins/snapshot-size/SnapshotSize.js":122,"./plugins/starfield/BabylonStarField.js":128,"./plugins/starfield/StarField.js":129,"./plugins/world/pong/PongWorld.js":130}],7:[function(require,module,exports){
+},{"./Game.js":3,"./plugins/block/Block.js":59,"./plugins/border/Border.js":60,"./plugins/bullet/Bullet.js":61,"./plugins/client/Client.js":62,"./plugins/client/LocalClient.js":63,"./plugins/collisions/Collisions.js":82,"./plugins/current-fps/CurrentFPS.js":83,"./plugins/entity-factory/EntityFactory.js":84,"./plugins/entity-input/EntityInput.js":85,"./plugins/entity-movement/EntityMovement.js":88,"./plugins/entity-movement/strategies/AsteroidsMovement.js":90,"./plugins/entity-movement/strategies/FroggerMovement.js":92,"./plugins/entity-movement/strategies/PacManMovement.js":93,"./plugins/entity-movement/strategies/PongMovement.js":94,"./plugins/gamepad/Gamepad.js":95,"./plugins/graphics-babylon/BabylonGraphics.js":96,"./plugins/graphics-babylon/camera/BabylonCamera.js":97,"./plugins/graphics-css/CSSGraphics.js":98,"./plugins/graphics-phaser/PhaserGraphics.js":99,"./plugins/graphics-three/ThreeGraphics.js":100,"./plugins/graphics/Graphics.js":101,"./plugins/gui-editor/Editor.js":102,"./plugins/gui-plugins/PluginsGUI.js":103,"./plugins/gui-yantra/YantraGUI.js":104,"./plugins/input-legend/InputLegend.js":105,"./plugins/keyboard/Keyboard.js":106,"./plugins/lifetime/Lifetime.js":107,"./plugins/mouse/Mouse.js":108,"./plugins/physics-matter/MatterPhysics.js":109,"./plugins/ping-time/PingTime.js":120,"./plugins/schema/Schema.js":122,"./plugins/snapshot-size/SnapshotSize.js":124,"./plugins/starfield/BabylonStarField.js":130,"./plugins/starfield/StarField.js":131,"./plugins/world/pong/PongWorld.js":132}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -703,50 +780,63 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// RendererInterface.js
-var RendererInterface = /*#__PURE__*/function () {
-  function RendererInterface() {
-    _classCallCheck(this, RendererInterface);
+// GraphicsInterface.js - Marak Squires 2023
+var GraphicInterface = /*#__PURE__*/function () {
+  function GraphicInterface() {
+    _classCallCheck(this, GraphicInterface);
   }
-  _createClass(RendererInterface, [{
+  _createClass(GraphicInterface, [{
     key: "init",
     value: function init() {
       throw new Error("init method not implemented.");
     }
+
+    // called by the client as many times as possible using requestAnimationFrame
   }, {
     key: "render",
     value: function render(game) {
       throw new Error("render method not implemented.");
     }
+
+    // called once per game tick, using fixed time step
   }, {
     key: "update",
     value: function update(entities) {
       throw new Error("update method not implemented.");
     }
+
+    // used to inflate entity data from the server
+    // the entityData may represent an: update, create, or destroy event
   }, {
-    key: "inflateEntity",
-    value: function inflateEntity(entityData) {
-      throw new Error("inflateEntity method not implemented.");
+    key: "inflateGraphic",
+    value: function inflateGraphic(entityData) {
+      throw new Error("inflateGraphic method not implemented.");
     }
+
+    // create a new graphic object
   }, {
-    key: "createEntity",
-    value: function createEntity(entity, data) {
-      throw new Error("updateEntity method not implemented.");
+    key: "createGraphic",
+    value: function createGraphic(entity, data) {
+      throw new Error("createGraphic method not implemented.");
     }
+
+    // remove the graphic object
   }, {
-    key: "destroyEntity",
-    value: function destroyEntity(entityId) {
-      throw new Error("destroyEntity method not implemented.");
+    key: "removeGraphic",
+    value: function removeGraphic(entityId) {
+      throw new Error("removeGraphic method not implemented.");
     }
+
+    // remove the graphics object
   }, {
-    key: "updateEntity",
-    value: function updateEntity(entity, data) {
-      throw new Error("updateEntity method not implemented.");
+    key: "updateGraphic",
+    value: function updateGraphic(entity, data) {
+      throw new Error("updateGraphic method not implemented.");
     }
   }]);
-  return RendererInterface;
+  return GraphicInterface;
 }();
-var _default = exports["default"] = RendererInterface;
+var _default = exports["default"] = GraphicInterface;
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -791,6 +881,22 @@ eventEmitter.after = function afterEvent(eventPattern, callback) {
   }
   eventEmitter.listeners[eventPattern].push(callback);
 };
+eventEmitter.once = function onceEvent(eventPattern, callback) {
+  var _this = this;
+  // Wrap the original callback
+  var onceWrapper = function onceWrapper() {
+    // Remove the wrapper after being called
+    _this.off(eventPattern, onceWrapper);
+    // Execute the original callback
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+    callback.apply(null, args);
+  };
+
+  // Add the wrapper as a listener
+  this.on(eventPattern, onceWrapper);
+};
 eventEmitter.on = function onEvent(eventPattern, callback) {
   if (!eventEmitter.listeners[eventPattern]) {
     eventEmitter.listeners[eventPattern] = [];
@@ -807,8 +913,8 @@ eventEmitter.off = function offEvent(eventPattern, callback) {
   });
 };
 eventEmitter.emit = function emitEvent(eventName) {
-  for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
+  for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    args[_key2 - 1] = arguments[_key2];
   }
   // Call anyListeners
   eventEmitter.anyListeners.forEach(function (listener) {
@@ -838,7 +944,7 @@ eventEmitter.emit = function emitEvent(eventName) {
 // ^^alias game.entityFactor.createEntity({ id: 123, type: 'PLAYER' });
 
 eventEmitter.bindClass = function bindClass(classInstance, namespace) {
-  var _this = this;
+  var _this2 = this;
   var methods = Object.getOwnPropertyNames(Object.getPrototypeOf(classInstance));
   methods.forEach(function (method) {
     if (typeof classInstance[method] === 'function' && method !== 'constructor') {
@@ -846,7 +952,7 @@ eventEmitter.bindClass = function bindClass(classInstance, namespace) {
       var originalMethod = classInstance[method].bind(classInstance);
 
       // Store the original method in wrappedFunctions for future reference
-      _this.wrappedFunctions[eventName] = originalMethod;
+      _this2.wrappedFunctions[eventName] = originalMethod;
 
       // Set the original method as an event listener
       // TODO: add back this line to pass tests, add failing tests for double emit bug
@@ -854,33 +960,39 @@ eventEmitter.bindClass = function bindClass(classInstance, namespace) {
 
       // Replace the class method with a wrapper function that emits events
       classInstance[method] = function () {
-        var _this$wrappedFunction;
-        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-          args[_key2] = arguments[_key2];
+        var _this2$wrappedFunctio;
+        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
         }
         // Emit the event
-        _this.emit.apply(_this, [eventName].concat(args));
+        _this2.emit.apply(_this2, [eventName].concat(args));
         // Call the original method
-        return (_this$wrappedFunction = _this.wrappedFunctions)[eventName].apply(_this$wrappedFunction, args);
+        return (_this2$wrappedFunctio = _this2.wrappedFunctions)[eventName].apply(_this2$wrappedFunctio, args);
       };
     }
   });
 };
+eventEmitter.listenerCount = function (eventPattern) {
+  if (this.listeners[eventPattern]) {
+    return this.listeners[eventPattern].length;
+  }
+  return 0;
+};
 eventEmitter.unbindClass = function unbindClass(classInstance, namespace) {
-  var _this2 = this;
+  var _this3 = this;
   var methods = Object.getOwnPropertyNames(Object.getPrototypeOf(classInstance));
   methods.forEach(function (method) {
     if (typeof classInstance[method] === 'function' && method !== 'constructor') {
       var eventName = namespace + '::' + method;
-      var wrappedFunction = _this2.wrappedFunctions[eventName];
+      var wrappedFunction = _this3.wrappedFunctions[eventName];
 
       // Remove the event listener if it exists
       if (wrappedFunction) {
-        _this2.off(eventName, wrappedFunction);
+        _this3.off(eventName, wrappedFunction);
         // Restore the original method by removing the wrapper
         classInstance[method] = wrappedFunction;
         // Remove the reference from wrappedFunctions
-        delete _this2.wrappedFunctions[eventName];
+        delete _this3.wrappedFunctions[eventName];
       }
     }
   });
@@ -993,6 +1105,7 @@ function loadPluginsFromConfig(_ref) {
     gamepad = _ref.gamepad,
     lifetime = _ref.lifetime;
   var plugins = this.plugins;
+  var gameConfig = this.config;
   this.use(new plugins.EntityFactory());
   if (physics === 'matter') {
     this.use(new plugins.MatterPhysics());
@@ -1009,6 +1122,12 @@ function loadPluginsFromConfig(_ref) {
     this.use(new plugins.Lifetime());
   }
   if (!this.isServer) {
+    var clientConfig = {
+      protobuf: gameConfig.protobuf,
+      deltaCompression: gameConfig.deltaCompression,
+      msgpack: gameConfig.msgpack
+    };
+    this.use(new plugins.Client(clientConfig));
     if (keyboard) {
       this.use(new plugins.Keyboard(keyboard));
     }
@@ -21300,11 +21419,13 @@ var _Gamepad = _interopRequireDefault(require("./plugins/gamepad/Gamepad.js"));
 var _Lifetime = _interopRequireDefault(require("./plugins/lifetime/Lifetime.js"));
 var _Border = _interopRequireDefault(require("./plugins/border/Border.js"));
 var _Bullet = _interopRequireDefault(require("./plugins/bullet/Bullet.js"));
+var _Block = _interopRequireDefault(require("./plugins/block/Block.js"));
 var _InputLegend = _interopRequireDefault(require("./plugins/input-legend/InputLegend.js"));
 var _PluginsGUI = _interopRequireDefault(require("./plugins/gui-plugins/PluginsGUI.js"));
 var _StarField = _interopRequireDefault(require("./plugins/starfield/StarField.js"));
 var _BabylonStarField = _interopRequireDefault(require("./plugins//starfield/BabylonStarField.js"));
-var _Block = _interopRequireDefault(require("./plugins/block/Block.js"));
+var _YantraGUI = _interopRequireDefault(require("./plugins/gui-yantra/YantraGUI.js"));
+var _Editor = _interopRequireDefault(require("./plugins/gui-editor/Editor.js"));
 var _PingTime = _interopRequireDefault(require("./plugins/ping-time/PingTime.js"));
 var _SnapshotSize = _interopRequireDefault(require("./plugins/snapshot-size/SnapshotSize.js"));
 var _CurrentFPS = _interopRequireDefault(require("./plugins/current-fps/CurrentFPS.js"));
@@ -21312,6 +21433,8 @@ var _FroggerMovement = _interopRequireDefault(require("./plugins/entity-movement
 var _PacManMovement = _interopRequireDefault(require("./plugins/entity-movement/strategies/PacManMovement.js"));
 var _PongMovement = _interopRequireDefault(require("./plugins/entity-movement/strategies/PongMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+// plugins.js - Marak Squires 2023
+
 // Core plugins
 
 // Client
@@ -21342,6 +21465,7 @@ var plugins = {
   Bullet: _Bullet["default"],
   Collision: _Collisions["default"],
   Client: _Client["default"],
+  Editor: _Editor["default"],
   EntityFactory: _EntityFactory["default"],
   EntityInput: _EntityInput["default"],
   EntityMovement: _EntityMovement["default"],
@@ -21371,7 +21495,7 @@ var plugins = {
 };
 var _default = exports["default"] = plugins;
 
-},{"./plugins//starfield/BabylonStarField.js":128,"./plugins/block/Block.js":59,"./plugins/border/Border.js":60,"./plugins/bullet/Bullet.js":61,"./plugins/client/Client.js":62,"./plugins/collisions/Collisions.js":82,"./plugins/current-fps/CurrentFPS.js":83,"./plugins/entity-factory/EntityFactory.js":84,"./plugins/entity-input/EntityInput.js":85,"./plugins/entity-movement/EntityMovement.js":88,"./plugins/entity-movement/strategies/FroggerMovement.js":92,"./plugins/entity-movement/strategies/PacManMovement.js":93,"./plugins/entity-movement/strategies/PongMovement.js":94,"./plugins/gamepad/Gamepad.js":95,"./plugins/graphics-babylon/BabylonGraphics.js":96,"./plugins/graphics-babylon/camera/BabylonCamera.js":97,"./plugins/graphics-css/CSSGraphics.js":98,"./plugins/graphics-phaser/PhaserGraphics.js":99,"./plugins/graphics-three/ThreeGraphics.js":100,"./plugins/graphics/Graphics.js":101,"./plugins/gui-plugins/PluginsGUI.js":102,"./plugins/input-legend/InputLegend.js":103,"./plugins/keyboard/Keyboard.js":104,"./plugins/lifetime/Lifetime.js":105,"./plugins/mouse/Mouse.js":106,"./plugins/physics-matter/MatterPhysics.js":107,"./plugins/physics-physx/PhysXPhysics.js":109,"./plugins/ping-time/PingTime.js":118,"./plugins/schema/Schema.js":120,"./plugins/snapshot-size/SnapshotSize.js":122,"./plugins/starfield/StarField.js":129}],59:[function(require,module,exports){
+},{"./plugins//starfield/BabylonStarField.js":130,"./plugins/block/Block.js":59,"./plugins/border/Border.js":60,"./plugins/bullet/Bullet.js":61,"./plugins/client/Client.js":62,"./plugins/collisions/Collisions.js":82,"./plugins/current-fps/CurrentFPS.js":83,"./plugins/entity-factory/EntityFactory.js":84,"./plugins/entity-input/EntityInput.js":85,"./plugins/entity-movement/EntityMovement.js":88,"./plugins/entity-movement/strategies/FroggerMovement.js":92,"./plugins/entity-movement/strategies/PacManMovement.js":93,"./plugins/entity-movement/strategies/PongMovement.js":94,"./plugins/gamepad/Gamepad.js":95,"./plugins/graphics-babylon/BabylonGraphics.js":96,"./plugins/graphics-babylon/camera/BabylonCamera.js":97,"./plugins/graphics-css/CSSGraphics.js":98,"./plugins/graphics-phaser/PhaserGraphics.js":99,"./plugins/graphics-three/ThreeGraphics.js":100,"./plugins/graphics/Graphics.js":101,"./plugins/gui-editor/Editor.js":102,"./plugins/gui-plugins/PluginsGUI.js":103,"./plugins/gui-yantra/YantraGUI.js":104,"./plugins/input-legend/InputLegend.js":105,"./plugins/keyboard/Keyboard.js":106,"./plugins/lifetime/Lifetime.js":107,"./plugins/mouse/Mouse.js":108,"./plugins/physics-matter/MatterPhysics.js":109,"./plugins/physics-physx/PhysXPhysics.js":111,"./plugins/ping-time/PingTime.js":120,"./plugins/schema/Schema.js":122,"./plugins/snapshot-size/SnapshotSize.js":124,"./plugins/starfield/StarField.js":131}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21390,7 +21514,7 @@ var Block = /*#__PURE__*/function () {
   function Block() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$MIN_BLOCK_SIZE = _ref.MIN_BLOCK_SIZE,
-      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 50 : _ref$MIN_BLOCK_SIZE,
+      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 100 : _ref$MIN_BLOCK_SIZE,
       _ref$width = _ref.width,
       width = _ref$width === void 0 ? 40 : _ref$width,
       _ref$height = _ref.height,
@@ -21509,10 +21633,6 @@ var Border = /*#__PURE__*/function () {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$autoBorder = _ref.autoBorder,
       autoBorder = _ref$autoBorder === void 0 ? true : _ref$autoBorder,
-      _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 600 : _ref$height,
-      _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 800 : _ref$width,
       _ref$position = _ref.position,
       position = _ref$position === void 0 ? {
         x: 0,
@@ -21520,8 +21640,6 @@ var Border = /*#__PURE__*/function () {
       } : _ref$position;
     _classCallCheck(this, Border);
     this.id = Border.id;
-    this.height = height;
-    this.width = width;
     this.position = position;
     this.autoBorder = autoBorder;
   }
@@ -21885,8 +22003,8 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // Client.js - Marak Squires 2023
 // Mantra Client, connects to either local instance or remote websocket server
 var Client = exports["default"] = /*#__PURE__*/function () {
-  function Client(playerId) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+  function Client() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$protobuf = _ref.protobuf,
       protobuf = _ref$protobuf === void 0 ? false : _ref$protobuf,
       _ref$msgpack = _ref.msgpack,
@@ -21897,7 +22015,6 @@ var Client = exports["default"] = /*#__PURE__*/function () {
       deltaCompression = _ref$deltaCompression === void 0 ? false : _ref$deltaCompression;
     _classCallCheck(this, Client);
     this.id = Client.id;
-    this.playerId = playerId; // Remark: localClient expects player name in constructor?
     // for convenience, separate fro game.config scope
     this.config = {
       protobuf: protobuf,
@@ -21914,13 +22031,13 @@ var Client = exports["default"] = /*#__PURE__*/function () {
       // For now, this is just localClient and websocketClient
       // Remark: We load both of them to allow for switching of local / remote modes
       // We could change this to only load WebSocketClient if .connect() is called
-      game.use(new _LocalClient["default"](this.playerId));
-      game.use(new _WebSocketClient["default"](this.playerId, {
+      game.use(new _LocalClient["default"]());
+      game.use(new _WebSocketClient["default"]({
         protobuf: this.config.protobuf,
         msgpack: this.config.msgpack,
         deltaCompression: this.config.deltaCompression,
         deltaEncoding: this.config.deltaEncoding
-      })); // does websocket require playerId? will server assign it?
+      }));
       game.systemsManager.addSystem('client', this);
     }
   }, {
@@ -21975,12 +22092,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // LocalClient.js - Marak Squires 2023
 // LocalClient is a client that runs the game loop locally, without a server
 var LocalClient = exports["default"] = /*#__PURE__*/function () {
-  function LocalClient(playerId) {
+  function LocalClient() {
     _classCallCheck(this, LocalClient);
-    this.entityName = playerId; // Remark: localClient expects player name in constructor?
     this.started = false; // TODO: This doesn't seem ideal, we may not know the player name at this point
-    // window.currentPlayerId currently used for various local client scoped auth functions, will need to be replaced with a better solution
-    window.currentPlayerId = playerId;
     this.id = LocalClient.id;
   }
   _createClass(LocalClient, [{
@@ -21994,6 +22108,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "start",
     value: function start(callback) {
+      var game = this.game;
       if (typeof callback === 'undefined') {
         callback = function noop() {};
       }
@@ -22011,10 +22126,15 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
         }, 10);
         return;
       }
-      this.game.localGameLoop(this.game, this.entityName); // Start the local game loop when offline
+      this.game.localGameLoop(this.game); // Start the local game loop when offline
 
       this.game.communicationClient = this;
       this.game.localGameLoopRunning = true;
+      this.game.createPlayer({
+        type: 'PLAYER'
+      }).then(function (ent) {
+        game.setPlayerId(ent.id);
+      });
       callback(null, true);
       this.game.emit('start');
     }
@@ -22032,7 +22152,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
           return;
         }
         var entityInput = this.game.getSystem('entity-input');
-        entityInput.handleInputs(this.entityName, {
+        entityInput.handleInputs(this.game.currentPlayerId, {
           controls: data.controls,
           mouse: data.mouse
         });
@@ -22073,7 +22193,7 @@ var config = {};
 // cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
 // should be resolved soon, but for now we need to use msgpack
 var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
-  function WebSocketClient(entityName, _ref) {
+  function WebSocketClient(_ref) {
     var _ref$protobuf = _ref.protobuf,
       protobuf = _ref$protobuf === void 0 ? false : _ref$protobuf,
       _ref$msgpack = _ref.msgpack,
@@ -22091,7 +22211,7 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
     };
     console.log("CLIENT CONFIG", this.config);
     this.listeners = {};
-    this.entityName = entityName;
+    this.connected = false;
     this.pingIntervalId = null;
     this.rtt = undefined;
     this.rttMeasurements = [];
@@ -22127,6 +22247,7 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
       this.inputSequenceNumber = 0;
       this.latestSnapshot = null;
       this.previousSnapshot = null;
+      this.connected = true;
       this.game.communicationClient = this;
       this.game.onlineGameLoopRunning = true;
       this.socket = new WebSocket(url);
@@ -22136,7 +22257,7 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
       this.socket.onclose = this.handleClose.bind(this);
       this.socket.onerror = this.handleError.bind(this);
       this.game.onlineGameLoop(this.game);
-
+      this.game.emit('connected');
       // Start measuring RTT
       this.startRttMeasurement();
 
@@ -22217,6 +22338,10 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
     key: "sendMessage",
     value: function sendMessage(action) {
       var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      if (!this.connected) {
+        console.error('not connected will not attempt to send message', action, data);
+        return;
+      }
       if (action === 'player_input') {
         this.inputSequenceNumber++;
         this.inputBuffer[this.inputSequenceNumber] = data;
@@ -22228,7 +22353,7 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
         // Remark: Client-side prediction is close; however we were seeing some ghosting issues
         //         More unit tests and test coverage is required for: snapshots, interpolation, and prediction
         /*
-          entityInput.handleInputs(this.entityName, {
+          entityInput.handleInputs(this.playerId, {
           controls: data.controls,
           mouse: data.mouse
         }, this.inputSequenceNumber);
@@ -22269,8 +22394,9 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
                 _context.next = 8;
                 break;
               }
-              window.currentPlayerId = data.playerId;
-              this.entityName = data.playerId;
+              // in client mode will set the authorized player id
+              game.setPlayerId(data.playerId);
+              this.playerId = data.playerId;
               return _context.abrupt("return");
             case 8:
               if (!(data.action === 'BECOME_TICKER')) {
@@ -22329,14 +22455,13 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
                 // TODO: add config flag here for snapshot interpolation
                 // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);
                 // console.log(inter)
-
                 if (this.isServerSideReconciliationEnabled && typeof data.lastProcessedInput !== 'undefined') {
-                  lastProcessedInput = data.lastProcessedInput[this.entityName];
+                  lastProcessedInput = data.lastProcessedInput[this.playerId];
                   if (lastProcessedInput < this.inputSequenceNumber) {
                     for (i = lastProcessedInput + 1; i <= this.inputSequenceNumber; i++) {
                       input = this.inputBuffer[i];
                       entityInput = this.game.getSystem('entity-input');
-                      entityInput.handleInputs(this.entityName, {
+                      entityInput.handleInputs(this.game.currentPlayerId, {
                         controls: input.controls,
                         mouse: input.controls
                       }, i);
@@ -22480,7 +22605,7 @@ function _decodeBlob() {
   return _decodeBlob.apply(this, arguments);
 }
 
-},{"../../lib/gameTick.js":9,"../server/messageSchema.js":121,"../snapshots/SnapShotManager/deltaCompression.js":125,"./lib/interpolateSnapshot.js":65,"@msgpack/msgpack":75}],65:[function(require,module,exports){
+},{"../../lib/gameTick.js":9,"../server/messageSchema.js":123,"../snapshots/SnapShotManager/deltaCompression.js":127,"./lib/interpolateSnapshot.js":65,"@msgpack/msgpack":75}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24407,13 +24532,16 @@ var CurrentFPS = /*#__PURE__*/function () {
       this.displayElement = document.createElement('div');
       this.displayElement.id = "fpsDisplay";
       this.displayElement.style.position = 'absolute';
-      this.displayElement.style.top = '90px'; // Adjusted from SnapshotSize plugin for spacing
+      this.displayElement.style.top = '8px'; // Adjusted from SnapshotSize plugin for spacing
       this.displayElement.style.right = '10px';
+      this.displayElement.style.zIndex = '1000';
       this.displayElement.style.padding = '5px';
       this.displayElement.style.border = '1px solid #ddd';
       this.displayElement.style.borderRadius = '4px';
       this.displayElement.style.backgroundColor = '#f8f8f8';
       this.displayElement.textContent = 'FPS: -';
+      // hidden
+      this.displayElement.style.display = 'none';
       document.body.appendChild(this.displayElement);
     }
   }, {
@@ -24421,6 +24549,10 @@ var CurrentFPS = /*#__PURE__*/function () {
     value: function subscribeToFPSEvent() {
       var _this = this;
       this.game.on('fps', function (fps) {
+        // check if hidden, if so show
+        if (_this.displayElement.style.display === 'none') {
+          _this.displayElement.style.display = 'block';
+        }
         _this.currentFPS = truncateToPrecision(fps);
         _this.displayFPS();
       });
@@ -24477,19 +24609,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // EntityFactory.js - Marak Squires 2023
-// TODO: move this to snapshot plugin
-// import deltaCompression from '../snapshots/SnapShotManager/deltaCompression.js';
 var EntityFactory = /*#__PURE__*/function () {
   function EntityFactory() {
     _classCallCheck(this, EntityFactory);
     this.id = EntityFactory.id;
-    //this.game = game;
     this.nextEntityId = 1; // 0 is reserved for server
-
-    this.preCreateEntityHooks = [];
-    this.postCreateEntityHooks = [];
-    this.preUpdateEntityHooks = [];
-    this.postUpdateEntityHooks = [];
   }
   _createClass(EntityFactory, [{
     key: "init",
@@ -24514,13 +24638,14 @@ var EntityFactory = /*#__PURE__*/function () {
   }, {
     key: "getEntity",
     value: function getEntity(entityId) {
-      if (typeof this.game.entities.get(entityId) === 'undefined') {
-        // console.log('No such entity', entityId);
+      if (typeof entityId === 'string') {
+        entityId = parseInt(entityId); // for now, this can be removed when we switch Component.js to use Maps
+      }
+
+      if (!this.game.entities.has(entityId)) {
         return null;
       }
-      var entity = {
-        id: entityId
-      };
+      var entity = {};
 
       // Iterate over all registered components and fetch their data if available
       for (var componentType in this.game.components) {
@@ -24529,13 +24654,16 @@ var EntityFactory = /*#__PURE__*/function () {
           entity[componentType] = componentData;
         }
       }
+      if (Object.keys(entity).length === 0) {
+        return null;
+      }
+      entity.id = entityId;
       return entity;
     }
   }, {
     key: "removeEntity",
     value: function removeEntity(entityId) {
       var ent = this.game.entities.get(entityId);
-      ;
       if (ent && this.game.systems.graphics && ent.graphics) {
         // Is this best done here? or in the graphics plugin?
         this.game.systems.graphics.removeGraphic(entityId);
@@ -24546,10 +24674,6 @@ var EntityFactory = /*#__PURE__*/function () {
         var updatedEntity = this.game.getEntity(entityId);
         this.game.entities.set(entityId, updatedEntity);
       }
-
-      // TODO: add this back or remove it?
-      // deltaCompression.removeState(entityId);
-      // now the destroyed entity will be removed in the next cleanupDestroyedEntities() call
     }
   }, {
     key: "cleanupDestroyedEntities",
@@ -24557,12 +24681,6 @@ var EntityFactory = /*#__PURE__*/function () {
       var destroyedComponentData = this.game.components.destroyed.data;
       for (var entityId in destroyedComponentData) {
         if (destroyedComponentData[entityId]) {
-          // This is side effect of Component.js set() method not using Map() for data
-          // Using numbers are object keys is not recommended
-          // TODO: switch Component.js to use Maps
-          if (typeof entityId === 'string') {
-            entityId = parseInt(entityId);
-          }
           // Removes the body from the physics engine
           if (typeof this.game.physics.removeBody === 'function') {
             // TODO: fix this
@@ -24572,7 +24690,6 @@ var EntityFactory = /*#__PURE__*/function () {
               console.log('No body found for entityId', entityId);
             }
           }
-
           // Delete associated components for the entity using Component's remove method
           for (var componentType in this.game.components) {
             this.game.components[componentType].remove(entityId);
@@ -24613,7 +24730,6 @@ var EntityFactory = /*#__PURE__*/function () {
         ent.pendingRender[graphicsInterface.id] = true;
       });
       if (entityData.position) {
-        // If position is not lockedProperties, use the new value from entityData
         this.game.components.position.set(entityId, {
           x: entityData.position.x,
           y: entityData.position.y,
@@ -24628,9 +24744,6 @@ var EntityFactory = /*#__PURE__*/function () {
     key: "createEntity",
     value: function createEntity(config) {
       // console.log('createEntity', config)
-      this.preCreateEntityHooks.forEach(function (fn) {
-        return fn(entityData);
-      });
       var entityId = this._generateId();
       var defaultConfig = {
         id: entityId,
@@ -24726,17 +24839,52 @@ var EntityFactory = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'isSensor', isSensor);
       this.game.addComponent(entityId, 'isStatic', isStatic);
       this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
-      // iterate through props of lockedProperties and for each prop we find, use as key name
-      // to lookup the current entity value and set it to the lockedProperties value
-      // we will later reference this lockedProperties value when updating the entity
+      if (config.body) {
+        var body = this.createBody(config);
+        body.myEntityId = entityId;
+        this.game.physics.addToWorld(this.game.engine, body);
+        this.game.bodyMap[entityId] = body;
+        if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
+          this.game.physics.setVelocity(body, velocity);
+        }
+        if (position) {
+          this.game.physics.setPosition(body, position);
+        }
+      }
+
+      // Add the entity to the game entities scope
+      // TODO: new Entity() should do this
+      // console.log('setting id', entityId, 'to entity')
+      this.game.entities.set(entityId, {
+        id: entityId
+      });
+
+      // get updated entity with components
+      var updatedEntity = this.game.getEntity(entityId);
+      if (typeof updatedEntity.pendingRender === 'undefined') {
+        updatedEntity.pendingRender = {};
+      }
+      this.game.graphics.forEach(function (graphicsInterface) {
+        updatedEntity.pendingRender[graphicsInterface.id] = true;
+      });
+      this.game.entities.set(entityId, updatedEntity);
+      return updatedEntity;
+    }
+  }, {
+    key: "applyLockedProperties",
+    value: function applyLockedProperties(entityId, lockedProperties) {
+      // Check and apply locked properties
       if (lockedProperties) {
         console.log("Processing lockedProperties properties");
         for (var key in lockedProperties) {
           var currentVal = this.game.components[key].get(entityId);
+          console.log('currentVal', currentVal, 'key', key, lockedProperties);
           if (currentVal !== undefined && currentVal !== null) {
             if (_typeof(lockedProperties[key]) === 'object' && !Array.isArray(lockedProperties[key])) {
               // If lockedProperties[key] is an object, iterate through its keys
+              console.log('lockedProperties[key]', lockedProperties[key]);
               for (var subKey in lockedProperties[key]) {
+                console.log('subKey', subKey, lockedProperties[key][subKey]);
                 if (lockedProperties[key][subKey] === true) {
                   // only process if the value is true
                   var nestedVal = currentVal[subKey];
@@ -24758,38 +24906,6 @@ var EntityFactory = /*#__PURE__*/function () {
           }
         }
       }
-      if (config.body) {
-        var body = this.createBody(config);
-        body.myEntityId = entityId;
-        this.game.physics.addToWorld(this.game.engine, body);
-        this.game.bodyMap[entityId] = body;
-        if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
-          this.game.physics.setVelocity(body, velocity);
-        }
-        if (position) {
-          this.game.physics.setPosition(body, position);
-        }
-      }
-      this.postCreateEntityHooks.forEach(function (fn) {
-        return fn(entity);
-      });
-
-      // Add the entity to the game entities scope
-      // TODO: new Entity() should do this
-      this.game.entities.set(entityId, {
-        id: entityId
-      });
-
-      // get updated entity with components
-      var updatedEntity = this.game.getEntity(entityId);
-      if (typeof updatedEntity.pendingRender === 'undefined') {
-        updatedEntity.pendingRender = {};
-      }
-      this.game.graphics.forEach(function (graphicsInterface) {
-        updatedEntity.pendingRender[graphicsInterface.id] = true;
-      });
-      this.game.entities.set(entityId, updatedEntity);
-      return updatedEntity;
     }
   }, {
     key: "inflateEntity",
@@ -24989,6 +25105,7 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
       this.strategies.forEach(function (strategy) {
         strategy.handleInputs(entityId, controls, sequenceNumber);
       });
+      this.game.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
     }
   }, {
     key: "update",
@@ -25006,6 +25123,7 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
   return EntityInput;
 }(_Plugin2["default"]);
 _defineProperty(EntityInput, "id", 'entity-input');
+_defineProperty(EntityInput, "removable", false);
 var _default = exports["default"] = EntityInput;
 
 },{"../../Plugin.js":4,"./strategies/2D/Default2DInputStrategy.js":86,"./strategies/3D/Default3DInputStrategy.js":87}],86:[function(require,module,exports){
@@ -25154,16 +25272,17 @@ exports["default"] = void 0;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
   function ThreeDimensionalInputStrategy(plugin) {
     _classCallCheck(this, ThreeDimensionalInputStrategy);
     this.plugin = plugin;
+    this.id = ThreeDimensionalInputStrategy.id;
   }
   _createClass(ThreeDimensionalInputStrategy, [{
     key: "init",
@@ -25221,7 +25340,7 @@ var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
       var moveSpeed = 5;
       var rotateSpeed = 0.1; // Small value since it's typically in radians
 
-      var entityMovementSystem = game.getSystem('entityMovement');
+      var entityMovementSystem = game.getSystem('entity-movement');
       var actions = Object.keys(controls).filter(function (key) {
         return controls[key];
       }).map(function (key) {
@@ -25261,6 +25380,7 @@ var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
   }]);
   return ThreeDimensionalInputStrategy;
 }();
+_defineProperty(ThreeDimensionalInputStrategy, "id", 'ThreeDimensionalInputStrategy');
 var _default = exports["default"] = ThreeDimensionalInputStrategy;
 
 },{}],88:[function(require,module,exports){
@@ -25358,6 +25478,7 @@ var EntityMovement = /*#__PURE__*/function (_Plugin) {
   return EntityMovement;
 }(_Plugin2["default"]);
 _defineProperty(EntityMovement, "id", 'entity-movement');
+_defineProperty(EntityMovement, "removable", false);
 var _default = exports["default"] = EntityMovement;
 
 },{"../../Plugin.js":4,"./strategies/3D/Asteroids3DMovement.js":89,"./strategies/DefaultMovement.js":91}],89:[function(require,module,exports){
@@ -25371,6 +25492,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 // 3DAsteroidsMovement.js - Marak Squires 2023
@@ -25387,6 +25509,7 @@ var AsteroidsMovementStrategy = /*#__PURE__*/function () {
     };
     // Define thrust for movement
     this.thrust = 0.05 * 1000;
+    this.id = AsteroidsMovementStrategy.id;
   }
   _createClass(AsteroidsMovementStrategy, [{
     key: "init",
@@ -25469,6 +25592,7 @@ var AsteroidsMovementStrategy = /*#__PURE__*/function () {
   }]);
   return AsteroidsMovementStrategy;
 }();
+_defineProperty(AsteroidsMovementStrategy, "id", '3d-asteroids-movement');
 var _default = exports["default"] = AsteroidsMovementStrategy;
 
 },{}],90:[function(require,module,exports){
@@ -25622,12 +25746,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var FroggerMovement = /*#__PURE__*/function () {
   function FroggerMovement() {
     _classCallCheck(this, FroggerMovement);
+    this.id = FroggerMovement.id;
   }
   _createClass(FroggerMovement, [{
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.id = FroggerMovement.id;
 
       // check to see if entityMovement system exists, if not throw error
       if (!game.systems['entity-movement']) {
@@ -26384,6 +26508,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     }
 
     // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
+    // TODO: rename to inflateGraphic
   }, {
     key: "inflateEntity",
     value: function inflateEntity(entity, alpha) {
@@ -26544,8 +26669,9 @@ var BabylonCamera = /*#__PURE__*/function () {
   }, {
     key: "render",
     value: function render() {
+      var game = this.game;
       if (this.config.camera && this.config.camera === 'follow') {
-        var currentPlayer = this.game.getEntity(window.currentPlayerId);
+        var currentPlayer = this.game.getEntity(game.currentPlayerId);
         if (currentPlayer && currentPlayer.graphics) {
           var graphic = currentPlayer.graphics['graphics-babylon'];
           if (graphic) {
@@ -26561,8 +26687,9 @@ var BabylonCamera = /*#__PURE__*/function () {
     key: "renderLerp",
     value: function renderLerp() {
       // TODO: use this instead on render(), uses built in lerp
+      var game = this.game;
       if (this.config.camera && this.config.camera === 'follow') {
-        var currentPlayer = this.game.getEntity(window.currentPlayerId);
+        var currentPlayer = this.game.getEntity(game.currentPlayerId);
         if (currentPlayer && currentPlayer.graphics) {
           var graphic = currentPlayer.graphics['graphics-babylon'];
           var smoothness = 1; // Value between 0 and 1, where 1 is instant
@@ -26811,7 +26938,8 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "update",
     value: function update() {
-      var currentPlayer = this.game.getEntity(window.currentPlayerId);
+      var game = this.game;
+      var currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (this.config.camera && this.config.camera === 'follow' && currentPlayer) {
         if (currentPlayer.position) {
           this.cameraPosition.x = currentPlayer.position.x;
@@ -27155,6 +27283,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "update",
     value: function update(entitiesData) {
+      var game = this.game;
       if (!this.scenesReady) {
         return;
       }
@@ -27162,8 +27291,8 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       if (this.config.camera && this.config.camera === 'follow') {
         //    if (this.followPlayer && this.followingPlayer !== true) {
         // Camera settings
-        var player = this.game.getEntity(window.currentPlayerId);
-        var graphics = this.game.components.graphics.get(window.currentPlayerId);
+        var player = this.game.getEntity(game.currentPlayerId);
+        var graphics = this.game.components.graphics.get(game.currentPlayerId);
         if (player && graphics && player.graphics['graphics-phaser']) {
           camera.startFollow(player.graphics['graphics-phaser']);
           this.followingPlayer = true;
@@ -27440,7 +27569,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
-          if (ent.pendingRender && ent.pendingRender['graphics-three']) {
+          if (ent.pendingRender['graphics-three']) {
             this.inflateEntity(ent, alpha);
             ent.pendingRender['graphics-three'] = false;
           }
@@ -27455,10 +27584,11 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "updateCameraFollow",
     value: function updateCameraFollow() {
+      var game = this.game;
       // Follow the player entity with the camera
-      var currentPlayer = this.game.getEntity(window.currentPlayerId);
+      var currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (currentPlayer) {
-        var playerGraphic = this.game.components.graphics.get([window.currentPlayerId, 'graphics-three']);
+        var playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
         if (playerGraphic) {
           // Calculate the new camera position with a slight offset above and behind the player
           var newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 50, -100));
@@ -27586,6 +27716,260 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var Editor = /*#__PURE__*/function () {
+  function Editor() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      sourceCode = _ref.sourceCode;
+    _classCallCheck(this, Editor);
+    this.id = Editor.id;
+    this.sourceCode = sourceCode;
+  }
+  _createClass(Editor, [{
+    key: "init",
+    value: function init(game) {
+      var _this = this;
+      this.game = game;
+      this.dropdownTimers = new Map(); // To manage delayed close timers
+
+      // Check for jQuery
+      if (typeof $ === 'undefined') {
+        console.log('$ is not defined, attempting to load jQuery from vendor');
+        game.loadScripts(['/vendor/jquery.min.js'], function () {
+          console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
+          _this.jqueryReady();
+        });
+      } else {
+        this.jqueryReady();
+      }
+      game.use(new this.game.plugins.PluginsGUI());
+    }
+  }, {
+    key: "jqueryReady",
+    value: function jqueryReady() {
+      this.createToolbar();
+      this.setupGlobalClickListener();
+      // this.createViewSourceModal();
+    }
+  }, {
+    key: "createToolbar",
+    value: function createToolbar() {
+      var $toolbar = $('<div>', {
+        id: 'editorToolbar',
+        "class": 'editor-toolbar'
+      });
+
+      // Create menus
+      var $fileMenu = this.createMenu('File');
+      var $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
+      // const $aboutMenu = this.createMenu('About');
+
+      // Populate menus
+      this.populateFileMenu($fileMenu);
+      this.populatePluginsMenu($pluginsMenu);
+      // TODO: about links
+      //this.populateAboutMenu($aboutMenu);
+
+      // Append menus to the toolbar
+      $toolbar.append($fileMenu, $pluginsMenu /*, $aboutMenu*/);
+
+      // Append the toolbar to the body
+      $('body').append($toolbar);
+    }
+  }, {
+    key: "createMenu",
+    value: function createMenu(menuTitle) {
+      var _this2 = this;
+      var onClickAction = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var $menu = $('<div>', {
+        "class": 'menu'
+      });
+      var $button = $('<button>').text(menuTitle);
+      if (onClickAction) {
+        $button.on('click', onClickAction);
+      } else {
+        var $dropdownContent = $('<div>', {
+          "class": 'dropdown-content'
+        });
+        $menu.append($dropdownContent);
+        $button.on('click', function () {
+          _this2.closeAllDropdowns();
+          $dropdownContent.toggleClass('show');
+        });
+
+        // Handle mouseout event
+        $dropdownContent.on('mouseout', function () {
+          _this2.dropdownTimers.set($dropdownContent[0], setTimeout(function () {
+            $dropdownContent.removeClass('show');
+          }, 333));
+        });
+
+        // Cancel the timer if the mouse re-enters
+        $dropdownContent.on('mouseover', function () {
+          if (_this2.dropdownTimers.has($dropdownContent[0])) {
+            clearTimeout(_this2.dropdownTimers.get($dropdownContent[0]));
+            _this2.dropdownTimers["delete"]($dropdownContent[0]);
+          }
+        });
+      }
+      $menu.append($button);
+      return $menu;
+    }
+  }, {
+    key: "populateFileMenu",
+    value: function populateFileMenu($menu) {
+      var _this3 = this;
+      var $dropdownContent = $menu.find('.dropdown-content');
+      var $viewSource = $('<a>', {
+        href: '#',
+        text: 'View Source'
+      });
+      $viewSource.on('click', function () {
+        return _this3.showSourceCode();
+      }); // Add click handler
+      $dropdownContent.append($viewSource);
+      var $deployWorld = $('<a>', {
+        href: 'https://yantra.gg/deploy',
+        text: 'Deploy to Yantra Cloud',
+        target: '_blank'
+      });
+      $dropdownContent.append($deployWorld);
+      var $aboutMantra = $('<a>', {
+        href: 'https://github.com/yantra-core/mantra',
+        text: 'About Mantra',
+        target: '_blank'
+      });
+      $dropdownContent.append($aboutMantra);
+    }
+  }, {
+    key: "populatePluginsMenu",
+    value: function populatePluginsMenu($menu) {
+      var $dropdownContent = $menu.find('.dropdown-content');
+      var $newItem = $('<a>', {
+        href: '#',
+        text: 'Plugins'
+      });
+      $dropdownContent.append($newItem);
+      // Repeat for other Plugins menu items...
+    }
+  }, {
+    key: "populateAboutMenu",
+    value: function populateAboutMenu($menu) {
+      var $dropdownContent = $menu.find('.dropdown-content');
+      var $githubLink = $('<a>', {
+        href: 'https://github.com/yantra-core/mantra',
+        text: 'Mantra GitHub Repository'
+      });
+      $dropdownContent.append($githubLink);
+
+      //const $yantraSDK = $('<a>', { href: 'https://github.com/yantra-core/', text: 'Yantra SDK' });
+      //$dropdownContent.append($yantraSDK);
+
+      var $yantraLink = $('<a>', {
+        href: 'https://yantra.gg',
+        text: 'Yantra Serverless Hosting'
+      });
+      $dropdownContent.append($yantraLink);
+      // Repeat for other About menu items...
+    }
+  }, {
+    key: "setupGlobalClickListener",
+    value: function setupGlobalClickListener() {
+      var _this4 = this;
+      $(document).on('click', function (event) {
+        if (!$(event.target).closest('.menu button').length) {
+          _this4.closeAllDropdowns();
+        }
+      });
+    }
+  }, {
+    key: "closeAllDropdowns",
+    value: function closeAllDropdowns() {
+      var _this5 = this;
+      $('.dropdown-content.show').each(function (index, dropdown) {
+        $(dropdown).removeClass('show');
+        var timer = _this5.dropdownTimers.get(dropdown);
+        if (timer) {
+          clearTimeout(timer);
+          _this5.dropdownTimers["delete"](dropdown);
+        }
+      });
+    }
+  }, {
+    key: "showPluginsGUI",
+    value: function showPluginsGUI() {
+      var game = this.game;
+      if (typeof game.systems['gui-plugins'] === 'undefined') {
+        game.use(new this.game.plugins.PluginsGUI());
+      }
+      // Functionality to show plugins GUI
+      if (this.game.systems['gui-plugins']) {
+        this.game.systems['gui-plugins'].togglePluginView();
+      }
+    }
+  }, {
+    key: "createViewSourceModal",
+    value: function createViewSourceModal() {
+      // Create modal structure
+      var $modal = $('<div>', {
+        id: 'sourceCodeModal',
+        "class": 'modal'
+      });
+      var $modalContent = $('<div>', {
+        "class": 'modal-content'
+      });
+      var $closeSpan = $('<span>', {
+        "class": 'close',
+        text: '×'
+      });
+      var $sourcePre = $('<pre>', {
+        id: 'sourceCode'
+      });
+      $modalContent.append($closeSpan, $sourcePre);
+      $modal.append($modalContent);
+
+      // Append the modal to the body
+      $('body').append($modal);
+
+      // Close event
+      $closeSpan.on('click', function () {
+        return $modal.hide();
+      });
+      $(window).on('click', function (event) {
+        if ($(event.target).is($modal)) {
+          $modal.hide();
+        }
+      });
+    }
+  }, {
+    key: "showSourceCode",
+    value: function showSourceCode() {
+      var sourceCode = document.documentElement.outerHTML;
+      console.log(sourceCode);
+      // open new link to github
+      window.open(this.sourceCode, '_blank');
+      //$('#sourceCode').text(sourceCode);
+      //$('#sourceCodeModal').show();
+    }
+  }]);
+  return Editor;
+}();
+_defineProperty(Editor, "id", 'gui-editor');
+var _default = exports["default"] = Editor;
+
+},{}],103:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -27612,6 +27996,7 @@ var PluginsGUI = /*#__PURE__*/function () {
       this.createPluginView();
       this.drawPluginTable();
       this.subscribeToPluginUpdates();
+      this.game.addSystem(this.id, this);
     }
   }, {
     key: "createPluginView",
@@ -27625,7 +28010,7 @@ var PluginsGUI = /*#__PURE__*/function () {
       document.body.appendChild(pluginView);
       var toolbarHeader = document.createElement('div');
       toolbarHeader.className = 'toolbarHeader';
-      toolbarHeader.textContent = 'Open Plugins';
+      toolbarHeader.textContent = 'Open Plugins ▲';
       var arrowIndicator = document.createElement('span');
       arrowIndicator.className = 'arrowIndicator';
       toolbarHeader.appendChild(arrowIndicator);
@@ -27791,8 +28176,11 @@ var PluginsGUI = /*#__PURE__*/function () {
       var pluginView = document.getElementById('pluginView');
       var arrowIndicator = document.querySelector('.arrowIndicator');
       var isExpanded = pluginView.classList.contains('expanded');
+      var toolbarHeader = document.querySelector('.toolbarHeader');
+      toolbarHeader.textContent = isExpanded ? 'Open Plugins ▲' : 'Close Plugins ▼';
       pluginView.classList.toggle('expanded', !isExpanded);
-      arrowIndicator.textContent = isExpanded ? '▲' : '▼'; // Change arrow direction
+
+      //arrowIndicator.textContent = isExpanded ? '▲' : '▼'; // Change arrow direction
     }
   }, {
     key: "unload",
@@ -27813,7 +28201,164 @@ var PluginsGUI = /*#__PURE__*/function () {
 _defineProperty(PluginsGUI, "id", 'gui-plugins');
 var _default = exports["default"] = PluginsGUI;
 
-},{}],103:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var YantraGUI = /*#__PURE__*/function () {
+  function YantraGUI() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    _classCallCheck(this, YantraGUI);
+    this.id = YantraGUI.id;
+    this.logContainer = null;
+    this.logTextArea = null;
+    this.metadataContainer = null;
+  }
+  _createClass(YantraGUI, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.createDisplay();
+      // Subscribe to relevant events or game updates
+      var self = this;
+      game.on('server::discovery::polling', function (data) {
+        console.log('server::discovery', data);
+        self.updateLog(data.message);
+      });
+      game.on('server::discovery::best-server', function (data) {
+        console.log('server::discovery::best-server', data);
+        console.log('data', data);
+        var bestServer = data.data[0];
+        var filteredData = {
+          region: bestServer.region,
+          activePlayers: bestServer.activePlayers,
+          processId: bestServer.processId,
+          hostId: bestServer.hostId,
+          mode: bestServer.mode,
+          settings: bestServer.settings
+        };
+        self.updateLog(JSON.stringify(filteredData, true, 2));
+        setTimeout(function () {
+          // hide the logContainer
+          self.logContainer.style.display = 'none';
+        }, 4444);
+        // self.updateMetadata(data.data);
+      });
+    }
+  }, {
+    key: "createDisplay",
+    value: function createDisplay() {
+      // Create and style the log container
+      this.logContainer = document.createElement('div');
+      this.logContainer.id = 'logContainer';
+      this.applyStyles(this.logContainer, {
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '20px',
+        positon: 'absolute',
+        top: '100px',
+        left: '0'
+      });
+
+      // Create and style the log text area
+      this.logTextArea = document.createElement('textarea');
+      this.logTextArea.id = 'yantraLogTextArea';
+      this.logTextArea.readOnly = true;
+      this.applyStyles(this.logTextArea, {
+        width: '60%',
+        height: '400px',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        padding: '10px',
+        boxSizing: 'border-box',
+        overflowY: 'scroll'
+      });
+
+      // Create and style the metadata container
+      /*
+      this.metadataContainer = document.createElement('div');
+      this.metadataContainer.id = 'yantraMetadataContainer';
+      this.applyStyles(this.metadataContainer, {
+        width: '35%',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        padding: '10px',
+        boxSizing: 'border-box'
+      });
+      */
+
+      // Append elements to the log container and then to the body
+      this.logContainer.appendChild(this.logTextArea);
+      // this.logContainer.appendChild(this.metadataContainer);
+      document.body.appendChild(this.logContainer);
+    }
+  }, {
+    key: "applyStyles",
+    value: function applyStyles(element, styles) {
+      for (var _i = 0, _Object$entries = Object.entries(styles); _i < _Object$entries.length; _i++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+          key = _Object$entries$_i[0],
+          value = _Object$entries$_i[1];
+        element.style[key] = value;
+      }
+    }
+  }, {
+    key: "updateLog",
+    value: function updateLog(message) {
+      console.log('updating log', message);
+      this.logTextArea.value += message + '\n';
+      this.logTextArea.scrollTop = this.logTextArea.scrollHeight;
+    }
+  }, {
+    key: "updateMetadata",
+    value: function updateMetadata(metadata) {
+      // Clear existing metadata
+      this.metadataContainer.innerHTML = '';
+
+      // Add new metadata
+      for (var _i2 = 0, _Object$entries2 = Object.entries(metadata); _i2 < _Object$entries2.length; _i2++) {
+        var _Object$entries2$_i = _slicedToArray(_Object$entries2[_i2], 2),
+          key = _Object$entries2$_i[0],
+          value = _Object$entries2$_i[1];
+        var p = document.createElement('p');
+        p.textContent = "".concat(key, ": ").concat(value);
+        this.metadataContainer.appendChild(p);
+      }
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      // Remove elements when the plugin is unloaded
+      if (this.logContainer && this.logContainer.parentNode) {
+        this.logContainer.parentNode.removeChild(this.logContainer);
+      }
+      this.logContainer = null;
+      this.logTextArea = null;
+      this.metadataContainer = null;
+    }
+  }]);
+  return YantraGUI;
+}(); // Exporting the plugin class
+_defineProperty(YantraGUI, "id", 'gui-yantra');
+var _default = exports["default"] = YantraGUI;
+
+},{}],105:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27882,7 +28427,7 @@ var InputLegend = /*#__PURE__*/function () {
       var _this = this;
       var game = this.game;
       var self = this;
-      game.on('entityInput::handleInputs', function (entityId, data) {
+      game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
         if (data) {
           var currentInputs = data.controls;
           for (var key in _this.highlightedKeys) {
@@ -27892,7 +28437,7 @@ var InputLegend = /*#__PURE__*/function () {
           for (var _key in currentInputs) {
             var row = document.getElementById("row-".concat(_key));
             if (row && currentInputs[_key]) {
-              row.style.backgroundColor = 'yellow';
+              row.style.backgroundColor = '#00ff00';
               _this.highlightedKeys[_key] = true;
             }
           }
@@ -27924,7 +28469,7 @@ var InputLegend = /*#__PURE__*/function () {
 _defineProperty(InputLegend, "id", 'input-legend');
 var _default = exports["default"] = InputLegend;
 
-},{}],104:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28070,7 +28615,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
 }();
 _defineProperty(Keyboard, "id", 'keyboard');
 
-},{}],105:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28104,7 +28649,7 @@ var Lifetime = /*#__PURE__*/function () {
         if (ent && this.game.components.lifetime[entityId] !== Infinity) {
           var elapsedTime = now - ent.creationTime;
           if (elapsedTime > ent.lifetime) {
-            this.game.removeEntity(entityId);
+            this.game.removeEntity(Number(entityId)); // TODO: remove Number(), refactor Components to use Map
           }
         }
       }
@@ -28121,7 +28666,7 @@ var Lifetime = /*#__PURE__*/function () {
 _defineProperty(Lifetime, "id", 'lifetime');
 var _default = exports["default"] = Lifetime;
 
-},{}],106:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28250,7 +28795,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
 }();
 _defineProperty(Mouse, "id", 'mouse');
 
-},{}],107:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28347,7 +28892,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
               // If this is the client and we are in online mode,
               // do not update local physics for remote players, only update local physics for the local player
               // This may be changed in the future or through configuration
-              if (_this2.game.isClient && _this2.game.onlineMode && entity.type === 'PLAYER' && entity.id !== window.currentPlayerId) {
+              if (_this2.game.isClient && _this2.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
                 // In online mode, if the entity is a player and that player is not the current player, skip updating physics
                 // continue; // Skip updating physics for remote players
               }
@@ -28741,7 +29286,7 @@ var truncateToStringWithPrecision = function truncateToStringWithPrecision(value
   return value.toFixed(precision);
 };
 
-},{"./PhysicsInterface.js":108,"matter-js":23}],108:[function(require,module,exports){
+},{"./PhysicsInterface.js":110,"matter-js":23}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -28843,7 +29388,7 @@ var PhysicsInterface = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = PhysicsInterface;
 
-},{}],109:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29235,7 +29780,7 @@ _defineProperty(PhysXPhysics, "id", 'physics-physx');
 _defineProperty(PhysXPhysics, "removable", false);
 var _default = exports["default"] = PhysXPhysics;
 
-},{"../physics-matter/PhysicsInterface.js":108,"./lib/body/applyForce.js":110,"./lib/body/getBodyPosition.js":111,"./lib/body/getBodyRotation.js":112,"./lib/body/getLinearVelocity.js":113,"./lib/body/rotateBody.js":114,"./lib/checkForMovedBodies.js":115,"./lib/math/quaternionToEuler.js":116,"./lib/updateEngine.js":117}],110:[function(require,module,exports){
+},{"../physics-matter/PhysicsInterface.js":110,"./lib/body/applyForce.js":112,"./lib/body/getBodyPosition.js":113,"./lib/body/getBodyRotation.js":114,"./lib/body/getLinearVelocity.js":115,"./lib/body/rotateBody.js":116,"./lib/checkForMovedBodies.js":117,"./lib/math/quaternionToEuler.js":118,"./lib/updateEngine.js":119}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29275,7 +29820,7 @@ function applyForce(body, position, force) {
   if (pxPosition) this.PhysX.destroy(pxPosition);
 }
 
-},{}],111:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29302,7 +29847,7 @@ function getBodyPosition(body) {
   };
 }
 
-},{}],112:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29339,7 +29884,7 @@ function getBodyRotation(body) {
   return euler;
 }
 
-},{"../math/quaternionToEuler.js":116}],113:[function(require,module,exports){
+},{"../math/quaternionToEuler.js":118}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29366,7 +29911,7 @@ function getLinearVelocity(body) {
   };
 }
 
-},{}],114:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29434,7 +29979,7 @@ function normalizeQuaternion(q) {
   return new this.PhysX.PxQuat(q.x / length, q.y / length, q.z / length, q.w / length);
 }
 
-},{}],115:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29480,7 +30025,7 @@ function checkForMovedBodies() {
   });
 }
 
-},{}],116:[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29507,7 +30052,7 @@ function quaternionToEuler(quaternion) {
   };
 }
 
-},{}],117:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29566,7 +30111,7 @@ function updateEngine(engine) {
   this.lastFrame = hrtime;
 }
 
-},{}],118:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29602,13 +30147,16 @@ var PingTime = /*#__PURE__*/function () {
       this.displayElement = document.createElement('div');
       this.displayElement.id = "pingTimeDisplay";
       this.displayElement.style.position = 'absolute';
-      this.displayElement.style.top = '10px';
-      this.displayElement.style.right = '10px';
+      this.displayElement.style.top = '8px';
+      this.displayElement.style.right = '85px';
+      this.displayElement.style.zIndex = '1000';
       this.displayElement.style.padding = '5px';
       this.displayElement.style.border = '1px solid #ddd';
       this.displayElement.style.borderRadius = '4px';
       this.displayElement.style.backgroundColor = '#f8f8f8';
       this.displayElement.textContent = 'Ping: - ms';
+      // hide
+      this.displayElement.style.display = 'none';
       document.body.appendChild(this.displayElement);
     }
   }, {
@@ -29616,6 +30164,10 @@ var PingTime = /*#__PURE__*/function () {
     value: function subscribeToPingTimeEvent() {
       var _this = this;
       this.game.on('pingtime', function (pingTime) {
+        // check if hidden, if so show
+        if (_this.displayElement.style.display === 'none') {
+          _this.displayElement.style.display = 'block';
+        }
         _this.pingTime = truncateToPrecision(pingTime);
         _this.displayPingTime();
       });
@@ -29653,7 +30205,7 @@ var truncateToPrecision = function truncateToPrecision(value) {
 };
 var _default = exports["default"] = PingTime;
 
-},{}],119:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29804,7 +30356,7 @@ var messageSchema = {
 };
 var _default = exports["default"] = messageSchema;
 
-},{}],120:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29840,7 +30392,7 @@ var Schema = exports["default"] = /*#__PURE__*/function () {
 _defineProperty(Schema, "id", 'schema');
 _defineProperty(Schema, "removable", false);
 
-},{"./Message.js":119,"protobufjs":24}],121:[function(require,module,exports){
+},{"./Message.js":121,"protobufjs":24}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29957,7 +30509,7 @@ var messageSchema = {
 };
 var _default = exports["default"] = messageSchema;
 
-},{}],122:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -29994,13 +30546,16 @@ var SnapshotSize = /*#__PURE__*/function () {
       this.displayElement = document.createElement('div');
       this.displayElement.id = "snapshotSizeDisplay";
       this.displayElement.style.position = 'absolute';
-      this.displayElement.style.top = '50px';
-      this.displayElement.style.right = '10px';
+      this.displayElement.style.top = '8px';
+      this.displayElement.style.right = '350px';
       this.displayElement.style.padding = '5px';
+      this.displayElement.style.zIndex = '1000';
       this.displayElement.style.border = '1px solid #ddd';
       this.displayElement.style.borderRadius = '4px';
       this.displayElement.style.backgroundColor = '#f8f8f8';
       this.displayElement.textContent = 'Snapshot Size: - bytes';
+      // hide
+      this.displayElement.style.display = 'none';
       document.body.appendChild(this.displayElement);
     }
   }, {
@@ -30008,6 +30563,10 @@ var SnapshotSize = /*#__PURE__*/function () {
     value: function subscribeToSnapshotSizeEvent() {
       var _this = this;
       this.game.on('snapshotsize', function (size) {
+        // check if hidden, if so show
+        if (_this.displayElement.style.display === 'none') {
+          _this.displayElement.style.display = 'block';
+        }
         _this.averageSnapshotSize = truncateToPrecision(size);
         _this.displaySnapshotSize();
       });
@@ -30047,7 +30606,7 @@ var truncateToPrecision = function truncateToPrecision(value) {
 };
 var _default = exports["default"] = SnapshotSize;
 
-},{"./vendor/bytes/bytes.js":123}],123:[function(require,module,exports){
+},{"./vendor/bytes/bytes.js":125}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30200,7 +30759,7 @@ function parse(val) {
   return Math.floor(map[unit] * floatValue);
 }
 
-},{}],124:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30340,7 +30899,7 @@ getDecodedSnapshot(snapshotId) {
 
 */
 
-},{"./getPlayerSnapshot.js":127}],125:[function(require,module,exports){
+},{"./getPlayerSnapshot.js":129}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30586,7 +31145,7 @@ function initializeDefaultState(id) {
 }
 var _default = exports["default"] = deltaCompression;
 
-},{"./float2Int.js":126}],126:[function(require,module,exports){
+},{"./float2Int.js":128}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30615,7 +31174,7 @@ var float2Int = {
 };
 var _default = exports["default"] = float2Int;
 
-},{}],127:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30734,7 +31293,7 @@ var truncateToPrecision = function truncateToPrecision(value) {
 };
 var _default = exports["default"] = getPlayerSnapshot;
 
-},{}],128:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30818,7 +31377,7 @@ _defineProperty(BabylonStarField, "id", 'babylon-starfield');
 _defineProperty(BabylonStarField, "removable", false);
 var _default = exports["default"] = BabylonStarField;
 
-},{}],129:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30892,7 +31451,7 @@ _defineProperty(StarField, "id", 'starfield');
 _defineProperty(StarField, "removable", false);
 var _default = exports["default"] = StarField;
 
-},{"../../plugins.js":58}],130:[function(require,module,exports){
+},{"../../plugins.js":58}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30939,7 +31498,7 @@ var PongWorld = /*#__PURE__*/function (_Plugin) {
       // Create the Player
       //
       game.createEntity({
-        id: window.currentPlayerId,
+        id: game.currentPlayerId,
         // TODO: replace this
         type: 'PLAYER',
         shape: 'rectangle',
