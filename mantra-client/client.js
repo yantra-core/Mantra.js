@@ -32,85 +32,8 @@ import config from './config/config.js';
 //
 //import { Game } from '../mantra-game/Game.js';
 import { Game, plugins } from '../mantra-game';
+// import Pong from '../mantra-worlds/Pong/Pong.js';
 
-// import PhysXPhysics from '../mantra-game/plugins/physics-physx/PhysXPhysics.js'; // WIP
-
-//
-// Input Strategies
-//
-import Default2DInputStrategy from '../mantra-game/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
-import Default3DInputStrategy from '../mantra-game/plugins/entity-input/strategies/3D/Default3DInputStrategy.js';
-
-
-//
-// Movement Strategies
-//
-import AsteroidsMovement from '../mantra-game/plugins/entity-movement/strategies/AsteroidsMovement.js';
-import Asteroids3DMovement from '../mantra-game/plugins/entity-movement/strategies/3D/Asteroids3DMovement.js';
-import PongMovement from '../mantra-game/plugins/entity-movement/strategies/PongMovement.js';
-import PacManMovement from '../mantra-game/plugins/entity-movement/strategies/PacManMovement.js';
-import FroggerMovement from '../mantra-game/plugins/entity-movement/strategies/FroggerMovement.js';
-
-
-// import PongWorld from '../mantra-game/plugins/world/pong/PongWorld.js';
-import Pong from '../mantra-worlds/Pong/Pong.js';
-
-
-// console.log('plugins', plugins)
-
-//
-// Creates a new game instance
-//
-/*
-let game = new Game({
-  isClient: true,        // can we remove this?
-  physics: 'matter',     // enum, 'physx', 'matter', default 'matter'
-  graphics: ['phaser'],  // array enum, 'phaser', 'css', 'none', default ['babylon']
-  keyboard: {            // boolean or config object, default true
-    preventDefaults: false
-  },       
-  mouse: true,           // boolean or config object, default true
-  collisions: true,      // boolean, default true
-  width: 1600 * 2,       // number, default 1600
-  height: 900 * 2,       // number, default 900
-});
-*/
-
-//
-// Create the Game object with default config
-//
-/*
-let defaultConfig = {
-  isClient: true,         // boolean, default true
-  isServer: false,        // boolean, default false
-  physics: 'matter',      // enum or Physics config object, 'physx', 'matter', default 'matter'
-  graphics: ['babylon'],  // array enum, 'phaser', 'css', 'none', default ['babylon']
-  mouse: true,            // boolean or Mouse config object, default true
-  keyboard: true,         // boolean or Keyboard config object, default true
-  collisions: true,       // boolean, default true
-  lifetime: true,         // boolean, enables lifetime property, default true
-  width: 1600,            // number, default 1600
-  height: 900,            // number, default 900
-}
-
-// Game will start with the defaultConfig, unless overridden
-
-// Game canvas(s) will be appended to <div id="gameHolder"></div>,
-// if gameHolder does not exists it will be append to body
-
-// So for example, if you wish to disable mouse inputs, you can simply:
-let game = new Game({
-  mouse: false
-});
-
-// If you wish you customize Keyboard to disable preventDefault:
-let game = new Game({
-  keyboard: {
-    preventDefaults: false
-  }
-});
-
-*/
 
 let game = new Game({
   isClient: true,
@@ -145,7 +68,9 @@ if (game.isOnline) {
 }
 // Always show FPS
 game.use(new plugins.CurrentFPS());
-game.use(new plugins.Editor());
+game.use(new plugins.Editor({
+  sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js'
+}));
 
 // game.use(new Pong());
 
@@ -191,6 +116,8 @@ if (mode === 'online') {
     game.connect('ws://192.168.1.80:8888/websocket');                   // websocket server
   }
   game.use(new plugins.StarField())
+  game.use(new plugins.PingTime())
+  game.use(new plugins.SnapshotSize())
 
 
 } else {

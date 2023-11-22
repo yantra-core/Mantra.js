@@ -59,13 +59,10 @@
       let Plugins = MANTRA.plugins;
 
       console.log(Plugins)
-
-      game.use(new Plugins.Editor({
-        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/yantra.html'
-      }));
-
-
       game.use(new Plugins.YantraGUI());
+      game.use(new Plugins.Editor({
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/hathora.html'
+      }));
 
       // Use Plugins to add systems to the game
       game.use(new Plugins.Bullet())

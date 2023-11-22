@@ -2,7 +2,7 @@ class Editor {
 
   static id = 'gui-editor';
 
-  constructor({ sourceCode }) {
+  constructor({ sourceCode } = {}) {
     this.id = Editor.id;
     this.sourceCode = sourceCode;
   }

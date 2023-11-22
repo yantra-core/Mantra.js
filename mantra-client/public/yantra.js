@@ -6,6 +6,15 @@ YANTRA.serverDiscovery = {
   maxPollCount: 99999,
   pollCount: 0,
   isPolling: false,
+  broadcastMessage: function(event, message){
+    let emitter = null;
+    if (typeof window.game !== 'undefined') {
+      emitter = window.game;
+    }
+    if (emitter) {
+      emitter.emit(event, message);
+    }
+  },
 
   async findBestServers(region, mode, owner, settings) {
     const url = `${this.etherspaceEndpoint}/api/v2/autoscale/${region}/${owner}/${mode}`;
@@ -21,7 +30,7 @@ YANTRA.serverDiscovery = {
     if (this.pollCount > this.maxPollCount) {
       throw new Error('Max polling attempts reached');
     }
-
+    this.broadcastMessage('server::discovery::polling', { message: 'Server is starting: ' + region + ' ' + owner + '/' + mode});
     console.log("pollForServer");
     this.pollCount++;
     this.isPolling = true;
@@ -30,6 +39,9 @@ YANTRA.serverDiscovery = {
       const serverInfo = await this.findBestServers(region, mode, owner, settings);
       if (Array.isArray(serverInfo) && serverInfo.length && serverInfo[0].processInfo) {
         console.log("got back at least one server with process info", serverInfo);
+        this.broadcastMessage({ message: 'found server', serverInfo });
+        this.broadcastMessage('server::discovery::best-server', { message: 'Found best server', data: serverInfo });
+
         this.isPolling = false;
         return serverInfo;
       } else {

@@ -1,9 +1,9 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #1e1e1e; /* Dark background */
+  background-color: #1e1e1e;
   margin: 0;
   padding: 20px;
-  color: #ddd; /* Lighter text for better readability on dark background */
+  color: #ddd;
 }
 
 .container {
@@ -13,24 +13,62 @@ body {
 }
 
 h1 {
-  color: #9a9cff; /* Light purple color for headings */
+  color: #9a9cff;
   text-align: center;
 }
 
+.demo-category > h2,h3 {
+  color: #9a9cff;
+  text-align: center; /* Align section titles to the left */
+}
+
+.demo-category > p {
+  color: #9a9cff;
+  text-align: center; /* Align section titles to the left */
+}
+
+.demo-flex-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap */
+  justify-content: space-around; /* Space out items evenly */
+  margin: 10px 0;
+}
+
 .demo-section {
-  background: #2a2a2a; /* Slightly lighter dark shade for sections */
-  margin: 20px 0;
+  background: #2a2a2a;
+  margin: 10px;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Darker shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   text-align: center;
+  flex-basis: 45%; /* Each section takes up roughly half the container's width */
 }
+
+.source-link {
+  display: inline-block;
+  padding: 8px 16px; /* Slightly reduced padding */
+  margin-top: 10px;
+  background-color: #6272a4; /* More subdued color */
+  color: white;
+  border: 1px solid #4a6bff; /* Border style to make it less prominent */
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  font-size: 12px; /* Smaller font size */
+  font-weight: normal; /* Optional: lighter font weight */
+}
+
+.source-link:hover {
+  background-color: #536391; /* Slightly darker on hover, keeping it subtle */
+  color: #ddd; /* Lightening the text color on hover for contrast */
+}
+
 
 .demo-link {
   display: inline-block;
   padding: 10px 20px;
   margin-top: 10px;
-  background-color: #4a6bff; /* Royal blue color for links */
+  background-color: #4a6bff;
   color: white;
   border-radius: 4px;
   text-decoration: none;
@@ -38,5 +76,25 @@ h1 {
 }
 
 .demo-link:hover {
-  background-color: #3949ab; /* Darker shade of blue on hover */
+  background-color: #3949ab;
 }
+
+.hathora-logo {
+  height: 20px;
+  margin: 0px;
+
+}
+
+a {
+  color: #9a9cff;
+
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+a:visited {
+  /*color: #9a9cff;*/
+}
+/* view source modals */

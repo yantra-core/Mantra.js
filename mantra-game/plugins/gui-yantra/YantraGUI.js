@@ -31,11 +31,10 @@ class YantraGUI {
         settings: bestServer.settings
       };
       self.updateLog(JSON.stringify(filteredData, true, 2));
-
       setTimeout(function(){
         // hide the logContainer
         self.logContainer.style.display = 'none';
-      }, 5000)
+      }, 4444)
       // self.updateMetadata(data.data);
     });
 
@@ -48,7 +47,10 @@ class YantraGUI {
     this.applyStyles(this.logContainer, {
       display: 'flex',
       justifyContent: 'space-between',
-      padding: '20px'
+      padding: '20px',
+      positon: 'absolute',
+      top: '100px',
+      left: '0'
     });
 
     // Create and style the log text area

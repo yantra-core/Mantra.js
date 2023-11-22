@@ -29,13 +29,14 @@
 
     document.addEventListener('DOMContentLoaded', async (event) => {
 
-      window.game = new MANTRA.Game({
+      let game = new MANTRA.Game({
         isClient: true, // TODO: remove this
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
-        protobuf: true,
+        protobuf: false,
+        msgpack: true,
         deltaCompression: true,
         options: {
           scriptRoot: './'
@@ -58,34 +59,23 @@
 
       let Plugins = MANTRA.plugins;
 
-      console.log(Plugins)
 
-      game.use(new Plugins.Editor({
-        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/yantra.html'
-      }));
-
-
-      game.use(new Plugins.YantraGUI());
 
       // Use Plugins to add systems to the game
       game.use(new Plugins.Bullet())
       game.use(new Plugins.Schema())
 
 
-      let playerId = 'Bobby';
-      let clientConfig = {
-        protobuf: true,
-        msgpack: false,
-        deltaCompression: true
-      };
-
-
       game.use(new Plugins.StarField());
+
       game.use(new Plugins.InputLegend());
+   
 
       // game.use(new Plugins.PluginsGUI());
 
-      game.use(new Plugins.Block());
+      game.use(new Plugins.Block({
+        MIN_BLOCK_SIZE: 100
+      }));
 
       let mode = 'fun';
       let owner = 'Marak'
@@ -98,44 +88,14 @@
         console.log("setting owner from query param", queryParams.owner);
         owner = queryParams.owner;
       }
- 
-      let bestRegion = await YANTRA.regionDiscovery.findFastestRegion();
-      console.log("bestRegion", bestRegion)
-      let bestServers = await YANTRA.serverDiscovery.connectToBestServer({ region: bestRegion, mode, owner });
-      console.log("bestServers", bestServers);
 
-      let bestServer = bestServers[0];
-      let wsConnectionString = bestServer.processInfo.wsConnectionString;
-
+      let wsConnectionString = 'wss://ayyo.cloudflare1973.workers.dev/websocket';
+      wsConnectionString = 'ws://192.168.1.80:8787/websocket';
       game.connect(wsConnectionString);
+
       game.use(new Plugins.CurrentFPS());
       game.use(new Plugins.SnapshotSize());
       game.use(new Plugins.PingTime());
-
-      /*
-
-      // Attempting to start local game first, then upgrade to online
-      // This is mostly workly; however we were seeing an issue with sync of ship sprite not moving
-      // starts the local game
-      //game.start();
-
-
-      game.stop(); // stop the local game
-
-      // clear all the local entities, game is about to connect
-      for (let [entityId, entity] of game.entities.entries()) {
-        game.removeEntity(entityId);
-      }
-
-      setTimeout(() => {
-        // begins to connect to the remote server
-        game.connect(wsConnectionString);
-
-        game.use(new Plugins.CurrentFPS());
-        game.use(new Plugins.SnapshotSize());
-        game.use(new Plugins.PingTime());
-      }, 1000);
-      */
 
     });
   </script>

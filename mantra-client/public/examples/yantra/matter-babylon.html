@@ -38,7 +38,7 @@
         protobuf: true,
         deltaCompression: true,
         options: {
-          scriptRoot: './'
+          scriptRoot: '../../'
         }
       });
 
@@ -70,15 +70,6 @@
       // Use Plugins to add systems to the game
       game.use(new Plugins.Bullet())
       game.use(new Plugins.Schema())
-
-
-      let playerId = 'Bobby';
-      let clientConfig = {
-        protobuf: true,
-        msgpack: false,
-        deltaCompression: true
-      };
-
 
       game.use(new Plugins.StarField());
       game.use(new Plugins.InputLegend());

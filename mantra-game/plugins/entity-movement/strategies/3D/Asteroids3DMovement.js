@@ -1,6 +1,9 @@
 // 3DAsteroidsMovement.js - Marak Squires 2023
 
 class AsteroidsMovementStrategy {
+
+  static id = '3d-asteroids-movement';
+
   constructor() {
     // Define rotation speeds for each axis
     this.rotationSpeeds = {
@@ -10,6 +13,7 @@ class AsteroidsMovementStrategy {
     };
     // Define thrust for movement
     this.thrust = 0.05 * 1000;
+    this.id = AsteroidsMovementStrategy.id;
   }
 
   init(game) {

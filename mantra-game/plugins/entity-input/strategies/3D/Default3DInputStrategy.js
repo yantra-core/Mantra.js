@@ -1,6 +1,10 @@
 class ThreeDimensionalInputStrategy {
+
+  static id = 'ThreeDimensionalInputStrategy';
+
   constructor(plugin) {
     this.plugin = plugin;
+    this.id = ThreeDimensionalInputStrategy.id;
   }
 
   init(game) {
@@ -59,7 +63,7 @@ class ThreeDimensionalInputStrategy {
     const moveSpeed = 5;
     const rotateSpeed = 0.1; // Small value since it's typically in radians
 
-    let entityMovementSystem = game.getSystem('entityMovement');
+    let entityMovementSystem = game.getSystem('entity-movement');
 
     const actions = Object.keys(controls).filter(key => controls[key]).map(key => plugin.defaultControlsMapping[key]);
 
