@@ -1,5 +1,7 @@
 export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, lifetime }) {
   let plugins = this.plugins;
+  let gameConfig = this.config
+
   this.use(new plugins.EntityFactory())
 
   if (physics === 'matter') {
@@ -17,11 +19,19 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   this.use(new plugins.EntityInput());
   this.use(new plugins.EntityMovement());
 
+
   if (lifetime) {
     this.use(new plugins.Lifetime());
   }
 
   if (!this.isServer) {
+
+    let clientConfig = {
+      protobuf: gameConfig.protobuf,
+      deltaCompression: gameConfig.deltaCompression,
+      msgpack: gameConfig.msgpack
+    };
+    this.use(new plugins.Client(clientConfig));
 
     if (keyboard) {
       this.use(new plugins.Keyboard(keyboard));

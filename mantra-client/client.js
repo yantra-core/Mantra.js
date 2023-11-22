@@ -161,7 +161,6 @@ function randomId() {
   return 'player_' + Math.random().toString(36).substr(2, 9);
 }
 let playerId = randomId();
-game.use(new plugins.Client(playerId, clientConfig));
 
 // Function to switch to Online Mode
 function switchToOnline() {

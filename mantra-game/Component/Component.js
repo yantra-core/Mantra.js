@@ -9,6 +9,15 @@ class Component {
   set(key, value) {
     const entityId = Array.isArray(key) ? key[0] : key;
 
+    // Check if the property is locked
+    if (this.game) {
+      const lockedProps = this.game.components['lockedProperties'].get(entityId);
+      if (this.isLocked(lockedProps, this.name)) {
+        // console.log(`Property ${key} is locked and cannot be updated.`);
+        return; // Do not update if the property is locked
+      }
+    }
+
     if (Array.isArray(key)) {
       // Ensure nested structure exists
       let current = this.data;
@@ -59,14 +68,26 @@ class Component {
       delete this.data[key];
     }
 
-    /* Removed 11/15/23, do we need to do this, or will entity update by reference?
-    // After removing the component data, update the entity in game.entities if necessary
-    const entityId = Array.isArray(key) ? key[0] : key;
-    if (this.game && this.game.entities && this.game.entities[entityId]) {
-      delete this.game.entities[entityId][this.name];
-    }
-    */
   }
+
+  // Helper method to check if a property or sub-property is locked
+  isLocked(lockedProps, key) {
+    if (!lockedProps) return false;
+
+    if (Array.isArray(key)) {
+      let current = lockedProps;
+      for (let i = 0; i < key.length; i++) {
+        if (current[key[i]] === undefined) {
+          return false; // Property not locked
+        }
+        current = current[key[i]];
+      }
+      return true; // Property is locked
+    }
+
+    return lockedProps[key] !== undefined;
+  }
+
 }
 
 export default Component;

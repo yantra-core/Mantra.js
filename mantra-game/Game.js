@@ -22,7 +22,7 @@ import plugins from './plugins.js';
 class Game {
   constructor({
     // game modes
-    isClient,
+    isClient = true,
     isEdgeClient = false,
     isServer = false,
     isOfflineMode,
@@ -45,6 +45,11 @@ class Game {
     deltaCompression = false,
     deltaEncoding = true,
     options = {} } = {}) {
+
+    if (isServer) {
+      // override default
+      isClient = false;
+    }
 
     // config scope for convenience
     const config = {
@@ -69,6 +74,7 @@ class Game {
       deltaEncoding,
       options
     };
+
     this.config = config;
 
     // Define the scriptRoot variable for loading external scripts
@@ -278,7 +284,7 @@ class Game {
 
   addComponent(entityId, componentType, data) {
     if (!this.components[componentType]) {
-      this.components[componentType] = new Component(componentType);
+      this.components[componentType] = new Component(componentType, this);
     }
     this.components[componentType].set(entityId, data);
   }
@@ -338,6 +344,7 @@ class Game {
   }
 
   setPlayerId(playerId) {
+    // console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;
   }
 

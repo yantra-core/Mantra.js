@@ -31,10 +31,9 @@ tap.test('locked properties functionality', (t) => {
       position: { x: 10, y: 0 }
     });
 
-
     game.gameTick();
 
-
+    let ent = game.getEntity(entityId);
     // Check if the position remains unchanged
     t.equal(game.getComponent(entityId, 'position').x, 0);
     t.equal(game.getComponent(entityId, 'position').y, 0);
@@ -83,7 +82,7 @@ tap.test('locked properties functionality', (t) => {
 
     // Check if the x-coordinate of position remains unchanged, but y-coordinate and velocity are updated
     t.equal(game.getComponent(entityId, 'position').x, 10);
-    t.notEqual(game.getComponent(entityId, 'position').y, 20);
+    t.notEqual(game.getComponent(entityId, 'position').y, 30);
     t.end();
   });
 

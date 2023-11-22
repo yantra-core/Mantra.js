@@ -42,9 +42,7 @@ class EntityFactory {
       return null;
     }
 
-    const entity = {
-      id: entityId
-    };
+    const entity = {};
 
     // Iterate over all registered components and fetch their data if available
     for (const componentType in this.game.components) {
@@ -53,6 +51,12 @@ class EntityFactory {
         entity[componentType] = componentData;
       }
     }
+
+    if (Object.keys(entity).length === 0) {
+      return null;
+    }
+
+    entity.id = entityId;
 
     return entity;
 
@@ -76,12 +80,6 @@ class EntityFactory {
     const destroyedComponentData = this.game.components.destroyed.data;
     for (let entityId in destroyedComponentData) {
       if (destroyedComponentData[entityId]) {
-        // This is side effect of Component.js set() method not using Map() for data
-        // Using numbers are object keys is not recommended
-        // TODO: switch Component.js to use Maps
-        if (typeof entityId === 'string') {
-          entityId = parseInt(entityId);
-        }
         // Removes the body from the physics engine
         if (typeof this.game.physics.removeBody === 'function') {
           // TODO: fix this
@@ -91,7 +89,6 @@ class EntityFactory {
             console.log('No body found for entityId', entityId);
           }
         }
-
         // Delete associated components for the entity using Component's remove method
         for (let componentType in this.game.components) {
           this.game.components[componentType].remove(entityId);
@@ -133,13 +130,13 @@ class EntityFactory {
     });
 
     if (entityData.position) {
-      // If position is not lockedProperties, use the new value from entityData
       this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y, z: entityData.position.z });
     }
 
     if (typeof entityData.rotation !== 'undefined') {
       this.game.components.rotation.set(entityId, entityData.rotation);
     }
+
   }
 
   createEntity(config) {
@@ -213,37 +210,7 @@ class EntityFactory {
     this.game.addComponent(entityId, 'isSensor', isSensor);
     this.game.addComponent(entityId, 'isStatic', isStatic);
     this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
-    // iterate through props of lockedProperties and for each prop we find, use as key name
-    // to lookup the current entity value and set it to the lockedProperties value
-    // we will later reference this lockedProperties value when updating the entity
-    if (lockedProperties) {
-      console.log("Processing lockedProperties properties");
-      for (let key in lockedProperties) {
-        let currentVal = this.game.components[key].get(entityId);
-        if (currentVal !== undefined && currentVal !== null) {
-          if (typeof lockedProperties[key] === 'object' && !Array.isArray(lockedProperties[key])) {
-            // If lockedProperties[key] is an object, iterate through its keys
-            for (let subKey in lockedProperties[key]) {
-              if (lockedProperties[key][subKey] === true) {  // only process if the value is true
-                let nestedVal = currentVal[subKey];
-                if (nestedVal !== undefined && nestedVal !== null) {
-                  console.log('Setting lockedProperties property', `${key}.${subKey}`, 'to', nestedVal);
-                  this.game.components['lockedProperties'].set(entityId, { [key]: { [subKey]: nestedVal } });
-                } else {
-                  console.log('Error: No such component or invalid value for', `${key}.${subKey}`);
-                }
-              }
-            }
-          } else if (lockedProperties[key] === true) {  // if lockedProperties[key] is not an object and the value is true
-            console.log('Setting lockedProperties property', key, 'to', currentVal);
-            this.game.components['lockedProperties'].set(entityId, { [key]: currentVal });
-          }
-        } else {
-          console.log('Error: No such component or invalid value for', key);
-        }
-      }
-    }
-
+ 
     if (config.body) {
       let body = this.createBody(config);
       body.myEntityId = entityId;
@@ -278,6 +245,41 @@ class EntityFactory {
     this.game.entities.set(entityId, updatedEntity);
 
     return updatedEntity;
+  }
+
+
+  applyLockedProperties(entityId, lockedProperties) {
+    // Check and apply locked properties
+    if (lockedProperties) {
+      console.log("Processing lockedProperties properties");
+      for (let key in lockedProperties) {
+        let currentVal = this.game.components[key].get(entityId);
+        console.log('currentVal', currentVal, 'key', key, lockedProperties)
+        if (currentVal !== undefined && currentVal !== null) {
+          if (typeof lockedProperties[key] === 'object' && !Array.isArray(lockedProperties[key])) {
+            // If lockedProperties[key] is an object, iterate through its keys
+            console.log('lockedProperties[key]', lockedProperties[key])
+            for (let subKey in lockedProperties[key]) {
+              console.log('subKey', subKey, lockedProperties[key][subKey])
+              if (lockedProperties[key][subKey] === true) {  // only process if the value is true
+                let nestedVal = currentVal[subKey];
+                if (nestedVal !== undefined && nestedVal !== null) {
+                  console.log('Setting lockedProperties property', `${key}.${subKey}`, 'to', nestedVal);
+                  this.game.components['lockedProperties'].set(entityId, { [key]: { [subKey]: nestedVal } });
+                } else {
+                  console.log('Error: No such component or invalid value for', `${key}.${subKey}`);
+                }
+              }
+            }
+          } else if (lockedProperties[key] === true) {  // if lockedProperties[key] is not an object and the value is true
+            console.log('Setting lockedProperties property', key, 'to', currentVal);
+            this.game.components['lockedProperties'].set(entityId, { [key]: currentVal });
+          }
+        } else {
+          console.log('Error: No such component or invalid value for', key);
+        }
+      }
+    }
   }
 
   inflateEntity(entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps

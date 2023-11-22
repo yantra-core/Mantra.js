@@ -13,7 +13,7 @@ let config = {};
 
 export default class WebSocketClient {
   static id = 'websocket-client';
-  constructor(playerId, {
+  constructor({
     protobuf = false,
     msgpack = false,
     deltaCompression = false
@@ -30,7 +30,6 @@ export default class WebSocketClient {
 
     console.log("CLIENT CONFIG", this.config)
     this.listeners = {};
-    this.playerId = playerId; // player name
     this.connected = false;
     this.pingIntervalId = null;
     this.rtt = undefined;
@@ -251,7 +250,6 @@ export default class WebSocketClient {
       // TODO: add config flag here for snapshot interpolation
       // let inter = interpolateSnapshot(1, this.game.previousSnapshot, this.game.latestSnapshot);
       // console.log(inter)
-
       if (this.isServerSideReconciliationEnabled && typeof data.lastProcessedInput !== 'undefined') {
         let lastProcessedInput = data.lastProcessedInput[this.playerId];
 

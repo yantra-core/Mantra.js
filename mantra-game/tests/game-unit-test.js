@@ -1,4 +1,4 @@
-import tap from 'tap';
+import tap from 'tape';
 import { Game } from '../Game.js';
 import Schema from '../plugins/schema/Schema.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
@@ -59,10 +59,8 @@ tap.test('game class', (t) => {
     for (let i = 0; i < 10; i++) {
       game.gameTick();
     }
-
-    const movedY = game.getComponent(entityId, 'position').y;
-    // Uncomment and adjust this based on your game's collision logic:
-    t.equal(true, movedY >= 20); // why did Y flip here?
+    const moved = game.getComponent(entityId, 'position');
+    t.equal(true, moved.y >= 20); 
     t.end();
   });
 
@@ -77,12 +75,12 @@ tap.test('game class', (t) => {
     
     game.removeEntity(entityId);
 
-    game.gameTick();
-
     const pendingRemoval = game.getEntity(entityId);
     t.equal(pendingRemoval.destroyed, true);
 
+    game.gameTick();
     game.systems['entity-factory'].cleanupDestroyedEntities();
+
 
     const removedEntity = game.getEntity(entityId);
     t.equal(removedEntity, null);
@@ -97,11 +95,9 @@ tap.test('game class', (t) => {
       type: 'PLAYER',
       position: { x: 10, y: 20 }
     });
-    console.log(game.components)
     
     let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.update(playerId, { D: true });
-
 
     for (let i = 0; i < 10; i++) {
       game.gameTick();
