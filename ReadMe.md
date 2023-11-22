@@ -36,8 +36,8 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 
 | Libraries        | Demo Link                                                                      |
 |----------------------------|--------------------------------------------------------------------------------|
-| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/online/matter-babylon.html)         |
-| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/online/matter-phaser.html)          |
+| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/yantra/matter-babylon.html)         |
+| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/yantra/matter-phaser.html)          |
 
 ### Offline
 
