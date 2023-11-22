@@ -38,8 +38,11 @@
       // Adds a controller input legend
       game.use(new Plugins.InputLegend());
 
-      // game.use(new Plugins.Editor());
       game.use(new Plugins.CurrentFPS());
+
+      game.use(new Plugins.Editor({
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/physx-babylon.html'
+      }));
 
       // custom player::joined handler, this is optional
       // without setting a custom player::joined, the default event will be used
