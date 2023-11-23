@@ -1,8 +1,7 @@
 import express from 'express';
 import path from 'path';
-import { Game, plugins } from '../mantra-game/Game.js';
-import WebsocketServer from '../mantra-game/plugins/server/WebsocketServer.js';
-
+import { Game, plugins } from '@yantra-core/mantra';
+import WebsocketServer from '@yantra-core/server-websocket';
 
 import Pong from '../mantra-worlds/Pong/Pong.js';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -26,7 +25,6 @@ game.use(new plugins.Bullet());
 game.use(new plugins.Block());
 
 //game.use(new plugins.Border({ autoBorder: true }));
-
 game.use(new WebsocketServer({
   protobuf: true,
   msgpack: false,
