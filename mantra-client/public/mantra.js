@@ -28230,8 +28230,12 @@ var YantraGUI = /*#__PURE__*/function () {
       this.createDisplay();
       // Subscribe to relevant events or game updates
       var self = this;
+      game.on('server::discovery::pingtest', function (data) {
+        console.log('server::discovery::pingtest', data);
+        self.updateLog(data.message);
+      });
       game.on('server::discovery::polling', function (data) {
-        console.log('server::discovery', data);
+        console.log('server::discovery::polling', data);
         self.updateLog(data.message);
       });
       game.on('server::discovery::best-server', function (data) {

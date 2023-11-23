@@ -39,9 +39,7 @@ YANTRA.serverDiscovery = {
       const serverInfo = await this.findBestServers(region, mode, owner, settings);
       if (Array.isArray(serverInfo) && serverInfo.length && serverInfo[0].processInfo) {
         console.log("got back at least one server with process info", serverInfo);
-        this.broadcastMessage({ message: 'found server', serverInfo });
         this.broadcastMessage('server::discovery::best-server', { message: 'Found best server', data: serverInfo });
-
         this.isPolling = false;
         return serverInfo;
       } else {
@@ -190,6 +188,13 @@ const getMedian = function (arr) {
 YANTRA.regionDiscovery = {
 
   async getRegionLatency(regionData) {
+
+    if (typeof game !== 'undefined' && typeof game.emit === 'function') {
+      game.emit('server::discovery::pingtest', { message: 'Performing Ping Test: ' + regionData.region });
+    } else {
+      console.log('Warning: Attempting to emit "server::discovery::pingtest" but game.emit was not found. Make sure to create a game instance before calling this function.')
+    }
+
     return new Promise((resolve) => {
       const latencies = [];
       let start1, start2, start3;
@@ -242,6 +247,16 @@ YANTRA.regionDiscovery = {
       }));
 
       const sortedResults = latencyResults.sort((a, b) => a.latency - b.latency);
+
+      if (typeof game !== 'undefined' && typeof game.emit === 'function') {
+        sortedResults.forEach(result => {
+          game.emit('server::discovery::pingtest', { message: 'Ping Test Result: ' + result.region + ' ' + result.latency });
+        });
+        game.emit('server::discovery::pingtest', { message: 'Found fastest region: ' + sortedResults[0].region});
+      } else {
+        console.log('Warning: Attempting to emit "server::discovery::pingtest" but game.emit was not found. Make sure to create a game instance before calling this function.')
+      }
+
       return sortedResults[0].region; // Returns the region with the lowest latency
     } catch (error) {
       console.error('Error in finding fastest region:', error);
