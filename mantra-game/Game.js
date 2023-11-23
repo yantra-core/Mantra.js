@@ -15,6 +15,9 @@ import onlineGameLoop from './lib/onlineGameLoop.js';
 // Main game loop / game tick
 import gameTick from './lib/gameTick.js';
 
+// Default Game.start(fn) logic if none provided ( creates a single player and border )
+import defaultGameStart from './lib/start/defaultGameStart.js';
+
 // Plugins
 import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
 import plugins from './plugins.js';
@@ -211,24 +214,9 @@ class Game {
       console.log('No game.start() was callback provided. Using default callback.');
       console.log("You can provide a callback to game.start() to create your game's entities and systems.");
       // Default local game start function if none provided
-      // Will create a single player and border
-      // TODO: move this to separate file
-      cb = function defaultLocalGameStart() {
-        // create a single player entity
-        game.createEntity({
-          id: game.systems.client.playerId,
-          type: 'PLAYER',
-          position: {
-            x: 0,
-            y: 0
-          }
-        });
-        game.use(new plugins.Border({ autoBorder: false }));
-        game.systems.border.createBorder({
-          height: 2000,
-          width: 2000,
-        });
-      }
+      cb = function () {
+        defaultGameStart(game);
+      };
     }
 
     if (!this.systems.client) {

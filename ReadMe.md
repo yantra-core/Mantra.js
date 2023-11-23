@@ -25,10 +25,12 @@ Mantra is designed to start a full-featured local game instance in seconds using
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game();
+    // optionally use plugins like Bullet
+    game.use(new MANTRA.plugins.Bullet());
     game.start();
   });
 </script>
-  ```
+```
 
 You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode. 
 
