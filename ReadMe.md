@@ -12,6 +12,10 @@ You can start building a simple offline game in seconds using your favorite libr
 
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
+<a class="callToActionLink" href="https://yantra.gg/blog/build-games-with-mantra">Read More about Building Games with Mantra and Yantra</a>
+
+<a href="https://yantra.gg/docs/">Additional Documentation</a>
+
 ## Super Simple Offline First
 
 Mantra is designed to start a full-featured local game instance in seconds using a simple:

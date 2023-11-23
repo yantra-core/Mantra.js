@@ -25366,7 +25366,9 @@ var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
       if (actions.includes('ROLL_RIGHT')) entityMovementSystem.rotate(entityId, 0, 0, rotateSpeed);
 
       // Firing mechanic can remain the same as in 2D
-      if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+      if (game.systems.bullet) {
+        if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+      }
     }
   }]);
   return ThreeDimensionalInputStrategy;
