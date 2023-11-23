@@ -84,12 +84,12 @@
 
       game.use(new Plugins.Block());
 
-      let mode = 'fun';
+      let world = 'fun';
       let owner = 'Marak'
 
-      if (queryParams.mode) {
-        console.log("setting mode from query param", queryParams.mode);
-        mode = queryParams.mode;
+      if (queryParams.world) {
+        console.log("setting mode from query param", queryParams.world);
+        world = queryParams.world;
       }
       if (queryParams.owner) {
         console.log("setting owner from query param", queryParams.owner);
@@ -98,7 +98,7 @@
  
       let bestRegion = await YANTRA.regionDiscovery.findFastestRegion();
       console.log("bestRegion", bestRegion)
-      let bestServers = await YANTRA.serverDiscovery.connectToBestServer({ region: bestRegion, mode, owner });
+      let bestServers = await YANTRA.serverDiscovery.connectToBestServer({ region: bestRegion, world, owner });
       console.log("bestServers", bestServers);
 
       let bestServer = bestServers[0];

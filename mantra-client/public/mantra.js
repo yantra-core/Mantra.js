@@ -21879,7 +21879,7 @@ var Bullet = /*#__PURE__*/function () {
         var entityIdB = bodyB.myEntityId;
         var entityA = this.game.getEntity(entityIdA);
         var entityB = this.game.getEntity(entityIdB);
-        console.log('bullet collision', entityIdA, entityIdB, entityA, entityB);
+
         // entityA is player ( for now )
         // console.log('types', entityA.type, entityB.type);
         if (!entityA || !entityB) {

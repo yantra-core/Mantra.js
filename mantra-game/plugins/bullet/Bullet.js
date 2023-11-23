@@ -107,7 +107,6 @@ class Bullet {
       const entityA = this.game.getEntity(entityIdA);
       const entityB = this.game.getEntity(entityIdB);
 
-      console.log('bullet collision', entityIdA, entityIdB, entityA, entityB)
       // entityA is player ( for now )
       // console.log('types', entityA.type, entityB.type);
       if (!entityA || !entityB) {
