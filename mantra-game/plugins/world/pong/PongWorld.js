@@ -11,7 +11,7 @@ class PongWorld extends Plugin {
 
   init(game) {
 
-    game.systems.entityInput.controlMappings = {
+    game.systems['entity-input'].controlMappings = {
       W: 'MOVE_FORWARD',
       S: 'MOVE_BACKWARD'
     };
@@ -22,7 +22,7 @@ class PongWorld extends Plugin {
     // Create the Player
     //
     game.createEntity({
-      id: window.currentPlayerId, // TODO: replace this
+      id: game.currentPlayerId, // TODO: replace this
       type: 'PLAYER',
       shape: 'rectangle',
       restitution: 0, // bounciness

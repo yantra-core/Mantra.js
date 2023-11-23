@@ -1,7 +1,7 @@
 // Block.js - Marak Squires 2023
 class Block {
   static id = 'block';
-  constructor({ MIN_BLOCK_SIZE = 1000, width = 40, height = 40 } = {}) {
+  constructor({ MIN_BLOCK_SIZE = 10000, width = 40, height = 40 } = {}) {
     this.id = Block.id;
     // Assuming the config includes width and height properties
     this.width = width; // Default size if none provided
@@ -31,11 +31,7 @@ class Block {
         console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
         return;
       }
-      //console.log("entityA", entityA)
-      //console.log("entityB", entityB)
-      // do not process blocks that are already destroyed
 
-      // console.log('aaaa', entityA.type, entityB.type)
       if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
         this.blockBulletCollision(entityIdA, entityIdB, entityA, entityB);
       }
@@ -49,7 +45,7 @@ class Block {
   blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
     if (this.game.mode === 'local' || !this.game.isClient) {
 
-      if (entityA.destroyed) {
+      if (entityA.destroyed || entityB.destroyed) {
         return;
       }
 

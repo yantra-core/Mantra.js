@@ -3,13 +3,13 @@ import path from 'path';
 import { Game, plugins } from '@yantra-core/mantra';
 import WebsocketServer from '@yantra-core/server-websocket';
 
-import Pong from '../mantra-worlds/Pong/Pong.js';
 import { fileURLToPath, pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize Express app and serve static HTML content
 const app = express();
+
 const staticContentPath = path.join(__dirname, '/../mantra-client/public'); // Define the path to your static content
 console.log('server staticContentPath', staticContentPath)
 app.use(express.static(staticContentPath));

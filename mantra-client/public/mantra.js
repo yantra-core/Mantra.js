@@ -21514,7 +21514,7 @@ var Block = /*#__PURE__*/function () {
   function Block() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$MIN_BLOCK_SIZE = _ref.MIN_BLOCK_SIZE,
-      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 100 : _ref$MIN_BLOCK_SIZE,
+      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 10000 : _ref$MIN_BLOCK_SIZE,
       _ref$width = _ref.width,
       width = _ref$width === void 0 ? 40 : _ref$width,
       _ref$height = _ref.height,
@@ -21525,6 +21525,7 @@ var Block = /*#__PURE__*/function () {
     this.width = width; // Default size if none provided
     this.height = height; // Default size if none provided
     this.MIN_BLOCK_SIZE = MIN_BLOCK_SIZE;
+    this.splits = 0;
   }
   _createClass(Block, [{
     key: "init",
@@ -21547,7 +21548,6 @@ var Block = /*#__PURE__*/function () {
           console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
           return;
         }
-        // console.log('aaaa', entityA.type, entityB.type)
         if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
           this.blockBulletCollision(entityIdA, entityIdB, entityA, entityB);
         }
@@ -21559,44 +21559,37 @@ var Block = /*#__PURE__*/function () {
   }, {
     key: "blockBulletCollision",
     value: function blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
-      // if (!this.game.isClient && this.game.onlineMode)
-      // for now, don't perform block split logic on client
-
       if (this.game.mode === 'local' || !this.game.isClient) {
+        if (entityA.destroyed || entityB.destroyed) {
+          return;
+        }
         this.game.removeEntity(entityIdB);
-
-        // Check if the block is big enough to split
-        if (entityA.width <= this.MIN_BLOCK_SIZE && entityA.height <= this.MIN_BLOCK_SIZE) {
+        if (entityA.width * entityA.height <= this.MIN_BLOCK_SIZE || entityA.splits >= Block.MAX_SPLITS) {
           this.game.removeEntity(entityIdA);
           return;
         }
-
-        // Calculate the size of the smaller blocks
         var newWidth = entityA.width / 2;
         var newHeight = entityA.height / 2;
-
-        // Create 4 smaller blocks
+        var newSplits = entityA.splits + 1;
         for (var i = 0; i < 4; i++) {
           var xOffset = i % 2 * newWidth;
           var yOffset = Math.floor(i / 2) * newHeight;
           this.game.createEntity({
             type: 'BLOCK',
-            // Position the new blocks relative to the position of the original block
             position: {
-              x: entityA.position.x + xOffset - entityA.width / 4,
-              y: entityA.position.y + yOffset - entityA.height / 4
+              x: entityA.position.x + xOffset,
+              y: entityA.position.y + yOffset
             },
             velocity: {
-              // Generate random velocities in both positive and negative directions
-              x: (Math.random() * 2 - 1) * 22.22,
-              y: (Math.random() * 2 - 1) * 22.22
+              x: (Math.random() * 2 - 1) * 10,
+              // Adjusted for less extreme velocities
+              y: (Math.random() * 2 - 1) * 10
             },
             width: newWidth,
-            height: newHeight
+            height: newHeight,
+            splits: newSplits
           });
         }
-
-        // Destroy the original block
         this.game.removeEntity(entityIdA);
       }
     }
@@ -21886,7 +21879,7 @@ var Bullet = /*#__PURE__*/function () {
         var entityIdB = bodyB.myEntityId;
         var entityA = this.game.getEntity(entityIdA);
         var entityB = this.game.getEntity(entityIdB);
-
+        console.log('bullet collision', entityIdA, entityIdB, entityA, entityB);
         // entityA is player ( for now )
         // console.log('types', entityA.type, entityB.type);
         if (!entityA || !entityB) {
@@ -21916,13 +21909,11 @@ var Bullet = /*#__PURE__*/function () {
         // Bullets are destroyed if they hit a BLOCK
         //
         if (entityA.type === 'BULLET' && entityB.type === 'BLOCK') {
-          // destroy the bullet if it hits a border wall
-          this.game.removeEntity(entityIdA);
+          //this.game.removeEntity(entityIdA);
           return;
         }
         if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
-          // destroy the bullet if it hits a border wall
-          this.game.removeEntity(entityIdB);
+          //this.game.removeEntity(entityIdB);
           return;
         }
 

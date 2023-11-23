@@ -7,7 +7,6 @@ import { encode } from "@msgpack/msgpack";
 
 import deltaCompression from '@yantra-core/snapshots/SnapShotManager/deltaCompression.js';
 import deltaEncoding from '@yantra-core/snapshots/SnapShotManager/deltaEncoding.js';
-import messageSchema from './messageSchema.js';
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
@@ -243,7 +242,7 @@ class WebSocketServer {
       lastProcessedInput: lastProcessedInput
     };
     if (encoder) {
-      let encodedMessage = encoder.encode(messageSchema, message);
+      let encodedMessage = encoder.encode(message);
       client.send(encodedMessage);
     } else {
       client.send(JSON.stringify(message));
@@ -275,7 +274,7 @@ class WebSocketServer {
 
     if (this.config.protobuf) {
       encoder = {
-        encode: function (schema, message) {
+        encode: function (message) {
           // Create a new message
           let _message = game.Message.fromObject(message); // or use .fromObject if conversion is necessary
           // Encode a message to an Uint8Array (browser) or Buffer (node)
@@ -285,7 +284,7 @@ class WebSocketServer {
       };
     } else if (this.config.msgpack) {
       encoder = {
-        encode: function (schema, message) {
+        encode: function (message) {
           return encode(message);
         }
       }; // Assuming msgpack is a global encoder object

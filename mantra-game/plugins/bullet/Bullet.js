@@ -107,6 +107,7 @@ class Bullet {
       const entityA = this.game.getEntity(entityIdA);
       const entityB = this.game.getEntity(entityIdB);
 
+      console.log('bullet collision', entityIdA, entityIdB, entityA, entityB)
       // entityA is player ( for now )
       // console.log('types', entityA.type, entityB.type);
       if (!entityA || !entityB) {
@@ -137,13 +138,11 @@ class Bullet {
       // Bullets are destroyed if they hit a BLOCK
       //
       if (entityA.type === 'BULLET' && entityB.type === 'BLOCK') {
-        // destroy the bullet if it hits a border wall
-        this.game.removeEntity(entityIdA);
+        //this.game.removeEntity(entityIdA);
         return;
       }
       if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
-        // destroy the bullet if it hits a border wall
-        this.game.removeEntity(entityIdB);
+        //this.game.removeEntity(entityIdB);
         return;
       }
 
