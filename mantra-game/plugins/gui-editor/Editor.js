@@ -96,7 +96,7 @@ class Editor {
     $viewSource.on('click', () => this.showSourceCode()); // Add click handler
     $dropdownContent.append($viewSource);
 
-    const $deployWorld = $('<a>', { href: 'https://yantra.gg/deploy', text: 'Deploy to Yantra Cloud', target: '_blank' });
+    const $deployWorld = $('<a>', { href: 'https://yantra.gg/game-dev-quickstart/deploy-world', text: 'Deploy to Yantra Cloud', target: '_blank' });
     $dropdownContent.append($deployWorld);
 
     const $aboutMantra = $('<a>', { href: 'https://github.com/yantra-core/mantra', text: 'About Mantra', target: '_blank' });

@@ -106,14 +106,14 @@ if (mode === 'online') {
   }
 
   if (env === 'cloudflare-local') {
-    game.connect('ws://192.168.1.80:8787/websocket');                 // cloudflare wranger local dev
+    game.connect('ws://127.0.0.1:8787/websocket');                 // cloudflare wranger local dev
   }
 
   if (env === 'local') {
     // Connects to websocket server
     // see: @yantra-core/mantra-server
 
-    game.connect('ws://192.168.1.80:8888/websocket');                   // websocket server
+    game.connect('ws://127.0.0.1:8888/websocket');                   // websocket server
   }
   game.use(new plugins.StarField())
   game.use(new plugins.PingTime())

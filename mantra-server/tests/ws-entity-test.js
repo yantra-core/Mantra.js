@@ -6,7 +6,7 @@ const WebSocket = require("ws");
 let ws;
 
 tap.test("WebSocket Server", t => {
-  ws = new WebSocket('ws://192.168.1.80:8888/websocket');
+  ws = new WebSocket('ws://127.0.0.1:8888/websocket');
 
   ws.on("error", (error) => {
     t.fail(`WebSocket error: ${error.message}`);

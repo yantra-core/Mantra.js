@@ -27827,7 +27827,7 @@ var Editor = /*#__PURE__*/function () {
       }); // Add click handler
       $dropdownContent.append($viewSource);
       var $deployWorld = $('<a>', {
-        href: 'https://yantra.gg/deploy',
+        href: 'https://yantra.gg/game-dev-quickstart/deploy-world',
         text: 'Deploy to Yantra Cloud',
         target: '_blank'
       });
