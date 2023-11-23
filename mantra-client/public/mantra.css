@@ -257,6 +257,8 @@ body {
   width: 75%; /* 75% of the screen width */
   max-width: 1000px; /* Maximum width */
   box-sizing: border-box; /* Include padding and border in the width */
+  display: flex;
+  flex-direction: column; /* Arrange title and columns container vertically */
 }
 
 /* The Close Button */
@@ -280,4 +282,56 @@ pre {
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+}
+
+/* Ping Test */
+.ping-results-container {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.ping-region {
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.ping-good {
+  background-color: #d4edda; /* Light green */
+}
+
+.ping-moderate {
+  background-color: #fff3cd; /* Light yellow */
+}
+
+.ping-poor {
+  background-color: #f8d7da; /* Light red */
+}
+
+.ping-pending {
+  background-color: #f0f0f0; /* Light grey for pending */
+}
+
+
+/* The Close Button */
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Ping results container styles */
+.ping-results-container {
+  margin-top: 10px;
 }

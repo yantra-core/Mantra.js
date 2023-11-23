@@ -28221,26 +28221,18 @@ var YantraGUI = /*#__PURE__*/function () {
     this.id = YantraGUI.id;
     this.logContainer = null;
     this.logTextArea = null;
-    this.metadataContainer = null;
+    this.pingTestComplete = false;
   }
   _createClass(YantraGUI, [{
     key: "init",
     value: function init(game) {
       this.game = game;
       this.createDisplay();
-      // Subscribe to relevant events or game updates
       var self = this;
-      game.on('server::discovery::pingtest', function (data) {
-        console.log('server::discovery::pingtest', data);
-        self.updateLog(data.message);
-      });
       game.on('server::discovery::polling', function (data) {
-        console.log('server::discovery::polling', data);
         self.updateLog(data.message);
       });
       game.on('server::discovery::best-server', function (data) {
-        console.log('server::discovery::best-server', data);
-        console.log('data', data);
         var bestServer = data.data[0];
         var filteredData = {
           region: bestServer.region,
@@ -28251,34 +28243,145 @@ var YantraGUI = /*#__PURE__*/function () {
           settings: bestServer.settings
         };
         self.updateLog(JSON.stringify(filteredData, true, 2));
-        setTimeout(function () {
-          // hide the logContainer
-          self.logContainer.style.display = 'none';
-        }, 4444);
-        // self.updateMetadata(data.data);
+      });
+      game.on('server::discovery::start', function (data) {
+        self.updateLog(data.message);
+      });
+      game.on('server::discovery::message', function (data) {
+        self.updateLog(data.message);
+      });
+      game.on('server::discovery::completed', function (data) {
+        self.pingTestComplete = true;
+      });
+      game.on('server::discovery::pingtest', function (data) {
+        var region = data.region;
+        var latency = data.latency;
+        var latencyClass = 'ping-good';
+        if (latency > 100 && latency <= 200) {
+          latencyClass = 'ping-moderate';
+        } else if (latency > 200) {
+          latencyClass = 'ping-poor';
+        }
+        var regionElement = document.querySelector("#pingResults .ping-region[data-region=\"".concat(region, "\"]"));
+        if (regionElement) {
+          regionElement.className = "ping-region ".concat(latencyClass);
+          regionElement.textContent = "".concat(region, ": ").concat(latency, " ms");
+        }
+        self.sortPingResults();
       });
     }
   }, {
     key: "createDisplay",
     value: function createDisplay() {
-      // Create and style the log container
-      this.logContainer = document.createElement('div');
-      this.logContainer.id = 'logContainer';
-      this.applyStyles(this.logContainer, {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '20px',
-        positon: 'absolute',
-        top: '100px',
-        left: '0'
+      // Event listener to close the modal when clicking outside of it
+      window.addEventListener('click', function (event) {
+        if (event.target === document.getElementById('pingModal')) {
+          document.getElementById('pingModal').style.display = 'none';
+        }
       });
 
-      // Create and style the log text area
+      // Event listener to close the modal on any key press after ping test results
+      window.addEventListener('keydown', function () {
+        if (self.pingTestComplete) {
+          // assuming pingTestComplete is a boolean flag
+          document.getElementById('pingModal').style.display = 'none';
+        }
+      });
+
+      // Create a container for the two-column layout
+      var columnsContainer = document.createElement('div');
+      this.applyStyles(columnsContainer, {
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%'
+      });
+
+      // Create container for ping results (left column)
+      var pingResults = document.createElement('div');
+      pingResults.id = 'pingResults';
+      pingResults.className = 'ping-results-container';
+      this.applyStyles(pingResults, {
+        width: '50%',
+        marginRight: '10px' // Add some spacing between columns
+      });
+
+      // Create a header for the modal which includes the title and close button
+      var modalHeader = document.createElement('div');
+      this.applyStyles(modalHeader, {
+        display: 'flex',
+        justifyContent: 'space-between',
+        // Space out title and close button
+        alignItems: 'center',
+        // Align items vertically
+        width: '100%'
+      });
+
+      // Create and style the ping test modal
+      var pingModal = document.createElement('div');
+      pingModal.id = 'pingModal';
+      pingModal.className = 'modal';
+      this.applyStyles(pingModal, {
+        /* Add necessary styles for modal */
+      });
+
+      // Create modal content container
+      var modalContent = document.createElement('div');
+      modalContent.className = 'modal-content';
+      this.applyStyles(modalContent, {
+        /* Add necessary styles for modal content */
+      });
+      // Create and style the close button (now part of the header)
+      var closeButton = document.createElement('span');
+      closeButton.className = 'close-button';
+      closeButton.textContent = '×';
+      this.applyStyles(closeButton, {
+        cursor: 'pointer',
+        fontSize: '28px',
+        fontWeight: 'bold',
+        color: '#aaa'
+      });
+
+      // Add title
+      var title = document.createElement('h2');
+      title.textContent = 'Yantra Server Discovery';
+
+      // Add event listener to close button
+      // const closeButton = document.querySelector('.close-button');
+      closeButton.addEventListener('click', function () {
+        document.getElementById('pingModal').style.display = 'none';
+      });
+
+      // Create and add title to the header
+      modalHeader.appendChild(title);
+
+      // Add the close button to the header
+      modalHeader.appendChild(closeButton);
+
+      // Append the header to the modal content
+      modalContent.prepend(modalHeader);
+
+      // Append elements
+      //modalContent.appendChild(closeButton);
+      //modalContent.appendChild(title);
+      modalContent.appendChild(pingResults);
+      pingModal.appendChild(modalContent);
+      document.body.appendChild(pingModal);
+
+      // Initialize regions with a pending state
+      window.YANTRA.serverDiscovery.regionList.forEach(function (regionInfo) {
+        var regionElement = document.createElement('div');
+        regionElement.className = 'ping-region ping-pending';
+        regionElement.setAttribute('data-region', regionInfo.region);
+        regionElement.textContent = "".concat(regionInfo.region, ": Pending...");
+        document.getElementById('pingResults').appendChild(regionElement);
+      });
+
+      // Create container for log text (right column)
       this.logTextArea = document.createElement('textarea');
       this.logTextArea.id = 'yantraLogTextArea';
       this.logTextArea.readOnly = true;
       this.applyStyles(this.logTextArea, {
-        width: '60%',
+        width: '50%',
         height: '400px',
         border: '1px solid #ddd',
         borderRadius: '4px',
@@ -28287,23 +28390,16 @@ var YantraGUI = /*#__PURE__*/function () {
         overflowY: 'scroll'
       });
 
-      // Create and style the metadata container
-      /*
-      this.metadataContainer = document.createElement('div');
-      this.metadataContainer.id = 'yantraMetadataContainer';
-      this.applyStyles(this.metadataContainer, {
-        width: '35%',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        padding: '10px',
-        boxSizing: 'border-box'
-      });
-      */
+      // Append elements to the columns container
+      columnsContainer.appendChild(pingResults);
+      columnsContainer.appendChild(this.logTextArea);
+
+      // Append columns container to the modal content
+      modalContent.appendChild(columnsContainer);
 
       // Append elements to the log container and then to the body
-      this.logContainer.appendChild(this.logTextArea);
-      // this.logContainer.appendChild(this.metadataContainer);
-      document.body.appendChild(this.logContainer);
+      //this.logContainer.appendChild(this.logTextArea);
+      //document.body.appendChild(this.logContainer);
     }
   }, {
     key: "applyStyles",
@@ -28318,25 +28414,24 @@ var YantraGUI = /*#__PURE__*/function () {
   }, {
     key: "updateLog",
     value: function updateLog(message) {
-      console.log('updating log', message);
       this.logTextArea.value += message + '\n';
       this.logTextArea.scrollTop = this.logTextArea.scrollHeight;
     }
   }, {
-    key: "updateMetadata",
-    value: function updateMetadata(metadata) {
-      // Clear existing metadata
-      this.metadataContainer.innerHTML = '';
+    key: "sortPingResults",
+    value: function sortPingResults() {
+      var pingResultsContainer = document.getElementById('pingResults');
+      var regions = Array.from(pingResultsContainer.children);
+      regions.sort(function (a, b) {
+        var latencyA = parseInt(a.textContent.split(': ')[1]);
+        var latencyB = parseInt(b.textContent.split(': ')[1]);
+        return latencyA - latencyB;
+      });
 
-      // Add new metadata
-      for (var _i2 = 0, _Object$entries2 = Object.entries(metadata); _i2 < _Object$entries2.length; _i2++) {
-        var _Object$entries2$_i = _slicedToArray(_Object$entries2[_i2], 2),
-          key = _Object$entries2$_i[0],
-          value = _Object$entries2$_i[1];
-        var p = document.createElement('p');
-        p.textContent = "".concat(key, ": ").concat(value);
-        this.metadataContainer.appendChild(p);
-      }
+      // Re-append the sorted regions to the container
+      regions.forEach(function (region) {
+        return pingResultsContainer.appendChild(region);
+      });
     }
   }, {
     key: "unload",
@@ -28347,7 +28442,6 @@ var YantraGUI = /*#__PURE__*/function () {
       }
       this.logContainer = null;
       this.logTextArea = null;
-      this.metadataContainer = null;
     }
   }]);
   return YantraGUI;

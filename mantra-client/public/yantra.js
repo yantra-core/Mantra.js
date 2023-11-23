@@ -1,10 +1,80 @@
 const YANTRA = {};
 const PING_CHECK_TIMEOUT = 120 * 1000;
+
+let awsRegionMapping = {
+  "us-east-1": "Washington_DC",
+  "us-west-1": "Seattle",
+  // "ap-east-1": "Hong_Kong",
+  "ap-south-1": "Mumbai",
+  // "ap-northeast-3": "Tokyo",
+  "ap-southeast-1": "Singapore",
+  "ap-southeast-2": "Sydney",
+  "ap-northeast-1": "Tokyo",
+  "eu-central-1": "Frankfurt",
+  "eu-west-2": "London",
+  // "eu-north-1": "Stockholm",
+  "sa-east-1": "Sao_Paulo",
+};
+
+let updateRegionList = [
+  {
+    "region": "Singapore",
+    "host": "ping.hathora.dev",
+    "port": 2006
+  },
+  {
+    "region": "Washington_DC",
+    "host": "ping.hathora.dev",
+    "port": 2001
+  },
+  {
+    "region": "Mumbai",
+    "host": "ping.hathora.dev",
+    "port": 2005
+  },
+  {
+    "region": "Sydney",
+    "host": "ping.hathora.dev",
+    "port": 2008
+  },
+  {
+    "region": "Sao_Paulo",
+    "host": "ping.hathora.dev",
+    "port": 2009
+  },
+  {
+    "region": "Seattle",
+    "host": "ping.hathora.dev",
+    "port": 2000
+  },
+  {
+    "region": "Chicago",
+    "host": "ping.hathora.dev",
+    "port": 2002
+  },
+  {
+    "region": "Frankfurt",
+    "host": "ping.hathora.dev",
+    "port": 2004
+  },
+  {
+    "region": "Tokyo",
+    "host": "ping.hathora.dev",
+    "port": 2007
+  },
+  {
+    "region": "London",
+    "host": "ping.hathora.dev",
+    "port": 2003
+  }
+];
+
 YANTRA.serverDiscovery = {
   etherspaceEndpoint: 'https://etherspace.ayyo.gg',
   pollIntervalMs: 500,
   maxPollCount: 99999,
   pollCount: 0,
+  regionList: updateRegionList,
   isPolling: false,
   broadcastMessage: function(event, message){
     let emitter = null;
@@ -86,75 +156,6 @@ window.onerror = function (err) {
   console.log('warning: uncaught error', err)
 };
 
-let awsRegionMapping = {
-  "us-east-1": "Washington_DC",
-  "us-west-1": "Seattle",
-  // "ap-east-1": "Hong_Kong",
-  "ap-south-1": "Mumbai",
-  // "ap-northeast-3": "Tokyo",
-  "ap-southeast-1": "Singapore",
-  "ap-southeast-2": "Sydney",
-  "ap-northeast-1": "Tokyo",
-  "eu-central-1": "Frankfurt",
-  "eu-west-2": "London",
-  // "eu-north-1": "Stockholm",
-  "sa-east-1": "Sao_Paulo",
-};
-
-
-let updateRegionList = [
-  {
-    "region": "Singapore",
-    "host": "ping.hathora.dev",
-    "port": 2006
-  },
-  {
-    "region": "Washington_DC",
-    "host": "ping.hathora.dev",
-    "port": 2001
-  },
-  {
-    "region": "Mumbai",
-    "host": "ping.hathora.dev",
-    "port": 2005
-  },
-  {
-    "region": "Sydney",
-    "host": "ping.hathora.dev",
-    "port": 2008
-  },
-  {
-    "region": "Sao_Paulo",
-    "host": "ping.hathora.dev",
-    "port": 2009
-  },
-  {
-    "region": "Seattle",
-    "host": "ping.hathora.dev",
-    "port": 2000
-  },
-  {
-    "region": "Chicago",
-    "host": "ping.hathora.dev",
-    "port": 2002
-  },
-  {
-    "region": "Frankfurt",
-    "host": "ping.hathora.dev",
-    "port": 2004
-  },
-  {
-    "region": "Tokyo",
-    "host": "ping.hathora.dev",
-    "port": 2007
-  },
-  {
-    "region": "London",
-    "host": "ping.hathora.dev",
-    "port": 2003
-  }
-];
-
 function getHostPort(region) {
   // console.log('getting region', region)
   const regionInfo = updateRegionList.find(item => item.region === region);
@@ -190,9 +191,9 @@ YANTRA.regionDiscovery = {
   async getRegionLatency(regionData) {
 
     if (typeof game !== 'undefined' && typeof game.emit === 'function') {
-      game.emit('server::discovery::pingtest', { message: 'Performing Ping Test: ' + regionData.region });
+      game.emit('server::discovery::message', { message: 'Performing Ping Test: ' + regionData.region });
     } else {
-      console.log('Warning: Attempting to emit "server::discovery::pingtest" but game.emit was not found. Make sure to create a game instance before calling this function.')
+      console.log('Warning: Attempting to emit "server::discovery::message" but game.emit was not found. Make sure to create a game instance before calling this function.')
     }
 
     return new Promise((resolve) => {
@@ -241,6 +242,11 @@ YANTRA.regionDiscovery = {
   },
 
   async findFastestRegion() {
+
+    if (typeof game !== 'undefined' && typeof game.emit === 'function') {
+      game.emit('server::discovery::message', { message: 'Finding Fastest Region' });
+    }
+
     try {
       const latencyResults = await Promise.all(updateRegionList.map(regionInfo => {
         return this.getRegionLatency(regionInfo);
@@ -250,9 +256,9 @@ YANTRA.regionDiscovery = {
 
       if (typeof game !== 'undefined' && typeof game.emit === 'function') {
         sortedResults.forEach(result => {
-          game.emit('server::discovery::pingtest', { message: 'Ping Test Result: ' + result.region + ' ' + result.latency });
+          game.emit('server::discovery::pingtest', { region: result.region, latency: result.latency});
         });
-        game.emit('server::discovery::pingtest', { message: 'Found fastest region: ' + sortedResults[0].region});
+        game.emit('server::discovery::message', { message: 'Found fastest region: ' + sortedResults[0].region});
       } else {
         console.log('Warning: Attempting to emit "server::discovery::pingtest" but game.emit was not found. Make sure to create a game instance before calling this function.')
       }
