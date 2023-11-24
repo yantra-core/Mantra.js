@@ -47,8 +47,30 @@ export default class WebSocketClient {
     this.game.systemsManager.addSystem('websocketClient', this);
   }
 
+  wsConnectionStringFromWindow () {
+    let url;
+    let host = window.location.hostname;
+    let port = window.location.port;
+    if (port == 7777) { // special case for dev mode, since we run separate client and server ports
+      port = 8888;
+    }
+    // detect if browser is https or http
+    let protocol = window.location.protocol;
+    // create a new wsConnectionString using the host and port and protocol
+    let wsConnectionString = `${protocol === 'https:' ? 'wss' : 'ws'}://${host}:${port}/websocket`;
+    // assign the new url to the url variable
+    url = wsConnectionString;
+    return url;
+  }
+
   connect(url) {
 
+    // if no url is provided, construct a websocket connection string based on current url
+    if (typeof url === 'undefined' && typeof window !== 'undefined') {
+      url = this.wsConnectionStringFromWindow();
+    }
+
+    console.log('connecting to', url);
     let self = this;
 
     let graphicsSystems = this.game.graphics.length;

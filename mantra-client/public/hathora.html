@@ -33,7 +33,7 @@
         isClient: true, // TODO: remove this
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
-        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        graphics: ['none'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         protobuf: true,
         deltaCompression: true,
@@ -58,33 +58,15 @@
 
       let Plugins = MANTRA.plugins;
 
-      console.log(Plugins)
-      game.use(new Plugins.YantraGUI());
-      game.use(new Plugins.Editor({
-        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/hathora.html'
-      }));
-
-      // Use Plugins to add systems to the game
-      game.use(new Plugins.Bullet())
       game.use(new Plugins.Schema())
 
 
-      let playerId = 'Bobby';
-      let clientConfig = {
-        protobuf: true,
-        msgpack: false,
-        deltaCompression: true
-      };
-
-
-      game.use(new Plugins.StarField());
-      game.use(new Plugins.InputLegend());
+      game.use(new Plugins.YantraGUI())
 
       // game.use(new Plugins.PluginsGUI());
+      
 
-      game.use(new Plugins.Block());
-
-      let world = 'fun';
+      let world = 'my-awesome-world';
       let owner = 'Marak'
 
       if (queryParams.world) {
@@ -104,35 +86,18 @@
       let bestServer = bestServers[0];
       let wsConnectionString = bestServer.processInfo.wsConnectionString;
 
-      game.connect(wsConnectionString);
-      game.use(new Plugins.CurrentFPS());
-      game.use(new Plugins.SnapshotSize());
-      game.use(new Plugins.PingTime());
+      // instead of calling connect, create iframe embed and use wsConnectionString as HTML server
 
-      /*
+      // convert wsConnectionString wss:// format to https://
+      let httpsConnectionString = wsConnectionString.replace('wss://', 'https://');
+      // create new iframe
+      let iframe = document.createElement('iframe');
+      // give id
+      iframe.id = 'mantraIframe';
+      iframe.src = httpsConnectionString;
 
-      // Attempting to start local game first, then upgrade to online
-      // This is mostly workly; however we were seeing an issue with sync of ship sprite not moving
-      // starts the local game
-      //game.start();
-
-
-      game.stop(); // stop the local game
-
-      // clear all the local entities, game is about to connect
-      for (let [entityId, entity] of game.entities.entries()) {
-        game.removeEntity(entityId);
-      }
-
-      setTimeout(() => {
-        // begins to connect to the remote server
-        game.connect(wsConnectionString);
-
-        game.use(new Plugins.CurrentFPS());
-        game.use(new Plugins.SnapshotSize());
-        game.use(new Plugins.PingTime());
-      }, 1000);
-      */
+      // add iframe to body
+      document.body.appendChild(iframe);
 
     });
   </script>

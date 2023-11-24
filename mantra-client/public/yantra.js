@@ -132,7 +132,7 @@ YANTRA.serverDiscovery = {
     console.log("gameConfig", gameConfig)
     this.pollCount = 0;
     const region = gameConfig.region || 'defaultRegion';
-    const mode = gameConfig.world || 'defaultWorld';
+    const mode = gameConfig.world || 'my-awesome-world';
     const owner = gameConfig.owner || 'defaultOwner';
     const settings = gameConfig.settings || {};
 

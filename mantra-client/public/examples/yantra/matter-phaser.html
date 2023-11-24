@@ -64,7 +64,6 @@
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/yantra/matter-phaser.html'
       }));
 
-
       game.use(new Plugins.YantraGUI());
 
       // Use Plugins to add systems to the game
@@ -74,11 +73,9 @@
       game.use(new Plugins.StarField());
       game.use(new Plugins.InputLegend());
 
-      // game.use(new Plugins.PluginsGUI());
-
       game.use(new Plugins.Block());
 
-      let world = 'fun';
+      let world = 'my-awesome-world';
       let owner = 'Marak'
 
       if (queryParams.world) {

@@ -335,3 +335,9 @@ pre {
 .ping-results-container {
   margin-top: 10px;
 }
+
+#mantraIframe {
+  width: 100vw;
+  height: 100vh;
+  border: none;
+}
