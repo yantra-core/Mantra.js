@@ -69,12 +69,8 @@
       // Use Plugins to add systems to the game
       game.use(new Plugins.Bullet())
       game.use(new Plugins.Schema())
-
       game.use(new Plugins.StarField());
       game.use(new Plugins.InputLegend());
-
-      // game.use(new Plugins.PluginsGUI());
-
       game.use(new Plugins.Block());
 
       let world = 'my-awesome-world';
@@ -101,31 +97,6 @@
       game.use(new Plugins.CurrentFPS());
       game.use(new Plugins.SnapshotSize());
       game.use(new Plugins.PingTime());
-
-      /*
-
-      // Attempting to start local game first, then upgrade to online
-      // This is mostly workly; however we were seeing an issue with sync of ship sprite not moving
-      // starts the local game
-      //game.start();
-
-
-      game.stop(); // stop the local game
-
-      // clear all the local entities, game is about to connect
-      for (let [entityId, entity] of game.entities.entries()) {
-        game.removeEntity(entityId);
-      }
-
-      setTimeout(() => {
-        // begins to connect to the remote server
-        game.connect(wsConnectionString);
-
-        game.use(new Plugins.CurrentFPS());
-        game.use(new Plugins.SnapshotSize());
-        game.use(new Plugins.PingTime());
-      }, 1000);
-      */
 
     });
   </script>
