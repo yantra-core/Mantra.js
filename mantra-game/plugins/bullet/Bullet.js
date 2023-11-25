@@ -32,7 +32,6 @@ class Bullet {
     }
   
     actionRateLimiterComponent.recordAction(entityId, 'fireBullet');
-
     let playerPos = entity.position;
     let playerRotation = entity.rotation; // in radians
 

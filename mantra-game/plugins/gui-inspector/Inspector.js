@@ -49,22 +49,38 @@ class Inspector {
       }
     }
 
-    let entityView = document.getElementById('entityView') || document.createElement('div');
-    entityView.id = "entityView";
-    entityView.innerHTML = '';
+    let entityView = document.getElementById('entityView');
+    
+    if (!entityView) {
+      entityView = document.createElement('div');
+      entityView.id = "entityView";
+      entityView.innerHTML = '';
 
-    let closeButton = document.createElement('span');
-    closeButton.id = "closeButton";
-    closeButton.className = "closeButton";
-    closeButton.textContent = 'X';
-    closeButton.onclick = () => entityView.style.display = 'none';
+      // adds close button
+      let closeButton = document.createElement('span');
+      closeButton.id = "closeButton";
+      closeButton.className = "close";
+      closeButton.textContent = 'X';
+      closeButton.onclick = () => entityView.style.display = 'none';
+      entityView.appendChild(closeButton);
 
-    entityView.appendChild(closeButton);
-    entityView.appendChild(table);
+      // adds title header
+      let title = document.createElement('h3');
+      title.textContent = 'Entity Inspector';
+      title.className = 'gui-title';
+      entityView.appendChild(title);
 
-    if (!document.getElementById('entityView')) {
-      document.body.appendChild(entityView);
+      if (!document.getElementById('entityView')) {
+        document.body.appendChild(entityView);
+      }
     }
+
+    // remove existing table if it exists
+    let existingTable = document.getElementById('entityPropertiesTable');
+    if (existingTable) {
+      existingTable.remove();
+    }
+    entityView.append(table);
   }
 
   renderValue(cell, value, key) {

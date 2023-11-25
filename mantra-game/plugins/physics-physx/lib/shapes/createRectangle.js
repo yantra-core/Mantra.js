@@ -4,12 +4,12 @@ export default function createRectangle(x, y, width, height, options = {}) {
   // Define filter data for the collision layers
   let filterData = new this.PhysX.PxFilterData(
     1, // Word0 (own layer)
-    0, // Word1 (layer to collide with)
+    1, // Word1 (layer to collide with)
     0,                 // Word2 (not used in this context)
     0                  // Word3 (not used in this context)
   );
 
-  console.log('createRectangle', options)
+  // console.log('createRectangle', options)
   // Ensure the PhysX instance is loaded and available
   if (!this.PhysX) {
     console.error("PhysX is not initialized.");
@@ -49,10 +49,10 @@ export default function createRectangle(x, y, width, height, options = {}) {
   // Check if the body is static or dynamic based on the 'isStatic' option
   if (options && options.isStatic) {
     // Create a static actor for the box
-    console.log('creating a static actor');
+    // console.log('creating a static actor');
     boxActor = this.physics.createRigidStatic(transform);
   } else {
-    console.log('creating a dynamic actor')
+    // console.log('creating a dynamic actor')
     // Create a dynamic actor for the box
     boxActor = this.physics.createRigidDynamic(transform);
     // Add the body to the list of dynamic bodies
@@ -65,7 +65,7 @@ export default function createRectangle(x, y, width, height, options = {}) {
       // Calculate the volume of the box. For a box, volume = width * height * depth
       let volume = width * height * 1; // Assuming '100' is your depth here
       let mass = options.density * volume;
-      console.log('SETTING MASS', mass);
+      // console.log('SETTING MASS', mass);
       // Now set the mass of the dynamic actor
       boxActor.setMass(1);
     }
@@ -80,7 +80,7 @@ export default function createRectangle(x, y, width, height, options = {}) {
         options.velocity.z || 0 // If z is not provided, assume 0
       );
 
-      console.log('velocityVec', velocityVec)
+      // console.log('velocityVec', velocityVec)
 
       // Use the created PxVec3 to set the linear velocity
       boxActor.setLinearVelocity(velocityVec);
@@ -122,6 +122,6 @@ export default function createRectangle(x, y, width, height, options = {}) {
   this.PhysX.destroy(transform);
 
   // Return the created box actor
-  console.log('returning the box actor', boxActor);
+  // console.log('returning the box actor', boxActor);
   return boxActor;
 }

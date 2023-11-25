@@ -1,6 +1,6 @@
 export default function createCircle(x, y, radius, options = {}) {
 
-  console.log('incoming options', x, y, radius);
+  // console.log('incoming circle options', x, y, radius, options);
   // Inside the createCircle function, after creating the boxShape
   // Define filter data for the collision layers
   let filterData = new this.PhysX.PxFilterData(
@@ -50,71 +50,20 @@ export default function createCircle(x, y, radius, options = {}) {
   // Check if the body is static or dynamic based on the 'isStatic' option
   if (options && options.isStatic) {
     // Create a static actor for the box
-    console.log('creating a static actor');
     sphereActor = this.physics.createRigidStatic(transform);
   } else {
-    console.log('creating a dynamic actor')
     // Create a dynamic actor for the box
     sphereActor = this.physics.createRigidDynamic(transform);
     // Add the body to the list of dynamic bodies
     this.dynamicBodies.push(sphereActor);
-
-
     // Correcting mass calculation for a sphere
     if (options && options.density) {
-      console.log('options.density', options.density);
       const volume = (4 / 3) * Math.PI * Math.pow(radius, 3); // Volume of a sphere
       let mass = options.density * volume;
-      console.log('Calculated mass', mass);
       sphereActor.setMass(10);
       //sphereActor.updateMassAndInertia(mass); // Update inertia based on mass
     }
 
-
-    if (options && options.velocity) {
-      // Create a force vector
-      const forceVec = new this.PhysX.PxVec3(
-        options.velocity.x,
-        options.velocity.y,
-        options.velocity.z || 0 // If z is not provided, assume 0
-      );
-  
-      console.log('Applying force vector:', forceVec);
-  
-      // Apply the force to the center of mass of the body
-      // This might depend on your specific PhysX wrapper's API
-      sphereActor.addForce(forceVec, this.PhysX.PxForceModeEnum.eFORCE, true);
-  }
-  
-
-
-    if (options && options.velocity) {
-
-      // TODO: create a force vector
-      // this.Body.applyForce(body, bodyPosition, force);
-
-      // apply velocity
-      // is this not correct? do we need to make this a vector?
-      // You need to create a PxVec3 for the velocity
-      /*
-      console.log("setting velocity", options.velocity)
-      const velocityVec = new this.PhysX.PxVec3(
-        100,
-        100,
-        100 // If z is not provided, assume 0
-      );
-
-
-
-      console.log('velocityVec', velocityVec)
-
-      // Use the created PxVec3 to set the linear velocity
-      sphereActor.setLinearVelocity(velocityVec);
-      */
-
-    }
-
-  
   }
 
   // Attach the shape to the actor
@@ -129,7 +78,22 @@ export default function createCircle(x, y, radius, options = {}) {
   // this.PhysX.destroy(shapeFlags);
   this.PhysX.destroy(transform);
 
+
+  if (options && options.velocity) {
+    // Create a force vector
+    const forceVec = new this.PhysX.PxVec3(
+      options.velocity.x,
+      options.velocity.y,
+      options.velocity.z || 0 // If z is not provided, assume 0
+    );
+    // Apply the force to the center of mass of the body
+    // This might depend on your specific PhysX wrapper's API
+    //this.applyForce(sphereActor, { x: 0, y: 0, z: 0}, forceVec)
+    this.Body.applyForce(sphereActor, { x: 0, y: 0, z: 0}, forceVec)
+    // sphereActor.addForce(forceVec, this.PhysX.eFORCE, true);
+  }
+
   // Return the created box actor
-  console.log('returning the sphereActor', sphereActor);
+  // console.log('returning the sphereActor', sphereActor);
   return sphereActor;
 }

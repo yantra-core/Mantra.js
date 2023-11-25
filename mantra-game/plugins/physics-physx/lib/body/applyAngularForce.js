@@ -8,5 +8,5 @@ export default function applyAngularForce(body, force, axis) {
   const torque = new this.PhysX.PxVec3(axis.x * force, axis.y * force, axis.z * force);
 
   // Apply the torque to the body
-  body.addTorque(torque, this.PhysX.PxForceMode.eFORCE, true);
+  body.addTorque(torque, this.PhysX.eFORCE, true);
 }

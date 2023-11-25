@@ -19,7 +19,7 @@ export default function applyForce(body, position, force) {
   const pxForce = new this.PhysX.PxVec3(force.x, force.y, force.z);
 
   const pxPosition = position ? new this.PhysX.PxVec3(position.x, position.y, position.z) : undefined;
-  body.addForce(pxForce, this.PhysX.PxForceModeEnum.eFORCE, pxPosition);
+  body.addForce(pxForce, this.PhysX.eFORCE, pxPosition);
 
   // Check if the body is dynamic (i.e., can be moved by forces).
   if (body.isRigidDynamic && body.isRigidDynamic()) {
