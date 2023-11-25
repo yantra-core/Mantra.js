@@ -407,3 +407,11 @@ pre {
 #entityPropertiesTable table tr:nth-child(even) {
   background-color: #fafafa;
 }
+
+
+.gui-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0px;
+  padding: 0px;
+}
