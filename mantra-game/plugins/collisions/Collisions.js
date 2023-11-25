@@ -34,6 +34,18 @@ class Collisions {
       return;
     }
 
+
+    // Check for specific collision cases and send events to the state machine
+    if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.game.Machine && this.game.Machine.sendEvent) {
+        this.game.Machine.sendEvent('COLLISION', { 
+          entityIdA: bodyA.myEntityId,
+          entityIdB: bodyB.myEntityId
+        });
+      }
+    }
+
+
     //console.log(entityA)
     //console.log(entityB)
 
@@ -51,6 +63,11 @@ class Collisions {
         system.handleCollision(pair, bodyA, bodyB);
       }
     }
+  }
+
+  shouldSendCollisionEvent(bodyA, bodyB) {
+    // for now, send all events to the stateMachine
+    return true;
   }
 
 }

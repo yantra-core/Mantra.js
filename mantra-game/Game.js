@@ -4,6 +4,7 @@
 // TODO: we have Entity.js do we even use it in Game scope? I think only EntityFactory uses it?
 import Component from './Component/Component.js';
 import SystemsManager from './System/SystemsManager.js';
+import Machine from './Machine/Machine.js';
 
 // Snapshots
 import SnapshotManager from './plugins/snapshots/SnapShotManager/SnapshotManager.js';
@@ -196,6 +197,7 @@ class Game {
       });
     }
 
+
   }
 
   update(deltaTime) {
@@ -225,6 +227,17 @@ class Game {
 
     let client = this.getSystem('client');
     client.start(cb);
+
+    /*
+    // Example Machine usage
+    // TODO: better integration with game lifecycle
+    Machine.createMachine(game);
+    Machine.sendEvent('START');
+    console.log('Current State:', Machine.getCurrentState());
+    game.Machine = Machine;
+    Machine.loadEntities(game);
+    */
+
   }
 
   stop() {
