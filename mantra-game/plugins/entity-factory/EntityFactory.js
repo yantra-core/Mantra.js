@@ -140,7 +140,9 @@ class EntityFactory {
   }
 
   createEntity(config) {
+
     // console.log('createEntity', config)
+
     let entityId = this._generateId();
 
     let defaultConfig = {
@@ -323,6 +325,7 @@ class EntityFactory {
 
   // TODO: move this to PhysicsPlugin
   createBody(config) {
+
     let commonBodyConfig = {
       mass: config.mass,
       isSensor: config.isSensor,
@@ -339,7 +342,6 @@ class EntityFactory {
       config.shape = 'circle';
     }
 
-    // console.log("CREATING NEW BODY", config)
     let body;
     switch (config.shape) {
       case 'rectangle':

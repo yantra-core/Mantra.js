@@ -138,6 +138,7 @@ class BabylonGraphics extends GraphicsInterface {
       }
     });
 
+
     function reEmitEvent(babylonEvent) {
       const newEvent = new MouseEvent(babylonEvent.type, babylonEvent);
       document.dispatchEvent(newEvent);
@@ -153,7 +154,10 @@ class BabylonGraphics extends GraphicsInterface {
       game.use(pluginInstance);
     });
 
+    // this.createCompass();
+
   }
+
 
   updateGraphic(entityData /*, alpha*/) {
     // console.log('setting position', entityData.position)
@@ -201,9 +205,18 @@ class BabylonGraphics extends GraphicsInterface {
           graphic.rotation.y = entityData.rotation + -Math.PI / 2;
           break;
         case 3:
-          graphic.rotation.y = entityData.rotation.y + -Math.PI / 2;
-          graphic.rotation.x = entityData.rotation.x
-          graphic.rotation.z = entityData.rotation.z + Math.PI / 2;
+          if (typeof entityData.rotation !== 'object') {
+            throw new Error('3D is activate but rotation is not an object. Did you make sure to use `physx` engine?');
+          }
+          const quaternion = new BABYLON.Quaternion(
+            entityData.rotation.x,
+            entityData.rotation.y,
+            entityData.rotation.z,
+            entityData.rotation.w
+          );
+
+          // Apply the quaternion rotation to the graphic
+          graphic.rotationQuaternion = quaternion;
           break;
         default:
           throw new Error('Unknown physics dimensions, cannot update graphic')
@@ -263,21 +276,28 @@ class BabylonGraphics extends GraphicsInterface {
         graphic = this.createBox(entityData); // TODO: createDefault()
     }
 
-    graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+    if (this.game.physics.dimension === 2) {
+      graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+    }
+
+    if (this.game.physics.dimension === 3) {
+      graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
+    }
+
 
     return graphic;
   }
 
   initializeObjectPools(size) {
     for (let i = 0; i < POOL_SIZE_BLOCK; i++) {
-      let block = BABYLON.MeshBuilder.CreateBox('box', {width: 1, height: 1, depth: 1}, this.scene);
+      let block = BABYLON.MeshBuilder.CreateBox('box', { width: 1, height: 1, depth: 1 }, this.scene);
       block.isVisible = false; // Start with the box hidden
       block.mantraPools = true;
       this.mantraPools.block.push(block);
     }
 
     for (let i = 0; i < POOL_SIZE_BULLET; i++) {
-      let bullet = BABYLON.MeshBuilder.CreateSphere('box', {width: 1, height: 1, depth: 1}, this.scene);
+      let bullet = BABYLON.MeshBuilder.CreateSphere('box', { width: 1, height: 1, depth: 1 }, this.scene);
       bullet.isVisible = false; // Start with the box hidden
       bullet.mantraPools = true;
       this.mantraPools.bullet.push(bullet);
@@ -312,23 +332,23 @@ class BabylonGraphics extends GraphicsInterface {
     let bullet = this.mantraPools.bullet.find(b => !b.isVisible);
     if (bullet) {
       bullet.isVisible = true;
-  
+
       // Assuming the original diameter of the bullet is known. 
       // Replace `originalDiameter` with the actual value.
       let originalDiameter = 1; // Example value
       let scale = (entityData.radius * 2) / originalDiameter;
-  
+
       bullet.scaling.x = scale;
       bullet.scaling.y = scale;
       bullet.scaling.z = scale;
-  
+
       bullet.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
-  
+
       return bullet;
     }
     return this.createSphere(entityData);
   }
-  
+
   releaseBullet(bullet) {
     bullet.isVisible = false;
     // Reset bullet properties if necessary
@@ -366,13 +386,16 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createTriangle(entityData) {
+
     let mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {
       diameterTop: 0,
       diameterBottom: 100,
       height: 100,
       tessellation: 3
     }, this.scene);
-    // rotate the triangle to the correct orientation ( forward facing )
+
+    // rotate the triangle so it points "forward"
+    // Remark: 11/25 this is no longer working? 
     mesh.rotation.z = Math.PI / 2;
     mesh.rotation.y += -Math.PI / 2;
     return mesh;

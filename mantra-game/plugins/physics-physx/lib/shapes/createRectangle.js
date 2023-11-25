@@ -86,6 +86,15 @@ export default function createRectangle(x, y, width, height, options = {}) {
       boxActor.setLinearVelocity(velocityVec);
 
     }
+
+    let inertiaTensor = {
+      x: 10,
+      y: 10,
+      z: 10
+    };
+
+    // boxActor.setMassSpaceInertiaTensor(new this.PhysX.PxVec3(inertiaTensor.x, inertiaTensor.y, inertiaTensor.z));
+
     /*
     // Lock the motion along the Z-axis
     const lockFlags =
@@ -100,9 +109,6 @@ export default function createRectangle(x, y, width, height, options = {}) {
     */
 
   }
-
-
-
 
   // Attach the shape to the actor
   boxActor.attachShape(boxShape);

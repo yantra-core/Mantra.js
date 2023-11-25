@@ -5,12 +5,7 @@ class AsteroidsMovementStrategy {
   static id = '3d-asteroids-movement';
 
   constructor() {
-    // Define rotation speeds for each axis
-    this.rotationSpeeds = {
-      x: 0.022, // pitch
-      y: 0.022, // yaw
-      z: 0.022  // roll
-    };
+
     // Define thrust for movement
     this.thrust = 0.05 * 1000;
     this.id = AsteroidsMovementStrategy.id;
@@ -28,13 +23,19 @@ class AsteroidsMovementStrategy {
   }
 
   getForwardDirection(body) {
-    let bodyRotation = this.game.physics.getBodyRotation(body);  // Assume getBodyRotation is a method in your entityMovement system
-
-    // Assuming the body faces towards the negative y-axis when pitch, yaw, and roll are 0
+    let bodyRotation = this.game.physics.getBodyRotation(body); // Quaternion
+    
+    // convert bodyRotation to babyonjs quaternion
+    let quaternion = new BABYLON.Quaternion(bodyRotation.x, bodyRotation.y, bodyRotation.z, bodyRotation.w);
+    // Default forward vector
+    let forwardVector = new BABYLON.Vector3(0, 0, -1);
+  
+    // Apply the rotation to the forward vector
+    let rotatedVector = forwardVector.rotateByQuaternionToRef(quaternion, new BABYLON.Vector3());
     return {
-      x: Math.sin(bodyRotation.y) * Math.cos(bodyRotation.x),
-      y: -Math.cos(bodyRotation.y) * Math.cos(bodyRotation.x),
-      z: Math.sin(bodyRotation.x)
+      x: rotatedVector.x,
+      y: rotatedVector.y,
+      z: rotatedVector.z
     };
   }
 
@@ -42,7 +43,8 @@ class AsteroidsMovementStrategy {
     const body = this.game.bodyMap[entityId];
     if (!body) return;
 
-    console.log('performing rotation', pitchDelta, yawDelta, rollDelta)
+    // console.log('pitchDelta', pitchDelta, 'yawDelta', yawDelta, 'rollDelta', rollDelta);
+    // console.log('performing rotation', pitchDelta, yawDelta, rollDelta)
 
     // Rotate around the x-axis for pitch
     if (pitchDelta !== 0) {
@@ -58,26 +60,29 @@ class AsteroidsMovementStrategy {
     }
   }
 
-
   update(entityId, dx, dy, dz) {
     const body = this.game.bodyMap[entityId];
     if (!body) return;
 
-    console.log('performing movement', entityId, dx, dy, dz)
-
+    /* Remark: "forward direction" is used for forward/backward movement relative to the entity's 3d rotation
+    // console.log('performing movement', entityId, dx, dy, dz)
+    // console.log('forwardDirection', forwardDirection)
     let forwardDirection = this.getForwardDirection(body);
-
-    console.log('forwardDirection', forwardDirection)
-
-    // Calculate the force to apply
-    // Here dy is used for forward/backward thrust, dx for left/right, and dz for up/down.
     const force = {
-      x: forwardDirection.x * dy * this.thrust + dx * this.thrust, // Forward/backward thrust along the forward direction
-      y: forwardDirection.y * dy * this.thrust, // Forward/backward thrust along the forward direction
-      z: forwardDirection.z * dy * this.thrust + dz * this.thrust // Up/Down thrust along the z-axis
+      x: forwardDirection.z * dy * this.thrust + dz * this.thrust, // Forward/backward thrust along PhysX's x-axis
+      y: forwardDirection.y * dy * this.thrust,                    // Up/Down thrust along PhysX's y-axis
+      z: forwardDirection.x * dy * this.thrust + dx * this.thrust  // Left/Right thrust along PhysX's z-axis
+    };
+    */
+
+    // use absolute movements, forwardDirection not needed
+    const force = {
+      x: dx * this.thrust, // Forward/backward thrust along PhysX's x-axis
+      y: dy * this.thrust,                    // Up/Down thrust along PhysX's y-axis
+      z: dz * this.thrust  // Left/Right thrust along PhysX's z-axis
     };
 
-    console.log('force', force)
+    // console.log('force', force)
 
     let bodyPosition = this.game.physics.getBodyPosition(body);
     this.game.physics.Body.applyForce(body, bodyPosition, force);

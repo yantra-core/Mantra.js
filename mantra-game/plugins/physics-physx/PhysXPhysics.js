@@ -8,6 +8,8 @@ import checkForMovedBodies from './lib/checkForMovedBodies.js';
 
 // Body methods
 import applyForce from './lib/body/applyForce.js';
+import applyAngularForce from './lib/body/applyAngularForce.js';
+import applyTorque from './lib/body/applyTorque.js';
 import rotateBody from './lib/body/rotateBody.js';
 import getBodyPosition from './lib/body/getBodyPosition.js';
 import getBodyRotation from './lib/body/getBodyRotation.js';
@@ -52,6 +54,8 @@ class PhysXPhysics extends PhysicsInterface {
     //this.Body = Matter.Body;
     this.Body = {
       applyForce: this.applyForce.bind(this),
+      applyAngularForce: applyAngularForce.bind(this),
+      applyTorque: applyTorque.bind(this),
       rotate: this.rotateBody.bind(this)
     };
     this.Bodies = {

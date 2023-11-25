@@ -44,7 +44,7 @@ import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
 import Editor from './plugins/gui-editor/Editor.js';
-
+import Inspector from './plugins/gui-inspector/Inspector.js';
 
 // Utility
 import PingTime from './plugins/ping-time/PingTime.js';
@@ -72,6 +72,7 @@ const plugins = {
   Keyboard,
   Lifetime,
   PluginsGUI,
+  Inspector,
   MatterPhysics,
   PhysXPhysics,
   PingTime,

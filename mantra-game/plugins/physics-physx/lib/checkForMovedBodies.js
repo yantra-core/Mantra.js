@@ -25,7 +25,7 @@ export default function checkForMovedBodies() {
     this.game.components.position.set(body.myEntityId, { x: bodyPosition.x, y: bodyPosition.y, z: bodyPosition.z });
 
     let bodyRotation = this.getBodyRotation(body);
-    // console.log('bodyRotation', bodyRotation)
+    //console.log('bodyRotation', bodyRotation)
     this.game.components.rotation.set(body.myEntityId, bodyRotation);
     //if (body.isAwake()) {}
   });

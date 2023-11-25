@@ -117,8 +117,20 @@ class BabylonCamera {
         if (graphic) {
           // Interpolating camera position
           let smoothness = 1; // Value between 0 and 1, where 1 is instant
-          this.camera.target.x += (graphic.position.x - this.camera.target.x) * smoothness;
-          this.camera.target.z += (graphic.position.z - this.camera.target.z) * smoothness;
+
+          switch (game.physics.dimension) {
+            case 2:
+              this.camera.target.x += (graphic.position.x - this.camera.target.x) * smoothness;
+              this.camera.target.z += (graphic.position.z - this.camera.target.z) * smoothness;
+            break;
+            case 3:
+              this.camera.target = graphic.position;
+              break;
+            default:
+              throw new Error('Unknown physics dimensions, cannot update camera')
+              break;
+          }
+
         }
       }
     }

@@ -341,3 +341,69 @@ pre {
   height: 100vh;
   border: none;
 }
+
+/* Styles for the Entity Inspector Window */
+#entityView {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  border: 1px solid #ccc;
+  background-color: white;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 400px;
+  overflow: auto;
+  z-index: 1000;
+}
+
+.closeButton {
+  float: right;
+  cursor: pointer;
+  color: #888;
+  font-weight: bold;
+}
+
+.closeButton:hover {
+  color: #555;
+}
+
+/* Styles for the table within the inspector */
+#entityPropertiesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#entityPropertiesTable th,
+#entityPropertiesTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#entityPropertiesTable th {
+  background-color: #f8f8f8;
+  color: #333;
+}
+
+#entityPropertiesTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Styles for nested tables */
+#entityPropertiesTable table {
+  width: 100%;
+  margin: 5px 0;
+  border: none;
+}
+
+#entityPropertiesTable table td,
+#entityPropertiesTable table th {
+  border: none;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+#entityPropertiesTable table tr:nth-child(even) {
+  background-color: #fafafa;
+}
