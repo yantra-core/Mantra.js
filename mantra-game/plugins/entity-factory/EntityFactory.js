@@ -169,7 +169,8 @@ class EntityFactory {
       friction: 0.1,  // Default friction
       frictionAir: 0.01, // Default air friction
       frictionStatic: 0.5, // Default static friction
-      lockedProperties: null // object hash of properties that should never be updated
+      lockedProperties: null, // object hash of properties that should never be updated
+      actionRateLimiter: null, // object hash of state history
     };
 
     // merge config with defaultConfig
@@ -212,6 +213,7 @@ class EntityFactory {
     this.game.addComponent(entityId, 'isSensor', isSensor);
     this.game.addComponent(entityId, 'isStatic', isStatic);
     this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
+    this.game.addComponent(entityId, 'actionRateLimiter', {});
  
     if (config.body) {
       let body = this.createBody(config);

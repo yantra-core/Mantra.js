@@ -9,6 +9,7 @@ class Bullet {
     this.direction = config.direction || { x: 0, y: 1 };
     this.damage = config.damage || 10;
     this.lifetime = config.lifetime || 2000;
+    this.fireRate = config.fireRate || 200;
   }
 
   init(game) {
@@ -20,9 +21,20 @@ class Bullet {
 
   fireBullet(entityId) {
 
-    let player = this.game.getEntity(entityId);
-    let playerPos = player.position;
-    let playerRotation = player.rotation; // in radians
+    let entity = this.game.getEntity(entityId);
+    let actionRateLimiterComponent = this.game.components.actionRateLimiter;
+    let lastFired = actionRateLimiterComponent.getLastActionTime(entityId, 'fireBullet');
+    let currentTime = Date.now();
+    
+    if (currentTime - lastFired < this.fireRate) {
+      // console.log('Rate limit hit for entity', entityId, ', cannot fire yet');
+      return;
+    }
+  
+    actionRateLimiterComponent.recordAction(entityId, 'fireBullet');
+
+    let playerPos = entity.position;
+    let playerRotation = entity.rotation; // in radians
 
     if (!playerPos) {
       // client might not have the position or rotation component, don't client-side predict

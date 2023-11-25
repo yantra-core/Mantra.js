@@ -6,6 +6,8 @@ import Component from './Component/Component.js';
 import SystemsManager from './System/SystemsManager.js';
 import Machine from './Machine/Machine.js';
 
+import ActionRateLimiter from './Component/ActionRateLimiter.js';
+
 // Snapshots
 import SnapshotManager from './plugins/snapshots/SnapShotManager/SnapshotManager.js';
 
@@ -155,6 +157,8 @@ class Game {
     this.components.BulletComponent = new Component('BulletComponent', this);
     this.components.graphics = new Component('graphics', this);
     this.components.lockedProperties = new Component('lockedProperties', this);
+    this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
+
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
@@ -282,13 +286,19 @@ class Game {
       delete this._plugins[pluginName];
     }
   }
-
+  
   addComponent(entityId, componentType, data) {
     if (!this.components[componentType]) {
       this.components[componentType] = new Component(componentType, this);
     }
+    // Initialize an empty map for the actionRateLimiter component
+    // TODO: remove this hard-coded check for actionRateLimiter
+    if (componentType === 'actionRateLimiter') {
+      data = new Map();
+    }
     this.components[componentType].set(entityId, data);
   }
+  
   getComponent(entityId, componentType) {
     return this.components[componentType] ? this.components[componentType].get(entityId) : null;
   }
