@@ -37,6 +37,11 @@ class Bullet {
       playerRotation = 0; // this should have a default
     }
 
+    // convert to 3d if rotation object
+    if (typeof playerRotation === 'object') {
+      playerRotation = playerRotation.z;
+    }
+
     // Place the bullet in front of the player
     let bulletStartPosition = {
       x: playerPos.x + distanceInFront * Math.sin(playerRotation),
