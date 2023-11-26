@@ -34,9 +34,15 @@ Mantra is designed to start a full-featured local game instance in seconds using
 
 You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode.
 
-`mantra` enables multiple ways to write custom game logic. At the lowest levels, you can customize your games using JavaScript or TypeScript code, generally writing Systems Plugins and working with the Event Emitter API.
+## Custom Game Logic
 
-`mantra` games have optional support for [xstate](https://github.com/statelyai/xstate) machines via the `XState` plugin. Representing your game logic as a state machine is an excellent way to ensure high-quality results with minimal coding complexities.
+**Write whatever works for you**
+
+`mantra` games can be customized in several intuitive ways. At the lowest levels, you can customize your games using JavaScript or TypeScript code, generally writing new Systems Plugins and working with the Event Emitter API.
+
+**Finite State Machines**
+
+`mantra` games have support for [xstate](https://github.com/statelyai/xstate) machines via the `XState` plugin. Representing your game logic as a state machine is an excellent way to ensure high-quality results with minimal coding complexities.
 
 ## Demos
 
