@@ -30,8 +30,7 @@ let Pong = {
 
 const Guards = {
   isCollisionGoal: (context, event) => {
-    // Implement the logic to determine if the collision is a goal collision
-    // For instance, you might check the event details sent from your collision system
+    console.log('Guard condition check:', event);
     return event.collisionType === 'goal';
   }
 };

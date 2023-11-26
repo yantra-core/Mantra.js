@@ -30,6 +30,11 @@ class EntityFactory {
     this.game.getEntities = this.getEntities.bind(this);
     this.game.updateEntity = this.updateEntity.bind(this);
     this.game.inflateEntity = this.inflateEntity.bind(this);
+    this.game.hasEntity = this.hasEntity.bind(this);
+  }
+
+  hasEntity (entityId) {
+    return this.game.entities.has(entityId);
   }
 
   getEntity(entityId) {

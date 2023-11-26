@@ -9,6 +9,9 @@ import EntityMovement from './plugins/entity-movement/EntityMovement.js';
 // Client
 import Client from './plugins/client/Client.js';
 
+// State Machines
+import XState from './plugins/xstate/XState.js';
+
 // Physics
 import MatterPhysics from './plugins/physics-matter/MatterPhysics.js';
 import PhysXPhysics from './plugins/physics-physx/PhysXPhysics.js';
@@ -89,7 +92,8 @@ const plugins = {
   BabylonStarField,
   MovementFrogger,
   MovementPacman,
-  MovementPong
+  MovementPong,
+  XState
 };
 
 export default plugins;

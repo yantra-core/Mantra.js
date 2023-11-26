@@ -42,7 +42,8 @@ MANTRA.plugins = {
   MovementFrogger: require('./plugins/entity-movement/strategies/FroggerMovement.js').default,
   MovementPacman: require('./plugins/entity-movement/strategies/PacManMovement.js').default,
   MovementPong: require('./plugins/entity-movement/strategies/PongMovement.js').default,
-  MovementAsteroids: require('./plugins/entity-movement/strategies/AsteroidsMovement.js').default
+  MovementAsteroids: require('./plugins/entity-movement/strategies/AsteroidsMovement.js').default,
+  XState: require('./plugins/xstate/XState.js').default,
   // ... add other plugins similarly
 };
 

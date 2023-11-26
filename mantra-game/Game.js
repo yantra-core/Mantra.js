@@ -1,30 +1,42 @@
-// Game.js
+// MANTRA - Yantra Works 2023
+// Game.js - Marak Squires 2023
 
 // Entity Component System
-// TODO: we have Entity.js do we even use it in Game scope? I think only EntityFactory uses it?
 import Component from './Component/Component.js';
 import SystemsManager from './System/SystemsManager.js';
-import Machine from './Machine/Machine.js';
 
-import ActionRateLimiter from './Component/ActionRateLimiter.js';
+// Plugins
+import plugins from './plugins.js';
 
 // Snapshots
 import SnapshotManager from './plugins/snapshots/SnapShotManager/SnapshotManager.js';
 
+// Game instances are event emitters
 import eventEmitter from './lib/eventEmitter.js';
+
+// Game loops
+// Local game loop is for single machine games ( no networking )
 import localGameLoop from './lib/localGameLoop.js';
+// Online game loop is for multiplayer games ( networking )
 import onlineGameLoop from './lib/onlineGameLoop.js';
 
-// Main game loop / game tick
+// Game tick, called once per tick from game loop
 import gameTick from './lib/gameTick.js';
 
-// Default Game.start(fn) logic if none provided ( creates a single player and border )
+// Provides a default Game.start(fn) logic ( creates a single player and border )
+// Bind to event `player::joined` to override default player creation logic
 import defaultGameStart from './lib/start/defaultGameStart.js';
 
-// Plugins
-import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
-import plugins from './plugins.js';
+// Action Rate Limiter, suitable for any Systems action that should be rate limited
+import ActionRateLimiter from './Component/ActionRateLimiter.js';
 
+// Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
+import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
+
+// Utility function for loading external script assets
+import loadScripts from './lib/util/loadScripts.js';
+
+// The Game class is the main entry point for Mantra games
 class Game {
   constructor({
     // game modes
@@ -103,6 +115,9 @@ class Game {
     this.onAny = eventEmitter.onAny.bind(eventEmitter);
     this.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
 
+    // Bind loadScripts from util
+    this.loadScripts = loadScripts.bind(this);
+
     this.bodyMap = {};
     this.systems = {};
 
@@ -114,9 +129,8 @@ class Game {
     this.width = width;
     this.height = height;
 
-    // TODO: Physics pipeline
     // Remark: Currently, only (1) physics engine is supported at a time
-    //  If we want to run multiple physics engines, we'll want to make this array
+    // If we want to run multiple physics engines, we'll want to make this array
     // this.physics = [];
 
     this.changedEntities = new Set();
@@ -231,6 +245,10 @@ class Game {
 
     let client = this.getSystem('client');
     client.start(cb);
+
+
+    // Machine.sendEvent('START');
+
 
     /*
     // Example Machine usage
@@ -359,30 +377,6 @@ class Game {
     this.currentPlayerId = playerId;
   }
 
-  // TODO: move to separate function
-  // Loads external js script files sequentially
-  loadScripts(scripts, finalCallback) {
-    if (this.isServer) {
-      return;
-    }
-    const loadScript = (index) => {
-      if (index < scripts.length) {
-        let script = document.createElement('script');
-        script.type = 'text/javascript';
-        // Prepend the scriptRoot to the script src
-        script.src = this.scriptRoot + scripts[index];
-        script.onload = () => {
-          console.log(`${scripts[index]} loaded`);
-          loadScript(index + 1); // Load the next script
-        };
-        document.head.appendChild(script);
-      } else {
-        finalCallback(); // All scripts have been loaded
-      }
-    };
-
-    loadScript(0); // Start loading the first script
-  }
 
 }
 
