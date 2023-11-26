@@ -41,7 +41,6 @@ tap.test('Loading entities', (t) => {
   game.use(new plugins.XState({ world: Pong }));
 
 
-  console.log(game.entities)
   let borderTop = game.getEntity(3);
   t.ok(borderTop, 'Border entity should be loaded');
   // check type and properties

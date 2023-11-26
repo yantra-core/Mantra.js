@@ -41,8 +41,8 @@ tap.test('Loading entities: Boss Entity', (t) => {
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let boss = game.getEntity(2);
-  t.ok(boss, 'BOSS entity should be loaded');
-  t.equal(boss.type, 'BOSS', 'Boss entity should have type BOSS');
+  t.ok(boss, 'NPC entity should be loaded');
+  t.equal(boss.type, 'NPC', 'Boss entity should have type NPC');
   t.equal(boss.health, 1000, 'Boss entity should have health of 1000');
   t.end();
 });

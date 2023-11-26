@@ -195,6 +195,27 @@ class BabylonGraphics extends GraphicsInterface {
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     }
 
+
+    if (typeof entityData.color === 'number') {
+
+      if (!graphic.material) {
+        graphic.material = new BABYLON.StandardMaterial("material", this.scene);
+      }
+
+
+      // console.log("setting color", entityData.color)
+      // Extract RGB components from the hexadecimal color value
+      var red = (entityData.color >> 16) & 255;
+      var green = (entityData.color >> 8) & 255;
+      var blue = entityData.color & 255;
+      //console.log('setting color', red, green, blue)
+      // Set tint of graphic using the extracted RGB values
+      graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
+      // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
+
+    }
+
+
     if (entityData.rotation !== undefined) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;

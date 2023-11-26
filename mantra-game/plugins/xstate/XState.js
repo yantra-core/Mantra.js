@@ -34,26 +34,27 @@ class XState {
     game.service = interpret(game.machine).onTransition((state) => {
       // Handle state transitions or notify other parts of the game
       // console.log('State changed to:', state.value, state.changes, state.context);
-
       // TODO: make this separate fn
       function applyStateChange (context) {
         // TODO: make this work for array of entities
         let ent = game.findEntity(context.name);
         if (ent) {
-          // console.log('setting health to:', context.health, ent)
           // TODO: map all components
-          ent.health = context.health;
-          game.components.health.data[ent.id] = context.health;
-          world.entities[context.name]['health'] = context.health;
+          let components = ['health', 'color'];
+          components.forEach((component) => {
+            if (context[component]) {
+              // console.log('setting component', component, context[component])
+              ent[component] = context[component];
+              world.entities[context.name][component] = context[component];
+              game.components[component].data[ent.id] = context[component];
+            }
+          });
         }
       }
-
       if (state.value === 'UpdateEntity') {
         applyStateChange(state.context);
         this.sendEvent('COMPLETE_UPDATE');
-        // console.log('make an update to the entity here', state.context);
       }
-      
     });
     game.service.start();
 
@@ -81,7 +82,7 @@ class XState {
 
   sendEvent (eventName, eventData) {
     let game = this.game;
-    console.log('Sending event:', eventName, eventData);
+    // console.log('Sending event:', eventName, eventData);
     // Sending event: COLLISION { collisionType: 'goal' }
     game.service.send(eventName, eventData);
   }

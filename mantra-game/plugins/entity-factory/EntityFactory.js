@@ -175,6 +175,7 @@ class EntityFactory {
       name: null,
       body: true,
       shape: 'triangle',
+      color: null,
       position: { x: 0, y: 0, z: 0 },
       velocity: { x: 0, y: 0, z: 0 },
       rotation: 0,
@@ -205,7 +206,7 @@ class EntityFactory {
     entityId = config.id;
     const entity = new Entity(entityId);
 
-    const { name, type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, maxSpeed, health, owner, lifetime } = config;
+    const { name, type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, owner, lifetime } = config;
     let { x, y } = position;
 
     /*
@@ -232,6 +233,7 @@ class EntityFactory {
     this.game.addComponent(entityId, 'depth', depth);
     this.game.addComponent(entityId, 'radius', radius);
     this.game.addComponent(entityId, 'shape', shape);
+    this.game.addComponent(entityId, 'color', color);
     this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
 
     this.game.addComponent(entityId, 'owner', owner);
@@ -255,7 +257,6 @@ class EntityFactory {
         this.game.physics.setPosition(body, position);
       }
     }
-
 
     // Add the entity to the game entities scope
     // TODO: new Entity() should do this

@@ -40,7 +40,6 @@ tap.test('player movement and controls', (t) => {
 
   t.test('Presses MOVE_FORWARD to move player', (t) => {
     let player = game.getEntity(bobby.id);
-    console.log('game.systems', game.systems)
     let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.update(player.id, { W: true });
     for (let i = 0; i < 10; i++) {
@@ -50,7 +49,6 @@ tap.test('player movement and controls', (t) => {
     const movedY = game.getComponent(player.id, 'position').y;
     const movedX = game.getComponent(player.id, 'position').x;
     // Uncomment and adjust this based on your game's collision logic:
-    console.log('movedY', movedY)
     t.true(movedY < 20);
     t.true(movedX === 0);
     t.end();
@@ -91,7 +89,6 @@ tap.test('player movement and controls', (t) => {
     t.true(bullet.position.x === 0, 'bullet should be at x position 0');
     t.true(bullet.position.y < 20, 'bullet should be at y position less than 20');
 
-    console.log( game.components.type)
     t.end();
 
   });

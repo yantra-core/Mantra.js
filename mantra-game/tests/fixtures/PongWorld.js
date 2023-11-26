@@ -30,7 +30,7 @@ let Pong = {
 
 const Guards = {
   isCollisionGoal: (context, event) => {
-    console.log('Guard condition check:', event);
+    // console.log('Guard condition check:', event);
     return event.collisionType === 'goal';
   }
 };

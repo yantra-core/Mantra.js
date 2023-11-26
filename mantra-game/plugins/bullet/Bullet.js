@@ -173,7 +173,7 @@ class Bullet {
 
         if (this.game.systems.xstate) {
           let xStateSystem = this.game.systems.xstate;
-          xStateSystem.sendEvent('ENTITY_DAMAGED', { name: entityA.name, damage: 100 });
+          xStateSystem.sendEvent('ENTITY_DAMAGED', { name: entityA.name, damage: this.damage });
         }
 
 
@@ -222,6 +222,18 @@ class Bullet {
         */
         //game.systems.health.applyDamage(entityIdB, bulletA.damage);
         //this.game.removeEntity(entityIdB);
+      }
+
+      //
+      // Bullets are destroyed if hit an NPC
+      //
+      if (entityA.type === 'BULLET' && entityB.type === 'NPC') {
+        this.game.removeEntity(entityIdA);
+        return;
+      }
+      if (entityA.type === 'NPC' && entityB.type === 'BULLET') {
+        this.game.removeEntity(entityIdB);
+        return;
       }
 
     }

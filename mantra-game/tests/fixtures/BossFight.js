@@ -45,9 +45,22 @@ function BossFightMiddleware () {
     calculateComponentUpdate: (context, event) => {
       // Logic to calculate and apply component updates
       context.health -= event.damage;
-      // console.log("Component context updates calculated:", context);
-    },
-    // ... other actions
+
+      // TODO: un-hardcode values, use percentage of max health
+      if (context.health < 900) {
+        // yellow
+        context.color = 0xffff00;
+      }
+      if (context.health < 500) {
+        // orange
+        context.color = 0xffa500;
+      }
+      if (context.health < 200) {
+        // red
+        context.color = 0xff0000;
+      }
+    }
+    
   };
   
   const Guards = {
@@ -60,7 +73,6 @@ function BossFightMiddleware () {
       return event.name === context.name && event.type === 'ENTITY_DESTROYED';
     },
   };
-  
   
   const healthThresholds = {
     PhaseTwo: 700, // Example threshold for Phase Two
@@ -78,19 +90,19 @@ function BossFightMiddleware () {
       "player": {
         "type": "PLAYER",
         "position": {
-          x: 100,
-          y: 100
+          x: 400,
+          y: 400
         }, // Define player's starting position
         // Additional player properties
       },
       "boss": {
-        "type": "BOSS",
+        "type": "NPC",
         "position": {
-          x: 400,
-          y: 300
+          x: 200,
+          y: 0
         }, // Define boss's position
-        height: 100,
-        width: 100,
+        height: 600,
+        width: 600,
         "health": 1000, // Example boss health
         // Additional boss properties like attack patterns, abilities, etc.
       }

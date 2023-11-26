@@ -164,6 +164,7 @@ class Game {
     };
 
     // define additional components for the game
+    this.components.health = new Component('color', this);
     this.components.health = new Component('health', this);
     this.components.target = new Component('target', this);
     this.components.lifetime = new Component('lifetime', this);
@@ -245,20 +246,6 @@ class Game {
 
     let client = this.getSystem('client');
     client.start(cb);
-
-
-    // Machine.sendEvent('START');
-
-
-    /*
-    // Example Machine usage
-    // TODO: better integration with game lifecycle
-    Machine.createMachine(game);
-    Machine.sendEvent('START');
-    console.log('Current State:', Machine.getCurrentState());
-    game.Machine = Machine;
-    Machine.loadEntities(game);
-    */
 
   }
 
