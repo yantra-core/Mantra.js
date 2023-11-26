@@ -16,7 +16,7 @@ const game = new Game({});
 game
   .use(new MatterPhysics())
   .use(new CollisionPlugin())
-  .use(new EntityFactory())
+  .use(new Entity())
   .use(new EntityInputPlugin())
   .use(new EntityMovementPlugin(new AsteroidsMovement()))
   .use(new BulletPlugin())

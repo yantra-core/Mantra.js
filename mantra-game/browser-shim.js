@@ -16,7 +16,7 @@ MANTRA.plugins = {
   Client: require('./plugins/client/Client.js').default,
   Collision: require('./plugins/collisions/Collisions.js').default,
   Creator: require('./plugins/gui-creator/Creator.js').default,
-  EntityFactory: require('./plugins/entity-factory/EntityFactory.js').default,
+  Entity: require('./plugins/entity/Entity.js').default,
   EntityInput: require('./plugins/entity-input/EntityInput.js').default,
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js').default,
   Gamepad: require('./plugins/gamepad/Gamepad.js').default,

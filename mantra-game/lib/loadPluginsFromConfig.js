@@ -2,7 +2,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   let plugins = this.plugins;
   let gameConfig = this.config
 
-  this.use(new plugins.EntityFactory())
+  this.use(new plugins.Entity())
 
   if (physics === 'matter') {
     this.use(new plugins.MatterPhysics());

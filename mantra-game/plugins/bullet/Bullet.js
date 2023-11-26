@@ -173,9 +173,8 @@ class Bullet {
 
         if (this.game.systems.xstate) {
           let xStateSystem = this.game.systems.xstate;
-          xStateSystem.sendEvent('ENTITY_DAMAGED', { name: entityA.name, damage: this.damage });
+          xStateSystem.sendEvent('entity::damage', { name: entityA.name, damage: this.damage });
         }
-
 
         /* TODO: move this to BabylonGraphics and Graphics Plugins
         if (entityA.type === 'PLAYER') {

@@ -17,7 +17,7 @@ function gameTick() {
 
   if (this.isClient) {
     // TODO: move to localGameLoop?
-    this.systems['entity-factory'].cleanupDestroyedEntities();
+    this.systems['entity'].cleanupDestroyedEntities();
   }
 
   // Update the physics engine

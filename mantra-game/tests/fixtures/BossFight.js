@@ -1,3 +1,5 @@
+import { createMachine, interpret } from 'xstate';
+
 // BossFight.js - Marak Squires 2023
 // returns a new game object with a state machine and actions
 function BossFightMiddleware () {
@@ -15,11 +17,11 @@ function BossFightMiddleware () {
       },
       Active: {
         on: {
-          ENTITY_DAMAGED: {
+          'entity::damage': { // Updated event name
             target: 'UpdateEntity', 
             cond: 'isBossDamaged'
           },
-          ENTITY_DESTROYED: {
+          'entity::remove': { // Updated event name
             target: 'Victory', 
             cond: 'isBossDefeated'
           }
@@ -42,6 +44,14 @@ function BossFightMiddleware () {
   };
   
   const Actions = {
+
+    /*
+    moveEntity: (context, event) => {
+      // Emitting a move event for the entity
+      this.game.emit('entity::move', { entityId: event.entityId, dx: event.dx, dy: event.dy, dz: event.dz });
+    },
+    */
+
     calculateComponentUpdate: (context, event) => {
       // Logic to calculate and apply component updates
       context.health -= event.damage;
@@ -66,10 +76,11 @@ function BossFightMiddleware () {
   
   const Guards = {
     isBossDamaged: (context, event) => {
-      return event.name === context.name && event.type === 'ENTITY_DAMAGED';
+      console.log('isBossDamaged', event, context)
+      return event.name === context.name;
     },
     isBossDefeated: (context, event) => {
-      return event.name === context.name && event.type === 'ENTITY_DESTROYED';
+      return event.name === context.name;
     },
   };
   
@@ -80,13 +91,6 @@ function BossFightMiddleware () {
       "height": 600
     },
     "entities": {
-      "player": {
-        "type": "PLAYER",
-        "position": {
-          x: -200,
-          y: -600
-        }
-      },
       "boss": {
         "type": "NPC",
         "position": {

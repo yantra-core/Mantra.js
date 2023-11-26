@@ -2,7 +2,7 @@
 
 // Core plugins
 import Collision from './plugins/collisions/Collisions.js';
-import EntityFactory from './plugins/entity-factory/EntityFactory.js';
+import Entity from './plugins/entity/Entity.js';
 import EntityInput from './plugins/entity-input/EntityInput.js';
 import EntityMovement from './plugins/entity-movement/EntityMovement.js';
 
@@ -70,7 +70,7 @@ const plugins = {
   Collision,
   Client,
   Creator,
-  EntityFactory,
+  Entity,
   EntityInput,
   EntityMovement,
   Gamepad,

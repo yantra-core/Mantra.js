@@ -436,6 +436,12 @@ pre {
   position: absolute;
 }
 
+.gui-container th {
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
 /* Basic Reset */
 #eventTable {
   border-collapse: collapse;

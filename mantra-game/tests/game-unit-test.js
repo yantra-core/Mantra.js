@@ -2,7 +2,7 @@ import tap from 'tape';
 import { Game } from '../Game.js';
 import Schema from '../plugins/schema/Schema.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
-import EntityFactory from '../plugins/entity-factory/EntityFactory.js';
+import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
 import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
 
@@ -16,7 +16,7 @@ const game = new Game({
 
 game.use(new Schema());
 game.use(new PhysicsMatter());
-game.use(new EntityFactory());
+game.use(new Entity());
 game.use(new EntityInput());
 
 tap.test('game class', (t) => {
@@ -79,7 +79,7 @@ tap.test('game class', (t) => {
     t.equal(pendingRemoval.destroyed, true);
 
     game.gameTick();
-    game.systems['entity-factory'].cleanupDestroyedEntities();
+    game.systems['entity'].cleanupDestroyedEntities();
 
 
     const removedEntity = game.getEntity(entityId);

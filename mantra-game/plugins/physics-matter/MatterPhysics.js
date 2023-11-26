@@ -240,7 +240,7 @@ class MatterPhysics extends PhysicsInterface {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-        game.emit('collisionActive', { pair, bodyA, bodyB })
+        game.emit('collision::active', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }
     });
@@ -251,7 +251,7 @@ class MatterPhysics extends PhysicsInterface {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-        game.emit('collisionEnd', { pair, bodyA, bodyB })
+        game.emit('collision::end', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }
     });

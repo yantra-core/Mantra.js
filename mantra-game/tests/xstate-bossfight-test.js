@@ -1,3 +1,4 @@
+
 // xstate-bossfight-test.js - Marak Squires 2023
 import tap from 'tape';
 import { Game, plugins } from '../Game.js';
@@ -40,7 +41,7 @@ tap.test('Loading entities: Boss Entity', (t) => {
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
 
-  let boss = game.getEntity(2);
+  let boss = game.getEntity(1);
   t.ok(boss, 'NPC entity should be loaded');
   t.equal(boss.type, 'NPC', 'Boss entity should have type NPC');
   t.equal(boss.health, 1000, 'Boss entity should have health of 1000');
@@ -57,10 +58,10 @@ tap.test('Guard conditions: Entity Damaged', (t) => {
   xStateSystem.createMachine();
 
   xStateSystem.sendEvent('START');
-  xStateSystem.sendEvent('ENTITY_DAMAGED', { name: 'boss', damage: 100 });
+  xStateSystem.sendEvent('entity::damage', { name: 'boss', damage: 100 });
 
   setImmediate(() => {
-    t.equal(xStateSystem.getCurrentState(), 'Active', 'State should transition to back to Active state on ENTITY_DAMAGED event');
+    t.equal(xStateSystem.getCurrentState(), 'Active', 'State should transition to back to Active state on entity::damage event');
     t.end();
   });
 });
@@ -76,9 +77,9 @@ tap.test('Boss Health Reduction', (t) => {
   xStateSystem.sendEvent('START');
 
   // Simulate multiple damage events
-  xStateSystem.sendEvent('ENTITY_DAMAGED', { name: 'boss', damage: 100 });
+  xStateSystem.sendEvent('entity::damage', { name: 'boss', damage: 100 });
   // xStateSystem.sendEvent('COMPLETE_UPDATE');
-  xStateSystem.sendEvent('ENTITY_DAMAGED', { name: 'boss', damage: 200 });
+  xStateSystem.sendEvent('entity::damage', { name: 'boss', damage: 200 });
 
   setImmediate(() => {
     // Assuming your game logic reduces boss health
@@ -99,7 +100,7 @@ tap.test('Transition to Victory State', (t) => {
   xStateSystem.sendEvent('START');
 
   // Simulate boss defeat
-  xStateSystem.sendEvent('ENTITY_DESTROYED', { name: 'boss' });
+  xStateSystem.sendEvent('entity::remove', { name: 'boss' });
 
   setImmediate(() => {
     t.equal(xStateSystem.getCurrentState(), 'Victory', 'State should transition to Victory on boss defeat');
@@ -122,13 +123,13 @@ tap.test('Complete Boss Fight Flow', (t) => {
   t.equal(xStateSystem.getCurrentState(), 'Active', 'Initial state should be Active');
 
   // Simulate damaging the boss
-  xStateSystem.sendEvent('ENTITY_DAMAGED', { name: 'boss', damage: 500 });
+  xStateSystem.sendEvent('entity::damage', { name: 'boss', damage: 500 });
   // Check for state and boss health
   let boss = game.findEntity('boss');
   t.equal(boss.health, 500, 'Boss health should be reduced after damage');
 
   // Simulate boss defeat
-  xStateSystem.sendEvent('ENTITY_DESTROYED', { name: 'boss' });
+  xStateSystem.sendEvent('entity::remove', { name: 'boss' });
   t.equal(xStateSystem.getCurrentState(), 'Victory', 'State should transition to Victory on boss defeat');
 
   t.end();

@@ -2,7 +2,7 @@ import tap from 'tape';
 import { Game } from '../Game.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 
-import EntityFactory from '../plugins/entity-factory/EntityFactory.js';
+import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
 import EntityMovement from '../plugins/entity-movement/EntityMovement.js';
 import Bullet from '../plugins/bullet/Bullet.js';
@@ -13,7 +13,7 @@ const game = new Game({
 });
 
 game.use(new PhysicsMatter());
-game.use(new EntityFactory());
+game.use(new Entity());
 game.use(new EntityInput());
 game.use(new EntityMovement());
 game.use(new Bullet());

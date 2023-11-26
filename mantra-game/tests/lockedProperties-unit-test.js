@@ -1,14 +1,14 @@
 import tap from 'tape';
 import { Game } from '../Game.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
-import EntityFactory from '../plugins/entity-factory/EntityFactory.js';
+import Entity from '../plugins/entity/Entity.js';
 
 const game = new Game({
   loadDefaultPlugins: false
 });
 
 game.use(new PhysicsMatter());
-game.use(new EntityFactory());
+game.use(new Entity());
 
 tap.test('locked properties functionality', (t) => {
 

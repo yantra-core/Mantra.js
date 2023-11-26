@@ -1,13 +1,13 @@
-// EntityFactory.js - Marak Squires 2023
-import Entity from '../../Entity/Entity.js';
+// Entity.js - Marak Squires 2023
+import EntityClass from '../../Entity/Entity.js';
 
-class EntityFactory {
+class Entity {
 
-  static id = 'entity-factory';
+  static id = 'entity';
   static removable = false;
 
   constructor() {
-    this.id = EntityFactory.id;
+    this.id = Entity.id;
     this.nextEntityId = 1; // 0 is reserved for server
   }
 
@@ -27,7 +27,7 @@ class EntityFactory {
     this.game.createEntity = this.createEntity.bind(this);
     this.game.removeEntity = this.removeEntity.bind(this);
     this.game.getEntity = this.getEntity.bind(this);
-    this.game.getEntities = this.getEntities.bind(this);
+    this.game.getEntities = this.allEntities.bind(this);
     this.game.updateEntity = this.updateEntity.bind(this);
     this.game.inflateEntity = this.inflateEntity.bind(this);
     this.game.hasEntity = this.hasEntity.bind(this);
@@ -124,7 +124,7 @@ class EntityFactory {
   }
 
   // Update the getEntities method to return the game.entities
-  getEntities() {
+  allEntities() {
     return this.game.entities;
   }
 
@@ -204,7 +204,7 @@ class EntityFactory {
     config = { ...defaultConfig, ...config };
 
     entityId = config.id;
-    const entity = new Entity(entityId);
+    const entity = new EntityClass(entityId);
 
     const { name, type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, owner, lifetime } = config;
     let { x, y } = position;
@@ -413,7 +413,7 @@ class EntityFactory {
   }
 }
 
-export default EntityFactory;
+export default Entity;
 
 /* refactor to use this pattern */
 /*
