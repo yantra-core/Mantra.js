@@ -199,29 +199,38 @@ Object.defineProperty(exports, "plugins", {
 });
 var _Component = _interopRequireDefault(require("./Component/Component.js"));
 var _SystemsManager = _interopRequireDefault(require("./System/SystemsManager.js"));
-var _Machine = _interopRequireDefault(require("./Machine/Machine.js"));
-var _ActionRateLimiter = _interopRequireDefault(require("./Component/ActionRateLimiter.js"));
+var _plugins = _interopRequireDefault(require("./plugins.js"));
 var _SnapshotManager = _interopRequireDefault(require("./plugins/snapshots/SnapShotManager/SnapshotManager.js"));
 var _eventEmitter = _interopRequireDefault(require("./lib/eventEmitter.js"));
 var _localGameLoop = _interopRequireDefault(require("./lib/localGameLoop.js"));
 var _onlineGameLoop = _interopRequireDefault(require("./lib/onlineGameLoop.js"));
 var _gameTick = _interopRequireDefault(require("./lib/gameTick.js"));
 var _defaultGameStart = _interopRequireDefault(require("./lib/start/defaultGameStart.js"));
+var _ActionRateLimiter = _interopRequireDefault(require("./Component/ActionRateLimiter.js"));
 var _loadPluginsFromConfig = _interopRequireDefault(require("./lib/loadPluginsFromConfig.js"));
-var _plugins = _interopRequireDefault(require("./plugins.js"));
+var _loadScripts = _interopRequireDefault(require("./lib/util/loadScripts.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // Game.js
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // MANTRA - Yantra Works 2023
+// Game.js - Marak Squires 2023
 // Entity Component System
-// TODO: we have Entity.js do we even use it in Game scope? I think only EntityFactory uses it?
-// Snapshots
-// Main game loop / game tick
-// Default Game.start(fn) logic if none provided ( creates a single player and border )
 // Plugins
+// Snapshots
+// Game instances are event emitters
+// Game loops
+// Local game loop is for single machine games ( no networking )
+// Online game loop is for multiplayer games ( networking )
+// Game tick, called once per tick from game loop
+// Provides a default Game.start(fn) logic ( creates a single player and border )
+// Bind to event `player::joined` to override default player creation logic
+// Action Rate Limiter, suitable for any Systems action that should be rate limited
+// Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
+// Utility function for loading external script assets
+// The Game class is the main entry point for Mantra games
 var Game = exports.Game = /*#__PURE__*/function () {
   function Game() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -313,6 +322,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.emit = _eventEmitter["default"].emit.bind(_eventEmitter["default"]);
     this.onAny = _eventEmitter["default"].onAny.bind(_eventEmitter["default"]);
     this.listenerCount = _eventEmitter["default"].listenerCount.bind(_eventEmitter["default"]);
+
+    // Bind loadScripts from util
+    this.loadScripts = _loadScripts["default"].bind(this);
     this.bodyMap = {};
     this.systems = {};
     this.snapshotQueue = [];
@@ -322,9 +334,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.width = width;
     this.height = height;
 
-    // TODO: Physics pipeline
     // Remark: Currently, only (1) physics engine is supported at a time
-    //  If we want to run multiple physics engines, we'll want to make this array
+    // If we want to run multiple physics engines, we'll want to make this array
     // this.physics = [];
 
     this.changedEntities = new Set();
@@ -358,6 +369,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     };
 
     // define additional components for the game
+    this.components.health = new _Component["default"]('color', this);
     this.components.health = new _Component["default"]('health', this);
     this.components.target = new _Component["default"]('target', this);
     this.components.lifetime = new _Component["default"]('lifetime', this);
@@ -435,16 +447,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
       var client = this.getSystem('client');
       client.start(cb);
-
-      /*
-      // Example Machine usage
-      // TODO: better integration with game lifecycle
-      Machine.createMachine(game);
-      Machine.sendEvent('START');
-      console.log('Current State:', Machine.getCurrentState());
-      game.Machine = Machine;
-      Machine.loadEntities(game);
-      */
     }
   }, {
     key: "stop",
@@ -577,90 +579,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // console.log('setting playerID', playerId)
       this.currentPlayerId = playerId;
     }
-
-    // TODO: move to separate function
-    // Loads external js script files sequentially
-  }, {
-    key: "loadScripts",
-    value: function loadScripts(scripts, finalCallback) {
-      var _this2 = this;
-      if (this.isServer) {
-        return;
-      }
-      var loadScript = function loadScript(index) {
-        if (index < scripts.length) {
-          var script = document.createElement('script');
-          script.type = 'text/javascript';
-          // Prepend the scriptRoot to the script src
-          script.src = _this2.scriptRoot + scripts[index];
-          script.onload = function () {
-            console.log("".concat(scripts[index], " loaded"));
-            loadScript(index + 1); // Load the next script
-          };
-
-          document.head.appendChild(script);
-        } else {
-          finalCallback(); // All scripts have been loaded
-        }
-      };
-
-      loadScript(0); // Start loading the first script
-    }
   }]);
   return Game;
 }();
 
-},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Machine/Machine.js":5,"./System/SystemsManager.js":7,"./lib/eventEmitter.js":10,"./lib/gameTick.js":11,"./lib/loadPluginsFromConfig.js":12,"./lib/localGameLoop.js":13,"./lib/onlineGameLoop.js":14,"./lib/start/defaultGameStart.js":15,"./plugins.js":84,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":157}],5:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-var _xstate = require("xstate");
-var _PongWorld = _interopRequireDefault(require("../tests/fixtures/PongWorld.js"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-// Machine.js - Marak Squires 2023
-
-var Machine = {};
-Machine.createMachine = function (game) {
-  // for now, hard-code a single game
-  var pongMachine = (0, _xstate.createMachine)(_PongWorld["default"].stateMachine, {
-    guards: _PongWorld["default"].guards
-  });
-  game.machine = pongMachine;
-  game.service = (0, _xstate.interpret)(game.machine).onTransition(function (state) {
-    // Handle state transitions or notify other parts of the game
-    console.log('State changed to:', state.value);
-  });
-  game.service.start();
-};
-Machine.loadEntities = function (game) {
-  for (var name in _PongWorld["default"].entities) {
-    var ent = _PongWorld["default"].entities[name];
-    if (ent.type === 'BORDER') {
-      game.use(new game.plugins.Border({}));
-      game.systems.border.createBorder({
-        height: ent.size.height,
-        width: ent.size.width
-      });
-    }
-    game.createEntity(ent);
-  }
-};
-
-// Function to send events to the state machine
-Machine.sendEvent = function (eventName, eventData) {
-  game.service.send(eventName, eventData);
-};
-
-// Function to get the current state
-Machine.getCurrentState = function () {
-  return game.service.state.value;
-};
-var _default = exports["default"] = Machine;
-
-},{"../tests/fixtures/PongWorld.js":164,"xstate":72}],6:[function(require,module,exports){
+},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./System/SystemsManager.js":6,"./lib/eventEmitter.js":9,"./lib/gameTick.js":10,"./lib/loadPluginsFromConfig.js":11,"./lib/localGameLoop.js":12,"./lib/onlineGameLoop.js":13,"./lib/start/defaultGameStart.js":14,"./lib/util/loadScripts.js":15,"./plugins.js":84,"./plugins/snapshots/SnapShotManager/SnapshotManager.js":158}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -705,7 +628,7 @@ var Plugin = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Plugin;
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -822,7 +745,7 @@ var SystemsManager = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":10}],8:[function(require,module,exports){
+},{"../lib/eventEmitter.js":9}],7:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -846,6 +769,7 @@ MANTRA.plugins = {
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js')["default"],
   Gamepad: require('./plugins/gamepad/Gamepad.js')["default"],
   Graphics: require('./plugins/graphics/Graphics.js')["default"],
+  Health: require('./plugins/health/Health.js')["default"],
   InputLegend: require('./plugins/input-legend/InputLegend.js')["default"],
   PingTime: require('./plugins/ping-time/PingTime.js')["default"],
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js')["default"],
@@ -868,13 +792,14 @@ MANTRA.plugins = {
   MovementFrogger: require('./plugins/entity-movement/strategies/FroggerMovement.js')["default"],
   MovementPacman: require('./plugins/entity-movement/strategies/PacManMovement.js')["default"],
   MovementPong: require('./plugins/entity-movement/strategies/PongMovement.js')["default"],
-  MovementAsteroids: require('./plugins/entity-movement/strategies/AsteroidsMovement.js')["default"]
+  MovementAsteroids: require('./plugins/entity-movement/strategies/AsteroidsMovement.js')["default"],
+  XState: require('./plugins/xstate/XState.js')["default"]
   // ... add other plugins similarly
 };
 
 module.exports = MANTRA;
 
-},{"./Game.js":4,"./plugins/block/Block.js":85,"./plugins/border/Border.js":86,"./plugins/bullet/Bullet.js":87,"./plugins/client/Client.js":88,"./plugins/client/LocalClient.js":89,"./plugins/collisions/Collisions.js":108,"./plugins/current-fps/CurrentFPS.js":109,"./plugins/entity-factory/EntityFactory.js":110,"./plugins/entity-input/EntityInput.js":111,"./plugins/entity-movement/EntityMovement.js":114,"./plugins/entity-movement/strategies/AsteroidsMovement.js":116,"./plugins/entity-movement/strategies/FroggerMovement.js":118,"./plugins/entity-movement/strategies/PacManMovement.js":119,"./plugins/entity-movement/strategies/PongMovement.js":120,"./plugins/gamepad/Gamepad.js":121,"./plugins/graphics-babylon/BabylonGraphics.js":122,"./plugins/graphics-babylon/camera/BabylonCamera.js":123,"./plugins/graphics-css/CSSGraphics.js":124,"./plugins/graphics-phaser/PhaserGraphics.js":125,"./plugins/graphics-three/ThreeGraphics.js":126,"./plugins/graphics/Graphics.js":127,"./plugins/gui-editor/Editor.js":128,"./plugins/gui-plugins/PluginsGUI.js":130,"./plugins/gui-yantra/YantraGUI.js":131,"./plugins/input-legend/InputLegend.js":132,"./plugins/keyboard/Keyboard.js":133,"./plugins/lifetime/Lifetime.js":134,"./plugins/mouse/Mouse.js":135,"./plugins/physics-matter/MatterPhysics.js":136,"./plugins/ping-time/PingTime.js":151,"./plugins/schema/Schema.js":153,"./plugins/snapshot-size/SnapshotSize.js":155,"./plugins/starfield/BabylonStarField.js":161,"./plugins/starfield/StarField.js":162,"./plugins/world/pong/PongWorld.js":163}],9:[function(require,module,exports){
+},{"./Game.js":4,"./plugins/block/Block.js":85,"./plugins/border/Border.js":86,"./plugins/bullet/Bullet.js":87,"./plugins/client/Client.js":88,"./plugins/client/LocalClient.js":89,"./plugins/collisions/Collisions.js":108,"./plugins/current-fps/CurrentFPS.js":109,"./plugins/entity-factory/EntityFactory.js":110,"./plugins/entity-input/EntityInput.js":111,"./plugins/entity-movement/EntityMovement.js":114,"./plugins/entity-movement/strategies/AsteroidsMovement.js":116,"./plugins/entity-movement/strategies/FroggerMovement.js":118,"./plugins/entity-movement/strategies/PacManMovement.js":119,"./plugins/entity-movement/strategies/PongMovement.js":120,"./plugins/gamepad/Gamepad.js":121,"./plugins/graphics-babylon/BabylonGraphics.js":122,"./plugins/graphics-babylon/camera/BabylonCamera.js":123,"./plugins/graphics-css/CSSGraphics.js":124,"./plugins/graphics-phaser/PhaserGraphics.js":125,"./plugins/graphics-three/ThreeGraphics.js":126,"./plugins/graphics/Graphics.js":127,"./plugins/gui-editor/Editor.js":128,"./plugins/gui-plugins/PluginsGUI.js":130,"./plugins/gui-yantra/YantraGUI.js":131,"./plugins/health/Health.js":132,"./plugins/input-legend/InputLegend.js":133,"./plugins/keyboard/Keyboard.js":134,"./plugins/lifetime/Lifetime.js":135,"./plugins/mouse/Mouse.js":136,"./plugins/physics-matter/MatterPhysics.js":137,"./plugins/ping-time/PingTime.js":152,"./plugins/schema/Schema.js":154,"./plugins/snapshot-size/SnapshotSize.js":156,"./plugins/starfield/BabylonStarField.js":162,"./plugins/starfield/StarField.js":163,"./plugins/world/pong/PongWorld.js":164,"./plugins/xstate/XState.js":165}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -945,7 +870,7 @@ var GraphicInterface = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = GraphicInterface;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1106,7 +1031,7 @@ eventEmitter.unbindClass = function unbindClass(classInstance, namespace) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1196,7 +1121,7 @@ function gameTick() {
 }
 var _default = exports["default"] = gameTick;
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1275,7 +1200,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1350,7 +1275,7 @@ function localGameLoop(game, playerId) {
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1438,7 +1363,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1448,13 +1373,46 @@ exports["default"] = defaultGameStart;
 function defaultGameStart(game) {
   var plugins = game.plugins;
   // creates a game border
-  game.use(new plugins.Border({
-    autoBorder: false
-  }));
+  /*
+  game.use(new plugins.Border({ autoBorder: false }));
   game.systems.border.createBorder({
     height: 2000,
-    width: 2000
+    width: 2000,
   });
+  */
+}
+
+},{}],15:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = loadScripts;
+// Loads external js script files sequentially
+function loadScripts(scripts, finalCallback) {
+  var _this = this;
+  if (this.isServer) {
+    return;
+  }
+  var loadScript = function loadScript(index) {
+    if (index < scripts.length) {
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      // Prepend the scriptRoot to the script src
+      script.src = _this.scriptRoot + scripts[index];
+      script.onload = function () {
+        console.log("".concat(scripts[index], " loaded"));
+        loadScript(index + 1); // Load the next script
+      };
+
+      document.head.appendChild(script);
+    } else {
+      finalCallback(); // All scripts have been loaded
+    }
+  };
+
+  loadScript(0); // Start loading the first script
 }
 
 },{}],16:[function(require,module,exports){
@@ -24573,7 +24531,7 @@ var IS_PRODUCTION = process.env.NODE_ENV === 'production';
 exports.IS_PRODUCTION = IS_PRODUCTION;
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":165}],72:[function(require,module,exports){
+},{"_process":166}],72:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -27450,6 +27408,7 @@ var _EntityFactory = _interopRequireDefault(require("./plugins/entity-factory/En
 var _EntityInput = _interopRequireDefault(require("./plugins/entity-input/EntityInput.js"));
 var _EntityMovement = _interopRequireDefault(require("./plugins/entity-movement/EntityMovement.js"));
 var _Client = _interopRequireDefault(require("./plugins/client/Client.js"));
+var _XState = _interopRequireDefault(require("./plugins/xstate/XState.js"));
 var _MatterPhysics = _interopRequireDefault(require("./plugins/physics-matter/MatterPhysics.js"));
 var _PhysXPhysics = _interopRequireDefault(require("./plugins/physics-physx/PhysXPhysics.js"));
 var _Schema = _interopRequireDefault(require("./plugins/schema/Schema.js"));
@@ -27462,6 +27421,7 @@ var _ThreeGraphics = _interopRequireDefault(require("./plugins/graphics-three/Th
 var _Mouse = _interopRequireDefault(require("./plugins/mouse/Mouse.js"));
 var _Keyboard = _interopRequireDefault(require("./plugins/keyboard/Keyboard.js"));
 var _Gamepad = _interopRequireDefault(require("./plugins/gamepad/Gamepad.js"));
+var _Health = _interopRequireDefault(require("./plugins/health/Health.js"));
 var _Lifetime = _interopRequireDefault(require("./plugins/lifetime/Lifetime.js"));
 var _Border = _interopRequireDefault(require("./plugins/border/Border.js"));
 var _Bullet = _interopRequireDefault(require("./plugins/bullet/Bullet.js"));
@@ -27485,6 +27445,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 // Core plugins
 
 // Client
+
+// State Machines
 
 // Physics
 
@@ -27518,6 +27480,7 @@ var plugins = {
   EntityMovement: _EntityMovement["default"],
   Gamepad: _Gamepad["default"],
   Graphics: _Graphics["default"],
+  Health: _Health["default"],
   InputLegend: _InputLegend["default"],
   Keyboard: _Keyboard["default"],
   Lifetime: _Lifetime["default"],
@@ -27539,11 +27502,12 @@ var plugins = {
   BabylonStarField: _BabylonStarField["default"],
   MovementFrogger: _FroggerMovement["default"],
   MovementPacman: _PacManMovement["default"],
-  MovementPong: _PongMovement["default"]
+  MovementPong: _PongMovement["default"],
+  XState: _XState["default"]
 };
 var _default = exports["default"] = plugins;
 
-},{"./plugins//starfield/BabylonStarField.js":161,"./plugins/block/Block.js":85,"./plugins/border/Border.js":86,"./plugins/bullet/Bullet.js":87,"./plugins/client/Client.js":88,"./plugins/collisions/Collisions.js":108,"./plugins/current-fps/CurrentFPS.js":109,"./plugins/entity-factory/EntityFactory.js":110,"./plugins/entity-input/EntityInput.js":111,"./plugins/entity-movement/EntityMovement.js":114,"./plugins/entity-movement/strategies/FroggerMovement.js":118,"./plugins/entity-movement/strategies/PacManMovement.js":119,"./plugins/entity-movement/strategies/PongMovement.js":120,"./plugins/gamepad/Gamepad.js":121,"./plugins/graphics-babylon/BabylonGraphics.js":122,"./plugins/graphics-babylon/camera/BabylonCamera.js":123,"./plugins/graphics-css/CSSGraphics.js":124,"./plugins/graphics-phaser/PhaserGraphics.js":125,"./plugins/graphics-three/ThreeGraphics.js":126,"./plugins/graphics/Graphics.js":127,"./plugins/gui-editor/Editor.js":128,"./plugins/gui-inspector/Inspector.js":129,"./plugins/gui-plugins/PluginsGUI.js":130,"./plugins/gui-yantra/YantraGUI.js":131,"./plugins/input-legend/InputLegend.js":132,"./plugins/keyboard/Keyboard.js":133,"./plugins/lifetime/Lifetime.js":134,"./plugins/mouse/Mouse.js":135,"./plugins/physics-matter/MatterPhysics.js":136,"./plugins/physics-physx/PhysXPhysics.js":138,"./plugins/ping-time/PingTime.js":151,"./plugins/schema/Schema.js":153,"./plugins/snapshot-size/SnapshotSize.js":155,"./plugins/starfield/StarField.js":162}],85:[function(require,module,exports){
+},{"./plugins//starfield/BabylonStarField.js":162,"./plugins/block/Block.js":85,"./plugins/border/Border.js":86,"./plugins/bullet/Bullet.js":87,"./plugins/client/Client.js":88,"./plugins/collisions/Collisions.js":108,"./plugins/current-fps/CurrentFPS.js":109,"./plugins/entity-factory/EntityFactory.js":110,"./plugins/entity-input/EntityInput.js":111,"./plugins/entity-movement/EntityMovement.js":114,"./plugins/entity-movement/strategies/FroggerMovement.js":118,"./plugins/entity-movement/strategies/PacManMovement.js":119,"./plugins/entity-movement/strategies/PongMovement.js":120,"./plugins/gamepad/Gamepad.js":121,"./plugins/graphics-babylon/BabylonGraphics.js":122,"./plugins/graphics-babylon/camera/BabylonCamera.js":123,"./plugins/graphics-css/CSSGraphics.js":124,"./plugins/graphics-phaser/PhaserGraphics.js":125,"./plugins/graphics-three/ThreeGraphics.js":126,"./plugins/graphics/Graphics.js":127,"./plugins/gui-editor/Editor.js":128,"./plugins/gui-inspector/Inspector.js":129,"./plugins/gui-plugins/PluginsGUI.js":130,"./plugins/gui-yantra/YantraGUI.js":131,"./plugins/health/Health.js":132,"./plugins/input-legend/InputLegend.js":133,"./plugins/keyboard/Keyboard.js":134,"./plugins/lifetime/Lifetime.js":135,"./plugins/mouse/Mouse.js":136,"./plugins/physics-matter/MatterPhysics.js":137,"./plugins/physics-physx/PhysXPhysics.js":139,"./plugins/ping-time/PingTime.js":152,"./plugins/schema/Schema.js":154,"./plugins/snapshot-size/SnapshotSize.js":156,"./plugins/starfield/StarField.js":163,"./plugins/xstate/XState.js":165}],85:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -27828,7 +27792,7 @@ var Bullet = /*#__PURE__*/function () {
       x: 0,
       y: 1
     };
-    this.damage = config.damage || 10;
+    this.damage = config.damage || 30;
     this.lifetime = config.lifetime || 2000;
     this.fireRate = config.fireRate || 200;
   }
@@ -27988,6 +27952,14 @@ var Bullet = /*#__PURE__*/function () {
         // console.log('bullet collides', entityIdA, entityIdB);
 
         if (entityA && entityA.id !== entityB.owner) {
+          if (this.game.systems.xstate) {
+            var xStateSystem = this.game.systems.xstate;
+            xStateSystem.sendEvent('ENTITY_DAMAGED', {
+              name: entityA.name,
+              damage: this.damage
+            });
+          }
+
           /* TODO: move this to BabylonGraphics and Graphics Plugins
           if (entityA.type === 'PLAYER') {
             let playerGraphics = entityA.graphics;
@@ -28028,6 +28000,18 @@ var Bullet = /*#__PURE__*/function () {
           */
           //game.systems.health.applyDamage(entityIdB, bulletA.damage);
           //this.game.removeEntity(entityIdB);
+        }
+
+        //
+        // Bullets are destroyed if hit an NPC
+        //
+        if (entityA.type === 'BULLET' && entityB.type === 'NPC') {
+          this.game.removeEntity(entityIdA);
+          return;
+        }
+        if (entityA.type === 'NPC' && entityB.type === 'BULLET') {
+          this.game.removeEntity(entityIdB);
+          return;
         }
       }
     }
@@ -28190,6 +28174,9 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
       });
       callback(null, true);
       this.game.emit('start');
+      if (this.game.systems.xstate) {
+        this.game.systems.xstate.sendEvent('START');
+      }
     }
   }, {
     key: "stop",
@@ -28681,7 +28668,7 @@ function _decodeBlob() {
   return _decodeBlob.apply(this, arguments);
 }
 
-},{"../../lib/gameTick.js":11,"../server/messageSchema.js":154,"../snapshots/SnapShotManager/deltaCompression.js":158,"./lib/interpolateSnapshot.js":91,"@msgpack/msgpack":101}],91:[function(require,module,exports){
+},{"../../lib/gameTick.js":10,"../server/messageSchema.js":155,"../snapshots/SnapShotManager/deltaCompression.js":159,"./lib/interpolateSnapshot.js":91,"@msgpack/msgpack":101}],91:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -30538,8 +30525,9 @@ var Collisions = /*#__PURE__*/function () {
 
       // Check for specific collision cases and send events to the state machine
       if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
-        if (this.game.Machine && this.game.Machine.sendEvent) {
-          this.game.Machine.sendEvent('COLLISION', {
+        if (this.game.machine && this.game.machine.sendEvent) {
+          // console.log('sending machine event', 'COLLISION');
+          this.game.machine.sendEvent('COLLISION', {
             entityIdA: bodyA.myEntityId,
             entityIdB: bodyB.myEntityId
           });
@@ -30695,6 +30683,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -30726,6 +30721,46 @@ var EntityFactory = /*#__PURE__*/function () {
       this.game.getEntities = this.getEntities.bind(this);
       this.game.updateEntity = this.updateEntity.bind(this);
       this.game.inflateEntity = this.inflateEntity.bind(this);
+      this.game.hasEntity = this.hasEntity.bind(this);
+      this.game.findEntity = this.findEntity.bind(this);
+    }
+  }, {
+    key: "hasEntity",
+    value: function hasEntity(entityId) {
+      return this.game.entities.has(entityId);
+    }
+  }, {
+    key: "findEntity",
+    value: function findEntity(query) {
+      if (typeof query === 'string') {
+        query = {
+          name: query
+        };
+      }
+      // iterate over entities and return the first match
+      var _iterator = _createForOfIteratorHelper(this.game.entities),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+            entityId = _step$value[0],
+            entity = _step$value[1];
+          var match = true;
+          for (var key in query) {
+            if (entity[key] !== query[key]) {
+              match = false;
+              break;
+            }
+          }
+          if (match) {
+            return entity;
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
     }
   }, {
     key: "getEntity",
@@ -30840,8 +30875,10 @@ var EntityFactory = /*#__PURE__*/function () {
       var entityId = this._generateId();
       var defaultConfig = {
         id: entityId,
+        name: null,
         body: true,
         shape: 'triangle',
+        color: null,
         position: {
           x: 0,
           y: 0,
@@ -30884,6 +30921,7 @@ var EntityFactory = /*#__PURE__*/function () {
       entityId = config.id;
       var entity = new _Entity["default"](entityId);
       var _config = config,
+        name = _config.name,
         type = _config.type,
         position = _config.position,
         mass = _config.mass,
@@ -30897,6 +30935,7 @@ var EntityFactory = /*#__PURE__*/function () {
         depth = _config.depth,
         radius = _config.radius,
         shape = _config.shape,
+        color = _config.color,
         maxSpeed = _config.maxSpeed,
         health = _config.health,
         owner = _config.owner,
@@ -30915,6 +30954,7 @@ var EntityFactory = /*#__PURE__*/function () {
       // Using game's API to add components
       // alert(type)
       this.game.addComponent(entityId, 'type', type || 'PLAYER');
+      this.game.addComponent(entityId, 'name', name || null);
       this.game.addComponent(entityId, 'position', position);
       this.game.addComponent(entityId, 'velocity', velocity);
       this.game.addComponent(entityId, 'rotation', config.rotation);
@@ -30926,6 +30966,7 @@ var EntityFactory = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'depth', depth);
       this.game.addComponent(entityId, 'radius', radius);
       this.game.addComponent(entityId, 'shape', shape);
+      this.game.addComponent(entityId, 'color', color);
       this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
       this.game.addComponent(entityId, 'owner', owner);
       this.game.addComponent(entityId, 'lifetime', lifetime);
@@ -31220,7 +31261,7 @@ _defineProperty(EntityInput, "id", 'entity-input');
 _defineProperty(EntityInput, "removable", false);
 var _default = exports["default"] = EntityInput;
 
-},{"../../Plugin.js":6,"./strategies/2D/Default2DInputStrategy.js":112,"./strategies/3D/Default3DInputStrategy.js":113}],112:[function(require,module,exports){
+},{"../../Plugin.js":5,"./strategies/2D/Default2DInputStrategy.js":112,"./strategies/3D/Default3DInputStrategy.js":113}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31586,7 +31627,7 @@ _defineProperty(EntityMovement, "id", 'entity-movement');
 _defineProperty(EntityMovement, "removable", false);
 var _default = exports["default"] = EntityMovement;
 
-},{"../../Plugin.js":6,"./strategies/3D/Asteroids3DMovement.js":115,"./strategies/DefaultMovement.js":117}],115:[function(require,module,exports){
+},{"../../Plugin.js":5,"./strategies/3D/Asteroids3DMovement.js":115,"./strategies/DefaultMovement.js":117}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32377,6 +32418,22 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // console.log(-entityData.position.x, entityData.position.z, entityData.position.y);
         graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
       }
+      if (typeof entityData.color === 'number') {
+        if (!graphic.material) {
+          graphic.material = new BABYLON.StandardMaterial("material", this.scene);
+        }
+
+        // console.log("setting color", entityData.color)
+        // Extract RGB components from the hexadecimal color value
+        var red = entityData.color >> 16 & 255;
+        var green = entityData.color >> 8 & 255;
+        var blue = entityData.color & 255;
+        //console.log('setting color', red, green, blue)
+        // Set tint of graphic using the extracted RGB values
+        graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
+        // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
+      }
+
       if (entityData.rotation !== undefined) {
         //graphic.rotation.y = -entityData.rotation;
         // in additon, adjust by -Math.PI / 2;
@@ -32668,7 +32725,7 @@ _defineProperty(BabylonGraphics, "id", 'graphics-babylon');
 _defineProperty(BabylonGraphics, "removable", false);
 var _default = exports["default"] = BabylonGraphics;
 
-},{"../../lib/GraphicsInterface.js":9,"../../plugins.js":84}],123:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":8,"../../plugins.js":84}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33124,7 +33181,7 @@ _defineProperty(CSSGraphics, "id", 'graphics-css');
 _defineProperty(CSSGraphics, "removable", false);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":9}],125:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":8}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33515,7 +33572,7 @@ _defineProperty(PhaserGraphics, "id", 'graphics-phaser');
 _defineProperty(PhaserGraphics, "removable", false);
 var _default = exports["default"] = PhaserGraphics;
 
-},{"../../lib/GraphicsInterface.js":9}],126:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":8}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33758,7 +33815,7 @@ _defineProperty(ThreeGraphics, "id", 'graphics-three');
 _defineProperty(ThreeGraphics, "removable", false);
 var _default = exports["default"] = ThreeGraphics;
 
-},{"../../lib/GraphicsInterface.js":9}],127:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":8}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34784,6 +34841,56 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var Health = /*#__PURE__*/function () {
+  function Health() {
+    _classCallCheck(this, Health);
+    this.id = Health.id;
+  }
+  _createClass(Health, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.game.systemsManager.addSystem('health', this);
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      var now = Date.now();
+      for (var entityId in this.game.components.health.data) {
+        var value = this.game.components.health.data[entityId];
+        // check if health is below 0, if so remove entity
+        //console.log('checking ent', entityId, value)
+        if (typeof value === 'number' && value <= 0) {
+          this.game.removeEntity(Number(entityId)); // TODO: remove Number(), refactor Components to use Map
+        }
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }]);
+  return Health;
+}();
+_defineProperty(Health, "id", 'health');
+var _default = exports["default"] = Health;
+
+},{}],133:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 // InputLegend.js - Marak Squires 2023
 var InputLegend = /*#__PURE__*/function () {
   function InputLegend() {
@@ -34881,7 +34988,7 @@ var InputLegend = /*#__PURE__*/function () {
 _defineProperty(InputLegend, "id", 'input-legend');
 var _default = exports["default"] = InputLegend;
 
-},{}],133:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35027,7 +35134,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
 }();
 _defineProperty(Keyboard, "id", 'keyboard');
 
-},{}],134:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35078,7 +35185,7 @@ var Lifetime = /*#__PURE__*/function () {
 _defineProperty(Lifetime, "id", 'lifetime');
 var _default = exports["default"] = Lifetime;
 
-},{}],135:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35207,7 +35314,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
 }();
 _defineProperty(Mouse, "id", 'mouse');
 
-},{}],136:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35698,7 +35805,7 @@ var truncateToStringWithPrecision = function truncateToStringWithPrecision(value
   return value.toFixed(precision);
 };
 
-},{"./PhysicsInterface.js":137,"matter-js":26}],137:[function(require,module,exports){
+},{"./PhysicsInterface.js":138,"matter-js":26}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35800,7 +35907,7 @@ var PhysicsInterface = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = PhysicsInterface;
 
-},{}],138:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36112,7 +36219,7 @@ _defineProperty(PhysXPhysics, "id", 'physics-physx');
 _defineProperty(PhysXPhysics, "removable", false);
 var _default = exports["default"] = PhysXPhysics;
 
-},{"../physics-matter/PhysicsInterface.js":137,"./lib/body/applyAngularForce.js":139,"./lib/body/applyForce.js":140,"./lib/body/applyTorque.js":141,"./lib/body/getBodyPosition.js":142,"./lib/body/getBodyRotation.js":143,"./lib/body/getLinearVelocity.js":144,"./lib/body/rotateBody.js":145,"./lib/checkForMovedBodies.js":146,"./lib/math/quaternionToEuler.js":147,"./lib/shapes/createCircle.js":148,"./lib/shapes/createRectangle.js":149,"./lib/updateEngine.js":150}],139:[function(require,module,exports){
+},{"../physics-matter/PhysicsInterface.js":138,"./lib/body/applyAngularForce.js":140,"./lib/body/applyForce.js":141,"./lib/body/applyTorque.js":142,"./lib/body/getBodyPosition.js":143,"./lib/body/getBodyRotation.js":144,"./lib/body/getLinearVelocity.js":145,"./lib/body/rotateBody.js":146,"./lib/checkForMovedBodies.js":147,"./lib/math/quaternionToEuler.js":148,"./lib/shapes/createCircle.js":149,"./lib/shapes/createRectangle.js":150,"./lib/updateEngine.js":151}],140:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36132,7 +36239,7 @@ function applyAngularForce(body, force, axis) {
   body.addTorque(torque, this.PhysX.eFORCE, true);
 }
 
-},{}],140:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36171,7 +36278,7 @@ function applyForce(body, position, force) {
   if (pxPosition) this.PhysX.destroy(pxPosition);
 }
 
-},{}],141:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36190,7 +36297,7 @@ function applyTorque(body, torqueAmount, axis) {
 }
 var _default = exports["default"] = applyTorque;
 
-},{}],142:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36217,7 +36324,7 @@ function getBodyPosition(body) {
   };
 }
 
-},{}],143:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36241,7 +36348,7 @@ function getBodyRotation(body) {
   };
 }
 
-},{}],144:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36268,7 +36375,7 @@ function getLinearVelocity(body) {
   };
 }
 
-},{}],145:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36311,7 +36418,7 @@ function calculateRotationQuaternion(PhysX, angle, axis) {
   return new PhysX.PxQuat(axis.x * sinHalfAngle, axis.y * sinHalfAngle, axis.z * sinHalfAngle, Math.cos(halfAngle));
 }
 
-},{}],146:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36357,7 +36464,7 @@ function checkForMovedBodies() {
   });
 }
 
-},{}],147:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36384,7 +36491,7 @@ function quaternionToEuler(quaternion) {
   };
 }
 
-},{}],148:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36483,7 +36590,7 @@ function createCircle(x, y, radius) {
   return sphereActor;
 }
 
-},{}],149:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36605,7 +36712,7 @@ function createRectangle(x, y, width, height) {
   return boxActor;
 }
 
-},{}],150:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36664,7 +36771,7 @@ function updateEngine(engine) {
   this.lastFrame = hrtime;
 }
 
-},{}],151:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36758,7 +36865,7 @@ var truncateToPrecision = function truncateToPrecision(value) {
 };
 var _default = exports["default"] = PingTime;
 
-},{}],152:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36909,7 +37016,7 @@ var messageSchema = {
 };
 var _default = exports["default"] = messageSchema;
 
-},{}],153:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36945,7 +37052,7 @@ var Schema = exports["default"] = /*#__PURE__*/function () {
 _defineProperty(Schema, "id", 'schema');
 _defineProperty(Schema, "removable", false);
 
-},{"./Message.js":152,"protobufjs":27}],154:[function(require,module,exports){
+},{"./Message.js":153,"protobufjs":27}],155:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37062,7 +37169,7 @@ var messageSchema = {
 };
 var _default = exports["default"] = messageSchema;
 
-},{}],155:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37159,7 +37266,7 @@ var truncateToPrecision = function truncateToPrecision(value) {
 };
 var _default = exports["default"] = SnapshotSize;
 
-},{"./vendor/bytes/bytes.js":156}],156:[function(require,module,exports){
+},{"./vendor/bytes/bytes.js":157}],157:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37312,7 +37419,7 @@ function parse(val) {
   return Math.floor(map[unit] * floatValue);
 }
 
-},{}],157:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37452,7 +37559,7 @@ getDecodedSnapshot(snapshotId) {
 
 */
 
-},{"./getPlayerSnapshot.js":160}],158:[function(require,module,exports){
+},{"./getPlayerSnapshot.js":161}],159:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37698,7 +37805,7 @@ function initializeDefaultState(id) {
 }
 var _default = exports["default"] = deltaCompression;
 
-},{"./float2Int.js":159}],159:[function(require,module,exports){
+},{"./float2Int.js":160}],160:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37727,7 +37834,7 @@ var float2Int = {
 };
 var _default = exports["default"] = float2Int;
 
-},{}],160:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37760,7 +37867,7 @@ var config = {
 };
 
 // TODO: auto-generate this list from the components
-var componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner'];
+var componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner', 'color'];
 var getPlayerSnapshot = function getPlayerSnapshot(playerId) {
   var differentialSnapshotState = [];
   var playerState = [];
@@ -37846,7 +37953,7 @@ var truncateToPrecision = function truncateToPrecision(value) {
 };
 var _default = exports["default"] = getPlayerSnapshot;
 
-},{}],161:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37930,7 +38037,7 @@ _defineProperty(BabylonStarField, "id", 'babylon-starfield');
 _defineProperty(BabylonStarField, "removable", false);
 var _default = exports["default"] = BabylonStarField;
 
-},{}],162:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38004,7 +38111,7 @@ _defineProperty(StarField, "id", 'starfield');
 _defineProperty(StarField, "removable", false);
 var _default = exports["default"] = StarField;
 
-},{"../../plugins.js":84}],163:[function(require,module,exports){
+},{"../../plugins.js":84}],164:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38166,124 +38273,125 @@ var PongWorld = /*#__PURE__*/function (_Plugin) {
 _defineProperty(PongWorld, "id", 'pong-world');
 var _default = exports["default"] = PongWorld;
 
-},{"../../../Plugin.js":6}],164:[function(require,module,exports){
+},{"../../../Plugin.js":5}],165:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-// Pong.js - Marak Squires 2023
-var Pong = {
-  id: 'pongGame',
-  initial: 'Idle',
-  states: {
-    Idle: {
-      on: {
-        START: 'Playing'
-      }
-    },
-    Playing: {
-      on: {
-        PAUSE: 'Paused',
-        COLLISION: [{
-          target: 'Scored',
-          cond: 'isCollisionGoal'
-        }, {
-          target: 'Playing'
-        } // Default, no scoring collision
-        ]
-      }
-    },
-
-    Scored: {
-      // Handle scoring logic here
-      on: {
-        CONTINUE: 'Playing'
-      }
-    },
-    Paused: {
-      on: {
-        RESUME: 'Playing'
-      }
-    },
-    GameOver: {
-      type: 'final'
-    }
+var _xstate = require("xstate");
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // XState.js - Marak Squires 2023
+var XState = /*#__PURE__*/function () {
+  function XState(_ref) {
+    var world = _ref.world;
+    _classCallCheck(this, XState);
+    this.id = XState.id;
+    this.world = world;
   }
-};
-var Guards = {
-  isCollisionGoal: function isCollisionGoal(context, event) {
-    // Implement the logic to determine if the collision is a goal collision
-    // For instance, you might check the event details sent from your collision system
-    return event.collisionType === 'goal';
-  }
-};
-var Game = {
-  "id": "pongGame",
-  "world": {
-    "width": 800,
-    "height": 600,
-    "background": "black",
-    "score": {
-      // Scoring system
-      "player1": 0,
-      "player2": 0 // can add more players as game runs
-    }
-  },
-
-  "entities": {
-    "player": {
-      "type": "PLAYER",
-      "position": {
-        "x": 30,
-        "y": 300
-      },
-      "size": {
-        "width": 20,
-        "height": 100
-      },
-      "velocity": {
-        "x": 0,
-        "y": 0
-      },
-      "input": {
-        "type": "player"
-      } // Player input handling
-    },
-
-    "ball": {
-      "type": "Ball",
-      "position": {
-        "x": 400,
-        "y": 300
-      },
-      "size": {
-        "radius": 10
-      },
-      "velocity": {
-        "x": 2,
-        "y": 2
+  _createClass(XState, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      if (this.world) {
+        this.createMachine();
+        this.loadEntities();
       }
-    },
-    "border": {
-      "type": "BORDER",
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "size": {
-        "width": 1600,
-        "height": 900
+      // register as system
+      game.systemsManager.addSystem('xstate', this);
+    }
+  }, {
+    key: "createMachine",
+    value: function createMachine() {
+      var _this = this;
+      // Game class instance
+      var game = this.game;
+      // world data as JSON state machine
+      var world = this.world;
+      // for now, hard-code a single game
+      world.stateMachine.predictableActionArguments = true;
+      var worldMachine = (0, _xstate.createMachine)(world.stateMachine, {
+        guards: world.guards,
+        actions: world.actions
+      });
+      game.machine = worldMachine;
+      game.service = (0, _xstate.interpret)(game.machine).onTransition(function (state) {
+        // Handle state transitions or notify other parts of the game
+        // console.log('State changed to:', state.value, state.changes, state.context);
+        // TODO: make this separate fn
+        function applyStateChange(context) {
+          // TODO: make this work for array of entities
+          var ent = game.findEntity(context.name);
+          if (ent) {
+            // TODO: map all components
+            var components = ['health', 'color'];
+            components.forEach(function (component) {
+              if (context[component]) {
+                // console.log('setting component', component, context[component])
+                ent[component] = context[component];
+                world.entities[context.name][component] = context[component];
+                game.components[component].data[ent.id] = context[component];
+              }
+            });
+            game.inflateEntity(ent);
+          }
+        }
+        if (state.value === 'UpdateEntity') {
+          applyStateChange(state.context);
+          _this.sendEvent('COMPLETE_UPDATE');
+        }
+      });
+      game.service.start();
+    }
+  }, {
+    key: "loadEntities",
+    value: function loadEntities() {
+      var game = this.game;
+      var world = this.world;
+      for (var name in world.entities) {
+        var ent = world.entities[name];
+        ent.name = name;
+        // TODO: tree lookup of TYPE to plugin, single depth
+        if (ent.type === 'BORDER') {
+          if (!game.systems.border) {
+            game.use(new game.plugins.Border({}));
+          }
+          game.systems.border.createBorder({
+            height: ent.size.height,
+            width: ent.size.width
+          });
+        }
+        game.createEntity(ent);
       }
     }
-  },
-  "stateMachine": Pong,
-  "guards": Guards
-};
-var _default = exports["default"] = Game;
+  }, {
+    key: "sendEvent",
+    value: function sendEvent(eventName, eventData) {
+      var game = this.game;
+      // console.log('Sending event:', eventName, eventData);
+      // Sending event: COLLISION { collisionType: 'goal' }
+      game.service.send(eventName, eventData);
+    }
+  }, {
+    key: "getCurrentState",
+    value: function getCurrentState() {
+      var game = this.game;
+      return game.service.state.value;
+    }
+  }]);
+  return XState;
+}();
+_defineProperty(XState, "id", 'xstate');
+_defineProperty(XState, "removable", false);
+var _default = exports["default"] = XState;
 
-},{}],165:[function(require,module,exports){
+},{"xstate":72}],166:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -38469,5 +38577,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[8])(8)
+},{}]},{},[7])(7)
 });

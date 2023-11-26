@@ -32,7 +32,11 @@ Mantra is designed to start a full-featured local game instance in seconds using
 </script>
 ```
 
-You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode. 
+You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode.
+
+`mantra` enables multiple ways to write custom game logic. At the lowest levels, you can customize your games using JavaScript or TypeScript code, generally writing Systems Plugins and working with the Event Emitter API.
+
+`mantra` games have optional support for [xstate](https://github.com/statelyai/xstate) machines via the `XState` plugin. Representing your game logic as a state machine is an excellent way to ensure high-quality results with minimal coding complexities.
 
 ## Demos
 
@@ -50,6 +54,7 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 | Libraries        | Demo Link                                                                      | CodePen Link                                                                |
 |----------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/offline/matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM)                     |
+| Matter.js + Babylon.js + `xstate`     | [Yantra](https://yantra.gg/mantra/examples/offline/xstate-matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/wvNXRBW)                     |
 | Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/offline/matter-phaser.html)       | [CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr)                |
 | Matter.js + CSS Graphics   | [Yantra](https://yantra.gg/mantra/examples/offline/matter-css.html)                                                                                | [CodePen](https://codepen.io/Marak-Squires/pen/abXpEve)                |
 | NVIDIA PhysX 5.3.0 + Babylon.js | [Yantra](https://yantra.gg/mantra/examples/offline/physx-babylon.html)                                                                            | [CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR)                |
@@ -245,6 +250,8 @@ The following checklist outlines the planned features and their current status:
 ## Mod Support
 
 - [✅] **Creator JSON API**: Manage game state remotely via JSON messages
+- [✅] **`xstate` Game Logic**: Manage game logic with [xstate](https://github.com/statelyai/xstate) machines
+
 - [❌] **Enhanced Event Hooks**: Wildcard splats, regex search, before/after/first/last
 - [❌] **Custom Resource Packs**: Manage game pack resources via API
 

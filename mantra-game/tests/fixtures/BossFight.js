@@ -6,8 +6,8 @@ function BossFightMiddleware () {
     id: 'bossFightGame',
     initial: 'Idle',
     context: {
-      name: 'boss', // Assuming 'boss' is the ID of the boss entity
-      health: 1000, // Initial health of the boss
+      name: 'boss',
+      health: 1000,
     },
     states: {
       Idle: {
@@ -45,28 +45,27 @@ function BossFightMiddleware () {
     calculateComponentUpdate: (context, event) => {
       // Logic to calculate and apply component updates
       context.health -= event.damage;
-
-      // TODO: un-hardcode values, use percentage of max health
-      if (context.health < 900) {
-        // yellow
-        context.color = 0xffff00;
-      }
-      if (context.health < 500) {
-        // orange
-        context.color = 0xffa500;
-      }
-      if (context.health < 200) {
-        // red
-        context.color = 0xff0000;
-      }
+  
+      // Define color ranges: yellow (0xffff00) to red (0xff0000)
+      const yellow = { r: 255, g: 255, b: 0 };
+      const red = { r: 255, g: 0, b: 0 };
+  
+      // Calculate the proportion of health lost
+      const maxHealth = 1000; // Assuming max health is 1000
+      const healthProportion = Math.max(context.health, 0) / maxHealth;
+  
+      // Interpolate between yellow and red based on health proportion
+      const r = yellow.r + (red.r - yellow.r) * (1 - healthProportion);
+      const g = yellow.g + (red.g - yellow.g) * (1 - healthProportion);
+      const b = yellow.b + (red.b - yellow.b) * (1 - healthProportion);
+  
+      // Convert RGB to hexadecimal color
+      context.color = (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(b);
     }
-    
   };
   
   const Guards = {
     isBossDamaged: (context, event) => {
-      // console.log("checking isBossDamaged", context, event);
-      // console.log("isBossDamaged Guard condition check:", context, event);
       return event.name === context.name && event.type === 'ENTITY_DAMAGED';
     },
     isBossDefeated: (context, event) => {
@@ -74,26 +73,19 @@ function BossFightMiddleware () {
     },
   };
   
-  const healthThresholds = {
-    PhaseTwo: 700, // Example threshold for Phase Two
-    PhaseThree: 300, // Example threshold for Phase Three
-  };
-  
   let Game = {
     "id": "bossFightGame",
     "world": {
       "width": 800,
-      "height": 600,
-      "background": "arena", // Example background
+      "height": 600
     },
     "entities": {
       "player": {
         "type": "PLAYER",
         "position": {
-          x: 400,
-          y: 400
-        }, // Define player's starting position
-        // Additional player properties
+          x: -200,
+          y: -600
+        }
       },
       "boss": {
         "type": "NPC",
@@ -103,7 +95,7 @@ function BossFightMiddleware () {
         }, // Define boss's position
         height: 600,
         width: 600,
-        "health": 1000, // Example boss health
+        "health": 1000
         // Additional boss properties like attack patterns, abilities, etc.
       }
     },

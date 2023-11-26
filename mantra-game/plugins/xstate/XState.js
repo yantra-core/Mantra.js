@@ -49,6 +49,7 @@ class XState {
               game.components[component].data[ent.id] = context[component];
             }
           });
+          game.inflateEntity(ent);
         }
       }
       if (state.value === 'UpdateEntity') {

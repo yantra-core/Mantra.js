@@ -7,7 +7,7 @@ class Bullet {
     this.redGlowMaterial = null; // Used for caching the material
     this.speed = config.speed || 22; // or 22?
     this.direction = config.direction || { x: 0, y: 1 };
-    this.damage = config.damage || 10;
+    this.damage = config.damage || 30;
     this.lifetime = config.lifetime || 2000;
     this.fireRate = config.fireRate || 200;
   }
