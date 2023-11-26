@@ -31,10 +31,30 @@ class EntityFactory {
     this.game.updateEntity = this.updateEntity.bind(this);
     this.game.inflateEntity = this.inflateEntity.bind(this);
     this.game.hasEntity = this.hasEntity.bind(this);
+    this.game.findEntity = this.findEntity.bind(this);
   }
 
   hasEntity (entityId) {
     return this.game.entities.has(entityId);
+  }
+
+  findEntity (query) {
+    if (typeof query === 'string') {
+      query = { name: query };
+    }
+    // iterate over entities and return the first match
+    for (let [entityId, entity] of this.game.entities) {
+      let match = true;
+      for (let key in query) {
+        if (entity[key] !== query[key]) {
+          match = false;
+          break;
+        }
+      }
+      if (match) {
+        return entity;
+      }
+    }
   }
 
   getEntity(entityId) {
@@ -152,6 +172,7 @@ class EntityFactory {
 
     let defaultConfig = {
       id: entityId,
+      name: null,
       body: true,
       shape: 'triangle',
       position: { x: 0, y: 0, z: 0 },
@@ -184,7 +205,7 @@ class EntityFactory {
     entityId = config.id;
     const entity = new Entity(entityId);
 
-    const { type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, maxSpeed, health, owner, lifetime } = config;
+    const { name, type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, maxSpeed, health, owner, lifetime } = config;
     let { x, y } = position;
 
     /*
@@ -198,6 +219,8 @@ class EntityFactory {
     // Using game's API to add components
     // alert(type)
     this.game.addComponent(entityId, 'type', type || 'PLAYER');
+    this.game.addComponent(entityId, 'name', name || null);
+
     this.game.addComponent(entityId, 'position', position);
     this.game.addComponent(entityId, 'velocity', velocity);
     this.game.addComponent(entityId, 'rotation', config.rotation);

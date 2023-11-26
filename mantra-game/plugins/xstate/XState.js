@@ -27,12 +27,30 @@ class XState {
     // for now, hard-code a single game
     world.stateMachine.predictableActionArguments = true;
     const worldMachine = createMachine(world.stateMachine, {
-      guards: world.guards
+      guards: world.guards,
+      actions: world.actions
     });
     game.machine = worldMachine;
     game.service = interpret(game.machine).onTransition((state) => {
       // Handle state transitions or notify other parts of the game
-      console.log('State changed to:', state.value);
+      // console.log('State changed to:', state.value, state.changes, state.context);
+
+      // TODO: make this separate fn
+      function applyStateChange (context) {
+        // TODO: make this work for array of entities
+        let ent = game.findEntity(context.name);
+        if (ent) {
+          // console.log('setting health to:', context.health, ent)
+          // TODO: map all components
+          ent.health = context.health;
+          world.entities[context.name]['health'] = context.health;
+        }
+      }
+
+      if (state.value === 'UpdateEntity') {
+        applyStateChange(state.context);
+        this.sendEvent('COMPLETE_UPDATE');
+      }
       
     });
     game.service.start();
@@ -44,7 +62,7 @@ class XState {
     let world = this.world;
     for (let name in world.entities) {
       let ent = world.entities[name];
-
+      ent.name = name;
       // TODO: tree lookup of TYPE to plugin, single depth
       if (ent.type === 'BORDER') {
         if (!game.systems.border) {
@@ -72,6 +90,5 @@ class XState {
   }
 
 }
-
 
 export default XState;
