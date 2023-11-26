@@ -40,16 +40,21 @@ class Editor {
     // Create menus
     const $fileMenu = this.createMenu('File');
     const $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
+    const $eventsMenu = this.createMenu('Events', this.showEventsInspector.bind(this));
+    const $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
+    const $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
     // const $aboutMenu = this.createMenu('About');
+    // TODO: add optional xstate menu for editing / viewing state machines
 
     // Populate menus
     this.populateFileMenu($fileMenu);
     this.populatePluginsMenu($pluginsMenu);
+
     // TODO: about links
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu/*, $aboutMenu*/);
+    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $inspectorMenu);
 
     // Append the toolbar to the body
     $('body').append($toolbar);
@@ -151,6 +156,36 @@ class Editor {
     // Functionality to show plugins GUI
     if (this.game.systems['gui-plugins']) {
       this.game.systems['gui-plugins'].togglePluginView();
+    }
+  }
+
+  showEventsInspector() {
+    let game = this.game;
+    console.log('showEventsInspector', game.systems['gui-event-inspector'])
+    if (typeof game.systems['gui-event-inspector'] === 'undefined') {
+      game.use(new this.game.plugins.EventInspector());
+    } else {
+      this.game.systemsManager.removeSystem('gui-event-inspector');
+    }
+  }
+
+  showControls() {
+    let game = this.game;
+    if (typeof game.systems['gui-controls'] === 'undefined') {
+      game.use(new this.game.plugins.ControlsGUI());
+      this.game.systems['gui-controls'].drawTable();
+    } else {
+      this.game.systemsManager.removeSystem('gui-controls');
+    }
+  }
+
+  showInspector () {
+    let game = this.game;
+    console.log('showInspector', game.systems['gui-inspector'])
+    if (typeof game.systems['gui-inspector'] === 'undefined') {
+      game.use(new this.game.plugins.Inspector());
+    } else {
+      this.game.systemsManager.removeSystem('gui-inspector');
     }
   }
 

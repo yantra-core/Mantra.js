@@ -41,14 +41,17 @@ import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 
-// TODO: gui-legend
-import InputLegend from './plugins/input-legend/InputLegend.js';
 import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
-import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
-import Editor from './plugins/gui-editor/Editor.js';
+
+// GUI
 import Inspector from './plugins/gui-inspector/Inspector.js';
+import Creator from './plugins/gui-creator/Creator.js';
+import ControlsGUI from './plugins/gui-controls/ControlsGUI.js';
+import Editor from './plugins/gui-editor/Editor.js';
+import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
+import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
 
 // Utility
 import PingTime from './plugins/ping-time/PingTime.js';
@@ -66,18 +69,21 @@ const plugins = {
   Bullet,
   Collision,
   Client,
-  Editor,
+  Creator,
   EntityFactory,
   EntityInput,
   EntityMovement,
   Gamepad,
   Graphics,
   Health,
-  InputLegend,
   Keyboard,
   Lifetime,
-  PluginsGUI,
+  Editor,
   Inspector,
+  EventInspector,
+  ControlsGUI,
+  PluginsGUI,
+  YantraGUI,
   MatterPhysics,
   PhysXPhysics,
   PingTime,

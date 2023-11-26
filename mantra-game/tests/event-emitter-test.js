@@ -140,58 +140,6 @@ tap.test('eventEmitter - emit with no listeners', (t) => {
   t.end();
 });
 
-tap.test('eventEmitter - single level wildcard pattern', (t) => {
-  let testValue = 0;
-  function handler() { testValue = 1; }
-
-  eventEmitter.on('namespace::*', handler);
-  eventEmitter.emit('namespace::testEvent');
-
-  t.equal(testValue, 1, 'Wildcard * should catch events with any single-level name after namespace');
-  t.end();
-});
-
-
-tap.test('eventEmitter - multi-level wildcard pattern', (t) => {
-  let testValue = 0;
-  function handler() { testValue = 1; }
-
-  eventEmitter.on('namespace::**', handler);
-  eventEmitter.emit('namespace::subnamespace:testEvent');
-
-  t.equal(testValue, 1, 'Wildcard ** should catch events with any depth of names after namespace');
-  t.end();
-});
-
-tap.test('eventEmitter - exact match vs wildcard precedence', (t) => {
-  let exactMatchCalled = false;
-  let wildcardMatchCalled = false;
-
-  function exactMatchHandler() { exactMatchCalled = true; }
-  function wildcardHandler() { wildcardMatchCalled = true; }
-
-  eventEmitter.on('event::test', exactMatchHandler);
-  eventEmitter.on('event::**', wildcardHandler);
-  
-  eventEmitter.emit('event::test');
-
-  t.equal(exactMatchCalled, true, 'Exact match handler should be called');
-  t.equal(wildcardMatchCalled, true, 'Wildcard match handler should also be called');
-  t.end();
-});
-
-tap.test('eventEmitter - removing wildcard listeners', (t) => {
-  let testValue = 0;
-  function handler() { testValue = 1; }
-
-  eventEmitter.on('namespace::*', handler);
-  eventEmitter.off('namespace::*', handler);
-  eventEmitter.emit('namespace:testEvent');
-
-  t.equal(testValue, 0, 'Handler should not be called after removal of wildcard listener');
-  t.end();
-});
-
 tap.test('eventEmitter - namespace-like event patterns', (t) => {
   let testValue = 0;
   function handler() { testValue = 1; }
@@ -261,20 +209,58 @@ tap.test('eventEmitter - bindClass method should emit events with JSON data', (t
   t.end();
 });
 
-
-
-
-/*
-// not working, investigate is this correct API usage still?
-tap.test('eventEmitter - mixed wildcard patterns', (t) => {
+tap.test('eventEmitter - error handling in event handlers', (t) => {
   let testValue = 0;
-  function handler() { testValue += 1; }
+  function handlerOne() {
+    throw new Error('IGNORE THIS ERROR IS TEST');
+  }
+  function handlerTwo() {
+    testValue = 1;
+  }
 
-  eventEmitter.on('namespace::subnamespace:**', handler);
-  eventEmitter.on('namespace::**', handler);
-  eventEmitter.emit('namespace::subnamespace::testEvent');
+  eventEmitter.on('testErrorEvent', handlerOne);
+  eventEmitter.on('testErrorEvent', handlerTwo);
 
-  t.equal(testValue, 2, 'Both single-level and multi-level wildcards should be triggered appropriately');
+  t.doesNotThrow(() => {
+    eventEmitter.emit('testErrorEvent');
+  }, 'Emitting an event with an error-throwing handler should not throw');
+
+  t.equal(testValue, 1, 'The second handler should still execute even if the first one throws an error');
+  eventEmitter.off('testErrorEvent', handlerOne);
+  eventEmitter.off('testErrorEvent', handlerTwo);
   t.end();
 });
-*/
+
+tap.test('eventEmitter - order of multiple handlers for the same event', (t) => {
+  let accumulator = '';
+  function handlerOne() { accumulator += 'A'; }
+  function handlerTwo() { accumulator += 'B'; }
+
+  eventEmitter.on('testOrderEvent', handlerOne);
+  eventEmitter.on('testOrderEvent', handlerTwo);
+
+  eventEmitter.emit('testOrderEvent');
+
+  t.equal(accumulator, 'AB', 'Handlers should be called in the order they were added');
+  eventEmitter.off('testOrderEvent', handlerOne);
+  eventEmitter.off('testOrderEvent', handlerTwo);
+  t.end();
+});
+
+
+tap.test('eventEmitter - context binding in event handlers', (t) => {
+  const contextObject = {
+    value: 10,
+    handler() {
+      this.value += 5;
+    }
+  };
+
+  eventEmitter.on('testContextEvent', contextObject.handler.bind(contextObject));
+
+  eventEmitter.emit('testContextEvent');
+
+  t.equal(contextObject.value, 15, 'The handler should be bound to the correct context and modify the contextObject value');
+  eventEmitter.off('testContextEvent', contextObject.handler);
+  t.end();
+});

@@ -1,3 +1,5 @@
+// Inspector.js - Marak Squires 2023
+import gui from '../gui-editor/gui.js';
 class Inspector {
   static id = 'gui-inspector';
 
@@ -26,6 +28,7 @@ class Inspector {
   }
 
   drawTable(entity) {
+    let self = this;
     if (!entity) {
       // console.log('No entity found, skipping drawTable');
       return;
@@ -49,37 +52,33 @@ class Inspector {
       }
     }
 
+    // Check if the entityView window already exists
     let entityView = document.getElementById('entityView');
-    
     if (!entityView) {
-      entityView = document.createElement('div');
-      entityView.id = "entityView";
-      entityView.innerHTML = '';
+      // Use gui.window() to create the window
+      entityView = gui.window('entityView', 'Entity Inspector', function(){
+        self.game.systemsManager.removeSystem(Inspector.id);
+      })
 
-      // adds close button
-      let closeButton = document.createElement('span');
-      closeButton.id = "closeButton";
-      closeButton.className = "close";
-      closeButton.textContent = 'X';
-      closeButton.onclick = () => entityView.style.display = 'none';
-      entityView.appendChild(closeButton);
+      // Optional: add custom styles or classes to the window
+      entityView.className += ' custom-inspector-class'; // Example
+    } else {
 
-      // adds title header
-      let title = document.createElement('h3');
-      title.textContent = 'Entity Inspector';
-      title.className = 'gui-title';
-      entityView.appendChild(title);
-
-      if (!document.getElementById('entityView')) {
-        document.body.appendChild(entityView);
+      // Check if the entityPropertiesTable already exists and remove it if it does
+      let existingTable = document.getElementById('entityPropertiesTable');
+      if (existingTable) {
+        existingTable.remove();
       }
+
     }
 
+    /*
     // remove existing table if it exists
     let existingTable = document.getElementById('entityPropertiesTable');
     if (existingTable) {
       existingTable.remove();
     }
+    */
     entityView.append(table);
   }
 
@@ -143,13 +142,20 @@ class Inspector {
     }
   }
 
-  truncateToPrecision (value, precision = 4) {
+  truncateToPrecision(value, precision = 4) {
     return Number(value.toFixed(precision));
   }
 
-  destroy() {
-    // Any cleanup code if necessary
+  unload() {
+    // Remove the plugin's UI elements from the DOM
+    let entityView = document.getElementById('entityView');
+    if (entityView) {
+      entityView.remove();
+    }
+
+    // Additional cleanup if necessary
   }
+
 }
 
 export default Inspector;

@@ -35,14 +35,16 @@
       // Adds a nice StarField background
       game.use(new Plugins.StarField());
 
-      // Adds a controller input legend
-      game.use(new Plugins.InputLegend());
-
       game.use(new Plugins.CurrentFPS());
 
       game.use(new Plugins.Editor({
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/physx-babylon.html'
       }));
+
+
+      // Adds a controller input legend
+      // game.use(new Plugins.ControlsGUI());
+
 
       // custom player::joined handler, this is optional
       // without setting a custom player::joined, the default event will be used

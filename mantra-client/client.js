@@ -59,7 +59,15 @@ game
   .use(new plugins.Block())
 
 game.use(new plugins.Schema());
-game.use(new plugins.InputLegend());
+
+// TODO: default load plugins
+game.use(new plugins.Health())
+
+// game.use(new plugins.Inspector())
+// game.use(new plugins.ControlsGUI());
+// game.use(new plugins.Creator());
+// game.use(new plugins.EventInspector());
+
 
 // Only show Ping Times and Snapshot Size in Online Mode
 if (game.isOnline) {
@@ -72,6 +80,11 @@ game.use(new plugins.Editor({
   sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js'
 }));
 
+
+import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
+import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
+
+game.use(new plugins.XState({ world: BossFight() }));
 // game.use(new Pong());
 
 
@@ -112,8 +125,7 @@ if (mode === 'online') {
   if (env === 'local') {
     // Connects to websocket server
     // see: @yantra-core/mantra-server
-
-    game.connect('ws://127.0.0.1:8888/websocket');                   // websocket server
+    game.connect('ws://192.168.1.80:8888/websocket');                   // websocket server
   }
   game.use(new plugins.StarField())
   game.use(new plugins.PingTime())
@@ -126,7 +138,6 @@ if (mode === 'online') {
 
     game.use(new plugins.StarField())
 
-    // create a single player entity
     game.createEntity({
       type: 'BLOCK',
       width: 500,
@@ -138,13 +149,18 @@ if (mode === 'online') {
       },
     });
 
+    /*
+    // create a single player entity
+  
+
+   
+    */
     game.use(new plugins.Border({ autoBorder: false }));
 
     game.systems.border.createBorder({
       height: 2000,
       width: 2000,
     });
-
 
 
   });

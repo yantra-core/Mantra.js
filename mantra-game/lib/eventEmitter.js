@@ -1,5 +1,6 @@
 const eventEmitter = {
   listeners: {},
+  emitters: {},
   wrappedFunctions: {}
 };
 
@@ -13,92 +14,68 @@ eventEmitter.offAny = function offAny(callback) {
   eventEmitter.anyListeners = eventEmitter.anyListeners.filter(listener => listener !== callback);
 };
 
-// Utility to check if the given eventName matches the pattern
-eventEmitter._isMatch = function _isMatch(pattern, eventName) {
-  const regexPattern = pattern
-    .split('::')
-    .map(part => {
-      if (part === '**') return '.*';  // Match any character (including '::')
-      if (part === '*') return '[^:]*'; // Match any character except ':'
-      return part.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); // Escape special characters
-    })
-    .join('::');
-  const regex = new RegExp(`^${regexPattern}$`);
-  return regex.test(eventName);
-};
-
-
-eventEmitter.before = function beforeEvent(eventPattern, callback) {
-  if (!eventEmitter.listeners[eventPattern]) {
-    eventEmitter.listeners[eventPattern] = [];
+eventEmitter.before = function beforeEvent(eventName, callback) {
+  if (!eventEmitter.listeners[eventName]) {
+    eventEmitter.listeners[eventName] = [];
   }
-  eventEmitter.listeners[eventPattern].unshift(callback);
+  eventEmitter.listeners[eventName].unshift(callback);
 };
 
-eventEmitter.after = function afterEvent(eventPattern, callback) {
-  if (!eventEmitter.listeners[eventPattern]) {
-    eventEmitter.listeners[eventPattern] = [];
+eventEmitter.after = function afterEvent(eventName, callback) {
+  if (!eventEmitter.listeners[eventName]) {
+    eventEmitter.listeners[eventName] = [];
   }
-  eventEmitter.listeners[eventPattern].push(callback);
+  eventEmitter.listeners[eventName].push(callback);
 };
 
-eventEmitter.once = function onceEvent(eventPattern, callback) {
-  // Wrap the original callback
+eventEmitter.once = function onceEvent(eventName, callback) {
   const onceWrapper = (...args) => {
-    // Remove the wrapper after being called
-    this.off(eventPattern, onceWrapper);
-    // Execute the original callback
+    this.off(eventName, onceWrapper);
     callback.apply(null, args);
   };
-
-  // Add the wrapper as a listener
-  this.on(eventPattern, onceWrapper);
+  this.on(eventName, onceWrapper);
 };
 
-
-eventEmitter.on = function onEvent(eventPattern, callback) {
-  if (!eventEmitter.listeners[eventPattern]) {
-    eventEmitter.listeners[eventPattern] = [];
+eventEmitter.on = function onEvent(eventName, callback) {
+  if (!eventEmitter.listeners[eventName]) {
+    eventEmitter.listeners[eventName] = [];
   }
-  eventEmitter.listeners[eventPattern].push(callback);
+  eventEmitter.listeners[eventName].push(callback);
 };
 
-eventEmitter.off = function offEvent(eventPattern, callback) {
-  Object.keys(eventEmitter.listeners).forEach(pattern => {
-    if (eventEmitter._isMatch(eventPattern, pattern)) {
-      eventEmitter.listeners[pattern] = eventEmitter.listeners[pattern].filter(listener => listener !== callback);
-    }
-  });
+eventEmitter.off = function offEvent(eventName, callback) {
+  if (eventEmitter.listeners[eventName]) {
+    eventEmitter.listeners[eventName] = eventEmitter.listeners[eventName].filter(listener => listener !== callback);
+  }
 };
 
 eventEmitter.emit = function emitEvent(eventName, ...args) {
+  
+  // Call anyListeners if they exist
+  // Remark: .onAny() can't really be used in production; however it could be very useful for slower fps debugging
+  if (eventEmitter.anyListeners.length > 0) {
+    eventEmitter.anyListeners.forEach(listener => {
+      // do not emit to the emitter that emitted the event
+      try {
+        listener.call(null, eventName, ...args);
+      } catch (error) {
+        console.error(`Error when executing any listener for event "${eventName}":`, error);
+      }
+    });
+  }
 
-  // Call anyListeners
-  eventEmitter.anyListeners.forEach(listener => {
-    try {
-      listener.call(null, eventName, ...args);
-    } catch (error) {
-      console.error(`Error when executing any listener for event "${eventName}":`, error);
-    }
-  });
-
-  // Call listeners matching the pattern
-  Object.keys(eventEmitter.listeners).forEach(pattern => {
-    if (eventEmitter._isMatch(pattern, eventName)) {
-      eventEmitter.listeners[pattern].forEach(listener => {
-        try {
-          listener.apply(null, args);
-        } catch (error) {
-          console.error(`Error when executing listener for event "${eventName}":`, error);
-        }
-      });
-    }
-  });
+  // Directly check if listeners exist for the eventName
+  const listeners = eventEmitter.listeners[eventName];
+  if (listeners) {
+    listeners.forEach(listener => {
+      try {
+        listener.apply(null, args);
+      } catch (error) {
+        console.error(`Error when executing listener for event "${eventName}":`, error);
+      }
+    });
+  }
 };
-
-// game.emit('entity-factory::create', { id: 123, type: 'PLAYER' });
-// game.createEntity({ id: 123, type: 'PLAYER' });
-// ^^alias game.entityFactor.createEntity({ id: 123, type: 'PLAYER' });
 
 eventEmitter.bindClass = function bindClass(classInstance, namespace) {
   const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(classInstance));
@@ -106,7 +83,7 @@ eventEmitter.bindClass = function bindClass(classInstance, namespace) {
     if (typeof classInstance[method] === 'function' && method !== 'constructor') {
       const eventName = namespace + '::' + method;
       const originalMethod = classInstance[method].bind(classInstance);
-
+      this.emitters[eventName] = classInstance;
       // Store the original method in wrappedFunctions for future reference
       this.wrappedFunctions[eventName] = originalMethod;
 
@@ -123,13 +100,6 @@ eventEmitter.bindClass = function bindClass(classInstance, namespace) {
       };
     }
   });
-};
-
-eventEmitter.listenerCount = function(eventPattern) {
-  if (this.listeners[eventPattern]) {
-    return this.listeners[eventPattern].length;
-  }
-  return 0;
 };
 
 
@@ -151,5 +121,13 @@ eventEmitter.unbindClass = function unbindClass(classInstance, namespace) {
     }
   });
 };
+
+eventEmitter.listenerCount = function(eventPattern) {
+  if (this.listeners[eventPattern]) {
+    return this.listeners[eventPattern].length;
+  }
+  return 0;
+};
+
 
 export default eventEmitter;

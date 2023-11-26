@@ -11,13 +11,11 @@ class SystemsManager {
     if (this.systems.has(systemId)) {
       throw new Error(`System with name ${systemId} already exists!`);
     }
-    // console.log('adding system', systemId, system, this.game.plugins);
-    // Remark: Defaulting all plugins as EE has been disabled for now
-    // Remark: We need to piece meal this / granularize it so that the wildcard regex
-    // registers the new system in event emitter
-    // the best option we can do is have the event binding be default off
-    // then setup defaults for the required default systems ( possibly listening event / etc )
-    // eventEmitter.bindClass(system, systemName)
+
+    // Remark: Defaulting all Plugins to event emitters has is currently enabled
+    // This means all plugin methods will be emitted as events
+    // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
+    eventEmitter.bindClass(system, systemId)
 
     // binds system to local instance Map
     this.systems.set(systemId, system);

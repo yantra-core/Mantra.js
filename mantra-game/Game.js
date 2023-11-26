@@ -113,7 +113,10 @@ class Game {
     this.once = eventEmitter.once.bind(eventEmitter);
     this.emit = eventEmitter.emit.bind(eventEmitter);
     this.onAny = eventEmitter.onAny.bind(eventEmitter);
+    this.offAny = eventEmitter.offAny.bind(eventEmitter);
     this.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
+    this.listeners = eventEmitter.listeners;
+    this.emitters = eventEmitter.emitters;
 
     // Bind loadScripts from util
     this.loadScripts = loadScripts.bind(this);

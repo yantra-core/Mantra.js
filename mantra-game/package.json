@@ -1,6 +1,6 @@
 {
   "name": "@yantra-core/mantra",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "Game.js",
   "type": "module",

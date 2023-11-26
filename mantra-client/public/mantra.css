@@ -3,7 +3,7 @@ body {
   padding: 0;
 }
 
-/* InputLegend.js Plugin */
+/* ControlsGUI.js Plugin */
 
 #controlsView {
   position: fixed;
@@ -13,19 +13,9 @@ body {
   border: 1px solid #dddddd;
   padding: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+  width: 20%; /* Adjust width as needed */
+  max-height: 80%;
 
-#controlsView .closeButton {
-  position: absolute;
-  top: 5px;
-  left: 320px;
-  padding: 10px;
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#controlsView .closeButton:hover {
 }
 
 #controlsTable {
@@ -113,9 +103,10 @@ body {
 .closeButton {
   cursor: pointer;
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 25px;
+  right: 25px;
   font-weight: bold;
+  font-size: 28px;
 }
 
 /* Scrollbar Styles */
@@ -354,6 +345,8 @@ pre {
   min-width: 400px;
   overflow: auto;
   z-index: 1000;
+  width: 40%;
+  height: 50%;
 }
 
 .closeButton {
@@ -414,4 +407,123 @@ pre {
   font-weight: bold;
   margin: 0px;
   padding: 0px;
+}
+
+/* Container for the Event Table */
+#emittersContainer {
+  top: 10%;
+  left: 30%;
+  z-index: 1000; /* To ensure it's above other elements */
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 30%; /* Adjust width as needed */
+  height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+.gui-container {
+  z-index: 1000; /* To ensure it's above other elements */
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+/* Basic Reset */
+#eventTable {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+#eventTable th,
+#eventTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Header Styling */
+#eventTable th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Zebra Striping for Rows */
+#eventTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover Effect for Rows */
+#eventTable tr:hover {
+  background-color: #ddd;
+}
+
+/* Responsive Table */
+@media screen and (max-width: 600px) {
+  #eventTable {
+    border: 0;
+  }
+
+  #eventTable thead {
+    display: none;
+  }
+
+  #eventTable tr {
+    margin-bottom: 10px;
+    display: block;
+    border-bottom: 2px solid #ddd;
+  }
+
+  #eventTable td {
+    display: block;
+    text-align: right;
+    font-size: 13px;
+    border-bottom: 1px dotted #ccc;
+  }
+
+  #eventTable td:last-child {
+    border-bottom: 0;
+  }
+
+  #eventTable td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+}
+
+.resizeHandle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: #ccc;
+  cursor: nwse-resize;
+}
+
+.dragHeader {
+  padding: 10px;
+  cursor: move;
+  background: #ddd;
+  color: #333;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+
+.dragHeader h1,h2,h3 {
+  padding: 0;
+  margin: 0;
 }

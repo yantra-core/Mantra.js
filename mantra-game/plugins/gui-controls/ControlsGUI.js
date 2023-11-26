@@ -1,15 +1,18 @@
-// InputLegend.js - Marak Squires 2023
-class InputLegend {
-  static id = 'input-legend';
+// ControlsGUI.js - Marak Squires 2023
+import gui from '../gui-editor/gui.js';
+class ControlsGUI {
+  static id = 'gui-controls';
 
   constructor(config = {}) {
-    this.id = InputLegend.id;
+    this.id = ControlsGUI.id;
     this.highlightedKeys = {};
   }
 
   init(game) {
     this.game = game;
     this.listenForEntityInput();
+    this.game.systemsManager.addSystem(this.id, this);
+    // this.drawTable();
   }
 
   drawTable() {
@@ -37,20 +40,11 @@ class InputLegend {
       cellAction.textContent = controls[key];
     }
 
-    let controlsView = document.createElement('div');
-    controlsView.id = "controlsView";
-
-    let closeButton = document.createElement('span');
-    closeButton.id = "closeButton";
-    closeButton.className = "closeButton";
-    closeButton.textContent = 'X';
-    closeButton.addEventListener('click', function () {
-      controlsView.style.display = 'none';
+    // Use gui.window() to create the window
+    this.controlsView = gui.window('controlsView', 'Input Controls', function(){
+      game.systemsManager.removeSystem(ControlsGUI.id);
     });
-
-    controlsView.appendChild(closeButton);
-    controlsView.appendChild(table);
-    document.body.appendChild(controlsView);
+    this.controlsView.appendChild(table);
   }
 
   listenForEntityInput(entity) {
@@ -91,9 +85,17 @@ class InputLegend {
     this.highlightedKeys = {};
   }
 
-  destroy() {
+  unload () {
+    // Remove the onAny listener
+    if (this.listener) {
+      this.game.offAny(this.listener);
+      this.listener = null;
+    }
+    // remove all html elements
+    this.controlsView.remove();
+    // clear the interval
     clearInterval(this.clearHighlightsInterval);
   }
 }
 
-export default InputLegend;
+export default ControlsGUI;
