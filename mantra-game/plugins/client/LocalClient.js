@@ -50,6 +50,10 @@ export default class LocalClient {
 
     callback(null, true);
     this.game.emit('start');
+
+    if (this.game.systems.xstate) {
+      this.game.systems.xstate.sendEvent('START');
+    }
     
   }
   stop () {

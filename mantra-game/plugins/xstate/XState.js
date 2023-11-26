@@ -43,6 +43,7 @@ class XState {
           // console.log('setting health to:', context.health, ent)
           // TODO: map all components
           ent.health = context.health;
+          game.components.health.data[ent.id] = context.health;
           world.entities[context.name]['health'] = context.health;
         }
       }
@@ -50,6 +51,7 @@ class XState {
       if (state.value === 'UpdateEntity') {
         applyStateChange(state.context);
         this.sendEvent('COMPLETE_UPDATE');
+        // console.log('make an update to the entity here', state.context);
       }
       
     });

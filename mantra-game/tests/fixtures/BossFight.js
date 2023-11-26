@@ -50,12 +50,11 @@ function BossFightMiddleware () {
     // ... other actions
   };
   
-  
   const Guards = {
     isBossDamaged: (context, event) => {
+      // console.log("checking isBossDamaged", context, event);
       // console.log("isBossDamaged Guard condition check:", context, event);
-      return true;
-      //return event.name === context.name && event.type === 'ENTITY_DAMAGED';
+      return event.name === context.name && event.type === 'ENTITY_DAMAGED';
     },
     isBossDefeated: (context, event) => {
       return event.name === context.name && event.type === 'ENTITY_DESTROYED';
@@ -78,7 +77,10 @@ function BossFightMiddleware () {
     "entities": {
       "player": {
         "type": "PLAYER",
-        "position": {}, // Define player's starting position
+        "position": {
+          x: 100,
+          y: 100
+        }, // Define player's starting position
         // Additional player properties
       },
       "boss": {

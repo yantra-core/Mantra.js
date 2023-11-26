@@ -20,6 +20,7 @@ MANTRA.plugins = {
   EntityMovement: require('./plugins/entity-movement/EntityMovement.js').default,
   Gamepad: require('./plugins/gamepad/Gamepad.js').default,
   Graphics: require('./plugins/graphics/Graphics.js').default,
+  Health: require('./plugins/health/Health.js').default,
   InputLegend: require('./plugins/input-legend/InputLegend.js').default,
   PingTime: require('./plugins/ping-time/PingTime.js').default,
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js').default,

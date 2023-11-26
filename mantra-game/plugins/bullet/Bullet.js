@@ -170,6 +170,13 @@ class Bullet {
       // console.log('bullet collides', entityIdA, entityIdB);
 
       if (entityA && entityA.id !== entityB.owner) {
+
+        if (this.game.systems.xstate) {
+          let xStateSystem = this.game.systems.xstate;
+          xStateSystem.sendEvent('ENTITY_DAMAGED', { name: entityA.name, damage: 100 });
+        }
+
+
         /* TODO: move this to BabylonGraphics and Graphics Plugins
         if (entityA.type === 'PLAYER') {
           let playerGraphics = entityA.graphics;

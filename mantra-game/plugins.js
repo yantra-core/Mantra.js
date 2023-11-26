@@ -33,6 +33,7 @@ import Keyboard from './plugins/keyboard/Keyboard.js';
 import Gamepad from './plugins/gamepad/Gamepad.js';
 
 // Entity Component Systems
+import Health from './plugins/health/Health.js';
 import Lifetime from './plugins/lifetime/Lifetime.js';
 
 // Game Objects
@@ -71,6 +72,7 @@ const plugins = {
   EntityMovement,
   Gamepad,
   Graphics,
+  Health,
   InputLegend,
   Keyboard,
   Lifetime,
