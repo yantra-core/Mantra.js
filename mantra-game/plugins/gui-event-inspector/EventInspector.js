@@ -11,7 +11,6 @@ class GuiEventInspector {
     this.listener = null; // To keep track of the onAny listener
     this.hasDrawn = false;
     this.sortBy = { column: 1, isAscending: false }; // Add sortBy state
-
   }
 
   init(game) {
@@ -45,7 +44,6 @@ class GuiEventInspector {
       game.systemsManager.removeSystem(GuiEventInspector.id);
     });
 
-
     // Create and append the table to the container
     this.eventTable = document.createElement('table');
     this.eventTable.id = "eventTable";
@@ -59,7 +57,6 @@ class GuiEventInspector {
     // Append header cells to header row
     headerRow.appendChild(headerEvent);
     headerRow.appendChild(headerCount);
-
 
     // Attach event listeners for sorting
     headerEvent.addEventListener('click', () => this.setSortBy(0));
@@ -80,7 +77,6 @@ class GuiEventInspector {
     }
     this.updateGlobalEventTable();
   }
-
 
   updateGlobalEventTable() {
     let sortedEvents = Object.entries(this.eventCounts);

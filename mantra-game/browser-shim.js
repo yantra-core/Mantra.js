@@ -6,6 +6,7 @@ MANTRA.Game = require('./Game.js').Game;
 // TODO: order by group, then sort alphabetically
 MANTRA.plugins = {
   AsteroidsMovement: require('./plugins/entity-movement/strategies/AsteroidsMovement.js').default,
+  Behaviors: require('./plugins/behaviors/Behaviors.js').default,
   BabylonCamera: require('./plugins/graphics-babylon/camera/BabylonCamera.js').default,
   BabylonGraphics: require('./plugins/graphics-babylon/BabylonGraphics.js').default,
   Block: require('./plugins/block/Block.js').default,
@@ -26,6 +27,7 @@ MANTRA.plugins = {
   PingTime: require('./plugins/ping-time/PingTime.js').default,
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js').default,
   YantraGUI: require('./plugins/gui-yantra/YantraGUI.js').default,
+  SutraGUI: require('./plugins/gui-sutra/SutraGUI.js').default,
   Editor: require('./plugins/gui-editor/Editor.js').default,
   SnapshotSize: require('./plugins/snapshot-size/SnapshotSize.js').default,
   Schema: require('./plugins/schema/Schema.js').default,

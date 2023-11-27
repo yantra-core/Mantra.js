@@ -9,32 +9,9 @@ body {
   position: fixed;
   top: 60px;
   right: 20px;
-  background-color: white;
-  border: 1px solid #dddddd;
-  padding: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 20%; /* Adjust width as needed */
   max-height: 80%;
-
 }
-
-#controlsTable {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-#controlsTable th,
-#controlsTable td {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 12px;
-  font-size: 24px;
-}
-
-#controlsTable th {
-  background-color: #f2f2f2;
-}
-
 
 #pluginView {
   position: fixed;
@@ -252,20 +229,6 @@ body {
   flex-direction: column; /* Arrange title and columns container vertically */
 }
 
-/* The Close Button */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
 
 pre {
   white-space: pre-wrap;
@@ -338,75 +301,11 @@ pre {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  border: 1px solid #ccc;
-  background-color: white;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  min-width: 400px;
+  min-width: 440px;
   overflow: auto;
   z-index: 1000;
-  width: 40%;
+  width: 440px;
   height: 50%;
-}
-
-.closeButton {
-  float: right;
-  cursor: pointer;
-  color: #888;
-  font-weight: bold;
-}
-
-.closeButton:hover {
-  color: #555;
-}
-
-/* Styles for the table within the inspector */
-#entityPropertiesTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-#entityPropertiesTable th,
-#entityPropertiesTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-#entityPropertiesTable th {
-  background-color: #f8f8f8;
-  color: #333;
-}
-
-#entityPropertiesTable tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-/* Styles for nested tables */
-#entityPropertiesTable table {
-  width: 100%;
-  margin: 5px 0;
-  border: none;
-}
-
-#entityPropertiesTable table td,
-#entityPropertiesTable table th {
-  border: none;
-  padding: 4px 8px;
-  text-align: left;
-}
-
-#entityPropertiesTable table tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-
-.gui-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0px;
-  padding: 0px;
 }
 
 /* Container for the Event Table */
@@ -414,99 +313,11 @@ pre {
   top: 10%;
   left: 30%;
   z-index: 1000; /* To ensure it's above other elements */
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 30%; /* Adjust width as needed */
   height: 60%;
   resize: both;
   overflow: auto;
   position: absolute;
-}
-
-.gui-container {
-  z-index: 1000; /* To ensure it's above other elements */
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  resize: both;
-  overflow: auto;
-  position: absolute;
-}
-
-.gui-container th {
-  background-color: #4CAF50;
-  color: white;
-  cursor: pointer;
-}
-
-/* Basic Reset */
-#eventTable {
-  border-collapse: collapse;
-  width: 100%;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #333;
-}
-
-#eventTable th,
-#eventTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-/* Header Styling */
-#eventTable th {
-  background-color: #4CAF50;
-  color: white;
-}
-
-/* Zebra Striping for Rows */
-#eventTable tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-/* Hover Effect for Rows */
-#eventTable tr:hover {
-  background-color: #ddd;
-}
-
-/* Responsive Table */
-@media screen and (max-width: 600px) {
-  #eventTable {
-    border: 0;
-  }
-
-  #eventTable thead {
-    display: none;
-  }
-
-  #eventTable tr {
-    margin-bottom: 10px;
-    display: block;
-    border-bottom: 2px solid #ddd;
-  }
-
-  #eventTable td {
-    display: block;
-    text-align: right;
-    font-size: 13px;
-    border-bottom: 1px dotted #ccc;
-  }
-
-  #eventTable td:last-child {
-    border-bottom: 0;
-  }
-
-  #eventTable td:before {
-    content: attr(data-label);
-    float: left;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
 }
 
 .resizeHandle {
@@ -519,17 +330,113 @@ pre {
   cursor: nwse-resize;
 }
 
-.dragHeader {
-  padding: 10px;
-  cursor: move;
-  background: #ddd;
-  color: #333;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+#sutraView {
+  position: fixed;
+  top: 60px;
+  right: 400px;
+  width: 40%; /* Adjust width as needed */
+  max-height: 80%;
+}
+
+/* Base styling for the GUI container */
+.gui-container {
+  z-index: 1000;
+  background-color: #0a0f1b; /* Dark background */
+  color: #d3d9df; /* Light text */
+  padding-bottom: 20px;
+
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+/* Styling for tables within the container */
+.gui-container table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.gui-container th,
+.gui-container td {
+  border: 1px solid #2a3348;
+  padding: 8px;
+  text-align: left;
+  color: #ffffff;
+  min-width: 60px;
+
+}
+
+.gui-container th {
+  background-color: #1c2535;
+  color: #4caf50; /* Green accent color */
+  cursor: pointer;
+}
+
+/* Title styling */
+.gui-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0px;
+  padding: 0px;
 }
 
 
-.dragHeader h1,h2,h3 {
+/* Header titles */
+.dragHeader h1, .dragHeader h2, .dragHeader h3 {
   padding: 0;
+  padding-left: 5px;
   margin: 0;
 }
+
+/* Close button styling */
+.closeButton {
+  float: right;
+  cursor: pointer;
+  color: #888;
+  font-weight: bold;
+}
+
+.closeButton:hover {
+  color: #d3d9df;
+}
+
+
+
+/* Traffic Light Buttons */
+.traffic-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 4px;
+  display: inline-block;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.traffic-light.close {
+  background-color: #ff605c;
+}
+
+.traffic-light.minimize {
+  background-color: #ffbd44;
+}
+
+.traffic-light.maximize {
+  background-color: #00ca56;
+}
+
+/* Modify the existing styles to match Big Sur's design */
+.dragHeader {
+  background: #f0f0f0; /* Lighter header */
+  color: #000;
+  cursor: move;
+
+  /* Add more styling as needed */
+}
+
+/* Rest of your existing CSS */

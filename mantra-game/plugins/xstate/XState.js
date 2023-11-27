@@ -1,12 +1,16 @@
 // XState.js - Marak Squires 2023
 import { createMachine, interpret } from 'xstate';
 
+
+
+
 class XState {
   static id = 'xstate';
   static removable = false;
   constructor({ world }) {
     this.id = XState.id;
     this.world = world;
+    this.debug = true;
   }
 
   init(game) {
@@ -20,6 +24,7 @@ class XState {
   }
 
   createMachine() {
+    let self = this;
     // Game class instance
     let game = this.game;
     // world data as JSON state machine
@@ -33,7 +38,16 @@ class XState {
     game.machine = worldMachine;
     game.service = interpret(game.machine).onTransition((state) => {
       // Handle state transitions or notify other parts of the game
-      // console.log('State changed to:', state.value, state.changes, state.context);
+      if (self.debug) {
+        console.log('State changed to:', state.value, state.changes, state.context);
+      }
+
+      if (state.matches('EndRound')) {
+        // If the state is 'EndRound', call the method to reload entities
+        this.reloadEntities();
+        return;
+      }
+
       // TODO: make this separate fn
       function applyStateChange (context) {
         // TODO: make this work for array of entities
@@ -81,9 +95,15 @@ class XState {
     }
   }
 
+  reloadEntities() {
+    // Logic to reload all entities from the game JSON
+    this.loadEntities(); // Assuming this method loads the entities
+  }
+
+
   sendEvent (eventName, eventData) {
     let game = this.game;
-    // console.log('Sending event:', eventName, eventData);
+    console.log('Sending event:', eventName, eventData);
     // Sending event: COLLISION { collisionType: 'goal' }
     game.service.send(eventName, eventData);
   }

@@ -1,8 +1,17 @@
-import { createMachine, interpret } from 'xstate';
-
 // BossFight.js - Marak Squires 2023
 // returns a new game object with a state machine and actions
 function BossFightMiddleware () {
+
+  const resetContextForNewRound = (context, event) => {
+    // Reset health and other necessary context properties for a new round
+    context.health = 1000;
+    // Perform any other context resets here
+  };
+
+  const spawnNewBoss = (context, event) => {
+    // Logic to spawn a new boss entity
+    // This could include setting new properties for the boss entity
+  };
 
   let BossFight = {
     id: 'bossFightGame',
@@ -17,12 +26,12 @@ function BossFightMiddleware () {
       },
       Active: {
         on: {
-          'entity::damage': { // Updated event name
+          'entity::damage': {
             target: 'UpdateEntity', 
             cond: 'isBossDamaged'
           },
-          'entity::remove': { // Updated event name
-            target: 'Victory', 
+          'entity::remove': {
+            target: 'EndRound', 
             cond: 'isBossDefeated'
           }
         }
@@ -33,16 +42,30 @@ function BossFightMiddleware () {
         },
         entry: 'calculateComponentUpdate'
       },
-      Victory: {
-        type: 'final',
-        // Additional actions or events after the boss is defeated
+      EndRound: {
+        // Removed type: 'final' to allow transitions out of this state
+        entry: 'reloadEntities',
+        on: {
+          START_NEW_ROUND: 'Idle' // Transition back to 'Idle' for a new round
+        }
       }
     },
-    on: {
-      // Define global event handlers if needed
+    actions: {
+      calculateComponentUpdate: (context, event) => {
+        // Logic to calculate and apply component updates
+      },
+      reloadEntities: (context, event) => {
+        console.log('calling xstate int reloadEntities', context, event)
+        // Logic to reload all entities for a new round
+      }
+    },
+    guards: {
+      isBossDamaged: (context, event) => event.name === context.name,
+      isBossDefeated: (context, event) => event.name === context.name,
     }
   };
   
+
   const Actions = {
 
     /*

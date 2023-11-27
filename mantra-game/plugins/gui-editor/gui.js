@@ -17,18 +17,56 @@ const gui = {
     const dragHeader = document.createElement('div');
     dragHeader.className = 'dragHeader';
 
+    // Add traffic light buttons
+    const closeButton = document.createElement('div');
+    const minimizeButton = document.createElement('div');
+    const maximizeButton = document.createElement('div');
+
+    closeButton.className = 'traffic-light close';
+    minimizeButton.className = 'traffic-light minimize';
+    maximizeButton.className = 'traffic-light maximize';
+    minimizeButton.onclick = () => close();
+    closeButton.onclick = () => close();
+    maximizeButton.onclick = () => {
+      if (container.style.width === '100vw') {
+        container.style.width = '50%';
+        container.style.height = '50%';
+        // set position to center
+
+        if (typeof container.lastTop !== 'undefined') {
+          container.style.top = container.lastTop;
+          container.style.left = container.lastLeft;
+        } else {
+          container.style.top = '20%';
+          container.style.left = '20%';
+        }
+
+      } else {
+
+        // store the exact last position on container itself
+        // use special property
+        container.lastTop = container.style.top;
+        container.lastLeft = container.style.left;
+
+        container.style.width = '100vw';
+        container.style.height = '90%';
+        // set position to top left
+        container.style.top = '50px';
+        container.style.left = '0px';
+      }
+    };
+    dragHeader.appendChild(closeButton);
+    dragHeader.appendChild(minimizeButton);
+    dragHeader.appendChild(maximizeButton);
+
+
     // create h3 for title
     const dragHeaderTitle = document.createElement('h3');
     dragHeaderTitle.textContent = title;
     dragHeader.appendChild(dragHeaderTitle);
     container.appendChild(dragHeader);
 
-    // Add close button
-    const closeButton = document.createElement('span');
-    closeButton.className = 'closeButton';
-    closeButton.textContent = 'X';
-    closeButton.onclick = () => close();
-    dragHeader.appendChild(closeButton);
+
 
     // Add resize handle
     const resizeHandle = document.createElement('div');
@@ -43,7 +81,7 @@ const gui = {
     this.initializeResize(resizeHandle, container);
 
     // Add event listener for click to manage z-index
-    container.addEventListener('click', function() {
+    container.addEventListener('click', function () {
       // Bring the clicked container to the front
       gui.bringToFront(container);
     });

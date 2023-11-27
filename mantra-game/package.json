@@ -22,6 +22,7 @@
     "tape": "^5.7.2"
   },
   "dependencies": {
+    "@yantra-core/sutra": "^1.1.2",
     "protobufjs": "^7.2.5",
     "xstate": "^4.38.3"
   }

@@ -89,7 +89,7 @@ tap.test('Boss Health Reduction', (t) => {
   });
 });
 
-tap.test('Transition to Victory State', (t) => {
+tap.test('Transition to EndRound State', (t) => {
   let game = new Game({ isServer: true });
 
   let freshBossFight = BossFight();
@@ -103,7 +103,7 @@ tap.test('Transition to Victory State', (t) => {
   xStateSystem.sendEvent('entity::remove', { name: 'boss' });
 
   setImmediate(() => {
-    t.equal(xStateSystem.getCurrentState(), 'Victory', 'State should transition to Victory on boss defeat');
+    t.equal(xStateSystem.getCurrentState(), 'EndRound', 'State should transition to Victory on boss defeat');
     t.end();
   });
 });
@@ -130,7 +130,48 @@ tap.test('Complete Boss Fight Flow', (t) => {
 
   // Simulate boss defeat
   xStateSystem.sendEvent('entity::remove', { name: 'boss' });
-  t.equal(xStateSystem.getCurrentState(), 'Victory', 'State should transition to Victory on boss defeat');
+  t.equal(xStateSystem.getCurrentState(), 'EndRound', 'State should transition to Victory on boss defeat');
 
   t.end();
 });
+
+/*
+tap.only('Restart Round and Spawn New Boss', (t) => {
+  let game = new Game({ isServer: true });
+
+  let freshBossFight = BossFight();
+  game.use(new plugins.XState({ world: freshBossFight }));
+
+  let xStateSystem = game.getSystem('xstate');
+  xStateSystem.createMachine();
+
+  // Start the boss fight
+  xStateSystem.sendEvent('START');
+  
+  // Simulate boss defeat
+  xStateSystem.sendEvent('entity::remove', { name: 'boss' });
+
+  setImmediate(() => {
+    t.equal(xStateSystem.getCurrentState(), 'EndRound', 'State should transition to EndRound on boss defeat');
+
+    // check that the boss is removed
+    let boss = game.findEntity('boss');
+    t.notOk(boss, 'Boss entity should be removed after defeat');
+
+    // Now, restart the round
+    xStateSystem.sendEvent('START_NEW_ROUND');
+
+    setImmediate(() => {
+      t.equal(xStateSystem.getCurrentState(), 'Idle', 'State should transition back to Idle for a new round');
+
+      // Verify if a new boss entity is spawned
+      let newBoss = game.findEntity('boss'); // Replace with the actual method to find the new boss entity
+      t.ok(newBoss, 'A new boss entity should be spawned for the new round');
+      t.equal(newBoss.health, 1000, 'New boss entity should have full health');
+
+      t.end();
+    });
+  });
+});
+
+*/

@@ -41,6 +41,9 @@ import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 
+// AI Behaviors
+import Behaviors from './plugins/behaviors/Behaviors.js';
+
 import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
@@ -51,6 +54,7 @@ import Creator from './plugins/gui-creator/Creator.js';
 import ControlsGUI from './plugins/gui-controls/ControlsGUI.js';
 import Editor from './plugins/gui-editor/Editor.js';
 import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
+import SutraGUI from './plugins/gui-sutra/SutraGUI.js';
 import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
 
 // Utility
@@ -64,6 +68,7 @@ import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.
 import MovementPong from './plugins/entity-movement/strategies/PongMovement.js';
 
 const plugins = {
+  Behaviors,
   Block,
   Border,
   Bullet,
@@ -83,6 +88,7 @@ const plugins = {
   EventInspector,
   ControlsGUI,
   PluginsGUI,
+  SutraGUI,
   YantraGUI,
   MatterPhysics,
   PhysXPhysics,
