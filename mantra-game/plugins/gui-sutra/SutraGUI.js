@@ -1,6 +1,6 @@
 // SutraGUI.js - Marak Squires 2023
 import gui from '../gui-editor/gui.js';
-import Sutra from '../../../../sutra/lib/sutra.js';
+import Sutra from '@yantra-core/sutra';
 class SutraGUI {
   static id = 'gui-controls';
 
