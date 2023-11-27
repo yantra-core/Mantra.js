@@ -330,14 +330,6 @@ pre {
   cursor: nwse-resize;
 }
 
-#sutraView {
-  position: fixed;
-  top: 60px;
-  right: 400px;
-  width: 40%; /* Adjust width as needed */
-  max-height: 80%;
-}
-
 /* Base styling for the GUI container */
 .gui-container {
   z-index: 1000;
@@ -439,4 +431,103 @@ pre {
   /* Add more styling as needed */
 }
 
-/* Rest of your existing CSS */
+/* Sutra.css */
+#sutraView {
+  position: absolute;
+  top: 60px;
+  right: 400px;
+  width: 40%;
+  background-color: #0a0f1b; /* Dark theme background */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  overflow: auto;
+}
+
+#sutraView #editorContainer {
+  background-color: #121a2e; /* Deeper blue for contrast */
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+#sutraView #editorContainer textarea {
+  width: 100%;
+  height: 200px;
+  background-color: #1c2535;
+  border: none;
+  color: #4caf50; /* Green text for contrast */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.node-element {
+  background-color: #162238;
+  border: 1px solid #2a3348;
+  color: #d3d9df;
+  padding: 10px;
+  margin-bottom: 10px;
+  margin-right: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.action-select, .param-input, #sutraView select {
+  background-color: #1c2535;
+  border: 1px solid #2a3348;
+  color: #d3d9df;
+  padding: 5px;
+  border-radius: 3px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.editor-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #162238;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+}
+
+.editor-table th, .editor-table td {
+  border: 1px solid #2a3348;
+  padding: 8px;
+  color: #d3d9df;
+}
+
+.editor-table th {
+  background-color: #1c2535;
+  color: #4caf50;
+}
+
+.condition, .else-branch {
+  font-weight: bold;
+  margin-top: 10px;
+  color: #d3d9df;
+}
+
+/* Button styling */
+#sutraView button {
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+#sutraView button:hover {
+  background-color: #45a049;
+}
+
+/* Additional styles for inputs and labels */
+.param-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #d3d9df;
+}
+
