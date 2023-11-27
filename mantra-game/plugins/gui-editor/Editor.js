@@ -42,6 +42,8 @@ class Editor {
     const $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
     const $eventsMenu = this.createMenu('Events', this.showEventsInspector.bind(this));
     const $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
+    const $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
+
     const $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
     // const $aboutMenu = this.createMenu('About');
     // TODO: add optional xstate menu for editing / viewing state machines
@@ -54,7 +56,7 @@ class Editor {
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $inspectorMenu);
+    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $inspectorMenu);
 
     // Append the toolbar to the body
     $('body').append($toolbar);
@@ -186,6 +188,16 @@ class Editor {
       game.use(new this.game.plugins.Inspector());
     } else {
       this.game.systemsManager.removeSystem('gui-inspector');
+    }
+  }
+
+  showEntities() {
+    let game = this.game;
+    if (typeof game.systems['gui-entities'] === 'undefined') {
+      game.use(new this.game.plugins.EntitiesGUI());
+      // this.game.systems['gui-entities'].drawTable();
+    } else {
+      this.game.systemsManager.removeSystem('gui-entities');
     }
   }
 

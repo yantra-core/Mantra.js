@@ -56,6 +56,7 @@ import Inspector from './plugins/gui-inspector/Inspector.js';
 import Creator from './plugins/gui-creator/Creator.js';
 import ControlsGUI from './plugins/gui-controls/ControlsGUI.js';
 import Editor from './plugins/gui-editor/Editor.js';
+import EntitiesGUI from './plugins/gui-entities/EntitiesGUI.js';
 import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
 import SutraGUI from './plugins/gui-sutra/SutraGUI.js';
 import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
@@ -87,10 +88,11 @@ const plugins = {
   Keyboard,
   Lifetime,
   Timers,
-  Editor,
   Inspector,
-  EventInspector,
   ControlsGUI,
+  Editor,
+  EntitiesGUI,
+  EventInspector,
   PluginsGUI,
   SutraGUI,
   YantraGUI,
