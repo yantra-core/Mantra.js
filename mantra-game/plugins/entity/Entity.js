@@ -1,6 +1,6 @@
 // Entity.js - Marak Squires 2023
 import EntityClass from '../../Entity/Entity.js';
-
+import TimersComponent from '../../Component/TimersComponent.js';
 class Entity {
 
   static id = 'entity';
@@ -198,6 +198,7 @@ class Entity {
       frictionStatic: 0.5, // Default static friction
       lockedProperties: null, // object hash of properties that should never be updated
       actionRateLimiter: null, // object hash of state history
+      timers: null // object hash timers for TimersComponent.js
     };
 
     // merge config with defaultConfig
@@ -244,6 +245,8 @@ class Entity {
     this.game.addComponent(entityId, 'isStatic', isStatic);
     this.game.addComponent(entityId, 'lockedProperties', lockedProperties);
     this.game.addComponent(entityId, 'actionRateLimiter', {});
+    // TODO: clean up API contract with Component
+    this.game.addComponent(entityId, 'timers', new TimersComponent('timers', entityId, this.game));
  
     if (config.body) {
       let body = this.createBody(config);

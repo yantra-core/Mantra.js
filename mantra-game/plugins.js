@@ -44,6 +44,9 @@ import Block from './plugins/block/Block.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
 
+// Timers
+import Timers from './plugins/timers/Timers.js';
+
 import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
@@ -83,6 +86,7 @@ const plugins = {
   Health,
   Keyboard,
   Lifetime,
+  Timers,
   Editor,
   Inspector,
   EventInspector,

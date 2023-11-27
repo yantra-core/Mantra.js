@@ -29,6 +29,7 @@ import defaultGameStart from './lib/start/defaultGameStart.js';
 
 // Action Rate Limiter, suitable for any Systems action that should be rate limited
 import ActionRateLimiter from './Component/ActionRateLimiter.js';
+import TimersComponent from './Component/TimersComponent.js';
 
 // Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
 import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
@@ -176,7 +177,7 @@ class Game {
     this.components.graphics = new Component('graphics', this);
     this.components.lockedProperties = new Component('lockedProperties', this);
     this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
-
+    this.components.timers = new TimersComponent('timers', this);
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);

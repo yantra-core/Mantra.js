@@ -23,6 +23,7 @@ MANTRA.plugins = {
   Gamepad: require('./plugins/gamepad/Gamepad.js').default,
   Graphics: require('./plugins/graphics/Graphics.js').default,
   Health: require('./plugins/health/Health.js').default,
+  Timers: require('./plugins/timers/Timers.js').default,
   ControlsGUI: require('./plugins/gui-controls/ControlsGUI.js').default,
   PingTime: require('./plugins/ping-time/PingTime.js').default,
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js').default,
