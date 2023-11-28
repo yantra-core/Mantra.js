@@ -1,6 +1,8 @@
 // SutraGUI.js - Marak Squires 2023
 import gui from '../gui-editor/gui.js';
-import sutra from '../../../../sutra/index.js';
+import sutra from '@yantra-core/sutra';
+
+//import sutra from '../../../../sutra/index.js';
 
 import drawTable from './lib/drawTable.js';
 import editor from './lib/editor.js';
