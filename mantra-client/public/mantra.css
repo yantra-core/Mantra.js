@@ -481,6 +481,10 @@ pre {
   box-sizing: border-box;
 }
 
+#entitiesTable tr {
+  cursor: pointer;
+}
+
 .editor-table {
   width: 100%;
   border-collapse: collapse;
@@ -530,4 +534,44 @@ pre {
   margin-bottom: 5px;
   color: #d3d9df;
 }
+
+
+
+
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.sliding-out-table {
+  animation: slideOut 1.1s ease-out forwards;
+}
+
+.sliding-in-table {
+  animation: slideIn 1.1s ease-out forwards;
+}
+
+.entity-inspector-container {
+  position: relative;
+  overflow: hidden;
+  /* Set a fixed height if necessary */
+}
+
 

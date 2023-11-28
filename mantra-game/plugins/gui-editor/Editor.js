@@ -43,6 +43,7 @@ class Editor {
     const $eventsMenu = this.createMenu('Events', this.showEventsInspector.bind(this));
     const $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
     const $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
+    const $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
 
     const $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
     // const $aboutMenu = this.createMenu('About');
@@ -56,7 +57,7 @@ class Editor {
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $inspectorMenu);
+    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $rulesMenu, $inspectorMenu);
 
     // Append the toolbar to the body
     $('body').append($toolbar);
@@ -148,6 +149,15 @@ class Editor {
         this.dropdownTimers.delete(dropdown);
       }
     });
+  }
+
+  showRules() {
+    let game = this.game;
+    if (typeof game.systems['gui-sutra'] === 'undefined') {
+      game.use(new this.game.plugins.SutraGUI());
+    } else {
+      this.game.systemsManager.removeSystem('gui-sutra');
+    }
   }
 
   showPluginsGUI() {

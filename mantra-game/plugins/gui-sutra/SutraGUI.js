@@ -6,7 +6,7 @@ import drawTable from './lib/drawTable.js';
 import editor from './lib/editor.js';
 
 class SutraGUI {
-  static id = 'gui-controls';
+  static id = 'gui-sutra';
 
   constructor(config = {}) {
     this.id = SutraGUI.id;

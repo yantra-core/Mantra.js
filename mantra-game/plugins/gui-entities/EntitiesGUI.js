@@ -24,11 +24,11 @@ class EntitiesGUI {
   }
 
   update() {
-    console.log('EntitiesGUI update', this.game.tick);
+    // console.log('EntitiesGUI update', this.game.tick);
 
     for (let entityId in this.game.components.creationTime.data) {
       let entity = this.game.getEntity(entityId);
-      console.log('ent', entity);
+      // console.log('ent', entity);
 
       /*
       // Check if entity state has changed since last update
@@ -51,7 +51,7 @@ class EntitiesGUI {
       let row = this.entitiesTable.querySelector(`tr[data-id='${entityId}']`);
       if (!row) {
         // create row
-      this.updateRowForEntity(entityId, entity);
+        this.updateRowForEntity(entityId, entity);
       }
 
     }
@@ -74,6 +74,18 @@ class EntitiesGUI {
     this.entitiesTable = document.createElement('table');
     this.entitiesTable.id = "entitiesTable";
     this.entitiesTable.className = 'entities-table'; // Add class for styling
+
+    // add click event to table
+    this.entitiesTable.addEventListener('click', (e) => {
+      // find the data-id attribute to get the entityId
+      let entityId = e.target.parentNode.getAttribute('data-id');
+      // set the global game selectedEntityId context so other guid components can use it
+      game.selectedEntityId = entityId;
+      // check if gui-inspector is loaded, if not, load it
+      if (!game.systems['gui-inspector']) {
+        game.use(new game.plugins.Inspector());
+      }
+    });
 
     // Create Header
     this.headerRow = this.entitiesTable.createTHead().insertRow();

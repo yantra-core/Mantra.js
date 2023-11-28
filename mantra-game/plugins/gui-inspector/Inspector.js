@@ -8,7 +8,6 @@ class Inspector {
     this.game = null;
     this.lastEntityState = {}; // Store the last state of the entity
     this.floatProperties = ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed'];
-
   }
 
   init(game) {
@@ -17,14 +16,23 @@ class Inspector {
   }
 
   update() {
-    if (this.game.currentPlayerId) {
-      let entity = this.game.getEntity(this.game.currentPlayerId);
 
+    if (!this.game.selectedEntityId) {
+      if (this.game.currentPlayerId) {
+        this.game.selectedEntityId = this.game.currentPlayerId;
+      }
+    }
+
+    // console.log('this.selectedEntityId', this.game.selectedEntityId)
+    if (this.game.selectedEntityId) {
+      let entity = this.game.getEntity(this.game.selectedEntityId);
       if (this.hasEntityChanged(entity)) {
+        // TODO: add sliding CSS animation effect or javascript something
         this.drawTable(entity);
         this.updateLastEntityState(entity);
       }
     }
+
   }
 
   drawTable(entity) {
@@ -153,7 +161,6 @@ class Inspector {
       entityView.remove();
     }
 
-    // Additional cleanup if necessary
   }
 
 }
