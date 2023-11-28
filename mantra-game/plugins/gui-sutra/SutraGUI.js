@@ -71,7 +71,6 @@ class SutraGUI {
       }]
     });
 
-
     rules.addAction({
       if: 'isSpawner',
       then: [{
@@ -98,9 +97,6 @@ class SutraGUI {
       then: [{ action: 'testAction' }]
     });
 
-
-    // Example tick call with mock data
-
     let json = rules.serializeToJson();
     console.log('json', json);
     this.drawTable();
@@ -118,10 +114,14 @@ class SutraGUI {
     let json = this.behavior.serializeToJson();
     console.log('json', json)
     let container = document.getElementById('sutraTable');
-    container.innerHTML = '';
+
+    let guiContent = container.querySelector('.gui-content');
+  
+
+    guiContent.innerHTML = '';
     alert('redraw')
     JSON.parse(json).tree.forEach(node => {
-      container.appendChild(this.createNodeElement(node, 0));
+      guiContent.appendChild(this.createNodeElement(node, 0));
     });
   }
 
@@ -130,19 +130,18 @@ class SutraGUI {
   }
 
   drawBehaviorTree(json) {
-    let emitters = this.getEmitters();
-    // object with keys as event names
-    // console.log('emitters', emitters)
     // get existing container
     let container = document.getElementById('sutraView');
     let table = document.getElementById('sutraTable');
+    let guiContent = container.querySelector('.gui-content');
+
     //let container = document.createElement('div');
     json.tree.forEach(node => {
       table.appendChild(this.createNodeElement(node, 1));
     });
     // Append this container to your GUI, adjust as needed
-    container.appendChild(table);
-    document.body.appendChild(container); // Example: appending to body
+    guiContent.appendChild(table);
+    container.appendChild(guiContent); // Example: appending to body
   }
 
   getAvailableActions() {
@@ -159,7 +158,6 @@ class SutraGUI {
     } else if (node.if) {
       this.appendConditionalElement(element, node, indentLevel);
     }
-
     return element;
   }
 
@@ -290,8 +288,6 @@ class SutraGUI {
     this.redrawBehaviorTree(); // Redraw the tree to reflect changes
   }
   
-  
-  
   showConditionalEditor(conditional) {
     // Implement the UI logic to show and edit the details of the conditional
     // This could be a form with inputs for the conditional's properties
@@ -308,7 +304,6 @@ class SutraGUI {
       }
       this.behavior.tick(entity);
     }
-
   }
 
   unload() {

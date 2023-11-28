@@ -62,7 +62,9 @@ class GuiEventInspector {
     headerEvent.addEventListener('click', () => this.setSortBy(0));
     headerCount.addEventListener('click', () => this.setSortBy(1));
 
-    this.container.appendChild(this.eventTable);
+    let guiContent = this.container.querySelector('.gui-content');
+    guiContent.appendChild(this.eventTable);
+    this.container.appendChild(guiContent);
 
     // Initial update of the table
     this.updateGlobalEventTable();
@@ -109,7 +111,6 @@ class GuiEventInspector {
       cellCount.textContent = count;
     });
   }
-
 
   loadMethodCode(eventName) {
     console.log(`Loading code for method: ${eventName}`);

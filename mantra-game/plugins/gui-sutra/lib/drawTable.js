@@ -8,7 +8,7 @@ export default function drawTable() {
     return;
   }
 
-  let table = document.createElement('table');
+  let table = document.createElement('div');
   table.id = "sutraTable";
 
   // Use gui.window() to create the window
@@ -20,6 +20,11 @@ export default function drawTable() {
   let addRuleButton = document.createElement('button');
   addRuleButton.textContent = 'Add Rule';
   addRuleButton.onclick = () => this.addNewRule();
-  this.sutraView.appendChild(addRuleButton);
-  this.sutraView.appendChild(table);
+
+  let guiContent = this.sutraView.querySelector('.gui-content');
+  guiContent.appendChild(addRuleButton);
+  guiContent.appendChild(table);
+
+  //this.sutraView.appendChild(addRuleButton);
+  //this.sutraView.appendChild(table);
 }

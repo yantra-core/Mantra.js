@@ -7,7 +7,7 @@ body {
 
 #controlsView {
   top: 10%;
-  right: 10%;
+  right: 30%;
   z-index: 1000; /* To ensure it's above other elements */
   width: 20%; /* Adjust width as needed */
   height: 30%;
@@ -452,14 +452,14 @@ pre {
 
 /* Sutra.css */
 #sutraView {
-  position: absolute;
-  top: 60px;
-  right: 400px;
-  width: 40%;
-  background-color: #0a0f1b; /* Dark theme background */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  top: 10%;
+  left: 30%;
+  z-index: 1000; /* To ensure it's above other elements */
+  width: 30%; /* Adjust width as needed */
+  height: 60%;
+  resize: both;
   overflow: auto;
+  position: absolute;
 }
 
 #sutraView #editorContainer {
