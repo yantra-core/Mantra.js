@@ -269,9 +269,9 @@ class Game {
   }
 
   // All Systems are Plugins, but not all Plugins are Systems
-  async use(pluginInstanceOrId) {
+  use(pluginInstanceOrId) {
     let basePath = './plugins/'; // Base path for loading plugins
-  
+
     // Check if the argument is a string (plugin ID)
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
@@ -280,16 +280,15 @@ class Game {
         console.log(`Plugin ${pluginId} is already loaded or loading.`);
         return this;
       }
-  
+
       // Mark the plugin as loading
       this._plugins[pluginId] = { status: 'loading' };
       this.emit('plugin::loading', pluginId);
-  
-      try {
-        // Dynamically load the plugin script
-        const scriptUrl = `${basePath}${pluginId}.js`;
-        await this.loadPluginScript(scriptUrl);
-  
+
+      // Dynamically load the plugin script
+      const scriptUrl = `${basePath}${pluginId}.js`;
+      this.loadPluginScript(scriptUrl).then(function () {
+
         // The script is expected to call `game.use(pluginInstance)` after loading
         console.log(`Plugin ${pluginId} loaded.`, this.plugins, this._plugins);
         if (typeof PLUGINS === 'object') {
@@ -299,30 +298,31 @@ class Game {
           // handle server-side case of string usage
           // TODO
         }
-      } catch (error) {
+
+      }).catch(function (err) {
         console.error(`Error loading plugin ${pluginId}:`, error);
         this._plugins[pluginId] = { status: 'error' };
         throw error;
-      }
-  
+      });
+
       return this;
     }
-  
+
     // Handling plugin instances
     if (typeof pluginInstanceOrId.id === 'undefined') {
       console.log('Error with pluginInstance', pluginInstanceOrId);
       throw new Error('All plugins must have a static id property');
     }
-  
+
     const pluginId = pluginInstanceOrId.id;
     this.loadedPlugins.push(pluginId);
     this.emit('plugin::loaded', pluginId);
     pluginInstanceOrId.init(this, this.engine, this.scene);
     this._plugins[pluginId] = pluginInstanceOrId;
-  
+
     return this;
   }
-  
+
   // Helper function to load plugin scripts
   loadPluginScript(scriptUrl) {
     return new Promise((resolve, reject) => {
@@ -334,7 +334,7 @@ class Game {
       document.head.appendChild(script);
     });
   }
-  
+
 
   removePlugin(pluginName) {
     let plugin = this._plugins[pluginName];
@@ -350,7 +350,7 @@ class Game {
       delete this._plugins[pluginName];
     }
   }
-  
+
   addComponent(entityId, componentType, data) {
     if (!this.components[componentType]) {
       this.components[componentType] = new Component(componentType, this);
@@ -362,7 +362,7 @@ class Game {
     }
     this.components[componentType].set(entityId, data);
   }
-  
+
   getComponent(entityId, componentType) {
     return this.components[componentType] ? this.components[componentType].get(entityId) : null;
   }

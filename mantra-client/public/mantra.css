@@ -621,5 +621,4 @@ pre {
 .entity-inspector-container {
   position: relative;
   overflow: hidden;
-  /* Set a fixed height if necessary */
 }
