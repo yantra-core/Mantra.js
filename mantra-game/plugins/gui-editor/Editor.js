@@ -23,7 +23,7 @@ class Editor {
     } else {
       this.jqueryReady();
     }
-    game.use(new this.game.plugins.PluginsGUI());
+    // game.use(new this.game.plugins.PluginsGUI());
 
   }
 
@@ -164,10 +164,8 @@ class Editor {
     let game = this.game;
     if (typeof game.systems['gui-plugins'] === 'undefined') {
       game.use(new this.game.plugins.PluginsGUI());
-    }
-    // Functionality to show plugins GUI
-    if (this.game.systems['gui-plugins']) {
-      this.game.systems['gui-plugins'].togglePluginView();
+    } else {
+      this.game.systemsManager.removeSystem('gui-plugins');
     }
   }
 

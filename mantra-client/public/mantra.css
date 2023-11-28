@@ -17,22 +17,14 @@ body {
 }
 
 #pluginView {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 50px; /* Default height */
-  background-color: white;
-  border-top: 1px solid black;
-  transition: height 0.3s ease-in-out;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-#pluginView.expanded {
-  height: 20vh; /* Expanded height */
-  max-height: 90vh;
-  overflow-y: auto;
+  top: 10%;
+  right: 30%;
+  z-index: 1000; /* To ensure it's above other elements */
+  width: 20%; /* Adjust width as needed */
+  height: 30%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
 }
 
 /* Responsive Design Adjustments */
@@ -42,13 +34,18 @@ body {
   }
 }
 
-#pluginContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 10px;
+#pluginsContainer {
+  top: 5%;
+  left: 1%;
+  z-index: 1000; /* To ensure it's above other elements */
+  width: 15vw; /* Adjust width as needed */
+  min-width: 200px;
+  max-width: 300px;
+  height: 80%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
 }
-
 
 .pluginCard {
   border: 1px solid #ddd;
