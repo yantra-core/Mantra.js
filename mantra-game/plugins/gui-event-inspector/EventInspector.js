@@ -40,7 +40,7 @@ class GuiEventInspector {
 
   createGlobalEventTable() {
     let game = this.game;
-    this.container = gui.window('emittersContainer', 'Event Inspector', function () {
+    this.container = gui.window('eventsView', 'Event Inspector', function () {
       game.systemsManager.removeSystem(GuiEventInspector.id);
     });
 

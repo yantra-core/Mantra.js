@@ -7,25 +7,29 @@ body {
 
 #controlsView {
   top: 10%;
-  right: 30%;
+  right: 20%;
   z-index: 1000; /* To ensure it's above other elements */
   width: 20%; /* Adjust width as needed */
   height: 30%;
+  min-width: 260px;
+  min-height: 215px;
   resize: both;
   overflow: auto;
   position: absolute;
 }
 
+/*
 #pluginView {
   top: 10%;
   right: 30%;
-  z-index: 1000; /* To ensure it's above other elements */
-  width: 20%; /* Adjust width as needed */
+  z-index: 1000; 
+  width: 20%; 
   height: 30%;
   resize: both;
   overflow: auto;
   position: absolute;
 }
+*/
 
 /* Responsive Design Adjustments */
 @media (max-width: 768px) {
@@ -36,7 +40,7 @@ body {
 
 #pluginsContainer {
   top: 5%;
-  left: 1%;
+  right: 10px;
   z-index: 1000; /* To ensure it's above other elements */
   width: 15vw; /* Adjust width as needed */
   min-width: 200px;
@@ -296,30 +300,6 @@ pre {
   border: none;
 }
 
-/* Styles for the Entity Inspector Window */
-#entityView {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  min-width: 440px;
-  overflow: auto;
-  z-index: 1000;
-  width: 440px;
-  height: 50%;
-}
-
-/* Container for the Event Table */
-#emittersContainer {
-  top: 10%;
-  left: 30%;
-  z-index: 1000; /* To ensure it's above other elements */
-  width: 30%; /* Adjust width as needed */
-  height: 60%;
-  resize: both;
-  overflow: auto;
-  position: absolute;
-}
-
 .resizeHandle {
   position: absolute;
   bottom: 0;
@@ -397,19 +377,6 @@ pre {
   color: #d3d9df;
 }
 
-
-
-/* Traffic Light Buttons */
-.traffic-light {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin: 0 4px;
-  display: inline-block;
-  cursor: pointer;
-  margin-top: 5px;
-}
-
 .traffic-light.close {
   background-color: #ff605c;
 }
@@ -421,22 +388,54 @@ pre {
 .traffic-light.maximize {
   background-color: #00ca56;
 }
+/* Header Styling */
 .gui-header {
   background: #f0f0f0;
   color: #000;
   cursor: move;
-  position: absolute; /* Changed from 'fixed' to 'absolute' */
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 50px; /* Set a fixed height */
+  height: 25px; /* Set a fixed height */
   z-index: 1; /* Ensure it stays on top */
-  /* Add more styling as needed */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+/* Title styling in the header */
+.gui-header h3 {
+  position: relative;
+  right: 25px;
+  font-weight: normal;
+  flex: 1;
+  text-align: center;
+  margin: 0;
+  font-size: 24px; /* Adjust font size as needed */
+  padding: 0;
+  font-size: 18px;
+}
+
+/* Traffic Light Buttons */
+.traffic-light-container {
+  display: flex;
+  align-items: center;
+}
+
+.traffic-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 4px;
+  display: inline-block;
+  cursor: pointer;
 }
 
 .gui-content {
   position: absolute;
-  top: 50px; /* Set this to the height of the gui-header */
+  top: 25px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -447,12 +446,47 @@ pre {
 
 /* we now also have gui-content which is a child of gui-container */
 
+
+/* Styles for the Entity Inspector Window */
+#entityView {
+  position: absolute;
+  bottom: 10%;
+  right: 20%;
+  min-width: 440px;
+  overflow: auto;
+  z-index: 1000;
+  width: 440px;
+  height: 50%;
+}
+
+#eventsView {
+  top: 5%;
+  left: 40%;
+  z-index: 1000;
+  width: 30%;
+  height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+#entitiesView {
+  top: 5%;
+  left: 20px;
+  z-index: 1000;
+  width: 30%; 
+  height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
 /* Sutra.css */
 #sutraView {
   top: 10%;
   left: 30%;
-  z-index: 1000; /* To ensure it's above other elements */
-  width: 30%; /* Adjust width as needed */
+  z-index: 1000;
+  width: 30%;
   height: 60%;
   resize: both;
   overflow: auto;
@@ -588,20 +622,4 @@ pre {
   position: relative;
   overflow: hidden;
   /* Set a fixed height if necessary */
-}
-
-
-
-@keyframes rainbowCycle {
-  0%, 100% { background-color: red; }
-  14% { background-color: orange; }
-  28% { background-color: yellow; }
-  42% { background-color: green; }
-  57% { background-color: blue; }
-  71% { background-color: indigo; }
-  85% { background-color: violet; }
-}
-
-.css-loading-animation {
-  animation: rainbowCycle 2s infinite linear;
 }

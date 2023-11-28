@@ -72,8 +72,6 @@ const gui = {
     container.appendChild(guiHeader);
     container.appendChild(content);
 
-
-
     // Add resize handle
     const resizeHandle = document.createElement('div');
     resizeHandle.className = 'resizeHandle';

@@ -57,7 +57,7 @@ class Editor {
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $rulesMenu, $inspectorMenu);
+    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, /* $rulesMenu,*/ $inspectorMenu);
 
     // Append the toolbar to the body
     $('body').append($toolbar);

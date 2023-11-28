@@ -67,7 +67,7 @@ class EntitiesGUI {
 
   createGlobalEventTable() {
     let game = this.game;
-    this.container = gui.window('emittersContainer', 'Entities', function () {
+    this.container = gui.window('entitiesView', 'Entities', function () {
       game.systemsManager.removeSystem(EntitiesGUI.id);
     });
 

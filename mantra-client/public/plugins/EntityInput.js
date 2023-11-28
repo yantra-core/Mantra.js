@@ -1,0 +1,418 @@
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).EntityInput = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var Plugin = /*#__PURE__*/function () {
+  function Plugin(game) {
+    _classCallCheck(this, Plugin);
+    this.game = game; // Store the reference to the game logic
+    this.name = 'Plugin'; // make name required to be set?
+    // registers itself in event emitter?
+  }
+  _createClass(Plugin, [{
+    key: "init",
+    value: function init() {
+      throw new Error('Method "init" must be implemented');
+    }
+  }, {
+    key: "update",
+    value: function update(deltaTime, snapshot) {
+      throw new Error('Method "update" must be implemented');
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      // throw new Error('Method "render" must be implemented');
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      // throw new Error('Method "destroy" must be implemented');
+    }
+  }]);
+  return Plugin;
+}();
+var _default = exports["default"] = Plugin;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Plugin2 = _interopRequireDefault(require("../../Plugin.js"));
+var _Default2DInputStrategy = _interopRequireDefault(require("./strategies/2D/Default2DInputStrategy.js"));
+var _Default3DInputStrategy = _interopRequireDefault(require("./strategies/3D/Default3DInputStrategy.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // EntityInput.js - Marak Squires 2023
+var EntityInput = /*#__PURE__*/function (_Plugin) {
+  _inherits(EntityInput, _Plugin);
+  var _super = _createSuper(EntityInput);
+  function EntityInput(strategy) {
+    var _this;
+    _classCallCheck(this, EntityInput);
+    _this = _super.call(this);
+    _this.id = 'entity-input';
+    _this.bulletCooldown = 20;
+    _this.buttonCooldown = 20;
+    _this.lastBulletFireTime = {};
+    _this.useMouseControls = false;
+
+    // Contains an array of input strategies that are run in order each time handleInputs() is called
+    _this.strategies = [];
+
+    // Contains an object mapping of all control names registered to the entityInput system
+    // These mappings are populated by the input strategies when they are initialized
+    // Mappings are currently last in, first out, and will overwrite each other,
+    // so the last strategy to register a control mapping will be the one that is used
+    _this.controlMappings = {};
+    return _this;
+  }
+  _createClass(EntityInput, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.game.systemsManager.addSystem('entity-input', this);
+      var self = this;
+      this.game.on('start', function () {
+        if (self.strategies.length === 0) {
+          self.loadDefaultStrategy();
+        }
+      });
+    }
+  }, {
+    key: "loadDefaultStrategy",
+    value: function loadDefaultStrategy() {
+      console.log('Warning: No input strategies registered, using default input strategy');
+      if (this.game.physics && this.game.physics.dimension === 3) {
+        console.log('game.use(new Default3DInputStrategy())');
+        this.game.use(new _Default3DInputStrategy["default"]());
+      } else {
+        console.log('game.use(new DefaultInputStrategy())');
+        this.game.use(new _Default2DInputStrategy["default"]());
+      }
+      this.game.emit('inputStrategyRegistered', this.strategies);
+    }
+  }, {
+    key: "handleInputs",
+    value: function handleInputs(entityId, controls, sequenceNumber) {
+      if (this.strategies.length === 0) {
+        this.loadDefaultStrategy();
+      }
+      this.strategies.forEach(function (strategy) {
+        strategy.handleInputs(entityId, controls, sequenceNumber);
+      });
+      this.game.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }, {
+    key: "unload",
+    value: function unload() {}
+  }]);
+  return EntityInput;
+}(_Plugin2["default"]);
+_defineProperty(EntityInput, "id", 'entity-input');
+_defineProperty(EntityInput, "removable", false);
+var _default = exports["default"] = EntityInput;
+
+},{"../../Plugin.js":1,"./strategies/2D/Default2DInputStrategy.js":3,"./strategies/3D/Default3DInputStrategy.js":4}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// DefaultTwoDimensionalInputStrategy.js - Marak Squires 2023
+// This input strategy is suitable for most top-down 2D games
+var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
+  function DefaultTwoDimensionalInputStrategy(plugin) {
+    _classCallCheck(this, DefaultTwoDimensionalInputStrategy);
+    this.id = DefaultTwoDimensionalInputStrategy.id;
+    this.plugin = plugin;
+  }
+  _createClass(DefaultTwoDimensionalInputStrategy, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.defaultControlsMapping = {
+        W: 'MOVE_FORWARD',
+        S: 'MOVE_BACKWARD',
+        A: 'MOVE_LEFT',
+        D: 'MOVE_RIGHT',
+        SPACE: 'FIRE_BULLET'
+        //LEFT: 'ROTATE_LEFT',
+        //RIGHT: 'ROTATE_RIGHT'
+      };
+
+      // Remark: Button / Input cooldown has been removed in favor of input pooling on gametick
+      // the new approach is to pool all inputs for a given tick, and send them to the server
+      // this implies a button cool down of 1 tick, which is the same as no cooldown
+      // Remark: bulletCooldown should be a property of the bullet system, not input system
+      // this.bulletCooldown = 1;
+      // this.buttonCooldown = 1;
+      // this.lastBulletFireTime = {};
+
+      this.useMouseControls = false;
+
+      // check to see if entityInput system exists, if not throw error
+      if (!game.systems['entity-input']) {
+        throw new Error('DefaultTwoDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
+      }
+      game.systemsManager.addSystem(this.id, this);
+      game.systems['entity-input'].strategies.push(this);
+      // take the this.controlMappings and map them to the entityInput system
+      game.systems['entity-input'].controlMappings = _objectSpread(_objectSpread({}, game.systems['entity-input'].controlMappings), this.defaultControlsMapping);
+    }
+  }, {
+    key: "handleInputs",
+    value: function handleInputs(entityId, _ref, sequenceNumber) {
+      var _ref$controls = _ref.controls,
+        controls = _ref$controls === void 0 ? {} : _ref$controls,
+        _ref$mouse = _ref.mouse,
+        mouse = _ref$mouse === void 0 ? {} : _ref$mouse;
+      var plugin = this;
+      var game = this.game;
+      game.lastProcessedInput[entityId] = sequenceNumber;
+      var moveSpeed = 5;
+      var entityMovementSystem = game.getSystem('entity-movement');
+      var _mouse$position = mouse.position,
+        position = _mouse$position === void 0 ? {
+          x: 0,
+          y: 0
+        } : _mouse$position,
+        _mouse$canvasPosition = mouse.canvasPosition,
+        canvasPosition = _mouse$canvasPosition === void 0 ? {
+          x: 0,
+          y: 0
+        } : _mouse$canvasPosition,
+        _mouse$buttons = mouse.buttons,
+        buttons = _mouse$buttons === void 0 ? {
+          LEFT: false,
+          RIGHT: false,
+          MIDDLE: false
+        } : _mouse$buttons;
+      var actions = Object.keys(controls).filter(function (key) {
+        return controls[key];
+      }).map(function (key) {
+        return plugin.defaultControlsMapping[key];
+      });
+      var entityData = game.getEntity(entityId);
+      if (entityData && entityData.position && plugin.useMouseControls) {
+        var canvasCenter = {
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2
+        };
+        var deltaX = position.x - (entityData.position.x + canvasCenter.x);
+        var deltaY = position.y - (entityData.position.y + canvasCenter.y);
+        var angle = Math.atan2(deltaY, deltaX);
+        var angleDeg = angle * (180 / Math.PI);
+        if (angleDeg >= -45 && angleDeg < 45) {
+          actions.push('MOVE_RIGHT');
+        } else if (angleDeg >= 45 && angleDeg < 135) {
+          actions.push('MOVE_BACKWARD');
+        } else if (angleDeg >= 135 || angleDeg < -135) {
+          actions.push('MOVE_LEFT');
+        } else if (angleDeg >= -135 && angleDeg < -45) {
+          actions.push('MOVE_FORWARD');
+        }
+      }
+      if (buttons.LEFT) actions.push('FIRE_BULLET');
+
+      /* Remark: Removes in favor of input pooling on gametick
+      if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
+      if (Date.now() - plugin.lastBulletFireTime[entityId] <= plugin.bulletCooldown) {
+        console.log('bullet cooldown', Date.now() - plugin.lastBulletFireTime[entityId]);
+        return;
+      };
+      plugin.lastBulletFireTime[entityId] = Date.now();
+      */
+      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
+      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
+      if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0);
+      if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0);
+      if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
+      if (actions.includes('ROTATE_RIGHT')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);
+      if (game.systems.bullet) {
+        if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+      }
+    }
+  }]);
+  return DefaultTwoDimensionalInputStrategy;
+}();
+_defineProperty(DefaultTwoDimensionalInputStrategy, "id", 'default-2d-input-strategy');
+var _default = exports["default"] = DefaultTwoDimensionalInputStrategy;
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
+  function ThreeDimensionalInputStrategy(plugin) {
+    _classCallCheck(this, ThreeDimensionalInputStrategy);
+    this.plugin = plugin;
+    this.id = ThreeDimensionalInputStrategy.id;
+  }
+  _createClass(ThreeDimensionalInputStrategy, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+
+      // check to see if entityInput system exists, if not throw error
+      if (!game.systems['entity-input']) {
+        throw new Error('ThreeDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
+      }
+      this.defaultControlsMapping = {
+        W: 'MOVE_FORWARD',
+        S: 'MOVE_BACKWARD',
+        A: 'MOVE_LEFT',
+        D: 'MOVE_RIGHT',
+        SPACE: 'FIRE_BULLET',
+        Q: 'MOVE_UP',
+        E: 'MOVE_DOWN',
+        UP: 'PITCH_UP',
+        DOWN: 'PITCH_DOWN',
+        LEFT: 'YAW_LEFT',
+        RIGHT: 'YAW_RIGHT',
+        Z: 'ROLL_LEFT',
+        C: 'ROLL_RIGHT'
+      };
+      game.systems['entity-input'].strategies.push(this);
+
+      // take the this.controlMappings and map them to the entityInput system
+      game.systems['entity-input'].controlMappings = _objectSpread(_objectSpread({}, game.systems['entity-input'].controlMappings), this.defaultControlsMapping);
+    }
+  }, {
+    key: "getForwardDirection",
+    value: function getForwardDirection(body) {
+      var bodyRotation = this.game.physics.getBodyRotation(body); // Assume getBodyRotation is a method in your entityMovement system
+      // console.log('initial bodyRotation', bodyRotation.x, bodyRotation.y, bodyRotation.z)
+      // Assuming the body faces towards the negative y-axis when pitch, yaw, and roll are 0
+      return {
+        x: Math.sin(bodyRotation.y) * Math.cos(bodyRotation.x),
+        y: -Math.cos(bodyRotation.y) * Math.cos(bodyRotation.x),
+        z: Math.sin(bodyRotation.x)
+      };
+    }
+  }, {
+    key: "handleInputs",
+    value: function handleInputs(entityId, _ref, sequenceNumber) {
+      var _ref$controls = _ref.controls,
+        controls = _ref$controls === void 0 ? {} : _ref$controls,
+        _ref$mouse = _ref.mouse,
+        mouse = _ref$mouse === void 0 ? {} : _ref$mouse;
+      var plugin = this;
+      var game = this.game;
+      game.lastProcessedInput[entityId] = sequenceNumber;
+
+      // Define movement speed for each axis and rotation speed
+      var moveSpeed = 5;
+      var rotateSpeed = 0.022; // Small value since it's typically in radians
+
+      var entityMovementSystem = game.getSystem('entity-movement');
+      var actions = Object.keys(controls).filter(function (key) {
+        return controls[key];
+      }).map(function (key) {
+        return plugin.defaultControlsMapping[key];
+      });
+
+      // Extract the entity data
+      var entityData = game.getEntity(entityId);
+      var body = game.bodyMap[entityId];
+      if (!entityData || !entityData.position) {
+        return;
+      }
+
+      // Movement
+      //let forwardDirection = this.getForwardDirection(body);
+      // console.log('input calc forward facing direction', forwardDirection.x, forwardDirection.y, forwardDirection.z)
+      // "forward facing" movements, forwardDirection needed
+      // these movements are relative to the forward facing direction of the entity
+      /*
+      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, -forwardDirection.y * moveSpeed, forwardDirection.z * moveSpeed);
+      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, forwardDirection.y * moveSpeed, -forwardDirection.z * moveSpeed);
+      if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, 0);  // Assuming left/right movement is still along the global X axis
+      if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 0);  // Assuming left/right movement is still along the global X axis
+      if (actions.includes('MOVE_UP')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);  // Assuming up/down movement is still along the global Z axis
+      if (actions.includes('MOVE_DOWN')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);  // Assuming up/down movement is still along the global Z axis
+      */
+      // absolute movements, forwardDirection not needed
+      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, -1, 0);
+      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, 1, 0);
+      if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -1, 0, 0); // Assuming left/right movement is still along the global X axis
+      if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, 1, 0, 0); // Assuming left/right movement is still along the global X axis
+      if (actions.includes('MOVE_UP')) entityMovementSystem.update(entityId, 0, 0, 1); // Assuming up/down movement is still along the global Z axis
+      if (actions.includes('MOVE_DOWN')) entityMovementSystem.update(entityId, 0, 0, -1); // Assuming up/down movement is still along the global Z axis
+
+      // Rotation
+      if (actions.includes('PITCH_UP')) entityMovementSystem.rotate(entityId, -rotateSpeed, 0, 0);
+      if (actions.includes('PITCH_DOWN')) entityMovementSystem.rotate(entityId, rotateSpeed, 0, 0);
+      if (actions.includes('YAW_LEFT')) entityMovementSystem.rotate(entityId, 0, -rotateSpeed, 0);
+      if (actions.includes('YAW_RIGHT')) entityMovementSystem.rotate(entityId, 0, rotateSpeed, 0);
+      if (actions.includes('ROLL_LEFT')) entityMovementSystem.rotate(entityId, 0, 0, -rotateSpeed);
+      if (actions.includes('ROLL_RIGHT')) entityMovementSystem.rotate(entityId, 0, 0, rotateSpeed);
+
+      // Firing mechanic can remain the same as in 2D
+      if (game.systems.bullet) {
+        if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+      }
+    }
+  }]);
+  return ThreeDimensionalInputStrategy;
+}();
+_defineProperty(ThreeDimensionalInputStrategy, "id", 'ThreeDimensionalInputStrategy');
+var _default = exports["default"] = ThreeDimensionalInputStrategy;
+
+},{}]},{},[2])(2)
+});
