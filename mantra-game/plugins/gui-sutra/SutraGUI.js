@@ -2,8 +2,7 @@
 import gui from '../gui-editor/gui.js';
 import sutra from '@yantra-core/sutra';
 
-//import sutra from '../../../../sutra/index.js';
-
+// import sutra from '../../../../sutra/index.js';
 import drawTable from './lib/drawTable.js';
 import editor from './lib/editor.js';
 
@@ -17,7 +16,7 @@ class SutraGUI {
     this.drawTable = drawTable.bind(this);
     this.showFunctionEditor = editor.showFunctionEditor.bind(this);
     this.showObjectEditor = editor.showObjectEditor.bind(this);
-    this.showAddConditionalForm = editor.showAddConditionalForm.bind(this);
+    this.showConditionalsForm = editor.showConditionalsForm.bind(this);
     this.createConditional = editor.createConditional.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
   }
@@ -109,7 +108,11 @@ class SutraGUI {
 
   addNewRule() {
     // Open a form to create a new conditional
-    this.showAddConditionalForm();
+    this.showConditionalsForm();
+  }
+
+  getEmitters() {
+    return this.game.emitters;
   }
 
   redrawBehaviorTree() {
@@ -125,10 +128,6 @@ class SutraGUI {
     JSON.parse(json).tree.forEach(node => {
       guiContent.appendChild(this.createNodeElement(node, 0));
     });
-  }
-
-  getEmitters() {
-    return this.game.emitters;
   }
 
   drawBehaviorTree(json) {
@@ -150,16 +149,26 @@ class SutraGUI {
     return Object.keys(this.getEmitters());
   }
 
-  createNodeElement(node, indentLevel) {
+  createNodeElement(node, indentLevel, path = '') {
     let element = document.createElement('div');
     element.className = 'node-element';
     element.style.marginLeft = `${indentLevel * 20}px`;
-
+  
+    // Generate a unique path identifier for the node
+    const nodeId = path ? `${path}-${node.action || node.if}` : (node.action || node.if);
+    
     if (node.action) {
       this.appendActionElement(element, node, indentLevel);
     } else if (node.if) {
       this.appendConditionalElement(element, node, indentLevel);
     }
+
+    console.log('noooode', node)
+    
+    // Create the Add Rule button and append it to the element
+    const addRuleBtn = this.createAddRuleButton(node.sutraPath);
+    element.appendChild(addRuleBtn);
+  
     return element;
   }
 
@@ -293,6 +302,31 @@ class SutraGUI {
   showConditionalEditor(conditional) {
     // Implement the UI logic to show and edit the details of the conditional
     // This could be a form with inputs for the conditional's properties
+  }
+
+  handleAddRuleClick(nodeId) {
+    console.log('handleAddRuleClick', nodeId)
+    let node = this.behavior.findNode(nodeId);
+    console.log('node', node)
+    if (node.action) {
+      // Add a new conditional
+      this.showConditionalsForm(node);
+    } else if (node.if) {
+      // Add a new action
+      this.showConditionalsForm(node);
+      //this.showAddActionForm(nodeId);
+    }
+  }
+
+  createAddRuleButton(nodeId) {
+    let button = document.createElement('button');
+    button.textContent = 'Add Rule';
+    button.className = 'add-rule-btn';
+    button.setAttribute('data-id', nodeId);
+    button.onclick = (e) => {
+      this.handleAddRuleClick(e.target.getAttribute('data-id'));
+    };
+    return button;
   }
 
   update() {

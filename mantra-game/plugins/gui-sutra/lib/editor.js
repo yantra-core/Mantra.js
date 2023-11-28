@@ -1,27 +1,7 @@
+import gui from '../../gui-editor/gui.js';
+
 const editor = {};
 
-
-editor.createConditional = function createConditional(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const type = formData.get('conditionalType');
-  if (type === 'function') {
-    // Logic to create and add custom function conditional
-    const func = new Function('return ' + formData.get('conditionalFunction'))();
-    this.behavior.addCondition('customFunction', func);
-  } else {
-    // Logic to create and add DSL object conditional
-    const dsl = {
-      op: formData.get('dslOperator'),
-      property: formData.get('dslProperty'),
-      value: formData.get('dslValue')
-    };
-    this.behavior.addCondition('customDSL', dsl);
-  }
-
-  // Redraw behavior tree or update UI as needed
-  this.redrawBehaviorTree();
-}
 
 editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditional) {
   let editorContainer = document.getElementById('editorContainer'); // Assuming you have a container for the editor
@@ -42,11 +22,12 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
     this.behavior.updateCondition(conditionalName, updatedFunction); // Assuming such a method exists
     this.redrawBehaviorTree(); // Redraw to reflect changes
   };
-  
+
   editorContainer.appendChild(saveButton);
 }
 
 editor.showObjectEditor = function showObjectEditor(conditionalName, conditional, operators) {
+  console.log('showObjectEditor', conditionalName, conditional, operators)
   let editorContainer = document.getElementById('editorContainer'); // Editor container
   editorContainer.innerHTML = ''; // Clear previous content
 
@@ -116,58 +97,118 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   buttonCell.appendChild(saveButton);
 }
 
+editor.showConditionalsForm = function showConditionalsForm(node) {
+  console.log('opening window the context is', node);
 
-editor.showAddConditionalForm = function showAddConditionalForm() {
+  // Check if the Sutra Form Editor window exists
+  let sutraFormView = document.getElementById('sutraFormView');
+  if (!sutraFormView) {
+    // Create the window if it doesn't exist
+    this.sutraFormView = gui.window('sutraFormView', 'Sutra Form Editor', function () {
+      // Handle window close event here if needed
+    });
+  }
+
+  // Get gui-content from inside this.sutraFormView
+  let guiContent = this.sutraFormView.querySelector('.gui-content');
+
+  // Create or get the editor container
   let editorContainer = document.getElementById('editorContainer');
   if (!editorContainer) {
     editorContainer = document.createElement('div');
     editorContainer.id = 'editorContainer';
-    this.sutraView.appendChild(editorContainer);
+    guiContent.appendChild(editorContainer);
   }
   editorContainer.innerHTML = ''; // Clear previous content
+
+  // Display the sutraPath and action at the top
+  let nodeInfo = document.createElement('div');
+  nodeInfo.innerHTML = `<strong>Path:</strong> ${node.sutraPath}<br><strong>Action:</strong> ${node.action}`;
+  editorContainer.appendChild(nodeInfo);
 
   // Form to choose between custom function or DSL object
   let form = document.createElement('form');
   form.innerHTML = `
     <label>
-      <input type="radio" name="conditionalType" value="function" checked>
-      Custom Function
-    </label>
-    <label>
       <input type="radio" name="conditionalType" value="dsl">
       DSL Object
     </label>
+    <label>
+      <input type="radio" name="conditionalType" value="function" checked>
+      Custom Function
+    </label>
     <div id="conditionalInputContainer"></div>
-    <button type="submit">Create Conditional</button>
+    <button type="submit">Save Conditional</button>
   `;
   editorContainer.appendChild(form);
 
   // Event listener for radio button change
   form.elements.conditionalType.forEach(radio => {
-    radio.addEventListener('change', (e) => this.onConditionalTypeChange(e.target.value));
+    radio.addEventListener('change', (e) => this.onConditionalTypeChange(e.target.value, node));
   });
 
   // Event listener for form submission
-  form.addEventListener('submit', (e) => this.createConditional(e));
+  form.addEventListener('submit', (e) => this.createConditional(e, node));
+
+  // Trigger the radio button change event to populate the form
+  let conditionalType = node && typeof node.condition === 'function' ? 'function' : 'dsl';
+  form.elements.conditionalType.forEach(radio => {
+    if (radio.value === conditionalType) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change'));
+    }
+  });
+
+  gui.bringToFront(this.sutraFormView);
 }
 
-editor.onConditionalTypeChange = function onConditionalTypeChange(type) {
+// Adjust createConditional to handle both creating and updating conditionals
+editor.createConditional = function createConditional(e, node) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const type = formData.get('conditionalType');
+  let conditionalName = node ? node.action : 'newConditional'; // Default name for new conditional
+
+  if (type === 'function') {
+    // Logic to create and add custom function conditional
+    const func = new Function('return ' + formData.get('conditionalFunction'))();
+    this.behavior.updateCondition(conditionalName, func);
+  } else {
+    // Logic to create and add DSL object conditional
+    const dsl = {
+      op: formData.get('dslOperator'),
+      property: formData.get('dslProperty'),
+      value: formData.get('dslValue')
+    };
+    this.behavior.updateCondition(conditionalName, dsl);
+  }
+
+  // Redraw behavior tree or update UI as needed
+  this.redrawBehaviorTree();
+}
+
+editor.onConditionalTypeChange = function onConditionalTypeChange(type, node) {
   // Update form based on selected type
   let inputContainer = document.getElementById('conditionalInputContainer');
   if (type === 'function') {
     // Provide a textarea for custom function input
-    inputContainer.innerHTML = '<textarea name="conditionalFunction"></textarea>';
+    let functionValue = node && typeof node.condition === 'function' ? node.condition.toString() : '';
+    inputContainer.innerHTML = `<textarea name="conditionalFunction">${functionValue}</textarea>`;
   } else {
     // Provide inputs for DSL object properties
+    let propertyValue = node && node.condition && node.condition.property ? node.condition.property : '';
+    let valueValue = node && node.condition && node.condition.value ? node.condition.value : '';
+    let selectedOp = node && node.condition && node.condition.op ? node.condition.op : '';
     inputContainer.innerHTML = `
-      <input name="dslProperty" placeholder="Property">
-      <input name="dslValue" placeholder="Value">
+      <input name="dslProperty" placeholder="Property" value="${propertyValue}">
+      <input name="dslValue" placeholder="Value" value="${valueValue}">
       <select name="dslOperator">
-        ${this.behavior.getOperators().map(op => `<option value="${op}">${op}</option>`).join('')}
+        ${this.behavior.getOperators().map(op => 
+          `<option value="${op}" ${op === selectedOp ? 'selected' : ''}>${op}</option>`
+        ).join('')}
       </select>
     `;
   }
 }
-
 
 export default editor;

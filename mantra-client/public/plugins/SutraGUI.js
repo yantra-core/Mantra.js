@@ -202,7 +202,7 @@ var SutraGUI = /*#__PURE__*/function () {
     this.drawTable = _drawTable["default"].bind(this);
     this.showFunctionEditor = _editor["default"].showFunctionEditor.bind(this);
     this.showObjectEditor = _editor["default"].showObjectEditor.bind(this);
-    this.showAddConditionalForm = _editor["default"].showAddConditionalForm.bind(this);
+    this.showConditionalsForm = _editor["default"].showConditionalsForm.bind(this);
     this.createConditional = _editor["default"].createConditional.bind(this);
     this.onConditionalTypeChange = _editor["default"].onConditionalTypeChange.bind(this);
   }
@@ -303,7 +303,7 @@ var SutraGUI = /*#__PURE__*/function () {
     key: "addNewRule",
     value: function addNewRule() {
       // Open a form to create a new conditional
-      this.showAddConditionalForm();
+      this.showConditionalsForm();
     }
   }, {
     key: "redrawBehaviorTree",
@@ -708,7 +708,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   };
   buttonCell.appendChild(saveButton);
 };
-editor.showAddConditionalForm = function showAddConditionalForm() {
+editor.showConditionalsForm = function showConditionalsForm() {
   var _this3 = this;
   var editorContainer = document.getElementById('editorContainer');
   if (!editorContainer) {

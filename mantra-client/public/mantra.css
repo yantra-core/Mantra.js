@@ -486,8 +486,19 @@ pre {
   top: 10%;
   left: 30%;
   z-index: 1000;
-  width: 30%;
+  width: 60%;
   height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+#sutraFormView {
+  top: 10%;
+  left: 50%;
+  z-index: 1000;
+  width: 300px;
+  height: 200px;
   resize: both;
   overflow: auto;
   position: absolute;
@@ -584,10 +595,6 @@ pre {
   margin-bottom: 5px;
   color: #d3d9df;
 }
-
-
-
-
 
 @keyframes slideOut {
   from {
