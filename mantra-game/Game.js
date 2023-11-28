@@ -270,6 +270,7 @@ class Game {
 
   // All Systems are Plugins, but not all Plugins are Systems
   use(pluginInstanceOrId) {
+    let game = this;
     let basePath = './plugins/'; // Base path for loading plugins
 
     // Check if the argument is a string (plugin ID)
@@ -288,20 +289,18 @@ class Game {
       // Dynamically load the plugin script
       const scriptUrl = `${basePath}${pluginId}.js`;
       this.loadPluginScript(scriptUrl).then(function () {
-
         // The script is expected to call `game.use(pluginInstance)` after loading
-        console.log(`Plugin ${pluginId} loaded.`, this.plugins, this._plugins);
+        console.log(`Plugin ${pluginId} loaded.`, game.plugins, game._plugins);
         if (typeof PLUGINS === 'object') {
           let pluginInstance = new PLUGINS[pluginId].default();
-          this.use(pluginInstance);
+          game.use(pluginInstance);
         } else {
           // handle server-side case of string usage
           // TODO
         }
-
       }).catch(function (err) {
-        console.error(`Error loading plugin ${pluginId}:`, error);
-        this._plugins[pluginId] = { status: 'error' };
+        console.error(`Error loading plugin ${pluginId}:`, err);
+        game._plugins[pluginId] = { status: 'error' };
         throw error;
       });
 
