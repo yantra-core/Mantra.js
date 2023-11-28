@@ -44,7 +44,11 @@ class ControlsGUI {
     this.controlsView = gui.window('controlsView', 'Input Controls', function(){
       game.systemsManager.removeSystem(ControlsGUI.id);
     });
-    this.controlsView.appendChild(table);
+
+    let guiContent = this.controlsView.querySelector('.gui-content');
+    guiContent.appendChild(table);
+    
+    //this.controlsView.appendChild(table);
   }
 
   listenForEntityInput(entity) {

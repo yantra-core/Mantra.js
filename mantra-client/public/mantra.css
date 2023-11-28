@@ -6,11 +6,14 @@ body {
 /* ControlsGUI.js Plugin */
 
 #controlsView {
-  position: fixed;
-  top: 60px;
-  right: 20px;
+  top: 10%;
+  right: 10%;
+  z-index: 1000; /* To ensure it's above other elements */
   width: 20%; /* Adjust width as needed */
-  max-height: 80%;
+  height: 30%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
 }
 
 #pluginView {
@@ -421,15 +424,31 @@ pre {
 .traffic-light.maximize {
   background-color: #00ca56;
 }
-
-/* Modify the existing styles to match Big Sur's design */
 .dragHeader {
-  background: #f0f0f0; /* Lighter header */
+  background: #f0f0f0;
   color: #000;
   cursor: move;
-
+  position: absolute; /* Changed from 'fixed' to 'absolute' */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px; /* Set a fixed height */
+  z-index: 1; /* Ensure it stays on top */
   /* Add more styling as needed */
 }
+
+.gui-content {
+  position: absolute;
+  top: 50px; /* Set this to the height of the dragHeader */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-x: hidden; /* Optional, depending on your content */
+  /* Additional styles as needed */
+}
+
+/* we now also have gui-content which is a child of gui-container */
 
 /* Sutra.css */
 #sutraView {

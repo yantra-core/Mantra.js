@@ -13,6 +13,11 @@ const gui = {
     container.id = id;
     container.className = 'gui-container';
 
+
+    // Create the content of the container
+    const content = document.createElement('div');
+    content.className = 'gui-content';
+
     // Create a draggable header
     const dragHeader = document.createElement('div');
     dragHeader.className = 'dragHeader';
@@ -65,6 +70,7 @@ const gui = {
     dragHeaderTitle.textContent = title;
     dragHeader.appendChild(dragHeaderTitle);
     container.appendChild(dragHeader);
+    container.appendChild(content);
 
 
 

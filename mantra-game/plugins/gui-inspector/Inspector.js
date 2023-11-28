@@ -62,6 +62,7 @@ class Inspector {
 
     // Check if the entityView window already exists
     let entityView = document.getElementById('entityView');
+
     if (!entityView) {
       // Use gui.window() to create the window
       entityView = gui.window('entityView', 'Entity Inspector', function(){
@@ -87,7 +88,11 @@ class Inspector {
       existingTable.remove();
     }
     */
-    entityView.append(table);
+
+    // append the table to div with class name gui-content that is child inside entityView
+    let guiContent = entityView.querySelector('.gui-content');
+    guiContent.appendChild(table);
+    // entityView.append(table);
   }
 
   renderValue(cell, value, key) {

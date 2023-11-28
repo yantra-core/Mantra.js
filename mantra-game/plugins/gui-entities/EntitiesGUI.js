@@ -91,9 +91,10 @@ class EntitiesGUI {
     this.headerRow = this.entitiesTable.createTHead().insertRow();
     this.updateTableHeaders(Array.from(this.knownProperties));
 
-    this.container.appendChild(this.entitiesTable);
-  }
+    let guiContent = this.container.querySelector('.gui-content');
+    guiContent.appendChild(this.entitiesTable);
 
+  }
 
   updateTableHeaders(properties) {
     this.headerRow.innerHTML = ''; // Clear existing headers
