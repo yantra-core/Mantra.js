@@ -19,8 +19,8 @@ const gui = {
     content.className = 'gui-content';
 
     // Create a draggable header
-    const dragHeader = document.createElement('div');
-    dragHeader.className = 'dragHeader';
+    const guiHeader = document.createElement('div');
+    guiHeader.className = 'gui-header';
 
     // Add traffic light buttons
     const closeButton = document.createElement('div');
@@ -60,16 +60,16 @@ const gui = {
         container.style.left = '0px';
       }
     };
-    dragHeader.appendChild(closeButton);
-    dragHeader.appendChild(minimizeButton);
-    dragHeader.appendChild(maximizeButton);
+    guiHeader.appendChild(closeButton);
+    guiHeader.appendChild(minimizeButton);
+    guiHeader.appendChild(maximizeButton);
 
 
     // create h3 for title
-    const dragHeaderTitle = document.createElement('h3');
-    dragHeaderTitle.textContent = title;
-    dragHeader.appendChild(dragHeaderTitle);
-    container.appendChild(dragHeader);
+    const guiHeaderTitle = document.createElement('h3');
+    guiHeaderTitle.textContent = title;
+    guiHeader.appendChild(guiHeaderTitle);
+    container.appendChild(guiHeader);
     container.appendChild(content);
 
 
@@ -83,7 +83,7 @@ const gui = {
     document.body.appendChild(container);
 
     // Initialize dragging and resizing
-    this.initializeDrag(dragHeader, container);
+    this.initializeDrag(guiHeader, container);
     this.initializeResize(resizeHandle, container);
 
     // Add event listener for click to manage z-index

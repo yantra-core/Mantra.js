@@ -25,6 +25,7 @@ MANTRA.plugins = {
   Health: require('./plugins/health/Health.js').default,
   Timers: require('./plugins/timers/Timers.js').default,
   ControlsGUI: require('./plugins/gui-controls/ControlsGUI.js').default,
+  LoadingScreen: require('./plugins/loading-screen/LoadingScreen.js').default,
   EntitiesGUI: require('./plugins/gui-entities/EntitiesGUI.js').default,
   PingTime: require('./plugins/ping-time/PingTime.js').default,
   PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js').default,

@@ -379,7 +379,7 @@ pre {
 
 
 /* Header titles */
-.dragHeader h1, .dragHeader h2, .dragHeader h3 {
+.gui-header h1, .gui-header h2, .gui-header h3 {
   padding: 0;
   padding-left: 5px;
   margin: 0;
@@ -421,7 +421,7 @@ pre {
 .traffic-light.maximize {
   background-color: #00ca56;
 }
-.dragHeader {
+.gui-header {
   background: #f0f0f0;
   color: #000;
   cursor: move;
@@ -436,7 +436,7 @@ pre {
 
 .gui-content {
   position: absolute;
-  top: 50px; /* Set this to the height of the dragHeader */
+  top: 50px; /* Set this to the height of the gui-header */
   left: 0;
   right: 0;
   bottom: 0;
@@ -591,3 +591,17 @@ pre {
 }
 
 
+
+@keyframes rainbowCycle {
+  0%, 100% { background-color: red; }
+  14% { background-color: orange; }
+  28% { background-color: yellow; }
+  42% { background-color: green; }
+  57% { background-color: blue; }
+  71% { background-color: indigo; }
+  85% { background-color: violet; }
+}
+
+.css-loading-animation {
+  animation: rainbowCycle 2s infinite linear;
+}
