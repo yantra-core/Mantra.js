@@ -1,21 +1,39 @@
 import sutra from '../../../../sutra/index.js';
 
-export default function testRules () {
+export default function testRules() {
 
   let rules = new sutra.Sutra();
+
+  // Define health level conditions for the boss
+  const healthLevels = [800, 600, 400, 200, 0];
+  const colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red
+
+  // Custom function for 'isBoss' condition
+  rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
+
+  // Adding health level conditions
+  healthLevels.forEach((level, index) => {
+    rules.addCondition(`isHealthBelow${level}`, {
+      op: 'lessThan',
+      property: 'health',
+      value: level
+    });
+  });
+
+  /*
+  // Action for the boss based on health levels
+  rules.addAction({
+    if: 'isBoss',
+    then: healthLevels.map((level, index) => ({
+      if: `isHealthBelow${level}`,
+      then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
+    }))
+  });
+  */
 
   // use custom function for condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
   rules.addCondition('isSpawner', (entity) => entity.type === 'SPAWNER');
-
-  /*
-  // could also be written as:
-  sutra.addCondition('isBoss', {
-    operator: 'equals',
-    property: 'type',
-    value: 'BOSS'
-  });
-  */
 
   // use standard Sutra DSL for condition
   rules.addCondition('isHealthLow', {
@@ -41,11 +59,13 @@ export default function testRules () {
   rules.on('entity::updateEntity', (entity, node) => {
     // create a new object that merges the entity and data
     //let updatedEntity = Object.assign({}, { id: entity.id }, data.data);
+    // console.log("entity::updateEntity", entity, node);
     game.systems.entity.inflateEntity(entity);
     //game.emit('entity::updateEntity', entity);
   });
 
   rules.on('entity::createEntity', (entity, node) => {
+    console.log("entity::createEntity", entity, node);
     game.systems.entity.createEntity(node.data);
     //game.emit('entity::createEntity', entity);
   });
@@ -85,7 +105,7 @@ export default function testRules () {
     then: [{
       if: 'timerCompleted',
       then: [{
-        if: 'blockCountLessThan5',
+        if: ['blockCountLessThan5', 'spawnerHealthAbove50'],
         then: [{
           action: 'entity::createEntity',
           data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: 0 } }
@@ -104,6 +124,14 @@ export default function testRules () {
     op: 'and',
     conditions: ['isBoss', 'isHealthLow']
   });
+
+  // New condition for spawner health
+  rules.addCondition('spawnerHealthAbove50', {
+    op: 'greaterThan',
+    property: 'health',
+    value: 50
+  });
+
 
   rules.addAction({
     if: 'isBossAndHealthLow',

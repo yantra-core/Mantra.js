@@ -177,6 +177,14 @@ class Entity {
       this.game.components.color.set(entityId, entityData.color);
     }
 
+    if (entityData.height) {
+      this.game.components.height.set(entityId, entityData.height);
+    }
+
+    if (entityData.width) {
+      this.game.components.width.set(entityId, entityData.width);
+    }
+
     if (entityData.position) {
       this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y, z: entityData.position.z });
     }

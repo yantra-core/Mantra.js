@@ -41,7 +41,6 @@ class SutraGUI {
       }
     });
 
-
     let json = rules.serializeToJson();
     console.log('json', json);
     this.drawTable();
@@ -158,10 +157,11 @@ class SutraGUI {
     saveBtn.className = 'save-button';
     saveBtn.addEventListener('click', (event) => {
       const serializedData = this.serializeFormToJSON(formElement);
-      console.log('Serialized Data:', serializedData);
+      // console.log('Serialized Data:', serializedData);
+      // must fetch live reference to tree as "node" is a copy at this point
+      let originalNode = this.behavior.findNode(node.sutraPath);
       // now that we have the updated for data, we need to update the sutra action
-      node.data = serializedData;
-      console.log('ref node', node)
+      originalNode.data = serializedData;
     });
 
     formElement.appendChild(saveBtn);
