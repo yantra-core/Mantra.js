@@ -240,29 +240,47 @@ class SutraGUI {
   }
 
   createNodeElement(node, indentLevel, path = '') {
-    let element = document.createElement('div');
-    element.className = 'node-element';
-    element.style.marginLeft = `${indentLevel * 20}px`;
+    // Create a form element instead of a div
+    let formElement = document.createElement('form');
+    formElement.className = 'node-element-form';
+    formElement.style.marginLeft = `${indentLevel * 20}px`;
 
     // Generate a unique path identifier for the node
     const nodeId = path ? `${path}-${node.action || node.if}` : (node.action || node.if);
 
+    // Create a div to hold the node contents
+    let contentDiv = document.createElement('div');
+    contentDiv.className = 'node-element';
+    formElement.appendChild(contentDiv);
+
     if (node.action) {
-      this.appendActionElement(element, node, indentLevel);
+      this.appendActionElement(contentDiv, node, indentLevel);
     } else if (node.if) {
-      this.appendConditionalElement(element, node, indentLevel);
+      this.appendConditionalElement(contentDiv, node, indentLevel);
     }
 
-    // Create the Add Rule button and append it to the element
+    // Append buttons to the contentDiv
     const addRuleBtn = this.createAddRuleButton(node.sutraPath);
     const removeRuleBtn = this.createRemoveRuleButton(node.sutraPath);
-    // hide the button by default
-    // addRuleBtn.style.display = 'none';
-    element.appendChild(addRuleBtn);
-    element.appendChild(removeRuleBtn);
+    contentDiv.appendChild(addRuleBtn);
+    contentDiv.appendChild(removeRuleBtn);
 
-    return element;
+    // Create and append the Save button to the form, not the contentDiv
+    const saveBtn = document.createElement('button');
+    saveBtn.type = 'button'; // Ensure this button doesn't submit the form
+    saveBtn.textContent = 'Save';
+    saveBtn.className = 'save-button';
+    saveBtn.addEventListener('click', (event) => {
+      const serializedData = this.serializeFormToJSON(formElement);
+      console.log('Serialized Data:', serializedData);
+      // Further processing of serializedData as needed
+    });
+
+    formElement.appendChild(saveBtn);
+
+    return formElement;
   }
+
 
   appendActionElement(element, node, indentLevel) {
     let actionSelectContainer = document.createElement('div');
@@ -312,38 +330,84 @@ class SutraGUI {
   }
 
   createDataContainer(node, indentLevel) {
-    console.log('creating a data container', node)
+    console.log('creating a data container', node);
     let dataContainer = document.createElement('div');
     dataContainer.className = 'data-container';
 
     Object.keys(node.data).forEach(key => {
-      let inputGroup = document.createElement('div');
-      inputGroup.className = 'input-group';
+      let path = key;
 
-      let label = this.createLabel(key, indentLevel);
-      let input = this.createInput(node, key);
+      // Check if the value is an object and not null
+      if (typeof node.data[key] === 'object' && node.data[key] !== null) {
+        let nestedLabel = this.createLabel(key, indentLevel);
+        dataContainer.appendChild(nestedLabel);
 
-      inputGroup.appendChild(label);
-      inputGroup.appendChild(input);
-
-      dataContainer.appendChild(inputGroup);
+        let nestedContainer = this.createNestedDataContainer(node.data[key], indentLevel + 1, path);
+        nestedContainer.dataset.key = key; // Optional: set a data attribute for the key
+        dataContainer.appendChild(nestedContainer);
+      } else {
+        let inputGroup = this.createInputGroup(node, key, indentLevel, path);
+        dataContainer.appendChild(inputGroup);
+      }
     });
 
     return dataContainer;
   }
 
 
+  createInputGroup(node, key, indentLevel, path) {
+    let inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group';
+
+    let label = this.createLabel(key, indentLevel);
+    let input = this.createInput(node, key, path);
+
+    inputGroup.appendChild(label);
+    inputGroup.appendChild(input);
+
+    return inputGroup;
+  }
+
+  createNestedDataContainer(nestedNode, indentLevel, path = '') {
+    let nestedDataContainer = document.createElement('div');
+    nestedDataContainer.className = 'nested-data-container nested-level-' + indentLevel;
+
+    Object.keys(nestedNode).forEach(nestedKey => {
+      let nestedPath = path ? `${path}.${nestedKey}` : nestedKey;
+      console.log('nestedPath', nestedPath)
+      if (typeof nestedNode[nestedKey] === 'object' && nestedNode[nestedKey] !== null) {
+        let nestedLabel = this.createLabel(nestedKey, indentLevel);
+        nestedDataContainer.appendChild(nestedLabel);
+
+        let innerNestedContainer = this.createNestedDataContainer(nestedNode[nestedKey], indentLevel + 1, nestedPath);
+        innerNestedContainer.dataset.key = nestedKey; // Optional
+        nestedDataContainer.appendChild(innerNestedContainer);
+      } else {
+        let inputGroup = this.createInputGroup({ data: nestedNode }, nestedKey, indentLevel, nestedPath);
+        nestedDataContainer.appendChild(inputGroup);
+      }
+    });
+
+    return nestedDataContainer;
+  }
+
   createLabel(key, indentLevel) {
     let label = document.createElement('label');
     label.textContent = key;
     label.className = 'param-label';
-    label.style.marginLeft = `${indentLevel * 20}px`;
+    // label.style.marginLeft = `${indentLevel * 20}px`;
     return label;
   }
 
-  createInput(node, key) {
+  createInput(node, key, path = '') {
+
     let input = document.createElement('input');
     input.className = 'param-input';
+    if (path.length) {
+      input.name = path;
+    } else {
+      input.name = key;
+    }
     input.setAttribute('data-action', node.action);
     input.setAttribute('data-key', key);
     input.setAttribute('data-id', node.data.id); // Assuming node.action can serve as a unique ID
@@ -353,6 +417,24 @@ class SutraGUI {
     };
     return input;
   }
+
+  serializeFormToJSON(form) {
+    let formData = new FormData(form);
+    let obj = {};
+    for (let [key, value] of formData) {
+      let keys = key.split('.');
+      keys.reduce((acc, k, i) => {
+        if (i === keys.length - 1) {
+          acc[k] = value;
+        } else {
+          acc[k] = acc[k] || {};
+        }
+        return acc[k];
+      }, obj);
+    }
+    return obj;
+  }
+
 
   appendConditionalElement(element, node, indentLevel) {
     let condition = this.createConditionElement(node);

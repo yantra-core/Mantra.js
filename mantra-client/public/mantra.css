@@ -777,3 +777,13 @@ textarea {
   font-size: 18px;
   font-weight: bold;
 }
+
+.nested-data-container {
+  margin-left: 20px; /* Base indentation */
+}
+
+/* Dynamic indentation based on level */
+.nested-level-1 { margin-left: 20px; }
+.nested-level-2 { margin-left: 40px; }
+.nested-level-3 { margin-left: 60px; }
+/* Add more levels as needed */
