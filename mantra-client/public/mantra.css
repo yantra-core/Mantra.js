@@ -504,14 +504,14 @@ pre {
   position: absolute;
 }
 
-#sutraView #editorContainer {
+#editorContainer {
   background-color: #121a2e; /* Deeper blue for contrast */
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-#sutraView #editorContainer textarea {
+#editorContainer textarea {
   width: 100%;
   height: 200px;
   background-color: #1c2535;
@@ -690,4 +690,90 @@ pre {
 .highlighted-sutra-node {
   background-color: orange; /* Example style - light blue background */
   /* Add any other styles as needed */
+}
+
+textarea {
+  background-color: #162238;
+  color: #d3d9df;
+}
+
+.action-select-container {
+  background-color: #1c2535;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Style for the data container */
+.data-container {
+  background-color: #162238;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Style for each input group in the data container */
+.input-group {
+  margin-bottom: 15px;
+}
+
+/* Style for labels in the data container */
+.input-group label {
+  color: #d3d9df;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Style for inputs in the data container */
+.input-group input, 
+.input-group select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  background-color: #1c2535;
+  border: 1px solid #2a3348;
+  color: #d3d9df;
+  box-sizing: border-box;
+}
+
+/* Hover effect for selects and inputs */
+.input-group input:hover, 
+.input-group select:hover {
+  background-color: #2a3348;
+  border-color: #4caf50;
+}
+
+/* Focus effect for selects and inputs */
+.input-group input:focus, 
+.input-group select:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+/* Adjusting the action select specifically */
+.action-select {
+  margin-bottom: 0; /* Remove additional margin if any */
+}
+
+.then-label {
+  color: #d3d9df;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.with-label {
+  color: #d3d9df;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
 }

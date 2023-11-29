@@ -2,7 +2,7 @@
 import gui from '../gui-editor/gui.js';
 import sutra from '@yantra-core/sutra';
 
-// import sutra from '../../../../sutra/index.js';
+//import sutra from '../../../../sutra/index.js';
 import drawTable from './lib/drawTable.js';
 import editor from './lib/editor.js';
 
@@ -61,11 +61,19 @@ class SutraGUI {
       value: 50
     });
 
+    rules.addCondition('blockCountLessThan5', {
+      op: 'lessThan',
+      gameProperty: 'blockCount',
+      value: 5
+    });
+
+    /*
     // Example of a global condition function
     rules.addCondition('blockCountLessThan5', (entity, gameState) => {
       // gameState.blockCount should hold the current block count
       return gameState.blockCount < 5;
     });
+    */
 
 
     /*
@@ -76,14 +84,14 @@ class SutraGUI {
     });
     */
 
-    rules.on('entity::updateEntity', (entity) => {
-      // console.log('entity::updateEntity', entity)
+    rules.on('entity::updateEntity', (entity, node) => {
+      // create a new object that merges the entity and data
+      //let updatedEntity = Object.assign({}, { id: entity.id }, data.data);
       game.systems.entity.inflateEntity(entity);
       //game.emit('entity::updateEntity', entity);
     });
 
     rules.on('entity::createEntity', (entity, node) => {
-      // console.log('aaaa entity::createEntity', entity, node)
       game.systems.entity.createEntity(node.data);
       //game.emit('entity::createEntity', entity);
     });
@@ -113,6 +121,10 @@ class SutraGUI {
       }]
     });
 
+    function generateRandomColorInt() {
+      return Math.floor(Math.random() * 255);
+    }
+
     // Modify the action for the spawner to include the new condition
     rules.addAction({
       if: 'isSpawner',
@@ -123,8 +135,13 @@ class SutraGUI {
           then: [{
             action: 'entity::createEntity',
             data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: 0 } }
-          }]
-        }]
+          }
+          ]
+        }, {
+          action: 'entity::updateEntity',
+          data: { color: generateRandomColorInt, speed: 5 }
+        }
+        ]
       }]
     });
 
@@ -156,7 +173,7 @@ class SutraGUI {
     this.redrawBehaviorTree();
   }
 
-  viewJson () {
+  viewJson() {
     let json = this.behavior.serializeToJson();
     console.log('json', json);
     // clear the #sutraTable
@@ -171,7 +188,7 @@ class SutraGUI {
     table.appendChild(jsonDiv);
   }
 
-  viewSutraEnglish () {
+  viewSutraEnglish() {
     let english = this.behavior.exportToEnglish();
     // TODO: add Sutra's i18n support
     //let cn = this.behavior.exportToEnglish(0, 'zh');
@@ -248,11 +265,32 @@ class SutraGUI {
   }
 
   appendActionElement(element, node, indentLevel) {
+    let actionSelectContainer = document.createElement('div');
+    actionSelectContainer.className = 'action-select-container';
+
+    // "Then" clause label
+    let thenLabel = document.createElement('label');
+    thenLabel.className = 'then-label';
+    thenLabel.textContent = 'Then:';
+    actionSelectContainer.appendChild(thenLabel);
+
     let select = this.createActionSelect(node);
-    element.appendChild(select);
+    actionSelectContainer.appendChild(select);
+    element.appendChild(actionSelectContainer);
 
     if (node.data) {
-      let dataContainer = this.createDataContainer(node, indentLevel);
+      // "With" context label for data container
+      let dataContainer = document.createElement('div');
+      dataContainer.className = 'data-container';
+
+      let withLabel = document.createElement('label');
+      withLabel.className = 'with-label';
+      withLabel.textContent = 'With:';
+      dataContainer.appendChild(withLabel);
+
+      let dataContent = this.createDataContainer(node, indentLevel);
+      dataContainer.appendChild(dataContent);
+
       element.appendChild(dataContainer);
     }
   }
@@ -274,16 +312,26 @@ class SutraGUI {
   }
 
   createDataContainer(node, indentLevel) {
+    console.log('creating a data container', node)
     let dataContainer = document.createElement('div');
     dataContainer.className = 'data-container';
+
     Object.keys(node.data).forEach(key => {
+      let inputGroup = document.createElement('div');
+      inputGroup.className = 'input-group';
+
       let label = this.createLabel(key, indentLevel);
       let input = this.createInput(node, key);
-      dataContainer.appendChild(label);
-      dataContainer.appendChild(input);
+
+      inputGroup.appendChild(label);
+      inputGroup.appendChild(input);
+
+      dataContainer.appendChild(inputGroup);
     });
+
     return dataContainer;
   }
+
 
   createLabel(key, indentLevel) {
     let label = document.createElement('label');
@@ -323,7 +371,7 @@ class SutraGUI {
     let condition = document.createElement('div');
     condition.className = 'condition';
     condition.textContent = `If: ${node.if}`;
-    condition.onclick = () => this.editConditional(node.if);
+    condition.onclick = () => this.showConditionalsForm(node);
     return condition;
   }
 
@@ -336,9 +384,8 @@ class SutraGUI {
   }
 
   editConditional(conditionalName) {
-    let conditional = this.behavior.getCondition(conditionalName); // Fetch the conditional's details
-
-    let operators = this.behavior.getOperators(); // Fetch available operators
+    return;
+    let operators = this.behavior.operators; // Fetch available operators
 
     let editorContainer = document.getElementById('editorContainer'); // Editor container
 
@@ -452,7 +499,7 @@ class SutraGUI {
         blockCount++;
       }
     }
-    
+
     // TODO: determine what gameState object should look like
     // this will represent serialized game state, which includes sutras
     // sutras can be applied at: game level, entity level, scene level ( coming soon )

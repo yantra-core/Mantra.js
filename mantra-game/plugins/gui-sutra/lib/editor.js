@@ -2,10 +2,9 @@ import gui from '../../gui-editor/gui.js';
 
 const editor = {};
 
-
 editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditional) {
   let editorContainer = document.getElementById('editorContainer'); // Assuming you have a container for the editor
-  editorContainer.innerHTML = ''; // Clear previous content
+  // editorContainer.innerHTML = ''; // Clear previous content
 
   let title = document.createElement('h3');
   title.textContent = `Edit Function: ${conditionalName}`;
@@ -27,9 +26,9 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
 }
 
 editor.showObjectEditor = function showObjectEditor(conditionalName, conditional, operators) {
-  console.log('showObjectEditor', conditionalName, conditional, operators)
+  // console.log('showObjectEditor', conditionalName, conditional, operators)
   let editorContainer = document.getElementById('editorContainer'); // Editor container
-  editorContainer.innerHTML = ''; // Clear previous content
+  // editorContainer.innerHTML = ''; // Clear previous content
 
   let title = document.createElement('h3');
   title.textContent = `Edit Object: ${conditionalName}`;
@@ -99,6 +98,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 
 editor.showConditionalsForm = function showConditionalsForm(node) {
 
+  console.log('node', node)
   if (typeof node === 'undefined') {
     // create default node with sutraPath of tree
     node = {
@@ -115,6 +115,12 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     // Create the window if it doesn't exist
     this.sutraFormView = gui.window('sutraFormView', 'Sutra Form Editor', function () {
       // Handle window close event here if needed
+      // remove #sutrasFormView from the DOM
+      // get the sutraFormView from the DOM
+      let sutraFormView = document.getElementById('sutraFormView');
+      if (sutraFormView) {
+        sutraFormView.remove();
+      }
     });
   }
 
@@ -133,8 +139,14 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   // Display the sutraPath and action at the top
   let nodeInfo = document.createElement('div');
   nodeInfo.className = 'node-info'; // Added class name
+  console.log('loading node', node);
 
-  nodeInfo.innerHTML = `<strong>Path:</strong> ${node.sutraPath}<br><strong>Action:</strong> ${node.action}`;
+  let humanPath = this.behavior.getReadableSutraPath(node.sutraPath);
+  console.log('humanPath', humanPath)
+  if (humanPath === '') {
+    humanPath = 'root'
+  }
+  nodeInfo.innerHTML = `<strong>Path:</strong> ${humanPath}<br><strong>If:</strong> ${node.if}<br><strong>Action:</strong> ${node.action}`;
   editorContainer.appendChild(nodeInfo);
 
   // Form to choose between custom function or DSL object
@@ -156,6 +168,25 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   <button type="submit" class="save-button">Save Conditional</button>
 `;
   editorContainer.appendChild(form);
+
+
+
+  // get the conditional data for the if statement
+  let conditionalName = node.if;
+  let conditional = this.behavior.getCondition(conditionalName);
+  console.log('conditional', conditional)
+
+  // TODO: move to form itself?
+  let operators = this.behavior.operators; // Fetch available operators
+
+  if (typeof conditional === 'function') {
+    this.showFunctionEditor(conditionalName, conditional);
+  } else if (typeof conditional === 'object') {
+    this.showObjectEditor(conditionalName, conditional, operators);
+  } else {
+    console.log('Unknown conditional type');
+  }
+
 
   // Event listener for radio button change
   form.elements.conditionalType.forEach(radio => {
