@@ -2,7 +2,7 @@
 import gui from '../gui-editor/gui.js';
 import sutra from '@yantra-core/sutra';
 
-//import sutra from '../../../../sutra/index.js';
+// import sutra from '../../../../sutra/index.js';
 import drawTable from './lib/drawTable.js';
 import editor from './lib/editor.js';
 
@@ -63,7 +63,7 @@ class SutraGUI {
 
     rules.addCondition('blockCountLessThan5', {
       op: 'lessThan',
-      gameProperty: 'blockCount',
+      gamePropertyPath: 'ents.BLOCK.length',
       value: 5
     });
 
@@ -243,7 +243,7 @@ class SutraGUI {
     // Create a form element instead of a div
     let formElement = document.createElement('form');
     formElement.className = 'node-element-form';
-    formElement.style.marginLeft = `${indentLevel * 20}px`;
+    // formElement.style.marginLeft = `${indentLevel * 10}px`;
 
     // Generate a unique path identifier for the node
     const nodeId = path ? `${path}-${node.action || node.if}` : (node.action || node.if);
@@ -562,7 +562,6 @@ class SutraGUI {
     return button;
   }
 
-
   update() {
     let game = this.game;
     this.bossHealth--;
@@ -574,25 +573,8 @@ class SutraGUI {
       });
     }
 
-    // for now, todo remove
-    let blockCount = 0;
     for (let [entityId, entity] of game.entities.entries()) {
-      if (entity.type === 'BLOCK') {
-        blockCount++;
-      }
-    }
-
-    // TODO: determine what gameState object should look like
-    // this will represent serialized game state, which includes sutras
-    // sutras can be applied at: game level, entity level, scene level ( coming soon )
-    const gameState = {
-      blockCount: blockCount
-    };
-
-    //console.log('sending', gameState)
-
-    for (let [entityId, entity] of game.entities.entries()) {
-      this.behavior.tick(entity, gameState);
+      this.behavior.tick(entity, game.data);
     }
   }
 

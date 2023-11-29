@@ -486,7 +486,7 @@ pre {
   top: 10%;
   left: 10%;
   z-index: 1000;
-  width: 40%;
+  width: 500px;
   height: 60%;
   resize: both;
   overflow: auto;

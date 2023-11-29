@@ -105,7 +105,9 @@ tap.test('game class', (t) => {
     // get reference to entity from gamestate
     const gameState = game.data;
     const entity = gameState.ents._[entityId];
-    const entityByType = gameState.ents.TEST[entityId];
+
+    // find the entity in gameState.ents.TEST array by checking data.id
+    const entityByType = gameState.ents.TEST.find(ent => ent.id === entityId);
 
     // check that game.data contains updated view of gamestate
     t.equal(entity, undefined);
@@ -114,7 +116,6 @@ tap.test('game class', (t) => {
     t.equal(removedEntity, null);
     t.end();
   });
-  
 
   t.end();
 });

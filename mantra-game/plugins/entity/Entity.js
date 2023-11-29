@@ -133,8 +133,10 @@ class Entity {
 
         // remove the reference in this.game.data.ents
         delete this.game.data.ents._[entityId];
-        delete this.game.data.ents[destroyedType][entityId];
-
+        // find entity by id and filter it out
+        this.game.data.ents[destroyedType] = this.game.data.ents[destroyedType].filter((entity) => {
+          return Number(entity.id) !== Number(entityId);
+        });
       }
     }
   }
@@ -306,8 +308,8 @@ class Entity {
     this.game.data.ents = this.game.data.ents || {};
     this.game.data.ents._ = this.game.data.ents._ || {};
     this.game.data.ents._[entityId] = updatedEntity;
-    this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || {};
-    this.game.data.ents[updatedEntity.type][entityId] = updatedEntity;
+    this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
+    this.game.data.ents[updatedEntity.type].push(updatedEntity);
 
     return updatedEntity;
   }
