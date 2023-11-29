@@ -1,10 +1,12 @@
 // SutraGUI.js - Marak Squires 2023
 import gui from '../gui-editor/gui.js';
-import sutra from '@yantra-core/sutra';
+// import sutra from '@yantra-core/sutra';
 
-// import sutra from '../../../../sutra/index.js';
+import sutra from '../../../../sutra/index.js';
 import drawTable from './lib/drawTable.js';
 import editor from './lib/editor.js';
+import serializeFormToJSON from './util/serializeFormToJSON.js';
+import testRules from './testRules.js';
 
 class SutraGUI {
   static id = 'gui-sutra';
@@ -19,18 +21,17 @@ class SutraGUI {
     this.showConditionalsForm = editor.showConditionalsForm.bind(this);
     this.createConditional = editor.createConditional.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
+    this.serializeFormToJSON = serializeFormToJSON.bind(this);
   }
 
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem(this.id, this);
-
-    let rules = new sutra.Sutra();
-
+    let rules = testRules();
 
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
-
+  
       // Highlight the current element
       let elementToHighlight = document.querySelector(`[data-id='${sutraPath}']`);
       // get the parent of this element
@@ -41,125 +42,10 @@ class SutraGUI {
     });
 
 
-    // use custom function for condition
-    rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
-    rules.addCondition('isSpawner', (entity) => entity.type === 'SPAWNER');
-
-    /*
-    // could also be written as:
-    sutra.addCondition('isBoss', {
-      operator: 'equals',
-      property: 'type',
-      value: 'BOSS'
-    });
-    */
-
-    // use standard Sutra DSL for condition
-    rules.addCondition('isHealthLow', {
-      op: 'lessThan',
-      property: 'health',
-      value: 50
-    });
-
-    rules.addCondition('blockCountLessThan5', {
-      op: 'lessThan',
-      gamePropertyPath: 'ents.BLOCK.length',
-      value: 5
-    });
-
-    /*
-    // Example of a global condition function
-    rules.addCondition('blockCountLessThan5', (entity, gameState) => {
-      // gameState.blockCount should hold the current block count
-      return gameState.blockCount < 5;
-    });
-    */
-
-
-    /*
-    rules.addCondition('isDead', {
-      op: 'lte',
-      property: 'health',
-      value: 0
-    });
-    */
-
-    rules.on('entity::updateEntity', (entity, node) => {
-      // create a new object that merges the entity and data
-      //let updatedEntity = Object.assign({}, { id: entity.id }, data.data);
-      game.systems.entity.inflateEntity(entity);
-      //game.emit('entity::updateEntity', entity);
-    });
-
-    rules.on('entity::createEntity', (entity, node) => {
-      game.systems.entity.createEntity(node.data);
-      //game.emit('entity::createEntity', entity);
-    });
-
-    rules.addCondition('timerCompleted', entity => {
-      // check if entities has timers and timer with name 'test-timer' is completed
-      let timerDone = false;
-      // TODO: remove this, should iterate and know timer names
-      if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
-        timerDone = true;
-        // set time done to false on origin timer
-        entity.timers.timers['test-timer'].done = false;
-      }
-
-      return timerDone;
-      //return entity.timerDone;
-    });
-
-    rules.addAction({
-      if: 'isBoss',
-      then: [{
-        if: 'isHealthLow',
-        then: [{
-          action: 'entity::updateEntity',
-          data: { color: 0xff0000, speed: 5 } // Example with multiple properties
-        }]
-      }]
-    });
-
-    function generateRandomColorInt() {
-      return Math.floor(Math.random() * 255);
-    }
-
-    // Modify the action for the spawner to include the new condition
-    rules.addAction({
-      if: 'isSpawner',
-      then: [{
-        if: 'timerCompleted',
-        then: [{
-          if: 'blockCountLessThan5',
-          then: [{
-            action: 'entity::createEntity',
-            data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: 0 } }
-          }
-          ]
-        }, {
-          action: 'entity::updateEntity',
-          data: { color: generateRandomColorInt, speed: 5 }
-        }
-        ]
-      }]
-    });
-
-    // Composite AND condition
-    rules.addCondition('isBossAndHealthLow', {
-      op: 'and',
-      conditions: ['isBoss', 'isHealthLow']
-    });
-
-    rules.addAction({
-      if: 'isBossAndHealthLow',
-      then: [{ action: 'testAction' }]
-    });
-
     let json = rules.serializeToJson();
     console.log('json', json);
     this.drawTable();
-    this.drawBehaviorTree(JSON.parse(json));
+    this.drawBehaviorTree(JSON.parse(json));  
 
     this.behavior = rules;
   }
@@ -273,14 +159,15 @@ class SutraGUI {
     saveBtn.addEventListener('click', (event) => {
       const serializedData = this.serializeFormToJSON(formElement);
       console.log('Serialized Data:', serializedData);
-      // Further processing of serializedData as needed
+      // now that we have the updated for data, we need to update the sutra action
+      node.data = serializedData;
+      console.log('ref node', node)
     });
 
     formElement.appendChild(saveBtn);
 
     return formElement;
   }
-
 
   appendActionElement(element, node, indentLevel) {
     let actionSelectContainer = document.createElement('div');
@@ -354,7 +241,6 @@ class SutraGUI {
     return dataContainer;
   }
 
-
   createInputGroup(node, key, indentLevel, path) {
     let inputGroup = document.createElement('div');
     inputGroup.className = 'input-group';
@@ -418,24 +304,6 @@ class SutraGUI {
     return input;
   }
 
-  serializeFormToJSON(form) {
-    let formData = new FormData(form);
-    let obj = {};
-    for (let [key, value] of formData) {
-      let keys = key.split('.');
-      keys.reduce((acc, k, i) => {
-        if (i === keys.length - 1) {
-          acc[k] = value;
-        } else {
-          acc[k] = acc[k] || {};
-        }
-        return acc[k];
-      }, obj);
-    }
-    return obj;
-  }
-
-
   appendConditionalElement(element, node, indentLevel) {
     let condition = this.createConditionElement(node);
     element.appendChild(condition);
@@ -465,28 +333,6 @@ class SutraGUI {
     return elseElement;
   }
 
-  editConditional(conditionalName) {
-    return;
-    let operators = this.behavior.operators; // Fetch available operators
-
-    let editorContainer = document.getElementById('editorContainer'); // Editor container
-
-    if (!editorContainer) {
-      editorContainer = document.createElement('div');
-      editorContainer.id = 'editorContainer';
-      this.sutraView.appendChild(editorContainer);
-      //document.body.appendChild(editorContainer);
-    }
-
-    if (typeof conditional === 'function') {
-      this.showFunctionEditor(conditionalName, conditional);
-    } else if (typeof conditional === 'object') {
-      this.showObjectEditor(conditionalName, conditional, operators);
-    } else {
-      console.log('Unknown conditional type');
-    }
-  }
-
   saveConditional(conditionalName, form) {
     const formData = new FormData(form);
     let updatedConditional = {};
@@ -499,10 +345,6 @@ class SutraGUI {
     this.redrawBehaviorTree(); // Redraw the tree to reflect changes
   }
 
-  showConditionalEditor(conditional) {
-    // Implement the UI logic to show and edit the details of the conditional
-    // This could be a form with inputs for the conditional's properties
-  }
 
   handleAddRuleClick(nodeId) {
     console.log('handleAddRuleClick', nodeId)
@@ -547,6 +389,7 @@ class SutraGUI {
     button.setAttribute('data-id', nodeId);
     button.onclick = (e) => {
       this.handleAddRuleClick(e.target.getAttribute('data-id'));
+      return false;
     };
     return button;
   }
