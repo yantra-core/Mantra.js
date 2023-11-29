@@ -37,10 +37,11 @@ export default class LocalClient {
       return
     }
 
+    this.game.localGameLoopRunning = true;
+
     this.game.localGameLoop(this.game);  // Start the local game loop when offline
 
     this.game.communicationClient = this;
-    this.game.localGameLoopRunning = true;
 
     this.game.createPlayer({
       type: 'PLAYER'

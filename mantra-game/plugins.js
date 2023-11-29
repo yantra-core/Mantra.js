@@ -66,6 +66,7 @@ import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
 import PingTime from './plugins/ping-time/PingTime.js';
 import SnapshotSize from './plugins/snapshot-size/SnapshotSize.js';
 import CurrentFPS from './plugins/current-fps/CurrentFPS.js';
+import ChronoControl from './plugins/chrono-control/ChronoControl.js';
 
 // Movement Strategies
 import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovement.js';
@@ -78,6 +79,7 @@ const plugins = {
   Border,
   Bullet,
   Collision,
+  ChronoControl,
   Client,
   Creator,
   Entity,

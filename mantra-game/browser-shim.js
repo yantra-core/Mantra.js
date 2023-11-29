@@ -16,6 +16,7 @@ MANTRA.plugins = {
   Camera: require('./plugins/graphics-babylon/camera/BabylonCamera.js').default,
   Client: require('./plugins/client/Client.js').default,
   Collision: require('./plugins/collisions/Collisions.js').default,
+  ChronoControl: require('./plugins/chrono-control/ChronoControl.js').default,
   Creator: require('./plugins/gui-creator/Creator.js').default,
   Entity: require('./plugins/entity/Entity.js').default,
   EntityInput: require('./plugins/entity-input/EntityInput.js').default,

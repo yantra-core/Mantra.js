@@ -12,6 +12,7 @@ const plugins = [
   './plugins/graphics-css/CSSGraphics.js',
   // Note: 'Camera' is the same as 'BabylonCamera', so it's not repeated
   './plugins/client/Client.js',
+  './plugins/chrono-control/ChronoControl.js',
   './plugins/collisions/Collisions.js',
   './plugins/gui-creator/Creator.js',
   './plugins/entity/Entity.js',

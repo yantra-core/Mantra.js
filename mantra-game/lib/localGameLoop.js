@@ -14,7 +14,7 @@ function localGameLoop(game, playerId) {
     started = true;
     lastGameTick = Date.now(); // Ensure we start with the current time
   }
-  game.localGameLoopRunning = true;
+  // game.localGameLoopRunning = true;
   game.mode = 'local';
   // Calculate deltaTime in seconds
   let currentTime = Date.now();

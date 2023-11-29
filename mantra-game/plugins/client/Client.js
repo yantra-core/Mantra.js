@@ -40,7 +40,10 @@ export default class Client {
   }
 
   stop () {
-    this.game.localGameLoopRunning = false;
+    console.log('Client.js plugin stopping game', this.game)
+    // this.game.localGameLoopRunning = false;
+    let localClient = this.game.getSystem('localClient');
+    localClient.stop();
   }
 
   connect (url) {
