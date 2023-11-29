@@ -152,6 +152,42 @@ class SutraGUI {
     this.showConditionalsForm();
   }
 
+  showSutra() {
+    this.redrawBehaviorTree();
+  }
+
+  viewJson () {
+    let json = this.behavior.serializeToJson();
+    console.log('json', json);
+    // clear the #sutraTable
+    let table = document.getElementById('sutraTable');
+    table.innerHTML = '';
+    // create a new div
+    let jsonDiv = document.createElement('textarea');
+    // set height and width to 100%
+    jsonDiv.style.width = '95%';
+    jsonDiv.style.height = '800px';
+    jsonDiv.value = json;
+    table.appendChild(jsonDiv);
+  }
+
+  viewSutraEnglish () {
+    let english = this.behavior.exportToEnglish();
+    // TODO: add Sutra's i18n support
+    //let cn = this.behavior.exportToEnglish(0, 'zh');
+    //let ja = this.behavior.exportToEnglish(0, 'ja');
+    // clear the #sutraTable
+    let table = document.getElementById('sutraTable');
+    table.innerHTML = '';
+    // create a new div
+    let englishDiv = document.createElement('textarea');
+    // set height and width to 100%
+    englishDiv.style.width = '95%';
+    englishDiv.style.height = '800px';
+    englishDiv.value = english;
+    table.appendChild(englishDiv);
+  }
+
   getEmitters() {
     return this.game.emitters;
   }
