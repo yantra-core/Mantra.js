@@ -1,4 +1,7 @@
-import sutra from '../../../../sutra/index.js';
+//import sutra from '../../../../sutra/index.js';
+import sutra from '@yantra-core/sutra';
+
+// import sutra from '../../../../sutra/index.js';
 
 export default function testRules() {
 
