@@ -98,6 +98,15 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 }
 
 editor.showConditionalsForm = function showConditionalsForm(node) {
+
+  if (typeof node === 'undefined') {
+    // create default node with sutraPath of tree
+    node = {
+      sutraPath: 'tree',
+      action: 'newConditional'
+    };
+  }
+
   console.log('opening window the context is', node);
 
   // Check if the Sutra Form Editor window exists
@@ -123,23 +132,29 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
 
   // Display the sutraPath and action at the top
   let nodeInfo = document.createElement('div');
+  nodeInfo.className = 'node-info'; // Added class name
+
   nodeInfo.innerHTML = `<strong>Path:</strong> ${node.sutraPath}<br><strong>Action:</strong> ${node.action}`;
   editorContainer.appendChild(nodeInfo);
 
   // Form to choose between custom function or DSL object
   let form = document.createElement('form');
+  form.className = 'sutra-form'; // Added class name
+
   form.innerHTML = `
-    <label>
-      <input type="radio" name="conditionalType" value="dsl">
+  <div class="radio-group">
+    <label class="radio-label">
+      <input type="radio" name="conditionalType" value="dsl" class="radio-input">
       DSL Object
     </label>
-    <label>
-      <input type="radio" name="conditionalType" value="function" checked>
+    <label class="radio-label">
+      <input type="radio" name="conditionalType" value="function" class="radio-input" checked>
       Custom Function
     </label>
-    <div id="conditionalInputContainer"></div>
-    <button type="submit">Save Conditional</button>
-  `;
+  </div>
+  <div id="conditionalInputContainer" class="input-container"></div>
+  <button type="submit" class="save-button">Save Conditional</button>
+`;
   editorContainer.appendChild(form);
 
   // Event listener for radio button change

@@ -27,6 +27,20 @@ class SutraGUI {
 
     let rules = new sutra.Sutra();
 
+
+    rules.onAny(function (ev, data, node) {
+      let sutraPath = node.sutraPath;
+
+      // Highlight the current element
+      let elementToHighlight = document.querySelector(`[data-id='${sutraPath}']`);
+      // get the parent of this element
+      if (elementToHighlight) {
+        elementToHighlight.parentElement.classList.add('highlighted-sutra-node');
+        elementToHighlight.parentElement.parentElement.classList.add('highlighted-sutra-node');
+      }
+    });
+
+
     // use custom function for condition
     rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
     rules.addCondition('isSpawner', (entity) => entity.type === 'SPAWNER');
@@ -47,6 +61,13 @@ class SutraGUI {
       value: 50
     });
 
+    // Example of a global condition function
+    rules.addCondition('blockCountLessThan5', (entity, gameState) => {
+      // gameState.blockCount should hold the current block count
+      return gameState.blockCount < 5;
+    });
+
+
     /*
     rules.addCondition('isDead', {
       op: 'lte',
@@ -57,8 +78,28 @@ class SutraGUI {
 
     rules.on('entity::updateEntity', (entity) => {
       // console.log('entity::updateEntity', entity)
-      //game.systems.entity.inflateEntity(entity);
-      game.emit('entity::updateEntity', entity);
+      game.systems.entity.inflateEntity(entity);
+      //game.emit('entity::updateEntity', entity);
+    });
+
+    rules.on('entity::createEntity', (entity, node) => {
+      // console.log('aaaa entity::createEntity', entity, node)
+      game.systems.entity.createEntity(node.data);
+      //game.emit('entity::createEntity', entity);
+    });
+
+    rules.addCondition('timerCompleted', entity => {
+      // check if entities has timers and timer with name 'test-timer' is completed
+      let timerDone = false;
+      // TODO: remove this, should iterate and know timer names
+      if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
+        timerDone = true;
+        // set time done to false on origin timer
+        entity.timers.timers['test-timer'].done = false;
+      }
+
+      return timerDone;
+      //return entity.timerDone;
     });
 
     rules.addAction({
@@ -72,19 +113,19 @@ class SutraGUI {
       }]
     });
 
+    // Modify the action for the spawner to include the new condition
     rules.addAction({
       if: 'isSpawner',
       then: [{
-        if: 'timers::done',
+        if: 'timerCompleted',
         then: [{
-          action: 'entity::createEntity',
-          data: { type: 'BOSS', height: 555, width: 222 }
+          if: 'blockCountLessThan5',
+          then: [{
+            action: 'entity::createEntity',
+            data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: 0 } }
+          }]
         }]
       }]
-    });
-    
-    rules.addCondition('timers::done', (entity, timerName) => {
-      return entity.timers.checkTimer(timerName);
     });
 
     // Composite AND condition
@@ -92,7 +133,7 @@ class SutraGUI {
       op: 'and',
       conditions: ['isBoss', 'isHealthLow']
     });
-  
+
     rules.addAction({
       if: 'isBossAndHealthLow',
       then: [{ action: 'testAction' }]
@@ -121,7 +162,7 @@ class SutraGUI {
     let container = document.getElementById('sutraTable');
 
     let guiContent = container.querySelector('.gui-content');
-  
+
 
     guiContent.innerHTML = '';
     alert('redraw')
@@ -153,22 +194,22 @@ class SutraGUI {
     let element = document.createElement('div');
     element.className = 'node-element';
     element.style.marginLeft = `${indentLevel * 20}px`;
-  
+
     // Generate a unique path identifier for the node
     const nodeId = path ? `${path}-${node.action || node.if}` : (node.action || node.if);
-    
+
     if (node.action) {
       this.appendActionElement(element, node, indentLevel);
     } else if (node.if) {
       this.appendConditionalElement(element, node, indentLevel);
     }
 
-    console.log('noooode', node)
-    
     // Create the Add Rule button and append it to the element
     const addRuleBtn = this.createAddRuleButton(node.sutraPath);
+    // hide the button by default
+    addRuleBtn.style.display = 'none';
     element.appendChild(addRuleBtn);
-  
+
     return element;
   }
 
@@ -193,7 +234,6 @@ class SutraGUI {
       if (node.action === action) {
         option.selected = true;
       }
-      console.log('nnnnn', node.action)
       select.appendChild(option);
     });
     return select;
@@ -262,13 +302,10 @@ class SutraGUI {
   }
 
   editConditional(conditionalName) {
-    console.log('editConditional', conditionalName)
     let conditional = this.behavior.getCondition(conditionalName); // Fetch the conditional's details
-    console.log("found conditional", typeof conditional, conditional);
-  
+
     let operators = this.behavior.getOperators(); // Fetch available operators
-    console.log('found operators', operators);
-  
+
     let editorContainer = document.getElementById('editorContainer'); // Editor container
 
     if (!editorContainer) {
@@ -286,19 +323,19 @@ class SutraGUI {
       console.log('Unknown conditional type');
     }
   }
-  
+
   saveConditional(conditionalName, form) {
     const formData = new FormData(form);
     let updatedConditional = {};
-  
+
     for (let [key, value] of formData.entries()) {
       updatedConditional[key] = value;
     }
-  
+
     this.behavior.updateCondition(conditionalName, updatedConditional); // Update Sutra instance
     this.redrawBehaviorTree(); // Redraw the tree to reflect changes
   }
-  
+
   showConditionalEditor(conditional) {
     // Implement the UI logic to show and edit the details of the conditional
     // This could be a form with inputs for the conditional's properties
@@ -332,13 +369,30 @@ class SutraGUI {
   update() {
     let game = this.game;
     this.bossHealth--;
+
+    if (game.tick % 70 === 0) {
+      // Clear previously highlighted elements
+      document.querySelectorAll('.highlighted-sutra-node').forEach(node => {
+        node.classList.remove('highlighted-sutra-node');
+      });
+    }
+
+    // for now, todo remove
+    let blockCount = 0;
     for (let [entityId, entity] of game.entities.entries()) {
-      // iterate through game entities
-      // console.log('entity', entity)
-      if (entity.type === 'BOSS') {
-        // console.log('boss found', entity.id, entity.health)
+      if (entity.type === 'BLOCK') {
+        blockCount++;
       }
-      this.behavior.tick(entity);
+    }
+    
+    const gameState = {
+      blockCount: blockCount
+    };
+
+    //console.log('sending', gameState)
+
+    for (let [entityId, entity] of game.entities.entries()) {
+      this.behavior.tick(entity, gameState);
     }
   }
 

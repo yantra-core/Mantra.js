@@ -23,11 +23,14 @@ class Timers extends Plugin {
       if (entity.timers) {
         const timersComp = entity.timers;
         Object.keys(timersComp.timers).forEach(timerName => {
+          // console.log('timerName', timerName, entity.id)
           const timer = timersComp.timers[timerName];
           if (!timer.completed && Date.now() >= timer.startTime + timer.duration) {
+            // console.log('timer done', entity.id, timerName, timer)
+            timer.done = true;
             if (timer.isInterval) {
               timersComp.resetTimer(timerName); // Reset for intervals
-              this.game.emit('timers::intervalElapsed', { entity, timerName });
+              this.game.emit('timers::done', { entity, timerName });
             } else {
               timer.completed = true;
               this.game.emit('timers::done', { entity, timerName });

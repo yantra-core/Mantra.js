@@ -95,6 +95,15 @@ class Entity {
     }
     if (ent) {
       this.game.components.destroyed.set(entityId, true);
+
+      // check to see if any timers exist, if so clear them all
+      if (this.game.components.timers.get(entityId)) {
+        let timers = this.game.components.timers.get(entityId);
+        for (let timerId in timers.timers) {
+          timers.removeTimer(timerId);
+        }
+      }
+
       // update the entity with the destroyed state
       let updatedEntity = this.game.getEntity(entityId);
       this.game.entities.set(entityId, updatedEntity);

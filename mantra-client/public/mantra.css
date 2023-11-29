@@ -484,9 +484,9 @@ pre {
 /* Sutra.css */
 #sutraView {
   top: 10%;
-  left: 30%;
+  left: 10%;
   z-index: 1000;
-  width: 60%;
+  width: 40%;
   height: 60%;
   resize: both;
   overflow: auto;
@@ -497,8 +497,8 @@ pre {
   top: 10%;
   left: 50%;
   z-index: 1000;
-  width: 300px;
-  height: 200px;
+  width: 500px;
+  height: 400px;
   resize: both;
   overflow: auto;
   position: absolute;
@@ -520,6 +520,63 @@ pre {
   padding: 10px;
   border-radius: 5px;
 }
+
+/* Sutra Form Editor Styles */
+#sutraFormView .gui-content {
+  padding: 15px;
+}
+
+.node-info {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.node-path,
+.node-action {
+  color: #4CAF50; /* Green color for emphasis */
+  font-weight: bold;
+}
+
+.sutra-form {
+  background-color: #162238;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.radio-group {
+  margin-bottom: 15px;
+}
+
+.radio-label {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.radio-input {
+  margin-right: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.save-button {
+  background-color: #2196F3; /* Blue color for the button */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.save-button:hover {
+  background-color: #1976D2; /* Darker blue on hover */
+}
+
+/* Add any additional styles as needed */
+
 
 .node-element {
   background-color: #162238;
@@ -628,4 +685,9 @@ pre {
 .entity-inspector-container {
   position: relative;
   overflow: hidden;
+}
+
+.highlighted-sutra-node {
+  background-color: orange; /* Example style - light blue background */
+  /* Add any other styles as needed */
 }
