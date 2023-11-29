@@ -38,13 +38,57 @@ export default function drawTable() {
 
   let guiContent = this.sutraView.querySelector('.gui-content');
 
+  // set background color to transparent
+  this.sutraView.style.backgroundColor = 'transparent';
+  
+  let slider = createOpacitySlider(this.sutraView);
+
   guiContent.appendChild(table);
   guiContent.appendChild(showSutraButton);
   guiContent.appendChild(viewJsonButton);
   guiContent.appendChild(readSutraButton);
+  guiContent.appendChild(slider);
+
+  // add <br>
+  guiContent.appendChild(document.createElement('br'));
   guiContent.appendChild(addRuleButton);
 
+  // trigger slider event to update background color
+  slider.querySelector('input').dispatchEvent(new Event('input'));
 
-  //this.sutraView.appendChild(addRuleButton);
-  //this.sutraView.appendChild(table);
+}
+
+function createOpacitySlider(element) {
+  // Create the wrapper div
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'absolute'; // Or 'relative' depending on your layout
+  wrapper.style.right = '40px'; // Adjust the value as needed
+  wrapper.style.top = '5px'; // Adjust the value as needed
+  wrapper.style.zIndex = '10'; // Ensure it's above other elements
+
+  // Create the slider element
+  const slider = document.createElement('input');
+  slider.setAttribute('type', 'range');
+  slider.setAttribute('min', '0');
+  slider.setAttribute('max', '1');
+  slider.setAttribute('step', '0.01');
+  slider.setAttribute('value', '0.88'); // Start with a fully transparent background
+  slider.style.width = '110px'; // Make the slider larger
+  slider.style.transform = 'scale(1.5)'; // Scale the slider for better visibility
+  slider.style.cursor = 'pointer';
+
+  // Append the slider to the wrapper
+  wrapper.appendChild(slider);
+
+  // Set initial background color with 0 opacity using rgba
+  element.style.backgroundColor = 'rgba(0, 0, 0, 0)'; // Assuming you want to start with a black background
+
+  // Add an event listener to the slider
+  slider.addEventListener('input', function() {
+    // Update the background color with the new opacity value
+    const opacity = this.value;
+    element.style.backgroundColor = `rgba(10, 15, 27, ${opacity})`; // #0a0f1b converted to rgba
+  });
+
+  return wrapper;
 }

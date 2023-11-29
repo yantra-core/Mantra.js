@@ -315,13 +315,43 @@ class SutraGUI {
   }
 
   createConditionElement(node) {
-    let condition = document.createElement('div');
-    condition.className = 'condition';
-    condition.textContent = `If: ${node.if}`;
-    condition.onclick = () => this.showConditionalsForm(node);
-    return condition;
-  }
+    let conditionContainer = document.createElement('div');
+    conditionContainer.className = 'condition-container';
+  
+    console.log('Condition node', node.if);
+  
+    if (Array.isArray(node.if)) {
+      node.if.forEach((cond, i) => {
+        let condition = document.createElement('div');
+        condition.className = 'condition';
 
+        if (i === 0) {
+          condition.textContent = `If: ${cond}`;
+        } else {
+          condition.textContent = `${cond}`;
+        }
+        condition.onclick = () => this.showConditionalsForm(node);
+        conditionContainer.appendChild(condition);
+        
+        // Add a visual separator, if desired
+        if (node.if.indexOf(cond) !== node.if.length - 1) {
+          let andSeparator = document.createElement('div');
+          andSeparator.className = 'condition-separator';
+          andSeparator.textContent = 'AND';
+          conditionContainer.appendChild(andSeparator);
+        }
+      });
+    } else {
+      let condition = document.createElement('div');
+      condition.className = 'condition';
+      condition.textContent = `If: ${node.if}`;
+      condition.onclick = () => this.showConditionalsForm(node);
+      conditionContainer.appendChild(condition);
+    }
+    
+    return conditionContainer;
+  }
+  
   createElseElement(node, indentLevel) {
     let elseElement = document.createElement('div');
     elseElement.className = 'else-branch';
