@@ -107,12 +107,14 @@ class Entity {
       // update the entity with the destroyed state
       let updatedEntity = this.game.getEntity(entityId);
       this.game.entities.set(entityId, updatedEntity);
+
     }
   }
 
   cleanupDestroyedEntities() {
     const destroyedComponentData = this.game.components.destroyed.data;
     for (let entityId in destroyedComponentData) {
+      const destroyedType = this.game.components.type.get(entityId);
       if (destroyedComponentData[entityId]) {
         // Removes the body from the physics engine
         if (typeof this.game.physics.removeBody === 'function') {
@@ -128,6 +130,11 @@ class Entity {
           this.game.components[componentType].remove(entityId);
         }
         this.game.entities.delete(entityId);
+
+        // remove the reference in this.game.data.ents
+        delete this.game.data.ents._[entityId];
+        delete this.game.data.ents[destroyedType][entityId];
+
       }
     }
   }
@@ -162,6 +169,11 @@ class Entity {
     this.game.graphics.forEach(function (graphicsInterface) {
       ent.pendingRender[graphicsInterface.id] = true;
     });
+
+    // TODO: add additional component types that can be updated ( should be most of them )
+    if (entityData.color) {
+      this.game.components.color.set(entityId, entityData.color);
+    }
 
     if (entityData.position) {
       this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y, z: entityData.position.z });
@@ -287,7 +299,15 @@ class Entity {
       updatedEntity.pendingRender[graphicsInterface.id] = true;
     });
 
+    // updates entity in the ECS entity Map scope
     this.game.entities.set(entityId, updatedEntity);
+
+    // updates entity in the flat game.data scope
+    this.game.data.ents = this.game.data.ents || {};
+    this.game.data.ents._ = this.game.data.ents._ || {};
+    this.game.data.ents._[entityId] = updatedEntity;
+    this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || {};
+    this.game.data.ents[updatedEntity.type][entityId] = updatedEntity;
 
     return updatedEntity;
   }

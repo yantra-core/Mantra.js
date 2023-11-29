@@ -96,6 +96,12 @@ class Game {
 
     this.config = config;
 
+    this.data = {
+      width: config.width,
+      height: config.height,
+      FPS: 60
+    };
+
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
     this.scriptRoot = 'https://yantra.gg/mantra';
