@@ -16,13 +16,16 @@ export default function drawTable() {
     game.systemsManager.removeSystem(self.id);
   });
 
+  /*
   // Add a button to create new rules
   let addRuleButton = document.createElement('button');
   addRuleButton.textContent = 'Add Rule';
   addRuleButton.onclick = () => this.addNewRule();
 
-  let guiContent = this.sutraView.querySelector('.gui-content');
   guiContent.appendChild(addRuleButton);
+  */
+  let guiContent = this.sutraView.querySelector('.gui-content');
+
   guiContent.appendChild(table);
 
   //this.sutraView.appendChild(addRuleButton);

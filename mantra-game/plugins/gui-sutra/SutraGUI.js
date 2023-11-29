@@ -158,16 +158,12 @@ class SutraGUI {
 
   redrawBehaviorTree() {
     let json = this.behavior.serializeToJson();
-    console.log('json', json)
     let container = document.getElementById('sutraTable');
 
-    let guiContent = container.querySelector('.gui-content');
-
-
-    guiContent.innerHTML = '';
-    alert('redraw')
+    //let guiContent = container.querySelector('.gui-content');
+    container.innerHTML = '';
     JSON.parse(json).tree.forEach(node => {
-      guiContent.appendChild(this.createNodeElement(node, 0));
+      container.appendChild(this.createNodeElement(node, 0));
     });
   }
 
@@ -206,9 +202,11 @@ class SutraGUI {
 
     // Create the Add Rule button and append it to the element
     const addRuleBtn = this.createAddRuleButton(node.sutraPath);
+    const removeRuleBtn = this.createRemoveRuleButton(node.sutraPath);
     // hide the button by default
-    addRuleBtn.style.display = 'none';
+    // addRuleBtn.style.display = 'none';
     element.appendChild(addRuleBtn);
+    element.appendChild(removeRuleBtn);
 
     return element;
   }
@@ -355,6 +353,28 @@ class SutraGUI {
     }
   }
 
+  handleRemoveRuleClick(nodeId) {
+    console.log('handleRemoveRuleClick', nodeId);
+    this.behavior.removeNode(nodeId);
+    /*
+    let node = this.behavior.findNode(nodeId);
+    console.log('node', node)
+    if (node.action) {
+      // Remove the action
+      this.behavior.removeNode(node.sutraPath);
+    } else if (node.if) {
+      // Remove the conditional
+      this.behavior.removeCondition(node.if);
+    }
+    */
+
+    let json = this.behavior.serializeToJson();
+    console.log('json', json);
+
+
+    this.redrawBehaviorTree();
+  }
+
   createAddRuleButton(nodeId) {
     let button = document.createElement('button');
     button.textContent = 'Add Rule';
@@ -365,6 +385,18 @@ class SutraGUI {
     };
     return button;
   }
+
+  createRemoveRuleButton(nodeId) {
+    let button = document.createElement('button');
+    button.textContent = 'Remove Rule';
+    button.className = 'remove-rule-btn';
+    button.setAttribute('data-id', nodeId);
+    button.onclick = (e) => {
+      this.handleRemoveRuleClick(e.target.getAttribute('data-id'));
+    };
+    return button;
+  }
+
 
   update() {
     let game = this.game;
@@ -385,6 +417,9 @@ class SutraGUI {
       }
     }
     
+    // TODO: determine what gameState object should look like
+    // this will represent serialized game state, which includes sutras
+    // sutras can be applied at: game level, entity level, scene level ( coming soon )
     const gameState = {
       blockCount: blockCount
     };
