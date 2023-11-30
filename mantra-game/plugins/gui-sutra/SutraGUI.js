@@ -18,6 +18,7 @@ class SutraGUI {
     this.showConditionalsForm = editor.showConditionalsForm.bind(this);
     this.createConditional = editor.createConditional.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
+    this.createConditionalForm = editor.createConditionalForm.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);
   }
 
@@ -28,7 +29,6 @@ class SutraGUI {
 
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
-  
       // Highlight the current element
       let elementToHighlight = document.querySelector(`[data-id='${sutraPath}']`);
       // get the parent of this element
@@ -41,7 +41,7 @@ class SutraGUI {
     let json = rules.serializeToJson();
     console.log('json', json);
     this.drawTable();
-    this.drawBehaviorTree(JSON.parse(json));  
+    this.drawBehaviorTree(JSON.parse(json));
 
     this.behavior = rules;
   }
@@ -56,7 +56,9 @@ class SutraGUI {
   }
 
   viewJson() {
-    let json = this.behavior.serializeToJson();
+    let json = this.behavior.serializeToJson({
+      includeSutraPath: false
+    });
     console.log('json', json);
     // clear the #sutraTable
     let table = document.getElementById('sutraTable');
@@ -106,15 +108,15 @@ class SutraGUI {
     // get existing container
     let container = document.getElementById('sutraView');
     let table = document.getElementById('sutraTable');
-    let guiContent = container.querySelector('.gui-content');
+    //let guiContent = container.querySelector('.gui-content');
 
     //let container = document.createElement('div');
     json.tree.forEach(node => {
       table.appendChild(this.createNodeElement(node, 1));
     });
     // Append this container to your GUI, adjust as needed
-    guiContent.appendChild(table);
-    container.appendChild(guiContent); // Example: appending to body
+    //guiContent.appendChild(table);
+    //container.appendChild(guiContent); // Example: appending to body
   }
 
   getAvailableActions() {
@@ -154,16 +156,25 @@ class SutraGUI {
     saveBtn.className = 'save-button';
     saveBtn.addEventListener('click', (event) => {
       const serializedData = this.serializeFormToJSON(formElement);
+      console.log('got serializedData', serializedData)
       // console.log('Serialized Data:', serializedData);
       // must fetch live reference to tree as "node" is a copy at this point
       let originalNode = this.behavior.findNode(node.sutraPath);
       // now that we have the updated for data, we need to update the sutra action
+      console.log('saving node', originalNode);
       originalNode.data = serializedData;
     });
 
     formElement.appendChild(saveBtn);
 
     return formElement;
+  }
+
+  saveSutra() {
+    // get the #sutraTable
+    let table = document.getElementById('sutraTable');
+    
+    console.log('saveSutra', this.serializeFormToJSON(table));
   }
 
   appendActionElement(element, node, indentLevel) {
@@ -214,7 +225,7 @@ class SutraGUI {
   }
 
   createDataContainer(node, indentLevel) {
-    console.log('creating a data container', node);
+    // console.log('creating a data container', node);
     let dataContainer = document.createElement('div');
     dataContainer.className = 'data-container';
 
@@ -257,7 +268,7 @@ class SutraGUI {
 
     Object.keys(nestedNode).forEach(nestedKey => {
       let nestedPath = path ? `${path}.${nestedKey}` : nestedKey;
-      console.log('nestedPath', nestedPath)
+      // console.log('nestedPath', nestedPath)
       if (typeof nestedNode[nestedKey] === 'object' && nestedNode[nestedKey] !== null) {
         let nestedLabel = this.createLabel(nestedKey, indentLevel);
         nestedDataContainer.appendChild(nestedLabel);
@@ -315,11 +326,10 @@ class SutraGUI {
   }
 
   createConditionElement(node) {
+    let self = this;
     let conditionContainer = document.createElement('div');
     conditionContainer.className = 'condition-container';
-  
-    console.log('Condition node', node.if);
-  
+
     if (Array.isArray(node.if)) {
       node.if.forEach((cond, i) => {
         let condition = document.createElement('div');
@@ -330,9 +340,12 @@ class SutraGUI {
         } else {
           condition.textContent = `${cond}`;
         }
-        condition.onclick = () => this.showConditionalsForm(node);
+        condition.onclick = function () {
+          // condition.classList.toggle('collapsed');
+          self.showConditionalsForm(node);
+        }
         conditionContainer.appendChild(condition);
-        
+
         // Add a visual separator, if desired
         if (node.if.indexOf(cond) !== node.if.length - 1) {
           let andSeparator = document.createElement('div');
@@ -345,13 +358,18 @@ class SutraGUI {
       let condition = document.createElement('div');
       condition.className = 'condition';
       condition.textContent = `If: ${node.if}`;
-      condition.onclick = () => this.showConditionalsForm(node);
+      condition.onclick = function () {
+        // find the child node-element-form in condition
+        let nodeElementForm = condition.parentElement.parentElement.querySelector('.node-element-form');
+        // nodeElementForm.classList.toggle('collapsed');
+        self.showConditionalsForm(node);
+      }
       conditionContainer.appendChild(condition);
     }
-    
+
     return conditionContainer;
   }
-  
+
   createElseElement(node, indentLevel) {
     let elseElement = document.createElement('div');
     elseElement.className = 'else-branch';
@@ -361,17 +379,11 @@ class SutraGUI {
   }
 
   saveConditional(conditionalName, form) {
-    const formData = new FormData(form);
-    let updatedConditional = {};
-
-    for (let [key, value] of formData.entries()) {
-      updatedConditional[key] = value;
-    }
-
-    this.behavior.updateCondition(conditionalName, updatedConditional); // Update Sutra instance
+    let json = this.serializeFormToJSON(form);
+    console.log('jsonjsonjson', conditionalName, json)
+    this.behavior.updateCondition(conditionalName, json); // Update Sutra instance
     this.redrawBehaviorTree(); // Redraw the tree to reflect changes
   }
-
 
   handleAddRuleClick(nodeId) {
     console.log('handleAddRuleClick', nodeId)

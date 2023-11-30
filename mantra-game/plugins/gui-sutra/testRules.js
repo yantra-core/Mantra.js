@@ -1,7 +1,6 @@
-//import sutra from '../../../../sutra/index.js';
+// import sutra from '../../../../sutra/index.js';
 import sutra from '@yantra-core/sutra';
 
-// import sutra from '../../../../sutra/index.js';
 
 export default function testRules() {
 
@@ -14,16 +13,7 @@ export default function testRules() {
   // Custom function for 'isBoss' condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
 
-  // Adding health level conditions
-  healthLevels.forEach((level, index) => {
-    rules.addCondition(`isHealthBelow${level}`, {
-      op: 'lessThan',
-      property: 'health',
-      value: level
-    });
-  });
 
-  /*
   // Action for the boss based on health levels
   rules.addAction({
     if: 'isBoss',
@@ -32,11 +22,18 @@ export default function testRules() {
       then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
     }))
   });
-  */
 
   // use custom function for condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
-  rules.addCondition('isSpawner', (entity) => entity.type === 'SPAWNER');
+  // rules.addCondition('isSpawner', (entity) => entity.type === 'SPAWNER');
+
+  // use standard Sutra DSL for condition
+  rules.addCondition('isSpawner', {
+    op: 'eq',
+    property: 'type',
+    value: 'SPAWNER'
+  });
+
 
   // use standard Sutra DSL for condition
   rules.addCondition('isHealthLow', {
@@ -87,6 +84,29 @@ export default function testRules() {
     //return entity.timerDone;
   });
 
+
+
+  // Modify the action for the spawner to include the new condition
+  rules.addAction({
+    if: 'isSpawner',
+    then: [{
+      if: 'timerCompleted',
+      then: [{
+        if: ['blockCountLessThan5', 'spawnerHealthAbove50'],
+        then: [{
+          action: 'entity::createEntity',
+          data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: -200 } }
+        }
+        ]
+      }, {
+        action: 'entity::updateEntity',
+        data: { color: generateRandomColorInt, speed: 5 }
+      }
+      ]
+    }]
+  });
+
+
   rules.addAction({
     if: 'isBoss',
     then: [{
@@ -102,26 +122,6 @@ export default function testRules() {
     return Math.floor(Math.random() * 255);
   }
 
-  // Modify the action for the spawner to include the new condition
-  rules.addAction({
-    if: 'isSpawner',
-    then: [{
-      if: 'timerCompleted',
-      then: [{
-        if: ['blockCountLessThan5', 'spawnerHealthAbove50'],
-        then: [{
-          action: 'entity::createEntity',
-          data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: 0 } }
-        }
-        ]
-      }, {
-        action: 'entity::updateEntity',
-        data: { color: generateRandomColorInt, speed: 5 }
-      }
-      ]
-    }]
-  });
-
   // Composite AND condition
   rules.addCondition('isBossAndHealthLow', {
     op: 'and',
@@ -135,10 +135,44 @@ export default function testRules() {
     value: 50
   });
 
+  // Adding health level conditions
+  healthLevels.forEach((level, index) => {
+    rules.addCondition(`isHealthBelow${level}`, {
+      op: 'lessThan',
+      property: 'health',
+      value: level
+    });
+  });
+
 
   rules.addAction({
     if: 'isBossAndHealthLow',
     then: [{ action: 'testAction' }]
+  });
+
+  // Custom function conditions to check entity count
+  rules.addCondition('blockCountEquals0', (data, gameState) => gameState.ents.BLOCK.length === 0);
+  rules.addCondition('bossCountEquals0', (data, gameState) => gameState.ents.BOSS.length === 0);
+  rules.addCondition('spawnerCountEquals0', function (data, gameState) {
+    return gameState.ents.SPAWNER.length === 0;
+  });
+
+  // Composite condition to check if all counts are zero
+  rules.addCondition('allEntitiesCountZero', {
+    op: 'and',
+    conditions: ['spawnerCountEquals0', 'blockCountEquals0', 'bossCountEquals0']
+  });
+
+  // Action to end the round
+  rules.addAction({
+    if: 'allEntitiesCountZero',
+    then: [{ action: 'endRound' }]
+  });
+
+  rules.on('endRound', () => {
+    console.log('Ending round as all BLOCK, BOSS, and SPAWNER counts are zero.');
+    alert("YOU ARE THE WINRAR")
+    // Implement the logic to end the round
   });
 
   return rules;

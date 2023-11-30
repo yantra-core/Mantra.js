@@ -3,16 +3,16 @@ import gui from '../../gui-editor/gui.js';
 const editor = {};
 
 editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditional) {
-  let editorContainer = document.getElementById('editorContainer'); // Assuming you have a container for the editor
-  // editorContainer.innerHTML = ''; // Clear previous content
 
+  let guiContent = this.sutraFormView.querySelector('.gui-content');
+  
   let title = document.createElement('h3');
   title.textContent = `Edit Function: ${conditionalName}`;
-  editorContainer.appendChild(title);
+  guiContent.appendChild(title);
 
   let textarea = document.createElement('textarea');
   textarea.value = conditional.toString(); // Convert function to string
-  editorContainer.appendChild(textarea);
+  guiContent.appendChild(textarea);
 
   let saveButton = document.createElement('button');
   saveButton.textContent = 'Save';
@@ -22,21 +22,24 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
     this.redrawBehaviorTree(); // Redraw to reflect changes
   };
 
-  editorContainer.appendChild(saveButton);
+  guiContent.appendChild(saveButton);
 }
 
 editor.showObjectEditor = function showObjectEditor(conditionalName, conditional, operators) {
+
+
+  let guiContent = this.sutraFormView.querySelector('.gui-content');
   // console.log('showObjectEditor', conditionalName, conditional, operators)
-  let editorContainer = document.getElementById('editorContainer'); // Editor container
+  // let editorContainer = document.getElementById('editorContainer'); // Editor container
   // editorContainer.innerHTML = ''; // Clear previous content
 
   let title = document.createElement('h3');
   title.textContent = `Edit Object: ${conditionalName}`;
-  editorContainer.appendChild(title);
+  guiContent.appendChild(title);
 
   let form = document.createElement('form');
   form.className = 'conditional-form'; // Add class for styling
-  editorContainer.appendChild(form);
+  guiContent.appendChild(form);
 
   let table = document.createElement('table');
   table.className = 'editor-table'; // Add class for styling
@@ -91,32 +94,26 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   saveButton.textContent = 'Save';
   saveButton.onclick = (event) => {
     event.preventDefault(); // Prevent form from submitting in the traditional way
+    console.log("SAVING CONDITIONAL", conditionalName, form)
     this.saveConditional(conditionalName, form);
   };
   buttonCell.appendChild(saveButton);
 }
 
 editor.showConditionalsForm = function showConditionalsForm(node) {
-
-  console.log('node', node)
+  // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {
-    // create default node with sutraPath of tree
     node = {
       sutraPath: 'tree',
       action: 'newConditional'
     };
   }
 
-  console.log('opening window the context is', node);
+  console.log('node', node);
 
-  // Check if the Sutra Form Editor window exists
   let sutraFormView = document.getElementById('sutraFormView');
   if (!sutraFormView) {
-    // Create the window if it doesn't exist
     this.sutraFormView = gui.window('sutraFormView', 'Sutra Form Editor', function () {
-      // Handle window close event here if needed
-      // remove #sutrasFormView from the DOM
-      // get the sutraFormView from the DOM
       let sutraFormView = document.getElementById('sutraFormView');
       if (sutraFormView) {
         sutraFormView.remove();
@@ -124,61 +121,45 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     });
   }
 
-  // Get gui-content from inside this.sutraFormView
   let guiContent = this.sutraFormView.querySelector('.gui-content');
+  guiContent.innerHTML = ''; // Clear previous content
 
-  // Create or get the editor container
-  let editorContainer = document.getElementById('editorContainer');
-  if (!editorContainer) {
-    editorContainer = document.createElement('div');
-    editorContainer.id = 'editorContainer';
-    guiContent.appendChild(editorContainer);
-  }
-  editorContainer.innerHTML = ''; // Clear previous content
-
-  // Display the sutraPath and action at the top
   let nodeInfo = document.createElement('div');
-  nodeInfo.className = 'node-info'; // Added class name
-  console.log('loading node', node);
+  nodeInfo.className = 'node-info'; 
+  let humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
+  nodeInfo.innerHTML = `<strong>Path:</strong> ${humanPath}<br><strong>Action:</strong> ${node.action}`;
+  guiContent.appendChild(nodeInfo);
 
-  let humanPath = this.behavior.getReadableSutraPath(node.sutraPath);
-  console.log('humanPath', humanPath)
-  if (humanPath === '') {
-    humanPath = 'root'
+  // Handle array of conditionals
+  if (Array.isArray(node.if)) {
+    node.if.forEach(conditionalName => {
+      this.createConditionalForm(conditionalName, node);
+    });
+  } else {
+    this.createConditionalForm(node.if, node);
   }
-  nodeInfo.innerHTML = `<strong>Path:</strong> ${humanPath}<br><strong>If:</strong> ${node.if}<br><strong>Action:</strong> ${node.action}`;
-  editorContainer.appendChild(nodeInfo);
 
-  // Form to choose between custom function or DSL object
+  gui.bringToFront(this.sutraFormView);
+}
+
+editor.createConditionalForm = function createConditionalForm(conditionalName, node) {
+  let self = this;
   let form = document.createElement('form');
-  form.className = 'sutra-form'; // Added class name
-
+  form.className = 'sutra-form';
   form.innerHTML = `
-  <div class="radio-group">
-    <label class="radio-label">
-      <input type="radio" name="conditionalType" value="dsl" class="radio-input">
-      DSL Object
-    </label>
-    <label class="radio-label">
-      <input type="radio" name="conditionalType" value="function" class="radio-input" checked>
-      Custom Function
-    </label>
-  </div>
-  <div id="conditionalInputContainer" class="input-container"></div>
-  <button type="submit" class="save-button">Save Conditional</button>
-`;
-  editorContainer.appendChild(form);
+    <div class="radio-group">
+      <!-- Radio buttons here -->
+    </div>
+    <div id="conditionalInputContainer-${conditionalName}" class="input-container"></div>
+    <button type="submit" class="save-button">Save Conditional</button>
+    <button type="submit" class="remove-button">Remove Conditional</button>
 
+  `;
 
-
-  // get the conditional data for the if statement
-  let conditionalName = node.if;
   let conditional = this.behavior.getCondition(conditionalName);
-  console.log('conditional', conditional)
+  console.log('conditional', conditional);
 
-  // TODO: move to form itself?
-  let operators = this.behavior.operators; // Fetch available operators
-
+  let operators = this.behavior.operators;
   if (typeof conditional === 'function') {
     this.showFunctionEditor(conditionalName, conditional);
   } else if (typeof conditional === 'object') {
@@ -187,29 +168,23 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     console.log('Unknown conditional type');
   }
 
-
-  // Event listener for radio button change
+  let guiContent = this.sutraFormView.querySelector('.gui-content');
+  guiContent.appendChild(form);
+  /*
   form.elements.conditionalType.forEach(radio => {
     radio.addEventListener('change', (e) => this.onConditionalTypeChange(e.target.value, node));
   });
-
-  // Event listener for form submission
-  form.addEventListener('submit', (e) => this.createConditional(e, node));
-
-  // Trigger the radio button change event to populate the form
-  let conditionalType = node && typeof node.condition === 'function' ? 'function' : 'dsl';
-  form.elements.conditionalType.forEach(radio => {
-    if (radio.value === conditionalType) {
-      radio.checked = true;
-      radio.dispatchEvent(new Event('change'));
-    }
+  */
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    console.log("SAVING CONDITIONAL", conditionalName, form)
+    self.saveConditional(conditionalName, form);
   });
-
-  gui.bringToFront(this.sutraFormView);
 }
 
 // Adjust createConditional to handle both creating and updating conditionals
 editor.createConditional = function createConditional(e, node) {
+
   e.preventDefault();
   const formData = new FormData(e.target);
   const type = formData.get('conditionalType');

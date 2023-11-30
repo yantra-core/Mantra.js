@@ -40,21 +40,37 @@ export default function drawTable() {
 
   // set background color to transparent
   this.sutraView.style.backgroundColor = 'transparent';
-  
+
   let slider = createOpacitySlider(this.sutraView);
 
-  guiContent.appendChild(table);
+  // Create and append the new footer
+  let footer = document.createElement('div');
+  footer.className = 'gui-window-footer';
+
   guiContent.appendChild(showSutraButton);
   guiContent.appendChild(viewJsonButton);
   guiContent.appendChild(readSutraButton);
   guiContent.appendChild(slider);
 
+  guiContent.appendChild(table);
+
   // add <br>
   guiContent.appendChild(document.createElement('br'));
   guiContent.appendChild(addRuleButton);
 
+
+  // create save button
+  let saveButton = document.createElement('button');
+  saveButton.textContent = 'Save';
+  saveButton.onclick = () => this.saveSutra();
+  footer.appendChild(saveButton);
+
+  //this.sutraView.appendChild(guiContent);
+  this.sutraView.appendChild(footer);
+
   // trigger slider event to update background color
   slider.querySelector('input').dispatchEvent(new Event('input'));
+  // this.sutraView.appendChild(footer);
 
 }
 
@@ -84,7 +100,7 @@ function createOpacitySlider(element) {
   element.style.backgroundColor = 'rgba(0, 0, 0, 0)'; // Assuming you want to start with a black background
 
   // Add an event listener to the slider
-  slider.addEventListener('input', function() {
+  slider.addEventListener('input', function () {
     // Update the background color with the new opacity value
     const opacity = this.value;
     element.style.backgroundColor = `rgba(10, 15, 27, ${opacity})`; // #0a0f1b converted to rgba

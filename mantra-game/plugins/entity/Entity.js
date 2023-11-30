@@ -134,9 +134,12 @@ class Entity {
         // remove the reference in this.game.data.ents
         delete this.game.data.ents._[entityId];
         // find entity by id and filter it out
-        this.game.data.ents[destroyedType] = this.game.data.ents[destroyedType].filter((entity) => {
-          return Number(entity.id) !== Number(entityId);
-        });
+        if (this.game.data.ents[destroyedType]) {
+          // TODO: missing test ^^^
+          this.game.data.ents[destroyedType] = this.game.data.ents[destroyedType].filter((entity) => {
+            return Number(entity.id) !== Number(entityId);
+          });
+        }
       }
     }
   }
