@@ -77,6 +77,19 @@ export default function testRules(game) {
     //return entity.timerDone;
   });
 
+
+
+  rules.addCondition('blockCountBetween5and10', [
+    { op: 'greaterThan', gamePropertyPath: 'ents.BLOCK.length', value: 5 },
+    { op: 'lessThan', gamePropertyPath: 'ents.BLOCK.length', value: 10 }
+  ]);
+
+  rules.addAction({
+    if: 'blockCountBetween5and10',
+    then: [{ action: 'validateBlockCount' }]
+  });
+
+
   rules.addAction({
     if: 'isSpawner',
     then: [{
