@@ -27,6 +27,30 @@ class SutraGUI {
     if (this.game.systemsManager) {
       this.game.systemsManager.addSystem(this.id, this);
     }
+
+    if (this.game.systems['entity-input']) {
+      // Remark: You may not have to disable inputs + remove events
+      // *just* removing events should be enough, this is OK for now
+      this.game.systems['entity-input'].disableInputs();
+      this.game.systems['keyboard'].unbindAllEvents();
+      // add a global click handler to document that will delegate any clicks
+      // that are not inside gui-windows to re-enable inputs
+      document.addEventListener('click', (e) => {
+        // check if the click was inside a gui-window
+        let guiWindow = e.target.closest('.gui-container');
+        if (!guiWindow) {
+          // re-enable inputs
+          this.game.systems['entity-input'].setInputsActive();
+          this.game.systems['keyboard'].bindInputControls();
+        } else {
+          // disable inputs
+          this.game.systems['entity-input'].disableInputs();
+          this.game.systems['keyboard'].unbindAllEvents();
+        }
+      });
+
+    }
+
     let rules = testRules(game);
 
     // gui.setTheme('light');
@@ -36,6 +60,8 @@ class SutraGUI {
       let humanReadablePath = rules.getReadableSutraPath(sutraPath);
       document.querySelectorAll(`[data-path='${sutraPath}']`).forEach(node => {
         node.classList.add('highlighted-sutra-node');
+        // remove collapsed class
+        node.classList.remove('collapsed');
       });
       // Highlight the current element
       let parts = sutraPath.split('.');
@@ -43,6 +69,7 @@ class SutraGUI {
         let path = parts.slice(0, i + 1).join('.');
         document.querySelectorAll(`[data-path='${path}']`).forEach(node => {
           node.classList.add('highlighted-sutra-node');
+          node.classList.remove('collapsed');
         });
       });
     });
@@ -186,7 +213,8 @@ class SutraGUI {
     thenLabel.className = 'then-label';
 
     thenLabel.innerHTML = `<span class="sutra-keyword">Then</span>`;
-  
+    actionSelectContainer.setAttribute('data-path', node.sutraPath);
+
     let select = this.createActionSelect(node);
     // Append select element inside label element
     thenLabel.appendChild(select);
@@ -194,6 +222,19 @@ class SutraGUI {
     // Append the label (with the select inside it) to the container
     actionSelectContainer.appendChild(thenLabel);
   
+    // add click handler to actionSelectContainer so that it removes all "collapsed" classes,
+    // from all nodes whose data-path matches the data-path of the actionSelectContainer
+    actionSelectContainer.onclick = function () {
+      let nodes = document.querySelectorAll(`[data-path='${node.sutraPath}']`);
+      console.log('made a nodes query', nodes)
+      // remove all collapsed classes from those nodes
+      nodes.forEach(node => {
+        // TODO: why toggle not working as expected?
+        // node.classList.toggle('collapsed');
+        node.classList.remove('collapsed');
+      });
+    }
+
     // Append the action select container to the main element
     element.appendChild(actionSelectContainer);
   
@@ -203,11 +244,17 @@ class SutraGUI {
       dataContainer.className = 'data-container';
       // Add with-container class
       dataContainer.classList.add('with-container');
+      dataContainer.classList.add('collapsed');
+
+      // set data-path attribute to sutraPath
+      dataContainer.setAttribute('data-path', node.sutraPath);
   
       // "With" context label
       let withLabel = document.createElement('label');
       withLabel.className = 'with-label';
       withLabel.innerHTML = `<span class="sutra-keyword">With</span>`;
+      element.setAttribute('data-path', node.sutraPath);
+
 
       // Append the label directly to the data container
       dataContainer.appendChild(withLabel);
@@ -402,8 +449,7 @@ class SutraGUI {
   createElseElement(node, indentLevel) {
     let elseElement = document.createElement('div');
     elseElement.className = 'else-branch';
-    // add condition class
-    elseElement.textContent = 'Else';
+    elseElement.innerHTML = `<span class="sutra-keyword">Else</span>`;
     node.else.forEach(childNode => elseElement.appendChild(this.createNodeElement(childNode, indentLevel + 1)));
     return elseElement;
   }
@@ -489,6 +535,8 @@ class SutraGUI {
       // Clear previously highlighted elements
       document.querySelectorAll('.highlighted-sutra-node').forEach(node => {
         node.classList.remove('highlighted-sutra-node');
+        // node.classList.add('collapsed');
+
       });
     }
 

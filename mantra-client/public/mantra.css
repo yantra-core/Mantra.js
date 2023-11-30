@@ -679,10 +679,15 @@ pre {
 }
 
 .condition, .else-branch {
-  position: relative;
-  font-weight: bold;
-  margin-top: 10px;
   color: #d3d9df;
+  margin-bottom: 5px;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  padding-left: 5px;
+  border-radius: 5px;
+  border: 1px solid #2a3348 !important; /* TODO: remove !important */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Button styling */

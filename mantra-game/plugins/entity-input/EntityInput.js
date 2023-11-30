@@ -12,6 +12,7 @@ class EntityInput extends Plugin {
     this.buttonCooldown = 20;
     this.lastBulletFireTime = {};
     this.useMouseControls = false;
+    this.inputsActive = true;
 
     // Contains an array of input strategies that are run in order each time handleInputs() is called
     this.strategies = [];
@@ -47,8 +48,18 @@ class EntityInput extends Plugin {
     this.game.emit('inputStrategyRegistered', this.strategies)
   }
 
-  handleInputs(entityId, controls, sequenceNumber) {
+  setInputsActive () {
+    this.inputsActive = true;
+  }
 
+  disableInputs () {
+    this.inputsActive = false;
+  }
+
+  handleInputs(entityId, controls, sequenceNumber) {
+    if (!this.inputsActive) {
+      return;
+    }
     if (this.strategies.length === 0) {
       this.loadDefaultStrategy();
     }

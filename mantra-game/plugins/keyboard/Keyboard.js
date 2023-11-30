@@ -107,10 +107,14 @@ export default class Keyboard {
     }
   }
 
-  unload() {
+  unbindAllEvents () {
     // remove all event listeners using the bound functions
     document.removeEventListener('keydown', this.boundHandleKeyDown);
     document.removeEventListener('keyup', this.boundHandleKeyUp);
+  }
+
+  unload() {
+    this.unbindAllEvents();
   }
 
 }
