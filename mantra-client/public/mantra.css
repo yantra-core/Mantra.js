@@ -486,6 +486,8 @@ pre {
   left: 10%;
   z-index: 1000;
   width: 500px;
+  min-width: 460px;
+  min-height: 200px;
   height: 60%;
   resize: both;
   overflow: auto;
@@ -625,9 +627,9 @@ pre {
 }
 
 .action-select, .param-input, #sutraView select {
-  /* background-color: #1c2535; */
+  background-color: transparent;
   border: 1px solid #2a3348;
-  /* color: #d3d9df; */
+  color: #d3d9df;
   padding: 5px;
   border-radius: 3px;
   width: 100%;
@@ -783,24 +785,35 @@ textarea {
   padding: 8px;
   margin-bottom: 5px;
   border-radius: 3px;
-  /* background-color: #1c2535; */
   border: 1px solid #2a3348;
-  /* color: #d3d9df; */
+  background-color: transparent;
+  color: #d3d9df;
   box-sizing: border-box;
+}
+
+.input-group option {
+  background-color: transparent;
+  color: #000000;
+}
+
+.action-select option {
+  background-color: transparent;
+  color: #000000;
 }
 
 /* Hover effect for selects and inputs */
 .input-group input:hover, 
 .input-group select:hover {
   /* background-color: #2a3348; */
-  border-color: #4caf50;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
 }
 
 /* Focus effect for selects and inputs */
 .input-group input:focus, 
 .input-group select:focus {
   outline: none;
-  border-color: #2196F3;
+  border-color: #9a9cff;
   box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
 }
 
