@@ -1,4 +1,4 @@
-// import sutra from '../../../../sutra/index.js';
+//import sutra from '../../../../sutra/index.js';
 import sutra from '@yantra-core/sutra';
 
 export default function testRules() {
@@ -12,15 +12,6 @@ export default function testRules() {
   // Custom function for 'isBoss' condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
 
-
-  // Action for the boss based on health levels
-  rules.addAction({
-    if: 'isBoss',
-    then: healthLevels.map((level, index) => ({
-      if: `isHealthBelow${level}`,
-      then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
-    }))
-  });
 
   // use custom function for condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
@@ -105,6 +96,15 @@ export default function testRules() {
     }]
   });
 
+    // Action for the boss based on health levels
+    rules.addAction({
+      if: 'isBoss',
+      then: healthLevels.map((level, index) => ({
+        if: `isHealthBelow${level}`,
+        then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
+      }))
+    });
+  
 
   rules.addAction({
     if: 'isBoss',
@@ -120,7 +120,6 @@ export default function testRules() {
   function generateRandomColorInt() {
     return Math.floor(Math.random() * 255);
   }
-
   // Composite AND condition
   rules.addCondition('isBossAndHealthLow', {
     op: 'and',
