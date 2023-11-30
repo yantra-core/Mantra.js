@@ -1,6 +1,6 @@
 {
   "name": "@yantra-core/mantra",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "",
   "main": "Game.js",
   "type": "module",
@@ -17,13 +17,25 @@
     "@msgpack/msgpack": "^3.0.0-beta2",
     "babel-loader": "^9.1.3",
     "babelify": "^10.0.0",
+    "browser-resolve": "^2.0.0",
+    "browserify-shim": "^3.8.16",
+    "esmify": "^2.1.1",
     "matter-js": "^0.19.0",
     "tap": "^18.5.2",
-    "tape": "^5.7.2"
+    "tape": "^5.7.2",
+    "browserify": "^17.0.0"
   },
   "dependencies": {
-    "@yantra-core/sutra": "^1.1.2",
+    "@yantra-core/sutra": "^1.3.1",
     "protobufjs": "^7.2.5",
     "xstate": "^4.38.3"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "@yantra-core/sutra": "global:Sutra"
   }
 }
