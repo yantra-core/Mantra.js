@@ -1,7 +1,6 @@
 // import sutra from '../../../../sutra/index.js';
 import sutra from '@yantra-core/sutra';
 
-
 export default function testRules() {
 
   let rules = new sutra.Sutra();
@@ -171,8 +170,23 @@ export default function testRules() {
 
   rules.on('endRound', () => {
     console.log('Ending round as all BLOCK, BOSS, and SPAWNER counts are zero.');
-    alert("YOU ARE THE WINRAR")
     // Implement the logic to end the round
+    // respawn the spawner
+    let ent = game.createEntity({
+      type: 'SPAWNER',
+      destroyed: false,
+      health: 100,
+      width: 200,
+      height: 200,
+      depth: 200,
+      position: {
+        x: -800,
+        y: -800
+      }
+    });
+    // alert("YOU ARE THE WINRAR")
+
+
   });
 
   return rules;

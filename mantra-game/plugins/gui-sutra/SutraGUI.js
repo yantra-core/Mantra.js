@@ -30,12 +30,17 @@ class SutraGUI {
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
       // Highlight the current element
-      let elementToHighlight = document.querySelector(`[data-id='${sutraPath}']`);
-      // get the parent of this element
-      if (elementToHighlight) {
-        elementToHighlight.parentElement.classList.add('highlighted-sutra-node');
-        elementToHighlight.parentElement.parentElement.classList.add('highlighted-sutra-node');
-      }
+      let parts = sutraPath.split('.');
+      parts.forEach((part, i) => {
+        let path = parts.slice(0, i + 1).join('.');
+        let elementToHighlight = document.querySelector(`[data-path='${path}']`);
+        // console.log('elementToHighlightelementToHighlightelementToHighlight', elementToHighlight)
+        // get the parent of this element
+        if (elementToHighlight) {
+          elementToHighlight.classList.add('highlighted-sutra-node');
+          elementToHighlight.parentElement.classList.add('highlighted-sutra-node');
+        }
+      });
     });
 
     let json = rules.serializeToJson();
@@ -135,6 +140,12 @@ class SutraGUI {
     // Create a div to hold the node contents
     let contentDiv = document.createElement('div');
     contentDiv.className = 'node-element';
+
+    // Append buttons to the contentDiv
+    const addRuleBtn = this.createAddRuleButton(node.sutraPath);
+    const removeRuleBtn = this.createRemoveRuleButton(node.sutraPath);
+    formElement.appendChild(addRuleBtn);
+    formElement.appendChild(removeRuleBtn);
     formElement.appendChild(contentDiv);
 
     if (node.action) {
@@ -142,30 +153,6 @@ class SutraGUI {
     } else if (node.if) {
       this.appendConditionalElement(contentDiv, node, indentLevel);
     }
-
-    // Append buttons to the contentDiv
-    const addRuleBtn = this.createAddRuleButton(node.sutraPath);
-    const removeRuleBtn = this.createRemoveRuleButton(node.sutraPath);
-    contentDiv.appendChild(addRuleBtn);
-    contentDiv.appendChild(removeRuleBtn);
-
-    // Create and append the Save button to the form, not the contentDiv
-    const saveBtn = document.createElement('button');
-    saveBtn.type = 'button'; // Ensure this button doesn't submit the form
-    saveBtn.textContent = 'Save';
-    saveBtn.className = 'save-button';
-    saveBtn.addEventListener('click', (event) => {
-      const serializedData = this.serializeFormToJSON(formElement);
-      console.log('got serializedData', serializedData)
-      // console.log('Serialized Data:', serializedData);
-      // must fetch live reference to tree as "node" is a copy at this point
-      let originalNode = this.behavior.findNode(node.sutraPath);
-      // now that we have the updated for data, we need to update the sutra action
-      console.log('saving node', originalNode);
-      originalNode.data = serializedData;
-    });
-
-    formElement.appendChild(saveBtn);
 
     return formElement;
   }
@@ -227,7 +214,7 @@ class SutraGUI {
   createDataContainer(node, indentLevel) {
     // console.log('creating a data container', node);
     let dataContainer = document.createElement('div');
-    dataContainer.className = 'data-container';
+    dataContainer.className = '';
 
     Object.keys(node.data).forEach(key => {
       let path = key;
@@ -334,12 +321,13 @@ class SutraGUI {
       node.if.forEach((cond, i) => {
         let condition = document.createElement('div');
         condition.className = 'condition';
-
         if (i === 0) {
           condition.textContent = `If: ${cond}`;
         } else {
           condition.textContent = `${cond}`;
         }
+        // set data-path attribute to node.sutraPath
+        condition.setAttribute('data-path', node.sutraPath);
         condition.onclick = function () {
           // condition.classList.toggle('collapsed');
           self.showConditionalsForm(node);
@@ -358,6 +346,8 @@ class SutraGUI {
       let condition = document.createElement('div');
       condition.className = 'condition';
       condition.textContent = `If: ${node.if}`;
+      condition.setAttribute('data-path', node.sutraPath);
+
       condition.onclick = function () {
         // find the child node-element-form in condition
         let nodeElementForm = condition.parentElement.parentElement.querySelector('.node-element-form');
