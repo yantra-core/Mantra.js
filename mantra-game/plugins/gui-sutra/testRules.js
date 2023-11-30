@@ -8,6 +8,9 @@ export default function testRules(game) {
   // Define health level conditions for the boss
   const healthLevels = [800, 600, 400, 200, 0];
   const colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red
+  // New color when the spawner is idle (not spawning)
+  const idleSpawnerColor = 0x777777; // Gray color
+  let activeSpawnerColor = 0xff0000; // Green color
 
   // Custom function for 'isBoss' condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
@@ -74,9 +77,6 @@ export default function testRules(game) {
     //return entity.timerDone;
   });
 
-
-
-  // Modify the action for the spawner to include the new condition
   rules.addAction({
     if: 'isSpawner',
     then: [{
@@ -84,27 +84,29 @@ export default function testRules(game) {
       then: [{
         if: ['blockCountLessThan5', 'spawnerHealthAbove50'],
         then: [{
+          action: 'entity::updateEntity',
+          data: { color: activeSpawnerColor } // Set the spawner color to gray when it's idle
+        },{
           action: 'entity::createEntity',
           data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: -200 } }
-        }
-        ]
-      }, {
+        }],
+        else: [{
         action: 'entity::updateEntity',
-        data: { color: generateRandomColorInt, speed: 5 }
-      }
-      ]
+        data: { color: idleSpawnerColor } // Set the spawner color to gray when it's idle
+      }]
+      }]
     }]
   });
 
-    // Action for the boss based on health levels
-    rules.addAction({
-      if: 'isBoss',
-      then: healthLevels.map((level, index) => ({
-        if: `isHealthBelow${level}`,
-        then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
-      }))
-    });
-  
+  // Action for the boss based on health levels
+  rules.addAction({
+    if: 'isBoss',
+    then: healthLevels.map((level, index) => ({
+      if: `isHealthBelow${level}`,
+      then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
+    }))
+  });
+
 
   rules.addAction({
     if: 'isBoss',

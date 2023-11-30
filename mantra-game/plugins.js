@@ -61,6 +61,7 @@ import EntitiesGUI from './plugins/gui-entities/EntitiesGUI.js';
 import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
 import SutraGUI from './plugins/gui-sutra/SutraGUI.js';
 import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
+import PluginExplorer from './plugins/gui-plugin-explorer/PluginExplorer.js';
 
 // Utility
 import PingTime from './plugins/ping-time/PingTime.js';
@@ -93,6 +94,7 @@ const plugins = {
   Timers,
   Inspector,
   ControlsGUI,
+  PluginExplorer,
   LoadingScreen,
   Editor,
   EntitiesGUI,

@@ -1,6 +1,52 @@
+//import lightTheme from "./themes/light.js";
+//import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
 const gui = {
-  window: function (id, title = 'Window', close) {
+  /*
+  setTheme: function (name) {
+    if (name === 'light') {
+      this.theme(lightTheme);
+    } else if (name === 'dark') {
+      this.theme(darkTheme);
+    } else {
+      console.log(`Theme ${name} not found, defaulting to light theme`);
+      this.theme(lightTheme);
+    }
+  },
+  theme: function (theme) {
+    // theme is an object gui-elements and cssObjects
+    // for each gui element type in the theme
+    // find *all* nodes that match the type
+    // iterate over each node and apply the cssObject
+    console.log('setting theme', theme)
+    for (let type in theme) {
+      let cssObject = theme[type];
+      let nodes = document.querySelectorAll(`.${type}`);
+      console.log('ffff', nodes)
+      nodes.forEach(node => {
+        this.skin(node, cssObject);
+      });
+    }
+  },
+  skin: function(guiElement, cssObject) {
+    // guiElement is a DOM element
+    // cssObject is an object with css properties
+    for (let property in cssObject) {
+      // update the live node style
+      guiElement.style[property] = cssObject[property];
+      // update the style sheet for all future nodes
+      // this will override any inline styles
+      let styleSheet = document.styleSheets[0];
+      let selector = `.${guiElement.className}`;
+      let rule = `${property}: ${cssObject[property]}`;
+      let index = styleSheet.cssRules.length;
+      styleSheet.insertRule(`${selector} { ${rule} }`, index);
+
+    }
+  },
+  */
+  elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
+  window: function (id, title = 'Window', close, pluginInstance = null) {
 
     if (typeof close === 'undefined') {
       close = function () {
@@ -21,6 +67,24 @@ const gui = {
     // Create a draggable header
     const guiHeader = document.createElement('div');
     guiHeader.className = 'gui-header';
+
+
+    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
+    if (false && pluginInstance) {
+      const gearIcon = document.createElement('i');
+      gearIcon.className = 'fas fa-cog';
+      gearIcon.style.float = 'right';
+      gearIcon.style.cursor = 'pointer';
+      gearIcon.style.top = '20px';
+      gearIcon.style.right = '20px';
+      gearIcon.style.fontSize = '50px';
+      gearIcon.innerHTML = "FFF";
+      gearIcon.onclick = () => {
+        console.log(pluginInstance)
+        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
+      };
+      guiHeader.appendChild(gearIcon);
+    }
 
     // Add traffic light buttons
     const closeButton = document.createElement('div');

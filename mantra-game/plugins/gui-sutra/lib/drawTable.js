@@ -3,18 +3,16 @@ import gui from '../../gui-editor/gui.js';
 export default function drawTable() {
   let game = this.game;
   let self = this;
-  if (!game.systems['entity-input']) {
-    console.log('entity-input system not found, skipping drawTable');
-    return;
-  }
 
   let table = document.createElement('div');
   table.id = "sutraTable";
 
   // Use gui.window() to create the window
   this.sutraView = gui.window('sutraView', 'Sutra Editor', function () {
-    game.systemsManager.removeSystem(self.id);
-  });
+    if (game.systemsManager) {
+      game.systemsManager.removeSystem(self.id);
+    }
+  }, game.systems['gui-sutra']);
 
   // Add a "Show Sutra" button
   let showSutraButton = document.createElement('button');
@@ -88,7 +86,7 @@ function createOpacitySlider(element) {
   slider.setAttribute('min', '0');
   slider.setAttribute('max', '1');
   slider.setAttribute('step', '0.01');
-  slider.setAttribute('value', '0.88'); // Start with a fully transparent background
+  slider.setAttribute('value', '1'); // Start with a fully solid background
   slider.style.width = '110px'; // Make the slider larger
   slider.style.transform = 'scale(1.5)'; // Scale the slider for better visibility
   slider.style.cursor = 'pointer';

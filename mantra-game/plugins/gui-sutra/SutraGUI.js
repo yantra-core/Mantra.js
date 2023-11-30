@@ -24,8 +24,12 @@ class SutraGUI {
 
   init(game) {
     this.game = game;
-    this.game.systemsManager.addSystem(this.id, this);
+    if (this.game.systemsManager) {
+      this.game.systemsManager.addSystem(this.id, this);
+    }
     let rules = testRules(game);
+
+    // gui.setTheme('light');
 
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
@@ -101,10 +105,11 @@ class SutraGUI {
   redrawBehaviorTree() {
     let json = this.behavior.serializeToJson();
     let container = document.getElementById('sutraTable');
-
+    console.log('again', json)
     //let guiContent = container.querySelector('.gui-content');
     container.innerHTML = '';
     JSON.parse(json).tree.forEach(node => {
+      console.log('nnnn', node)
       container.appendChild(this.createNodeElement(node, 0));
     });
   }
@@ -125,7 +130,12 @@ class SutraGUI {
   }
 
   getAvailableActions() {
-    return Object.keys(this.getEmitters());
+    let re = [];
+    let emitters = this.getEmitters();
+    if (!emitters) {
+      return re;
+    }
+    return Object.keys(emitters);
   }
 
   createNodeElement(node, indentLevel, path = '') {
@@ -142,13 +152,14 @@ class SutraGUI {
     contentDiv.className = 'node-element';
 
     // Append buttons to the contentDiv
-    const addRuleBtn = this.createAddRuleButton(node.sutraPath);
-    const removeRuleBtn = this.createRemoveRuleButton(node.sutraPath);
-    formElement.appendChild(addRuleBtn);
-    formElement.appendChild(removeRuleBtn);
+    //const addRuleBtn = this.createAddRuleButton(node.sutraPath);
+    //formElement.appendChild(addRuleBtn);
     formElement.appendChild(contentDiv);
 
     if (node.action) {
+      // add new className to formElement, action-node-form
+      formElement.classList.add('action-node-form');
+      // formElement.classList.add('collapsible-content');
       this.appendActionElement(contentDiv, node, indentLevel);
     } else if (node.if) {
       this.appendConditionalElement(contentDiv, node, indentLevel);
@@ -165,35 +176,51 @@ class SutraGUI {
   }
 
   appendActionElement(element, node, indentLevel) {
+
+    // "Then" clause container
     let actionSelectContainer = document.createElement('div');
     actionSelectContainer.className = 'action-select-container';
-
-    // "Then" clause label
+  
+    // "Then" clause label with embedded select element
     let thenLabel = document.createElement('label');
     thenLabel.className = 'then-label';
-    thenLabel.textContent = 'Then:';
-    actionSelectContainer.appendChild(thenLabel);
 
+    thenLabel.innerHTML = `<span class="sutra-keyword">Then</span>`;
+  
     let select = this.createActionSelect(node);
-    actionSelectContainer.appendChild(select);
+    // Append select element inside label element
+    thenLabel.appendChild(select);
+  
+    // Append the label (with the select inside it) to the container
+    actionSelectContainer.appendChild(thenLabel);
+  
+    // Append the action select container to the main element
     element.appendChild(actionSelectContainer);
-
+  
     if (node.data) {
-      // "With" context label for data container
+      // "With" context container for data
       let dataContainer = document.createElement('div');
       dataContainer.className = 'data-container';
-
+      // Add with-container class
+      dataContainer.classList.add('with-container');
+  
+      // "With" context label
       let withLabel = document.createElement('label');
       withLabel.className = 'with-label';
-      withLabel.textContent = 'With:';
-      dataContainer.appendChild(withLabel);
+      withLabel.innerHTML = `<span class="sutra-keyword">With</span>`;
 
+      // Append the label directly to the data container
+      dataContainer.appendChild(withLabel);
+  
+      // Create and append the data content to the data container
       let dataContent = this.createDataContainer(node, indentLevel);
       dataContainer.appendChild(dataContent);
-
+  
+      // Append the data container to the main element
       element.appendChild(dataContainer);
     }
   }
+  
 
   createActionSelect(node) {
     let select = document.createElement('select');
@@ -300,11 +327,15 @@ class SutraGUI {
   }
 
   appendConditionalElement(element, node, indentLevel) {
+    let self = this;
     let condition = this.createConditionElement(node);
     element.appendChild(condition);
 
+
     if (node.then) {
-      node.then.forEach(childNode => element.appendChild(this.createNodeElement(childNode, indentLevel + 1)));
+      node.then.forEach(function (childNode) {
+        element.appendChild(self.createNodeElement(childNode, indentLevel + 1))
+      });
     }
     if (node.else) {
       let elseElement = this.createElseElement(node, indentLevel);
@@ -321,31 +352,35 @@ class SutraGUI {
       node.if.forEach((cond, i) => {
         let condition = document.createElement('div');
         condition.className = 'condition';
-        if (i === 0) {
-          condition.textContent = `If: ${cond}`;
-        } else {
-          condition.textContent = `${cond}`;
-        }
+        condition.innerHTML = `<span class="sutra-keyword">If</span> ${cond}`;
         // set data-path attribute to node.sutraPath
         condition.setAttribute('data-path', node.sutraPath);
         condition.onclick = function () {
           // condition.classList.toggle('collapsed');
           self.showConditionalsForm(node);
         }
+
         conditionContainer.appendChild(condition);
 
+        const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
+        condition.appendChild(removeRuleBtn);
+
         // Add a visual separator, if desired
+        /*
         if (node.if.indexOf(cond) !== node.if.length - 1) {
           let andSeparator = document.createElement('div');
           andSeparator.className = 'condition-separator';
           andSeparator.textContent = 'AND';
           conditionContainer.appendChild(andSeparator);
         }
+        */
       });
     } else {
       let condition = document.createElement('div');
       condition.className = 'condition';
-      condition.textContent = `If: ${node.if}`;
+      // condition.textContent = `If: ${node.if}`;
+      condition.innerHTML = `<span class="sutra-keyword">If</span> ${node.if}`;
+
       condition.setAttribute('data-path', node.sutraPath);
 
       condition.onclick = function () {
@@ -355,6 +390,10 @@ class SutraGUI {
         self.showConditionalsForm(node);
       }
       conditionContainer.appendChild(condition);
+
+      const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
+      condition.appendChild(removeRuleBtn);
+
     }
 
     return conditionContainer;
@@ -363,6 +402,7 @@ class SutraGUI {
   createElseElement(node, indentLevel) {
     let elseElement = document.createElement('div');
     elseElement.className = 'else-branch';
+    // add condition class
     elseElement.textContent = 'Else';
     node.else.forEach(childNode => elseElement.appendChild(this.createNodeElement(childNode, indentLevel + 1)));
     return elseElement;
@@ -389,9 +429,13 @@ class SutraGUI {
     }
   }
 
-  handleRemoveRuleClick(nodeId) {
-    console.log('handleRemoveRuleClick', nodeId);
-    this.behavior.removeNode(nodeId);
+  handleRemoveRuleClick(sutraPath) {
+    console.log('handleRemoveRuleClick', sutraPath);
+    try {
+      this.behavior.removeNode(sutraPath);
+    } catch (err) {
+      console.log(err);
+    }
     /*
     let node = this.behavior.findNode(nodeId);
     console.log('node', node)
@@ -413,8 +457,9 @@ class SutraGUI {
 
   createAddRuleButton(nodeId) {
     let button = document.createElement('button');
-    button.textContent = 'Add Rule';
-    button.className = 'add-rule-btn';
+    button.textContent = '+';
+    button.className = 'rule-button rule-button-add';
+    button.title = 'Add a new rule';
     button.setAttribute('data-id', nodeId);
     button.onclick = (e) => {
       this.handleAddRuleClick(e.target.getAttribute('data-id'));
@@ -425,10 +470,12 @@ class SutraGUI {
 
   createRemoveRuleButton(nodeId) {
     let button = document.createElement('button');
-    button.textContent = 'Remove Rule';
-    button.className = 'remove-rule-btn';
+    button.textContent = '-';
+    button.className = 'rule-button rule-button-remove';
+    button.title = 'Remove this rule';
     button.setAttribute('data-id', nodeId);
     button.onclick = (e) => {
+      e.stopPropagation();
       this.handleRemoveRuleClick(e.target.getAttribute('data-id'));
     };
     return button;

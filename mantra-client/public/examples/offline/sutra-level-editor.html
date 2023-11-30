@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+      let game = new MANTRA.Game({
+        width: 2000,
+        height: 2000,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '../../'
+        }
+      });
+
+      let Plugins = MANTRA.plugins;
+
+      // Use Plugins to extend the game with new functionality
+
+      // Adds projectile Bullets to the game
+      // test chanining
+      game.use(new Plugins.Bullet()).use(new Plugins.Block());
+
+      // Adds a nice StarField background
+      game.use(new Plugins.StarField());
+
+      // Adds a controller input legend
+      // game.use(new Plugins.ControlsGUI());
+
+      // game.use(new Plugins.Editor());
+      game.use(new Plugins.CurrentFPS());
+
+      game.use(new Plugins.Timers({}));
+      game.use(new Plugins.Health({}));
+
+      game.use(new Plugins.SutraGUI({}));
+
+
+      // game.use(new Plugins.SutraGUI({ }));
+
+
+      game.use(new Plugins.Editor({
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-babylon.html'
+      }));
+
+
+
+      // start the game loop
+      game.start(function () {
+
+        game.createEntity({
+          type: 'BOSS',
+          health: 500,
+          width: 230,
+          height: 320,
+          depth: 200,
+          position: {
+            x: 0,
+            y: -400
+          },
+        });
+
+        let ent = game.createEntity({
+          type: 'SPAWNER',
+          health: 100,
+          width: 200,
+          height: 200,
+          depth: 200,
+          position: {
+            x: -800,
+            y: -800
+          }
+        });
+
+        ent.timers.setTimer('test-timer', 1, true);
+
+        game.on('timers::done', (entityId, timerId) => {
+          // console.log('timer done', entityId, timerId);
+        });
+
+
+      });
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

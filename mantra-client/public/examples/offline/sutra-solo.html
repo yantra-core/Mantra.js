@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/plugins/SutraGUI.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+      let sutraGui = new window.PLUGINS.SutraGUI.default();
+      sutraGui.init({});
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

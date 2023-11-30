@@ -18,6 +18,20 @@ body {
   position: absolute;
 }
 
+#pluginExplorer {
+  top: 10%;
+  right: 20%;
+  z-index: 1000; /* To ensure it's above other elements */
+  width: 20%; /* Adjust width as needed */
+  height: 30%;
+  min-width: 600px;
+  min-height: 500px;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+
+}
+
 /*
 #pluginView {
   top: 10%;
@@ -179,6 +193,7 @@ body {
 
 .menu button:hover {
   background-color: #666; /* Slightly lighter on hover for interactive effect */
+  color: #9a9cff; /* Light blue text on hover */
 }
 
 .dropdown-content {
@@ -343,8 +358,9 @@ pre {
 }
 
 .gui-container th {
+  font-size: 18px;
   background-color: #1c2535;
-  color: #4caf50; /* Green accent color */
+  color: #9a9cff; /* purple */
   cursor: pointer;
 }
 
@@ -585,9 +601,9 @@ pre {
   color: #d3d9df;
   /* padding-left: 10px; */
   padding-top: 10px;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  margin-top: 0px;
   margin-left: 10px;
   /* margin-right: 20px; */
   /*
@@ -624,15 +640,18 @@ pre {
 
 .node-element-form {
   /* display: none; */
+  margin: 0px;
+  padding: 0px;
 }
 
 .action-select, .param-input, #sutraView select {
   background-color: transparent;
-  border: 1px solid #2a3348;
+  /* border: 1px solid #2a3348; */
+  border: 1px solid transparent;
+  
   color: #d3d9df;
   padding: 5px;
   border-radius: 3px;
-  width: 100%;
   box-sizing: border-box;
 }
 
@@ -660,6 +679,7 @@ pre {
 }
 
 .condition, .else-branch {
+  position: relative;
   font-weight: bold;
   margin-top: 10px;
   color: #d3d9df;
@@ -743,15 +763,6 @@ textarea {
   color: #d3d9df;
 }
 
-.action-select-container {
-  /* background-color: #1c2535; */
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  border: 1px solid #2a3348;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
 /* Style for the data container */
 .data-container {
   /* background-color: #162238; */
@@ -769,6 +780,7 @@ textarea {
 /* Style for each input group in the data container */
 .input-group {
   margin-bottom: 15px;
+  margin-left: 20px;
 }
 
 /* Style for labels in the data container */
@@ -817,25 +829,82 @@ textarea {
   box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
 }
 
+.action-node-form .node-element {
+  margin-left: 0px;
+}
+
+.condition-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.condition {
+  border: 1px solid #d0d0d0;
+  padding: 5px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  cursor: pointer;
+}
+
+.condition-separator {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
 /* Adjusting the action select specifically */
 .action-select {
   margin-bottom: 0; /* Remove additional margin if any */
 }
 
-.then-label {
+.action-select-container {
+  /* background-color: #1c2535; */
   color: #d3d9df;
-  margin-bottom: 10px;
   display: block;
   font-size: 18px;
   font-weight: bold;
+  display: flex; /* Establishes a flex container */
+  align-items: center; /* Vertically centers the children */
+}
+
+.action-select-container select {
+  flex-grow: 1; /* Allows the select to grow and fill the space */
+}
+
+.sutra-keyword {
+  color: #9a9cff;
+  font-size: 16px !important;
+}
+
+.then-label {
+  color: #d3d9df;
+  margin-bottom: 5px;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  padding-left: 5px;
+  border-radius: 5px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.then-label span {
+  margin-right: 10px; /* Spacing between label and select */
 }
 
 .with-label {
   color: #d3d9df;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   display: block;
   font-size: 18px;
   font-weight: bold;
+  padding-top: 5px;
+  padding-left: 5px;
+
+}
+
+.with-container {
+  margin: 0px;
+  padding: 0px;
 }
 
 .nested-data-container {
@@ -849,19 +918,88 @@ textarea {
 /* Add more levels as needed */
 
 
-.condition-container {
-  display: flex;
-  flex-direction: column;
+
+.plugin-form-container {
+  font-family: Arial, sans-serif;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-.condition {
-  border: 1px solid #d0d0d0;
-  padding: 5px;
+.method-form {
+  margin-bottom: 15px;
+}
+
+.method-label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
   margin-bottom: 5px;
+}
+
+.method-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.condition-separator {
-  font-weight: bold;
-  margin: 5px 0;
+.submit-button:hover {
+  background-color: #45a049;
+}
+
+
+/* Reduce the button size and padding */
+.rule-button {
+  padding: 4px 8px;
+  font-size: 12px;
+  margin: 0 4px;
+}
+
+/* Replace text with icons */
+.rule-button-add {
+  /*
+  background-image: url('path-to-add-icon');
+  background-repeat: no-repeat;
+  background-size: contain;
+  text-indent: -9999px;
+  */
+
+}
+
+.rule-button-remove {
+  /*background-image: url('path-to-remove-icon');
+  background-repeat: no-repeat;
+  background-size: contain;
+  text-indent: -9999px; 
+  */
+  position: absolute !important;
+  right: -2px;
+  bottom: -3px;
+  margin: 5px;
+  padding: 4px;
+  width: 20px;
+
+}
+
+/* For collapsible sections */
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.collapsible-content-open {
+  max-height: 500px; /* Adjust as needed */
 }
