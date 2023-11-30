@@ -25,7 +25,7 @@ class SutraGUI {
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem(this.id, this);
-    let rules = testRules();
+    let rules = testRules(game);
 
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;

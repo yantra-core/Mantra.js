@@ -1,7 +1,7 @@
 //import sutra from '../../../../sutra/index.js';
 import sutra from '@yantra-core/sutra';
 
-export default function testRules() {
+export default function testRules(game) {
 
   let rules = new sutra.Sutra();
 
