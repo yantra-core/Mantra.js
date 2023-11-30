@@ -29,17 +29,17 @@ class SutraGUI {
 
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
+      let humanReadablePath = rules.getReadableSutraPath(sutraPath);
+      document.querySelectorAll(`[data-path='${sutraPath}']`).forEach(node => {
+        node.classList.add('highlighted-sutra-node');
+      });
       // Highlight the current element
       let parts = sutraPath.split('.');
       parts.forEach((part, i) => {
         let path = parts.slice(0, i + 1).join('.');
-        let elementToHighlight = document.querySelector(`[data-path='${path}']`);
-        // console.log('elementToHighlightelementToHighlightelementToHighlight', elementToHighlight)
-        // get the parent of this element
-        if (elementToHighlight) {
-          elementToHighlight.classList.add('highlighted-sutra-node');
-          elementToHighlight.parentElement.classList.add('highlighted-sutra-node');
-        }
+        document.querySelectorAll(`[data-path='${path}']`).forEach(node => {
+          node.classList.add('highlighted-sutra-node');
+        });
       });
     });
 
@@ -438,7 +438,7 @@ class SutraGUI {
     let game = this.game;
     this.bossHealth--;
 
-    if (game.tick % 70 === 0) {
+    if (game.tick % 60 === 0) {
       // Clear previously highlighted elements
       document.querySelectorAll('.highlighted-sutra-node').forEach(node => {
         node.classList.remove('highlighted-sutra-node');

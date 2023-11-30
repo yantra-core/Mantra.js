@@ -667,7 +667,7 @@ pre {
 #sutraView button {
   position: relative; /* Add this */
 
-  background-color: #4caf50;
+  background-color: #5021FF;
   border: none;
   color: white;
   text-align: center;
@@ -680,7 +680,7 @@ pre {
 }
 
 #sutraView button:hover {
-  background-color: #45a049;
+  background-color: #2160FF;
 }
 
 #sutraTable {
@@ -729,9 +729,11 @@ pre {
   overflow: hidden;
 }
 
+/*   // #9a9cff */
 .highlighted-sutra-node {
-  background-color: orange; /* Example style - light blue background */
-  /* Add any other styles as needed */
+  border: 1px solid 9a9cff !important;
+  box-shadow: 0 0 15px rgba(154, 156, 255, 0.6); /* Soft blue glow */
+  transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 textarea {
