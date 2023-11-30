@@ -226,11 +226,19 @@ class Bullet {
       //
       // Bullets are destroyed if hit an NPC
       //
-      if (entityA.type === 'BULLET' && entityB.type === 'NPC') {
+      let npcTypes = ['NPC', 'BOSS', 'SPAWNER'];
+      // console.log("checking ", entityA.type, entityB.type, npcTypes)
+      if (entityA.type === 'BULLET' && npcTypes.indexOf(entityB.type) !== -1) {
+        entityB.health -= entityA.damage || 10;
+        // console.log('NPC health', entityB, entityB.health)
+        this.game.components.health.set(entityIdB, entityB.health);
         this.game.removeEntity(entityIdA);
         return;
       }
-      if (entityA.type === 'NPC' && entityB.type === 'BULLET') {
+      if (npcTypes.indexOf(entityA.type) !== -1 && entityB.type === 'BULLET') {
+        entityA.health -= entityB.damage || 10;
+        // console.log('NPC health', entityA,  entityA.health)
+        this.game.components.health.set(entityIdA, entityA.health);
         this.game.removeEntity(entityIdB);
         return;
       }
