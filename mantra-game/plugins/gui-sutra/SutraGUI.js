@@ -162,7 +162,7 @@ class SutraGUI {
     return Object.keys(emitters);
   }
 
-  createNodeElement(node, indentLevel, path = '') {
+  createNodeElement(node, indentLevel, path = '', keyword = 'IF') {
     // Create a form element instead of a div
     let formElement = document.createElement('form');
     formElement.className = 'node-element-form';
@@ -184,7 +184,7 @@ class SutraGUI {
       // add new className to formElement, action-node-form
       formElement.classList.add('action-node-form');
       // formElement.classList.add('collapsible-content');
-      this.appendActionElement(contentDiv, node, indentLevel);
+      this.appendActionElement(contentDiv, node, indentLevel, keyword);
     } else if (node.if) {
       this.appendConditionalElement(contentDiv, node, indentLevel);
     }
@@ -199,7 +199,7 @@ class SutraGUI {
     console.log('saveSutra', this.serializeFormToJSON(table));
   }
 
-  appendActionElement(element, node, indentLevel) {
+  appendActionElement(element, node, indentLevel, keyword = 'THEN') {
 
     // "Then" clause container
     let actionSelectContainer = document.createElement('div');
@@ -209,7 +209,7 @@ class SutraGUI {
     let thenLabel = document.createElement('label');
     thenLabel.className = 'then-label';
 
-    thenLabel.innerHTML = `<span class="sutra-keyword">Then</span>`;
+    thenLabel.innerHTML = `<span class="sutra-keyword">${keyword}</span>`;
     actionSelectContainer.setAttribute('data-path', node.sutraPath);
 
     let select = this.createActionSelect(node);
@@ -241,7 +241,7 @@ class SutraGUI {
       dataContainer.className = 'data-container';
       // Add with-container class
       dataContainer.classList.add('with-container');
-      dataContainer.classList.add('collapsed');
+      // dataContainer.classList.add('collapsed');
 
       // set data-path attribute to sutraPath
       dataContainer.setAttribute('data-path', node.sutraPath);
@@ -249,7 +249,7 @@ class SutraGUI {
       // "With" context label
       let withLabel = document.createElement('label');
       withLabel.className = 'with-label';
-      withLabel.innerHTML = `<span class="sutra-keyword">With</span>`;
+      withLabel.innerHTML = `<span class="sutra-keyword">WITH</span>`;
       element.setAttribute('data-path', node.sutraPath);
 
 
@@ -347,7 +347,10 @@ class SutraGUI {
     let label = document.createElement('label');
     label.textContent = key;
     label.className = 'param-label';
-    // label.style.marginLeft = `${indentLevel * 20}px`;
+    label.style.marginLeft = '10px';
+    // make bold
+    label.style.fontWeight = 'bold';
+    //label.style.marginLeft = `${indentLevel * 10}px`;
     return label;
   }
 
@@ -378,7 +381,7 @@ class SutraGUI {
 
     if (node.then) {
       node.then.forEach(function (childNode) {
-        element.appendChild(self.createNodeElement(childNode, indentLevel + 1))
+        element.appendChild(self.createNodeElement(childNode, indentLevel + 1, '', 'THEN'))
       });
     }
     if (node.else) {
@@ -389,14 +392,37 @@ class SutraGUI {
 
   createConditionElement(node) {
     let self = this;
+    let keyword = "IF";
     let conditionContainer = document.createElement('div');
     conditionContainer.className = 'condition-container';
 
+    // check to see if node.sutraPath is anywhere at first level of tree[0]
+    // could be tree[1] or tree[2] etc.
+    let isFirstLevel = false;
+    // check to see if has one "[" then it is first level
+    // TODO: better way to handle this
+    if (node.sutraPath.split('[').length === 2) {
+      isFirstLevel = true;
+    }
+    
+    if (!isFirstLevel) {
+      // Add a visual separator, if desired
+      /*
+      let ifSeparator = document.createElement('div');
+      ifSeparator.className = 'condition-separator';
+      ifSeparator.textContent = 'IF';
+      conditionContainer.appendChild(ifSeparator);
+      */
+      keyword = "AND"; 
+
+    }
+
+    console.log('nodenodenode', node.sutraPath)
     if (Array.isArray(node.if)) {
       node.if.forEach((cond, i) => {
         let condition = document.createElement('div');
         condition.className = 'condition';
-        condition.innerHTML = `<span class="sutra-keyword">If</span> ${cond}`;
+        condition.innerHTML = `<span class="sutra-keyword">${keyword}</span> ${cond}`;
         // set data-path attribute to node.sutraPath
         condition.setAttribute('data-path', node.sutraPath);
         condition.onclick = function () {
@@ -422,8 +448,7 @@ class SutraGUI {
     } else {
       let condition = document.createElement('div');
       condition.className = 'condition';
-      // condition.textContent = `If: ${node.if}`;
-      condition.innerHTML = `<span class="sutra-keyword">If</span> ${node.if}`;
+      condition.innerHTML = `<span class="sutra-keyword">${keyword}</span> ${node.if}`;
 
       condition.setAttribute('data-path', node.sutraPath);
 
@@ -444,10 +469,11 @@ class SutraGUI {
   }
 
   createElseElement(node, indentLevel) {
+    let keyword = "ELSE";
+
     let elseElement = document.createElement('div');
     elseElement.className = 'else-branch';
-    elseElement.innerHTML = `<span class="sutra-keyword">Else</span>`;
-    node.else.forEach(childNode => elseElement.appendChild(this.createNodeElement(childNode, indentLevel + 1)));
+    node.else.forEach(childNode => elseElement.appendChild(this.createNodeElement(childNode, indentLevel + 1, '', 'ELSE')));
     return elseElement;
   }
 

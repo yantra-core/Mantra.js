@@ -681,6 +681,8 @@ pre {
 .condition, .else-branch {
   color: #d3d9df;
   margin-bottom: 5px;
+  margin-top: 10px;
+  padding-bottom: 5px;
   display: block;
   font-size: 18px;
   font-weight: bold;
@@ -785,8 +787,12 @@ textarea {
 /* Style for each input group in the data container */
 .input-group {
   margin-bottom: 15px;
+}
+
+.input-group input {
   margin-left: 20px;
 }
+
 
 /* Style for labels in the data container */
 .input-group label {
@@ -798,7 +804,7 @@ textarea {
 /* Style for inputs in the data container */
 .input-group input, 
 .input-group select {
-  width: 100%;
+  /* width: 100%; */
   padding: 8px;
   margin-bottom: 5px;
   border-radius: 3px;
