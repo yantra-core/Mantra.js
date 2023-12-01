@@ -95,7 +95,6 @@ class SutraGUI {
     let json = this.behavior.serializeToJson({
       includeSutraPath: false
     });
-    console.log('json', json);
     // clear the #sutraTable
     let table = document.getElementById('sutraTable');
     table.innerHTML = '';
@@ -132,11 +131,9 @@ class SutraGUI {
   redrawBehaviorTree() {
     let json = this.behavior.serializeToJson();
     let container = document.getElementById('sutraTable');
-    console.log('again', json)
     //let guiContent = container.querySelector('.gui-content');
     container.innerHTML = '';
     JSON.parse(json).tree.forEach(node => {
-      console.log('nnnn', node)
       container.appendChild(this.createNodeElement(node, 0));
     });
   }

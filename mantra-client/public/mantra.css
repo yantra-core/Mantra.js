@@ -1009,7 +1009,7 @@ textarea {
   max-height: 500px; /* Adjust as needed */
 }
 
-.remove-condition-button {
+.remove-condition-button, .add-condition-below-button {
   right: 25px;
   background-color: #5021FF;
   border: none;
@@ -1025,7 +1025,7 @@ textarea {
   margin-bottom: 10px;
 }
 
-.remove-condition-button:hover {
+.remove-condition-button:hover, .add-condition-below-button:hover {
   background-color: #2160FF;
 }
 

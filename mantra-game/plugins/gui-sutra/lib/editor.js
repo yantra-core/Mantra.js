@@ -16,6 +16,7 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
 
   let saveButton = document.createElement('button');
   saveButton.textContent = 'Save';
+  saveButton.classList.add('save-button');
   saveButton.onclick = () => {
     const updatedFunction = new Function('return ' + textarea.value)();
     this.behavior.updateCondition(conditionalName, updatedFunction); // Assuming such a method exists
@@ -26,6 +27,7 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
 }
 
 editor.showObjectEditor = function showObjectEditor(conditionalName, conditional, operators) {
+  let self = this;
   let guiContent = this.sutraFormView.querySelector('.gui-content');
 
   // Main container for the editor
@@ -46,6 +48,8 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     conditional.gameProperty = '';
   }
 
+  // TODO: if conditional.conditions is an array with length,
+  // then we need to create a form for each condition in the array
   // Create form fields based on the conditional's properties
   for (let key in conditional) {
     if (key === 'op') continue; // Skip 'op' here, it will be handled separately
@@ -101,7 +105,33 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   saveButton.onclick = (event) => {
     event.preventDefault();
     console.log("SAVING CONDITIONAL", conditionalName, form)
-    this.saveConditional(conditionalName, form);
+
+    // get the existing condition
+    let existingCondition = this.behavior.getCondition(conditionalName);
+    // create a new array of conditions
+    let newConditionObj = [];
+    // add the existing condition to the new array
+
+    if (Array.isArray(existingCondition)) {
+      existingCondition.forEach((cond, index) => {
+        newConditionObj.push(cond);
+      });
+    } else {
+      newConditionObj.push(existingCondition);
+    }
+
+    // get the form data
+    const formData = self.serializeFormToJSON(form);
+    console.log('formData', formData);
+    // add a new condition to the new array
+    newConditionObj.push(formData);
+    console.log('updating', conditionalName, newConditionObj)
+    self.behavior.updateCondition(conditionalName, newConditionObj, true);
+
+    // get the update condition to verify it was updated
+    let updatedCondition = this.behavior.getCondition(conditionalName);
+    console.log('updatedCondition', updatedCondition);
+
   };
 }
 
@@ -128,7 +158,6 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
 
   let guiContent = this.sutraFormView.querySelector('.gui-content');
   guiContent.innerHTML = ''; // Clear previous content
-
 
   let nodeInfo = document.createElement('div');
   nodeInfo.className = 'node-info';
@@ -162,7 +191,16 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
       this.createConditionalForm(conditionalName, node);
     });
   } else {
-    this.createConditionalForm(node.if, node);
+    // get condition first
+    let condition = this.behavior.getCondition(node.if);
+    if (Array.isArray(condition.conditions)) {
+      condition.conditions.forEach((condName, index) => {
+        let subCondition = this.behavior.getCondition(condName);
+        this.createConditionalForm(condName, node);
+      });
+    } else {
+      this.createConditionalForm(node.if, node);
+    }
   }
 
   gui.bringToFront(this.sutraFormView);
@@ -191,28 +229,79 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   removeConditionButton.className = 'remove-condition-button';
   removeConditionButton.textContent = 'Remove Entire If Condition';
 
+
   removeConditionButton.onclick = (event) => {
     event.preventDefault();
-
-    // find the node in the tree based on sutraPath
-    // let originalNode = this.behavior.findNode(node.sutraPath);
-    // remove the node from the tree
     this.behavior.removeNode(node.sutraPath);
-
     // close the editor window since we deleted the condition we were editing
     let sutraFormView = document.getElementById('sutraFormView');
     if (sutraFormView) {
       sutraFormView.remove();
     }
-
     //this.behavior.removeCondition(conditionalName);
     this.redrawBehaviorTree();
   };
+
+  // create add condition below button
+  let addConditionBelowButton = document.createElement('button');
+  addConditionBelowButton.type = 'submit';
+  addConditionBelowButton.className = 'add-condition-below-button';
+  addConditionBelowButton.textContent = 'Add Condition Below';
+
+  addConditionBelowButton.onclick = (event) => {
+    event.preventDefault();
+    // create a new conditional name
+    // TODO: this is not working correctly yet
+    // TODO: have a big list of made up names for new behavior tree nodes
+    //let newConditionalName = 'newCondition';
+    // create the new conditional with placeholder values
+    // update the condition immediately with placeholder values
+    // and redraw the behavior tree, let UI take care of everything else
+
+    console.log('about to update condition', conditionalName)
+
+    // get the existing condition
+    let existingCondition = this.behavior.getCondition(conditionalName);
+    // create a new array of conditions
+    let newConditionObj = [];
+    // add the existing condition to the new array
+
+    if (Array.isArray(existingCondition)) {
+      existingCondition.forEach((cond, index) => {
+        newConditionObj.push(cond);
+      });
+    } else {
+      newConditionObj.push(existingCondition);
+    }
+
+    // add a new condition to the new array
+    newConditionObj.push({ op: '==', property: '', value: '' });
+    console.log('updating', conditionalName, newConditionObj)
+    self.behavior.updateCondition(conditionalName, newConditionObj, true);
+
+    // get the update condition to verify it was updated
+    let updatedCondition = this.behavior.getCondition(conditionalName);
+    console.log('updatedCondition', updatedCondition);
+
+    let updatedNode = self.behavior.findNode(node.sutraPath);
+
+    // reload window with updated node
+    self.showConditionalsForm(updatedNode);
+
+    // show serialized behavior tree
+    console.log('serialized behavior tree', self.behavior.serializeToJson());
+    //this.behavior.addCondition(newConditionalName, { op: '==', property: '', value: '' });
+    // let newConditionalName = this.behavior.getUniqueConditionalName();
+    // creates a new empty condition form
+    // self.createConditionalForm(conditionalName, node);
+  };
+
 
   // Append the created elements to the form
   form.appendChild(radioGroupDiv);
   form.appendChild(conditionalInputContainer);
   form.appendChild(removeConditionButton);
+  form.appendChild(addConditionBelowButton);
 
   // Append the form to the DOM or a parent element as required
   // Example: document.body.appendChild(form); or parentElement.appendChild(form);
@@ -253,8 +342,8 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    console.log("SAVING CONDITIONAL", conditionalName, form)
-    self.saveConditional(conditionalName, form);
+    //console.log("SAVING CONDITIONAL", conditionalName, form)
+    //self.saveConditional(conditionalName, form);
   });
 }
 
