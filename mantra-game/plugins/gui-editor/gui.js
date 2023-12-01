@@ -47,7 +47,7 @@ const gui = {
   */
   elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
   window: function (id, title = 'Window', close, pluginInstance = null) {
-
+    let self = this;
     if (typeof close === 'undefined') {
       close = function () {
         console.log("WARNING: No close function provided for window with id: " + id + ", defaulting to remove()");
@@ -86,6 +86,10 @@ const gui = {
       guiHeader.appendChild(gearIcon);
     }
 
+    // Traffic light container
+    let trafficLightContainer = document.createElement('div');
+    trafficLightContainer.className = 'traffic-light-container';
+
     // Add traffic light buttons
     const closeButton = document.createElement('div');
     const minimizeButton = document.createElement('div');
@@ -97,41 +101,24 @@ const gui = {
     minimizeButton.onclick = () => close();
     closeButton.onclick = () => close();
     maximizeButton.onclick = () => {
-      if (container.style.width === '100vw') {
-        container.style.width = '50%';
-        container.style.height = '50%';
-        // set position to center
-
-        if (typeof container.lastTop !== 'undefined') {
-          container.style.top = container.lastTop;
-          container.style.left = container.lastLeft;
-        } else {
-          container.style.top = '20%';
-          container.style.left = '20%';
-        }
-
-      } else {
-
-        // store the exact last position on container itself
-        // use special property
-        container.lastTop = container.style.top;
-        container.lastLeft = container.style.left;
-
-        container.style.width = '100vw';
-        container.style.height = '90%';
-        // set position to top left
-        container.style.top = '50px';
-        container.style.left = '0px';
-      }
+      self.maxWindow(container);
     };
-    guiHeader.appendChild(closeButton);
-    guiHeader.appendChild(minimizeButton);
-    guiHeader.appendChild(maximizeButton);
 
+    trafficLightContainer.appendChild(closeButton);
+    trafficLightContainer.appendChild(minimizeButton);
+    trafficLightContainer.appendChild(maximizeButton);
+
+    guiHeader.appendChild(trafficLightContainer);
 
     // create h3 for title
     const guiHeaderTitle = document.createElement('h3');
     guiHeaderTitle.textContent = title;
+
+    // add "double click" event to h3 to maximize window
+    guiHeaderTitle.ondblclick = () => {
+      self.maxWindow(container);
+    };
+
     guiHeader.appendChild(guiHeaderTitle);
     container.appendChild(guiHeader);
     container.appendChild(content);
@@ -157,6 +144,35 @@ const gui = {
     return container;
   },
 
+  maxWindow(container) {
+    if (container.style.width === '100vw') {
+      container.style.width = '50%';
+      container.style.height = '50%';
+      // set position to center
+
+      if (typeof container.lastTop !== 'undefined') {
+        container.style.top = container.lastTop;
+        container.style.left = container.lastLeft;
+      } else {
+        container.style.top = '20%';
+        container.style.left = '20%';
+      }
+
+    } else {
+
+      // store the exact last position on container itself
+      // use special property
+      container.lastTop = container.style.top;
+      container.lastLeft = container.style.left;
+
+      container.style.width = '100vw';
+      container.style.height = '90%';
+      // set position to top left
+      container.style.top = '50px';
+      container.style.left = '0px';
+    }
+
+  },
   initializeResize(resizeHandle, container) {
     resizeHandle.addEventListener('mousedown', (e) => {
       e.preventDefault();

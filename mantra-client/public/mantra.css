@@ -3,13 +3,13 @@ body {
   padding: 0;
 }
 
-/* ControlsGUI.js Plugin */
-
 #controlsView {
   top: 10%;
   right: 20%;
-  z-index: 1000; /* To ensure it's above other elements */
-  width: 20%; /* Adjust width as needed */
+  z-index: 1000;
+
+  width: 20%;
+
   height: 30%;
   min-width: 260px;
   min-height: 215px;
@@ -21,8 +21,10 @@ body {
 #pluginExplorer {
   top: 10%;
   right: 20%;
-  z-index: 1000; /* To ensure it's above other elements */
-  width: 20%; /* Adjust width as needed */
+  z-index: 1000;
+
+  width: 20%;
+
   height: 30%;
   min-width: 600px;
   min-height: 500px;
@@ -32,31 +34,20 @@ body {
 
 }
 
-/*
-#pluginView {
-  top: 10%;
-  right: 30%;
-  z-index: 1000; 
-  width: 20%; 
-  height: 30%;
-  resize: both;
-  overflow: auto;
-  position: absolute;
-}
-*/
-
-/* Responsive Design Adjustments */
 @media (max-width: 768px) {
   #pluginView {
-    width: 40%; /* Wider on smaller screens */
+    width: 40%;
+
   }
 }
 
 #pluginsContainer {
   top: 5%;
   right: 10px;
-  z-index: 1000; /* To ensure it's above other elements */
-  width: 15vw; /* Adjust width as needed */
+  z-index: 1000;
+
+  width: 15vw;
+
   min-width: 200px;
   max-width: 300px;
   height: 80%;
@@ -75,16 +66,17 @@ body {
   justify-content: space-between;
   transition: box-shadow 0.3s ease-in-out;
   cursor: pointer;
-  flex-basis: calc(100% / 12 - 20px); /* Adjust according to your design preference */
+  flex-basis: calc(100% / 12 - 20px);
 
 }
 
 .pluginCard:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .pluginCard.active {
-  background-color: #e0f7fa; /* Light blue background for active plugins */
+  background-color: #e0f7fa;
+
 }
 
 .pluginName {
@@ -104,20 +96,18 @@ body {
   font-size: 28px;
 }
 
-/* Scrollbar Styles */
 #pluginView::-webkit-scrollbar {
   width: 6px;
 }
 
 #pluginView::-webkit-scrollbar-thumb {
-  background: #888; 
+  background: #888;
   border-radius: 10px;
 }
 
 #pluginView::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #555;
 }
-
 
 .toolbarHeader {
   display: flex;
@@ -130,11 +120,9 @@ body {
 .arrowIndicator {
   display: inline-block;
   margin-left: 5px;
-  user-select: none; /* Prevent text selection */
+  user-select: none;
+
 }
-
-
-/* YantraGUI */
 
 #logContainer {
   width: 60%;
@@ -161,39 +149,37 @@ body {
   box-sizing: border-box;
 }
 
-/* Editor toolbar */
-/* Editor toolbar */
 .editor-toolbar {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: #333; /* Dark background for a slick look */
+  background-color: #333;
   display: flex;
   justify-content: start;
   padding: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* subtle shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .menu {
-  position: relative; /* Set relative positioning for menu items */
+  position: relative;
 }
 
 .menu button {
   margin-right: 10px;
-  background-color: #555; /* Dark button color */
-  color: white; /* Light text color for contrast */
+  background-color: #555;
+  color: white;
   border: none;
   padding: 10px 15px;
-  text-transform: uppercase; /* Makes text uppercase for a more toolbar-like appearance */
+  text-transform: uppercase;
   font-size: 14px;
-  border-radius: 4px; /* Rounded corners */
-  transition: background-color 0.3s; /* Smooth transition for hover effect */
-  cursor: pointer; /* Changes cursor to indicate button */
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  cursor: pointer;
 }
 
 .menu button:hover {
-  background-color: #666; /* Slightly lighter on hover for interactive effect */
-  color: #9a9cff; /* Light blue text on hover */
+  background-color: #666;
+  color: #9a9cff;
 }
 
 .dropdown-content {
@@ -202,10 +188,10 @@ body {
   background-color: #f9f9f9;
   min-width: 300px;
   min-height: 130px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  top: 100%; /* Position dropdown directly below the menu item */
-  left: 0; /* Align dropdown left edge with menu item left edge */
+  top: 100%;
+  left: 0;
 }
 
 .dropdown-content a {
@@ -215,39 +201,49 @@ body {
   display: block;
 }
 
-.dropdown-content a:hover {background-color: #f1f1f1;}
-
-.show {display: block;}
-
-
-/* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  display: flex; /* Use flexbox */
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
 }
 
-/* Modal Content */
+.show {
+  display: block;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  overflow: auto;
+
+  background-color: rgba(0, 0, 0, 0.4);
+
+  justify-content: center;
+
+  align-items: center;
+
+  display: flex;
+
+}
+
 .modal-content {
   background-color: #fefefe;
   padding: 20px;
   border: 1px solid #888;
-  width: 75%; /* 75% of the screen width */
-  max-width: 1000px; /* Maximum width */
-  box-sizing: border-box; /* Include padding and border in the width */
-  display: flex;
-  flex-direction: column; /* Arrange title and columns container vertically */
-}
+  width: 75%;
 
+  max-width: 1000px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+}
 
 pre {
   white-space: pre-wrap;
@@ -257,7 +253,6 @@ pre {
   word-wrap: break-word;
 }
 
-/* Ping Test */
 .ping-results-container {
   margin: 10px;
   padding: 10px;
@@ -273,23 +268,25 @@ pre {
 }
 
 .ping-good {
-  background-color: #d4edda; /* Light green */
+  background-color: #d4edda;
+
 }
 
 .ping-moderate {
-  background-color: #fff3cd; /* Light yellow */
+  background-color: #fff3cd;
+
 }
 
 .ping-poor {
-  background-color: #f8d7da; /* Light red */
+  background-color: #f8d7da;
+
 }
 
 .ping-pending {
-  background-color: #f0f0f0; /* Light grey for pending */
+  background-color: #f0f0f0;
+
 }
 
-
-/* The Close Button */
 .close-button {
   color: #aaa;
   float: right;
@@ -304,7 +301,6 @@ pre {
   cursor: pointer;
 }
 
-/* Ping results container styles */
 .ping-results-container {
   margin-top: 10px;
 }
@@ -325,11 +321,12 @@ pre {
   cursor: nwse-resize;
 }
 
-/* Base styling for the GUI container */
 .gui-container {
   z-index: 1000;
-  background-color: #0a0f1b; /* Dark background */
-  color: #d3d9df; /* Light text */
+  background-color: #0a0f1b;
+
+  color: #d3d9df;
+
   padding-bottom: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -338,7 +335,6 @@ pre {
   position: absolute;
 }
 
-/* Styling for tables within the container */
 .gui-container table {
   border-collapse: collapse;
   width: 100%;
@@ -354,17 +350,18 @@ pre {
   text-align: left;
   color: #ffffff;
   min-width: 60px;
+  vertical-align: top;
 
 }
 
 .gui-container th {
   font-size: 18px;
   background-color: #1c2535;
-  color: #9a9cff; /* purple */
+  color: #9a9cff;
+
   cursor: pointer;
 }
 
-/* Title styling */
 .gui-title {
   font-size: 24px;
   font-weight: bold;
@@ -372,15 +369,14 @@ pre {
   padding: 0px;
 }
 
-
-/* Header titles */
-.gui-header h1, .gui-header h2, .gui-header h3 {
+.gui-header h1,
+.gui-header h2,
+.gui-header h3 {
   padding: 0;
   padding-left: 5px;
   margin: 0;
 }
 
-/* Close button styling */
 .closeButton {
   float: right;
   cursor: pointer;
@@ -390,6 +386,10 @@ pre {
 
 .closeButton:hover {
   color: #d3d9df;
+}
+
+.traffic-light-container {
+  width: 100px;
 }
 
 .traffic-light.close {
@@ -403,7 +403,7 @@ pre {
 .traffic-light.maximize {
   background-color: #00ca56;
 }
-/* Header Styling */
+
 .gui-header {
   background: #f0f0f0;
   color: #000;
@@ -412,15 +412,16 @@ pre {
   top: 0;
   left: 0;
   right: 0;
-  height: 25px; /* Set a fixed height */
-  z-index: 1; /* Ensure it stays on top */
+  height: 25px;
+
+  z-index: 1;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
 }
 
-/* Title styling in the header */
 .gui-header h3 {
   position: relative;
   right: 25px;
@@ -428,12 +429,12 @@ pre {
   flex: 1;
   text-align: center;
   margin: 0;
-  font-size: 24px; /* Adjust font size as needed */
+  font-size: 24px;
+
   padding: 0;
   font-size: 18px;
 }
 
-/* Traffic Light Buttons */
 .traffic-light-container {
   display: flex;
   align-items: center;
@@ -454,15 +455,12 @@ pre {
   left: 0;
   right: 0;
   bottom: 0;
-  overflow-y: auto; /* Enables vertical scrolling */
-  overflow-x: hidden; /* Optional, depending on your content */
-  /* Additional styles as needed */
+  overflow-y: auto;
+
+  overflow-x: hidden;
+
 }
 
-/* we now also have gui-content which is a child of gui-container */
-
-
-/* Styles for the Entity Inspector Window */
 #entityView {
   position: absolute;
   bottom: 10%;
@@ -489,14 +487,13 @@ pre {
   top: 5%;
   left: 20px;
   z-index: 1000;
-  width: 30%; 
+  width: 30%;
   height: 60%;
   resize: both;
   overflow: auto;
   position: absolute;
 }
 
-/* Sutra.css */
 #sutraView {
   top: 10%;
   left: 10%;
@@ -522,7 +519,7 @@ pre {
 }
 
 #editorContainer {
-  background-color: #121a2e; /* Deeper blue for contrast */
+  background-color: #121a2e;
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -533,12 +530,11 @@ pre {
   height: 200px;
   background-color: #1c2535;
   border: none;
-  color: #4caf50; /* Green text for contrast */
+  color: #4caf50;
   padding: 10px;
   border-radius: 5px;
 }
 
-/* Sutra Form Editor Styles */
 #sutraFormView .gui-content {
   padding: 15px;
 }
@@ -550,7 +546,8 @@ pre {
 
 .node-path,
 .node-action {
-  color: #4CAF50; /* Green color for emphasis */
+  color: #4CAF50;
+
   font-weight: bold;
 }
 
@@ -579,7 +576,8 @@ pre {
 }
 
 .save-button {
-  background-color: #2196F3; /* Blue color for the button */
+  background-color: #2196F3;
+
   color: white;
   border: none;
   padding: 10px 20px;
@@ -589,32 +587,23 @@ pre {
 }
 
 .save-button:hover {
-  background-color: #1976D2; /* Darker blue on hover */
+  background-color: #1976D2;
+
 }
-
-/* Add any additional styles as needed */
-
 
 .node-element {
-  /* background-color: #162238; */
-  /* border: 1px solid #2a3348; */
+
   color: #d3d9df;
-  /* padding-left: 10px; */
-  padding-top: 10px;
+
   padding-bottom: 0px;
   margin-bottom: 0px;
-  margin-top: 0px;
+  margin-top: 10px;
   margin-left: 10px;
-  /* margin-right: 20px; */
-  /*
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
-  */
-  cursor: pointer; /* Indicates the element is clickable */
+
+  cursor: pointer;
 
 }
 
-/* Collapsed state: child nodes are hidden */
 .node-element.collapsed .node-element {
   display: none;
 }
@@ -623,8 +612,11 @@ pre {
   display: none;
 }
 
-/* Style to prevent the entire node from collapsing when interacting with inputs or buttons */
-.node-element-form, .action-select-container, .data-container, .input-group, button {
+.node-element-form,
+.action-select-container,
+.data-container,
+.input-group,
+button {
   cursor: default;
 }
 
@@ -632,27 +624,31 @@ pre {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0; /* Add this to span the entire width */
+  right: 0;
+
   background-color: #f0f0f0;
   padding: 10px;
   box-sizing: border-box;
 }
 
 .node-element-form {
-  /* display: none; */
+
   margin: 0px;
   padding: 0px;
 }
 
-.action-select, .param-input, #sutraView select {
+.action-select,
+.param-input,
+#sutraView select {
   background-color: transparent;
-  /* border: 1px solid #2a3348; */
+
   border: 1px solid transparent;
-  
   color: #d3d9df;
   padding: 5px;
   border-radius: 3px;
   box-sizing: border-box;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 #entitiesTable tr {
@@ -667,7 +663,8 @@ pre {
   border-radius: 5px;
 }
 
-.editor-table th, .editor-table td {
+.editor-table th,
+.editor-table td {
   border: 1px solid #2a3348;
   padding: 8px;
   color: #d3d9df;
@@ -678,7 +675,8 @@ pre {
   color: #4caf50;
 }
 
-.condition, .else-branch {
+.condition,
+.else-branch {
   color: #d3d9df;
   margin-bottom: 5px;
   margin-top: 10px;
@@ -688,13 +686,13 @@ pre {
   font-weight: bold;
   padding-left: 5px;
   border-radius: 5px;
-  border: 1px solid #2a3348 !important; /* TODO: remove !important */
+  border: 1px solid #2a3348 !important;
+
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Button styling */
 #sutraView button {
-  position: relative; /* Add this */
+  position: relative;
 
   background-color: #5021FF;
   border: none;
@@ -717,7 +715,6 @@ pre {
   margin: 10px;
 }
 
-/* Additional styles for inputs and labels */
 .param-label {
   display: block;
   margin-bottom: 5px;
@@ -728,6 +725,7 @@ pre {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-100%);
     opacity: 1;
@@ -739,6 +737,7 @@ pre {
     transform: translateX(100%);
     opacity: 1;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -758,11 +757,12 @@ pre {
   overflow: hidden;
 }
 
-/*   // #9a9cff */
 .highlighted-sutra-node {
   border: 1px solid 9a9cff !important;
-  box-shadow: 0 0 15px rgba(154, 156, 255, 0.6); /* Soft blue glow */
-  transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  box-shadow: 0 0 15px rgba(154, 156, 255, 0.6);
+
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+
 }
 
 textarea {
@@ -770,11 +770,10 @@ textarea {
   color: #d3d9df;
 }
 
-/* Style for the data container */
 .data-container {
-  /* background-color: #162238; */
+
   padding-left: 15px;
-  /*padding-right: 15px;*/
+
   padding-top: 15px;
   padding-bottom: 15px;
   margin-bottom: 20px;
@@ -783,8 +782,6 @@ textarea {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-
-/* Style for each input group in the data container */
 .input-group {
   margin-bottom: 15px;
 }
@@ -793,18 +790,15 @@ textarea {
   margin-left: 20px;
 }
 
-
-/* Style for labels in the data container */
 .input-group label {
-  /* color: #d3d9df; */
+
   margin-bottom: 5px;
   display: block;
 }
 
-/* Style for inputs in the data container */
-.input-group input, 
+.input-group input,
 .input-group select {
-  /* width: 100%; */
+
   padding: 8px;
   margin-bottom: 5px;
   border-radius: 3px;
@@ -824,16 +818,14 @@ textarea {
   color: #000000;
 }
 
-/* Hover effect for selects and inputs */
-.input-group input:hover, 
+.input-group input:hover,
 .input-group select:hover {
-  /* background-color: #2a3348; */
+
   border-color: #ffffff;
   box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
 }
 
-/* Focus effect for selects and inputs */
-.input-group input:focus, 
+.input-group input:focus,
 .input-group select:focus {
   outline: none;
   border-color: #9a9cff;
@@ -862,27 +854,30 @@ textarea {
   margin: 5px 0;
 }
 
-/* Adjusting the action select specifically */
 .action-select {
-  margin-bottom: 0; /* Remove additional margin if any */
+  margin-bottom: 0;
+
 }
 
 .action-select-container {
-  /* background-color: #1c2535; */
+
   color: #d3d9df;
   display: block;
   font-size: 18px;
   font-weight: bold;
-  display: flex; /* Establishes a flex container */
-  align-items: center; /* Vertically centers the children */
+  display: flex;
+
+  align-items: center;
+
 }
 
 .action-select-container select {
-  flex-grow: 1; /* Allows the select to grow and fill the space */
+  flex-grow: 1;
+
 }
 
 .sutra-keyword {
-  color: #9a9cff;
+  color: #9a9cff !important;
   font-size: 16px !important;
 }
 
@@ -899,7 +894,8 @@ textarea {
 }
 
 .then-label span {
-  margin-right: 10px; /* Spacing between label and select */
+  margin-right: 10px;
+
 }
 
 .with-label {
@@ -919,16 +915,21 @@ textarea {
 }
 
 .nested-data-container {
-  margin-left: 20px; /* Base indentation */
+  margin-left: 20px;
+
 }
 
-/* Dynamic indentation based on level */
-.nested-level-1 { margin-left: 20px; }
-.nested-level-2 { margin-left: 40px; }
-.nested-level-3 { margin-left: 60px; }
-/* Add more levels as needed */
+.nested-level-1 {
+  margin-left: 20px;
+}
 
+.nested-level-2 {
+  margin-left: 40px;
+}
 
+.nested-level-3 {
+  margin-left: 60px;
+}
 
 .plugin-form-container {
   font-family: Arial, sans-serif;
@@ -970,31 +971,18 @@ textarea {
   background-color: #45a049;
 }
 
-
-/* Reduce the button size and padding */
 .rule-button {
   padding: 4px 8px;
   font-size: 12px;
   margin: 0 4px;
 }
 
-/* Replace text with icons */
 .rule-button-add {
-  /*
-  background-image: url('path-to-add-icon');
-  background-repeat: no-repeat;
-  background-size: contain;
-  text-indent: -9999px;
-  */
 
 }
 
 .rule-button-remove {
-  /*background-image: url('path-to-remove-icon');
-  background-repeat: no-repeat;
-  background-size: contain;
-  text-indent: -9999px; 
-  */
+
   position: absolute !important;
   right: -2px;
   bottom: -3px;
@@ -1004,7 +992,6 @@ textarea {
 
 }
 
-/* For collapsible sections */
 .collapsible-content {
   max-height: 0;
   overflow: hidden;
@@ -1012,10 +999,12 @@ textarea {
 }
 
 .collapsible-content-open {
-  max-height: 500px; /* Adjust as needed */
+  max-height: 500px;
+
 }
 
-.remove-condition-button, .add-condition-below-button {
+.remove-condition-button,
+.add-condition-below-button {
   right: 25px;
   background-color: #5021FF;
   border: none;
@@ -1031,11 +1020,11 @@ textarea {
   margin-bottom: 10px;
 }
 
-.remove-condition-button:hover, .add-condition-below-button:hover {
+.remove-condition-button:hover,
+.add-condition-below-button:hover {
   background-color: #2160FF;
 }
 
-/* Styles for the main editor container */
 .conditional-editor-container {
   background-color: #162238;
   padding: 10px;
@@ -1045,12 +1034,10 @@ textarea {
   margin-bottom: 20px;
 }
 
-/* Styles for each field container */
 .field-container {
   margin-bottom: 15px;
 }
 
-/* Styles for labels in the editor */
 .field-label {
   display: block;
   margin-bottom: 5px;
@@ -1058,9 +1045,8 @@ textarea {
   font-weight: bold;
 }
 
-/* Styles for input fields in the editor */
 .field-input {
-  
+
   background-color: transparent;
   border: 1px solid #d3d9df;
   color: #d3d9df;
@@ -1070,12 +1056,10 @@ textarea {
   width: 100%;
 }
 
-/* Styling for the operator container */
 .operator-container {
   margin-bottom: 15px;
 }
 
-/* Styling for the operator select dropdown */
 .operator-select {
   background-color: transparent;
   border: 1px solid #d3d9df;
@@ -1086,7 +1070,6 @@ textarea {
   width: 100%;
 }
 
-/* Styles for the save button */
 .save-button {
   background-color: #5021FF;
   border: none;
@@ -1105,8 +1088,16 @@ textarea {
   background-color: #2160FF;
 }
 
-/* Styles for the editor title */
 .conditional-editor-container h3 {
   color: #9a9cff;
 }
 
+#colorPicker {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%),
+  linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%),
+  linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);      
+  cursor: crosshair;
+  border: 1px solid #ccc;
+}

@@ -47,7 +47,19 @@ class SutraGUI {
           this.game.systems['entity-input'].disableInputs();
           this.game.systems['keyboard'].unbindAllEvents();
         }
+
+
+        // check to see if this is a class sutra-link, if so open the form editor
+        if (e.target.classList.contains('sutra-link')) {
+          let sutraPath = e.target.getAttribute('data-path');
+          let node = this.behavior.findNode(sutraPath);
+          this.showConditionalsForm(node);
+        }
+
       });
+
+
+
 
     }
 
@@ -269,18 +281,27 @@ class SutraGUI {
   createActionSelect(node) {
     let select = document.createElement('select');
     select.className = 'action-select';
+
     let actions = this.getAvailableActions();
+
+    // Check if node.action is in the list of actions
+    if (node.action && !actions.includes(node.action)) {
+        actions.push(node.action); // Add it to the list if not present
+    }
+
     actions.forEach(action => {
-      let option = document.createElement('option');
-      option.value = action;
-      option.text = action;
-      if (node.action === action) {
-        option.selected = true;
-      }
-      select.appendChild(option);
+        let option = document.createElement('option');
+        option.value = action;
+        option.text = action;
+        if (node.action === action) {
+            option.selected = true;
+        }
+        select.appendChild(option);
     });
+
     return select;
-  }
+}
+
 
   createDataContainer(node, indentLevel) {
     // console.log('creating a data container', node);
@@ -479,7 +500,7 @@ class SutraGUI {
 
   saveConditional(conditionalName, form) {
     let json = this.serializeFormToJSON(form);
-    console.log('jsonjsonjson', conditionalName, json)
+    console.log('SutraGui.saveConditional() called', conditionalName, json)
     this.behavior.updateCondition(conditionalName, json); // Update Sutra instance
     this.redrawBehaviorTree(); // Redraw the tree to reflect changes
   }
@@ -573,5 +594,7 @@ class SutraGUI {
     this.sutraView.remove();
   }
 }
+
+
 
 export default SutraGUI;

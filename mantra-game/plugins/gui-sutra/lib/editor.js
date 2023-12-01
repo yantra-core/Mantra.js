@@ -29,7 +29,6 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
 editor.showObjectEditor = function showObjectEditor(conditionalName, conditional, operators) {
   let self = this;
   let guiContent = this.sutraFormView.querySelector('.gui-content');
-
   // Main container for the editor
   let editorContainer = document.createElement('div');
   editorContainer.className = 'conditional-editor-container';
@@ -39,27 +38,111 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   form.className = 'conditional-form';
   editorContainer.appendChild(form);
 
+  // Descriptive text
+  let description = document.createElement('p');
+  description.innerHTML = `<span class="sutra-keyword">property</span> refers to current context values <br/><span class="sutra-keyword">gamePropertyPath</span>  refers to global 'game.data'`;
+  form.appendChild(description);
+
+  // if global 
+  //  such as gameState.ents[entity.type] or ents.BLOCK.length in game.data.
+
+  // Radio buttons for property type selection
+  let propertyRadio = createRadio('propertyType', 'property', 'Local Property');
+  let gamePropertyRadio = createRadio('propertyType', 'gamePropertyPath', 'Global Game Property');
+  form.appendChild(propertyRadio.container);
+  form.appendChild(gamePropertyRadio.container);
+
+  // Event listener to toggle input fields
+  propertyRadio.input.addEventListener('change', toggleFields);
+  gamePropertyRadio.input.addEventListener('change', toggleFields);
+
+  // Function to create radio buttons
+  function createRadio(name, value, label) {
+    let container = document.createElement('div');
+
+    let input = document.createElement('input');
+    input.type = 'radio';
+    input.name = name;
+    input.value = value;
+    input.id = value;
+
+    let labelElement = document.createElement('label');
+    labelElement.textContent = label;
+    labelElement.setAttribute('for', value);
+
+    container.appendChild(input);
+    container.appendChild(labelElement);
+
+    return { container, input };
+  }
+
+  // Function to toggle visibility of input fields
+  function toggleFields() {
+    // set all field values to empty string
+    /*
+    let fields = form.querySelectorAll('.field-input');
+    fields.forEach(field => {
+      field.value = '';
+    });
+    */
+
+    propertyFieldContainer.style.display = propertyRadio.input.checked ? 'block' : 'none';
+    gamePropertyFieldContainer.style.display = gamePropertyRadio.input.checked ? 'block' : 'none';
+  }
+
+  // Create form fields
+  let propertyFieldContainer = createField('property', conditional.property || '');
+  let gamePropertyFieldContainer = createField('gamePropertyPath', conditional.gamePropertyPath || '');
+
+  form.appendChild(propertyFieldContainer);
+  form.appendChild(gamePropertyFieldContainer);
+  
+  // Function to create input fields
+  function createField(name, value) {
+    let fieldContainer = document.createElement('div');
+    fieldContainer.className = 'field-container';
+
+    let label = document.createElement('label');
+    label.textContent = name;
+    label.className = 'field-label';
+    label.classList.add('sutra-keyword');
+    fieldContainer.appendChild(label);
+
+    let input = document.createElement('input');
+    input.type = 'text';
+    input.name = name;
+    input.value = value;
+    input.className = 'field-input';
+    fieldContainer.appendChild(input);
+
+    return fieldContainer;
+  }
+
+  /*
   // We need to always show "property" and "gameProperty", even if they are empty
-  // create default empty values if they don't exist
   if (typeof conditional.property === 'undefined') {
     conditional.property = '';
   }
   if (typeof conditional.gameProperty === 'undefined') {
-    conditional.gameProperty = '';
+    conditional.gamePropertyPath = '';
   }
-
-  // TODO: if conditional.conditions is an array with length,
-  // then we need to create a form for each condition in the array
+  */
+  
   // Create form fields based on the conditional's properties
   for (let key in conditional) {
     if (key === 'op') continue; // Skip 'op' here, it will be handled separately
+
+    if (key === 'property' || key === 'gamePropertyPath') {
+      continue; // Skip these, they were handled above
+      //label.classList.add('sutra-keyword');
+    }
 
     let fieldContainer = document.createElement('div');
     fieldContainer.className = 'field-container';
     form.appendChild(fieldContainer);
 
     let label = document.createElement('label');
-    label.textContent = key + ':';
+    label.textContent = key;
     label.className = 'field-label';
     fieldContainer.appendChild(label);
 
@@ -70,14 +153,14 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     input.className = 'field-input';
     fieldContainer.appendChild(input);
   }
-
-  // Container for operator selection
+  
   let opContainer = document.createElement('div');
   opContainer.className = 'operator-container';
   form.appendChild(opContainer);
 
   let opLabel = document.createElement('label');
-  opLabel.textContent = 'Operator:';
+  opLabel.textContent = 'OP';
+  opLabel.classList.add('sutra-keyword');
   opContainer.appendChild(opLabel);
 
   let select = document.createElement('select');
@@ -95,7 +178,6 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     }
   });
 
-  // Save button
   let saveButton = document.createElement('button');
   saveButton.type = 'submit';
   saveButton.textContent = 'Save';
@@ -104,14 +186,16 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 
   saveButton.onclick = (event) => {
     event.preventDefault();
-    console.log("SAVING CONDITIONAL", conditionalName, form)
 
+    // check to see which radio button is checked
+    let propertyType = form.querySelector('input[name="propertyType"]:checked').value;
+
+    
     // get the existing condition
     let existingCondition = this.behavior.getCondition(conditionalName);
     // create a new array of conditions
     let newConditionObj = [];
     // add the existing condition to the new array
-
     if (Array.isArray(existingCondition)) {
       existingCondition.forEach((cond, index) => {
         newConditionObj.push(cond);
@@ -122,19 +206,32 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 
     // get the form data
     const formData = self.serializeFormToJSON(form);
-    console.log('formData', formData);
+
+    if (propertyType === 'property') {
+      // removes the gamePropertyPath property
+      delete formData.gamePropertyPath;
+    }
+    if (propertyType === 'gamePropertyPath') {
+      // removes the property property
+      delete formData.property;
+    }
+
     // add a new condition to the new array
     newConditionObj.push(formData);
     console.log('updating', conditionalName, newConditionObj)
     self.behavior.updateCondition(conditionalName, newConditionObj, true);
-
     // get the update condition to verify it was updated
     let updatedCondition = this.behavior.getCondition(conditionalName);
     console.log('updatedCondition', updatedCondition);
-
   };
-}
-
+  // Initially set field visibility
+  if (conditional.property !== undefined) {
+    propertyRadio.input.checked = true;
+  } else if (conditional.gamePropertyPath !== undefined) {
+    gamePropertyRadio.input.checked = true;
+  }
+  toggleFields(); // Call this to set initial field visibility
+};
 editor.showConditionalsForm = function showConditionalsForm(node) {
   // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {
@@ -148,13 +245,15 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
 
   let sutraFormView = document.getElementById('sutraFormView');
   if (!sutraFormView) {
-    this.sutraFormView = gui.window('sutraFormView', 'Sutra Form Editor', function () {
+    this.sutraFormView = gui.window('sutraFormView', 'Sutra Condition Editor', function () {
       let sutraFormView = document.getElementById('sutraFormView');
       if (sutraFormView) {
         sutraFormView.remove();
       }
     });
   }
+  // not working?
+  gui.bringToFront(this.sutraFormView);
 
   let guiContent = this.sutraFormView.querySelector('.gui-content');
   guiContent.innerHTML = ''; // Clear previous content
@@ -162,23 +261,47 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   let nodeInfo = document.createElement('div');
   nodeInfo.className = 'node-info';
 
+  let ifLink = '';
+
+  if (Array.isArray(node.if)) {
+    node.if.forEach((conditionalName, index) => {
+      // let conditional = this.behavior.getCondition(conditionalName);
+      if (index > 0) {
+        ifLink += ` <strong class="sutra-keyword">AND</strong> <span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
+      } else {
+        ifLink += `<span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
+      }
+    });
+  }
+  else {
+    ifLink = node.if;
+  }
+
   let humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
 
+  humanPath = humanPath.replace('and', '<strong class="sutra-keyword">AND</strong>');
   // Create and append the 'Path' element
   let pathElement = document.createElement('div');
-  pathElement.innerHTML = `<strong class="sutra-keyword">Path:</strong> ${humanPath}`;
+  pathElement.innerHTML = `<strong class="sutra-keyword">ROOT</strong> ${humanPath}`;
   nodeInfo.appendChild(pathElement);
 
   // Create and append the 'If' element
   let ifElement = document.createElement('div');
-  ifElement.innerHTML = `<strong class="sutra-keyword">If:</strong> ${node.if}`;
+  ifElement.innerHTML = `<strong class="sutra-keyword">IF</strong> ${ifLink}`;
   nodeInfo.appendChild(ifElement);
 
   if (typeof node.then[0].action !== 'undefined') {
     // Create and append the 'Then' element
     let thenElement = document.createElement('div');
-    thenElement.innerHTML = `<strong class="sutra-keyword">Then:</strong> ${node.then[0].action}`;
+    thenElement.innerHTML = `<strong class="sutra-keyword">THEN</strong> ${node.then[0].action}`;
     nodeInfo.appendChild(thenElement);
+  }
+
+  if (typeof node.then[0].data !== 'undefined') {
+    // add "WITH" header span
+    let withElement = document.createElement('div');
+    withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
+    nodeInfo.appendChild(withElement);
   }
 
   // Append the entire node info to the GUI content
@@ -212,7 +335,6 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   // Create the form element
   let form = document.createElement('form');
   form.className = 'sutra-form';
-
   // Create the radio group div
   let radioGroupDiv = document.createElement('div');
   radioGroupDiv.className = 'radio-group';
@@ -228,7 +350,6 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   removeConditionButton.type = 'submit';
   removeConditionButton.className = 'remove-condition-button';
   removeConditionButton.textContent = 'Remove Entire If Condition';
-
 
   removeConditionButton.onclick = (event) => {
     event.preventDefault();
