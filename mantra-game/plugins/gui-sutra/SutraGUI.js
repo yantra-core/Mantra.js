@@ -61,7 +61,7 @@ class SutraGUI {
       document.querySelectorAll(`[data-path='${sutraPath}']`).forEach(node => {
         node.classList.add('highlighted-sutra-node');
         // remove collapsed class
-        node.classList.remove('collapsed');
+        //node.classList.remove('collapsed');
       });
       // Highlight the current element
       let parts = sutraPath.split('.');
@@ -69,7 +69,7 @@ class SutraGUI {
         let path = parts.slice(0, i + 1).join('.');
         document.querySelectorAll(`[data-path='${path}']`).forEach(node => {
           node.classList.add('highlighted-sutra-node');
-          node.classList.remove('collapsed');
+          //node.classList.remove('collapsed');
         });
       });
     });

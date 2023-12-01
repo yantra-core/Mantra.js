@@ -1008,3 +1008,99 @@ textarea {
 .collapsible-content-open {
   max-height: 500px; /* Adjust as needed */
 }
+
+.remove-condition-button {
+  right: 25px;
+  background-color: #5021FF;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+}
+
+.remove-condition-button:hover {
+  background-color: #2160FF;
+}
+
+/* Styles for the main editor container */
+.conditional-editor-container {
+  background-color: #162238;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  color: #d3d9df;
+  margin-bottom: 20px;
+}
+
+/* Styles for each field container */
+.field-container {
+  margin-bottom: 15px;
+}
+
+/* Styles for labels in the editor */
+.field-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #d3d9df;
+  font-weight: bold;
+}
+
+/* Styles for input fields in the editor */
+.field-input {
+  
+  background-color: transparent;
+  border: 1px solid #d3d9df;
+  color: #d3d9df;
+  padding: 5px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Styling for the operator container */
+.operator-container {
+  margin-bottom: 15px;
+}
+
+/* Styling for the operator select dropdown */
+.operator-select {
+  background-color: transparent;
+  border: 1px solid #d3d9df;
+  color: #d3d9df;
+  padding: 5px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Styles for the save button */
+.save-button {
+  background-color: #5021FF;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 5px 10px;
+}
+
+.save-button:hover {
+  background-color: #2160FF;
+}
+
+/* Styles for the editor title */
+.conditional-editor-container h3 {
+  color: #9a9cff;
+}
+

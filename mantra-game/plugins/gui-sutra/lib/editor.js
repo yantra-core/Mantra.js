@@ -26,53 +26,61 @@ editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditi
 }
 
 editor.showObjectEditor = function showObjectEditor(conditionalName, conditional, operators) {
-
-
   let guiContent = this.sutraFormView.querySelector('.gui-content');
-  // console.log('showObjectEditor', conditionalName, conditional, operators)
-  // let editorContainer = document.getElementById('editorContainer'); // Editor container
-  // editorContainer.innerHTML = ''; // Clear previous content
 
-  let title = document.createElement('h3');
-  title.textContent = `Edit Object: ${conditionalName}`;
-  guiContent.appendChild(title);
+  // Main container for the editor
+  let editorContainer = document.createElement('div');
+  editorContainer.className = 'conditional-editor-container';
+  guiContent.appendChild(editorContainer);
 
   let form = document.createElement('form');
-  form.className = 'conditional-form'; // Add class for styling
-  guiContent.appendChild(form);
+  form.className = 'conditional-form';
+  editorContainer.appendChild(form);
 
-  let table = document.createElement('table');
-  table.className = 'editor-table'; // Add class for styling
-  form.appendChild(table);
+  // We need to always show "property" and "gameProperty", even if they are empty
+  // create default empty values if they don't exist
+  if (typeof conditional.property === 'undefined') {
+    conditional.property = '';
+  }
+  if (typeof conditional.gameProperty === 'undefined') {
+    conditional.gameProperty = '';
+  }
 
   // Create form fields based on the conditional's properties
   for (let key in conditional) {
     if (key === 'op') continue; // Skip 'op' here, it will be handled separately
 
-    let row = table.insertRow();
-    let labelCell = row.insertCell();
-    let inputCell = row.insertCell();
+    let fieldContainer = document.createElement('div');
+    fieldContainer.className = 'field-container';
+    form.appendChild(fieldContainer);
 
     let label = document.createElement('label');
-    label.textContent = key;
-    labelCell.appendChild(label);
+    label.textContent = key + ':';
+    label.className = 'field-label';
+    fieldContainer.appendChild(label);
 
     let input = document.createElement('input');
     input.type = 'text';
     input.name = key;
     input.value = conditional[key];
-    inputCell.appendChild(input);
+    input.className = 'field-input';
+    fieldContainer.appendChild(input);
   }
 
-  // Row for operators
-  let opRow = table.insertRow();
-  let opLabelCell = opRow.insertCell();
-  let opSelectCell = opRow.insertCell();
+  // Container for operator selection
+  let opContainer = document.createElement('div');
+  opContainer.className = 'operator-container';
+  form.appendChild(opContainer);
 
-  opLabelCell.appendChild(document.createTextNode('Operator'));
+  let opLabel = document.createElement('label');
+  opLabel.textContent = 'Operator:';
+  opContainer.appendChild(opLabel);
 
   let select = document.createElement('select');
   select.name = 'op';
+  select.className = 'operator-select';
+  opContainer.appendChild(select);
+
   operators.forEach(operator => {
     let option = document.createElement('option');
     option.value = operator;
@@ -82,22 +90,19 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
       option.selected = true;
     }
   });
-  opSelectCell.appendChild(select);
 
-  // save button
-  let buttonRow = table.insertRow();
-  let buttonCell = buttonRow.insertCell();
-  buttonCell.colSpan = 2; // Span across both columns
-
+  // Save button
   let saveButton = document.createElement('button');
   saveButton.type = 'submit';
   saveButton.textContent = 'Save';
+  saveButton.className = 'save-button';
+  form.appendChild(saveButton);
+
   saveButton.onclick = (event) => {
-    event.preventDefault(); // Prevent form from submitting in the traditional way
+    event.preventDefault();
     console.log("SAVING CONDITIONAL", conditionalName, form)
     this.saveConditional(conditionalName, form);
   };
-  buttonCell.appendChild(saveButton);
 }
 
 editor.showConditionalsForm = function showConditionalsForm(node) {
@@ -166,16 +171,51 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
 editor.createConditionalForm = function createConditionalForm(conditionalName, node) {
   console.log('creating conditional form', conditionalName, node)
   let self = this;
+  // Create the form element
   let form = document.createElement('form');
   form.className = 'sutra-form';
-  form.innerHTML = `
-    <div class="radio-group">
-      <!-- Radio buttons here -->
-    </div>
-    <div id="conditionalInputContainer-${conditionalName}" class="input-container"></div>
-    <button type="submit" class="save-button">Save Conditional</button>
-    <button type="submit" class="remove-button">Remove Conditional</button>
-  `;
+
+  // Create the radio group div
+  let radioGroupDiv = document.createElement('div');
+  radioGroupDiv.className = 'radio-group';
+  // Add radio buttons to radioGroupDiv as needed
+
+  // Create the conditional input container div
+  let conditionalInputContainer = document.createElement('div');
+  conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
+  conditionalInputContainer.className = 'input-container';
+
+  // Create the remove condition button
+  let removeConditionButton = document.createElement('button');
+  removeConditionButton.type = 'submit';
+  removeConditionButton.className = 'remove-condition-button';
+  removeConditionButton.textContent = 'Remove Entire If Condition';
+
+  removeConditionButton.onclick = (event) => {
+    event.preventDefault();
+
+    // find the node in the tree based on sutraPath
+    // let originalNode = this.behavior.findNode(node.sutraPath);
+    // remove the node from the tree
+    this.behavior.removeNode(node.sutraPath);
+
+    // close the editor window since we deleted the condition we were editing
+    let sutraFormView = document.getElementById('sutraFormView');
+    if (sutraFormView) {
+      sutraFormView.remove();
+    }
+
+    //this.behavior.removeCondition(conditionalName);
+    this.redrawBehaviorTree();
+  };
+
+  // Append the created elements to the form
+  form.appendChild(radioGroupDiv);
+  form.appendChild(conditionalInputContainer);
+  form.appendChild(removeConditionButton);
+
+  // Append the form to the DOM or a parent element as required
+  // Example: document.body.appendChild(form); or parentElement.appendChild(form);
 
   let conditional = this.behavior.getCondition(conditionalName);
   console.log('conditional', conditional);
