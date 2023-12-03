@@ -17,6 +17,7 @@ import MatterPhysics from './plugins/physics-matter/MatterPhysics.js';
 import PhysXPhysics from './plugins/physics-physx/PhysXPhysics.js';
 
 // Data
+import SnapshotManager from './plugins/snapshot-manager/SnapShotManager.js';
 import Schema from './plugins/schema/Schema.js';
 
 // Graphics
@@ -106,6 +107,7 @@ const plugins = {
   PhysXPhysics,
   PingTime,
   Schema,
+  SnapshotManager,
   SnapshotSize,
   CurrentFPS,
   Mouse: Mouse,
