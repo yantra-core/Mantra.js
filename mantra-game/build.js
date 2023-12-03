@@ -27,6 +27,7 @@ const plugins = [
   './plugins/gui-entities/EntitiesGUI.js',
   './plugins/ping-time/PingTime.js',
   './plugins/gui-plugin-explorer/PluginExplorer.js',
+  './plugins/snapshot-manager/SnapshotManager.js',
   './plugins/gui-plugins/PluginsGUI.js',
   './plugins/gui-yantra/YantraGUI.js',
   './plugins/gui-sutra/SutraGUI.js',

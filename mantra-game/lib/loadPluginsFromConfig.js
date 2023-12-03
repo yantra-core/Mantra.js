@@ -14,10 +14,6 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
     this.use('PhysXPhysics');
   }
 
-  if (collisions) {
-    this.use('Collisions');
-  }
-
   this.use('EntityInput');
   this.use('EntityMovement');
   this.use('SnapshotManager');
@@ -33,7 +29,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       deltaCompression: gameConfig.deltaCompression,
       msgpack: gameConfig.msgpack
     };
-    this.use('Client', clientConfig);
+    // this.use('Client', clientConfig);
 
     if (keyboard) {
       //      this.use(new plugins.Keyboard(keyboard));

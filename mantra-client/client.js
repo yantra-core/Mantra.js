@@ -31,9 +31,9 @@ import config from './config/config.js';
 // Game and Clients
 //
 //import { Game } from '../mantra-game/Game.js';
-import { Game, plugins } from '../mantra-game';
+import { Game } from '../mantra-game';
+import plugins from '../mantra-game/plugins.js';
 // import Pong from '../mantra-worlds/Pong/Pong.js';
-
 
 let game = new Game({
   isClient: true,
@@ -55,10 +55,20 @@ window.game = game;
 // Use Plugins to add systems to the game
 //
 game
-  .use(new plugins.Bullet())
   .use(new plugins.Block())
 
+
+// Plugins can also be loaded async by string name
+//game.use('Bullet');
+game.use(new plugins.Bullet())
+
+game.use(new plugins.ChronoControl())
+
 game.use(new plugins.Schema());
+
+game.use(new plugins.Timers());
+
+// game.use(new plugins.LoadingScreen());
 
 // TODO: default load plugins
 game.use(new plugins.Health())
@@ -74,17 +84,28 @@ if (game.isOnline) {
   game.use(new plugins.PingTime());
   game.use(new plugins.SnapshotSize());
 }
+
+game.use(new plugins.Client());
+
+game.use(new plugins.Behaviors());
+
 // Always show FPS
 game.use(new plugins.CurrentFPS());
-game.use(new plugins.Editor({
+game.use('Editor', {
   sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js'
-}));
+});
 
 
 import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
 
-game.use(new plugins.XState({ world: BossFight() }));
+// game.use(new plugins.XState({ world: BossFight() }));
+game.use(new plugins.SutraGUI({ }));
+
+// game.use(new plugins.PluginExplorer({ }));
+
+// game.systems['gui-plugin-explorer'].drawPluginForm(game.systems.block, plugins.Block)
+
 // game.use(new Pong());
 
 
@@ -136,8 +157,9 @@ if (mode === 'online') {
   // Single Player Offline Mode
   game.start(function () {
 
-    game.use(new plugins.StarField())
+    game.use('StarField');
 
+    /*
     game.createEntity({
       type: 'BLOCK',
       width: 500,
@@ -147,6 +169,38 @@ if (mode === 'online') {
         x: 0,
         y: -1000
       },
+    });
+    */
+
+    game.createEntity({
+      type: 'BOSS',
+      health: 500,
+      width: 230,
+      height: 320,
+      depth: 200,
+      position: {
+        x: 0,
+        y: -400
+      },
+    });
+
+    let ent = game.createEntity({
+      type: 'SPAWNER',
+      health: 100,
+      width: 200,
+      height: 200,
+      depth: 200,
+      color: 0xff0000,
+      position: {
+        x: -800,
+        y: -800
+      }
+    });
+
+    ent.timers.setTimer('test-timer', 1, true);
+
+    game.on('timers::done', (entityId, timerId) => {
+      // console.log('timer done', entityId, timerId);
     });
 
     /*
@@ -167,7 +221,7 @@ if (mode === 'online') {
 
 }
 
-game.use(new plugins.Collision());
+// game.use(new plugins.Collision());
 
 //game.stop(); // stops local client
 

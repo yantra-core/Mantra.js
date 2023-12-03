@@ -1,5 +1,5 @@
-import plugins from "../../plugins.js";
-
+// TODO: add starfields for other graphics engines
+import BabylonStarField from "./BabylonStarField.js";
 class StarField {
 
   static id = 'starfield';
@@ -24,7 +24,7 @@ class StarField {
       // Since the graphics are ready, we can initialize this plugin immediately
       game.graphics.forEach(function(graphicInterface){
         if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
-          game.use(new plugins.BabylonStarField());
+          game.use(new BabylonStarField());
         }
       })
     } else {
@@ -32,7 +32,7 @@ class StarField {
       // once the graphics reports read, the array of pendingLoad plugins will be initialized
       game.graphics.forEach(function(graphicInterface){
         if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
-          graphicInterface.pendingLoad.push(new plugins.BabylonStarField());
+          graphicInterface.pendingLoad.push(new BabylonStarField());
         }
       })
     }

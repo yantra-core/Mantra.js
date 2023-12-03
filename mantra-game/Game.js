@@ -212,6 +212,10 @@ class Game {
     this.onlineGameLoop = onlineGameLoop.bind(this);
     this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
 
+    // keeps track of game.use('PluginStringName') async loading
+    // game.start() will wait for all plugins to be loaded before starting
+    // this means any plugins which are game.use('PluginStringName') will "block" the game from starting
+    this.loadingPluginsCount = 0;
     // this.plugins represents the initial plugins the Game wil have access to
     // subsequent plugins will be loaded dynamically with game.use()
     this.plugins = plugins;
@@ -271,7 +275,7 @@ class Game {
     // Wait for all systems to be ready before starting the game loop
     // TODO: replace this with general 'ready' event
     console.log('waiting for graphics to be ready', game.graphicsReady, game.graphicsReady.length, game.graphics.length, )
-    if (!game.physicsReady || game.graphicsReady.length === 0 || (game.graphics.length > 0 && (game.graphics.length !== game.graphicsReady.length))) {
+    if (game.loadingPluginsCount > 0 || !game.physicsReady || game.graphicsReady.length === 0 || (game.graphics.length > 0 && (game.graphics.length !== game.graphicsReady.length))) {
       setTimeout(function(){
         game.start(cb);
       }, 4);
@@ -328,6 +332,7 @@ class Game {
 
       // Mark the plugin as loading
       this._plugins[pluginId] = { status: 'loading' };
+      this.loadingPluginsCount++;
       this.emit('plugin::loading', pluginId);
 
       // Dynamically load the plugin script
@@ -336,13 +341,15 @@ class Game {
         // The script is expected to call `game.use(pluginInstance)` after loading
         console.log(`Plugin ${pluginId} loaded.`, game.plugins, game._plugins);
         if (typeof PLUGINS === 'object') {
+          //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
           let pluginInstance = new PLUGINS[pluginId].default(options);
           game.use(pluginInstance);
-          console.log('eeeee', 'plugin::ready::' + pluginInstance.id)
-          game.emit('plugin::ready::' + pluginId, pluginInstance)
+          game.emit('plugin::ready::' + pluginId, pluginInstance);
+          game.loadingPluginsCount--;
         } else {
-          // handle server-side case of string usage
-          // TODO
+          // decrement loadingPluginsCount even if it fails
+          // this means applications will attempt to load even if plugins fail
+          game.loadingPluginsCount--;
         }
       }).catch(function (err) {
         console.error(`Error loading plugin ${pluginId}:`, err);
