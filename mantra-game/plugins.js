@@ -17,7 +17,7 @@ import MatterPhysics from './plugins/physics-matter/MatterPhysics.js';
 import PhysXPhysics from './plugins/physics-physx/PhysXPhysics.js';
 
 // Data
-import SnapshotManager from './plugins/snapshot-manager/SnapShotManager.js';
+import SnapshotManager from './plugins/snapshot-manager/SnapshotManager.js';
 import Schema from './plugins/schema/Schema.js';
 
 // Graphics

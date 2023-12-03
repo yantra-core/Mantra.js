@@ -18,7 +18,7 @@ let localPlayerStateCache = {};
 
 const deltaCompression = {}; // deltaCompression module scope
 
-// this config could be part of instance scope in SnapShotManager
+// this config could be part of instance scope in SnapshotManager
 let config = deltaCompression.config = {
   // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
   //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline

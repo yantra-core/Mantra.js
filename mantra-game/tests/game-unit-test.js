@@ -4,8 +4,8 @@ import Schema from '../plugins/schema/Schema.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
-import SnapshotManager from '../plugins/snapshot-manager/SnapShotManager.js';
-import hasStateChanged from '../plugins/snapshot-manager/SnapShotManager/hasStateChanged.js';
+import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
+import hasStateChanged from '../plugins/snapshot-manager/SnapshotManager/hasStateChanged.js';
 
 const game = new Game({
   loadDefaultPlugins: false,

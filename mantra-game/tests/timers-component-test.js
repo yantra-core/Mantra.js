@@ -4,7 +4,7 @@ import Schema from '../plugins/schema/Schema.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
-import hasStateChanged from '../plugins/snapshot-manager/SnapShotManager/hasStateChanged.js';
+import hasStateChanged from '../plugins/snapshot-manager/SnapshotManager/hasStateChanged.js';
 
 import TimersComponent from '../Component/TimersComponent.js';
 

@@ -9,7 +9,7 @@ import SystemsManager from './System/SystemsManager.js';
 // import plugins from './plugins.js';
 
 // Snapshots
-// import SnapshotManager from './plugins/snapshot-manager/SnapShotManager/SnapshotManager.js';
+// import SnapshotManager from './plugins/snapshot-manager/SnapshotManager/SnapshotManager.js';
 
 // Game instances are event emitters
 import eventEmitter from './lib/eventEmitter.js';

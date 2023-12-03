@@ -2,7 +2,7 @@ import tap from 'tape';
 import { Game } from '../Game.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import Entity from '../plugins/entity/Entity.js';
-import SnapshotManager from '../plugins/snapshot-manager/SnapShotManager.js';
+import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
 
 const game = new Game({
   loadDefaultPlugins: false

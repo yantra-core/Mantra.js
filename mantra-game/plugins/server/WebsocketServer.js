@@ -5,8 +5,8 @@ import http from 'http';
 import { nanoid } from 'nanoid';
 import { encode } from "@msgpack/msgpack";
 
-import deltaCompression from '@yantra-core/snapshots/SnapShotManager/deltaCompression.js';
-import deltaEncoding from '@yantra-core/snapshots/SnapShotManager/deltaEncoding.js';
+import deltaCompression from '@yantra-core/snapshots/SnapshotManager/deltaCompression.js';
+import deltaEncoding from '@yantra-core/snapshots/SnapshotManager/deltaEncoding.js';
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;

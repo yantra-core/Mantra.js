@@ -1,5 +1,5 @@
 import tap from 'tape'
-import deltaCompression from '../plugins/snapshot-manager/SnapShotManager/deltaCompression.js'
+import deltaCompression from '../plugins/snapshot-manager/SnapshotManager/deltaCompression.js'
 
 // TODO: add test suite for float2Int.js and integration test for deltaCompression
 deltaCompression.config.float2Int = true;

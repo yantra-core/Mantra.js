@@ -20,7 +20,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
   this.use('EntityInput');
   this.use('EntityMovement');
-  this.use('SnapShotManager');
+  this.use('SnapshotManager');
 
   if (lifetime) {
     this.use('Lifetime');

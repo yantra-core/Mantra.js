@@ -1,6 +1,6 @@
 import tap from 'tape';
-import deltaEncoding from '../plugins/snapshot-manager/SnapShotManager/deltaEncoding.js';
-import hasStateChanged from '../plugins/snapshot-manager/SnapShotManager/hasStateChanged.js';
+import deltaEncoding from '../plugins/snapshot-manager/SnapshotManager/deltaEncoding.js';
+import hasStateChanged from '../plugins/snapshot-manager/SnapshotManager/hasStateChanged.js';
 
 // Mocking a snapshot of game state
 const mockSnapshot = (id, type, owner, position = { x: 0, y: 0 }) => ({
