@@ -1,9 +1,6 @@
 // XState.js - Marak Squires 2023
 import { createMachine, interpret } from 'xstate';
 
-
-
-
 class XState {
   static id = 'xstate';
   static removable = false;

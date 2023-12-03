@@ -25,11 +25,8 @@ class PhaserGraphics extends GraphicsInterface {
   init(game) {
     // console.log('PhaserGraphics.init()');
 
-    // register renderer with graphics pipeline
-    game.graphics.push(this);
     this.game = game;
 
-    this.game.systemsManager.addSystem('graphics-phaser', this);
 
     // check to see if Phaser scope is available, if not assume we need to inject it sequentially
     if (typeof Phaser === 'undefined') {
@@ -96,7 +93,16 @@ class PhaserGraphics extends GraphicsInterface {
       let camera = scene.cameras.main;
 
       self.scenesReady = true;
+
+      // register renderer with graphics pipeline
+      game.graphics.push(this);
+
+      // possible duplicate api, ready per pipeline not needed,
+      // as we have async loading of plugins now, review this line and remove
       game.graphicsReady.push(self.name);
+
+      // wait until scene is loaded before letting systems know phaser graphics are ready
+      this.game.systemsManager.addSystem('graphics-phaser', this);
 
       // camera.rotation = -Math.PI / 2;
       /*
@@ -132,6 +138,7 @@ class PhaserGraphics extends GraphicsInterface {
     });
 
     loadMainScene();
+
 
   }
 
@@ -187,7 +194,6 @@ class PhaserGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
-
     // switch case based on entityData.type
     let graphic;
     switch (entityData.type) {

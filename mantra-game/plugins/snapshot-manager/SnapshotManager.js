@@ -1,12 +1,20 @@
-import getPlayerSnapshot from './getPlayerSnapshot.js';
+import getPlayerSnapshot from './SnapShotManager/getPlayerSnapshot.js';
 
 class SnapshotManager {
-  constructor(game) {
-    game.lastProcessedInput = {};
-    this.game = game;
+  static id = 'snapshot-manager';
+  constructor() {
     this.snapshotCount = 0;
     this.snapshotBuffer = [];
-    
+    this.id = SnapshotManager.id;
+
+
+  }
+
+  init(game) {
+    game.lastProcessedInput = {};
+    this.game = game;
+    // hoist snapshotManager to game instance
+    this.game.snapshotManager = this;
     // Bind some methods to parent Game scope for convenience
     // The most useful and common System methods are expected to be bound to Game
     // This allows developers to customcraft a clean Game API based on their needs

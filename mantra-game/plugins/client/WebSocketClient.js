@@ -1,6 +1,6 @@
 // WebSocketClient.js - Marak Squires 2023
 import { decode, decodeAsync } from "@msgpack/msgpack";
-import deltaCompression from "../snapshots/SnapShotManager/deltaCompression.js";
+import deltaCompression from "../snapshot-manager/SnapShotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 import messageSchema from "../server/messageSchema.js";
 import gameTick from "../../lib/gameTick.js";

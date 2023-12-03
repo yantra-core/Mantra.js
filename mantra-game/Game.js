@@ -6,13 +6,15 @@ import Component from './Component/Component.js';
 import SystemsManager from './System/SystemsManager.js';
 
 // Plugins
-import plugins from './plugins.js';
+// import plugins from './plugins.js';
 
 // Snapshots
-import SnapshotManager from './plugins/snapshots/SnapShotManager/SnapshotManager.js';
+// import SnapshotManager from './plugins/snapshot-manager/SnapShotManager/SnapshotManager.js';
 
 // Game instances are event emitters
 import eventEmitter from './lib/eventEmitter.js';
+
+// import Client from './plugins/client/Client.js';
 
 // Game loops
 // Local game loop is for single machine games ( no networking )
@@ -45,6 +47,7 @@ class Game {
     isEdgeClient = false,
     isServer = false,
     isOfflineMode,
+    plugins = {}, // Plugin Classes that will be bound to the game instance
     // game options
     loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
     width = 1600,
@@ -109,6 +112,7 @@ class Game {
     // Could be another CDN or other remote location
     // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
+      console.log("USING SCRIPT ROOT", options.scriptRoot)
       this.scriptRoot = options.scriptRoot;
     }
 
@@ -157,6 +161,8 @@ class Game {
 
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
+
+
     this.components = {
       type: new Component('type', this),           // string type, name of Entity
       destroyed: new Component('destroyed', this), // boolean, if true, entity is pending destroy and will be removed from game
@@ -189,7 +195,7 @@ class Game {
     this.systemsManager = new SystemsManager(this);
 
     // snapshotManager doesn't seem optional as plugin, not sure game loop can run without basic snapshots interface / api
-    this.snapshotManager = new SnapshotManager(this);
+    // this.snapshotManager = new SnapshotManager(this);
 
     // Graphics rendering pipeline
     this.graphics = [];
@@ -206,7 +212,8 @@ class Game {
     this.onlineGameLoop = onlineGameLoop.bind(this);
     this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
 
-    // this.plugins represents all possible plugins the Game has access to
+    // this.plugins represents the initial plugins the Game wil have access to
+    // subsequent plugins will be loaded dynamically with game.use()
     this.plugins = plugins;
 
     // this._plugins represents all plugin instances that have been loaded
@@ -229,6 +236,7 @@ class Game {
 
   }
 
+  // TODO: hoist to systemsManager
   update(deltaTime) {
     // Call update method of SystemsManager, which delegate to all Systems which have an update method
     this.systemsManager.update(deltaTime);
@@ -236,9 +244,12 @@ class Game {
 
   render() {
     // Call render method of SystemsManager, which will delegate to all Graphics systems
+
+    // TODO: should we remove this and hoist it to the systemsManager?
     this.systemsManager.render();
   }
 
+  // TODO: make this smaller
   start(cb) {
     let game = this;
     if (typeof cb !== 'function') {
@@ -251,14 +262,28 @@ class Game {
     }
 
     if (!this.systems.client) {
-      game.use(new plugins.Client('Bunny', game.config));
+    //  game.use(new Client('Bunny', game.config));
     }
 
     let client = this.getSystem('client');
-    client.start(cb);
+
+
+    // Wait for all systems to be ready before starting the game loop
+    // TODO: replace this with general 'ready' event
+    console.log('waiting for graphics to be ready', game.graphicsReady, game.graphicsReady.length, game.graphics.length, )
+    if (!game.physicsReady || game.graphicsReady.length === 0 || (game.graphics.length > 0 && (game.graphics.length !== game.graphicsReady.length))) {
+      setTimeout(function(){
+        game.start(cb);
+      }, 4);
+      return
+    } else {
+      console.log('starting immediately');
+      client.start(cb);
+    }
 
   }
 
+  // TODO: move to client, let client hoist the connection logic to game
   stop() {
     let client = this.getSystem('client');
     client.stop();
@@ -275,10 +300,12 @@ class Game {
   }
 
   // All Systems are Plugins, but not all Plugins are Systems
-  use(pluginInstanceOrId) {
+  use(pluginInstanceOrId, options = {}) {
     let game = this;
-    let basePath = './plugins/'; // Base path for loading plugins
 
+    // TODO: make this configurable
+    let basePath = '/plugins/'; // Base path for loading plugins
+    basePath = this.scriptRoot + basePath;
     // Check if the argument is a string (plugin ID)
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
@@ -286,6 +313,17 @@ class Game {
       if (this._plugins[pluginId]) {
         console.log(`Plugin ${pluginId} is already loaded or loading.`);
         return this;
+      }
+
+      if (this.isServer) {
+        // console.log('pluginId', pluginId, this.plugins)
+        if (this.plugins[pluginId]) {
+          console.log('loading plugin', pluginId, this.plugins[pluginId])
+          return this.use(new this.plugins[pluginId](), options);
+        }
+
+        console.log(`Attempted to load plugin by string name "${pluginId}"on server, could not find! skipping`);
+        return;
       }
 
       // Mark the plugin as loading
@@ -298,8 +336,10 @@ class Game {
         // The script is expected to call `game.use(pluginInstance)` after loading
         console.log(`Plugin ${pluginId} loaded.`, game.plugins, game._plugins);
         if (typeof PLUGINS === 'object') {
-          let pluginInstance = new PLUGINS[pluginId].default();
+          let pluginInstance = new PLUGINS[pluginId].default(options);
           game.use(pluginInstance);
+          console.log('eeeee', 'plugin::ready::' + pluginInstance.id)
+          game.emit('plugin::ready::' + pluginId, pluginInstance)
         } else {
           // handle server-side case of string usage
           // TODO
@@ -307,7 +347,7 @@ class Game {
       }).catch(function (err) {
         console.error(`Error loading plugin ${pluginId}:`, err);
         game._plugins[pluginId] = { status: 'error' };
-        throw error;
+        throw err;
       });
 
       return this;
@@ -330,6 +370,7 @@ class Game {
 
   // Helper function to load plugin scripts
   loadPluginScript(scriptUrl) {
+    console.log('loadPluginScript', scriptUrl)
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = scriptUrl;
@@ -356,6 +397,7 @@ class Game {
     }
   }
 
+  // TODO: move to componentManager
   addComponent(entityId, componentType, data) {
     if (!this.components[componentType]) {
       this.components[componentType] = new Component(componentType, this);
@@ -390,6 +432,7 @@ class Game {
     });
   }
 
+  // TODO: move to playerManager
   // allows for custom player creation logic, or default player creation logic
   createPlayer(playerConfig) {
     return new Promise((resolve, reject) => {
@@ -431,4 +474,4 @@ class Game {
 
 }
 
-export { Game, plugins };
+export { Game };

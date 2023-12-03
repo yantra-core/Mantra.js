@@ -498,7 +498,7 @@ pre {
   top: 10%;
   left: 10%;
   z-index: 1000;
-  width: 500px;
+  width: 550px;
   min-width: 460px;
   min-height: 200px;
   height: 60%;
@@ -641,7 +641,6 @@ button {
 .param-input,
 #sutraView select {
   background-color: transparent;
-
   border: 1px solid transparent;
   color: #d3d9df;
   padding: 5px;

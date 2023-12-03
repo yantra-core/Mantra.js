@@ -1,6 +1,8 @@
 // BabylonRenderer.js extends RendererInterface.js
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
-import plugins from '../../plugins.js';
+import BabylonCamera from './camera/BabylonCamera.js';
+// TODO: remove circular dependency to plugins.js
+// import plugins from '../../plugins.js';
 
 // You can create your own renderer by replacing this file with a Class that extends RendererInterface.js
 
@@ -44,9 +46,7 @@ class BabylonGraphics extends GraphicsInterface {
 
   init(game) {
 
-    game.graphics.push(this);
     this.game = game;
-    this.game.systemsManager.addSystem('graphics-babylon', this);
 
     // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
     if (typeof BABYLON === 'undefined') {
@@ -146,15 +146,26 @@ class BabylonGraphics extends GraphicsInterface {
 
     // TODO: Should we have generic Camera plugin scoped to graphics pipeline?
     //       see how StarField.js is implemented for reference
-    game.use(new plugins.Camera({ camera: this.config.camera }));
+    game.use(new BabylonCamera({ camera: this.config.camera }));
 
-    game.graphicsReady.push(this.name);
 
     this.pendingLoad.forEach(function (pluginInstance) {
       game.use(pluginInstance);
     });
 
     // this.createCompass();
+
+
+    // once the graphics system is ready, add it to the systemsManager
+    this.game.systemsManager.addSystem('graphics-babylon', this);
+
+    // register this graphics pipline with the game
+    game.graphics.push(this);
+
+    // Remark: graphicsReady is deprecated, now that plugins can be lazy loaded
+    // TODO: investigate and remove graphicsReady
+    game.graphicsReady.push(this.name);
+    
 
   }
 
@@ -268,6 +279,8 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
+    console.log('Babylon.createGraphic', entityData)
+    // throw new Error('line')
     // switch case based on entityData.type
     let graphic;
     switch (entityData.type) {
@@ -303,6 +316,26 @@ class BabylonGraphics extends GraphicsInterface {
 
     if (this.game.physics.dimension === 3) {
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
+    }
+
+
+    if (typeof entityData.color === 'number') {
+
+      if (!graphic.material) {
+        graphic.material = new BABYLON.StandardMaterial("material", this.scene);
+      }
+
+
+      // console.log("setting color", entityData.color)
+      // Extract RGB components from the hexadecimal color value
+      var red = (entityData.color >> 16) & 255;
+      var green = (entityData.color >> 8) & 255;
+      var blue = entityData.color & 255;
+      //console.log('setting color', red, green, blue)
+      // Set tint of graphic using the extracted RGB values
+      graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
+      // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
+
     }
 
 
@@ -424,9 +457,8 @@ class BabylonGraphics extends GraphicsInterface {
 
   // called as much as the client requires in order to render
   render(game, alpha) {
-    let self = this;
-    let cameraSystem = game.getSystem('graphics-babylon-camera');
 
+    let self = this;
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       if (ent.pendingRender && ent.pendingRender['graphics-babylon']) {
@@ -435,7 +467,11 @@ class BabylonGraphics extends GraphicsInterface {
       }
     }
 
-    cameraSystem.render();
+    if (game.systems['graphics-babylon-camera']) {
+      let cameraSystem = game.getSystem('graphics-babylon-camera');
+      cameraSystem.render();
+    }
+
     this.scene.render();
 
   }
@@ -443,8 +479,10 @@ class BabylonGraphics extends GraphicsInterface {
   // called each time new gametick data arrives
   update() {
     let game = this.game;
-    let cameraSystem = this.game.getSystem('graphics-babylon-camera');
-    cameraSystem.update(); // is cameraSystem.update() required here?
+    if (game.systems['graphics-babylon-camera']) {
+      let cameraSystem = this.game.getSystem('graphics-babylon-camera');
+      cameraSystem.update(); // is cameraSystem.update() required here?
+    }
   }
 
   // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins

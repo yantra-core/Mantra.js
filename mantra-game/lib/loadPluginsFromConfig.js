@@ -2,26 +2,28 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   let plugins = this.plugins;
   let gameConfig = this.config
 
-  this.use(new plugins.Entity())
+  this.use('Entity');
 
   if (physics === 'matter') {
-    this.use(new plugins.MatterPhysics());
+    this.use('MatterPhysics');
+    //this.use(new plugins.MatterPhysics());
   }
 
   if (physics === 'physx') {
-    this.use(new plugins.PhysXPhysics());
+    // this.use(new plugins.PhysXPhysics());
+    this.use('PhysXPhysics');
   }
 
   if (collisions) {
-    this.use(new plugins.Collision());
+    this.use('Collisions');
   }
 
-  this.use(new plugins.EntityInput());
-  this.use(new plugins.EntityMovement());
-
+  this.use('EntityInput');
+  this.use('EntityMovement');
+  this.use('SnapShotManager');
 
   if (lifetime) {
-    this.use(new plugins.Lifetime());
+    this.use('Lifetime');
   }
 
   if (!this.isServer) {
@@ -31,18 +33,20 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       deltaCompression: gameConfig.deltaCompression,
       msgpack: gameConfig.msgpack
     };
-    this.use(new plugins.Client(clientConfig));
+    this.use('Client', clientConfig);
 
     if (keyboard) {
-      this.use(new plugins.Keyboard(keyboard));
+      //      this.use(new plugins.Keyboard(keyboard));
+      this.use('Keyboard');
+
     }
 
     if (mouse) {
-      this.use(new plugins.Mouse());
+      this.use('Mouse');
     }
 
     if (gamepad) {
-      this.use(new plugins.Gamepad());
+      this.use('Gamepad');
     }
 
     // TODO: move to Graphics.loadFromConfig() ?
@@ -51,15 +55,20 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
         graphics = [graphics];
       }
 
-      this.use(new plugins.Graphics()); // camera configs
+      // this.use(new plugins.Graphics()); // camera configs
+      this.use('Graphics');
+
       if (graphics.includes('babylon')) {
-        this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
+        // this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
+        this.use('BabylonGraphics', { camera: this.config.camera });
       }
       if (graphics.includes('css')) {
         this.use(new plugins.CSSGraphics({ camera: this.config.camera }));
       }
       if (graphics.includes('phaser')) {
-        this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
+        // this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
+        this.use('PhaserGraphics', { camera: this.config.camera });
+
       }
       if (graphics.includes('three')) {
         this.use(new plugins.ThreeGraphics({ camera: this.config.camera }));

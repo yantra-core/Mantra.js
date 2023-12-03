@@ -1,6 +1,6 @@
 import { Game, plugins } from '../../mantra-game/Game.js';
-import deltaEncoding from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaEncoding.js';
-import deltaCompression from '@yantra-core/mantra/plugins/snapshots/SnapShotManager/deltaCompression.js';
+import deltaEncoding from '@yantra-core/mantra/plugins/snapshot-manager/SnapShotManager/deltaEncoding.js';
+import deltaCompression from '@yantra-core/mantra/plugins/snapshot-manager/SnapShotManager/deltaCompression.js';
 import { encode } from "@msgpack/msgpack";
 
 let config = {};
