@@ -22,10 +22,6 @@ export default class LocalClient {
 
     this.game.isOnline = false;
 
-    let graphicsSystems = this.game.graphics.length;
-    let graphicsReady = this.game.graphicsReady.length;
-    let physicsReady = this.game.physicsReady;
-
     let self = this;
 
 

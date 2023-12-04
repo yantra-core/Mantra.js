@@ -73,19 +73,6 @@ export default class WebSocketClient {
     console.log('connecting to', url);
     let self = this;
 
-    let graphicsSystems = this.game.graphics.length;
-    let graphicsReady = this.game.graphicsReady.length;
-
-    if (graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
-      console.log('graphics not ready, trying again in 200ms')
-      console.log('graphics register', this.game.graphics)
-      console.log('graphicsReady', this.game.graphicsReady)
-      setTimeout(function () {
-        self.connect(url);
-      }, 200)
-      return
-    }
-
     this.inputBuffer = {};
     this.inputSequenceNumber = 0;
     this.latestSnapshot = null;
