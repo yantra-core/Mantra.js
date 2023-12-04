@@ -1949,6 +1949,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 function testRules(game) {
   var rules = new _index["default"].Sutra();
   // return rules;
+
   // Define health level conditions for the boss
   var healthLevels = [800, 600, 400, 200, 0];
   var colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red

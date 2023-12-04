@@ -253,8 +253,13 @@ class Game {
       return
     } else {
       console.log('All Plugins are ready! Starting Mantra Game Client...');
-      let client = this.getSystem('client');
-      client.start(cb);
+
+      if (game.systems.client) {
+        let client = this.getSystem('client');
+        client.start(cb);
+      } else {
+        console.log('Warning: No Client System found, will not start game loop.');
+      }
     }
   }
 

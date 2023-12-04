@@ -523,8 +523,12 @@ var Game = exports.Game = /*#__PURE__*/function () {
         return;
       } else {
         console.log('All Plugins are ready! Starting Mantra Game Client...');
-        var client = this.getSystem('client');
-        client.start(cb);
+        if (game.systems.client) {
+          var client = this.getSystem('client');
+          client.start(cb);
+        } else {
+          console.log('Warning: No Client System found, will not start game loop.');
+        }
       }
     }
 

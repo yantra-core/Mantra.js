@@ -9,14 +9,11 @@
 </head>
 
 <body>
-<script type="module" src="/plugins/Client.js"></script>
+<script type="module" src="./Client.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game({
-      loadDefaultPlugins: false,
-      options: {
-        scriptRoot: '../'
-      }
+      loadDefaultPlugins: false
     });
     let client = new window.PLUGINS.Client.default();
     // game is not required for plugins to work, except some plugins are still hard-coded to use it

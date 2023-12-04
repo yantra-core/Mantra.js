@@ -9,14 +9,11 @@
 </head>
 
 <body>
-<script type="module" src="/plugins/Lifetime.js"></script>
+<script type="module" src="./Lifetime.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game({
-      loadDefaultPlugins: false,
-      options: {
-        scriptRoot: '../'
-      }
+      loadDefaultPlugins: false
     });
     let lifetime = new window.PLUGINS.Lifetime.default();
     // game is not required for plugins to work, except some plugins are still hard-coded to use it

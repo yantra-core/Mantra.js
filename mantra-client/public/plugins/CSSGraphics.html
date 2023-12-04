@@ -9,14 +9,11 @@
 </head>
 
 <body>
-<script type="module" src="/plugins/CSSGraphics.js"></script>
+<script type="module" src="./CSSGraphics.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game({
-      loadDefaultPlugins: false,
-      options: {
-        scriptRoot: '../'
-      }
+      loadDefaultPlugins: false
     });
     let cssgraphics = new window.PLUGINS.CSSGraphics.default();
     // game is not required for plugins to work, except some plugins are still hard-coded to use it

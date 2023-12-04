@@ -9,14 +9,11 @@
 </head>
 
 <body>
-<script type="module" src="/plugins/LoadingScreen.js"></script>
+<script type="module" src="./LoadingScreen.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game({
-      loadDefaultPlugins: false,
-      options: {
-        scriptRoot: '../'
-      }
+      loadDefaultPlugins: false
     });
     let loadingscreen = new window.PLUGINS.LoadingScreen.default();
     // game is not required for plugins to work, except some plugins are still hard-coded to use it

@@ -27,7 +27,7 @@ var ControlsGUI = /*#__PURE__*/function () {
       this.game = game;
       this.listenForEntityInput();
       this.game.systemsManager.addSystem(this.id, this);
-      // this.drawTable();
+      this.drawTable();
     }
   }, {
     key: "drawTable",
