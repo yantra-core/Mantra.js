@@ -52,6 +52,10 @@ tap.test('Loading entities', (t) => {
 
   game.use(new plugins.XState({ world: Pong }));
 
+  let xStateSystem = game.getSystem('xstate');
+  xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
 
   let borderTop = game.getEntity(3);
   t.ok(borderTop, 'Border entity should be loaded');
@@ -71,6 +75,7 @@ tap.test('Guard conditions', (t) => {
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
 
   xStateSystem.sendEvent('START');
 

@@ -1,4 +1,4 @@
-import getPlayerSnapshot from './SnapShotManager/getPlayerSnapshot.js';
+import getPlayerSnapshot from './SnapshotManager/getPlayerSnapshot.js';
 
 class SnapshotManager {
   static id = 'snapshot-manager';
@@ -6,8 +6,6 @@ class SnapshotManager {
     this.snapshotCount = 0;
     this.snapshotBuffer = [];
     this.id = SnapshotManager.id;
-
-
   }
 
   init(game) {

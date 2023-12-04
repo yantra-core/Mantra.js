@@ -265,8 +265,18 @@ class Game {
   }
 
   connect(url) {
-    let client = this.getSystem('client');
-    client.connect(url);
+    let game = this;
+    // Wait for all systems to be ready before starting the game loop
+    if (game.loadingPluginsCount > 0) {
+      setTimeout(function () {
+        game.connect(url);
+      }, 4);
+      return
+    } else {
+      console.log('All Plugins are ready! Starting Mantra Game Client...');
+      let client = this.getSystem('client');
+      client.connect(url);
+    }
   }
 
   disconnect() {

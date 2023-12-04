@@ -9,6 +9,9 @@ import EntityMovement from './plugins/entity-movement/EntityMovement.js';
 // Client
 import Client from './plugins/client/Client.js';
 
+// Server
+// import WebsocketServer from './plugins/server/WebsocketServer.js';
+
 // State Machines
 import XState from './plugins/xstate/XState.js';
 
@@ -83,6 +86,7 @@ const plugins = {
   Collision,
   ChronoControl,
   Client,
+  // WebsocketServer,
   Creator,
   Entity,
   EntityInput,

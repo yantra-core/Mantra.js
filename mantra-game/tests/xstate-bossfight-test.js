@@ -16,6 +16,7 @@ tap.test('Machine creation and initialization', (t) => {
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let system = game.getSystem('xstate');
+  system.loadEntities();
   system.createMachine();
 
   t.ok(game.machine, 'Machine should be initialized');
@@ -36,6 +37,8 @@ tap.test('State transitions: Idle to Active', (t) => {
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
   xStateSystem.sendEvent('START');
 
   setImmediate(() => {
@@ -52,6 +55,9 @@ tap.test('Loading entities: Boss Entity', (t) => {
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
+  let xStateSystem = game.getSystem('xstate');
+  xStateSystem.createMachine();
+  xStateSystem.loadEntities();
 
   let boss = game.getEntity(1);
   t.ok(boss, 'NPC entity should be loaded');
@@ -71,6 +77,8 @@ tap.test('Guard conditions: Entity Damaged', (t) => {
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
 
   xStateSystem.sendEvent('START');
   xStateSystem.sendEvent('entity::damage', { name: 'boss', damage: 100 });
@@ -92,6 +100,8 @@ tap.test('Boss Health Reduction', (t) => {
   
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
   xStateSystem.sendEvent('START');
 
   // Simulate multiple damage events
@@ -118,6 +128,8 @@ tap.test('Transition to EndRound State', (t) => {
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
   xStateSystem.sendEvent('START');
 
   // Simulate boss defeat
@@ -141,6 +153,7 @@ tap.test('Complete Boss Fight Flow', (t) => {
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
   
   // Start the boss fight
   xStateSystem.sendEvent('START');
