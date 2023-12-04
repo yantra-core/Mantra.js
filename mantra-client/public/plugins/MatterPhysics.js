@@ -1,4 +1,708 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).MatterPhysics = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// Collisions.js - Marak Squires 2023
+var Collisions = /*#__PURE__*/function () {
+  function Collisions() {
+    _classCallCheck(this, Collisions);
+    this.id = Collisions.id;
+  }
+  _createClass(Collisions, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+
+      // TODO: this won't work unless game.physics exists
+      // Binds our handleCollision method to the game physics engine's collisionStart event
+      this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
+      this.game.physics.collisionActive(this.game, function noop() {});
+      this.game.physics.collisionEnd(this.game, function noop() {});
+
+      // Binds game.handleCollision to the Game for convenience 
+      this.game.handleCollision = this.handleCollision.bind(this);
+    }
+  }, {
+    key: "handleCollision",
+    value: function handleCollision(pair, bodyA, bodyB) {
+      // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
+      var entityIdA = bodyA.myEntityId;
+      var entityIdB = bodyB.myEntityId;
+      var entityA = this.game.getEntity(entityIdA);
+      var entityB = this.game.getEntity(entityIdB);
+      if (!entityA || !entityB) {
+        // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
+        return;
+      }
+
+      // Check for specific collision cases and send events to the state machine
+      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+        if (this.game.machine && this.game.machine.sendEvent) {
+          // console.log('sending machine event', 'COLLISION');
+          this.game.machine.sendEvent('COLLISION', {
+            entityIdA: bodyA.myEntityId,
+            entityIdB: bodyB.myEntityId
+          });
+        }
+      }
+
+      //console.log(entityA)
+      //console.log(entityB)
+
+      // do not process player collisions locally ( for now )
+      if (this.game.isClient && entityA.type === 'PLAYER' && entityB.type === 'PLAYER') {
+        //console.log("BYPASSING PLAYER COLISION ON CLIENT")
+        pair.isActive = false;
+        return;
+      }
+
+      // iterate through all systems and see if they have a handleCollision method
+      var _iterator = _createForOfIteratorHelper(this.game.systemsManager.systems),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+            _ = _step$value[0],
+            system = _step$value[1];
+          if (typeof system.handleCollision === "function") {
+            // any system that has a handleCollision method will be called here
+            system.handleCollision(pair, bodyA, bodyB);
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+    }
+  }, {
+    key: "shouldSendCollisionEvent",
+    value: function shouldSendCollisionEvent(bodyA, bodyB) {
+      // for now, send all events to the stateMachine
+      return true;
+    }
+  }]);
+  return Collisions;
+}();
+_defineProperty(Collisions, "id", 'collisions');
+_defineProperty(Collisions, "removable", false);
+var _default = exports["default"] = Collisions;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _matterJs = _interopRequireDefault(require("matter-js"));
+var _PhysicsInterface2 = _interopRequireDefault(require("./PhysicsInterface.js"));
+var _Collisions = _interopRequireDefault(require("../collisions/Collisions.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // MatterPhysics.js - Marak Squires 2023
+var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
+  _inherits(MatterPhysics, _PhysicsInterface);
+  var _super = _createSuper(MatterPhysics);
+  function MatterPhysics(config) {
+    var _this;
+    _classCallCheck(this, MatterPhysics);
+    _this = _super.call(this);
+    _this.id = MatterPhysics.id;
+    _this.namespace = 'physics';
+    _this.Vector = _matterJs["default"].Vector;
+    _this.Body = _matterJs["default"].Body;
+    _this.Bodies = _matterJs["default"].Bodies;
+    _this.Composite = _matterJs["default"].Composite;
+    _this.Events = _matterJs["default"].Events;
+    _this.dimension = 2;
+
+    // TODO: add all collision events
+    //
+    // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
+    //
+    //
+    // collisionActive is used for continuous collision detection ( like touching a planet )
+    ////
+    // collisionEnd is currently not being used
+    //
+    return _this;
+  }
+  _createClass(MatterPhysics, [{
+    key: "init",
+    value: function init(game) {
+      var _this2 = this;
+      this.engine = _matterJs["default"].Engine.create();
+      this.engine.gravity.x = 0;
+      this.engine.gravity.y = 0;
+      this.world = this.engine.world;
+      game.physics = this;
+      game.engine = this.engine;
+      game.world = this.world;
+      this.game = game;
+      game.physicsReady = true;
+
+      // should this be onAfterUpdate? since we are serializing the state of the world?
+      // i would assume we want that data *after* the update?
+      this.onAfterUpdate(this.engine, function (event) {
+        // Remark: should this and bodyMap be replaced with a more generic mapping
+        // in order to allow non-physics backed entities to exist in the game?
+        var _iterator = _createForOfIteratorHelper(event.source.world.bodies),
+          _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var body = _step.value;
+            var entity = _this2.game.getEntity(body.myEntityId);
+            if (entity && body.isSleeping !== true && body.myEntityId) {
+              //
+              // Clamp max speed
+              //
+              var maxSpeed = 100; // TODO: move to config
+              if (entity.maxSpeed) {
+                maxSpeed = entity.maxSpeed;
+              }
+              limitSpeed(body, maxSpeed);
+
+              //
+              // Apply locked properties  ( like entity cannot move x or y position, etc )
+              //
+              _this2.lockedProperties(body);
+
+              // If this is the client and we are in online mode,
+              // do not update local physics for remote players, only update local physics for the local player
+              // This may be changed in the future or through configuration
+              if (_this2.game.isClient && _this2.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
+                // In online mode, if the entity is a player and that player is not the current player, skip updating physics
+                // continue; // Skip updating physics for remote players
+              }
+              if (_this2.game.isClient) {
+                // this is the logic for updating *all* entities positions
+                // this should probably be in entity-movement plugin
+                /*            */
+                // console.log(body.myEntityId, body.position)
+                var ent = _this2.game.entities.get(body.myEntityId);
+                // console.log('client ent', ent.id ,body.position)
+                // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
+                if (_this2.game.localGameLoopRunning) {
+                  // check if body position has changed
+
+                  var bodyPosition = {
+                    x: truncateToStringWithPrecision(body.position.x, 3),
+                    y: truncateToStringWithPrecision(body.position.y, 3)
+                  };
+                  var entPosition = {
+                    x: truncateToStringWithPrecision(ent.position.x, 3),
+                    y: truncateToStringWithPrecision(ent.position.y, 3)
+                  };
+
+                  // TODO: add this same kind of logic for server as well?
+                  // delta encoding will filter this; however it would be better to do it here as well
+                  if (bodyPosition.x !== entPosition.x || bodyPosition.y !== entPosition.y) {
+                    _this2.game.changedEntities.add(body.myEntityId);
+                  }
+                  // TODO: rotation / velocity as well, use flag isChanged
+
+                  _this2.game.components.velocity.set(body.myEntityId, {
+                    x: body.velocity.x,
+                    y: body.velocity.y
+                  });
+                  _this2.game.components.position.set(body.myEntityId, {
+                    x: body.position.x,
+                    y: body.position.y
+                  });
+                  _this2.game.components.rotation.set(body.myEntityId, body.angle);
+                }
+                if (ent.type === 'BULLET') {
+                  _this2.game.changedEntities.add(body.myEntityId);
+                  _this2.game.components.velocity.set(body.myEntityId, {
+                    x: body.velocity.x,
+                    y: body.velocity.y
+                  });
+                  _this2.game.components.position.set(body.myEntityId, {
+                    x: body.position.x,
+                    y: body.position.y
+                  });
+                  _this2.game.components.rotation.set(body.myEntityId, body.angle);
+                }
+              } else {
+                // this is the logic for updating *all* entities positions
+                // this should probably be in entity-movement plugin
+
+                var _ent = _this2.game.getEntity(body.myEntityId);
+                //console.log('server ent', ent)
+                _this2.game.changedEntities.add(body.myEntityId);
+                _this2.game.components.velocity.set(body.myEntityId, {
+                  x: body.velocity.x,
+                  y: body.velocity.y
+                });
+                _this2.game.components.position.set(body.myEntityId, {
+                  x: body.position.x,
+                  y: body.position.y
+                });
+                _this2.game.components.rotation.set(body.myEntityId, body.angle);
+              }
+            }
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      });
+
+      // TODO: configurable collision plugins
+      game.use(new _Collisions["default"]());
+    }
+  }, {
+    key: "createBody",
+    value: function createBody(options) {
+      return _matterJs["default"].Body.create(options);
+    }
+
+    // Equivalent to Engine.create()
+  }, {
+    key: "createEngine",
+    value: function createEngine(options) {
+      return _matterJs["default"].Engine.create(options);
+    }
+
+    // Equivalent to World.add()
+  }, {
+    key: "addToWorld",
+    value: function addToWorld(engine, body) {
+      _matterJs["default"].World.add(engine.world, body);
+    }
+  }, {
+    key: "removeBody",
+    value: function removeBody(body) {
+      _matterJs["default"].World.remove(this.engine.world, body);
+    }
+
+    // Equivalent to World.remove()
+  }, {
+    key: "removeFromWorld",
+    value: function removeFromWorld(engine, body) {
+      _matterJs["default"].World.remove(engine.world, body);
+    }
+
+    // Equivalent to Engine.update()
+  }, {
+    key: "updateEngine",
+    value: function updateEngine(engine, delta) {
+      _matterJs["default"].Engine.update(engine, delta);
+    }
+
+    // Equivalent to Bodies.rectangle()
+  }, {
+    key: "createRectangle",
+    value: function createRectangle(x, y, width, height, options) {
+      return _matterJs["default"].Bodies.rectangle(x, y, width, height, options);
+    }
+
+    // Equivalent to Body.applyForce()
+  }, {
+    key: "applyForce",
+    value: function applyForce(body, position, force) {
+      _matterJs["default"].Body.applyForce(body, position, force);
+    }
+
+    // Custom method to get a body's position
+  }, {
+    key: "getBodyPosition",
+    value: function getBodyPosition(body) {
+      return body.position;
+    }
+
+    // Custom method to get a body's velocity
+  }, {
+    key: "getBodyVelocity",
+    value: function getBodyVelocity(body) {
+      return body.velocity;
+    }
+  }, {
+    key: "getBodyRotation",
+    value: function getBodyRotation(body) {
+      return body.angle;
+    }
+  }, {
+    key: "rotateBody",
+    value: function rotateBody(body, rotation) {
+      _matterJs["default"].Body.rotate(body, rotation);
+    }
+  }, {
+    key: "onBeforeUpdate",
+    value: function onBeforeUpdate(engine, callback) {
+      _matterJs["default"].Events.on(engine, 'beforeUpdate', callback);
+    }
+  }, {
+    key: "onAfterUpdate",
+    value: function onAfterUpdate(engine, callback) {
+      _matterJs["default"].Events.on(engine, 'afterUpdate', callback);
+    }
+  }, {
+    key: "setPosition",
+    value: function setPosition(body, position) {
+      _matterJs["default"].Body.setPosition(body, position);
+    }
+  }, {
+    key: "setVelocity",
+    value: function setVelocity(body, velocity) {
+      _matterJs["default"].Body.setVelocity(body, velocity);
+    }
+  }, {
+    key: "collisionStart",
+    value: function collisionStart(game, callback) {
+      var _this3 = this;
+      _matterJs["default"].Events.on(game.engine, 'collisionStart', function (event) {
+        var _iterator2 = _createForOfIteratorHelper(event.pairs),
+          _step2;
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var pair = _step2.value;
+            var bodyA = pair.bodyA;
+            var bodyB = pair.bodyB;
+            var entityIdA = bodyA.myEntityId;
+            var entityIdB = bodyB.myEntityId;
+            var entityA = _this3.game.getEntity(entityIdA);
+            var entityB = _this3.game.getEntity(entityIdB);
+            bodyA.entity = entityA;
+            bodyB.entity = entityB;
+            game.emit('collisionStart', {
+              pair: pair,
+              bodyA: bodyA,
+              bodyB: bodyB
+            });
+            callback(pair, bodyA, bodyB);
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+      });
+    }
+  }, {
+    key: "collisionActive",
+    value: function collisionActive(game, callback) {
+      _matterJs["default"].Events.on(game.engine, 'collisionActive', function (event) {
+        var _iterator3 = _createForOfIteratorHelper(event.pairs),
+          _step3;
+        try {
+          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+            var pair = _step3.value;
+            var bodyA = pair.bodyA;
+            var bodyB = pair.bodyB;
+            game.emit('collision::active', {
+              pair: pair,
+              bodyA: bodyA,
+              bodyB: bodyB
+            });
+            callback(pair, bodyA, bodyB);
+          }
+        } catch (err) {
+          _iterator3.e(err);
+        } finally {
+          _iterator3.f();
+        }
+      });
+    }
+  }, {
+    key: "collisionEnd",
+    value: function collisionEnd(game, callback) {
+      _matterJs["default"].Events.on(game.engine, 'collisionEnd', function (event) {
+        var _iterator4 = _createForOfIteratorHelper(event.pairs),
+          _step4;
+        try {
+          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+            var pair = _step4.value;
+            var bodyA = pair.bodyA;
+            var bodyB = pair.bodyB;
+            game.emit('collision::end', {
+              pair: pair,
+              bodyA: bodyA,
+              bodyB: bodyB
+            });
+            callback(pair, bodyA, bodyB);
+          }
+        } catch (err) {
+          _iterator4.e(err);
+        } finally {
+          _iterator4.f();
+        }
+      });
+    }
+
+    // Remark: This may not work as expected, since the callback is not the same function reference
+    // TODO: remove anonymous functions for collision handlers and have them be returned named functions
+  }, {
+    key: "removeCollisionStart",
+    value: function removeCollisionStart(game, callback) {
+      _matterJs["default"].Events.off(game.engine, 'collisionStart', callback);
+    }
+  }, {
+    key: "removeCollisionActive",
+    value: function removeCollisionActive(game, callback) {
+      _matterJs["default"].Events.off(game.engine, 'collisionActive', callback);
+    }
+  }, {
+    key: "removeCollisionEnd",
+    value: function removeCollisionEnd(game, callback) {
+      _matterJs["default"].Events.off(game.engine, 'collisionEnd', callback);
+    }
+  }, {
+    key: "lockedProperties",
+    value: function lockedProperties(body) {
+      var eId = body.myEntityId;
+      var ent = this.game.getEntity(eId);
+      if (ent && ent.lockedProperties) {
+        if (ent.lockedProperties.position) {
+          var currentPosition = body.position;
+          if (typeof ent.lockedProperties.position.x === 'number') {
+            currentPosition.x = ent.lockedProperties.position.x;
+          }
+          if (typeof ent.lockedProperties.position.y === 'number') {
+            currentPosition.y = ent.lockedProperties.position.y;
+          }
+          _matterJs["default"].Body.setPosition(body, currentPosition);
+        }
+      }
+    }
+  }]);
+  return MatterPhysics;
+}(_PhysicsInterface2["default"]);
+_defineProperty(MatterPhysics, "id", 'physics-matter');
+_defineProperty(MatterPhysics, "removable", false);
+var _default = exports["default"] = MatterPhysics;
+function limitSpeed(body, maxSpeed) {
+  var speed = _matterJs["default"].Vector.magnitude(body.velocity);
+  if (speed > maxSpeed) {
+    var newVelocity = _matterJs["default"].Vector.mult(_matterJs["default"].Vector.normalise(body.velocity), maxSpeed);
+    _matterJs["default"].Body.setVelocity(body, newVelocity);
+  }
+}
+
+/*
+
+class MatterPhysics extends PhysicsInterface {
+  constructor(workerMode = false) {
+    super();
+    if (workerMode) {
+      this.initWorkerMode();
+    } else {
+      this.initDirectMode();
+    }
+  }
+
+  initWorkerMode() {
+    this.worker = new Worker('matterWorker.js');
+    this.worker.onmessage = this.handleWorkerMessages.bind(this);
+    this.pendingRequests = new Map();
+    this.requestId = 0;
+
+    return new Proxy(this, {
+      get(target, prop) {
+        if (typeof target[prop] === 'function') {
+          return function (...args) {
+            return target.postMessageToWorker(prop, args);
+          }
+        }
+        return target[prop];
+      }
+    });
+  }
+
+  initDirectMode() {
+    // Here, directly bind Matter.js methods to this class
+    // for example, this.createEngine = Matter.Engine.create;
+    // and so on for all other methods
+  }
+
+}
+
+// 1:1 mapping use function, not proxy, simple call to object
+class MatterPhysics extends PhysicsInterface {
+  constructor() {
+    // ...
+
+    if (workerMode) {
+    if (isNode) {
+      // Node.js environment
+      const { fork } = require('child_process');
+      this.worker = fork('path/to/matterWorker.js');
+    } else {
+      // Browser environment
+      this.worker = new Worker('matterWorker.js');
+    }
+    this.worker.onmessage = this.handleWorkerMessages.bind(this);
+    // Additional setup...
+  } else {
+    this.initDirectMode();
+  }
+
+
+  }
+
+  handleWorkerMessages(event) {
+    if (event.data.command === 'engineUpdated') {
+      // Handle the updated physics state
+      // Update your game entities with the new physics data
+    }
+  }
+
+  createEngine(options) {
+    this.worker.postMessage({ command: 'createEngine', options });
+  }
+
+  updateEngine(delta) {
+    this.worker.postMessage({ command: 'updateEngine', delta });
+  }
+
+  // ... other methods
+}
+
+
+*/
+
+var truncateToStringWithPrecision = function truncateToStringWithPrecision(value) {
+  var precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
+  return value.toFixed(precision);
+};
+
+},{"../collisions/Collisions.js":1,"./PhysicsInterface.js":3,"matter-js":4}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// Remark: This PhysicsInterface file should should be in the mantra-game package and referenced as a dependency
+var PhysicsInterface = /*#__PURE__*/function () {
+  function PhysicsInterface() {
+    _classCallCheck(this, PhysicsInterface);
+    if (this.constructor === PhysicsInterface) {
+      throw new Error('Abstract class cannot be instantiated');
+    }
+  }
+
+  // Equivalent to Engine.create()
+  _createClass(PhysicsInterface, [{
+    key: "createEngine",
+    value: function createEngine(options) {
+      throw new Error('Method "createEngine" must be implemented');
+    }
+
+    // Equivalent to World.add()
+  }, {
+    key: "addToWorld",
+    value: function addToWorld(engine, body) {
+      throw new Error('Method "addToWorld" must be implemented');
+    }
+
+    // Equivalent to World.remove()
+  }, {
+    key: "removeFromWorld",
+    value: function removeFromWorld(engine, body) {
+      throw new Error('Method "removeFromWorld" must be implemented');
+    }
+
+    // Equivalent to Engine.update()
+  }, {
+    key: "updateEngine",
+    value: function updateEngine(engine, delta) {
+      throw new Error('Method "updateEngine" must be implemented');
+    }
+
+    // Equivalent to Bodies.rectangle()
+  }, {
+    key: "createRectangle",
+    value: function createRectangle(x, y, width, height, options) {
+      throw new Error('Method "createRectangle" must be implemented');
+    }
+
+    // Equivalent to Body.applyForce()
+  }, {
+    key: "applyForce",
+    value: function applyForce(body, position, force) {
+      throw new Error('Method "applyForce" must be implemented');
+    }
+
+    // Custom method to get a body's position
+  }, {
+    key: "getBodyPosition",
+    value: function getBodyPosition(body) {
+      throw new Error('Method "getBodyPosition" must be implemented');
+    }
+
+    // Custom method to get a body's velocity
+  }, {
+    key: "getBodyVelocity",
+    value: function getBodyVelocity(body) {
+      throw new Error('Method "getBodyVelocity" must be implemented');
+    }
+  }, {
+    key: "onBeforeUpdate",
+    value: function onBeforeUpdate(engine, callback) {
+      throw new Error('Method "onBeforeUpdate" must be implemented');
+    }
+  }, {
+    key: "setPosition",
+    value: function setPosition(body, position) {
+      throw new Error('Method "setPosition" must be implemented');
+    }
+  }, {
+    key: "setVelocity",
+    value: function setVelocity(body, velocity) {
+      throw new Error('Method "setVelocity" must be implemented');
+    }
+  }, {
+    key: "collisionStart",
+    value: function collisionStart(engine, callback) {
+      throw new Error('Method "onCollision" must be implemented');
+    }
+  }]);
+  return PhysicsInterface;
+}();
+var _default = exports["default"] = PhysicsInterface;
+
+},{}],4:[function(require,module,exports){
 (function (global){(function (){
 /*!
  * matter-js 0.19.0 by @liabru
@@ -11002,709 +11706,5 @@ var Common = __webpack_require__(0);
 /******/ ]);
 });
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// Collisions.js - Marak Squires 2023
-var Collisions = /*#__PURE__*/function () {
-  function Collisions() {
-    _classCallCheck(this, Collisions);
-    this.id = Collisions.id;
-  }
-  _createClass(Collisions, [{
-    key: "init",
-    value: function init(game) {
-      this.game = game;
-
-      // TODO: this won't work unless game.physics exists
-      // Binds our handleCollision method to the game physics engine's collisionStart event
-      this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
-      this.game.physics.collisionActive(this.game, function noop() {});
-      this.game.physics.collisionEnd(this.game, function noop() {});
-
-      // Binds game.handleCollision to the Game for convenience 
-      this.game.handleCollision = this.handleCollision.bind(this);
-    }
-  }, {
-    key: "handleCollision",
-    value: function handleCollision(pair, bodyA, bodyB) {
-      // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
-      var entityIdA = bodyA.myEntityId;
-      var entityIdB = bodyB.myEntityId;
-      var entityA = this.game.getEntity(entityIdA);
-      var entityB = this.game.getEntity(entityIdB);
-      if (!entityA || !entityB) {
-        // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
-        return;
-      }
-
-      // Check for specific collision cases and send events to the state machine
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
-        if (this.game.machine && this.game.machine.sendEvent) {
-          // console.log('sending machine event', 'COLLISION');
-          this.game.machine.sendEvent('COLLISION', {
-            entityIdA: bodyA.myEntityId,
-            entityIdB: bodyB.myEntityId
-          });
-        }
-      }
-
-      //console.log(entityA)
-      //console.log(entityB)
-
-      // do not process player collisions locally ( for now )
-      if (this.game.isClient && entityA.type === 'PLAYER' && entityB.type === 'PLAYER') {
-        //console.log("BYPASSING PLAYER COLISION ON CLIENT")
-        pair.isActive = false;
-        return;
-      }
-
-      // iterate through all systems and see if they have a handleCollision method
-      var _iterator = _createForOfIteratorHelper(this.game.systemsManager.systems),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var _step$value = _slicedToArray(_step.value, 2),
-            _ = _step$value[0],
-            system = _step$value[1];
-          if (typeof system.handleCollision === "function") {
-            // any system that has a handleCollision method will be called here
-            system.handleCollision(pair, bodyA, bodyB);
-          }
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    }
-  }, {
-    key: "shouldSendCollisionEvent",
-    value: function shouldSendCollisionEvent(bodyA, bodyB) {
-      // for now, send all events to the stateMachine
-      return true;
-    }
-  }]);
-  return Collisions;
-}();
-_defineProperty(Collisions, "id", 'collisions');
-_defineProperty(Collisions, "removable", false);
-var _default = exports["default"] = Collisions;
-
-},{}],3:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-var _matterJs = _interopRequireDefault(require("matter-js"));
-var _PhysicsInterface2 = _interopRequireDefault(require("./PhysicsInterface.js"));
-var _Collisions = _interopRequireDefault(require("../collisions/Collisions.js"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // MatterPhysics.js - Marak Squires 2023
-var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
-  _inherits(MatterPhysics, _PhysicsInterface);
-  var _super = _createSuper(MatterPhysics);
-  function MatterPhysics(config) {
-    var _this;
-    _classCallCheck(this, MatterPhysics);
-    _this = _super.call(this);
-    _this.id = MatterPhysics.id;
-    _this.namespace = 'physics';
-    _this.Vector = _matterJs["default"].Vector;
-    _this.Body = _matterJs["default"].Body;
-    _this.Bodies = _matterJs["default"].Bodies;
-    _this.Composite = _matterJs["default"].Composite;
-    _this.Events = _matterJs["default"].Events;
-    _this.dimension = 2;
-
-    // TODO: add all collision events
-    //
-    // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
-    //
-    //
-    // collisionActive is used for continuous collision detection ( like touching a planet )
-    ////
-    // collisionEnd is currently not being used
-    //
-    return _this;
-  }
-  _createClass(MatterPhysics, [{
-    key: "init",
-    value: function init(game) {
-      var _this2 = this;
-      this.engine = _matterJs["default"].Engine.create();
-      this.engine.gravity.x = 0;
-      this.engine.gravity.y = 0;
-      this.world = this.engine.world;
-      game.physics = this;
-      game.engine = this.engine;
-      game.world = this.world;
-      this.game = game;
-      game.physicsReady = true;
-
-      // should this be onAfterUpdate? since we are serializing the state of the world?
-      // i would assume we want that data *after* the update?
-      this.onAfterUpdate(this.engine, function (event) {
-        // Remark: should this and bodyMap be replaced with a more generic mapping
-        // in order to allow non-physics backed entities to exist in the game?
-        var _iterator = _createForOfIteratorHelper(event.source.world.bodies),
-          _step;
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var body = _step.value;
-            var entity = _this2.game.getEntity(body.myEntityId);
-            if (entity && body.isSleeping !== true && body.myEntityId) {
-              //
-              // Clamp max speed
-              //
-              var maxSpeed = 100; // TODO: move to config
-              if (entity.maxSpeed) {
-                maxSpeed = entity.maxSpeed;
-              }
-              limitSpeed(body, maxSpeed);
-
-              //
-              // Apply locked properties  ( like entity cannot move x or y position, etc )
-              //
-              _this2.lockedProperties(body);
-
-              // If this is the client and we are in online mode,
-              // do not update local physics for remote players, only update local physics for the local player
-              // This may be changed in the future or through configuration
-              if (_this2.game.isClient && _this2.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
-                // In online mode, if the entity is a player and that player is not the current player, skip updating physics
-                // continue; // Skip updating physics for remote players
-              }
-              if (_this2.game.isClient) {
-                // this is the logic for updating *all* entities positions
-                // this should probably be in entity-movement plugin
-                /*            */
-                // console.log(body.myEntityId, body.position)
-                var ent = _this2.game.entities.get(body.myEntityId);
-                // console.log('client ent', ent.id ,body.position)
-                // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
-                if (_this2.game.localGameLoopRunning) {
-                  // check if body position has changed
-
-                  var bodyPosition = {
-                    x: truncateToStringWithPrecision(body.position.x, 3),
-                    y: truncateToStringWithPrecision(body.position.y, 3)
-                  };
-                  var entPosition = {
-                    x: truncateToStringWithPrecision(ent.position.x, 3),
-                    y: truncateToStringWithPrecision(ent.position.y, 3)
-                  };
-
-                  // TODO: add this same kind of logic for server as well?
-                  // delta encoding will filter this; however it would be better to do it here as well
-                  if (bodyPosition.x !== entPosition.x || bodyPosition.y !== entPosition.y) {
-                    _this2.game.changedEntities.add(body.myEntityId);
-                  }
-                  // TODO: rotation / velocity as well, use flag isChanged
-
-                  _this2.game.components.velocity.set(body.myEntityId, {
-                    x: body.velocity.x,
-                    y: body.velocity.y
-                  });
-                  _this2.game.components.position.set(body.myEntityId, {
-                    x: body.position.x,
-                    y: body.position.y
-                  });
-                  _this2.game.components.rotation.set(body.myEntityId, body.angle);
-                }
-                if (ent.type === 'BULLET') {
-                  _this2.game.changedEntities.add(body.myEntityId);
-                  _this2.game.components.velocity.set(body.myEntityId, {
-                    x: body.velocity.x,
-                    y: body.velocity.y
-                  });
-                  _this2.game.components.position.set(body.myEntityId, {
-                    x: body.position.x,
-                    y: body.position.y
-                  });
-                  _this2.game.components.rotation.set(body.myEntityId, body.angle);
-                }
-              } else {
-                // this is the logic for updating *all* entities positions
-                // this should probably be in entity-movement plugin
-
-                var _ent = _this2.game.getEntity(body.myEntityId);
-                //console.log('server ent', ent)
-                _this2.game.changedEntities.add(body.myEntityId);
-                _this2.game.components.velocity.set(body.myEntityId, {
-                  x: body.velocity.x,
-                  y: body.velocity.y
-                });
-                _this2.game.components.position.set(body.myEntityId, {
-                  x: body.position.x,
-                  y: body.position.y
-                });
-                _this2.game.components.rotation.set(body.myEntityId, body.angle);
-              }
-            }
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
-      });
-
-      // TODO: configurable collision plugins
-      game.use(new _Collisions["default"]());
-    }
-  }, {
-    key: "createBody",
-    value: function createBody(options) {
-      return _matterJs["default"].Body.create(options);
-    }
-
-    // Equivalent to Engine.create()
-  }, {
-    key: "createEngine",
-    value: function createEngine(options) {
-      return _matterJs["default"].Engine.create(options);
-    }
-
-    // Equivalent to World.add()
-  }, {
-    key: "addToWorld",
-    value: function addToWorld(engine, body) {
-      _matterJs["default"].World.add(engine.world, body);
-    }
-  }, {
-    key: "removeBody",
-    value: function removeBody(body) {
-      _matterJs["default"].World.remove(this.engine.world, body);
-    }
-
-    // Equivalent to World.remove()
-  }, {
-    key: "removeFromWorld",
-    value: function removeFromWorld(engine, body) {
-      _matterJs["default"].World.remove(engine.world, body);
-    }
-
-    // Equivalent to Engine.update()
-  }, {
-    key: "updateEngine",
-    value: function updateEngine(engine, delta) {
-      _matterJs["default"].Engine.update(engine, delta);
-    }
-
-    // Equivalent to Bodies.rectangle()
-  }, {
-    key: "createRectangle",
-    value: function createRectangle(x, y, width, height, options) {
-      return _matterJs["default"].Bodies.rectangle(x, y, width, height, options);
-    }
-
-    // Equivalent to Body.applyForce()
-  }, {
-    key: "applyForce",
-    value: function applyForce(body, position, force) {
-      _matterJs["default"].Body.applyForce(body, position, force);
-    }
-
-    // Custom method to get a body's position
-  }, {
-    key: "getBodyPosition",
-    value: function getBodyPosition(body) {
-      return body.position;
-    }
-
-    // Custom method to get a body's velocity
-  }, {
-    key: "getBodyVelocity",
-    value: function getBodyVelocity(body) {
-      return body.velocity;
-    }
-  }, {
-    key: "getBodyRotation",
-    value: function getBodyRotation(body) {
-      return body.angle;
-    }
-  }, {
-    key: "rotateBody",
-    value: function rotateBody(body, rotation) {
-      _matterJs["default"].Body.rotate(body, rotation);
-    }
-  }, {
-    key: "onBeforeUpdate",
-    value: function onBeforeUpdate(engine, callback) {
-      _matterJs["default"].Events.on(engine, 'beforeUpdate', callback);
-    }
-  }, {
-    key: "onAfterUpdate",
-    value: function onAfterUpdate(engine, callback) {
-      _matterJs["default"].Events.on(engine, 'afterUpdate', callback);
-    }
-  }, {
-    key: "setPosition",
-    value: function setPosition(body, position) {
-      _matterJs["default"].Body.setPosition(body, position);
-    }
-  }, {
-    key: "setVelocity",
-    value: function setVelocity(body, velocity) {
-      _matterJs["default"].Body.setVelocity(body, velocity);
-    }
-  }, {
-    key: "collisionStart",
-    value: function collisionStart(game, callback) {
-      var _this3 = this;
-      _matterJs["default"].Events.on(game.engine, 'collisionStart', function (event) {
-        var _iterator2 = _createForOfIteratorHelper(event.pairs),
-          _step2;
-        try {
-          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-            var pair = _step2.value;
-            var bodyA = pair.bodyA;
-            var bodyB = pair.bodyB;
-            var entityIdA = bodyA.myEntityId;
-            var entityIdB = bodyB.myEntityId;
-            var entityA = _this3.game.getEntity(entityIdA);
-            var entityB = _this3.game.getEntity(entityIdB);
-            bodyA.entity = entityA;
-            bodyB.entity = entityB;
-            game.emit('collisionStart', {
-              pair: pair,
-              bodyA: bodyA,
-              bodyB: bodyB
-            });
-            callback(pair, bodyA, bodyB);
-          }
-        } catch (err) {
-          _iterator2.e(err);
-        } finally {
-          _iterator2.f();
-        }
-      });
-    }
-  }, {
-    key: "collisionActive",
-    value: function collisionActive(game, callback) {
-      _matterJs["default"].Events.on(game.engine, 'collisionActive', function (event) {
-        var _iterator3 = _createForOfIteratorHelper(event.pairs),
-          _step3;
-        try {
-          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-            var pair = _step3.value;
-            var bodyA = pair.bodyA;
-            var bodyB = pair.bodyB;
-            game.emit('collision::active', {
-              pair: pair,
-              bodyA: bodyA,
-              bodyB: bodyB
-            });
-            callback(pair, bodyA, bodyB);
-          }
-        } catch (err) {
-          _iterator3.e(err);
-        } finally {
-          _iterator3.f();
-        }
-      });
-    }
-  }, {
-    key: "collisionEnd",
-    value: function collisionEnd(game, callback) {
-      _matterJs["default"].Events.on(game.engine, 'collisionEnd', function (event) {
-        var _iterator4 = _createForOfIteratorHelper(event.pairs),
-          _step4;
-        try {
-          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-            var pair = _step4.value;
-            var bodyA = pair.bodyA;
-            var bodyB = pair.bodyB;
-            game.emit('collision::end', {
-              pair: pair,
-              bodyA: bodyA,
-              bodyB: bodyB
-            });
-            callback(pair, bodyA, bodyB);
-          }
-        } catch (err) {
-          _iterator4.e(err);
-        } finally {
-          _iterator4.f();
-        }
-      });
-    }
-
-    // Remark: This may not work as expected, since the callback is not the same function reference
-    // TODO: remove anonymous functions for collision handlers and have them be returned named functions
-  }, {
-    key: "removeCollisionStart",
-    value: function removeCollisionStart(game, callback) {
-      _matterJs["default"].Events.off(game.engine, 'collisionStart', callback);
-    }
-  }, {
-    key: "removeCollisionActive",
-    value: function removeCollisionActive(game, callback) {
-      _matterJs["default"].Events.off(game.engine, 'collisionActive', callback);
-    }
-  }, {
-    key: "removeCollisionEnd",
-    value: function removeCollisionEnd(game, callback) {
-      _matterJs["default"].Events.off(game.engine, 'collisionEnd', callback);
-    }
-  }, {
-    key: "lockedProperties",
-    value: function lockedProperties(body) {
-      var eId = body.myEntityId;
-      var ent = this.game.getEntity(eId);
-      if (ent && ent.lockedProperties) {
-        if (ent.lockedProperties.position) {
-          var currentPosition = body.position;
-          if (typeof ent.lockedProperties.position.x === 'number') {
-            currentPosition.x = ent.lockedProperties.position.x;
-          }
-          if (typeof ent.lockedProperties.position.y === 'number') {
-            currentPosition.y = ent.lockedProperties.position.y;
-          }
-          _matterJs["default"].Body.setPosition(body, currentPosition);
-        }
-      }
-    }
-  }]);
-  return MatterPhysics;
-}(_PhysicsInterface2["default"]);
-_defineProperty(MatterPhysics, "id", 'physics-matter');
-_defineProperty(MatterPhysics, "removable", false);
-var _default = exports["default"] = MatterPhysics;
-function limitSpeed(body, maxSpeed) {
-  var speed = _matterJs["default"].Vector.magnitude(body.velocity);
-  if (speed > maxSpeed) {
-    var newVelocity = _matterJs["default"].Vector.mult(_matterJs["default"].Vector.normalise(body.velocity), maxSpeed);
-    _matterJs["default"].Body.setVelocity(body, newVelocity);
-  }
-}
-
-/*
-
-class MatterPhysics extends PhysicsInterface {
-  constructor(workerMode = false) {
-    super();
-    if (workerMode) {
-      this.initWorkerMode();
-    } else {
-      this.initDirectMode();
-    }
-  }
-
-  initWorkerMode() {
-    this.worker = new Worker('matterWorker.js');
-    this.worker.onmessage = this.handleWorkerMessages.bind(this);
-    this.pendingRequests = new Map();
-    this.requestId = 0;
-
-    return new Proxy(this, {
-      get(target, prop) {
-        if (typeof target[prop] === 'function') {
-          return function (...args) {
-            return target.postMessageToWorker(prop, args);
-          }
-        }
-        return target[prop];
-      }
-    });
-  }
-
-  initDirectMode() {
-    // Here, directly bind Matter.js methods to this class
-    // for example, this.createEngine = Matter.Engine.create;
-    // and so on for all other methods
-  }
-
-}
-
-// 1:1 mapping use function, not proxy, simple call to object
-class MatterPhysics extends PhysicsInterface {
-  constructor() {
-    // ...
-
-    if (workerMode) {
-    if (isNode) {
-      // Node.js environment
-      const { fork } = require('child_process');
-      this.worker = fork('path/to/matterWorker.js');
-    } else {
-      // Browser environment
-      this.worker = new Worker('matterWorker.js');
-    }
-    this.worker.onmessage = this.handleWorkerMessages.bind(this);
-    // Additional setup...
-  } else {
-    this.initDirectMode();
-  }
-
-
-  }
-
-  handleWorkerMessages(event) {
-    if (event.data.command === 'engineUpdated') {
-      // Handle the updated physics state
-      // Update your game entities with the new physics data
-    }
-  }
-
-  createEngine(options) {
-    this.worker.postMessage({ command: 'createEngine', options });
-  }
-
-  updateEngine(delta) {
-    this.worker.postMessage({ command: 'updateEngine', delta });
-  }
-
-  // ... other methods
-}
-
-
-*/
-
-var truncateToStringWithPrecision = function truncateToStringWithPrecision(value) {
-  var precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
-  return value.toFixed(precision);
-};
-
-},{"../collisions/Collisions.js":2,"./PhysicsInterface.js":4,"matter-js":1}],4:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// Remark: This PhysicsInterface file should should be in the mantra-game package and referenced as a dependency
-var PhysicsInterface = /*#__PURE__*/function () {
-  function PhysicsInterface() {
-    _classCallCheck(this, PhysicsInterface);
-    if (this.constructor === PhysicsInterface) {
-      throw new Error('Abstract class cannot be instantiated');
-    }
-  }
-
-  // Equivalent to Engine.create()
-  _createClass(PhysicsInterface, [{
-    key: "createEngine",
-    value: function createEngine(options) {
-      throw new Error('Method "createEngine" must be implemented');
-    }
-
-    // Equivalent to World.add()
-  }, {
-    key: "addToWorld",
-    value: function addToWorld(engine, body) {
-      throw new Error('Method "addToWorld" must be implemented');
-    }
-
-    // Equivalent to World.remove()
-  }, {
-    key: "removeFromWorld",
-    value: function removeFromWorld(engine, body) {
-      throw new Error('Method "removeFromWorld" must be implemented');
-    }
-
-    // Equivalent to Engine.update()
-  }, {
-    key: "updateEngine",
-    value: function updateEngine(engine, delta) {
-      throw new Error('Method "updateEngine" must be implemented');
-    }
-
-    // Equivalent to Bodies.rectangle()
-  }, {
-    key: "createRectangle",
-    value: function createRectangle(x, y, width, height, options) {
-      throw new Error('Method "createRectangle" must be implemented');
-    }
-
-    // Equivalent to Body.applyForce()
-  }, {
-    key: "applyForce",
-    value: function applyForce(body, position, force) {
-      throw new Error('Method "applyForce" must be implemented');
-    }
-
-    // Custom method to get a body's position
-  }, {
-    key: "getBodyPosition",
-    value: function getBodyPosition(body) {
-      throw new Error('Method "getBodyPosition" must be implemented');
-    }
-
-    // Custom method to get a body's velocity
-  }, {
-    key: "getBodyVelocity",
-    value: function getBodyVelocity(body) {
-      throw new Error('Method "getBodyVelocity" must be implemented');
-    }
-  }, {
-    key: "onBeforeUpdate",
-    value: function onBeforeUpdate(engine, callback) {
-      throw new Error('Method "onBeforeUpdate" must be implemented');
-    }
-  }, {
-    key: "setPosition",
-    value: function setPosition(body, position) {
-      throw new Error('Method "setPosition" must be implemented');
-    }
-  }, {
-    key: "setVelocity",
-    value: function setVelocity(body, velocity) {
-      throw new Error('Method "setVelocity" must be implemented');
-    }
-  }, {
-    key: "collisionStart",
-    value: function collisionStart(engine, callback) {
-      throw new Error('Method "onCollision" must be implemented');
-    }
-  }]);
-  return PhysicsInterface;
-}();
-var _default = exports["default"] = PhysicsInterface;
-
-},{}]},{},[3])(3)
+},{}]},{},[2])(2)
 });

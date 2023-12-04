@@ -538,8 +538,18 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "connect",
     value: function connect(url) {
-      var client = this.getSystem('client');
-      client.connect(url);
+      var game = this;
+      // Wait for all systems to be ready before starting the game loop
+      if (game.loadingPluginsCount > 0) {
+        setTimeout(function () {
+          game.connect(url);
+        }, 4);
+        return;
+      } else {
+        console.log('All Plugins are ready! Starting Mantra Game Client...');
+        var client = this.getSystem('client');
+        client.connect(url);
+      }
     }
   }, {
     key: "disconnect",
@@ -1186,11 +1196,8 @@ function loadPluginsFromConfig(_ref) {
   this.use('Entity');
   if (physics === 'matter') {
     this.use('MatterPhysics');
-    //this.use(new plugins.MatterPhysics());
   }
-
   if (physics === 'physx') {
-    // this.use(new plugins.PhysXPhysics());
     this.use('PhysXPhysics');
   }
   this.use('EntityInput');
@@ -1207,7 +1214,6 @@ function loadPluginsFromConfig(_ref) {
     };
     this.use('Client', clientConfig);
     if (keyboard) {
-      //      this.use(new plugins.Keyboard(keyboard));
       this.use('Keyboard');
     }
     if (mouse) {
@@ -1222,11 +1228,8 @@ function loadPluginsFromConfig(_ref) {
       if (typeof graphics === 'string') {
         graphics = [graphics];
       }
-
-      // this.use(new plugins.Graphics()); // camera configs
       this.use('Graphics');
       if (graphics.includes('babylon')) {
-        // this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
         this.use('BabylonGraphics', {
           camera: this.config.camera
         });
@@ -1237,7 +1240,6 @@ function loadPluginsFromConfig(_ref) {
         });
       }
       if (graphics.includes('phaser')) {
-        // this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
         this.use('PhaserGraphics', {
           camera: this.config.camera
         });

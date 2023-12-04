@@ -26,7 +26,7 @@ Mantra is designed to start a full-featured local game instance in seconds using
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game();
     // optionally use plugins like Bullet
-    game.use(new MANTRA.plugins.Bullet());
+    game.use('Bullet');
     game.start();
   });
 </script>
@@ -211,6 +211,8 @@ game.getSnapshot(snapshotId)
 
 ```js
 game.use(pluginInstance)
+game.use(pluginIdAsString)
+
 ```
 
 <a name="plugins"></a>

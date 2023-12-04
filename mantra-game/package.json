@@ -2,7 +2,7 @@
   "name": "@yantra-core/mantra",
   "version": "1.1.0",
   "description": "",
-  "main": "Game.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "tap --coverage-report=lcov --allow-incomplete-coverage tests/",
