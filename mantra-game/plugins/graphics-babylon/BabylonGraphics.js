@@ -278,7 +278,7 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
-    console.log('Babylon.createGraphic', entityData)
+    // console.log('Babylon.createGraphic', entityData)
     // throw new Error('line')
     // switch case based on entityData.type
     let graphic;

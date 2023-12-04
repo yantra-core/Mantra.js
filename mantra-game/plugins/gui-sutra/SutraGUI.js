@@ -40,7 +40,7 @@ class SutraGUI {
       this.game.systemsManager.addSystem(this.id, this);
     }
 
-    if (this.game.systems['entity-input']) {
+    if (this.game && this.game.systems && this.game.systems['entity-input']) {
       // Remark: You may not have to disable inputs + remove events
       // *just* removing events should be enough, this is OK for now
       this.game.systems['entity-input'].disableInputs();
@@ -52,7 +52,7 @@ class SutraGUI {
     document.addEventListener('click', (e) => {
       // check if the click was inside a gui-window
       let guiWindow = e.target.closest('.gui-container');
-      if (this.game.systems['entity-input'] && this.game.systems['keyboard']) {
+      if (this.game && this.game.systems && this.game.systems['entity-input'] && this.game.systems['keyboard']) {
         if (!guiWindow) {
           // re-enable inputs
           this.game.systems['entity-input'].setInputsActive();

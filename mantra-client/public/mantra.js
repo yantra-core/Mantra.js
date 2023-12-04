@@ -1232,9 +1232,9 @@ function loadPluginsFromConfig(_ref) {
         });
       }
       if (graphics.includes('css')) {
-        this.use(new plugins.CSSGraphics({
+        this.use('CSSGraphics', {
           camera: this.config.camera
-        }));
+        });
       }
       if (graphics.includes('phaser')) {
         // this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
@@ -1243,9 +1243,9 @@ function loadPluginsFromConfig(_ref) {
         });
       }
       if (graphics.includes('three')) {
-        this.use(new plugins.ThreeGraphics({
+        this.use('ThreeGraphics', {
           camera: this.config.camera
-        }));
+        });
       }
     }
   }

@@ -27,24 +27,20 @@
       // Use Plugins to extend the game with new functionality
 
       // Adds projectile Bullets to the game
-      game.use(new Plugins.Bullet())
+      game.use('Bullet')
 
       // Adds destructible Blocks to the game
-      game.use(new Plugins.Block());
+      game.use('Block');
 
-      // Adds a nice StarField background
-      game.use(new Plugins.StarField());
+      
+      game.use('CurrentFPS');
 
-      game.use(new Plugins.CurrentFPS());
-
-      game.use(new Plugins.Editor({
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/physx-babylon.html'
-      }));
-
+      });
 
       // Adds a controller input legend
       // game.use(new Plugins.ControlsGUI());
-
 
       // custom player::joined handler, this is optional
       // without setting a custom player::joined, the default event will be used
@@ -75,7 +71,9 @@
             y: -500
           },
         });
-        game.use(new Plugins.Border({ autoBorder: true }));
+        game.use('Border', { autoBorder: true });
+        game.use('StarField');
+
       });
     });
   </script>

@@ -85,7 +85,7 @@ if (game.isOnline) {
   game.use(new plugins.SnapshotSize());
 }
 
-game.use(new plugins.Client());
+// game.use(new plugins.Client());
 
 game.use(new plugins.Behaviors());
 

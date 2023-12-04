@@ -6,11 +6,9 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
   if (physics === 'matter') {
     this.use('MatterPhysics');
-    //this.use(new plugins.MatterPhysics());
   }
 
   if (physics === 'physx') {
-    // this.use(new plugins.PhysXPhysics());
     this.use('PhysXPhysics');
   }
 
@@ -32,9 +30,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
     this.use('Client', clientConfig);
 
     if (keyboard) {
-      //      this.use(new plugins.Keyboard(keyboard));
       this.use('Keyboard');
-
     }
 
     if (mouse) {
@@ -51,23 +47,19 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
         graphics = [graphics];
       }
 
-      // this.use(new plugins.Graphics()); // camera configs
       this.use('Graphics');
 
       if (graphics.includes('babylon')) {
-        // this.use(new plugins.BabylonGraphics({camera: this.config.camera }));
         this.use('BabylonGraphics', { camera: this.config.camera });
       }
       if (graphics.includes('css')) {
-        this.use(new plugins.CSSGraphics({ camera: this.config.camera }));
+        this.use('CSSGraphics', { camera: this.config.camera });
       }
       if (graphics.includes('phaser')) {
-        // this.use(new plugins.PhaserGraphics({ camera: this.config.camera }));
         this.use('PhaserGraphics', { camera: this.config.camera });
-
       }
       if (graphics.includes('three')) {
-        this.use(new plugins.ThreeGraphics({ camera: this.config.camera }));
+        this.use('ThreeGraphics', { camera: this.config.camera });
       }
     }
   }

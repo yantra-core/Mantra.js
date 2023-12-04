@@ -27,22 +27,19 @@
       // Use Plugins to extend the game with new functionality
 
       // Adds projectile Bullets to the game
-      game.use(new Plugins.Bullet())
+      game.use('Bullet')
 
       // Adds destructible Blocks to the game
-      game.use(new Plugins.Block());
+      game.use('Block');
 
       // Adds a nice StarField background
-      game.use(new Plugins.StarField());
+      game.use('StarField');
 
-      // Adds a controller input legend
-      game.use(new Plugins.ControlsGUI());
+      game.use('CurrentFPS');
 
-      game.use(new Plugins.CurrentFPS());
-
-      game.use(new Plugins.Editor({
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-phaser.html'
-      }));
+      });
 
 
       // custom player::joined handler, this is optional
@@ -74,7 +71,7 @@
             y: -500
           },
         });
-        game.use(new Plugins.Border({ autoBorder: true }));
+        game.use('Border');
       });
     });
   </script>

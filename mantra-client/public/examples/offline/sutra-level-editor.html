@@ -30,30 +30,26 @@
 
       // Adds projectile Bullets to the game
       // test chanining
-      game.use(new Plugins.Bullet()).use(new Plugins.Block());
+      game.use('Bullet').use('Block');
 
       // Adds a nice StarField background
-      game.use(new Plugins.StarField());
+      game.use('StarField');
 
       // Adds a controller input legend
       // game.use(new Plugins.ControlsGUI());
 
       // game.use(new Plugins.Editor());
-      game.use(new Plugins.CurrentFPS());
+      game.use('CurrentFPS');
 
-      game.use(new Plugins.Timers({}));
-      game.use(new Plugins.Health({}));
-
-      game.use(new Plugins.SutraGUI({}));
-
+      game.use('Timers');
+      game.use('Health');
+      game.use('SutraGUI');
 
       // game.use(new Plugins.SutraGUI({ }));
 
-
-      game.use(new Plugins.Editor({
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-babylon.html'
-      }));
-
+      });
 
 
       // start the game loop

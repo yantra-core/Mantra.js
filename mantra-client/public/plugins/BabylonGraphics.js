@@ -379,7 +379,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "createGraphic",
     value: function createGraphic(entityData) {
-      console.log('Babylon.createGraphic', entityData);
+      // console.log('Babylon.createGraphic', entityData)
       // throw new Error('line')
       // switch case based on entityData.type
       var graphic;

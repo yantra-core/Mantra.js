@@ -250,8 +250,9 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _gui = _interopRequireDefault(require("../gui-editor/gui.js"));
 var _drawTable = _interopRequireDefault(require("./lib/drawTable.js"));
-var _dataView2 = _interopRequireDefault(require("./lib/editor/dataView.js"));
+var _dataView = _interopRequireDefault(require("./lib/editor/dataView.js"));
 var _dataForm = _interopRequireDefault(require("./lib/editor/dataForm.js"));
+var _actionForm = _interopRequireDefault(require("./lib/editor/actionForm.js"));
 var _createLabel = _interopRequireDefault(require("./lib/editor/createLabel.js"));
 var _editor = _interopRequireDefault(require("./lib/editor.js"));
 var _serializeFormToJSON = _interopRequireDefault(require("./util/serializeFormToJSON.js"));
@@ -284,9 +285,9 @@ var SutraGUI = /*#__PURE__*/function () {
     this.showConditionalsForm = _editor["default"].showConditionalsForm.bind(this);
     this.createConditional = _editor["default"].createConditional.bind(this);
     this.createLabel = _createLabel["default"].bind(this);
-    this.dataView = _dataView2["default"].bind(this);
+    this.dataView = _dataView["default"].bind(this);
     this.dataForm = _dataForm["default"].bind(this);
-    this.showActionForm = _editor["default"].showActionForm.bind(this);
+    this.showActionForm = _actionForm["default"].bind(this);
     this.onConditionalTypeChange = _editor["default"].onConditionalTypeChange.bind(this);
     this.createConditionalForm = _editor["default"].createConditionalForm.bind(this);
     this.serializeFormToJSON = _serializeFormToJSON["default"].bind(this);
@@ -299,16 +300,19 @@ var SutraGUI = /*#__PURE__*/function () {
       if (this.game.systemsManager) {
         this.game.systemsManager.addSystem(this.id, this);
       }
-      if (this.game.systems['entity-input']) {
+      if (this.game && this.game.systems && this.game.systems['entity-input']) {
         // Remark: You may not have to disable inputs + remove events
         // *just* removing events should be enough, this is OK for now
         this.game.systems['entity-input'].disableInputs();
         this.game.systems['keyboard'].unbindAllEvents();
-        // add a global click handler to document that will delegate any clicks
-        // that are not inside gui-windows to re-enable inputs
-        document.addEventListener('click', function (e) {
-          // check if the click was inside a gui-window
-          var guiWindow = e.target.closest('.gui-container');
+      }
+
+      // add a global click handler to document that will delegate any clicks
+      // that are not inside gui-windows to re-enable inputs
+      document.addEventListener('click', function (e) {
+        // check if the click was inside a gui-window
+        var guiWindow = e.target.closest('.gui-container');
+        if (_this.game && _this.game.systems && _this.game.systems['entity-input'] && _this.game.systems['keyboard']) {
           if (!guiWindow) {
             // re-enable inputs
             _this.game.systems['entity-input'].setInputsActive();
@@ -325,8 +329,8 @@ var SutraGUI = /*#__PURE__*/function () {
             var node = _this.behavior.findNode(sutraPath);
             _this.showConditionalsForm(node);
           }
-        });
-      }
+        }
+      });
       var rules = (0, _testRules["default"])(game);
 
       // gui.setTheme('light');
@@ -427,6 +431,11 @@ var SutraGUI = /*#__PURE__*/function () {
       var table = document.getElementById('sutraTable');
       //let guiContent = container.querySelector('.gui-content');
 
+      if (json.tree.length === 0) {
+        // add message to indicate no sutra
+        table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
+        return;
+      }
       //let container = document.createElement('div');
       json.tree.forEach(function (node) {
         table.appendChild(_this3.createNodeElement(node, 1));
@@ -526,9 +535,20 @@ var SutraGUI = /*#__PURE__*/function () {
       // Append the action select container to the main element
       element.appendChild(actionSelectContainer);
       if (node.data) {
-        var _dataView = this.dataView(node, indentLevel);
+        var dataContainer = document.createElement('div');
+        dataContainer.className = 'data-container';
+        dataContainer.classList.add('with-container');
+        dataContainer.setAttribute('data-path', node.sutraPath);
+        var withLabel = document.createElement('label');
+        withLabel.className = 'with-label';
+        withLabel.innerHTML = "<a href=\"#\" class=\"sutra-keyword\">WITH</a>";
+        //dataContainer.appendChild(withLabel);
+
+        actionSelectContainer.appendChild(withLabel);
+
+        //let dataView = this.dataView(node, indentLevel);
         // Append the data container to the main element
-        element.appendChild(_dataView);
+        //element.appendChild(dataView);
       }
     }
   }, {
@@ -801,7 +821,7 @@ var SutraGUI = /*#__PURE__*/function () {
 _defineProperty(SutraGUI, "id", 'gui-sutra');
 var _default = exports["default"] = SutraGUI;
 
-},{"../gui-editor/gui.js":1,"./lib/drawTable.js":3,"./lib/editor.js":4,"./lib/editor/createLabel.js":6,"./lib/editor/dataForm.js":7,"./lib/editor/dataView.js":8,"./testRules.js":9,"./util/serializeFormToJSON.js":10}],3:[function(require,module,exports){
+},{"../gui-editor/gui.js":1,"./lib/drawTable.js":3,"./lib/editor.js":4,"./lib/editor/actionForm.js":5,"./lib/editor/createLabel.js":7,"./lib/editor/dataForm.js":8,"./lib/editor/dataView.js":9,"./testRules.js":10,"./util/serializeFormToJSON.js":11}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -822,7 +842,7 @@ function drawTable() {
     if (game.systemsManager) {
       game.systemsManager.removeSystem(self.id);
     }
-  }, game.systems['gui-sutra']);
+  });
 
   // Add a "Show Sutra" button
   var showSutraButton = document.createElement('button');
@@ -966,7 +986,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   editorContainer.appendChild(form);
 
   // Descriptive text
-  var description = document.createElement('p');
+  var description = document.createElement('div');
   description.innerHTML = "<span class=\"sutra-keyword\">property</span> refers to current context values <br/><span class=\"sutra-keyword\">gamePropertyPath</span>  refers to global 'game.data'";
   form.appendChild(description);
 
@@ -1018,7 +1038,11 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 
   // Create form fields
   var propertyFieldContainer = createField('property', conditional.property || '');
-  var propertySelectContainer = (0, _componentsSelect["default"])('property', Object.keys(game.components));
+  var components = [];
+  if (typeof game !== 'undefined' && game.components) {
+    components = Object.keys(game.components);
+  }
+  var propertySelectContainer = (0, _componentsSelect["default"])('property', components);
   var gamePropertyFieldContainer = createField('gamePropertyPath', conditional.gamePropertyPath || '');
   form.appendChild(propertySelectContainer);
   form.appendChild(gamePropertyFieldContainer);
@@ -1146,7 +1170,257 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   toggleFields(); // Call this to set initial field visibility
 };
 
-editor.showActionForm = function showActionForm(node) {
+editor.showConditionalsForm = function showConditionalsForm(node) {
+  var _this3 = this;
+  // If the node is undefined, assume we are at tree root
+  if (typeof node === 'undefined') {
+    node = {
+      sutraPath: 'tree',
+      action: 'newConditional',
+      "if": 'newConditional',
+      then: [{
+        action: 'newAction'
+      }]
+    };
+  }
+  console.log('node', node);
+  var sutraFormView = document.getElementById('sutraFormView');
+  if (!sutraFormView) {
+    this.sutraFormView = _gui["default"].window('sutraFormView', 'Sutra Condition Editor', function () {
+      var sutraFormView = document.getElementById('sutraFormView');
+      if (sutraFormView) {
+        sutraFormView.remove();
+      }
+    });
+  }
+  // not working?
+  _gui["default"].bringToFront(this.sutraFormView);
+  var guiContent = this.sutraFormView.querySelector('.gui-content');
+  guiContent.innerHTML = ''; // Clear previous content
+
+  var nodeInfo = document.createElement('div');
+  nodeInfo.className = 'node-info';
+  var ifLink = '';
+  if (Array.isArray(node["if"])) {
+    node["if"].forEach(function (conditionalName, index) {
+      // let conditional = this.behavior.getCondition(conditionalName);
+      if (index > 0) {
+        ifLink += "<strong class=\"sutra-keyword\">AND</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
+      } else {
+        ifLink += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
+      }
+    });
+  } else {
+    ifLink = node["if"];
+  }
+  var humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
+  console.log('humanPath', humanPath);
+  humanPath = humanPath.replace('and', '');
+  humanPath = humanPath.split(' ');
+
+  // for each item in humanPath create a span that has sutra-link class and sutra-path attribute
+  var path = '';
+  humanPath.forEach(function (item, index) {
+    if (index > 0) {
+      path += " <strong class=\"sutra-keyword\">..</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(item, "</span>");
+    } else {
+      path += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(item, "</span>");
+    }
+  });
+
+  // Create and append the 'Path' element
+  var pathElement = document.createElement('div');
+  pathElement.innerHTML = "<strong class=\"sutra-keyword\">ROOT</strong> ".concat(humanPath);
+  nodeInfo.appendChild(pathElement);
+
+  // Create and append the 'If' element
+  var ifElement = document.createElement('div');
+  ifElement.innerHTML = "<strong class=\"sutra-keyword\">IF</strong> ".concat(ifLink);
+  nodeInfo.appendChild(ifElement);
+  if (node.then && Array.isArray(node.then) && typeof node.then[0].action !== 'undefined') {
+    // Create and append the 'Then' element
+    var thenElement = document.createElement('div');
+    thenElement.innerHTML = "<strong class=\"sutra-keyword\">THEN</strong> ".concat(node.then[0].action);
+    // clicking on the Then element should up Action Editor
+    thenElement.addEventListener('click', function (e) {
+      e.preventDefault();
+      _this3.showActionForm(node.then[0]);
+    });
+    nodeInfo.appendChild(thenElement);
+  }
+
+  /*
+  if (typeof node.then[0].data !== 'undefined') {
+    // add "WITH" header span
+    let withElement = document.createElement('div');
+    withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
+    nodeInfo.appendChild(withElement);
+  }
+  */
+
+  // Append the entire node info to the GUI content
+  guiContent.appendChild(nodeInfo);
+
+  // Handle array of conditionals
+  if (Array.isArray(node["if"])) {
+    node["if"].forEach(function (conditionalName) {
+      _this3.createConditionalForm(conditionalName, node);
+    });
+  } else {
+    // get condition first
+    var condition = this.behavior.getCondition(node["if"]);
+    if (!condition) {
+      console.log('condition not found', node["if"]);
+      condition = {
+        op: '==',
+        property: 'type',
+        value: 'block'
+      };
+    }
+    if (Array.isArray(condition.conditions)) {
+      condition.conditions.forEach(function (condName, index) {
+        var subCondition = _this3.behavior.getCondition(condName);
+        _this3.createConditionalForm(condName, node);
+      });
+    } else {
+      this.createConditionalForm(node["if"], node);
+    }
+  }
+
+  // add footer for adding new conditional / remove entire if condition
+  // let button = addConditionButton(this, conode);
+
+  var footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = "<h3>Entire Condition Footer</h3>";
+  guiContent.appendChild(footer);
+  _gui["default"].bringToFront(this.sutraFormView);
+};
+editor.createConditionalForm = function createConditionalForm(conditionalName, node) {
+  var _this4 = this;
+  console.log('creating conditional form', conditionalName, node);
+  var self = this;
+  // Create the form element
+
+  /*
+  let form = document.createElement('form');
+  form.className = 'sutra-form';
+  // Create the radio group div
+  let radioGroupDiv = document.createElement('div');
+  radioGroupDiv.className = 'radio-group';
+  // Add radio buttons to radioGroupDiv as needed
+   // Create the conditional input container div
+  let conditionalInputContainer = document.createElement('div');
+  conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
+  conditionalInputContainer.className = 'input-container';
+   // Append the created elements to the form
+  form.appendChild(radioGroupDiv);
+  form.appendChild(conditionalInputContainer);
+  // form.appendChild(removeConditionButton);
+  // form.appendChild(addConditionBelowButton);
+  */
+  // Append the form to the DOM or a parent element as required
+  // Example: document.body.appendChild(form); or parentElement.appendChild(form);
+
+  var conditional = this.behavior.getCondition(conditionalName);
+  console.log('conditional', conditional);
+  if (!conditional) {
+    console.log('condition not found', conditionalName);
+    conditional = {
+      op: '==',
+      property: 'type',
+      value: 'block'
+    };
+  }
+
+  // Handling when conditional is an array
+  if (Array.isArray(conditional)) {
+    // Create a container for each condition in the array
+    conditional.forEach(function (cond, index) {
+      var container = document.createElement('div');
+      container.id = "conditional-".concat(conditionalName, "-").concat(index);
+      container.className = 'conditional-array-item';
+      // Depending on the type of condition (function or object), call the appropriate editor
+      if (typeof cond === 'function') {
+        _this4.showFunctionEditor("".concat(conditionalName, "-").concat(index), cond, container);
+      } else if (_typeof(cond) === 'object') {
+        _this4.showObjectEditor("".concat(conditionalName, "-").concat(index), cond, _this4.behavior.operators, container);
+      } else {
+        console.log('Unknown conditional type in array');
+      }
+      var guiContent = _this4.sutraFormView.querySelector('.gui-content');
+      guiContent.appendChild(container);
+
+      // Append the container to the form
+      //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
+    });
+  } else if (typeof conditional === 'function') {
+    this.showFunctionEditor(conditionalName, conditional);
+  } else if (_typeof(conditional) === 'object') {
+    this.showObjectEditor(conditionalName, conditional, this.behavior.operators);
+  } else {
+    console.log('Unknown conditional type');
+  }
+  var guiContent = this.sutraFormView.querySelector('.gui-content');
+  var footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = "<h3>Individual Condition Footer</h3>";
+  guiContent.appendChild(footer);
+};
+
+// Adjust createConditional to handle both creating and updating conditionals
+editor.createConditional = function createConditional(e, node) {
+  e.preventDefault();
+  var formData = new FormData(e.target);
+  var type = formData.get('conditionalType');
+  var conditionalName = node ? node.action : 'newConditional'; // Default name for new conditional
+
+  if (type === 'function') {
+    // Logic to create and add custom function conditional
+    var func = new Function('return ' + formData.get('conditionalFunction'))();
+    this.behavior.updateCondition(conditionalName, func);
+  } else {
+    // Logic to create and add DSL object conditional
+    var dsl = {
+      op: formData.get('dslOperator'),
+      property: formData.get('dslProperty'),
+      value: formData.get('dslValue')
+    };
+    this.behavior.updateCondition(conditionalName, dsl);
+  }
+
+  // Redraw behavior tree or update UI as needed
+  this.redrawBehaviorTree();
+};
+editor.onConditionalTypeChange = function onConditionalTypeChange(type, node) {
+  // Update form based on selected type
+  var inputContainer = document.getElementById('conditionalInputContainer');
+  if (type === 'function') {
+    // Provide a textarea for custom function input
+    var functionValue = node && typeof node.condition === 'function' ? node.condition.toString() : '';
+    inputContainer.innerHTML = "<textarea name=\"conditionalFunction\">".concat(functionValue, "</textarea>");
+  } else {
+    // Provide inputs for DSL object properties
+    var propertyValue = node && node.condition && node.condition.property ? node.condition.property : '';
+    var valueValue = node && node.condition && node.condition.value ? node.condition.value : '';
+    var selectedOp = node && node.condition && node.condition.op ? node.condition.op : '';
+    inputContainer.innerHTML = "\n      <input name=\"dslProperty\" placeholder=\"Property\" value=\"".concat(propertyValue, "\">\n      <input name=\"dslValue\" placeholder=\"Value\" value=\"").concat(valueValue, "\">\n      <select name=\"dslOperator\">\n        ").concat(this.behavior.getOperators().map(function (op) {
+      return "<option value=\"".concat(op, "\" ").concat(op === selectedOp ? 'selected' : '', ">").concat(op, "</option>");
+    }).join(''), "\n      </select>\n    ");
+  }
+};
+var _default = exports["default"] = editor;
+
+},{"../../gui-editor/gui.js":1,"./editor/componentsSelect.js":6}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = showActionForm;
+var _gui = _interopRequireDefault(require("../../../gui-editor/gui.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function showActionForm(node) {
   /*
   // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {
@@ -1219,217 +1493,9 @@ editor.showActionForm = function showActionForm(node) {
 
   var formContainer = this.dataForm(node);
   guiContent.appendChild(formContainer);
-};
-editor.showConditionalsForm = function showConditionalsForm(node) {
-  var _this3 = this;
-  // If the node is undefined, assume we are at tree root
-  if (typeof node === 'undefined') {
-    node = {
-      sutraPath: 'tree',
-      action: 'newConditional'
-    };
-  }
-  console.log('node', node);
-  var sutraFormView = document.getElementById('sutraFormView');
-  if (!sutraFormView) {
-    this.sutraFormView = _gui["default"].window('sutraFormView', 'Sutra Condition Editor', function () {
-      var sutraFormView = document.getElementById('sutraFormView');
-      if (sutraFormView) {
-        sutraFormView.remove();
-      }
-    });
-  }
-  // not working?
-  _gui["default"].bringToFront(this.sutraFormView);
-  var guiContent = this.sutraFormView.querySelector('.gui-content');
-  guiContent.innerHTML = ''; // Clear previous content
+}
 
-  var nodeInfo = document.createElement('div');
-  nodeInfo.className = 'node-info';
-  var ifLink = '';
-  if (Array.isArray(node["if"])) {
-    node["if"].forEach(function (conditionalName, index) {
-      // let conditional = this.behavior.getCondition(conditionalName);
-      if (index > 0) {
-        ifLink += " <strong class=\"sutra-keyword\">AND</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
-      } else {
-        ifLink += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
-      }
-    });
-  } else {
-    ifLink = node["if"];
-  }
-  var humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
-  humanPath = humanPath.replace('and', '<strong class="sutra-keyword">AND</strong>');
-  // Create and append the 'Path' element
-  var pathElement = document.createElement('div');
-  pathElement.innerHTML = "<strong class=\"sutra-keyword\">ROOT</strong> ".concat(humanPath);
-  nodeInfo.appendChild(pathElement);
-
-  // Create and append the 'If' element
-  var ifElement = document.createElement('div');
-  ifElement.innerHTML = "<strong class=\"sutra-keyword\">IF</strong> ".concat(ifLink);
-  nodeInfo.appendChild(ifElement);
-  if (typeof node.then[0].action !== 'undefined') {
-    // Create and append the 'Then' element
-    var thenElement = document.createElement('div');
-    thenElement.innerHTML = "<strong class=\"sutra-keyword\">THEN</strong> ".concat(node.then[0].action);
-    // clicking on the Then element should up Action Editor
-    thenElement.addEventListener('click', function (e) {
-      e.preventDefault();
-      _this3.showActionForm(node.then[0]);
-    });
-    nodeInfo.appendChild(thenElement);
-  }
-
-  /*
-  if (typeof node.then[0].data !== 'undefined') {
-    // add "WITH" header span
-    let withElement = document.createElement('div');
-    withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
-    nodeInfo.appendChild(withElement);
-  }
-  */
-
-  // Append the entire node info to the GUI content
-  guiContent.appendChild(nodeInfo);
-
-  // Handle array of conditionals
-  if (Array.isArray(node["if"])) {
-    node["if"].forEach(function (conditionalName) {
-      _this3.createConditionalForm(conditionalName, node);
-    });
-  } else {
-    // get condition first
-    var condition = this.behavior.getCondition(node["if"]);
-    if (Array.isArray(condition.conditions)) {
-      condition.conditions.forEach(function (condName, index) {
-        var subCondition = _this3.behavior.getCondition(condName);
-        _this3.createConditionalForm(condName, node);
-      });
-    } else {
-      this.createConditionalForm(node["if"], node);
-    }
-  }
-
-  // add footer for adding new conditional / remove entire if condition
-  // let button = addConditionButton(this, conode);
-
-  var footer = document.createElement('div');
-  footer.className = 'footer';
-  footer.innerHTML = "<h3>Entire Condition Footer</h3>";
-  guiContent.appendChild(footer);
-  _gui["default"].bringToFront(this.sutraFormView);
-};
-editor.createConditionalForm = function createConditionalForm(conditionalName, node) {
-  var _this4 = this;
-  console.log('creating conditional form', conditionalName, node);
-  var self = this;
-  // Create the form element
-
-  /*
-  let form = document.createElement('form');
-  form.className = 'sutra-form';
-  // Create the radio group div
-  let radioGroupDiv = document.createElement('div');
-  radioGroupDiv.className = 'radio-group';
-  // Add radio buttons to radioGroupDiv as needed
-   // Create the conditional input container div
-  let conditionalInputContainer = document.createElement('div');
-  conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
-  conditionalInputContainer.className = 'input-container';
-   // Append the created elements to the form
-  form.appendChild(radioGroupDiv);
-  form.appendChild(conditionalInputContainer);
-  // form.appendChild(removeConditionButton);
-  // form.appendChild(addConditionBelowButton);
-  */
-  // Append the form to the DOM or a parent element as required
-  // Example: document.body.appendChild(form); or parentElement.appendChild(form);
-
-  var conditional = this.behavior.getCondition(conditionalName);
-  console.log('conditional', conditional);
-
-  // Handling when conditional is an array
-  if (Array.isArray(conditional)) {
-    // Create a container for each condition in the array
-    conditional.forEach(function (cond, index) {
-      var container = document.createElement('div');
-      container.id = "conditional-".concat(conditionalName, "-").concat(index);
-      container.className = 'conditional-array-item';
-
-      // Depending on the type of condition (function or object), call the appropriate editor
-      if (typeof cond === 'function') {
-        _this4.showFunctionEditor("".concat(conditionalName, "-").concat(index), cond, container);
-      } else if (_typeof(cond) === 'object') {
-        _this4.showObjectEditor("".concat(conditionalName, "-").concat(index), cond, _this4.behavior.operators, container);
-      } else {
-        console.log('Unknown conditional type in array');
-      }
-      var guiContent = _this4.sutraFormView.querySelector('.gui-content');
-      guiContent.appendChild(container);
-
-      // Append the container to the form
-      //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
-    });
-  } else if (typeof conditional === 'function') {
-    this.showFunctionEditor(conditionalName, conditional);
-  } else if (_typeof(conditional) === 'object') {
-    this.showObjectEditor(conditionalName, conditional, this.behavior.operators);
-  } else {
-    console.log('Unknown conditional type');
-  }
-  var guiContent = this.sutraFormView.querySelector('.gui-content');
-  var footer = document.createElement('div');
-  footer.className = 'footer';
-  footer.innerHTML = "<h3>Individual Condition Footer</h3>";
-  guiContent.appendChild(footer);
-};
-
-// Adjust createConditional to handle both creating and updating conditionals
-editor.createConditional = function createConditional(e, node) {
-  e.preventDefault();
-  var formData = new FormData(e.target);
-  var type = formData.get('conditionalType');
-  var conditionalName = node ? node.action : 'newConditional'; // Default name for new conditional
-
-  if (type === 'function') {
-    // Logic to create and add custom function conditional
-    var func = new Function('return ' + formData.get('conditionalFunction'))();
-    this.behavior.updateCondition(conditionalName, func);
-  } else {
-    // Logic to create and add DSL object conditional
-    var dsl = {
-      op: formData.get('dslOperator'),
-      property: formData.get('dslProperty'),
-      value: formData.get('dslValue')
-    };
-    this.behavior.updateCondition(conditionalName, dsl);
-  }
-
-  // Redraw behavior tree or update UI as needed
-  this.redrawBehaviorTree();
-};
-editor.onConditionalTypeChange = function onConditionalTypeChange(type, node) {
-  // Update form based on selected type
-  var inputContainer = document.getElementById('conditionalInputContainer');
-  if (type === 'function') {
-    // Provide a textarea for custom function input
-    var functionValue = node && typeof node.condition === 'function' ? node.condition.toString() : '';
-    inputContainer.innerHTML = "<textarea name=\"conditionalFunction\">".concat(functionValue, "</textarea>");
-  } else {
-    // Provide inputs for DSL object properties
-    var propertyValue = node && node.condition && node.condition.property ? node.condition.property : '';
-    var valueValue = node && node.condition && node.condition.value ? node.condition.value : '';
-    var selectedOp = node && node.condition && node.condition.op ? node.condition.op : '';
-    inputContainer.innerHTML = "\n      <input name=\"dslProperty\" placeholder=\"Property\" value=\"".concat(propertyValue, "\">\n      <input name=\"dslValue\" placeholder=\"Value\" value=\"").concat(valueValue, "\">\n      <select name=\"dslOperator\">\n        ").concat(this.behavior.getOperators().map(function (op) {
-      return "<option value=\"".concat(op, "\" ").concat(op === selectedOp ? 'selected' : '', ">").concat(op, "</option>");
-    }).join(''), "\n      </select>\n    ");
-  }
-};
-var _default = exports["default"] = editor;
-
-},{"../../gui-editor/gui.js":1,"./editor/componentsSelect.js":5}],5:[function(require,module,exports){
+},{"../../../gui-editor/gui.js":1}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1457,7 +1523,7 @@ function componentsSelect(id, components) {
   return fieldContainer;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1475,18 +1541,27 @@ function createLabel(key, indentLevel) {
   return label;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = dataView;
+exports["default"] = dataForm;
+var _actionForm = _interopRequireDefault(require("./actionForm.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function dataView(node) {
+function dataForm(node) {
+  var _this = this;
   var indentLevel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   this.createDataContainer = createDataContainer.bind(this);
   this.createNestedDataContainer = createNestedDataContainer.bind(this);
+  this.redrawComponent = redrawComponent.bind(this);
+  this.showAddPropertyForm = showAddPropertyForm.bind(this);
+  this.addPropertyToNestedNode = addPropertyToNestedNode.bind(this);
+  this.createObjectInput = createObjectInput.bind(this);
+  this.createValueInput = createValueInput.bind(this);
+  this.actionForm = _actionForm["default"].bind(this);
 
   // "With" context container for data
   var dataContainer = document.createElement('div');
@@ -1510,31 +1585,247 @@ function dataView(node) {
   // Create and append the data content to the data container
   var dataContent = this.createDataContainer(node, indentLevel);
   dataContainer.appendChild(dataContent);
+
+  // Add "Add Property" button
+  var addButton = document.createElement('button');
+  addButton.innerText = 'Add Property';
+  addButton.onclick = function () {
+    return _this.showAddPropertyForm(node, indentLevel, dataContainer);
+  };
+  dataContainer.appendChild(addButton);
   return dataContainer;
 }
-function createDataContainer(node, indentLevel) {
-  var _this = this;
-  // console.log('creating a data container', node);
+function createDataContainer(node) {
+  var _this2 = this;
+  var indentLevel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  console.log('creating a data container', node, indentLevel);
   var dataContainer = document.createElement('div');
-  dataContainer.className = '';
+  dataContainer.className = 'action-form';
   Object.keys(node.data).forEach(function (key) {
     var path = key;
     // Check if the value is an object and not null
     if (_typeof(node.data[key]) === 'object' && node.data[key] !== null) {
-      var nestedLabel = _this.createLabel(key, indentLevel);
+      var nestedLabel = _this2.createLabel(key, indentLevel);
       dataContainer.appendChild(nestedLabel);
-      var nestedContainer = _this.createNestedDataContainer(node.data[key], indentLevel + 1, path);
+      var nestedContainer = _this2.createNestedDataContainer(node.data[key], indentLevel + 1, path);
       nestedContainer.dataset.key = key; // Optional: set a data attribute for the key
       dataContainer.appendChild(nestedContainer);
+      var addButton = document.createElement('button');
+      addButton.innerText = 'Add Property';
+      addButton.onclick = function () {
+        return _this2.showAddPropertyForm(node, indentLevel, dataContainer);
+      };
+
+      // Add indentation to the button based on the indent level
+      addButton.style.marginLeft = "".concat(indentLevel + 1 * 20, "px"); // adjust 20px to your preference
+
+      dataContainer.appendChild(addButton);
     } else {
-      var inputGroup = _this.createInputGroup(node, key, indentLevel, path);
+      var inputGroup = _this2.createInputGroup(node, key, indentLevel, path);
       dataContainer.appendChild(inputGroup);
     }
   });
   return dataContainer;
 }
+function showAddPropertyForm(node, indentLevel, parentElement) {
+  var self = this;
+  var form = document.createElement('form');
+  var typeSelect = createTypeSelect();
+  var valueInput = this.createValueInput('string'); // default type is string
+
+  // Updating value input based on type selection
+  typeSelect.onchange = function () {
+    var selectedType = this.value;
+    form.replaceChild(self.createValueInput(selectedType, indentLevel), valueInput);
+    valueInput = form.elements.value;
+  };
+  form.appendChild(createLabelInputPair('Key', 'text', 'key'));
+  form.appendChild(typeSelect);
+  form.appendChild(valueInput);
+  form.appendChild(createButton('Save', 'submit'));
+  form.appendChild(createButton('Cancel'));
+
+  // Cancel button functionality
+  form.lastChild.onclick = function (event) {
+    event.preventDefault();
+    parentElement.removeChild(form);
+  };
+  form.onsubmit = function (event) {
+    event.preventDefault();
+    var key = event.target.elements.key.value;
+    var value = parseValueFromInput(valueInput, typeSelect.value);
+    if (indentLevel > 0) {
+      // For nested objects, update the nestedNode instead of the main node
+      self.addPropertyToNestedNode(node, key, value, parentElement, indentLevel);
+    } else {
+      addPropertyToNode(node, key, value);
+      self.redrawComponent(node, indentLevel, parentElement);
+    }
+  };
+  parentElement.appendChild(form);
+}
+function addPropertyToNestedNode(nestedNode, key, value, parentElement, indentLevel) {
+  var _this3 = this;
+  nestedNode[key] = value;
+  // Redraw the nested object container
+  while (parentElement.firstChild) {
+    parentElement.removeChild(parentElement.firstChild);
+  }
+  var newDataContent = this.createDataContainer({
+    data: nestedNode
+  }, indentLevel);
+  parentElement.appendChild(newDataContent);
+  parentElement.appendChild(createButton('Add Nested Property', 'button', function () {
+    return _this3.showAddPropertyForm(nestedNode, indentLevel, parentElement);
+  }));
+}
+function createLabelInputPair(labelText, inputType, inputName) {
+  var label = document.createElement('label');
+  label.textContent = "".concat(labelText, ": ");
+  label.classList.add('data-label');
+  var input = document.createElement('input');
+  input.type = inputType;
+  input.name = inputName;
+  label.appendChild(input);
+  return label;
+}
+function createTypeSelect() {
+  var select = document.createElement('select');
+  var types = ['string', 'number', 'boolean', 'object', 'array', 'function', 'null'];
+  types.forEach(function (type) {
+    var option = document.createElement('option');
+    option.value = type;
+    option.textContent = type;
+    select.appendChild(option);
+  });
+  return select;
+}
+function createValueInput(type) {
+  var indentLevel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  switch (type) {
+    case 'boolean':
+      var checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.name = 'value';
+      return checkbox;
+    case 'object':
+      return this.createObjectInput(indentLevel + 1);
+    case 'array':
+      return createArrayInput();
+    case 'function':
+      return createFunctionInput();
+    case 'null':
+      var nullInput = document.createElement('input');
+      nullInput.disabled = true;
+      nullInput.name = 'value';
+      return nullInput;
+    default:
+      var input = document.createElement('input');
+      input.type = type;
+      input.name = 'value';
+      input.placeholder = 'Value';
+      // input.classList.add('param-input');
+      return input;
+  }
+}
+function createObjectInput(indentLevel) {
+  var self = this;
+  var nestedNode = {}; // Initialize an empty object for nested data
+  var container = document.createElement('div');
+  container.className = "nested-data-container nested-level-".concat(indentLevel);
+  var addButton = document.createElement('button');
+  addButton.textContent = 'Add Nested Property';
+  addButton.onclick = function () {
+    self.showAddPropertyForm(nestedNode, indentLevel + 1, container);
+  };
+  container.appendChild(addButton);
+  return container;
+}
+function createArrayInput() {
+  var container = document.createElement('div');
+  var addButton = document.createElement('button');
+  addButton.textContent = 'Add Item';
+  addButton.onclick = function () {
+    container.appendChild(createArrayItemInput());
+  };
+  container.appendChild(addButton);
+  return container;
+}
+function createFunctionInput() {
+  var textarea = document.createElement('textarea');
+  textarea.placeholder = 'Enter function body here...';
+  return textarea;
+}
+function createKeyValuePairInput() {
+  var container = document.createElement('div');
+  var keyInput = document.createElement('input');
+  keyInput.placeholder = 'Key';
+  var valueInput = this.createValueInput('string'); // default to string
+  container.appendChild(keyInput);
+  container.appendChild(valueInput);
+  return container;
+}
+function createArrayItemInput() {
+  var itemContainer = document.createElement('div');
+  var itemInput = this.createValueInput('string'); // default to string
+  var deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.onclick = function () {
+    itemContainer.remove();
+  };
+  itemContainer.appendChild(itemInput);
+  itemContainer.appendChild(deleteButton);
+  return itemContainer;
+}
+function parseValueFromInput(input, type) {
+  console.log('parseValueFromInput', input, type);
+  switch (type) {
+    case 'number':
+      return parseFloat(input.value) || 0;
+    case 'boolean':
+      return input.checked;
+    case 'null':
+      return null;
+    default:
+      return input.value;
+  }
+}
+function createButton(text) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'button';
+  var button = document.createElement('button');
+  button.type = type;
+  button.textContent = text;
+  return button;
+}
+function addPropertyToNode(node, key, value) {
+  // Assuming node.data is the object to update
+  node.data[key] = value;
+}
+
+// TODO: what is going on with redrawComponent?
+// it seems to not redraw actual component, just some sub-view
+// it would be better if this instead just reloads the whole data view
+// based on the current state of the tree
+function redrawComponent(node, indentLevel, parentElement) {
+  // get the exists gui-content
+  var guiContent = this.sutraActionEditor.querySelector('.gui-content');
+  // empty it
+  guiContent.innerHTML = '';
+
+  // redraw the node
+  var dataContent = this.actionForm(node);
+  guiContent.appendChild(dataContent);
+  return;
+  // Clear the existing content
+  while (parentElement.firstChild) {
+    parentElement.removeChild(parentElement.firstChild);
+  }
+  // Redraw the component
+  var newDataContent = this.createDataContainer(node, indentLevel);
+  parentElement.appendChild(newDataContent);
+}
 function createNestedDataContainer(nestedNode, indentLevel) {
-  var _this2 = this;
+  var _this4 = this;
   var path = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   var nestedDataContainer = document.createElement('div');
   nestedDataContainer.className = 'nested-data-container nested-level-' + indentLevel;
@@ -1542,13 +1833,13 @@ function createNestedDataContainer(nestedNode, indentLevel) {
     var nestedPath = path ? "".concat(path, ".").concat(nestedKey) : nestedKey;
     // console.log('nestedPath', nestedPath)
     if (_typeof(nestedNode[nestedKey]) === 'object' && nestedNode[nestedKey] !== null) {
-      var nestedLabel = _this2.createLabel(nestedKey, indentLevel);
+      var nestedLabel = _this4.createLabel(nestedKey, indentLevel);
       nestedDataContainer.appendChild(nestedLabel);
-      var innerNestedContainer = _this2.createNestedDataContainer(nestedNode[nestedKey], indentLevel + 1, nestedPath);
+      var innerNestedContainer = _this4.createNestedDataContainer(nestedNode[nestedKey], indentLevel + 1, nestedPath);
       innerNestedContainer.dataset.key = nestedKey; // Optional
       nestedDataContainer.appendChild(innerNestedContainer);
     } else {
-      var inputGroup = _this2.createInputGroup({
+      var inputGroup = _this4.createInputGroup({
         data: nestedNode
       }, nestedKey, indentLevel, nestedPath);
       nestedDataContainer.appendChild(inputGroup);
@@ -1557,7 +1848,7 @@ function createNestedDataContainer(nestedNode, indentLevel) {
   return nestedDataContainer;
 }
 
-},{}],8:[function(require,module,exports){
+},{"./actionForm.js":5}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1644,7 +1935,7 @@ function createValueDisplay(key, value, indentLevel, path) {
   return valueDisplayWrapper;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1657,7 +1948,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 function testRules(game) {
   var rules = new _index["default"].Sutra();
-
+  // return rules;
   // Define health level conditions for the boss
   var healthLevels = [800, 600, 400, 200, 0];
   var colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red
@@ -1926,11 +2217,10 @@ function testRules(game) {
     // alert("YOU ARE THE WINRAR")
   });
 
-  console.log("RRRRRRR", rules);
   return rules;
 }
 
-},{"../../../../sutra/index.js":11}],10:[function(require,module,exports){
+},{"../../../../sutra/index.js":12}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2005,7 +2295,7 @@ function coerceType(value) {
   return value;
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2021,7 +2311,7 @@ sutra.createSutra = function () {
 };
 var _default = exports["default"] = sutra;
 
-},{"./lib/Sutra.js":12}],12:[function(require,module,exports){
+},{"./lib/Sutra.js":13}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2483,7 +2773,7 @@ var Sutra = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Sutra;
 
-},{"./evaluateCompositeCondition.js":13,"./evaluateCondition.js":14,"./evaluateDSLCondition.js":15,"./evaluateSingleCondition.js":16,"./exportToEnglish.js":17,"./operatorAliases.js":18,"./parsePath.js":19,"./serializeToJson.js":20}],13:[function(require,module,exports){
+},{"./evaluateCompositeCondition.js":14,"./evaluateCondition.js":15,"./evaluateDSLCondition.js":16,"./evaluateSingleCondition.js":17,"./exportToEnglish.js":18,"./operatorAliases.js":19,"./parsePath.js":20,"./serializeToJson.js":21}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2515,7 +2805,7 @@ function evaluateCompositeCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2554,7 +2844,7 @@ function evaluateCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2612,7 +2902,7 @@ function evaluateDSLCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2665,7 +2955,7 @@ function evaluateSingleCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2735,7 +3025,7 @@ function exportToEnglish() {
   }).join('.\n').concat('.');
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2760,7 +3050,7 @@ var _default = exports["default"] = {
   '!': 'not'
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2780,7 +3070,7 @@ function parsePath(path) {
   }, []);
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

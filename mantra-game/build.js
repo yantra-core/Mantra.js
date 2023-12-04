@@ -39,6 +39,7 @@ const plugins = [
   './plugins/lifetime/Lifetime.js',
   './plugins/client/LocalClient.js',
   './plugins/physics-matter/MatterPhysics.js',
+  './plugins/physics-physx/PhysXPhysics.js',
   './plugins/mouse/Mouse.js',
   './plugins/graphics-phaser/PhaserGraphics.js',
   './plugins/graphics-three/ThreeGraphics.js',

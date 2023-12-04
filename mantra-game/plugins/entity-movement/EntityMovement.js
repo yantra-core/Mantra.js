@@ -18,6 +18,20 @@ class EntityMovement extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
   }
 
+
+  /*
+    // TODO: In EntityMovement.js
+    init(game) {
+      this.game = game;
+      this.game.on('entity::move', data => {
+        this.update(data.entityId, data.dx, data.dy, data.dz);
+      });
+      // Other event listeners...
+    }
+
+
+  */
+
   addStrategy (strategy) {
     this.strategies.push(strategy);
   }

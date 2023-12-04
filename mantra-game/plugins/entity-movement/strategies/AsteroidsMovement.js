@@ -1,10 +1,11 @@
 // AsteroidsMovement.js - Marak Squires 2023
 class AsteroidsMovementStrategy {
+  static id = 'asteroids-movement';
   constructor() {}
 
   init(game) {
     this.game = game;
-
+    this.id = AsteroidsMovementStrategy.id;
     // check to see if entityInput system exists, if not throw error
     if (!game.systems['entity-movement']) {
       throw new Error('AsteroidsMovementStrategy requires an entityMovement system to be registered! Please game.use(new EntityMovement())');

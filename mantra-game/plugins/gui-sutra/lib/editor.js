@@ -92,7 +92,11 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 
   // Create form fields
   let propertyFieldContainer = createField('property', conditional.property || '');
-  let propertySelectContainer = componentsSelect('property', Object.keys(game.components));
+  let components = [];
+  if (typeof game !== 'undefined' && game.components) {
+    components = Object.keys(game.components);
+  }
+  let propertySelectContainer = componentsSelect('property', components);
   let gamePropertyFieldContainer = createField('gamePropertyPath', conditional.gamePropertyPath || '');
 
   form.appendChild(propertySelectContainer);

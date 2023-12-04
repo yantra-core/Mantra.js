@@ -55,7 +55,7 @@ var ControlsGUI = /*#__PURE__*/function () {
       // Use gui.window() to create the window
       this.controlsView = _gui["default"].window('controlsView', 'Input Controls', function () {
         game.systemsManager.removeSystem(ControlsGUI.id);
-      }, game.systems['gui-controls']);
+      });
       var guiContent = this.controlsView.querySelector('.gui-content');
       guiContent.appendChild(table);
 
