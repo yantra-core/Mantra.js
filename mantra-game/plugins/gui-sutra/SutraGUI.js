@@ -1,10 +1,15 @@
 // SutraGUI.js - Marak Squires 2023
 import gui from '../gui-editor/gui.js';
 import drawTable from './lib/drawTable.js';
+
 import dataView from './lib/editor/dataView.js';
 import dataForm from './lib/editor/dataForm.js';
+import actionForm from './lib/editor/actionForm.js';
+
 import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
+
+
 import serializeFormToJSON from './util/serializeFormToJSON.js';
 import testRules from './testRules.js';
 
@@ -23,7 +28,7 @@ class SutraGUI {
     this.createLabel = createLabel.bind(this);
     this.dataView = dataView.bind(this);
     this.dataForm = dataForm.bind(this);
-    this.showActionForm = editor.showActionForm.bind(this);
+    this.showActionForm = actionForm.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
     this.createConditionalForm = editor.createConditionalForm.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);

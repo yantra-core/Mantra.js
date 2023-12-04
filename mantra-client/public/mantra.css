@@ -922,6 +922,10 @@ textarea {
   padding: 0px;
 }
 
+.data-border {
+  border: 1px solid #2a3348;
+}
+
 .data-value-wrapper {
   display: flex;
   align-items: center;
@@ -977,6 +981,14 @@ textarea {
 
 .nested-level-3 {
   margin-left: 60px;
+}
+
+.nested-level-4 {
+  margin-left: 80px;
+}
+
+.nested-level-5 {
+  margin-left: 100px;
 }
 
 .plugin-form-container {
