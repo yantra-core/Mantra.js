@@ -341,11 +341,13 @@ class Game {
             // alert('plugin must perform async operation before it\'s ready');
           } else {
             game.loadingPluginsCount--;
+            delete game._plugins[pluginId];
             game.emit('plugin::ready::' + pluginId, pluginInstance);
           }
         } else {
           // decrement loadingPluginsCount even if it fails
           // this means applications will attempt to load even if plugins fail
+          delete game._plugins[pluginId];
           game.loadingPluginsCount--;
         }
       }).catch(function (err) {

@@ -35,6 +35,13 @@ class SystemsManager {
       system.unload();
     }
     this.systems.delete(systemId);
+
+
+    // Remark: Special scope used for plugins, we can probably remove this or rename it
+    if (this.game._plugins[system.id]) {
+      delete this.game._plugins[system.id];
+    }
+
     // we may want to remove the extra game.systems scope? or reference directly to the map?
     delete this.game.systems[systemId];
   }

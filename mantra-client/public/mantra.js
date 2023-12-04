@@ -617,11 +617,13 @@ var Game = exports.Game = /*#__PURE__*/function () {
               // alert('plugin must perform async operation before it\'s ready');
             } else {
               game.loadingPluginsCount--;
+              delete game._plugins[_pluginId];
               game.emit('plugin::ready::' + _pluginId, pluginInstance);
             }
           } else {
             // decrement loadingPluginsCount even if it fails
             // this means applications will attempt to load even if plugins fail
+            delete game._plugins[_pluginId];
             game.loadingPluginsCount--;
           }
         })["catch"](function (err) {
@@ -829,6 +831,15 @@ var SystemsManager = /*#__PURE__*/function () {
         system.unload();
       }
       this.systems["delete"](systemId);
+
+      // Remark: Special scope used for plugins, we can probably remove this or rename it
+      console.log('removing system', systemId, system);
+      console.log(this.game._plugins);
+      if (this.game._plugins[system.id]) {
+        delete this.game._plugins[system.id];
+      }
+      console.log(this.game._plugins);
+
       // we may want to remove the extra game.systems scope? or reference directly to the map?
       delete this.game.systems[systemId];
     }

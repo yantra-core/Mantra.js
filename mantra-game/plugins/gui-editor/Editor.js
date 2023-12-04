@@ -199,7 +199,7 @@ class Editor {
     let game = this.game;
     console.log('showInspector', game.systems['gui-inspector'])
     if (typeof game.systems['gui-inspector'] === 'undefined') {
-      game.use('InspectorGUI');
+      game.use('Inspector');
     } else {
       this.game.systemsManager.removeSystem('gui-inspector');
     }

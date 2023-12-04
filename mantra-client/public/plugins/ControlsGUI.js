@@ -27,6 +27,7 @@ var ControlsGUI = /*#__PURE__*/function () {
       this.game = game;
       this.listenForEntityInput();
       this.game.systemsManager.addSystem(this.id, this);
+      this.drawTable();
     }
   }, {
     key: "drawTable",
@@ -105,8 +106,10 @@ var ControlsGUI = /*#__PURE__*/function () {
         this.game.offAny(this.listener);
         this.listener = null;
       }
-      // remove all html elements
-      this.controlsView.remove();
+      if (this.controlsView) {
+        // remove all html elements
+        this.controlsView.remove();
+      }
       // clear the interval
       clearInterval(this.clearHighlightsInterval);
     }
