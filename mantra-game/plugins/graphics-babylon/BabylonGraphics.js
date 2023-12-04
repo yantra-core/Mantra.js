@@ -20,10 +20,12 @@ class BabylonGraphics extends GraphicsInterface {
 
   static id = 'graphics-babylon';
   static removable = false;
+  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   constructor({ camera } = {}) {
     super();
     this.id = BabylonGraphics.id;
+    this.async = BabylonGraphics.async;
     this.engine = null;
     this.scene = null;
     this.camera = null;
@@ -45,7 +47,6 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   init(game) {
-
     this.game = game;
 
     // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
@@ -162,13 +163,11 @@ class BabylonGraphics extends GraphicsInterface {
     // register this graphics pipline with the game
     game.graphics.push(this);
 
-    // Remark: graphicsReady is deprecated, now that plugins can be lazy loaded
-    // TODO: investigate and remove graphicsReady
-    game.graphicsReady.push(this.name);
-    
-
+    // async:true plugins *must* self report when they are ready
+    game.emit('plugin::ready::graphics-babylon', this);
+    // TODO: remove this line from plugin implementations
+    game.loadingPluginsCount--;
   }
-
 
   updateGraphic(entityData /*, alpha*/) {
     // console.log('setting position', entityData.position)

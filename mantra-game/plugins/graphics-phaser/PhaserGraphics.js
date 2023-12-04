@@ -5,10 +5,12 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 class PhaserGraphics extends GraphicsInterface {
   static id = 'graphics-phaser';
   static removable = false;
+  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   constructor({ camera = {}, startingZoom = 0.4 } = {}) {
     super();
     this.id = 'graphics-phaser';
+    this.async = PhaserGraphics.async;
 
     let config = {
       camera,
@@ -99,10 +101,16 @@ class PhaserGraphics extends GraphicsInterface {
 
       // possible duplicate api, ready per pipeline not needed,
       // as we have async loading of plugins now, review this line and remove
-      game.graphicsReady.push(self.name);
+      // game.graphicsReady.push(self.name);
 
       // wait until scene is loaded before letting systems know phaser graphics are ready
       this.game.systemsManager.addSystem('graphics-phaser', this);
+
+
+        // async:true plugins *must* self report when they are ready
+        game.emit('plugin::ready::graphics-phaser', this);
+        // TODO: remove this line from plugin implementations
+        game.loadingPluginsCount--;
 
       // camera.rotation = -Math.PI / 2;
       /*

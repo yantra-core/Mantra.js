@@ -33,10 +33,12 @@ const COLLISION_LAYER_2 = 2;
 class PhysXPhysics extends PhysicsInterface {
   static id = 'physics-physx';
   static removable = false;
+  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
   constructor(config) {
     super();
 
     this.id = PhysXPhysics.id;
+    this.async = PhysXPhysics.async;
     this.updateEngine = updateEngine;
     this.applyForce = applyForce;
     this.rotateBody = rotateBody;
@@ -145,6 +147,11 @@ class PhysXPhysics extends PhysicsInterface {
       console.log('Created scene objects');
 
       game.physicsReady = true;
+
+      // async:true plugins *must* self report when they are ready
+      game.emit('plugin::ready::physics-physx', this);
+      // TODO: remove this line from plugin implementations
+      game.loadingPluginsCount--;
 
 
     });

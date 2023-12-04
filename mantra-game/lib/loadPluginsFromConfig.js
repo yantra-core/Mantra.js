@@ -29,7 +29,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       deltaCompression: gameConfig.deltaCompression,
       msgpack: gameConfig.msgpack
     };
-    // this.use('Client', clientConfig);
+    this.use('Client', clientConfig);
 
     if (keyboard) {
       //      this.use(new plugins.Keyboard(keyboard));

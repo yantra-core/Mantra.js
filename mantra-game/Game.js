@@ -5,22 +5,16 @@
 import Component from './Component/Component.js';
 import SystemsManager from './System/SystemsManager.js';
 
-// Plugins
-// import plugins from './plugins.js';
-
-// Snapshots
-// import SnapshotManager from './plugins/snapshot-manager/SnapshotManager/SnapshotManager.js';
-
 // Game instances are event emitters
 import eventEmitter from './lib/eventEmitter.js';
 
-// import Client from './plugins/client/Client.js';
-
 // Game loops
+// TODO: move to plugins
 // Local game loop is for single machine games ( no networking )
 import localGameLoop from './lib/localGameLoop.js';
 // Online game loop is for multiplayer games ( networking )
 import onlineGameLoop from './lib/onlineGameLoop.js';
+
 
 // Game tick, called once per tick from game loop
 import gameTick from './lib/gameTick.js';
@@ -194,18 +188,8 @@ class Game {
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
 
-    // snapshotManager doesn't seem optional as plugin, not sure game loop can run without basic snapshots interface / api
-    // this.snapshotManager = new SnapshotManager(this);
-
     // Graphics rendering pipeline
     this.graphics = [];
-
-    // Graphics could take time to load and be ready
-    // as each Graphics plugin becomes ready, this array will be populated with the plugin name
-    // Game.connect() and Game.start() will wait for all Graphics to be ready before proceeding
-    // Remark: We could use this same ready pattern for all Plugins / Systems
-    this.graphicsReady = [];
-    this.physicsReady = false;
 
     this.gameTick = gameTick.bind(this);
     this.localGameLoop = localGameLoop.bind(this);
@@ -237,7 +221,6 @@ class Game {
       });
     }
 
-
   }
 
   // TODO: hoist to systemsManager
@@ -248,12 +231,10 @@ class Game {
 
   render() {
     // Call render method of SystemsManager, which will delegate to all Graphics systems
-
     // TODO: should we remove this and hoist it to the systemsManager?
     this.systemsManager.render();
   }
 
-  // TODO: make this smaller
   start(cb) {
     let game = this;
     if (typeof cb !== 'function') {
@@ -264,27 +245,17 @@ class Game {
         defaultGameStart(game);
       };
     }
-
-    if (!this.systems.client) {
-    //  game.use(new Client('Bunny', game.config));
-    }
-
-    let client = this.getSystem('client');
-
-
     // Wait for all systems to be ready before starting the game loop
-    // TODO: replace this with general 'ready' event
-    console.log('waiting for graphics to be ready', game.graphicsReady, game.graphicsReady.length, game.graphics.length, )
-    if (game.loadingPluginsCount > 0 || !game.physicsReady || game.graphicsReady.length === 0 || (game.graphics.length > 0 && (game.graphics.length !== game.graphicsReady.length))) {
-      setTimeout(function(){
+    if (game.loadingPluginsCount > 0) {
+      setTimeout(function () {
         game.start(cb);
       }, 4);
       return
     } else {
-      console.log('starting immediately');
+      console.log('All Plugins are ready! Starting Mantra Game Client...');
+      let client = this.getSystem('client');
       client.start(cb);
     }
-
   }
 
   // TODO: move to client, let client hoist the connection logic to game
@@ -304,12 +275,15 @@ class Game {
   }
 
   // All Systems are Plugins, but not all Plugins are Systems
+  // TODO: move to separate file
   use(pluginInstanceOrId, options = {}) {
     let game = this;
 
     // TODO: make this configurable
     let basePath = '/plugins/'; // Base path for loading plugins
     basePath = this.scriptRoot + basePath;
+    //console.log("FOUND SCRIPT ROOT", this.scriptRoot)
+    //console.log("LOADING FROM BASEPATH", basePath)
     // Check if the argument is a string (plugin ID)
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
@@ -344,8 +318,16 @@ class Game {
           //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
           let pluginInstance = new PLUGINS[pluginId].default(options);
           game.use(pluginInstance);
-          game.emit('plugin::ready::' + pluginId, pluginInstance);
-          game.loadingPluginsCount--;
+          // check to see if pluginInstance is async, if so
+          // we'll assume it will emit a ready event when it's ready
+          if (pluginInstance.async) {
+            // plugin must perform async operation before it's ready
+            // plugin author *must* emit their own ready event game will not start
+            // alert('plugin must perform async operation before it\'s ready');
+          } else {
+            game.loadingPluginsCount--;
+            game.emit('plugin::ready::' + pluginId, pluginInstance);
+          }
         } else {
           // decrement loadingPluginsCount even if it fails
           // this means applications will attempt to load even if plugins fail
@@ -387,7 +369,6 @@ class Game {
       document.head.appendChild(script);
     });
   }
-
 
   removePlugin(pluginName) {
     let plugin = this._plugins[pluginName];
