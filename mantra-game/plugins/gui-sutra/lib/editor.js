@@ -1,5 +1,5 @@
 import gui from '../../gui-editor/gui.js';
-
+import componentsSelect from './editor/componentsSelect.js';
 const editor = {};
 
 editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditional) {
@@ -86,15 +86,16 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     });
     */
 
-    propertyFieldContainer.style.display = propertyRadio.input.checked ? 'block' : 'none';
+    propertySelectContainer.style.display = propertyRadio.input.checked ? 'block' : 'none';
     gamePropertyFieldContainer.style.display = gamePropertyRadio.input.checked ? 'block' : 'none';
   }
 
   // Create form fields
   let propertyFieldContainer = createField('property', conditional.property || '');
+  let propertySelectContainer = componentsSelect('property', Object.keys(game.components));
   let gamePropertyFieldContainer = createField('gamePropertyPath', conditional.gamePropertyPath || '');
 
-  form.appendChild(propertyFieldContainer);
+  form.appendChild(propertySelectContainer);
   form.appendChild(gamePropertyFieldContainer);
   
   // Function to create input fields
@@ -326,6 +327,14 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     }
   }
 
+  // add footer for adding new conditional / remove entire if condition
+  // let button = addConditionButton(this, conode);
+
+  let footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = `<h3>Entire Condition Footer</h3>`;
+  guiContent.appendChild(footer);
+
   gui.bringToFront(this.sutraFormView);
 }
 
@@ -333,6 +342,8 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   console.log('creating conditional form', conditionalName, node)
   let self = this;
   // Create the form element
+  
+  /*
   let form = document.createElement('form');
   form.className = 'sutra-form';
   // Create the radio group div
@@ -345,85 +356,12 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
   conditionalInputContainer.className = 'input-container';
 
-  // Create the remove condition button
-  let removeConditionButton = document.createElement('button');
-  removeConditionButton.type = 'submit';
-  removeConditionButton.className = 'remove-condition-button';
-  removeConditionButton.textContent = 'Remove Entire If Condition';
-
-  removeConditionButton.onclick = (event) => {
-    event.preventDefault();
-    this.behavior.removeNode(node.sutraPath);
-    // close the editor window since we deleted the condition we were editing
-    let sutraFormView = document.getElementById('sutraFormView');
-    if (sutraFormView) {
-      sutraFormView.remove();
-    }
-    //this.behavior.removeCondition(conditionalName);
-    this.redrawBehaviorTree();
-  };
-
-  // create add condition below button
-  let addConditionBelowButton = document.createElement('button');
-  addConditionBelowButton.type = 'submit';
-  addConditionBelowButton.className = 'add-condition-below-button';
-  addConditionBelowButton.textContent = 'Add Condition Below';
-
-  addConditionBelowButton.onclick = (event) => {
-    event.preventDefault();
-    // create a new conditional name
-    // TODO: this is not working correctly yet
-    // TODO: have a big list of made up names for new behavior tree nodes
-    //let newConditionalName = 'newCondition';
-    // create the new conditional with placeholder values
-    // update the condition immediately with placeholder values
-    // and redraw the behavior tree, let UI take care of everything else
-
-    console.log('about to update condition', conditionalName)
-
-    // get the existing condition
-    let existingCondition = this.behavior.getCondition(conditionalName);
-    // create a new array of conditions
-    let newConditionObj = [];
-    // add the existing condition to the new array
-
-    if (Array.isArray(existingCondition)) {
-      existingCondition.forEach((cond, index) => {
-        newConditionObj.push(cond);
-      });
-    } else {
-      newConditionObj.push(existingCondition);
-    }
-
-    // add a new condition to the new array
-    newConditionObj.push({ op: '==', property: '', value: '' });
-    console.log('updating', conditionalName, newConditionObj)
-    self.behavior.updateCondition(conditionalName, newConditionObj, true);
-
-    // get the update condition to verify it was updated
-    let updatedCondition = this.behavior.getCondition(conditionalName);
-    console.log('updatedCondition', updatedCondition);
-
-    let updatedNode = self.behavior.findNode(node.sutraPath);
-
-    // reload window with updated node
-    self.showConditionalsForm(updatedNode);
-
-    // show serialized behavior tree
-    console.log('serialized behavior tree', self.behavior.serializeToJson());
-    //this.behavior.addCondition(newConditionalName, { op: '==', property: '', value: '' });
-    // let newConditionalName = this.behavior.getUniqueConditionalName();
-    // creates a new empty condition form
-    // self.createConditionalForm(conditionalName, node);
-  };
-
-
   // Append the created elements to the form
   form.appendChild(radioGroupDiv);
   form.appendChild(conditionalInputContainer);
-  form.appendChild(removeConditionButton);
-  form.appendChild(addConditionBelowButton);
-
+  // form.appendChild(removeConditionButton);
+  // form.appendChild(addConditionBelowButton);
+  */
   // Append the form to the DOM or a parent element as required
   // Example: document.body.appendChild(form); or parentElement.appendChild(form);
 
@@ -446,9 +384,11 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
       } else {
         console.log('Unknown conditional type in array');
       }
-
+      let guiContent = this.sutraFormView.querySelector('.gui-content');
+      guiContent.appendChild(container);
+    
       // Append the container to the form
-      form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
+      //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
     });
   } else if (typeof conditional === 'function') {
     this.showFunctionEditor(conditionalName, conditional);
@@ -458,14 +398,14 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
     console.log('Unknown conditional type');
   }
 
-  let guiContent = this.sutraFormView.querySelector('.gui-content');
-  guiContent.appendChild(form);
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    //console.log("SAVING CONDITIONAL", conditionalName, form)
-    //self.saveConditional(conditionalName, form);
-  });
+  let guiContent = this.sutraFormView.querySelector('.gui-content');
+  let footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = `<h3>Individual Condition Footer</h3>`;
+  guiContent.appendChild(footer);
+
+
 }
 
 // Adjust createConditional to handle both creating and updating conditionals

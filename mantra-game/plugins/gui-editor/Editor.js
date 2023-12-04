@@ -1,6 +1,7 @@
 class Editor {
 
   static id = 'gui-editor';
+  static async = true;
 
   constructor({ sourceCode } = {}) {
     this.id = Editor.id;
@@ -57,7 +58,7 @@ class Editor {
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, /* $rulesMenu,*/ $inspectorMenu);
+    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $rulesMenu, $inspectorMenu);
 
     // Append the toolbar to the body
     $('body').append($toolbar);
@@ -154,7 +155,7 @@ class Editor {
   showRules() {
     let game = this.game;
     if (typeof game.systems['gui-sutra'] === 'undefined') {
-      game.use(new this.game.plugins.SutraGUI());
+      game.use('SutraGUI');
     } else {
       this.game.systemsManager.removeSystem('gui-sutra');
     }
@@ -163,7 +164,7 @@ class Editor {
   showPluginsGUI() {
     let game = this.game;
     if (typeof game.systems['gui-plugins'] === 'undefined') {
-      game.use(new this.game.plugins.PluginsGUI());
+      game.use('PluginsGUI');
     } else {
       this.game.systemsManager.removeSystem('gui-plugins');
     }
@@ -173,7 +174,7 @@ class Editor {
     let game = this.game;
     console.log('showEventsInspector', game.systems['gui-event-inspector'])
     if (typeof game.systems['gui-event-inspector'] === 'undefined') {
-      game.use(new this.game.plugins.EventInspector());
+      game.use('EventInspector');
     } else {
       this.game.systemsManager.removeSystem('gui-event-inspector');
     }
@@ -182,8 +183,13 @@ class Editor {
   showControls() {
     let game = this.game;
     if (typeof game.systems['gui-controls'] === 'undefined') {
-      game.use(new this.game.plugins.ControlsGUI());
-      this.game.systems['gui-controls'].drawTable();
+
+      game.once('plugin::ready::gui-controls', () => {
+        alert('plugin::ready::gui-controls')
+        this.game.systems['gui-controls'].drawTable();
+      });
+      game.use('ControlsGUI');
+
     } else {
       this.game.systemsManager.removeSystem('gui-controls');
     }
@@ -193,7 +199,7 @@ class Editor {
     let game = this.game;
     console.log('showInspector', game.systems['gui-inspector'])
     if (typeof game.systems['gui-inspector'] === 'undefined') {
-      game.use(new this.game.plugins.Inspector());
+      game.use('InspectorGUI');
     } else {
       this.game.systemsManager.removeSystem('gui-inspector');
     }
@@ -202,7 +208,7 @@ class Editor {
   showEntities() {
     let game = this.game;
     if (typeof game.systems['gui-entities'] === 'undefined') {
-      game.use(new this.game.plugins.EntitiesGUI());
+      game.use('EntitiesGUI');
       // this.game.systems['gui-entities'].drawTable();
     } else {
       this.game.systemsManager.removeSystem('gui-entities');

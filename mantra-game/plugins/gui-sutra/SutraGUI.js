@@ -1,6 +1,8 @@
 // SutraGUI.js - Marak Squires 2023
 import gui from '../gui-editor/gui.js';
 import drawTable from './lib/drawTable.js';
+import dataView from './lib/editor/dataView.js';
+import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
 import serializeFormToJSON from './util/serializeFormToJSON.js';
 import testRules from './testRules.js';
@@ -17,6 +19,8 @@ class SutraGUI {
     this.showObjectEditor = editor.showObjectEditor.bind(this);
     this.showConditionalsForm = editor.showConditionalsForm.bind(this);
     this.createConditional = editor.createConditional.bind(this);
+    this.createLabel = createLabel.bind(this);
+    this.dataView = dataView.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
     this.createConditionalForm = editor.createConditionalForm.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);
@@ -59,8 +63,6 @@ class SutraGUI {
       });
 
 
-
-
     }
 
     let rules = testRules(game);
@@ -87,7 +89,6 @@ class SutraGUI {
     });
 
     let json = rules.serializeToJson();
-    console.log('json', json);
     this.drawTable();
     this.drawBehaviorTree(JSON.parse(json));
 
@@ -207,8 +208,8 @@ class SutraGUI {
   saveSutra() {
     // get the #sutraTable
     let table = document.getElementById('sutraTable');
-    
-    console.log('saveSutra', this.serializeFormToJSON(table));
+
+    // console.log('saveSutra', this.serializeFormToJSON(table));
   }
 
   appendActionElement(element, node, indentLevel, keyword = 'THEN') {
@@ -216,7 +217,7 @@ class SutraGUI {
     // "Then" clause container
     let actionSelectContainer = document.createElement('div');
     actionSelectContainer.className = 'action-select-container';
-  
+
     // "Then" clause label with embedded select element
     let thenLabel = document.createElement('label');
     thenLabel.className = 'then-label';
@@ -227,15 +228,15 @@ class SutraGUI {
     let select = this.createActionSelect(node);
     // Append select element inside label element
     thenLabel.appendChild(select);
-  
+
     // Append the label (with the select inside it) to the container
     actionSelectContainer.appendChild(thenLabel);
-  
+
     // add click handler to actionSelectContainer so that it removes all "collapsed" classes,
     // from all nodes whose data-path matches the data-path of the actionSelectContainer
     actionSelectContainer.onclick = function () {
       let nodes = document.querySelectorAll(`[data-path='${node.sutraPath}']`);
-      console.log('made a nodes query', nodes)
+      // console.log('made a nodes query', nodes)
       // remove all collapsed classes from those nodes
       nodes.forEach(node => {
         // TODO: why toggle not working as expected?
@@ -246,37 +247,15 @@ class SutraGUI {
 
     // Append the action select container to the main element
     element.appendChild(actionSelectContainer);
-  
+
     if (node.data) {
-      // "With" context container for data
-      let dataContainer = document.createElement('div');
-      dataContainer.className = 'data-container';
-      // Add with-container class
-      dataContainer.classList.add('with-container');
-      // dataContainer.classList.add('collapsed');
 
-      // set data-path attribute to sutraPath
-      dataContainer.setAttribute('data-path', node.sutraPath);
-  
-      // "With" context label
-      let withLabel = document.createElement('label');
-      withLabel.className = 'with-label';
-      withLabel.innerHTML = `<span class="sutra-keyword">WITH</span>`;
-      element.setAttribute('data-path', node.sutraPath);
-
-
-      // Append the label directly to the data container
-      dataContainer.appendChild(withLabel);
-  
-      // Create and append the data content to the data container
-      let dataContent = this.createDataContainer(node, indentLevel);
-      dataContainer.appendChild(dataContent);
-  
+      let dataView = this.dataView(node, indentLevel);
       // Append the data container to the main element
-      element.appendChild(dataContainer);
+      element.appendChild(dataView);
     }
   }
-  
+
 
   createActionSelect(node) {
     let select = document.createElement('select');
@@ -286,46 +265,20 @@ class SutraGUI {
 
     // Check if node.action is in the list of actions
     if (node.action && !actions.includes(node.action)) {
-        actions.push(node.action); // Add it to the list if not present
+      actions.push(node.action); // Add it to the list if not present
     }
 
     actions.forEach(action => {
-        let option = document.createElement('option');
-        option.value = action;
-        option.text = action;
-        if (node.action === action) {
-            option.selected = true;
-        }
-        select.appendChild(option);
+      let option = document.createElement('option');
+      option.value = action;
+      option.text = action;
+      if (node.action === action) {
+        option.selected = true;
+      }
+      select.appendChild(option);
     });
 
     return select;
-}
-
-
-  createDataContainer(node, indentLevel) {
-    // console.log('creating a data container', node);
-    let dataContainer = document.createElement('div');
-    dataContainer.className = '';
-
-    Object.keys(node.data).forEach(key => {
-      let path = key;
-
-      // Check if the value is an object and not null
-      if (typeof node.data[key] === 'object' && node.data[key] !== null) {
-        let nestedLabel = this.createLabel(key, indentLevel);
-        dataContainer.appendChild(nestedLabel);
-
-        let nestedContainer = this.createNestedDataContainer(node.data[key], indentLevel + 1, path);
-        nestedContainer.dataset.key = key; // Optional: set a data attribute for the key
-        dataContainer.appendChild(nestedContainer);
-      } else {
-        let inputGroup = this.createInputGroup(node, key, indentLevel, path);
-        dataContainer.appendChild(inputGroup);
-      }
-    });
-
-    return dataContainer;
   }
 
   createInputGroup(node, key, indentLevel, path) {
@@ -341,39 +294,6 @@ class SutraGUI {
     return inputGroup;
   }
 
-  createNestedDataContainer(nestedNode, indentLevel, path = '') {
-    let nestedDataContainer = document.createElement('div');
-    nestedDataContainer.className = 'nested-data-container nested-level-' + indentLevel;
-
-    Object.keys(nestedNode).forEach(nestedKey => {
-      let nestedPath = path ? `${path}.${nestedKey}` : nestedKey;
-      // console.log('nestedPath', nestedPath)
-      if (typeof nestedNode[nestedKey] === 'object' && nestedNode[nestedKey] !== null) {
-        let nestedLabel = this.createLabel(nestedKey, indentLevel);
-        nestedDataContainer.appendChild(nestedLabel);
-
-        let innerNestedContainer = this.createNestedDataContainer(nestedNode[nestedKey], indentLevel + 1, nestedPath);
-        innerNestedContainer.dataset.key = nestedKey; // Optional
-        nestedDataContainer.appendChild(innerNestedContainer);
-      } else {
-        let inputGroup = this.createInputGroup({ data: nestedNode }, nestedKey, indentLevel, nestedPath);
-        nestedDataContainer.appendChild(inputGroup);
-      }
-    });
-
-    return nestedDataContainer;
-  }
-
-  createLabel(key, indentLevel) {
-    let label = document.createElement('label');
-    label.textContent = key;
-    label.className = 'param-label';
-    label.style.marginLeft = '10px';
-    // make bold
-    label.style.fontWeight = 'bold';
-    //label.style.marginLeft = `${indentLevel * 10}px`;
-    return label;
-  }
 
   createInput(node, key, path = '') {
 
@@ -425,7 +345,7 @@ class SutraGUI {
     if (node.sutraPath.split('[').length === 2) {
       isFirstLevel = true;
     }
-    
+
     if (!isFirstLevel) {
       // Add a visual separator, if desired
       /*
@@ -434,11 +354,10 @@ class SutraGUI {
       ifSeparator.textContent = 'IF';
       conditionContainer.appendChild(ifSeparator);
       */
-      keyword = "AND"; 
+      keyword = "AND";
 
     }
 
-    console.log('nodenodenode', node.sutraPath)
     if (Array.isArray(node.if)) {
       node.if.forEach((cond, i) => {
         let condition = document.createElement('div');
@@ -453,8 +372,8 @@ class SutraGUI {
 
         conditionContainer.appendChild(condition);
 
-        const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
-        condition.appendChild(removeRuleBtn);
+        //const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
+        //condition.appendChild(removeRuleBtn);
 
         // Add a visual separator, if desired
         /*
@@ -481,8 +400,8 @@ class SutraGUI {
       }
       conditionContainer.appendChild(condition);
 
-      const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
-      condition.appendChild(removeRuleBtn);
+      //const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
+      //condition.appendChild(removeRuleBtn);
 
     }
 
