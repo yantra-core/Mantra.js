@@ -2,6 +2,7 @@
 import gui from '../gui-editor/gui.js';
 import drawTable from './lib/drawTable.js';
 import dataView from './lib/editor/dataView.js';
+import dataForm from './lib/editor/dataForm.js';
 import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
 import serializeFormToJSON from './util/serializeFormToJSON.js';
@@ -21,6 +22,8 @@ class SutraGUI {
     this.createConditional = editor.createConditional.bind(this);
     this.createLabel = createLabel.bind(this);
     this.dataView = dataView.bind(this);
+    this.dataForm = dataForm.bind(this);
+    this.showActionForm = editor.showActionForm.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
     this.createConditionalForm = editor.createConditionalForm.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);
@@ -196,6 +199,11 @@ class SutraGUI {
     if (node.action) {
       // add new className to formElement, action-node-form
       formElement.classList.add('action-node-form');
+      // add click handler to formElement so that it opens showActionForm
+      formElement.onclick = () => {
+        this.showActionForm(node);
+      }
+
       // formElement.classList.add('collapsible-content');
       this.appendActionElement(contentDiv, node, indentLevel, keyword);
     } else if (node.if) {
@@ -249,7 +257,6 @@ class SutraGUI {
     element.appendChild(actionSelectContainer);
 
     if (node.data) {
-
       let dataView = this.dataView(node, indentLevel);
       // Append the data container to the main element
       element.appendChild(dataView);

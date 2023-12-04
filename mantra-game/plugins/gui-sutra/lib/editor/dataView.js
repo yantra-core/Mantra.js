@@ -1,75 +1,88 @@
 export default function dataView(node, indentLevel = 0) {
+  this.createDataContainer = createDataContainer.bind(this);
+  this.createNestedDataContainer = createNestedDataContainer.bind(this);
+  this.createLabel = createLabel.bind(this);
+  this.createValueDisplay = createValueDisplay.bind(this);
 
-  // "With" context container for data
   let dataContainer = document.createElement('div');
   dataContainer.className = 'data-container';
-  // Add with-container class
   dataContainer.classList.add('with-container');
-  // dataContainer.classList.add('collapsed');
-
-  // set data-path attribute to sutraPath
   dataContainer.setAttribute('data-path', node.sutraPath);
 
-  // "With" context label
   let withLabel = document.createElement('label');
   withLabel.className = 'with-label';
   withLabel.innerHTML = `<span class="sutra-keyword">WITH</span>`;
-  dataContainer.setAttribute('data-path', node.sutraPath);
-
-  // Append the label directly to the data container
   dataContainer.appendChild(withLabel);
 
-  // Create and append the data content to the data container
-  let dataContent = createDataContainer(this, node, indentLevel);
+  let dataContent = this.createDataContainer(node, indentLevel);
   dataContainer.appendChild(dataContent);
   return dataContainer;
-
 }
 
-function createDataContainer(self, node, indentLevel) {
-  // console.log('creating a data container', node);
+function createDataContainer(node, indentLevel) {
   let dataContainer = document.createElement('div');
   dataContainer.className = '';
 
   Object.keys(node.data).forEach(key => {
     let path = key;
-
-    // Check if the value is an object and not null
     if (typeof node.data[key] === 'object' && node.data[key] !== null) {
-      let nestedLabel = self.createLabel(key, indentLevel);
+      let nestedLabel = this.createLabel(key, indentLevel);
       dataContainer.appendChild(nestedLabel);
-
-      let nestedContainer = createNestedDataContainer(node.data[key], indentLevel + 1, path);
-      nestedContainer.dataset.key = key; // Optional: set a data attribute for the key
+      let nestedContainer = this.createNestedDataContainer(node.data[key], indentLevel + 1, path);
       dataContainer.appendChild(nestedContainer);
     } else {
-      let inputGroup = self.createInputGroup(node, key, indentLevel, path);
-      dataContainer.appendChild(inputGroup);
+      let valueDisplay = this.createValueDisplay(key, node.data[key], indentLevel, path);
+      dataContainer.appendChild(valueDisplay);
     }
   });
-
   return dataContainer;
 }
 
-function createNestedDataContainer(self, nestedNode, indentLevel, path = '') {
+function createNestedDataContainer(nestedNode, indentLevel, path = '') {
   let nestedDataContainer = document.createElement('div');
   nestedDataContainer.className = 'nested-data-container nested-level-' + indentLevel;
 
   Object.keys(nestedNode).forEach(nestedKey => {
     let nestedPath = path ? `${path}.${nestedKey}` : nestedKey;
-    // console.log('nestedPath', nestedPath)
     if (typeof nestedNode[nestedKey] === 'object' && nestedNode[nestedKey] !== null) {
-      let nestedLabel = self.createLabel(nestedKey, indentLevel);
+      let nestedLabel = this.createLabel(nestedKey, indentLevel);
       nestedDataContainer.appendChild(nestedLabel);
 
-      let innerNestedContainer = self.createNestedDataContainer(nestedNode[nestedKey], indentLevel + 1, nestedPath);
-      innerNestedContainer.dataset.key = nestedKey; // Optional
+      let innerNestedContainer = this.createNestedDataContainer(nestedNode[nestedKey], indentLevel + 1, nestedPath);
       nestedDataContainer.appendChild(innerNestedContainer);
     } else {
-      let inputGroup = self.createInputGroup({ data: nestedNode }, nestedKey, indentLevel, nestedPath);
-      nestedDataContainer.appendChild(inputGroup);
+      let valueDisplay = this.createValueDisplay(nestedKey, nestedNode[nestedKey], indentLevel, nestedPath);
+      nestedDataContainer.appendChild(valueDisplay);
     }
   });
 
   return nestedDataContainer;
+}
+
+function createLabel(key, indentLevel) {
+  let label = document.createElement('label');
+  label.className = 'data-label';
+  label.innerText = key;
+  console.log("CRETING LABEL", key, indentLevel)
+  label.style.paddingLeft = `${indentLevel * 20}px`; // Indentation for nesting
+  return label;
+}
+
+function createValueDisplay(key, value, indentLevel, path) {
+  let valueDisplayWrapper = document.createElement('div');
+  valueDisplayWrapper.className = 'data-value-wrapper';
+  valueDisplayWrapper.style.paddingLeft = `${indentLevel * 20}px`;
+
+  let label = document.createElement('label');
+  label.className = 'data-key';
+  label.innerText = key + ':';
+  valueDisplayWrapper.appendChild(label);
+
+  let valueDisplay = document.createElement('div');
+  valueDisplay.className = 'data-value';
+  valueDisplay.innerText = value;
+  valueDisplayWrapper.appendChild(valueDisplay);
+
+  valueDisplayWrapper.setAttribute('data-path', path);
+  return valueDisplayWrapper;
 }

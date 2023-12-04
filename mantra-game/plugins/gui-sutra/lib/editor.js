@@ -97,7 +97,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
 
   form.appendChild(propertySelectContainer);
   form.appendChild(gamePropertyFieldContainer);
-  
+
   // Function to create input fields
   function createField(name, value) {
     let fieldContainer = document.createElement('div');
@@ -128,7 +128,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     conditional.gamePropertyPath = '';
   }
   */
-  
+
   // Create form fields based on the conditional's properties
   for (let key in conditional) {
     if (key === 'op') continue; // Skip 'op' here, it will be handled separately
@@ -154,7 +154,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     input.className = 'field-input';
     fieldContainer.appendChild(input);
   }
-  
+
   let opContainer = document.createElement('div');
   opContainer.className = 'operator-container';
   form.appendChild(opContainer);
@@ -191,7 +191,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     // check to see which radio button is checked
     let propertyType = form.querySelector('input[name="propertyType"]:checked').value;
 
-    
+
     // get the existing condition
     let existingCondition = this.behavior.getCondition(conditionalName);
     // create a new array of conditions
@@ -233,6 +233,98 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   }
   toggleFields(); // Call this to set initial field visibility
 };
+
+editor.showActionForm = function showActionForm(node) {
+
+  /*
+  // If the node is undefined, assume we are at tree root
+  if (typeof node === 'undefined') {
+    node = {
+      sutraPath: 'tree',
+      action: 'newConditional'
+    };
+  }
+  */
+
+  console.log('node', node);
+
+  let sutraActionEditor = document.getElementById('sutraActionEditor');
+  if (!sutraActionEditor) {
+    this.sutraActionEditor = gui.window('sutraActionEditor', 'Sutra Action Editor', function () {
+      let sutraActionEditor = document.getElementById('sutraActionEditor');
+      if (sutraActionEditor) {
+        sutraActionEditor.remove();
+      }
+    });
+  }
+  // not working?
+  gui.bringToFront(this.sutraActionEditor);
+
+  let guiContent = this.sutraActionEditor.querySelector('.gui-content');
+  guiContent.innerHTML = ''; // Clear previous content
+
+
+  // "Then" clause container
+  let actionSelectContainer = document.createElement('div');
+  actionSelectContainer.className = 'action-select-container';
+
+  // "Then" clause label with embedded select element
+  let thenLabel = document.createElement('label');
+  thenLabel.className = 'then-label';
+
+  thenLabel.innerHTML = `<span class="sutra-keyword">THEN</span>`;
+  actionSelectContainer.setAttribute('data-path', node.sutraPath);
+
+  let select = this.createActionSelect(node);
+  // Append select element inside label element
+  thenLabel.appendChild(select);
+
+  // Append the label (with the select inside it) to the container
+  actionSelectContainer.appendChild(thenLabel);
+
+
+
+  let nodeInfo = document.createElement('div');
+  nodeInfo.className = 'node-info';
+
+  let ifLink = '';
+
+  if (Array.isArray(node.if)) {
+    node.if.forEach((conditionalName, index) => {
+      // let conditional = this.behavior.getCondition(conditionalName);
+      if (index > 0) {
+        ifLink += ` <strong class="sutra-keyword">AND</strong> <span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
+      } else {
+        ifLink += `<span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
+      }
+    });
+  }
+  else {
+    ifLink = node.if;
+  }
+
+  let humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
+
+  humanPath = humanPath.replace('and', '<strong class="sutra-keyword">..</strong>');
+  // Create and append the 'Path' element
+  let pathElement = document.createElement('div');
+  pathElement.innerHTML = `<strong class="sutra-keyword">PATH</strong> ${humanPath}`;
+  nodeInfo.appendChild(pathElement);
+
+
+  // Append the entire node info to the GUI content
+  guiContent.appendChild(nodeInfo);
+
+  // Append the entire container to the GUI content
+  guiContent.appendChild(actionSelectContainer);
+
+  //  this.appendActionElement(guiContent, node);
+
+  let formContainer = this.dataForm(node);
+  guiContent.appendChild(formContainer);
+
+}
+
 editor.showConditionalsForm = function showConditionalsForm(node) {
   // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {
@@ -295,15 +387,22 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     // Create and append the 'Then' element
     let thenElement = document.createElement('div');
     thenElement.innerHTML = `<strong class="sutra-keyword">THEN</strong> ${node.then[0].action}`;
+    // clicking on the Then element should up Action Editor
+    thenElement.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showActionForm(node.then[0]);
+    });
     nodeInfo.appendChild(thenElement);
   }
 
+  /*
   if (typeof node.then[0].data !== 'undefined') {
     // add "WITH" header span
     let withElement = document.createElement('div');
     withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
     nodeInfo.appendChild(withElement);
   }
+  */
 
   // Append the entire node info to the GUI content
   guiContent.appendChild(nodeInfo);
@@ -342,7 +441,7 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   console.log('creating conditional form', conditionalName, node)
   let self = this;
   // Create the form element
-  
+
   /*
   let form = document.createElement('form');
   form.className = 'sutra-form';
@@ -386,7 +485,7 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
       }
       let guiContent = this.sutraFormView.querySelector('.gui-content');
       guiContent.appendChild(container);
-    
+
       // Append the container to the form
       //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
     });

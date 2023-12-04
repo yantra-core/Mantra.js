@@ -518,6 +518,17 @@ pre {
   position: absolute;
 }
 
+#sutraActionEditor {
+  top: 10%;
+  left: 50%;
+  z-index: 1000;
+  width: 700px;
+  height: 600px;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
 #editorContainer {
   background-color: #121a2e;
   padding: 15px;
@@ -770,9 +781,7 @@ textarea {
 }
 
 .data-container {
-
   padding-left: 15px;
-
   padding-top: 15px;
   padding-bottom: 15px;
   margin-bottom: 20px;
@@ -913,6 +922,46 @@ textarea {
   padding: 0px;
 }
 
+.data-value-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.data-key {
+  color: #ffffff;
+  background-color: #2a3348;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Adjust as needed to align with your design */
+}
+
+.data-value {
+  color: #ffffff;
+  background-color: #2a3348;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Adjust as needed to align with your design */
+}
+
+
+/* Optional: Hover and focus effects for data values */
+.data-value:hover {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+.data-value:focus {
+  outline: none;
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+
 .nested-data-container {
   margin-left: 20px;
 
@@ -1026,11 +1075,11 @@ textarea {
 
 .conditional-editor-container {
   background-color: #162238;
-  padding: 10px;
+  padding: 25px;
   border-radius: 5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
   color: #d3d9df;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .field-container {
