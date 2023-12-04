@@ -36,33 +36,21 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
         callback = function noop() {};
       }
       this.game.isOnline = false;
-      var graphicsSystems = this.game.graphics.length;
-      var graphicsReady = this.game.graphicsReady.length;
-      var physicsReady = this.game.physicsReady;
       var self = this;
-
-      // Wait for all systems to be ready before starting the game loop
-      // TODO: replace this with general 'ready' event
-      if (!physicsReady || graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
-        setTimeout(function () {
-          self.start(callback);
-        }, 10);
-        return;
-      }
-      this.game.localGameLoop(this.game); // Start the local game loop when offline
-
-      this.game.communicationClient = this;
-      this.game.localGameLoopRunning = true;
-      this.game.createPlayer({
-        type: 'PLAYER'
-      }).then(function (ent) {
-        game.setPlayerId(ent.id);
-      });
       callback(null, true);
       this.game.emit('start');
       if (this.game.systems.xstate) {
         this.game.systems.xstate.sendEvent('START');
       }
+      this.game.localGameLoopRunning = true;
+      this.game.localGameLoop(this.game); // Start the local game loop when offline
+
+      this.game.communicationClient = this;
+      this.game.createPlayer({
+        type: 'PLAYER'
+      }).then(function (ent) {
+        game.setPlayerId(ent.id);
+      });
     }
   }, {
     key: "stop",

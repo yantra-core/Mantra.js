@@ -102,6 +102,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _inherits(ThreeGraphics, _GraphicsInterface);
   var _super = _createSuper(ThreeGraphics);
+  // indicates that this plugin has async initialization and should not auto-emit a ready event on return
+
   function ThreeGraphics() {
     var _this;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -110,6 +112,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _classCallCheck(this, ThreeGraphics);
     _this = _super.call(this);
     _this.id = ThreeGraphics.id;
+    _this.async = ThreeGraphics.async;
     _this.renderer = null;
     _this.camera = null;
 
@@ -166,7 +169,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.scene.add(light);
 
       // Notify the system that graphics are ready
-      game.graphicsReady.push(this.name);
+      // game.graphicsReady.push(this.name);
 
       // Position the camera for a bird's eye view
       this.camera.position.set(0, 200, 200);
@@ -174,6 +177,11 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // TODO: Initialize controls for camera interaction
       // this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
       // this.controls.enableZoom = true; // Enable zooming
+
+      // async:true plugins *must* self report when they are ready
+      game.emit('plugin::ready::graphics-three', this);
+      // TODO: remove this line from plugin implementations
+      game.loadingPluginsCount--;
     }
   }, {
     key: "createGraphic",
@@ -310,6 +318,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 }(_GraphicsInterface2["default"]);
 _defineProperty(ThreeGraphics, "id", 'graphics-three');
 _defineProperty(ThreeGraphics, "removable", false);
+_defineProperty(ThreeGraphics, "async", true);
 var _default = exports["default"] = ThreeGraphics;
 
 },{"../../lib/GraphicsInterface.js":1}]},{},[2])(2)

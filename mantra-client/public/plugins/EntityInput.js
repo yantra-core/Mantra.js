@@ -80,6 +80,7 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
     _this.buttonCooldown = 20;
     _this.lastBulletFireTime = {};
     _this.useMouseControls = false;
+    _this.inputsActive = true;
 
     // Contains an array of input strategies that are run in order each time handleInputs() is called
     _this.strategies = [];
@@ -117,8 +118,21 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
       this.game.emit('inputStrategyRegistered', this.strategies);
     }
   }, {
+    key: "setInputsActive",
+    value: function setInputsActive() {
+      this.inputsActive = true;
+    }
+  }, {
+    key: "disableInputs",
+    value: function disableInputs() {
+      this.inputsActive = false;
+    }
+  }, {
     key: "handleInputs",
     value: function handleInputs(entityId, controls, sequenceNumber) {
+      if (!this.inputsActive) {
+        return;
+      }
       if (this.strategies.length === 0) {
         this.loadDefaultStrategy();
       }

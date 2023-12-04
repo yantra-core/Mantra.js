@@ -36,6 +36,22 @@ var Graphics = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "inflateGraphic",
+    value: function inflateGraphic(entityData) {
+      var game = this.game;
+      game.graphics.forEach(function (graphicsInterface) {
+        // don't recreate same graphic if already exists on interface
+        var ent = game.getEntity(entityData.id);
+        // console.log(graphicsInterface.id, "CREATING FOR ENT", ent)
+        if (ent && ent.graphics && ent.graphics[graphicsInterface.id]) {
+          // perform update
+          this.updateGraphic(entityData);
+        } else {
+          this.createGraphic(entityData);
+        }
+      });
+    }
+  }, {
     key: "update",
     value: function update() {}
 
@@ -44,14 +60,14 @@ var Graphics = /*#__PURE__*/function () {
   }, {
     key: "createGraphic",
     value: function createGraphic(entityData) {
+      console.log('Graphics.createGraphic', entityData);
       var game = this.game;
       game.graphics.forEach(function (graphicsInterface) {
         // don't recreate same graphic if already exists on interface
         var ent = game.getEntity(entityData.id);
         // console.log(graphicsInterface.id, "CREATING FOR ENT", ent)
         if (ent && ent.graphics && ent.graphics[graphicsInterface.id]) {
-          // console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.id, ent.graphics[graphicsInterface.id])
-          return;
+          return this.updateGraphic(entityData);
         }
         var graphic = graphicsInterface.createGraphic(entityData);
         if (graphic) {
@@ -73,8 +89,14 @@ var Graphics = /*#__PURE__*/function () {
   }, {
     key: "updateGraphic",
     value: function updateGraphic(entityData, alpha) {
+      console.log('Graphics.updateGraphic', entityData);
       var game = this.game;
       game.graphics.forEach(function (graphicsInterface) {
+        // check to see if graphic doesn't exist
+        var ent = game.getEntity(entityData.id);
+        if (!ent || !ent.graphics || !ent.graphics[graphicsInterface.id]) {
+          return this.createGraphic(entityData);
+        }
         graphicsInterface.updateGraphic(entityData, alpha);
       });
     }

@@ -103,6 +103,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _inherits(PhaserGraphics, _GraphicsInterface);
   var _super = _createSuper(PhaserGraphics);
+  // indicates that this plugin has async initialization and should not auto-emit a ready event on return
+
   function PhaserGraphics() {
     var _this;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -113,6 +115,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _classCallCheck(this, PhaserGraphics);
     _this = _super.call(this);
     _this.id = 'graphics-phaser';
+    _this.async = PhaserGraphics.async;
     var config = {
       camera: camera,
       startingZoom: startingZoom
@@ -130,10 +133,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       var _this2 = this;
       // console.log('PhaserGraphics.init()');
 
-      // register renderer with graphics pipeline
-      game.graphics.push(this);
       this.game = game;
-      this.game.systemsManager.addSystem('graphics-phaser', this);
 
       // check to see if Phaser scope is available, if not assume we need to inject it sequentially
       if (typeof Phaser === 'undefined') {
@@ -181,7 +181,21 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         self.scene = scene;
         var camera = scene.cameras.main;
         self.scenesReady = true;
-        game.graphicsReady.push(self.name);
+
+        // register renderer with graphics pipeline
+        game.graphics.push(this);
+
+        // possible duplicate api, ready per pipeline not needed,
+        // as we have async loading of plugins now, review this line and remove
+        // game.graphicsReady.push(self.name);
+
+        // wait until scene is loaded before letting systems know phaser graphics are ready
+        this.game.systemsManager.addSystem('graphics-phaser', this);
+
+        // async:true plugins *must* self report when they are ready
+        game.emit('plugin::ready::graphics-phaser', this);
+        // TODO: remove this line from plugin implementations
+        game.loadingPluginsCount--;
 
         // camera.rotation = -Math.PI / 2;
         /*
@@ -458,6 +472,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 }(_GraphicsInterface2["default"]);
 _defineProperty(PhaserGraphics, "id", 'graphics-phaser');
 _defineProperty(PhaserGraphics, "removable", false);
+_defineProperty(PhaserGraphics, "async", true);
 var _default = exports["default"] = PhaserGraphics;
 
 },{"../../lib/GraphicsInterface.js":1}]},{},[2])(2)

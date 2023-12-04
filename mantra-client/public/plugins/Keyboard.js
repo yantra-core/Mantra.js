@@ -133,11 +133,16 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "unload",
-    value: function unload() {
+    key: "unbindAllEvents",
+    value: function unbindAllEvents() {
       // remove all event listeners using the bound functions
       document.removeEventListener('keydown', this.boundHandleKeyDown);
       document.removeEventListener('keyup', this.boundHandleKeyUp);
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      this.unbindAllEvents();
     }
   }]);
   return Keyboard;

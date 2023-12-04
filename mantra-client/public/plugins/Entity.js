@@ -348,6 +348,15 @@ var Entity = /*#__PURE__*/function () {
       }
       if (ent) {
         this.game.components.destroyed.set(entityId, true);
+
+        // check to see if any timers exist, if so clear them all
+        if (this.game.components.timers.get(entityId)) {
+          var timers = this.game.components.timers.get(entityId);
+          for (var timerId in timers.timers) {
+            timers.removeTimer(timerId);
+          }
+        }
+
         // update the entity with the destroyed state
         var updatedEntity = this.game.getEntity(entityId);
         this.game.entities.set(entityId, updatedEntity);
@@ -356,24 +365,39 @@ var Entity = /*#__PURE__*/function () {
   }, {
     key: "cleanupDestroyedEntities",
     value: function cleanupDestroyedEntities() {
+      var _this = this;
       var destroyedComponentData = this.game.components.destroyed.data;
-      for (var entityId in destroyedComponentData) {
+      var _loop = function _loop(entityId) {
+        var destroyedType = _this.game.components.type.get(entityId);
         if (destroyedComponentData[entityId]) {
           // Removes the body from the physics engine
-          if (typeof this.game.physics.removeBody === 'function') {
+          if (typeof _this.game.physics.removeBody === 'function') {
             // TODO: fix this
-            if (this.game.bodyMap[entityId]) {
-              this.game.physics.removeBody(this.game.bodyMap[entityId]);
+            if (_this.game.bodyMap[entityId]) {
+              _this.game.physics.removeBody(_this.game.bodyMap[entityId]);
             } else {
               console.log('No body found for entityId', entityId);
             }
           }
           // Delete associated components for the entity using Component's remove method
-          for (var componentType in this.game.components) {
-            this.game.components[componentType].remove(entityId);
+          for (var componentType in _this.game.components) {
+            _this.game.components[componentType].remove(entityId);
           }
-          this.game.entities["delete"](entityId);
+          _this.game.entities["delete"](entityId);
+
+          // remove the reference in this.game.data.ents
+          delete _this.game.data.ents._[entityId];
+          // find entity by id and filter it out
+          if (_this.game.data.ents[destroyedType]) {
+            // TODO: missing test ^^^
+            _this.game.data.ents[destroyedType] = _this.game.data.ents[destroyedType].filter(function (entity) {
+              return Number(entity.id) !== Number(entityId);
+            });
+          }
         }
+      };
+      for (var entityId in destroyedComponentData) {
+        _loop(entityId);
       }
     }
 
@@ -407,6 +431,17 @@ var Entity = /*#__PURE__*/function () {
       this.game.graphics.forEach(function (graphicsInterface) {
         ent.pendingRender[graphicsInterface.id] = true;
       });
+
+      // TODO: add additional component types that can be updated ( should be most of them )
+      if (entityData.color) {
+        this.game.components.color.set(entityId, entityData.color);
+      }
+      if (entityData.height) {
+        this.game.components.height.set(entityId, entityData.height);
+      }
+      if (entityData.width) {
+        this.game.components.width.set(entityId, entityData.width);
+      }
       if (entityData.position) {
         this.game.components.position.set(entityId, {
           x: entityData.position.x,
@@ -559,7 +594,16 @@ var Entity = /*#__PURE__*/function () {
       this.game.graphics.forEach(function (graphicsInterface) {
         updatedEntity.pendingRender[graphicsInterface.id] = true;
       });
+
+      // updates entity in the ECS entity Map scope
       this.game.entities.set(entityId, updatedEntity);
+
+      // updates entity in the flat game.data scope
+      this.game.data.ents = this.game.data.ents || {};
+      this.game.data.ents._ = this.game.data.ents._ || {};
+      this.game.data.ents._[entityId] = updatedEntity;
+      this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
+      this.game.data.ents[updatedEntity.type].push(updatedEntity);
       return updatedEntity;
     }
   }, {
