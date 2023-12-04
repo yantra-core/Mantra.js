@@ -41,7 +41,6 @@ export default function dataForm(node, indentLevel = 0) {
   addButton.onclick = () => this.showAddPropertyForm(node, indentLevel, dataContainer);
   dataContainer.appendChild(addButton);
 
-
   return dataContainer;
 
 }
@@ -49,7 +48,7 @@ export default function dataForm(node, indentLevel = 0) {
 function createDataContainer(node, indentLevel = 0) {
   console.log('creating a data container', node, indentLevel);
   let dataContainer = document.createElement('div');
-  dataContainer.className = '';
+  dataContainer.className = 'action-form';
 
   Object.keys(node.data).forEach(key => {
     let path = key;

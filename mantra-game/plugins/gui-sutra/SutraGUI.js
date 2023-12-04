@@ -45,11 +45,14 @@ class SutraGUI {
       // *just* removing events should be enough, this is OK for now
       this.game.systems['entity-input'].disableInputs();
       this.game.systems['keyboard'].unbindAllEvents();
-      // add a global click handler to document that will delegate any clicks
-      // that are not inside gui-windows to re-enable inputs
-      document.addEventListener('click', (e) => {
-        // check if the click was inside a gui-window
-        let guiWindow = e.target.closest('.gui-container');
+    }
+
+    // add a global click handler to document that will delegate any clicks
+    // that are not inside gui-windows to re-enable inputs
+    document.addEventListener('click', (e) => {
+      // check if the click was inside a gui-window
+      let guiWindow = e.target.closest('.gui-container');
+      if (this.game.systems['entity-input'] && this.game.systems['keyboard']) {
         if (!guiWindow) {
           // re-enable inputs
           this.game.systems['entity-input'].setInputsActive();
@@ -59,19 +62,16 @@ class SutraGUI {
           this.game.systems['entity-input'].disableInputs();
           this.game.systems['keyboard'].unbindAllEvents();
         }
-
-
+  
         // check to see if this is a class sutra-link, if so open the form editor
         if (e.target.classList.contains('sutra-link')) {
           let sutraPath = e.target.getAttribute('data-path');
           let node = this.behavior.findNode(sutraPath);
           this.showConditionalsForm(node);
         }
+      }
 
-      });
-
-
-    }
+    });
 
     let rules = testRules(game);
 
@@ -165,6 +165,11 @@ class SutraGUI {
     let table = document.getElementById('sutraTable');
     //let guiContent = container.querySelector('.gui-content');
 
+    if (json.tree.length === 0) {
+      // add message to indicate no sutra
+      table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
+      return;
+    }
     //let container = document.createElement('div');
     json.tree.forEach(node => {
       table.appendChild(this.createNodeElement(node, 1));
@@ -262,9 +267,23 @@ class SutraGUI {
     element.appendChild(actionSelectContainer);
 
     if (node.data) {
-      let dataView = this.dataView(node, indentLevel);
+
+
+      let dataContainer = document.createElement('div');
+      dataContainer.className = 'data-container';
+      dataContainer.classList.add('with-container');
+      dataContainer.setAttribute('data-path', node.sutraPath);
+
+      let withLabel = document.createElement('label');
+      withLabel.className = 'with-label';
+      withLabel.innerHTML = `<a href="#" class="sutra-keyword">WITH</a>`;
+      //dataContainer.appendChild(withLabel);
+
+      actionSelectContainer.appendChild(withLabel);
+
+      //let dataView = this.dataView(node, indentLevel);
       // Append the data container to the main element
-      element.appendChild(dataView);
+      //element.appendChild(dataView);
     }
   }
 

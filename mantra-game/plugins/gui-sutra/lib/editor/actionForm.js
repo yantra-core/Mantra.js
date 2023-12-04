@@ -48,8 +48,6 @@ export default function showActionForm(node) {
   // Append the label (with the select inside it) to the container
   actionSelectContainer.appendChild(thenLabel);
 
-
-
   let nodeInfo = document.createElement('div');
   nodeInfo.className = 'node-info';
 

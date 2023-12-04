@@ -529,6 +529,28 @@ pre {
   position: absolute;
 }
 
+.sutra-link {
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.sutra-link:hover {
+  text-decoration: underline;
+}
+
+.sutra-link:active {
+  color: #9a9cff;
+}
+
+.sutra-link:focus {
+  outline: none;
+}
+
+.sutra-link:visited {
+  color: #9a9cff;
+}
+
 #editorContainer {
   background-color: #121a2e;
   padding: 15px;
@@ -547,7 +569,11 @@ pre {
 }
 
 #sutraFormView .gui-content {
-  padding: 15px;
+  padding: 25px;
+}
+
+#sutraActionEditor .gui-content {
+  padding: 25px;
 }
 
 .node-info {
@@ -564,6 +590,12 @@ pre {
 
 .sutra-form {
   background-color: #162238;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-form {
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -603,16 +635,12 @@ pre {
 }
 
 .node-element {
-
   color: #d3d9df;
-
   padding-bottom: 0px;
   margin-bottom: 0px;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-left: 10px;
-
   cursor: pointer;
-
 }
 
 .node-element.collapsed .node-element {
@@ -688,17 +716,9 @@ button {
 .condition,
 .else-branch {
   color: #d3d9df;
-  margin-bottom: 5px;
-  margin-top: 10px;
-  padding-bottom: 5px;
   display: block;
   font-size: 18px;
   font-weight: bold;
-  padding-left: 5px;
-  border-radius: 5px;
-  border: 1px solid #2a3348 !important;
-
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #sutraView button {
@@ -850,7 +870,8 @@ textarea {
 }
 
 .condition {
-  border: 1px solid #d0d0d0;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   padding: 5px;
   margin-bottom: 0px;
   margin-top: 0px;
@@ -1092,6 +1113,29 @@ textarea {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
   color: #d3d9df;
   margin-bottom: 25px;
+  font-size: 22px;
+}
+
+.conditional-editor-container label {
+  color: #d3d9df;
+  font-size: 22px !important;
+}
+
+.conditional-editor-container span {
+  font-size: 22px !important;
+  font-weight: normal;
+}
+
+.conditional-editor-container select {
+  font-size: 22px !important;
+}
+
+.conditional-editor-container option {
+  color: #000000;
+}
+
+.conditional-editor-container input {
+  font-size: 22px !important;
 }
 
 .field-container {

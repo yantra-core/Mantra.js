@@ -39,7 +39,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   editorContainer.appendChild(form);
 
   // Descriptive text
-  let description = document.createElement('p');
+  let description = document.createElement('div');
   description.innerHTML = `<span class="sutra-keyword">property</span> refers to current context values <br/><span class="sutra-keyword">gamePropertyPath</span>  refers to global 'game.data'`;
   form.appendChild(description);
 
@@ -241,7 +241,9 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   if (typeof node === 'undefined') {
     node = {
       sutraPath: 'tree',
-      action: 'newConditional'
+      action: 'newConditional',
+      if: 'newConditional',
+      then: [{ action: 'newAction' }]
     };
   }
 
@@ -307,7 +309,7 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   ifElement.innerHTML = `<strong class="sutra-keyword">IF</strong> ${ifLink}`;
   nodeInfo.appendChild(ifElement);
 
-  if (typeof node.then[0].action !== 'undefined') {
+  if (node.then && Array.isArray(node.then) && typeof node.then[0].action !== 'undefined') {
     // Create and append the 'Then' element
     let thenElement = document.createElement('div');
     thenElement.innerHTML = `<strong class="sutra-keyword">THEN</strong> ${node.then[0].action}`;
@@ -340,6 +342,16 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   } else {
     // get condition first
     let condition = this.behavior.getCondition(node.if);
+
+    if (!condition) {
+      console.log('condition not found', node.if);
+      condition = {
+        op: '==',
+        property: 'type',
+        value: 'block'
+      }
+    }
+
     if (Array.isArray(condition.conditions)) {
       condition.conditions.forEach((condName, index) => {
         let subCondition = this.behavior.getCondition(condName);
@@ -391,6 +403,16 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   let conditional = this.behavior.getCondition(conditionalName);
   console.log('conditional', conditional);
 
+  if (!conditional) {
+    console.log('condition not found', conditionalName);
+    conditional = {
+      op: '==',
+      property: 'type',
+      value: 'block'
+    }
+  }
+
+
   // Handling when conditional is an array
   if (Array.isArray(conditional)) {
     // Create a container for each condition in the array
@@ -398,7 +420,6 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
       let container = document.createElement('div');
       container.id = `conditional-${conditionalName}-${index}`;
       container.className = 'conditional-array-item';
-
       // Depending on the type of condition (function or object), call the appropriate editor
       if (typeof cond === 'function') {
         this.showFunctionEditor(`${conditionalName}-${index}`, cond, container);
