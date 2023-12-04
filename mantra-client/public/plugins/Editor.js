@@ -202,7 +202,7 @@ var Editor = /*#__PURE__*/function () {
     value: function showRules() {
       var game = this.game;
       if (typeof game.systems['gui-sutra'] === 'undefined') {
-        game.use(new this.game.plugins.SutraGUI());
+        game.use('SutraGUI');
       } else {
         this.game.systemsManager.removeSystem('gui-sutra');
       }
@@ -212,7 +212,7 @@ var Editor = /*#__PURE__*/function () {
     value: function showPluginsGUI() {
       var game = this.game;
       if (typeof game.systems['gui-plugins'] === 'undefined') {
-        game.use(new this.game.plugins.PluginsGUI());
+        game.use('PluginsGUI');
       } else {
         this.game.systemsManager.removeSystem('gui-plugins');
       }
@@ -223,7 +223,7 @@ var Editor = /*#__PURE__*/function () {
       var game = this.game;
       console.log('showEventsInspector', game.systems['gui-event-inspector']);
       if (typeof game.systems['gui-event-inspector'] === 'undefined') {
-        game.use(new this.game.plugins.EventInspector());
+        game.use('EventInspector');
       } else {
         this.game.systemsManager.removeSystem('gui-event-inspector');
       }
@@ -231,10 +231,14 @@ var Editor = /*#__PURE__*/function () {
   }, {
     key: "showControls",
     value: function showControls() {
+      var _this6 = this;
       var game = this.game;
       if (typeof game.systems['gui-controls'] === 'undefined') {
-        game.use(new this.game.plugins.ControlsGUI());
-        this.game.systems['gui-controls'].drawTable();
+        game.once('plugin::ready::gui-controls', function () {
+          alert('plugin::ready::gui-controls');
+          _this6.game.systems['gui-controls'].drawTable();
+        });
+        game.use('ControlsGUI');
       } else {
         this.game.systemsManager.removeSystem('gui-controls');
       }
@@ -245,7 +249,7 @@ var Editor = /*#__PURE__*/function () {
       var game = this.game;
       console.log('showInspector', game.systems['gui-inspector']);
       if (typeof game.systems['gui-inspector'] === 'undefined') {
-        game.use(new this.game.plugins.Inspector());
+        game.use('InspectorGUI');
       } else {
         this.game.systemsManager.removeSystem('gui-inspector');
       }
@@ -255,7 +259,7 @@ var Editor = /*#__PURE__*/function () {
     value: function showEntities() {
       var game = this.game;
       if (typeof game.systems['gui-entities'] === 'undefined') {
-        game.use(new this.game.plugins.EntitiesGUI());
+        game.use('EntitiesGUI');
         // this.game.systems['gui-entities'].drawTable();
       } else {
         this.game.systemsManager.removeSystem('gui-entities');
@@ -309,6 +313,7 @@ var Editor = /*#__PURE__*/function () {
   return Editor;
 }();
 _defineProperty(Editor, "id", 'gui-editor');
+_defineProperty(Editor, "async", true);
 var _default = exports["default"] = Editor;
 
 },{}]},{},[1])(1)

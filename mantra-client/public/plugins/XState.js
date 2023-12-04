@@ -6133,7 +6133,6 @@ var XState = /*#__PURE__*/function () {
       this.game = game;
       if (this.world) {
         this.createMachine();
-        this.loadEntities();
       }
       // register as system
       game.systemsManager.addSystem('xstate', this);
@@ -6221,7 +6220,6 @@ var XState = /*#__PURE__*/function () {
     key: "sendEvent",
     value: function sendEvent(eventName, eventData) {
       var game = this.game;
-      console.log('Sending event:', eventName, eventData);
       // Sending event: COLLISION { collisionType: 'goal' }
       game.service.send(eventName, eventData);
     }

@@ -1,7 +1,10 @@
 import express from 'express';
 import path from 'path';
-import { Game, plugins } from '@yantra-core/mantra';
-import WebsocketServer from '@yantra-core/server-websocket';
+import { Game } from '../mantra-game/Game.js';
+import plugins from '../mantra-game/plugins.js';
+// TODO: mantra dependency
+//import WebsocketServer from '@yantra-core/server-websocket';
+import WebsocketServer from '../mantra-game/plugins/server/WebsocketServer.js';
 
 import { fileURLToPath, pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -19,8 +22,12 @@ const game = new Game({
   isServer: true
 });
 
+game.use(new plugins.MatterPhysics());
+game.use(new plugins.SnapshotManager());
+game.use(new plugins.Entity());
+game.use(new plugins.EntityInput());
+game.use(new plugins.EntityMovement());
 game.use(new plugins.Schema());
-
 game.use(new plugins.Bullet());
 game.use(new plugins.Block());
 

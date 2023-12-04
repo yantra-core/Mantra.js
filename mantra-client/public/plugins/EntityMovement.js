@@ -88,7 +88,7 @@ var EntityMovement = /*#__PURE__*/function (_Plugin) {
     }
 
     /*
-      // In EntityMovement.js
+      // TODO: In EntityMovement.js
       init(game) {
         this.game = game;
         this.game.on('entity::move', data => {

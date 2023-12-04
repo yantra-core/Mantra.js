@@ -32,17 +32,18 @@
 
       // Use Plugins to add systems to the game
       // game.use(new Plugins.Bullet())
-      game.use(new Plugins.Schema())
-      game.use(new Plugins.StarField());
-      game.use(new Plugins.ControlsGUI());
-      game.use(new Plugins.Block());
-      game.use(new Plugins.Editor({
+      game.use('Schema')
+      game.use('StarField');
+      //game.use(new Plugins.ControlsGUI());
+      game.use('Block');
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/online.html'
-      }));
-
-      game.use(new Plugins.CurrentFPS());
-      game.use(new Plugins.PingTime());
-      game.use(new Plugins.SnapshotSize());
+      });
+      game.use('Client');
+      
+      game.use('CurrentFPS');
+      game.use('PingTime');
+      game.use('SnapshotSize');
 
       game.connect(); 
      

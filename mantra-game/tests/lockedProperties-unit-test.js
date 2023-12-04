@@ -2,6 +2,7 @@ import tap from 'tape';
 import { Game } from '../Game.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import Entity from '../plugins/entity/Entity.js';
+import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
 
 const game = new Game({
   loadDefaultPlugins: false
@@ -9,6 +10,7 @@ const game = new Game({
 
 game.use(new PhysicsMatter());
 game.use(new Entity());
+game.use(new SnapshotManager());
 
 tap.test('locked properties functionality', (t) => {
 

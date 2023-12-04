@@ -131,7 +131,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
       // let the graphics pipeline know the document is ready ( we could add document event listener here )
       // Remark: CSSGraphics current requires no async external loading scripts
-      game.graphicsReady.push(self.name);
 
       // Initialize the CSS render div
       this.initCSSRenderDiv();

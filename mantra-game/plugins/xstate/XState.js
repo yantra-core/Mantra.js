@@ -1,9 +1,6 @@
 // XState.js - Marak Squires 2023
 import { createMachine, interpret } from 'xstate';
 
-
-
-
 class XState {
   static id = 'xstate';
   static removable = false;
@@ -17,7 +14,6 @@ class XState {
     this.game = game;
     if (this.world) {
       this.createMachine();
-      this.loadEntities();
     }
     // register as system
     game.systemsManager.addSystem('xstate', this);
@@ -103,7 +99,6 @@ class XState {
 
   sendEvent (eventName, eventData) {
     let game = this.game;
-    console.log('Sending event:', eventName, eventData);
     // Sending event: COLLISION { collisionType: 'goal' }
     game.service.send(eventName, eventData);
   }

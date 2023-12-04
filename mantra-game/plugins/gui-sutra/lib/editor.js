@@ -1,5 +1,5 @@
 import gui from '../../gui-editor/gui.js';
-
+import componentsSelect from './editor/componentsSelect.js';
 const editor = {};
 
 editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditional) {
@@ -39,7 +39,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   editorContainer.appendChild(form);
 
   // Descriptive text
-  let description = document.createElement('p');
+  let description = document.createElement('div');
   description.innerHTML = `<span class="sutra-keyword">property</span> refers to current context values <br/><span class="sutra-keyword">gamePropertyPath</span>  refers to global 'game.data'`;
   form.appendChild(description);
 
@@ -86,17 +86,22 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     });
     */
 
-    propertyFieldContainer.style.display = propertyRadio.input.checked ? 'block' : 'none';
+    propertySelectContainer.style.display = propertyRadio.input.checked ? 'block' : 'none';
     gamePropertyFieldContainer.style.display = gamePropertyRadio.input.checked ? 'block' : 'none';
   }
 
   // Create form fields
   let propertyFieldContainer = createField('property', conditional.property || '');
+  let components = [];
+  if (typeof game !== 'undefined' && game.components) {
+    components = Object.keys(game.components);
+  }
+  let propertySelectContainer = componentsSelect('property', components);
   let gamePropertyFieldContainer = createField('gamePropertyPath', conditional.gamePropertyPath || '');
 
-  form.appendChild(propertyFieldContainer);
+  form.appendChild(propertySelectContainer);
   form.appendChild(gamePropertyFieldContainer);
-  
+
   // Function to create input fields
   function createField(name, value) {
     let fieldContainer = document.createElement('div');
@@ -127,7 +132,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     conditional.gamePropertyPath = '';
   }
   */
-  
+
   // Create form fields based on the conditional's properties
   for (let key in conditional) {
     if (key === 'op') continue; // Skip 'op' here, it will be handled separately
@@ -153,7 +158,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     input.className = 'field-input';
     fieldContainer.appendChild(input);
   }
-  
+
   let opContainer = document.createElement('div');
   opContainer.className = 'operator-container';
   form.appendChild(opContainer);
@@ -190,7 +195,7 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
     // check to see which radio button is checked
     let propertyType = form.querySelector('input[name="propertyType"]:checked').value;
 
-    
+
     // get the existing condition
     let existingCondition = this.behavior.getCondition(conditionalName);
     // create a new array of conditions
@@ -232,12 +237,17 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   }
   toggleFields(); // Call this to set initial field visibility
 };
+
+
+
 editor.showConditionalsForm = function showConditionalsForm(node) {
   // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {
     node = {
       sutraPath: 'tree',
-      action: 'newConditional'
+      action: 'newConditional',
+      if: 'newConditional',
+      then: [{ action: 'newAction' }]
     };
   }
 
@@ -267,7 +277,7 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     node.if.forEach((conditionalName, index) => {
       // let conditional = this.behavior.getCondition(conditionalName);
       if (index > 0) {
-        ifLink += ` <strong class="sutra-keyword">AND</strong> <span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
+        ifLink += `<strong class="sutra-keyword">AND</strong> <span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
       } else {
         ifLink += `<span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${conditionalName}</span>`;
       }
@@ -278,8 +288,21 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   }
 
   let humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
+  console.log('humanPath', humanPath)
+  humanPath = humanPath.replace('and', '');
+  humanPath = humanPath.split(' ');
 
-  humanPath = humanPath.replace('and', '<strong class="sutra-keyword">AND</strong>');
+  // for each item in humanPath create a span that has sutra-link class and sutra-path attribute
+  let path = '';
+  humanPath.forEach((item, index) => {
+    if (index > 0) {
+      path += ` <strong class="sutra-keyword">..</strong> <span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${item}</span>`;
+    } else {
+      path += `<span="openCondition" class="sutra-link" data-path="${node.sutraPath}">${item}</span>`;
+    }
+  });
+
+
   // Create and append the 'Path' element
   let pathElement = document.createElement('div');
   pathElement.innerHTML = `<strong class="sutra-keyword">ROOT</strong> ${humanPath}`;
@@ -290,19 +313,26 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   ifElement.innerHTML = `<strong class="sutra-keyword">IF</strong> ${ifLink}`;
   nodeInfo.appendChild(ifElement);
 
-  if (typeof node.then[0].action !== 'undefined') {
+  if (node.then && Array.isArray(node.then) && typeof node.then[0].action !== 'undefined') {
     // Create and append the 'Then' element
     let thenElement = document.createElement('div');
     thenElement.innerHTML = `<strong class="sutra-keyword">THEN</strong> ${node.then[0].action}`;
+    // clicking on the Then element should up Action Editor
+    thenElement.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showActionForm(node.then[0]);
+    });
     nodeInfo.appendChild(thenElement);
   }
 
+  /*
   if (typeof node.then[0].data !== 'undefined') {
     // add "WITH" header span
     let withElement = document.createElement('div');
     withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
     nodeInfo.appendChild(withElement);
   }
+  */
 
   // Append the entire node info to the GUI content
   guiContent.appendChild(nodeInfo);
@@ -316,6 +346,16 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
   } else {
     // get condition first
     let condition = this.behavior.getCondition(node.if);
+
+    if (!condition) {
+      console.log('condition not found', node.if);
+      condition = {
+        op: '==',
+        property: 'type',
+        value: 'block'
+      }
+    }
+
     if (Array.isArray(condition.conditions)) {
       condition.conditions.forEach((condName, index) => {
         let subCondition = this.behavior.getCondition(condName);
@@ -326,6 +366,14 @@ editor.showConditionalsForm = function showConditionalsForm(node) {
     }
   }
 
+  // add footer for adding new conditional / remove entire if condition
+  // let button = addConditionButton(this, conode);
+
+  let footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = `<h3>Entire Condition Footer</h3>`;
+  guiContent.appendChild(footer);
+
   gui.bringToFront(this.sutraFormView);
 }
 
@@ -333,6 +381,8 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   console.log('creating conditional form', conditionalName, node)
   let self = this;
   // Create the form element
+
+  /*
   let form = document.createElement('form');
   form.className = 'sutra-form';
   // Create the radio group div
@@ -345,90 +395,27 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
   conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
   conditionalInputContainer.className = 'input-container';
 
-  // Create the remove condition button
-  let removeConditionButton = document.createElement('button');
-  removeConditionButton.type = 'submit';
-  removeConditionButton.className = 'remove-condition-button';
-  removeConditionButton.textContent = 'Remove Entire If Condition';
-
-  removeConditionButton.onclick = (event) => {
-    event.preventDefault();
-    this.behavior.removeNode(node.sutraPath);
-    // close the editor window since we deleted the condition we were editing
-    let sutraFormView = document.getElementById('sutraFormView');
-    if (sutraFormView) {
-      sutraFormView.remove();
-    }
-    //this.behavior.removeCondition(conditionalName);
-    this.redrawBehaviorTree();
-  };
-
-  // create add condition below button
-  let addConditionBelowButton = document.createElement('button');
-  addConditionBelowButton.type = 'submit';
-  addConditionBelowButton.className = 'add-condition-below-button';
-  addConditionBelowButton.textContent = 'Add Condition Below';
-
-  addConditionBelowButton.onclick = (event) => {
-    event.preventDefault();
-    // create a new conditional name
-    // TODO: this is not working correctly yet
-    // TODO: have a big list of made up names for new behavior tree nodes
-    //let newConditionalName = 'newCondition';
-    // create the new conditional with placeholder values
-    // update the condition immediately with placeholder values
-    // and redraw the behavior tree, let UI take care of everything else
-
-    console.log('about to update condition', conditionalName)
-
-    // get the existing condition
-    let existingCondition = this.behavior.getCondition(conditionalName);
-    // create a new array of conditions
-    let newConditionObj = [];
-    // add the existing condition to the new array
-
-    if (Array.isArray(existingCondition)) {
-      existingCondition.forEach((cond, index) => {
-        newConditionObj.push(cond);
-      });
-    } else {
-      newConditionObj.push(existingCondition);
-    }
-
-    // add a new condition to the new array
-    newConditionObj.push({ op: '==', property: '', value: '' });
-    console.log('updating', conditionalName, newConditionObj)
-    self.behavior.updateCondition(conditionalName, newConditionObj, true);
-
-    // get the update condition to verify it was updated
-    let updatedCondition = this.behavior.getCondition(conditionalName);
-    console.log('updatedCondition', updatedCondition);
-
-    let updatedNode = self.behavior.findNode(node.sutraPath);
-
-    // reload window with updated node
-    self.showConditionalsForm(updatedNode);
-
-    // show serialized behavior tree
-    console.log('serialized behavior tree', self.behavior.serializeToJson());
-    //this.behavior.addCondition(newConditionalName, { op: '==', property: '', value: '' });
-    // let newConditionalName = this.behavior.getUniqueConditionalName();
-    // creates a new empty condition form
-    // self.createConditionalForm(conditionalName, node);
-  };
-
-
   // Append the created elements to the form
   form.appendChild(radioGroupDiv);
   form.appendChild(conditionalInputContainer);
-  form.appendChild(removeConditionButton);
-  form.appendChild(addConditionBelowButton);
-
+  // form.appendChild(removeConditionButton);
+  // form.appendChild(addConditionBelowButton);
+  */
   // Append the form to the DOM or a parent element as required
   // Example: document.body.appendChild(form); or parentElement.appendChild(form);
 
   let conditional = this.behavior.getCondition(conditionalName);
   console.log('conditional', conditional);
+
+  if (!conditional) {
+    console.log('condition not found', conditionalName);
+    conditional = {
+      op: '==',
+      property: 'type',
+      value: 'block'
+    }
+  }
+
 
   // Handling when conditional is an array
   if (Array.isArray(conditional)) {
@@ -437,7 +424,6 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
       let container = document.createElement('div');
       container.id = `conditional-${conditionalName}-${index}`;
       container.className = 'conditional-array-item';
-
       // Depending on the type of condition (function or object), call the appropriate editor
       if (typeof cond === 'function') {
         this.showFunctionEditor(`${conditionalName}-${index}`, cond, container);
@@ -446,9 +432,11 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
       } else {
         console.log('Unknown conditional type in array');
       }
+      let guiContent = this.sutraFormView.querySelector('.gui-content');
+      guiContent.appendChild(container);
 
       // Append the container to the form
-      form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
+      //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
     });
   } else if (typeof conditional === 'function') {
     this.showFunctionEditor(conditionalName, conditional);
@@ -458,14 +446,14 @@ editor.createConditionalForm = function createConditionalForm(conditionalName, n
     console.log('Unknown conditional type');
   }
 
-  let guiContent = this.sutraFormView.querySelector('.gui-content');
-  guiContent.appendChild(form);
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    //console.log("SAVING CONDITIONAL", conditionalName, form)
-    //self.saveConditional(conditionalName, form);
-  });
+  let guiContent = this.sutraFormView.querySelector('.gui-content');
+  let footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = `<h3>Individual Condition Footer</h3>`;
+  guiContent.appendChild(footer);
+
+
 }
 
 // Adjust createConditional to handle both creating and updating conditionals

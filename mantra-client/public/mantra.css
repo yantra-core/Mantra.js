@@ -498,7 +498,7 @@ pre {
   top: 10%;
   left: 10%;
   z-index: 1000;
-  width: 500px;
+  width: 550px;
   min-width: 460px;
   min-height: 200px;
   height: 60%;
@@ -516,6 +516,39 @@ pre {
   resize: both;
   overflow: auto;
   position: absolute;
+}
+
+#sutraActionEditor {
+  top: 10%;
+  left: 50%;
+  z-index: 1000;
+  width: 700px;
+  height: 600px;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+.sutra-link {
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.sutra-link:hover {
+  text-decoration: underline;
+}
+
+.sutra-link:active {
+  color: #9a9cff;
+}
+
+.sutra-link:focus {
+  outline: none;
+}
+
+.sutra-link:visited {
+  color: #9a9cff;
 }
 
 #editorContainer {
@@ -536,7 +569,11 @@ pre {
 }
 
 #sutraFormView .gui-content {
-  padding: 15px;
+  padding: 25px;
+}
+
+#sutraActionEditor .gui-content {
+  padding: 25px;
 }
 
 .node-info {
@@ -553,6 +590,12 @@ pre {
 
 .sutra-form {
   background-color: #162238;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-form {
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -592,16 +635,12 @@ pre {
 }
 
 .node-element {
-
   color: #d3d9df;
-
   padding-bottom: 0px;
   margin-bottom: 0px;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-left: 10px;
-
   cursor: pointer;
-
 }
 
 .node-element.collapsed .node-element {
@@ -641,7 +680,6 @@ button {
 .param-input,
 #sutraView select {
   background-color: transparent;
-
   border: 1px solid transparent;
   color: #d3d9df;
   padding: 5px;
@@ -678,17 +716,9 @@ button {
 .condition,
 .else-branch {
   color: #d3d9df;
-  margin-bottom: 5px;
-  margin-top: 10px;
-  padding-bottom: 5px;
   display: block;
   font-size: 18px;
   font-weight: bold;
-  padding-left: 5px;
-  border-radius: 5px;
-  border: 1px solid #2a3348 !important;
-
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #sutraView button {
@@ -771,9 +801,7 @@ textarea {
 }
 
 .data-container {
-
   padding-left: 15px;
-
   padding-top: 15px;
   padding-bottom: 15px;
   margin-bottom: 20px;
@@ -842,7 +870,8 @@ textarea {
 }
 
 .condition {
-  border: 1px solid #d0d0d0;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   padding: 5px;
   margin-bottom: 0px;
   margin-top: 0px;
@@ -914,6 +943,50 @@ textarea {
   padding: 0px;
 }
 
+.data-border {
+  border: 1px solid #2a3348;
+}
+
+.data-value-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.data-key {
+  color: #ffffff;
+  background-color: #2a3348;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Adjust as needed to align with your design */
+}
+
+.data-value {
+  color: #ffffff;
+  background-color: #2a3348;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Adjust as needed to align with your design */
+}
+
+
+/* Optional: Hover and focus effects for data values */
+.data-value:hover {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+.data-value:focus {
+  outline: none;
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+
 .nested-data-container {
   margin-left: 20px;
 
@@ -929,6 +1002,14 @@ textarea {
 
 .nested-level-3 {
   margin-left: 60px;
+}
+
+.nested-level-4 {
+  margin-left: 80px;
+}
+
+.nested-level-5 {
+  margin-left: 100px;
 }
 
 .plugin-form-container {
@@ -1027,11 +1108,34 @@ textarea {
 
 .conditional-editor-container {
   background-color: #162238;
-  padding: 10px;
+  padding: 25px;
   border-radius: 5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
   color: #d3d9df;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 22px;
+}
+
+.conditional-editor-container label {
+  color: #d3d9df;
+  font-size: 22px !important;
+}
+
+.conditional-editor-container span {
+  font-size: 22px !important;
+  font-weight: normal;
+}
+
+.conditional-editor-container select {
+  font-size: 22px !important;
+}
+
+.conditional-editor-container option {
+  color: #000000;
+}
+
+.conditional-editor-container input {
+  font-size: 22px !important;
 }
 
 .field-container {

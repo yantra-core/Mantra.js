@@ -6,7 +6,8 @@ import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
 import EntityMovement from '../plugins/entity-movement/EntityMovement.js';
 import Bullet from '../plugins/bullet/Bullet.js';
-import hasStateChanged from '../plugins/snapshots/SnapShotManager/hasStateChanged.js';
+import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
+import hasStateChanged from '../plugins/snapshot-manager/SnapshotManager/hasStateChanged.js';
 
 const game = new Game({
   loadDefaultPlugins: false
@@ -14,6 +15,7 @@ const game = new Game({
 
 game.use(new PhysicsMatter());
 game.use(new Entity());
+game.use(new SnapshotManager());
 game.use(new EntityInput());
 game.use(new EntityMovement());
 game.use(new Bullet());

@@ -4,10 +4,12 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
   static removable = false;
+  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   constructor({ camera, cameraConfig } = {}) {
     super();
     this.id = ThreeGraphics.id;
+    this.async = ThreeGraphics.async;
     this.renderer = null;
     this.camera = null;
 
@@ -70,7 +72,7 @@ class ThreeGraphics extends GraphicsInterface {
     this.scene.add(light);
 
     // Notify the system that graphics are ready
-    game.graphicsReady.push(this.name);
+    // game.graphicsReady.push(this.name);
 
     // Position the camera for a bird's eye view
     this.camera.position.set(0, 200, 200);
@@ -78,6 +80,12 @@ class ThreeGraphics extends GraphicsInterface {
     // TODO: Initialize controls for camera interaction
     // this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     // this.controls.enableZoom = true; // Enable zooming
+
+    // async:true plugins *must* self report when they are ready
+    game.emit('plugin::ready::graphics-three', this);
+    // TODO: remove this line from plugin implementations
+    game.loadingPluginsCount--;
+
   }
 
   createGraphic(entityData) {

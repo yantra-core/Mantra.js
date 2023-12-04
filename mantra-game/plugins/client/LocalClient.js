@@ -22,20 +22,16 @@ export default class LocalClient {
 
     this.game.isOnline = false;
 
-    let graphicsSystems = this.game.graphics.length;
-    let graphicsReady = this.game.graphicsReady.length;
-    let physicsReady = this.game.physicsReady;
-
     let self = this;
 
-    // Wait for all systems to be ready before starting the game loop
-    // TODO: replace this with general 'ready' event
-    if (!physicsReady || graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
-      setTimeout(function(){
-        self.start(callback);
-      }, 10)
-      return
+
+    callback(null, true);
+    this.game.emit('start');
+
+    if (this.game.systems.xstate) {
+      this.game.systems.xstate.sendEvent('START');
     }
+
 
     this.game.localGameLoopRunning = true;
 
@@ -49,12 +45,6 @@ export default class LocalClient {
       game.setPlayerId(ent.id);
     });
 
-    callback(null, true);
-    this.game.emit('start');
-
-    if (this.game.systems.xstate) {
-      this.game.systems.xstate.sendEvent('START');
-    }
     
   }
   stop () {

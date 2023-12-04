@@ -4,6 +4,7 @@ import sutra from '@yantra-core/sutra';
 export default function testRules(game) {
 
   let rules = new sutra.Sutra();
+  // return rules;
 
   // Define health level conditions for the boss
   const healthLevels = [800, 600, 400, 200, 0];
@@ -14,7 +15,6 @@ export default function testRules(game) {
 
   // Custom function for 'isBoss' condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
-
 
   // use custom function for condition
   rules.addCondition('isBoss', (entity) => entity.type === 'BOSS');
@@ -77,38 +77,76 @@ export default function testRules(game) {
     //return entity.timerDone;
   });
 
-
-
   rules.addCondition('blockCountBetween5and10', [
     { op: 'greaterThan', gamePropertyPath: 'ents.BLOCK.length', value: 5 },
     { op: 'lessThan', gamePropertyPath: 'ents.BLOCK.length', value: 10 }
   ]);
 
-  rules.addAction({
-    if: 'blockCountBetween5and10',
-    then: [{ action: 'validateBlockCount' }]
+  rules.on('consoleLog', (entity, node) => {
+    console.log("consoleLog", entity, node);
   });
 
-
+  /*
   rules.addAction({
-    if: 'isSpawner',
-    then: [{
-      if: 'timerCompleted',
-      then: [{
-        if: ['blockCountLessThan5', 'spawnerHealthAbove50'],
+    if: 'blockCountBetween5and10',
+    then: [{ action: 'consoleLog' }]
+  });
+  */
+
+  function generateRandomPosition() {
+    const x = Math.random() * 100 - 50; // Example range, adjust as needed
+    const y = Math.random() * 100 - 50; // Example range, adjust as needed
+    return { x, y };
+  }
+
+  // Adding a new condition to check if the entity is a block
+  rules.addCondition('isBlock', (entity) => {
+    return entity.type === 'BLOCK';
+  });
+  // () => ({ position: generateRandomPosition() })
+  // Action to move all blocks when timerCompleted
+  // Function to generate random positions
+  function generateRandomPosition() {
+    const x = Math.random() * 1000 - 500; // Example range, adjust as needed
+    const y = Math.random() * 1000 - 500; // Example range, adjust as needed
+    return { x, y };
+  }
+
+  function logger () {
+    console.log('FFFFFFFF')
+  }
+  // Action to move all blocks when timerCompleted
+  rules.addAction({
+    if: 'timerCompleted',
+    then: [
+      {
+        if: 'isBlock',
         then: [{
           action: 'entity::updateEntity',
-          data: { color: activeSpawnerColor } // Set the spawner color to gray when it's idle
-        },{
-          action: 'entity::createEntity',
-          data: { type: 'BLOCK', height: 20, width: 20, position: { x: 0, y: -200 } }
-        }],
-        else: [{
-        action: 'entity::updateEntity',
-        data: { color: idleSpawnerColor } // Set the spawner color to gray when it's idle
-      }]
-      }]
-    }]
+          data: {
+            color: 'generateRandomColorInt',
+            position: 'generateRandomPosition'
+          }
+        }]
+      },
+      {
+        if: 'isSpawner',
+        then: [{
+          if: ['blockCountLessThan5', 'spawnerHealthAbove50'],
+          then: [{
+            action: 'entity::updateEntity',
+            data: { color: activeSpawnerColor }
+          }, {
+            action: 'entity::createEntity',
+            data: { type: 'BLOCK', color: generateRandomColorInt,  height: 20, width: 20, position: { x: 0, y: -200 } }
+          }],
+          else: [{
+            action: 'entity::updateEntity',
+            data: { color: idleSpawnerColor }
+          }]
+        }]
+      }
+    ]
   });
 
   // Action for the boss based on health levels
@@ -119,7 +157,6 @@ export default function testRules(game) {
       then: [{ action: 'entity::updateEntity', data: { color: colors[index], speed: 5 } }]
     }))
   });
-
 
   rules.addAction({
     if: 'isBoss',
@@ -135,6 +172,7 @@ export default function testRules(game) {
   function generateRandomColorInt() {
     return Math.floor(Math.random() * 255);
   }
+
   // Composite AND condition
   rules.addCondition('isBossAndHealthLow', {
     op: 'and',
@@ -199,7 +237,6 @@ export default function testRules(game) {
       }
     });
     // alert("YOU ARE THE WINRAR")
-
 
   });
 

@@ -24,31 +24,25 @@
         }
       });
 
-      let Plugins = MANTRA.plugins;
-
       // Use Plugins to extend the game with new functionality
 
       // Adds projectile Bullets to the game
-      game.use(new Plugins.Bullet());
+      game.use('Bullet');
 
       // Adds Health to the game
-      game.use(new Plugins.Health());
+      game.use('Health');
 
       // Adds destructible Blocks to the game
-      game.use(new Plugins.Block());
+      game.use('Block');
 
       // Adds a nice StarField background
-      game.use(new Plugins.StarField());
+      game.use('StarField');
 
-      // Adds a controller input legend
-      game.use(new Plugins.ControlsGUI());
+      game.use('CurrentFPS');
 
-      // game.use(new Plugins.Editor());
-      game.use(new Plugins.CurrentFPS());
-
-      game.use(new Plugins.Editor({
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/xstate-matter-babylon.html'
-      }));
+      });
 
       function BossFightMiddleware() {
 
@@ -152,11 +146,16 @@
 
       }
 
-      game.use(new Plugins.XState({
+      game.use('XState', {
         world: BossFightMiddleware()
-      }))
+      })
 
-      game.start();
+    
+      game.start(function(){
+
+        game.systems['xstate'].loadEntities();
+
+      });
     });
   </script>
   <div id="gameHolder"></div>

@@ -153,7 +153,10 @@ var Client = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "stop",
     value: function stop() {
-      this.game.localGameLoopRunning = false;
+      console.log('Client.js plugin stopping game', this.game);
+      // this.game.localGameLoopRunning = false;
+      var localClient = this.game.getSystem('localClient');
+      localClient.stop();
     }
   }, {
     key: "connect",
@@ -217,33 +220,21 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
         callback = function noop() {};
       }
       this.game.isOnline = false;
-      var graphicsSystems = this.game.graphics.length;
-      var graphicsReady = this.game.graphicsReady.length;
-      var physicsReady = this.game.physicsReady;
       var self = this;
-
-      // Wait for all systems to be ready before starting the game loop
-      // TODO: replace this with general 'ready' event
-      if (!physicsReady || graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
-        setTimeout(function () {
-          self.start(callback);
-        }, 10);
-        return;
-      }
-      this.game.localGameLoop(this.game); // Start the local game loop when offline
-
-      this.game.communicationClient = this;
-      this.game.localGameLoopRunning = true;
-      this.game.createPlayer({
-        type: 'PLAYER'
-      }).then(function (ent) {
-        game.setPlayerId(ent.id);
-      });
       callback(null, true);
       this.game.emit('start');
       if (this.game.systems.xstate) {
         this.game.systems.xstate.sendEvent('START');
       }
+      this.game.localGameLoopRunning = true;
+      this.game.localGameLoop(this.game); // Start the local game loop when offline
+
+      this.game.communicationClient = this;
+      this.game.createPlayer({
+        type: 'PLAYER'
+      }).then(function (ent) {
+        game.setPlayerId(ent.id);
+      });
     }
   }, {
     key: "stop",
@@ -278,7 +269,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _msgpack = require("@msgpack/msgpack");
-var _deltaCompression = _interopRequireDefault(require("../snapshots/SnapShotManager/deltaCompression.js"));
+var _deltaCompression = _interopRequireDefault(require("../snapshot-manager/SnapshotManager/deltaCompression.js"));
 var _interpolateSnapshot = _interopRequireDefault(require("./lib/interpolateSnapshot.js"));
 var _messageSchema = _interopRequireDefault(require("../server/messageSchema.js"));
 var _gameTick = _interopRequireDefault(require("../../lib/gameTick.js"));
@@ -362,17 +353,6 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
       }
       console.log('connecting to', url);
       var self = this;
-      var graphicsSystems = this.game.graphics.length;
-      var graphicsReady = this.game.graphicsReady.length;
-      if (graphicsSystems > 0 && graphicsSystems !== graphicsReady) {
-        console.log('graphics not ready, trying again in 200ms');
-        console.log('graphics register', this.game.graphics);
-        console.log('graphicsReady', this.game.graphicsReady);
-        setTimeout(function () {
-          self.connect(url);
-        }, 200);
-        return;
-      }
       this.inputBuffer = {};
       this.inputSequenceNumber = 0;
       this.latestSnapshot = null;
@@ -735,7 +715,7 @@ function _decodeBlob() {
   return _decodeBlob.apply(this, arguments);
 }
 
-},{"../../lib/gameTick.js":1,"../server/messageSchema.js":22,"../snapshots/SnapShotManager/deltaCompression.js":23,"./lib/interpolateSnapshot.js":5,"@msgpack/msgpack":15}],5:[function(require,module,exports){
+},{"../../lib/gameTick.js":1,"../server/messageSchema.js":22,"../snapshot-manager/SnapshotManager/deltaCompression.js":23,"./lib/interpolateSnapshot.js":5,"@msgpack/msgpack":15}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2692,7 +2672,7 @@ var playerStateCache = {};
 var localPlayerStateCache = {};
 var deltaCompression = {}; // deltaCompression module scope
 
-// this config could be part of instance scope in SnapShotManager
+// this config could be part of instance scope in SnapshotManager
 var config = deltaCompression.config = {
   // Remark: We are currently performing float2Int encoding in the deltaCompression pipeline, not the deltaEncoding pipeline
   //         This is because both the server and client are already iterating over the state in the deltaCompression pipeline

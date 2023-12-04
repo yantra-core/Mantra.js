@@ -95,11 +95,14 @@ var Timers = /*#__PURE__*/function (_Plugin) {
         if (entity.timers) {
           var timersComp = entity.timers;
           Object.keys(timersComp.timers).forEach(function (timerName) {
+            // console.log('timerName', timerName, entity.id)
             var timer = timersComp.timers[timerName];
             if (!timer.completed && Date.now() >= timer.startTime + timer.duration) {
+              // console.log('timer done', entity.id, timerName, timer)
+              timer.done = true;
               if (timer.isInterval) {
                 timersComp.resetTimer(timerName); // Reset for intervals
-                _this2.game.emit('timers::intervalElapsed', {
+                _this2.game.emit('timers::done', {
                   entity: entity,
                   timerName: timerName
                 });

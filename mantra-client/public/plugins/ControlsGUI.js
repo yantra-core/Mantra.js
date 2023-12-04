@@ -124,11 +124,58 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+//import lightTheme from "./themes/light.js";
+//import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
 var gui = {
+  /*
+  setTheme: function (name) {
+    if (name === 'light') {
+      this.theme(lightTheme);
+    } else if (name === 'dark') {
+      this.theme(darkTheme);
+    } else {
+      console.log(`Theme ${name} not found, defaulting to light theme`);
+      this.theme(lightTheme);
+    }
+  },
+  theme: function (theme) {
+    // theme is an object gui-elements and cssObjects
+    // for each gui element type in the theme
+    // find *all* nodes that match the type
+    // iterate over each node and apply the cssObject
+    console.log('setting theme', theme)
+    for (let type in theme) {
+      let cssObject = theme[type];
+      let nodes = document.querySelectorAll(`.${type}`);
+      console.log('ffff', nodes)
+      nodes.forEach(node => {
+        this.skin(node, cssObject);
+      });
+    }
+  },
+  skin: function(guiElement, cssObject) {
+    // guiElement is a DOM element
+    // cssObject is an object with css properties
+    for (let property in cssObject) {
+      // update the live node style
+      guiElement.style[property] = cssObject[property];
+      // update the style sheet for all future nodes
+      // this will override any inline styles
+      let styleSheet = document.styleSheets[0];
+      let selector = `.${guiElement.className}`;
+      let rule = `${property}: ${cssObject[property]}`;
+      let index = styleSheet.cssRules.length;
+      styleSheet.insertRule(`${selector} { ${rule} }`, index);
+     }
+  },
+  */
+  elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
   window: function window(id) {
     var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Window';
     var close = arguments.length > 2 ? arguments[2] : undefined;
+    var pluginInstance = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    var self = this;
     if (typeof close === 'undefined') {
       close = function close() {
         console.log("WARNING: No close function provided for window with id: " + id + ", defaulting to remove()");
@@ -148,6 +195,27 @@ var gui = {
     var guiHeader = document.createElement('div');
     guiHeader.className = 'gui-header';
 
+    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
+    if (false && pluginInstance) {
+      var gearIcon = document.createElement('i');
+      gearIcon.className = 'fas fa-cog';
+      gearIcon.style["float"] = 'right';
+      gearIcon.style.cursor = 'pointer';
+      gearIcon.style.top = '20px';
+      gearIcon.style.right = '20px';
+      gearIcon.style.fontSize = '50px';
+      gearIcon.innerHTML = "FFF";
+      gearIcon.onclick = function () {
+        console.log(pluginInstance);
+        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
+      };
+      guiHeader.appendChild(gearIcon);
+    }
+
+    // Traffic light container
+    var trafficLightContainer = document.createElement('div');
+    trafficLightContainer.className = 'traffic-light-container';
+
     // Add traffic light buttons
     var closeButton = document.createElement('div');
     var minimizeButton = document.createElement('div');
@@ -162,37 +230,21 @@ var gui = {
       return close();
     };
     maximizeButton.onclick = function () {
-      if (container.style.width === '100vw') {
-        container.style.width = '50%';
-        container.style.height = '50%';
-        // set position to center
-
-        if (typeof container.lastTop !== 'undefined') {
-          container.style.top = container.lastTop;
-          container.style.left = container.lastLeft;
-        } else {
-          container.style.top = '20%';
-          container.style.left = '20%';
-        }
-      } else {
-        // store the exact last position on container itself
-        // use special property
-        container.lastTop = container.style.top;
-        container.lastLeft = container.style.left;
-        container.style.width = '100vw';
-        container.style.height = '90%';
-        // set position to top left
-        container.style.top = '50px';
-        container.style.left = '0px';
-      }
+      self.maxWindow(container);
     };
-    guiHeader.appendChild(closeButton);
-    guiHeader.appendChild(minimizeButton);
-    guiHeader.appendChild(maximizeButton);
+    trafficLightContainer.appendChild(closeButton);
+    trafficLightContainer.appendChild(minimizeButton);
+    trafficLightContainer.appendChild(maximizeButton);
+    guiHeader.appendChild(trafficLightContainer);
 
     // create h3 for title
     var guiHeaderTitle = document.createElement('h3');
     guiHeaderTitle.textContent = title;
+
+    // add "double click" event to h3 to maximize window
+    guiHeaderTitle.ondblclick = function () {
+      self.maxWindow(container);
+    };
     guiHeader.appendChild(guiHeaderTitle);
     container.appendChild(guiHeader);
     container.appendChild(content);
@@ -215,6 +267,31 @@ var gui = {
       gui.bringToFront(container);
     });
     return container;
+  },
+  maxWindow: function maxWindow(container) {
+    if (container.style.width === '100vw') {
+      container.style.width = '50%';
+      container.style.height = '50%';
+      // set position to center
+
+      if (typeof container.lastTop !== 'undefined') {
+        container.style.top = container.lastTop;
+        container.style.left = container.lastLeft;
+      } else {
+        container.style.top = '20%';
+        container.style.left = '20%';
+      }
+    } else {
+      // store the exact last position on container itself
+      // use special property
+      container.lastTop = container.style.top;
+      container.lastLeft = container.style.left;
+      container.style.width = '100vw';
+      container.style.height = '90%';
+      // set position to top left
+      container.style.top = '50px';
+      container.style.left = '0px';
+    }
   },
   initializeResize: function initializeResize(resizeHandle, container) {
     var _this = this;

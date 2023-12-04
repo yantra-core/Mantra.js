@@ -23,28 +23,18 @@
       });
 
       let Plugins = MANTRA.plugins;
+      console.log("Plugins", Plugins)
+      console.log(Object.keys(Plugins).length)
 
       // Use Plugins to extend the game with new functionality
 
       // Adds projectile Bullets to the game
       // test chanining
-      game.use(new Plugins.Bullet()).use(new Plugins.Block());
-
-      // Adds a nice StarField background
-      game.use(new Plugins.StarField());
-
-      // Adds a controller input legend
-      game.use(new Plugins.ControlsGUI());
-
-      // game.use(new Plugins.Editor());
-      game.use(new Plugins.CurrentFPS());
-
-      // game.use(new Plugins.SutraGUI({ }));
-
-
-      game.use(new Plugins.Editor({
+      game.use('Bullet').use('Block');
+      game.use('CurrentFPS');
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-babylon.html'
-      }));
+      });
 
       // custom player::joined handler, this is optional
       // without setting a custom player::joined, the default event will be used
@@ -64,6 +54,9 @@
 
       // start the game loop
       game.start(function () {
+        // Adds a nice StarField background
+        game.use('StarField');
+
         // Creates a single Block, since we have used Block plugin, this will be a destructible Block
         game.createEntity({
           type: 'BLOCK',
@@ -75,7 +68,8 @@
             y: -500
           },
         });
-        game.use(new Plugins.Border({ autoBorder: true }));
+        //game.use(new Plugins.Border({ autoBorder: true }));
+
       });
     });
   </script>

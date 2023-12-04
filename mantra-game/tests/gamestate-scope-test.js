@@ -4,6 +4,7 @@ import Schema from '../plugins/schema/Schema.js';
 import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
+import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
 
 const game = new Game({
   height: 600,
@@ -19,6 +20,7 @@ game.use(new Schema());
 game.use(new PhysicsMatter());
 game.use(new Entity());
 game.use(new EntityInput());
+game.use(new SnapshotManager());
 
 tap.test('game class', (t) => {
 

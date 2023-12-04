@@ -1,16 +1,22 @@
 
 // xstate-bossfight-test.js - Marak Squires 2023
 import tap from 'tape';
-import { Game, plugins } from '../Game.js';
+import { Game } from '../Game.js';
 import BossFight from './fixtures/BossFight.js';
-
+import plugins from '../plugins.js';
 tap.test('Machine creation and initialization', (t) => {
-  let game = new Game({ isServer: true });
+  let game = new Game({ 
+    isServer: true,   // indicates that this is a server-side test
+    plugins: plugins  // binds the plugins to the game instance
+   });
 
   let freshBossFight = BossFight();
+  // game.use(new plugins.Entity());
+
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let system = game.getSystem('xstate');
+  system.loadEntities();
   system.createMachine();
 
   t.ok(game.machine, 'Machine should be initialized');
@@ -20,13 +26,19 @@ tap.test('Machine creation and initialization', (t) => {
 });
 
 tap.test('State transitions: Idle to Active', (t) => {
-  let game = new Game({ isServer: true });
+
+  let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
   xStateSystem.sendEvent('START');
 
   setImmediate(() => {
@@ -36,10 +48,16 @@ tap.test('State transitions: Idle to Active', (t) => {
 });
 
 tap.test('Loading entities: Boss Entity', (t) => {
-  let game = new Game({ isServer: true });
+  let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
+  let xStateSystem = game.getSystem('xstate');
+  xStateSystem.createMachine();
+  xStateSystem.loadEntities();
 
   let boss = game.getEntity(1);
   t.ok(boss, 'NPC entity should be loaded');
@@ -49,13 +67,18 @@ tap.test('Loading entities: Boss Entity', (t) => {
 });
 
 tap.test('Guard conditions: Entity Damaged', (t) => {
-  let game = new Game({ isServer: true });
+  let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
 
   xStateSystem.sendEvent('START');
   xStateSystem.sendEvent('entity::damage', { name: 'boss', damage: 100 });
@@ -67,13 +90,18 @@ tap.test('Guard conditions: Entity Damaged', (t) => {
 });
 
 tap.test('Boss Health Reduction', (t) => {
-  let game = new Game({ isServer: true });
+  let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
   
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
   xStateSystem.sendEvent('START');
 
   // Simulate multiple damage events
@@ -90,13 +118,18 @@ tap.test('Boss Health Reduction', (t) => {
 });
 
 tap.test('Transition to EndRound State', (t) => {
-  let game = new Game({ isServer: true });
+  let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
+
   xStateSystem.sendEvent('START');
 
   // Simulate boss defeat
@@ -110,13 +143,17 @@ tap.test('Transition to EndRound State', (t) => {
 
 
 tap.test('Complete Boss Fight Flow', (t) => {
-  let game = new Game({ isServer: true });
+  let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
 
   let freshBossFight = BossFight();
   game.use(new plugins.XState({ world: freshBossFight }));
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
   
   // Start the boss fight
   xStateSystem.sendEvent('START');

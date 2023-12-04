@@ -5,10 +5,12 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 class PhaserGraphics extends GraphicsInterface {
   static id = 'graphics-phaser';
   static removable = false;
+  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   constructor({ camera = {}, startingZoom = 0.4 } = {}) {
     super();
     this.id = 'graphics-phaser';
+    this.async = PhaserGraphics.async;
 
     let config = {
       camera,
@@ -25,11 +27,8 @@ class PhaserGraphics extends GraphicsInterface {
   init(game) {
     // console.log('PhaserGraphics.init()');
 
-    // register renderer with graphics pipeline
-    game.graphics.push(this);
     this.game = game;
 
-    this.game.systemsManager.addSystem('graphics-phaser', this);
 
     // check to see if Phaser scope is available, if not assume we need to inject it sequentially
     if (typeof Phaser === 'undefined') {
@@ -96,7 +95,22 @@ class PhaserGraphics extends GraphicsInterface {
       let camera = scene.cameras.main;
 
       self.scenesReady = true;
-      game.graphicsReady.push(self.name);
+
+      // register renderer with graphics pipeline
+      game.graphics.push(this);
+
+      // possible duplicate api, ready per pipeline not needed,
+      // as we have async loading of plugins now, review this line and remove
+      // game.graphicsReady.push(self.name);
+
+      // wait until scene is loaded before letting systems know phaser graphics are ready
+      this.game.systemsManager.addSystem('graphics-phaser', this);
+
+
+        // async:true plugins *must* self report when they are ready
+        game.emit('plugin::ready::graphics-phaser', this);
+        // TODO: remove this line from plugin implementations
+        game.loadingPluginsCount--;
 
       // camera.rotation = -Math.PI / 2;
       /*
@@ -132,6 +146,7 @@ class PhaserGraphics extends GraphicsInterface {
     });
 
     loadMainScene();
+
 
   }
 
@@ -187,7 +202,6 @@ class PhaserGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
-
     // switch case based on entityData.type
     let graphic;
     switch (entityData.type) {

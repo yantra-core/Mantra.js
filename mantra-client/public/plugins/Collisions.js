@@ -30,6 +30,7 @@ var Collisions = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
 
+      // TODO: this won't work unless game.physics exists
       // Binds our handleCollision method to the game physics engine's collisionStart event
       this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
       this.game.physics.collisionActive(this.game, function noop() {});

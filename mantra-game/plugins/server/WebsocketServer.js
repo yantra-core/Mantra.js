@@ -4,9 +4,10 @@ import WebSocket, { WebSocketServer as WebSocketServerActual } from 'ws';
 import http from 'http';
 import { nanoid } from 'nanoid';
 import { encode } from "@msgpack/msgpack";
-
-import deltaCompression from '@yantra-core/snapshots/SnapShotManager/deltaCompression.js';
-import deltaEncoding from '@yantra-core/snapshots/SnapShotManager/deltaEncoding.js';
+// TODO: mantra dependency
+import plugins from '../../plugins.js';
+import deltaCompression from '../snapshot-manager/SnapshotManager/deltaCompression.js';
+import deltaEncoding from '../snapshot-manager/SnapshotManager/deltaEncoding.js';
 
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
@@ -74,7 +75,6 @@ class WebSocketServer {
 
     this.game.listen = this.listen.bind(this);
 
-
   }
 
   listen(port) {
@@ -89,7 +89,6 @@ class WebSocketServer {
 
     this.wsServer.on('connection', (ws) => this.handleConnection(ws));
   }
-
 
   async handleConnection(ws) {
 

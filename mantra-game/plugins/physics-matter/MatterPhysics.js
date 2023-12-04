@@ -1,6 +1,7 @@
 // MatterPhysics.js - Marak Squires 2023
 import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
+import Collisions from '../collisions/Collisions.js';
 
 class MatterPhysics extends PhysicsInterface {
 
@@ -139,6 +140,9 @@ class MatterPhysics extends PhysicsInterface {
 
       }
     });
+
+    // TODO: configurable collision plugins
+    game.use(new Collisions());
 
   }
 

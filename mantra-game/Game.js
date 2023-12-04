@@ -5,20 +5,16 @@
 import Component from './Component/Component.js';
 import SystemsManager from './System/SystemsManager.js';
 
-// Plugins
-import plugins from './plugins.js';
-
-// Snapshots
-import SnapshotManager from './plugins/snapshots/SnapShotManager/SnapshotManager.js';
-
 // Game instances are event emitters
 import eventEmitter from './lib/eventEmitter.js';
 
 // Game loops
+// TODO: move to plugins
 // Local game loop is for single machine games ( no networking )
 import localGameLoop from './lib/localGameLoop.js';
 // Online game loop is for multiplayer games ( networking )
 import onlineGameLoop from './lib/onlineGameLoop.js';
+
 
 // Game tick, called once per tick from game loop
 import gameTick from './lib/gameTick.js';
@@ -45,6 +41,7 @@ class Game {
     isEdgeClient = false,
     isServer = false,
     isOfflineMode,
+    plugins = {}, // Plugin Classes that will be bound to the game instance
     // game options
     loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
     width = 1600,
@@ -109,6 +106,7 @@ class Game {
     // Could be another CDN or other remote location
     // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
+      console.log("USING SCRIPT ROOT", options.scriptRoot)
       this.scriptRoot = options.scriptRoot;
     }
 
@@ -157,6 +155,8 @@ class Game {
 
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
+
+
     this.components = {
       type: new Component('type', this),           // string type, name of Entity
       destroyed: new Component('destroyed', this), // boolean, if true, entity is pending destroy and will be removed from game
@@ -188,25 +188,20 @@ class Game {
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
 
-    // snapshotManager doesn't seem optional as plugin, not sure game loop can run without basic snapshots interface / api
-    this.snapshotManager = new SnapshotManager(this);
-
     // Graphics rendering pipeline
     this.graphics = [];
-
-    // Graphics could take time to load and be ready
-    // as each Graphics plugin becomes ready, this array will be populated with the plugin name
-    // Game.connect() and Game.start() will wait for all Graphics to be ready before proceeding
-    // Remark: We could use this same ready pattern for all Plugins / Systems
-    this.graphicsReady = [];
-    this.physicsReady = false;
 
     this.gameTick = gameTick.bind(this);
     this.localGameLoop = localGameLoop.bind(this);
     this.onlineGameLoop = onlineGameLoop.bind(this);
     this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
 
-    // this.plugins represents all possible plugins the Game has access to
+    // keeps track of game.use('PluginStringName') async loading
+    // game.start() will wait for all plugins to be loaded before starting
+    // this means any plugins which are game.use('PluginStringName') will "block" the game from starting
+    this.loadingPluginsCount = 0;
+    // this.plugins represents the initial plugins the Game wil have access to
+    // subsequent plugins will be loaded dynamically with game.use()
     this.plugins = plugins;
 
     // this._plugins represents all plugin instances that have been loaded
@@ -226,9 +221,9 @@ class Game {
       });
     }
 
-
   }
 
+  // TODO: hoist to systemsManager
   update(deltaTime) {
     // Call update method of SystemsManager, which delegate to all Systems which have an update method
     this.systemsManager.update(deltaTime);
@@ -236,6 +231,7 @@ class Game {
 
   render() {
     // Call render method of SystemsManager, which will delegate to all Graphics systems
+    // TODO: should we remove this and hoist it to the systemsManager?
     this.systemsManager.render();
   }
 
@@ -249,24 +245,38 @@ class Game {
         defaultGameStart(game);
       };
     }
-
-    if (!this.systems.client) {
-      game.use(new plugins.Client('Bunny', game.config));
+    // Wait for all systems to be ready before starting the game loop
+    if (game.loadingPluginsCount > 0) {
+      setTimeout(function () {
+        game.start(cb);
+      }, 4);
+      return
+    } else {
+      console.log('All Plugins are ready! Starting Mantra Game Client...');
+      let client = this.getSystem('client');
+      client.start(cb);
     }
-
-    let client = this.getSystem('client');
-    client.start(cb);
-
   }
 
+  // TODO: move to client, let client hoist the connection logic to game
   stop() {
     let client = this.getSystem('client');
     client.stop();
   }
 
   connect(url) {
-    let client = this.getSystem('client');
-    client.connect(url);
+    let game = this;
+    // Wait for all systems to be ready before starting the game loop
+    if (game.loadingPluginsCount > 0) {
+      setTimeout(function () {
+        game.connect(url);
+      }, 4);
+      return
+    } else {
+      console.log('All Plugins are ready! Starting Mantra Game Client...');
+      let client = this.getSystem('client');
+      client.connect(url);
+    }
   }
 
   disconnect() {
@@ -275,10 +285,15 @@ class Game {
   }
 
   // All Systems are Plugins, but not all Plugins are Systems
-  use(pluginInstanceOrId) {
+  // TODO: move to separate file
+  use(pluginInstanceOrId, options = {}) {
     let game = this;
-    let basePath = './plugins/'; // Base path for loading plugins
 
+    // TODO: make this configurable
+    let basePath = '/plugins/'; // Base path for loading plugins
+    basePath = this.scriptRoot + basePath;
+    //console.log("FOUND SCRIPT ROOT", this.scriptRoot)
+    //console.log("LOADING FROM BASEPATH", basePath)
     // Check if the argument is a string (plugin ID)
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
@@ -288,8 +303,20 @@ class Game {
         return this;
       }
 
+      if (this.isServer) {
+        // console.log('pluginId', pluginId, this.plugins)
+        if (this.plugins[pluginId]) {
+          console.log('loading plugin', pluginId, this.plugins[pluginId])
+          return this.use(new this.plugins[pluginId](), options);
+        }
+
+        console.log(`Attempted to load plugin by string name "${pluginId}"on server, could not find! skipping`);
+        return;
+      }
+
       // Mark the plugin as loading
       this._plugins[pluginId] = { status: 'loading' };
+      this.loadingPluginsCount++;
       this.emit('plugin::loading', pluginId);
 
       // Dynamically load the plugin script
@@ -298,16 +325,28 @@ class Game {
         // The script is expected to call `game.use(pluginInstance)` after loading
         console.log(`Plugin ${pluginId} loaded.`, game.plugins, game._plugins);
         if (typeof PLUGINS === 'object') {
-          let pluginInstance = new PLUGINS[pluginId].default();
+          //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
+          let pluginInstance = new PLUGINS[pluginId].default(options);
           game.use(pluginInstance);
+          // check to see if pluginInstance is async, if so
+          // we'll assume it will emit a ready event when it's ready
+          if (pluginInstance.async) {
+            // plugin must perform async operation before it's ready
+            // plugin author *must* emit their own ready event game will not start
+            // alert('plugin must perform async operation before it\'s ready');
+          } else {
+            game.loadingPluginsCount--;
+            game.emit('plugin::ready::' + pluginId, pluginInstance);
+          }
         } else {
-          // handle server-side case of string usage
-          // TODO
+          // decrement loadingPluginsCount even if it fails
+          // this means applications will attempt to load even if plugins fail
+          game.loadingPluginsCount--;
         }
       }).catch(function (err) {
         console.error(`Error loading plugin ${pluginId}:`, err);
         game._plugins[pluginId] = { status: 'error' };
-        throw error;
+        throw err;
       });
 
       return this;
@@ -330,6 +369,7 @@ class Game {
 
   // Helper function to load plugin scripts
   loadPluginScript(scriptUrl) {
+    console.log('loadPluginScript', scriptUrl)
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = scriptUrl;
@@ -339,7 +379,6 @@ class Game {
       document.head.appendChild(script);
     });
   }
-
 
   removePlugin(pluginName) {
     let plugin = this._plugins[pluginName];
@@ -356,6 +395,7 @@ class Game {
     }
   }
 
+  // TODO: move to componentManager
   addComponent(entityId, componentType, data) {
     if (!this.components[componentType]) {
       this.components[componentType] = new Component(componentType, this);
@@ -390,6 +430,7 @@ class Game {
     });
   }
 
+  // TODO: move to playerManager
   // allows for custom player creation logic, or default player creation logic
   createPlayer(playerConfig) {
     return new Promise((resolve, reject) => {
@@ -431,4 +472,4 @@ class Game {
 
 }
 
-export { Game, plugins };
+export { Game };

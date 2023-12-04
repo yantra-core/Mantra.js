@@ -1,12 +1,16 @@
 import tap from 'tape';
-import {Game, plugins} from '../Game.js';
+import { Game } from '../Game.js';
 import Pong from './fixtures/PongWorld.js';
+
+import plugins from '../plugins.js';
 
 tap.test('Machine creation and initialization', (t) => {
 
   let game = new Game({
-    isServer: true
+    isServer: true,
+    plugins: plugins
   });
+
 
   game.use(new plugins.XState({
     world: Pong
@@ -23,7 +27,11 @@ tap.test('Machine creation and initialization', (t) => {
 
 
 tap.test('State transitions', (t) => {
-  let game = new Game({ isServer: true });
+    let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
+
   game.use(new plugins.XState({ world: Pong }));
   
   let xStateSystem = game.getSystem('xstate');
@@ -37,8 +45,16 @@ tap.test('State transitions', (t) => {
 });
 
 tap.test('Loading entities', (t) => {
-  let game = new Game({ isServer: true });
+    let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
+
   game.use(new plugins.XState({ world: Pong }));
+
+  let xStateSystem = game.getSystem('xstate');
+  xStateSystem.createMachine();
+  xStateSystem.loadEntities();
 
 
   let borderTop = game.getEntity(3);
@@ -50,11 +66,16 @@ tap.test('Loading entities', (t) => {
 });
 
 tap.test('Guard conditions', (t) => {
-  let game = new Game({ isServer: true });
+    let game = new Game({
+    isServer: true,
+    plugins: plugins
+  });
+
   game.use(new plugins.XState({ world: Pong }));
 
   let xStateSystem = game.getSystem('xstate');
   xStateSystem.createMachine();
+  xStateSystem.loadEntities();
 
   xStateSystem.sendEvent('START');
 

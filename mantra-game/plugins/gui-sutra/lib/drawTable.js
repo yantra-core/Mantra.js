@@ -12,7 +12,7 @@ export default function drawTable() {
     if (game.systemsManager) {
       game.systemsManager.removeSystem(self.id);
     }
-  }, game.systems['gui-sutra']);
+  });
 
   // Add a "Show Sutra" button
   let showSutraButton = document.createElement('button');

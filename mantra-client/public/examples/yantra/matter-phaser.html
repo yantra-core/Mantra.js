@@ -60,20 +60,20 @@
 
       console.log(Plugins)
 
-      game.use(new Plugins.Editor({
+      game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/yantra/matter-phaser.html'
-      }));
+      });
 
-      game.use(new Plugins.YantraGUI());
+      game.use('YantraGUI');
 
       // Use Plugins to add systems to the game
-      game.use(new Plugins.Bullet())
-      game.use(new Plugins.Schema())
+      game.use('Bullet')
+      game.use('Schema')
 
-      game.use(new Plugins.StarField());
-      game.use(new Plugins.ControlsGUI());
+      game.use('StarField');
+      game.use('ControlsGUI');
 
-      game.use(new Plugins.Block());
+      game.use('Block');
 
       let world = 'my-awesome-world';
       let owner = 'Marak'
@@ -96,9 +96,9 @@
       let wsConnectionString = bestServer.processInfo.wsConnectionString;
 
       game.connect(wsConnectionString);
-      game.use(new Plugins.CurrentFPS());
-      game.use(new Plugins.SnapshotSize());
-      game.use(new Plugins.PingTime());
+      game.use('CurrentFPS');
+      game.use('SnapshotSize');
+      game.use('PingTime');
 
     });
   </script>
