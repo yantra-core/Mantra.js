@@ -213,11 +213,12 @@ class SutraGUI {
       formElement.onclick = () => {
         this.showActionForm(node);
       }
-
-      // formElement.classList.add('collapsible-content');
       this.appendActionElement(contentDiv, node, indentLevel, keyword);
     } else if (node.if) {
       this.appendConditionalElement(contentDiv, node, indentLevel);
+    }
+    if (indentLevel !== 1) {
+      formElement.classList.add('collapsible-content');
     }
 
     return formElement;
@@ -259,7 +260,7 @@ class SutraGUI {
       nodes.forEach(node => {
         // TODO: why toggle not working as expected?
         // node.classList.toggle('collapsed');
-        node.classList.remove('collapsed');
+        // node.classList.remove('collapsed');
       });
     }
 
@@ -434,6 +435,16 @@ class SutraGUI {
       //const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
       //condition.appendChild(removeRuleBtn);
 
+    }
+
+    // clicking the form element will toggle collapsed class
+    conditionContainer.onclick = (e) => {
+      let target = e.target;
+      let container = target.parentElement;
+      let allCollapsibleContent = conditionContainer.parentElement.querySelectorAll('.node-element-form');
+      allCollapsibleContent.forEach(collapsibleContent => {
+        collapsibleContent.classList.toggle('collapsible-content');
+      });
     }
 
     return conditionContainer;
