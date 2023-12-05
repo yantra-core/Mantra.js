@@ -2784,7 +2784,7 @@ var Sutra = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Sutra;
 
-},{"./evaluateCompositeCondition.js":14,"./evaluateCondition.js":15,"./evaluateDSLCondition.js":16,"./evaluateSingleCondition.js":17,"./exportToEnglish.js":18,"./operatorAliases.js":19,"./parsePath.js":20,"./serializeToJson.js":21}],14:[function(require,module,exports){
+},{"./evaluateCompositeCondition.js":14,"./evaluateCondition.js":15,"./evaluateDSLCondition.js":16,"./evaluateSingleCondition.js":17,"./exportToEnglish.js":18,"./operatorAliases.js":20,"./parsePath.js":21,"./serializeToJson.js":22}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2973,6 +2973,94 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = exportToEnglish;
+var _i18n = _interopRequireDefault(require("./i18n.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+// Custom function to format data in a readable manner
+var formatData = function formatData(data, indent) {
+  if (_typeof(data) !== 'object' || data === null) {
+    return "".concat(indent).concat(data);
+  }
+  return Object.entries(data).map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+      key = _ref2[0],
+      value = _ref2[1];
+    var stringValue = '';
+    if (typeof value === 'function') {
+      // Get function name from value
+      stringValue = "".concat(value.name, "()");
+    } else if (_typeof(value) === 'object' && value !== null) {
+      // Format nested object
+      var nestedIndent = indent + '  ';
+      stringValue = "\n".concat(formatData(value, nestedIndent));
+    } else {
+      // Handle non-object values
+      stringValue = value;
+    }
+    return "".concat(indent).concat(key, ": ").concat(stringValue);
+  }).join('\n');
+};
+function exportToEnglish() {
+  var indentLevel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'en';
+  var langKeywords = _i18n["default"][lang] || _i18n["default"].en; // Fallback to English if the language is not found
+
+  var describeAction = function describeAction(node, indentLevel) {
+    var currentIndent = ' '.repeat(indentLevel * 2);
+    var nextIndent = ' '.repeat(indentLevel * 2);
+    var withIndent = ' '.repeat(indentLevel * 2 + 2); // Indent for "with" label
+    var dataIndent = ' '.repeat((indentLevel + 2) * 2); // Indent for data
+
+    if (node.action) {
+      return "".concat(currentIndent, "'").concat(node.action, "'");
+    } else if (node["if"]) {
+      var description = "".concat(currentIndent).concat(langKeywords.ifKeyword, " ").concat(node["if"]);
+
+      // Process 'then' block
+      if (node.then) {
+        var thenDescription = node.then.map(function (childNode) {
+          var childDesc = describeAction(childNode, indentLevel + 1);
+          if (childNode.data) {
+            childDesc += "\n".concat(formatData(childNode.data, dataIndent));
+          }
+          return childDesc;
+        }).join('\n');
+        description += "\n".concat(thenDescription);
+      }
+
+      // Process 'else' block
+      if (node["else"]) {
+        var elseDescription = node["else"].map(function (childNode) {
+          var childDesc = describeAction(childNode, indentLevel + 1);
+          if (childNode.data) {
+            childDesc += "\n".concat(formatData(childNode.data, dataIndent));
+          }
+          return childDesc;
+        }).join('\n');
+        description += "\n".concat(currentIndent).concat(langKeywords.elseKeyword, "\n").concat(elseDescription);
+      }
+      return description;
+    }
+    return '';
+  };
+  return this.tree.map(function (node) {
+    return describeAction(node, indentLevel);
+  }).join('.\n').concat('.');
+}
+
+},{"./i18n.js":19}],19:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
 // Example language configuration object
 var languageConfig = {
   en: {
@@ -3002,41 +3090,9 @@ var languageConfig = {
   }
   // You can add more languages here
 };
+var _default = exports["default"] = languageConfig;
 
-function exportToEnglish() {
-  var indentLevel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-  var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'en';
-  var langKeywords = languageConfig[lang] || languageConfig.en; // Fallback to English if the language is not found
-
-  var describeAction = function describeAction(node, indentLevel) {
-    var currentIndent = ' '.repeat(indentLevel * 4);
-    var nextIndent = ' '.repeat((indentLevel + 1) * 4);
-    if (node.action) {
-      return "".concat(currentIndent, "'").concat(node.action, "'");
-    } else if (node["if"]) {
-      var description = "".concat(currentIndent).concat(langKeywords.ifKeyword, " ").concat(node["if"]);
-      if (node.then) {
-        var thenDescription = node.then.map(function (childNode) {
-          return describeAction(childNode, indentLevel + 1);
-        }).join('\n');
-        description += " ".concat(langKeywords.thenKeyword, "\n").concat(thenDescription);
-      }
-      if (node["else"]) {
-        var elseDescription = node["else"].map(function (childNode) {
-          return describeAction(childNode, indentLevel + 1);
-        }).join('\n');
-        description += "\n".concat(currentIndent).concat(langKeywords.elseKeyword, "\n").concat(elseDescription);
-      }
-      return description;
-    }
-    return '';
-  };
-  return this.tree.map(function (node) {
-    return describeAction(node, indentLevel);
-  }).join('.\n').concat('.');
-}
-
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3061,7 +3117,7 @@ var _default = exports["default"] = {
   '!': 'not'
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3081,7 +3137,7 @@ function parsePath(path) {
   }, []);
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3093,70 +3149,40 @@ function _objectWithoutProperties(source, excluded) { if (source == null) return
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function serializeToJson() {
-  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-    _ref$includeSutraPath = _ref.includeSutraPath,
-    includeSutraPath = _ref$includeSutraPath === void 0 ? true : _ref$includeSutraPath;
-  includeSutraPath = true;
   var serializedData = {
     tree: this.tree.map(function (node) {
-      return serializeNode(node, includeSutraPath);
+      return serializeNode(node);
     }),
     conditions: {}
   };
 
   // Serialize the DSL part of conditions correctly
   for (var key in this.conditions) {
-    var condition = this.conditions[key];
-    if (Array.isArray(condition)) {
-      // Handle each condition in the array
-      serializedData.conditions[key] = condition.map(function (cond) {
-        if (typeof cond === 'function') {
-          // Condition is a function
-          return _typeof(cond.original) === 'object' ? cond.original : {
-            type: 'customFunction'
-          };
-        } else if (_typeof(cond) === 'object') {
-          // Condition is an object (assumed to be a DSL condition)
-          return cond;
-        }
-      });
-    } else if (typeof condition === 'function') {
-      // Single condition is a function
-      serializedData.conditions[key] = _typeof(condition.original) === 'object' ? condition.original : {
+    if (typeof this.conditions[key] === 'function') {
+      serializedData.conditions[key] = _typeof(this.conditions[key].original) === 'object' ? this.conditions[key].original : {
         type: 'customFunction'
       };
-    } else if (_typeof(condition) === 'object') {
-      // Single condition is an object (assumed to be a DSL condition)
-      serializedData.conditions[key] = condition;
     }
   }
   return JSON.stringify(serializedData, null, 2);
 }
 
 // Helper function to serialize a single node
-function serializeNode(node, includeSutraPath) {
+function serializeNode(node) {
   var parent = node.parent,
     serializedNode = _objectWithoutProperties(node, _excluded); // Exclude the parent property
 
   // Recursively serialize 'then' and 'else' branches
   if (serializedNode.then && Array.isArray(serializedNode.then)) {
     serializedNode.then = serializedNode.then.map(function (childNode) {
-      return serializeNode(childNode, includeSutraPath);
+      return serializeNode(childNode);
     });
   }
   if (serializedNode["else"] && Array.isArray(serializedNode["else"])) {
     serializedNode["else"] = serializedNode["else"].map(function (childNode) {
-      return serializeNode(childNode, includeSutraPath);
+      return serializeNode(childNode);
     });
   }
-
-  // Optional: Handle sutraPath based on includeSutraPath flag
-  /*
-  if (!includeSutraPath) {
-    delete serializedNode.sutraPath;
-  }
-  */
-
   return serializedNode;
 }
 

@@ -473,11 +473,11 @@ var pluginsList = {
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.087
+    "size": 28.15
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 20.352
+    "size": 20.408
   },
   "Gamepad": {
     "path": "./plugins/gamepad/Gamepad.js",
@@ -513,7 +513,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 22.007
+    "size": 22.006
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -521,7 +521,7 @@ var pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 127.337
+    "size": 129.75
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
