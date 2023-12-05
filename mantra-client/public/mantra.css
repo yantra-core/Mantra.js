@@ -1022,10 +1022,10 @@ textarea {
 }
 
 .pluginLabel {
-  max-width: 120px;
+  width: 80px;
   text-overflow: ellipsis;
+  display: inline-flex;
 }
-
 
 .plugin-form-container {
   font-family: Arial, sans-serif;

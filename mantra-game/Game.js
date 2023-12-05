@@ -253,7 +253,6 @@ class Game {
       return
     } else {
       console.log('All Plugins are ready! Starting Mantra Game Client...');
-
       if (game.systems.client) {
         let client = this.getSystem('client');
         client.start(cb);
@@ -312,7 +311,7 @@ class Game {
         // console.log('pluginId', pluginId, this.plugins)
         if (this.plugins[pluginId]) {
           console.log('loading plugin', pluginId, this.plugins[pluginId])
-          return this.use(new this.plugins[pluginId](), options);
+          return this.use(new this.plugins[pluginId](options));
         }
 
         console.log(`Attempted to load plugin by string name "${pluginId}"on server, could not find! skipping`);
@@ -338,7 +337,6 @@ class Game {
           if (pluginInstance.async) {
             // plugin must perform async operation before it's ready
             // plugin author *must* emit their own ready event game will not start
-            // alert('plugin must perform async operation before it\'s ready');
           } else {
             game.loadingPluginsCount--;
             delete game._plugins[pluginId];

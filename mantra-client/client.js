@@ -63,6 +63,7 @@ game
 game.use(new plugins.Bullet())
 
 game.use(new plugins.ChronoControl())
+game.use(new plugins.PluginsGUI())
 
 game.use(new plugins.Schema());
 
@@ -92,7 +93,8 @@ game.use(new plugins.Behaviors());
 // Always show FPS
 game.use(new plugins.CurrentFPS());
 game.use('Editor', {
-  sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js'
+  sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js',
+  sutraEditor: true
 });
 
 
@@ -100,7 +102,7 @@ import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
 
 // game.use(new plugins.XState({ world: BossFight() }));
-game.use(new plugins.SutraGUI({ }));
+// game.use(new plugins.SutraGUI({ }));
 
 // game.use(new plugins.PluginExplorer({ }));
 

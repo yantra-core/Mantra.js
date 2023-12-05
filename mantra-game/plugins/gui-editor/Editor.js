@@ -3,9 +3,10 @@ class Editor {
   static id = 'gui-editor';
   static async = true;
 
-  constructor({ sourceCode } = {}) {
+  constructor({ sourceCode, sutraEditor = false } = {}) {
     this.id = Editor.id;
     this.sourceCode = sourceCode;
+    this.sutraEditor = sutraEditor;
   }
 
   init(game) {
@@ -58,7 +59,12 @@ class Editor {
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $rulesMenu, $inspectorMenu);
+    let toolBarItems = [$fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu];
+    if (this.sutraEditor) {
+     toolBarItems.push($rulesMenu)
+    }
+    toolBarItems.push($inspectorMenu)
+    $toolbar.append(toolBarItems);
 
     // Append the toolbar to the body
     $('body').append($toolbar);

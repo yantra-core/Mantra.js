@@ -54,11 +54,13 @@ class PluginsGUI {
     
     // Map to store the plugin name and its loaded status
     const pluginStatusMap = new Map();
-  
     // Iterate over game._plugins to get the plugin names and their loaded status
     for (let p in game._plugins) {
       let pluginName = game._plugins[p].constructor.name;
-      pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
+      // TODO: remove this conditional, legacy data still in game._plugins
+      if (pluginName !== 'Object') {
+        pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
+      }
     }
   
     // Add system plugins to the map if not already present
@@ -73,7 +75,6 @@ class PluginsGUI {
     const uncheckedPlugins = [];
     const pluginList = document.createElement('ul');
     pluginList.className = "pluginList";
-  
     pluginStatusMap.forEach((isChecked, pluginName) => {
       const listItem = document.createElement('li');
       listItem.className = "pluginItem";

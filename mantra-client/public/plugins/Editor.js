@@ -15,10 +15,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var Editor = /*#__PURE__*/function () {
   function Editor() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      sourceCode = _ref.sourceCode;
+      sourceCode = _ref.sourceCode,
+      _ref$sutraEditor = _ref.sutraEditor,
+      sutraEditor = _ref$sutraEditor === void 0 ? false : _ref$sutraEditor;
     _classCallCheck(this, Editor);
     this.id = Editor.id;
     this.sourceCode = sourceCode;
+    this.sutraEditor = sutraEditor;
   }
   _createClass(Editor, [{
     key: "init",
@@ -73,7 +76,12 @@ var Editor = /*#__PURE__*/function () {
       //this.populateAboutMenu($aboutMenu);
 
       // Append menus to the toolbar
-      $toolbar.append($fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu, $rulesMenu, $inspectorMenu);
+      var toolBarItems = [$fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu];
+      if (this.sutraEditor) {
+        toolBarItems.push($rulesMenu);
+      }
+      toolBarItems.push($inspectorMenu);
+      $toolbar.append(toolBarItems);
 
       // Append the toolbar to the body
       $('body').append($toolbar);

@@ -587,7 +587,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
           // console.log('pluginId', pluginId, this.plugins)
           if (this.plugins[_pluginId]) {
             console.log('loading plugin', _pluginId, this.plugins[_pluginId]);
-            return this.use(new this.plugins[_pluginId](), options);
+            return this.use(new this.plugins[_pluginId](options));
           }
           console.log("Attempted to load plugin by string name \"".concat(_pluginId, "\"on server, could not find! skipping"));
           return;
@@ -614,7 +614,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
             if (pluginInstance.async) {
               // plugin must perform async operation before it's ready
               // plugin author *must* emit their own ready event game will not start
-              // alert('plugin must perform async operation before it\'s ready');
             } else {
               game.loadingPluginsCount--;
               delete game._plugins[_pluginId];

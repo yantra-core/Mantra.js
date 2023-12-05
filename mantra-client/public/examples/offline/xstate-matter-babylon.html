@@ -150,14 +150,13 @@
         world: BossFightMiddleware()
       })
 
-    
       game.start(function(){
-
+        game.use('StarField');
         game.systems['xstate'].loadEntities();
-
       });
     });
-  </script>
+
+</script>
   <div id="gameHolder"></div>
 </body>
 

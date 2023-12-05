@@ -311,11 +311,13 @@ var PluginsGUI = /*#__PURE__*/function () {
 
       // Map to store the plugin name and its loaded status
       var pluginStatusMap = new Map();
-
       // Iterate over game._plugins to get the plugin names and their loaded status
       for (var p in game._plugins) {
         var pluginName = game._plugins[p].constructor.name;
-        pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
+        // TODO: remove this conditional, legacy data still in game._plugins
+        if (pluginName !== 'Object') {
+          pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
+        }
       }
 
       // Add system plugins to the map if not already present
@@ -324,13 +326,6 @@ var PluginsGUI = /*#__PURE__*/function () {
           pluginStatusMap.set(pluginId, false); // false indicates the plugin is not loaded
         }
       });
-
-      /*
-      // Clear all rows except the header
-      while (this.pluginTable.rows.length > 1) {
-        this.pluginTable.deleteRow(1);
-      }
-      */
 
       // Separate plugins into checked and unchecked
       var checkedPlugins = [];
@@ -478,11 +473,11 @@ var pluginsList = {
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.15
+    "size": 28.087
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 20.408
+    "size": 20.352
   },
   "Gamepad": {
     "path": "./plugins/gamepad/Gamepad.js",
@@ -518,7 +513,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 21.596
+    "size": 22.007
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -526,11 +521,11 @@ var pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 126.839
+    "size": 127.337
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 12.697
+    "size": 12.983
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
