@@ -327,7 +327,7 @@ class Game {
       const scriptUrl = `${basePath}${pluginId}.js`;
       this.loadPluginScript(scriptUrl).then(function () {
         // The script is expected to call `game.use(pluginInstance)` after loading
-        console.log(`Plugin ${pluginId} loaded.`, game.plugins, game._plugins);
+        console.log(`Plugin ${pluginId} loaded.`);
         if (typeof PLUGINS === 'object') {
           //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
           let pluginInstance = new PLUGINS[pluginId].default(options);
