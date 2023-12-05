@@ -604,7 +604,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         var scriptUrl = "".concat(basePath).concat(_pluginId, ".js");
         this.loadPluginScript(scriptUrl).then(function () {
           // The script is expected to call `game.use(pluginInstance)` after loading
-          console.log("Plugin ".concat(_pluginId, " loaded."), game.plugins, game._plugins);
+          console.log("Plugin ".concat(_pluginId, " loaded."));
           if ((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object') {
             //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
             var pluginInstance = new PLUGINS[_pluginId]["default"](options);
@@ -901,62 +901,7 @@ var _default = exports["default"] = SystemsManager;
 
 var MANTRA = {};
 MANTRA.Game = require('./Game.js').Game;
-
-// Manually require each plugin
-// TODO: order by group, then sort alphabetically
-MANTRA.plugins = {
-  // Behaviors: require('./plugins/behaviors/Behaviors.js').default,
-  // BabylonCamera: require('./plugins/graphics-babylon/camera/BabylonCamera.js').default,
-  // BabylonGraphics: require('./plugins/graphics-babylon/BabylonGraphics.js').default,
-  //Block: require('./plugins/block/Block.js').default,
-  //Border: require('./plugins/border/Border.js').default,
-  // Bullet: require('./plugins/bullet/Bullet.js').default,
-  //CSSGraphics: require('./plugins/graphics-css/CSSGraphics.js').default,
-  //Camera: require('./plugins/graphics-babylon/camera/BabylonCamera.js').default,
-  //Client: require('./plugins/client/Client.js').default,
-  //Collision: require('./plugins/collisions/Collisions.js').default,
-  //Entity: require('./plugins/entity/Entity.js').default,
-  //EntityInput: require('./plugins/entity-input/EntityInput.js').default,
-  //EntityMovement: require('./plugins/entity-movement/EntityMovement.js').default,
-  //Gamepad: require('./plugins/gamepad/Gamepad.js').default,
-  // Graphics: require('./plugins/graphics/Graphics.js').default,
-  //EntitiesGUI: require('./plugins/gui-entities/EntitiesGUI.js').default,
-
-  //Health: require('./plugins/health/Health.js').default,
-  //Timers: require('./plugins/timers/Timers.js').default,
-  // ControlsGUI: require('./plugins/gui-controls/ControlsGUI.js').default,
-  // LoadingScreen: require('./plugins/loading-screen/LoadingScreen.js').default,
-  // PingTime: require('./plugins/ping-time/PingTime.js').default,
-  // ChronoControl: require('./plugins/chrono-control/ChronoControl.js').default,
-  // Creator: require('./plugins/gui-creator/Creator.js').default,
-  //PluginsGUI: require('./plugins/gui-plugins/PluginsGUI.js').default,
-  //YantraGUI: require('./plugins/gui-yantra/YantraGUI.js').default,
-  //SutraGUI: require('./plugins/gui-sutra/SutraGUI.js').default,
-  //Editor: require('./plugins/gui-editor/Editor.js').default,
-  //SnapshotSize: require('./plugins/snapshot-size/SnapshotSize.js').default,
-  //Schema: require('./plugins/schema/Schema.js').default,
-  //CurrentFPS: require('./plugins/current-fps/CurrentFPS.js').default,
-  //Keyboard: require('./plugins/keyboard/Keyboard.js').default,
-  //Lifetime: require('./plugins/lifetime/Lifetime.js').default,
-  //LocalClient: require('./plugins/client/LocalClient.js').default,
-  // MatterPhysics: require('./plugins/physics-matter/MatterPhysics.js').default,
-  //Mouse: require('./plugins/mouse/Mouse.js').default,
-  //PhaserGraphics: require('./plugins/graphics-phaser/PhaserGraphics.js').default,
-  //ThreeGraphics: require('./plugins/graphics-three/ThreeGraphics.js').default,
-  //StarField: require('./plugins/starfield/StarField.js').default,
-  /*
-  AsteroidsMovement: require('./plugins/entity-movement/strategies/AsteroidsMovement.js').default,
-  BabylonStarField: require('./plugins/starfield/BabylonStarField.js').default,
-  MovementFrogger: require('./plugins/entity-movement/strategies/FroggerMovement.js').default,
-  MovementPacman: require('./plugins/entity-movement/strategies/PacManMovement.js').default,
-  MovementPong: require('./plugins/entity-movement/strategies/PongMovement.js').default,
-  MovementAsteroids: require('./plugins/entity-movement/strategies/AsteroidsMovement.js').default,
-  PongMovement: require('./plugins/entity-movement/strategies/PongMovement.js').default,
-  PongWorld: require('./plugins/world/pong/PongWorld.js').default,
-  XState: require('./plugins/xstate/XState.js').default,
-   */
-  // ... add other plugins similarly
-};
+MANTRA.plugins = {}; // empty plugin scope, may be populated by using plugins
 module.exports = MANTRA;
 
 },{"./Game.js":4}],7:[function(require,module,exports){

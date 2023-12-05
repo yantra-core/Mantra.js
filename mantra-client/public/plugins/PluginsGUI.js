@@ -513,7 +513,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 22.006
+    "size": 22.005
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",

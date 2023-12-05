@@ -24,21 +24,12 @@
         }
       });
 
-      let Plugins = MANTRA.plugins;
-
       // Use Plugins to extend the game with new functionality
 
       // Adds projectile Bullets to the game
       // test chanining
       game.use('Bullet').use('Block');
 
-      // Adds a nice StarField background
-      game.use('StarField');
-
-      // Adds a controller input legend
-      // game.use(new Plugins.ControlsGUI());
-
-      // game.use(new Plugins.Editor());
       game.use('CurrentFPS');
 
       game.use('Timers');
@@ -48,12 +39,16 @@
       // game.use(new Plugins.SutraGUI({ }));
 
       game.use('Editor', {
-        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-babylon.html'
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/sutra-level-editor.html',
+        sutraEditor: true
       });
 
 
       // start the game loop
       game.start(function () {
+
+        // Adds a nice StarField background
+        game.use('StarField');
 
         game.createEntity({
           type: 'BOSS',

@@ -34,15 +34,28 @@ Mantra is designed to start a full-featured local game instance in seconds using
 
 You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode.
 
-## Custom Game Logic
+## Custom Game Logic with Sutra
 
-**Write whatever works for you**
+### Write whatever works for you
 
 `mantra` games can be customized in several intuitive ways. At the lowest levels, you can customize your games using JavaScript or TypeScript code, generally writing new Systems Plugins and working with the Event Emitter API.
 
-**Finite State Machines**
+### Sutra Behavioral Trees
 
-`mantra` games have support for [xstate](https://github.com/statelyai/xstate) machines via the `XState` plugin. Representing your game logic as a state machine is an excellent way to ensure high-quality results with minimal coding complexities.
+Using the [Sutra](https://github.com/yantra-core/sutra) library `mantra` game logic can be created using JSON files, a Fluent JavaScript API, or the *ALPHA* [Visual Editor](https://yantra.gg/mantra/examples/offline/sutra-level-editor). `sutra` supports `i18n` compatible exports to a human readable defintions like this:
+
+**Example Sutra**
+```
+if isBoss
+  if isHealthLow
+    'entity::updateEntity'
+      color: 0xff0000
+      speed: 5
+```
+
+### Finite State Machines
+
+In addition to custom code and `sutra`, `mantra` game logic can be coded in a standard [xstate](https://github.com/statelyai/xstate) machines via the `XState` plugin.
 
 ## Demos
 
@@ -60,6 +73,7 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 | Libraries        | Demo Link                                                                      | CodePen Link                                                                |
 |----------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/offline/matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM)                     |
+| Matter.js + Babylon.js + `sutra`     | [Yantra](https://yantra.gg/mantra/examples/offline/sutra-level-editor.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/KKJbeva)                     |
 | Matter.js + Babylon.js + `xstate`     | [Yantra](https://yantra.gg/mantra/examples/offline/xstate-matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/wvNXRBW)                     |
 | Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/offline/matter-phaser.html)       | [CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr)                |
 | Matter.js + CSS Graphics   | [Yantra](https://yantra.gg/mantra/examples/offline/matter-css.html)                                                                                | [CodePen](https://codepen.io/Marak-Squires/pen/abXpEve)                |
@@ -253,6 +267,7 @@ The following checklist outlines the planned features and their current status:
 ### Plugin System
 - [✅] **Everything is a Plugin**
 - [✅] **Plugins can be loaded / unloaded in-game**
+- [✅] **Plugins can be used as stand-alone apps**
 - [❌] **Plugin code can be edited in-game**
 
 ## Mod Support
