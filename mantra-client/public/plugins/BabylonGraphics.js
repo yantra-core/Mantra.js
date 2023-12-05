@@ -151,7 +151,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     value: function init(game) {
       var _this2 = this;
       this.game = game;
-
+      this.game.use('Graphics');
       // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
       if (typeof BABYLON === 'undefined') {
         console.log('BABYLON is not defined, attempting to load it from vendor');

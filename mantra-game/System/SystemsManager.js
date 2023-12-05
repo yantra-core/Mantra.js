@@ -9,7 +9,9 @@ class SystemsManager {
 
   addSystem(systemId, system) {
     if (this.systems.has(systemId)) {
-      throw new Error(`System with name ${systemId} already exists!`);
+      // throw new Error(`System with name ${systemId} already exists!`);
+      console.log(`Warning: System with name ${systemId} already exists!`);
+      return;
     }
 
     // Remark: Defaulting all Plugins to event emitters has is currently enabled
@@ -27,7 +29,9 @@ class SystemsManager {
 
   removeSystem(systemId) {
     if (!this.systems.has(systemId)) {
-      throw new Error(`System with name ${systemId} does not exist!`);
+      //throw new Error(`System with name ${systemId} does not exist!`);
+      console.log('Warning: System with name ${systemId} does not exist!')
+      return;
     }
     // call the system.unload method if it exists
     const system = this.systems.get(systemId);

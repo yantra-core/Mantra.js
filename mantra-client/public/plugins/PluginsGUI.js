@@ -249,14 +249,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _gui = _interopRequireDefault(require("../gui-editor/gui.js"));
+var _pluginsList = _interopRequireDefault(require("./pluginsList.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -281,6 +276,7 @@ var PluginsGUI = /*#__PURE__*/function () {
   }, {
     key: "createPluginView",
     value: function createPluginView() {
+      var game = this.game;
       // Create the window using gui.window
       this.container = _gui["default"].window('pluginsContainer', 'Plugins', function () {
         game.systemsManager.removeSystem(PluginsGUI.id);
@@ -290,6 +286,7 @@ var PluginsGUI = /*#__PURE__*/function () {
       this.pluginTable = document.createElement('table');
       this.pluginTable.id = "pluginTable";
       this.pluginTable.className = "pluginTable";
+      console.log("CREATINT TABLE", this.pluginTable);
       var headerRow = this.pluginTable.createTHead().insertRow();
       var headerName = document.createElement('th');
       var headerStatus = document.createElement('th');
@@ -308,37 +305,68 @@ var PluginsGUI = /*#__PURE__*/function () {
     key: "drawPluginTable",
     value: function drawPluginTable() {
       var _this = this;
-      var plugins = this.game.plugins;
-      var loadedPlugins = new Set(this.game.loadedPlugins.map(function (name) {
-        return name.toLowerCase();
-      }));
+      var game = this.game;
+      // Ensure that pluginsList is an array
+      var systemPlugins = Array.isArray(_pluginsList["default"]) ? _pluginsList["default"] : Object.keys(_pluginsList["default"]);
 
-      // Remove all previous rows except the header
+      // Map to store the plugin name and its loaded status
+      var pluginStatusMap = new Map();
+
+      // Iterate over game._plugins to get the plugin names and their loaded status
+      for (var p in game._plugins) {
+        var pluginName = game._plugins[p].constructor.name;
+        pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
+      }
+
+      // Add system plugins to the map if not already present
+      systemPlugins.forEach(function (pluginId) {
+        if (!pluginStatusMap.has(pluginId)) {
+          pluginStatusMap.set(pluginId, false); // false indicates the plugin is not loaded
+        }
+      });
+
+      /*
+      // Clear all rows except the header
       while (this.pluginTable.rows.length > 1) {
         this.pluginTable.deleteRow(1);
       }
-      Object.entries(plugins).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-          pluginName = _ref2[0],
-          plugin = _ref2[1];
-        var row = _this.pluginTable.insertRow();
-        var cellName = row.insertCell();
-        var cellStatus = row.insertCell();
-        var pluginId = plugins[pluginName].id;
-        cellName.textContent = pluginName;
+      */
+
+      // Separate plugins into checked and unchecked
+      var checkedPlugins = [];
+      var uncheckedPlugins = [];
+      var pluginList = document.createElement('ul');
+      pluginList.className = "pluginList";
+      pluginStatusMap.forEach(function (isChecked, pluginName) {
+        var listItem = document.createElement('li');
+        listItem.className = "pluginItem";
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        console.log("CHECKING IF LOADED", pluginId, loadedPlugins.has(pluginId));
-        console.log('lll', loadedPlugins);
-
-        // check if plugin is in system, not if it been loaded once
-        var checkSystem = _this.game.systems[pluginId];
-        checkbox.checked = loadedPlugins.has(pluginId);
-        checkbox.disabled = plugin.removable === false;
+        checkbox.checked = isChecked;
+        checkbox.id = "checkbox-".concat(pluginName.replace(/\s+/g, '-'));
+        checkbox.className = "pluginCheckbox";
         checkbox.addEventListener('change', function () {
-          _this.togglePlugin(checkbox, pluginName, pluginId);
+          _this.togglePlugin(checkbox, pluginName);
         });
-        cellStatus.appendChild(checkbox);
+        var label = document.createElement('label');
+        label.setAttribute('for', checkbox.id);
+        label.textContent = pluginName;
+        label.className = "pluginLabel";
+        listItem.appendChild(checkbox);
+        listItem.appendChild(label);
+        pluginList.appendChild(listItem);
+      });
+
+      // Replace the existing table with the newly created list
+      this.pluginTable.replaceWith(pluginList);
+      this.pluginTable = pluginList; // Update the reference to the new list
+
+      // Append checked plugins first, then unchecked
+      checkedPlugins.forEach(function (row) {
+        return _this.pluginTable.appendChild(row);
+      });
+      uncheckedPlugins.forEach(function (row) {
+        return _this.pluginTable.appendChild(row);
       });
     }
   }, {
@@ -351,8 +379,8 @@ var PluginsGUI = /*#__PURE__*/function () {
         if (this.game._plugins[pluginId]) {
           this.game._plugins[pluginId].reload();
         } else {
-          var pluginInstance = new this.game.plugins[pluginName]();
-          this.game.use(pluginInstance);
+          // let pluginInstance = new this.game.plugins[pluginName]();
+          this.game.use(pluginName);
         }
       } else {
         // this.game.removeSystem(this.game.plugins[pluginName].id);
@@ -365,6 +393,9 @@ var PluginsGUI = /*#__PURE__*/function () {
       var _this2 = this;
       // Update the plugin table when plugins are loaded or unloaded
       this.game.on('plugin::loaded', function (pluginName) {
+        _this2.drawPluginTable();
+      });
+      this.game.on('plugin::ready', function (pluginName) {
         _this2.drawPluginTable();
       });
       this.game.on('plugin::unloaded', function (pluginName) {
@@ -385,5 +416,192 @@ var PluginsGUI = /*#__PURE__*/function () {
 _defineProperty(PluginsGUI, "id", 'gui-plugins');
 var _default = exports["default"] = PluginsGUI;
 
-},{"../gui-editor/gui.js":1}]},{},[2])(2)
+},{"../gui-editor/gui.js":1,"./pluginsList.js":3}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var pluginsList = {
+  "AsteroidsMovement": {
+    "path": "./plugins/entity-movement/strategies/AsteroidsMovement.js",
+    "size": 4.953
+  },
+  "Behaviors": {
+    "path": "./plugins/behaviors/Behaviors.js",
+    "size": 5.512
+  },
+  "BabylonCamera": {
+    "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
+    "size": 8.995
+  },
+  "BabylonGraphics": {
+    "path": "./plugins/graphics-babylon/BabylonGraphics.js",
+    "size": 50.587
+  },
+  "Block": {
+    "path": "./plugins/block/Block.js",
+    "size": 6.122
+  },
+  "Border": {
+    "path": "./plugins/border/Border.js",
+    "size": 8.926
+  },
+  "Bullet": {
+    "path": "./plugins/bullet/Bullet.js",
+    "size": 12.372
+  },
+  "CSSGraphics": {
+    "path": "./plugins/graphics-css/CSSGraphics.js",
+    "size": 20.186
+  },
+  "Client": {
+    "path": "./plugins/client/Client.js",
+    "size": 122.057
+  },
+  "ChronoControl": {
+    "path": "./plugins/chrono-control/ChronoControl.js",
+    "size": 9.901
+  },
+  "Collisions": {
+    "path": "./plugins/collisions/Collisions.js",
+    "size": 8.607
+  },
+  "Creator": {
+    "path": "./plugins/gui-creator/Creator.js",
+    "size": 6.391
+  },
+  "Entity": {
+    "path": "./plugins/entity/Entity.js",
+    "size": 38.184
+  },
+  "EntityInput": {
+    "path": "./plugins/entity-input/EntityInput.js",
+    "size": 28.15
+  },
+  "EntityMovement": {
+    "path": "./plugins/entity-movement/EntityMovement.js",
+    "size": 20.408
+  },
+  "Gamepad": {
+    "path": "./plugins/gamepad/Gamepad.js",
+    "size": 5.789
+  },
+  "Graphics": {
+    "path": "./plugins/graphics/Graphics.js",
+    "size": 5.7
+  },
+  "Health": {
+    "path": "./plugins/health/Health.js",
+    "size": 3.9
+  },
+  "Timers": {
+    "path": "./plugins/timers/Timers.js",
+    "size": 9.691
+  },
+  "ControlsGUI": {
+    "path": "./plugins/gui-controls/ControlsGUI.js",
+    "size": 15.363
+  },
+  "LoadingScreen": {
+    "path": "./plugins/loading-screen/LoadingScreen.js",
+    "size": 14.641
+  },
+  "EntitiesGUI": {
+    "path": "./plugins/gui-entities/EntitiesGUI.js",
+    "size": 18.76
+  },
+  "PingTime": {
+    "path": "./plugins/ping-time/PingTime.js",
+    "size": 5.687
+  },
+  "PluginsGUI": {
+    "path": "./plugins/gui-plugins/PluginsGUI.js",
+    "size": 21.596
+  },
+  "YantraGUI": {
+    "path": "./plugins/gui-yantra/YantraGUI.js",
+    "size": 12.952
+  },
+  "SutraGUI": {
+    "path": "./plugins/gui-sutra/SutraGUI.js",
+    "size": 126.839
+  },
+  "Editor": {
+    "path": "./plugins/gui-editor/Editor.js",
+    "size": 12.697
+  },
+  "SnapshotSize": {
+    "path": "./plugins/snapshot-size/SnapshotSize.js",
+    "size": 9.829
+  },
+  "Schema": {
+    "path": "./plugins/schema/Schema.js",
+    "size": 287.685
+  },
+  "CurrentFPS": {
+    "path": "./plugins/current-fps/CurrentFPS.js",
+    "size": 5.728
+  },
+  "Keyboard": {
+    "path": "./plugins/keyboard/Keyboard.js",
+    "size": 9.453
+  },
+  "Lifetime": {
+    "path": "./plugins/lifetime/Lifetime.js",
+    "size": 3.929
+  },
+  "LocalClient": {
+    "path": "./plugins/client/LocalClient.js",
+    "size": 4.988
+  },
+  "MatterPhysics": {
+    "path": "./plugins/physics-matter/MatterPhysics.js",
+    "size": 393.053
+  },
+  "Mouse": {
+    "path": "./plugins/mouse/Mouse.js",
+    "size": 6.198
+  },
+  "PhaserGraphics": {
+    "path": "./plugins/graphics-phaser/PhaserGraphics.js",
+    "size": 24.656
+  },
+  "ThreeGraphics": {
+    "path": "./plugins/graphics-three/ThreeGraphics.js",
+    "size": 19.209
+  },
+  "PongMovement": {
+    "path": "./plugins/entity-movement/strategies/PongMovement.js",
+    "size": 5.054
+  },
+  "PongWorld": {
+    "path": "./plugins/world/pong/PongWorld.js",
+    "size": 11.68
+  },
+  "StarField": {
+    "path": "./plugins/starfield/StarField.js",
+    "size": 9.31
+  },
+  "BabylonStarField": {
+    "path": "./plugins/starfield/BabylonStarField.js",
+    "size": 5.68
+  },
+  "FroggerMovement": {
+    "path": "./plugins/entity-movement/strategies/FroggerMovement.js",
+    "size": 4.579
+  },
+  "PacManMovement": {
+    "path": "./plugins/entity-movement/strategies/PacManMovement.js",
+    "size": 4.573
+  },
+  "XState": {
+    "path": "./plugins/xstate/XState.js",
+    "size": 192.085
+  }
+};
+var _default = exports["default"] = pluginsList;
+
+},{}]},{},[2])(2)
 });

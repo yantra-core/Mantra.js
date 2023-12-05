@@ -49,6 +49,7 @@ class BabylonGraphics extends GraphicsInterface {
   init(game) {
     this.game = game;
 
+    this.game.use('Graphics');
     // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
     if (typeof BABYLON === 'undefined') {
       console.log('BABYLON is not defined, attempting to load it from vendor');
@@ -274,7 +275,6 @@ class BabylonGraphics extends GraphicsInterface {
     } else {
       entity.graphics['graphics-babylon'].dispose();
     }
-
   }
 
   createGraphic(entityData) {

@@ -351,6 +351,7 @@ pre {
   color: #ffffff;
   min-width: 60px;
   vertical-align: top;
+  max-width: 120px;
 
 }
 
@@ -1011,6 +1012,20 @@ textarea {
 .nested-level-5 {
   margin-left: 100px;
 }
+
+.pluginList {
+  list-style: none;
+  font-size: 22px;
+  padding: 0;
+  padding-left: 10px;
+  margin: 0;
+}
+
+.pluginLabel {
+  max-width: 120px;
+  text-overflow: ellipsis;
+}
+
 
 .plugin-form-container {
   font-family: Arial, sans-serif;

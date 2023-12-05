@@ -804,7 +804,9 @@ var SystemsManager = /*#__PURE__*/function () {
     key: "addSystem",
     value: function addSystem(systemId, system) {
       if (this.systems.has(systemId)) {
-        throw new Error("System with name ".concat(systemId, " already exists!"));
+        // throw new Error(`System with name ${systemId} already exists!`);
+        console.log("Warning: System with name ".concat(systemId, " already exists!"));
+        return;
       }
 
       // Remark: Defaulting all Plugins to event emitters has is currently enabled
@@ -823,7 +825,9 @@ var SystemsManager = /*#__PURE__*/function () {
     key: "removeSystem",
     value: function removeSystem(systemId) {
       if (!this.systems.has(systemId)) {
-        throw new Error("System with name ".concat(systemId, " does not exist!"));
+        //throw new Error(`System with name ${systemId} does not exist!`);
+        console.log('Warning: System with name ${systemId} does not exist!');
+        return;
       }
       // call the system.unload method if it exists
       var system = this.systems.get(systemId);
@@ -833,12 +837,9 @@ var SystemsManager = /*#__PURE__*/function () {
       this.systems["delete"](systemId);
 
       // Remark: Special scope used for plugins, we can probably remove this or rename it
-      console.log('removing system', systemId, system);
-      console.log(this.game._plugins);
       if (this.game._plugins[system.id]) {
         delete this.game._plugins[system.id];
       }
-      console.log(this.game._plugins);
 
       // we may want to remove the extra game.systems scope? or reference directly to the map?
       delete this.game.systems[systemId];

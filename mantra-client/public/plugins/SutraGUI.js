@@ -483,11 +483,12 @@ var SutraGUI = /*#__PURE__*/function () {
         formElement.onclick = function () {
           _this4.showActionForm(node);
         };
-
-        // formElement.classList.add('collapsible-content');
         this.appendActionElement(contentDiv, node, indentLevel, keyword);
       } else if (node["if"]) {
         this.appendConditionalElement(contentDiv, node, indentLevel);
+      }
+      if (indentLevel !== 1) {
+        formElement.classList.add('collapsible-content');
       }
       return formElement;
     }
@@ -528,7 +529,7 @@ var SutraGUI = /*#__PURE__*/function () {
         nodes.forEach(function (node) {
           // TODO: why toggle not working as expected?
           // node.classList.toggle('collapsed');
-          node.classList.remove('collapsed');
+          // node.classList.remove('collapsed');
         });
       };
 
@@ -690,6 +691,15 @@ var SutraGUI = /*#__PURE__*/function () {
         //condition.appendChild(removeRuleBtn);
       }
 
+      // clicking the form element will toggle collapsed class
+      conditionContainer.onclick = function (e) {
+        var target = e.target;
+        var container = target.parentElement;
+        var allCollapsibleContent = conditionContainer.parentElement.querySelectorAll('.node-element-form');
+        allCollapsibleContent.forEach(function (collapsibleContent) {
+          collapsibleContent.classList.toggle('collapsible-content');
+        });
+      };
       return conditionContainer;
     }
   }, {
