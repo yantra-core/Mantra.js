@@ -3,7 +3,6 @@ class BabylonCamera {
   static id = 'graphics-babylon-camera';
   static removable = false;
 
-
   constructor({ camera } = {}) {
     this.id = BabylonCamera.id;
 
@@ -55,6 +54,8 @@ class BabylonCamera {
 
     //   Rotate the camera by -Math.PI / 2
     this.camera.alpha += Math.PI / 2;
+
+    this.camera.radius = 4500;
   }
 
   setupCameraControls() {

@@ -239,6 +239,44 @@ var gui = {
     clickedContainer.style.zIndex = '10';
   }
 };
+gui.init = function (game) {
+  if (typeof document === 'undefined') {
+    console.log('gui-plugin: document not found, skipping initialization');
+    return;
+  }
+  // add a global click handler to document that will delegate any clicks
+  // that are not inside gui-windows to re-enable inputs
+  document.addEventListener('click', function (e) {
+    // check if the click was inside a gui-window
+    var guiWindow = e.target.closest('.gui-container');
+    if (game && game.systems && game.systems['entity-input'] && game.systems['keyboard']) {
+      if (!guiWindow) {
+        // re-enable inputs
+        game.systems['entity-input'].setInputsActive();
+        game.systems['keyboard'].bindInputControls();
+      } else {
+        // disable inputs
+        game.systems['entity-input'].disableInputs();
+        game.systems['keyboard'].unbindAllEvents();
+      }
+    }
+  });
+
+  // bind the ESC key
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      // get all gui-containers
+      var containers = document.querySelectorAll('.gui-container');
+
+      // TODO: unload the plugin instead of removing the container
+      // remove the last one
+      var lastContainer = containers[containers.length - 1];
+      if (lastContainer) {
+        lastContainer.remove();
+      }
+    }
+  });
+};
 var _default = exports["default"] = gui;
 
 },{}],2:[function(require,module,exports){
@@ -429,11 +467,11 @@ var pluginsList = {
   },
   "BabylonCamera": {
     "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 8.995
+    "size": 9.069
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.587
+    "size": 50.661
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -497,15 +535,15 @@ var pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 15.363
+    "size": 16.69
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 14.641
+    "size": 15.968
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 18.76
+    "size": 20.087
   },
   "PingTime": {
     "path": "./plugins/ping-time/PingTime.js",
@@ -513,7 +551,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 22.005
+    "size": 23.333
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -521,7 +559,7 @@ var pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 129.75
+    "size": 131.757
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",

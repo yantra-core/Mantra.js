@@ -9,11 +9,11 @@ const pluginsList = {
   },
   "BabylonCamera": {
     "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 8.995
+    "size": 9.069
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.587
+    "size": 50.661
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -77,15 +77,15 @@ const pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 15.363
+    "size": 16.69
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 14.641
+    "size": 15.968
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 18.76
+    "size": 20.087
   },
   "PingTime": {
     "path": "./plugins/ping-time/PingTime.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 22.005
+    "size": 23.333
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,7 +101,7 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 129.75
+    "size": 131.757
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
