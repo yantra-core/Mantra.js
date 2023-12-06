@@ -9,11 +9,11 @@ const pluginsList = {
   },
   "BabylonCamera": {
     "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 9.069
+    "size": 9.028
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.661
+    "size": 50.62
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.333
+    "size": 23.332
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,7 +101,7 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 131.757
+    "size": 94.724
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",

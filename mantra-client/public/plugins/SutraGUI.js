@@ -406,7 +406,9 @@ var SutraGUI = /*#__PURE__*/function () {
   }, {
     key: "showSutra",
     value: function showSutra() {
-      this.redrawBehaviorTree();
+      // this.redrawBehaviorTree();
+      var json = this.behavior.toJSON();
+      this.redrawBehaviorTree(this.behavior);
     }
   }, {
     key: "viewJson",
@@ -451,14 +453,14 @@ var SutraGUI = /*#__PURE__*/function () {
     }
   }, {
     key: "redrawBehaviorTree",
-    value: function redrawBehaviorTree() {
+    value: function redrawBehaviorTree(json) {
       var _this2 = this;
-      var json = this.behavior.serializeToJson();
-      var container = document.getElementById('sutraTable');
+      var container = document.getElementById('sutraView');
+      var table = document.getElementById('sutraTable');
+      table.innerHTML = '';
       //let guiContent = container.querySelector('.gui-content');
-      container.innerHTML = '';
-      JSON.parse(json).tree.forEach(function (node) {
-        container.appendChild(_this2.createNodeElement(node, 0));
+      json.tree.forEach(function (node) {
+        table.appendChild(_this2.createNodeElement(node, 1));
       });
     }
   }, {
@@ -469,7 +471,6 @@ var SutraGUI = /*#__PURE__*/function () {
       var container = document.getElementById('sutraView');
       var table = document.getElementById('sutraTable');
       //let guiContent = container.querySelector('.gui-content');
-
       if (json.tree.length === 0) {
         // add message to indicate no sutra
         table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
@@ -798,7 +799,6 @@ var SutraGUI = /*#__PURE__*/function () {
       */
 
       var json = this.behavior.serializeToJson();
-      console.log('json', json);
       this.redrawBehaviorTree();
     }
   }, {

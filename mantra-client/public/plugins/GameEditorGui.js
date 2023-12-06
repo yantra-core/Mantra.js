@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).PluginsGUI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).GameEditorGui = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -287,7 +287,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _gui = _interopRequireDefault(require("../gui-editor/gui.js"));
-var _pluginsList = _interopRequireDefault(require("./pluginsList.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -296,345 +295,184 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-var PluginsGUI = /*#__PURE__*/function () {
-  function PluginsGUI() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    _classCallCheck(this, PluginsGUI);
-    this.id = PluginsGUI.id;
+var GameEditor = /*#__PURE__*/function () {
+  function GameEditor() {
+    _classCallCheck(this, GameEditor);
+    this.id = GameEditor.id;
   }
-  _createClass(PluginsGUI, [{
+  _createClass(GameEditor, [{
     key: "init",
     value: function init(game) {
-      this.game = game;
-      this.createPluginView();
-      this.drawPluginTable();
-      this.subscribeToPluginUpdates();
-      this.game.addSystem(this.id, this);
-    }
-  }, {
-    key: "createPluginView",
-    value: function createPluginView() {
-      var game = this.game;
-      // Create the window using gui.window
-      this.container = _gui["default"].window('pluginsContainer', 'Plugins', function () {
-        game.systemsManager.removeSystem(PluginsGUI.id);
-      });
-
-      // Create the table for plugins
-      this.pluginTable = document.createElement('table');
-      this.pluginTable.id = "pluginTable";
-      this.pluginTable.className = "pluginTable";
-      console.log("CREATINT TABLE", this.pluginTable);
-      var headerRow = this.pluginTable.createTHead().insertRow();
-      var headerName = document.createElement('th');
-      var headerStatus = document.createElement('th');
-      headerName.textContent = 'Plugin Name';
-      headerStatus.textContent = 'Status';
-      headerRow.appendChild(headerName);
-      headerRow.appendChild(headerStatus);
-
-      // Append the table to the container's gui-content
-      var guiContent = this.container.querySelector('.gui-content');
-      guiContent.appendChild(this.pluginTable);
-      console.log('appending', guiContent, 'to', this.container, 'with', this.pluginTable, 'inside');
-      this.container.appendChild(guiContent);
-    }
-  }, {
-    key: "drawPluginTable",
-    value: function drawPluginTable() {
       var _this = this;
-      var game = this.game;
-      // Ensure that pluginsList is an array
-      var systemPlugins = Array.isArray(_pluginsList["default"]) ? _pluginsList["default"] : Object.keys(_pluginsList["default"]);
+      this.game = game;
 
-      // Map to store the plugin name and its loaded status
-      var pluginStatusMap = new Map();
-      // Iterate over game._plugins to get the plugin names and their loaded status
-      for (var p in game._plugins) {
-        var pluginName = game._plugins[p].constructor.name;
-        // TODO: remove this conditional, legacy data still in game._plugins
-        if (pluginName !== 'Object') {
-          pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
-        }
+      // Check if the entityView window already exists
+      this.gameEditorView = document.getElementById('gameEditorView');
+      _gui["default"].init(game);
+      if (this.game && this.game.systems && this.game.systems['entity-input']) {
+        // Remark: You may not have to disable inputs + remove events
+        this.game.systems['entity-input'].disableInputs();
+        this.game.systems['keyboard'].unbindAllEvents();
       }
-
-      // Add system plugins to the map if not already present
-      systemPlugins.forEach(function (pluginId) {
-        if (!pluginStatusMap.has(pluginId)) {
-          pluginStatusMap.set(pluginId, false); // false indicates the plugin is not loaded
-        }
-      });
-
-      // Separate plugins into checked and unchecked
-      var checkedPlugins = [];
-      var uncheckedPlugins = [];
-      var pluginList = document.createElement('ul');
-      pluginList.className = "pluginList";
-      pluginStatusMap.forEach(function (isChecked, pluginName) {
-        var listItem = document.createElement('li');
-        listItem.className = "pluginItem";
-        var checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = isChecked;
-        checkbox.id = "checkbox-".concat(pluginName.replace(/\s+/g, '-'));
-        checkbox.className = "pluginCheckbox";
-        checkbox.addEventListener('change', function () {
-          _this.togglePlugin(checkbox, pluginName);
+      if (!this.gameEditorView) {
+        // Use gui.window() to create the window
+        this.gameEditorView = _gui["default"].window('gameEditorView', 'Game Editor', function () {
+          self.game.systemsManager.removeSystem(GameEditor.id);
         });
-        var label = document.createElement('label');
-        label.setAttribute('for', checkbox.id);
-        label.textContent = pluginName;
-        label.className = "pluginLabel";
-        listItem.appendChild(checkbox);
-        listItem.appendChild(label);
-        pluginList.appendChild(listItem);
-      });
-
-      // Replace the existing table with the newly created list
-      this.pluginTable.replaceWith(pluginList);
-      this.pluginTable = pluginList; // Update the reference to the new list
-
-      // Append checked plugins first, then unchecked
-      checkedPlugins.forEach(function (row) {
-        return _this.pluginTable.appendChild(row);
-      });
-      uncheckedPlugins.forEach(function (row) {
-        return _this.pluginTable.appendChild(row);
-      });
-    }
-  }, {
-    key: "togglePlugin",
-    value: function togglePlugin(checkbox, pluginName, pluginId) {
-      console.log('togglePlugin', checkbox, pluginName, pluginId);
-      if (checkbox.checked) {
-        // check to see if the plugin is already loaded
-        // if so, just call reload
-        if (this.game._plugins[pluginId]) {
-          this.game._plugins[pluginId].reload();
-        } else {
-          // let pluginInstance = new this.game.plugins[pluginName]();
-          this.game.use(pluginName);
-        }
+      }
+      this.folderExplorer = document.createElement('div');
+      this.folderExplorer.id = 'folder-explorer';
+      this.gameEditorView.appendChild(this.folderExplorer);
+      // Check for cash
+      if (typeof $ === 'undefined') {
+        console.log('$ is not defined, attempting to load cash from vendor');
+        game.loadScripts(['/vendor/cash.min.js'], function () {
+          console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
+          _this.cashReady();
+        });
       } else {
-        // this.game.removeSystem(this.game.plugins[pluginName].id);
-        this.game.removePlugin(pluginId);
+        this.cashReady();
       }
     }
   }, {
-    key: "subscribeToPluginUpdates",
-    value: function subscribeToPluginUpdates() {
+    key: "cashReady",
+    value: function cashReady() {
+      // alert('cash ready')
+      var guiContent = $('.gui-content', this.gameEditorView);
+      this.createGameSettingsFolder(guiContent);
+      this.createGameSettingsForm(this.game.gameConfig.settings, guiContent);
+      this.createEntitiesFolder(guiContent);
+      this.buildEntityFolders(this.game.gameConfig.entities, guiContent);
+    }
+  }, {
+    key: "createEntitiesFolder",
+    value: function createEntitiesFolder(parentElement) {
+      var entitiesFolder = $('<div>', {
+        "class": 'entities-folder'
+      }).appendTo(parentElement);
+      var folderLabel = $('<span>', {
+        text: 'Entities'
+      }).appendTo(entitiesFolder);
+      folderLabel.addClass('folder-label');
+      folderLabel.prepend('<i class="folder-icon"></i>Entities');
+      folderLabel.on('click', function () {
+        return $('.folder-structure').toggle();
+      });
+    }
+  }, {
+    key: "buildEntityFolders",
+    value: function buildEntityFolders(entities, parentElement) {
       var _this2 = this;
-      // Update the plugin table when plugins are loaded or unloaded
-      this.game.on('plugin::loaded', function (pluginName) {
-        _this2.drawPluginTable();
-      });
-      this.game.on('plugin::ready', function (pluginName) {
-        _this2.drawPluginTable();
-      });
-      this.game.on('plugin::unloaded', function (pluginName) {
-        _this2.drawPluginTable();
+      var parentPath = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+      // Make the entities list initially hidden
+      var ul = $('<ul class="folder-structure">').hide();
+      $(parentElement).append(ul);
+      var _loop = function _loop() {
+        if (key === 'gameType') return 1; // continue
+        var currentPath = parentPath ? "".concat(parentPath, "/").concat(key) : key;
+        var entity = entities[key];
+        var displayName = entity.name || key;
+        var li = $('<li>');
+        var textSpan = $('<span>').text(displayName);
+        li.append(textSpan);
+        ul.append(li);
+        if (entity.gameType === 'folder') {
+          textSpan.prepend('<i class="folder-icon"></i>'); // Placeholder for folder icon
+          textSpan.addClass('folder-label');
+          textSpan.on('click', function () {
+            return _this2.toggleFolder(li);
+          }); // Click to toggle folder
+
+          var subEntities = entity.members ? entity.members : entity;
+          _this2.buildEntityFolders(subEntities, li, currentPath);
+        } else if (entity.gameType === 'entity') {
+          textSpan.prepend('<i class="entity-icon"></i>'); // Placeholder for entity icon
+          textSpan.addClass('entity-label');
+          textSpan.on('click', function () {
+            return _this2.editEntity(entity);
+          });
+        }
+      };
+      for (var key in entities) {
+        if (_loop()) continue;
+      }
+    }
+  }, {
+    key: "createGameSettingsFolder",
+    value: function createGameSettingsFolder(parentElement) {
+      var gameSettingsFolder = $('<div>').prependTo(parentElement);
+      gameSettingsFolder.addClass('game-settings-folder');
+      var folderLabel = $('<span>').appendTo(gameSettingsFolder);
+      folderLabel.addClass('folder-label');
+      folderLabel.html('Game Settings');
+      folderLabel.prepend('<i class="folder-icon"></i>');
+      folderLabel.on('click', function () {
+        return $('#game-settings-form').toggle();
       });
     }
   }, {
-    key: "unload",
-    value: function unload() {
-      // Remove the window from the DOM
-      if (this.container && this.container.parentNode) {
-        this.container.parentNode.removeChild(this.container);
+    key: "createGameSettingsForm",
+    value: function createGameSettingsForm(gameConfigSettings, parentElement) {
+      var _this3 = this;
+      var form = $('<form>').attr({
+        id: 'game-settings-form',
+        "class": 'game-settings-form'
+      }).appendTo(parentElement).hide();
+      var settings = Object.keys(gameConfigSettings);
+      settings.forEach(function (setting) {
+        var fieldContainer = $('<div>').addClass('form-field').appendTo(form);
+        $('<label>').attr({
+          "for": 'game-' + setting
+        }).text(setting).appendTo(fieldContainer);
+        $('<input>').attr({
+          type: 'text',
+          id: 'game-' + setting,
+          name: setting,
+          value: gameConfigSettings[setting],
+          "class": 'game-input'
+        }).appendTo(fieldContainer);
+      });
+
+      //$('<button>').text('Save Settings').attr({ type: 'submit' }).appendTo(form);
+      // save button disabled ( for now )
+      //$('button[type="submit"]').prop('disabled', true);
+
+      form.on('submit', function (e) {
+        e.preventDefault();
+        _this3.saveGameSettings();
+      });
+    }
+  }, {
+    key: "toggleFolder",
+    value: function toggleFolder(folderItem) {
+      folderItem.children('ul').toggle(); // Toggle the visibility of the folder's contents
+    }
+  }, {
+    key: "saveGameSettings",
+    value: function saveGameSettings() {
+      var updatedSettings = {};
+      $('#game-settings-form .game-input').each(function () {
+        var input = $(this);
+        updatedSettings[input.attr('name')] = input.val();
+      });
+      // TODO: Update the game settings in the game's data structure
+      console.log('Updated Game Settings: ', updatedSettings);
+    }
+  }, {
+    key: "editEntity",
+    value: function editEntity(entity) {
+      // Implement entity editing logic
+      if (!game.systems['gui-entity-editor']) {
+        game.use('EntityEditor');
       }
+      this.game.systems['gui-entity-editor'].setEntity(entity);
     }
   }]);
-  return PluginsGUI;
+  return GameEditor;
 }();
-_defineProperty(PluginsGUI, "id", 'gui-plugins');
-var _default = exports["default"] = PluginsGUI;
+_defineProperty(GameEditor, "id", 'gui-game-editor');
+_defineProperty(GameEditor, "async", true);
+var _default = exports["default"] = GameEditor;
 
-},{"../gui-editor/gui.js":1,"./pluginsList.js":3}],3:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-var pluginsList = {
-  "AsteroidsMovement": {
-    "path": "./plugins/entity-movement/strategies/AsteroidsMovement.js",
-    "size": 4.953
-  },
-  "Behaviors": {
-    "path": "./plugins/behaviors/Behaviors.js",
-    "size": 5.512
-  },
-  "BabylonCamera": {
-    "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 9.028
-  },
-  "BabylonGraphics": {
-    "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.62
-  },
-  "Block": {
-    "path": "./plugins/block/Block.js",
-    "size": 6.122
-  },
-  "Border": {
-    "path": "./plugins/border/Border.js",
-    "size": 8.926
-  },
-  "Bullet": {
-    "path": "./plugins/bullet/Bullet.js",
-    "size": 12.372
-  },
-  "CSSGraphics": {
-    "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 20.186
-  },
-  "Client": {
-    "path": "./plugins/client/Client.js",
-    "size": 122.057
-  },
-  "ChronoControl": {
-    "path": "./plugins/chrono-control/ChronoControl.js",
-    "size": 9.901
-  },
-  "Collisions": {
-    "path": "./plugins/collisions/Collisions.js",
-    "size": 8.607
-  },
-  "Creator": {
-    "path": "./plugins/gui-creator/Creator.js",
-    "size": 6.391
-  },
-  "Entity": {
-    "path": "./plugins/entity/Entity.js",
-    "size": 38.184
-  },
-  "EntityInput": {
-    "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.15
-  },
-  "EntityMovement": {
-    "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 20.408
-  },
-  "Gamepad": {
-    "path": "./plugins/gamepad/Gamepad.js",
-    "size": 5.789
-  },
-  "Graphics": {
-    "path": "./plugins/graphics/Graphics.js",
-    "size": 5.7
-  },
-  "Health": {
-    "path": "./plugins/health/Health.js",
-    "size": 3.9
-  },
-  "Timers": {
-    "path": "./plugins/timers/Timers.js",
-    "size": 9.691
-  },
-  "ControlsGUI": {
-    "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 16.69
-  },
-  "LoadingScreen": {
-    "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 15.968
-  },
-  "EntitiesGUI": {
-    "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 20.087
-  },
-  "PingTime": {
-    "path": "./plugins/ping-time/PingTime.js",
-    "size": 5.687
-  },
-  "PluginsGUI": {
-    "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.332
-  },
-  "YantraGUI": {
-    "path": "./plugins/gui-yantra/YantraGUI.js",
-    "size": 12.952
-  },
-  "SutraGUI": {
-    "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 94.724
-  },
-  "Editor": {
-    "path": "./plugins/gui-editor/Editor.js",
-    "size": 12.983
-  },
-  "SnapshotSize": {
-    "path": "./plugins/snapshot-size/SnapshotSize.js",
-    "size": 9.829
-  },
-  "Schema": {
-    "path": "./plugins/schema/Schema.js",
-    "size": 287.685
-  },
-  "CurrentFPS": {
-    "path": "./plugins/current-fps/CurrentFPS.js",
-    "size": 5.728
-  },
-  "Keyboard": {
-    "path": "./plugins/keyboard/Keyboard.js",
-    "size": 9.453
-  },
-  "Lifetime": {
-    "path": "./plugins/lifetime/Lifetime.js",
-    "size": 3.929
-  },
-  "LocalClient": {
-    "path": "./plugins/client/LocalClient.js",
-    "size": 4.988
-  },
-  "MatterPhysics": {
-    "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 393.053
-  },
-  "Mouse": {
-    "path": "./plugins/mouse/Mouse.js",
-    "size": 6.198
-  },
-  "PhaserGraphics": {
-    "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 24.656
-  },
-  "ThreeGraphics": {
-    "path": "./plugins/graphics-three/ThreeGraphics.js",
-    "size": 19.209
-  },
-  "PongMovement": {
-    "path": "./plugins/entity-movement/strategies/PongMovement.js",
-    "size": 5.054
-  },
-  "PongWorld": {
-    "path": "./plugins/world/pong/PongWorld.js",
-    "size": 11.68
-  },
-  "StarField": {
-    "path": "./plugins/starfield/StarField.js",
-    "size": 9.31
-  },
-  "BabylonStarField": {
-    "path": "./plugins/starfield/BabylonStarField.js",
-    "size": 5.68
-  },
-  "FroggerMovement": {
-    "path": "./plugins/entity-movement/strategies/FroggerMovement.js",
-    "size": 4.579
-  },
-  "PacManMovement": {
-    "path": "./plugins/entity-movement/strategies/PacManMovement.js",
-    "size": 4.573
-  },
-  "XState": {
-    "path": "./plugins/xstate/XState.js",
-    "size": 192.085
-  }
-};
-var _default = exports["default"] = pluginsList;
-
-},{}]},{},[2])(2)
+},{"../gui-editor/gui.js":1}]},{},[2])(2)
 });
