@@ -830,9 +830,9 @@ button {
 
 .highlighted-sutra-node {
   border: 1px solid 9a9cff !important;
-  box-shadow: 0 0 15px rgba(154, 156, 255, 0.6);
+  box-shadow: 0 0 15px rgba(154, 156, 255, 0.6) !important;
 
-  transition: border 0.3s ease, box-shadow 0.3s ease;
+  transition: border 0.3s ease, box-shadow 0.3s ease !important;
 
 }
 
@@ -941,6 +941,7 @@ option {
 
 .action-select {
   margin-bottom: 0;
+  width: 230px;
 
 }
 

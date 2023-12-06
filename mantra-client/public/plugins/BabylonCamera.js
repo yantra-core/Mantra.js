@@ -63,8 +63,6 @@ var BabylonCamera = /*#__PURE__*/function () {
 
       //   Rotate the camera by -Math.PI / 2
       this.camera.alpha += Math.PI / 2;
-
-      // set current zoom to 50% of max
       this.camera.radius = 4500;
     }
   }, {

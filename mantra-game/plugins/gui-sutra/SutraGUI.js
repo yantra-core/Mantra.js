@@ -109,7 +109,9 @@ class SutraGUI {
   }
 
   showSutra() {
-    this.redrawBehaviorTree();
+    // this.redrawBehaviorTree();
+    let json = this.behavior.toJSON();
+    this.redrawBehaviorTree(this.behavior);
   }
 
   viewJson() {
@@ -126,6 +128,8 @@ class SutraGUI {
     jsonDiv.style.height = '800px';
     jsonDiv.value = json;
     table.appendChild(jsonDiv);
+
+    this.adjustTextareaHeight(jsonDiv);
   }
 
   viewSutraEnglish() {
@@ -149,13 +153,14 @@ class SutraGUI {
     return this.game.emitters;
   }
 
-  redrawBehaviorTree() {
-    let json = this.behavior.serializeToJson();
-    let container = document.getElementById('sutraTable');
+  redrawBehaviorTree(json) {
+    let container = document.getElementById('sutraView');
+
+    let table = document.getElementById('sutraTable');
+    table.innerHTML = '';
     //let guiContent = container.querySelector('.gui-content');
-    container.innerHTML = '';
-    JSON.parse(json).tree.forEach(node => {
-      container.appendChild(this.createNodeElement(node, 0));
+    json.tree.forEach(node => {
+      table.appendChild(this.createNodeElement(node, 1));
     });
   }
 
@@ -164,7 +169,6 @@ class SutraGUI {
     let container = document.getElementById('sutraView');
     let table = document.getElementById('sutraTable');
     //let guiContent = container.querySelector('.gui-content');
-
     if (json.tree.length === 0) {
       // add message to indicate no sutra
       table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
@@ -500,9 +504,6 @@ class SutraGUI {
     */
 
     let json = this.behavior.serializeToJson();
-    console.log('json', json);
-
-
     this.redrawBehaviorTree();
   }
 
@@ -554,8 +555,13 @@ class SutraGUI {
     // remove all html elements
     this.sutraView.remove();
   }
+
+  adjustTextareaHeight(textarea) {
+    textarea.style.height = 'auto'; // Reset height to recalculate
+    textarea.style.height = textarea.scrollHeight + 'px'; // Set new height
+  }
+
+
 }
-
-
 
 export default SutraGUI;

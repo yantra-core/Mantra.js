@@ -424,6 +424,7 @@ var SutraGUI = /*#__PURE__*/function () {
       jsonDiv.style.height = '800px';
       jsonDiv.value = json;
       table.appendChild(jsonDiv);
+      this.adjustTextareaHeight(jsonDiv);
     }
   }, {
     key: "viewSutraEnglish",
@@ -862,6 +863,12 @@ var SutraGUI = /*#__PURE__*/function () {
     value: function unload() {
       // remove all html elements
       this.sutraView.remove();
+    }
+  }, {
+    key: "adjustTextareaHeight",
+    value: function adjustTextareaHeight(textarea) {
+      textarea.style.height = 'auto'; // Reset height to recalculate
+      textarea.style.height = textarea.scrollHeight + 'px'; // Set new height
     }
   }]);
   return SutraGUI;
@@ -2052,7 +2059,7 @@ function testRules(game) {
   });
 
   rules.on('entity::createEntity', function (entity, node) {
-    console.log("entity::createEntity", entity, node);
+    // console.log("entity::createEntity", entity, node);
     game.systems.entity.createEntity(node.data);
     //game.emit('entity::createEntity', entity);
   });
@@ -2150,16 +2157,18 @@ function testRules(game) {
               y: -200
             }
           }
-        }],
-        "else": [{
-          action: 'entity::updateEntity',
-          data: {
-            color: idleSpawnerColor
-          }
         }]
       }]
     }]
   });
+
+  /*
+   ,
+          else: [{
+            action: 'entity::updateEntity',
+            data: { color: idleSpawnerColor }
+          }]
+  */
 
   // Action for the boss based on health levels
   rules.addAction({

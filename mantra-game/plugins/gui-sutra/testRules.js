@@ -58,7 +58,7 @@ export default function testRules(game) {
   });
 
   rules.on('entity::createEntity', (entity, node) => {
-    console.log("entity::createEntity", entity, node);
+    // console.log("entity::createEntity", entity, node);
     game.systems.entity.createEntity(node.data);
     //game.emit('entity::createEntity', entity);
   });
@@ -139,15 +139,20 @@ export default function testRules(game) {
           }, {
             action: 'entity::createEntity',
             data: { type: 'BLOCK', color: generateRandomColorInt,  height: 20, width: 20, position: { x: 0, y: -200 } }
-          }],
-          else: [{
-            action: 'entity::updateEntity',
-            data: { color: idleSpawnerColor }
           }]
         }]
       }
     ]
   });
+
+  /*
+
+  ,
+          else: [{
+            action: 'entity::updateEntity',
+            data: { color: idleSpawnerColor }
+          }]
+  */
 
   // Action for the boss based on health levels
   rules.addAction({
@@ -224,6 +229,7 @@ export default function testRules(game) {
     console.log('Ending round as all BLOCK, BOSS, and SPAWNER counts are zero.');
     // Implement the logic to end the round
     // respawn the spawner
+    // TODO: remove game reference here, should be entity::createEntity
     let ent = game.createEntity({
       type: 'SPAWNER',
       destroyed: false,
@@ -239,6 +245,20 @@ export default function testRules(game) {
     // alert("YOU ARE THE WINRAR")
 
   });
+
+
+    /*
+    // Action to move all blocks when timerCompleted
+    rules.addAction({
+      if: 'createSpawner',
+      then: [{
+        action: 'entity::createEntity',
+        data: MANTRA.data.spawner
+      }]
+    });
+
+    rules.emit('createSpawner')
+    */
 
   return rules;
 
