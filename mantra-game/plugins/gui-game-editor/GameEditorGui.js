@@ -25,7 +25,7 @@ class GameEditor {
 
     if (!this.gameEditorView) {
       // Use gui.window() to create the window
-      this.gameEditorView = gui.window('gameEditorView', 'Game Editor', function(){
+      this.gameEditorView = gui.window('gameEditorView', 'Game Editor', function () {
         self.game.systemsManager.removeSystem(GameEditor.id);
       })
     }
@@ -50,6 +50,7 @@ class GameEditor {
   cashReady() {
     // alert('cash ready')
     let guiContent = $('.gui-content', this.gameEditorView);
+    this.createGameSettingsForm(this.game.gameConfig.settings, guiContent);
     this.buildFolderStructure(this.game.gameConfig.entities, guiContent);
   }
 
@@ -84,13 +85,74 @@ class GameEditor {
     }
   }
 
+  createGameSettingsForm(gameConfigSettings, parentElement) {
+    const form = $('<form>').attr({ id: 'game-settings-form', class: 'game-settings-form' }).prependTo(parentElement);
+    const settings = Object.keys(gameConfigSettings);
+  
+    settings.forEach(setting => {
+      const fieldContainer = $('<div>').addClass('form-field').appendTo(form);
+  
+      $('<label>')
+        .attr({ for: 'game-' + setting })
+        .text(setting)
+        .appendTo(fieldContainer);
+  
+      $('<input>')
+        .attr({
+          type: 'text',
+          id: 'game-' + setting,
+          name: setting,
+          value: gameConfigSettings[setting],
+          class: 'game-input'
+        })
+        .appendTo(fieldContainer);
+    });
+  
+    //$('<button>').text('Save Settings').attr({ type: 'submit' }).appendTo(form);
+    // save button disabled ( for now )
+    //$('button[type="submit"]').prop('disabled', true);
+  
+    form.on('submit', (e) => {
+      e.preventDefault();
+      this.saveGameSettings();
+    });
+  }
+  
+  
+  
+  
+
   toggleFolder(folderItem) {
     folderItem.children('ul').toggle(); // Toggle the visibility of the folder's contents
+  }
+
+  saveGameSettings() {
+    let updatedSettings = {};
+    $('#game-settings-form .game-input').each(function () {
+      let input = $(this);
+      updatedSettings[input.attr('name')] = input.val();
+    });
+    // TODO: Update the game settings in the game's data structure
+    console.log('Updated Game Settings: ', updatedSettings);
   }
 
   editEntity(entity) {
     // Implement entity editing logic
     console.log('Editing entity:', entity);
+
+    // find the data-id attribute to get the entityId
+    //let entityId = e.target.parentNode.getAttribute('data-id');
+
+    // set the global game selectedEntityId context so other guid components can use it
+    // this.game.selectedEntityId = entity;
+    // check if gui-inspector is loaded, if not, load it
+    if (!game.systems['gui-entity-editor']) {
+      game.use('EntityEditor');
+    }
+
+    this.game.systems['gui-entity-editor'].setEntity(entity);
+
+
   }
 
 }
