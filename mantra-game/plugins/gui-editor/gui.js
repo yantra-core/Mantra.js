@@ -244,4 +244,41 @@ const gui = {
 
 };
 
+gui.init = function (game) {
+
+  // add a global click handler to document that will delegate any clicks
+  // that are not inside gui-windows to re-enable inputs
+  document.addEventListener('click', (e) => {
+    // check if the click was inside a gui-window
+    let guiWindow = e.target.closest('.gui-container');
+    if (game && game.systems && game.systems['entity-input'] && game.systems['keyboard']) {
+      if (!guiWindow) {
+        // re-enable inputs
+        game.systems['entity-input'].setInputsActive();
+        game.systems['keyboard'].bindInputControls();
+      } else {
+        // disable inputs
+        game.systems['entity-input'].disableInputs();
+        game.systems['keyboard'].unbindAllEvents();
+      }
+    }
+  });
+}
+
+
+// bind the ESC key
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    // get all gui-containers
+    const containers = document.querySelectorAll('.gui-container');
+
+    // TODO: unload the plugin instead of removing the container
+    // remove the last one
+    let lastContainer = containers[containers.length - 1];
+    if (lastContainer) {
+      lastContainer.remove();
+    }
+  }
+});
+
 export default gui;

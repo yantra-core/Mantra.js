@@ -508,6 +508,21 @@ pre {
   position: absolute;
 }
 
+
+#gameEditorView {
+  top: 10%;
+  left: 10%;
+  z-index: 1000;
+  width: 550px;
+  min-width: 460px;
+  min-height: 200px;
+  height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
+
 #sutraFormView {
   top: 10%;
   left: 50%;
@@ -1219,4 +1234,51 @@ textarea {
   linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);      
   cursor: crosshair;
   border: 1px solid #ccc;
+}
+
+#folder-explorer ul {
+  list-style-type: none;
+}
+
+#folder-explorer li {
+  cursor: pointer;
+  padding: 5px;
+}
+
+#folder-explorer li:hover {
+  background-color: lightgrey;
+}
+
+.folder-structure {
+  list-style-type: none;
+}
+
+.entity {
+  margin-left: 20px;
+}
+
+.folder-icon {
+  background: url('/vendor/feather/folder.svg');
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: 24px 24px; /* Resize the background image */
+}
+
+.folder-label {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #d3d9df;
+  cursor: pointer;
+}
+
+.entity-label {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #d3d9df;
+  cursor: pointer;
 }

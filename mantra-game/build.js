@@ -32,6 +32,7 @@ const plugins = [
   './plugins/gui-yantra/YantraGUI.js',
   './plugins/gui-sutra/SutraGUI.js',
   './plugins/gui-editor/Editor.js',
+  './plugins/gui-game-editor/GameEditorGui.js',
   './plugins/gui-inspector/Inspector.js',
   './plugins/gui-event-inspector/EventInspector.js',
   './plugins/snapshot-size/SnapshotSize.js',

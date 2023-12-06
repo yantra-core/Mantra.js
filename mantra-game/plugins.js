@@ -61,6 +61,7 @@ import Inspector from './plugins/gui-inspector/Inspector.js';
 import Creator from './plugins/gui-creator/Creator.js';
 import ControlsGUI from './plugins/gui-controls/ControlsGUI.js';
 import Editor from './plugins/gui-editor/Editor.js';
+import GameEditor from './plugins/gui-game-editor/GameEditorGui.js';
 import EntitiesGUI from './plugins/gui-entities/EntitiesGUI.js';
 import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
 import SutraGUI from './plugins/gui-sutra/SutraGUI.js';
@@ -102,6 +103,7 @@ const plugins = {
   PluginExplorer,
   LoadingScreen,
   Editor,
+  GameEditor,
   EntitiesGUI,
   EventInspector,
   PluginsGUI,
