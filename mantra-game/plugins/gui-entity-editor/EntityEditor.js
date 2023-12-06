@@ -49,15 +49,17 @@ class EntityEditor {
 
   }
 
-  setEntity(entity, parent = null, prefix = '') {
+  setEntity(entity, parent = null, prefix = '', indentLevel = 0) {
+    let game = this.game;
     const guiContent = parent ? parent : $('.gui-content', this.entityEditor);
     if (!parent) {
       guiContent.empty(); // Clear existing content only if it's the root call
       $('<form>', { id: 'entity-edit-form' }).appendTo(guiContent);
     }
-    
+
     const form = $('#entity-edit-form');
 
+    let currentComponents = Object.keys(entity);
     for (const key in entity) {
       if (!entity.hasOwnProperty(key)) continue;
       const inputName = prefix ? `${prefix}[${key}]` : key;
@@ -65,11 +67,12 @@ class EntityEditor {
       if (typeof entity[key] === 'object' && entity[key] !== null) {
         const fieldSet = $('<fieldset>').appendTo(form);
         $('<legend>').text(key).appendTo(fieldSet);
-        this.setEntity(entity[key], fieldSet, inputName); // Recursive call for nested objects
+        this.setEntity(entity[key], fieldSet, inputName, indentLevel + 1); // Recursive call for nested objects
       } else {
         const fieldContainer = $('<div>', { class: 'form-field' }).appendTo(form);
+        fieldContainer.css('padding-left', `${indentLevel * 20}px`);
         $('<label>', { text: key, for: 'entity-' + inputName }).appendTo(fieldContainer);
-        $('<input>', { 
+        $('<input>', {
           type: 'text',
           id: 'entity-' + inputName,
           name: inputName,
@@ -89,12 +92,64 @@ class EntityEditor {
         this.saveEntity();
       });
     }
+
+    if (indentLevel === 0) {
+      this.createComponentsForm(entity, currentComponents);
+    }
+  }
+
+  createComponentsForm(entity, currentComponents) {
+    let allComponentKeys = Object.keys(this.game.components);
+    // console.log('allComponentKeys', allComponentKeys);
+    // console.log('currentComponents', currentComponents);
+
+    // Create diff array of unused components
+    let displayComponents = allComponentKeys.filter((component) => {
+      return !currentComponents.includes(component);
+    });
+
+    // create a div to hold the dropdown and add button
+    const componentDiv = document.createElement('div');
+    componentDiv.classList.add('component-selector')
+
+    // Create a dropdown select with an add button
+    const dropdown = document.createElement('select');
+    dropdown.id = 'componentDropdown';
+
+    displayComponents.forEach((component) => {
+      const option = document.createElement('option');
+      option.value = component;
+      option.text = component;
+      dropdown.appendChild(option);
+    });
+
+    const addButton = document.createElement('button');
+    addButton.textContent = 'Add';
+    addButton.onclick = () => this.addComponentToEntity(dropdown.value, entity);
+
+    componentDiv.append(dropdown);
+    componentDiv.append(addButton);
+
+    // Append dropdown and add button to the DOM
+    const guiContent = $('#entity-edit-form').parent();
+    guiContent.append(componentDiv);
+    //guiContent.append(dropdown);
+    //guiContent.append(addButton);
+  }
+
+  addComponentToEntity(component, entity) {
+    // TODO: needs a more formalized way to add components to entity
+    // game.addComponentToEntity(component, entity) or entity.addComponent()
+    entity[component] = '';
+    console.log('eeee', entity)
+    // Re-render the entity editor
+    this.setEntity(entity);
   }
 
 
   saveEntity() {
     const updatedEntity = {};
-    $('#entity-edit-form .entity-input').each(function() {
+    $('#entity-edit-form .entity-input').each(function () {
       const input = $(this);
       const inputName = input.attr('name');
       // Code to parse inputName and assign value to updatedEntity at correct nested location

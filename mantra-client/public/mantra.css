@@ -414,9 +414,7 @@ pre {
   left: 0;
   right: 0;
   height: 25px;
-
   z-index: 1;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -532,6 +530,10 @@ pre {
   resize: both;
   overflow: auto;
   position: absolute;
+}
+
+#gameEditorView .gui-content {
+  padding: 20px;
 }
 
 
@@ -685,6 +687,17 @@ pre {
 .input-group,
 button {
   cursor: default;
+}
+
+button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+
 }
 
 .gui-window-footer {
@@ -862,6 +875,21 @@ textarea {
   background-color: transparent;
   color: #d3d9df;
   box-sizing: border-box;
+}
+
+select  {
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  background-color: transparent;
+  color: #d3d9df;
+  box-sizing: border-box;
+}
+
+option {
+  background-color: transparent;
+  color: #000000;
 }
 
 .input-group option {
@@ -1042,13 +1070,16 @@ textarea {
 
 .pluginList {
   list-style: none;
-  font-size: 22px;
+  font-size: 10px;
   padding: 0;
   padding-left: 10px;
-  margin: 0;
+  margin: 10px;
+  cursor: pointer;
 }
 
 .pluginLabel {
+  padding-left: 10px;
+  font-size: 22px;
   width: 80px;
   text-overflow: ellipsis;
   display: inline-flex;
@@ -1100,9 +1131,7 @@ textarea {
   margin: 0 4px;
 }
 
-.rule-button-add {
-
-}
+.rule-button-add {}
 
 .rule-button-remove {
 
@@ -1241,9 +1270,9 @@ textarea {
 #colorPicker {
   width: 200px;
   height: 200px;
-  background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%),
-  linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%),
-  linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);      
+  background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),
+    linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),
+    linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);
   cursor: crosshair;
   border: 1px solid #ccc;
 }
@@ -1274,17 +1303,31 @@ textarea {
   display: inline-block;
   width: 24px;
   height: 24px;
-  background-size: 24px 24px; /* Resize the background image */
+  background-size: 24px 24px;
+  /* Resize the background image */
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+  background-size: 24px 24px;
+  /* Resize the background image */
+}
+
+.folder-icon:hover {
+  color: #9a9cff;
 }
 
 .folder-label {
-  display: inline-block;
-  margin-left: 5px;
+  display: flex;
+  /* Use flexbox for alignment */
+  align-items: center;
+  /* Align items vertically in the center */
+  cursor: pointer;
   font-size: 18px;
   font-weight: bold;
   color: #d3d9df;
-  cursor: pointer;
 }
+
 
 .entity-label {
   display: inline-block;
@@ -1311,7 +1354,6 @@ textarea {
 }
 
 .form-field input {
-  width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -1359,4 +1401,9 @@ button[type="submit"]:disabled {
   padding: 20px;
   border: 1px solid #ccc;
   margin: 20px;
+}
+
+.component-selector {
+  margin-bottom: 10px;
+  padding-left: 20px;
 }

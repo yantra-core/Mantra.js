@@ -50,12 +50,23 @@ class GameEditor {
   cashReady() {
     // alert('cash ready')
     let guiContent = $('.gui-content', this.gameEditorView);
+    this.createGameSettingsFolder(guiContent);
     this.createGameSettingsForm(this.game.gameConfig.settings, guiContent);
-    this.buildFolderStructure(this.game.gameConfig.entities, guiContent);
+    this.createEntitiesFolder(guiContent);
+    this.buildEntityFolders(this.game.gameConfig.entities, guiContent);
+   }
+
+  createEntitiesFolder(parentElement) {
+    const entitiesFolder = $('<div>', { class: 'entities-folder' }).appendTo(parentElement);
+    const folderLabel = $('<span>', { text: 'Entities'}).appendTo(entitiesFolder);
+    folderLabel.addClass('folder-label');
+    folderLabel.prepend('<i class="folder-icon"></i>Entities');
+    folderLabel.on('click', () => $('.folder-structure').toggle());
   }
 
-  buildFolderStructure(entities, parentElement, parentPath = '') {
-    const ul = $('<ul class="folder-structure">');
+  buildEntityFolders(entities, parentElement, parentPath = '') {
+    // Make the entities list initially hidden
+    const ul = $('<ul class="folder-structure">').hide();
     $(parentElement).append(ul);
 
     for (const key in entities) {
@@ -76,7 +87,7 @@ class GameEditor {
         textSpan.on('click', () => this.toggleFolder(li)); // Click to toggle folder
 
         const subEntities = entity.members ? entity.members : entity;
-        this.buildFolderStructure(subEntities, li, currentPath);
+        this.buildEntityFolders(subEntities, li, currentPath);
       } else if (entity.gameType === 'entity') {
         textSpan.prepend('<i class="entity-icon"></i>'); // Placeholder for entity icon
         textSpan.addClass('entity-label');
@@ -85,18 +96,28 @@ class GameEditor {
     }
   }
 
+  createGameSettingsFolder(parentElement) {
+    const gameSettingsFolder = $('<div>').prependTo(parentElement);
+    gameSettingsFolder.addClass('game-settings-folder');
+    const folderLabel = $('<span>').appendTo(gameSettingsFolder);
+    folderLabel.addClass('folder-label')
+    folderLabel.html('Game Settings');
+    folderLabel.prepend('<i class="folder-icon"></i>');
+    folderLabel.on('click', () => $('#game-settings-form').toggle());
+  }
+
   createGameSettingsForm(gameConfigSettings, parentElement) {
-    const form = $('<form>').attr({ id: 'game-settings-form', class: 'game-settings-form' }).prependTo(parentElement);
+
+    const form = $('<form>').attr({ id: 'game-settings-form', class: 'game-settings-form' }).appendTo(parentElement).hide();
     const settings = Object.keys(gameConfigSettings);
-  
     settings.forEach(setting => {
       const fieldContainer = $('<div>').addClass('form-field').appendTo(form);
-  
+
       $('<label>')
         .attr({ for: 'game-' + setting })
         .text(setting)
         .appendTo(fieldContainer);
-  
+
       $('<input>')
         .attr({
           type: 'text',
@@ -107,20 +128,16 @@ class GameEditor {
         })
         .appendTo(fieldContainer);
     });
-  
+
     //$('<button>').text('Save Settings').attr({ type: 'submit' }).appendTo(form);
     // save button disabled ( for now )
     //$('button[type="submit"]').prop('disabled', true);
-  
+
     form.on('submit', (e) => {
       e.preventDefault();
       this.saveGameSettings();
     });
   }
-  
-  
-  
-  
 
   toggleFolder(folderItem) {
     folderItem.children('ul').toggle(); // Toggle the visibility of the folder's contents
@@ -138,21 +155,10 @@ class GameEditor {
 
   editEntity(entity) {
     // Implement entity editing logic
-    console.log('Editing entity:', entity);
-
-    // find the data-id attribute to get the entityId
-    //let entityId = e.target.parentNode.getAttribute('data-id');
-
-    // set the global game selectedEntityId context so other guid components can use it
-    // this.game.selectedEntityId = entity;
-    // check if gui-inspector is loaded, if not, load it
     if (!game.systems['gui-entity-editor']) {
       game.use('EntityEditor');
     }
-
     this.game.systems['gui-entity-editor'].setEntity(entity);
-
-
   }
 
 }

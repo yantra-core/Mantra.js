@@ -285,7 +285,4 @@ gui.init = function (game) {
 
 }
 
-
-
-
 export default gui;
