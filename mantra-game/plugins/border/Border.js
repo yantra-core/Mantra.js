@@ -3,10 +3,11 @@ class Border {
 
   static id = 'border';
 
-  constructor({ autoBorder = false, position = { x: 0, y: 0 } } = {}) {
+  constructor({ autoBorder = false, position = { x: 0, y: 0 }, thickness = 200 } = {}) {
     this.id = Border.id;
     this.position = position;
     this.autoBorder = autoBorder;
+    this.thickness = thickness;
   }
 
   init(game) {
@@ -19,6 +20,7 @@ class Border {
         id: 'border',
         height: this.game.height,
         width: this.game.width,
+        thickness: this.thickness,
         position: {
           x: this.position.x,
           y: this.position.y
@@ -33,7 +35,7 @@ class Border {
   createBorder(entityData) {
     let height = entityData.height;
     let width = entityData.width;
-    let WALL_THICKNESS = 200;
+    let WALL_THICKNESS = entityData.thickness || 200;
 
     const borders = {
       top: {

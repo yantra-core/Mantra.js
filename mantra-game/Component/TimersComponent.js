@@ -7,7 +7,6 @@ class TimersComponent extends Component {
     this.timers = {}; // Object to hold named timers
   }
 
-
   // Set a timer with a specific duration, with optional interval flag
   setTimer(name, duration, isInterval = false) {
     this.timers[name] = {
@@ -21,6 +20,7 @@ class TimersComponent extends Component {
   getTimer(name) {
     return this.timers[name];
   }
+
   checkTimer(name) {
     if (!this.timers[name]) return false;
   

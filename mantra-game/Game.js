@@ -456,12 +456,12 @@ class Game {
 
   defaultCreatePlayer(playerConfig) {
     console.log('creating default player')
-
     return this.createEntity({
       type: 'PLAYER',
       shape: 'triangle',
       width: 200,
       height: 200,
+      color: 0x00ff00,
       position: {
         x: 0,
         y: 0

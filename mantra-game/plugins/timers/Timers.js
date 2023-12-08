@@ -1,4 +1,5 @@
 import Plugin from '../../Plugin.js';
+import TimersComponent from '../../Component/TimersComponent.js';
 
 class Timers extends Plugin {
   static id = 'timers';
@@ -6,13 +7,21 @@ class Timers extends Plugin {
     super(game);
     this.game = game;
     this.id = Timers.id;
+    this.systemTimers = {};
   }
 
 
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem(this.id, this);
+    this.game.createTimer = this.createTimer.bind(this);
 
+  }
+
+  createTimer (timerName, duration, isInterval = false) {
+    let timer = new TimersComponent(timerName, duration, isInterval);
+    this.systemTimers[timerName] = timer;
+    return timer;
   }
   // Called every game loop
   update() {
@@ -30,11 +39,25 @@ class Timers extends Plugin {
             timer.done = true;
             if (timer.isInterval) {
               timersComp.resetTimer(timerName); // Reset for intervals
-              this.game.emit('timers::done', { entity, timerName });
+              this.game.emit('timer::done', entity, timerName, timer);
             } else {
               timer.completed = true;
-              this.game.emit('timers::done', { entity, timerName });
+              this.game.emit('timer::done', entity, timerName, timer);
             }
+
+            if (this.game.data) {
+              // if data.timer && data.
+              this.game.data.timers = this.game.data.timers || [];
+              this.game.data.timers.push({
+                entityId: entity.id,
+                entity: entity,
+                gameType: 'timer',
+                timerName: timerName,
+                timer: timer
+              });
+            }
+
+
           }
         });
       }

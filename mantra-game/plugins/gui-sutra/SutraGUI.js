@@ -9,9 +9,12 @@ import actionForm from './lib/editor/actionForm.js';
 import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
 
+//import sutra from '../../../../sutra/index.js';
+import sutra from '@yantra-core/sutra';
+
 
 import serializeFormToJSON from './util/serializeFormToJSON.js';
-import testRules from './testRules.js';
+// import testRules from './testRules.js';
 
 class SutraGUI {
   static id = 'gui-sutra';
@@ -32,6 +35,7 @@ class SutraGUI {
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
     this.createConditionalForm = editor.createConditionalForm.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);
+    this.sutra = sutra;
   }
 
   init(game) {
@@ -70,13 +74,19 @@ class SutraGUI {
           this.showConditionalsForm(node);
         }
       }
-
     });
 
-    let rules = testRules(game);
+    if (this.game.rules) {
+      this.setRules(this.game.rules);
+    }
+
+  }
+
+  setRules (rules) {
+
+    // let rules = testRules(game);
 
     // gui.setTheme('light');
-
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
       let humanReadablePath = rules.getReadableSutraPath(sutraPath);
@@ -101,6 +111,8 @@ class SutraGUI {
     this.drawBehaviorTree(JSON.parse(json));
 
     this.behavior = rules;
+
+
   }
 
   addNewRule() {
@@ -535,8 +547,6 @@ class SutraGUI {
 
   update() {
     let game = this.game;
-    this.bossHealth--;
-
     if (game.tick % 60 === 0) {
       // Clear previously highlighted elements
       document.querySelectorAll('.highlighted-sutra-node').forEach(node => {
@@ -544,10 +554,6 @@ class SutraGUI {
         // node.classList.add('collapsed');
 
       });
-    }
-
-    for (let [entityId, entity] of game.entities.entries()) {
-      this.behavior.tick(entity, game.data);
     }
   }
 

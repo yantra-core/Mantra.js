@@ -179,32 +179,35 @@ class BabylonGraphics extends GraphicsInterface {
 
     let graphic = previousEntity.graphics['graphics-babylon'];
 
-    // alpha value will be present if snapshot interpolation is enabled
-    if (typeof alpha === 'number') {
-      if (typeof previousEntity.position.z !== 'number') {
-        previousEntity.position.z = 0;
-      }
-      if (typeof entityData.position.z !== 'number') {
-        entityData.position.z = 0;
-      }
+    if (typeof entityData.position === 'object') {
+      // alpha value will be present if snapshot interpolation is enabled
+      if (typeof alpha === 'number') {
+        if (typeof previousEntity.position.z !== 'number') {
+          previousEntity.position.z = 0;
+        }
+        if (typeof entityData.position.z !== 'number') {
+          entityData.position.z = 0;
+        }
 
-      // Perform interpolation between the previous and current state
-      let previousVector = new BABYLON.Vector3(previousEntity.position.x, previousEntity.position.y, previousEntity.position.z);
-      let currentVector = new BABYLON.Vector3(entityData.position.x, entityData.position.y, entityData.position.z);
-      const interpolatedPosition = BABYLON.Vector3.Lerp(previousVector, currentVector, alpha);
-      // TODO: add rotation interpolation
-      // const interpolatedRotation = BABYLON.Quaternion.Slerp(previousEntity.rotation, entityData.rotation, alpha);
-      // console.log(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
-      // Update the entity's graphical representation with the interpolated state
-      graphic.position = new BABYLON.Vector3(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
+        // Perform interpolation between the previous and current state
+        let previousVector = new BABYLON.Vector3(previousEntity.position.x, previousEntity.position.y, previousEntity.position.z);
+        let currentVector = new BABYLON.Vector3(entityData.position.x, entityData.position.y, entityData.position.z);
+        const interpolatedPosition = BABYLON.Vector3.Lerp(previousVector, currentVector, alpha);
+        // TODO: add rotation interpolation
+        // const interpolatedRotation = BABYLON.Quaternion.Slerp(previousEntity.rotation, entityData.rotation, alpha);
+        // console.log(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
+        // Update the entity's graphical representation with the interpolated state
+        graphic.position = new BABYLON.Vector3(-interpolatedPosition.x, interpolatedPosition.z, interpolatedPosition.y);
 
-    } else {
-      //
-      // Snapshot interpolation is not enabled, use exact position values from the snapshot
-      //
-      // console.log(-entityData.position.x, entityData.position.z, entityData.position.y);
-      graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
+      } else {
+        //
+        // Snapshot interpolation is not enabled, use exact position values from the snapshot
+        //
+        // console.log(-entityData.position.x, entityData.position.z, entityData.position.y);
+        graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
+      }
     }
+
 
 
     if (typeof entityData.color === 'number') {
@@ -227,7 +230,7 @@ class BabylonGraphics extends GraphicsInterface {
     }
 
 
-    if (entityData.rotation !== undefined) {
+    if (entityData.rotation !== undefined && entityData.rotation !== null) {
       //graphic.rotation.y = -entityData.rotation;
       // in additon, adjust by -Math.PI / 2;
       // adjust cylinder rotation shape to point "forward"
@@ -489,9 +492,7 @@ class BabylonGraphics extends GraphicsInterface {
   inflateEntity(entity, alpha) {
     if (entity.graphics && entity.graphics['graphics-babylon']) {
       let graphic = entity.graphics['graphics-babylon'];
-      if (entity.type !== 'BORDER') { // TODO: remove this
-        this.updateGraphic(entity, alpha);
-      }
+      this.updateGraphic(entity, alpha);
     } else {
       if (entity.destroyed) {
         // shouldnt happen got destroy event for already removed ent

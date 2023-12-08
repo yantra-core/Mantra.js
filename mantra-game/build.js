@@ -4,6 +4,7 @@ import fs from 'fs';
 const plugins = [
   './plugins/entity-movement/strategies/AsteroidsMovement.js',
   './plugins/behaviors/Behaviors.js',
+  './plugins/sutra/Sutra.js',
   './plugins/graphics-babylon/camera/BabylonCamera.js',
   './plugins/graphics-babylon/BabylonGraphics.js',
   './plugins/block/Block.js',
@@ -31,6 +32,7 @@ const plugins = [
   './plugins/gui-plugins/PluginsGUI.js',
   './plugins/gui-yantra/YantraGUI.js',
   './plugins/gui-sutra/SutraGUI.js',
+  './plugins/gui-scoreboard/Scoreboard.js',
   './plugins/gui-editor/Editor.js',
   './plugins/gui-game-editor/GameEditorGui.js',
   './plugins/gui-inspector/Inspector.js',
@@ -48,6 +50,7 @@ const plugins = [
   './plugins/graphics-three/ThreeGraphics.js',
   './plugins/entity-movement/strategies/PongMovement.js',
   './plugins/world/pong/PongWorld.js',
+  './plugins/world-tower/TowerWorld.js',
   './plugins/starfield/StarField.js',
   './plugins/starfield/BabylonStarField.js',
   './plugins/entity-movement/strategies/FroggerMovement.js',

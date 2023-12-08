@@ -13,19 +13,19 @@ const pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.62
+    "size": 50.749
   },
   "Block": {
     "path": "./plugins/block/Block.js",
-    "size": 6.122
+    "size": 6.791
   },
   "Border": {
     "path": "./plugins/border/Border.js",
-    "size": 8.926
+    "size": 9.126
   },
   "Bullet": {
     "path": "./plugins/bullet/Bullet.js",
-    "size": 12.372
+    "size": 13.027
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
@@ -41,7 +41,7 @@ const pluginsList = {
   },
   "Collisions": {
     "path": "./plugins/collisions/Collisions.js",
-    "size": 8.607
+    "size": 9.11
   },
   "Creator": {
     "path": "./plugins/gui-creator/Creator.js",
@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 38.184
+    "size": 39.92
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -73,7 +73,7 @@ const pluginsList = {
   },
   "Timers": {
     "path": "./plugins/timers/Timers.js",
-    "size": 9.691
+    "size": 21.13
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.332
+    "size": 23.33
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,7 +101,7 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 94.724
+    "size": 83.967
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
@@ -133,7 +133,7 @@ const pluginsList = {
   },
   "MatterPhysics": {
     "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 393.053
+    "size": 393.556
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
@@ -141,7 +141,7 @@ const pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 24.656
+    "size": 24.642
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

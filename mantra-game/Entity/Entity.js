@@ -4,6 +4,9 @@ class Entity {
       this.id = id;
       this.components = {};
     }
+    getTimer(name) {
+      return this.timers[name];
+    }
  
   }
   

@@ -37,12 +37,10 @@
       game.use('SutraGUI');
 
       // game.use(new Plugins.SutraGUI({ }));
-
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/sutra-level-editor.html',
         sutraEditor: true
       });
-
 
       // start the game loop
       game.start(function () {
@@ -76,7 +74,7 @@
 
         ent.timers.setTimer('test-timer', 1, true);
 
-        game.on('timers::done', (entityId, timerId) => {
+        game.on('timer::done', (entityId, timerId) => {
           // console.log('timer done', entityId, timerId);
         });
 

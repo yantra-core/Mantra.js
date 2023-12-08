@@ -44,7 +44,6 @@ function gameTick() {
       });
     }
 
-
     // TODO: move this to Bullet plugin
     let entity = this.getEntity(entityId);
     // kinematic bullet movements on client

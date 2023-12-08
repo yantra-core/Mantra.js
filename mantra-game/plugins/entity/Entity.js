@@ -114,6 +114,9 @@ class Entity {
   cleanupDestroyedEntities() {
     const destroyedComponentData = this.game.components.destroyed.data;
     for (let entityId in destroyedComponentData) {
+      if (typeof entityId === 'string') {
+        entityId = parseInt(entityId); // for now, this can be removed when we switch Component.js to use Maps
+      }
       const destroyedType = this.game.components.type.get(entityId);
       if (destroyedComponentData[entityId]) {
         // Removes the body from the physics engine
@@ -130,7 +133,6 @@ class Entity {
           this.game.components[componentType].remove(entityId);
         }
         this.game.entities.delete(entityId);
-
         // remove the reference in this.game.data.ents
         delete this.game.data.ents._[entityId];
         // find entity by id and filter it out
@@ -157,6 +159,7 @@ class Entity {
 
     // if the state doesn't exist, return error
     if (!fullState) {
+      console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
       console.log('This should not happen, if a new state came in it should be created');
       return;
     }
@@ -178,6 +181,10 @@ class Entity {
     // TODO: add additional component types that can be updated ( should be most of them )
     if (entityData.color) {
       this.game.components.color.set(entityId, entityData.color);
+      if (!this.game.changedEntities.has(entityId)) {
+      }
+      this.game.changedEntities.add(entityId);
+      // console.log("SETTING COLOR", entityData.color)
     }
 
     if (entityData.height) {
@@ -189,7 +196,25 @@ class Entity {
     }
 
     if (entityData.position) {
-      this.game.components.position.set(entityId, { x: entityData.position.x, y: entityData.position.y, z: entityData.position.z });
+      // Remark: Tests require we update component, perhaps changed test?
+      this.game.components.position.set(entityId, entityData.position);
+      this.game.physics.setPosition(this.game.bodyMap[entityId], entityData.position);
+    }
+
+    if (entityData.velocity) {
+      this.game.physics.setVelocity(this.game.bodyMap[entityId], entityData.velocity);
+    }
+
+    if (entityData.health) {
+      this.game.components.health.set(entityId, entityData.health);
+    }
+
+    if (typeof entityData.thickness !== 'undefined' && entityData.thickness !== null) {
+      this.game.components.width.set(entityId, entityData.thickness);
+    }
+
+    if (typeof entityData.score !== 'undefined' && entityData.score !== null) {
+      this.game.components.score.set(entityId, entityData.score);
     }
 
     if (typeof entityData.rotation !== 'undefined') {
@@ -211,11 +236,13 @@ class Entity {
       shape: 'triangle',
       color: null,
       position: { x: 0, y: 0, z: 0 },
+      startingPosition: { x: 0, y: 0, z: 0 },
       velocity: { x: 0, y: 0, z: 0 },
       rotation: 0,
       mass: 100,
       density: 100,
       health: 100,
+      score: 0,
       height: 100,
       width: 100,
       depth: 10,
@@ -241,7 +268,13 @@ class Entity {
     entityId = config.id;
     const entity = new EntityClass(entityId);
 
-    const { name, type, position, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, owner, lifetime } = config;
+    /*
+    entity.getTimer = (timerId) => {
+      return this.game.components.timers.get(entityId, timerId);
+    };
+    */
+
+    const { name, type, position, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, lifetime } = config;
     let { x, y } = position;
 
     /*
@@ -256,13 +289,14 @@ class Entity {
     // alert(type)
     this.game.addComponent(entityId, 'type', type || 'PLAYER');
     this.game.addComponent(entityId, 'name', name || null);
-
     this.game.addComponent(entityId, 'position', position);
+    this.game.addComponent(entityId, 'startingPosition', startingPosition);
     this.game.addComponent(entityId, 'velocity', velocity);
     this.game.addComponent(entityId, 'rotation', config.rotation);
     this.game.addComponent(entityId, 'mass', mass);
     this.game.addComponent(entityId, 'density', density);
     this.game.addComponent(entityId, 'health', health);
+    this.game.addComponent(entityId, 'score', score);
     this.game.addComponent(entityId, 'width', width);
     this.game.addComponent(entityId, 'height', height);
     this.game.addComponent(entityId, 'depth', depth);

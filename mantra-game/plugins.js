@@ -48,6 +48,7 @@ import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
+import Sutra from './plugins/sutra/Sutra.js';
 
 // Timers
 import Timers from './plugins/timers/Timers.js';
@@ -68,6 +69,7 @@ import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
 import SutraGUI from './plugins/gui-sutra/SutraGUI.js';
 import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
 import PluginExplorer from './plugins/gui-plugin-explorer/PluginExplorer.js';
+import Scoreboard from './plugins/gui-scoreboard/Scoreboard.js';
 
 // Utility
 import PingTime from './plugins/ping-time/PingTime.js';
@@ -80,8 +82,13 @@ import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovemen
 import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.js';
 import MovementPong from './plugins/entity-movement/strategies/PongMovement.js';
 
+
+// World
+import TowerWorld from './plugins/world-tower/TowerWorld.js';
+
 const plugins = {
   Behaviors,
+  Sutra,
   Block,
   Border,
   Bullet,
@@ -106,9 +113,11 @@ const plugins = {
   Editor,
   GameEditor,
   EntityEditor,
+  TowerWorld,
   EntitiesGUI,
   EventInspector,
   PluginsGUI,
+  Scoreboard,
   SutraGUI,
   YantraGUI,
   MatterPhysics,
