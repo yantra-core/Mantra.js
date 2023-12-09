@@ -27,6 +27,9 @@ if (mode === 'online' && env === 'local') {
 
 import config from './config/config.js';
 
+// import TowerWorld from '../mantra-game/tests/fixtures/TowerWorld.js';
+// import testRules from '../mantra-game/plugins/gui-sutra/testRules.js';
+
 //
 // Game and Clients
 //
@@ -36,6 +39,9 @@ import plugins from '../mantra-game/plugins.js';
 // import Pong from '../mantra-worlds/Pong/Pong.js';
 
 let game = new Game({
+  height: 600 * 10,
+  width: 800 * 10,
+  plugins: {},
   isClient: true,
   mouse: true,
   isEdgeClient: isEdgeClient,
@@ -50,20 +56,25 @@ let game = new Game({
     scriptRoot: './' // use local scripts instead of default yantra.gg CDN
   }
 });
+
+// game.gameConfig = TowerWorld;
+
 window.game = game;
 //
 // Use Plugins to add systems to the game
 //
-game
-  .use(new plugins.Block())
-
 
 // Plugins can also be loaded async by string name
 //game.use('Bullet');
 game.use(new plugins.Bullet())
+game.use(new plugins.Entity())
+
+game.use(new plugins.MatterPhysics());
+
+// game.use(new plugins.Collision());
 
 game.use(new plugins.ChronoControl())
-game.use(new plugins.PluginsGUI())
+//game.use(new plugins.PluginsGUI())
 
 game.use(new plugins.Schema());
 
@@ -88,7 +99,7 @@ if (game.isOnline) {
 
 // game.use(new plugins.Client());
 
-game.use(new plugins.Behaviors());
+// game.use(new plugins.Behaviors());
 
 // Always show FPS
 game.use(new plugins.CurrentFPS());
@@ -97,12 +108,18 @@ game.use('Editor', {
   sutraEditor: true
 });
 
+game.use(new plugins.Sutra({ }));
+
+
+//game.use(new plugins.GameEditor());
+//game.use(new plugins.EntityEditor());
 
 import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
 
 // game.use(new plugins.XState({ world: BossFight() }));
-// game.use(new plugins.SutraGUI({ }));
+//game.use(new plugins.SutraGUI({ }));
+
 
 // game.use(new plugins.PluginExplorer({ }));
 
@@ -134,6 +151,11 @@ function switchToOnline() {
 // game.connect('ws://0.0.0.0:8787/websocket');  // @yantra-core/mantra-edge
 // game.connect('ws://0.0.0.0:8888/websocket');  // @yantra-core/mantra-edge
 
+// create a round timer, each 60 seconds move to the next round
+let roundTimer = game.createTimer('round-timer', 4, true);
+console.log('rrr', roundTimer)
+
+// game.setRules(testRules(game));
 
 if (mode === 'online') {
 
@@ -156,74 +178,22 @@ if (mode === 'online') {
 
 
 } else {
+
   // Single Player Offline Mode
   game.start(function () {
+    game.use(new plugins.StarField())
+    game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
+    game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
 
-    game.use('StarField');
+    game.use(new plugins.Scoreboard());
 
-    /*
-    game.createEntity({
-      type: 'BLOCK',
-      width: 500,
-      height: 500,
-      depth: 200,
-      position: {
-        x: 0,
-        y: -1000
-      },
-    });
-    */
-
-    game.createEntity({
-      type: 'BOSS',
-      health: 500,
-      width: 230,
-      height: 320,
-      depth: 200,
-      position: {
-        x: 0,
-        y: -400
-      },
-    });
-
-    let ent = game.createEntity({
-      type: 'SPAWNER',
-      health: 100,
-      width: 200,
-      height: 200,
-      depth: 200,
-      color: 0xff0000,
-      position: {
-        x: -800,
-        y: -800
-      }
-    });
-
-    ent.timers.setTimer('test-timer', 1, true);
-
-    game.on('timers::done', (entityId, timerId) => {
-      // console.log('timer done', entityId, timerId);
-    });
-
-    /*
-    // create a single player entity
-  
-
-   
-    */
-    game.use(new plugins.Border({ autoBorder: false }));
-
-    game.systems.border.createBorder({
-      height: 2000,
-      width: 2000,
-    });
-
-
+    game.use(new plugins.TowerWorld());
+    game.data.roundEnded = false;
+    game.data.roundStarted = true;
   });
 
 }
 
-// game.use(new plugins.Collision());
 
 //game.stop(); // stops local client
 

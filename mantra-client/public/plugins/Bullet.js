@@ -89,6 +89,7 @@ var Bullet = /*#__PURE__*/function () {
         owner: entityId,
         rotation: playerRotation,
         isSensor: true,
+        color: entity.bulletColor || 0x000000,
         velocity: {
           x: directionX * this.speed,
           y: directionY * this.speed
@@ -142,9 +143,12 @@ var Bullet = /*#__PURE__*/function () {
         // entityA is player ( for now )
         // console.log('types', entityA.type, entityB.type);
         if (!entityA || !entityB) {
-          console.log('Bullet.handleCollision no entity found. Skipping...', entityA, entityB);
+          //console.log('Bullet.handleCollision no entity found. Skipping...', entityA, entityB);
           return;
         }
+
+        // console.log('Bullet.handleCollision', entityIdA, entityIdB, entityA.owner, entityB.owner);
+
         if (entityA.type !== 'BULLET' && entityB.type !== 'BULLET') {
           // console.log('neither is a bullet. Skipping...');
           return;
@@ -175,10 +179,12 @@ var Bullet = /*#__PURE__*/function () {
           //this.game.removeEntity(entityIdB);
           return;
         }
-
-        // Check if bullets have the same owner
-        if ((entityA.type === 'BULLET' || entityB.type === 'BULLET') && entityA && entityB && entityA.owner === entityB.owner) {
-          // console.log("SAME OWNER", entityA.owner, entityB.owner)
+        if (entityA.type === 'BULLET' && entityB.id === entityA.owner) {
+          // console.log('bullet owner collision', entityIdA, entityIdB);
+          return;
+        }
+        if (entityB.type === 'BULLET' && entityA.id === entityB.owner) {
+          // console.log('bullet owner collision', entityIdA, entityIdB);
           return;
         }
 
@@ -240,18 +246,28 @@ var Bullet = /*#__PURE__*/function () {
         //
         var npcTypes = ['NPC', 'BOSS', 'SPAWNER'];
         // console.log("checking ", entityA.type, entityB.type, npcTypes)
-        if (entityA.type === 'BULLET' && npcTypes.indexOf(entityB.type) !== -1) {
+        // if (entityA.type === 'BULLET' && npcTypes.indexOf(entityB.type) !== -1) {
+        if (entityA.type === 'BULLET' && typeof entityB.health === 'number') {
           entityB.health -= entityA.damage || 10;
           // console.log('NPC health', entityB, entityB.health)
           this.game.components.health.set(entityIdB, entityB.health);
           this.game.removeEntity(entityIdA);
+          if (entityB.health <= 0) {
+            // console.log('NPC died', entityB)
+            this.game.removeEntity(entityIdB);
+          }
           return;
         }
-        if (npcTypes.indexOf(entityA.type) !== -1 && entityB.type === 'BULLET') {
+        // if (npcTypes.indexOf(entityA.type) !== -1 && entityB.type === 'BULLET') {
+        if (typeof entityA.health === 'number' && entityB.type === 'BULLET') {
           entityA.health -= entityB.damage || 10;
           // console.log('NPC health', entityA,  entityA.health)
           this.game.components.health.set(entityIdA, entityA.health);
           this.game.removeEntity(entityIdB);
+          if (entityA.health <= 0) {
+            // console.log('NPC died', entityA)
+            this.game.removeEntity(entityIdA);
+          }
           return;
         }
       }

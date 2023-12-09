@@ -13,11 +13,11 @@ const pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.749
+    "size": 50.679
   },
   "Block": {
     "path": "./plugins/block/Block.js",
-    "size": 6.791
+    "size": 6.794
   },
   "Border": {
     "path": "./plugins/border/Border.js",
@@ -25,7 +25,7 @@ const pluginsList = {
   },
   "Bullet": {
     "path": "./plugins/bullet/Bullet.js",
-    "size": 13.027
+    "size": 13.052
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 39.92
+    "size": 39.863
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.33
+    "size": 23.331
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,7 +101,7 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 83.967
+    "size": 83.943
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",

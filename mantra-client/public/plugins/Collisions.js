@@ -51,7 +51,6 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
-
       // Check for specific collision cases and send events to the state machine
       if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
         if (this.game.machine && this.game.machine.sendEvent) {
@@ -59,6 +58,17 @@ var Collisions = /*#__PURE__*/function () {
           this.game.machine.sendEvent('COLLISION', {
             entityIdA: bodyA.myEntityId,
             entityIdB: bodyB.myEntityId
+          });
+        }
+        if (this.game.rules) {
+          this.game.data.collisions = this.game.data.collisions || [];
+          // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+          this.game.data.collisions.push({
+            type: 'COLLISION',
+            entityIdA: bodyA.myEntityId,
+            entityIdB: bodyB.myEntityId,
+            bodyA: entityA,
+            bodyB: entityB
           });
         }
       }

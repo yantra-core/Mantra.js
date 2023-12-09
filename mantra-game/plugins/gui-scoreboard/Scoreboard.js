@@ -22,9 +22,11 @@ class Scoreboard {
     // scoreboard.style.cssText = "position: absolute; top: 0; left: 50%; transform: translateX(-50%); text-align: center;";
     // set height and width
 
+    /*
     let header = document.createElement('h1');
     header.textContent = "Scoreboard";
     scoreboard.appendChild(header);
+    */
 
     let list = document.createElement('ul');
     for (let player in this.scoreData) {
@@ -67,7 +69,7 @@ class Scoreboard {
     let scoreData = {};
     for (let id in players) {
       let player = players[id];
-      scoreData[player.name || player.id] = player.score || 0;
+      scoreData[player.name || 'Anon'] = player.score || 0;
     }
     this.scoreData = scoreData;
     // TODO: only draw if diff

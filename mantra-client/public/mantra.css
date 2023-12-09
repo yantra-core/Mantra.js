@@ -506,6 +506,20 @@ pre {
   position: absolute;
 }
 
+#scoreboardView {
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  z-index: 1000;
+  width: 400px;
+  height: 400px;  
+}
+
+#scoreboardView ul li  {
+  font-size: 64px;
+  list-style-type: none;
+}
+
 #entityEditor {
   top: 10%;
   left: 40%;
@@ -1408,3 +1422,4 @@ button[type="submit"]:disabled {
   margin-bottom: 10px;
   padding-left: 20px;
 }
+

@@ -29,11 +29,14 @@ var Border = /*#__PURE__*/function () {
       position = _ref$position === void 0 ? {
         x: 0,
         y: 0
-      } : _ref$position;
+      } : _ref$position,
+      _ref$thickness = _ref.thickness,
+      thickness = _ref$thickness === void 0 ? 200 : _ref$thickness;
     _classCallCheck(this, Border);
     this.id = Border.id;
     this.position = position;
     this.autoBorder = autoBorder;
+    this.thickness = thickness;
   }
   _createClass(Border, [{
     key: "init",
@@ -47,6 +50,7 @@ var Border = /*#__PURE__*/function () {
           id: 'border',
           height: this.game.height,
           width: this.game.width,
+          thickness: this.thickness,
           position: {
             x: this.position.x,
             y: this.position.y
@@ -62,7 +66,7 @@ var Border = /*#__PURE__*/function () {
     value: function createBorder(entityData) {
       var height = entityData.height;
       var width = entityData.width;
-      var WALL_THICKNESS = 200;
+      var WALL_THICKNESS = entityData.thickness || 200;
       var borders = {
         top: {
           position: {

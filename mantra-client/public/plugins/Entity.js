@@ -203,22 +203,31 @@ var _default = exports["default"] = TimersComponent;
 },{"./Component.js":1}],3:[function(require,module,exports){
 "use strict";
 
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 // Entity.js
-var Entity = /*#__PURE__*/_createClass(function Entity(id) {
-  _classCallCheck(this, Entity);
-  this.id = id;
-  this.components = {};
-});
+var Entity = /*#__PURE__*/function () {
+  function Entity(id) {
+    _classCallCheck(this, Entity);
+    this.id = id;
+    this.components = {};
+  }
+  _createClass(Entity, [{
+    key: "getTimer",
+    value: function getTimer(name) {
+      return this.timers[name];
+    }
+  }]);
+  return Entity;
+}();
 var _default = exports["default"] = Entity;
 
 },{}],4:[function(require,module,exports){
@@ -368,6 +377,10 @@ var Entity = /*#__PURE__*/function () {
       var _this = this;
       var destroyedComponentData = this.game.components.destroyed.data;
       var _loop = function _loop(entityId) {
+        if (typeof entityId === 'string') {
+          entityId = parseInt(entityId); // for now, this can be removed when we switch Component.js to use Maps
+        }
+
         var destroyedType = _this.game.components.type.get(entityId);
         if (destroyedComponentData[entityId]) {
           // Removes the body from the physics engine
@@ -384,7 +397,6 @@ var Entity = /*#__PURE__*/function () {
             _this.game.components[componentType].remove(entityId);
           }
           _this.game.entities["delete"](entityId);
-
           // remove the reference in this.game.data.ents
           delete _this.game.data.ents._[entityId];
           // find entity by id and filter it out
@@ -415,6 +427,7 @@ var Entity = /*#__PURE__*/function () {
 
       // if the state doesn't exist, return error
       if (!fullState) {
+        console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
         console.log('This should not happen, if a new state came in it should be created');
         return;
       }
@@ -435,7 +448,11 @@ var Entity = /*#__PURE__*/function () {
       // TODO: add additional component types that can be updated ( should be most of them )
       if (entityData.color) {
         this.game.components.color.set(entityId, entityData.color);
+        if (!this.game.changedEntities.has(entityId)) {}
+        this.game.changedEntities.add(entityId);
+        // console.log("SETTING COLOR", entityData.color)
       }
+
       if (entityData.height) {
         this.game.components.height.set(entityId, entityData.height);
       }
@@ -443,11 +460,21 @@ var Entity = /*#__PURE__*/function () {
         this.game.components.width.set(entityId, entityData.width);
       }
       if (entityData.position) {
-        this.game.components.position.set(entityId, {
-          x: entityData.position.x,
-          y: entityData.position.y,
-          z: entityData.position.z
-        });
+        // Remark: Tests require we update component, perhaps changed test?
+        this.game.components.position.set(entityId, entityData.position);
+        this.game.physics.setPosition(this.game.bodyMap[entityId], entityData.position);
+      }
+      if (entityData.velocity) {
+        this.game.physics.setVelocity(this.game.bodyMap[entityId], entityData.velocity);
+      }
+      if (entityData.health) {
+        this.game.components.health.set(entityId, entityData.health);
+      }
+      if (typeof entityData.thickness !== 'undefined' && entityData.thickness !== null) {
+        this.game.components.width.set(entityId, entityData.thickness);
+      }
+      if (typeof entityData.score !== 'undefined' && entityData.score !== null) {
+        this.game.components.score.set(entityId, entityData.score);
       }
       if (typeof entityData.rotation !== 'undefined') {
         this.game.components.rotation.set(entityId, entityData.rotation);
@@ -470,6 +497,11 @@ var Entity = /*#__PURE__*/function () {
           y: 0,
           z: 0
         },
+        startingPosition: {
+          x: 0,
+          y: 0,
+          z: 0
+        },
         velocity: {
           x: 0,
           y: 0,
@@ -479,6 +511,7 @@ var Entity = /*#__PURE__*/function () {
         mass: 100,
         density: 100,
         health: 100,
+        score: 0,
         height: 100,
         width: 100,
         depth: 10,
@@ -508,10 +541,18 @@ var Entity = /*#__PURE__*/function () {
       config = _objectSpread(_objectSpread({}, defaultConfig), config);
       entityId = config.id;
       var entity = new _Entity["default"](entityId);
+
+      /*
+      entity.getTimer = (timerId) => {
+        return this.game.components.timers.get(entityId, timerId);
+      };
+      */
+
       var _config = config,
         name = _config.name,
         type = _config.type,
         position = _config.position,
+        startingPosition = _config.startingPosition,
         mass = _config.mass,
         density = _config.density,
         velocity = _config.velocity,
@@ -526,6 +567,7 @@ var Entity = /*#__PURE__*/function () {
         color = _config.color,
         maxSpeed = _config.maxSpeed,
         health = _config.health,
+        score = _config.score,
         owner = _config.owner,
         lifetime = _config.lifetime;
       var x = position.x,
@@ -544,11 +586,13 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'type', type || 'PLAYER');
       this.game.addComponent(entityId, 'name', name || null);
       this.game.addComponent(entityId, 'position', position);
+      this.game.addComponent(entityId, 'startingPosition', startingPosition);
       this.game.addComponent(entityId, 'velocity', velocity);
       this.game.addComponent(entityId, 'rotation', config.rotation);
       this.game.addComponent(entityId, 'mass', mass);
       this.game.addComponent(entityId, 'density', density);
       this.game.addComponent(entityId, 'health', health);
+      this.game.addComponent(entityId, 'score', score);
       this.game.addComponent(entityId, 'width', width);
       this.game.addComponent(entityId, 'height', height);
       this.game.addComponent(entityId, 'depth', depth);

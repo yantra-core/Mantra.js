@@ -164,9 +164,9 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.phaserGame = new Phaser.Game({
         type: Phaser.AUTO,
         parent: 'gameHolder',
-        width: game.width,
+        width: 1600,
         // TODO: config  
-        height: game.height,
+        height: 800,
         scene: [_Main]
       });
       var self = this;

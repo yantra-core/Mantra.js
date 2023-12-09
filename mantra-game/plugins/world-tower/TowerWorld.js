@@ -4,8 +4,30 @@ class TowerWorld {
     this.id = TowerWorld.id;
   }
 
+  sutras = {
+    'round': {
+      description: 'Round Logic. Adds conditions and actions related to the round.'
+    },
+    'spawner': {
+      description: 'Spawner Logic. Adds conditions and actions related to the spawner.'
+    },
+    'player': {
+      description: 'Player Logic. Adds conditions and actions related to the player.'
+    },
+    'collision': {
+      description: 'Collision Logic. Adds conditions and actions related to collisions.'
+    },
+    'colorChanges': {
+      description: 'Color Changes Logic. Adds conditions and actions related to color changes.'
+    }
+  }
+
   init(game) {
     this.game = game;
+
+    for (let key in this.sutras) {
+      this.sutras[key] = this[key]();
+    }
 
     // base unit spawner
     let unitSpawner = {
@@ -59,22 +81,22 @@ class TowerWorld {
     });
 
     // Create Sutras
-    let roundSutra = this.createRoundSutra();
-    let spawnerSutra = this.createSpawnerSutra();
-    let playerSutra = this.createPlayerSutra();
-    let collisionSutra = this.createCollisionSutra();
-    let colorChangesSutra = this.createChangesColorWithDamageSutra();
+    let roundSutra = this.sutras['round'];
+    let spawnerSutra = this.sutras['spawner'];
+    let playerSutra = this.sutras['player'];
+    let collisionSutra = this.sutras['collision'];
+    let colorChangesSutra = this.sutras['colorChanges'];
 
     // Main rules Sutra
     let rules = game.createSutra();
     rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
     rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
 
-    //rules.use(roundSutra, 'roundLogic');
-    rules.use(spawnerSutra, 'spawnerLogic');
-    rules.use(playerSutra, 'playerLogic');
-    rules.use(collisionSutra, 'collisionLogic');
-    rules.use(colorChangesSutra, 'colorChangesLogic');
+    //rules.use(roundSutra, 'round');
+    rules.use(spawnerSutra, 'spawner');
+    rules.use(playerSutra, 'player');
+    rules.use(collisionSutra, 'collision');
+    rules.use(colorChangesSutra, 'colorChanges');
 
     rules.on('entity::updateEntity', function (data, node) {
       // console.log('entity::updateEntity', data);
@@ -103,12 +125,12 @@ class TowerWorld {
 
     rules.addAction({
       if: 'changesColorWithDamage',
-      subtree: 'colorChangesLogic'
+      subtree: 'colorChanges'
     })
 
     rules.addAction({
       if: 'timerCompleted',
-      subtree: 'spawnerLogic'
+      subtree: 'spawner'
     });
 
     game.setSutra(rules);
@@ -129,9 +151,8 @@ class TowerWorld {
 
   destroy() { }
 
-
-  createChangesColorWithDamageSutra() {
-
+  colorChanges() {
+    let game = this.game;
     let colorChanges = this.game.createSutra();
 
 
@@ -153,15 +174,6 @@ class TowerWorld {
       });
     });
 
-    /*
-    healthLevels.map(function(level, index) {
-      colorChanges.addAction({
-        if: `isHealthBelow${level}`,
-        then: [{ action: 'entity::updateEntity', data: { color: colors[index] } }]
-      })
-    });*/
-
-
     // Action for the boss based on health levels
     colorChanges.addAction({
       if: 'changesColorWithDamage',
@@ -180,7 +192,8 @@ class TowerWorld {
 
   }
 
-  createRoundSutra() {
+  round() {
+    let game = this.game;
     let round = this.game.createSutra();
 
     // Condition to check if a round has started
@@ -202,7 +215,8 @@ class TowerWorld {
     return round;
   }
 
-  createSpawnerSutra() {
+  spawner() {
+    let game = this.game;
     let spawner = this.game.createSutra();
     spawner.addCondition('isSpawner', function (entity, gameState) {
       return entity.type === 'UnitSpawner';
@@ -295,13 +309,13 @@ class TowerWorld {
     return spawner;
   }
 
-  createPlayerSutra() {
+  player() {
     let player = this.game.createSutra();
     // ... Define conditions and actions related to the player ...
     return player;
   }
 
-  createCollisionSutra() {
+  collision() {
     let collision = this.game.createSutra();
     // ... Define conditions and actions related to collisions ...
     return collision;
@@ -309,12 +323,12 @@ class TowerWorld {
 
   createAdditionalRules(rules) {
 
-
+    let game = this.game;
     // Action to move all blocks when timerCompleted
     /*
     rules.addAction({
       if: ['roundStarted'],
-      subtree: 'roundLogic'
+      subtree: 'round'
     });
     */
 

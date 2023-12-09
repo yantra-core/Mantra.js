@@ -755,6 +755,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         shape: 'triangle',
         width: 200,
         height: 200,
+        color: 0x00ff00,
         position: {
           x: 0,
           y: 0

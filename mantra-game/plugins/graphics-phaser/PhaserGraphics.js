@@ -76,8 +76,8 @@ class PhaserGraphics extends GraphicsInterface {
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'gameHolder',
-      width: game.width, // TODO: config  
-      height: game.height,
+      width: 1600, // TODO: config  
+      height: 800,
       scene: [_Main]
     });
 

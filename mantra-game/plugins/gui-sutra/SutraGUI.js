@@ -87,6 +87,7 @@ class SutraGUI {
     // let rules = testRules(game);
 
     // gui.setTheme('light');
+    /*
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
       let humanReadablePath = rules.getReadableSutraPath(sutraPath);
@@ -105,6 +106,7 @@ class SutraGUI {
         });
       });
     });
+    */
 
     let json = rules.serializeToJson();
     this.drawTable();

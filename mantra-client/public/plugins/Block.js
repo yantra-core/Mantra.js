@@ -29,6 +29,22 @@ var Block = /*#__PURE__*/function () {
     this.height = height; // Default size if none provided
     this.MIN_BLOCK_SIZE = MIN_BLOCK_SIZE;
     this.splits = 0;
+    this.rgbColorsInts = [0x0000ff,
+    // Blue
+    // 0x00ff00,  // Green
+    // 0xff0000,  // Red
+    0xffff00,
+    // Yellow
+    0x00ffff,
+    // Cyan (a shade of Blue-Green, not in ROYGBIV)
+    0xff00ff,
+    // Magenta (a shade of Red-Violet, not in ROYGBIV)
+    0xffa500,
+    // Orange
+    0x4b0082,
+    // Indigo
+    0x8a2be2 // Violet
+    ];
   }
   _createClass(Block, [{
     key: "init",
@@ -66,6 +82,8 @@ var Block = /*#__PURE__*/function () {
         if (entityA.destroyed || entityB.destroyed) {
           return;
         }
+
+        // console.log("Block.handleCollision", entityIdA, entityIdB, entityA, entityB)
         this.game.removeEntity(entityIdB);
         if (entityA.width * entityA.height <= this.MIN_BLOCK_SIZE || entityA.splits >= Block.MAX_SPLITS) {
           this.game.removeEntity(entityIdA);
@@ -74,7 +92,10 @@ var Block = /*#__PURE__*/function () {
         var newWidth = entityA.width / 2;
         var newHeight = entityA.height / 2;
         var newSplits = entityA.splits + 1;
+
+        // TODO: could we move this into a sutra rule instead?
         for (var i = 0; i < 4; i++) {
+          var newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];
           var xOffset = i % 2 * newWidth;
           var yOffset = Math.floor(i / 2) * newHeight;
           this.game.createEntity({
@@ -88,6 +109,8 @@ var Block = /*#__PURE__*/function () {
               // Adjusted for less extreme velocities
               y: (Math.random() * 2 - 1) * 10
             },
+            // inherit color from parent
+            color: newColor,
             width: newWidth,
             height: newHeight,
             splits: newSplits

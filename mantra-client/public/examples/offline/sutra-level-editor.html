@@ -13,8 +13,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
       let game = new MANTRA.Game({
-        width: 2000,
-        height: 2000,
+        height: 600 * 10,
+        width: 800 * 10,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
@@ -28,13 +28,14 @@
 
       // Adds projectile Bullets to the game
       // test chanining
-      game.use('Bullet').use('Block');
+      game.use('Bullet')
 
       game.use('CurrentFPS');
 
       game.use('Timers');
       game.use('Health');
-      game.use('SutraGUI');
+      game.use('Sutra');
+
 
       // game.use(new Plugins.SutraGUI({ }));
       game.use('Editor', {
@@ -44,39 +45,15 @@
 
       // start the game loop
       game.start(function () {
+        game.use('Block', { MIN_BLOCK_SIZE: 1000 });
+        game.use('Border', { autoBorder: true, thickness: 200 });
 
         // Adds a nice StarField background
         game.use('StarField');
+        game.use('TowerWorld', { game: game });
 
-        game.createEntity({
-          type: 'BOSS',
-          health: 500,
-          width: 230,
-          height: 320,
-          depth: 200,
-          position: {
-            x: 0,
-            y: -400
-          },
-        });
-
-        let ent = game.createEntity({
-          type: 'SPAWNER',
-          health: 100,
-          width: 200,
-          height: 200,
-          depth: 200,
-          position: {
-            x: -800,
-            y: -800
-          }
-        });
-
-        ent.timers.setTimer('test-timer', 1, true);
-
-        game.on('timer::done', (entityId, timerId) => {
-          // console.log('timer done', entityId, timerId);
-        });
+        game.data.roundEnded = false;
+        game.data.roundStarted = true;
 
 
       });
