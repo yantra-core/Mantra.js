@@ -506,6 +506,19 @@ pre {
   position: absolute;
 }
 
+#midiView {
+  top: 30%;
+  left: 30%;
+  z-index: 1000;
+  width: 550px;
+  min-width: 460px;
+  min-height: 200px;
+  height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
 #scoreboardView {
   position: absolute;
   top: 100px;

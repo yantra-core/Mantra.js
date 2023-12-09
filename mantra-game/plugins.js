@@ -36,6 +36,10 @@ import Mouse from './plugins/mouse/Mouse.js';
 import Keyboard from './plugins/keyboard/Keyboard.js';
 import Gamepad from './plugins/gamepad/Gamepad.js';
 
+// Multimedia Devices
+import Midi from './plugins/midi/Midi.js';
+import MidiGUI from './plugins/gui-midi/MidiGUI.js';
+
 // Entity Component Systems
 import Health from './plugins/health/Health.js';
 import Lifetime from './plugins/lifetime/Lifetime.js';
@@ -106,6 +110,8 @@ const plugins = {
   Keyboard,
   Lifetime,
   Timers,
+  Midi,
+  MidiGUI,
   Inspector,
   ControlsGUI,
   PluginExplorer,
