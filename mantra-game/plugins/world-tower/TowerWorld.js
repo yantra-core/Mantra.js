@@ -20,6 +20,19 @@ class TowerWorld {
       color: 0x00ff00
     };
 
+    function createBorders(N) {
+      for (let i = 0; i < N; i++) {
+        const scaleFactor = 0.2 * (i + 1);
+        game.systems.border.createBorder({
+          height: (game.height * scaleFactor) + game.height,
+          width: (game.width * scaleFactor) + game.width,
+          // depth: 100,
+        });
+      }
+    }
+
+    createBorders(1);
+
     // create 8 unit spawners at the top of the map border, left to right, evenly spaced
     let spawners = [];
 
@@ -45,206 +58,335 @@ class TowerWorld {
       ent.timers.setTimer('test-timer', 2, true);
     });
 
+    // Create Sutras
+    let roundSutra = this.createRoundSutra();
+    let spawnerSutra = this.createSpawnerSutra();
+    let playerSutra = this.createPlayerSutra();
+    let collisionSutra = this.createCollisionSutra();
+    let colorChangesSutra = this.createChangesColorWithDamageSutra();
+
+    // Main rules Sutra
     let rules = game.createSutra();
+    rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
+    rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
+
+    //rules.use(roundSutra, 'roundLogic');
+    rules.use(spawnerSutra, 'spawnerLogic');
+    rules.use(playerSutra, 'playerLogic');
+    rules.use(collisionSutra, 'collisionLogic');
+    rules.use(colorChangesSutra, 'colorChangesLogic');
+
+    rules.on('entity::updateEntity', function (data, node) {
+      // console.log('entity::updateEntity', data);
+      game.updateEntity(data);
+    });
+
+    rules.addCondition('timerCompleted', entity => {
+      let timerDone = false;
+      // TODO: remove this, should iterate and know timer names
+      if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
+        timerDone = true;
+        // set time done to false on origin timer
+        entity.timers.timers['test-timer'].done = false;
+      }
+      if (timerDone) {
+        console.log('timerDone', timerDone)
+      }
+      return timerDone;
+    });
+
+    // Additional rules
+    this.createAdditionalRules(rules);
+
+    // Event handlers
+    this.setupEventHandlers(rules);
+
+    rules.addAction({
+      if: 'changesColorWithDamage',
+      subtree: 'colorChangesLogic'
+    })
+
+    rules.addAction({
+      if: 'timerCompleted',
+      subtree: 'spawnerLogic'
+    });
+
     game.setSutra(rules);
+    game.data.roundStarted = true;
 
-    function createConditions() {
+    game.on('timer::done', (entity, timerName, timer) => {
+      // console.log('timer done', entity, timerName, timer);
+    });
 
-      // Custom function for 'isBoss' condition
-      rules.addCondition('isSpawner', (entity) => entity.type === 'UnitSpawner');
-      rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
-      rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
+    return rules;
 
-      // TODO: replace code with entity.getTimer('test-timer').done
-      // will that even work this is a copy of the entity right?
-      // should it be a reference to the entity?
-      rules.addCondition('timerCompleted', entity => {
-        // check if entities has timers and timer with name 'test-timer' is completed
-        let timerDone = false;
-        // throw new Error('fudge');
-        // console.log('entity.timers', entity)
-        // TODO: remove this, should iterate and know timer names
-        if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
-          timerDone = true;
-          // set time done to false on origin timer
-          entity.timers.timers['test-timer'].done = false;
-        }
-        return timerDone;
-        //return entity.timerDone;
+  }
+
+  update() {
+  }
+
+  render() { }
+
+  destroy() { }
+
+
+  createChangesColorWithDamageSutra() {
+
+    let colorChanges = this.game.createSutra();
+
+
+    colorChanges.addCondition('changesColorWithDamage', {
+      op: 'or',
+      conditions: ['isSpawner', 'isPlayer', 'isBorder']
+    });
+
+    // Define health level conditions for the boss
+    const healthLevels = [100, 80, 60, 40, 20];
+    const colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red
+
+    // Adding health level conditions
+    healthLevels.forEach((level, index) => {
+      colorChanges.addCondition(`isHealthBelow${level}`, {
+        op: 'lessThan',
+        property: 'health',
+        value: level
       });
+    });
 
-
-      rules.addCondition('allEnemiesCleared', function (entity, gameState) {
-        let length = gameState.ents.UnitSpawner.length;
-        return length <= 7;
-        // TODO: return length === 0;
+    /*
+    healthLevels.map(function(level, index) {
+      colorChanges.addAction({
+        if: `isHealthBelow${level}`,
+        then: [{ action: 'entity::updateEntity', data: { color: colors[index] } }]
       })
+    });*/
 
-      rules.addCondition('blockHitWall', function (entity, data) {
-        if (entity.type === 'COLLISION') {
-          if (entity.bodyA.type === 'BORDER' || entity.bodyB.type === 'BORDER') {
-            // console.log('blockHitWall', entity, data)
-            if (entity.bodyA.type === 'BLOCK' || entity.bodyB.type === 'BLOCK') {
-              return true;
-            }
+
+    // Action for the boss based on health levels
+    colorChanges.addAction({
+      if: 'changesColorWithDamage',
+      then: healthLevels.map((level, index) => ({
+        if: `isHealthBelow${level}`,
+        then: [{ action: 'entity::updateEntity', data: { color: colors[index] } }]
+      }))
+    });
+
+    colorChanges.on('entity::updateEntity', function (data, node) {
+      // console.log('entity::updateEntity', data);
+      game.updateEntity(data);
+    });
+
+    return colorChanges;
+
+  }
+
+  createRoundSutra() {
+    let round = this.game.createSutra();
+
+    // Condition to check if a round has started
+    round.addCondition('roundStarted', (entity, gameState) => {
+      return gameState.roundStarted === true;
+    });
+
+    // Condition to check if a round has ended
+    round.addCondition('roundEnded', (entity, gameState) => {
+      return gameState.roundEnded === true;
+    });
+
+    // Composite condition to check if a round is currently running
+    round.addCondition('roundRunning', {
+      op: 'not',
+      conditions: ['roundEnded']
+    });
+
+    return round;
+  }
+
+  createSpawnerSutra() {
+    let spawner = this.game.createSutra();
+    spawner.addCondition('isSpawner', function (entity, gameState) {
+      return entity.type === 'UnitSpawner';
+    });
+
+    // Assuming the entity initially moves to the right
+    spawner.addCondition('moveLeft', (entity, gameState) => entity.position.x >= entity.startingPosition.x);
+    spawner.addCondition('moveRight', (entity, gameState) => entity.position.x < entity.startingPosition.x - 400);
+
+    // Action to move all blocks when timerCompleted
+    spawner.addAction({
+      if: ['isSpawner'],
+      then: [{
+        action: 'spawnBlock',
+        data: {
+          x: 0,
+          y: 100
+        }
+
+      }]
+    });
+
+    //
+    // Spawner Movement
+    //
+    spawner.addAction({
+      if: ['isSpawner', 'moveLeft'],
+      then: [{
+        action: 'entity::updateEntity',
+        data: {
+          velocity: {
+            x: -10,
+            y: 30
           }
         }
-      });
+      }]
+    });
 
-      rules.addCondition('blockHitPlayer', function (entity, data) {
-        if (entity.type === 'COLLISION') {
-          if (entity.bodyA.type === 'PLAYER' || entity.bodyB.type === 'PLAYER') {
-            // console.log('blockHitPlayer', entity, data)
-            if (entity.bodyA.type === 'BLOCK' || entity.bodyB.type === 'BLOCK') {
-              return true;
-            }
+    spawner.addAction({
+      if: ['isSpawner', 'moveRight'],
+      then: [{
+        action: 'entity::updateEntity',
+        data: {
+          velocity: {
+            x: 10,
+            y: 30
           }
         }
-      });
+      }]
+    });
 
-      // Assuming the entity initially moves to the right
-      rules.addCondition('moveLeft', (entity, gameState) => entity.position.x >= entity.startingPosition.x);
-      rules.addCondition('moveRight', (entity, gameState) => entity.position.x < entity.startingPosition.x - 400);
-
-      rules.addCondition('spawnUnitTouchedHomebase', (entity, gameState) => {
-        if (entity.type === 'COLLISION') {
-          // console.log('spawnUnitTouchedHomebase', entity)
-          if (entity.bodyA.type === 'UnitSpawner' && entity.bodyB.type === 'BORDER') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
-            return true;
-          }
-          if (entity.bodyB.type === 'UnitSpawner' && entity.bodyA.type === 'BORDER') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
-            return true;
-          }
-        }
-      });
-
-    };
-
-    function createActions() {
-
-      // Action to move all blocks when timerCompleted
-      rules.addAction({
-        if: ['timerCompleted', 'isSpawner'],
-        then: [{
-          action: 'spawnBlock',
-          data: {
-            x: 0,
-            y: 100
-          }
-
-        }]
-      });
-
-      // Define health level conditions for the boss
-      const healthLevels = [100, 80, 60, 40, 20];
-      const colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red
-
-      // Adding health level conditions
-      healthLevels.forEach((level, index) => {
-        rules.addCondition(`isHealthBelow${level}`, {
-          op: 'lessThan',
-          property: 'health',
-          value: level
-        });
-      });
-
-      // Action for the boss based on health levels
-      rules.addAction({
-        if: 'isSpawner',
-        then: healthLevels.map((level, index) => ({
-          if: `isHealthBelow${level}`,
-          then: [{ action: 'entity::updateEntity', data: { color: colors[index] } }]
-        }))
-      });
-
-      rules.addAction({
-        if: 'isPlayer',
-        then: healthLevels.map((level, index) => ({
-          if: `isHealthBelow${level}`,
-          then: [{ action: 'entity::updateEntity', data: { color: colors[index] } }]
-        }))
-      });
-
-      rules.addAction({
-        if: 'isBorder',
-        then: healthLevels.map((level, index) => ({
-          if: `isHealthBelow${level}`,
-          then: [{ action: 'entity::updateEntity', data: { color: colors[index] } }]
-        }))
-      });
-
-      //
-      // Spawner Movement
-      //
-      rules.addAction({
-        if: ['isSpawner', 'moveLeft'],
-        then: [{
-          action: 'entity::updateEntity',
-          data: {
-            velocity: {
-              x: -10,
-              y: 3
-            }
-          }
-        }]
-      });
-
-      rules.addAction({
-        if: ['isSpawner', 'moveRight'],
-        then: [{
-          action: 'entity::updateEntity',
-          data: {
-            velocity: {
-              x: 10,
-              y: 3
-            }
-          }
-        }]
-      });
-
-      //
-      // End Spawner Movement 
-      //
-
-      rules.addAction({
-        if: ['spawnUnitTouchedHomebase'],
-        then: [{
-          action: 'entity::removeEntity'
+    spawner.on('spawnBlock', (entity, data) => {
+      // console.log('spawnBlock', entity, data)
+      let ent = game.createEntity({
+        type: 'BLOCK',
+        position: {
+          x: entity.position.x,
+          y: entity.position.y + 300
         },
-        {
-          action: 'resetSpawnerUnit'
-        }]
+        velocity: {
+          x: 0,
+          y: 100
+        },
+        width: 100,
+        height: 100,
+        color: 0xff0000
       });
+    });
+
+    spawner.on('entity::updateEntity', function (data, node) {
+      // console.log('entity::updateEntity', data);
+      game.updateEntity(data);
+    });
+
+    spawner.addCondition('spawnUnitTouchedHomebase', (entity, gameState) => {
+      if (entity.type === 'COLLISION') {
+        // console.log('spawnUnitTouchedHomebase', entity)
+        if (entity.bodyA.type === 'UnitSpawner' && entity.bodyB.type === 'BORDER') {
+          // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          return true;
+        }
+        if (entity.bodyB.type === 'UnitSpawner' && entity.bodyA.type === 'BORDER') {
+          // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          return true;
+        }
+      }
+    });
+
+    // ... Define conditions and actions related to the spawner ...
+    return spawner;
+  }
+
+  createPlayerSutra() {
+    let player = this.game.createSutra();
+    // ... Define conditions and actions related to the player ...
+    return player;
+  }
+
+  createCollisionSutra() {
+    let collision = this.game.createSutra();
+    // ... Define conditions and actions related to collisions ...
+    return collision;
+  }
+
+  createAdditionalRules(rules) {
 
 
-      //
-      // Player / Block Collisions
-      //
-      rules.addAction({
-        if: ['blockHitPlayer'],
-        then: [{
-          action: 'blockHitPlayer'
-        }]
-      });
-
-      rules.addAction({
-        if: ['blockHitWall'],
-        then: [{
-          action: 'blockHitWall'
-        }]
-      })
-
-    };
-
-    /* Remark: Potential short-hand for single action mapping
-    rules.mapAction('blockHitPlayer');
-    rules.on('blockHitPlayer', function (data, node) {});
+    // Action to move all blocks when timerCompleted
+    /*
+    rules.addAction({
+      if: ['roundStarted'],
+      subtree: 'roundLogic'
+    });
     */
 
-    createConditions();
-    createActions();
+    rules.addAction({
+      if: ['spawnUnitTouchedHomebase'],
+      then: [{
+        action: 'entity::removeEntity'
+      },
+      {
+        action: 'resetSpawnerUnit'
+      }]
+    });
+
+    rules.on('resetSpawnerUnit', function (data, node) {
+      console.log('resetSpawnerUnit data', data);
+      console.log('resetSpawnerUnit node', node);
+
+      let previous;
+
+      if (data.bodyA.type === 'UnitSpawner') {
+        previous = data.bodyA;
+      } else {
+        previous = data.bodyB;
+      }
+
+      let newSpawner = {
+        type: 'UnitSpawner',
+        health: 100,
+        position: previous.startingPosition,
+        width: 100,
+        height: 100,
+        color: 0x00ff00,
+      };
+
+      newSpawner.startingPosition = previous.startingPosition;
+
+      let ent = game.createEntity(newSpawner);
+      ent.timers.setTimer('test-timer', 0.5, true);
+
+      console.log("ent UnitSpawner", ent)
+
+    });
+
+    rules.on('entity::removeEntity', function (event, data, node) {
+      // console.log('entity::removeEntity', event.bodyA, event.bodyB);
+      if (event.bodyA.type === 'BORDER') {
+        game.removeEntity(event.bodyB.id);
+        // set the color of bodyB to red
+      }
+      if (event.bodyB.type === 'BORDER') {
+        game.removeEntity(event.bodyA.id);
+      }
+    });
+
+
+    rules.addCondition('blockHitWall', function (entity, data) {
+      if (entity.type === 'COLLISION') {
+        if (entity.bodyA.type === 'BORDER' || entity.bodyB.type === 'BORDER') {
+          // console.log('blockHitWall', entity, data)
+          if (entity.bodyA.type === 'BLOCK' || entity.bodyB.type === 'BLOCK') {
+            return true;
+          }
+        }
+      }
+    });
+
+    rules.addAction({
+      if: ['blockHitWall'],
+      then: [{
+        action: 'blockHitWall'
+      }]
+    })
 
     rules.on('blockHitWall', function (event, data, node) {
 
@@ -272,7 +414,7 @@ class TowerWorld {
         return;
       }
       // remove existing border
-      
+
       game.updateEntity({
         id: border.id,
         type: 'BORDER',
@@ -280,6 +422,28 @@ class TowerWorld {
         // color: 0xff0000
       });
 
+    });
+
+    //
+    // Player / Block Collisions
+    //
+    rules.addAction({
+      if: ['blockHitPlayer'],
+      then: [{
+        action: 'blockHitPlayer'
+      }]
+    });
+
+
+    rules.addCondition('blockHitPlayer', function (entity, data) {
+      if (entity.type === 'COLLISION') {
+        if (entity.bodyA.type === 'PLAYER' || entity.bodyB.type === 'PLAYER') {
+          // console.log('blockHitPlayer', entity, data)
+          if (entity.bodyA.type === 'BLOCK' || entity.bodyB.type === 'BLOCK') {
+            return true;
+          }
+        }
+      }
     });
 
     rules.on('blockHitPlayer', function (data, node) {
@@ -329,7 +493,7 @@ class TowerWorld {
         });
       } else {
         // TODO: remove this
-        console.log('updating with new score', player.score)
+        // console.log('updating with new score', player.score)
         game.updateEntity({
           id: player.id,
           health: player.health,
@@ -338,114 +502,98 @@ class TowerWorld {
       }
     });
 
-    rules.on('entity::removeEntity', function (event, data, node) {
-      // console.log('entity::removeEntity', event.bodyA, event.bodyB);
-      if (event.bodyA.type === 'BORDER') {
-        game.removeEntity(event.bodyB.id);
-        // set the color of bodyB to red
-      }
-      if (event.bodyB.type === 'BORDER') {
-        game.removeEntity(event.bodyA.id);
-      }
-    });
-
-    rules.on('entity::updateEntity', function (data, node) {
-      // console.log('entity::updateEntity', data);
-      game.updateEntity(data);
-    });
-
-    rules.addAction({
-      if: ['allEnemiesCleared'],
-      then: [{
-        action: 'roundOver'
-      }]
-    })
-
-    rules.on('roundOver', function () {
-      // console.log('roundOver!!!')
-    });
-
-    rules.on("entity::createEntity", function (data, node) {
-      console.log('entity::createEntity', data);
-      console.log('ent', ent)
-    });
-
-    rules.on('resetSpawnerUnit', function (data, node) {
-      console.log('resetSpawnerUnit data', data);
-      console.log('resetSpawnerUnit node', node);
-
-      let previous;
-
-      if (data.bodyA.type === 'UnitSpawner') {
-        previous = data.bodyA;
-      } else {
-        previous = data.bodyB;
-      }
-
-      let newSpawner = {
-        type: 'UnitSpawner',
-        health: 100,
-        position: previous.startingPosition,
-        width: 100,
-        height: 100,
-        color: 0x00ff00,
-      };
-
-      newSpawner.startingPosition = previous.startingPosition;
-
-      let ent = game.createEntity(newSpawner);
-      ent.timers.setTimer('test-timer', 0.5, true);
-
-      console.log("ent UnitSpawner", ent)
-
-    });
-
-    rules.on('spawnBlock', (entity, data) => {
-      // console.log('spawnBlock', entity, data)
-      let ent = game.createEntity({
-        type: 'BLOCK',
-        position: {
-          x: entity.position.x,
-          y: entity.position.y + 300
-        },
-        velocity: {
-          x: 0,
-          y: 100
-        },
-        width: 100,
-        height: 100,
-        color: 0xff0000
-      });
-    });
-
-
-    game.on('timer::done', (entity, timerName, timer) => {
-      //       console.log('timer done', entity, timerName, timer);
-    });
-
-
-    // create a rule to spawn a unit every 2 seconds
-
-    /*
-    console.log('ggg', game.systems)
-    game.systems['gui-sutra'].setRules(rules)
-    console.log('rrrr', rules)
-    */
-
-    return rules;
-
-
-
-
   }
 
-  update() {
+  setupEventHandlers(rules) {
+    // ... Define event handlers ...
   }
 
-  render() { }
 
-  destroy() { }
 
 }
 
 export default TowerWorld;
+
+
+/*
+
+  // TODO: round end / reset round / round start
+  // Custom function for 'isBoss' condition
+
+
+  rules.addCondition('scoreIsAbove10', {
+    op: 'greaterThan',
+    property: 'score',
+    value: 10
+  });
+
+  rules.addAction({
+    if: ['scoreIsAbove10'],
+    then: [{
+      action: 'upgradeWeapon'
+    }]
+  });
+
+  rules.on('upgradeWeapon', function (data, node) {
+    console.log('upgradeWeapon', data, node)
+    game.updateEntity({
+      id: data.id,
+      type: 'PLAYER',
+      bulletColor: 0x00ff00
+    });
+  });
+
+
+
+  rules.addCondition('allWallsFallen', function (entity, gameState) {
+    // check see if any of UnitSpawners have been made it past the world height + 1000
+    let height = gameState.height;
+    let unitSpawners = gameState.ents.UnitSpawner;
+    let allWallsFallen = false;
+    unitSpawners.forEach(spawner => {
+      if (spawner.position.y > 3000) {
+        allWallsFallen = true;
+      }
+    }
+    );
+    return allWallsFallen;
+  });
+
+  rules.addAction({
+    if: ['allWallsFallen'],
+    then: [{
+      action: 'roundLost'
+    }]
+  })
+
+  rules.addCondition('allEnemiesCleared', function (entity, gameState) {
+    let length = gameState.ents.UnitSpawner.length;
+    return length <= 7;
+    // TODO: return length === 0;
+  })
+
+
+
+
+
+  rules.addAction({
+    if: ['allEnemiesCleared'],
+    then: [{
+      action: 'roundOver'
+    }]
+  })
+
+  rules.on('roundOver', function () {
+    // console.log('roundOver!!!')
+  });
+
+  rules.on('roundLost', function (data, node, gameState) {
+    // console.log('roundLost!!!');
+    // stop the game
+    game.data.roundStarted = false;
+    game.data.roundEnded = true;
+  });
+
+
+*/
+

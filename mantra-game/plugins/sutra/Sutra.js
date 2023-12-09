@@ -25,17 +25,15 @@ class Sutra {
         game.rules.tick(entity, game.data);
       }
 
-      /*
       if (game.data && game.data.timers) {
         if (game.data.timers.length) {
-          console.log('game.data.timers', game.data.timers)
+          // console.log('game.data.timers', game.data.timers)
         }
          game.data.timers.forEach((timer) => {
           game.rules.tick(timer, game.data);
         });
         game.data.timers = [];
       }
-      */
 
       if (game.data && game.data.collisions) {
         if (game.data.collisions.length > 0 ) {
