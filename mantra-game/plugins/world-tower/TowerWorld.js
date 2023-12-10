@@ -22,15 +22,8 @@ class TowerWorld {
     }
   }
 
-  init(game) {
-    this.game = game;
-
-    for (let key in this.sutras) {
-      this.sutras[key] = this[key]();
-    }
-
-    // base unit spawner
-    let unitSpawner = {
+  entities = {
+    'UnitSpawner': {
       type: 'UnitSpawner',
       health: 100,
       position: {
@@ -40,30 +33,25 @@ class TowerWorld {
       width: 100,
       height: 100,
       color: 0x00ff00
-    };
+    }
+  }
 
-    function createBorders(N) {
-      for (let i = 0; i < N; i++) {
-        const scaleFactor = 0.2 * (i + 1);
-        game.systems.border.createBorder({
-          height: (game.height * scaleFactor) + game.height,
-          width: (game.width * scaleFactor) + game.width,
-          // depth: 100,
-        });
-      }
+  init(game) {
+    this.game = game;
+
+    for (let key in this.sutras) {
+      this.sutras[key] = this[key]();
     }
 
-    createBorders(1);
+    this.createBorders(2);
 
     // create 8 unit spawners at the top of the map border, left to right, evenly spaced
     let spawners = [];
 
     for (let i = 0; i < 8; i++) {
       // create fresh clone of unitSpawner
-      let spawner = JSON.parse(JSON.stringify(unitSpawner));
-
+      let spawner = JSON.parse(JSON.stringify(this.entities.UnitSpawner));
       let smallerWidth = game.width * 0.8;
-
       spawner.position.x = -smallerWidth / 2 + (smallerWidth / 8) * i;
       spawner.position.y = (-game.height / 2) + 100;
       spawner.startingPosition = {
@@ -91,18 +79,6 @@ class TowerWorld {
     let rules = game.createSutra();
     rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
     rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
-
-    //rules.use(roundSutra, 'round');
-    rules.use(spawnerSutra, 'spawner');
-    rules.use(playerSutra, 'player');
-    rules.use(collisionSutra, 'collision');
-    rules.use(colorChangesSutra, 'colorChanges');
-
-    rules.on('entity::updateEntity', function (data, node) {
-      // console.log('entity::updateEntity', data);
-      game.updateEntity(data);
-    });
-
     rules.addCondition('timerCompleted', entity => {
       let timerDone = false;
       // TODO: remove this, should iterate and know timer names
@@ -117,6 +93,17 @@ class TowerWorld {
       return timerDone;
     });
 
+    rules.on('entity::updateEntity', function (data, node) {
+      // console.log('entity::updateEntity', data);
+      game.updateEntity(data);
+    });
+
+    rules.use(roundSutra, 'round');
+    rules.use(spawnerSutra, 'spawner');
+    rules.use(playerSutra, 'player');
+    rules.use(collisionSutra, 'collision');
+    rules.use(colorChangesSutra, 'colorChanges');
+
     // Additional rules
     this.createAdditionalRules(rules);
 
@@ -124,13 +111,14 @@ class TowerWorld {
     this.setupEventHandlers(rules);
 
     rules.addAction({
-      if: 'changesColorWithDamage',
-      subtree: 'colorChanges'
+      if: ['roundStarted', 'timerCompleted'],
+      subtree: 'spawner' // TODO: needs to store subtrees as flat index same as conditions
+      // if not that, separate sugar fluent api , prob not
     })
 
     rules.addAction({
-      if: 'timerCompleted',
-      subtree: 'spawner'
+      if: 'changesColorWithDamage',
+      subtree: 'colorChanges'
     });
 
     game.setSutra(rules);
@@ -138,6 +126,7 @@ class TowerWorld {
 
     game.on('timer::done', (entity, timerName, timer) => {
       // console.log('timer done', entity, timerName, timer);
+      console.log(game.data)
     });
 
     return rules;
@@ -151,10 +140,21 @@ class TowerWorld {
 
   destroy() { }
 
+  // base unit spawner
+  createBorders(N) {
+    for (let i = 0; i < N; i++) {
+      const scaleFactor = 0.2 * (i + 1);
+      game.systems.border.createBorder({
+        height: (game.height * scaleFactor) + game.height,
+        width: (game.width * scaleFactor) + game.width,
+        // depth: 100,
+      });
+    }
+  }
+
   colorChanges() {
     let game = this.game;
     let colorChanges = this.game.createSutra();
-
 
     colorChanges.addCondition('changesColorWithDamage', {
       op: 'or',
@@ -226,47 +226,38 @@ class TowerWorld {
     spawner.addCondition('moveLeft', (entity, gameState) => entity.position.x >= entity.startingPosition.x);
     spawner.addCondition('moveRight', (entity, gameState) => entity.position.x < entity.startingPosition.x - 400);
 
-    // Action to move all blocks when timerCompleted
-    spawner.addAction({
-      if: ['isSpawner'],
-      then: [{
-        action: 'spawnBlock',
-        data: {
-          x: 0,
-          y: 100
-        }
-
-      }]
-    });
+    spawner
+      .if('isSpawner')
+      .then('spawnBlock', {
+        x: 0,
+        y: 100
+      });
 
     //
     // Spawner Movement
     //
-    spawner.addAction({
-      if: ['isSpawner', 'moveLeft'],
-      then: [{
-        action: 'entity::updateEntity',
-        data: {
-          velocity: {
-            x: -10,
-            y: 30
-          }
-        }
-      }]
-    });
 
-    spawner.addAction({
-      if: ['isSpawner', 'moveRight'],
-      then: [{
-        action: 'entity::updateEntity',
-        data: {
-          velocity: {
-            x: 10,
-            y: 30
-          }
+    // spawner.define()
+    // spawner.condition('isSpawner', (entity, gameState) => entity.type === 'UnitSpawner');
+
+    spawner
+      .if('isSpawner', 'moveLeft')
+      .then('entity::updateEntity', {
+        velocity: {
+          x: -10,
+          y: 30
         }
-      }]
-    });
+      })
+      .then('updateColorWhenMoving')
+
+    spawner
+      .if('isSpawner', 'moveRight')
+      .then('entity::updateEntity', {
+        velocity: {
+          x: 10,
+          y: 30
+        }
+      })
 
     spawner.on('spawnBlock', (entity, data) => {
       // console.log('spawnBlock', entity, data)
@@ -305,84 +296,63 @@ class TowerWorld {
       }
     });
 
-    // ... Define conditions and actions related to the spawner ...
     return spawner;
   }
 
   player() {
     let player = this.game.createSutra();
-    // ... Define conditions and actions related to the player ...
     return player;
+  }
+
+  wall() {
+    let wall = this.game.createSutra();
+    return wall;
   }
 
   collision() {
     let collision = this.game.createSutra();
-    // ... Define conditions and actions related to collisions ...
     return collision;
   }
 
   createAdditionalRules(rules) {
-
     let game = this.game;
-    // Action to move all blocks when timerCompleted
-    /*
-    rules.addAction({
-      if: ['roundStarted'],
-      subtree: 'round'
-    });
-    */
 
-    rules.addAction({
-      if: ['spawnUnitTouchedHomebase'],
-      then: [{
-        action: 'entity::removeEntity'
-      },
-      {
-        action: 'resetSpawnerUnit'
-      }]
-    });
+    rules
+      .if('spawnUnitTouchedHomebase')
+      .then('removeSpawnUnit')
+      .then('resetSpawnerUnit');
 
-    rules.on('resetSpawnerUnit', function (data, node) {
-      console.log('resetSpawnerUnit data', data);
-      console.log('resetSpawnerUnit node', node);
+    rules
+      .on('resetSpawnerUnit', function (data, node) {
+        let previous;
+        if (data.bodyA.type === 'UnitSpawner') {
+          previous = data.bodyA;
+        } else {
+          previous = data.bodyB;
+        }
+        let newSpawner = {
+          type: 'UnitSpawner',
+          health: 100,
+          position: previous.startingPosition,
+          width: 100,
+          height: 100,
+          color: 0x00ff00,
+        };
+        newSpawner.startingPosition = previous.startingPosition;
+        let ent = game.createEntity(newSpawner);
+        ent.timers.setTimer('test-timer', 0.5, true);
+      });
 
-      let previous;
-
-      if (data.bodyA.type === 'UnitSpawner') {
-        previous = data.bodyA;
-      } else {
-        previous = data.bodyB;
-      }
-
-      let newSpawner = {
-        type: 'UnitSpawner',
-        health: 100,
-        position: previous.startingPosition,
-        width: 100,
-        height: 100,
-        color: 0x00ff00,
-      };
-
-      newSpawner.startingPosition = previous.startingPosition;
-
-      let ent = game.createEntity(newSpawner);
-      ent.timers.setTimer('test-timer', 0.5, true);
-
-      console.log("ent UnitSpawner", ent)
-
-    });
-
-    rules.on('entity::removeEntity', function (event, data, node) {
-      // console.log('entity::removeEntity', event.bodyA, event.bodyB);
-      if (event.bodyA.type === 'BORDER') {
-        game.removeEntity(event.bodyB.id);
-        // set the color of bodyB to red
-      }
-      if (event.bodyB.type === 'BORDER') {
-        game.removeEntity(event.bodyA.id);
-      }
-    });
-
+    rules
+      .on('removeSpawnUnit', function (event, data, node) {
+        if (event.bodyA.type === 'BORDER') {
+          game.removeEntity(event.bodyB.id);
+          // set the color of bodyB to red
+        }
+        if (event.bodyB.type === 'BORDER') {
+          game.removeEntity(event.bodyA.id);
+        }
+      });
 
     rules.addCondition('blockHitWall', function (entity, data) {
       if (entity.type === 'COLLISION') {
@@ -395,58 +365,50 @@ class TowerWorld {
       }
     });
 
-    rules.addAction({
-      if: ['blockHitWall'],
-      then: [{
-        action: 'blockHitWall'
-      }]
-    })
+    rules
+      .if('blockHitWall')
+      .then('damageWall')
+      .then('removeBlock');
 
-    rules.on('blockHitWall', function (event, data, node) {
-
-      let border, block;
-
-      if (event.bodyA.type === 'BORDER') {
-        border = event.bodyA;
-        block = event.bodyB;
+    rules.on('removeBlock', function (data, node) {
+      // console.log('removeBlock', data, node)
+      let block;
+      if (data.bodyA.type === 'BLOCK') {
+        block = data.bodyA;
       }
-      if (event.bodyB.type === 'BORDER') {
-        border = event.bodyB;
-        block = event.bodyA;
+      if (data.bodyB.type === 'BLOCK') {
+        block = data.bodyB;
       }
-
-      // remove the block
       game.removeEntity(block.id);
+    });
 
-      // wall takes some damage
+    rules.on('damageWall', function (data, node) {
+      // console.log('damageWall', data, node)
+      let border;
+      if (data.bodyA.type === 'BORDER') {
+        border = data.bodyA;
+      }
+      if (data.bodyB.type === 'BORDER') {
+        border = data.bodyB;
+      }
       border.health -= 1;
-
-
       if (border.health <= 0) {
         // remove the wall
         game.removeEntity(border.id);
         return;
       }
       // remove existing border
-
       game.updateEntity({
         id: border.id,
         type: 'BORDER',
         health: border.health,
         // color: 0xff0000
       });
-
     });
 
     //
     // Player / Block Collisions
     //
-    rules.addAction({
-      if: ['blockHitPlayer'],
-      then: [{
-        action: 'blockHitPlayer'
-      }]
-    });
 
 
     rules.addCondition('blockHitPlayer', function (entity, data) {
@@ -460,8 +422,150 @@ class TowerWorld {
       }
     });
 
-    rules.on('blockHitPlayer', function (data, node) {
-      // console.log('blockHitPlayer', data, node)
+
+    rules
+      .if('playerHealthBelow0')
+      .then('resetPlayerPosition');
+
+    rules.addCondition('playerHealthBelow0', function (entity, gameState) {
+      if (entity.type === 'PLAYER') {
+        if (entity.health <= 0) {
+          return true;
+        }
+      }
+    });
+
+    rules.on('resetPlayerPosition', function (data, node) {
+      // console.log('resetPlayerPosition', data, node)
+      game.updateEntity({
+        id: data.id,
+        position: {
+          x: 0,
+          y: 0
+        },
+        velocity: {
+          x: 0,
+          y: 0
+        },
+        health: 100,
+        color: 0x00ff00,
+        score: 0
+      });
+    });
+
+    rules
+      .if('blockHitPlayer')
+      .if('blockIsRed')
+      .then('damagePlayer')
+
+    rules
+      .if('blockHitPlayer')
+      .if('blockIsNotRed')
+      .then('healPlayer')
+
+    rules
+      .if('blockHitPlayer')
+      .then('removeBlock')
+
+    /* TODO: nested scope fluent syntax
+    rules
+    .if('blockHitPlayer')
+    .then((rules) => {
+      rules
+        .if('blockIsRed')
+        .then('damagePlayer')
+        .else('healPlayer');
+    })
+    .then('removeBlock')
+    */
+
+
+
+
+    /*
+    rules
+    .if('blockHitPlayer')
+    .then('removeBlock')
+    .then((rules) => {
+      rules
+        .if('blockIsRed')
+        .then('damagePlayer')
+        .else('healPlayer');
+    });
+    */
+
+
+    /*
+    rules
+      .if('blockHitPlayer')
+      .then('removeBlock')
+      .if('blockIsRed')
+      .then('damagePlayer')
+    */
+
+    /*
+    rules
+    .if('blockHitPlayer')
+    .if('blockIsNotRed')
+    .then('healPlayer')
+
+    rules
+    .if('blockHitPlayer')
+    .then('removeBlock')
+    */
+
+
+
+    // TODO: add else support for type check of block to heal / damage
+
+
+    rules.on('removeBlock', function (data, node) {
+      // console.log('removeBlock', data, node)
+      let block;
+      if (data.bodyA.type === 'BLOCK') {
+        block = data.bodyA;
+      }
+      if (data.bodyB.type === 'BLOCK') {
+        block = data.bodyB;
+      }
+      game.removeEntity(block.id);
+    });
+
+    rules.addCondition('blockIsRed', function (data, node) {
+      let block;
+      console.log("blockIsRed", data, node)
+      if (data.bodyA.type === 'BLOCK') {
+        block = data.bodyA;
+      } else {
+        block = data.bodyB;
+      }
+      console.log('blockIsRed', block)
+      if (block.type === 'BLOCK') {
+        if (block.color === 0xff0000) {
+          console.log("returning true")
+          return true;
+        }
+      }
+    });
+
+    rules.addCondition('blockIsNotRed', function (data, node) {
+      let block;
+      console.log("blockIsRed", data, node)
+      if (data.bodyA.type === 'BLOCK') {
+        block = data.bodyA;
+      } else {
+        block = data.bodyB;
+      }
+      console.log('blockIsRed', block)
+      if (block.type === 'BLOCK') {
+        if (block.color !== 0xff0000) {
+          console.log("returning true")
+          return true;
+        }
+      }
+    });
+    rules.on('damagePlayer', function (data, node) {
+      console.log('damagePlayer', data, node)
       let block;
       let player;
 
@@ -473,47 +577,58 @@ class TowerWorld {
         block = data.bodyB;
         player = data.bodyA;
       }
+      console.log('pppp', player)
+      player.health -= 10;
+      game.updateEntity({
+        id: player.id,
+        health: player.health
+      });
+    });
 
-      game.removeEntity(block.id);
+    rules.on('healPlayer', function (data, node) {
 
-      if (typeof player.score === 'undefined' || player.score == null) {
-        player.score = 0;
+      console.log("healPlayer", data, node)
+      let player;
+
+      if (data.bodyA.type === 'PLAYER') {
+        player = data.bodyA;
       }
-
-      // if block was red, damage player
-      if (block.color === 0xff0000) {
-        player.health -= 10;
-      } else {
-        // if not, heal player
+      if (data.bodyB.type === 'PLAYER') {
+        player = data.bodyB;
+      }
+      console.log('fff', player)
+      if (player) {
         player.health += 5;
-        player.score += 1;
+        game.updateEntity({
+          id: player.id,
+          health: player.health
+        });
       }
+    });
 
-      if (player.health <= 0) {
-        // reset the player position and health
-        game.updateEntity({
-          id: player.id,
-          position: {
-            x: 0,
-            y: 0
-          },
-          velocity: {
-            x: 0,
-            y: 0
-          },
-          health: 100,
-          color: 0x00ff00,
-          score: 0
-        });
-      } else {
-        // TODO: remove this
-        // console.log('updating with new score', player.score)
-        game.updateEntity({
-          id: player.id,
-          health: player.health,
-          score: player.score
-        });
+    rules.addCondition('allWallsFallen', function (entity, gameState) {
+      // check see if any of UnitSpawners have been made it past the world height + 1000
+      let height = gameState.height;
+      let unitSpawners = gameState.ents.UnitSpawner;
+      let allWallsFallen = false;
+      unitSpawners.forEach(spawner => {
+        if (spawner.position.y > 4200) {
+          allWallsFallen = true;
+        }
       }
+      );
+      return allWallsFallen;
+    });
+
+    rules
+      .if('allWallsFallen')
+      .then('roundLost');
+
+    rules.on('roundLost', function (data, node, gameState) {
+      // console.log('roundLost!!!');
+      // stop the game
+      game.data.roundStarted = false;
+      game.data.roundEnded = true;
     });
 
   }
@@ -521,8 +636,6 @@ class TowerWorld {
   setupEventHandlers(rules) {
     // ... Define event handlers ...
   }
-
-
 
 }
 
@@ -557,37 +670,12 @@ export default TowerWorld;
     });
   });
 
-
-
-  rules.addCondition('allWallsFallen', function (entity, gameState) {
-    // check see if any of UnitSpawners have been made it past the world height + 1000
-    let height = gameState.height;
-    let unitSpawners = gameState.ents.UnitSpawner;
-    let allWallsFallen = false;
-    unitSpawners.forEach(spawner => {
-      if (spawner.position.y > 3000) {
-        allWallsFallen = true;
-      }
-    }
-    );
-    return allWallsFallen;
-  });
-
-  rules.addAction({
-    if: ['allWallsFallen'],
-    then: [{
-      action: 'roundLost'
-    }]
-  })
-
+ 
   rules.addCondition('allEnemiesCleared', function (entity, gameState) {
     let length = gameState.ents.UnitSpawner.length;
     return length <= 7;
     // TODO: return length === 0;
   })
-
-
-
 
 
   rules.addAction({
@@ -599,13 +687,6 @@ export default TowerWorld;
 
   rules.on('roundOver', function () {
     // console.log('roundOver!!!')
-  });
-
-  rules.on('roundLost', function (data, node, gameState) {
-    // console.log('roundLost!!!');
-    // stop the game
-    game.data.roundStarted = false;
-    game.data.roundEnded = true;
   });
 
 

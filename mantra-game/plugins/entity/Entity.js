@@ -221,6 +221,8 @@ class Entity {
       this.game.components.rotation.set(entityId, entityData.rotation);
     }
 
+    return ent;
+
   }
 
   createEntity(config) {
