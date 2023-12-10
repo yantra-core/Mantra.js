@@ -1,0 +1,117 @@
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+* {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+#screen {
+	/* Don't blur the screen when resized */
+	image-rendering: -moz-crisp-edges;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
+
+	/*
+	width: 256px;
+	height: 240px;
+	*/
+	width: 100%;
+	height: 100%;
+
+	border: 0px none;
+	background-color: black;
+}
+
+#status {
+	font-weight: bold;
+	color: rgb(120, 120, 120);
+}
+
+#control_holder {
+	text-align: right;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#screen_holder {
+	text-align: center;
+}
+
+#game_holder {
+	text-align: center;
+}
+
+h3 {
+	color: #fff;
+}
+
+table {
+	color: #fff;
+}
+
+#output {
+	width: 100%;
+	height: 200px;
+	margin: 0 auto;
+	margin-top: 10px;
+	border-left: 0px;
+	border-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	display: block;
+	background-color: black;
+	color: white;
+	font-family: 'Lucida Console', Monaco, monospace;
+	outline: none;
+}
+
+#footer {
+	padding: 20px;
+}
+
+.ui_button {
+	height: 44px;
+	margin: 10px;
+}
+
+.ui_select {
+	height: 44px;
+}
+
+.ui_checkbox {
+	height: 44px;
+	width: 44px;
+}
+
+.ui_button {
+	background-color: #4CAF50; /* Green background */
+	border: none;
+	color: white; /* White text */
+	padding: 15px 32px; /* Top and bottom padding, Left and right padding */
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px; /* Font size */
+	margin: 4px 2px; /* Margin around buttons */
+	cursor: pointer;
+	border-radius: 4px; /* Rounded corners */
+	transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effect */
+}
+
+.ui_button:hover {
+	background-color: #45a049; /* Darker shade of green */
+}
+
+.ui_button:disabled {
+	background-color: #cccccc; /* Gray background for disabled button */
+	color: #666666; /* Dark gray text color for disabled button */
+	cursor: not-allowed; /* Cursor to indicate the button is disabled */
+}

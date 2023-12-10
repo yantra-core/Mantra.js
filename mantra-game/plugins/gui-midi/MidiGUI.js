@@ -56,3 +56,64 @@ class GuiMidi {
 }
 
 export default GuiMidi;
+
+
+/*
+
+
+// Initialize Babylon.js scene
+const canvas = document.getElementById('renderCanvas');
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+
+const camera = new BABYLON.ArcRotateCamera('camera', Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), scene);
+camera.attachControl(canvas, true);
+
+const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(1, 1, 0), scene);
+
+// Function to create a note object
+function createNoteObject(noteNumber) {
+    const size = 0.2; // Size can vary based on note properties
+    const noteObject = BABYLON.MeshBuilder.CreateSphere(`note_${noteNumber}`, {diameter: size}, scene);
+    noteObject.position.x = (noteNumber % 12) - 6; // Example positioning logic
+    noteObject.position.y = 0;
+    noteObject.isVisible = false;
+
+    return noteObject;
+}
+
+// Dictionary to store note objects
+const notes = {};
+
+// Function to process MIDI data
+function processMIDIData(data) {
+    const [command, noteNumber, velocity] = data;
+
+    if (command === 144) { // Note on
+        if (!notes[noteNumber]) {
+            notes[noteNumber] = createNoteObject(noteNumber);
+        }
+        notes[noteNumber].isVisible = true;
+        // Additional logic for animation based on velocity
+    } else if (command === 128) { // Note off
+        if (notes[noteNumber]) {
+            notes[noteNumber].isVisible = false;
+        }
+    }
+}
+
+// Render loop
+engine.runRenderLoop(function () {
+    scene.render();
+});
+
+// Handle window resize
+window.addEventListener('resize', function(){
+    engine.resize();
+});
+
+// Example of processing MIDI data
+processMIDIData([144, 60, 100]); // Note on C4
+processMIDIData([128, 60, 0]);   // Note off C4
+
+*/

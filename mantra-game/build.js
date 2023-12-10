@@ -1,5 +1,6 @@
 import browserify from 'browserify';
 import fs from 'fs';
+import path from 'path';
 
 const plugins = [
   './plugins/entity-movement/strategies/AsteroidsMovement.js',
@@ -57,11 +58,26 @@ const plugins = [
   './plugins/entity-movement/strategies/PacManMovement.js',
   './plugins/gui-midi/MidiGUI.js',
   './plugins/midi/Midi.js',
+  './plugins/nes/Nes.js',
   // 'MovementPong' is the same as 'PongMovement', so it's not repeated
   // 'MovementAsteroids' is the same as 'AsteroidsMovement', so it's not repeated
   './plugins/xstate/XState.js',
   // ... add other plugins if you have more
 ];
+
+// Function to copy directory recursively
+function copyDirSync(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  let entries = fs.readdirSync(src, { withFileTypes: true });
+
+  for (let entry of entries) {
+    let srcPath = path.join(src, entry.name);
+    let destPath = path.join(dest, entry.name);
+
+    entry.isDirectory() ? copyDirSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
+  }
+}
+
 
 function getFileName(path) {
   const parts = path.split('/');
@@ -75,9 +91,18 @@ function logStep(plugin, message) {
 plugins.forEach(plugin => {
   logStep(plugin, 'Starting bundling');
 
-  // Prepend 'mplugins_' to the standalone name
   const b = browserify(plugin, { standalone: `PLUGINS.${getFileName(plugin)}` })
     .transform('babelify')
     .bundle()
     .pipe(fs.createWriteStream(`../mantra-client/public/plugins/${getFileName(plugin)}.js`));
+
+  // After bundling the plugin, copy its subdirectories
+  const pluginDir = path.dirname(plugin);
+  const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;
+  fs.readdirSync(pluginDir, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .forEach(dirent => {
+      copyDirSync(path.join(pluginDir, dirent.name), path.join(destDir, dirent.name));
+      logStep(plugin, `Copied subdirectory: ${dirent.name}`);
+    });
 });
