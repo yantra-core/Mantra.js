@@ -2,6 +2,9 @@ import gui from '../../../gui-editor/gui.js';
 
 export default function showActionForm(node) {
 
+  // Remark: Action form is not yet implemented
+  
+  return;
   /*
   // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {

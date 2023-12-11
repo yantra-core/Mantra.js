@@ -70,12 +70,13 @@ class SutraGUI {
           this.game.systems['entity-input'].disableInputs();
           this.game.systems['keyboard'].unbindAllEvents();
         }
-  
+
         // check to see if this is a class sutra-link, if so open the form editor
         if (e.target.classList.contains('sutra-link')) {
           let sutraPath = e.target.getAttribute('data-path');
           let node = this.behavior.findNode(sutraPath);
-          this.showConditionalsForm(node);
+          // Remark: Editing / Viewing Conditionals is not yet supported
+          //this.showConditionalsForm(node);
         }
       }
     });
@@ -86,7 +87,7 @@ class SutraGUI {
 
   }
 
-  setRules (rules) {
+  setRules(rules) {
     // let rules = testRules(game);
 
     // gui.setTheme('light');
@@ -212,27 +213,30 @@ class SutraGUI {
   }
 
   createNodeElement(node, indentLevel, path = '', keyword = 'IF') {
-    // Create a form element instead of a div
     let formElement = document.createElement('form');
     formElement.className = 'node-element-form';
-    // formElement.style.marginLeft = `${indentLevel * 10}px`;
 
-    // Generate a unique path identifier for the node
     const nodeId = path ? `${path}-${node.action || node.if}` : (node.action || node.if);
 
-    // Create a div to hold the node contents
+    // Check if node.subtree is a string, indicating a subtree reference
+    if (typeof node.subtree === 'string') {
+      // Retrieve the subtree based on the reference
+      let subtree = this.game.rules.getSubtree(node.subtree);
+
+      // Check if subtree is an instance of Sutra and needs recursive rendering
+      // Render each node in the subtree recursively
+      subtree.tree.forEach(subNode => {
+        let childFormElement = this.createNodeElement(subNode, indentLevel + 1, nodeId);
+        formElement.appendChild(childFormElement);
+      });
+    }
+
     let contentDiv = document.createElement('div');
     contentDiv.className = 'node-element';
-
-    // Append buttons to the contentDiv
-    //const addRuleBtn = this.createAddRuleButton(node.sutraPath);
-    //formElement.appendChild(addRuleBtn);
     formElement.appendChild(contentDiv);
 
     if (node.action) {
-      // add new className to formElement, action-node-form
       formElement.classList.add('action-node-form');
-      // add click handler to formElement so that it opens showActionForm
       formElement.onclick = () => {
         this.showActionForm(node);
       }
@@ -246,6 +250,7 @@ class SutraGUI {
 
     return formElement;
   }
+
 
   saveSutra() {
     // get the #sutraTable
@@ -421,8 +426,8 @@ class SutraGUI {
         // set data-path attribute to node.sutraPath
         condition.setAttribute('data-path', node.sutraPath);
         condition.onclick = function () {
-          // condition.classList.toggle('collapsed');
-          self.showConditionalsForm(node);
+          // Remark: Editing / Viewing Conditionals is not yet supported
+          // self.showConditionalsForm(node);
         }
 
         conditionContainer.appendChild(condition);
@@ -451,7 +456,8 @@ class SutraGUI {
         // find the child node-element-form in condition
         let nodeElementForm = condition.parentElement.parentElement.querySelector('.node-element-form');
         // nodeElementForm.classList.toggle('collapsed');
-        self.showConditionalsForm(node);
+        // Remark: Editing / Viewing Conditionals is not yet supported
+        // self.showConditionalsForm(node);
       }
       conditionContainer.appendChild(condition);
 
