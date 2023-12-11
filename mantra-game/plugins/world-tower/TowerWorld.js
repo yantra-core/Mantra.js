@@ -47,7 +47,6 @@ class TowerWorld {
 
     // Create Sutras
     let roundSutra = this.sutras['round'];
-
     let spawnerSutra = this.sutras['spawner'];
     let playerSutra = this.sutras['player'];
     let collisionSutra = this.sutras['collision'];
@@ -60,7 +59,7 @@ class TowerWorld {
     game.setSutra(rules);
 
     rules
-      .if('roundStarted')
+      .if('roundNotPaused')
       .if('roundNotRunning')
       .then('spawnEnemyUnits')
       .then('startRound')
@@ -90,6 +89,7 @@ class TowerWorld {
       .then('removeBlock')
 
     rules
+      .if('roundRunning')
       .if('allWallsFallen')
       .then('roundLost');
 
@@ -243,6 +243,31 @@ class TowerWorld {
       return gameState.roundRunning === false;
     });
 
+    round.addCondition('roundPaused', (entity, gameState) => {
+      return gameState.roundPaused === true;
+    });
+
+    // TODO: remove add NOT condition
+    round.addCondition('roundNotPaused', (entity, gameState) => {
+      return gameState.roundPaused !== true;
+    });
+
+    round.on('roundLost', function (data, node, gameState) {
+      console.log('roundLost!!!');
+      // stop the game
+      game.data.roundStarted = false;
+      game.data.roundRunning = false;
+      game.data.roundEnded = true;
+      game.data.roundPaused = true;
+    });
+
+    round.on('startRound', function (data, node, gameState) {
+      // set roundRunning to true
+      console.log('startRound')
+      game.data.roundRunning = true;
+      game.data.roundEnded = false;
+    });
+
     // round.if('startRound').then('startRound');
 
     return round;
@@ -328,27 +353,7 @@ class TowerWorld {
       }
     });
 
-    return spawner;
-  }
-
-  player() {
-    let player = this.game.createSutra();
-    return player;
-  }
-
-  wall() {
-    let wall = this.game.createSutra();
-    return wall;
-  }
-
-  collision() {
-    let collision = this.game.createSutra();
-    return collision;
-  }
-
-  createAdditionalRules(rules) {
-    let game = this.game;
-    rules
+    spawner
       .on('resetSpawnerUnit', function (data, node) {
         let previous;
         if (data.bodyA.type === 'UnitSpawner') {
@@ -368,6 +373,92 @@ class TowerWorld {
         let ent = game.createEntity(newSpawner);
         ent.timers.setTimer('test-timer', 0.5, true);
       });
+
+
+    return spawner;
+  }
+
+  player() {
+    let player = this.game.createSutra();
+
+    player.on('resetPlayerPosition', function (data, node) {
+      // console.log('resetPlayerPosition', data, node)
+      game.updateEntity({
+        id: data.id,
+        position: {
+          x: 0,
+          y: 0
+        },
+        velocity: {
+          x: 0,
+          y: 0
+        },
+        health: 100,
+        color: 0x00ff00,
+        score: 0
+      });
+    });
+
+    player.on('damagePlayer', function (data, node) {
+      // console.log('damagePlayer', data, node)
+      let block;
+      let player;
+
+      if (data.bodyA.type === 'BLOCK') {
+        block = data.bodyA;
+        player = data.bodyB;
+      }
+      if (data.bodyB.type === 'BLOCK') {
+        block = data.bodyB;
+        player = data.bodyA;
+      }
+      player.health -= 10;
+      game.updateEntity({
+        id: player.id,
+        health: player.health
+      });
+    });
+
+    player.on('healPlayer', function (data, node) {
+      let player;
+      if (data.bodyA.type === 'PLAYER') {
+        player = data.bodyA;
+      }
+      if (data.bodyB.type === 'PLAYER') {
+        player = data.bodyB;
+      }
+      if (player) {
+        player.health += 5;
+        game.updateEntity({
+          id: player.id,
+          health: player.health
+        });
+      }
+    });
+
+    player.addCondition('playerHealthBelow0', function (entity, gameState) {
+      if (entity.type === 'PLAYER') {
+        if (entity.health <= 0) {
+          return true;
+        }
+      }
+    });
+
+    return player;
+  }
+
+  wall() {
+    let wall = this.game.createSutra();
+    return wall;
+  }
+
+  collision() {
+    let collision = this.game.createSutra();
+    return collision;
+  }
+
+  createAdditionalRules(rules) {
+    let game = this.game;
 
     rules
       .on('removeSpawnUnit', function (event, data, node) {
@@ -441,31 +532,6 @@ class TowerWorld {
       }
     });
 
-    rules.addCondition('playerHealthBelow0', function (entity, gameState) {
-      if (entity.type === 'PLAYER') {
-        if (entity.health <= 0) {
-          return true;
-        }
-      }
-    });
-
-    rules.on('resetPlayerPosition', function (data, node) {
-      // console.log('resetPlayerPosition', data, node)
-      game.updateEntity({
-        id: data.id,
-        position: {
-          x: 0,
-          y: 0
-        },
-        velocity: {
-          x: 0,
-          y: 0
-        },
-        health: 100,
-        color: 0x00ff00,
-        score: 0
-      });
-    });
 
     // TODO: add else support for type check of block to heal / damage
     rules.on('removeBlock', function (data, node) {
@@ -509,55 +575,6 @@ class TowerWorld {
         }
       }
     });
-    rules.on('damagePlayer', function (data, node) {
-      // console.log('damagePlayer', data, node)
-      let block;
-      let player;
-
-      if (data.bodyA.type === 'BLOCK') {
-        block = data.bodyA;
-        player = data.bodyB;
-      }
-      if (data.bodyB.type === 'BLOCK') {
-        block = data.bodyB;
-        player = data.bodyA;
-      }
-      player.health -= 10;
-      game.updateEntity({
-        id: player.id,
-        health: player.health
-      });
-    });
-
-    rules.on('healPlayer', function (data, node) {
-      let player;
-      if (data.bodyA.type === 'PLAYER') {
-        player = data.bodyA;
-      }
-      if (data.bodyB.type === 'PLAYER') {
-        player = data.bodyB;
-      }
-      if (player) {
-        player.health += 5;
-        game.updateEntity({
-          id: player.id,
-          health: player.health
-        });
-      }
-    });
-
-    rules.on('roundLost', function (data, node, gameState) {
-      //console.log('roundLost!!!');
-      // stop the game
-      game.data.roundStarted = false;
-      game.data.roundRunning = false;
-      game.data.roundEnded = true;
-    });
-
-    rules.on('startRound', function (data, node, gameState) {
-      // set roundRunning to true
-      game.data.roundRunning = true;
-    });
 
     rules.on('entity::updateEntity', function (data, node) {
       // console.log('entity::updateEntity', data);
@@ -598,6 +615,23 @@ class TowerWorld {
       });
 
     });
+
+    /*
+    rules.on('roundLost', function (data, node, gameState) {
+      //console.log('roundLost!!!');
+      // stop the game
+      game.data.roundStarted = false;
+      game.data.roundRunning = false;
+      game.data.roundEnded = true;
+    });
+
+    rules.on('startRound', function (data, node, gameState) {
+      // set roundRunning to true
+      game.data.roundRunning = true;
+    });
+    */
+
+
 
   }
 

@@ -31,6 +31,9 @@ import PhaserGraphics from './plugins/graphics-phaser/PhaserGraphics.js';
 import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
 import ThreeGraphics from './plugins/graphics-three/ThreeGraphics.js';
 
+// Gaming devices
+import Nes from './plugins/nes/Nes.js';
+
 // Input Devices
 import Mouse from './plugins/mouse/Mouse.js';
 import Keyboard from './plugins/keyboard/Keyboard.js';
@@ -112,6 +115,7 @@ const plugins = {
   Timers,
   Midi,
   MidiGUI,
+  Nes,
   Inspector,
   ControlsGUI,
   PluginExplorer,
