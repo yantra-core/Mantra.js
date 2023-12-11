@@ -54,6 +54,8 @@ class TowerWorld {
     let colorChangesSutra = this.sutras['colorChanges'];
 
     // Main rules Sutra
+    // TODO: ensure entire Sutra definition is exports on TowerWorld such that any
+    // node can be re-used in other Sutras
     let rules = game.createSutra();
     game.setSutra(rules);
 
@@ -143,10 +145,6 @@ class TowerWorld {
 
     // Additional rules
     this.createAdditionalRules(rules);
-
-    // Event handlers
-    this.setupEventHandlers(rules);
-
 
     game.setSutra(rules);
 
@@ -283,7 +281,6 @@ class TowerWorld {
           y: 30
         }
       })
-      .then('updateColorWhenMoving')
 
     spawner
       .if('isSpawner', 'moveRight')

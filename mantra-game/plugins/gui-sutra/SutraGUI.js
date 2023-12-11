@@ -83,7 +83,6 @@ class SutraGUI {
   }
 
   setRules (rules) {
-
     // let rules = testRules(game);
 
     // gui.setTheme('light');
@@ -108,11 +107,11 @@ class SutraGUI {
     });
     */
 
+    this.behavior = rules;
+
     let json = rules.serializeToJson();
     this.drawTable();
     this.drawBehaviorTree(JSON.parse(json));
-
-    this.behavior = rules;
 
 
   }
@@ -148,19 +147,21 @@ class SutraGUI {
 
   viewSutraEnglish() {
     let english = this.behavior.exportToEnglish();
+    // replace all \n with <br>
+    //english = english.replace(/\n/g, '<br>');
     // TODO: add Sutra's i18n support
     //let cn = this.behavior.exportToEnglish(0, 'zh');
     //let ja = this.behavior.exportToEnglish(0, 'ja');
     // clear the #sutraTable
     let table = document.getElementById('sutraTable');
     table.innerHTML = '';
-    // create a new div
-    let englishDiv = document.createElement('textarea');
-    // set height and width to 100%
+    let pre = document.createElement('pre');
+    let englishDiv = document.createElement('code');
     englishDiv.style.width = '95%';
     englishDiv.style.height = '800px';
-    englishDiv.value = english;
-    table.appendChild(englishDiv);
+    englishDiv.innerHTML = english;
+    pre.appendChild(englishDiv);
+    table.appendChild(pre);
   }
 
   getEmitters() {
@@ -185,7 +186,7 @@ class SutraGUI {
     //let guiContent = container.querySelector('.gui-content');
     if (json.tree.length === 0) {
       // add message to indicate no sutra
-      table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
+      // table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
       return;
     }
     //let container = document.createElement('div');

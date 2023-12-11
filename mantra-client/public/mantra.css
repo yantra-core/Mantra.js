@@ -519,6 +519,21 @@ pre {
   position: absolute;
 }
 
+#nesView {
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  width: 60vw;
+  height: 80vh;
+
+  min-width: 460px;
+  min-height: 200px;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+  color: #d3d9df;
+}
+
 #scoreboardView {
   position: absolute;
   top: 100px;
@@ -698,6 +713,7 @@ pre {
   margin-top: 5px;
   margin-left: 10px;
   cursor: pointer;
+  padding-bottom: 15px;
 }
 
 .node-element.collapsed .node-element {
@@ -739,7 +755,7 @@ button {
 }
 
 .node-element-form {
-
+  border: 1px solid #2a3348;
   margin: 0px;
   padding: 0px;
 }
@@ -798,7 +814,7 @@ button {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  margin: 4px 2px;
+  margin: 12px;
   cursor: pointer;
   border-radius: 4px;
   font-size: 16px;
@@ -945,6 +961,7 @@ option {
 
 .action-node-form .node-element {
   margin-left: 0px;
+  padding-bottom: 0px !important;
 }
 
 .condition-container {
@@ -960,6 +977,16 @@ option {
   margin-top: 0px;
   cursor: pointer;
 }
+.condition:hover {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.4);
+}
+
+/* add class to .condition when pressed */
+.condition:active {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.4);
+}
 
 .condition-separator {
   font-weight: bold;
@@ -973,15 +1000,24 @@ option {
 }
 
 .action-select-container {
-
   color: #d3d9df;
   display: block;
   font-size: 18px;
   font-weight: bold;
   display: flex;
-
   align-items: center;
+}
 
+
+.action-select-container:hover {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.4);
+}
+
+/* add class to .condition when pressed */
+.action-select-container:active {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.4);
 }
 
 .action-select-container select {

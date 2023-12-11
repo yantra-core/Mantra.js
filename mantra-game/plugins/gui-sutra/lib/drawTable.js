@@ -40,7 +40,8 @@ export default function drawTable() {
   this.sutraView.style.backgroundColor = 'transparent';
 
   let slider = createOpacitySlider(this.sutraView);
-
+  // hide the slider (for now)
+  slider.style.display = 'none';
   // Create and append the new footer
   let footer = document.createElement('div');
   footer.className = 'gui-window-footer';
@@ -54,14 +55,14 @@ export default function drawTable() {
 
   // add <br>
   guiContent.appendChild(document.createElement('br'));
-  guiContent.appendChild(addRuleButton);
+  // guiContent.appendChild(addRuleButton);
 
 
   // create save button
   let saveButton = document.createElement('button');
   saveButton.textContent = 'Save';
   saveButton.onclick = () => this.saveSutra();
-  footer.appendChild(saveButton);
+  // footer.appendChild(saveButton);
 
   //this.sutraView.appendChild(guiContent);
   this.sutraView.appendChild(footer);
