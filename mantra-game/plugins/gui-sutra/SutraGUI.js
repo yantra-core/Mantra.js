@@ -6,6 +6,7 @@ import dataView from './lib/editor/dataView.js';
 import dataForm from './lib/editor/dataForm.js';
 import actionForm from './lib/editor/actionForm.js';
 import conditionalsForm from './lib/editor/conditionalsForm.js';
+import conditionalForm from './lib/editor/conditionalForm.js';
 
 import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
@@ -30,12 +31,13 @@ class SutraGUI {
     // this.conditionalsForm = conditionalsForm.bind(this);
     this.showConditionalsForm = conditionalsForm.bind(this);
     this.createConditional = editor.createConditional.bind(this);
+    this.createConditionalForm = conditionalForm.bind(this);
+
     this.createLabel = createLabel.bind(this);
     this.dataView = dataView.bind(this);
     this.dataForm = dataForm.bind(this);
     this.showActionForm = actionForm.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
-    this.createConditionalForm = editor.createConditionalForm.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);
     this.sutra = sutra;
   }
