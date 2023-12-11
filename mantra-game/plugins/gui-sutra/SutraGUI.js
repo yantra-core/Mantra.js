@@ -5,6 +5,7 @@ import drawTable from './lib/drawTable.js';
 import dataView from './lib/editor/dataView.js';
 import dataForm from './lib/editor/dataForm.js';
 import actionForm from './lib/editor/actionForm.js';
+import conditionalsForm from './lib/editor/conditionalsForm.js';
 
 import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
@@ -26,7 +27,8 @@ class SutraGUI {
     this.drawTable = drawTable.bind(this);
     this.showFunctionEditor = editor.showFunctionEditor.bind(this);
     this.showObjectEditor = editor.showObjectEditor.bind(this);
-    this.showConditionalsForm = editor.showConditionalsForm.bind(this);
+    // this.conditionalsForm = conditionalsForm.bind(this);
+    this.showConditionalsForm = conditionalsForm.bind(this);
     this.createConditional = editor.createConditional.bind(this);
     this.createLabel = createLabel.bind(this);
     this.dataView = dataView.bind(this);
