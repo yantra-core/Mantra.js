@@ -48,6 +48,7 @@ const plugins = [
   './plugins/physics-physx/PhysXPhysics.js',
   './plugins/mouse/Mouse.js',
   './plugins/graphics-phaser/PhaserGraphics.js',
+  './plugins/graphics-phaser/PhaserCamera.js',
   './plugins/graphics-three/ThreeGraphics.js',
   './plugins/entity-movement/strategies/PongMovement.js',
   './plugins/world/pong/PongWorld.js',

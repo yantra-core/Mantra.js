@@ -28,6 +28,7 @@ import Graphics from './plugins/graphics/Graphics.js';
 import BabylonGraphics from './plugins/graphics-babylon/BabylonGraphics.js';
 import Camera from './plugins/graphics-babylon/camera/BabylonCamera.js'; // TODO: rename to BabylonCamera?
 import PhaserGraphics from './plugins/graphics-phaser/PhaserGraphics.js';
+import PhaserCamera from './plugins/graphics-phaser/PhaserCamera.js';
 import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
 import ThreeGraphics from './plugins/graphics-three/ThreeGraphics.js';
 
@@ -140,6 +141,7 @@ const plugins = {
   Mouse: Mouse,
   BabylonGraphics,
   PhaserGraphics,
+  PhaserCamera,
   ThreeGraphics,
   CSSGraphics,
   Camera,
