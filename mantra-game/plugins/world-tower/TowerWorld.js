@@ -56,6 +56,7 @@ class TowerWorld {
     // TODO: ensure entire Sutra definition is exports on TowerWorld such that any
     // node can be re-used in other Sutras
     let rules = game.createSutra();
+
     game.setSutra(rules);
 
     rules
@@ -78,21 +79,20 @@ class TowerWorld {
       .if('playerHealthBelow0')
       .then('resetPlayerPosition');
 
-    rules
-      .if('blockHitPlayer')
-      .then((rules) => {
-        rules
-          .if('blockIsRed')
-          .then('damagePlayer')
-          .else('healPlayer');
-      })
-      .then('removeBlock')
+  rules
+    .if('blockHitPlayer')
+    .then((rules) => {
+      rules
+        .if('blockIsRed')
+        .then('damagePlayer')
+        .else('healPlayer');
+    })
+    .then('removeBlock')
 
     rules
       .if('roundRunning')
       .if('allWallsFallen')
       .then('roundLost');
-
 
     // TODO: subtree reference for fluent
     rules.addAction({
@@ -355,12 +355,7 @@ class TowerWorld {
 
     spawner
       .on('resetSpawnerUnit', function (data, node) {
-        let previous;
-        if (data.bodyA.type === 'UnitSpawner') {
-          previous = data.bodyA;
-        } else {
-          previous = data.bodyB;
-        }
+        let previous = data.UnitSpawner;
         let newSpawner = {
           type: 'UnitSpawner',
           health: 100,
@@ -400,18 +395,9 @@ class TowerWorld {
     });
 
     player.on('damagePlayer', function (data, node) {
-      // console.log('damagePlayer', data, node)
-      let block;
-      let player;
+      let block = data.BLOCK;
+      let player = data.PLAYER;
 
-      if (data.bodyA.type === 'BLOCK') {
-        block = data.bodyA;
-        player = data.bodyB;
-      }
-      if (data.bodyB.type === 'BLOCK') {
-        block = data.bodyB;
-        player = data.bodyA;
-      }
       player.health -= 10;
       game.updateEntity({
         id: player.id,
@@ -420,13 +406,9 @@ class TowerWorld {
     });
 
     player.on('healPlayer', function (data, node) {
-      let player;
-      if (data.bodyA.type === 'PLAYER') {
-        player = data.bodyA;
-      }
-      if (data.bodyB.type === 'PLAYER') {
-        player = data.bodyB;
-      }
+      let block = data.BLOCK;
+      let player = data.PLAYER;
+
       if (player) {
         player.health += 5;
         game.updateEntity({
@@ -482,27 +464,13 @@ class TowerWorld {
       }
     });
 
-    rules.on('removeBlock', function (data, node) {
-      // console.log('removeBlock', data, node)
-      let block;
-      if (data.bodyA.type === 'BLOCK') {
-        block = data.bodyA;
-      }
-      if (data.bodyB.type === 'BLOCK') {
-        block = data.bodyB;
-      }
+    rules.on('removeBlock', function (context, node) {
+      let block = context.BLOCK;
       game.removeEntity(block.id);
     });
 
-    rules.on('damageWall', function (data, node) {
-      // console.log('damageWall', data, node)
-      let border;
-      if (data.bodyA.type === 'BORDER') {
-        border = data.bodyA;
-      }
-      if (data.bodyB.type === 'BORDER') {
-        border = data.bodyB;
-      }
+    rules.on('damageWall', function (context, node) {
+      let border = context.BORDER;
       border.health -= 1;
       if (border.health <= 0) {
         // remove the wall
@@ -532,20 +500,6 @@ class TowerWorld {
       }
     });
 
-
-    // TODO: add else support for type check of block to heal / damage
-    rules.on('removeBlock', function (data, node) {
-      // console.log('removeBlock', data, node)
-      let block;
-      if (data.bodyA.type === 'BLOCK') {
-        block = data.bodyA;
-      }
-      if (data.bodyB.type === 'BLOCK') {
-        block = data.bodyB;
-      }
-      game.removeEntity(block.id);
-    });
-
     rules.addCondition('blockIsRed', function (data, node) {
       let block;
       if (data.bodyA.type === 'BLOCK') {
@@ -555,22 +509,6 @@ class TowerWorld {
       }
       if (block.type === 'BLOCK') {
         if (block.color === 0xff0000) {
-          return true;
-        }
-      }
-    });
-
-    // TODO: remove this, replace with NOT blockIsRed
-    rules.addCondition('blockIsNotRed', function (data, node) {
-      let block;
-      if (data.bodyA.type === 'BLOCK') {
-        block = data.bodyA;
-      } else {
-        block = data.bodyB;
-      }
-      if (block.type === 'BLOCK') {
-        if (block.color !== 0xff0000) {
-          console.log("returning true")
           return true;
         }
       }
@@ -630,7 +568,6 @@ class TowerWorld {
       game.data.roundRunning = true;
     });
     */
-
 
 
   }
