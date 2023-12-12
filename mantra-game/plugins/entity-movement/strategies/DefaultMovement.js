@@ -21,6 +21,7 @@ class DefaultMovementStrategy {
       return;
     }
 
+    // TODO: this.game.applyForce()
     const position = this.game.getComponent(entityId, 'position');
     if (position) {
       const forceFactor = 0.05;
@@ -30,6 +31,7 @@ class DefaultMovementStrategy {
       this.game.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
     }
 
+    // TODO: this.game.rotateBody()
     if (typeof rotation === 'number') {
       const rotationSpeed = 0.022;
       let rotationAmount = rotation * rotationSpeed;

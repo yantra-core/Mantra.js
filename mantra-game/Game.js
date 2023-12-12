@@ -474,6 +474,20 @@ class Game {
     this.currentPlayerId = playerId;
   }
 
+  // TODO: should physics plugin mount these instead of direct map to game?
+  applyForce(entityId, force) {
+    const body = this.bodyMap[entityId];
+    this.physics.applyForce(body, body.position, force);
+    this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
+  }
+
+  rotate(entityId, rotation) {
+    const rotationSpeed = 0.022; // TODO: config
+    let rotationAmount = rotation * rotationSpeed;
+    const body = this.bodyMap[entityId];
+    this.physics.rotateBody(body, rotationAmount);
+  }
+
 
 }
 

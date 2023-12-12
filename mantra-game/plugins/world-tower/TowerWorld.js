@@ -2,6 +2,7 @@ import round from './sutras/round.js';
 import player from './sutras/player.js';
 import colorChanges from './sutras/colorChanges.js';
 import enemy from './sutras/enemy.js';
+import input from './sutras/input.js';
 
 class TowerWorld {
   static id = 'world-tower';
@@ -54,6 +55,7 @@ class TowerWorld {
     let roundSutra = round.call(this);
     let spawnerSutra = enemy.call(this);
     let playerSutra = player.call(this);
+    let inputSutra = input.call(this);
     let colorChangesSutra = colorChanges.call(this);
 
     // Main rules Sutra
@@ -132,6 +134,7 @@ class TowerWorld {
     rules.use(spawnerSutra, 'spawner');
     rules.use(playerSutra, 'player');
     rules.use(colorChangesSutra, 'colorChanges');
+    rules.use(inputSutra, 'input');
 
     rules
       .if('roundRunning')
@@ -144,6 +147,12 @@ class TowerWorld {
       subtree: 'colorChanges'
     });
 
+    // rules.if('isPlayer').then('input');
+    rules.addAction({
+      if: 'isPlayer',
+      subtree: 'input'
+    });
+
     // Additional rules
     this.createAdditionalRules(rules);
 
@@ -151,7 +160,6 @@ class TowerWorld {
 
     game.data.roundStarted = true;
     game.data.roundRunning = false;
-
 
     game.on('timer::done', (entity, timerName, timer) => {
       // console.log('timer done', entity, timerName, timer);
