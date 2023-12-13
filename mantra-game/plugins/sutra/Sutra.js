@@ -1,5 +1,5 @@
-import { createSutra } from '../../../../sutra/index.js';
-//import { sutra } from '@yantra-core/sutra';
+//import { createSutra } from '../../../../sutra/index.js';
+import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 class Sutra {
   static id = 'sutra';
