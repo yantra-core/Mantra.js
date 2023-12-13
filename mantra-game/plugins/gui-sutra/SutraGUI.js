@@ -11,10 +11,6 @@ import conditionalForm from './lib/editor/conditionalForm.js';
 import createLabel from './lib/editor/createLabel.js';
 import editor from './lib/editor.js';
 
-//import sutra from '../../../../sutra/index.js';
-import sutra from '@yantra-core/sutra';
-
-
 import serializeFormToJSON from './util/serializeFormToJSON.js';
 // import testRules from './testRules.js';
 
@@ -39,7 +35,7 @@ class SutraGUI {
     this.showActionForm = actionForm.bind(this);
     this.onConditionalTypeChange = editor.onConditionalTypeChange.bind(this);
     this.serializeFormToJSON = serializeFormToJSON.bind(this);
-    this.sutra = sutra;
+    // this.sutra = sutra;
   }
 
   init(game) {
