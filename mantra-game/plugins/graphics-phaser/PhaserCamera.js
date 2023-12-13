@@ -10,7 +10,7 @@ class PhaserCamera {
     this.config = config;
     this.zoom = {
       maxZoom: 2.222,
-      minZoom: 0.22,
+      minZoom: 0.1,
       current: 1,
       tweening: false
     };
@@ -18,7 +18,7 @@ class PhaserCamera {
     // Adjust zoom limits for non-desktop devices
     if (!scene.game.device.os.desktop) {
       this.zoom.maxZoom = 3.333;
-      this.zoom.minZoom = 0.33;
+      this.zoom.minZoom = 0.1;
     }
 
     this.initZoomControls();
@@ -80,8 +80,8 @@ export default PhaserCamera;
 const zoom = {};
 
 zoom.maxZoom = 2.222;
-zoom.minZoom = 0.22;
-zoom.current = 1;
+zoom.minZoom = 0.1;
+zoom.current = 0.1;
 
 zoom.tweening = false;
 
