@@ -75,6 +75,8 @@ var Block = /*#__PURE__*/function () {
         }
       }
     }
+
+    // TODO: add option to cancel collision pairs
   }, {
     key: "blockBulletCollision",
     value: function blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {

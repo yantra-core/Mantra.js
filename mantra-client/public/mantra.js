@@ -768,6 +768,26 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // console.log('setting playerID', playerId)
       this.currentPlayerId = playerId;
     }
+
+    // TODO: should physics plugin mount these instead of direct map to game?
+  }, {
+    key: "applyForce",
+    value: function applyForce(entityId, force) {
+      var body = this.bodyMap[entityId];
+      this.physics.applyForce(body, body.position, force);
+      this.components.velocity[entityId] = {
+        x: body.velocity.x,
+        y: body.velocity.y
+      };
+    }
+  }, {
+    key: "rotate",
+    value: function rotate(entityId, rotation) {
+      var rotationSpeed = 0.022; // TODO: config
+      var rotationAmount = rotation * rotationSpeed;
+      var body = this.bodyMap[entityId];
+      this.physics.rotateBody(body, rotationAmount);
+    }
   }]);
   return Game;
 }();

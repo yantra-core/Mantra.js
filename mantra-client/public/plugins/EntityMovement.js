@@ -311,6 +311,8 @@ var DefaultMovementStrategy = /*#__PURE__*/function () {
       if (!entityId) {
         return;
       }
+
+      // TODO: this.game.applyForce()
       var position = this.game.getComponent(entityId, 'position');
       if (position) {
         var forceFactor = 0.05;
@@ -325,6 +327,8 @@ var DefaultMovementStrategy = /*#__PURE__*/function () {
           y: body.velocity.y
         };
       }
+
+      // TODO: this.game.rotateBody()
       if (typeof rotation === 'number') {
         var rotationSpeed = 0.022;
         var rotationAmount = rotation * rotationSpeed;

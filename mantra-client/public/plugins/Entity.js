@@ -479,6 +479,7 @@ var Entity = /*#__PURE__*/function () {
       if (typeof entityData.rotation !== 'undefined') {
         this.game.components.rotation.set(entityId, entityData.rotation);
       }
+      return ent;
     }
   }, {
     key: "createEntity",

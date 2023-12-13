@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).PluginsGUI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).MidiGUI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -287,7 +287,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _gui = _interopRequireDefault(require("../gui-editor/gui.js"));
-var _pluginsList = _interopRequireDefault(require("./pluginsList.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -295,346 +294,129 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-var PluginsGUI = /*#__PURE__*/function () {
-  function PluginsGUI() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    _classCallCheck(this, PluginsGUI);
-    this.id = PluginsGUI.id;
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // gui-midi.js
+var GuiMidi = /*#__PURE__*/function () {
+  function GuiMidi() {
+    _classCallCheck(this, GuiMidi);
+    this.id = GuiMidi.id;
+    this.midiLog = [];
   }
-  _createClass(PluginsGUI, [{
+  _createClass(GuiMidi, [{
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.createPluginView();
-      this.drawPluginTable();
-      this.subscribeToPluginUpdates();
-      this.game.addSystem(this.id, this);
+      game.on('midi-data', this.logMidiData.bind(this));
+      game.on('midi::log', this.logMidiEvent.bind(this)); // Listen to midi::log events
+
+      this.createMidiWindow();
     }
   }, {
-    key: "createPluginView",
-    value: function createPluginView() {
-      var game = this.game;
-      // Create the window using gui.window
-      this.container = _gui["default"].window('pluginsContainer', 'Plugins', function () {
-        game.systemsManager.removeSystem(PluginsGUI.id);
-      });
-
-      // Create the table for plugins
-      this.pluginTable = document.createElement('table');
-      this.pluginTable.id = "pluginTable";
-      this.pluginTable.className = "pluginTable";
-      console.log("CREATINT TABLE", this.pluginTable);
-      var headerRow = this.pluginTable.createTHead().insertRow();
-      var headerName = document.createElement('th');
-      var headerStatus = document.createElement('th');
-      headerName.textContent = 'Plugin Name';
-      headerStatus.textContent = 'Status';
-      headerRow.appendChild(headerName);
-      headerRow.appendChild(headerStatus);
-
-      // Append the table to the container's gui-content
-      var guiContent = this.container.querySelector('.gui-content');
-      guiContent.appendChild(this.pluginTable);
-      console.log('appending', guiContent, 'to', this.container, 'with', this.pluginTable, 'inside');
-      this.container.appendChild(guiContent);
+    key: "logMidiEvent",
+    value: function logMidiEvent(message) {
+      var logItem = document.createElement('p');
+      logItem.textContent = "MIDI Event: ".concat(message);
+      this.logElement.appendChild(logItem);
     }
   }, {
-    key: "drawPluginTable",
-    value: function drawPluginTable() {
+    key: "createMidiWindow",
+    value: function createMidiWindow() {
       var _this = this;
-      var game = this.game;
-      // Ensure that pluginsList is an array
-      var systemPlugins = Array.isArray(_pluginsList["default"]) ? _pluginsList["default"] : Object.keys(_pluginsList["default"]);
-
-      // Map to store the plugin name and its loaded status
-      var pluginStatusMap = new Map();
-      // Iterate over game._plugins to get the plugin names and their loaded status
-      for (var p in game._plugins) {
-        var pluginName = game._plugins[p].constructor.name;
-        // TODO: remove this conditional, legacy data still in game._plugins
-        if (pluginName !== 'Object') {
-          pluginStatusMap.set(pluginName, true); // true indicates the plugin is loaded
-        }
-      }
-
-      // Add system plugins to the map if not already present
-      systemPlugins.forEach(function (pluginId) {
-        if (!pluginStatusMap.has(pluginId)) {
-          pluginStatusMap.set(pluginId, false); // false indicates the plugin is not loaded
-        }
+      this.midiView = _gui["default"].window('midiView', 'MIDI Debug', function () {
+        _this.game.systemsManager.removeSystem(GuiMidi.id);
       });
-
-      // Separate plugins into checked and unchecked
-      var checkedPlugins = [];
-      var uncheckedPlugins = [];
-      var pluginList = document.createElement('ul');
-      pluginList.className = "pluginList";
-      pluginStatusMap.forEach(function (isChecked, pluginName) {
-        var listItem = document.createElement('li');
-        listItem.className = "pluginItem";
-        var checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = isChecked;
-        checkbox.id = "checkbox-".concat(pluginName.replace(/\s+/g, '-'));
-        checkbox.className = "pluginCheckbox";
-        checkbox.addEventListener('change', function () {
-          _this.togglePlugin(checkbox, pluginName);
-        });
-        var label = document.createElement('label');
-        label.setAttribute('for', checkbox.id);
-        label.textContent = pluginName;
-        label.className = "pluginLabel";
-        listItem.appendChild(checkbox);
-        listItem.appendChild(label);
-        pluginList.appendChild(listItem);
-      });
-
-      // Replace the existing table with the newly created list
-      this.pluginTable.replaceWith(pluginList);
-      this.pluginTable = pluginList; // Update the reference to the new list
-
-      // Append checked plugins first, then unchecked
-      checkedPlugins.forEach(function (row) {
-        return _this.pluginTable.appendChild(row);
-      });
-      uncheckedPlugins.forEach(function (row) {
-        return _this.pluginTable.appendChild(row);
-      });
+      var guiContent = this.midiView.querySelector('.gui-content');
+      this.logElement = document.createElement('div');
+      this.logElement.id = "midi-log";
+      guiContent.appendChild(this.logElement);
     }
   }, {
-    key: "togglePlugin",
-    value: function togglePlugin(checkbox, pluginName, pluginId) {
-      console.log('togglePlugin', checkbox, pluginName, pluginId);
-      if (checkbox.checked) {
-        // check to see if the plugin is already loaded
-        // if so, just call reload
-        if (this.game._plugins[pluginId]) {
-          this.game._plugins[pluginId].reload();
-        } else {
-          // let pluginInstance = new this.game.plugins[pluginName]();
-          this.game.use(pluginName);
-        }
-      } else {
-        // this.game.removeSystem(this.game.plugins[pluginName].id);
-        this.game.removePlugin(pluginId);
-      }
+    key: "logMidiData",
+    value: function logMidiData(data) {
+      this.midiLog.push(data);
+      this.updateLogDisplay();
     }
   }, {
-    key: "subscribeToPluginUpdates",
-    value: function subscribeToPluginUpdates() {
+    key: "updateLogDisplay",
+    value: function updateLogDisplay() {
       var _this2 = this;
-      // Update the plugin table when plugins are loaded or unloaded
-      this.game.on('plugin::loaded', function (pluginName) {
-        _this2.drawPluginTable();
-      });
-      this.game.on('plugin::ready', function (pluginName) {
-        _this2.drawPluginTable();
-      });
-      this.game.on('plugin::unloaded', function (pluginName) {
-        _this2.drawPluginTable();
+      this.logElement.innerHTML = '';
+      this.midiLog.forEach(function (data) {
+        var item = document.createElement('p');
+        item.textContent = "MIDI Data: ".concat(data);
+        _this2.logElement.appendChild(item);
       });
     }
   }, {
     key: "unload",
     value: function unload() {
-      // Remove the window from the DOM
-      if (this.container && this.container.parentNode) {
-        this.container.parentNode.removeChild(this.container);
+      if (this.midiView) {
+        this.midiView.remove();
       }
     }
   }]);
-  return PluginsGUI;
+  return GuiMidi;
 }();
-_defineProperty(PluginsGUI, "id", 'gui-plugins');
-var _default = exports["default"] = PluginsGUI;
+_defineProperty(GuiMidi, "id", 'gui-midi');
+var _default = exports["default"] = GuiMidi;
+/*
 
-},{"../gui-editor/gui.js":1,"./pluginsList.js":3}],3:[function(require,module,exports){
-"use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
+// Initialize Babylon.js scene
+const canvas = document.getElementById('renderCanvas');
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+
+const camera = new BABYLON.ArcRotateCamera('camera', Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), scene);
+camera.attachControl(canvas, true);
+
+const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(1, 1, 0), scene);
+
+// Function to create a note object
+function createNoteObject(noteNumber) {
+    const size = 0.2; // Size can vary based on note properties
+    const noteObject = BABYLON.MeshBuilder.CreateSphere(`note_${noteNumber}`, {diameter: size}, scene);
+    noteObject.position.x = (noteNumber % 12) - 6; // Example positioning logic
+    noteObject.position.y = 0;
+    noteObject.isVisible = false;
+
+    return noteObject;
+}
+
+// Dictionary to store note objects
+const notes = {};
+
+// Function to process MIDI data
+function processMIDIData(data) {
+    const [command, noteNumber, velocity] = data;
+
+    if (command === 144) { // Note on
+        if (!notes[noteNumber]) {
+            notes[noteNumber] = createNoteObject(noteNumber);
+        }
+        notes[noteNumber].isVisible = true;
+        // Additional logic for animation based on velocity
+    } else if (command === 128) { // Note off
+        if (notes[noteNumber]) {
+            notes[noteNumber].isVisible = false;
+        }
+    }
+}
+
+// Render loop
+engine.runRenderLoop(function () {
+    scene.render();
 });
-exports["default"] = void 0;
-var pluginsList = {
-  "AsteroidsMovement": {
-    "path": "./plugins/entity-movement/strategies/AsteroidsMovement.js",
-    "size": 4.953
-  },
-  "Behaviors": {
-    "path": "./plugins/behaviors/Behaviors.js",
-    "size": 5.512
-  },
-  "BabylonCamera": {
-    "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 9.028
-  },
-  "BabylonGraphics": {
-    "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.679
-  },
-  "Block": {
-    "path": "./plugins/block/Block.js",
-    "size": 6.845
-  },
-  "Border": {
-    "path": "./plugins/border/Border.js",
-    "size": 9.126
-  },
-  "Bullet": {
-    "path": "./plugins/bullet/Bullet.js",
-    "size": 13.052
-  },
-  "CSSGraphics": {
-    "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 20.186
-  },
-  "Client": {
-    "path": "./plugins/client/Client.js",
-    "size": 122.057
-  },
-  "ChronoControl": {
-    "path": "./plugins/chrono-control/ChronoControl.js",
-    "size": 9.901
-  },
-  "Collisions": {
-    "path": "./plugins/collisions/Collisions.js",
-    "size": 9.322
-  },
-  "Creator": {
-    "path": "./plugins/gui-creator/Creator.js",
-    "size": 6.391
-  },
-  "Entity": {
-    "path": "./plugins/entity/Entity.js",
-    "size": 39.881
-  },
-  "EntityInput": {
-    "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.15
-  },
-  "EntityMovement": {
-    "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 20.486
-  },
-  "Gamepad": {
-    "path": "./plugins/gamepad/Gamepad.js",
-    "size": 5.789
-  },
-  "Graphics": {
-    "path": "./plugins/graphics/Graphics.js",
-    "size": 5.7
-  },
-  "Health": {
-    "path": "./plugins/health/Health.js",
-    "size": 3.9
-  },
-  "Timers": {
-    "path": "./plugins/timers/Timers.js",
-    "size": 21.13
-  },
-  "ControlsGUI": {
-    "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 16.69
-  },
-  "LoadingScreen": {
-    "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 15.968
-  },
-  "EntitiesGUI": {
-    "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 20.087
-  },
-  "PingTime": {
-    "path": "./plugins/ping-time/PingTime.js",
-    "size": 5.687
-  },
-  "PluginsGUI": {
-    "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.332
-  },
-  "YantraGUI": {
-    "path": "./plugins/gui-yantra/YantraGUI.js",
-    "size": 12.952
-  },
-  "SutraGUI": {
-    "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 84.771
-  },
-  "Editor": {
-    "path": "./plugins/gui-editor/Editor.js",
-    "size": 12.983
-  },
-  "SnapshotSize": {
-    "path": "./plugins/snapshot-size/SnapshotSize.js",
-    "size": 9.829
-  },
-  "Schema": {
-    "path": "./plugins/schema/Schema.js",
-    "size": 287.685
-  },
-  "CurrentFPS": {
-    "path": "./plugins/current-fps/CurrentFPS.js",
-    "size": 5.728
-  },
-  "Keyboard": {
-    "path": "./plugins/keyboard/Keyboard.js",
-    "size": 9.453
-  },
-  "Lifetime": {
-    "path": "./plugins/lifetime/Lifetime.js",
-    "size": 3.929
-  },
-  "LocalClient": {
-    "path": "./plugins/client/LocalClient.js",
-    "size": 4.988
-  },
-  "MatterPhysics": {
-    "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 393.768
-  },
-  "Mouse": {
-    "path": "./plugins/mouse/Mouse.js",
-    "size": 6.198
-  },
-  "PhaserGraphics": {
-    "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 32.836
-  },
-  "ThreeGraphics": {
-    "path": "./plugins/graphics-three/ThreeGraphics.js",
-    "size": 19.209
-  },
-  "PongMovement": {
-    "path": "./plugins/entity-movement/strategies/PongMovement.js",
-    "size": 5.054
-  },
-  "PongWorld": {
-    "path": "./plugins/world/pong/PongWorld.js",
-    "size": 11.68
-  },
-  "StarField": {
-    "path": "./plugins/starfield/StarField.js",
-    "size": 9.31
-  },
-  "BabylonStarField": {
-    "path": "./plugins/starfield/BabylonStarField.js",
-    "size": 5.68
-  },
-  "FroggerMovement": {
-    "path": "./plugins/entity-movement/strategies/FroggerMovement.js",
-    "size": 4.579
-  },
-  "PacManMovement": {
-    "path": "./plugins/entity-movement/strategies/PacManMovement.js",
-    "size": 4.573
-  },
-  "XState": {
-    "path": "./plugins/xstate/XState.js",
-    "size": 192.085
-  }
-};
-var _default = exports["default"] = pluginsList;
 
-},{}]},{},[2])(2)
+// Handle window resize
+window.addEventListener('resize', function(){
+    engine.resize();
+});
+
+// Example of processing MIDI data
+processMIDIData([144, 60, 100]); // Note on C4
+processMIDIData([128, 60, 0]);   // Note off C4
+
+*/
+
+},{"../gui-editor/gui.js":1}]},{},[2])(2)
 });

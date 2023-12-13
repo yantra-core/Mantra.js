@@ -280,7 +280,6 @@ gui.init = function (game) {
 var _default = exports["default"] = gui;
 
 },{}],2:[function(require,module,exports){
-(function (global){(function (){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -292,9 +291,10 @@ var _drawTable = _interopRequireDefault(require("./lib/drawTable.js"));
 var _dataView = _interopRequireDefault(require("./lib/editor/dataView.js"));
 var _dataForm = _interopRequireDefault(require("./lib/editor/dataForm.js"));
 var _actionForm = _interopRequireDefault(require("./lib/editor/actionForm.js"));
+var _conditionalsForm = _interopRequireDefault(require("./lib/editor/conditionalsForm.js"));
+var _conditionalForm = _interopRequireDefault(require("./lib/editor/conditionalForm.js"));
 var _createLabel = _interopRequireDefault(require("./lib/editor/createLabel.js"));
 var _editor = _interopRequireDefault(require("./lib/editor.js"));
-var _sutra = _interopRequireDefault((typeof window !== "undefined" ? window['Sutra'] : typeof global !== "undefined" ? global['Sutra'] : null));
 var _serializeFormToJSON = _interopRequireDefault(require("./util/serializeFormToJSON.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -304,7 +304,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // SutraGUI.js - Marak Squires 2023
-//import sutra from '../../../../sutra/index.js';
 // import testRules from './testRules.js';
 var SutraGUI = /*#__PURE__*/function () {
   function SutraGUI() {
@@ -316,16 +315,17 @@ var SutraGUI = /*#__PURE__*/function () {
     this.drawTable = _drawTable["default"].bind(this);
     this.showFunctionEditor = _editor["default"].showFunctionEditor.bind(this);
     this.showObjectEditor = _editor["default"].showObjectEditor.bind(this);
-    this.showConditionalsForm = _editor["default"].showConditionalsForm.bind(this);
+    // this.conditionalsForm = conditionalsForm.bind(this);
+    this.showConditionalsForm = _conditionalsForm["default"].bind(this);
     this.createConditional = _editor["default"].createConditional.bind(this);
+    this.createConditionalForm = _conditionalForm["default"].bind(this);
     this.createLabel = _createLabel["default"].bind(this);
     this.dataView = _dataView["default"].bind(this);
     this.dataForm = _dataForm["default"].bind(this);
     this.showActionForm = _actionForm["default"].bind(this);
     this.onConditionalTypeChange = _editor["default"].onConditionalTypeChange.bind(this);
-    this.createConditionalForm = _editor["default"].createConditionalForm.bind(this);
     this.serializeFormToJSON = _serializeFormToJSON["default"].bind(this);
-    this.sutra = _sutra["default"];
+    // this.sutra = sutra;
   }
   _createClass(SutraGUI, [{
     key: "init",
@@ -362,10 +362,12 @@ var SutraGUI = /*#__PURE__*/function () {
           if (e.target.classList.contains('sutra-link')) {
             var sutraPath = e.target.getAttribute('data-path');
             var node = _this.behavior.findNode(sutraPath);
-            _this.showConditionalsForm(node);
+            // Remark: Editing / Viewing Conditionals is not yet supported
+            //this.showConditionalsForm(node);
           }
         }
       });
+
       if (this.game.rules) {
         this.setRules(this.game.rules);
       }
@@ -397,10 +399,10 @@ var SutraGUI = /*#__PURE__*/function () {
       });
       */
 
+      this.behavior = rules;
       var json = rules.serializeToJson();
       this.drawTable();
       this.drawBehaviorTree(JSON.parse(json));
-      this.behavior = rules;
     }
   }, {
     key: "addNewRule",
@@ -437,19 +439,21 @@ var SutraGUI = /*#__PURE__*/function () {
     key: "viewSutraEnglish",
     value: function viewSutraEnglish() {
       var english = this.behavior.exportToEnglish();
+      // replace all \n with <br>
+      //english = english.replace(/\n/g, '<br>');
       // TODO: add Sutra's i18n support
       //let cn = this.behavior.exportToEnglish(0, 'zh');
       //let ja = this.behavior.exportToEnglish(0, 'ja');
       // clear the #sutraTable
       var table = document.getElementById('sutraTable');
       table.innerHTML = '';
-      // create a new div
-      var englishDiv = document.createElement('textarea');
-      // set height and width to 100%
+      var pre = document.createElement('pre');
+      var englishDiv = document.createElement('code');
       englishDiv.style.width = '95%';
       englishDiv.style.height = '800px';
-      englishDiv.value = english;
-      table.appendChild(englishDiv);
+      englishDiv.innerHTML = english;
+      pre.appendChild(englishDiv);
+      table.appendChild(pre);
     }
   }, {
     key: "getEmitters",
@@ -478,7 +482,7 @@ var SutraGUI = /*#__PURE__*/function () {
       //let guiContent = container.querySelector('.gui-content');
       if (json.tree.length === 0) {
         // add message to indicate no sutra
-        table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
+        // table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
         return;
       }
       //let container = document.createElement('div');
@@ -505,26 +509,27 @@ var SutraGUI = /*#__PURE__*/function () {
       var _this4 = this;
       var path = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
       var keyword = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'IF';
-      // Create a form element instead of a div
       var formElement = document.createElement('form');
       formElement.className = 'node-element-form';
-      // formElement.style.marginLeft = `${indentLevel * 10}px`;
-
-      // Generate a unique path identifier for the node
       var nodeId = path ? "".concat(path, "-").concat(node.action || node["if"]) : node.action || node["if"];
 
-      // Create a div to hold the node contents
+      // Check if node.subtree is a string, indicating a subtree reference
+      if (typeof node.subtree === 'string') {
+        // Retrieve the subtree based on the reference
+        var subtree = this.game.rules.getSubtree(node.subtree);
+
+        // Check if subtree is an instance of Sutra and needs recursive rendering
+        // Render each node in the subtree recursively
+        subtree.tree.forEach(function (subNode) {
+          var childFormElement = _this4.createNodeElement(subNode, indentLevel + 1, nodeId);
+          formElement.appendChild(childFormElement);
+        });
+      }
       var contentDiv = document.createElement('div');
       contentDiv.className = 'node-element';
-
-      // Append buttons to the contentDiv
-      //const addRuleBtn = this.createAddRuleButton(node.sutraPath);
-      //formElement.appendChild(addRuleBtn);
       formElement.appendChild(contentDiv);
       if (node.action) {
-        // add new className to formElement, action-node-form
         formElement.classList.add('action-node-form');
-        // add click handler to formElement so that it opens showActionForm
         formElement.onclick = function () {
           _this4.showActionForm(node);
         };
@@ -701,8 +706,8 @@ var SutraGUI = /*#__PURE__*/function () {
           // set data-path attribute to node.sutraPath
           condition.setAttribute('data-path', node.sutraPath);
           condition.onclick = function () {
-            // condition.classList.toggle('collapsed');
-            self.showConditionalsForm(node);
+            // Remark: Editing / Viewing Conditionals is not yet supported
+            // self.showConditionalsForm(node);
           };
           conditionContainer.appendChild(condition);
 
@@ -728,8 +733,10 @@ var SutraGUI = /*#__PURE__*/function () {
           // find the child node-element-form in condition
           var nodeElementForm = condition.parentElement.parentElement.querySelector('.node-element-form');
           // nodeElementForm.classList.toggle('collapsed');
-          self.showConditionalsForm(node);
+          // Remark: Editing / Viewing Conditionals is not yet supported
+          // self.showConditionalsForm(node);
         };
+
         conditionContainer.appendChild(condition);
 
         //const removeRuleBtn = self.createRemoveRuleButton(node.sutraPath);
@@ -866,8 +873,7 @@ var SutraGUI = /*#__PURE__*/function () {
 _defineProperty(SutraGUI, "id", 'gui-sutra');
 var _default = exports["default"] = SutraGUI;
 
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../gui-editor/gui.js":1,"./lib/drawTable.js":3,"./lib/editor.js":4,"./lib/editor/actionForm.js":5,"./lib/editor/createLabel.js":7,"./lib/editor/dataForm.js":8,"./lib/editor/dataView.js":9,"./util/serializeFormToJSON.js":10}],3:[function(require,module,exports){
+},{"../gui-editor/gui.js":1,"./lib/drawTable.js":3,"./lib/editor.js":4,"./lib/editor/actionForm.js":5,"./lib/editor/conditionalForm.js":7,"./lib/editor/conditionalsForm.js":8,"./lib/editor/createLabel.js":9,"./lib/editor/dataForm.js":10,"./lib/editor/dataView.js":11,"./util/serializeFormToJSON.js":12}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -922,7 +928,8 @@ function drawTable() {
   // set background color to transparent
   this.sutraView.style.backgroundColor = 'transparent';
   var slider = createOpacitySlider(this.sutraView);
-
+  // hide the slider (for now)
+  slider.style.display = 'none';
   // Create and append the new footer
   var footer = document.createElement('div');
   footer.className = 'gui-window-footer';
@@ -934,7 +941,7 @@ function drawTable() {
 
   // add <br>
   guiContent.appendChild(document.createElement('br'));
-  guiContent.appendChild(addRuleButton);
+  // guiContent.appendChild(addRuleButton);
 
   // create save button
   var saveButton = document.createElement('button');
@@ -942,7 +949,7 @@ function drawTable() {
   saveButton.onclick = function () {
     return _this.saveSutra();
   };
-  footer.appendChild(saveButton);
+  // footer.appendChild(saveButton);
 
   //this.sutraView.appendChild(guiContent);
   this.sutraView.appendChild(footer);
@@ -997,7 +1004,6 @@ exports["default"] = void 0;
 var _gui = _interopRequireDefault(require("../../gui-editor/gui.js"));
 var _componentsSelect = _interopRequireDefault(require("./editor/componentsSelect.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 var editor = {};
 editor.showFunctionEditor = function showFunctionEditor(conditionalName, conditional) {
   var _this = this;
@@ -1216,204 +1222,6 @@ editor.showObjectEditor = function showObjectEditor(conditionalName, conditional
   toggleFields(); // Call this to set initial field visibility
 };
 
-editor.showConditionalsForm = function showConditionalsForm(node) {
-  var _this3 = this;
-  // If the node is undefined, assume we are at tree root
-  if (typeof node === 'undefined') {
-    node = {
-      sutraPath: 'tree',
-      action: 'newConditional',
-      "if": 'newConditional',
-      then: [{
-        action: 'newAction'
-      }]
-    };
-  }
-  console.log('node', node);
-  var sutraFormView = document.getElementById('sutraFormView');
-  if (!sutraFormView) {
-    this.sutraFormView = _gui["default"].window('sutraFormView', 'Sutra Condition Editor', function () {
-      var sutraFormView = document.getElementById('sutraFormView');
-      if (sutraFormView) {
-        sutraFormView.remove();
-      }
-    });
-  }
-  // not working?
-  _gui["default"].bringToFront(this.sutraFormView);
-  var guiContent = this.sutraFormView.querySelector('.gui-content');
-  guiContent.innerHTML = ''; // Clear previous content
-
-  var nodeInfo = document.createElement('div');
-  nodeInfo.className = 'node-info';
-  var ifLink = '';
-  if (Array.isArray(node["if"])) {
-    node["if"].forEach(function (conditionalName, index) {
-      // let conditional = this.behavior.getCondition(conditionalName);
-      if (index > 0) {
-        ifLink += "<strong class=\"sutra-keyword\">AND</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
-      } else {
-        ifLink += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
-      }
-    });
-  } else {
-    ifLink = node["if"];
-  }
-  var humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
-  console.log('humanPath', humanPath);
-  humanPath = humanPath.replace('and', '');
-  humanPath = humanPath.split(' ');
-
-  // for each item in humanPath create a span that has sutra-link class and sutra-path attribute
-  var path = '';
-  humanPath.forEach(function (item, index) {
-    if (index > 0) {
-      path += " <strong class=\"sutra-keyword\">..</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(item, "</span>");
-    } else {
-      path += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(item, "</span>");
-    }
-  });
-
-  // Create and append the 'Path' element
-  var pathElement = document.createElement('div');
-  pathElement.innerHTML = "<strong class=\"sutra-keyword\">ROOT</strong> ".concat(humanPath);
-  nodeInfo.appendChild(pathElement);
-
-  // Create and append the 'If' element
-  var ifElement = document.createElement('div');
-  ifElement.innerHTML = "<strong class=\"sutra-keyword\">IF</strong> ".concat(ifLink);
-  nodeInfo.appendChild(ifElement);
-  if (node.then && Array.isArray(node.then) && typeof node.then[0].action !== 'undefined') {
-    // Create and append the 'Then' element
-    var thenElement = document.createElement('div');
-    thenElement.innerHTML = "<strong class=\"sutra-keyword\">THEN</strong> ".concat(node.then[0].action);
-    // clicking on the Then element should up Action Editor
-    thenElement.addEventListener('click', function (e) {
-      e.preventDefault();
-      _this3.showActionForm(node.then[0]);
-    });
-    nodeInfo.appendChild(thenElement);
-  }
-
-  /*
-  if (typeof node.then[0].data !== 'undefined') {
-    // add "WITH" header span
-    let withElement = document.createElement('div');
-    withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
-    nodeInfo.appendChild(withElement);
-  }
-  */
-
-  // Append the entire node info to the GUI content
-  guiContent.appendChild(nodeInfo);
-
-  // Handle array of conditionals
-  if (Array.isArray(node["if"])) {
-    node["if"].forEach(function (conditionalName) {
-      _this3.createConditionalForm(conditionalName, node);
-    });
-  } else {
-    // get condition first
-    var condition = this.behavior.getCondition(node["if"]);
-    if (!condition) {
-      console.log('condition not found', node["if"]);
-      condition = {
-        op: '==',
-        property: 'type',
-        value: 'block'
-      };
-    }
-    if (Array.isArray(condition.conditions)) {
-      condition.conditions.forEach(function (condName, index) {
-        var subCondition = _this3.behavior.getCondition(condName);
-        _this3.createConditionalForm(condName, node);
-      });
-    } else {
-      this.createConditionalForm(node["if"], node);
-    }
-  }
-
-  // add footer for adding new conditional / remove entire if condition
-  // let button = addConditionButton(this, conode);
-
-  var footer = document.createElement('div');
-  footer.className = 'footer';
-  footer.innerHTML = "<h3>Entire Condition Footer</h3>";
-  guiContent.appendChild(footer);
-  _gui["default"].bringToFront(this.sutraFormView);
-};
-editor.createConditionalForm = function createConditionalForm(conditionalName, node) {
-  var _this4 = this;
-  console.log('creating conditional form', conditionalName, node);
-  var self = this;
-  // Create the form element
-
-  /*
-  let form = document.createElement('form');
-  form.className = 'sutra-form';
-  // Create the radio group div
-  let radioGroupDiv = document.createElement('div');
-  radioGroupDiv.className = 'radio-group';
-  // Add radio buttons to radioGroupDiv as needed
-   // Create the conditional input container div
-  let conditionalInputContainer = document.createElement('div');
-  conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
-  conditionalInputContainer.className = 'input-container';
-   // Append the created elements to the form
-  form.appendChild(radioGroupDiv);
-  form.appendChild(conditionalInputContainer);
-  // form.appendChild(removeConditionButton);
-  // form.appendChild(addConditionBelowButton);
-  */
-  // Append the form to the DOM or a parent element as required
-  // Example: document.body.appendChild(form); or parentElement.appendChild(form);
-
-  var conditional = this.behavior.getCondition(conditionalName);
-  console.log('conditional', conditional);
-  if (!conditional) {
-    console.log('condition not found', conditionalName);
-    conditional = {
-      op: '==',
-      property: 'type',
-      value: 'block'
-    };
-  }
-
-  // Handling when conditional is an array
-  if (Array.isArray(conditional)) {
-    // Create a container for each condition in the array
-    conditional.forEach(function (cond, index) {
-      var container = document.createElement('div');
-      container.id = "conditional-".concat(conditionalName, "-").concat(index);
-      container.className = 'conditional-array-item';
-      // Depending on the type of condition (function or object), call the appropriate editor
-      if (typeof cond === 'function') {
-        _this4.showFunctionEditor("".concat(conditionalName, "-").concat(index), cond, container);
-      } else if (_typeof(cond) === 'object') {
-        _this4.showObjectEditor("".concat(conditionalName, "-").concat(index), cond, _this4.behavior.operators, container);
-      } else {
-        console.log('Unknown conditional type in array');
-      }
-      var guiContent = _this4.sutraFormView.querySelector('.gui-content');
-      guiContent.appendChild(container);
-
-      // Append the container to the form
-      //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
-    });
-  } else if (typeof conditional === 'function') {
-    this.showFunctionEditor(conditionalName, conditional);
-  } else if (_typeof(conditional) === 'object') {
-    this.showObjectEditor(conditionalName, conditional, this.behavior.operators);
-  } else {
-    console.log('Unknown conditional type');
-  }
-  var guiContent = this.sutraFormView.querySelector('.gui-content');
-  var footer = document.createElement('div');
-  footer.className = 'footer';
-  footer.innerHTML = "<h3>Individual Condition Footer</h3>";
-  guiContent.appendChild(footer);
-};
-
 // Adjust createConditional to handle both creating and updating conditionals
 editor.createConditional = function createConditional(e, node) {
   e.preventDefault();
@@ -1467,6 +1275,9 @@ exports["default"] = showActionForm;
 var _gui = _interopRequireDefault(require("../../../gui-editor/gui.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function showActionForm(node) {
+  // Remark: Action form is not yet implemented
+
+  return;
   /*
   // If the node is undefined, assume we are at tree root
   if (typeof node === 'undefined') {
@@ -1575,6 +1386,221 @@ function componentsSelect(id, components) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = createConditionalForm;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function createConditionalForm(conditionalName, node) {
+  var _this = this;
+  console.log('creating conditional form', conditionalName, node);
+  var self = this;
+  // Create the form element
+
+  /*
+  let form = document.createElement('form');
+  form.className = 'sutra-form';
+  // Create the radio group div
+  let radioGroupDiv = document.createElement('div');
+  radioGroupDiv.className = 'radio-group';
+  // Add radio buttons to radioGroupDiv as needed
+   // Create the conditional input container div
+  let conditionalInputContainer = document.createElement('div');
+  conditionalInputContainer.id = `conditionalInputContainer-${conditionalName}`;
+  conditionalInputContainer.className = 'input-container';
+   // Append the created elements to the form
+  form.appendChild(radioGroupDiv);
+  form.appendChild(conditionalInputContainer);
+  // form.appendChild(removeConditionButton);
+  // form.appendChild(addConditionBelowButton);
+  */
+  // Append the form to the DOM or a parent element as required
+  // Example: document.body.appendChild(form); or parentElement.appendChild(form);
+
+  var conditional = this.behavior.getCondition(conditionalName);
+  console.log('conditional', conditional);
+  if (!conditional) {
+    console.log('condition not found', conditionalName);
+    conditional = {
+      op: '==',
+      property: 'type',
+      value: 'block'
+    };
+  }
+
+  // Handling when conditional is an array
+  if (Array.isArray(conditional)) {
+    // Create a container for each condition in the array
+    conditional.forEach(function (cond, index) {
+      var container = document.createElement('div');
+      container.id = "conditional-".concat(conditionalName, "-").concat(index);
+      container.className = 'conditional-array-item';
+      // Depending on the type of condition (function or object), call the appropriate editor
+      if (typeof cond === 'function') {
+        _this.showFunctionEditor("".concat(conditionalName, "-").concat(index), cond, container);
+      } else if (_typeof(cond) === 'object') {
+        _this.showObjectEditor("".concat(conditionalName, "-").concat(index), cond, _this.behavior.operators, container);
+      } else {
+        console.log('Unknown conditional type in array');
+      }
+      var guiContent = _this.sutraFormView.querySelector('.gui-content');
+      guiContent.appendChild(container);
+
+      // Append the container to the form
+      //form.querySelector('#conditionalInputContainer-' + conditionalName).appendChild(container);
+    });
+  } else if (typeof conditional === 'function') {
+    this.showFunctionEditor(conditionalName, conditional);
+  } else if (_typeof(conditional) === 'object') {
+    this.showObjectEditor(conditionalName, conditional, this.behavior.operators);
+  } else {
+    console.log('Unknown conditional type');
+  }
+  var guiContent = this.sutraFormView.querySelector('.gui-content');
+  var footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = "<h3>Individual Condition Footer</h3>";
+  guiContent.appendChild(footer);
+}
+
+},{}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = showConditionalsForm;
+var _gui = _interopRequireDefault(require("../../../gui-editor/gui.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function showConditionalsForm(node) {
+  var _this = this;
+  // If the node is undefined, assume we are at tree root
+  if (typeof node === 'undefined') {
+    node = {
+      sutraPath: 'tree',
+      action: 'newConditional',
+      "if": 'newConditional',
+      then: [{
+        action: 'newAction'
+      }]
+    };
+  }
+  var sutraFormView = document.getElementById('sutraFormView');
+  if (!sutraFormView) {
+    this.sutraFormView = _gui["default"].window('sutraFormView', 'Sutra Condition Editor', function () {
+      var sutraFormView = document.getElementById('sutraFormView');
+      if (sutraFormView) {
+        sutraFormView.remove();
+      }
+    });
+  }
+  // not working?
+  _gui["default"].bringToFront(this.sutraFormView);
+  var guiContent = this.sutraFormView.querySelector('.gui-content');
+  guiContent.innerHTML = ''; // Clear previous content
+
+  var nodeInfo = document.createElement('div');
+  nodeInfo.className = 'node-info';
+  var ifLink = '';
+  if (Array.isArray(node["if"])) {
+    node["if"].forEach(function (conditionalName, index) {
+      // let conditional = this.behavior.getCondition(conditionalName);
+      if (index > 0) {
+        ifLink += "<strong class=\"sutra-keyword\">AND</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
+      } else {
+        ifLink += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(conditionalName, "</span>");
+      }
+    });
+  } else {
+    ifLink = node["if"];
+  }
+  var humanPath = this.behavior.getReadableSutraPath(node.sutraPath) || 'root';
+  console.log('humanPath', humanPath);
+  humanPath = humanPath.replace('and', '');
+  humanPath = humanPath.split(' ');
+
+  // for each item in humanPath create a span that has sutra-link class and sutra-path attribute
+  var path = '';
+  humanPath.forEach(function (item, index) {
+    if (index > 0) {
+      path += " <strong class=\"sutra-keyword\">..</strong> <span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(item, "</span>");
+    } else {
+      path += "<span=\"openCondition\" class=\"sutra-link\" data-path=\"".concat(node.sutraPath, "\">").concat(item, "</span>");
+    }
+  });
+
+  // Create and append the 'Path' element
+  var pathElement = document.createElement('div');
+  pathElement.innerHTML = "<strong class=\"sutra-keyword\">ROOT</strong> ".concat(humanPath);
+  nodeInfo.appendChild(pathElement);
+
+  // Create and append the 'If' element
+  var ifElement = document.createElement('div');
+  ifElement.innerHTML = "<strong class=\"sutra-keyword\">IF</strong> ".concat(ifLink);
+  nodeInfo.appendChild(ifElement);
+  if (node.then && Array.isArray(node.then) && typeof node.then[0].action !== 'undefined') {
+    // Create and append the 'Then' element
+    var thenElement = document.createElement('div');
+    thenElement.innerHTML = "<strong class=\"sutra-keyword\">THEN</strong> ".concat(node.then[0].action);
+    // clicking on the Then element should up Action Editor
+    thenElement.addEventListener('click', function (e) {
+      e.preventDefault();
+      _this.showActionForm(node.then[0]);
+    });
+    nodeInfo.appendChild(thenElement);
+  }
+
+  /*
+  if (typeof node.then[0].data !== 'undefined') {
+    // add "WITH" header span
+    let withElement = document.createElement('div');
+    withElement.innerHTML = `<strong class="sutra-keyword">WITH</strong>`;
+    nodeInfo.appendChild(withElement);
+  }
+  */
+
+  // Append the entire node info to the GUI content
+  guiContent.appendChild(nodeInfo);
+
+  // Handle array of conditionals
+  if (Array.isArray(node["if"])) {
+    node["if"].forEach(function (conditionalName) {
+      _this.createConditionalForm(conditionalName, node);
+    });
+  } else {
+    // get condition first
+    var condition = this.behavior.getCondition(node["if"]);
+    if (!condition) {
+      console.log('condition not found', node["if"]);
+      condition = {
+        op: '==',
+        property: 'type',
+        value: 'block'
+      };
+    }
+    if (Array.isArray(condition.conditions)) {
+      condition.conditions.forEach(function (condName, index) {
+        var subCondition = _this.behavior.getCondition(condName);
+        _this.createConditionalForm(condName, node);
+      });
+    } else {
+      this.createConditionalForm(node["if"], node);
+    }
+  }
+
+  // add footer for adding new conditional / remove entire if condition
+  // let button = addConditionButton(this, conode);
+
+  var footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = "<h3>Entire Condition Footer</h3>";
+  guiContent.appendChild(footer);
+  _gui["default"].bringToFront(this.sutraFormView);
+}
+
+},{"../../../gui-editor/gui.js":1}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = createLabel;
 function createLabel(key, indentLevel) {
   var label = document.createElement('label');
@@ -1587,7 +1613,7 @@ function createLabel(key, indentLevel) {
   return label;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1894,7 +1920,7 @@ function createNestedDataContainer(nestedNode, indentLevel) {
   return nestedDataContainer;
 }
 
-},{"./actionForm.js":5}],9:[function(require,module,exports){
+},{"./actionForm.js":5}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1981,7 +2007,7 @@ function createValueDisplay(key, value, indentLevel, path) {
   return valueDisplayWrapper;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

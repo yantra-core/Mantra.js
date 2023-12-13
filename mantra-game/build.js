@@ -12,7 +12,6 @@ const plugins = [
   './plugins/border/Border.js',
   './plugins/bullet/Bullet.js',
   './plugins/graphics-css/CSSGraphics.js',
-  // Note: 'Camera' is the same as 'BabylonCamera', so it's not repeated
   './plugins/client/Client.js',
   './plugins/chrono-control/ChronoControl.js',
   './plugins/collisions/Collisions.js',
@@ -89,6 +88,9 @@ function logStep(plugin, message) {
   console.log(`[${getFileName(plugin)}] ${message}`);
 }
 
+// include additions files and dirs aside from the Plugin class file
+const includeDirs = ['vendor'];
+
 plugins.forEach(plugin => {
   logStep(plugin, 'Starting bundling');
 
@@ -100,8 +102,9 @@ plugins.forEach(plugin => {
   // After bundling the plugin, copy its subdirectories
   const pluginDir = path.dirname(plugin);
   const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;
+
   fs.readdirSync(pluginDir, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
+    .filter(dirent => dirent.isDirectory() && includeDirs.includes(dirent.name))
     .forEach(dirent => {
       copyDirSync(path.join(pluginDir, dirent.name), path.join(destDir, dirent.name));
       logStep(plugin, `Copied subdirectory: ${dirent.name}`);

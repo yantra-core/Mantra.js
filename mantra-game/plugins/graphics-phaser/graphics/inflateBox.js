@@ -11,11 +11,14 @@ export default function inflategraphic(entityData) {
     // Create a new triangle if it doesn't exist
     graphic = this.scene.add.graphics();
     entityData.graphic = graphic; // Store the reference in entityData for future updates
-    if (entityData.color) {
-      graphic.fillStyle(entityData.color, 1);
-      graphic.currentFillColor = entityData.color;
-      graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
+    if (!entityData.color) {
+      // defaults to white
+      entityData.color = 0xffffff;
     }
+
+    graphic.fillStyle(entityData.color, 1);
+    graphic.currentFillColor = entityData.color;
+    graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
     this.scene.add.existing(graphic);
     this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
   }

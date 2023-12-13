@@ -63,13 +63,18 @@ var Collisions = /*#__PURE__*/function () {
         if (this.game.rules) {
           this.game.data.collisions = this.game.data.collisions || [];
           // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-          this.game.data.collisions.push({
+          var collisionContext = {
             type: 'COLLISION',
             entityIdA: bodyA.myEntityId,
             entityIdB: bodyB.myEntityId,
             bodyA: entityA,
             bodyB: entityB
-          });
+          };
+
+          // add entity onto the collision by type name
+          collisionContext[entityA.type] = entityA;
+          collisionContext[entityB.type] = entityB;
+          this.game.data.collisions.push(collisionContext);
         }
       }
 

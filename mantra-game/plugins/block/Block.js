@@ -53,6 +53,7 @@ class Block {
     }
   }
 
+  // TODO: add option to cancel collision pairs
   blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
     if (this.game.mode === 'local' || !this.game.isClient) {
 
