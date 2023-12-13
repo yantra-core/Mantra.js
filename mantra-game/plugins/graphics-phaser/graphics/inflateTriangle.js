@@ -50,8 +50,6 @@ export default function inflateTriangle(entityData) {
       graphic.rotation = entityData.rotation;
     }
   }
-  // Optional: Update position if needed
-  // graphic.setPosition(centerX, centerY);
 
   return graphic;
 }
