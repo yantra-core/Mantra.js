@@ -33,7 +33,6 @@ class PhaserCamera {
       // Use this.zoom and this.camera instead of global variables
       // console.log('wheel', pointer, gameObjects, deltaX, deltaY, deltaZ)
 
-
       let currentZoom = zoom.current;
 
       // Determine the zoom factor based on the wheel event.
@@ -46,7 +45,6 @@ class PhaserCamera {
       currentZoom = Math.min(Math.max(currentZoom, zoom.minZoom), zoom.maxZoom);
       // Use zoom.tweenTo for smoother zoom transitions
       zoom.tweenTo(this.scene, currentZoom, 666);  // 1000 ms duration for the tween
-
 
     });
 
@@ -75,8 +73,6 @@ class PhaserCamera {
 }
 
 export default PhaserCamera;
-
-
 
 const zoom = {};
 
@@ -178,3 +174,31 @@ zoom.set = function (mainScene, absoluteAmount) {
   mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
   zoom.current = absoluteAmount;
 };
+
+/*
+  TODO: add back camera follow
+ let camera = this.scene.cameras.main;
+    if (true || this.config.camera && this.config.camera === 'follow') {
+
+      //    if (this.followPlayer && this.followingPlayer !== true) {
+      // Camera settings
+      // console.log('game.currentPlayerId', game.currentPlayerId)
+      let player = this.game.getEntity(game.currentPlayerId);
+      let graphics = this.game.components.graphics.get(game.currentPlayerId);
+      if (player && !this.followingPlayer && graphics && player.graphics['graphics-phaser']) {
+        console.log('starting follow');
+        camera.startFollow(player.graphics['graphics-phaser']);
+        this.followingPlayer = true;
+      }
+    }
+
+    // center camera
+    // TODO now center the camera
+    // center camera to (0,0) in game world coordinates
+    let centerX = 0;
+    let centerY = 0;
+    // console.log('centering camera', centerX, centerY)
+    camera.setPosition(centerX, centerY);
+    camera.zoom = this.startingZoom;
+
+    */
