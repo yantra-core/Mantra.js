@@ -28,9 +28,9 @@ class PhaserCamera {
   // update() is called each game tick, we may want to implement render() here instead for RAF
   update() {
     let camera = this.scene.cameras.main;
-    let player = this.game.getEntity(game.currentPlayerId);
-    let graphics = this.game.components.graphics.get(game.currentPlayerId);
-    if (player.graphics && player.graphics['graphics-phaser']) {
+    let player = this.game.getEntity(this.game.currentPlayerId);
+    let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
+    if (camera && player.graphics && player.graphics['graphics-phaser']) {
       camera.centerOn(player.position.x, player.position.y);
       this.followingPlayer = true; // Set the flag to true
     }

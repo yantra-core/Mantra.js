@@ -34,6 +34,13 @@ var BabylonStarField = /*#__PURE__*/function () {
     key: "initialize",
     value: function initialize() {
       var _this = this;
+      var self;
+      if (typeof BABYLON === 'undefined' || typeof this.scene === 'undefined') {
+        setTimeout(function () {
+          self.initialize();
+        }, 10);
+        return;
+      }
       var pcs = new BABYLON.PointsCloudSystem("pcs", 1, this.scene);
       this.pcs = pcs;
       pcs.addPoints(this.starCount, function (particle, i) {

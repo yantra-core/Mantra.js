@@ -20,6 +20,16 @@ class BabylonStarField {
   }
 
   initialize() {
+
+    let self;
+
+    if (typeof BABYLON === 'undefined' || typeof this.scene === 'undefined') {
+      setTimeout(function(){
+        self.initialize();
+      }, 10)
+      return;
+    }
+
     var pcs = new BABYLON.PointsCloudSystem("pcs", 1, this.scene);
     this.pcs = pcs;
 

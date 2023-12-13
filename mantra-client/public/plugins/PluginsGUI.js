@@ -471,7 +471,7 @@ var pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 50.679
+    "size": 52.48
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -551,7 +551,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.332
+    "size": 23.334
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -563,7 +563,7 @@ var pluginsList = {
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 12.983
+    "size": 17.695
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -599,7 +599,7 @@ var pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 32.836
+    "size": 34.394
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",
@@ -615,11 +615,11 @@ var pluginsList = {
   },
   "StarField": {
     "path": "./plugins/starfield/StarField.js",
-    "size": 9.31
+    "size": 10.172
   },
   "BabylonStarField": {
     "path": "./plugins/starfield/BabylonStarField.js",
-    "size": 5.68
+    "size": 5.879
   },
   "FroggerMovement": {
     "path": "./plugins/entity-movement/strategies/FroggerMovement.js",

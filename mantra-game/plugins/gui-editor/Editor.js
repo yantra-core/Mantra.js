@@ -1,3 +1,5 @@
+import GraphicsSelector from './lib/GraphicsSelector.js';
+
 class Editor {
 
   static id = 'gui-editor';
@@ -46,6 +48,7 @@ class Editor {
     const $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
     const $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
     const $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
+    const $graphicsSelector = new GraphicsSelector(this.game);
 
     const $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
     // const $aboutMenu = this.createMenu('About');
@@ -65,6 +68,7 @@ class Editor {
     }
     toolBarItems.push($inspectorMenu)
     $toolbar.append(toolBarItems);
+    $toolbar.append($graphicsSelector.selectBox);
 
     // Append the toolbar to the body
     $('body').append($toolbar);

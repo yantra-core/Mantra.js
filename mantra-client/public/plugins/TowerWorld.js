@@ -157,6 +157,7 @@ var TowerWorld = /*#__PURE__*/function () {
   }, {
     key: "createBorders",
     value: function createBorders(N) {
+      var game = this.game;
       // TODO: move this a sutra
       for (var i = 0; i < N; i++) {
         var scaleFactor = 0.2 * (i + 1);
@@ -575,6 +576,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = player;
 function player() {
+  var game = this.game;
   var player = this.game.createSutra();
   player.addCondition('isPlayer', function (entity) {
     return entity.type === 'PLAYER';

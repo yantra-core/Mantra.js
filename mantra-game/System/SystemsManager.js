@@ -42,8 +42,8 @@ class SystemsManager {
 
 
     // Remark: Special scope used for plugins, we can probably remove this or rename it
-    if (this.game._plugins[system.id]) {
-      delete this.game._plugins[system.id];
+    if (this.game._plugins[systemId]) {
+      delete this.game._plugins[systemId];
     }
 
     // we may want to remove the extra game.systems scope? or reference directly to the map?

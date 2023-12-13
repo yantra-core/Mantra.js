@@ -44,9 +44,9 @@ var PhaserCamera = /*#__PURE__*/function () {
     key: "update",
     value: function update() {
       var camera = this.scene.cameras.main;
-      var player = this.game.getEntity(game.currentPlayerId);
-      var graphics = this.game.components.graphics.get(game.currentPlayerId);
-      if (player.graphics && player.graphics['graphics-phaser']) {
+      var player = this.game.getEntity(this.game.currentPlayerId);
+      var graphics = this.game.components.graphics.get(this.game.currentPlayerId);
+      if (camera && player.graphics && player.graphics['graphics-phaser']) {
         camera.centerOn(player.position.x, player.position.y);
         this.followingPlayer = true; // Set the flag to true
       }

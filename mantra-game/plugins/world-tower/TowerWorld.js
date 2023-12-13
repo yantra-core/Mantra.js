@@ -51,6 +51,8 @@ class TowerWorld {
       }
     }
 
+    // game.use('Scoreboard');
+
     // Create Sutras
     let roundSutra = round.call(this);
     let spawnerSutra = enemy.call(this);
@@ -179,6 +181,7 @@ class TowerWorld {
 
   // base unit spawner
   createBorders(N) {
+    let game = this.game;
     // TODO: move this a sutra
     for (let i = 0; i < N; i++) {
       const scaleFactor = 0.2 * (i + 1);
@@ -325,14 +328,11 @@ class TowerWorld {
     });
     */
 
-
   }
-
 
 }
 
 export default TowerWorld;
-
 
 /*
 
@@ -383,4 +383,3 @@ export default TowerWorld;
 
 
 */
-

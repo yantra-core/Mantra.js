@@ -59,7 +59,7 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
-window.game = game;
+// window.game = game;
 //
 // Use Plugins to add systems to the game
 //
@@ -70,7 +70,9 @@ game.use(new plugins.Bullet())
 game.use(new plugins.Entity())
 
 game.use(new plugins.MatterPhysics());
+// game.use(new plugins.PhaserGraphics());
 
+// game.use(new plugins.PhaserCamera());
 // game.use(new plugins.Collision());
 
 game.use(new plugins.ChronoControl())
@@ -103,10 +105,10 @@ if (game.isOnline) {
 
 // Always show FPS
 game.use(new plugins.CurrentFPS());
-game.use('Editor', {
+game.use(new plugins.Editor({
   sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js',
   sutraEditor: true
-});
+}));
 
 game.use(new plugins.Sutra({ }));
 
@@ -118,7 +120,6 @@ import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
 
 // game.use(new plugins.XState({ world: BossFight() }));
-//game.use(new plugins.SutraGUI({ }));
 
 
 // game.use(new plugins.PluginExplorer({ }));
@@ -153,9 +154,7 @@ function switchToOnline() {
 
 // create a round timer, each 60 seconds move to the next round
 let roundTimer = game.createTimer('round-timer', 4, true);
-console.log('rrr', roundTimer)
-
-// game.setRules(testRules(game));
+console.log('roundTimer', roundTimer)
 
 if (mode === 'online') {
 
@@ -175,7 +174,7 @@ if (mode === 'online') {
   game.use(new plugins.StarField())
   game.use(new plugins.PingTime())
   game.use(new plugins.SnapshotSize())
-
+  
 
 } else {
 
@@ -184,8 +183,12 @@ if (mode === 'online') {
     game.use(new plugins.StarField())
     game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
+    // game.use(new plugins.SutraGUI({ }));
 
-    game.use(new plugins.Scoreboard());
+    // game.use(new plugins.Scoreboard());
+    //game.use(new plugins.MidiGUI())
+    //game.use(new plugins.Midi())
+    // game.use(new plugins.Nes());
 
     game.use(new plugins.TowerWorld());
     game.data.roundEnded = false;

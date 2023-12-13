@@ -34,6 +34,13 @@ var BabylonStarField = /*#__PURE__*/function () {
     key: "initialize",
     value: function initialize() {
       var _this = this;
+      var self;
+      if (typeof BABYLON === 'undefined' || typeof this.scene === 'undefined') {
+        setTimeout(function () {
+          self.initialize();
+        }, 10);
+        return;
+      }
       var pcs = new BABYLON.PointsCloudSystem("pcs", 1, this.scene);
       this.pcs = pcs;
       pcs.addPoints(this.starCount, function (particle, i) {
@@ -115,12 +122,24 @@ var StarField = /*#__PURE__*/function () {
       this.game = game;
       this.engine = engine;
       this.scene = scene;
-      game.graphics.forEach(function (graphicInterface) {
-        if (graphicInterface.id === 'graphics-babylon') {
-          // hard-code per graphics pipeline for now
-          game.use(new _BabylonStarField["default"]());
+      function loadStarfields() {
+        // for now, we will mutually exclusive lock starfield to one graphics engine
+        // TODO: implement pattern for branching plugins that can delegate to other plugins
+        // For example: game.use('StarField') -> game.use('BabylonStarField-') -> game.use('PhaserStarField')
+        // This pattern will be useful for creating global high level APIs that can be implemented by multiple plugins
+        if (game.graphics.length === 0) {
+          console.log('no graphics plugins loaded, trying again');
+          setTimeout(loadStarfields, 10);
+          return;
         }
-      });
+        game.graphics.forEach(function (graphicInterface) {
+          if (graphicInterface.id === 'graphics-babylon') {
+            // hard-code per graphics pipeline for now
+            game.use(new _BabylonStarField["default"]());
+          }
+        });
+      }
+      loadStarfields();
     }
   }, {
     key: "unload",

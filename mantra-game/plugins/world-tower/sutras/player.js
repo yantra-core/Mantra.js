@@ -1,4 +1,5 @@
 export default function player() {
+  let game = this.game;
   let player = this.game.createSutra();
 
   player.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');

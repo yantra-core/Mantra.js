@@ -150,7 +150,7 @@ class PhaserGraphics extends GraphicsInterface {
   }
   
   inflate(snapshot) {
-    console.log(snapshot)
+    // console.log(snapshot)
   }
 
   render(game, alpha) {
@@ -159,7 +159,10 @@ class PhaserGraphics extends GraphicsInterface {
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       // console.log('rendering', ent)
-
+      this.inflateGraphic(ent, alpha);
+      // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
+      //                    This could impact online mode, test for multiplayer
+      /*
       // check if there is no graphic available, if so, inflate
       if (!ent.graphics || !ent.graphics['graphics-phaser']) {
         this.inflateGraphic(ent, alpha);
@@ -169,6 +172,30 @@ class PhaserGraphics extends GraphicsInterface {
         this.inflateGraphic(ent, alpha);
         ent.pendingRender['graphics-phaser'] = false;
       }
+      */
+    }
+  }
+
+  unload () {
+
+    // TODO: consolidate graphics pipeline unloading into SystemsManager
+    // TODO: remove duplicated unload() code in BabylonGraphics
+    this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
+    delete this.game._plugins['PhaserGraphics'];
+
+    // iterate through all entities and remove existing phaser graphics
+    for (let [eId, entity] of this.game.entities.entries()) {
+      if (entity.graphics && entity.graphics['graphics-phaser']) {
+        this.removeGraphic(eId);
+        delete entity.graphics['graphics-phaser'];
+      }
+    }
+
+    // stop phaser, remove canvas
+    this.phaserGame.destroy(true);
+    let canvas = document.getElementById('phaser-render-canvas');
+    if (canvas) {
+      canvas.remove();
     }
   }
 

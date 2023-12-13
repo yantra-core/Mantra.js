@@ -463,10 +463,15 @@ class BabylonGraphics extends GraphicsInterface {
     let self = this;
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
+      this.inflateEntity(ent, alpha);
+      // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
+      //                    This could impact online mode, test for multiplayer
+      /*
       if (ent.pendingRender && ent.pendingRender['graphics-babylon']) {
         this.inflateEntity(ent, alpha);
         ent.pendingRender['graphics-babylon'] = false;
       }
+      */
     }
 
     if (game.systems['graphics-babylon-camera']) {
@@ -509,6 +514,36 @@ class BabylonGraphics extends GraphicsInterface {
 
   inflate(snapshot) { } // not used?
 
+  unload () {
+
+    // TODO: consolidate graphics pipeline unloading into SystemsManager
+    // TODO: remove duplicated unload() code in PhaserGraphics
+
+    // iterate through all entities and remove existing babylon graphics
+    for (let [eId, entity] of this.game.entities.entries()) {
+      if (entity.graphics && entity.graphics['graphics-babylon']) {
+        this.removeGraphic(eId);
+        delete entity.graphics['graphics-babylon'];
+      }
+    }
+
+    // remove BabylonCamera as well
+    // Remark: is this required? could we just leave it in memory?
+    this.game.systemsManager.removeSystem('graphics-babylon-camera');
+
+    this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
+    delete this.game._plugins['BabylonGraphics'];
+
+    // stop babylon, remove canvas
+    this.engine.stopRenderLoop();
+    this.engine.dispose();
+    this.scene.dispose();
+    // remove canvas
+    let canvas = document.getElementById('babylon-render-canvas');
+    if (canvas) {
+      canvas.remove();
+    }
+  }
 
 }
 

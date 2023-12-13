@@ -582,10 +582,15 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
+          this.inflateEntity(ent, alpha);
+          // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
+          //                    This could impact online mode, test for multiplayer
+          /*
           if (ent.pendingRender && ent.pendingRender['graphics-babylon']) {
             this.inflateEntity(ent, alpha);
             ent.pendingRender['graphics-babylon'] = false;
           }
+          */
         }
       } catch (err) {
         _iterator.e(err);
@@ -635,6 +640,49 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "inflate",
     value: function inflate(snapshot) {} // not used?
+  }, {
+    key: "unload",
+    value: function unload() {
+      var _this4 = this;
+      // TODO: consolidate graphics pipeline unloading into SystemsManager
+      // TODO: remove duplicated unload() code in PhaserGraphics
+      // iterate through all entities and remove existing babylon graphics
+      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step2;
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            eId = _step2$value[0],
+            entity = _step2$value[1];
+          if (entity.graphics && entity.graphics['graphics-babylon']) {
+            this.removeGraphic(eId);
+            delete entity.graphics['graphics-babylon'];
+          }
+        }
+
+        // remove BabylonCamera as well
+        // Remark: is this required? could we just leave it in memory?
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+      this.game.systemsManager.removeSystem('graphics-babylon-camera');
+      this.game.graphics = this.game.graphics.filter(function (g) {
+        return g.id !== _this4.id;
+      });
+      delete this.game._plugins['BabylonGraphics'];
+
+      // stop babylon, remove canvas
+      this.engine.stopRenderLoop();
+      this.engine.dispose();
+      this.scene.dispose();
+      // remove canvas
+      var canvas = document.getElementById('babylon-render-canvas');
+      if (canvas) {
+        canvas.remove();
+      }
+    }
   }]);
   return BabylonGraphics;
 }(_GraphicsInterface2["default"]);

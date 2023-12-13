@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _GraphicsSelector = _interopRequireDefault(require("./lib/GraphicsSelector.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -64,6 +66,7 @@ var Editor = /*#__PURE__*/function () {
       var $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
       var $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
       var $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
+      var $graphicsSelector = new _GraphicsSelector["default"](this.game);
       var $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
       // const $aboutMenu = this.createMenu('About');
       // TODO: add optional xstate menu for editing / viewing state machines
@@ -82,6 +85,7 @@ var Editor = /*#__PURE__*/function () {
       }
       toolBarItems.push($inspectorMenu);
       $toolbar.append(toolBarItems);
+      $toolbar.append($graphicsSelector.selectBox);
 
       // Append the toolbar to the body
       $('body').append($toolbar);
@@ -323,6 +327,95 @@ var Editor = /*#__PURE__*/function () {
 _defineProperty(Editor, "id", 'gui-editor');
 _defineProperty(Editor, "async", true);
 var _default = exports["default"] = Editor;
+
+},{"./lib/GraphicsSelector.js":2}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var GraphicsSelector = /*#__PURE__*/function () {
+  function GraphicsSelector(game) {
+    _classCallCheck(this, GraphicsSelector);
+    this.game = game;
+    this.selectBox = this.createElements(); // Now returns the select box element
+    this.addEventListeners();
+  }
+  _createClass(GraphicsSelector, [{
+    key: "createElements",
+    value: function createElements() {
+      // Create the select box
+      var selectBox = document.createElement('select');
+      selectBox.id = 'graphicsSelect';
+      // TODO: Populate the select box with options as needed
+      // Example: this.addOption(selectBox, 'Option 1', 'value1');
+      this.addOption(selectBox, 'Babylon.js', 'BabylonGraphics');
+      this.addOption(selectBox, 'Phaser 3', 'PhaserGraphics');
+      return selectBox;
+    }
+  }, {
+    key: "selectElement",
+    value: function selectElement(value) {
+      // Select the option with the given value
+      this.selectBox.value = value;
+    }
+  }, {
+    key: "addOption",
+    value: function addOption(selectBox, text, value) {
+      var option = document.createElement('option');
+      option.text = text;
+      option.value = value;
+      selectBox.add(option);
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      var _this = this;
+      this.game.on('plugin::ready::graphics-phaser', function () {
+        _this.selectElement('PhaserGraphics');
+      });
+      this.game.on('plugin::ready::graphics-babylon', function () {
+        _this.selectElement('BabylonGraphics');
+      });
+      // Add event listener to the select box
+      this.selectBox.addEventListener('change', function (event) {
+        _this.handleSelectionChange(event);
+      });
+    }
+  }, {
+    key: "handleSelectionChange",
+    value: function handleSelectionChange(event) {
+      // TODO: Implement what happens when the selection changes
+      console.log('Selected:', event.target.value);
+      console.log('this.game.systems', this.game.systems);
+      if (typeof this.game.systems['graphics-babylon'] !== 'undefined') {
+        this.game.systemsManager.removeSystem('graphics-babylon');
+      }
+      if (this.game.systems['graphics-phaser']) {
+        this.game.systemsManager.removeSystem('graphics-phaser');
+      }
+
+      // for now, TODO: pass actual config from previous instance
+      this.game.use(event.target.value, {
+        camera: 'follow'
+      });
+
+      // for now, remove later
+      if (event.target.value === 'BabylonGraphics') {
+        this.game.use('StarField');
+      }
+    }
+  }]);
+  return GraphicsSelector;
+}();
+var _default = exports["default"] = GraphicsSelector;
 
 },{}]},{},[1])(1)
 });

@@ -115,9 +115,9 @@ var PhaserCamera = /*#__PURE__*/function () {
     key: "update",
     value: function update() {
       var camera = this.scene.cameras.main;
-      var player = this.game.getEntity(game.currentPlayerId);
-      var graphics = this.game.components.graphics.get(game.currentPlayerId);
-      if (player.graphics && player.graphics['graphics-phaser']) {
+      var player = this.game.getEntity(this.game.currentPlayerId);
+      var graphics = this.game.components.graphics.get(this.game.currentPlayerId);
+      if (camera && player.graphics && player.graphics['graphics-phaser']) {
         camera.centerOn(player.position.x, player.position.y);
         this.followingPlayer = true; // Set the flag to true
       }
@@ -452,7 +452,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "inflate",
     value: function inflate(snapshot) {
-      console.log(snapshot);
+      // console.log(snapshot)
     }
   }, {
     key: "render",
@@ -468,7 +468,10 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
           // console.log('rendering', ent)
-
+          this.inflateGraphic(ent, alpha);
+          // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
+          //                    This could impact online mode, test for multiplayer
+          /*
           // check if there is no graphic available, if so, inflate
           if (!ent.graphics || !ent.graphics['graphics-phaser']) {
             this.inflateGraphic(ent, alpha);
@@ -478,11 +481,49 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             this.inflateGraphic(ent, alpha);
             ent.pendingRender['graphics-phaser'] = false;
           }
+          */
         }
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
+      }
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      var _this3 = this;
+      // TODO: consolidate graphics pipeline unloading into SystemsManager
+      // TODO: remove duplicated unload() code in BabylonGraphics
+      this.game.graphics = this.game.graphics.filter(function (g) {
+        return g.id !== _this3.id;
+      });
+      delete this.game._plugins['PhaserGraphics'];
+
+      // iterate through all entities and remove existing phaser graphics
+      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step2;
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            eId = _step2$value[0],
+            entity = _step2$value[1];
+          if (entity.graphics && entity.graphics['graphics-phaser']) {
+            this.removeGraphic(eId);
+            delete entity.graphics['graphics-phaser'];
+          }
+        }
+
+        // stop phaser, remove canvas
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+      this.phaserGame.destroy(true);
+      var canvas = document.getElementById('phaser-render-canvas');
+      if (canvas) {
+        canvas.remove();
       }
     }
   }]);
