@@ -243,7 +243,7 @@ class Entity {
       rotation: 0,
       mass: 100,
       density: 100,
-      health: 100,
+      health: Infinity,
       score: 0,
       height: 100,
       width: 100,
@@ -261,7 +261,8 @@ class Entity {
       frictionStatic: 0.5, // Default static friction
       lockedProperties: null, // object hash of properties that should never be updated
       actionRateLimiter: null, // object hash of state history
-      timers: null // object hash timers for TimersComponent.js
+      timers: null, // object hash timers for TimersComponent.js
+      realStone: null, // object hash of properties for RealStone.js
     };
 
     // merge config with defaultConfig
@@ -276,7 +277,7 @@ class Entity {
     };
     */
 
-    const { name, type, position, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, lifetime } = config;
+    const { name, type, position, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, lifetime, realStone } = config;
     let { x, y } = position;
 
     /*
@@ -317,6 +318,7 @@ class Entity {
     this.game.addComponent(entityId, 'actionRateLimiter', {});
     // TODO: clean up API contract with Component
     this.game.addComponent(entityId, 'timers', new TimersComponent('timers', entityId, this.game));
+    this.game.addComponent(entityId, 'realStone', realStone);
  
     if (config.body) {
       let body = this.createBody(config);
@@ -360,7 +362,6 @@ class Entity {
 
     return updatedEntity;
   }
-
 
   applyLockedProperties(entityId, lockedProperties) {
     // Check and apply locked properties

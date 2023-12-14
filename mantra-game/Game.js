@@ -174,7 +174,7 @@ class Game {
     };
 
     // define additional components for the game
-    this.components.health = new Component('color', this);
+    this.components.color = new Component('color', this);
     this.components.health = new Component('health', this);
     this.components.target = new Component('target', this);
     this.components.lifetime = new Component('lifetime', this);
@@ -184,7 +184,7 @@ class Game {
     this.components.lockedProperties = new Component('lockedProperties', this);
     this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
     this.components.timers = new TimersComponent('timers', this);
-
+    this.components.realStone = new Component('realStone', this);
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
 

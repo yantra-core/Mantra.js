@@ -57,6 +57,7 @@ import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
 import Sutra from './plugins/sutra/Sutra.js';
+import RealStone from './plugins/real-stone/RealStone.js';
 
 // Timers
 import Timers from './plugins/timers/Timers.js';
@@ -97,6 +98,7 @@ import TowerWorld from './plugins/world-tower/TowerWorld.js';
 const plugins = {
   Behaviors,
   Sutra,
+  RealStone,
   Block,
   Border,
   Bullet,
