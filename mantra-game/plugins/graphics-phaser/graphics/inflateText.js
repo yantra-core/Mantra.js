@@ -1,28 +1,35 @@
 export default function inflateText(entityData) {
-  // Check to see if there is an existing text object on the entity, if so, use that
-  let textObject;
-  if (entityData.graphics && entityData.graphics['graphics-phaser']) {
-    textObject = entityData.graphics['graphics-phaser'];
-  }
+  // Check if there is an existing container with the text and background
+  let container = entityData.graphics && entityData.graphics['graphics-phaser'];
 
-  let textStyle = { font: '32px Arial', fill: '#f00fff' }
+  let textStyle = { font: '32px Arial', fill: '#f00fff' };
 
-  // If there's no existing text object, create a new one
-  if (!textObject) {
-    textObject = this.scene.add.text(entityData.position.x, entityData.position.y, entityData.text, textStyle);
-    textObject.setOrigin(0.5, 0); // Center text horizontally and anchor to the top
-    textObject.setDepth(1001);
+  // If there's no existing container, create a new one
+  if (!container) {
+    // Create text and background graphic
+    const textObject = this.scene.add.text(0, 0, entityData.text, textStyle).setOrigin(0.5, 0.5);
+    const backgroundGraphic = this.scene.add.graphics().fillStyle(0xcccccc, 1);
+    
+    backgroundGraphic.fillRect(-textObject.width / 2, -textObject.height / 2, textObject.displayWidth, textObject.displayHeight);
+
+    // Create a container and add the text and background graphic to it
+    container = this.scene.add.container(entityData.position.x, entityData.position.y, [backgroundGraphic, textObject]);
     entityData.graphics = entityData.graphics || {};
-    entityData.graphics['graphics-phaser'] = textObject; // Store the reference in entityData for future updates
-    this.scene.add.existing(textObject);
-    this.game.components.graphics.set([entityData.id, 'graphics-phaser'], textObject);
+    entityData.graphics['graphics-phaser'] = container;
   } else {
-    // Update the text only if it has changed
+    // Update the text and background graphic if the text has changed
+    const textObject = container.list[1]; // Assuming textObject is the second item in the container
+    const backgroundGraphic = container.list[0]; // Assuming backgroundGraphic is the first item
+
     if (textObject.text !== entityData.text) {
       textObject.setText(entityData.text);
+      backgroundGraphic.clear();
+      backgroundGraphic.fillRect(-textObject.width / 2, -textObject.height / 2, textObject.width, textObject.height);
     }
-    // Update position in case it has changed
-    textObject.setPosition(entityData.position.x, entityData.position.y);
+
+    // Update container position
+    container.setPosition(entityData.position.x, entityData.position.y + 30);
   }
-  return textObject;
+
+  return container;
 }

@@ -1,19 +1,37 @@
-export default function inflateText(entityData) {
-  const plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', { width: entityData.width, height: entityData.height }, this.scene);
+export default function inflateText(entityData, scene) {
+  let plane, texture;
 
-  const texture = new BABYLON.DynamicTexture('dynamic texture', { width: 512, height: 256 }, this.scene);
-  const material = new BABYLON.StandardMaterial('Mat', this.scene);
+  if (entityData.graphics && entityData.graphics['graphics-babylon']) {
+    // If the plane and text already exist, retrieve them
+    plane = entityData.graphics['graphics-babylon'].plane;
+    texture = entityData.graphics['graphics-babylon'].texture;
+  } else {
+    // Create a new plane and texture
+    plane = new BABYLON.MeshBuilder.CreatePlane('signboard', { width: 120, height: 20 }, scene);
+    texture = new BABYLON.DynamicTexture('dynamicTexture', { width: 512, height: 256 }, scene, false);
+    texture.hasAlpha = true;
 
-  const text = 'HELLO WORLD';  // Or use entityData.text if it contains the message
-  const font = 'bold 44px monospace';
+    const material = new BABYLON.StandardMaterial('textMaterial', scene);
+    material.diffuseTexture = texture;
+    material.backFaceCulling = false;
 
-  texture.drawText(text, null, 40, font, 'black', 'white', true, true);
+    plane.material = material;
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
-  material.diffuseTexture = texture;
-  plane.material = material;
+    // Store the plane and texture in entityData for future use
+    entityData.graphics = entityData.graphics || {};
+    entityData.graphics['graphics-babylon'] = { plane, texture };
+  }
 
-  // Set the billboard mode so the plane always faces the camera
-  plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+  // Draw or update text on the dynamic texture
+  const text = entityData.text || '';
+  const font = 'bold 128px monospace';
+  const textSize = texture.getContext().measureText(text);
+  const xPosition = (texture.getSize().width - textSize.width) / 2;
+  const yPosition = (texture.getSize().height + 128 * 0.8) / 2; // Adjust for vertical centering
+  texture.drawText(text, 0, yPosition, font, 'purple', 'white', true, true);
 
+  // Adjust plane position
+  plane.position = new BABYLON.Vector3(entityData.position.x, entityData.position.y + 200, entityData.position.z);
   return plane;
 }

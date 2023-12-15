@@ -14,7 +14,7 @@ class PhaserGraphics extends GraphicsInterface {
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
-  constructor({ camera = {}, startingZoom = 0.2 } = {}) {
+  constructor({ camera = {}, startingZoom = 0.5 } = {}) {
     super();
     this.id = 'graphics-phaser';
     this.async = PhaserGraphics.async;
