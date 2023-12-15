@@ -1,21 +1,14 @@
-// BabylonRenderer.js extends RendererInterface.js
+// BabylonGraphics.js - Marak Squires 2023
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 import BabylonCamera from './camera/BabylonCamera.js';
-// TODO: remove circular dependency to plugins.js
-// import plugins from '../../plugins.js';
-
-// You can create your own renderer by replacing this file with a Class that extends RendererInterface.js
-
-// Simple Babylon.js Debug GUI for Entity inspection
-//import DebugGUI from '../../Component/DebugGUI.js';
-//import EntityLabel from '../../Component/EntityLabel.js';
-//import StarField from '../../Component/StarField.js';
+// import inflate3DText from './lib/inflate3DText.js';
+import inflateText from './lib/inflateText.js';
 
 let lastKnownStates = {};
-
 const POOL_SIZE_BLOCK = 3000;
 const POOL_SIZE_BULLET = 1000;
 
+// You can create your own renderer by replacing this file with a Class that extends GraphicsInterface.js
 class BabylonGraphics extends GraphicsInterface {
 
   static id = 'graphics-babylon';
@@ -32,6 +25,9 @@ class BabylonGraphics extends GraphicsInterface {
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
     this.pendingLoad = []; // queue of pending Plugins that depend on this Babylon Graphics
+
+    // this.inflate3DText = inflateText.bind(this);
+    this.inflateText = inflateText.bind(this);
 
     // config scope for convenience
     let config = {
@@ -177,6 +173,12 @@ class BabylonGraphics extends GraphicsInterface {
       return;
     }
 
+
+    if (entityData.type === 'PART') {
+      return;
+
+      console.log("Babylon.updateGraphic PART", entityData)
+    }
     let graphic = previousEntity.graphics['graphics-babylon'];
 
     if (typeof entityData.position === 'object') {
@@ -281,7 +283,7 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
-    // console.log('Babylon.createGraphic', entityData)
+    console.log('Babylon.createGraphic', entityData)
     // throw new Error('line')
     // switch case based on entityData.type
     let graphic;
@@ -297,7 +299,9 @@ class BabylonGraphics extends GraphicsInterface {
         graphic = this.getBullet(entityData);
         break;
       case 'TEXT':
-        graphic = this.createText(entityData);
+        graphic = this.inflateText(entityData);
+        // TODO: add support for 3d text
+        // graphic = this.inflateText(entityData);
         break;
       case 'BORDER':
         graphic = this.createBox(entityData);
@@ -313,6 +317,7 @@ class BabylonGraphics extends GraphicsInterface {
     }
 
     if (this.game.physics.dimension === 2) {
+      console.log("SETTING POSITION", entityData.name, entityData.type, entityData.position.x, entityData.position.y)
       graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
     }
 
@@ -410,26 +415,6 @@ class BabylonGraphics extends GraphicsInterface {
     // Reset bullet properties if necessary
   }
 
-  createText(entityData) {
-    const plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', { width: entityData.width, height: entityData.height }, this.scene);
-
-    const texture = new BABYLON.DynamicTexture('dynamic texture', { width: 512, height: 256 }, this.scene);
-    const material = new BABYLON.StandardMaterial('Mat', this.scene);
-
-    const text = 'HELLO WORLD';  // Or use entityData.text if it contains the message
-    const font = 'bold 44px monospace';
-
-    texture.drawText(text, null, 40, font, 'black', 'white', true, true);
-
-    material.diffuseTexture = texture;
-    plane.material = material;
-
-    // Set the billboard mode so the plane always faces the camera
-    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-
-    return plane;
-  }
-
 
   createSphere(entityData) {
     let sphere = BABYLON.MeshBuilder.CreateSphere('bullet', { diameter: entityData.radius * 2 }, this.scene);
@@ -438,6 +423,10 @@ class BabylonGraphics extends GraphicsInterface {
 
   createBox(entityData) {
     let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.depth, depth: entityData.height }, this.scene);
+    if (entityData.rotation) {
+      box.rotation.y = -entityData.rotation;
+    }
+    entityData.position.x = -entityData.position.x;
     return box;
   }
 
