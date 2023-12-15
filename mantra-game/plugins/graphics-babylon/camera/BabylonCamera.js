@@ -55,7 +55,7 @@ class BabylonCamera {
     //   Rotate the camera by -Math.PI / 2
     this.camera.alpha += Math.PI / 2;
 
-    this.camera.radius = 4500;
+    this.camera.radius = 1300;
   }
 
   setupCameraControls() {
@@ -70,8 +70,6 @@ class BabylonCamera {
 
     // this.camera.inputs.attached.pointers.buttons = [1, -1, -1];
     this.camera._panningMouseButton = 0;
-
-
   }
   
 

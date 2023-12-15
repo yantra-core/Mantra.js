@@ -57,6 +57,19 @@ export default function createEntityFromPart(part, contraption) {
     });
   }
 
+  if (part.type === 'Actuator') {
+    part.on('activate', () => {
+      // set the tint of the entity to yellow
+      console.log('Actuator on', part);
+      this.game.updateEntity({ id: part.entityId, color: 0xffff00 });
+    });
+    part.on('deactivate', () => {
+      // set the tint of the entity to yellow
+      console.log('Actuator off', part);
+      this.game.updateEntity({ id: part.entityId, color: 0xffffff });
+    });
+  }
+
   // create the entity
 
 

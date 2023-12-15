@@ -461,8 +461,8 @@ class Game {
     return this.createEntity({
       type: 'PLAYER',
       shape: 'triangle',
-      width: 200,
-      height: 200,
+      width: 64,
+      height: 64,
       color: 0x00ff00,
       position: {
         x: 0,

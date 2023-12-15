@@ -5,6 +5,7 @@ import createEntityFromPart from './lib/createEntityFromPart.js';
 import createWire from './lib/parts/createWire.js';
 
 
+import securitySystemWithWires from './security-system-wires.js';
 import testContraption from './security-system.js';
 import testLight from './button-wire-light.js';
 
@@ -26,12 +27,13 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
 
     console.log('RealStone.init()', RealStoneActual);
-    let contraption = testLight();
-    //let contraption = testContraption();
-    console.log('contraption', contraption);
+    //let contraption = testLight();
+    // let contraption = testContraption();
+    let contraption = securitySystemWithWires()
+    //console.log('contraption', contraption);
     
     contraption.onAny((event, ...args) => {
-      console.log('contraption event', event, args);
+      //console.log('onAny contraption event', event, args);
     });
 
     // iterate through each part and create a corresponding entity

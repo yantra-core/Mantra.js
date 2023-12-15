@@ -511,7 +511,7 @@ var Entity = /*#__PURE__*/function () {
         rotation: 0,
         mass: 100,
         density: 100,
-        health: 100,
+        health: Infinity,
         score: 0,
         height: 100,
         width: 100,
@@ -535,7 +535,11 @@ var Entity = /*#__PURE__*/function () {
         // object hash of properties that should never be updated
         actionRateLimiter: null,
         // object hash of state history
-        timers: null // object hash timers for TimersComponent.js
+        timers: null,
+        // object hash timers for TimersComponent.js
+        realStone: null,
+        // object hash of properties for RealStone.js
+        text: null
       };
 
       // merge config with defaultConfig
@@ -553,6 +557,7 @@ var Entity = /*#__PURE__*/function () {
         name = _config.name,
         type = _config.type,
         position = _config.position,
+        rotation = _config.rotation,
         startingPosition = _config.startingPosition,
         mass = _config.mass,
         density = _config.density,
@@ -570,7 +575,9 @@ var Entity = /*#__PURE__*/function () {
         health = _config.health,
         score = _config.score,
         owner = _config.owner,
-        lifetime = _config.lifetime;
+        lifetime = _config.lifetime,
+        realStone = _config.realStone,
+        text = _config.text;
       var x = position.x,
         y = position.y;
 
@@ -589,7 +596,7 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'position', position);
       this.game.addComponent(entityId, 'startingPosition', startingPosition);
       this.game.addComponent(entityId, 'velocity', velocity);
-      this.game.addComponent(entityId, 'rotation', config.rotation);
+      this.game.addComponent(entityId, 'rotation', rotation);
       this.game.addComponent(entityId, 'mass', mass);
       this.game.addComponent(entityId, 'density', density);
       this.game.addComponent(entityId, 'health', health);
@@ -611,6 +618,8 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'actionRateLimiter', {});
       // TODO: clean up API contract with Component
       this.game.addComponent(entityId, 'timers', new _TimersComponent["default"]('timers', entityId, this.game));
+      this.game.addComponent(entityId, 'realStone', realStone);
+      this.game.addComponent(entityId, 'text', text);
       if (config.body) {
         var body = this.createBody(config);
         body.myEntityId = entityId;
