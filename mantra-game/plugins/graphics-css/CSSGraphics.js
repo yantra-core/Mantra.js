@@ -1,5 +1,6 @@
 // CSSGraphics.js - Marak Squires 2023
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
+import inflateBox from './lib/inflateBox.js';
 
 class CSSGraphics extends GraphicsInterface {
 
@@ -26,6 +27,7 @@ class CSSGraphics extends GraphicsInterface {
     this.game = game;
 
     this.game.systemsManager.addSystem('graphics-css', this);
+    this.inflateBox = inflateBox.bind(this);
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
@@ -80,6 +82,8 @@ class CSSGraphics extends GraphicsInterface {
         entityElement.style.width = (radius * 2) + 'px';
         entityElement.style.height = (radius * 2) + 'px';
         entityElement.style.borderRadius = '50%';  // This will make the div a circle
+        entityElement.style.background = 'red';
+
         break;
       case 'PLAYER':
         // For PLAYER entities, create a triangle
@@ -87,21 +91,16 @@ class CSSGraphics extends GraphicsInterface {
         entityElement.style.height = '0px';
         entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
         entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
-        entityElement.style.borderBottom = entityData.height + 'px solid blue';
+        entityElement.style.borderBottom = entityData.height + 'px solid green';
         break;
       case 'TEXT':
         entityElement = this.createText(entityElement, entityData);
         break;
       default:
-        // For other entities, create a rectangle
-        entityElement.style.width = entityData.width + 'px';
-        entityElement.style.height = entityData.height + 'px';
-        entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
-        entityElement.style.background = 'blue';  // Move this line here
+        this.inflateBox(entityElement, entityData);
         break;
     }
 
-    entityElement.style.background = 'blue';
     this.renderDiv.appendChild(entityElement);
 
     // Update the position of the entity element
@@ -121,8 +120,18 @@ class CSSGraphics extends GraphicsInterface {
       }
     }
 
+
     const entityElement = document.getElementById(`entity-${entityData.id}`);
     if (entityElement) {
+
+      // Update the entity color
+      if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+        // entityData.color is int number here we need a hex
+        let hexColor = '#' + entityData.color.toString(16);
+        // update the background color
+        entityElement.style.background = hexColor;
+      }
+
       // Update the position of the entity element
       return this.updateEntityElementPosition(entityElement, entityData);
     } else {
@@ -144,7 +153,7 @@ class CSSGraphics extends GraphicsInterface {
     chatBubble.style.padding = '10px';
     chatBubble.style.background = '#fff';
     chatBubble.style.maxWidth = '200px';
-    chatBubble.innerText = "entityData.text";  // Assuming entityData contains the chat text
+    chatBubble.innerText = entityData.text || '';
 
     // Append the chat bubble to the container
     entityElement.appendChild(chatBubble);
@@ -205,11 +214,10 @@ class CSSGraphics extends GraphicsInterface {
   render(game, alpha) {
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
+      this.inflateEntity(ent, alpha);
       if (ent.pendingRender && ent.pendingRender['graphics-css']) {
-        this.inflateEntity(ent, alpha);
         ent.pendingRender['graphics-css'] = false;
       }
-
     }
   }
 

@@ -8,15 +8,15 @@ class Collisions {
     this.id = Collisions.id;
   }
 
-  init (game) {
+  init(game) {
     this.game = game;
-    
+
     // TODO: this won't work unless game.physics exists
     // Binds our handleCollision method to the game physics engine's collisionStart event
     this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
-    this.game.physics.collisionActive(this.game,  function noop (){});
-    this.game.physics.collisionEnd(this.game, function noop (){});
-    
+    this.game.physics.collisionActive(this.game, function noop() { });
+    this.game.physics.collisionEnd(this.game, function noop() { });
+
     // Binds game.handleCollision to the Game for convenience 
     this.game.handleCollision = this.handleCollision.bind(this);
 
@@ -38,11 +38,23 @@ class Collisions {
     if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
       if (this.game.machine && this.game.machine.sendEvent) {
         // console.log('sending machine event', 'COLLISION');
-        this.game.machine.sendEvent('COLLISION', { 
+        this.game.machine.sendEvent('COLLISION', {
           entityIdA: bodyA.myEntityId,
           entityIdB: bodyB.myEntityId
         });
       }
+
+      if (entityA.realStone && entityA.realStone.part && entityA.realStone.part.handleCollision) {
+        if (entityB.type !== 'TEXT') {
+          entityA.realStone.part.handleCollision(entityB);
+        }
+      }
+      if (entityB.realStone && entityB.realStone.part && entityB.realStone.part.handleCollision) {
+        if (entityA.type !== 'TEXT') {
+          entityB.realStone.part.handleCollision(entityA);
+        }
+      }
+
       if (this.game.rules) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)

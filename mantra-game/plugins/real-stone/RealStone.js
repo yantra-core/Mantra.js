@@ -4,7 +4,6 @@ import { RealStone as RealStoneActual } from '../../../../RealStone/index.js';
 import createEntityFromPart from './lib/createEntityFromPart.js';
 import createWire from './lib/parts/createWire.js';
 
-
 import securitySystemWithWires from './security-system-wires.js';
 import testContraption from './security-system.js';
 import testLight from './button-wire-light.js';
@@ -27,9 +26,9 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
 
     console.log('RealStone.init()', RealStoneActual);
-    //let contraption = testLight();
-    // let contraption = testContraption();
-    let contraption = securitySystemWithWires()
+    let contraption = testLight();
+    //let contraption = testContraption();
+    //let contraption = securitySystemWithWires()
     //console.log('contraption', contraption);
     
     contraption.onAny((event, ...args) => {

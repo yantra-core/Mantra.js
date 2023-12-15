@@ -173,12 +173,6 @@ class BabylonGraphics extends GraphicsInterface {
       return;
     }
 
-
-    if (entityData.type === 'PART') {
-      return;
-
-      console.log("Babylon.updateGraphic PART", entityData)
-    }
     let graphic = previousEntity.graphics['graphics-babylon'];
 
     if (typeof entityData.position === 'object') {
@@ -210,14 +204,11 @@ class BabylonGraphics extends GraphicsInterface {
       }
     }
 
-
-
     if (typeof entityData.color === 'number') {
 
       if (!graphic.material) {
         graphic.material = new BABYLON.StandardMaterial("material", this.scene);
       }
-
 
       // console.log("setting color", entityData.color)
       // Extract RGB components from the hexadecimal color value
@@ -230,7 +221,6 @@ class BabylonGraphics extends GraphicsInterface {
       // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
 
     }
-
 
     if (entityData.rotation !== undefined && entityData.rotation !== null) {
       //graphic.rotation.y = -entityData.rotation;
@@ -318,7 +308,10 @@ class BabylonGraphics extends GraphicsInterface {
 
     if (this.game.physics.dimension === 2) {
       console.log("SETTING POSITION", entityData.name, entityData.type, entityData.position.x, entityData.position.y)
-      graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+      if (typeof entityData.position.z === 'undefined') {
+        entityData.position.z = 1;
+      }
+      graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     }
 
     if (this.game.physics.dimension === 3) {
@@ -426,7 +419,7 @@ class BabylonGraphics extends GraphicsInterface {
     if (entityData.rotation) {
       box.rotation.y = -entityData.rotation;
     }
-    entityData.position.x = -entityData.position.x;
+    box.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     return box;
   }
 

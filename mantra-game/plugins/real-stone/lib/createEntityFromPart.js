@@ -1,5 +1,5 @@
 export default function createEntityFromPart(part, contraption) {
-
+  let game = this.game;
   // Setup events for parts
   if (part.type === 'LEDLight') {
     part.on('on', () => {
@@ -70,29 +70,62 @@ export default function createEntityFromPart(part, contraption) {
     });
   }
 
+  if (part.type === 'Rover') {
+    part.on('move', (position) => {
+      // set the tint of the entity to yellow
+      console.log('Rover move', part);
+      this.game.updateEntity({ id: part.entityId, position: position });
+      // game.applyForce(part.entityId, part.props.velocity);
+    });
+  }
+
   // create the entity
 
-
   let entity;
-  if (part.type === 'Wire') {
-    entity = this.createWire(part, contraption);
-  } else {
-    // Handle non-wire parts
-    entity = this.game.createEntity({
-      name: part.type,
-      type: 'PART',
-      position: part.position,
-      width: part.size.width,
-      height: part.size.height,
-      isStatic: true,
-      realStone: {
-        part: part,
-        contraption: contraption
-      }
-    });
-    part.entityId = entity.id;
 
+  switch (part.type) {
+    case 'Wire':
+      entity = this.createWire(part, contraption);
+
+      break;
+    case 'Rover':
+      entity = this.game.createEntity({
+        name: part.type,
+        type: 'PART',
+        color: part.props.color,
+        position: part.position,
+        width: part.size.width,
+        height: part.size.height,
+        isStatic: false,
+        isSensor: true,
+        realStone: {
+          part: part,
+          contraption: contraption
+        }
+      });
+      break;
+
+    default:
+
+      // Handle non-wire parts
+      entity = this.game.createEntity({
+        name: part.type,
+        type: 'PART',
+        color: part.props.color,
+        position: part.position,
+        width: part.size.width,
+        height: part.size.height,
+        isStatic: true,
+        realStone: {
+          part: part,
+          contraption: contraption
+        }
+      });
+      break;
   }
+
+  part.entityId = entity.id;
+
 
   if (part.type !== 'Wire') {
     // create a text label for the entity
