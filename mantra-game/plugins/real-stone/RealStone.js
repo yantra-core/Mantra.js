@@ -2,6 +2,8 @@ import Plugin from '../../Plugin.js';
 import { RealStone as RealStoneActual } from '../../../../RealStone/index.js';
 
 import createEntityFromPart from './lib/createEntityFromPart.js';
+import createWire from './lib/parts/createWire.js';
+
 
 import testContraption from './security-system.js';
 import testLight from './button-wire-light.js';
@@ -14,6 +16,7 @@ class RealStone extends Plugin {
     this.game = game; // Store the reference to the game logic
     this.id = RealStone.id;
     this.createEntityFromPart = createEntityFromPart.bind(this);
+    this.createWire = createWire.bind(this);
   }
 
   init(game) {
@@ -23,25 +26,21 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
 
     console.log('RealStone.init()', RealStoneActual);
-    // let contraption = testLight();
-    let contraption = testContraption();
+    let contraption = testLight();
+    //let contraption = testContraption();
     console.log('contraption', contraption);
     
     contraption.onAny((event, ...args) => {
       console.log('contraption event', event, args);
     });
 
-
     // iterate through each part and create a corresponding entity
     contraption.parts.forEach(part => {
       let ent = this.createEntityFromPart(part, contraption)
-      console.log('create ent from part', part, ent)
-
-
+      // console.log('create ent from part', part, ent)
       // let updated = this.game.getEntity(entity.id);
       //console.log('entity', entity)
       //console.log("updated ent", updated)
-
     });
 
   }
@@ -60,7 +59,6 @@ class RealStone extends Plugin {
         console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
         return;
       }
-
 
       if (entityA.realStone) {
         // trigger the part if possible

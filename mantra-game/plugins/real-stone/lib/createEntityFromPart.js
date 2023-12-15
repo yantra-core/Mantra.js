@@ -1,5 +1,6 @@
-export default function createEntityFromPart (part, contraption) {
+export default function createEntityFromPart(part, contraption) {
 
+  // Setup events for parts
   if (part.type === 'LEDLight') {
     part.on('on', () => {
       // set the tint of the entity to yellow
@@ -56,45 +57,16 @@ export default function createEntityFromPart (part, contraption) {
     });
   }
 
+  // create the entity
+
 
   let entity;
   if (part.type === 'Wire') {
-    console.log('wire part, render string', part);
-  
-    // Create a line segment for each unique connection pair
-    part.inputs.forEach(input => {
-      part.outputs.forEach(output => {
-        // Calculate midpoint, angle, and length for the segment
-        const midpoint = { 
-          x: (input.position.x + output.position.x) / 2, 
-          y: (input.position.y + output.position.y) / 2,
-          z: (input.position.z + output.position.z) / 2
-        };
-
-        const angle = Math.atan2(output.position.y - input.position.y, output.position.x - input.position.x);
-        const length = Math.hypot(output.position.x - input.position.x, output.position.y - input.position.y);
-        console.log('mmmmmmmmmmmmmmmmmmmm', midpoint, angle, length)
-  
-        entity = this.game.createEntity({
-          type: 'PART', // Assuming LINE is a type for thin boxes
-          position: midpoint,
-          width: length,
-          height: 1, // Assuming height is minimal for a line
-          angle: angle,
-          isStatic: true,
-          realStone: {
-            part: part,
-            contraption: contraption
-          }
-        });
-        // TODO: this might be an issue with multiple wires
-        part.entityId = entity.id;
-
-      });
-    });
+    entity = this.createWire(part, contraption);
   } else {
     // Handle non-wire parts
     entity = this.game.createEntity({
+      name: part.type,
       type: 'PART',
       position: part.position,
       width: part.size.width,
@@ -109,6 +81,26 @@ export default function createEntityFromPart (part, contraption) {
 
   }
 
+  if (part.type !== 'Wire') {
+    // create a text label for the entity
+    let textLabel = this.game.createEntity({
+      type: 'TEXT',
+      text: part.type,
+      position: {
+        x: part.position.x, // Center horizontally
+        y: part.position.y + part.size.height / 2     // Position below the entity
+      },
+      width: part.size.width,
+      height: part.size.height,
+      isStatic: true,
+      isSensor: true,
+      realStone: {
+        part: part,
+        contraption: contraption
+      }
+    });
+
+  }
 
 
 }

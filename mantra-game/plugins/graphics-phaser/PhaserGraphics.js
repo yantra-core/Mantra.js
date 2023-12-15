@@ -6,13 +6,15 @@ import inflateGraphic from './graphics/inflateGraphic.js';
 import inflateTriangle from './graphics/inflateTriangle.js';
 import inflateBox from './graphics/inflateBox.js';
 import inflateCircle from './graphics/inflateCircle.js';
+import inflateText from './graphics/inflateText.js';
 
 class PhaserGraphics extends GraphicsInterface {
   static id = 'graphics-phaser';
   static removable = false;
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  constructor({ camera = {}, startingZoom = 0.1 } = {}) {
+  // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
+  constructor({ camera = {}, startingZoom = 0.2 } = {}) {
     super();
     this.id = 'graphics-phaser';
     this.async = PhaserGraphics.async;
@@ -31,6 +33,7 @@ class PhaserGraphics extends GraphicsInterface {
     this.inflateBox = inflateBox.bind(this);
     this.inflateTriangle = inflateTriangle.bind(this);
     this.inflateCircle = inflateCircle.bind(this);
+    this.inflateText = inflateText.bind(this);
   }
 
   init(game) {
@@ -64,8 +67,10 @@ class PhaserGraphics extends GraphicsInterface {
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'gameHolder',
+      /*
       width: 1600, // TODO: config  
       height: 800,
+      */
       scene: [_Main],
       scale: {
         //mode: Phaser.Scale.ENVELOP,

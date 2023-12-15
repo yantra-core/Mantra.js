@@ -65,3 +65,28 @@ class Graphics {
 }
 
 export default Graphics;
+
+
+/*
+
+
+function downloadCanvasAsImage(canvasElement, filename) {
+    // Ensure a filename is provided
+    filename = filename || 'canvas_image.png';
+
+    // Create an image URL from the canvas
+    const imageURL = canvasElement.toDataURL("image/png").replace("image/png", "image/octet-stream");
+
+    // Create a temporary link element and trigger the download
+    let downloadLink = document.createElement('a');
+    downloadLink.href = imageURL;
+    downloadLink.download = filename;
+
+    // Append the link to the body, click it, and then remove it
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+
+*/

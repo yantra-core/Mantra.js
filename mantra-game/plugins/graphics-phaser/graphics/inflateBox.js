@@ -43,6 +43,11 @@ export default function inflategraphic(entityData) {
   // let adjustedY = entityData.position.y + this.game.height / 2;
 
   graphic.setPosition(position.x, position.y);
+
+  if (entityData.rotation) {
+    graphic.setRotation(entityData.rotation);
+  }
+
   // TODO: conditional update of position, use float truncation
   /*  
   //console.log('checking', currentGraphicsPosition, position)

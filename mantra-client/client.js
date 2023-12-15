@@ -70,7 +70,7 @@ game.use(new plugins.Bullet())
 game.use(new plugins.Entity())
 
 game.use(new plugins.MatterPhysics());
-// game.use(new plugins.PhaserGraphics());
+//game.use(new plugins.PhaserGraphics());
 
 // game.use(new plugins.PhaserCamera());
 // game.use(new plugins.Collision());
@@ -85,7 +85,7 @@ game.use(new plugins.Timers());
 // game.use(new plugins.LoadingScreen());
 
 // TODO: default load plugins
-game.use(new plugins.Health())
+// game.use(new plugins.Health())
 
 // game.use(new plugins.Inspector())
 // game.use(new plugins.ControlsGUI());
@@ -183,6 +183,8 @@ if (mode === 'online') {
     game.use(new plugins.StarField())
     game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
+    //game.use(new plugins.RealStone())
+
     // game.use(new plugins.SutraGUI({ }));
 
     // game.use(new plugins.Scoreboard());

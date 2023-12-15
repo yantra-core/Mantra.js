@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 39.881
+    "size": 40.068
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -105,7 +105,7 @@ const pluginsList = {
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 17.695
+    "size": 31.118
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -141,7 +141,7 @@ const pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 34.394
+    "size": 34.408
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

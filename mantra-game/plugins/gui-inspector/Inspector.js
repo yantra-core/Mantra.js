@@ -7,7 +7,7 @@ class Inspector {
     this.id = Inspector.id;
     this.game = null;
     this.lastEntityState = {}; // Store the last state of the entity
-    this.floatProperties = ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed'];
+    this.floatProperties = ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed', 'rotation'];
   }
 
   init(game) {

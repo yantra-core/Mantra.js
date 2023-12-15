@@ -11,7 +11,9 @@ export default function inflateGraphic (entity) {
     case 'BULLET':
       graphic = this.inflateCircle(entity);
       break;
-      graphic = this.inflateTriangle(entity);
+    case 'TEXT':
+      graphic = this.inflateText(entity);
+      break;
     default:
       graphic = this.inflateBox(entity); // TODO: createDefault()
   }

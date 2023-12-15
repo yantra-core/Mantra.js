@@ -183,8 +183,11 @@ class Game {
     this.components.graphics = new Component('graphics', this);
     this.components.lockedProperties = new Component('lockedProperties', this);
     this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
+
     this.components.timers = new TimersComponent('timers', this);
     this.components.realStone = new Component('realStone', this);
+    this.components.text = new Component('text', this);
+
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
 
@@ -220,7 +223,6 @@ class Game {
         lifetime
       });
     }
-
   }
 
   // TODO: hoist to systemsManager

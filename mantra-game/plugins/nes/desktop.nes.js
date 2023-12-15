@@ -18,6 +18,6 @@ desktop.app.nes.openWindow = function openWindow () {
 };
 
 desktop.app.nes.closeWindow = function closeWindow () {
-  $('#nesIframe').attr('src', 'desktop/apps/desktop.nes/vendor/SaltyNES.html');
+  $('#nesIframe').attr('src', './vendor/SaltyNES.html');
   return true;
 };
