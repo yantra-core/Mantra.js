@@ -1,6 +1,7 @@
 // CSSGraphics.js - Marak Squires 2023
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 import inflateBox from './lib/inflateBox.js';
+import inflateText from './lib/inflateText.js';
 
 class CSSGraphics extends GraphicsInterface {
 
@@ -18,6 +19,10 @@ class CSSGraphics extends GraphicsInterface {
 
     this.id = CSSGraphics.id;
     this.cameraPosition = { x: 0, y: 0 };
+
+    this.inflateBox = inflateBox.bind(this);
+    this.inflateText = inflateText.bind(this);
+
   }
 
   init(game) {
@@ -27,7 +32,6 @@ class CSSGraphics extends GraphicsInterface {
     this.game = game;
 
     this.game.systemsManager.addSystem('graphics-css', this);
-    this.inflateBox = inflateBox.bind(this);
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
@@ -69,9 +73,9 @@ class CSSGraphics extends GraphicsInterface {
     if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
       if (typeof entityData.rotation === 'object') {
         // transform 3d to 2.5d
-       entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
+        entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
       } else {
-       entityData.rotation = entityData.rotation;
+        entityData.rotation = entityData.rotation;
       }
     }
 
@@ -94,7 +98,7 @@ class CSSGraphics extends GraphicsInterface {
         entityElement.style.borderBottom = entityData.height + 'px solid green';
         break;
       case 'TEXT':
-        entityElement = this.createText(entityElement, entityData);
+        entityElement = this.inflateText(entityElement, entityData);
         break;
       default:
         this.inflateBox(entityElement, entityData);
@@ -140,29 +144,6 @@ class CSSGraphics extends GraphicsInterface {
     }
   }
 
-  createText(entityElement, entityData) {
-    // Create a container for the chat bubble
-    entityElement.className = 'chat-bubble-container';
-    entityElement.style.position = 'absolute';
-
-    // Create the chat bubble itself
-    const chatBubble = document.createElement('div');
-    chatBubble.className = 'chat-bubble';
-    chatBubble.style.border = '1px solid #000';
-    chatBubble.style.borderRadius = '10px';
-    chatBubble.style.padding = '10px';
-    chatBubble.style.background = '#fff';
-    chatBubble.style.maxWidth = '200px';
-    chatBubble.innerText = entityData.text || '';
-
-    // Append the chat bubble to the container
-    entityElement.appendChild(chatBubble);
-    // Update the position of the chat bubble container
-    //this.updateEntityElementPosition(entityElement, entityData);
-
-    return entityElement;
-  }
-
   removeGraphic(entityId) {
 
     let entity = this.game.getEntity(entityId);
@@ -179,7 +160,6 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   updateEntityElementPosition(entityElement, { position, width, height, rotation = 0 }) {
-
     // Adjust the position based on the camera position
     const adjustedPosition = {
       x: position.x - this.cameraPosition.x + window.innerWidth / 2,
@@ -191,15 +171,24 @@ class CSSGraphics extends GraphicsInterface {
 
     // convert rotation to degrees
     let angle = rotation * (180 / Math.PI);
-    // Translate and rotate the element
-    entityElement.style.transform = `
-      translate(${domX}px, ${domY}px)
-      rotate(${angle}deg)
-    `;
+
+    this.setTransform(entityElement, domX, domY, rotation, angle);
 
     return entityElement;
   }
 
+  setTransform(entityElement, domX, domY, rotation, angle) {
+    // Retrieve the last rotation value, default to 0 if not set
+    let lastRotation = entityElement.dataset.rotation || 0;
+    // Update rotation if provided
+    if (rotation) {
+      lastRotation = angle;
+      entityElement.dataset.rotation = angle;
+    }
+
+    // Update the transform property
+    entityElement.style.transform = `translate(${domX}px, ${domY}px) rotate(${lastRotation}deg)`;
+  }
   update() {
     let game = this.game;
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
@@ -223,6 +212,7 @@ class CSSGraphics extends GraphicsInterface {
 
   inflateEntity(entity, alpha) {
 
+    // checks for existence of entity, performs update or create
     if (entity.graphics && entity.graphics['graphics-css']) {
       let graphic = entity.graphics['graphics-css'];
       this.updateGraphic(entity, alpha);
