@@ -11,6 +11,14 @@ class CSSGraphics extends GraphicsInterface {
   constructor({ camera } = {}) {
     super();
 
+    if (typeof camera === 'string') {
+      // legacy API, remove in future
+      camera = {
+        follow: true
+      }
+    }
+
+
     // config scope for convenience
     let config = {
       camera
@@ -192,7 +200,7 @@ class CSSGraphics extends GraphicsInterface {
   update() {
     let game = this.game;
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
-    if (this.config.camera && this.config.camera === 'follow' && currentPlayer) {
+    if (this.config.camera && this.config.camera.follow && currentPlayer) {
       if (currentPlayer.position) {
         this.cameraPosition.x = currentPlayer.position.x;
         this.cameraPosition.y = currentPlayer.position.y;

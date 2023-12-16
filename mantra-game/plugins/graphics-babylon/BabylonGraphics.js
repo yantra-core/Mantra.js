@@ -15,13 +15,30 @@ class BabylonGraphics extends GraphicsInterface {
   static removable = false;
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  constructor({ camera } = {}) {
+  constructor({ camera = {}}) {
     super();
     this.id = BabylonGraphics.id;
     this.async = BabylonGraphics.async;
     this.engine = null;
     this.scene = null;
-    this.camera = null;
+
+    if (typeof camera === 'string') {
+      // legacy API, remove in future
+      camera = {
+        follow: true
+      }
+    }
+
+    if (typeof camera.startingZoom !== 'number') {
+      camera.startingZoom = 0.4;
+    }
+    
+    if (typeof camera.follow === 'undefined') {
+      camera.follow = true;
+    }
+
+    this.camera = camera;
+    this.startingZoom = camera.startingZoom;
     this.entityStates = {};    // Store application-specific entity data
     this.debug = false;  // Store debug flag for later usage
     this.pendingLoad = []; // queue of pending Plugins that depend on this Babylon Graphics
@@ -30,9 +47,7 @@ class BabylonGraphics extends GraphicsInterface {
     this.inflateText = inflateText.bind(this);
 
     // config scope for convenience
-    let config = {
-      camera
-    };
+    let config = camera;
     this.config = config;
 
     this.mantraPools = {
@@ -144,8 +159,7 @@ class BabylonGraphics extends GraphicsInterface {
 
     // TODO: Should we have generic Camera plugin scoped to graphics pipeline?
     //       see how StarField.js is implemented for reference
-    game.use(new BabylonCamera({ camera: this.config.camera }));
-
+    game.use(new BabylonCamera({ camera: this.camera }));
 
     this.pendingLoad.forEach(function (pluginInstance) {
       game.use(pluginInstance);

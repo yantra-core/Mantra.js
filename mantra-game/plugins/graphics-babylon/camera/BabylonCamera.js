@@ -3,9 +3,9 @@ class BabylonCamera {
   static id = 'graphics-babylon-camera';
   static removable = false;
 
-  constructor({ camera } = {}) {
+  constructor({ camera }) {
     this.id = BabylonCamera.id;
-
+    this.startingZoom = camera.startingZoom;
     // config scope for convenience
     let config = {
       camera
@@ -55,7 +55,9 @@ class BabylonCamera {
     //   Rotate the camera by -Math.PI / 2
     this.camera.alpha += Math.PI / 2;
 
-    this.camera.radius = 1300;
+    this.camera.radius = 2560 * this.startingZoom;
+    //alert(this.camera.radius)
+    //console.log('this.camera.radiusthis.camera.radiusthis.camera.radius', this.camera.radius)
   }
 
   setupCameraControls() {
@@ -109,7 +111,7 @@ class BabylonCamera {
 
   render() {
     let game = this.game;
-    if (this.config.camera && this.config.camera === 'follow') {
+    if (this.config.camera && this.config.camera.follow) {
       let currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (currentPlayer && currentPlayer.graphics) {
         let graphic = currentPlayer.graphics['graphics-babylon'];
@@ -137,7 +139,7 @@ class BabylonCamera {
 
   renderLerp() { // TODO: use this instead on render(), uses built in lerp
     let game = this.game;
-    if (this.config.camera && this.config.camera === 'follow') {
+    if (this.config.camera && this.config.camera.follow) {
       let currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (currentPlayer && currentPlayer.graphics) {
         let graphic = currentPlayer.graphics['graphics-babylon'];

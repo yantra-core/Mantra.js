@@ -19,6 +19,13 @@ class PhaserGraphics extends GraphicsInterface {
     this.id = 'graphics-phaser';
     this.async = PhaserGraphics.async;
 
+    if (typeof camera === 'string') {
+      // legacy API, remove in future
+      camera = {
+        follow: true
+      }
+    }
+
     let config = {
       camera,
       startingZoom

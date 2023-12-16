@@ -50,7 +50,10 @@ class Game {
     physics = 'matter',
     graphics = ['babylon'],
     collisions = true,
-    camera = 'follow',
+    camera = {
+      type: 'follow',
+      startingZoom: 0.8, // scale from 0 to 50
+    },
     keyboard = true,
     mouse = true,
     gamepad = true,
