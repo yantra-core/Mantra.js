@@ -61,13 +61,6 @@ In addition to custom code and `sutra`, `mantra` game logic can be coded in a st
 
 [View All Demos on Yantra.gg](https://yantra.gg/mantra)
 
-### Online
-
-| Libraries        | Demo Link                                                                      |
-|----------------------------|--------------------------------------------------------------------------------|
-| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/yantra/matter-babylon.html)         |
-| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/yantra/matter-phaser.html)          |
-
 ### Offline
 
 | Libraries        | Demo Link                                                                      | CodePen Link                                                                |
@@ -82,6 +75,15 @@ In addition to custom code and `sutra`, `mantra` game logic can be coded in a st
 
 
 You can view any of these examples in your browser and begin modifying the game code immediately.
+
+### Online
+
+| Libraries        | Demo Link                                                                      |
+|----------------------------|--------------------------------------------------------------------------------|
+| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/yantra/matter-babylon.html)         |
+| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/yantra/matter-phaser.html)          |
+
+If no servers are active, these demos may take 10-20 seconds to start, and then the server will be immediately available until all players are disconnected.
 
 ## Start Local Websocket Server
 
