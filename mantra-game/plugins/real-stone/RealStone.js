@@ -32,6 +32,8 @@ class RealStone extends Plugin {
     console.log('RealStone.init()', RealStoneActual);
     if (this.contraption) {
       this.initContraption(this.contraption);
+    } else {
+      this.initContraption(roverLight());
     }
 
   }

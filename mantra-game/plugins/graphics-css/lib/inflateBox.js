@@ -5,12 +5,10 @@ export default function inflateBox(entityElement, entityData) {
     // entityData.color is int number here we need a hex
     hexColor = '#' + entityData.color.toString(16);
   }
-  console.log('entityData', entityData)
-  console.log('hexColor', hexColor)
+
   entityElement.style.width = entityData.width + 'px';
   entityElement.style.height = entityData.height + 'px';
   entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
-
 
   // set initial rotation of the entity
   if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {

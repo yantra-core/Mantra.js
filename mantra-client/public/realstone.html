@@ -8,88 +8,156 @@
   <link rel="stylesheet" href="/mantra.css">
   <script type="module" src="/mantra.js"></script>
   <script type="module" src="/realstone.js"></script>
+  <script type="module" src="/realDemo.js"></script>
+  <style>
+    #contraption-interface {
+      text-align: center;
+      margin-top: 20px;
+    }
 
+    #save-contraption-form {
+      margin-bottom: 20px;
+    }
+
+    #display-contraption {
+      margin-top: 20px;
+      display: none;
+    }
+
+    textarea {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 400px;
+      height: 800px;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('save-contraption-form');
+      const contraptionNameDisplay = document.getElementById('contraption-name-display');
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const contraptionName = document.getElementById('contraption-name').value;
+        // Implement the POST request to save the contraption
+        saveContraption(contraptionName);
+      });
+
+      const runContraptionForm = document.getElementById('run-contraption-form');
+      runContraptionForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const contraptionCode = document.getElementById('contraption-code').value;
+        // Implement the POST request to save the contraption
+        runContraption(contraptionCode);
+      });
+
+      async function saveContraption(name) {
+
+
+        // get the code from the textarea
+        let contraptionCode = document.getElementById('contraption-code').value;
+        // Assuming roverLightSystem is a variable that holds the contraption code
+        const payload = {
+          name: name,
+          code: contraptionCode || '' // This should be defined in your scope
+        };
+
+        try {
+          const response = await fetch(`${etherspaceEndpoint}/api/v1/contraption/${name}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            contraptionNameDisplay.textContent = `Saved: ${data.name}`;
+          } else {
+            contraptionNameDisplay.textContent = `Error saving contraption: ${data.message}`;
+          }
+        } catch (error) {
+          contraptionNameDisplay.textContent = `Network error: ${error.message}`;
+        }
+
+        let displayContraption = document.getElementById('display-contraption');
+        if (displayContraption) {
+          displayContraption.style.display = 'block';
+        }
+      }
+
+      let etherspaceHost = 'http://192.168.1.80:8889';
+      let etherspaceEndpoint = etherspaceHost + '';
+
+
+      async function getContraption(contraptionId) {
+        // Implement GET request to fetch contraption
+        const response = await fetch(`${etherspaceEndpoint}/api/v1/contraption/${contraptionId}`);
+        const data = await response.json();
+
+        if (data) {
+          contraptionNameDisplay.textContent = data.name; // Update display with fetched name
+        } else {
+          contraptionNameDisplay.textContent = 'Could not find: ' + contraptionId;
+        }
+        let displayContraption = document.getElementById('display-contraption');
+        if (displayContraption) {
+          displayContraption.style.display = 'block';
+        }
+
+        // set contraption-code textarea value to fetched code
+        let contraptionCode = document.getElementById('contraption-code');
+        if (contraptionCode) {
+          contraptionCode.value = data.code;
+        }
+
+        //contraptionNameDisplay.style.display = 'block';
+      }
+
+      // Example usage
+      getContraption('rover-light');
+    });
+
+    function runContraption (code) {
+      // alert(code)
+      // TODO: eval code
+      // let yes = confirm(`You are about to eval() this code: ${code}`)
+      let yes = true;
+      if (yes) {
+        eval(code)
+
+        console.log('rrrr', roverLightSystem)
+        game.use('RealStone', {
+          contraption: roverLightSystem
+        });
+
+
+      }
+    }
+
+  </script>
 </head>
 
 <body>
-  <script type="text/javascript">
-
-
-
-
-
-    document.addEventListener('DOMContentLoaded', async (event) => {
-
-      let roverLightSystem = RS.createContraption({
-        powerRequired: false
-      });
-
-      // Create the buttons
-      let button = new RS.Button(-150, -200, 0);
-      let button2 = new RS.Button(150, -200, 0);
-
-      // Create the LED lights
-      let ledLight1 = new RS.LEDLight(-200, 250, 0);
-      let ledLight2 = new RS.LEDLight(0, 250, 0);
-      let ledLight3 = new RS.LEDLight(200, 250, 0);
-
-      // Create the Rover
-      let redRover = new RS.Rover(0, -200, 0, {
-        color: 0xff0000,
-        velocity: { x: -20, y: 0 }
-      });
-
-      // Create wires for each button
-      let wire1 = new RS.Wire();
-      let wire2 = new RS.Wire();
-
-      // Connect the first button to the first and second LED lights
-      button.connect(wire1);
-      wire1.connect(ledLight1);
-      wire1.connect(ledLight2);
-      wire1.connect(ledLight3);
-
-      // Connect the second button to the third LED light
-      button2.connect(wire2);
-      //wire2.connect(ledLight1);
-      //wire2.connect(ledLight2);
-      wire2.connect(ledLight3);
-
-      // Add components to RealStone system
-      roverLightSystem.addPart(button);
-      roverLightSystem.addPart(button2);
-      roverLightSystem.addPart(wire1);
-      roverLightSystem.addPart(wire2);
-      roverLightSystem.addPart(ledLight1);
-      roverLightSystem.addPart(ledLight2);
-      roverLightSystem.addPart(ledLight3);
-      roverLightSystem.addPart(redRover);
-
-      // Start moving the Rover
-      redRover.startMoving();
-
-      //return realStoneSystem;
-
-      let game = new MANTRA.Game({
-        physics: 'matter', // enum, 'physx', 'matter
-        collisions: true,
-        graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-        camera: 'follow',
-        options: {
-          scriptRoot: './'
-        }
-      });
-      game.start();
-      game.use('Bullet');
-      game.use('RealStone', {
-        contraption: roverLightSystem
-      });
-    });
+  <div id="contraption-interface">
+    <div id="display-contraption">
+      <h3>Contraption Name: <span id="contraption-name-display"></span></h3>
+    </div>
+    <form id="save-contraption-form">
+      <input type="text" id="contraption-name" placeholder="Enter contraption name" value="rover-light" required>
+      <button type="submit">Save Contraption</button>
+    </form>
+    <form id="run-contraption-form">
+      <button type="submit">Run Contraption</button>
+      <!-- TODO Monaco editor -->
+      <textarea id="contraption-code" rows="10" cols="50" placeholder="Enter contraption code here"></textarea>
+  </div>
+  <script>
+    // JavaScript to handle form submission and fetching contraption
   </script>
-  <!-- <div class="stars"></div> -->
-  <!-- <div class="twinkling"></div> -->
-  <!-- <div class="clouds"></div> -->
-
 </body>
 
 </html>

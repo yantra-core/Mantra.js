@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.RS = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).RealStone = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -82,7 +82,6 @@ Object.defineProperty(exports, "Wire", {
     return _Wire["default"];
   }
 });
-exports.createContraption = createContraption;
 var _RealStone = _interopRequireDefault(require("./lib/RealStone.js"));
 var _ElectricalSignal = _interopRequireDefault(require("./lib/signals/ElectricalSignal.js"));
 var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
@@ -97,9 +96,6 @@ var _Repeater = _interopRequireDefault(require("./lib/parts/Repeater.js"));
 var _Rover = _interopRequireDefault(require("./lib/parts/Rover.js"));
 var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function createContraption() {
-  return new _RealStone["default"]();
-}
 
 },{"./lib/RealStone.js":3,"./lib/parts/Actuator.js":4,"./lib/parts/Amplifier.js":5,"./lib/parts/Button.js":6,"./lib/parts/LEDLight.js":7,"./lib/parts/LaserSensor.js":8,"./lib/parts/Mirror.js":9,"./lib/parts/MotionDetector.js":10,"./lib/parts/PressureSensor.js":11,"./lib/parts/Repeater.js":12,"./lib/parts/Rover.js":13,"./lib/parts/Wire.js":14,"./lib/signals/ElectricalSignal.js":15}],2:[function(require,module,exports){
 "use strict";
@@ -122,8 +118,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
   _inherits(Part, _EventEmitter);
   var _super = _createSuper(Part);
@@ -171,8 +167,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
@@ -336,8 +332,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Actuator = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(Actuator, _Part);
   var _super = _createSuper(Actuator);
@@ -439,8 +435,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Amplifier = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(Amplifier, _Part);
   var _super = _createSuper(Amplifier);
@@ -524,8 +520,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Button = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(Button, _Part);
   var _super = _createSuper(Button);
@@ -648,8 +644,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(LEDLight, _Part);
   var _super = _createSuper(LEDLight);
@@ -772,8 +768,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
@@ -835,8 +831,8 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
@@ -912,8 +908,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var MotionDetector = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(MotionDetector, _Part);
   var _super = _createSuper(MotionDetector);
@@ -997,8 +993,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(PressureSensor, _Part);
   var _super = _createSuper(PressureSensor);
@@ -1065,8 +1061,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Repeater = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(Repeater, _Part);
   var _super = _createSuper(Repeater);
@@ -1136,8 +1132,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Rover = /*#__PURE__*/function (_Part) {
   _inherits(Rover, _Part);
   var _super = _createSuper(Rover);
@@ -1283,8 +1279,8 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
   _inherits(Wire, _Part);
   var _super = _createSuper(Wire);
@@ -1415,8 +1411,8 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var ElectricalSignal = exports["default"] = /*#__PURE__*/function () {
   function ElectricalSignal() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -1483,8 +1479,8 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var EventEmitter = exports["default"] = /*#__PURE__*/function () {
   function EventEmitter() {
     _classCallCheck(this, EventEmitter);
@@ -1570,5 +1566,691 @@ var EventEmitter = exports["default"] = /*#__PURE__*/function () {
   return EventEmitter;
 }();
 
-},{}]},{},[1])(1)
+},{}],17:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var Plugin = /*#__PURE__*/function () {
+  function Plugin(game) {
+    _classCallCheck(this, Plugin);
+    this.game = game; // Store the reference to the game logic
+    this.name = 'Plugin'; // make name required to be set?
+    // registers itself in event emitter?
+  }
+  _createClass(Plugin, [{
+    key: "init",
+    value: function init() {
+      throw new Error('Method "init" must be implemented');
+    }
+  }, {
+    key: "update",
+    value: function update(deltaTime, snapshot) {
+      throw new Error('Method "update" must be implemented');
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      // throw new Error('Method "render" must be implemented');
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      // throw new Error('Method "destroy" must be implemented');
+    }
+  }]);
+  return Plugin;
+}();
+var _default = exports["default"] = Plugin;
+
+},{}],18:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Plugin2 = _interopRequireDefault(require("../../Plugin.js"));
+var _index = require("../../../../RealStone/index.js");
+var _createEntityFromPart = _interopRequireDefault(require("./lib/createEntityFromPart.js"));
+var _partEventListeners = _interopRequireDefault(require("./lib/partEventListeners.js"));
+var _createWire = _interopRequireDefault(require("./lib/parts/createWire.js"));
+var _securitySystemWires = _interopRequireDefault(require("./security-system-wires.js"));
+var _securitySystem = _interopRequireDefault(require("./security-system.js"));
+var _buttonWireLight = _interopRequireDefault(require("./button-wire-light.js"));
+var _roverLight = _interopRequireDefault(require("./rover-light.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// handles input controller events and relays them to the game logic
+var RealStone = /*#__PURE__*/function (_Plugin) {
+  _inherits(RealStone, _Plugin);
+  var _super = _createSuper(RealStone);
+  function RealStone() {
+    var _this;
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$contraption = _ref.contraption,
+      contraption = _ref$contraption === void 0 ? null : _ref$contraption,
+      _ref$contraptions = _ref.contraptions,
+      contraptions = _ref$contraptions === void 0 ? null : _ref$contraptions;
+    _classCallCheck(this, RealStone);
+    _this = _super.call(this);
+    _this.id = RealStone.id;
+    _this.contraption = contraption;
+    _this.contraptions = contraptions;
+    _this.createEntityFromPart = _createEntityFromPart["default"].bind(_assertThisInitialized(_this));
+    _this.createWire = _createWire["default"].bind(_assertThisInitialized(_this));
+    _this.partEventListeners = _partEventListeners["default"].bind(_assertThisInitialized(_this));
+    return _this;
+  }
+  _createClass(RealStone, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+
+      // add the system to the systems manager
+      this.game.systemsManager.addSystem(this.id, this);
+      console.log('RealStone.init()', _index.RealStone);
+      if (this.contraption) {
+        this.initContraption(this.contraption);
+      } else {
+        this.initContraption((0, _roverLight["default"])());
+      }
+    }
+  }, {
+    key: "initContraption",
+    value: function initContraption(contraption) {
+      var _this2 = this;
+      //let contraption = testLight();
+      // let contraption = roverLight();
+      //let contraption = testContraption();
+      //let contraption = securitySystemWithWires()
+      //console.log('contraption', contraption);
+
+      contraption.onAny(function (event) {
+        //console.log('onAny contraption event', event, args);
+      });
+
+      // iterate through each part and create a corresponding entity
+      contraption.parts.forEach(function (part) {
+        // bind any potential event listners for the part, based on the type of part
+        _this2.partEventListeners(part, contraption);
+        var ent = _this2.createEntityFromPart(part, contraption);
+        // console.log('created entity', ent);
+      });
+    }
+
+    // TODO: add support for multiple contraptions
+  }, {
+    key: "setContraption",
+    value: function setContraption(contraption) {
+      this.contraption = contraption;
+      this.initContraption(contraption);
+    }
+  }, {
+    key: "handleCollision",
+    value: function handleCollision(pair, bodyA, bodyB) {
+      // console.log('real stone collisions check', pair, bodyA, bodyB)
+
+      if (bodyA.myEntityId && bodyB.myEntityId) {
+        var entityIdA = bodyA.myEntityId;
+        var entityIdB = bodyB.myEntityId;
+        var entityA = this.game.entities.get(entityIdA);
+        var entityB = this.game.entities.get(entityIdB);
+        if (!entityA || !entityB) {
+          console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
+          return;
+        }
+        if (entityA.realStone) {
+          // trigger the part if possible
+          // console.log('entityA.realStone', entityA.realStone)
+          if (entityA.realStone.part.trigger) {
+            entityA.realStone.part.trigger();
+          }
+          if (entityA.realStone.part.press) {
+            entityA.realStone.part.press();
+          }
+          if (entityA.realStone.part.detectMotion) {
+            entityA.realStone.part.detectMotion();
+          }
+        }
+        if (entityB.realStone) {
+          // trigger the part if possible
+          // console.log('entityB.realStone', entityB.realStone)
+          if (entityB.realStone.part.trigger) {
+            entityB.realStone.part.trigger();
+          }
+          if (entityB.realStone.part.press) {
+            entityB.realStone.part.press();
+          }
+          if (entityB.realStone.part.detectMotion) {
+            entityB.realStone.part.detectMotion();
+          }
+        }
+      }
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }]);
+  return RealStone;
+}(_Plugin2["default"]);
+_defineProperty(RealStone, "id", 'real-stone');
+var _default = exports["default"] = RealStone;
+
+},{"../../../../RealStone/index.js":1,"../../Plugin.js":17,"./button-wire-light.js":19,"./lib/createEntityFromPart.js":20,"./lib/partEventListeners.js":21,"./lib/parts/createWire.js":22,"./rover-light.js":23,"./security-system-wires.js":24,"./security-system.js":25}],19:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = buttonLight;
+var _index = require("../../../../RealStone/index.js");
+function buttonLight() {
+  var realStoneSystem = new _index.RealStone({
+    powerRequired: false // default is false, set to true to enforce power requirements
+  });
+
+  // Create the button
+  var button = new _index.Button(0, -350, 0); // Positioned a bit below in the center
+
+  // Create three LED lights and position them on the top row
+  var ledLight1 = new _index.LEDLight(-200, 250, 0); // First light
+  var ledLight2 = new _index.LEDLight(0, 250, 0); // Second light, in the middle
+  var ledLight3 = new _index.LEDLight(200, 250, 0); // Third light
+
+  // Create wires to connect each LED light to the button
+  var wire = new _index.Wire();
+
+  // Connect button to each wire, and each wire to corresponding LED light
+  button.connect(wire);
+  wire.connect(ledLight1);
+  button.connect(wire);
+  wire.connect(ledLight2);
+  button.connect(wire);
+  wire.connect(ledLight3);
+
+  // Add components to RealStone system
+  realStoneSystem.addPart(button);
+  realStoneSystem.addPart(wire);
+  realStoneSystem.addPart(ledLight1);
+  realStoneSystem.addPart(ledLight2);
+  realStoneSystem.addPart(ledLight3);
+
+  // Simulate pressing the button
+  // button.press();
+  return realStoneSystem;
+}
+
+},{"../../../../RealStone/index.js":1}],20:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createEntityFromPart;
+function createEntityFromPart(part, contraption) {
+  var game = this.game;
+
+  // create the entity
+
+  var entity;
+  switch (part.type) {
+    case 'Wire':
+      entity = this.createWire(part, contraption);
+      break;
+    case 'Rover':
+      entity = this.game.createEntity({
+        name: part.type,
+        type: 'PART',
+        color: part.props.color,
+        position: part.position,
+        width: part.size.width,
+        height: part.size.height,
+        isStatic: false,
+        isSensor: true,
+        realStone: {
+          part: part,
+          contraption: contraption
+        }
+      });
+      break;
+    default:
+      // Handle non-wire parts
+      entity = this.game.createEntity({
+        name: part.type,
+        type: 'PART',
+        color: part.props.color,
+        position: part.position,
+        width: part.size.width,
+        height: part.size.height,
+        isStatic: true,
+        realStone: {
+          part: part,
+          contraption: contraption
+        }
+      });
+      break;
+  }
+
+  // check to see if entity is array, some parts create multiple entities
+  if (Array.isArray(entity)) {
+    var entityIds = [];
+    entity.forEach(function (e) {
+      entityIds.push(e.id);
+    });
+    part.entities = entityIds;
+  } else {
+    part.entityId = entity.id;
+  }
+  if (part.type !== 'Wire') {
+    // create a text label for the entity
+
+    var entityCenterX = part.position.x - part.size.width / 4;
+    var textLabel = this.game.createEntity({
+      type: 'TEXT',
+      text: part.type,
+      position: {
+        x: entityCenterX,
+        // Center horizontally
+        y: part.position.y + part.size.height + 10 // Position below the entity
+      },
+
+      width: part.size.width,
+      height: part.size.height,
+      isStatic: true,
+      isSensor: true,
+      realStone: {
+        part: part,
+        contraption: contraption
+      }
+    });
+  }
+}
+
+},{}],21:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = partEventListeners;
+// Listens for events on parts
+
+function partEventListeners(part, contraption) {
+  var _this = this;
+  if (part.type === 'Wire') {
+    part.on('transmit', function (signal) {
+      // set the tint of the entity to yellow
+      // console.log('Wire transmit', part);
+      // check to see if part has entities array, if so, update all entities
+      if (Array.isArray(part.entities)) {
+        part.entities.forEach(function (entityId) {
+          _this.game.updateEntity({
+            id: entityId,
+            color: 0xffff00
+          });
+        });
+      }
+    });
+    part.on('off', function () {
+      // set the tint of the entity to yellow
+      //console.log('Wire stopTransmit', part);
+      if (Array.isArray(part.entities)) {
+        part.entities.forEach(function (entityId) {
+          _this.game.updateEntity({
+            id: entityId,
+            color: 0xffffff
+          });
+        });
+      }
+    });
+  }
+  if (part.type === 'LEDLight') {
+    part.on('on', function () {
+      // set the tint of the entity to yellow
+      // console.log('LEDLight on', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffff00
+      });
+    });
+    part.on('off', function () {
+      // set the tint of the entity to yellow
+      // console.log('LEDLight off', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffffff
+      });
+    });
+  }
+  if (part.type === 'MotionDetector') {
+    part.on('on', function () {
+      // set the tint of the entity to yellow
+      // console.log('MotionDetector on', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffff00
+      });
+    });
+    part.on('off', function () {
+      // set the tint of the entity to yellow
+      // console.log('MotionDetector off', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffffff
+      });
+    });
+  }
+  if (part.type === 'Repeater') {
+    part.on('repeat', function () {
+      // set the tint of the entity to yellow
+      // console.log('Repeater on', part);
+      // TODO: should pulse? is not binary on / off state
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xf00f00
+      });
+    });
+  }
+  if (part.type === 'PressureSensor') {
+    part.on('trigger', function () {
+      // set the tint of the entity to yellow
+      // console.log('PressureSensor on', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffff00
+      });
+    });
+  }
+  if (part.type === 'Button') {
+    part.on('press', function () {
+      // set the tint of the entity to yellow
+      // console.log('Button on', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0x9a9ccf
+      });
+    });
+    part.on('release', function () {
+      // set the tint of the entity to yellow
+      // console.log('Button off', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffffff
+      });
+    });
+  }
+  if (part.type === 'Actuator') {
+    part.on('activate', function () {
+      // set the tint of the entity to yellow
+      // console.log('Actuator on', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffff00
+      });
+    });
+    part.on('deactivate', function () {
+      // set the tint of the entity to yellow
+      // console.log('Actuator off', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        color: 0xffffff
+      });
+    });
+  }
+  if (part.type === 'Rover') {
+    part.on('move', function (position) {
+      // set the tint of the entity to yellow
+      // console.log('Rover move', part);
+      _this.game.updateEntity({
+        id: part.entityId,
+        position: position
+      });
+      // game.applyForce(part.entityId, part.props.velocity);
+    });
+  }
+}
+
+},{}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createWire;
+function createWire(part, contraption) {
+  var _this = this;
+  var entities = []; // Store entities for each wire segment
+  // console.log('wire part, render', part);
+
+  // Create a line segment (thin box) for each unique connection pair
+  part.inputs.forEach(function (input) {
+    part.outputs.forEach(function (output) {
+      // Calculate midpoint, angle, and length for the segment
+      var midpoint = {
+        x: (input.position.x + output.position.x) / 2,
+        y: (input.position.y + output.position.y) / 2,
+        z: (input.position.z + output.position.z) / 2
+      };
+      var angle = Math.atan2(output.position.y - input.position.y, output.position.x - input.position.x);
+      var length = Math.hypot(output.position.x - input.position.x, output.position.y - input.position.y);
+
+      // Create a thin box to represent the line
+      var boxWidth = length;
+      var boxHeight = 3; // A small height to make it look like a line
+
+      // console.log('creating box', midpoint, angle, boxWidth, boxHeight)
+      var entity = _this.game.createEntity({
+        name: part.type,
+        isSensor: true,
+        type: 'PART',
+        // Use PART type for the thin box
+        position: midpoint,
+        width: boxWidth,
+        height: boxHeight,
+        rotation: angle,
+        isStatic: true,
+        realStone: {
+          part: part,
+          contraption: contraption
+        }
+      });
+      entities.push(entity);
+    });
+  });
+  // console.log('CREATED', entities)
+  return entities; // Return all created entities
+}
+
+},{}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = buttonLight;
+var _index = require("../../../../RealStone/index.js");
+function buttonLight() {
+  var realStoneSystem = new _index.RealStone({
+    powerRequired: false
+  });
+
+  // Create the buttons
+  var button = new _index.Button(-150, -200, 0);
+  var button2 = new _index.Button(150, -200, 0);
+
+  // Create the LED lights
+  var ledLight1 = new _index.LEDLight(-200, 250, 0);
+  var ledLight2 = new _index.LEDLight(0, 250, 0);
+  var ledLight3 = new _index.LEDLight(200, 250, 0);
+
+  // Create the Rover
+  var redRover = new _index.Rover(0, -200, 0, {
+    color: 0xff0000,
+    velocity: {
+      x: -20,
+      y: 0
+    }
+  });
+
+  // Create wires for each button
+  var wire1 = new _index.Wire();
+  var wire2 = new _index.Wire();
+
+  // Connect the first button to the first and second LED lights
+  button.connect(wire1);
+  wire1.connect(ledLight1);
+  wire1.connect(ledLight2);
+  wire1.connect(ledLight3);
+
+  // Connect the second button to the third LED light
+  button2.connect(wire2);
+  //wire2.connect(ledLight1);
+  //wire2.connect(ledLight2);
+  wire2.connect(ledLight3);
+
+  // Add components to RealStone system
+  realStoneSystem.addPart(button);
+  realStoneSystem.addPart(button2);
+  realStoneSystem.addPart(wire1);
+  realStoneSystem.addPart(wire2);
+  realStoneSystem.addPart(ledLight1);
+  realStoneSystem.addPart(ledLight2);
+  realStoneSystem.addPart(ledLight3);
+  realStoneSystem.addPart(redRover);
+
+  // Start moving the Rover
+  redRover.startMoving();
+  return realStoneSystem;
+}
+
+},{"../../../../RealStone/index.js":1}],24:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createSecuritySystem;
+var _index = require("../../../../RealStone/index.js");
+function createSecuritySystem() {
+  var realStoneSystem = new _index.RealStone();
+
+  // Initialize and position components
+  var motionDetector = new _index.MotionDetector(-150, -250, 0);
+  var pressureSensor = new _index.PressureSensor(150, -250, 0);
+  var actuator = new _index.Actuator(450, -250, 0);
+  var securityLight = new _index.LEDLight(450, 0, 200, {
+    wattage: 60
+  });
+  var manualOverrideButton = new _index.Button(50, 450, 0);
+
+  // Initialize wires
+  var wireFromMotionDetector = new _index.Wire();
+  var wireFromPressureSensor = new _index.Wire();
+  var wireFromButton = new _index.Wire();
+  var wireToLight = new _index.Wire();
+
+  // Connect components with wires
+  motionDetector.connect(wireFromMotionDetector);
+  wireFromMotionDetector.connect(actuator);
+  pressureSensor.connect(wireFromPressureSensor);
+  wireFromPressureSensor.connect(actuator);
+  manualOverrideButton.connect(wireFromButton);
+  wireFromButton.connect(actuator);
+  actuator.connect(wireToLight);
+  wireToLight.connect(securityLight);
+
+  // Add components and wires to RealStone system
+  realStoneSystem.addPart(motionDetector);
+  realStoneSystem.addPart(pressureSensor);
+  realStoneSystem.addPart(securityLight);
+  realStoneSystem.addPart(manualOverrideButton);
+  realStoneSystem.addPart(actuator);
+  realStoneSystem.addPart(wireFromMotionDetector);
+  realStoneSystem.addPart(wireFromPressureSensor);
+  realStoneSystem.addPart(wireFromButton);
+  realStoneSystem.addPart(wireToLight);
+
+  // Simulate interactions
+  // motionDetector.detectMotion(); // Simulate motion detection
+
+  // Logging the system state
+  console.log(realStoneSystem);
+  return realStoneSystem;
+}
+
+},{"../../../../RealStone/index.js":1}],25:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createSecuritySystem;
+var _index = require("../../../../RealStone/index.js");
+function createSecuritySystem() {
+  var realStoneSystem = new _index.RealStone();
+
+  // Initialize and position components
+  var motionDetector = new _index.MotionDetector(-150, -250, 0); // Position at top-left
+  var pressureSensor = new _index.PressureSensor(150, -250, 0); // Next to the Motion Detector
+  var actuator = new _index.Actuator(450, -250, 0); // Positioned appropriately
+  var securityLight = new _index.LEDLight(450, 0, 0, {
+    wattage: 60
+  }); // Near bottom-right
+  var manualOverrideButton = new _index.Button(50, 450, 0); // Near bottom-left
+
+  // Connect components to the Actuator
+  motionDetector.connect(actuator);
+  pressureSensor.connect(actuator);
+  manualOverrideButton.connect(actuator);
+
+  // Connect Actuator to the Security Light
+  actuator.connect(securityLight);
+
+  // Add components to RealStone system
+  realStoneSystem.addPart(motionDetector);
+  realStoneSystem.addPart(pressureSensor);
+  realStoneSystem.addPart(securityLight);
+  realStoneSystem.addPart(manualOverrideButton);
+  realStoneSystem.addPart(actuator);
+
+  // Simulate interactions
+  motionDetector.detectMotion(); // Simulate motion detection
+  // manualOverrideButton.press(); // Simulate manual override
+
+  // Logging the system state
+  console.log(realStoneSystem);
+  //console.log(JSON.stringify(realStoneSystem.toJSON(), true, 2))
+
+  return realStoneSystem;
+}
+
+},{"../../../../RealStone/index.js":1}]},{},[18])(18)
 });
