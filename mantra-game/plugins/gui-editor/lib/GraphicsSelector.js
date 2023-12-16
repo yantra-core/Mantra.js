@@ -11,8 +11,8 @@ class GraphicsSelector {
     selectBox.id = 'graphicsSelect';
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
-    this.addOption(selectBox, 'Babylon.js', 'BabylonGraphics');
-    this.addOption(selectBox, 'Phaser 3', 'PhaserGraphics');
+    this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
+    this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
     return selectBox;
   }
 
@@ -42,25 +42,48 @@ class GraphicsSelector {
   }
 
   handleSelectionChange(event) {
-    // TODO: Implement what happens when the selection changes
-    console.log('Selected:', event.target.value);
-    console.log('this.game.systems', this.game.systems)
-    if (typeof this.game.systems['graphics-babylon'] !== 'undefined') {
-      this.game.systemsManager.removeSystem('graphics-babylon');
+    let game = this.game;
+    this.showLoadingSpinner();
+
+    // Get the value of the selected graphics mode
+    const selectedGraphicsMode = event.target.value;
+    let selectGraphicsId;
+
+    if (selectedGraphicsMode === 'BabylonGraphics') {
+      selectGraphicsId = 'graphics-babylon';
     }
 
-    if (this.game.systems['graphics-phaser']) {
-      this.game.systemsManager.removeSystem('graphics-phaser');
+    if (selectedGraphicsMode === 'PhaserGraphics') {
+      selectGraphicsId = 'graphics-phaser';
     }
-    
-    // for now, TODO: pass actual config from previous instance
-    this.game.use(event.target.value, { camera: 'follow' });
 
-    // for now, remove later
-    if (event.target.value === 'BabylonGraphics') {
-      this.game.use('StarField');
+    // Check if the selected graphics mode is already registered
+    if (typeof this.game.systems[selectGraphicsId] === 'undefined') {
+      this.game.use(selectedGraphicsMode, { camera: 'follow' });
+
+      // Add event listeners for plugin ready events
+      this.game.once(`plugin::ready::${selectGraphicsId}`, () => {
+
+        // iterate through all existing graphics ( except this one ) and remove them
+        this.game.graphics.forEach(function (graphics) {
+          if (graphics.id !== selectGraphicsId) {
+            game.systemsManager.removeSystem(graphics.id);
+          }
+        });
+
+        this.hideLoadingSpinner();
+      });
     }
   }
+
+  showLoadingSpinner() {
+    document.body.style.cursor = 'wait';
+  }
+
+  hideLoadingSpinner() {
+    document.body.style.cursor = 'default';
+  }
+
 
 }
 
