@@ -54,8 +54,7 @@
       text-align: center;
     }
 
-    #run-contraption-form {
-    }
+    #run-contraption-form {}
 
     #save-contraption-form label {
       font-weight: bold;
@@ -122,11 +121,17 @@
       height: 1000px;
 
     }
+
+    select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #0056b3;
+    }
   </style>
   <script>
     let etherspaceHost = 'http://192.168.1.80:8889';
     let etherspaceEndpoint = etherspaceHost + '';
-
 
     async function getContraption(contraptionId) {
 
@@ -151,6 +156,16 @@
       if (contraptionCode) {
         contraptionCode.value = data.code;
       }
+
+      // update input contraption-name with new name
+      let contraptionName = document.getElementById('contraption-name');
+      if (contraptionName) {
+        contraptionName.value = data.name;
+      }
+
+      // clear all PARTS from Mantra
+      game.systems.realstone.clearAllParts();
+
       // for now autorun
       let autoRunCode = true;
       if (autoRunCode) {
@@ -182,8 +197,57 @@
         runContraption(contraptionCode);
       });
 
-      async function saveContraption(name) {
+      // Define your endpoint and user ID
+      const etherspaceEndpoint = 'http://192.168.1.80:8889/api/v1/contraptions';
+      const userId = 'Marak'; // Replace with the actual user ID
 
+      // Function to fetch contraptions for a given user
+      async function fetchContraptionsForUser(userId) {
+        try {
+          const response = await fetch(`${etherspaceEndpoint}/${userId}`);
+          const contraptions = await response.json();
+
+          // Call function to render dropdown with fetched contraptions
+          renderDropdown(contraptions);
+        } catch (error) {
+          console.error('Error fetching contraptions:', error);
+          // Handle any errors, such as by displaying a message to the user
+        }
+      }
+
+      // Function to render dropdown select with contraptions
+      function renderDropdown(contraptions) {
+        const selectElement = document.createElement('select');
+        selectElement.id = 'contraption-select';
+        contraptions.forEach(contraption => {
+          const optionElement = document.createElement('option');
+          optionElement.value = contraption.name; // Assuming each contraption has an ID
+          optionElement.textContent = contraption.name; // And a name
+          selectElement.appendChild(optionElement);
+        });
+
+
+        // get display-contraption div
+        let displayContraption = document.getElementById('display-contraption');
+        // Append the select element to the body or another element in your page
+        displayContraption.appendChild(selectElement);
+
+        // Optionally, add an event listener for when the user selects a contraption
+        selectElement.addEventListener('change', (event) => {
+          const selectedContraptionId = event.target.value;
+          console.log(`User selected contraption ID: ${selectedContraptionId}`);
+          // unload contraption
+          // load contraption
+          getContraption(selectedContraptionId);
+          // Additional code to handle the selection
+        });
+      }
+
+      // Call the function with the user ID
+      fetchContraptionsForUser(userId);
+
+      getContraption('rover-light');
+      async function saveContraption(name) {
 
         // get the code from the textarea
         let contraptionCode = document.getElementById('contraption-code').value;
@@ -219,7 +283,6 @@
         }
       }
 
-
     });
 
     function runContraption(code) {
@@ -230,10 +293,15 @@
       // let yes = confirm(`You are about to eval() this code: ${code}`)
       let yes = true;
       if (yes) {
+        console.log('about to run code')
+        console.log(code)
+        console.log('code complete')
         eval(code)
 
-        game.systems.realstone.setContraption(roverLightSystem);
-        console.log('rrrr', roverLightSystem)
+        // try to figure out example name ( for now )
+        let systemName = 'realStoneSystem';
+
+        game.systems.realstone.setContraption(eval(systemName));
       }
     }
 
@@ -241,7 +309,6 @@
 </head>
 
 <body>
-
 
   <div id="main-container">
     <header>
@@ -262,7 +329,7 @@
         <button type="submit">Run Contraption</button>
         <!-- TODO Monaco editor -->
       </form>
-      
+
 
     </section>
     <textarea id="contraption-code" rows="10" cols="50" placeholder="Enter contraption code here"></textarea>

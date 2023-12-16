@@ -61,6 +61,18 @@ class RealStone extends Plugin {
 
   }
 
+  clearAllParts() {
+    this.game.entities.forEach(ent => {
+      if (ent.type === 'PART') {
+        this.game.removeEntity(ent.id);
+      }
+      if (ent.type === 'TEXT') { // for now
+        this.game.removeEntity(ent.id);
+      }
+
+    });
+  }
+
   // TODO: add support for multiple contraptions
   setContraption(contraption) {
     console.log("Mantra.RealStone Plugin - Setting Contraption", contraption)
