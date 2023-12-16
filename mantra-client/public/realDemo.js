@@ -56,13 +56,17 @@ document.addEventListener('DOMContentLoaded', async (event) => {
   let game = new MANTRA.Game({
     physics: 'matter', // enum, 'physx', 'matter
     collisions: true,
-    graphics: ['phaser'], // array enum, 'babylon', 'phaser', 'css', 'three'
+    graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
     camera: 'follow',
     options: {
       scriptRoot: './'
     }
   });
+  game.use('RealStone');
+
   game.start(function(){
+    game.use('Editor');
+
     document.addEventListener('click', function (e) {
       // check to see if we are inside an input, textarea, button or submit
       // if so, disable inputs controls
@@ -76,7 +80,12 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         game.systems['entity-input'].setInputsActive();
         game.systems['keyboard'].bindInputControls();
       }
-    });  
+    });
+    
+    // Example usage
+    window.getContraption('rover-light');
+
+
   });
   game.use('Bullet');
   window.game = game;

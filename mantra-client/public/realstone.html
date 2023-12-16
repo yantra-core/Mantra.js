@@ -10,29 +10,160 @@
   <script type="module" src="/realstone.js"></script>
   <script type="module" src="/realDemo.js"></script>
   <style>
-    #contraption-interface {
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    #main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
       text-align: center;
-      margin-top: 20px;
+      padding: 20px 0;
+    }
+
+    #contraption-interface {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      position: absolute;
+      right: 20px;
+      top: 140px;
+
     }
 
     #save-contraption-form {
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 20px;
     }
 
     #display-contraption {
-      margin-top: 20px;
-      display: none;
+      text-align: center;
+    }
+
+    #run-contraption-form {
+    }
+
+    #save-contraption-form label {
+      font-weight: bold;
+    }
+
+    #save-contraption-form input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #save-contraption-form button {
+      padding: 10px 15px;
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #save-contraption-form button:hover {
+      background-color: #003d82;
+    }
+
+    h1 {
+      color: #333;
+      position: absolute;
+      right: 20px;
+      top: 60px;
+
+    }
+
+    h3 {
+      color: #555;
     }
 
     textarea {
       position: absolute;
-      top: 0;
+      top: 50px;
       left: 0;
       width: 400px;
       height: 800px;
+      font-family: 'Courier New', monospace;
+      /* Monospace font */
+      background-color: #282c34;
+      /* Dark background */
+      color: #abb2bf;
+      /* Light text */
+      padding: 10px;
+      /* Padding inside textarea */
+      border: 1px solid #abb2bf;
+      /* Optional border */
+      width: 100%;
+      /* Width of the editor */
+      height: 300px;
+      /* Height of the editor */
+      line-height: 1.5;
+      /* Line height for better readability */
+      tab-size: 4;
+      /* Set tab size for better code formatting */
+      white-space: pre;
+      /* Preserve whitespace and formatting */
+      width: 600px;
+      height: 1000px;
+
     }
   </style>
   <script>
+    let etherspaceHost = 'http://192.168.1.80:8889';
+    let etherspaceEndpoint = etherspaceHost + '';
+
+
+    async function getContraption(contraptionId) {
+
+      const contraptionNameDisplay = document.getElementById('contraption-name-display');
+
+      // Implement GET request to fetch contraption
+      const response = await fetch(`${etherspaceEndpoint}/api/v1/contraption/${contraptionId}`);
+      const data = await response.json();
+
+      if (data) {
+        contraptionNameDisplay.textContent = data.name; // Update display with fetched name
+      } else {
+        contraptionNameDisplay.textContent = 'Could not find: ' + contraptionId;
+      }
+      let displayContraption = document.getElementById('display-contraption');
+      if (displayContraption) {
+        displayContraption.style.display = 'block';
+      }
+
+      // set contraption-code textarea value to fetched code
+      let contraptionCode = document.getElementById('contraption-code');
+      if (contraptionCode) {
+        contraptionCode.value = data.code;
+      }
+      // for now autorun
+      let autoRunCode = true;
+      if (autoRunCode) {
+        setTimeout(function () {
+          runContraption(data.code);
+        }, 200)
+      }
+
+      //contraptionNameDisplay.style.display = 'block';
+    }
+    window.getContraption = getContraption;
+
+
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('save-contraption-form');
       const contraptionNameDisplay = document.getElementById('contraption-name-display');
@@ -48,7 +179,6 @@
       runContraptionForm.addEventListener('submit', function (event) {
         event.preventDefault();
         const contraptionCode = document.getElementById('contraption-code').value;
-        // Implement the POST request to save the contraption
         runContraption(contraptionCode);
       });
 
@@ -89,39 +219,12 @@
         }
       }
 
-      let etherspaceHost = 'http://192.168.1.80:8889';
-      let etherspaceEndpoint = etherspaceHost + '';
 
-
-      async function getContraption(contraptionId) {
-        // Implement GET request to fetch contraption
-        const response = await fetch(`${etherspaceEndpoint}/api/v1/contraption/${contraptionId}`);
-        const data = await response.json();
-
-        if (data) {
-          contraptionNameDisplay.textContent = data.name; // Update display with fetched name
-        } else {
-          contraptionNameDisplay.textContent = 'Could not find: ' + contraptionId;
-        }
-        let displayContraption = document.getElementById('display-contraption');
-        if (displayContraption) {
-          displayContraption.style.display = 'block';
-        }
-
-        // set contraption-code textarea value to fetched code
-        let contraptionCode = document.getElementById('contraption-code');
-        if (contraptionCode) {
-          contraptionCode.value = data.code;
-        }
-
-        //contraptionNameDisplay.style.display = 'block';
-      }
-
-      // Example usage
-      getContraption('rover-light');
     });
 
-    function runContraption (code) {
+    function runContraption(code) {
+
+      // TODO: we need to check for existing contraption and remove it
       // alert(code)
       // TODO: eval code
       // let yes = confirm(`You are about to eval() this code: ${code}`)
@@ -129,12 +232,8 @@
       if (yes) {
         eval(code)
 
+        game.systems.realstone.setContraption(roverLightSystem);
         console.log('rrrr', roverLightSystem)
-        game.use('RealStone', {
-          contraption: roverLightSystem
-        });
-
-
       }
     }
 
@@ -142,6 +241,35 @@
 </head>
 
 <body>
+
+
+  <div id="main-container">
+    <header>
+      <h1>RealStone Contraption Viewer</h1>
+    </header>
+
+    <section id="contraption-interface">
+      <div id="display-contraption">
+        <h3>Contraption Name: <span id="contraption-name-display"></span></h3>
+      </div>
+
+      <form id="save-contraption-form">
+        <label for="contraption-name">Contraption Name:</label>
+        <input type="text" id="contraption-name" placeholder="Enter contraption name" required>
+        <button type="submit">Save Contraption</button>
+      </form>
+      <form id="run-contraption-form">
+        <button type="submit">Run Contraption</button>
+        <!-- TODO Monaco editor -->
+      </form>
+      
+
+    </section>
+    <textarea id="contraption-code" rows="10" cols="50" placeholder="Enter contraption code here"></textarea>
+
+  </div>
+
+  <!--
   <div id="contraption-interface">
     <div id="display-contraption">
       <h3>Contraption Name: <span id="contraption-name-display"></span></h3>
@@ -152,12 +280,11 @@
     </form>
     <form id="run-contraption-form">
       <button type="submit">Run Contraption</button>
-      <!-- TODO Monaco editor -->
       <textarea id="contraption-code" rows="10" cols="50" placeholder="Enter contraption code here"></textarea>
+    </form>
   </div>
-  <script>
-    // JavaScript to handle form submission and fetching contraption
-  </script>
+  -->
+
 </body>
 
 </html>
