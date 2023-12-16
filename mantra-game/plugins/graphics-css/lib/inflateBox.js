@@ -10,9 +10,18 @@ export default function inflateBox(entityElement, entityData) {
   entityElement.style.height = entityData.height + 'px';
   entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
-  // set initial rotation of the entity
-  if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
-    //entityElement.style.transform = `rotate(${entityData.rotation}deg)`;
+  if (entityData.type === 'PART' && entityData.name === 'Button') {
+    // add pointer cursor for buttons on hover
+    entityElement.style.cursor = 'pointer';
+    // add click event listener for buttons
+    entityElement.addEventListener('click', () => {
+      // should call part.press()
+      // get the full ent from the game
+      let ent = game.getEntity(entityData.id);
+      if (ent && ent.realStone && ent.realStone.part.press) {
+        ent.realStone.part.press();
+      }
+    });
   }
 
   // set border color to black
