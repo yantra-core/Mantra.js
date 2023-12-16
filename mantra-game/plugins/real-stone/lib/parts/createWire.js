@@ -1,6 +1,6 @@
 export default function createWire(part, contraption) {
   let entities = []; // Store entities for each wire segment
-  console.log('wire part, render string', part);
+  // console.log('wire part, render', part);
 
   // Create a line segment (thin box) for each unique connection pair
   part.inputs.forEach(input => {
@@ -19,7 +19,7 @@ export default function createWire(part, contraption) {
       const boxWidth = length;
       const boxHeight = 3; // A small height to make it look like a line
 
-      console.log('creating box', midpoint, angle, boxWidth, boxHeight)
+      // console.log('creating box', midpoint, angle, boxWidth, boxHeight)
       let entity = this.game.createEntity({
         name: part.type,
         isSensor: true,
@@ -38,6 +38,6 @@ export default function createWire(part, contraption) {
       entities.push(entity);
     });
   });
-
+  // console.log('CREATED', entities)
   return entities; // Return all created entities
 }

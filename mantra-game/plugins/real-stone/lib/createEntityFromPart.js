@@ -8,7 +8,6 @@ export default function createEntityFromPart(part, contraption) {
   switch (part.type) {
     case 'Wire':
       entity = this.createWire(part, contraption);
-
       break;
     case 'Rover':
       entity = this.game.createEntity({
@@ -46,17 +45,31 @@ export default function createEntityFromPart(part, contraption) {
       break;
   }
 
-  part.entityId = entity.id;
+
+  // check to see if entity is array, some parts create multiple entities
+  if (Array.isArray(entity)) {
+    let entityIds = [];
+    entity.forEach(e => {
+      entityIds.push(e.id);
+    });
+    part.entities = entityIds;
+  } else {
+    part.entityId = entity.id;
+  }
+
 
 
   if (part.type !== 'Wire') {
     // create a text label for the entity
+
+    let entityCenterX = part.position.x - part.size.width / 4;
+
     let textLabel = this.game.createEntity({
       type: 'TEXT',
       text: part.type,
       position: {
-        x: part.position.x, // Center horizontally
-        y: part.position.y + part.size.height / 2     // Position below the entity
+        x: entityCenterX, // Center horizontally
+        y: part.position.y + part.size.height + 10     // Position below the entity
       },
       width: part.size.width,
       height: part.size.height,

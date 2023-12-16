@@ -2,11 +2,13 @@ import Plugin from '../../Plugin.js';
 import { RealStone as RealStoneActual } from '../../../../RealStone/index.js';
 
 import createEntityFromPart from './lib/createEntityFromPart.js';
+import partEventListeners from './lib/partEventListeners.js';
 import createWire from './lib/parts/createWire.js';
 
 import securitySystemWithWires from './security-system-wires.js';
 import testContraption from './security-system.js';
 import testLight from './button-wire-light.js';
+import roverLight from './rover-light.js';
 
 // handles input controller events and relays them to the game logic
 class RealStone extends Plugin {
@@ -17,6 +19,7 @@ class RealStone extends Plugin {
     this.id = RealStone.id;
     this.createEntityFromPart = createEntityFromPart.bind(this);
     this.createWire = createWire.bind(this);
+    this.partEventListeners = partEventListeners.bind(this);
   }
 
   init(game) {
@@ -26,7 +29,8 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
 
     console.log('RealStone.init()', RealStoneActual);
-    let contraption = testLight();
+    //let contraption = testLight();
+    let contraption = roverLight();
     //let contraption = testContraption();
     //let contraption = securitySystemWithWires()
     //console.log('contraption', contraption);
@@ -37,6 +41,10 @@ class RealStone extends Plugin {
 
     // iterate through each part and create a corresponding entity
     contraption.parts.forEach(part => {
+
+      // bind any potential event listners for the part, based on the type of part
+      this.partEventListeners(part, contraption);
+
       let ent = this.createEntityFromPart(part, contraption)
       // console.log('create ent from part', part, ent)
       // let updated = this.game.getEntity(entity.id);
