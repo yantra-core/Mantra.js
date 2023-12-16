@@ -15,7 +15,7 @@ export default function inflategraphic(entityData) {
       // defaults to white
       entityData.color = 0xffffff;
     }
-
+    graphic.setDepth(9999)
     graphic.fillStyle(entityData.color, 1);
     graphic.currentFillColor = entityData.color;
     graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);

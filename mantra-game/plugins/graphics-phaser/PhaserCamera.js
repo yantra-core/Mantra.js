@@ -16,7 +16,6 @@ class PhaserCamera {
       tweening: false
     };
     */
-
     this.initZoomControls();
   }
 

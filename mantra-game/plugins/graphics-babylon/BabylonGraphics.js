@@ -417,9 +417,8 @@ class BabylonGraphics extends GraphicsInterface {
   createBox(entityData) {
     let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.depth, depth: entityData.height }, this.scene);
     if (entityData.rotation) {
-      box.rotation.y = -entityData.rotation;
+      box.rotation.y = entityData.rotation;
     }
-    box.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     return box;
   }
 
