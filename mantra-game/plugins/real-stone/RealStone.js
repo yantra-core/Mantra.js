@@ -12,8 +12,8 @@ import roverLight from './rover-light.js';
 
 // handles input controller events and relays them to the game logic
 class RealStone extends Plugin {
-  static id = 'real-stone';
-  constructor({ contraption = null, contraptions = null } = {}) {
+  static id = 'realstone';
+  constructor({ contraption = null, contraptions = null, useDefaultContraption = false } = {}) {
     super();
     this.id = RealStone.id;
     this.contraption = contraption;
@@ -33,9 +33,11 @@ class RealStone extends Plugin {
     if (this.contraption) {
       this.initContraption(this.contraption);
     } else {
-      this.initContraption(roverLight());
+      // TODO: add config option for default contraption if none is specified at construction
+      if (this.useDefaultContraption) {
+        this.initContraption(roverLight());
+      }
     }
-
   }
 
   initContraption(contraption) {
@@ -45,7 +47,6 @@ class RealStone extends Plugin {
     //let contraption = testContraption();
     //let contraption = securitySystemWithWires()
     //console.log('contraption', contraption);
-    
     contraption.onAny((event, ...args) => {
       //console.log('onAny contraption event', event, args);
     });
@@ -62,6 +63,7 @@ class RealStone extends Plugin {
 
   // TODO: add support for multiple contraptions
   setContraption(contraption) {
+    console.log("Mantra.RealStone Plugin - Setting Contraption", contraption)
     this.contraption = contraption;
     this.initContraption(contraption);
   }

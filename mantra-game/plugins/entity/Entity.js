@@ -152,7 +152,6 @@ class Entity {
   }
 
   updateEntity(entityData) {
-
     const entityId = entityData.id;
 
     let fullState = this.game.getEntity(entityId);
@@ -198,7 +197,10 @@ class Entity {
     if (entityData.position) {
       // Remark: Tests require we update component, perhaps changed test?
       this.game.components.position.set(entityId, entityData.position);
-      this.game.physics.setPosition(this.game.bodyMap[entityId], entityData.position);
+      let body = this.game.bodyMap[entityId];
+      if (body) {
+        this.game.physics.setPosition(body, entityData.position);
+      }
     }
 
     if (entityData.velocity) {
@@ -219,6 +221,8 @@ class Entity {
 
     if (typeof entityData.rotation !== 'undefined') {
       this.game.components.rotation.set(entityId, entityData.rotation);
+
+      // TODO: update rotation in physics engine      
     }
 
     return ent;
@@ -333,6 +337,9 @@ class Entity {
       }
       if (position) {
         this.game.physics.setPosition(body, position);
+      }
+      if (typeof rotation !== 'undefined') {
+        this.game.physics.setRotation(body, rotation);
       }
     }
 

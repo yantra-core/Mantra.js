@@ -1,6 +1,5 @@
 export default function createEntityFromPart(part, contraption) {
   let game = this.game;
-
   // create the entity
 
   let entity;
@@ -83,5 +82,6 @@ export default function createEntityFromPart(part, contraption) {
 
   }
 
+  return entity;
 
 }

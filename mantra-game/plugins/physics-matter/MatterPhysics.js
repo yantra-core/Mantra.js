@@ -210,6 +210,10 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Events.on(engine, 'afterUpdate', callback);
   }
 
+  setRotation(body, rotation) {
+    Matter.Body.setAngle(body, rotation);
+  }
+
   setPosition(body, position) {
     Matter.Body.setPosition(body, position);
   }
