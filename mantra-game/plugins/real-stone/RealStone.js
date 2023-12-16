@@ -13,10 +13,11 @@ import roverLight from './rover-light.js';
 // handles input controller events and relays them to the game logic
 class RealStone extends Plugin {
   static id = 'real-stone';
-  constructor(game) {
-    super(game);
-    this.game = game; // Store the reference to the game logic
+  constructor({ contraption = null, contraptions = null } = {}) {
+    super();
     this.id = RealStone.id;
+    this.contraption = contraption;
+    this.contraptions = contraptions;
     this.createEntityFromPart = createEntityFromPart.bind(this);
     this.createWire = createWire.bind(this);
     this.partEventListeners = partEventListeners.bind(this);
@@ -29,8 +30,16 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
 
     console.log('RealStone.init()', RealStoneActual);
+    if (this.contraption) {
+      this.initContraption(this.contraption);
+    }
+
+  }
+
+  initContraption(contraption) {
+
     //let contraption = testLight();
-    let contraption = roverLight();
+    // let contraption = roverLight();
     //let contraption = testContraption();
     //let contraption = securitySystemWithWires()
     //console.log('contraption', contraption);
@@ -41,17 +50,18 @@ class RealStone extends Plugin {
 
     // iterate through each part and create a corresponding entity
     contraption.parts.forEach(part => {
-
       // bind any potential event listners for the part, based on the type of part
       this.partEventListeners(part, contraption);
-
-      let ent = this.createEntityFromPart(part, contraption)
-      // console.log('create ent from part', part, ent)
-      // let updated = this.game.getEntity(entity.id);
-      //console.log('entity', entity)
-      //console.log("updated ent", updated)
+      let ent = this.createEntityFromPart(part, contraption);
+      // console.log('created entity', ent);
     });
 
+  }
+
+  // TODO: add support for multiple contraptions
+  setContraption(contraption) {
+    this.contraption = contraption;
+    this.initContraption(contraption);
   }
 
   handleCollision(pair, bodyA, bodyB) {
