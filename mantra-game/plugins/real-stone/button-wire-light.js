@@ -24,7 +24,7 @@ export default function buttonLight() {
   button.connect(wire);
   wire.connect(ledLight3);
 
-  // Add components to RealStone system
+  // Add parts to RealStone system
   realStoneSystem.addPart(button);
   realStoneSystem.addPart(wire);
   realStoneSystem.addPart(ledLight1);

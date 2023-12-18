@@ -2,8 +2,18 @@ import Plugin from '../../Plugin.js';
 import { RealStone as RealStoneActual } from '../../../../RealStone/index.js';
 
 import createEntityFromPart from './lib/createEntityFromPart.js';
-import partEventListeners from './lib/partEventListeners.js';
+import partEventListeners from './lib/bindPartEvents.js';
+
 import createWire from './lib/parts/createWire.js';
+import bindWire from './lib/events/bindWire.js';
+import bindButton from './lib/events/bindButton.js';
+import bindLEDLight from './lib/events/bindLEDLight.js';
+import bindAcuator from './lib/events/bindActuator.js';
+import bindLatch from './lib/events/bindLatch.js';
+import bindMotionDetector from './lib/events/bindMotionDetector.js';
+import bindRelay from './lib/events/bindRelay.js';
+import bindPressureSensor from './lib/events/bindPressureSensor.js';
+import bindRover from './lib/events/bindRover.js';
 
 import securitySystemWithWires from './security-system-wires.js';
 import testContraption from './security-system.js';
@@ -19,7 +29,21 @@ class RealStone extends Plugin {
     this.contraption = contraption;
     this.contraptions = contraptions;
     this.createEntityFromPart = createEntityFromPart.bind(this);
+    
+    this.bindWire = bindWire.bind(this);
     this.createWire = createWire.bind(this);
+
+    this.bindButton = bindButton.bind(this);
+    this.bindLEDLight = bindLEDLight.bind(this);
+    this.bindAcuator = bindAcuator.bind(this);
+    this.bindLatch = bindLatch.bind(this);
+    this.bindMotionDetector = bindMotionDetector.bind(this);
+    this.bindRelay = bindRelay.bind(this);
+    this.bindPressureSensor = bindPressureSensor.bind(this);
+    this.bindRover = bindRover.bind(this);
+
+
+    
     this.partEventListeners = partEventListeners.bind(this);
   }
 
@@ -48,7 +72,7 @@ class RealStone extends Plugin {
     //let contraption = securitySystemWithWires()
     //console.log('contraption', contraption);
     contraption.onAny((event, ...args) => {
-      //console.log('onAny contraption event', event, args);
+      // console.log('onAny contraption event', event, args);
     });
 
     // iterate through each part and create a corresponding entity

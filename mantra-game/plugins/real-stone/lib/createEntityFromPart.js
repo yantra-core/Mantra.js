@@ -1,4 +1,5 @@
 export default function createEntityFromPart(part, contraption) {
+
   let game = this.game;
   // create the entity
 
@@ -84,4 +85,20 @@ export default function createEntityFromPart(part, contraption) {
 
   return entity;
 
+}
+
+// TODO: move this to entity code, not graphics code
+let partColors = {
+  "ElectricalSignal": "#FFD700",
+  "Actuator": "#808080",
+  "Amplifier": "#00008B",
+  "Button": "#FF4500",
+  "LaserSensor": "#800080",
+  "Latch": "#B8860B",
+  "LEDLight": "#00FF00",
+  "Mirror": "#C0C0C0",
+  "MotionDetector": "#FF69B4",
+  "PressureSensor": "#4682B4",
+  "Relay": "#A52A2A",
+  "Rover": "#8B4513"
 }

@@ -1,5 +1,5 @@
 
-import { RealStone, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor, Repeater } from '../../../../RealStone/index.js';
+import { RealStone, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor, Relay } from '../../../../RealStone/index.js';
 
 export default function createSecuritySystem() {
   const realStoneSystem = new RealStone();
@@ -19,7 +19,7 @@ export default function createSecuritySystem() {
   // Connect Actuator to the Security Light
   actuator.connect(securityLight);
 
-  // Add components to RealStone system
+  // Add parts to RealStone system
   realStoneSystem.addPart(motionDetector);
   realStoneSystem.addPart(pressureSensor);
   realStoneSystem.addPart(securityLight);
