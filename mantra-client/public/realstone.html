@@ -203,12 +203,16 @@
         const contraption = module.default();
 
         // Assuming the system name is declared globally in the code
-        let systemName = 'realStoneSystem';
+        let systemName = module.default.name;
         window[systemName] = contraption;
 
         // Set the contraption to the RealStone system
         if (window[systemName]) {
           game.systems.realstone.setContraption(window[systemName]);
+        }
+
+        if (contraption.start) {
+          // contraption.start();
         }
 
         // Clean up by revoking the blob URL
@@ -217,26 +221,6 @@
         console.log('Contraption loaded and executed');
       } catch (error) {
         console.error('Error running contraption:', error);
-      }
-    }
-
-    function runContraption(code) {
-      let yes = true; // In production, you may want a more secure confirmation method
-      if (yes) {
-        console.log('About to run code', code);
-
-        // Create and run the function
-        const contraptionFunction = new Function('RS', code);
-        let contraption = contraptionFunction();
-        contraptionFunction(window.RS);
-
-        // Assuming the system name is declared globally in the code
-        let systemName = 'realStoneSystem';
-        if (window[systemName]) {
-          game.systems.realstone.setContraption(window[systemName]);
-        }
-
-        console.log('Code execution complete');
       }
     }
 
@@ -320,9 +304,19 @@
       // Call the function with the user ID
       await fetchContraptionsForUser(userId);
 
-      //getContraption('rover-light');
-      await getContraption('button-light');
-      // getContraption('button-relay-light');
+      let contraptionName = 'button-relay-light';
+      contraptionName = 'rover-light';
+      contraptionName = 'all-examples-composite';
+      // Could auto-load a contraption at start
+      // for now, we will load allExamples from memory
+      // await getContraption(contraptionName);
+
+  // Set the contraption to the RealStone system
+    let allExamples = RS.allExamples();
+    game.systems.realstone.setContraption(allExamples);
+
+
+      
 
       // getContraption('button-actuator-light');
       //getContraption('button-amplify-wire-light');

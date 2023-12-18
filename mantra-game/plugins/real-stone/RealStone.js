@@ -30,8 +30,6 @@ class RealStone extends Plugin {
     this.contraption = contraption;
     this.contraptions = contraptions;
 
-    console.log("CONSTRUCTING", contraption, contraptions)
-
     this.createEntityFromPart = createEntityFromPart.bind(this);
     
     this.bindWire = bindWire.bind(this);
@@ -58,7 +56,14 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
     console.log('RealStone.init()', RealStoneActual);
     if (self.contraption) {
-      self.initContraption.call(self.contraption);
+
+      if (self.contraption.start) {
+        self.initContraption.call(self.contraption);
+
+      } else {
+        self.initContraption.start();
+      }
+
     } else {
       // TODO: add config option for default contraption if none is specified at construction
       if (self.useDefaultContraption) {
@@ -69,22 +74,37 @@ class RealStone extends Plugin {
 
   initContraption(contraption) {
 
-    //let contraption = testLight();
-    // let contraption = roverLight();
-    //let contraption = testContraption();
-    //let contraption = securitySystemWithWires()
+    if (contraption.start) {
+      contraption.start();
+    }
+
     //console.log('contraption', contraption);
     contraption.onAny((event, ...args) => {
       // console.log('onAny contraption event', event, args);
     });
 
-    // iterate through each part and create a corresponding entity
-    contraption.parts.forEach(part => {
-      // bind any potential event listners for the part, based on the type of part
-      this.partEventListeners(part, contraption);
-      let ent = this.createEntityFromPart(part, contraption);
-      // console.log('created entity', ent);
-    });
+    // TODO: DRY this logic up with below
+    if (contraption.parts.length > 0) {
+      // iterate through each part and create a corresponding entity
+      contraption.parts.forEach(part => {
+        // bind any potential event listners for the part, based on the type of part
+        this.partEventListeners(part, contraption);
+        let ent = this.createEntityFromPart(part, contraption);
+        // console.log('created entity', ent);
+      });
+    }
+
+    if (contraption.contraptions.length > 0) {
+      // iterate through each contraption and create a corresponding entity
+      contraption.contraptions.forEach(contraption => {
+        contraption.parts.forEach(part => {
+          // bind any potential event listners for the part, based on the type of part
+          this.partEventListeners(part, contraption);
+          let ent = this.createEntityFromPart(part, contraption);
+          // console.log('created entity', ent);
+        });
+      });
+    }
 
   }
 
