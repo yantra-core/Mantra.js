@@ -8,7 +8,8 @@ import createWire from './lib/parts/createWire.js';
 import bindWire from './lib/events/bindWire.js';
 import bindButton from './lib/events/bindButton.js';
 import bindLEDLight from './lib/events/bindLEDLight.js';
-import bindAcuator from './lib/events/bindActuator.js';
+import bindActuator from './lib/events/bindActuator.js';
+import bindAmplifier from './lib/events/bindAmplifer.js';
 import bindLatch from './lib/events/bindLatch.js';
 import bindMotionDetector from './lib/events/bindMotionDetector.js';
 import bindRelay from './lib/events/bindRelay.js';
@@ -28,6 +29,9 @@ class RealStone extends Plugin {
     this.id = RealStone.id;
     this.contraption = contraption;
     this.contraptions = contraptions;
+
+    console.log("CONSTRUCTING", contraption, contraptions)
+
     this.createEntityFromPart = createEntityFromPart.bind(this);
     
     this.bindWire = bindWire.bind(this);
@@ -35,31 +39,30 @@ class RealStone extends Plugin {
 
     this.bindButton = bindButton.bind(this);
     this.bindLEDLight = bindLEDLight.bind(this);
-    this.bindAcuator = bindAcuator.bind(this);
+    this.bindActuator = bindActuator.bind(this);
+    this.bindAmplifier = bindAmplifier.bind(this);
     this.bindLatch = bindLatch.bind(this);
     this.bindMotionDetector = bindMotionDetector.bind(this);
     this.bindRelay = bindRelay.bind(this);
     this.bindPressureSensor = bindPressureSensor.bind(this);
     this.bindRover = bindRover.bind(this);
-
-
     
     this.partEventListeners = partEventListeners.bind(this);
   }
 
   init(game) {
+    let self = this
     this.game = game;
 
     // add the system to the systems manager
     this.game.systemsManager.addSystem(this.id, this);
-
     console.log('RealStone.init()', RealStoneActual);
-    if (this.contraption) {
-      this.initContraption(this.contraption);
+    if (self.contraption) {
+      self.initContraption.call(self.contraption);
     } else {
       // TODO: add config option for default contraption if none is specified at construction
-      if (this.useDefaultContraption) {
-        this.initContraption(roverLight());
+      if (self.useDefaultContraption) {
+        self.initContraption(roverLight());
       }
     }
   }
@@ -131,7 +134,6 @@ class RealStone extends Plugin {
         if (entityA.realStone.part.detectMotion) {
           entityA.realStone.part.detectMotion();
         }
-
       }
 
       if (entityB.realStone) {

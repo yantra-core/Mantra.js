@@ -11,7 +11,7 @@ export default function inflateBox(entityElement, entityData) {
   entityElement.style.height = entityData.height + 'px';
   entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
-  if (entityData.type === 'PART' ) {
+  if (entityData.type === 'PART') {
 
     // add pointer cursor for buttons on hover
     entityElement.style.cursor = 'pointer';
@@ -30,29 +30,35 @@ export default function inflateBox(entityElement, entityData) {
     // mouse down event, 
     entityElement.addEventListener('pointerdown', (ev) => {
       console.log(ev.target, entityData.id, entityData.type, entityData)
-      // should call part.press()
+
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part.press) {
-        console.log("pressing", ent.realStone.part)
+
+      // delgate based on part type name
+      let partName = ent.realStone.part.name;
+      let partType = ent.realStone.part.type;
+      let part = ent.realStone.part;
+      /*
+      console.log('partName', partName)
+      console.log('partType', partType)
+      console.log('part', part)
+      */
+
+      if (partType === 'Button') {
         ent.realStone.part.press();
       }
 
-      // TODO: remove this line
-      if (ent && ent.realStone && ent.realStone.part.toggleFn) {
-        console.log('toggleFn', ent.realStone.part.toggleFn)
-        ent.realStone.part.toggleFn();
-      }
+      // LEDLight, Latch, Amplifier
       if (ent && ent.realStone && ent.realStone.part.toggle) {
-        console.log('toggle', ent.realStone.part.toggle)
         ent.realStone.part.toggle();
       }
 
-
+      /*
       if (ent && ent.realStone && ent.realStone.part.trigger) {
         console.log('trigger', ent.realStone.part.trigger)
         ent.realStone.part.trigger();
       }
+      */
 
       /*
       if (ent && ent.realStone && ent.realStone.part.toggle) {
@@ -62,13 +68,25 @@ export default function inflateBox(entityElement, entityData) {
     });
     entityElement.addEventListener('pointerup', (ev) => {
       // console.log(ev.target, entityData.id, entityData.type, entityData)
-      // should call part.press()
+
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
-      // TODO: Button type only?
-      if (ent && ent.realStone && ent.realStone.part.release) {
-        ent.realStone.part.release();
+
+      // delgate based on part type name
+      let partName = ent.realStone.part.name;
+      let partType = ent.realStone.part.type;
+
+      console.log('partName', partName)
+      console.log('partType', partType)
+
+
+      if (partType === 'Button') {
+        if (ent && ent.realStone && ent.realStone.part.release) {
+          ent.realStone.part.release();
+        }
       }
+
+
     });
 
   }

@@ -1,6 +1,6 @@
 export default function bindRoverEvents (part, contraption) {
   let game = this.game;
-  part.realStone.on('Rover::move', (position) => {
+  part.on('move', (position) => {
     // set the tint of the entity to yellow
     // console.log('Rover move', part);
     game.updateEntity({ id: part.entityId, position: position });

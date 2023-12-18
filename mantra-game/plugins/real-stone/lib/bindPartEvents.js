@@ -4,5 +4,8 @@ export default function partEventListeners(part, contraption) {
   let bindPartFnName = 'bind' + partType;
   if (typeof this[bindPartFnName] === 'function') {
     this[bindPartFnName](part, contraption);
+  } else {
+    console.log('missing', bindPartFnName)
+    alert('missing bind' + bindPartFnName)
   }
 }

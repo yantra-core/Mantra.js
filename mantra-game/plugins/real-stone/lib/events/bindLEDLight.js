@@ -1,20 +1,21 @@
 export default function bindLEDLightEvents (part, contraption) {
   let game = this.game;
 
-  part.realStone.on('LEDLight::on', () => {
+  part.onAny((event, data) => {
+    // we can see on and off events here
+    console.log(`LEDLight "${event}" "${data}"`);
+  });
+
+  part.on('activate', () => {
     // set the tint of the entity to yellow
     game.updateEntity({ id: part.entityId, color: 0xffff00 });
   });
-  part.realStone.on('LEDLight::off', () => {
-    game.updateEntity({ id: part.entityId, color: part.color });
+  part.on('deactivate', () => {
+    try {
+      game.updateEntity({ id: part.entityId, color: 0xffffff });
+      } catch (err) {
+      console.log('err', err)
+    }
   });
 
-  /* // TODO: investigate why this event name doesn't work anymore, it should
-  part.on('off', () => {
-    alert('LEDLight::off')
-  });
-  part.on('on', () => {
-    alert('LEDLight::on')
-  });
-  */
 }

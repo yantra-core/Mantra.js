@@ -20,7 +20,7 @@ export default function inflateText(entityElement, entityData) {
   //chatBubble.style.height = `${entityData.height}px`;
   chatBubble.innerText = entityData.text || '';
 
-  console.log('appending new text element')
+  // console.log('appending new text element')
   // Append the chat bubble to the container
   entityElement.appendChild(chatBubble);
   // Update the position of the chat bubble container
