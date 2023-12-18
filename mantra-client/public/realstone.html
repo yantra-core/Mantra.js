@@ -43,7 +43,7 @@
 
     #save-contraption-form {
 
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       gap: 10px;
@@ -54,7 +54,9 @@
       text-align: center;
     }
 
-    #run-contraption-form {}
+    #run-contraption-form {
+      display: none;
+    }
 
     #save-contraption-form label {
       font-weight: bold;
@@ -130,15 +132,15 @@
     }
   </style>
   <script>
-    let etherspaceHost = 'http://192.168.1.80:8889';
+    let etherspaceHost = 'http://192.168.1.80:8889/api/v1';
+    //etherspaceHost = 'https://etherspace.ayyo.gg/api/v1';
     let etherspaceEndpoint = etherspaceHost + '';
 
     async function getContraption(contraptionId) {
-
       const contraptionNameDisplay = document.getElementById('contraption-name-display');
 
       // Implement GET request to fetch contraption
-      const response = await fetch(`${etherspaceEndpoint}/api/v1/contraption/${contraptionId}`);
+      const response = await fetch(`${etherspaceEndpoint}/contraption/${contraptionId}`);
       const data = await response.json();
 
       if (data) {
@@ -146,40 +148,115 @@
       } else {
         contraptionNameDisplay.textContent = 'Could not find: ' + contraptionId;
       }
+
       let displayContraption = document.getElementById('display-contraption');
       if (displayContraption) {
         displayContraption.style.display = 'block';
       }
 
-      // set contraption-code textarea value to fetched code
+      // Set contraption-code textarea value to fetched code
       let contraptionCode = document.getElementById('contraption-code');
       if (contraptionCode) {
         contraptionCode.value = data.code;
       }
 
-      // update input contraption-name with new name
+      // Update input contraption-name with new name
       let contraptionName = document.getElementById('contraption-name');
       if (contraptionName) {
         contraptionName.value = data.name;
       }
 
-      // clear all PARTS from Mantra
-      game.systems.realstone.clearAllParts();
+      // Update the select dropdown
+      updateSelectDropdown(data.name);
 
-      // for now autorun
-      let autoRunCode = true;
-      if (autoRunCode) {
-        setTimeout(function () {
-          runContraption(data.code);
-        }, 200)
+      // Clear all PARTS from Mantra
+      if (game.systems.realstone) {
+        game.systems.realstone.clearAllParts();
       }
 
-      //contraptionNameDisplay.style.display = 'block';
+      // For now autorun
+      let autoRunCode = true;
+      if (autoRunCode) {
+        setTimeout(() => {
+          // runContraption(data.code);
+          runContraptionModule(data.code);
+        }, 200);
+      }
     }
     window.getContraption = getContraption;
 
+    async function runContraptionModule(code) {
+      try {
 
-    document.addEventListener('DOMContentLoaded', function () {
+        console.log('About to run code', code)
+
+        // Create a new blob with the fetched code
+        const blob = new Blob([code], { type: 'application/javascript' });
+
+        // Create a URL for the blob
+        const url = URL.createObjectURL(blob);
+
+        // Dynamically import the blob as a module
+        const module = await import(url);
+
+        // Assuming the module exports a function named 'default'
+        const contraption = module.default();
+
+        // Assuming the system name is declared globally in the code
+        let systemName = 'realStoneSystem';
+        window[systemName] = contraption;
+
+        // Set the contraption to the RealStone system
+        if (window[systemName]) {
+          game.systems.realstone.setContraption(window[systemName]);
+        }
+
+        // Clean up by revoking the blob URL
+        URL.revokeObjectURL(url);
+
+        console.log('Contraption loaded and executed');
+      } catch (error) {
+        console.error('Error running contraption:', error);
+      }
+    }
+
+    function runContraption(code) {
+      let yes = true; // In production, you may want a more secure confirmation method
+      if (yes) {
+        console.log('About to run code', code);
+
+        // Create and run the function
+        const contraptionFunction = new Function('RS', code);
+        let contraption = contraptionFunction();
+        contraptionFunction(window.RS);
+
+        // Assuming the system name is declared globally in the code
+        let systemName = 'realStoneSystem';
+        if (window[systemName]) {
+          game.systems.realstone.setContraption(window[systemName]);
+        }
+
+        console.log('Code execution complete');
+      }
+    }
+
+    function updateSelectDropdown(name) {
+      let contraptionSelect = document.getElementById('contraption-select');
+      if (contraptionSelect) {
+        contraptionSelect.value = name;
+      } else {
+        // Add the new option to the select dropdown
+        let selectElement = document.createElement('select');
+        selectElement.id = 'contraption-select';
+        let optionElement = document.createElement('option');
+        optionElement.value = name; // Assuming each contraption has a name
+        optionElement.textContent = name;
+        selectElement.appendChild(optionElement);
+        selectElement.value = name;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
       const form = document.getElementById('save-contraption-form');
       const contraptionNameDisplay = document.getElementById('contraption-name-display');
 
@@ -198,15 +275,13 @@
       });
 
       // Define your endpoint and user ID
-      const etherspaceEndpoint = 'http://192.168.1.80:8889/api/v1/contraptions';
       const userId = 'Marak'; // Replace with the actual user ID
 
       // Function to fetch contraptions for a given user
       async function fetchContraptionsForUser(userId) {
         try {
-          const response = await fetch(`${etherspaceEndpoint}/${userId}`);
+          const response = await fetch(`${etherspaceEndpoint}/contraptions/${userId}`);
           const contraptions = await response.json();
-
           // Call function to render dropdown with fetched contraptions
           renderDropdown(contraptions);
         } catch (error) {
@@ -226,7 +301,6 @@
           selectElement.appendChild(optionElement);
         });
 
-
         // get display-contraption div
         let displayContraption = document.getElementById('display-contraption');
         // Append the select element to the body or another element in your page
@@ -244,9 +318,14 @@
       }
 
       // Call the function with the user ID
-      fetchContraptionsForUser(userId);
+      await fetchContraptionsForUser(userId);
 
-      getContraption('rover-light');
+      //getContraption('rover-light');
+      await getContraption('button-light');
+      // getContraption('button-relay-light');
+
+      // getContraption('button-actuator-light');
+      //getContraption('button-amplify-wire-light');
       async function saveContraption(name) {
 
         // get the code from the textarea
@@ -285,26 +364,6 @@
 
     });
 
-    function runContraption(code) {
-
-      // TODO: we need to check for existing contraption and remove it
-      // alert(code)
-      // TODO: eval code
-      // let yes = confirm(`You are about to eval() this code: ${code}`)
-      let yes = true;
-      if (yes) {
-        console.log('about to run code')
-        console.log(code)
-        console.log('code complete')
-        eval(code)
-
-        // try to figure out example name ( for now )
-        let systemName = 'realStoneSystem';
-
-        game.systems.realstone.setContraption(eval(systemName));
-      }
-    }
-
   </script>
 </head>
 
@@ -325,11 +384,10 @@
         <input type="text" id="contraption-name" placeholder="Enter contraption name" required>
         <button type="submit">Save Contraption</button>
       </form>
+
       <form id="run-contraption-form">
         <button type="submit">Run Contraption</button>
-        <!-- TODO Monaco editor -->
       </form>
-
 
     </section>
     <textarea id="contraption-code" rows="10" cols="50" placeholder="Enter contraption code here"></textarea>

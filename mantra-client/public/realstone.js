@@ -40,6 +40,12 @@ Object.defineProperty(exports, "LaserSensor", {
     return _LaserSensor["default"];
   }
 });
+Object.defineProperty(exports, "Latch", {
+  enumerable: true,
+  get: function get() {
+    return _Latch["default"];
+  }
+});
 Object.defineProperty(exports, "Mirror", {
   enumerable: true,
   get: function get() {
@@ -64,10 +70,10 @@ Object.defineProperty(exports, "RealStone", {
     return _RealStone["default"];
   }
 });
-Object.defineProperty(exports, "Repeater", {
+Object.defineProperty(exports, "Relay", {
   enumerable: true,
   get: function get() {
-    return _Repeater["default"];
+    return _Relay["default"];
   }
 });
 Object.defineProperty(exports, "Rover", {
@@ -89,11 +95,12 @@ var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
 var _Amplifier = _interopRequireDefault(require("./lib/parts/Amplifier.js"));
 var _Button = _interopRequireDefault(require("./lib/parts/Button.js"));
 var _LaserSensor = _interopRequireDefault(require("./lib/parts/LaserSensor.js"));
+var _Latch = _interopRequireDefault(require("./lib/parts/Latch.js"));
 var _LEDLight = _interopRequireDefault(require("./lib/parts/LEDLight.js"));
 var _Mirror = _interopRequireDefault(require("./lib/parts/Mirror.js"));
 var _MotionDetector = _interopRequireDefault(require("./lib/parts/MotionDetector.js"));
 var _PressureSensor = _interopRequireDefault(require("./lib/parts/PressureSensor.js"));
-var _Repeater = _interopRequireDefault(require("./lib/parts/Repeater.js"));
+var _Relay = _interopRequireDefault(require("./lib/parts/Relay.js"));
 var _Rover = _interopRequireDefault(require("./lib/parts/Rover.js"));
 var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -101,7 +108,7 @@ function createContraption() {
   return new _RealStone["default"]();
 }
 
-},{"./lib/RealStone.js":3,"./lib/parts/Actuator.js":4,"./lib/parts/Amplifier.js":5,"./lib/parts/Button.js":6,"./lib/parts/LEDLight.js":7,"./lib/parts/LaserSensor.js":8,"./lib/parts/Mirror.js":9,"./lib/parts/MotionDetector.js":10,"./lib/parts/PressureSensor.js":11,"./lib/parts/Repeater.js":12,"./lib/parts/Rover.js":13,"./lib/parts/Wire.js":14,"./lib/signals/ElectricalSignal.js":15}],2:[function(require,module,exports){
+},{"./lib/RealStone.js":3,"./lib/parts/Actuator.js":4,"./lib/parts/Amplifier.js":5,"./lib/parts/Button.js":6,"./lib/parts/LEDLight.js":7,"./lib/parts/LaserSensor.js":8,"./lib/parts/Latch.js":9,"./lib/parts/Mirror.js":10,"./lib/parts/MotionDetector.js":11,"./lib/parts/PressureSensor.js":12,"./lib/parts/Relay.js":13,"./lib/parts/Rover.js":14,"./lib/parts/Wire.js":15,"./lib/signals/ElectricalSignal.js":16}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -155,7 +162,7 @@ var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
 // for now, could also be a base Part class
 _defineProperty(Part, "idCounter", 0);
 
-},{"./utils/EventEmitter.js":16}],3:[function(require,module,exports){
+},{"./utils/EventEmitter.js":17}],3:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -186,18 +193,53 @@ var RealStone = /*#__PURE__*/function (_EventEmitter) {
   function RealStone() {
     var _this;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$x = _ref.x,
+      x = _ref$x === void 0 ? 0 : _ref$x,
+      _ref$y = _ref.y,
+      y = _ref$y === void 0 ? 0 : _ref$y,
+      _ref$z = _ref.z,
+      z = _ref$z === void 0 ? 0 : _ref$z,
       _ref$powerRequired = _ref.powerRequired,
       powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired;
     _classCallCheck(this, RealStone);
     _this = _super.call(this);
-    _this.parts = [];
+    _this.x = x; // Local x-coordinate in global space
+    _this.y = y; // Local y-coordinate in global space
+    _this.z = z; // Local z-coordinate in global space
+
     _this.powerRequired = powerRequired;
+    _this.parts = [];
     return _this;
   }
+
+  // top-level on method for the contraption
   _createClass(RealStone, [{
+    key: "on",
+    value: function on() {
+      // check to see if any parts have been added,
+      if (this.parts.length > 0) {
+        // get the first part and assume that it is the top-level part
+        // then call the Part.on() method on that part
+        this.parts[0].on();
+      }
+    }
+  }, {
+    key: "off",
+    value: function off() {
+      if (this.parts.length > 0) {
+        this.parts[0].off();
+      }
+    }
+
+    // TODO: rename to add()
+  }, {
     key: "addPart",
     value: function addPart(part) {
       var _this2 = this;
+      // Adjust part's position relative to the RealStone's local coordinates
+      part.position.x += this.x;
+      part.position.y += this.y;
+      part.position.z += this.z;
       this.parts.push(part);
       if (part instanceof _EventEmitter2["default"]) {
         part.onAny(function (eventName) {
@@ -253,6 +295,30 @@ var RealStone = /*#__PURE__*/function (_EventEmitter) {
         if (typeof part.update === 'function') {
           part.update();
         }
+      });
+    }
+  }, {
+    key: "setMode",
+    value: function setMode(newMode) {
+      this.mode = newMode;
+    }
+  }, {
+    key: "setPosition",
+    value: function setPosition(x, y, z) {
+      var dx = x - this.x;
+      var dy = y - this.y;
+      var dz = z - this.z;
+
+      // Update RealStone's local coordinates
+      this.x = x;
+      this.y = y;
+      this.z = z;
+
+      // Update all parts' positions
+      this.parts.forEach(function (part) {
+        part.position.x += dx;
+        part.position.y += dy;
+        part.position.z += dz;
       });
     }
   }, {
@@ -316,7 +382,7 @@ var RealStone = /*#__PURE__*/function (_EventEmitter) {
 }(_EventEmitter2["default"]);
 var _default = exports["default"] = RealStone;
 
-},{"./parts/LEDLight.js":7,"./parts/PressureSensor.js":11,"./parts/Wire.js":14,"./utils/EventEmitter.js":16}],4:[function(require,module,exports){
+},{"./parts/LEDLight.js":7,"./parts/PressureSensor.js":12,"./parts/Wire.js":15,"./utils/EventEmitter.js":17}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -354,6 +420,7 @@ var Actuator = exports["default"] = /*#__PURE__*/function (_Part) {
     _this = _super.call(this, x, y, z);
     _this.type = Actuator.type;
     _this.isActive = false;
+    _this.isOn = false;
     _this.frequency = frequency;
     _this.pulseTimer = null;
     _this.connectedParts = [];
@@ -370,19 +437,23 @@ var Actuator = exports["default"] = /*#__PURE__*/function (_Part) {
   }, {
     key: "receive",
     value: function receive(signal) {
+      console.log("Actuator received signal", signal);
       this.signal = signal;
-      this.toggleState();
+      this.toggle();
     }
   }, {
-    key: "toggleState",
-    value: function toggleState() {
-      this.isActive = !this.isActive;
-      if (this.isActive) {
+    key: "toggle",
+    value: function toggle() {
+      if (!this.isOn) {
         this.startPulsing();
-        this.emit('activate');
+        this.emit('on');
+        this.isOn = true;
+        // immediately send a signal to connected components
+        this.update();
       } else {
         this.stopPulsing();
-        this.emit('deactivate');
+        this.emit('off');
+        this.isOn = false;
       }
     }
   }, {
@@ -407,7 +478,8 @@ var Actuator = exports["default"] = /*#__PURE__*/function (_Part) {
     key: "update",
     value: function update() {
       var _this3 = this;
-      if (this.isActive) {
+      if (this.isOn) {
+        this.emit('pulse', this.signal);
         // Perform actions while the actuator is active
         this.connectedParts.forEach(function (comp) {
           return comp.receive(_this3.signal);
@@ -537,13 +609,8 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
     _classCallCheck(this, Button);
     _this = _super.call(this, x, y, z);
     _this.type = Button.type;
-    _this.connectedComponent = null;
     _this.signal = new _ElectricalSignal["default"]();
     _this.connectedParts = [];
-    _this.toggleDelay = 100; // Delay for debounce
-    _this.autoReleaseDelay = 500; // Delay for auto-release
-    _this.lastToggle = 0;
-    _this.pressTimer = null; // Timer for auto-release
     return _this;
   }
   _createClass(Button, [{
@@ -562,42 +629,19 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
   }, {
     key: "press",
     value: function press() {
-      var _this2 = this;
       var signal = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.signal;
-      var currentTime = Date.now();
-
-      // Debounce: check if enough time has passed since the last press
-      if (currentTime - this.lastToggle < this.toggleDelay) {
-        return; // Not enough time has passed, so exit the function
-      }
-
-      // Update the last toggle time
-      this.lastToggle = currentTime;
-
       // Emit press event and send signal
-      // console.log('Button.press', signal);
       this.emit('press', signal);
       this.connectedParts.forEach(function (component) {
         if (component.receive && typeof component.receive === 'function') {
           component.receive(signal);
         }
       });
-
-      // Clear existing timer if any
-      if (this.pressTimer) {
-        clearTimeout(this.pressTimer);
-      }
-
-      // Set a timer for auto-release
-      this.pressTimer = setTimeout(function () {
-        _this2.release();
-        _this2.pressTimer = null;
-      }, this.autoReleaseDelay);
     }
   }, {
     key: "receive",
     value: function receive(signal) {
-      this.transmit(signal);
+      // Implement if needed; currently, the button may not need to receive signals
     }
   }, {
     key: "transmit",
@@ -611,15 +655,12 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
   }, {
     key: "release",
     value: function release() {
-      var _this3 = this;
+      var _this2 = this;
+      // Emit release event
       this.emit('release');
-      // console.log('Button released');
-
-      // Notify connected components
       this.connectedParts.forEach(function (component) {
         if (component.off && typeof component.off === 'function') {
-          // Optionally, you can send a release signal
-          component.off(_this3.signal);
+          component.off(_this2.signal);
         }
       });
     }
@@ -628,7 +669,7 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Button, "type", 'Button');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":15}],7:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -673,11 +714,16 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
       x = x.x || 0;
     }
     _this = _super.call(this, x, y, z);
+    _this.toggleFn = _this.toggle.bind(_assertThisInitialized(_this));
     _this.type = LEDLight.type;
-    _this.wattage = wattage;
-    _this.maxWattage = maxWattage;
     _this.isOn = false; // Property to track the LED light's state
-    _this.isBroken = false; // Property to track if the light is broken
+    _this.color = 0x00ff00;
+
+    // non-shared properties
+    _this.props = {};
+    _this.props.wattage = wattage;
+    _this.props.maxWattage = maxWattage;
+    _this.props.isBroken = false; // Property to track if the light is broken
     return _this;
   }
   _createClass(LEDLight, [{
@@ -686,40 +732,55 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
       this.realStone = realStone;
     }
   }, {
+    key: "on",
+    value: function on(signal) {
+      // console.log('Turning on LED light...', signal);
+      this.isOn = true;
+      this.emit('on', signal);
+    }
+  }, {
     key: "off",
     value: function off(signal) {
       // console.log('Turning off LED light...');
       this.isOn = false;
-      this.emit('off');
+      this.emit('off', signal);
+    }
+  }, {
+    key: "toggle",
+    value: function toggle(signal) {
+      if (this.isOn) {
+        this.off(signal);
+      } else {
+        this.on(signal);
+      }
     }
   }, {
     key: "receive",
     value: function receive(signal) {
       // Check if the light is broken
-      if (this.isBroken) {
+      if (this.props.isBroken) {
         // console.log('LED light is broken and cannot be turned on.');
         return;
       }
       this.signal = signal;
       var power = signal.calculatePower();
-
       // Check for exceeding maxWattage
-      if (power > this.maxWattage) {
+      if (power > this.props.maxWattage) {
         // console.log('LED light has broken due to excessive power!');
         this.isOn = false;
-        this.isBroken = true; // Permanently disable the light
+        this.props.isBroken = true; // Permanently disable the light
         this.emit('broken');
         return;
       }
       if (this.isOn) {
         // console.log('Turning off LED light...');
         this.isOn = false;
-        this.emit('off');
+        this.emit('off', signal);
       } else {
-        if (!this.realStone.powerRequired || power >= this.wattage) {
+        if (!this.realStone.powerRequired || power >= this.props.wattage) {
           // console.log('Turning on LED light...', signal);
           this.isOn = true;
-          this.emit('on');
+          this.emit('on', signal);
         } else {
           // console.log('Insufficient power to turn on LED light...')
         }
@@ -729,7 +790,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
     key: "handleCollision",
     value: function handleCollision(entity) {
       // Check if the light is broken
-      if (this.isBroken) {
+      if (this.props.isBroken) {
         // console.log('LED light is broken and cannot be turned on.');
         return;
       }
@@ -738,7 +799,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
       if (entity.type === 'Rover') {
         // console.log('LED light has broken due to collision with Rover!');
         this.isOn = false;
-        this.isBroken = true; // Permanently disable the light
+        this.props.isBroken = true; // Permanently disable the light
         this.props.color = 'grey';
         this.emit('broken');
       }
@@ -749,7 +810,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
     key: "update",
     value: function update() {
       // Add dynamic effects like blinking or fading if the light is not broken
-      if (!this.isBroken) {
+      if (!this.props.isBroken) {
         // Your update logic here
       }
     }
@@ -819,7 +880,114 @@ var LaserSensor = exports["default"] = /*#__PURE__*/function (_EventEmitter) {
   return LaserSensor;
 }(_EventEmitter2["default"]);
 
-},{"../signals/ElectricalSignal.js":15,"../utils/EventEmitter.js":16}],9:[function(require,module,exports){
+},{"../signals/ElectricalSignal.js":16,"../utils/EventEmitter.js":17}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Part2 = require("../Part.js");
+var _ElectricalSignal = _interopRequireDefault(require("../signals/ElectricalSignal.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var Latch = exports["default"] = /*#__PURE__*/function (_Part) {
+  _inherits(Latch, _Part);
+  var _super = _createSuper(Latch);
+  function Latch() {
+    var _this;
+    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    _classCallCheck(this, Latch);
+    _this = _super.call(this, x, y, z);
+    _this.type = Latch.type;
+    _this.connectedParts = [];
+    _this.signal = new _ElectricalSignal["default"]();
+    _this.isLatched = false; // State of the latch
+
+    _this.triggerFn = _this.engage.bind(_assertThisInitialized(_this));
+    _this.toggleFn = _this.toggle.bind(_assertThisInitialized(_this));
+    // this.transmitFn = this.disengage.bind(this);
+    return _this;
+  }
+  _createClass(Latch, [{
+    key: "setRealStone",
+    value: function setRealStone(realStone) {
+      this.realStone = realStone;
+    }
+  }, {
+    key: "connect",
+    value: function connect(component) {
+      if (component.constructor.name === 'Wire') {
+        component.inputs.push(this);
+      }
+      this.connectedParts.push(component);
+    }
+  }, {
+    key: "toggle",
+    value: function toggle() {
+      var signal = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.signal;
+      this.isLatched = !this.isLatched; // Toggle the latch state
+      if (this.isLatched) {
+        this.engage(signal);
+      } else {
+        this.disengage(signal);
+      }
+    }
+  }, {
+    key: "on",
+    value: function on() {
+      this.engage();
+    }
+  }, {
+    key: "off",
+    value: function off() {
+      this.disengage();
+    }
+  }, {
+    key: "engage",
+    value: function engage() {
+      var signal = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.signal;
+      this.isLatched = true;
+      this.emit('engage', signal); // Emit an activation event
+      this.transmit(signal);
+    }
+  }, {
+    key: "disengage",
+    value: function disengage(signal) {
+      this.isLatched = false;
+      this.emit('disengage'); // Emit a deactivation event
+      this.transmit(signal);
+    }
+  }, {
+    key: "transmit",
+    value: function transmit(signal) {
+      this.connectedParts.forEach(function (component) {
+        if (component.receive) {
+          component.receive(signal);
+        }
+      });
+    }
+  }]);
+  return Latch;
+}(_Part2.Part);
+_defineProperty(Latch, "type", 'Latch');
+
+},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],10:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -890,7 +1058,7 @@ var Mirror = exports["default"] = /*#__PURE__*/function (_EventEmitter) {
   return Mirror;
 }(_EventEmitter2["default"]);
 
-},{"../utils/EventEmitter.js":16}],10:[function(require,module,exports){
+},{"../utils/EventEmitter.js":17}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -949,7 +1117,7 @@ var MotionDetector = exports["default"] = /*#__PURE__*/function (_Part) {
         signal.encodeUSB(1); // Encoding a binary '1' to indicate motion detection
         console.log('Motion detected!');
         this.transmit(signal);
-        this.emit('motion');
+        this.emit('motion', signal);
       } else {
         console.log('Motion detector is not connected to any component.');
       }
@@ -975,7 +1143,7 @@ var MotionDetector = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(MotionDetector, "type", 'MotionDetector');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":15}],11:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1027,10 +1195,22 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
     value: function trigger() {
       var signal = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.signal;
       // Emit signal to all connected components
-      this.emit('trigger');
+      this.emit('trigger', signal);
       this.connectedParts.forEach(function (component) {
         if (component.receive && typeof component.receive === 'function') {
           component.receive(signal);
+        }
+      });
+    }
+  }, {
+    key: "release",
+    value: function release() {
+      var _this2 = this;
+      // Emit release event
+      this.emit('release');
+      this.connectedParts.forEach(function (component) {
+        if (component.off && typeof component.off === 'function') {
+          component.off(_this2.signal);
         }
       });
     }
@@ -1045,7 +1225,7 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(PressureSensor, "type", 'PressureSensor');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":15}],12:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1066,57 +1246,69 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-var Repeater = exports["default"] = /*#__PURE__*/function (_Part) {
-  _inherits(Repeater, _Part);
-  var _super = _createSuper(Repeater);
-  function Repeater() {
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // TODO: WIP
+var Relay = exports["default"] = /*#__PURE__*/function (_Part) {
+  _inherits(Relay, _Part);
+  var _super = _createSuper(Relay);
+  function Relay() {
     var _this;
     var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    _classCallCheck(this, Repeater);
+    _classCallCheck(this, Relay);
     _this = _super.call(this, x, y, z);
-    _this.type = Repeater.type;
-    _this.connectedParts = [];
+    _this.type = Relay.type;
+    // Use arrays to manage multiple connections
+    _this.inputs = [];
+    _this.outputs = [];
     return _this;
   }
-  _createClass(Repeater, [{
+  _createClass(Relay, [{
     key: "connect",
     value: function connect(component) {
       if (component.constructor.name === 'Wire') {
         component.inputs.push(this);
       }
-      this.connectedParts.push(component);
+      this.outputs.push(component);
     }
+  }, {
+    key: "off",
+    value: function off() {
+      this.emit('off');
+    }
+
+    // The receive method now needs to handle signals from multiple inputs
   }, {
     key: "receive",
     value: function receive(signal) {
+      // Handle the received signal, possibly with input-specific logic
       this.transmit(signal);
     }
+
+    // Transmit signal to all connected outputs
   }, {
     key: "transmit",
     value: function transmit(signal) {
-      this.emit('repeat', signal);
-      this.connectedParts.forEach(function (component) {
+      this.emit('transmit', signal); // Emitting a 'relay' event instead of 'repeat'
+      this.outputs.forEach(function (component) {
         if (component.receive) {
           component.receive(signal);
         }
       });
     }
 
-    // Optional: Add an update() method if the Repeater has dynamic behavior
+    // If Relay has dynamic behavior, include the update logic
   }, {
     key: "update",
     value: function update() {
-      // Update logic for the Repeater, if any
+      // Implement any update logic for the Relay
     }
   }]);
-  return Repeater;
+  return Relay;
 }(_Part2.Part);
-_defineProperty(Repeater, "type", 'Repeater');
+_defineProperty(Relay, "type", 'Relay');
 
-},{"../Part.js":2}],13:[function(require,module,exports){
+},{"../Part.js":2}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1153,13 +1345,16 @@ var Rover = /*#__PURE__*/function (_Part) {
         y: 5
       } : _ref$velocity,
       _ref$color = _ref.color,
-      color = _ref$color === void 0 ? 0xcccccc : _ref$color;
+      color = _ref$color === void 0 ? 0xcccccc : _ref$color,
+      _ref$movementRate = _ref.movementRate,
+      movementRate = _ref$movementRate === void 0 ? 16.666 : _ref$movementRate;
     _classCallCheck(this, Rover);
     _this = _super.call(this, x, y, z);
     _this.type = Rover.type;
     _this.props = {};
     _this.props.velocity = velocity;
     _this.props.color = color;
+    _this.props.movementRate = movementRate;
     _this.state = 'inactive'; // Initially inactive
     _this.isOn = false; // Toggle state
     _this.movementInterval = null;
@@ -1180,8 +1375,8 @@ var Rover = /*#__PURE__*/function (_Part) {
 
     // Method to activate or deactivate the Rover
   }, {
-    key: "toggleOnOff",
-    value: function toggleOnOff() {
+    key: "toggle",
+    value: function toggle() {
       this.isOn = !this.isOn;
       if (this.isOn) {
         this.startMoving();
@@ -1201,7 +1396,13 @@ var Rover = /*#__PURE__*/function (_Part) {
       }
       this.movementInterval = setInterval(function () {
         return _this2.update();
-      }, this.defaultDelay);
+      }, this.props.movementRate);
+    }
+  }, {
+    key: "off",
+    value: function off() {
+      this.stopMoving();
+      this.isOn = false;
     }
 
     // Method to stop moving
@@ -1253,7 +1454,7 @@ var Rover = /*#__PURE__*/function (_Part) {
       this.collisionCooldown = true;
       setTimeout(function () {
         _this3.collisionCooldown = false;
-      }, 200); // Collision cooldown period
+      }, this.props.movementRate); // Collision cooldown period
     }
   }]);
   return Rover;
@@ -1261,7 +1462,7 @@ var Rover = /*#__PURE__*/function (_Part) {
 _defineProperty(Rover, "type", 'Rover');
 var _default = exports["default"] = Rover;
 
-},{"../Part.js":2}],14:[function(require,module,exports){
+},{"../Part.js":2}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1404,7 +1605,7 @@ var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Wire, "type", 'Wire');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":15}],15:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1445,6 +1646,8 @@ var ElectricalSignal = exports["default"] = /*#__PURE__*/function () {
     this.frequency = frequency;
     this.phaseAngle = phaseAngle;
     this.powerFactor = powerFactor;
+    // Binary signal representation
+    this.binarySignal = 0; // 0 or 1
   }
 
   // Method to calculate power, etc.
@@ -1472,7 +1675,7 @@ var ElectricalSignal = exports["default"] = /*#__PURE__*/function () {
   return ElectricalSignal;
 }();
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1543,7 +1746,12 @@ var EventEmitter = exports["default"] = /*#__PURE__*/function () {
       // Call anyListeners if they exist
       this.anyListeners.forEach(function (listener) {
         try {
-          listener.call.apply(listener, [_this2, eventName].concat(args));
+          var scopedEventName = eventName;
+          if (_this2.type) {
+            scopedEventName = _this2.type + '::' + eventName;
+            //scopedEventName = eventName;
+          }
+          listener.call.apply(listener, [_this2, scopedEventName].concat(args));
         } catch (error) {
           console.error("Error when executing any listener for event \"".concat(eventName, "\":"), error);
         }
@@ -1553,6 +1761,7 @@ var EventEmitter = exports["default"] = /*#__PURE__*/function () {
       var listeners = this.listeners[eventName];
       if (listeners) {
         listeners.forEach(function (listener) {
+          // console.log('trying to emit, listener', listener)
           try {
             listener.apply(_this2, args);
           } catch (error) {
