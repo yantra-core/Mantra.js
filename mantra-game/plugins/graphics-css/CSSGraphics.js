@@ -39,13 +39,25 @@ class CSSGraphics extends GraphicsInterface {
 
     this.game = game;
 
-    this.game.systemsManager.addSystem('graphics-css', this);
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
 
     // Initialize the CSS render div
     this.initCSSRenderDiv();
+
+
+    // register renderer with graphics pipeline
+    game.graphics.push(this);
+
+    this.game.systemsManager.addSystem('graphics-css', this);
+
+    // is sync load; however we still need to let the graphics pipeline know we are ready
+    game.emit('plugin::ready::graphics-css', this);
+
+    // TODO: remove this line from plugin implementations
+    game.loadingPluginsCount--;
+
   }
 
   initCSSRenderDiv() {
@@ -232,6 +244,26 @@ class CSSGraphics extends GraphicsInterface {
     }
   }
 
+  unload() {
+
+    // TODO: consolidate graphics pipeline unloading into SystemsManager
+    // TODO: remove duplicated unload() code in BabylonGraphics
+    this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
+    delete this.game._plugins['CSSGraphics'];
+
+    // iterate through all entities and remove existing css graphics
+    for (let [eId, entity] of this.game.entities.entries()) {
+      if (entity.graphics && entity.graphics['graphics-css']) {
+        this.removeGraphic(eId);
+        delete entity.graphics['graphics-css'];
+      }
+    }
+
+    let div = document.getElementById('css-render-canvas');
+    if (div) {
+      div.remove();
+    }
+  }
 }
 
 export default CSSGraphics;
