@@ -42,10 +42,10 @@ export default function inflategraphic(entityData) {
       setCursorStyle(graphic, this.scene, 'pointer');
       // Get the full entity from the game and delegate based on part type
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part) {
-        let partType = ent.realStone.part.type;
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        let partType = ent.ayCraft.part.type;
         if (partType === 'MotionDetector') {
-          ent.realStone.part.onFn();
+          ent.ayCraft.part.onFn();
         }
       }
     });
@@ -59,13 +59,13 @@ export default function inflategraphic(entityData) {
       // setCursorStyle(graphic, this.scene, 'grabbing');
       // Handle pointer down events
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part) {
-        let partType = ent.realStone.part.type;
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        let partType = ent.ayCraft.part.type;
         if (partType === 'Button') {
-          ent.realStone.part.press();
+          ent.ayCraft.part.press();
         }
-        if (ent.realStone.part.toggle) {
-          ent.realStone.part.toggle();
+        if (ent.ayCraft.part.toggle) {
+          ent.ayCraft.part.toggle();
         }
       }
     });
@@ -73,10 +73,10 @@ export default function inflategraphic(entityData) {
     graphic.on('pointerup', () => {
       // Handle pointer up events
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part) {
-        let partType = ent.realStone.part.type;
-        if (partType === 'Button' && ent.realStone.part.release) {
-          ent.realStone.part.release();
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        let partType = ent.ayCraft.part.type;
+        if (partType === 'Button' && ent.ayCraft.part.release) {
+          ent.ayCraft.part.release();
         }
       }
     });

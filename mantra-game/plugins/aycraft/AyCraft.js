@@ -1,5 +1,5 @@
 import Plugin from '../../Plugin.js';
-import { RealStone as RealStoneActual } from '../../../../RealStone/index.js';
+import { AyCraft as AyCraftActual } from '../../../../AyCraft.js/index.js';
 
 import createEntityFromPart from './lib/createEntityFromPart.js';
 import partEventListeners from './lib/bindPartEvents.js';
@@ -22,11 +22,11 @@ import testLight from './button-wire-light.js';
 import roverLight from './rover-light.js';
 
 // handles input controller events and relays them to the game logic
-class RealStone extends Plugin {
-  static id = 'realstone';
+class AyCraft extends Plugin {
+  static id = 'aycraft';
   constructor({ contraption = null, contraptions = null, useDefaultContraption = false } = {}) {
     super();
-    this.id = RealStone.id;
+    this.id = AyCraft.id;
     this.contraption = contraption;
     this.contraptions = contraptions;
 
@@ -54,7 +54,7 @@ class RealStone extends Plugin {
 
     // add the system to the systems manager
     this.game.systemsManager.addSystem(this.id, this);
-    console.log('RealStone.init()', RealStoneActual);
+    console.log('AyCraft.init()', AyCraftActual);
     if (self.contraption) {
       self.initContraption(self.contraption);
       if (self.contraption.start) {
@@ -114,7 +114,7 @@ class RealStone extends Plugin {
       if (ent.type === 'PART') {
 
         // get the part and call .offFn if it exists
-        let part = ent.realStone.part;
+        let part = ent.ayCraft.part;
         if (part.unload) {
           console.log('calling part.unload', part.name)
           part.unload();
@@ -130,7 +130,7 @@ class RealStone extends Plugin {
 
   // TODO: add support for multiple contraptions
   setContraption(contraption) {
-    console.log("Mantra.RealStone Plugin - Setting Contraption", contraption)
+    console.log("Mantra.AyCraft Plugin - Setting Contraption", contraption)
     this.contraption = contraption;
     this.initContraption(contraption);
   }
@@ -150,46 +150,44 @@ class RealStone extends Plugin {
         return;
       }
 
-      if (entityA.realStone) {
+      if (entityA.ayCraft) {
         // trigger the part if possible
-        // console.log('entityA.realStone', entityA.realStone)
+        // console.log('entityA.ayCraft', entityA.ayCraft)
 
     
-          if (entityA.realStone.part.trigger) {
-            entityA.realStone.part.trigger();
+          if (entityA.ayCraft.part.trigger) {
+            entityA.ayCraft.part.trigger();
           }
-          if (entityA.realStone.part.press) {
-            entityA.realStone.part.press();
+          if (entityA.ayCraft.part.press) {
+            entityA.ayCraft.part.press();
           }
-          if (entityA.realStone.part.detectMotion) {
-            entityA.realStone.part.detectMotion();
-          }
-
-          if (entityA.realStone.part.toggle) {
-            entityA.realStone.part.toggle();
+          if (entityA.ayCraft.part.detectMotion) {
+            entityA.ayCraft.part.detectMotion();
           }
 
-
+          if (entityA.ayCraft.part.toggle) {
+            entityA.ayCraft.part.toggle();
+          }
 
         }
 
-      if (entityB.realStone) {
+      if (entityB.ayCraft) {
 
 
           // trigger the part if possible
-          // console.log('entityB.realStone', entityB.realStone)
-          if (entityB.realStone.part.trigger) {
-            entityB.realStone.part.trigger();
+          // console.log('entityB.ayCraft', entityB.ayCraft)
+          if (entityB.ayCraft.part.trigger) {
+            entityB.ayCraft.part.trigger();
           }
-          if (entityB.realStone.part.press) {
-            entityB.realStone.part.press();
+          if (entityB.ayCraft.part.press) {
+            entityB.ayCraft.part.press();
           }
-          if (entityB.realStone.part.detectMotion) {
-            entityB.realStone.part.detectMotion();
+          if (entityB.ayCraft.part.detectMotion) {
+            entityB.ayCraft.part.detectMotion();
           }
 
-          if (entityB.realStone.part.toggle) {
-            entityB.realStone.part.toggle();
+          if (entityB.ayCraft.part.toggle) {
+            entityB.ayCraft.part.toggle();
           }
 
 
@@ -208,4 +206,4 @@ class RealStone extends Plugin {
 
 }
 
-export default RealStone;
+export default AyCraft;

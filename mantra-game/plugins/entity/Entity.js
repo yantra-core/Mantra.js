@@ -266,7 +266,7 @@ class Entity {
       lockedProperties: null, // object hash of properties that should never be updated
       actionRateLimiter: null, // object hash of state history
       timers: null, // object hash timers for TimersComponent.js
-      realStone: null, // object hash of properties for RealStone.js
+      ayCraft: null, // object hash of properties for AyCraft.js
       text: null,
     };
 
@@ -282,7 +282,7 @@ class Entity {
     };
     */
 
-    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, lifetime, realStone, text } = config;
+    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, lifetime, ayCraft, text } = config;
     let { x, y } = position;
 
     /*
@@ -323,7 +323,7 @@ class Entity {
     this.game.addComponent(entityId, 'actionRateLimiter', {});
     // TODO: clean up API contract with Component
     this.game.addComponent(entityId, 'timers', new TimersComponent('timers', entityId, this.game));
-    this.game.addComponent(entityId, 'realStone', realStone);
+    this.game.addComponent(entityId, 'ayCraft', ayCraft);
     this.game.addComponent(entityId, 'text', text);
 
  

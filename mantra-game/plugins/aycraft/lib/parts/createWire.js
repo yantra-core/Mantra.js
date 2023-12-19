@@ -29,7 +29,7 @@ export default function createWire(part, contraption) {
         height: boxHeight,
         rotation: angle,
         isStatic: true,
-        realStone: {
+        ayCraft: {
           part: part,
           contraption: contraption
         }

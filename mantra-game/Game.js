@@ -188,7 +188,7 @@ class Game {
     this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
 
     this.components.timers = new TimersComponent('timers', this);
-    this.components.realStone = new Component('realStone', this);
+    this.components.ayCraft = new Component('ayCraft', this);
     this.components.text = new Component('text', this);
 
     // Systems Manager

@@ -1,8 +1,8 @@
 
-import { RealStone, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor, Relay } from '../../../../RealStone/index.js';
+import { AyCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor, Relay } from '../../../../AyCraft.js/index.js';
 
 export default function createSecuritySystem() {
-  const realStoneSystem = new RealStone();
+  const ayCraftSystem = new AyCraft();
 
   // Initialize and position components
   const motionDetector = new MotionDetector(-150, -250, 0); // Position at top-left
@@ -19,21 +19,21 @@ export default function createSecuritySystem() {
   // Connect Actuator to the Security Light
   actuator.connect(securityLight);
 
-  // Add parts to RealStone system
-  realStoneSystem.addPart(motionDetector);
-  realStoneSystem.addPart(pressureSensor);
-  realStoneSystem.addPart(securityLight);
-  realStoneSystem.addPart(manualOverrideButton);
-  realStoneSystem.addPart(actuator);
+  // Add parts to AyCraft system
+  ayCraftSystem.addPart(motionDetector);
+  ayCraftSystem.addPart(pressureSensor);
+  ayCraftSystem.addPart(securityLight);
+  ayCraftSystem.addPart(manualOverrideButton);
+  ayCraftSystem.addPart(actuator);
 
   // Simulate interactions
   motionDetector.detectMotion(); // Simulate motion detection
   // manualOverrideButton.press(); // Simulate manual override
 
   // Logging the system state
-  console.log(realStoneSystem);
-  //console.log(JSON.stringify(realStoneSystem.toJSON(), true, 2))
+  console.log(ayCraftSystem);
+  //console.log(JSON.stringify(ayCraftSystem.toJSON(), true, 2))
 
-  return realStoneSystem;
+  return ayCraftSystem;
 }
 

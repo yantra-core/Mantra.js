@@ -19,7 +19,7 @@ export default function createEntityFromPart(part, contraption) {
         height: part.size.height,
         isStatic: false,
         isSensor: true,
-        realStone: {
+        ayCraft: {
           part: part,
           contraption: contraption
         }
@@ -37,7 +37,7 @@ export default function createEntityFromPart(part, contraption) {
         width: part.size.width,
         height: part.size.height,
         isStatic: true,
-        realStone: {
+        ayCraft: {
           part: part,
           contraption: contraption
         }
@@ -75,7 +75,7 @@ export default function createEntityFromPart(part, contraption) {
       height: part.size.height,
       isStatic: true,
       isSensor: true,
-      realStone: {
+      ayCraft: {
         part: part,
         contraption: contraption
       }

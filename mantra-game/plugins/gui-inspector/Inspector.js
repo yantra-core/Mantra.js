@@ -99,7 +99,7 @@ class Inspector {
     // TODO: add a check if any values have a .toJSON() method
     // if so, assume it's a custom serialization method we can call on circular data
     if (key === 'part' || key === 'contraption') {
-      value = '[RealStone Object]';
+      value = '[AyCraft Object]';
     }
     if (typeof value === 'object' && value !== null) {
       let subTable = document.createElement('table');

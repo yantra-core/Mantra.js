@@ -44,14 +44,14 @@ class Collisions {
         });
       }
 
-      if (entityA.realStone && entityA.realStone.part && entityA.realStone.part.handleCollision) {
+      if (entityA.ayCraft && entityA.ayCraft.part && entityA.ayCraft.part.handleCollision) {
         if (entityB.type !== 'TEXT') {
-          entityA.realStone.part.handleCollision(entityB);
+          entityA.ayCraft.part.handleCollision(entityB);
         }
       }
-      if (entityB.realStone && entityB.realStone.part && entityB.realStone.part.handleCollision) {
+      if (entityB.ayCraft && entityB.ayCraft.part && entityB.ayCraft.part.handleCollision) {
         if (entityA.type !== 'TEXT') {
-          entityB.realStone.part.handleCollision(entityA);
+          entityB.ayCraft.part.handleCollision(entityA);
         }
       }
 

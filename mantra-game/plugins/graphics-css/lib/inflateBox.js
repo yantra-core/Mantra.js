@@ -43,12 +43,12 @@ export default function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      let partName = ent.realStone.part.name;
-      let partType = ent.realStone.part.type;
-      let part = ent.realStone.part;
+      let partName = ent.ayCraft.part.name;
+      let partType = ent.ayCraft.part.type;
+      let part = ent.ayCraft.part;
       if (partType === 'MotionDetector') {
         // console.log('MotionDetector', part);
-        ent.realStone.part.onFn();
+        ent.ayCraft.part.onFn();
       }
     });
 
@@ -61,15 +61,15 @@ export default function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      let partName = ent.realStone.part.name;
-      let partType = ent.realStone.part.type;
-      let part = ent.realStone.part;
+      let partName = ent.ayCraft.part.name;
+      let partType = ent.ayCraft.part.type;
+      let part = ent.ayCraft.part;
       if (partType === 'Button') {
-        ent.realStone.part.press();
+        ent.ayCraft.part.press();
       }
       // LEDLight, Latch, Amplifier, etc
-      if (ent && ent.realStone && ent.realStone.part.toggle) {
-        ent.realStone.part.toggle();
+      if (ent && ent.ayCraft && ent.ayCraft.part.toggle) {
+        ent.ayCraft.part.toggle();
       }
     });
     entityElement.addEventListener('pointerup', (ev) => {
@@ -77,11 +77,11 @@ export default function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      let partName = ent.realStone.part.name;
-      let partType = ent.realStone.part.type;
+      let partName = ent.ayCraft.part.name;
+      let partType = ent.ayCraft.part.type;
       if (partType === 'Button') {
-        if (ent && ent.realStone && ent.realStone.part.release) {
-          ent.realStone.part.release();
+        if (ent && ent.ayCraft && ent.ayCraft.part.release) {
+          ent.ayCraft.part.release();
         }
       }
     });

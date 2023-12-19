@@ -1,7 +1,7 @@
-import { RealStone, Button, LEDLight, Wire, Rover } from '../../../../RealStone/index.js';
+import { AyCraft, Button, LEDLight, Wire, Rover } from '../../../../AyCraft.js/index.js';
 
 export default function buttonLight() {
-  let realStoneSystem = new RealStone({
+  let ayCraftSystem = new AyCraft({
     powerRequired: false
   });
 
@@ -36,18 +36,18 @@ export default function buttonLight() {
   //wire2.connect(ledLight2);
   wire2.connect(ledLight3);
 
-  // Add parts to RealStone system
-  realStoneSystem.addPart(button);
-  realStoneSystem.addPart(button2);
-  realStoneSystem.addPart(wire1);
-  realStoneSystem.addPart(wire2);
-  realStoneSystem.addPart(ledLight1);
-  realStoneSystem.addPart(ledLight2);
-  realStoneSystem.addPart(ledLight3);
-  realStoneSystem.addPart(redRover);
+  // Add parts to AyCraft system
+  ayCraftSystem.addPart(button);
+  ayCraftSystem.addPart(button2);
+  ayCraftSystem.addPart(wire1);
+  ayCraftSystem.addPart(wire2);
+  ayCraftSystem.addPart(ledLight1);
+  ayCraftSystem.addPart(ledLight2);
+  ayCraftSystem.addPart(ledLight3);
+  ayCraftSystem.addPart(redRover);
 
   // Start moving the Rover
   redRover.startMoving();
 
-  return realStoneSystem;
+  return ayCraftSystem;
 }

@@ -456,10 +456,10 @@ class BabylonGraphics extends GraphicsInterface {
       // Additional logic if needed
       // Get the full entity from the game and delegate based on part type
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part) {
-        let partType = ent.realStone.part.type;
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        let partType = ent.ayCraft.part.type;
         if (partType === 'MotionDetector') {
-          ent.realStone.part.onFn();
+          ent.ayCraft.part.onFn();
         }
       }
     }));
@@ -468,13 +468,13 @@ class BabylonGraphics extends GraphicsInterface {
     box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, () => {
       // console.log('pointerdown', entityData.id, entityData.type, entityData);
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part) {
-        let partType = ent.realStone.part.type;
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        let partType = ent.ayCraft.part.type;
         if (partType === 'Button') {
-          ent.realStone.part.press();
+          ent.ayCraft.part.press();
         }
-        if (ent.realStone.part.toggle) {
-          ent.realStone.part.toggle();
+        if (ent.ayCraft.part.toggle) {
+          ent.ayCraft.part.toggle();
         }
       }
       // Logic for pointer down
@@ -485,10 +485,10 @@ class BabylonGraphics extends GraphicsInterface {
       // Logic for pointer up
       // console.log('pointerup', entityData.id, entityData.type, entityData)
       let ent = game.getEntity(entityData.id);
-      if (ent && ent.realStone && ent.realStone.part) {
-        let partType = ent.realStone.part.type;
-        if (partType === 'Button' && ent.realStone.part.release) {
-          ent.realStone.part.release();
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        let partType = ent.ayCraft.part.type;
+        if (partType === 'Button' && ent.ayCraft.part.release) {
+          ent.ayCraft.part.release();
         }
       }
     }));

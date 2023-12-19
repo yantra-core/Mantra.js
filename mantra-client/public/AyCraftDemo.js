@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
       scriptRoot: './'
     }
   });
-  game.use('RealStone');
+  game.use('AyCraft');
 
   game.start(function(){
     game.use('Editor');

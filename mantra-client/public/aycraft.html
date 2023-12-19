@@ -7,8 +7,8 @@
   <title>Mantra - Client</title>
   <link rel="stylesheet" href="/mantra.css">
   <script type="module" src="/mantra.js"></script>
-  <script type="module" src="/realstone.js"></script>
-  <script type="module" src="/realDemo.js"></script>
+  <script type="module" src="/aycraft.js"></script>
+  <script type="module" src="/AyCraftDemo.js"></script>
   <style>
     body,
     html {
@@ -132,6 +132,7 @@
     }
   </style>
   <script>
+    // TODO: move all this code to AyCraftGUI.js
     let etherspaceHost = 'http://192.168.1.80:8889/api/v1';
     //etherspaceHost = 'https://etherspace.ayyo.gg/api/v1';
     let etherspaceEndpoint = etherspaceHost + '';
@@ -170,8 +171,8 @@
       updateSelectDropdown(data.name);
 
       // Clear all PARTS from Mantra
-      if (game.systems.realstone) {
-        game.systems.realstone.clearAllParts();
+      if (game.systems.aycraft) {
+        game.systems.aycraft.clearAllParts();
       }
 
       // For now autorun
@@ -206,9 +207,9 @@
         let systemName = module.default.name;
         window[systemName] = contraption;
 
-        // Set the contraption to the RealStone system
+        // Set the contraption to the AyCraft system
         if (window[systemName]) {
-          game.systems.realstone.setContraption(window[systemName]);
+          game.systems.aycraft.setContraption(window[systemName]);
         }
 
         if (contraption.start) {
@@ -311,9 +312,9 @@
       // for now, we will load allExamples from memory
       await getContraption(contraptionName);
 
-      // Set the contraption to the RealStone system
+      // Set the contraption to the AyCraft system
       //let allExamples = RS.allExamples();
-      //game.systems.realstone.setContraption(allExamples);
+      //game.systems.aycraft.setContraption(allExamples);
 
 
       // getContraption('button-actuator-light');
@@ -363,7 +364,7 @@
 
   <div id="main-container">
     <header>
-      <h1>RealStone Contraption Viewer</h1>
+      <h1>AyCraft Contraption Viewer</h1>
     </header>
 
     <section id="contraption-interface">
