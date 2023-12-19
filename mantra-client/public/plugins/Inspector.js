@@ -5,6 +5,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+// TODO:
+// Allow option to set window as background
+// Allow option for simple 4x4 grid for windows
+// Default mode is to place 2x2 vertical on left side first,
+// then 2x2 vertical on right side
+// Then for 3, its top left, bottom left, top right, with bottom right empty
+// For 4 each is 1x1, the entire window is filled at 4x4
+// Repeat same logic in units of 4 for 8, 12, 16, etc
+// Max windows is 64
+
+// TODO: all windows should have footers with a toolbar ( empty for now )
+// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
+
 //import lightTheme from "./themes/light.js";
 //import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
@@ -304,7 +317,7 @@ var Inspector = /*#__PURE__*/function () {
     this.id = Inspector.id;
     this.game = null;
     this.lastEntityState = {}; // Store the last state of the entity
-    this.floatProperties = ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed'];
+    this.floatProperties = ['width', 'height', 'mass', 'health', 'lifetime', 'maxSpeed', 'rotation'];
   }
   _createClass(Inspector, [{
     key: "init",
@@ -389,6 +402,11 @@ var Inspector = /*#__PURE__*/function () {
   }, {
     key: "renderValue",
     value: function renderValue(cell, value, key) {
+      // TODO: add a check if any values have a .toJSON() method
+      // if so, assume it's a custom serialization method we can call on circular data
+      if (key === 'part' || key === 'contraption') {
+        value = '[AyCraft Object]';
+      }
       if (_typeof(value) === 'object' && value !== null) {
         var subTable = document.createElement('table');
         for (var subKey in value) {

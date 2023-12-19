@@ -260,7 +260,7 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
     key: "connect",
     value: function connect(targetComponent) {
       // Check if the target component belongs to another AyCraft instance
-      if (targetComponent instanceof AyCraftComponent && this.realStone !== targetComponent.realStone) {
+      if (targetComponent instanceof AyCraftComponent && this.ayCraft !== targetComponent.ayCraft) {
         // Implement logic to handle inter-contraption connections
         // This could involve using a global event emitter or a direct reference
       } else {
@@ -415,8 +415,8 @@ var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
   }
   _createClass(Part, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
 
     // Additional methods or properties common to all parts can be added here
@@ -603,8 +603,8 @@ var Amplifier = exports["default"] = /*#__PURE__*/function (_Part) {
   }
   _createClass(Amplifier, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
   }, {
     key: "connect",
@@ -730,8 +730,8 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
   }
   _createClass(Button, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
   }, {
     key: "connect",
@@ -851,8 +851,8 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
   }
   _createClass(LEDLight, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
   }, {
     key: "activate",
@@ -899,7 +899,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
         // console.log('Turning off LED light...');
         this.deactivate(signal);
       } else {
-        if (!this.realStone.powerRequired || power >= this.props.wattage) {
+        if (!this.ayCraft.powerRequired || power >= this.props.wattage) {
           // console.log('Turning on LED light...');
           this.activate(signal);
         } else {
@@ -1056,8 +1056,8 @@ var Latch = exports["default"] = /*#__PURE__*/function (_Part) {
   }
   _createClass(Latch, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
   }, {
     key: "connect",
@@ -1453,8 +1453,8 @@ var Relay = exports["default"] = /*#__PURE__*/function (_Part) {
   }
   _createClass(Relay, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
   }, {
     key: "connect",
@@ -1592,8 +1592,8 @@ var Rover = /*#__PURE__*/function (_Part) {
   // Method to set AyCraft reference
   _createClass(Rover, [{
     key: "setAyCraft",
-    value: function setAyCraft(realStone) {
-      this.realStone = realStone;
+    value: function setAyCraft(ayCraft) {
+      this.ayCraft = ayCraft;
     }
 
     // Method to activate or deactivate the Rover
@@ -2064,7 +2064,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _Plugin2 = _interopRequireDefault(require("../../Plugin.js"));
-var _index = require("../../../../AyCraft/index.js");
+var _index = require("../../../../AyCraft.js/index.js");
 var _createEntityFromPart = _interopRequireDefault(require("./lib/createEntityFromPart.js"));
 var _bindPartEvents = _interopRequireDefault(require("./lib/bindPartEvents.js"));
 var _createWire = _interopRequireDefault(require("./lib/parts/createWire.js"));
@@ -2198,7 +2198,7 @@ var AyCraft = /*#__PURE__*/function (_Plugin) {
       this.game.entities.forEach(function (ent) {
         if (ent.type === 'PART') {
           // get the part and call .offFn if it exists
-          var part = ent.realStone.part;
+          var part = ent.ayCraft.part;
           if (part.unload) {
             console.log('calling part.unload', part.name);
             part.unload();
@@ -2234,37 +2234,37 @@ var AyCraft = /*#__PURE__*/function (_Plugin) {
           console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
           return;
         }
-        if (entityA.realStone) {
+        if (entityA.ayCraft) {
           // trigger the part if possible
-          // console.log('entityA.realStone', entityA.realStone)
+          // console.log('entityA.ayCraft', entityA.ayCraft)
 
-          if (entityA.realStone.part.trigger) {
-            entityA.realStone.part.trigger();
+          if (entityA.ayCraft.part.trigger) {
+            entityA.ayCraft.part.trigger();
           }
-          if (entityA.realStone.part.press) {
-            entityA.realStone.part.press();
+          if (entityA.ayCraft.part.press) {
+            entityA.ayCraft.part.press();
           }
-          if (entityA.realStone.part.detectMotion) {
-            entityA.realStone.part.detectMotion();
+          if (entityA.ayCraft.part.detectMotion) {
+            entityA.ayCraft.part.detectMotion();
           }
-          if (entityA.realStone.part.toggle) {
-            entityA.realStone.part.toggle();
+          if (entityA.ayCraft.part.toggle) {
+            entityA.ayCraft.part.toggle();
           }
         }
-        if (entityB.realStone) {
+        if (entityB.ayCraft) {
           // trigger the part if possible
-          // console.log('entityB.realStone', entityB.realStone)
-          if (entityB.realStone.part.trigger) {
-            entityB.realStone.part.trigger();
+          // console.log('entityB.ayCraft', entityB.ayCraft)
+          if (entityB.ayCraft.part.trigger) {
+            entityB.ayCraft.part.trigger();
           }
-          if (entityB.realStone.part.press) {
-            entityB.realStone.part.press();
+          if (entityB.ayCraft.part.press) {
+            entityB.ayCraft.part.press();
           }
-          if (entityB.realStone.part.detectMotion) {
-            entityB.realStone.part.detectMotion();
+          if (entityB.ayCraft.part.detectMotion) {
+            entityB.ayCraft.part.detectMotion();
           }
-          if (entityB.realStone.part.toggle) {
-            entityB.realStone.part.toggle();
+          if (entityB.ayCraft.part.toggle) {
+            entityB.ayCraft.part.toggle();
           }
         }
       }
@@ -2284,16 +2284,16 @@ var AyCraft = /*#__PURE__*/function (_Plugin) {
 _defineProperty(AyCraft, "id", 'aycraft');
 var _default = exports["default"] = AyCraft;
 
-},{"../../../../AyCraft/index.js":1,"../../Plugin.js":18,"./button-wire-light.js":20,"./lib/bindPartEvents.js":21,"./lib/createEntityFromPart.js":22,"./lib/events/bindActuator.js":23,"./lib/events/bindAmplifer.js":24,"./lib/events/bindButton.js":25,"./lib/events/bindLEDLight.js":26,"./lib/events/bindLatch.js":27,"./lib/events/bindMotionDetector.js":28,"./lib/events/bindPressureSensor.js":29,"./lib/events/bindRelay.js":30,"./lib/events/bindRover.js":31,"./lib/events/bindWire.js":32,"./lib/parts/createWire.js":33,"./rover-light.js":34,"./security-system-wires.js":35,"./security-system.js":36}],20:[function(require,module,exports){
+},{"../../../../AyCraft.js/index.js":1,"../../Plugin.js":18,"./button-wire-light.js":20,"./lib/bindPartEvents.js":21,"./lib/createEntityFromPart.js":22,"./lib/events/bindActuator.js":23,"./lib/events/bindAmplifer.js":24,"./lib/events/bindButton.js":25,"./lib/events/bindLEDLight.js":26,"./lib/events/bindLatch.js":27,"./lib/events/bindMotionDetector.js":28,"./lib/events/bindPressureSensor.js":29,"./lib/events/bindRelay.js":30,"./lib/events/bindRover.js":31,"./lib/events/bindWire.js":32,"./lib/parts/createWire.js":33,"./rover-light.js":34,"./security-system-wires.js":35,"./security-system.js":36}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = buttonLight;
-var _index = require("../../../../AyCraft/index.js");
+var _index = require("../../../../AyCraft.js/index.js");
 function buttonLight() {
-  var realStoneSystem = new _index.AyCraft({
+  var ayCraftSystem = new _index.AyCraft({
     powerRequired: false // default is false, set to true to enforce power requirements
   });
 
@@ -2317,18 +2317,18 @@ function buttonLight() {
   wire.connect(ledLight3);
 
   // Add parts to AyCraft system
-  realStoneSystem.addPart(button);
-  realStoneSystem.addPart(wire);
-  realStoneSystem.addPart(ledLight1);
-  realStoneSystem.addPart(ledLight2);
-  realStoneSystem.addPart(ledLight3);
+  ayCraftSystem.addPart(button);
+  ayCraftSystem.addPart(wire);
+  ayCraftSystem.addPart(ledLight1);
+  ayCraftSystem.addPart(ledLight2);
+  ayCraftSystem.addPart(ledLight3);
 
   // Simulate pressing the button
   // button.press();
-  return realStoneSystem;
+  return ayCraftSystem;
 }
 
-},{"../../../../AyCraft/index.js":1}],21:[function(require,module,exports){
+},{"../../../../AyCraft.js/index.js":1}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2373,7 +2373,7 @@ function createEntityFromPart(part, contraption) {
         height: part.size.height,
         isStatic: false,
         isSensor: true,
-        realStone: {
+        ayCraft: {
           part: part,
           contraption: contraption
         }
@@ -2389,7 +2389,7 @@ function createEntityFromPart(part, contraption) {
         width: part.size.width,
         height: part.size.height,
         isStatic: true,
-        realStone: {
+        ayCraft: {
           part: part,
           contraption: contraption
         }
@@ -2424,7 +2424,7 @@ function createEntityFromPart(part, contraption) {
       height: part.size.height,
       isStatic: true,
       isSensor: true,
-      realStone: {
+      ayCraft: {
         part: part,
         contraption: contraption
       }
@@ -2782,7 +2782,7 @@ function createWire(part, contraption) {
         height: boxHeight,
         rotation: angle,
         isStatic: true,
-        realStone: {
+        ayCraft: {
           part: part,
           contraption: contraption
         }
@@ -2801,9 +2801,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = buttonLight;
-var _index = require("../../../../AyCraft/index.js");
+var _index = require("../../../../AyCraft.js/index.js");
 function buttonLight() {
-  var realStoneSystem = new _index.AyCraft({
+  var ayCraftSystem = new _index.AyCraft({
     powerRequired: false
   });
 
@@ -2842,30 +2842,30 @@ function buttonLight() {
   wire2.connect(ledLight3);
 
   // Add parts to AyCraft system
-  realStoneSystem.addPart(button);
-  realStoneSystem.addPart(button2);
-  realStoneSystem.addPart(wire1);
-  realStoneSystem.addPart(wire2);
-  realStoneSystem.addPart(ledLight1);
-  realStoneSystem.addPart(ledLight2);
-  realStoneSystem.addPart(ledLight3);
-  realStoneSystem.addPart(redRover);
+  ayCraftSystem.addPart(button);
+  ayCraftSystem.addPart(button2);
+  ayCraftSystem.addPart(wire1);
+  ayCraftSystem.addPart(wire2);
+  ayCraftSystem.addPart(ledLight1);
+  ayCraftSystem.addPart(ledLight2);
+  ayCraftSystem.addPart(ledLight3);
+  ayCraftSystem.addPart(redRover);
 
   // Start moving the Rover
   redRover.startMoving();
-  return realStoneSystem;
+  return ayCraftSystem;
 }
 
-},{"../../../../AyCraft/index.js":1}],35:[function(require,module,exports){
+},{"../../../../AyCraft.js/index.js":1}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = createSecuritySystem;
-var _index = require("../../../../AyCraft/index.js");
+var _index = require("../../../../AyCraft.js/index.js");
 function createSecuritySystem() {
-  var realStoneSystem = new _index.AyCraft();
+  var ayCraftSystem = new _index.AyCraft();
 
   // Initialize and position components
   var motionDetector = new _index.MotionDetector(-150, -250, 0);
@@ -2893,34 +2893,34 @@ function createSecuritySystem() {
   wireToLight.connect(securityLight);
 
   // Add components and wires to AyCraft system
-  realStoneSystem.addPart(motionDetector);
-  realStoneSystem.addPart(pressureSensor);
-  realStoneSystem.addPart(securityLight);
-  realStoneSystem.addPart(manualOverrideButton);
-  realStoneSystem.addPart(actuator);
-  realStoneSystem.addPart(wireFromMotionDetector);
-  realStoneSystem.addPart(wireFromPressureSensor);
-  realStoneSystem.addPart(wireFromButton);
-  realStoneSystem.addPart(wireToLight);
+  ayCraftSystem.addPart(motionDetector);
+  ayCraftSystem.addPart(pressureSensor);
+  ayCraftSystem.addPart(securityLight);
+  ayCraftSystem.addPart(manualOverrideButton);
+  ayCraftSystem.addPart(actuator);
+  ayCraftSystem.addPart(wireFromMotionDetector);
+  ayCraftSystem.addPart(wireFromPressureSensor);
+  ayCraftSystem.addPart(wireFromButton);
+  ayCraftSystem.addPart(wireToLight);
 
   // Simulate interactions
   // motionDetector.detectMotion(); // Simulate motion detection
 
   // Logging the system state
-  console.log(realStoneSystem);
-  return realStoneSystem;
+  console.log(ayCraftSystem);
+  return ayCraftSystem;
 }
 
-},{"../../../../AyCraft/index.js":1}],36:[function(require,module,exports){
+},{"../../../../AyCraft.js/index.js":1}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = createSecuritySystem;
-var _index = require("../../../../AyCraft/index.js");
+var _index = require("../../../../AyCraft.js/index.js");
 function createSecuritySystem() {
-  var realStoneSystem = new _index.AyCraft();
+  var ayCraftSystem = new _index.AyCraft();
 
   // Initialize and position components
   var motionDetector = new _index.MotionDetector(-150, -250, 0); // Position at top-left
@@ -2940,22 +2940,22 @@ function createSecuritySystem() {
   actuator.connect(securityLight);
 
   // Add parts to AyCraft system
-  realStoneSystem.addPart(motionDetector);
-  realStoneSystem.addPart(pressureSensor);
-  realStoneSystem.addPart(securityLight);
-  realStoneSystem.addPart(manualOverrideButton);
-  realStoneSystem.addPart(actuator);
+  ayCraftSystem.addPart(motionDetector);
+  ayCraftSystem.addPart(pressureSensor);
+  ayCraftSystem.addPart(securityLight);
+  ayCraftSystem.addPart(manualOverrideButton);
+  ayCraftSystem.addPart(actuator);
 
   // Simulate interactions
   motionDetector.detectMotion(); // Simulate motion detection
   // manualOverrideButton.press(); // Simulate manual override
 
   // Logging the system state
-  console.log(realStoneSystem);
-  //console.log(JSON.stringify(realStoneSystem.toJSON(), true, 2))
+  console.log(ayCraftSystem);
+  //console.log(JSON.stringify(ayCraftSystem.toJSON(), true, 2))
 
-  return realStoneSystem;
+  return ayCraftSystem;
 }
 
-},{"../../../../AyCraft/index.js":1}]},{},[19])(19)
+},{"../../../../AyCraft.js/index.js":1}]},{},[19])(19)
 });

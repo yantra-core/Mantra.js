@@ -462,7 +462,10 @@ var Entity = /*#__PURE__*/function () {
       if (entityData.position) {
         // Remark: Tests require we update component, perhaps changed test?
         this.game.components.position.set(entityId, entityData.position);
-        this.game.physics.setPosition(this.game.bodyMap[entityId], entityData.position);
+        var body = this.game.bodyMap[entityId];
+        if (body) {
+          this.game.physics.setPosition(body, entityData.position);
+        }
       }
       if (entityData.velocity) {
         this.game.physics.setVelocity(this.game.bodyMap[entityId], entityData.velocity);
@@ -478,7 +481,10 @@ var Entity = /*#__PURE__*/function () {
       }
       if (typeof entityData.rotation !== 'undefined') {
         this.game.components.rotation.set(entityId, entityData.rotation);
+
+        // TODO: update rotation in physics engine      
       }
+
       return ent;
     }
   }, {
@@ -537,8 +543,8 @@ var Entity = /*#__PURE__*/function () {
         // object hash of state history
         timers: null,
         // object hash timers for TimersComponent.js
-        realStone: null,
-        // object hash of properties for RealStone.js
+        ayCraft: null,
+        // object hash of properties for AyCraft.js
         text: null
       };
 
@@ -576,7 +582,7 @@ var Entity = /*#__PURE__*/function () {
         score = _config.score,
         owner = _config.owner,
         lifetime = _config.lifetime,
-        realStone = _config.realStone,
+        ayCraft = _config.ayCraft,
         text = _config.text;
       var x = position.x,
         y = position.y;
@@ -618,7 +624,7 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'actionRateLimiter', {});
       // TODO: clean up API contract with Component
       this.game.addComponent(entityId, 'timers', new _TimersComponent["default"]('timers', entityId, this.game));
-      this.game.addComponent(entityId, 'realStone', realStone);
+      this.game.addComponent(entityId, 'ayCraft', ayCraft);
       this.game.addComponent(entityId, 'text', text);
       if (config.body) {
         var body = this.createBody(config);
@@ -630,6 +636,9 @@ var Entity = /*#__PURE__*/function () {
         }
         if (position) {
           this.game.physics.setPosition(body, position);
+        }
+        if (typeof rotation !== 'undefined') {
+          this.game.physics.setRotation(body, rotation);
         }
       }
 

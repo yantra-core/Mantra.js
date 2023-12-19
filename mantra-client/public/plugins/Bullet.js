@@ -94,8 +94,9 @@ var Bullet = /*#__PURE__*/function () {
           x: directionX * this.speed,
           y: directionY * this.speed
         },
-        radius: 33,
-        damage: 10
+        radius: 16,
+        // TODO: make this a config
+        damage: 10 // TODO: make this a config
       };
       // console.log('using bulletDirectionConfig', bulletDirectionConfig)
       this.game.createEntity(bulletDirectionConfig);

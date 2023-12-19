@@ -77,6 +77,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
+var _inflateBox = _interopRequireDefault(require("./lib/inflateBox.js"));
+var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -108,6 +110,12 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       camera = _ref.camera;
     _classCallCheck(this, CSSGraphics);
     _this = _super.call(this);
+    if (typeof camera === 'string') {
+      // legacy API, remove in future
+      camera = {
+        follow: true
+      };
+    }
 
     // config scope for convenience
     var config = {
@@ -119,6 +127,8 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       x: 0,
       y: 0
     };
+    _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
+    _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
     return _this;
   }
   _createClass(CSSGraphics, [{
@@ -127,13 +137,22 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // register renderer with graphics pipeline
       game.graphics.push(this);
       this.game = game;
-      this.game.systemsManager.addSystem('graphics-css', this);
 
       // let the graphics pipeline know the document is ready ( we could add document event listener here )
       // Remark: CSSGraphics current requires no async external loading scripts
 
       // Initialize the CSS render div
       this.initCSSRenderDiv();
+
+      // register renderer with graphics pipeline
+      game.graphics.push(this);
+      this.game.systemsManager.addSystem('graphics-css', this);
+
+      // is sync load; however we still need to let the graphics pipeline know we are ready
+      game.emit('plugin::ready::graphics-css', this);
+
+      // TODO: remove this line from plugin implementations
+      game.loadingPluginsCount--;
     }
   }, {
     key: "initCSSRenderDiv",
@@ -178,6 +197,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
           entityElement.style.width = radius * 2 + 'px';
           entityElement.style.height = radius * 2 + 'px';
           entityElement.style.borderRadius = '50%'; // This will make the div a circle
+          entityElement.style.background = 'red';
           break;
         case 'PLAYER':
           // For PLAYER entities, create a triangle
@@ -185,20 +205,15 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
           entityElement.style.height = '0px';
           entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
           entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
-          entityElement.style.borderBottom = entityData.height + 'px solid blue';
+          entityElement.style.borderBottom = entityData.height + 'px solid green';
           break;
         case 'TEXT':
-          entityElement = this.createText(entityElement, entityData);
+          entityElement = this.inflateText(entityElement, entityData);
           break;
         default:
-          // For other entities, create a rectangle
-          entityElement.style.width = entityData.width + 'px';
-          entityElement.style.height = entityData.height + 'px';
-          entityElement.style.borderRadius = '10px'; // Optional: to make it rounded
-          entityElement.style.background = 'blue'; // Move this line here
+          this.inflateBox(entityElement, entityData);
           break;
       }
-      entityElement.style.background = 'blue';
       this.renderDiv.appendChild(entityElement);
 
       // Update the position of the entity element
@@ -219,36 +234,20 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       }
       var entityElement = document.getElementById("entity-".concat(entityData.id));
       if (entityElement) {
+        // Update the entity color
+        if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+          // entityData.color is int number here we need a hex
+          var hexColor = '#' + entityData.color.toString(16);
+          // update the background color
+          entityElement.style.background = hexColor;
+        }
+
         // Update the position of the entity element
         return this.updateEntityElementPosition(entityElement, entityData);
       } else {
         // If the entity element does not exist, create it
         return this.createGraphic(entityData);
       }
-    }
-  }, {
-    key: "createText",
-    value: function createText(entityElement, entityData) {
-      // Create a container for the chat bubble
-      entityElement.className = 'chat-bubble-container';
-      entityElement.style.position = 'absolute';
-
-      // Create the chat bubble itself
-      var chatBubble = document.createElement('div');
-      chatBubble.className = 'chat-bubble';
-      chatBubble.style.border = '1px solid #000';
-      chatBubble.style.borderRadius = '10px';
-      chatBubble.style.padding = '10px';
-      chatBubble.style.background = '#fff';
-      chatBubble.style.maxWidth = '200px';
-      chatBubble.innerText = "entityData.text"; // Assuming entityData contains the chat text
-
-      // Append the chat bubble to the container
-      entityElement.appendChild(chatBubble);
-      // Update the position of the chat bubble container
-      //this.updateEntityElementPosition(entityElement, entityData);
-
-      return entityElement;
     }
   }, {
     key: "removeGraphic",
@@ -280,16 +279,29 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
       // convert rotation to degrees
       var angle = rotation * (180 / Math.PI);
-      // Translate and rotate the element
-      entityElement.style.transform = "\n      translate(".concat(domX, "px, ").concat(domY, "px)\n      rotate(").concat(angle, "deg)\n    ");
+      this.setTransform(entityElement, domX, domY, rotation, angle);
       return entityElement;
+    }
+  }, {
+    key: "setTransform",
+    value: function setTransform(entityElement, domX, domY, rotation, angle) {
+      // Retrieve the last rotation value, default to 0 if not set
+      var lastRotation = entityElement.dataset.rotation || 0;
+      // Update rotation if provided
+      if (rotation) {
+        lastRotation = angle;
+        entityElement.dataset.rotation = angle;
+      }
+
+      // Update the transform property
+      entityElement.style.transform = "translate(".concat(domX, "px, ").concat(domY, "px) rotate(").concat(lastRotation, "deg)");
     }
   }, {
     key: "update",
     value: function update() {
       var game = this.game;
       var currentPlayer = this.game.getEntity(game.currentPlayerId);
-      if (this.config.camera && this.config.camera === 'follow' && currentPlayer) {
+      if (this.config.camera && this.config.camera.follow && currentPlayer) {
         if (currentPlayer.position) {
           this.cameraPosition.x = currentPlayer.position.x;
           this.cameraPosition.y = currentPlayer.position.y;
@@ -307,8 +319,8 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
+          this.inflateEntity(ent, alpha);
           if (ent.pendingRender && ent.pendingRender['graphics-css']) {
-            this.inflateEntity(ent, alpha);
             ent.pendingRender['graphics-css'] = false;
           }
         }
@@ -321,12 +333,47 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "inflateEntity",
     value: function inflateEntity(entity, alpha) {
+      // checks for existence of entity, performs update or create
       if (entity.graphics && entity.graphics['graphics-css']) {
         var graphic = entity.graphics['graphics-css'];
         this.updateGraphic(entity, alpha);
       } else {
         var _graphic = this.createGraphic(entity);
         this.game.components.graphics.set([entity.id, 'graphics-css'], _graphic);
+      }
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      var _this2 = this;
+      // TODO: consolidate graphics pipeline unloading into SystemsManager
+      // TODO: remove duplicated unload() code in BabylonGraphics
+      this.game.graphics = this.game.graphics.filter(function (g) {
+        return g.id !== _this2.id;
+      });
+      delete this.game._plugins['CSSGraphics'];
+
+      // iterate through all entities and remove existing css graphics
+      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step2;
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            eId = _step2$value[0],
+            entity = _step2$value[1];
+          if (entity.graphics && entity.graphics['graphics-css']) {
+            this.removeGraphic(eId);
+            delete entity.graphics['graphics-css'];
+          }
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+      var div = document.getElementById('css-render-canvas');
+      if (div) {
+        div.remove();
       }
     }
   }]);
@@ -336,5 +383,131 @@ _defineProperty(CSSGraphics, "id", 'graphics-css');
 _defineProperty(CSSGraphics, "removable", false);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1}]},{},[2])(2)
+},{"../../lib/GraphicsInterface.js":1,"./lib/inflateBox.js":3,"./lib/inflateText.js":4}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateBox;
+var depthChart = ['background', 'border', 'wire', 'part', 'PLAYER', 'BLOCK'];
+function inflateBox(entityElement, entityData) {
+  var game = this.game;
+  // For other entities, create a rectangle
+  var hexColor = 'white';
+  if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+    // entityData.color is int number here we need a hex
+    hexColor = '#' + entityData.color.toString(16);
+  }
+  entityElement.style.width = entityData.width + 'px';
+  entityElement.style.height = entityData.height + 'px';
+  entityElement.style.borderRadius = '10px'; // Optional: to make it rounded
+
+  // set default depth based on type
+  entityElement.style.zIndex = depthChart.indexOf(entityData.type);
+  console.log('inflateBox', entityData.type, entityElement.style.zIndex);
+  if (entityData.type === 'PART') {
+    if (entityData.name === 'Wire') {
+      // set a low z-index for wires
+      entityElement.style.zIndex = depthChart.indexOf('wire');
+    } else {
+      // set 1000 z-index for parts
+      entityElement.style.zIndex = depthChart.indexOf('part');
+    }
+
+    // add pointer cursor for buttons on hover
+    entityElement.style.cursor = 'pointer';
+
+    // add hover state with 3d drop shadow effect
+    entityElement.addEventListener('mouseover', function () {
+      entityElement.style.boxShadow = '5px 5px 10px rgba(0,0,0,0.5)';
+      // get the full ent from the game
+      var ent = game.getEntity(entityData.id);
+      // delgate based on part type name
+      var partName = ent.ayCraft.part.name;
+      var partType = ent.ayCraft.part.type;
+      var part = ent.ayCraft.part;
+      if (partType === 'MotionDetector') {
+        // console.log('MotionDetector', part);
+        ent.ayCraft.part.onFn();
+      }
+    });
+    entityElement.addEventListener('mouseout', function () {
+      entityElement.style.boxShadow = '';
+    });
+    entityElement.addEventListener('pointerdown', function (ev) {
+      console.log(ev.target, entityData.id, entityData.type, entityData);
+      // get the full ent from the game
+      var ent = game.getEntity(entityData.id);
+      // delgate based on part type name
+      var partName = ent.ayCraft.part.name;
+      var partType = ent.ayCraft.part.type;
+      var part = ent.ayCraft.part;
+      if (partType === 'Button') {
+        ent.ayCraft.part.press();
+      }
+      // LEDLight, Latch, Amplifier, etc
+      if (ent && ent.ayCraft && ent.ayCraft.part.toggle) {
+        ent.ayCraft.part.toggle();
+      }
+    });
+    entityElement.addEventListener('pointerup', function (ev) {
+      // console.log(ev.target, entityData.id, entityData.type, entityData)
+      // get the full ent from the game
+      var ent = game.getEntity(entityData.id);
+      // delgate based on part type name
+      var partName = ent.ayCraft.part.name;
+      var partType = ent.ayCraft.part.type;
+      if (partType === 'Button') {
+        if (ent && ent.ayCraft && ent.ayCraft.part.release) {
+          ent.ayCraft.part.release();
+        }
+      }
+    });
+  }
+
+  // set border color to black
+  entityElement.style.border = '1px solid black';
+  entityElement.style.background = hexColor; // Move this line here
+  return entityElement;
+}
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateText;
+function inflateText(entityElement, entityData) {
+  // TODO: check if chat bubble already exists, if so just update it
+  // Create a container for the chat bubble
+  entityElement.className = 'chat-bubble-container';
+  entityElement.style.position = 'absolute';
+
+  // Create the chat bubble itself
+  var chatBubble = document.createElement('div');
+  chatBubble.className = 'chat-bubble';
+  chatBubble.style.border = '1px solid #000';
+  chatBubble.style.borderRadius = '10px';
+  // chatBubble.style.padding = '10px';
+  // set padding to left and right
+  chatBubble.style.paddingLeft = '10px';
+  chatBubble.style.paddingRight = '10px';
+  chatBubble.style.background = '#fff';
+  // chatBubble.style.maxWidth = '200px';
+  //chatBubble.style.width = `${entityData.width}px`;
+  //chatBubble.style.height = `${entityData.height}px`;
+  chatBubble.innerText = entityData.text || '';
+
+  // console.log('appending new text element')
+  // Append the chat bubble to the container
+  entityElement.appendChild(chatBubble);
+  // Update the position of the chat bubble container
+  //this.updateEntityElementPosition(entityElement, entityData);
+
+  return entityElement;
+}
+
+},{}]},{},[2])(2)
 });

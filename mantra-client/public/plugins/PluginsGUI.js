@@ -5,6 +5,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+// TODO:
+// Allow option to set window as background
+// Allow option for simple 4x4 grid for windows
+// Default mode is to place 2x2 vertical on left side first,
+// then 2x2 vertical on right side
+// Then for 3, its top left, bottom left, top right, with bottom right empty
+// For 4 each is 1x1, the entire window is filled at 4x4
+// Repeat same logic in units of 4 for 8, 12, 16, etc
+// Max windows is 64
+
+// TODO: all windows should have footers with a toolbar ( empty for now )
+// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
+
 //import lightTheme from "./themes/light.js";
 //import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
@@ -471,7 +484,7 @@ var pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 52.48
+    "size": 54.137
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -487,7 +500,7 @@ var pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 20.186
+    "size": 20.845
   },
   "Client": {
     "path": "./plugins/client/Client.js",
@@ -507,7 +520,7 @@ var pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 39.881
+    "size": 40.209
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -523,7 +536,7 @@ var pluginsList = {
   },
   "Graphics": {
     "path": "./plugins/graphics/Graphics.js",
-    "size": 5.7
+    "size": 6.371
   },
   "Health": {
     "path": "./plugins/health/Health.js",
@@ -551,7 +564,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.334
+    "size": 23.337
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -563,7 +576,7 @@ var pluginsList = {
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 17.695
+    "size": 31.118
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -599,7 +612,7 @@ var pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 34.394
+    "size": 36.583
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

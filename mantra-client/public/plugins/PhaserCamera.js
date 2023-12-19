@@ -29,7 +29,6 @@ var PhaserCamera = /*#__PURE__*/function () {
       tweening: false
     };
     */
-
     this.initZoomControls();
   }
   _createClass(PhaserCamera, [{

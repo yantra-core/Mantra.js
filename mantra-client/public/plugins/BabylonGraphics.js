@@ -78,6 +78,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
 var _BabylonCamera = _interopRequireDefault(require("./camera/BabylonCamera.js"));
+var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -102,43 +103,51 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // BabylonRenderer.js extends RendererInterface.js
-// TODO: remove circular dependency to plugins.js
-// import plugins from '../../plugins.js';
-
-// You can create your own renderer by replacing this file with a Class that extends RendererInterface.js
-
-// Simple Babylon.js Debug GUI for Entity inspection
-//import DebugGUI from '../../Component/DebugGUI.js';
-//import EntityLabel from '../../Component/EntityLabel.js';
-//import StarField from '../../Component/StarField.js';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // BabylonGraphics.js - Marak Squires 2023
+// import inflate3DText from './lib/inflate3DText.js';
 var lastKnownStates = {};
 var POOL_SIZE_BLOCK = 3000;
 var POOL_SIZE_BULLET = 1000;
+
+// You can create your own renderer by replacing this file with a Class that extends GraphicsInterface.js
 var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _inherits(BabylonGraphics, _GraphicsInterface);
   var _super = _createSuper(BabylonGraphics);
   // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  function BabylonGraphics() {
+  function BabylonGraphics(_ref) {
     var _this;
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      camera = _ref.camera;
+    var _ref$camera = _ref.camera,
+      camera = _ref$camera === void 0 ? {} : _ref$camera;
     _classCallCheck(this, BabylonGraphics);
     _this = _super.call(this);
     _this.id = BabylonGraphics.id;
     _this.async = BabylonGraphics.async;
     _this.engine = null;
     _this.scene = null;
-    _this.camera = null;
+    if (typeof camera === 'string') {
+      // legacy API, remove in future
+      camera = {
+        follow: true
+      };
+    }
+    if (typeof camera.startingZoom !== 'number') {
+      camera.startingZoom = 0.4;
+    }
+    if (typeof camera.follow === 'undefined') {
+      camera.follow = true;
+    }
+    _this.camera = camera;
+    _this.startingZoom = camera.startingZoom;
     _this.entityStates = {}; // Store application-specific entity data
     _this.debug = false; // Store debug flag for later usage
     _this.pendingLoad = []; // queue of pending Plugins that depend on this Babylon Graphics
 
+    // this.inflate3DText = inflateText.bind(this);
+    _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
+
     // config scope for convenience
-    var config = {
-      camera: camera
-    };
+    var config = camera;
     _this.config = config;
     _this.mantraPools = {
       block: [],
@@ -251,7 +260,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
               // TODO: Should we have generic Camera plugin scoped to graphics pipeline?
               //       see how StarField.js is implemented for reference
               game.use(new _BabylonCamera["default"]({
-                camera: this.config.camera
+                camera: this.camera
               }));
               this.pendingLoad.forEach(function (pluginInstance) {
                 game.use(pluginInstance);
@@ -339,7 +348,8 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // TODO: put in switch here for dimensions
         switch (this.game.physics.dimension) {
           case 2:
-            graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+            // graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+            graphic.rotation = new BABYLON.Vector3(0, entityData.rotation, 0);
             break;
           case 3:
             if (_typeof(entityData.rotation) !== 'object') {
@@ -380,7 +390,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "createGraphic",
     value: function createGraphic(entityData) {
-      // console.log('Babylon.createGraphic', entityData)
+      console.log('Babylon.createGraphic', entityData);
       // throw new Error('line')
       // switch case based on entityData.type
       var graphic;
@@ -396,7 +406,9 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
           graphic = this.getBullet(entityData);
           break;
         case 'TEXT':
-          graphic = this.createText(entityData);
+          graphic = this.inflateText(entityData);
+          // TODO: add support for 3d text
+          // graphic = this.inflateText(entityData);
           break;
         case 'BORDER':
           graphic = this.createBox(entityData);
@@ -413,7 +425,11 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       }
 
       if (this.game.physics.dimension === 2) {
-        graphic.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+        console.log("SETTING POSITION", entityData.name, entityData.type, entityData.position.x, entityData.position.y);
+        if (typeof entityData.position.z === 'undefined') {
+          entityData.position.z = 1;
+        }
+        graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
       }
       if (this.game.physics.dimension === 3) {
         graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
@@ -513,28 +529,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Reset bullet properties if necessary
     }
   }, {
-    key: "createText",
-    value: function createText(entityData) {
-      var plane = BABYLON.MeshBuilder.CreatePlane('chatBubble', {
-        width: entityData.width,
-        height: entityData.height
-      }, this.scene);
-      var texture = new BABYLON.DynamicTexture('dynamic texture', {
-        width: 512,
-        height: 256
-      }, this.scene);
-      var material = new BABYLON.StandardMaterial('Mat', this.scene);
-      var text = 'HELLO WORLD'; // Or use entityData.text if it contains the message
-      var font = 'bold 44px monospace';
-      texture.drawText(text, null, 40, font, 'black', 'white', true, true);
-      material.diffuseTexture = texture;
-      plane.material = material;
-
-      // Set the billboard mode so the plane always faces the camera
-      plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-      return plane;
-    }
-  }, {
     key: "createSphere",
     value: function createSphere(entityData) {
       var sphere = BABYLON.MeshBuilder.CreateSphere('bullet', {
@@ -545,11 +539,74 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "createBox",
     value: function createBox(entityData) {
+      var _this4 = this;
+      var game = this.game;
       var box = BABYLON.MeshBuilder.CreateBox('default', {
         width: entityData.width,
         height: entityData.depth,
         depth: entityData.height
       }, this.scene);
+
+      // Add rotation if present
+      if (entityData.rotation) {
+        // Set rotation as needed
+      }
+
+      // Ensure the box is actionable
+      box.isPickable = true;
+
+      // Create an action manager for the box
+      box.actionManager = new BABYLON.ActionManager(this.scene);
+
+      // Pointer over event
+      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function () {
+        // console.log('pointerover', entityData.id, entityData.type, entityData);
+        _this4.scene.getEngine().getRenderingCanvas().style.cursor = 'pointer';
+      }));
+
+      // Pointer out event
+      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function () {
+        // console.log('pointerout', entityData.id, entityData.type, entityData)
+        _this4.scene.getEngine().getRenderingCanvas().style.cursor = 'default';
+        // Additional logic if needed
+        // Get the full entity from the game and delegate based on part type
+        var ent = game.getEntity(entityData.id);
+        if (ent && ent.ayCraft && ent.ayCraft.part) {
+          var partType = ent.ayCraft.part.type;
+          if (partType === 'MotionDetector') {
+            ent.ayCraft.part.onFn();
+          }
+        }
+      }));
+
+      // Pointer down event
+      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, function () {
+        // console.log('pointerdown', entityData.id, entityData.type, entityData);
+        var ent = game.getEntity(entityData.id);
+        if (ent && ent.ayCraft && ent.ayCraft.part) {
+          var partType = ent.ayCraft.part.type;
+          if (partType === 'Button') {
+            ent.ayCraft.part.press();
+          }
+          if (ent.ayCraft.part.toggle) {
+            ent.ayCraft.part.toggle();
+          }
+        }
+        // Logic for pointer down
+      }));
+
+      // Pointer up event
+      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
+        // Logic for pointer up
+        // console.log('pointerup', entityData.id, entityData.type, entityData)
+        var ent = game.getEntity(entityData.id);
+        if (ent && ent.ayCraft && ent.ayCraft.part) {
+          var partType = ent.ayCraft.part.type;
+          if (partType === 'Button' && ent.ayCraft.part.release) {
+            ent.ayCraft.part.release();
+          }
+        }
+      }));
       return box;
     }
   }, {
@@ -643,7 +700,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "unload",
     value: function unload() {
-      var _this4 = this;
+      var _this5 = this;
       // TODO: consolidate graphics pipeline unloading into SystemsManager
       // TODO: remove duplicated unload() code in PhaserGraphics
       // iterate through all entities and remove existing babylon graphics
@@ -669,7 +726,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       }
       this.game.systemsManager.removeSystem('graphics-babylon-camera');
       this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this4.id;
+        return g.id !== _this5.id;
       });
       delete this.game._plugins['BabylonGraphics'];
 
@@ -691,7 +748,7 @@ _defineProperty(BabylonGraphics, "removable", false);
 _defineProperty(BabylonGraphics, "async", true);
 var _default = exports["default"] = BabylonGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./camera/BabylonCamera.js":3}],3:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./camera/BabylonCamera.js":3,"./lib/inflateText.js":4}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -706,12 +763,11 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var BabylonCamera = /*#__PURE__*/function () {
-  function BabylonCamera() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      camera = _ref.camera;
+  function BabylonCamera(_ref) {
+    var camera = _ref.camera;
     _classCallCheck(this, BabylonCamera);
     this.id = BabylonCamera.id;
-
+    this.startingZoom = camera.startingZoom;
     // config scope for convenience
     var config = {
       camera: camera
@@ -756,7 +812,9 @@ var BabylonCamera = /*#__PURE__*/function () {
 
       //   Rotate the camera by -Math.PI / 2
       this.camera.alpha += Math.PI / 2;
-      this.camera.radius = 4500;
+      this.camera.radius = 2560 * this.startingZoom;
+      //alert(this.camera.radius)
+      //console.log('this.camera.radiusthis.camera.radiusthis.camera.radius', this.camera.radius)
     }
   }, {
     key: "setupCameraControls",
@@ -820,7 +878,7 @@ var BabylonCamera = /*#__PURE__*/function () {
     key: "render",
     value: function render() {
       var game = this.game;
-      if (this.config.camera && this.config.camera === 'follow') {
+      if (this.config.camera && this.config.camera.follow) {
         var currentPlayer = this.game.getEntity(game.currentPlayerId);
         if (currentPlayer && currentPlayer.graphics) {
           var graphic = currentPlayer.graphics['graphics-babylon'];
@@ -849,7 +907,7 @@ var BabylonCamera = /*#__PURE__*/function () {
     value: function renderLerp() {
       // TODO: use this instead on render(), uses built in lerp
       var game = this.game;
-      if (this.config.camera && this.config.camera === 'follow') {
+      if (this.config.camera && this.config.camera.follow) {
         var currentPlayer = this.game.getEntity(game.currentPlayerId);
         if (currentPlayer && currentPlayer.graphics) {
           var graphic = currentPlayer.graphics['graphics-babylon'];
@@ -879,6 +937,72 @@ var BabylonCamera = /*#__PURE__*/function () {
 _defineProperty(BabylonCamera, "id", 'graphics-babylon-camera');
 _defineProperty(BabylonCamera, "removable", false);
 var _default = exports["default"] = BabylonCamera;
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateText;
+function inflateText(entityData, scene) {
+  var plane, texture;
+
+  // TODO: ensure this file won't be called each game tick, and only on update or create
+  // we cannot dispose of the texture and plane each tick, or we will get CPU spikes
+
+  if (entityData.graphics && entityData.graphics['graphics-babylon']) {
+    // Dispose of existing texture and plane if they exist
+    entityData.graphics['graphics-babylon'].texture.dispose();
+    entityData.graphics['graphics-babylon'].plane.dispose();
+  }
+  var text = entityData.text || '';
+  var font = 'bold 244px monospace';
+
+  // Create a temporary canvas to measure text
+  var tempCanvas = document.createElement('canvas');
+  var context = tempCanvas.getContext('2d');
+  context.font = font;
+  var textSize = context.measureText(text);
+
+  // Adjust texture size based on text size
+  var textureWidth = Math.ceil(textSize.width) + 60;
+  var textureHeight = 288; // Fixed height
+
+  // Create new texture and plane with calculated dimensions
+  texture = new BABYLON.DynamicTexture('dynamicTexture', {
+    width: textureWidth,
+    height: textureHeight
+  }, scene, false);
+  texture.hasAlpha = true;
+  var material = new BABYLON.StandardMaterial('textMaterial', scene);
+  material.diffuseTexture = texture;
+  material.backFaceCulling = false;
+  plane = new BABYLON.MeshBuilder.CreatePlane('signboard', {
+    width: textureWidth / 10,
+    height: textureHeight / 10
+  }, scene);
+  plane.material = material;
+  plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+  // Clear texture and draw new text
+  texture.getContext().clearRect(0, 0, textureWidth, textureHeight);
+  var xPosition = 30; // Horizontal padding
+  var yPosition = textureHeight / 2 + textSize.actualBoundingBoxAscent / 2 - 40; // Adjusted for vertical centering
+  texture.drawText(text, xPosition, yPosition, font, 'purple', 'white', true, true);
+
+  // Update entityData with new graphics
+  entityData.graphics = {
+    'graphics-babylon': {
+      plane: plane,
+      texture: texture
+    }
+  };
+
+  // Adjust plane position
+  plane.position = new BABYLON.Vector3(entityData.position.x, entityData.position.y + 200, entityData.position.z);
+  return plane;
+}
 
 },{}]},{},[2])(2)
 });

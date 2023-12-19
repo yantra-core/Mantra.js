@@ -67,6 +67,14 @@ var Editor = /*#__PURE__*/function () {
       var $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
       var $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
       var $graphicsSelector = new _GraphicsSelector["default"](this.game);
+
+      // set css styles for $graphicsSelector
+      $graphicsSelector.selectBox.style.position = 'absolute';
+      $graphicsSelector.selectBox.style.right = '150px';
+      $graphicsSelector.selectBox.style.top = '0px';
+      $graphicsSelector.selectBox.style.fontSize = '22px';
+      // cursor pointer
+      $graphicsSelector.selectBox.style.cursor = 'pointer';
       var $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
       // const $aboutMenu = this.createMenu('About');
       // TODO: add optional xstate menu for editing / viewing state machines
@@ -356,8 +364,9 @@ var GraphicsSelector = /*#__PURE__*/function () {
       selectBox.id = 'graphicsSelect';
       // TODO: Populate the select box with options as needed
       // Example: this.addOption(selectBox, 'Option 1', 'value1');
-      this.addOption(selectBox, 'Babylon.js', 'BabylonGraphics');
-      this.addOption(selectBox, 'Phaser 3', 'PhaserGraphics');
+      this.addOption(selectBox, 'Mantra CSS - v1.1.0', 'CSSGraphics');
+      this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
+      this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
       return selectBox;
     }
   }, {
@@ -392,25 +401,50 @@ var GraphicsSelector = /*#__PURE__*/function () {
   }, {
     key: "handleSelectionChange",
     value: function handleSelectionChange(event) {
-      // TODO: Implement what happens when the selection changes
-      console.log('Selected:', event.target.value);
-      console.log('this.game.systems', this.game.systems);
-      if (typeof this.game.systems['graphics-babylon'] !== 'undefined') {
-        this.game.systemsManager.removeSystem('graphics-babylon');
+      var _this2 = this;
+      var game = this.game;
+      this.showLoadingSpinner();
+
+      // Get the value of the selected graphics mode
+      var selectedGraphicsMode = event.target.value;
+      var selectGraphicsId;
+      if (selectedGraphicsMode === 'BabylonGraphics') {
+        selectGraphicsId = 'graphics-babylon';
       }
-      if (this.game.systems['graphics-phaser']) {
-        this.game.systemsManager.removeSystem('graphics-phaser');
+      if (selectedGraphicsMode === 'PhaserGraphics') {
+        selectGraphicsId = 'graphics-phaser';
+      }
+      if (selectedGraphicsMode === 'CSSGraphics') {
+        selectGraphicsId = 'graphics-css';
       }
 
-      // for now, TODO: pass actual config from previous instance
-      this.game.use(event.target.value, {
-        camera: 'follow'
-      });
+      // Check if the selected graphics mode is already registered
+      if (typeof this.game.systems[selectGraphicsId] === 'undefined') {
+        this.game.use(selectedGraphicsMode, {
+          camera: 'follow'
+        });
 
-      // for now, remove later
-      if (event.target.value === 'BabylonGraphics') {
-        this.game.use('StarField');
+        // Add event listeners for plugin ready events
+        this.game.once("plugin::ready::".concat(selectGraphicsId), function () {
+          // iterate through all existing graphics ( except this one ) and remove them
+          _this2.game.graphics.forEach(function (graphics) {
+            if (graphics.id !== selectGraphicsId) {
+              game.systemsManager.removeSystem(graphics.id);
+            }
+          });
+          _this2.hideLoadingSpinner();
+        });
       }
+    }
+  }, {
+    key: "showLoadingSpinner",
+    value: function showLoadingSpinner() {
+      document.body.style.cursor = 'wait';
+    }
+  }, {
+    key: "hideLoadingSpinner",
+    value: function hideLoadingSpinner() {
+      document.body.style.cursor = 'default';
     }
   }]);
   return GraphicsSelector;

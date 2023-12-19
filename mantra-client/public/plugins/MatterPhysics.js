@@ -60,6 +60,16 @@ var Collisions = /*#__PURE__*/function () {
             entityIdB: bodyB.myEntityId
           });
         }
+        if (entityA.ayCraft && entityA.ayCraft.part && entityA.ayCraft.part.handleCollision) {
+          if (entityB.type !== 'TEXT') {
+            entityA.ayCraft.part.handleCollision(entityB);
+          }
+        }
+        if (entityB.ayCraft && entityB.ayCraft.part && entityB.ayCraft.part.handleCollision) {
+          if (entityA.type !== 'TEXT') {
+            entityB.ayCraft.part.handleCollision(entityA);
+          }
+        }
         if (this.game.rules) {
           this.game.data.collisions = this.game.data.collisions || [];
           // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
@@ -385,6 +395,11 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     key: "onAfterUpdate",
     value: function onAfterUpdate(engine, callback) {
       _matterJs["default"].Events.on(engine, 'afterUpdate', callback);
+    }
+  }, {
+    key: "setRotation",
+    value: function setRotation(body, rotation) {
+      _matterJs["default"].Body.setAngle(body, rotation);
     }
   }, {
     key: "setPosition",

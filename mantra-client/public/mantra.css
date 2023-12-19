@@ -1589,30 +1589,3 @@ button[type="submit"]:disabled {
   height: 100%;
   display: block;
 }
-
-.stars {
-  background: #000 url(img/stars.png) repeat top center;
-  z-index: 0;
-}
-
-.twinkling {
-  background: transparent url(img/twinkling.png) repeat top center;
-  z-index: 1;
-
-  -moz-animation: move-twink-back 200s linear infinite;
-  -ms-animation: move-twink-back 200s linear infinite;
-  -o-animation: move-twink-back 200s linear infinite;
-  -webkit-animation: move-twink-back 200s linear infinite;
-  animation: move-twink-back 200s linear infinite;
-}
-
-.clouds {
-  background: transparent url(img/clouds.png) repeat top center;
-  z-index: 3;
-
-  -moz-animation: move-clouds-back 200s linear infinite;
-  -ms-animation: move-clouds-back 200s linear infinite;
-  -o-animation: move-clouds-back 200s linear infinite;
-  -webkit-animation: move-clouds-back 200s linear infinite;
-  animation: move-clouds-back 200s linear infinite;
-}

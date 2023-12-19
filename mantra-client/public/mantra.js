@@ -318,7 +318,10 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$collisions = _ref.collisions,
       collisions = _ref$collisions === void 0 ? true : _ref$collisions,
       _ref$camera = _ref.camera,
-      camera = _ref$camera === void 0 ? 'follow' : _ref$camera,
+      camera = _ref$camera === void 0 ? {
+        type: 'follow',
+        startingZoom: 0.8 // scale from 0 to 50
+      } : _ref$camera,
       _ref$keyboard = _ref.keyboard,
       keyboard = _ref$keyboard === void 0 ? true : _ref$keyboard,
       _ref$mouse = _ref.mouse,
@@ -443,7 +446,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     };
 
     // define additional components for the game
-    this.components.health = new _Component["default"]('color', this);
+    this.components.color = new _Component["default"]('color', this);
     this.components.health = new _Component["default"]('health', this);
     this.components.target = new _Component["default"]('target', this);
     this.components.lifetime = new _Component["default"]('lifetime', this);
@@ -453,6 +456,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.lockedProperties = new _Component["default"]('lockedProperties', this);
     this.components.actionRateLimiter = new _ActionRateLimiter["default"]('actionRateLimiter', this);
     this.components.timers = new _TimersComponent["default"]('timers', this);
+    this.components.ayCraft = new _Component["default"]('ayCraft', this);
+    this.components.text = new _Component["default"]('text', this);
 
     // Systems Manager
     this.systemsManager = new _SystemsManager["default"](this);
@@ -753,8 +758,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       return this.createEntity({
         type: 'PLAYER',
         shape: 'triangle',
-        width: 200,
-        height: 200,
+        width: 64,
+        height: 64,
         color: 0x00ff00,
         position: {
           x: 0,

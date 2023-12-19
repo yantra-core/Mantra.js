@@ -100,7 +100,6 @@ var PhaserCamera = /*#__PURE__*/function () {
       tweening: false
     };
     */
-
     this.initZoomControls();
   }
   _createClass(PhaserCamera, [{
@@ -280,6 +279,7 @@ var _inflateGraphic = _interopRequireDefault(require("./graphics/inflateGraphic.
 var _inflateTriangle = _interopRequireDefault(require("./graphics/inflateTriangle.js"));
 var _inflateBox = _interopRequireDefault(require("./graphics/inflateBox.js"));
 var _inflateCircle = _interopRequireDefault(require("./graphics/inflateCircle.js"));
+var _inflateText = _interopRequireDefault(require("./graphics/inflateText.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -308,17 +308,24 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   var _super = _createSuper(PhaserGraphics);
   // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
+  // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
   function PhaserGraphics() {
     var _this;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$camera = _ref.camera,
       camera = _ref$camera === void 0 ? {} : _ref$camera,
       _ref$startingZoom = _ref.startingZoom,
-      startingZoom = _ref$startingZoom === void 0 ? 0.1 : _ref$startingZoom;
+      startingZoom = _ref$startingZoom === void 0 ? 0.7 : _ref$startingZoom;
     _classCallCheck(this, PhaserGraphics);
     _this = _super.call(this);
     _this.id = 'graphics-phaser';
     _this.async = PhaserGraphics.async;
+    if (typeof camera === 'string') {
+      // legacy API, remove in future
+      camera = {
+        follow: true
+      };
+    }
     var config = {
       camera: camera,
       startingZoom: startingZoom
@@ -332,6 +339,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
     _this.inflateTriangle = _inflateTriangle["default"].bind(_assertThisInitialized(_this));
     _this.inflateCircle = _inflateCircle["default"].bind(_assertThisInitialized(_this));
+    _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
     return _this;
   }
   _createClass(PhaserGraphics, [{
@@ -368,9 +376,9 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.phaserGame = new Phaser.Game({
         type: Phaser.AUTO,
         parent: 'gameHolder',
-        width: 1600,
+        width: 800,
         // TODO: config  
-        height: 800,
+        height: 600,
         scene: [_Main],
         scale: {
           //mode: Phaser.Scale.ENVELOP,
@@ -534,14 +542,19 @@ _defineProperty(PhaserGraphics, "removable", false);
 _defineProperty(PhaserGraphics, "async", true);
 var _default = exports["default"] = PhaserGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./PhaserCamera.js":2,"./graphics/inflateBox.js":4,"./graphics/inflateCircle.js":5,"./graphics/inflateGraphic.js":6,"./graphics/inflateTriangle.js":7}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./PhaserCamera.js":2,"./graphics/inflateBox.js":4,"./graphics/inflateCircle.js":5,"./graphics/inflateGraphic.js":6,"./graphics/inflateText.js":7,"./graphics/inflateTriangle.js":8}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = inflategraphic;
+var _setCursorStyle = _interopRequireDefault(require("../util/setCursorStyle.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var depthChart = ['background', 'border', 'wire', 'part', 'PLAYER', 'BLOCK'];
 function inflategraphic(entityData) {
+  var _this = this;
+  var game = this.game;
   // check to see if there is existing graphic on entity, if so, use that
   var graphic;
   if (entityData.graphics && entityData.graphics['graphics-phaser']) {
@@ -555,9 +568,56 @@ function inflategraphic(entityData) {
       // defaults to white
       entityData.color = 0xffffff;
     }
+    graphic.setDepth(9999);
     graphic.fillStyle(entityData.color, 1);
     graphic.currentFillColor = entityData.color;
     graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
+
+    // Add interactive property to enable input events
+    var hitArea = new Phaser.Geom.Rectangle(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
+    graphic.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+
+    // Add pointer events
+    graphic.on('pointerover', function () {
+      // console.log('pointerover', entityData.id, entityData.type, entityData)
+      (0, _setCursorStyle["default"])(graphic, _this.scene, 'pointer');
+      // Get the full entity from the game and delegate based on part type
+      var ent = game.getEntity(entityData.id);
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        var partType = ent.ayCraft.part.type;
+        if (partType === 'MotionDetector') {
+          ent.ayCraft.part.onFn();
+        }
+      }
+    });
+    graphic.on('pointerout', function () {
+      //setCursorStyle(graphic, this.scene, 'default');
+    });
+    graphic.on('pointerdown', function () {
+      // set closed hand cursor
+      // setCursorStyle(graphic, this.scene, 'grabbing');
+      // Handle pointer down events
+      var ent = game.getEntity(entityData.id);
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        var partType = ent.ayCraft.part.type;
+        if (partType === 'Button') {
+          ent.ayCraft.part.press();
+        }
+        if (ent.ayCraft.part.toggle) {
+          ent.ayCraft.part.toggle();
+        }
+      }
+    });
+    graphic.on('pointerup', function () {
+      // Handle pointer up events
+      var ent = game.getEntity(entityData.id);
+      if (ent && ent.ayCraft && ent.ayCraft.part) {
+        var partType = ent.ayCraft.part.type;
+        if (partType === 'Button' && ent.ayCraft.part.release) {
+          ent.ayCraft.part.release();
+        }
+      }
+    });
     this.scene.add.existing(graphic);
     this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
   }
@@ -580,28 +640,14 @@ function inflategraphic(entityData) {
     y: graphic.y
   };
   var position = entityData.position;
-
-  // let adjustedX = entityData.position.x + this.game.width / 2;
-  // let adjustedY = entityData.position.y + this.game.height / 2;
-
   graphic.setPosition(position.x, position.y);
-  // TODO: conditional update of position, use float truncation
-  /*  
-  //console.log('checking', currentGraphicsPosition, position)
-  if (typeof currentGraphicsPosition === 'undefined' || (currentGraphicsPosition.x !== position.x || currentGraphicsPosition.y !== position.y)) {
-    if (entityData.type === 'BORDER') {
-      //throw new Error('setting new position', position)
-      console.log('setting new position', position)
-    }
-    //let adjustedX = entityData.position.x + this.game.width / 2;
-    //let adjustedY = entityData.position.y + this.game.height / 2;
+  if (entityData.rotation) {
+    graphic.setRotation(entityData.rotation);
   }
-  */
-
   return graphic;
 }
 
-},{}],5:[function(require,module,exports){
+},{"../util/setCursorStyle.js":9}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -650,7 +696,9 @@ function inflateGraphic(entity) {
     case 'BULLET':
       graphic = this.inflateCircle(entity);
       break;
-      graphic = this.inflateTriangle(entity);
+    case 'TEXT':
+      graphic = this.inflateText(entity);
+      break;
     default:
       graphic = this.inflateBox(entity);
     // TODO: createDefault()
@@ -660,6 +708,55 @@ function inflateGraphic(entity) {
 }
 
 },{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateText;
+function inflateText(entityData) {
+  // Check if there is an existing container with the text and background
+  var container = entityData.graphics && entityData.graphics['graphics-phaser'];
+  var textStyle = {
+    font: '22px Arial',
+    fill: '#f00fff',
+    backgroundColor: '#ffffff',
+    padding: 3
+  };
+
+  // If there's no existing container, create a new one
+  if (!container) {
+    // Create text and background graphic
+    var textObject = this.scene.add.text(0, 0, entityData.text, textStyle).setOrigin(0.5, 0.5);
+    var backgroundGraphic = this.scene.add.graphics().fillStyle(0xffffff, 1);
+    textObject.setAlpha(1);
+    backgroundGraphic.setAlpha(1);
+    textObject.setDepth(9999);
+    backgroundGraphic.setDepth(9998);
+    backgroundGraphic.fillRect(-textObject.width / 2 - 5, -textObject.height / 2, textObject.displayWidth + 10, textObject.displayHeight);
+
+    // Create a container and add the text and background graphic to it
+    container = this.scene.add.container(entityData.position.x, entityData.position.y, [backgroundGraphic, textObject]);
+    entityData.graphics = entityData.graphics || {};
+    entityData.graphics['graphics-phaser'] = container;
+  } else {
+    // Update the text and background graphic if the text has changed
+    var _textObject = container.list[1]; // Assuming textObject is the second item in the container
+    var _backgroundGraphic = container.list[0]; // Assuming backgroundGraphic is the first item
+
+    if (_textObject.text !== entityData.text) {
+      _textObject.setText(entityData.text);
+      _backgroundGraphic.clear();
+      _backgroundGraphic.fillRect(-_textObject.width / 2, -_textObject.height / 2, _textObject.width, _textObject.height);
+    }
+
+    // Update container position
+    container.setPosition(entityData.position.x, entityData.position.y);
+  }
+  return container;
+}
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -726,6 +823,22 @@ function inflateTriangle(entityData) {
     }
   }
   return graphic;
+}
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = setCursorStyle;
+function setCursorStyle(graphic, scene, cursorStyle) {
+  graphic.on('pointerover', function () {
+    scene.game.canvas.style.cursor = cursorStyle;
+  });
+  graphic.on('pointerout', function () {
+    scene.game.canvas.style.cursor = 'default';
+  });
 }
 
 },{}]},{},[3])(3)

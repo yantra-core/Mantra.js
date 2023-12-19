@@ -13,12 +13,11 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var BabylonCamera = /*#__PURE__*/function () {
-  function BabylonCamera() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      camera = _ref.camera;
+  function BabylonCamera(_ref) {
+    var camera = _ref.camera;
     _classCallCheck(this, BabylonCamera);
     this.id = BabylonCamera.id;
-
+    this.startingZoom = camera.startingZoom;
     // config scope for convenience
     var config = {
       camera: camera
@@ -63,7 +62,9 @@ var BabylonCamera = /*#__PURE__*/function () {
 
       //   Rotate the camera by -Math.PI / 2
       this.camera.alpha += Math.PI / 2;
-      this.camera.radius = 4500;
+      this.camera.radius = 2560 * this.startingZoom;
+      //alert(this.camera.radius)
+      //console.log('this.camera.radiusthis.camera.radiusthis.camera.radius', this.camera.radius)
     }
   }, {
     key: "setupCameraControls",
@@ -127,7 +128,7 @@ var BabylonCamera = /*#__PURE__*/function () {
     key: "render",
     value: function render() {
       var game = this.game;
-      if (this.config.camera && this.config.camera === 'follow') {
+      if (this.config.camera && this.config.camera.follow) {
         var currentPlayer = this.game.getEntity(game.currentPlayerId);
         if (currentPlayer && currentPlayer.graphics) {
           var graphic = currentPlayer.graphics['graphics-babylon'];
@@ -156,7 +157,7 @@ var BabylonCamera = /*#__PURE__*/function () {
     value: function renderLerp() {
       // TODO: use this instead on render(), uses built in lerp
       var game = this.game;
-      if (this.config.camera && this.config.camera === 'follow') {
+      if (this.config.camera && this.config.camera.follow) {
         var currentPlayer = this.game.getEntity(game.currentPlayerId);
         if (currentPlayer && currentPlayer.graphics) {
           var graphic = currentPlayer.graphics['graphics-babylon'];
