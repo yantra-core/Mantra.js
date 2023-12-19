@@ -583,10 +583,10 @@ function inflategraphic(entityData) {
       (0, _setCursorStyle["default"])(graphic, _this.scene, 'pointer');
       // Get the full entity from the game and delegate based on part type
       var ent = game.getEntity(entityData.id);
-      if (ent && ent.ayCraft && ent.ayCraft.part) {
-        var partType = ent.ayCraft.part.type;
+      if (ent && ent.yCraft && ent.yCraft.part) {
+        var partType = ent.yCraft.part.type;
         if (partType === 'MotionDetector') {
-          ent.ayCraft.part.onFn();
+          ent.yCraft.part.onFn();
         }
       }
     });
@@ -598,23 +598,23 @@ function inflategraphic(entityData) {
       // setCursorStyle(graphic, this.scene, 'grabbing');
       // Handle pointer down events
       var ent = game.getEntity(entityData.id);
-      if (ent && ent.ayCraft && ent.ayCraft.part) {
-        var partType = ent.ayCraft.part.type;
+      if (ent && ent.yCraft && ent.yCraft.part) {
+        var partType = ent.yCraft.part.type;
         if (partType === 'Button') {
-          ent.ayCraft.part.press();
+          ent.yCraft.part.press();
         }
-        if (ent.ayCraft.part.toggle) {
-          ent.ayCraft.part.toggle();
+        if (ent.yCraft.part.toggle) {
+          ent.yCraft.part.toggle();
         }
       }
     });
     graphic.on('pointerup', function () {
       // Handle pointer up events
       var ent = game.getEntity(entityData.id);
-      if (ent && ent.ayCraft && ent.ayCraft.part) {
-        var partType = ent.ayCraft.part.type;
-        if (partType === 'Button' && ent.ayCraft.part.release) {
-          ent.ayCraft.part.release();
+      if (ent && ent.yCraft && ent.yCraft.part) {
+        var partType = ent.yCraft.part.type;
+        if (partType === 'Button' && ent.yCraft.part.release) {
+          ent.yCraft.part.release();
         }
       }
     });

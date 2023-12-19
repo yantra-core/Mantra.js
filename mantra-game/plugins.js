@@ -57,7 +57,7 @@ import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
 import Sutra from './plugins/sutra/Sutra.js';
-import AyCraft from './plugins/aycraft/AyCraft.js';
+import YCraft from './plugins/ycraft/YCraft.js';
 
 // Timers
 import Timers from './plugins/timers/Timers.js';
@@ -98,7 +98,7 @@ import TowerWorld from './plugins/world-tower/TowerWorld.js';
 const plugins = {
   Behaviors,
   Sutra,
-  AyCraft,
+  YCraft,
   Block,
   Border,
   Bullet,

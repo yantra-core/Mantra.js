@@ -6,7 +6,7 @@ const plugins = [
   './plugins/entity-movement/strategies/AsteroidsMovement.js',
   './plugins/behaviors/Behaviors.js',
   './plugins/sutra/Sutra.js',
-  './plugins/aycraft/AyCraft.js',
+  './plugins/ycraft/YCraft.js',
   './plugins/graphics-babylon/camera/BabylonCamera.js',
   './plugins/graphics-babylon/BabylonGraphics.js',
   './plugins/block/Block.js',

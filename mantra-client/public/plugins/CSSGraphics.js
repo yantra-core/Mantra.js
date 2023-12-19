@@ -424,12 +424,12 @@ function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       var ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      var partName = ent.ayCraft.part.name;
-      var partType = ent.ayCraft.part.type;
-      var part = ent.ayCraft.part;
+      var partName = ent.yCraft.part.name;
+      var partType = ent.yCraft.part.type;
+      var part = ent.yCraft.part;
       if (partType === 'MotionDetector') {
         // console.log('MotionDetector', part);
-        ent.ayCraft.part.onFn();
+        ent.yCraft.part.onFn();
       }
     });
     entityElement.addEventListener('mouseout', function () {
@@ -440,15 +440,15 @@ function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       var ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      var partName = ent.ayCraft.part.name;
-      var partType = ent.ayCraft.part.type;
-      var part = ent.ayCraft.part;
+      var partName = ent.yCraft.part.name;
+      var partType = ent.yCraft.part.type;
+      var part = ent.yCraft.part;
       if (partType === 'Button') {
-        ent.ayCraft.part.press();
+        ent.yCraft.part.press();
       }
       // LEDLight, Latch, Amplifier, etc
-      if (ent && ent.ayCraft && ent.ayCraft.part.toggle) {
-        ent.ayCraft.part.toggle();
+      if (ent && ent.yCraft && ent.yCraft.part.toggle) {
+        ent.yCraft.part.toggle();
       }
     });
     entityElement.addEventListener('pointerup', function (ev) {
@@ -456,11 +456,11 @@ function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       var ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      var partName = ent.ayCraft.part.name;
-      var partType = ent.ayCraft.part.type;
+      var partName = ent.yCraft.part.name;
+      var partType = ent.yCraft.part.type;
       if (partType === 'Button') {
-        if (ent && ent.ayCraft && ent.ayCraft.part.release) {
-          ent.ayCraft.part.release();
+        if (ent && ent.yCraft && ent.yCraft.part.release) {
+          ent.yCraft.part.release();
         }
       }
     });

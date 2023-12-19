@@ -543,8 +543,8 @@ var Entity = /*#__PURE__*/function () {
         // object hash of state history
         timers: null,
         // object hash timers for TimersComponent.js
-        ayCraft: null,
-        // object hash of properties for AyCraft.js
+        yCraft: null,
+        // object hash of properties for YCraft.js
         text: null
       };
 
@@ -582,7 +582,7 @@ var Entity = /*#__PURE__*/function () {
         score = _config.score,
         owner = _config.owner,
         lifetime = _config.lifetime,
-        ayCraft = _config.ayCraft,
+        yCraft = _config.yCraft,
         text = _config.text;
       var x = position.x,
         y = position.y;
@@ -624,7 +624,7 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'actionRateLimiter', {});
       // TODO: clean up API contract with Component
       this.game.addComponent(entityId, 'timers', new _TimersComponent["default"]('timers', entityId, this.game));
-      this.game.addComponent(entityId, 'ayCraft', ayCraft);
+      this.game.addComponent(entityId, 'yCraft', yCraft);
       this.game.addComponent(entityId, 'text', text);
       if (config.body) {
         var body = this.createBody(config);

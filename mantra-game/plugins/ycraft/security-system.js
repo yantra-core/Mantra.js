@@ -1,8 +1,8 @@
 
-import { AyCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor, Relay } from '../../../../AyCraft.js/index.js';
+import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor, Relay } from '../../../../YCraft.js/index.js';
 
 export default function createSecuritySystem() {
-  const ayCraftSystem = new AyCraft();
+  const yCraftSystem = new YCraft();
 
   // Initialize and position components
   const motionDetector = new MotionDetector(-150, -250, 0); // Position at top-left
@@ -19,21 +19,21 @@ export default function createSecuritySystem() {
   // Connect Actuator to the Security Light
   actuator.connect(securityLight);
 
-  // Add parts to AyCraft system
-  ayCraftSystem.addPart(motionDetector);
-  ayCraftSystem.addPart(pressureSensor);
-  ayCraftSystem.addPart(securityLight);
-  ayCraftSystem.addPart(manualOverrideButton);
-  ayCraftSystem.addPart(actuator);
+  // Add parts to YCraft system
+  yCraftSystem.addPart(motionDetector);
+  yCraftSystem.addPart(pressureSensor);
+  yCraftSystem.addPart(securityLight);
+  yCraftSystem.addPart(manualOverrideButton);
+  yCraftSystem.addPart(actuator);
 
   // Simulate interactions
   motionDetector.detectMotion(); // Simulate motion detection
   // manualOverrideButton.press(); // Simulate manual override
 
   // Logging the system state
-  console.log(ayCraftSystem);
-  //console.log(JSON.stringify(ayCraftSystem.toJSON(), true, 2))
+  console.log(yCraftSystem);
+  //console.log(JSON.stringify(yCraftSystem.toJSON(), true, 2))
 
-  return ayCraftSystem;
+  return yCraftSystem;
 }
 

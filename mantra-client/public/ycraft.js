@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.RS = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.YC = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14,12 +14,6 @@ Object.defineProperty(exports, "Amplifier", {
   enumerable: true,
   get: function get() {
     return _Amplifier["default"];
-  }
-});
-Object.defineProperty(exports, "AyCraft", {
-  enumerable: true,
-  get: function get() {
-    return _AyCraft["default"];
   }
 });
 Object.defineProperty(exports, "Button", {
@@ -88,6 +82,12 @@ Object.defineProperty(exports, "Wire", {
     return _Wire["default"];
   }
 });
+Object.defineProperty(exports, "YCraft", {
+  enumerable: true,
+  get: function get() {
+    return _YCraft["default"];
+  }
+});
 Object.defineProperty(exports, "allExamples", {
   enumerable: true,
   get: function get() {
@@ -95,7 +95,7 @@ Object.defineProperty(exports, "allExamples", {
   }
 });
 exports.createContraption = createContraption;
-var _AyCraft = _interopRequireDefault(require("./lib/AyCraft.js"));
+var _YCraft = _interopRequireDefault(require("./lib/YCraft.js"));
 var _ElectricalSignal = _interopRequireDefault(require("./lib/signals/ElectricalSignal.js"));
 var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
 var _Amplifier = _interopRequireDefault(require("./lib/parts/Amplifier.js"));
@@ -112,10 +112,10 @@ var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
 var _allExamplesComposite = _interopRequireDefault(require("./examples/WIP/all-examples-composite.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function createContraption() {
-  return new _AyCraft["default"]();
+  return new _YCraft["default"]();
 }
 
-},{"./examples/WIP/all-examples-composite.js":2,"./lib/AyCraft.js":4,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/LEDLight.js":9,"./lib/parts/LaserSensor.js":10,"./lib/parts/Latch.js":11,"./lib/parts/Mirror.js":12,"./lib/parts/MotionDetector.js":13,"./lib/parts/PressureSensor.js":14,"./lib/parts/Relay.js":15,"./lib/parts/Rover.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],2:[function(require,module,exports){
+},{"./examples/WIP/all-examples-composite.js":2,"./lib/YCraft.js":5,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/LEDLight.js":9,"./lib/parts/LaserSensor.js":10,"./lib/parts/Latch.js":11,"./lib/parts/Mirror.js":12,"./lib/parts/MotionDetector.js":13,"./lib/parts/PressureSensor.js":14,"./lib/parts/Relay.js":15,"./lib/parts/Rover.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -138,7 +138,7 @@ import signalButtonBreakLight from './WIP/signal-button-break-light.js/index.js'
 
 */
 function multipleContraptions() {
-  var bigDevice = new _index.AyCraft(0, 0, 0, {
+  var bigDevice = new _index.YCraft(0, 0, 0, {
     width: 1000,
     height: 1000,
     depth: 1000
@@ -182,12 +182,6 @@ Object.defineProperty(exports, "Amplifier", {
     return _Amplifier["default"];
   }
 });
-Object.defineProperty(exports, "AyCraft", {
-  enumerable: true,
-  get: function get() {
-    return _AyCraft["default"];
-  }
-});
 Object.defineProperty(exports, "Button", {
   enumerable: true,
   get: function get() {
@@ -254,7 +248,13 @@ Object.defineProperty(exports, "Wire", {
     return _Wire["default"];
   }
 });
-var _AyCraft = _interopRequireDefault(require("./lib/AyCraft.js"));
+Object.defineProperty(exports, "YCraft", {
+  enumerable: true,
+  get: function get() {
+    return _YCraft["default"];
+  }
+});
+var _YCraft = _interopRequireDefault(require("./lib/YCraft.js"));
 var _ElectricalSignal = _interopRequireDefault(require("./lib/signals/ElectricalSignal.js"));
 var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
 var _Amplifier = _interopRequireDefault(require("./lib/parts/Amplifier.js"));
@@ -270,7 +270,67 @@ var _Rover = _interopRequireDefault(require("./lib/parts/Rover.js"));
 var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./lib/AyCraft.js":4,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/LEDLight.js":9,"./lib/parts/LaserSensor.js":10,"./lib/parts/Latch.js":11,"./lib/parts/Mirror.js":12,"./lib/parts/MotionDetector.js":13,"./lib/parts/PressureSensor.js":14,"./lib/parts/Relay.js":15,"./lib/parts/Rover.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],4:[function(require,module,exports){
+},{"./lib/YCraft.js":5,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/LEDLight.js":9,"./lib/parts/LaserSensor.js":10,"./lib/parts/Latch.js":11,"./lib/parts/Mirror.js":12,"./lib/parts/MotionDetector.js":13,"./lib/parts/PressureSensor.js":14,"./lib/parts/Relay.js":15,"./lib/parts/Rover.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Part = void 0;
+var _EventEmitter2 = _interopRequireDefault(require("./utils/EventEmitter.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
+  _inherits(Part, _EventEmitter);
+  var _super = _createSuper(Part);
+  function Part() {
+    var _this;
+    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    _classCallCheck(this, Part);
+    _this = _super.call(this);
+    _this.id = Part.idCounter++; // Assign a unique ID and increment the counter
+    _this.position = {
+      x: x,
+      y: y,
+      z: z
+    };
+    _this.size = {
+      width: 64,
+      height: 64,
+      depth: 64
+    }; // Fixed size for each part
+    _this.props = {}; // Properties specific to each part
+    return _this;
+  }
+  _createClass(Part, [{
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
+    }
+
+    // Additional methods or properties common to all parts can be added here
+  }]);
+  return Part;
+}(_EventEmitter2["default"]);
+// for now, could also be a base Part class
+_defineProperty(Part, "idCounter", 0);
+
+},{"./utils/EventEmitter.js":19}],5:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -292,10 +352,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-var AyCraft = /*#__PURE__*/function (_EventEmitter) {
-  _inherits(AyCraft, _EventEmitter);
-  var _super = _createSuper(AyCraft);
-  function AyCraft() {
+var YCraft = /*#__PURE__*/function (_EventEmitter) {
+  _inherits(YCraft, _EventEmitter);
+  var _super = _createSuper(YCraft);
+  function YCraft() {
     var _this;
     var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -303,7 +363,7 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
     var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
       _ref$powerRequired = _ref.powerRequired,
       powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired;
-    _classCallCheck(this, AyCraft);
+    _classCallCheck(this, YCraft);
     _this = _super.call(this);
 
     // Local x-coordinate in global space
@@ -323,7 +383,7 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
   }
 
   // top-level on method for the contraption
-  _createClass(AyCraft, [{
+  _createClass(YCraft, [{
     key: "start",
     value: function start() {
       // check to see if any parts have been added,
@@ -368,10 +428,10 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
       var offsetZ = this.position.z;
       contraption.setPosition(contraption.position.x + offsetX, contraption.position.y + offsetY, contraption.position.z + offsetZ);
 
-      // Add the contraption to the AyCraft's contraptions array
+      // Add the contraption to the YCraft's contraptions array
       this.contraptions.push(contraption);
 
-      // Forward events from the contraption to the AyCraft instance
+      // Forward events from the contraption to the YCraft instance
       contraption.onAny(function (eventName) {
         for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
           args[_key - 1] = arguments[_key];
@@ -379,16 +439,16 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
         _this2.emit.apply(_this2, [eventName].concat(args));
       });
 
-      // Set the AyCraft context for the contraption
-      if (typeof contraption.setAyCraft === 'function') {
-        contraption.setAyCraft(this);
+      // Set the YCraft context for the contraption
+      if (typeof contraption.setYCraft === 'function') {
+        contraption.setYCraft(this);
       }
     }
   }, {
     key: "addPart",
     value: function addPart(part) {
       var _this3 = this;
-      // Adjust part's position relative to the AyCraft's local coordinates
+      // Adjust part's position relative to the YCraft's local coordinates
       part.position.x += this.position.x;
       part.position.y += this.position.y;
       part.position.z += this.position.z;
@@ -398,11 +458,11 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
           for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
             args[_key2 - 1] = arguments[_key2];
           }
-          // Forward the part's events to the AyCraft instance
+          // Forward the part's events to the YCraft instance
           _this3.emit.apply(_this3, [eventName].concat(args));
         });
-        if (typeof part.setAyCraft === 'function') {
-          part.setAyCraft(this);
+        if (typeof part.setYCraft === 'function') {
+          part.setYCraft(this);
         }
       }
     }
@@ -425,12 +485,12 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
   }, {
     key: "connect",
     value: function connect(targetComponent) {
-      // Check if the target component belongs to another AyCraft instance
-      if (targetComponent instanceof AyCraftComponent && this.ayCraft !== targetComponent.ayCraft) {
+      // Check if the target component belongs to another YCraft instance
+      if (targetComponent instanceof YCraftComponent && this.yCraft !== targetComponent.yCraft) {
         // Implement logic to handle inter-contraption connections
         // This could involve using a global event emitter or a direct reference
       } else {
-        // Regular connection logic for components within the same AyCraft instance
+        // Regular connection logic for components within the same YCraft instance
       }
     }
   }, {
@@ -460,7 +520,7 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
       var dx = x - this.position.x;
       var dy = y - this.position.y;
       var dz = z - this.position.z;
-      // Update AyCraft's local coordinates
+      // Update YCraft's local coordinates
       this.position.x = x;
       this.position.y = y;
       this.position.z = z;
@@ -528,69 +588,9 @@ var AyCraft = /*#__PURE__*/function (_EventEmitter) {
       return connections;
     }
   }]);
-  return AyCraft;
+  return YCraft;
 }(_EventEmitter2["default"]);
-var _default = exports["default"] = AyCraft;
-
-},{"./utils/EventEmitter.js":19}],5:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Part = void 0;
-var _EventEmitter2 = _interopRequireDefault(require("./utils/EventEmitter.js"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
-  _inherits(Part, _EventEmitter);
-  var _super = _createSuper(Part);
-  function Part() {
-    var _this;
-    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-    _classCallCheck(this, Part);
-    _this = _super.call(this);
-    _this.id = Part.idCounter++; // Assign a unique ID and increment the counter
-    _this.position = {
-      x: x,
-      y: y,
-      z: z
-    };
-    _this.size = {
-      width: 64,
-      height: 64,
-      depth: 64
-    }; // Fixed size for each part
-    _this.props = {}; // Properties specific to each part
-    return _this;
-  }
-  _createClass(Part, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
-    }
-
-    // Additional methods or properties common to all parts can be added here
-  }]);
-  return Part;
-}(_EventEmitter2["default"]);
-// for now, could also be a base Part class
-_defineProperty(Part, "idCounter", 0);
+var _default = exports["default"] = YCraft;
 
 },{"./utils/EventEmitter.js":19}],6:[function(require,module,exports){
 "use strict";
@@ -713,7 +713,7 @@ var Actuator = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Actuator, "type", 'Actuator');
 
-},{"../Part.js":5}],7:[function(require,module,exports){
+},{"../Part.js":4}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -768,9 +768,9 @@ var Amplifier = exports["default"] = /*#__PURE__*/function (_Part) {
     return _this;
   }
   _createClass(Amplifier, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
     }
   }, {
     key: "connect",
@@ -846,7 +846,7 @@ var Amplifier = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Amplifier, "type", 'Amplifier');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],8:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -895,9 +895,9 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
     return _this;
   }
   _createClass(Button, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
     }
   }, {
     key: "connect",
@@ -953,7 +953,7 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Button, "type", 'Button');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],9:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1016,9 +1016,9 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
     return _this;
   }
   _createClass(LEDLight, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
     }
   }, {
     key: "activate",
@@ -1065,7 +1065,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
         // console.log('Turning off LED light...');
         this.deactivate(signal);
       } else {
-        if (!this.ayCraft.powerRequired || power >= this.props.wattage) {
+        if (!this.yCraft.powerRequired || power >= this.props.wattage) {
           // console.log('Turning on LED light...');
           this.activate(signal);
         } else {
@@ -1112,7 +1112,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(LEDLight, "type", 'LEDLight');
 
-},{"../Part.js":5}],10:[function(require,module,exports){
+},{"../Part.js":4}],10:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1221,9 +1221,9 @@ var Latch = exports["default"] = /*#__PURE__*/function (_Part) {
     return _this;
   }
   _createClass(Latch, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
     }
   }, {
     key: "connect",
@@ -1272,7 +1272,7 @@ var Latch = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Latch, "type", 'Latch');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],12:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],12:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1451,7 +1451,7 @@ var MotionDetector = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(MotionDetector, "type", 'MotionDetector');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],14:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1560,7 +1560,7 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(PressureSensor, "type", 'PressureSensor');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],15:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1616,9 +1616,9 @@ var Relay = exports["default"] = /*#__PURE__*/function (_Part) {
     return _this;
   }
   _createClass(Relay, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
     }
   }, {
     key: "connect",
@@ -1689,7 +1689,7 @@ var Relay = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Relay, "type", 'Relay');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],16:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1753,11 +1753,11 @@ var Rover = /*#__PURE__*/function (_Part) {
     return _this;
   }
 
-  // Method to set AyCraft reference
+  // Method to set YCraft reference
   _createClass(Rover, [{
-    key: "setAyCraft",
-    value: function setAyCraft(ayCraft) {
-      this.ayCraft = ayCraft;
+    key: "setYCraft",
+    value: function setYCraft(yCraft) {
+      this.yCraft = yCraft;
     }
 
     // Method to activate or deactivate the Rover
@@ -1852,7 +1852,7 @@ var Rover = /*#__PURE__*/function (_Part) {
 _defineProperty(Rover, "type", 'Rover');
 var _default = exports["default"] = Rover;
 
-},{"../Part.js":5}],17:[function(require,module,exports){
+},{"../Part.js":4}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2003,7 +2003,7 @@ var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Wire, "type", 'Wire');
 
-},{"../Part.js":5,"../signals/ElectricalSignal.js":18}],18:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -60,14 +60,14 @@ var Collisions = /*#__PURE__*/function () {
             entityIdB: bodyB.myEntityId
           });
         }
-        if (entityA.ayCraft && entityA.ayCraft.part && entityA.ayCraft.part.handleCollision) {
+        if (entityA.yCraft && entityA.yCraft.part && entityA.yCraft.part.handleCollision) {
           if (entityB.type !== 'TEXT') {
-            entityA.ayCraft.part.handleCollision(entityB);
+            entityA.yCraft.part.handleCollision(entityB);
           }
         }
-        if (entityB.ayCraft && entityB.ayCraft.part && entityB.ayCraft.part.handleCollision) {
+        if (entityB.yCraft && entityB.yCraft.part && entityB.yCraft.part.handleCollision) {
           if (entityA.type !== 'TEXT') {
-            entityB.ayCraft.part.handleCollision(entityA);
+            entityB.yCraft.part.handleCollision(entityA);
           }
         }
         if (this.game.rules) {

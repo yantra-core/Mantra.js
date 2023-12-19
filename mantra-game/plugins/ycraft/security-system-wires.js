@@ -1,7 +1,7 @@
-import { AyCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from '../../../../AyCraft.js/index.js';
+import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from '../../../../YCraft.js/index.js';
 
 export default function createSecuritySystem() {
-    const ayCraftSystem = new AyCraft();
+    const yCraftSystem = new YCraft();
 
     // Initialize and position components
     const motionDetector = new MotionDetector(-150, -250, 0);
@@ -29,22 +29,22 @@ export default function createSecuritySystem() {
     actuator.connect(wireToLight);
     wireToLight.connect(securityLight);
 
-    // Add components and wires to AyCraft system
-    ayCraftSystem.addPart(motionDetector);
-    ayCraftSystem.addPart(pressureSensor);
-    ayCraftSystem.addPart(securityLight);
-    ayCraftSystem.addPart(manualOverrideButton);
-    ayCraftSystem.addPart(actuator);
-    ayCraftSystem.addPart(wireFromMotionDetector);
-    ayCraftSystem.addPart(wireFromPressureSensor);
-    ayCraftSystem.addPart(wireFromButton);
-    ayCraftSystem.addPart(wireToLight);
+    // Add components and wires to YCraft system
+    yCraftSystem.addPart(motionDetector);
+    yCraftSystem.addPart(pressureSensor);
+    yCraftSystem.addPart(securityLight);
+    yCraftSystem.addPart(manualOverrideButton);
+    yCraftSystem.addPart(actuator);
+    yCraftSystem.addPart(wireFromMotionDetector);
+    yCraftSystem.addPart(wireFromPressureSensor);
+    yCraftSystem.addPart(wireFromButton);
+    yCraftSystem.addPart(wireToLight);
 
     // Simulate interactions
     // motionDetector.detectMotion(); // Simulate motion detection
 
     // Logging the system state
-    console.log(ayCraftSystem);
+    console.log(yCraftSystem);
 
-    return ayCraftSystem;
+    return yCraftSystem;
 }

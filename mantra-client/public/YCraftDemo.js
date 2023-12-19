@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
       scriptRoot: './'
     }
   });
-  game.use('AyCraft');
+  game.use('YCraft');
 
   game.start(function(){
     game.use('Editor');

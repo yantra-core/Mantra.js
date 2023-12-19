@@ -405,7 +405,7 @@ var Inspector = /*#__PURE__*/function () {
       // TODO: add a check if any values have a .toJSON() method
       // if so, assume it's a custom serialization method we can call on circular data
       if (key === 'part' || key === 'contraption') {
-        value = '[AyCraft Object]';
+        value = '[YCraft Object]';
       }
       if (_typeof(value) === 'object' && value !== null) {
         var subTable = document.createElement('table');

@@ -1,5 +1,7 @@
+// import { YCraft as YCraftActual } from '../../../../YCraft.js/index.js';
+import { YCraft as YCraftActual } from 'ycraft';
+
 import Plugin from '../../Plugin.js';
-import { AyCraft as AyCraftActual } from '../../../../AyCraft.js/index.js';
 
 import createEntityFromPart from './lib/createEntityFromPart.js';
 import partEventListeners from './lib/bindPartEvents.js';
@@ -16,17 +18,17 @@ import bindRelay from './lib/events/bindRelay.js';
 import bindPressureSensor from './lib/events/bindPressureSensor.js';
 import bindRover from './lib/events/bindRover.js';
 
-import securitySystemWithWires from './security-system-wires.js';
-import testContraption from './security-system.js';
-import testLight from './button-wire-light.js';
-import roverLight from './rover-light.js';
+// import securitySystemWithWires from './security-system-wires.js';
+// import testContraption from './security-system.js';
+// import testLight from './button-wire-light.js';
+// import roverLight from './rover-light.js';
 
 // handles input controller events and relays them to the game logic
-class AyCraft extends Plugin {
-  static id = 'aycraft';
+class YCraft extends Plugin {
+  static id = 'ycraft';
   constructor({ contraption = null, contraptions = null, useDefaultContraption = false } = {}) {
     super();
-    this.id = AyCraft.id;
+    this.id = YCraft.id;
     this.contraption = contraption;
     this.contraptions = contraptions;
 
@@ -54,7 +56,7 @@ class AyCraft extends Plugin {
 
     // add the system to the systems manager
     this.game.systemsManager.addSystem(this.id, this);
-    console.log('AyCraft.init()', AyCraftActual);
+    console.log('YCraft.init()', YCraftActual);
     if (self.contraption) {
       self.initContraption(self.contraption);
       if (self.contraption.start) {
@@ -67,7 +69,7 @@ class AyCraft extends Plugin {
     } else {
       // TODO: add config option for default contraption if none is specified at construction
       if (self.useDefaultContraption) {
-        self.initContraption(roverLight());
+        // self.initContraption(roverLight());
       }
     }
   }
@@ -114,7 +116,7 @@ class AyCraft extends Plugin {
       if (ent.type === 'PART') {
 
         // get the part and call .offFn if it exists
-        let part = ent.ayCraft.part;
+        let part = ent.yCraft.part;
         if (part.unload) {
           console.log('calling part.unload', part.name)
           part.unload();
@@ -130,7 +132,7 @@ class AyCraft extends Plugin {
 
   // TODO: add support for multiple contraptions
   setContraption(contraption) {
-    console.log("Mantra.AyCraft Plugin - Setting Contraption", contraption)
+    console.log("Mantra.YCraft Plugin - Setting Contraption", contraption)
     this.contraption = contraption;
     this.initContraption(contraption);
   }
@@ -150,44 +152,44 @@ class AyCraft extends Plugin {
         return;
       }
 
-      if (entityA.ayCraft) {
+      if (entityA.yCraft) {
         // trigger the part if possible
-        // console.log('entityA.ayCraft', entityA.ayCraft)
+        // console.log('entityA.yCraft', entityA.yCraft)
 
     
-          if (entityA.ayCraft.part.trigger) {
-            entityA.ayCraft.part.trigger();
+          if (entityA.yCraft.part.trigger) {
+            entityA.yCraft.part.trigger();
           }
-          if (entityA.ayCraft.part.press) {
-            entityA.ayCraft.part.press();
+          if (entityA.yCraft.part.press) {
+            entityA.yCraft.part.press();
           }
-          if (entityA.ayCraft.part.detectMotion) {
-            entityA.ayCraft.part.detectMotion();
+          if (entityA.yCraft.part.detectMotion) {
+            entityA.yCraft.part.detectMotion();
           }
 
-          if (entityA.ayCraft.part.toggle) {
-            entityA.ayCraft.part.toggle();
+          if (entityA.yCraft.part.toggle) {
+            entityA.yCraft.part.toggle();
           }
 
         }
 
-      if (entityB.ayCraft) {
+      if (entityB.yCraft) {
 
 
           // trigger the part if possible
-          // console.log('entityB.ayCraft', entityB.ayCraft)
-          if (entityB.ayCraft.part.trigger) {
-            entityB.ayCraft.part.trigger();
+          // console.log('entityB.yCraft', entityB.yCraft)
+          if (entityB.yCraft.part.trigger) {
+            entityB.yCraft.part.trigger();
           }
-          if (entityB.ayCraft.part.press) {
-            entityB.ayCraft.part.press();
+          if (entityB.yCraft.part.press) {
+            entityB.yCraft.part.press();
           }
-          if (entityB.ayCraft.part.detectMotion) {
-            entityB.ayCraft.part.detectMotion();
+          if (entityB.yCraft.part.detectMotion) {
+            entityB.yCraft.part.detectMotion();
           }
 
-          if (entityB.ayCraft.part.toggle) {
-            entityB.ayCraft.part.toggle();
+          if (entityB.yCraft.part.toggle) {
+            entityB.yCraft.part.toggle();
           }
 
 
@@ -206,4 +208,4 @@ class AyCraft extends Plugin {
 
 }
 
-export default AyCraft;
+export default YCraft;

@@ -43,12 +43,12 @@ export default function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      let partName = ent.ayCraft.part.name;
-      let partType = ent.ayCraft.part.type;
-      let part = ent.ayCraft.part;
+      let partName = ent.yCraft.part.name;
+      let partType = ent.yCraft.part.type;
+      let part = ent.yCraft.part;
       if (partType === 'MotionDetector') {
         // console.log('MotionDetector', part);
-        ent.ayCraft.part.onFn();
+        ent.yCraft.part.onFn();
       }
     });
 
@@ -61,15 +61,15 @@ export default function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      let partName = ent.ayCraft.part.name;
-      let partType = ent.ayCraft.part.type;
-      let part = ent.ayCraft.part;
+      let partName = ent.yCraft.part.name;
+      let partType = ent.yCraft.part.type;
+      let part = ent.yCraft.part;
       if (partType === 'Button') {
-        ent.ayCraft.part.press();
+        ent.yCraft.part.press();
       }
       // LEDLight, Latch, Amplifier, etc
-      if (ent && ent.ayCraft && ent.ayCraft.part.toggle) {
-        ent.ayCraft.part.toggle();
+      if (ent && ent.yCraft && ent.yCraft.part.toggle) {
+        ent.yCraft.part.toggle();
       }
     });
     entityElement.addEventListener('pointerup', (ev) => {
@@ -77,11 +77,11 @@ export default function inflateBox(entityElement, entityData) {
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
-      let partName = ent.ayCraft.part.name;
-      let partType = ent.ayCraft.part.type;
+      let partName = ent.yCraft.part.name;
+      let partType = ent.yCraft.part.type;
       if (partType === 'Button') {
-        if (ent && ent.ayCraft && ent.ayCraft.part.release) {
-          ent.ayCraft.part.release();
+        if (ent && ent.yCraft && ent.yCraft.part.release) {
+          ent.yCraft.part.release();
         }
       }
     });

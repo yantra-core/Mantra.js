@@ -1,7 +1,7 @@
-import { AyCraft, Button, LEDLight, Wire, Rover } from '../../../../AyCraft.js/index.js';
+import { YCraft, Button, LEDLight, Wire, Rover } from '../../../../YCraft.js/index.js';
 
 export default function buttonLight() {
-  let ayCraftSystem = new AyCraft({
+  let yCraftSystem = new YCraft({
     powerRequired: false
   });
 
@@ -36,18 +36,18 @@ export default function buttonLight() {
   //wire2.connect(ledLight2);
   wire2.connect(ledLight3);
 
-  // Add parts to AyCraft system
-  ayCraftSystem.addPart(button);
-  ayCraftSystem.addPart(button2);
-  ayCraftSystem.addPart(wire1);
-  ayCraftSystem.addPart(wire2);
-  ayCraftSystem.addPart(ledLight1);
-  ayCraftSystem.addPart(ledLight2);
-  ayCraftSystem.addPart(ledLight3);
-  ayCraftSystem.addPart(redRover);
+  // Add parts to YCraft system
+  yCraftSystem.addPart(button);
+  yCraftSystem.addPart(button2);
+  yCraftSystem.addPart(wire1);
+  yCraftSystem.addPart(wire2);
+  yCraftSystem.addPart(ledLight1);
+  yCraftSystem.addPart(ledLight2);
+  yCraftSystem.addPart(ledLight3);
+  yCraftSystem.addPart(redRover);
 
   // Start moving the Rover
   redRover.startMoving();
 
-  return ayCraftSystem;
+  return yCraftSystem;
 }

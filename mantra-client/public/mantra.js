@@ -456,7 +456,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.lockedProperties = new _Component["default"]('lockedProperties', this);
     this.components.actionRateLimiter = new _ActionRateLimiter["default"]('actionRateLimiter', this);
     this.components.timers = new _TimersComponent["default"]('timers', this);
-    this.components.ayCraft = new _Component["default"]('ayCraft', this);
+    this.components.yCraft = new _Component["default"]('yCraft', this);
     this.components.text = new _Component["default"]('text', this);
 
     // Systems Manager
