@@ -15,7 +15,7 @@ class BabylonGraphics extends GraphicsInterface {
   static removable = false;
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  constructor({ camera = {}}) {
+  constructor({ camera = {} }) {
     super();
     this.id = BabylonGraphics.id;
     this.async = BabylonGraphics.async;
@@ -32,7 +32,7 @@ class BabylonGraphics extends GraphicsInterface {
     if (typeof camera.startingZoom !== 'number') {
       camera.startingZoom = 0.4;
     }
-    
+
     if (typeof camera.follow === 'undefined') {
       camera.follow = true;
     }
@@ -243,7 +243,8 @@ class BabylonGraphics extends GraphicsInterface {
       // TODO: put in switch here for dimensions
       switch (this.game.physics.dimension) {
         case 2:
-          graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+          // graphic.rotation.y = entityData.rotation + -Math.PI / 2;
+          graphic.rotation = new BABYLON.Vector3(0, entityData.rotation, 0);
           break;
         case 3:
           if (typeof entityData.rotation !== 'object') {
@@ -427,12 +428,71 @@ class BabylonGraphics extends GraphicsInterface {
     let sphere = BABYLON.MeshBuilder.CreateSphere('bullet', { diameter: entityData.radius * 2 }, this.scene);
     return sphere;
   }
-
   createBox(entityData) {
+    let game = this.game;
     let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.depth, depth: entityData.height }, this.scene);
+
+    // Add rotation if present
     if (entityData.rotation) {
-      box.rotation.y = entityData.rotation;
+      // Set rotation as needed
     }
+
+    // Ensure the box is actionable
+    box.isPickable = true;
+
+    // Create an action manager for the box
+    box.actionManager = new BABYLON.ActionManager(this.scene);
+
+    // Pointer over event
+    box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, () => {
+      // console.log('pointerover', entityData.id, entityData.type, entityData);
+      this.scene.getEngine().getRenderingCanvas().style.cursor = 'pointer';
+    }));
+
+    // Pointer out event
+    box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, () => {
+      // console.log('pointerout', entityData.id, entityData.type, entityData)
+      this.scene.getEngine().getRenderingCanvas().style.cursor = 'default';
+      // Additional logic if needed
+      // Get the full entity from the game and delegate based on part type
+      let ent = game.getEntity(entityData.id);
+      if (ent && ent.realStone && ent.realStone.part) {
+        let partType = ent.realStone.part.type;
+        if (partType === 'MotionDetector') {
+          ent.realStone.part.onFn();
+        }
+      }
+    }));
+
+    // Pointer down event
+    box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, () => {
+      // console.log('pointerdown', entityData.id, entityData.type, entityData);
+      let ent = game.getEntity(entityData.id);
+      if (ent && ent.realStone && ent.realStone.part) {
+        let partType = ent.realStone.part.type;
+        if (partType === 'Button') {
+          ent.realStone.part.press();
+        }
+        if (ent.realStone.part.toggle) {
+          ent.realStone.part.toggle();
+        }
+      }
+      // Logic for pointer down
+    }));
+
+    // Pointer up event
+    box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, () => {
+      // Logic for pointer up
+      // console.log('pointerup', entityData.id, entityData.type, entityData)
+      let ent = game.getEntity(entityData.id);
+      if (ent && ent.realStone && ent.realStone.part) {
+        let partType = ent.realStone.part.type;
+        if (partType === 'Button' && ent.realStone.part.release) {
+          ent.realStone.part.release();
+        }
+      }
+    }));
+
     return box;
   }
 
@@ -509,7 +569,7 @@ class BabylonGraphics extends GraphicsInterface {
 
   inflate(snapshot) { } // not used?
 
-  unload () {
+  unload() {
 
     // TODO: consolidate graphics pipeline unloading into SystemsManager
     // TODO: remove duplicated unload() code in PhaserGraphics

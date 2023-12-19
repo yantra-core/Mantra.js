@@ -50,6 +50,14 @@ class Editor {
     const $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
     const $graphicsSelector = new GraphicsSelector(this.game);
 
+    // set css styles for $graphicsSelector
+    $graphicsSelector.selectBox.style.position = 'absolute';
+    $graphicsSelector.selectBox.style.right = '150px';
+    $graphicsSelector.selectBox.style.top = '0px';
+    $graphicsSelector.selectBox.style.fontSize = '22px';
+    // cursor pointer
+    $graphicsSelector.selectBox.style.cursor = 'pointer';
+
     const $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
     // const $aboutMenu = this.createMenu('About');
     // TODO: add optional xstate menu for editing / viewing state machines

@@ -13,7 +13,7 @@ const pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 52.48
+    "size": 54.137
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -29,7 +29,7 @@ const pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 20.186
+    "size": 20.845
   },
   "Client": {
     "path": "./plugins/client/Client.js",
@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 40.068
+    "size": 40.209
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -65,7 +65,7 @@ const pluginsList = {
   },
   "Graphics": {
     "path": "./plugins/graphics/Graphics.js",
-    "size": 5.7
+    "size": 6.371
   },
   "Health": {
     "path": "./plugins/health/Health.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.334
+    "size": 23.337
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -141,7 +141,7 @@ const pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 34.408
+    "size": 36.583
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

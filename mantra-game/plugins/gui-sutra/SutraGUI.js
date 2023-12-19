@@ -576,7 +576,6 @@ class SutraGUI {
     textarea.style.height = textarea.scrollHeight + 'px'; // Set new height
   }
 
-
 }
 
 export default SutraGUI;
