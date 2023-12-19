@@ -31,7 +31,7 @@ class RealStone extends Plugin {
     this.contraptions = contraptions;
 
     this.createEntityFromPart = createEntityFromPart.bind(this);
-    
+
     this.bindWire = bindWire.bind(this);
     this.createWire = createWire.bind(this);
 
@@ -44,7 +44,7 @@ class RealStone extends Plugin {
     this.bindRelay = bindRelay.bind(this);
     this.bindPressureSensor = bindPressureSensor.bind(this);
     this.bindRover = bindRover.bind(this);
-    
+
     this.partEventListeners = partEventListeners.bind(this);
   }
 
@@ -56,13 +56,13 @@ class RealStone extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
     console.log('RealStone.init()', RealStoneActual);
     if (self.contraption) {
-
+      self.initContraption(self.contraption);
       if (self.contraption.start) {
-        self.initContraption.call(self.contraption);
-
-      } else {
-        self.initContraption.start();
+        // self.contraption.start();
       }
+
+      /*
+      */
 
     } else {
       // TODO: add config option for default contraption if none is specified at construction
@@ -75,7 +75,7 @@ class RealStone extends Plugin {
   initContraption(contraption) {
 
     if (contraption.start) {
-      contraption.start();
+      // contraption.start();
     }
 
     //console.log('contraption', contraption);
@@ -87,6 +87,7 @@ class RealStone extends Plugin {
     if (contraption.parts.length > 0) {
       // iterate through each part and create a corresponding entity
       contraption.parts.forEach(part => {
+        console.log("GGGGG", part)
         // bind any potential event listners for the part, based on the type of part
         this.partEventListeners(part, contraption);
         let ent = this.createEntityFromPart(part, contraption);
@@ -111,12 +112,19 @@ class RealStone extends Plugin {
   clearAllParts() {
     this.game.entities.forEach(ent => {
       if (ent.type === 'PART') {
+
+        // get the part and call .offFn if it exists
+        let part = ent.realStone.part;
+        if (part.unload) {
+          console.log('calling part.unload', part.name)
+          part.unload();
+        }
+
         this.game.removeEntity(ent.id);
       }
       if (ent.type === 'TEXT') { // for now
         this.game.removeEntity(ent.id);
       }
-
     });
   }
 
@@ -145,29 +153,46 @@ class RealStone extends Plugin {
       if (entityA.realStone) {
         // trigger the part if possible
         // console.log('entityA.realStone', entityA.realStone)
-        if (entityA.realStone.part.trigger) {
-          entityA.realStone.part.trigger();
+
+    
+          if (entityA.realStone.part.trigger) {
+            entityA.realStone.part.trigger();
+          }
+          if (entityA.realStone.part.press) {
+            entityA.realStone.part.press();
+          }
+          if (entityA.realStone.part.detectMotion) {
+            entityA.realStone.part.detectMotion();
+          }
+
+          if (entityA.realStone.part.toggle) {
+            entityA.realStone.part.toggle();
+          }
+
+
+
         }
-        if (entityA.realStone.part.press) {
-          entityA.realStone.part.press();
-        }
-        if (entityA.realStone.part.detectMotion) {
-          entityA.realStone.part.detectMotion();
-        }
-      }
 
       if (entityB.realStone) {
-        // trigger the part if possible
-        // console.log('entityB.realStone', entityB.realStone)
-        if (entityB.realStone.part.trigger) {
-          entityB.realStone.part.trigger();
-        }
-        if (entityB.realStone.part.press) {
-          entityB.realStone.part.press();
-        }
-        if (entityB.realStone.part.detectMotion) {
-          entityB.realStone.part.detectMotion();
-        }
+
+
+          // trigger the part if possible
+          // console.log('entityB.realStone', entityB.realStone)
+          if (entityB.realStone.part.trigger) {
+            entityB.realStone.part.trigger();
+          }
+          if (entityB.realStone.part.press) {
+            entityB.realStone.part.press();
+          }
+          if (entityB.realStone.part.detectMotion) {
+            entityB.realStone.part.detectMotion();
+          }
+
+          if (entityB.realStone.part.toggle) {
+            entityB.realStone.part.toggle();
+          }
+
+
       }
 
     }

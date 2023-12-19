@@ -306,17 +306,15 @@
 
       let contraptionName = 'button-relay-light';
       contraptionName = 'rover-light';
-      contraptionName = 'all-examples-composite';
+      // contraptionName = 'all-examples-composite';
       // Could auto-load a contraption at start
       // for now, we will load allExamples from memory
-      // await getContraption(contraptionName);
+      await getContraption(contraptionName);
 
-  // Set the contraption to the RealStone system
-    let allExamples = RS.allExamples();
-    game.systems.realstone.setContraption(allExamples);
+      // Set the contraption to the RealStone system
+      //let allExamples = RS.allExamples();
+      //game.systems.realstone.setContraption(allExamples);
 
-
-      
 
       // getContraption('button-actuator-light');
       //getContraption('button-amplify-wire-light');

@@ -3,7 +3,6 @@ export default function bindLatchEvents (part, contraption) {
   part.on('trigger', () => {
     // set the tint of the entity to yellow
     // console.log('PressureSensor on', part);
-    alert('OK')
     game.updateEntity({ id: part.entityId, color: 0xffff00 });
   });
   part.on('release', () => {

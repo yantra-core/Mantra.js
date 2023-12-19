@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     
 
   });
-  game.use('Bullet');
+  // game.use('Bullet');
   window.game = game;
 
   /*
