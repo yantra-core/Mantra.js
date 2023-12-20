@@ -10,5 +10,4 @@ export default function bindLatchEvents (part, contraption) {
     // console.log('MotionDetector off', part);
     game.updateEntity({ id: part.entityId, color: 0xffffff });
   });
-
 }

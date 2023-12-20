@@ -12,7 +12,7 @@ export default function bindWireEvents (part, contraption) {
   });
   part.on('stopTransmit', () => {
     // set the tint of the entity to yellow
-    console.log('Wire stopTransmit', part);
+    // console.log('Wire stopTransmit', part);
     if (Array.isArray(part.entities)) {
       part.entities.forEach(entityId => {
         game.updateEntity({ id: entityId, color: 0xffffff });

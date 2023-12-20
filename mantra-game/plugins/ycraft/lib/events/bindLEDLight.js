@@ -3,7 +3,7 @@ export default function bindLEDLightEvents (part, contraption) {
 
   part.onAny((event, data) => {
     // we can see on and off events here
-    console.log(`LEDLight "${event}" "${data}"`);
+    // console.log(`LEDLight "${event}" "${data}"`);
   });
 
   part.on('activate', () => {

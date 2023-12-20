@@ -77,6 +77,7 @@ import EntityEditor from './plugins/gui-entity-editor/EntityEditor.js';
 import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
 import SutraGUI from './plugins/gui-sutra/SutraGUI.js';
 import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
+import YCraftGUI from './plugins/gui-ycraft/YCraftGUI.js';
 import PluginExplorer from './plugins/gui-plugin-explorer/PluginExplorer.js';
 import Scoreboard from './plugins/gui-scoreboard/Scoreboard.js';
 
@@ -132,6 +133,7 @@ const plugins = {
   PluginsGUI,
   Scoreboard,
   SutraGUI,
+  YCraftGUI,
   YantraGUI,
   MatterPhysics,
   PhysXPhysics,

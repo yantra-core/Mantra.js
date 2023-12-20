@@ -29,7 +29,8 @@ class YCraft extends Plugin {
   constructor({ contraption = null, contraptions = null, useDefaultContraption = false } = {}) {
     super();
     this.id = YCraft.id;
-    this.contraption = contraption;
+    this.contraption = contraption();
+    this.contraptionSource = contraption.toString();
     this.contraptions = contraptions;
 
     this.createEntityFromPart = createEntityFromPart.bind(this);
@@ -53,6 +54,25 @@ class YCraft extends Plugin {
   init(game) {
     let self = this
     this.game = game;
+    this.game.contraption = this.contraption;
+
+    document.addEventListener('click', function (e) {
+      // check to see if we are inside an input, textarea, button or submit
+      // if so, disable inputs controls
+      let target = e.target;
+      let tagName = target.tagName.toLowerCase();
+      let type = target.type;
+     // if (tagName === 'input' || tagName === 'textarea' || tagName === 'button' || tagName === 'submit') {
+     // TODO: move this to graphics plugin init?
+     if (tagName === 'div') {
+        game.systems['entity-input'].disableInputs();
+        game.systems['keyboard'].unbindAllEvents();
+      } else {
+        game.systems['entity-input'].setInputsActive();
+        game.systems['keyboard'].bindInputControls();
+      }
+    });
+
 
     // add the system to the systems manager
     this.game.systemsManager.addSystem(this.id, this);
@@ -72,6 +92,7 @@ class YCraft extends Plugin {
         // self.initContraption(roverLight());
       }
     }
+
   }
 
   initContraption(contraption) {
@@ -89,7 +110,6 @@ class YCraft extends Plugin {
     if (contraption.parts.length > 0) {
       // iterate through each part and create a corresponding entity
       contraption.parts.forEach(part => {
-        console.log("GGGGG", part)
         // bind any potential event listners for the part, based on the type of part
         this.partEventListeners(part, contraption);
         let ent = this.createEntityFromPart(part, contraption);
@@ -134,6 +154,8 @@ class YCraft extends Plugin {
   setContraption(contraption) {
     console.log("Mantra.YCraft Plugin - Setting Contraption", contraption)
     this.contraption = contraption;
+    // for now, could be better scoped as array of contraptions
+    this.game.contraption = contraption;
     this.initContraption(contraption);
   }
 

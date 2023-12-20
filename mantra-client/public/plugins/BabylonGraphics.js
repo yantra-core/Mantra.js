@@ -390,7 +390,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "createGraphic",
     value: function createGraphic(entityData) {
-      console.log('Babylon.createGraphic', entityData);
+      // console.log('Babylon.createGraphic', entityData)
       // throw new Error('line')
       // switch case based on entityData.type
       var graphic;
@@ -425,7 +425,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       }
 
       if (this.game.physics.dimension === 2) {
-        console.log("SETTING POSITION", entityData.name, entityData.type, entityData.position.x, entityData.position.y);
         if (typeof entityData.position.z === 'undefined') {
           entityData.position.z = 1;
         }

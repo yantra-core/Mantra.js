@@ -654,7 +654,7 @@ pre {
 }
 
 .gui-content textarea {
-  width: 97%;
+  width: 100%;
   height: 200px;
   background-color: #1c2535;
   border: none;
@@ -1496,96 +1496,60 @@ button[type="submit"]:disabled {
   padding-left: 20px;
 }
 
+#contraption-interface {
+  background-color: #fff;
+  padding: 20px;
+  /* border-radius: 8px; */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* margin-bottom: 20px; */
 
-@keyframes move-twink-back {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: -10000px 5000px;
-  }
 }
 
-@-webkit-keyframes move-twink-back {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: -10000px 5000px;
-  }
+#contraption-interface select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #0056b3;
 }
 
-@-moz-keyframes move-twink-back {
-  from {
-    background-position: 0 0;
-  }
 
-  to {
-    background-position: -10000px 5000px;
-  }
+#save-contraption-form {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-@-ms-keyframes move-twink-back {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: -10000px 5000px;
-  }
+#display-contraption {
+  text-align: center;
+  font-size: 22px;
+  color: black;
 }
 
-@keyframes move-clouds-back {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: 10000px 0;
-  }
+#run-contraption-form {
+  display: none;
 }
 
-@-webkit-keyframes move-clouds-back {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: 10000px 0;
-  }
+#save-contraption-form label {
+  font-weight: bold;
 }
 
-@-moz-keyframes move-clouds-back {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: 10000px 0;
-  }
+#save-contraption-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-@-ms-keyframes move-clouds-back {
-  from {
-    background-position: 0;
-  }
-
-  to {
-    background-position: 10000px 0;
-  }
+#save-contraption-form button {
+  padding: 10px 15px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.stars,
-.twinkling,
-.clouds {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+#save-contraption-form button:hover {
+  background-color: #003d82;
 }
