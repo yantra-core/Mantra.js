@@ -16,7 +16,10 @@
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: ['phaser', 'babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
-        camera: 'follow',
+        camera: {
+          follow: true,
+          startingZoom: 0.3,
+        },
         options: {
           scriptRoot: '../../'
         }
@@ -35,11 +38,14 @@
       // Adds a nice StarField background
       game.use('StarField');
 
-
       game.use('CurrentFPS');
+
+      game.use('ControlsGUI');
+
       game.use('Editor', {
-        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/renderplex.html'
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-phaser.html'
       });
+
 
       // custom player::joined handler, this is optional
       // without setting a custom player::joined, the default event will be used

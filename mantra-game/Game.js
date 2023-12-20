@@ -50,10 +50,7 @@ class Game {
     physics = 'matter',
     graphics = ['babylon'],
     collisions = true,
-    camera = {
-      type = 'follow',
-      startingZoom = 1
-    } = {},
+    camera = {},
     keyboard = true,
     mouse = true,
     gamepad = true,
@@ -64,7 +61,6 @@ class Game {
     deltaCompression = false,
     deltaEncoding = true,
     options = {} } = {}) {
-
     if (isServer) {
       // override default
       isClient = false;
@@ -91,7 +87,8 @@ class Game {
       msgpack,
       deltaCompression,
       deltaEncoding,
-      options
+      options,
+      multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
 
     this.config = config;
@@ -257,7 +254,27 @@ class Game {
       }, 4);
       return
     } else {
+
+      // Remark: If multiple graphics plugins are used, default behavior is to,
+      //         horizontally stack the graphics plugins so they all fit on the screen
+      if (game.config.multiplexGraphicsHorizontally) {
+        // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
+        let totalCount = game.graphics.length;
+        let newWidth = 100 / totalCount;
+        // find each canvas in the #gameHolder and apply the new width
+        if (totalCount > 1) {
+          if (document && document.querySelectorAll) {
+            let canvasList = document.querySelectorAll('#gameHolder canvas');
+            for (let i = 0; i < canvasList.length; i++) {
+              // console.log('setting new width for', canvasList[i], 'to', newWidth + '%')
+              canvasList[i].style.width = newWidth + '%';
+            }
+          }
+        }
+      }
+
       console.log('All Plugins are ready! Starting Mantra Game Client...');
+
       if (game.systems.client) {
         let client = this.getSystem('client');
         client.start(cb);

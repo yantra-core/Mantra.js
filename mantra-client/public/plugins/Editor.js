@@ -434,6 +434,16 @@ var GraphicsSelector = /*#__PURE__*/function () {
           });
           _this2.hideLoadingSpinner();
         });
+      } else {
+        // check to see if we already have multiple graphics plugins loaded
+        // if so, assume multiplex and remove all the others except this one
+        if (this.game.graphics.length > 1) {
+          this.game.graphics.forEach(function (graphics) {
+            if (graphics.id !== selectGraphicsId) {
+              game.systemsManager.removeSystem(graphics.id);
+            }
+          });
+        }
       }
     }
   }, {

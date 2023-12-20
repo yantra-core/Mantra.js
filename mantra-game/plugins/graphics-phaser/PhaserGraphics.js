@@ -14,7 +14,7 @@ class PhaserGraphics extends GraphicsInterface {
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
-  constructor({ camera = {}, startingZoom = 1 } = {}) {
+  constructor({ camera = { follow = true, startingZoom = 1 } = {}}) {
     super();
     this.id = 'graphics-phaser';
     this.async = PhaserGraphics.async;
@@ -29,13 +29,16 @@ class PhaserGraphics extends GraphicsInterface {
     // alert(camera.follow)
 
     let config = {
-      camera,
-      startingZoom
+      camera
     };
+
+    if (typeof config.camera.startingZoom === 'undefined') {
+      config.camera.startingZoom = 1;
+    }
+
     // config scope for convenience
     this.config = config;
 
-    this.startingZoom = startingZoom;
     this.scenesReady = false;
     this.scene = null;
     this.inflateGraphic = inflateGraphic.bind(this);
@@ -50,7 +53,7 @@ class PhaserGraphics extends GraphicsInterface {
     // check to see if Phaser scope is available, if not assume we need to inject it sequentially
     if (typeof Phaser === 'undefined') {
       console.log('Phaser is not defined, attempting to load it from vendor');
-      game.loadScripts([ '/vendor/phaser.min.js'], () => {
+      game.loadScripts(['/vendor/phaser.min.js'], () => {
         this.phaserReady(game);
       });
     } else {
@@ -65,7 +68,7 @@ class PhaserGraphics extends GraphicsInterface {
         function Main() {
           Phaser.Scene.call(this, 'Main');
         },
-      init() {},
+      init() { },
       create() {
         this.cameras.main.setBackgroundColor('#000000');
       },
@@ -112,8 +115,7 @@ class PhaserGraphics extends GraphicsInterface {
 
       // async:true plugins *must* self report when they are ready
       game.emit('plugin::ready::graphics-phaser', this);
-
-      camera.zoom = this.startingZoom;
+      camera.zoom = this.config.camera.startingZoom;
 
       // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
@@ -126,7 +128,7 @@ class PhaserGraphics extends GraphicsInterface {
         function Main() {
           Phaser.Scene.call(this, 'Main');
         },
-      init() {},
+      init() { },
       create() {
         this.cameras.main.setBackgroundColor('#000000');
       },
@@ -160,7 +162,7 @@ class PhaserGraphics extends GraphicsInterface {
     // TODO: camera updates here?
     // update() will be called at the games frame rate
   }
-  
+
   inflate(snapshot) {
     // console.log(snapshot)
   }
@@ -188,7 +190,7 @@ class PhaserGraphics extends GraphicsInterface {
     }
   }
 
-  unload () {
+  unload() {
 
     // TODO: consolidate graphics pipeline unloading into SystemsManager
     // TODO: remove duplicated unload() code in BabylonGraphics

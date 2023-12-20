@@ -30,7 +30,7 @@ class SystemsManager {
   removeSystem(systemId) {
     if (!this.systems.has(systemId)) {
       //throw new Error(`System with name ${systemId} does not exist!`);
-      console.log('Warning: System with name ${systemId} does not exist!')
+      console.log(`Warning: System with name ${systemId} does not exist!`)
       return;
     }
     // call the system.unload method if it exists

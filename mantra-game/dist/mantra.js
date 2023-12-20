@@ -295,7 +295,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // The Game class is the main entry point for Mantra games
 var Game = exports.Game = /*#__PURE__*/function () {
   function Game() {
-    var _ref2, _ref2$type, _ref2$startingZoom;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$isClient = _ref.isClient,
       isClient = _ref$isClient === void 0 ? true : _ref$isClient,
@@ -319,7 +318,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$collisions = _ref.collisions,
       collisions = _ref$collisions === void 0 ? true : _ref$collisions,
       _ref$camera = _ref.camera,
-      camera = _ref$camera === void 0 ? (_ref2 = {}, _ref2$type = _ref2.type, type = _ref2$type === void 0 ? 'follow' : _ref2$type, _ref2$startingZoom = _ref2.startingZoom, startingZoom = _ref2$startingZoom === void 0 ? 1 : _ref2$startingZoom, _ref2) : _ref$camera,
+      camera = _ref$camera === void 0 ? {} : _ref$camera,
       _ref$keyboard = _ref.keyboard,
       keyboard = _ref$keyboard === void 0 ? true : _ref$keyboard,
       _ref$mouse = _ref.mouse,
@@ -365,8 +364,10 @@ var Game = exports.Game = /*#__PURE__*/function () {
       msgpack: msgpack,
       deltaCompression: deltaCompression,
       deltaEncoding: deltaEncoding,
-      options: options
+      options: options,
+      multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
+
     this.config = config;
     this.data = {
       width: config.width,
@@ -525,6 +526,23 @@ var Game = exports.Game = /*#__PURE__*/function () {
         }, 4);
         return;
       } else {
+        // Remark: If multiple graphics plugins are used, default behavior is to,
+        //         horizontally stack the graphics plugins so they all fit on the screen
+        if (game.config.multiplexGraphicsHorizontally) {
+          // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
+          var totalCount = game.graphics.length;
+          var newWidth = 100 / totalCount;
+          // find each canvas in the #gameHolder and apply the new width
+          if (totalCount > 1) {
+            if (document && document.querySelectorAll) {
+              var canvasList = document.querySelectorAll('#gameHolder canvas');
+              for (var i = 0; i < canvasList.length; i++) {
+                // console.log('setting new width for', canvasList[i], 'to', newWidth + '%')
+                canvasList[i].style.width = newWidth + '%';
+              }
+            }
+          }
+        }
         console.log('All Plugins are ready! Starting Mantra Game Client...');
         if (game.systems.client) {
           var client = this.getSystem('client');
@@ -849,7 +867,7 @@ var SystemsManager = /*#__PURE__*/function () {
     value: function removeSystem(systemId) {
       if (!this.systems.has(systemId)) {
         //throw new Error(`System with name ${systemId} does not exist!`);
-        console.log('Warning: System with name ${systemId} does not exist!');
+        console.log("Warning: System with name ".concat(systemId, " does not exist!"));
         return;
       }
       // call the system.unload method if it exists

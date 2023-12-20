@@ -339,7 +339,9 @@ class Entity {
         this.game.physics.setPosition(body, position);
       }
       if (typeof rotation !== 'undefined') {
-        this.game.physics.setRotation(body, rotation);
+        if (this.game.physics && this.game.physics.setRotation) {
+          this.game.physics.setRotation(body, rotation);
+        }
       }
     }
 

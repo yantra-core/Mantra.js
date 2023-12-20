@@ -115,10 +115,8 @@ var PhaserCamera = /*#__PURE__*/function () {
     value: function update() {
       var camera = this.scene.cameras.main;
       var player = this.game.getEntity(this.game.currentPlayerId);
-      console.log('getting player', player);
-      var graphics = this.game.components.graphics.get(this.game.currentPlayerId);
+      // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
       if (camera && player.graphics && player.graphics['graphics-phaser']) {
-        console.log('following player', player);
         camera.centerOn(player.position.x, player.position.y);
         this.followingPlayer = true; // Set the flag to true
       }
@@ -311,13 +309,11 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
-  function PhaserGraphics() {
+  function PhaserGraphics(_ref) {
+    var _ref2, _ref2$follow, _ref2$startingZoom;
     var _this;
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      _ref$camera = _ref.camera,
-      camera = _ref$camera === void 0 ? {} : _ref$camera,
-      _ref$startingZoom = _ref.startingZoom,
-      startingZoom = _ref$startingZoom === void 0 ? 1 : _ref$startingZoom;
+    var _ref$camera = _ref.camera,
+      camera = _ref$camera === void 0 ? (_ref2 = {}, _ref2$follow = _ref2.follow, follow = _ref2$follow === void 0 ? true : _ref2$follow, _ref2$startingZoom = _ref2.startingZoom, startingZoom = _ref2$startingZoom === void 0 ? 1 : _ref2$startingZoom, _ref2) : _ref$camera;
     _classCallCheck(this, PhaserGraphics);
     _this = _super.call(this);
     _this.id = 'graphics-phaser';
@@ -332,12 +328,14 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     // alert(camera.follow)
 
     var config = {
-      camera: camera,
-      startingZoom: startingZoom
+      camera: camera
     };
+    if (typeof config.camera.startingZoom === 'undefined') {
+      config.camera.startingZoom = 1;
+    }
+
     // config scope for convenience
     _this.config = config;
-    _this.startingZoom = startingZoom;
     _this.scenesReady = false;
     _this.scene = null;
     _this.inflateGraphic = _inflateGraphic["default"].bind(_assertThisInitialized(_this));
@@ -415,7 +413,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
         // async:true plugins *must* self report when they are ready
         game.emit('plugin::ready::graphics-phaser', this);
-        camera.zoom = this.startingZoom;
+        camera.zoom = this.config.camera.startingZoom;
 
         // TODO: remove this line from plugin implementations
         game.loadingPluginsCount--;

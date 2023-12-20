@@ -37,6 +37,11 @@ var ControlsGUI = /*#__PURE__*/function () {
         console.log('entity-input system not found, skipping drawTable');
         return;
       }
+
+      // check to see if controlsView already exists, if so, remove it
+      if (this.controlsView) {
+        this.controlsView.remove();
+      }
       var entityInputSystem = game.systemsManager.getSystem('entity-input');
       var controls = entityInputSystem.controlMappings;
       var table = document.createElement('table');

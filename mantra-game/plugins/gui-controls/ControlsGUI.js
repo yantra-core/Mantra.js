@@ -23,6 +23,11 @@ class ControlsGUI {
       return;
     }
 
+    // check to see if controlsView already exists, if so, remove it
+    if (this.controlsView) {
+      this.controlsView.remove();
+    }
+
     let entityInputSystem = game.systemsManager.getSystem('entity-input');
     let controls = entityInputSystem.controlMappings;
 

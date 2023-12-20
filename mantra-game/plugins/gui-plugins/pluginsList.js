@@ -13,7 +13,7 @@ const pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 57.156
+    "size": 57.154
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 40.421
+    "size": 40.503
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -77,7 +77,7 @@ const pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 17.27
+    "size": 17.417
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
@@ -105,7 +105,7 @@ const pluginsList = {
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 18.943
+    "size": 19.366
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -141,7 +141,7 @@ const pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 38.681
+    "size": 39.007
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

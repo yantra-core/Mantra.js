@@ -36,6 +36,8 @@
       game.use('StarField');
 
       game.use('CurrentFPS');
+      game.use('ControlsGUI');
+
 
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-css.html'
@@ -71,7 +73,7 @@
             y: -500
           },
         });
-        game.use('Border');
+        game.use('Border', { autoBorder: true });
       });
     });
   </script>

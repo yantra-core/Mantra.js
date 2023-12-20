@@ -16,7 +16,10 @@
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: ['phaser'], // array enum, 'babylon', 'phaser', 'css', 'three'
-        camera: 'follow',
+        camera: {
+          follow: true,
+          startingZoom: 0.3,
+        },
         options: {
           scriptRoot: '../../'
         }
@@ -36,6 +39,8 @@
       game.use('StarField');
 
       game.use('CurrentFPS');
+
+      game.use('ControlsGUI');
 
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-phaser.html'
@@ -71,7 +76,7 @@
             y: -500
           },
         });
-        game.use('Border');
+        game.use('Border', { autoBorder: true });
       });
     });
   </script>
