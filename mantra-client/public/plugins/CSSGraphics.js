@@ -157,11 +157,16 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "initCSSRenderDiv",
     value: function initCSSRenderDiv() {
+      // Ensure the gameHolder div exists
+      // Remark: This is handled by `Graphics.js`; however in async loading with no priority
+      // It is currently possible that CSSGraphics will load before Graphics does, so we need this check
       var gameHolder = document.getElementById('gameHolder');
       if (!gameHolder) {
-        console.error('gameHolder not found!');
-        return;
+        gameHolder = document.createElement('div');
+        gameHolder.id = 'gameHolder';
+        document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
       }
+
       var renderDiv = document.getElementById('css-render-div');
       if (!renderDiv) {
         renderDiv = document.createElement('div');
@@ -405,7 +410,8 @@ function inflateBox(entityElement, entityData) {
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
-  console.log('inflateBox', entityData.type, entityElement.style.zIndex);
+  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+
   if (entityData.type === 'PART') {
     if (entityData.name === 'Wire') {
       // set a low z-index for wires

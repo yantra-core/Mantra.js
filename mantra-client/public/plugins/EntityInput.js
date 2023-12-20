@@ -109,10 +109,10 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
     value: function loadDefaultStrategy() {
       console.log('Warning: No input strategies registered, using default input strategy');
       if (this.game.physics && this.game.physics.dimension === 3) {
-        console.log('game.use(new Default3DInputStrategy())');
+        //console.log('game.use(new Default3DInputStrategy())');
         this.game.use(new _Default3DInputStrategy["default"]());
       } else {
-        console.log('game.use(new DefaultInputStrategy())');
+        //console.log('game.use(new DefaultInputStrategy())');
         this.game.use(new _Default2DInputStrategy["default"]());
       }
       this.game.emit('inputStrategyRegistered', this.strategies);

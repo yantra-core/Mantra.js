@@ -28,7 +28,7 @@ export default class WebSocketClient {
       deltaCompression
     };
 
-    console.log("CLIENT CONFIG", this.config)
+    console.log("WebSocketClient is using ClientConfig", this.config)
     this.listeners = {};
     this.connected = false;
     this.pingIntervalId = null;

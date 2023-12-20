@@ -13,7 +13,7 @@ export default function loadScripts(scripts, finalCallback) {
       script.src = this.scriptRoot + scripts[index];
 
       script.onload = () => {
-        console.log(`${scripts[index]} loaded`);
+        // console.log(`${scripts[index]} loaded`);
         loadScript(index + 1); // Load the next script after the current one finishes loading
       };
 

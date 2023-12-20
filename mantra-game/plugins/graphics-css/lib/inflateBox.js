@@ -22,7 +22,7 @@ export default function inflateBox(entityElement, entityData) {
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
-  console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
 
   if (entityData.type === 'PART') {
 

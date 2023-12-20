@@ -5,13 +5,13 @@ body {
 }
 
 #controlsView {
-  top: 10%;
-  right: 20%;
+  bottom: 30px;
+  right: 30px;
   z-index: 1000;
 
-  width: 20%;
+  width: 200px;
 
-  height: 30%;
+  height: 300px;
   min-width: 260px;
   min-height: 215px;
   resize: both;
@@ -159,6 +159,7 @@ body {
   justify-content: start;
   padding: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 9001;
 }
 
 .menu {
@@ -495,11 +496,11 @@ pre {
 }
 
 #contraptionsView {
-  top: 5%;
-  left: 20px;
+  top: 70px;
+  left: 30px;
   z-index: 1000;
-  width: 30%;
-  height: 60%;
+  width: 350px;
+  height: 200px;
   resize: both;
   overflow: auto;
   position: absolute;
@@ -1508,8 +1509,14 @@ button[type="submit"]:disabled {
 }
 
 #contraption-interface {
-  background-color: #fff;
-  padding: 20px;
+  background-color: #1c2535;
+  color: #9a9cff;
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  padding-bottom: 10px;
+
   /* border-radius: 8px; */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   /* margin-bottom: 20px; */
@@ -1520,7 +1527,6 @@ button[type="submit"]:disabled {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  color: #0056b3;
 }
 
 
@@ -1533,9 +1539,8 @@ button[type="submit"]:disabled {
 }
 
 #display-contraption {
-  text-align: center;
   font-size: 22px;
-  color: black;
+  font-weight: bold;
 }
 
 #run-contraption-form {
@@ -1568,4 +1573,72 @@ button[type="submit"]:disabled {
 #loadingScreen {
   font-family: 'Courier New', Courier, monospace;
   font-size: 18px;
+  z-index: 10000;
 }
+.crt-background {
+  position: relative;
+  background: black;
+  overflow: hidden;
+}
+
+.crt-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.7);
+  filter: contrast(150%);
+  animation: pulseGlow 2s ease-in-out infinite;
+
+}
+
+.crt-scanlines {
+  z-index: 9999 !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0,
+    rgba(255, 255, 255, 1) 10px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.1;
+  pointer-events: none;
+  animation: pulseScanlines 2s ease-in-out infinite;
+}
+
+@keyframes pulseScanlines {
+  0%, 100% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.66);
+  }
+  50% {
+    box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.77);
+  }
+}
+
+/*
+
+@font-face {
+  font-family: 'Bravura';
+  src: url('vendor/Bravura.otf') format('opentype');
+}
+
+
+.char {
+  font-family: 'Bravura', sans-serif;
+}
+*/

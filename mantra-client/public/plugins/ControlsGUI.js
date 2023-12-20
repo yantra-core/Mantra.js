@@ -34,7 +34,7 @@ var ControlsGUI = /*#__PURE__*/function () {
     value: function drawTable() {
       var game = this.game;
       if (!game.systems['entity-input']) {
-        console.log('entity-input system not found, skipping drawTable');
+        // console.log('entity-input system not found, skipping drawTable');
         return;
       }
 

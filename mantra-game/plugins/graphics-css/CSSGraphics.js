@@ -61,10 +61,15 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   initCSSRenderDiv() {
-    const gameHolder = document.getElementById('gameHolder');
+
+    // Ensure the gameHolder div exists
+    // Remark: This is handled by `Graphics.js`; however in async loading with no priority
+    // It is currently possible that CSSGraphics will load before Graphics does, so we need this check
+    let gameHolder = document.getElementById('gameHolder');
     if (!gameHolder) {
-      console.error('gameHolder not found!');
-      return;
+      gameHolder = document.createElement('div');
+      gameHolder.id = 'gameHolder';
+      document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
     }
 
     let renderDiv = document.getElementById('css-render-div');

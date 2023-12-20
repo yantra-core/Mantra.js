@@ -22,7 +22,6 @@ export default class Mouse {
 
   init(game) {
     this.game = game;
-    console.log('init mouse controls');
     this.bindMouseControls();
   }
 

@@ -27,7 +27,7 @@ class YCraftGUI {
   }
 
   createContraptionViewer() {
-
+    let game = this.game;
     // check for existing contraptionsView
     let contraptionsView = document.getElementById('contraptionsView');
     if (contraptionsView) {
@@ -35,11 +35,12 @@ class YCraftGUI {
     }
 
     this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {
-      game.systemsManager.removeSystem(EntitiesGUI.id);
-      this.container.remove();
-    });
-    this.container.style.top = '100px';
-    this.container.style.left = '60px';
+      game.systemsManager.removeSystem(YCraftGUI.id);
+      let contraptionsView = document.getElementById('contraptionsView');
+      if (contraptionsView) {
+        contraptionsView.remove();
+      }
+      });
 
     // Create main container div
     var mainContainer = document.createElement('div');
@@ -167,7 +168,16 @@ class YCraftGUI {
     // Set contraption-code textarea value to fetched code
     let contraptionCode = document.getElementById('contraption-code');
     if (contraptionCode) {
-      contraptionCode.value = data.code;
+      let code = data.code;
+      // Trims whitespace from top of file
+      let lines = code.split('\n');
+      // remove the first lines of whitespace until we find no empty lines
+      // Done to clean up imported examples if they have extra whitespace at top
+      while (lines[0] === '') {
+        lines.shift();
+      }
+      code = lines.join('\n')
+      contraptionCode.value = code;
     }
 
     // Update input contraption-name with new name
@@ -194,7 +204,7 @@ class YCraftGUI {
     }
   }
 
-  setContraption (contraption, source) {
+  setContraption(contraption, source) {
     this.contraption = contraption;
     // for now, could be better scoped as array of contraptions
     // this.game.contraption = contraption;
@@ -211,7 +221,7 @@ class YCraftGUI {
     // Create a label for the select element
     const label = document.createElement('label');
     label.setAttribute('for', 'contraption-select');
-    label.textContent = 'Choose a Contraption:';
+    label.textContent = 'Contraption: ';
 
     contraptions.forEach(contraption => {
       const optionElement = document.createElement('option');

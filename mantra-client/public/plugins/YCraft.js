@@ -2162,7 +2162,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
 
       // add the system to the systems manager
       this.game.systemsManager.addSystem(this.id, this);
-      console.log('YCraft.init()', _index.YCraft);
+      // console.log('YCraft.init()', YCraftActual);
       if (self.contraption) {
         self.initContraption(self.contraption);
         if (self.contraption.start) {
@@ -2576,6 +2576,7 @@ function bindLatchEvents(part, contraption) {
   part.on('engage', function () {
     // set the tint of the entity to yellow
     //console.log('Latch on', part);
+    // game.playNote("G5", "32n");
     _this.game.updateEntity({
       id: part.entityId,
       color: 0xffff00
@@ -2584,6 +2585,7 @@ function bindLatchEvents(part, contraption) {
   part.on('disengage', function () {
     // set the tint of the entity to yellow
     //console.log('Latch off', part);
+    // game.playNote("C5", "32n");
     _this.game.updateEntity({
       id: part.entityId,
       color: 0xffffff

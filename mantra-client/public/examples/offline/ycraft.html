@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YCraft - Client Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/ycraft.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+      //let game = new MANTRA.Game({
+        //        loadDefaultPlugins: false
+      //});
+
+      let game = new MANTRA.Game({
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '../../'
+        }
+      });
+
+      game.use('YCraft');
+
+      game.start(function () {
+        game.use('Editor');
+        game.use('YCraftGUI');
+
+      });
+      // game.use('Bullet');
+      window.game = game;
+
+
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

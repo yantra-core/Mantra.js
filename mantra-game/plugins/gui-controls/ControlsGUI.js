@@ -19,7 +19,7 @@ class ControlsGUI {
     let game = this.game;
 
     if (!game.systems['entity-input']) {
-      console.log('entity-input system not found, skipping drawTable');
+      // console.log('entity-input system not found, skipping drawTable');
       return;
     }
 

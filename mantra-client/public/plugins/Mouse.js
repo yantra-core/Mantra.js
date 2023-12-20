@@ -36,7 +36,6 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      console.log('init mouse controls');
       this.bindMouseControls();
     }
   }, {

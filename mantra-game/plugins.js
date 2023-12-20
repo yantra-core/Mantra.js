@@ -43,6 +43,7 @@ import Gamepad from './plugins/gamepad/Gamepad.js';
 // Multimedia Devices
 import Midi from './plugins/midi/Midi.js';
 import MidiGUI from './plugins/gui-midi/MidiGUI.js';
+import FloatyTyper from './plugins/typer-floaty/FloatyTyper.js';
 
 // Audio
 import Tone from './plugins/tone/Tone.js';
@@ -122,6 +123,7 @@ const plugins = {
   Timers,
   Midi,
   MidiGUI,
+  FloatyTyper,
   Tone,
   Nes,
   Inspector,

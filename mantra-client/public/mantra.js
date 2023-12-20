@@ -379,6 +379,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       height: config.height,
       FPS: 60
     };
+    console.log("Mantra starting...");
 
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
@@ -387,7 +388,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     // Could be another CDN or other remote location
     // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
-      console.log("USING SCRIPT ROOT", options.scriptRoot);
+      console.log("Mantra is using the follow path as it's root:", options.scriptRoot);
       this.scriptRoot = options.scriptRoot;
     }
     console.log("new Game(".concat(JSON.stringify(config, true, 2), ")"));
@@ -631,7 +632,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         var scriptUrl = "".concat(basePath).concat(_pluginId, ".js");
         this.loadPluginScript(scriptUrl).then(function () {
           // The script is expected to call `game.use(pluginInstance)` after loading
-          console.log("Plugin ".concat(_pluginId, " loaded."));
+          console.log("Loaded: ".concat(_pluginId));
           if ((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object') {
             //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
             var pluginInstance = new PLUGINS[_pluginId]["default"](options);
@@ -679,7 +680,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "loadPluginScript",
     value: function loadPluginScript(scriptUrl) {
-      console.log('loadPluginScript', scriptUrl);
+      console.log('Loading', scriptUrl);
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
         script.src = scriptUrl;
@@ -777,7 +778,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "defaultCreatePlayer",
     value: function defaultCreatePlayer(playerConfig) {
-      console.log('creating default player');
+      // console.log('creating default player')
       return this.createEntity({
         type: 'PLAYER',
         shape: 'triangle',
@@ -789,6 +790,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
           y: 0
         }
       });
+    }
+  }, {
+    key: "playNote",
+    value: function playNote(note, duration) {
+      // console.log('Tone Plugin not loaded. Cannot play tone.');
     }
   }, {
     key: "setPlayerId",
@@ -1470,7 +1476,7 @@ function loadScripts(scripts, finalCallback) {
       script.defer = true;
       script.src = _this.scriptRoot + scripts[index];
       script.onload = function () {
-        console.log("".concat(scripts[index], " loaded"));
+        // console.log(`${scripts[index]} loaded`);
         loadScript(index + 1); // Load the next script after the current one finishes loading
       };
 
@@ -1543,15 +1549,38 @@ var LoadingScreen = /*#__PURE__*/function () {
         var timeRemaining = _this.minLoadTime - (now - _this.startTime);
         // check to see if enough this.minLoadtime has passed since this.startTime 
         // if not, set a timeout to wait until it has
+
+        self.gameReadyHandler();
         if (timeRemaining > 0) {
           setTimeout(function () {
-            self.gameReadyHandler();
+            self.unload();
           }, timeRemaining * 0.33);
         } else {
-          self.gameReadyHandler();
+          self.unload();
         }
       });
+
+      //this.animateCRT = this.animateCRT.bind(this); // Bind the function
+      // this.animateCRT();
     }
+
+    /* Remark: Replaced with CSS animation
+    animateCRT() {
+      const glowElement = document.querySelector('.crt-glow');
+      const scanlinesElement = document.querySelector('.crt-scanlines');
+    
+      // Adjust the glow intensity
+      let glowIntensity = Math.random() * 0.5 + 0.5;
+      glowElement.style.boxShadow = `inset 0 0 ${30 * glowIntensity}px rgba(0, 255, 0, ${0.7 * glowIntensity})`;
+    
+      // Adjust the scanlines opacity
+      let scanlinesOpacity = Math.random() * 0.1 + 0.05;
+      scanlinesElement.style.opacity = scanlinesOpacity;
+    
+      // Repeat this animation with a smoother transition
+      setTimeout(this.animateCRT, 1000); // Adjust the timing as needed
+    }
+    */
   }, {
     key: "gameReadyHandler",
     value: function gameReadyHandler() {
@@ -1564,9 +1593,6 @@ var LoadingScreen = /*#__PURE__*/function () {
           _this2.fastTrackLoading(plugin, remainingTime);
         }
       });
-      setTimeout(function () {
-        _this2.unload();
-      }, remainingTime);
     }
   }, {
     key: "isPluginLoaded",
@@ -1598,7 +1624,29 @@ var LoadingScreen = /*#__PURE__*/function () {
     value: function createLoadingScreen() {
       this.loadingScreen = document.createElement('div');
       this.loadingScreen.id = 'loadingScreen';
-      this.setupStyles(this.loadingScreen, {
+
+      // add class crt-background
+      this.loadingScreen.classList.add('crt-background');
+
+      // let loadingScreen = document.getElementById('loadingScreen');
+
+      // crt-background (if needed)
+      var crtBackground = document.createElement('div');
+      crtBackground.classList.add('crt-background');
+      this.loadingScreen.appendChild(crtBackground);
+
+      // crt-glow
+      var crtGlow = document.createElement('div');
+      crtGlow.classList.add('crt-glow');
+      crtBackground.appendChild(crtGlow); // Append to crtBackground if exists
+
+      // crt-scanlines
+      var crtScanlines = document.createElement('div');
+      crtScanlines.classList.add('crt-scanlines');
+      crtBackground.appendChild(crtScanlines); // Append to crtBackground if exists
+
+      this.crtBackground = crtBackground;
+      this.setupStyles(this.crtBackground, {
         position: 'fixed',
         top: '0',
         left: '0',
@@ -1639,7 +1687,7 @@ var LoadingScreen = /*#__PURE__*/function () {
       });
       headerContainer.appendChild(gameTitle);
       headerContainer.appendChild(this.pluginCounter);
-      this.loadingScreen.appendChild(headerContainer);
+      this.crtBackground.appendChild(headerContainer);
       this.createPluginLoaders();
       document.body.appendChild(this.loadingScreen);
     }
@@ -1687,7 +1735,9 @@ var LoadingScreen = /*#__PURE__*/function () {
       progressBarContainer.appendChild(progressBar);
       pluginContainer.appendChild(pluginName);
       pluginContainer.appendChild(progressBarContainer);
-      this.loadingScreen.appendChild(pluginContainer);
+      //this.loadingScreen.appendChild(pluginContainer);
+      this.crtBackground.appendChild(pluginContainer); // Append to crtBackground if exists
+
       this.pluginElements[plugin] = progressBar;
 
       // Initialize and store the loading timer for each plugin

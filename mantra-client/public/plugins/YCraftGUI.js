@@ -340,17 +340,19 @@ var YCraftGUI = /*#__PURE__*/function () {
   }, {
     key: "createContraptionViewer",
     value: function createContraptionViewer() {
+      var game = this.game;
       // check for existing contraptionsView
       var contraptionsView = document.getElementById('contraptionsView');
       if (contraptionsView) {
         contraptionsView.remove();
       }
       this.container = _gui["default"].window('contraptionsView', 'YCraft Contraption Viewer', function () {
-        game.systemsManager.removeSystem(EntitiesGUI.id);
-        this.container.remove();
+        game.systemsManager.removeSystem(YCraftGUI.id);
+        var contraptionsView = document.getElementById('contraptionsView');
+        if (contraptionsView) {
+          contraptionsView.remove();
+        }
       });
-      this.container.style.top = '100px';
-      this.container.style.left = '60px';
 
       // Create main container div
       var mainContainer = document.createElement('div');
@@ -454,7 +456,7 @@ var YCraftGUI = /*#__PURE__*/function () {
     key: "getContraption",
     value: function () {
       var _getContraption = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(contraptionId) {
-        var self, game, contraptionNameDisplay, response, data, displayContraption, contraptionCode, contraptionName, autoRunCode;
+        var self, game, contraptionNameDisplay, response, data, displayContraption, contraptionCode, code, lines, contraptionName, autoRunCode;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -484,7 +486,14 @@ var YCraftGUI = /*#__PURE__*/function () {
               // Set contraption-code textarea value to fetched code
               contraptionCode = document.getElementById('contraption-code');
               if (contraptionCode) {
-                contraptionCode.value = data.code;
+                code = data.code; // Trims whitespace from top of file
+                lines = code.split('\n'); // remove the first lines of whitespace until we find no empty lines
+                // Done to clean up imported examples if they have extra whitespace at top
+                while (lines[0] === '') {
+                  lines.shift();
+                }
+                code = lines.join('\n');
+                contraptionCode.value = code;
               }
 
               // Update input contraption-name with new name
@@ -542,7 +551,7 @@ var YCraftGUI = /*#__PURE__*/function () {
       // Create a label for the select element
       var label = document.createElement('label');
       label.setAttribute('for', 'contraption-select');
-      label.textContent = 'Choose a Contraption:';
+      label.textContent = 'Contraption: ';
       contraptions.forEach(function (contraption) {
         var optionElement = document.createElement('option');
         optionElement.value = contraption.name; // Assuming each contraption has a name

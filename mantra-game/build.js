@@ -59,6 +59,7 @@ const plugins = [
   './plugins/entity-movement/strategies/FroggerMovement.js',
   './plugins/entity-movement/strategies/PacManMovement.js',
   './plugins/gui-midi/MidiGUI.js',
+  './plugins/typer-floaty/FloatyTyper.js',
   './plugins/midi/Midi.js',
   './plugins/tone/Tone.js',
   './plugins/nes/Nes.js',

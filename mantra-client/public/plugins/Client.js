@@ -307,7 +307,7 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
       msgpack: msgpack,
       deltaCompression: deltaCompression
     };
-    console.log("CLIENT CONFIG", this.config);
+    console.log("WebSocketClient is using ClientConfig", this.config);
     this.listeners = {};
     this.connected = false;
     this.pingIntervalId = null;

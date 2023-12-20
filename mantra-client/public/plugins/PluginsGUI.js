@@ -500,11 +500,11 @@ var pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 26.398
+    "size": 26.772
   },
   "Client": {
     "path": "./plugins/client/Client.js",
-    "size": 122.057
+    "size": 122.081
   },
   "ChronoControl": {
     "path": "./plugins/chrono-control/ChronoControl.js",
@@ -524,7 +524,7 @@ var pluginsList = {
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.15
+    "size": 28.154
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
@@ -548,11 +548,11 @@ var pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 17.417
+    "size": 17.42
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 12.124
+    "size": 13.779
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
@@ -608,7 +608,7 @@ var pluginsList = {
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
-    "size": 6.198
+    "size": 6.156
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",

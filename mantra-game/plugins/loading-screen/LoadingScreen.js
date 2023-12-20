@@ -42,16 +42,45 @@ class LoadingScreen {
       let timeRemaining = this.minLoadTime - (now - this.startTime);
       // check to see if enough this.minLoadtime has passed since this.startTime 
       // if not, set a timeout to wait until it has
+
+   
+      self.gameReadyHandler();
+
       if (timeRemaining > 0) {
         setTimeout(() => {
-          self.gameReadyHandler();
+          self.unload();
         }, timeRemaining * 0.33);
       } else {
-        self.gameReadyHandler();
+        self.unload();
       }
 
     });
+
+   
+
+    //this.animateCRT = this.animateCRT.bind(this); // Bind the function
+    // this.animateCRT();
+
   }
+
+  /* Remark: Replaced with CSS animation
+  animateCRT() {
+    const glowElement = document.querySelector('.crt-glow');
+    const scanlinesElement = document.querySelector('.crt-scanlines');
+  
+    // Adjust the glow intensity
+    let glowIntensity = Math.random() * 0.5 + 0.5;
+    glowElement.style.boxShadow = `inset 0 0 ${30 * glowIntensity}px rgba(0, 255, 0, ${0.7 * glowIntensity})`;
+  
+    // Adjust the scanlines opacity
+    let scanlinesOpacity = Math.random() * 0.1 + 0.05;
+    scanlinesElement.style.opacity = scanlinesOpacity;
+  
+    // Repeat this animation with a smoother transition
+    setTimeout(this.animateCRT, 1000); // Adjust the timing as needed
+  }
+  */
+  
 
   gameReadyHandler() {
 
@@ -65,9 +94,6 @@ class LoadingScreen {
       }
     });
 
-    setTimeout(() => {
-      this.unload();
-    }, remainingTime);
   }
 
   isPluginLoaded(pluginId) {
@@ -95,9 +121,33 @@ class LoadingScreen {
   }
 
   createLoadingScreen() {
+ 
     this.loadingScreen = document.createElement('div');
     this.loadingScreen.id = 'loadingScreen';
-    this.setupStyles(this.loadingScreen, {
+   
+    // add class crt-background
+    this.loadingScreen.classList.add('crt-background');
+
+    // let loadingScreen = document.getElementById('loadingScreen');
+
+    // crt-background (if needed)
+    let crtBackground = document.createElement('div');
+    crtBackground.classList.add('crt-background');
+    this.loadingScreen.appendChild(crtBackground);
+    
+    // crt-glow
+    let crtGlow = document.createElement('div');
+    crtGlow.classList.add('crt-glow');
+    crtBackground.appendChild(crtGlow); // Append to crtBackground if exists
+    
+    // crt-scanlines
+    let crtScanlines = document.createElement('div');
+    crtScanlines.classList.add('crt-scanlines');
+    crtBackground.appendChild(crtScanlines); // Append to crtBackground if exists
+    
+    this.crtBackground = crtBackground;
+
+    this.setupStyles(this.crtBackground, {
       position: 'fixed',
       top: '0',
       left: '0',
@@ -141,7 +191,7 @@ class LoadingScreen {
 
     headerContainer.appendChild(gameTitle);
     headerContainer.appendChild(this.pluginCounter);
-    this.loadingScreen.appendChild(headerContainer);
+    this.crtBackground.appendChild(headerContainer);
 
 
 
@@ -189,7 +239,8 @@ class LoadingScreen {
     progressBarContainer.appendChild(progressBar);
     pluginContainer.appendChild(pluginName);
     pluginContainer.appendChild(progressBarContainer);
-    this.loadingScreen.appendChild(pluginContainer);
+    //this.loadingScreen.appendChild(pluginContainer);
+    this.crtBackground.appendChild(pluginContainer); // Append to crtBackground if exists
 
     this.pluginElements[plugin] = progressBar;
 

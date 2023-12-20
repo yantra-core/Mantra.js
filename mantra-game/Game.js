@@ -102,6 +102,8 @@ class Game {
       FPS: 60
     };
 
+    console.log("Mantra starting...");
+
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
     this.scriptRoot = 'https://yantra.gg/mantra';
@@ -109,7 +111,7 @@ class Game {
     // Could be another CDN or other remote location
     // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
-      console.log("USING SCRIPT ROOT", options.scriptRoot)
+      console.log("Mantra is using the follow path as it's root:", options.scriptRoot)
       this.scriptRoot = options.scriptRoot;
     }
 
@@ -354,7 +356,7 @@ class Game {
       const scriptUrl = `${basePath}${pluginId}.js`;
       this.loadPluginScript(scriptUrl).then(function () {
         // The script is expected to call `game.use(pluginInstance)` after loading
-        console.log(`Plugin ${pluginId} loaded.`);
+        console.log(`Loaded: ${pluginId}`);
         if (typeof PLUGINS === 'object') {
           //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
           let pluginInstance = new PLUGINS[pluginId].default(options);
@@ -401,7 +403,7 @@ class Game {
 
   // Helper function to load plugin scripts
   loadPluginScript(scriptUrl) {
-    console.log('loadPluginScript', scriptUrl)
+    console.log('Loading', scriptUrl)
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = scriptUrl;
@@ -484,7 +486,7 @@ class Game {
   }
 
   defaultCreatePlayer(playerConfig) {
-    console.log('creating default player')
+    // console.log('creating default player')
     return this.createEntity({
       type: 'PLAYER',
       shape: 'triangle',
@@ -496,6 +498,10 @@ class Game {
         y: 0
       },
     });
+  }
+
+  playNote(note, duration) {
+    // console.log('Tone Plugin not loaded. Cannot play tone.');
   }
 
   setPlayerId(playerId) {
