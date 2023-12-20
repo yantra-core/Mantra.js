@@ -4,7 +4,7 @@ class LoadingScreen {
   constructor(config = {}) {
     this.id = LoadingScreen.id;
     this.plugins = [];
-    this.minLoadTime = config.minLoadTime || 3600; // Minimum time for the loading screen
+    this.minLoadTime = config.minLoadTime || 330; // Minimum time for the loading screen
     this.startTime = Date.now(); // Track the start time of the loading process
     this.loadedPluginsCount = 0;
     this.confirmedLoadedPlugins = [];

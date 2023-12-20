@@ -87,6 +87,8 @@ game.use(new plugins.ChronoControl())
 
 game.use(new plugins.Schema());
 
+game.use(new plugins.Tone());
+
 game.use(new plugins.Timers());
 
 // game.use(new plugins.LoadingScreen());

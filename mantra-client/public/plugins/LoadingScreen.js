@@ -18,7 +18,7 @@ var LoadingScreen = /*#__PURE__*/function () {
     _classCallCheck(this, LoadingScreen);
     this.id = LoadingScreen.id;
     this.plugins = [];
-    this.minLoadTime = 3600; // Minimum time for the loading screen
+    this.minLoadTime = config.minLoadTime || 330; // Minimum time for the loading screen
     this.startTime = Date.now(); // Track the start time of the loading process
     this.loadedPluginsCount = 0;
     this.confirmedLoadedPlugins = [];
@@ -29,6 +29,7 @@ var LoadingScreen = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       var _this = this;
+      var self = this;
       this.game = game;
       this.game.systemsManager.addSystem(this.id, this);
       var currentPlugins = Object.keys(this.game._plugins);
@@ -47,7 +48,17 @@ var LoadingScreen = /*#__PURE__*/function () {
         _this.markPluginAsLoaded(pluginId);
       });
       this.game.on('game::ready', function () {
-        _this.gameReadyHandler();
+        var now = Date.now();
+        var timeRemaining = _this.minLoadTime - (now - _this.startTime);
+        // check to see if enough this.minLoadtime has passed since this.startTime 
+        // if not, set a timeout to wait until it has
+        if (timeRemaining > 0) {
+          setTimeout(function () {
+            self.gameReadyHandler();
+          }, timeRemaining * 0.33);
+        } else {
+          self.gameReadyHandler();
+        }
       });
     }
   }, {

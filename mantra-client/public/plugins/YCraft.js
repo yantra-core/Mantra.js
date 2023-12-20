@@ -2788,6 +2788,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createSecuritySystem;
 var _index = require("../../../../YCraft.js/index.js");
+// import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from 'ycraft';
+
 function createSecuritySystem() {
   var yCraftSystem = new _index.YCraft();
 

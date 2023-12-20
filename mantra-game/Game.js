@@ -44,7 +44,7 @@ class Game {
     plugins = {}, // Plugin Classes that will be bound to the game instance
     // game options
     showLoadingScreen = true,
-    minLoadTime = 6600, // minimum time to show loading screen
+    minLoadTime = 330, // minimum time to show loading screen
     loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
     width = 1600,
     height = 900,

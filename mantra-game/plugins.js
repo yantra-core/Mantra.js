@@ -44,6 +44,9 @@ import Gamepad from './plugins/gamepad/Gamepad.js';
 import Midi from './plugins/midi/Midi.js';
 import MidiGUI from './plugins/gui-midi/MidiGUI.js';
 
+// Audio
+import Tone from './plugins/tone/Tone.js';
+
 // Entity Component Systems
 import Health from './plugins/health/Health.js';
 import Lifetime from './plugins/lifetime/Lifetime.js';
@@ -119,6 +122,7 @@ const plugins = {
   Timers,
   Midi,
   MidiGUI,
+  Tone,
   Nes,
   Inspector,
   ControlsGUI,

@@ -60,6 +60,7 @@ const plugins = [
   './plugins/entity-movement/strategies/PacManMovement.js',
   './plugins/gui-midi/MidiGUI.js',
   './plugins/midi/Midi.js',
+  './plugins/tone/Tone.js',
   './plugins/nes/Nes.js',
   // 'MovementPong' is the same as 'PongMovement', so it's not repeated
   // 'MovementAsteroids' is the same as 'AsteroidsMovement', so it's not repeated

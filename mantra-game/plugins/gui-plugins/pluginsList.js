@@ -81,7 +81,7 @@ const pluginsList = {
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 11.67
+    "size": 12.124
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",

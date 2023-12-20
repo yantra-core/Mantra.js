@@ -305,6 +305,10 @@ var Game = exports.Game = /*#__PURE__*/function () {
       isOfflineMode = _ref.isOfflineMode,
       _ref$plugins = _ref.plugins,
       plugins = _ref$plugins === void 0 ? {} : _ref$plugins,
+      _ref$showLoadingScree = _ref.showLoadingScreen,
+      showLoadingScreen = _ref$showLoadingScree === void 0 ? true : _ref$showLoadingScree,
+      _ref$minLoadTime = _ref.minLoadTime,
+      minLoadTime = _ref$minLoadTime === void 0 ? 330 : _ref$minLoadTime,
       _ref$loadDefaultPlugi = _ref.loadDefaultPlugins,
       loadDefaultPlugins = _ref$loadDefaultPlugi === void 0 ? true : _ref$loadDefaultPlugi,
       _ref$width = _ref.width,
@@ -342,12 +346,13 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // override default
       isClient = false;
     }
-
     // config scope for convenience
     var config = {
       isClient: isClient,
       isEdgeClient: isEdgeClient,
       isServer: isServer,
+      showLoadingScreen: showLoadingScreen,
+      minLoadTime: minLoadTime,
       loadDefaultPlugins: loadDefaultPlugins,
       width: width,
       height: height,
@@ -678,7 +683,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
         script.src = scriptUrl;
-        script.async = true;
+        //script.async = true;
+        script.defer = true;
         script.onload = function () {
           return resolve();
         };
@@ -1198,8 +1204,10 @@ function loadPluginsFromConfig(_ref) {
     lifetime = _ref.lifetime;
   var plugins = this.plugins;
   var gameConfig = this.config;
-  if (!this.isServer) {
-    this.use(new _LoadingScreen["default"]());
+  if (gameConfig.showLoadingScreen && !this.isServer) {
+    this.use(new _LoadingScreen["default"]({
+      minLoadTime: gameConfig.minLoadTime
+    }));
   }
   this.use('Entity');
   if (physics === 'matter') {
@@ -1449,7 +1457,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = loadScripts;
-// Loads external js script files sequentially
 function loadScripts(scripts, finalCallback) {
   var _this = this;
   if (this.isServer) {
@@ -1459,11 +1466,18 @@ function loadScripts(scripts, finalCallback) {
     if (index < scripts.length) {
       var script = document.createElement('script');
       script.type = 'text/javascript';
-      // Prepend the scriptRoot to the script src
+      // script.async = true; // Enable asynchronous loading
+      script.defer = true;
       script.src = _this.scriptRoot + scripts[index];
       script.onload = function () {
         console.log("".concat(scripts[index], " loaded"));
-        loadScript(index + 1); // Load the next script
+        loadScript(index + 1); // Load the next script after the current one finishes loading
+      };
+
+      // Handle script loading errors
+      script.onerror = function () {
+        console.error("Error loading script: ".concat(scripts[index]));
+        // Optionally, proceed to the next script or handle the error
       };
 
       document.head.appendChild(script);
@@ -1495,7 +1509,7 @@ var LoadingScreen = /*#__PURE__*/function () {
     _classCallCheck(this, LoadingScreen);
     this.id = LoadingScreen.id;
     this.plugins = [];
-    this.minLoadTime = 3600; // Minimum time for the loading screen
+    this.minLoadTime = config.minLoadTime || 330; // Minimum time for the loading screen
     this.startTime = Date.now(); // Track the start time of the loading process
     this.loadedPluginsCount = 0;
     this.confirmedLoadedPlugins = [];
@@ -1506,6 +1520,7 @@ var LoadingScreen = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       var _this = this;
+      var self = this;
       this.game = game;
       this.game.systemsManager.addSystem(this.id, this);
       var currentPlugins = Object.keys(this.game._plugins);
@@ -1524,7 +1539,17 @@ var LoadingScreen = /*#__PURE__*/function () {
         _this.markPluginAsLoaded(pluginId);
       });
       this.game.on('game::ready', function () {
-        _this.gameReadyHandler();
+        var now = Date.now();
+        var timeRemaining = _this.minLoadTime - (now - _this.startTime);
+        // check to see if enough this.minLoadtime has passed since this.startTime 
+        // if not, set a timeout to wait until it has
+        if (timeRemaining > 0) {
+          setTimeout(function () {
+            self.gameReadyHandler();
+          }, timeRemaining * 0.33);
+        } else {
+          self.gameReadyHandler();
+        }
       });
     }
   }, {
