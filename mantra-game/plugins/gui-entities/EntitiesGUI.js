@@ -83,7 +83,7 @@ class EntitiesGUI {
       game.selectedEntityId = entityId;
       // check if gui-inspector is loaded, if not, load it
       if (!game.systems['gui-inspector']) {
-        game.use(new game.plugins.Inspector());
+        game.use('Inspector');
       }
     });
 

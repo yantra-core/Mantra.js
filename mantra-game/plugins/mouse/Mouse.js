@@ -45,6 +45,16 @@ export default class Mouse {
   }
 
   handleMouseDown(event) {
+    let target = event.target;
+
+    // check to see if target has a mantra-id attribute
+    let mantraId = target.getAttribute('mantra-id');
+    if (mantraId) {
+      // if this is a Mantra entity, set the selectedEntityId
+      // this is used for GUI rendering and CSSGraphics
+      this.game.selectedEntityId = mantraId;
+    }
+
     switch (event.button) {
       case 0:
         this.mouseButtons.LEFT = true;

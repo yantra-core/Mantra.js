@@ -47,18 +47,26 @@ class Inspector {
     let headerHTML = '<tr><th>Property</th><th>Value</th></tr>';
     table.innerHTML = headerHTML;
 
-    for (let key in entity) {
+    // get all keys
+    let keys = Object.keys(entity);
+
+    // list keys we want to sort first
+    let customSorted = ['id', 'type', 'name'];
+
+    // key new array with custom sorted keys first, then merge in the rest with no duplicates
+    let sortedKeys = [...new Set([...customSorted, ...keys])];
+
+    sortedKeys.forEach((key) => {
       let row = table.insertRow();
       let cellKey = row.insertCell();
       let cellValue = row.insertCell();
       cellKey.textContent = key;
-
       if (key === 'graphics') {
         cellValue.textContent = 'graphics';
       } else {
         this.renderValue(cellValue, entity[key], key);
       }
-    }
+    });
 
     // Check if the entityView window already exists
     let entityView = document.getElementById('entityView');

@@ -470,7 +470,7 @@ class Game {
   // allows for custom player creation logic, or default player creation logic
   createPlayer(playerConfig) {
     return new Promise((resolve, reject) => {
-      console.log(this.listenerCount('player::joined'))
+      // console.log(this.listenerCount('player::joined'))
       if (this.listenerCount('player::joined') === 0) {
         let result = this.defaultCreatePlayer(playerConfig);
         resolve(result);

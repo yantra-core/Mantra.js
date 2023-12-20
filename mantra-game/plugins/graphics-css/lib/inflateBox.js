@@ -1,14 +1,7 @@
-const depthChart = [
-  'background',
-  'border',
-  'wire',
-  'part',
-  'PLAYER',
-  'BLOCK'
-];
 
 export default function inflateBox(entityElement, entityData) {
   let game = this.game;
+  let depthChart = this.depthChart;
   // For other entities, create a rectangle
   let hexColor = 'white';
   if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
@@ -22,16 +15,18 @@ export default function inflateBox(entityElement, entityData) {
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
+
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
 
   if (entityData.type === 'PART') {
 
     if (entityData.name === 'Wire') {
       // set a low z-index for wires
-      entityElement.style.zIndex = depthChart.indexOf('wire');
+      // entityElement.style.zIndex = depthChart.indexOf('wire');
+      entityElement.style.zIndex = -1;
     } else {
       // set 1000 z-index for parts
-      entityElement.style.zIndex = depthChart.indexOf('part');
+      entityElement.style.zIndex = depthChart.indexOf('PART');
     }
 
     // add pointer cursor for buttons on hover
@@ -57,7 +52,7 @@ export default function inflateBox(entityElement, entityData) {
     });
 
     entityElement.addEventListener('pointerdown', (ev) => {
-      console.log(ev.target, entityData.id, entityData.type, entityData)
+      // console.log(ev.target, entityData.id, entityData.type, entityData)
       // get the full ent from the game
       let ent = game.getEntity(entityData.id);
       // delgate based on part type name
@@ -87,7 +82,7 @@ export default function inflateBox(entityElement, entityData) {
     });
 
   }
-
+  // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
   // set border color to black
   entityElement.style.border = '1px solid black';
   entityElement.style.background = hexColor;  // Move this line here

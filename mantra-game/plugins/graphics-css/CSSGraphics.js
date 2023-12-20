@@ -18,7 +18,6 @@ class CSSGraphics extends GraphicsInterface {
       }
     }
 
-
     // config scope for convenience
     let config = {
       camera
@@ -30,6 +29,18 @@ class CSSGraphics extends GraphicsInterface {
 
     this.inflateBox = inflateBox.bind(this);
     this.inflateText = inflateText.bind(this);
+
+    this.depthChart = [
+      'background',
+      'border',
+      'wire',
+      'PART',
+      'TEXT',
+      'PLAYER',
+      'BLOCK'
+    ];
+
+    // this.depthChart = this.depthChart.reverse();
 
   }
 
@@ -91,6 +102,10 @@ class CSSGraphics extends GraphicsInterface {
     }
     let entityElement = document.createElement('div');
     entityElement.id = `entity-${entityData.id}`;
+
+    // set data-id to entity id
+    entityElement.setAttribute('mantra-id', entityData.id);
+
     entityElement.className = 'entity-element';
     entityElement.style.position = 'absolute';
 
