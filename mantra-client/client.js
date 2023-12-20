@@ -46,11 +46,11 @@ let game = new Game({
   mouse: true,
   isEdgeClient: isEdgeClient,
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['phaser'], // 'babylon', 'css', 'phaser'
+  graphics: ['babylon'], // 'babylon', 'css', 'phaser'
   collisions: true,
   camera: {
     follow: true,
-    startingZoom: 0.8
+    startingZoom: 0.5
   },
   protobuf: clientConfig.protobuf,
   msgpack: clientConfig.msgpack,
@@ -59,6 +59,7 @@ let game = new Game({
     scriptRoot: './' // use local scripts instead of default yantra.gg CDN
   }
 });
+
 
 // game.gameConfig = TowerWorld;
 
@@ -187,7 +188,6 @@ if (mode === 'online') {
     game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
     game.use(new plugins.Bullet())
-
     // import lightButton from '../../YCraft.js/examples/button-light.js'; // for now
     // import allExamples from '../../YCraft.js/examples/WIP/all-examples-composite.js'; // for now
     // import roverLight from '../../YCraft.js/examples/rover-light.js'; // for now

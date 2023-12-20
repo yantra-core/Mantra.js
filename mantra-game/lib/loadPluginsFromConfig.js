@@ -1,6 +1,12 @@
+import LoadingScreen from "../plugins/loading-screen/LoadingScreen.js";
+
 export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, lifetime }) {
   let plugins = this.plugins;
   let gameConfig = this.config
+
+  if (!this.isServer) {
+    this.use(new LoadingScreen());
+  }
 
   this.use('Entity');
 

@@ -274,6 +274,7 @@ class Game {
       }
 
       console.log('All Plugins are ready! Starting Mantra Game Client...');
+      game.emit('game::ready');
 
       if (game.systems.client) {
         let client = this.getSystem('client');

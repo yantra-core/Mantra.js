@@ -5,302 +5,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-// TODO:
-// Allow option to set window as background
-// Allow option for simple 4x4 grid for windows
-// Default mode is to place 2x2 vertical on left side first,
-// then 2x2 vertical on right side
-// Then for 3, its top left, bottom left, top right, with bottom right empty
-// For 4 each is 1x1, the entire window is filled at 4x4
-// Repeat same logic in units of 4 for 8, 12, 16, etc
-// Max windows is 64
-
-// TODO: all windows should have footers with a toolbar ( empty for now )
-// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
-
-//import lightTheme from "./themes/light.js";
-//import darkTheme from "./themes/dark.js";
-// gui.js - Marak Squires 2023
-var gui = {
-  /*
-  setTheme: function (name) {
-    if (name === 'light') {
-      this.theme(lightTheme);
-    } else if (name === 'dark') {
-      this.theme(darkTheme);
-    } else {
-      console.log(`Theme ${name} not found, defaulting to light theme`);
-      this.theme(lightTheme);
-    }
-  },
-  theme: function (theme) {
-    // theme is an object gui-elements and cssObjects
-    // for each gui element type in the theme
-    // find *all* nodes that match the type
-    // iterate over each node and apply the cssObject
-    console.log('setting theme', theme)
-    for (let type in theme) {
-      let cssObject = theme[type];
-      let nodes = document.querySelectorAll(`.${type}`);
-      console.log('ffff', nodes)
-      nodes.forEach(node => {
-        this.skin(node, cssObject);
-      });
-    }
-  },
-  skin: function(guiElement, cssObject) {
-    // guiElement is a DOM element
-    // cssObject is an object with css properties
-    for (let property in cssObject) {
-      // update the live node style
-      guiElement.style[property] = cssObject[property];
-      // update the style sheet for all future nodes
-      // this will override any inline styles
-      let styleSheet = document.styleSheets[0];
-      let selector = `.${guiElement.className}`;
-      let rule = `${property}: ${cssObject[property]}`;
-      let index = styleSheet.cssRules.length;
-      styleSheet.insertRule(`${selector} { ${rule} }`, index);
-     }
-  },
-  */
-  elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
-  window: function window(id) {
-    var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Window';
-    var close = arguments.length > 2 ? arguments[2] : undefined;
-    var pluginInstance = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    var self = this;
-    if (typeof close === 'undefined') {
-      close = function close() {
-        console.log("WARNING: No close function provided for window with id: " + id + ", defaulting to remove()");
-        document.getElementById(id).remove();
-      };
-    }
-    // Create container
-    var container = document.createElement('div');
-    container.id = id;
-    container.className = 'gui-container';
-
-    // Create the content of the container
-    var content = document.createElement('div');
-    content.className = 'gui-content';
-
-    // Create a draggable header
-    var guiHeader = document.createElement('div');
-    guiHeader.className = 'gui-header';
-
-    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
-    if (false && pluginInstance) {
-      var gearIcon = document.createElement('i');
-      gearIcon.className = 'fas fa-cog';
-      gearIcon.style["float"] = 'right';
-      gearIcon.style.cursor = 'pointer';
-      gearIcon.style.top = '20px';
-      gearIcon.style.right = '20px';
-      gearIcon.style.fontSize = '50px';
-      gearIcon.innerHTML = "FFF";
-      gearIcon.onclick = function () {
-        console.log(pluginInstance);
-        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
-      };
-      guiHeader.appendChild(gearIcon);
-    }
-
-    // Traffic light container
-    var trafficLightContainer = document.createElement('div');
-    trafficLightContainer.className = 'traffic-light-container';
-
-    // Add traffic light buttons
-    var closeButton = document.createElement('div');
-    var minimizeButton = document.createElement('div');
-    var maximizeButton = document.createElement('div');
-    closeButton.className = 'traffic-light close';
-    minimizeButton.className = 'traffic-light minimize';
-    maximizeButton.className = 'traffic-light maximize';
-    minimizeButton.onclick = function () {
-      return close();
-    };
-    closeButton.onclick = function () {
-      return close();
-    };
-    maximizeButton.onclick = function () {
-      self.maxWindow(container);
-    };
-    trafficLightContainer.appendChild(closeButton);
-    trafficLightContainer.appendChild(minimizeButton);
-    trafficLightContainer.appendChild(maximizeButton);
-    guiHeader.appendChild(trafficLightContainer);
-
-    // create h3 for title
-    var guiHeaderTitle = document.createElement('h3');
-    guiHeaderTitle.textContent = title;
-
-    // add "double click" event to h3 to maximize window
-    guiHeaderTitle.ondblclick = function () {
-      self.maxWindow(container);
-    };
-    guiHeader.appendChild(guiHeaderTitle);
-    container.appendChild(guiHeader);
-    container.appendChild(content);
-
-    // Add resize handle
-    var resizeHandle = document.createElement('div');
-    resizeHandle.className = 'resizeHandle';
-    container.appendChild(resizeHandle);
-
-    // Append the container to the document body
-    document.body.appendChild(container);
-
-    // Initialize dragging and resizing
-    this.initializeDrag(guiHeader, container);
-    this.initializeResize(resizeHandle, container);
-
-    // Add event listener for click to manage z-index
-    container.addEventListener('click', function () {
-      // Bring the clicked container to the front
-      gui.bringToFront(container);
-    });
-    return container;
-  },
-  maxWindow: function maxWindow(container) {
-    if (container.style.width === '100vw') {
-      container.style.width = '50%';
-      container.style.height = '50%';
-      // set position to center
-
-      if (typeof container.lastTop !== 'undefined') {
-        container.style.top = container.lastTop;
-        container.style.left = container.lastLeft;
-      } else {
-        container.style.top = '20%';
-        container.style.left = '20%';
-      }
-    } else {
-      // store the exact last position on container itself
-      // use special property
-      container.lastTop = container.style.top;
-      container.lastLeft = container.style.left;
-      container.style.width = '100vw';
-      container.style.height = '90%';
-      // set position to top left
-      container.style.top = '50px';
-      container.style.left = '0px';
-    }
-  },
-  initializeResize: function initializeResize(resizeHandle, container) {
-    var _this = this;
-    resizeHandle.addEventListener('mousedown', function (e) {
-      e.preventDefault();
-      gui.bringToFront(container);
-      window.addEventListener('mousemove', resize);
-      window.addEventListener('mouseup', stopResize);
-    });
-    var resize = function resize(e) {
-      // Set new width and height of the container
-      _this.container.style.width = e.clientX - _this.container.offsetLeft + 'px';
-      _this.container.style.height = e.clientY - _this.container.offsetTop + 'px';
-    };
-    var stopResize = function stopResize() {
-      window.removeEventListener('mousemove', resize);
-    };
-  },
-  initializeDrag: function initializeDrag(dragElement, container) {
-    var offsetX = 0,
-      offsetY = 0,
-      mouseX = 0,
-      mouseY = 0;
-    dragElement.onmousedown = dragMouseDown;
-    function dragMouseDown(e) {
-      e = e || window.event;
-      e.preventDefault();
-      gui.bringToFront(container);
-      // Get the mouse cursor position at startup
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      document.onmouseup = closeDragElement;
-      // Call a function whenever the cursor moves
-      document.onmousemove = elementDrag;
-    }
-    function elementDrag(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // Calculate the new cursor position
-      offsetX = mouseX - e.clientX;
-      offsetY = mouseY - e.clientY;
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      // Set the element's new position
-      dragElement.parentElement.style.top = dragElement.parentElement.offsetTop - offsetY + "px";
-      dragElement.parentElement.style.left = dragElement.parentElement.offsetLeft - offsetX + "px";
-    }
-    function closeDragElement() {
-      // Stop moving when mouse button is released
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-  },
-  bringToFront: function bringToFront(clickedContainer) {
-    // Get all gui-containers
-    var containers = document.querySelectorAll('.gui-container');
-
-    // Set z-index of all containers to 1
-    containers.forEach(function (container) {
-      container.style.zIndex = '1';
-    });
-
-    // Set z-index of the clicked container to 10
-    clickedContainer.style.zIndex = '10';
-  }
-};
-gui.init = function (game) {
-  if (typeof document === 'undefined') {
-    console.log('gui-plugin: document not found, skipping initialization');
-    return;
-  }
-  // add a global click handler to document that will delegate any clicks
-  // that are not inside gui-windows to re-enable inputs
-  document.addEventListener('click', function (e) {
-    // check if the click was inside a gui-window
-    var guiWindow = e.target.closest('.gui-container');
-    if (game && game.systems && game.systems['entity-input'] && game.systems['keyboard']) {
-      if (!guiWindow) {
-        // re-enable inputs
-        game.systems['entity-input'].setInputsActive();
-        game.systems['keyboard'].bindInputControls();
-      } else {
-        // disable inputs
-        game.systems['entity-input'].disableInputs();
-        game.systems['keyboard'].unbindAllEvents();
-      }
-    }
-  });
-
-  // bind the ESC key
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape') {
-      // get all gui-containers
-      var containers = document.querySelectorAll('.gui-container');
-
-      // TODO: unload the plugin instead of removing the container
-      // remove the last one
-      var lastContainer = containers[containers.length - 1];
-      if (lastContainer) {
-        lastContainer.remove();
-      }
-    }
-  });
-};
-var _default = exports["default"] = gui;
-
-},{}],2:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-var _gui = _interopRequireDefault(require("../gui-editor/gui.js"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -313,74 +17,247 @@ var LoadingScreen = /*#__PURE__*/function () {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, LoadingScreen);
     this.id = LoadingScreen.id;
-    this.createLoadingScreen();
-    // this.setupCanvasAnimation();
+    this.plugins = [];
+    this.minLoadTime = 3600; // Minimum time for the loading screen
+    this.startTime = Date.now(); // Track the start time of the loading process
+    this.loadedPluginsCount = 0;
+    this.confirmedLoadedPlugins = [];
+    this.pluginTimers = {}; // Store timers for each plugin
+    this.pluginElements = {}; // Store references to plugin UI elements
   }
   _createClass(LoadingScreen, [{
     key: "init",
     value: function init(game) {
+      var _this = this;
       this.game = game;
-      // hide loading screen
-      this.loadingScreen.style.display = 'none';
+      this.game.systemsManager.addSystem(this.id, this);
+      var currentPlugins = Object.keys(this.game._plugins);
+      this.plugins = this.plugins.concat(currentPlugins);
+      this.plugins.sort();
+      this.createLoadingScreen();
+      this.game.on('plugin::loading', function (pluginId) {
+        // check to see if we already have a loading timer for this plugin
+        // if not, create one
+        if (_this.plugins.indexOf(pluginId) === -1) {
+          _this.plugins.push(pluginId);
+          _this.createPluginLoader(pluginId);
+        }
+      });
+      this.game.on('plugin::loaded', function (pluginId) {
+        _this.markPluginAsLoaded(pluginId);
+      });
+      this.game.on('game::ready', function () {
+        _this.gameReadyHandler();
+      });
+    }
+  }, {
+    key: "gameReadyHandler",
+    value: function gameReadyHandler() {
+      var _this2 = this;
+      var currentTime = Date.now();
+      var elapsedTime = currentTime - this.startTime;
+      var remainingTime = Math.max(this.minLoadTime - elapsedTime, 0);
+      this.plugins.forEach(function (plugin) {
+        if (!_this2.isPluginLoaded(plugin)) {
+          _this2.fastTrackLoading(plugin, remainingTime);
+        }
+      });
+      setTimeout(function () {
+        _this2.unload();
+      }, remainingTime);
+    }
+  }, {
+    key: "isPluginLoaded",
+    value: function isPluginLoaded(pluginId) {
+      var progressBar = this.pluginElements[pluginId];
+      return progressBar && progressBar.style.width === '100%';
+    }
+  }, {
+    key: "fastTrackLoading",
+    value: function fastTrackLoading(pluginId, remainingTime) {
+      var _this3 = this;
+      clearInterval(this.pluginTimers[pluginId]);
+      var progressBar = this.pluginElements[pluginId];
+      if (progressBar) {
+        var currentWidth = parseInt(progressBar.style.width, 10) || 0;
+        var intervalTime = remainingTime / (100 - currentWidth);
+        this.pluginTimers[pluginId] = setInterval(function () {
+          if (currentWidth < 100) {
+            currentWidth++;
+            progressBar.style.width = currentWidth + '%';
+          } else {
+            clearInterval(_this3.pluginTimers[pluginId]);
+          }
+        }, intervalTime);
+      }
     }
   }, {
     key: "createLoadingScreen",
     value: function createLoadingScreen() {
-      // Create loading screen container
       this.loadingScreen = document.createElement('div');
       this.loadingScreen.id = 'loadingScreen';
-      this.loadingScreen.style.position = 'fixed';
-      this.loadingScreen.style.top = 0;
-      this.loadingScreen.style.left = 0;
-      this.loadingScreen.style.width = '100%';
-      this.loadingScreen.style.height = '100%';
-      this.loadingScreen.style.backgroundColor = 'black';
-      this.loadingScreen.style.zIndex = 9999; // Ensure it's on top
+      this.setupStyles(this.loadingScreen, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'black',
+        color: 'white',
+        zIndex: '9999',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+      });
 
+      // Header container
+      var headerContainer = document.createElement('div');
+      this.setupStyles(headerContainer, {
+        width: '80%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px'
+      });
+
+      // Game title
+      var gameTitle = document.createElement('div');
+      gameTitle.textContent = 'Mantra.js Game Starting';
+      this.setupStyles(gameTitle, {
+        fontSize: '20px',
+        fontWeight: 'bold'
+      });
+
+      // Plugin counter
+      this.pluginCounter = document.createElement('div');
+      this.updatePluginCounter(); // Update the plugin counter initially
+      this.setupStyles(this.pluginCounter, {
+        fontSize: '16px'
+      });
+      headerContainer.appendChild(gameTitle);
+      headerContainer.appendChild(this.pluginCounter);
+      this.loadingScreen.appendChild(headerContainer);
+      this.createPluginLoaders();
       document.body.appendChild(this.loadingScreen);
-
-      // Rainbow colors
-      var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-      var colorIndex = 0;
-      var self = this;
-      function updateColor() {
-        self.loadingScreen.style.backgroundColor = colors[colorIndex];
-        colorIndex = (colorIndex + 1) % colors.length;
-      }
-      // Change color every 500 milliseconds
-      this.colorInterval = setInterval(function () {
-        updateColor();
-      }, 50);
-      updateColor();
-
-      //document.body.appendChild(this.loadingScreen);
-      /*
-      // Create a canvas element
-      this.canvas = document.createElement('canvas');
-      this.canvas.id = 'loadingCanvas';
-      this.canvas.style.width = '100%';
-      this.canvas.style.height = '100%';
-      this.loadingScreen.appendChild(this.canvas);
-      */
     }
   }, {
-    key: "setupCanvasAnimation",
-    value: function setupCanvasAnimation() {
-      // Check if canvas is supported
-      if (this.canvas.getContext) {
-        var ctx = this.canvas.getContext('2d');
-        // Set up your canvas rainbow animation here
-        // Once the canvas is ready, remove or fade out the CSS animation
-        this.loadingScreen.classList.remove('css-loading-animation');
-        // Implement the rainbow animation on the canvas
+    key: "updatePluginCounter",
+    value: function updatePluginCounter() {
+      // this.pluginCounter.textContent = `${this.loadedPluginsCount}/${this.plugins.length} plugins loaded`;
+    }
+  }, {
+    key: "createPluginLoader",
+    value: function createPluginLoader(plugin) {
+      // Plugin container
+      var pluginContainer = document.createElement('div');
+      this.setupStyles(pluginContainer, {
+        display: 'flex',
+        alignItems: 'center',
+        margin: '5px',
+        width: '80%'
+      });
+
+      // Plugin name
+      var pluginName = document.createElement('div');
+      pluginName.textContent = plugin;
+      this.setupStyles(pluginName, {
+        marginRight: '10px',
+        // Add margin to separate name from progress bar
+        whiteSpace: 'nowrap' // Prevent plugin name from wrapping
+      });
+
+      // Progress bar container
+      var progressBarContainer = document.createElement('div');
+      this.setupStyles(progressBarContainer, {
+        width: '60%',
+        // Fixed width for all progress bars
+        marginLeft: 'auto' // Aligns the progress bar container to the right
+      });
+
+      // Progress bar
+      var progressBar = document.createElement('div');
+      this.setupStyles(progressBar, {
+        width: '0%',
+        height: '20px',
+        backgroundColor: 'limegreen'
+      });
+      progressBarContainer.appendChild(progressBar);
+      pluginContainer.appendChild(pluginName);
+      pluginContainer.appendChild(progressBarContainer);
+      this.loadingScreen.appendChild(pluginContainer);
+      this.pluginElements[plugin] = progressBar;
+
+      // Initialize and store the loading timer for each plugin
+      this.pluginTimers[plugin] = this.initializeLoadingTimer(progressBar, plugin);
+    }
+  }, {
+    key: "createPluginLoaders",
+    value: function createPluginLoaders() {
+      var _this4 = this;
+      this.plugins.forEach(function (plugin) {
+        _this4.createPluginLoader(plugin);
+      });
+    }
+  }, {
+    key: "initializeLoadingTimer",
+    value: function initializeLoadingTimer(progressBar, plugin) {
+      var _this5 = this;
+      var width = 0;
+      var maxTime = this.minLoadTime + Math.random() * 5000; // Randomize load time
+      var intervalTime = maxTime / 100;
+      return setInterval(function () {
+        if (width < 100) {
+          width++;
+          progressBar.style.width = width + '%';
+        } else {
+          clearInterval(_this5.pluginTimers[plugin]);
+        }
+      }, intervalTime);
+    }
+  }, {
+    key: "markPluginAsLoaded",
+    value: function markPluginAsLoaded(pluginId) {
+      // Clear the existing slow loading timer
+      clearInterval(this.pluginTimers[pluginId]);
+      var progressBar = this.pluginElements[pluginId];
+      if (progressBar) {
+        // Start a new faster loading timer
+        this.animateToCompletion(progressBar, pluginId);
       }
+      if (this.confirmedLoadedPlugins.indexOf(pluginId) !== -1) {
+        return;
+      }
+      this.confirmedLoadedPlugins.push(pluginId);
+      this.loadedPluginsCount++;
+      this.updatePluginCounter();
+    }
+  }, {
+    key: "animateToCompletion",
+    value: function animateToCompletion(progressBar, pluginId) {
+      var _this6 = this;
+      var currentWidth = parseInt(progressBar.style.width, 10) || 0;
+      var fastLoadTime = Math.random() * 500 + 200; // Random time between 200ms and 700ms
+      var intervalTime = fastLoadTime / (100 - currentWidth); // Time per percentage
+
+      this.pluginTimers[pluginId] = setInterval(function () {
+        if (currentWidth < 100) {
+          currentWidth++;
+          progressBar.style.width = currentWidth + '%';
+        } else {
+          clearInterval(_this6.pluginTimers[pluginId]);
+        }
+      }, intervalTime);
+    }
+  }, {
+    key: "setupStyles",
+    value: function setupStyles(element, styles) {
+      Object.assign(element.style, styles);
     }
   }, {
     key: "unload",
     value: function unload() {
-      clearInterval(this.colorInterval);
-
-      // Remove the loading screen
+      Object.values(this.pluginTimers).forEach(clearInterval);
       if (this.loadingScreen && this.loadingScreen.parentNode) {
         this.loadingScreen.parentNode.removeChild(this.loadingScreen);
       }
@@ -391,5 +268,5 @@ var LoadingScreen = /*#__PURE__*/function () {
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
-},{"../gui-editor/gui.js":1}]},{},[2])(2)
+},{}]},{},[1])(1)
 });
