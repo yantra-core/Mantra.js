@@ -115,8 +115,10 @@ var PhaserCamera = /*#__PURE__*/function () {
     value: function update() {
       var camera = this.scene.cameras.main;
       var player = this.game.getEntity(this.game.currentPlayerId);
+      console.log('getting player', player);
       var graphics = this.game.components.graphics.get(this.game.currentPlayerId);
       if (camera && player.graphics && player.graphics['graphics-phaser']) {
+        console.log('following player', player);
         camera.centerOn(player.position.x, player.position.y);
         this.followingPlayer = true; // Set the flag to true
       }
@@ -315,7 +317,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       _ref$camera = _ref.camera,
       camera = _ref$camera === void 0 ? {} : _ref$camera,
       _ref$startingZoom = _ref.startingZoom,
-      startingZoom = _ref$startingZoom === void 0 ? 0.7 : _ref$startingZoom;
+      startingZoom = _ref$startingZoom === void 0 ? 1 : _ref$startingZoom;
     _classCallCheck(this, PhaserGraphics);
     _this = _super.call(this);
     _this.id = 'graphics-phaser';
@@ -326,6 +328,9 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         follow: true
       };
     }
+
+    // alert(camera.follow)
+
     var config = {
       camera: camera,
       startingZoom: startingZoom
@@ -522,12 +527,17 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
           }
         }
 
-        // stop phaser, remove canvas
+        // remove the PhaserCamera system plugin
       } catch (err) {
         _iterator2.e(err);
       } finally {
         _iterator2.f();
       }
+      if (this.game.systems['graphics-phaser-camera']) {
+        this.game.systemsManager.removeSystem('graphics-phaser-camera');
+      }
+
+      // stop phaser, remove canvas
       this.phaserGame.destroy(true);
       var canvas = document.getElementById('phaser-render-canvas');
       if (canvas) {

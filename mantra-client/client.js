@@ -46,9 +46,12 @@ let game = new Game({
   mouse: true,
   isEdgeClient: isEdgeClient,
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['babylon'], // 'babylon', 'css', 'phaser'
+  graphics: ['phaser'], // 'babylon', 'css', 'phaser'
   collisions: true,
-  camera: 'follow',
+  camera: {
+    follow: true,
+    startingZoom: 0.8
+  },
   protobuf: clientConfig.protobuf,
   msgpack: clientConfig.msgpack,
   deltaCompression: clientConfig.deltaCompression,
@@ -66,11 +69,12 @@ let game = new Game({
 
 // Plugins can also be loaded async by string name
 //game.use('Bullet');
-game.use(new plugins.Bullet())
+// game.use(new plugins.Bullet())
 game.use(new plugins.Entity())
 
 game.use(new plugins.MatterPhysics());
 //game.use(new plugins.PhaserGraphics());
+// game.use(new plugins.BabylonGraphics());
 
 // game.use(new plugins.PhaserCamera());
 // game.use(new plugins.Collision());
@@ -174,7 +178,6 @@ if (mode === 'online') {
   game.use(new plugins.StarField())
   game.use(new plugins.PingTime())
   game.use(new plugins.SnapshotSize())
-  
 
 } else {
 
@@ -183,16 +186,28 @@ if (mode === 'online') {
     game.use(new plugins.StarField())
     game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
-    //game.use(new plugins.RealStone())
+    game.use(new plugins.Bullet())
+
+    // import lightButton from '../../YCraft.js/examples/button-light.js'; // for now
+    // import allExamples from '../../YCraft.js/examples/WIP/all-examples-composite.js'; // for now
+    // import roverLight from '../../YCraft.js/examples/rover-light.js'; // for now
+    // import securitySystem from '../../YCraft.js/examples/security-system.js';
+
+    /*
+    game.use(new plugins.YCraft({
+      contraption: roverLight,
+    }))
+    game.use(new plugins.YCraftGUI())
+    */
+
 
     // game.use(new plugins.SutraGUI({ }));
-
     // game.use(new plugins.Scoreboard());
     //game.use(new plugins.MidiGUI())
     //game.use(new plugins.Midi())
     // game.use(new plugins.Nes());
-
-    game.use(new plugins.TowerWorld());
+   
+    // game.use(new plugins.TowerWorld());
     game.data.roundEnded = false;
     game.data.roundStarted = true;
   });

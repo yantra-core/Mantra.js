@@ -28,7 +28,7 @@ class PhaserCamera {
   update() {
     let camera = this.scene.cameras.main;
     let player = this.game.getEntity(this.game.currentPlayerId);
-    let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
+    // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
     if (camera && player.graphics && player.graphics['graphics-phaser']) {
       camera.centerOn(player.position.x, player.position.y);
       this.followingPlayer = true; // Set the flag to true

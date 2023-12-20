@@ -9,11 +9,11 @@ const pluginsList = {
   },
   "BabylonCamera": {
     "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 9.028
+    "size": 9.131
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 54.137
+    "size": 57.156
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -25,11 +25,11 @@ const pluginsList = {
   },
   "Bullet": {
     "path": "./plugins/bullet/Bullet.js",
-    "size": 13.052
+    "size": 13.116
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 20.845
+    "size": 26.398
   },
   "Client": {
     "path": "./plugins/client/Client.js",
@@ -41,7 +41,7 @@ const pluginsList = {
   },
   "Collisions": {
     "path": "./plugins/collisions/Collisions.js",
-    "size": 9.322
+    "size": 9.748
   },
   "Creator": {
     "path": "./plugins/gui-creator/Creator.js",
@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 40.209
+    "size": 40.421
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -77,15 +77,15 @@ const pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 16.69
+    "size": 17.27
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
-    "size": 15.968
+    "size": 16.548
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 20.087
+    "size": 20.667
   },
   "PingTime": {
     "path": "./plugins/ping-time/PingTime.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.337
+    "size": 23.917
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,11 +101,11 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 84.771
+    "size": 85.351
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 31.118
+    "size": 18.943
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -133,7 +133,7 @@ const pluginsList = {
   },
   "MatterPhysics": {
     "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 393.768
+    "size": 394.339
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
@@ -141,7 +141,7 @@ const pluginsList = {
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 36.583
+    "size": 38.681
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

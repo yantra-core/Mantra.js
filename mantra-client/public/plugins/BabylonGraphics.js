@@ -132,7 +132,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       };
     }
     if (typeof camera.startingZoom !== 'number') {
-      camera.startingZoom = 0.4;
+      camera.startingZoom = 1;
     }
     if (typeof camera.follow === 'undefined') {
       camera.follow = true;
