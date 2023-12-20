@@ -1,4 +1,5 @@
-import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from '../../../../YCraft.js/index.js';
+import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from 'ycraft';
+// import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from '../../../../YCraft.js/index.js';
 
 export default function createSecuritySystem() {
     const yCraftSystem = new YCraft();
