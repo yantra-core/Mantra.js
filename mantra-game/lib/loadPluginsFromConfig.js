@@ -4,8 +4,10 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   let plugins = this.plugins;
   let gameConfig = this.config
 
-  if (!this.isServer) {
-    this.use(new LoadingScreen());
+  if (gameConfig.showLoadingScreen && !this.isServer) {
+    this.use(new LoadingScreen({
+      minLoadTime: gameConfig.minLoadTime
+    }));
   }
 
   this.use('Entity');

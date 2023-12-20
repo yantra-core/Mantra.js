@@ -30,6 +30,7 @@
     document.addEventListener('DOMContentLoaded', async (event) => {
 
       window.game = new MANTRA.Game({
+        showLoadingScreen: false,
         isClient: true, // TODO: remove this
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,

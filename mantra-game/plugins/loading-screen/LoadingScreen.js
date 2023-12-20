@@ -4,7 +4,7 @@ class LoadingScreen {
   constructor(config = {}) {
     this.id = LoadingScreen.id;
     this.plugins = [];
-    this.minLoadTime = 3600; // Minimum time for the loading screen
+    this.minLoadTime = config.minLoadTime || 3600; // Minimum time for the loading screen
     this.startTime = Date.now(); // Track the start time of the loading process
     this.loadedPluginsCount = 0;
     this.confirmedLoadedPlugins = [];
@@ -13,6 +13,8 @@ class LoadingScreen {
   }
 
   init(game) {
+    let self = this;
+
     this.game = game;
     this.game.systemsManager.addSystem(this.id, this);
 
@@ -36,11 +38,23 @@ class LoadingScreen {
     });
 
     this.game.on('game::ready', () => {
-      this.gameReadyHandler();
+      let now = Date.now();
+      let timeRemaining = this.minLoadTime - (now - this.startTime);
+      // check to see if enough this.minLoadtime has passed since this.startTime 
+      // if not, set a timeout to wait until it has
+      if (timeRemaining > 0) {
+        setTimeout(() => {
+          self.gameReadyHandler();
+        }, timeRemaining * 0.33);
+      } else {
+        self.gameReadyHandler();
+      }
+
     });
   }
 
   gameReadyHandler() {
+
     const currentTime = Date.now();
     const elapsedTime = currentTime - this.startTime;
     const remainingTime = Math.max(this.minLoadTime - elapsedTime, 0);

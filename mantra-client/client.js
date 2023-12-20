@@ -43,6 +43,8 @@ let game = new Game({
   width: 800 * 10,
   plugins: {},
   isClient: true,
+  showLoadingScreen: true,
+  minLoadTime: 220,
   mouse: true,
   isEdgeClient: isEdgeClient,
   physics: 'matter', // 'matter', 'physx'

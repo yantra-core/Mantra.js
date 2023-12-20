@@ -43,6 +43,8 @@ class Game {
     isOfflineMode,
     plugins = {}, // Plugin Classes that will be bound to the game instance
     // game options
+    showLoadingScreen = true,
+    minLoadTime = 6600, // minimum time to show loading screen
     loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
     width = 1600,
     height = 900,
@@ -65,12 +67,13 @@ class Game {
       // override default
       isClient = false;
     }
-
     // config scope for convenience
     const config = {
       isClient,
       isEdgeClient,
       isServer,
+      showLoadingScreen,
+      minLoadTime,
       loadDefaultPlugins,
       width,
       height,
@@ -314,6 +317,7 @@ class Game {
   // All Systems are Plugins, but not all Plugins are Systems
   // TODO: move to separate file
   use(pluginInstanceOrId, options = {}) {
+
     let game = this;
 
     // TODO: make this configurable
@@ -401,7 +405,9 @@ class Game {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = scriptUrl;
-      script.async = true;
+      //script.async = true;
+      script.defer = true;
+
       script.onload = () => resolve();
       script.onerror = () => reject(new Error(`Failed to load script: ${scriptUrl}`));
       document.head.appendChild(script);
