@@ -18,7 +18,7 @@ import bindRelay from './lib/events/bindRelay.js';
 import bindPressureSensor from './lib/events/bindPressureSensor.js';
 import bindRover from './lib/events/bindRover.js';
 
-// import securitySystemWithWires from './security-system-wires.js';
+import securitySystemWithWires from './security-system-wires.js';
 // import testContraption from './security-system.js';
 // import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
@@ -29,6 +29,12 @@ class YCraft extends Plugin {
   constructor({ contraption = null, contraptions = null, useDefaultContraption = false } = {}) {
     super();
     this.id = YCraft.id;
+
+    // for now, default behavior so it won't crash if no contraption is passed
+    if (typeof contraption !== 'function') {
+      console.log("securitySystemWithWires", securitySystemWithWires)
+      contraption = securitySystemWithWires;
+    }
     this.contraption = contraption();
     this.contraptionSource = contraption.toString();
     this.contraptions = contraptions;
@@ -156,6 +162,12 @@ class YCraft extends Plugin {
     this.contraption = contraption;
     // for now, could be better scoped as array of contraptions
     this.game.contraption = contraption;
+
+    // redraw view if available
+    if (this.game.systems['gui-ycraft']) {
+      this.game.systems['gui-ycraft'].setContraption(contraption, this.contraptionSource);
+    }
+
     this.initContraption(contraption);
   }
 

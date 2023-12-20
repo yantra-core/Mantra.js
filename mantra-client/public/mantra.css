@@ -494,6 +494,17 @@ pre {
   position: absolute;
 }
 
+#contraptionsView {
+  top: 5%;
+  left: 20px;
+  z-index: 1000;
+  width: 30%;
+  height: 60%;
+  resize: both;
+  overflow: auto;
+  position: absolute;
+}
+
 #graphics-babylon-window {
   top: 10%;
   left: 10%;

@@ -323,8 +323,8 @@ var YCraftGUI = /*#__PURE__*/function () {
     this.pingTestComplete = false;
 
     // TODO: move all this code to YCraftGUI.js
-    this.etherspaceHost = 'http://192.168.1.80:8889/api/v1';
-    //etherspaceHost = 'https://etherspace.ayyo.gg/api/v1';
+    //this.etherspaceHost = 'http://192.168.1.80:8889/api/v1';
+    this.etherspaceHost = 'https://etherspace.ayyo.gg/api/v1';
     this.etherspaceEndpoint = this.etherspaceHost + '';
   }
   _createClass(YCraftGUI, [{
@@ -340,8 +340,14 @@ var YCraftGUI = /*#__PURE__*/function () {
   }, {
     key: "createContraptionViewer",
     value: function createContraptionViewer() {
-      this.container = _gui["default"].window('entitiesView', 'YCraft Contraption Viewer', function () {
+      // check for existing contraptionsView
+      var contraptionsView = document.getElementById('contraptionsView');
+      if (contraptionsView) {
+        contraptionsView.remove();
+      }
+      this.container = _gui["default"].window('contraptionsView', 'YCraft Contraption Viewer', function () {
         game.systemsManager.removeSystem(EntitiesGUI.id);
+        this.container.remove();
       });
       this.container.style.top = '100px';
       this.container.style.left = '60px';
@@ -513,7 +519,18 @@ var YCraftGUI = /*#__PURE__*/function () {
         return _getContraption.apply(this, arguments);
       }
       return getContraption;
-    }() // Function to render dropdown select with contraptions
+    }()
+  }, {
+    key: "setContraption",
+    value: function setContraption(contraption, source) {
+      this.contraption = contraption;
+      // for now, could be better scoped as array of contraptions
+      // this.game.contraption = contraption;
+      // redraw view if available
+      this.createContraptionViewer(contraption);
+    }
+
+    // Function to render dropdown select with contraptions
   }, {
     key: "renderDropdown",
     value: function renderDropdown(contraptions) {

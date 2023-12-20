@@ -8,154 +8,26 @@
   <link rel="stylesheet" href="/mantra.css">
   <script type="module" src="/mantra.js"></script>
   <script type="module" src="/ycraft.js"></script>
-  <script type="module" src="/YCraftDemo.js"></script>
-  <style>
-    body,
-    html {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f4;
-    }
-
-    #main-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    header {
-      text-align: center;
-      padding: 20px 0;
-    }
-
-    #contraption-interface {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      position: absolute;
-      right: 20px;
-      top: 140px;
-
-    }
-
-    #save-contraption-form {
-
-      display: none;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    #display-contraption {
-      text-align: center;
-    }
-
-    #run-contraption-form {
-      display: none;
-    }
-
-    #save-contraption-form label {
-      font-weight: bold;
-    }
-
-    #save-contraption-form input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    #save-contraption-form button {
-      padding: 10px 15px;
-      background-color: #0056b3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    #save-contraption-form button:hover {
-      background-color: #003d82;
-    }
-
-    h1 {
-      color: #333;
-      position: absolute;
-      right: 20px;
-      top: 60px;
-
-    }
-
-    h3 {
-      color: #555;
-    }
-
-    textarea {
-      position: absolute;
-      top: 50px;
-      left: 0;
-      width: 400px;
-      height: 800px;
-      font-family: 'Courier New', monospace;
-      /* Monospace font */
-      background-color: #282c34;
-      /* Dark background */
-      color: #abb2bf;
-      /* Light text */
-      padding: 10px;
-      /* Padding inside textarea */
-      border: 1px solid #abb2bf;
-      /* Optional border */
-      width: 100%;
-      /* Width of the editor */
-      height: 300px;
-      /* Height of the editor */
-      line-height: 1.5;
-      /* Line height for better readability */
-      tab-size: 4;
-      /* Set tab size for better code formatting */
-      white-space: pre;
-      /* Preserve whitespace and formatting */
-      width: 600px;
-      height: 1000px;
-
-    }
-
-    select {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      color: #0056b3;
-    }
-  </style>
   <script>
-
+    document.addEventListener('DOMContentLoaded', async (event) => {
+      let game = new MANTRA.Game({
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: './'
+        }
+      });
+      game.use('YCraft');
+      game.start(function () {
+        game.use('Editor');
+      });
+      // game.use('Bullet');
+      window.game = game;
+    });
   </script>
 </head>
-
 <body>
-
-  
-
-  <!--
-  <div id="contraption-interface">
-    <div id="display-contraption">
-      <h3>Contraption Name: <span id="contraption-name-display"></span></h3>
-    </div>
-    <form id="save-contraption-form">
-      <input type="text" id="contraption-name" placeholder="Enter contraption name" value="rover-light" required>
-      <button type="submit">Save Contraption</button>
-    </form>
-    <form id="run-contraption-form">
-      <button type="submit">Run Contraption</button>
-      <textarea id="contraption-code" rows="10" cols="50" placeholder="Enter contraption code here"></textarea>
-    </form>
-  </div>
-  -->
-
 </body>
-
 </html>

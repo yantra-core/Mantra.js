@@ -11,8 +11,8 @@ class YCraftGUI {
     this.pingTestComplete = false;
 
     // TODO: move all this code to YCraftGUI.js
-    this.etherspaceHost = 'http://192.168.1.80:8889/api/v1';
-    //etherspaceHost = 'https://etherspace.ayyo.gg/api/v1';
+    //this.etherspaceHost = 'http://192.168.1.80:8889/api/v1';
+    this.etherspaceHost = 'https://etherspace.ayyo.gg/api/v1';
     this.etherspaceEndpoint = this.etherspaceHost + '';
 
   }
@@ -28,8 +28,15 @@ class YCraftGUI {
 
   createContraptionViewer() {
 
-    this.container = gui.window('entitiesView', 'YCraft Contraption Viewer', function () {
+    // check for existing contraptionsView
+    let contraptionsView = document.getElementById('contraptionsView');
+    if (contraptionsView) {
+      contraptionsView.remove();
+    }
+
+    this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {
       game.systemsManager.removeSystem(EntitiesGUI.id);
+      this.container.remove();
     });
     this.container.style.top = '100px';
     this.container.style.left = '60px';
@@ -40,7 +47,7 @@ class YCraftGUI {
 
     // Create header and title
     var header = document.createElement('header');
-    
+
     /*
     var h1 = document.createElement('h1');
     h1.textContent = 'YCraft Contraption Viewer';
@@ -115,7 +122,7 @@ class YCraftGUI {
 
     this.createDisplay();
     this.adjustTextareaHeight(textarea);
-    
+
   }
 
   updateSelectDropdown(name) {
@@ -187,41 +194,49 @@ class YCraftGUI {
     }
   }
 
-// Function to render dropdown select with contraptions
-renderDropdown(contraptions) {
-  let contraptionInterface = document.getElementById('contraption-interface');
-  const selectElement = document.createElement('select');
-  selectElement.id = 'contraption-select';
+  setContraption (contraption, source) {
+    this.contraption = contraption;
+    // for now, could be better scoped as array of contraptions
+    // this.game.contraption = contraption;
+    // redraw view if available
+    this.createContraptionViewer(contraption);
+  }
 
-  // Create a label for the select element
-  const label = document.createElement('label');
-  label.setAttribute('for', 'contraption-select');
-  label.textContent = 'Choose a Contraption:';
+  // Function to render dropdown select with contraptions
+  renderDropdown(contraptions) {
+    let contraptionInterface = document.getElementById('contraption-interface');
+    const selectElement = document.createElement('select');
+    selectElement.id = 'contraption-select';
 
-  contraptions.forEach(contraption => {
+    // Create a label for the select element
+    const label = document.createElement('label');
+    label.setAttribute('for', 'contraption-select');
+    label.textContent = 'Choose a Contraption:';
+
+    contraptions.forEach(contraption => {
       const optionElement = document.createElement('option');
       optionElement.value = contraption.name; // Assuming each contraption has a name
       optionElement.textContent = contraption.name;
       selectElement.appendChild(optionElement);
-  });
+    });
 
-  // get display-contraption div
-  let displayContraption = document.getElementById('display-contraption');
+    // get display-contraption div
+    let displayContraption = document.getElementById('display-contraption');
 
-  // Append the label and then the select element
-  displayContraption.appendChild(label);
-  displayContraption.appendChild(selectElement);
+    // Append the label and then the select element
+    displayContraption.appendChild(label);
+    displayContraption.appendChild(selectElement);
 
-  // Optionally, add an event listener for when the user selects a contraption
-  selectElement.addEventListener('change', (event) => {
+    // Optionally, add an event listener for when the user selects a contraption
+    selectElement.addEventListener('change', (event) => {
       const selectedContraptionName = event.target.value;
       console.log(`User selected contraption name: ${selectedContraptionName}`);
       // Additional code to handle the selection, like getting and loading the selected contraption
       this.getContraption(selectedContraptionName);
-  });
+    });
 
-  contraptionInterface.appendChild(displayContraption);
-}
+    contraptionInterface.appendChild(displayContraption);
+  }
 
 
   async createDisplay() {

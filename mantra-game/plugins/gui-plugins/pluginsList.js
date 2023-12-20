@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.917
+    "size": 23.918
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",

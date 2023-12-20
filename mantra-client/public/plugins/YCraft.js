@@ -2078,6 +2078,7 @@ var _bindMotionDetector = _interopRequireDefault(require("./lib/events/bindMotio
 var _bindRelay = _interopRequireDefault(require("./lib/events/bindRelay.js"));
 var _bindPressureSensor = _interopRequireDefault(require("./lib/events/bindPressureSensor.js"));
 var _bindRover = _interopRequireDefault(require("./lib/events/bindRover.js"));
+var _securitySystemWires = _interopRequireDefault(require("./security-system-wires.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2093,7 +2094,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { YCraft as YCraftActual } from 'ycraft';
-// import securitySystemWithWires from './security-system-wires.js';
 // import testContraption from './security-system.js';
 // import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
@@ -2113,6 +2113,12 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
     _classCallCheck(this, YCraft);
     _this = _super.call(this);
     _this.id = YCraft.id;
+
+    // for now, default behavior so it won't crash if no contraption is passed
+    if (typeof contraption !== 'function') {
+      console.log("securitySystemWithWires", _securitySystemWires["default"]);
+      contraption = _securitySystemWires["default"];
+    }
     _this.contraption = contraption();
     _this.contraptionSource = contraption.toString();
     _this.contraptions = contraptions;
@@ -2237,6 +2243,11 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
       this.contraption = contraption;
       // for now, could be better scoped as array of contraptions
       this.game.contraption = contraption;
+
+      // redraw view if available
+      if (this.game.systems['gui-ycraft']) {
+        this.game.systems['gui-ycraft'].setContraption(contraption, this.contraptionSource);
+      }
       this.initContraption(contraption);
     }
   }, {
@@ -2303,7 +2314,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
 _defineProperty(YCraft, "id", 'ycraft');
 var _default = exports["default"] = YCraft;
 
-},{"../../../../YCraft.js/index.js":1,"../../Plugin.js":18,"./lib/bindPartEvents.js":20,"./lib/createEntityFromPart.js":21,"./lib/events/bindActuator.js":22,"./lib/events/bindAmplifer.js":23,"./lib/events/bindButton.js":24,"./lib/events/bindLEDLight.js":25,"./lib/events/bindLatch.js":26,"./lib/events/bindMotionDetector.js":27,"./lib/events/bindPressureSensor.js":28,"./lib/events/bindRelay.js":29,"./lib/events/bindRover.js":30,"./lib/events/bindWire.js":31,"./lib/parts/createWire.js":32}],20:[function(require,module,exports){
+},{"../../../../YCraft.js/index.js":1,"../../Plugin.js":18,"./lib/bindPartEvents.js":20,"./lib/createEntityFromPart.js":21,"./lib/events/bindActuator.js":22,"./lib/events/bindAmplifer.js":23,"./lib/events/bindButton.js":24,"./lib/events/bindLEDLight.js":25,"./lib/events/bindLatch.js":26,"./lib/events/bindMotionDetector.js":27,"./lib/events/bindPressureSensor.js":28,"./lib/events/bindRelay.js":29,"./lib/events/bindRover.js":30,"./lib/events/bindWire.js":31,"./lib/parts/createWire.js":32,"./security-system-wires.js":33}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2769,5 +2780,60 @@ function createWire(part, contraption) {
   return entities; // Return all created entities
 }
 
-},{}]},{},[19])(19)
+},{}],33:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createSecuritySystem;
+var _index = require("../../../../YCraft.js/index.js");
+function createSecuritySystem() {
+  var yCraftSystem = new _index.YCraft();
+
+  // Initialize and position components
+  var motionDetector = new _index.MotionDetector(-150, -250, 0);
+  var pressureSensor = new _index.PressureSensor(150, -250, 0);
+  var actuator = new _index.Actuator(450, -250, 0);
+  var securityLight = new _index.LEDLight(450, 0, 200, {
+    wattage: 60
+  });
+  var manualOverrideButton = new _index.Button(50, 450, 0);
+
+  // Initialize wires
+  var wireFromMotionDetector = new _index.Wire();
+  var wireFromPressureSensor = new _index.Wire();
+  var wireFromButton = new _index.Wire();
+  var wireToLight = new _index.Wire();
+
+  // Connect components with wires
+  motionDetector.connect(wireFromMotionDetector);
+  wireFromMotionDetector.connect(actuator);
+  pressureSensor.connect(wireFromPressureSensor);
+  wireFromPressureSensor.connect(actuator);
+  manualOverrideButton.connect(wireFromButton);
+  wireFromButton.connect(actuator);
+  actuator.connect(wireToLight);
+  wireToLight.connect(securityLight);
+
+  // Add components and wires to YCraft system
+  yCraftSystem.addPart(motionDetector);
+  yCraftSystem.addPart(pressureSensor);
+  yCraftSystem.addPart(securityLight);
+  yCraftSystem.addPart(manualOverrideButton);
+  yCraftSystem.addPart(actuator);
+  yCraftSystem.addPart(wireFromMotionDetector);
+  yCraftSystem.addPart(wireFromPressureSensor);
+  yCraftSystem.addPart(wireFromButton);
+  yCraftSystem.addPart(wireToLight);
+
+  // Simulate interactions
+  // motionDetector.detectMotion(); // Simulate motion detection
+
+  // Logging the system state
+  console.log(yCraftSystem);
+  return yCraftSystem;
+}
+
+},{"../../../../YCraft.js/index.js":1}]},{},[19])(19)
 });

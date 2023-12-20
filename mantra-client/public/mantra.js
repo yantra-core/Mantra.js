@@ -295,7 +295,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // The Game class is the main entry point for Mantra games
 var Game = exports.Game = /*#__PURE__*/function () {
   function Game() {
-    var _ref2, _ref2$type, _ref2$startingZoom;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$isClient = _ref.isClient,
       isClient = _ref$isClient === void 0 ? true : _ref$isClient,
@@ -319,7 +318,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$collisions = _ref.collisions,
       collisions = _ref$collisions === void 0 ? true : _ref$collisions,
       _ref$camera = _ref.camera,
-      camera = _ref$camera === void 0 ? (_ref2 = {}, _ref2$type = _ref2.type, type = _ref2$type === void 0 ? 'follow' : _ref2$type, _ref2$startingZoom = _ref2.startingZoom, startingZoom = _ref2$startingZoom === void 0 ? 1 : _ref2$startingZoom, _ref2) : _ref$camera,
+      camera = _ref$camera === void 0 ? {} : _ref$camera,
       _ref$keyboard = _ref.keyboard,
       keyboard = _ref$keyboard === void 0 ? true : _ref$keyboard,
       _ref$mouse = _ref.mouse,
