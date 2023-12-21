@@ -140,10 +140,14 @@ class XState {
       world: BossFightMiddleware()
     })
     game.use('StarField');
-
     game.on('plugin::ready::XState', () => {
       game.systems['xstate'].loadEntities();
+
+    });
+
+    game.systems.graphics.switchGraphics('BabylonGraphics', function(){
       game.createDefaultPlayer();
+
     });
 
   }

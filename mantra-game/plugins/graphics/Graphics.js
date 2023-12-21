@@ -48,6 +48,43 @@ class Graphics {
     });
   }
 
+  switchGraphics(graphicsInterfaceName, cb) {
+    cb = cb || function noop() { };
+
+    let game = this.game;
+
+    let engines = {
+      'BabylonGraphics': 'graphics-babylon',
+      'PhaserGraphics': 'graphics-phaser',
+      'CSSGraphics': 'graphics-css'
+    };
+
+    let graphicsInterfaceId = engines[graphicsInterfaceName];
+
+    document.body.style.cursor = 'wait';
+    // Check if the selected graphics mode is already registered
+    if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
+      this.game.use(graphicsInterfaceName, { camera: 'follow' });
+
+      // Add event listeners for plugin ready events
+      this.game.once(`plugin::ready::${graphicsInterfaceId}`, () => {
+
+        // iterate through all existing graphics ( except this one ) and remove them
+        this.game.graphics.forEach(function (graphics) {
+          if (graphics.id !== graphicsInterfaceId) {
+            game.systemsManager.removeSystem(graphics.id);
+          }
+        });
+
+        document.body.style.cursor = 'default';
+        cb(null);
+      });
+    } else {
+      cb(null);
+    }
+
+  }
+
   removeGraphic(entityId) {
     let game = this.game;
     game.graphics.forEach(function (graphicsInterface) {

@@ -12,13 +12,13 @@ class WorldSelector {
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
     this.addOption(selectBox, 'Current World', 'Client');
-    this.addOption(selectBox, '2D Platformer', 'BabylonGraphics');
-    this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
-    this.addOption(selectBox, 'YCraft Contraptions', 'BabylonGraphics');
-    this.addOption(selectBox, 'Sutra Behavior Trees', 'BabylonGraphics');
-    this.addOption(selectBox, 'XState Machines', 'BabylonGraphics');
+    //this.addOption(selectBox, '2D Platformer', 'BabylonGraphics');
+    //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
+    this.addOption(selectBox, 'YCraft Contraptions', 'YCraft');
+    this.addOption(selectBox, 'Sutra Behavior Trees', 'Sutra');
+    this.addOption(selectBox, 'XState Machines', 'XState');
 
-    this.addOption(selectBox, '3D Flight', 'PhaserGraphics');
+    // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
     return selectBox;
   }
 
@@ -51,9 +51,13 @@ class WorldSelector {
     let game = this.game;
     this.showLoadingSpinner();
 
-
+    let selectedWorld = event.target.value;
+    // alert(selectedWorld)
     game.systems.entity.clearAllEntities();
-    let worldInstance = new WORLDS.worlds['XState']();
+    let worldName = 'XState';
+    worldName = 'Sutra';
+    worldName = selectedWorld;
+    let worldInstance = new WORLDS.worlds[worldName]();
     worldInstance.init(game);
 
     console.log(game.systems['xstate'])
