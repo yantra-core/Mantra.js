@@ -177,7 +177,8 @@ class Game {
       depth: new Component('depth', this),
       radius: new Component('radius', this),
       isSensor: new Component('isSensor', this),
-      owner: new Component('owner', this)
+      owner: new Component('owner', this),
+      inputs: new Component('inputs', this)
     };
 
     // define additional components for the game

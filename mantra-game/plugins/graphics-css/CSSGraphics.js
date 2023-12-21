@@ -4,6 +4,7 @@ import inflateBox from './lib/inflateBox.js';
 import inflateText from './lib/inflateText.js';
 
 import updateEntityPosition from './lib/updateEntityPosition.js';
+import updatePlayerSprite from './lib/updatePlayerSprite.js';
 import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
 import handleInputs from './lib/handleInputs.js';
@@ -36,6 +37,7 @@ class CSSGraphics extends GraphicsInterface {
     this.inflateText = inflateText.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
     this.handleInputs = handleInputs.bind(this);
+    this.updatePlayerSprite = updatePlayerSprite.bind(this);
 
     this.depthChart = [
       'background',
@@ -288,6 +290,91 @@ class CSSGraphics extends GraphicsInterface {
     }
 
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
+    let entityId = game.currentPlayerId;
+
+    if (currentPlayer && currentPlayer.inputs && currentPlayer.inputs.mouse && currentPlayer.inputs.mouse.buttons.LEFT) {
+      let data = currentPlayer.inputs;
+      // Player's current position
+      const playerX = currentPlayer.position.x;
+      const playerY = currentPlayer.position.y;
+
+      // Get mouse position
+      const mouseX = data.mouse.position.x;
+      const mouseY = data.mouse.position.y;
+
+      // Calculate direction vector
+      let dirX = mouseX - playerX;
+      let dirY = mouseY - playerY;
+
+      // Calculate the angle in radians
+      const angle = Math.atan2(dirY, dirX);
+
+      // Define the fixed directions (in radians)
+      const directions = {
+        UP: -Math.PI / 2,
+        DOWN: Math.PI / 2,
+        LEFT: Math.PI,
+        RIGHT: 0,
+        /*
+        UP_LEFT: -3 * Math.PI / 4,
+        UP_RIGHT: -Math.PI / 4,
+        DOWN_LEFT: 3 * Math.PI / 4,
+        DOWN_RIGHT: Math.PI / 4
+        */
+      };
+
+      // Find the closest direction
+      let closestDirection = Object.keys(directions).reduce((prev, curr) => {
+        if (Math.abs(angle - directions[curr]) < Math.abs(angle - directions[prev])) {
+          return curr;
+        }
+        return prev;
+      });
+
+      // Set direction vector based on the closest fixed direction
+      switch (closestDirection) {
+        case 'UP':
+          dirX = 0;
+          dirY = -1;
+          break;
+        case 'DOWN':
+          dirX = 0;
+          dirY = 1;
+          break;
+        case 'LEFT':
+          dirX = -1;
+          dirY = 0;
+          break;
+        case 'RIGHT':
+          dirX = 1;
+          dirY = 0;
+          break;
+        case 'UP_LEFT':
+          dirX = -1;
+          dirY = -1;
+          break;
+        case 'UP_RIGHT':
+          dirX = 1;
+          dirY = -1;
+          break;
+        case 'DOWN_LEFT':
+          dirX = -1;
+          dirY = 1;
+          break;
+        case 'DOWN_RIGHT':
+          dirX = 1;
+          dirY = 1;
+          break;
+      }
+      console.log("entityIdentityId", entityId, data);
+      // this.updatePlayerSprite(entityId, data);
+
+      // Apply the direction vector as force or movement
+      game.applyForce(entityId, { x: dirX, y: dirY });
+
+    }
+
+
     if (this.config.camera && this.config.camera.follow && currentPlayer) {
       if (currentPlayer.position) {
         this.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;

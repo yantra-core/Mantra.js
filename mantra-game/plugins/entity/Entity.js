@@ -258,6 +258,7 @@ class Entity {
       isSensor: false,
       restitution: 0,
       owner: 0, // 0 = server
+      inputs: null,
       destroyed: false,
       type: 'PLAYER',
       friction: 0.1,  // Default friction
@@ -282,7 +283,7 @@ class Entity {
     };
     */
 
-    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, lifetime, yCraft, text } = config;
+    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, inputs, lifetime, yCraft, text } = config;
     let { x, y } = position;
 
     /*
@@ -314,6 +315,7 @@ class Entity {
     this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
 
     this.game.addComponent(entityId, 'owner', owner);
+    this.game.addComponent(entityId, 'inputs', inputs);
     this.game.addComponent(entityId, 'lifetime', lifetime);
     this.game.addComponent(entityId, 'destroyed', false);
     this.game.addComponent(entityId, 'creationTime', Date.now());  // Current time in milliseconds

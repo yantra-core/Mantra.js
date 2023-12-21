@@ -65,33 +65,8 @@ class GraphicsSelector {
       selectGraphicsId = 'graphics-css';
     }
 
-    // Check if the selected graphics mode is already registered
-    if (typeof this.game.systems[selectGraphicsId] === 'undefined') {
-      this.game.use(selectedGraphicsMode, { camera: 'follow' });
+    game.systems.graphics.switchGraphics(selectedGraphicsMode);
 
-      // Add event listeners for plugin ready events
-      this.game.once(`plugin::ready::${selectGraphicsId}`, () => {
-
-        // iterate through all existing graphics ( except this one ) and remove them
-        this.game.graphics.forEach(function (graphics) {
-          if (graphics.id !== selectGraphicsId) {
-            game.systemsManager.removeSystem(graphics.id);
-          }
-        });
-
-        this.hideLoadingSpinner();
-      });
-    } else {
-      // check to see if we already have multiple graphics plugins loaded
-      // if so, assume multiplex and remove all the others except this one
-      if (this.game.graphics.length > 1) {
-        this.game.graphics.forEach(function (graphics) {
-          if (graphics.id !== selectGraphicsId) {
-            game.systemsManager.removeSystem(graphics.id);
-          }
-        });
-      }
-    }
   }
 
   showLoadingSpinner() {
