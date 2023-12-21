@@ -490,6 +490,13 @@ class Game {
 
   createDefaultPlayer(playerConfig) {
     // console.log('creating default player')
+
+    // check if game.currentPlayerId is already set,
+    // if so return
+    if (this.currentPlayerId) {
+      return this.getEntity(this.currentPlayerId);
+    }
+
     let player = this.createEntity({
       type: 'PLAYER',
       shape: 'triangle',

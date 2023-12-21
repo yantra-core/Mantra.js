@@ -80,7 +80,6 @@ class Graphics {
     };
 
     let graphicsInterfaceId = engines[graphicsInterfaceName];
-
     document.body.style.cursor = 'wait';
     // Check if the selected graphics mode is already registered
     if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
@@ -95,16 +94,16 @@ class Graphics {
             game.systemsManager.removeSystem(graphics.id);
           }
         });
-
         document.body.style.cursor = 'default';
         cb(null);
       });
     } else {
+      document.body.style.cursor = 'default';
       cb(null);
     }
 
   }
-
+  
   removeGraphic(entityId) {
     let game = this.game;
     game.graphics.forEach(function (graphicsInterface) {

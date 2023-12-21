@@ -1,6 +1,9 @@
 let mode = 'offline'; // online / offline
 let env = 'local'; // cloudflare / cloudflare-local / local
 
+// import roverLight from '../../YCraft.js/examples/rover-light.js'; // for now
+import worlds from '../mantra-worlds/index.js';
+
 // default values for offline mode, no compression
 let clientConfig = {
   protobuf: false,
@@ -47,8 +50,12 @@ let game = new Game({
   minLoadTime: 220,
   mouse: true,
   isEdgeClient: isEdgeClient,
+  gravity: {
+    x: 0,
+    y: 0
+  },
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['babylon'], // 'babylon', 'css', 'phaser'
+  graphics: ['css'], // 'babylon', 'css', 'phaser'
   collisions: true,
   camera: {
     follow: true,
@@ -58,7 +65,7 @@ let game = new Game({
   msgpack: clientConfig.msgpack,
   deltaCompression: clientConfig.deltaCompression,
   options: {
-    scriptRoot: './' // use local scripts instead of default yantra.gg CDN
+    scriptRoot: '.' // use local scripts instead of default yantra.gg CDN
   }
 });
 
@@ -74,20 +81,24 @@ let game = new Game({
 //game.use('Bullet');
 // game.use(new plugins.Bullet())
 game.use(new plugins.Entity())
+game.use(new plugins.Platform());
 
 game.use(new plugins.MatterPhysics());
+// game.use(new plugins.CSSGraphics());
+
 //game.use(new plugins.PhaserGraphics());
 // game.use(new plugins.BabylonGraphics());
 
 // game.use(new plugins.PhaserCamera());
 // game.use(new plugins.Collision());
 
+// game.use(new plugins.FloatyTyper())
+
 game.use(new plugins.ChronoControl())
 //game.use(new plugins.PluginsGUI())
 
 game.use(new plugins.Schema());
 
-game.use(new plugins.Tone());
 
 game.use(new plugins.Timers());
 
@@ -122,20 +133,9 @@ game.use(new plugins.Editor({
 game.use(new plugins.Sutra({ }));
 
 
-//game.use(new plugins.GameEditor());
-//game.use(new plugins.EntityEditor());
 
-import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
-import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
-
-// game.use(new plugins.XState({ world: BossFight() }));
-
-
-// game.use(new plugins.PluginExplorer({ }));
-
-// game.systems['gui-plugin-explorer'].drawPluginForm(game.systems.block, plugins.Block)
-
-// game.use(new Pong());
+// import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
+// import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
 
 
 // for local / offline play we can use any id we want
@@ -152,18 +152,12 @@ function switchToOnline() {
   //game.connect('ws://0.0.0.0:8787/websocket');  // @yantra-core/mantra-edge
 }
 
-// Setup button event listeners
-//document.getElementById('connectButton').addEventListener('click', switchToOnline);
-//document.getElementById('disconnectButton').addEventListener('click', switchToOffline);
-
-
-
 // game.connect('ws://0.0.0.0:8787/websocket');  // @yantra-core/mantra-edge
 // game.connect('ws://0.0.0.0:8888/websocket');  // @yantra-core/mantra-edge
 
 // create a round timer, each 60 seconds move to the next round
 let roundTimer = game.createTimer('round-timer', 4, true);
-console.log('roundTimer', roundTimer)
+// console.log('roundTimer', roundTimer)
 
 if (mode === 'online') {
 
@@ -192,23 +186,18 @@ if (mode === 'online') {
     game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
     game.use(new plugins.Bullet())
-    // import lightButton from '../../YCraft.js/examples/button-light.js'; // for now
-    // import allExamples from '../../YCraft.js/examples/WIP/all-examples-composite.js'; // for now
-    // import roverLight from '../../YCraft.js/examples/rover-light.js'; // for now
-    // import securitySystem from '../../YCraft.js/examples/security-system.js';
+    game.use(new worlds.Home());
+    game.use(new plugins.Tone());
 
-    /*
-    game.use(new plugins.YCraft({
-      contraption: roverLight,
-    }))
-    game.use(new plugins.YCraftGUI())
-    */
-
-
+    // game.use(new plugins.XState({ world: BossFight() }));
+    // game.use(new plugins.PluginExplorer({ }));
+    // game.systems['gui-plugin-explorer'].drawPluginForm(game.systems.block, plugins.Block)
+    // game.use(new plugins.YCraft({ contraption: roverLight }))
+    // game.use(new plugins.YCraftGUI())
     // game.use(new plugins.SutraGUI({ }));
     // game.use(new plugins.Scoreboard());
-    //game.use(new plugins.MidiGUI())
-    //game.use(new plugins.Midi())
+    // game.use(new plugins.MidiGUI())
+    // game.use(new plugins.Midi())
     // game.use(new plugins.Nes());
    
     // game.use(new plugins.TowerWorld());

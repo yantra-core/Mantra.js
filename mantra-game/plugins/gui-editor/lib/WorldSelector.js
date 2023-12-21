@@ -11,7 +11,7 @@ class WorldSelector {
     selectBox.id = 'graphicsSelect';
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
-    this.addOption(selectBox, 'Select World...', 'Client');
+    this.addOption(selectBox, 'Home World', 'Home');
     this.addOption(selectBox, '2D Platform', 'Platform');
     //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
     this.addOption(selectBox, 'YCraft Crafting World', 'YCraft');
@@ -51,6 +51,7 @@ class WorldSelector {
 
   handleSelectionChange(event) {
     let game = this.game;
+    let that = this;
     this.showLoadingSpinner();
 
     let selectedWorld = event.target.value;
@@ -60,12 +61,15 @@ class WorldSelector {
     worldName = 'Sutra';
     worldName = selectedWorld;
     let worldInstance = new WORLDS.worlds[worldName]();
+
+    game.on('plugin::ready::' + worldInstance.id, function () {
+      that.hideLoadingSpinner();
+    });
+
     worldInstance.init(game);
 
     //console.log(WORLDS.worlds['XState'])
     // WORLDS.worlds['XState'].init();
-
-    this.hideLoadingSpinner();
     
   }
 

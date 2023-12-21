@@ -1,6 +1,4 @@
-// import Matter from 'matter-js';
 //import Prando from 'prando';
-//import { nanoid } from 'nanoid';
 
 class Platform {
   static id = 'platform';
@@ -11,7 +9,6 @@ class Platform {
     this.height = height;
     this.depth = depth;
     this.kinds = ['solid', 'trampoline', 'rubber', 'jello', 'mollasas', 'ice', 'linoleum', 'flypaper', 'sandpaper'];
-    // this.rng = new Prando('ayyo.gg');
   }
 
   init(game) {
@@ -20,20 +17,15 @@ class Platform {
   }
 
   update() {
-    // Update logic if any
   }
 
   render() {
-    // Render logic if any
   }
 
   destroy() {
-    // Cleanup logic if any
   }
 
   generatePlatforms(worker, count) {
-    // Your existing platform.generate function logic
-    // Update this method to use class properties and methods as needed
   }
 
   createPlatform(entityData) {

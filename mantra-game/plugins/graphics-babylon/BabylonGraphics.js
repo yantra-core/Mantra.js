@@ -96,6 +96,7 @@ class BabylonGraphics extends GraphicsInterface {
       // renderCanvas.style.position = 'absolute';
       renderCanvas.style.top = '0px';
       renderCanvas.style.left = '0px';
+      renderCanvas.style.background = '#007fff';
       // append the renderCanvas to the gameHolder
       document.getElementById('gameHolder').appendChild(renderCanvas);
     }
@@ -174,10 +175,21 @@ class BabylonGraphics extends GraphicsInterface {
     // register this graphics pipline with the game
     game.graphics.push(this);
 
-    // async:true plugins *must* self report when they are ready
-    game.emit('plugin::ready::graphics-babylon', this);
-    // TODO: remove this line from plugin implementations
-    game.loadingPluginsCount--;
+    // Setup AssetsManager or similar loader
+    let assetsManager = new BABYLON.AssetsManager(this.scene);
+
+    // Define your assets to be loaded here
+    // Example: var meshTask = assetsManager.addMeshTask("mesh task", "", "path/", "file.babylon");
+
+    // Check when all assets are loaded
+    assetsManager.onFinish = (tasks) => {
+      // All assets are loaded, now you can emit your ready event
+      game.emit('plugin::ready::graphics-babylon', this);
+      game.loadingPluginsCount--;
+    };
+
+    // Start loading the assets
+    assetsManager.load();
   }
 
   updateGraphic(entityData /*, alpha*/) {

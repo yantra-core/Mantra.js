@@ -47,6 +47,9 @@ class GraphicsSelector {
 
   handleSelectionChange(event) {
     let game = this.game;
+
+    // TODO: figure out why cursor doesnt immediate change,
+    //       when switching to BabylonGraphics
     this.showLoadingSpinner();
 
     // Get the value of the selected graphics mode
@@ -76,7 +79,6 @@ class GraphicsSelector {
   hideLoadingSpinner() {
     document.body.style.cursor = 'default';
   }
-
 
 }
 
