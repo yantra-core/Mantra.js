@@ -22,6 +22,26 @@ class Graphics {
       document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
     }
 
+    this.preload();
+    
+  }
+
+
+  preload () {
+
+    // preload the guy sprites ( for now )
+    let preload = ['guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1'];
+    let preloaderDiv = document.createElement('div');
+    preloaderDiv.id = 'preloader';
+    gameHolder.appendChild(preloaderDiv);
+
+    preload.forEach(function (spriteName) {
+      let img = document.createElement('span');
+      img.classList.add(spriteName);
+      preloaderDiv.appendChild(img);
+    });
+
+
   }
 
   update() { }

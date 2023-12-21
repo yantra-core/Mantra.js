@@ -511,6 +511,12 @@ class Game {
     // console.log('Tone Plugin not loaded. Cannot play tone.');
   }
 
+  setGravity(x = 0, y = 0, z = 0) {
+    if (this.physics) {
+      this.physics.setGravity(x, y, z);
+    }
+  }
+
   setPlayerId(playerId) {
     // console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;

@@ -3,6 +3,11 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 import inflateBox from './lib/inflateBox.js';
 import inflateText from './lib/inflateText.js';
 
+import updateEntityPosition from './lib/updateEntityPosition.js';
+import mouseWheelZoom from './lib/mouseWheelZoom.js';
+
+import handleInputs from './lib/handleInputs.js';
+
 class CSSGraphics extends GraphicsInterface {
 
   static id = 'graphics-css';
@@ -29,6 +34,8 @@ class CSSGraphics extends GraphicsInterface {
 
     this.inflateBox = inflateBox.bind(this);
     this.inflateText = inflateText.bind(this);
+    this.updateEntityPosition = updateEntityPosition.bind(this);
+    this.handleInputs = handleInputs.bind(this);
 
     this.depthChart = [
       'background',
@@ -41,6 +48,7 @@ class CSSGraphics extends GraphicsInterface {
     ];
 
     // this.depthChart = this.depthChart.reverse();
+    this.mouseWheelZoom = mouseWheelZoom.bind(this);
 
   }
 
@@ -50,66 +58,14 @@ class CSSGraphics extends GraphicsInterface {
     game.zoomScale = 1;
     this.game = game;
 
-    game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
-      if (data) {
-        let currentInputs = data.controls;
-
-
-        if (game.tick % 5 !== 0) {
-          return;
-        }
-        // check to see if we have a player entity
-        let playerEntity = game.getEntity(entityId);
-        if (!playerEntity) {
-          return;
-        }
-        let graphic = playerEntity.graphics['graphics-css'];
-        if (!graphic) {
-          return;
-        }
-
-        let direction = 'right';
-        if (currentInputs) {
-          if (currentInputs.W) {
-            direction = 'up';
-          } else if (currentInputs.A) {
-            direction = 'left';
-          } else if (currentInputs.S) {
-            direction = 'down';
-          } else if (currentInputs.D) {
-            direction = 'right';
-          }
-          // Assume there's a way to determine whether to use -0 or -1 suffix
-          // For simplicity, let's alternate between -0 and -1
-
-          // get current className from graphic
-          let spriteClass = graphic.className;
-
-          // check it spriteClass has "0" in it
-          let spriteNumber = spriteClass.indexOf('0') > -1 ? 1 : 0;
-
-
-          // let spriteNumber = Math.round(Math.random()); // Randomly choose 0 or 1
-          //let spriteNumber = playerEntity.bit;
-          spriteClass = `guy-${direction}-${spriteNumber}`;
-
-          // First, clear previous sprite classes if any
-          graphic.classList.remove('guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1');
-
-          // Add the new sprite class
-          graphic.classList.add(spriteClass);
-
-        }
-
-      }
-    });
-
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
 
     // Initialize the CSS render div
     this.initCSSRenderDiv();
 
+    // Bind event handlers for changing player sprite
+    this.handleInputs();
 
     // register renderer with graphics pipeline
     game.graphics.push(this);
@@ -123,49 +79,7 @@ class CSSGraphics extends GraphicsInterface {
     game.loadingPluginsCount--;
 
     // Add event listener for mouse wheel
-    document.addEventListener('wheel', this.cssMouseWheelZoom, { passive: false });
-
-  }
-
-  cssMouseWheelZoom(event) {
-
-    let game = this.game;
-    let scale = game.zoomScale;
-    // Game viewport
-    let gameViewport = document.getElementById('gameHolder');
-
-
-    // Zoom settings
-    const zoomSettings = {
-      intensity: 0.01, // Decreased zoom intensity for smoother zoom
-      minScale: 0.1,   // Minimum scale limit
-    };
-
-    // Function to update scale
-    // Prevent default scrolling behavior
-    event.preventDefault();
-
-    // Determine zoom direction
-    const delta = event.wheelDelta ? event.wheelDelta : -event.detail;
-    const direction = delta > 0 ? 1 : -1;
-
-    // Update scale
-    scale += direction * zoomSettings.intensity;
-    scale = Math.max(zoomSettings.minScale, scale); // Prevent zooming out too much
-
-    // Apply scale to viewport
-    gameViewport.style.transform = `scale(${scale})`;
-
-    game.zoomScale = scale;
-
-    const viewportCenterX = window.innerWidth / 2;
-    const viewportCenterY = window.innerHeight / 2;
-
-    // TODO: implement offset to ensure camera is center of screen after zoom
-    // gameViewport.style.transform = `translate(${-this.cameraPosition.x}px, ${-this.cameraPosition.y}px) scale(${scale})`;
-
-    //game.viewportCenterXOffset = (viewportCenterX) / scale;
-    //game.viewportCenterYOffset = (viewportCenterY) / scale;
+    document.addEventListener('wheel', this.mouseWheelZoom, { passive: false });
 
   }
 
@@ -264,7 +178,7 @@ class CSSGraphics extends GraphicsInterface {
     this.renderDiv.appendChild(entityElement);
 
     // Update the position of the entity element
-    this.updateEntityElementPosition(entityElement, entityData);
+    this.updateEntityPosition(entityElement, entityData);
     return entityElement;
   }
 
@@ -328,7 +242,7 @@ class CSSGraphics extends GraphicsInterface {
       */
 
       // Update the position of the entity element
-      return this.updateEntityElementPosition(entityElement, entityData);
+      return this.updateEntityPosition(entityElement, entityData);
     } else {
       // If the entity element does not exist, create it
       return this.createGraphic(entityData);
@@ -348,24 +262,6 @@ class CSSGraphics extends GraphicsInterface {
       entity.graphics['graphics-css'].remove();
     }
 
-  }
-
-  updateEntityElementPosition(entityElement, { position, width, height, rotation = 0 }) {
-    // Adjust the position based on the camera position
-    const adjustedPosition = {
-      x: position.x - this.cameraPosition.x + window.outerWidth / 2,
-      y: position.y - this.cameraPosition.y + window.outerHeight / 2
-    };
-
-    const domX = adjustedPosition.x - width / 2;
-    const domY = adjustedPosition.y - height / 2;
-
-    // convert rotation to degrees
-    let angle = rotation * (180 / Math.PI);
-
-    this.setTransform(entityElement, domX, domY, rotation, angle);
-
-    return entityElement;
   }
 
   setTransform(entityElement, domX, domY, rotation, angle) {

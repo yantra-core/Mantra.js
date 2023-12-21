@@ -14,7 +14,7 @@ export default function inflateCircle(entityData) {
     graphic.clear();
   }
   graphic.fillStyle(0xff0000, 1);
-  graphic.fillCircle(0, 0, 50);
+  graphic.fillCircle(0, 0, entityData.radius);
   graphic.setDepth(10);
   graphic.setPosition(entityData.position.x, entityData.position.y);
   return graphic;

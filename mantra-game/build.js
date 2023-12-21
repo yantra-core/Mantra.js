@@ -10,6 +10,7 @@ const plugins = [
   './plugins/graphics-babylon/camera/BabylonCamera.js',
   './plugins/graphics-babylon/BabylonGraphics.js',
   './plugins/block/Block.js',
+  './plugins/platform/Platform.js',
   './plugins/border/Border.js',
   './plugins/bullet/Bullet.js',
   './plugins/graphics-css/CSSGraphics.js',

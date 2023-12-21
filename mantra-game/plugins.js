@@ -56,6 +56,7 @@ import Lifetime from './plugins/lifetime/Lifetime.js';
 import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
+import Platform from './plugins/platform/Platform.js';
 import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 
 // AI Behaviors
@@ -105,6 +106,7 @@ const plugins = {
   Sutra,
   YCraft,
   Block,
+  Platform,
   Border,
   Bullet,
   Collision,

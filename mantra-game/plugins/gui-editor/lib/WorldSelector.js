@@ -11,11 +11,11 @@ class WorldSelector {
     selectBox.id = 'graphicsSelect';
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
-    this.addOption(selectBox, 'Current World', 'Client');
-    //this.addOption(selectBox, '2D Platformer', 'BabylonGraphics');
+    this.addOption(selectBox, 'Select World...', 'Client');
+    this.addOption(selectBox, '2D Platform', 'Platform');
     //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
-    this.addOption(selectBox, 'YCraft Contraptions', 'YCraft');
-    this.addOption(selectBox, 'Sutra Behavior Trees', 'Sutra');
+    this.addOption(selectBox, 'YCraft Crafting World', 'YCraft');
+    this.addOption(selectBox, 'Sutra Tree World', 'Sutra');
     this.addOption(selectBox, 'XState Machines', 'XState');
 
     // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
@@ -35,12 +35,14 @@ class WorldSelector {
   }
 
   addEventListeners() {
+    /*
     this.game.on('plugin::ready::graphics-phaser', () => {
       this.selectElement('PhaserGraphics');
     });
     this.game.on('plugin::ready::graphics-babylon', () => {
       this.selectElement('BabylonGraphics');
     });
+    */
     // Add event listener to the select box
     this.selectBox.addEventListener('change', (event) => {
       this.handleSelectionChange(event);
@@ -59,8 +61,6 @@ class WorldSelector {
     worldName = selectedWorld;
     let worldInstance = new WORLDS.worlds[worldName]();
     worldInstance.init(game);
-
-    console.log(game.systems['xstate'])
 
     //console.log(WORLDS.worlds['XState'])
     // WORLDS.worlds['XState'].init();
