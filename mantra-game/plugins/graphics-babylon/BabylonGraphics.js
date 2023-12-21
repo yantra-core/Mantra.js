@@ -499,8 +499,8 @@ class BabylonGraphics extends GraphicsInterface {
 
     let mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {
       diameterTop: 0,
-      diameterBottom: 100,
-      height: 100,
+      diameterBottom: entityData.width,
+      height: entityData.height,
       tessellation: 3
     }, this.scene);
 

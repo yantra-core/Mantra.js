@@ -14,7 +14,7 @@ class EntitiesGUI {
     this.defaultProperties = ['id', 'type', 'name']; // Default properties to display
     this.knownProperties = new Set(this.defaultProperties);
     this.previousEntityStates = {}; // ...rest of the properties
-
+    this.pendingSort = true;
   }
   init(game) {
     this.game = game;
@@ -25,9 +25,39 @@ class EntitiesGUI {
 
   update() {
     // console.log('EntitiesGUI update', this.game.tick);
-
+    let ents = [];
     for (let entityId in this.game.components.creationTime.data) {
       let entity = this.game.getEntity(entityId);
+      if (entity) {
+        ents.push(entity);
+      }
+    }
+
+    // console.log('Sorting by', this.sortBy);
+    let sortByProperty = this.sortBy.column;
+    let isAscending = this.sortBy.isAscending;
+
+    ents.sort((a, b) => {
+      let aValue = a[sortByProperty];
+      let bValue = b[sortByProperty];
+
+      // Handle undefined values
+      if (aValue === undefined) return isAscending ? 1 : -1;
+      if (bValue === undefined) return isAscending ? -1 : 1;
+
+      // Unified comparison for both numbers and strings
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return isAscending ? aValue - bValue : bValue - aValue;
+      } else {
+        aValue = aValue.toString();
+        bValue = bValue.toString();
+        return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      }
+    });
+
+
+    ents.forEach(entity => {
+      let entityId = entity.id;
       // console.log('ent', entity);
 
       /*
@@ -38,13 +68,13 @@ class EntitiesGUI {
       }
       */
 
-      if (entity.destroyed) {
+      if (entity.destroyed || this.pendingSort) {
         // Remove the row from the table
         let row = this.entitiesTable.querySelector(`tr[data-id='${entityId}']`);
         if (row) {
           row.parentNode.removeChild(row);
         }
-        continue;
+        return;
       }
 
       // check to see if row exists by id
@@ -54,7 +84,8 @@ class EntitiesGUI {
         this.updateRowForEntity(entityId, entity);
       }
 
-    }
+    });
+    this.pendingSort = false;
   }
 
   hasEntityChanged(entityId, entity) {
@@ -78,12 +109,23 @@ class EntitiesGUI {
     // add click event to table
     this.entitiesTable.addEventListener('click', (e) => {
       // find the data-id attribute to get the entityId
+
+      // check to see if this is table header
+      if (e.target.tagName === 'TH') {
+        // get the column index
+        let columnIndex = Array.from(e.target.parentNode.children).indexOf(e.target);
+        this.setSortBy(columnIndex);
+        return;
+      }
+
       let entityId = e.target.parentNode.getAttribute('data-id');
-      // set the global game selectedEntityId context so other guid components can use it
-      game.selectedEntityId = entityId;
-      // check if gui-inspector is loaded, if not, load it
-      if (!game.systems['gui-inspector']) {
-        game.use('Inspector');
+      if (entityId) {
+        // set the global game selectedEntityId context so other guid components can use it
+        game.selectedEntityId = entityId;
+        // check if gui-inspector is loaded, if not, load it
+        if (!game.systems['gui-inspector']) {
+          game.use('Inspector');
+        }
       }
     });
 
@@ -95,6 +137,7 @@ class EntitiesGUI {
     guiContent.appendChild(this.entitiesTable);
 
   }
+
 
   updateTableHeaders(properties) {
     this.headerRow.innerHTML = ''; // Clear existing headers
@@ -138,13 +181,15 @@ class EntitiesGUI {
   }
 
   setSortBy(columnIndex) {
-    // console.log('setSortBy', columnIndex, this.sortBy.column, this.sortBy.isAscending);
-    if (this.sortBy.column === columnIndex) {
+    // Get property name from the header
+    let propertyName = this.headerRow.cells[columnIndex].textContent;
+    // console.log('setSortBy', propertyName, this.sortBy.column, this.sortBy.isAscending);
+    if (this.sortBy.column === propertyName) {
       this.sortBy.isAscending = !this.sortBy.isAscending; // Toggle sort order
     } else {
-      this.sortBy = { column: columnIndex, isAscending: true };
+      this.sortBy = { column: propertyName, isAscending: true };
     }
-    this.updateGlobalEventTable();
+    this.pendingSort = true;
   }
 
   openEntityInEditor(entity) {
