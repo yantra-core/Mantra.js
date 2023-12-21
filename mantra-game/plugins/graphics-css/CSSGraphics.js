@@ -47,7 +47,7 @@ class CSSGraphics extends GraphicsInterface {
   init(game) {
     // register renderer with graphics pipeline
     game.graphics.push(this);
-
+    game.zoomScale = 1;
     this.game = game;
 
     game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
@@ -121,6 +121,51 @@ class CSSGraphics extends GraphicsInterface {
 
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
+
+    // Add event listener for mouse wheel
+    document.addEventListener('wheel', this.cssMouseWheelZoom, { passive: false });
+
+  }
+
+  cssMouseWheelZoom(event) {
+
+    let game = this.game;
+    let scale = game.zoomScale;
+    // Game viewport
+    let gameViewport = document.getElementById('gameHolder');
+
+
+    // Zoom settings
+    const zoomSettings = {
+      intensity: 0.01, // Decreased zoom intensity for smoother zoom
+      minScale: 0.1,   // Minimum scale limit
+    };
+
+    // Function to update scale
+    // Prevent default scrolling behavior
+    event.preventDefault();
+
+    // Determine zoom direction
+    const delta = event.wheelDelta ? event.wheelDelta : -event.detail;
+    const direction = delta > 0 ? 1 : -1;
+
+    // Update scale
+    scale += direction * zoomSettings.intensity;
+    scale = Math.max(zoomSettings.minScale, scale); // Prevent zooming out too much
+
+    // Apply scale to viewport
+    gameViewport.style.transform = `scale(${scale})`;
+
+    game.zoomScale = scale;
+
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
+
+    // TODO: implement offset to ensure camera is center of screen after zoom
+    // gameViewport.style.transform = `translate(${-this.cameraPosition.x}px, ${-this.cameraPosition.y}px) scale(${scale})`;
+
+    //game.viewportCenterXOffset = (viewportCenterX) / scale;
+    //game.viewportCenterYOffset = (viewportCenterY) / scale;
 
   }
 
@@ -337,11 +382,20 @@ class CSSGraphics extends GraphicsInterface {
   }
   update() {
     let game = this.game;
+
+    if (typeof game.viewportCenterXOffset === 'undefined') {
+      game.viewportCenterXOffset = 0;
+    }
+
+    if (typeof game.viewportCenterYOffset === 'undefined') {
+      game.viewportCenterYOffset = 0;
+    }
+
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     if (this.config.camera && this.config.camera.follow && currentPlayer) {
       if (currentPlayer.position) {
-        this.cameraPosition.x = currentPlayer.position.x;
-        this.cameraPosition.y = currentPlayer.position.y;
+        this.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
+        this.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
       }
     }
   }
@@ -376,6 +430,9 @@ class CSSGraphics extends GraphicsInterface {
     // TODO: remove duplicated unload() code in BabylonGraphics
     this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
     delete this.game._plugins['CSSGraphics'];
+
+    // remove the wheel event listener
+    document.removeEventListener('wheel', this.cssMouseWheelZoom);
 
     // iterate through all entities and remove existing css graphics
     for (let [eId, entity] of this.game.entities.entries()) {
