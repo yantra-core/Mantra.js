@@ -53,6 +53,7 @@ class Game {
     graphics = ['babylon'],
     collisions = true,
     camera = {},
+    gravity = {},
     keyboard = true,
     mouse = true,
     gamepad = true,
@@ -77,6 +78,7 @@ class Game {
       loadDefaultPlugins,
       width,
       height,
+      gravity,
       physics,
       graphics,
       collisions,
@@ -472,7 +474,7 @@ class Game {
     return new Promise((resolve, reject) => {
       // console.log(this.listenerCount('player::joined'))
       if (this.listenerCount('player::joined') === 0) {
-        let result = this.defaultCreatePlayer(playerConfig);
+        let result = this.createDefaultPlayer(playerConfig);
         resolve(result);
       } else {
         // Attach a one-time listener for handling the response
@@ -485,19 +487,24 @@ class Game {
     });
   }
 
-  defaultCreatePlayer(playerConfig) {
+  createDefaultPlayer(playerConfig) {
     // console.log('creating default player')
-    return this.createEntity({
+    let player = this.createEntity({
       type: 'PLAYER',
       shape: 'triangle',
       width: 64,
       height: 64,
+      friction: 0.5,  // Default friction
+      frictionAir: 0.5, // Default air friction
+      frictionStatic: 1, // Default static friction
       color: 0x00ff00,
       position: {
         x: 0,
         y: 0
       },
     });
+    this.setPlayerId(player.id);
+    return player;
   }
 
   playNote(note, duration) {
@@ -522,7 +529,6 @@ class Game {
     const body = this.bodyMap[entityId];
     this.physics.rotateBody(body, rotationAmount);
   }
-
 
 }
 

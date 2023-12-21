@@ -24,7 +24,7 @@ class DefaultMovementStrategy {
     // TODO: this.game.applyForce()
     const position = this.game.getComponent(entityId, 'position');
     if (position) {
-      const forceFactor = 0.05;
+      const forceFactor = 0.5;
       const force = { x: dx * forceFactor, y: -dy * forceFactor };
       const body = this.game.bodyMap[entityId];
       this.game.physics.applyForce(body, body.position, force);

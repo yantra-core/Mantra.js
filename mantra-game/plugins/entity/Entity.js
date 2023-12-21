@@ -448,6 +448,15 @@ class Entity {
 
   }
 
+  clearAllEntities() {
+    this.game.entities.forEach(ent => {
+      if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
+        ent.yCraft.part.unload();
+      }
+      this.game.removeEntity(ent.id);
+    });
+  }
+
   // TODO: move this to PhysicsPlugin
   createBody(config) {
 

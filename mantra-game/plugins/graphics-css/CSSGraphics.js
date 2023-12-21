@@ -50,6 +50,59 @@ class CSSGraphics extends GraphicsInterface {
 
     this.game = game;
 
+    game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
+      if (data) {
+        let currentInputs = data.controls;
+
+
+        if (game.tick % 5 !== 0) {
+          return;
+        }
+        // check to see if we have a player entity
+        let playerEntity = game.getEntity(entityId);
+        if (!playerEntity) {
+          return;
+        }
+        let graphic = playerEntity.graphics['graphics-css'];
+        if (!graphic) {
+          return;
+        }
+
+        let direction = 'right';
+        if (currentInputs) {
+          if (currentInputs.W) {
+            direction = 'up';
+          } else if (currentInputs.A) {
+            direction = 'left';
+          } else if (currentInputs.S) {
+            direction = 'down';
+          } else if (currentInputs.D) {
+            direction = 'right';
+          }
+          // Assume there's a way to determine whether to use -0 or -1 suffix
+          // For simplicity, let's alternate between -0 and -1
+
+          // get current className from graphic
+          let spriteClass = graphic.className;
+
+          // check it spriteClass has "0" in it
+          let spriteNumber = spriteClass.indexOf('0') > -1 ? 1 : 0;
+
+
+          // let spriteNumber = Math.round(Math.random()); // Randomly choose 0 or 1
+          //let spriteNumber = playerEntity.bit;
+          spriteClass = `guy-${direction}-${spriteNumber}`;
+
+          // First, clear previous sprite classes if any
+          graphic.classList.remove('guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1');
+
+          // Add the new sprite class
+          graphic.classList.add(spriteClass);
+
+        }
+
+      }
+    });
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
@@ -131,11 +184,29 @@ class CSSGraphics extends GraphicsInterface {
         break;
       case 'PLAYER':
         // For PLAYER entities, create a triangle
-        entityElement.style.width = '0px';
-        entityElement.style.height = '0px';
-        entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
-        entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
-        entityElement.style.borderBottom = entityData.height + 'px solid green';
+        entityElement.style.width = entityData.width + 'px';
+        entityElement.style.height = entityData.height + 'px';
+        //entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
+        //entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
+        //entityElement.style.borderBottom = entityData.height + 'px solid green';
+        // entityElement.classList.add('pixelart-to-css');
+
+        /*
+
+        we have: 
+
+        .guy-down-0
+        .guy-down-1
+        .guy-up-0
+        .guy-up-1
+        .guy-right-0
+        .guy-right-1
+
+        */
+
+        entityElement.classList.add('guy-right-0');
+
+
         break;
       case 'TEXT':
         entityElement = this.inflateText(entityElement, entityData);
@@ -164,7 +235,6 @@ class CSSGraphics extends GraphicsInterface {
       }
     }
 
-
     const entityElement = document.getElementById(`entity-${entityData.id}`);
     if (entityElement) {
 
@@ -175,6 +245,42 @@ class CSSGraphics extends GraphicsInterface {
         // update the background color
         entityElement.style.background = hexColor;
       }
+      // Update the background sprite if velocity is present
+      /*
+      if (entityData.type === 'PLAYER' && entityData.velocity && this.game.tick % 10 === 0 && Math.abs(entityData.velocity.x) > 0.001 && Math.abs(entityData.velocity.y) > 0.001) {
+
+        let angle = Math.atan2(entityData.velocity.y, entityData.velocity.x);
+        let angleDeg = angle * 180 / Math.PI;
+
+        // Remark: Move this logic to just listen for local entityInput
+        // we can revist this for server side prediction later
+        // Determine direction based on angle
+        let direction = "";
+        if (angleDeg >= -45 && angleDeg < 45) {
+          direction = "right";
+        } else if (angleDeg >= 45 && angleDeg < 135) {
+          direction = "down";
+        } else if (angleDeg >= -135 && angleDeg < -45) {
+          direction = "up";
+        } else {
+          direction = "left";
+        }
+
+        // Assume there's a way to determine whether to use -0 or -1 suffix
+        // For simplicity, let's alternate between -0 and -1
+        let spriteNumber = Math.round(Math.random()); // Randomly choose 0 or 1
+        let spriteClass = `guy-${direction}-${spriteNumber}`;
+
+        // First, clear previous sprite classes if any
+        entityElement.classList.remove('guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1');
+
+        // Add the new sprite class
+        entityElement.classList.add(spriteClass);
+
+        //console.log('Entity data:', entityData);
+        //console.log('Applied class:', spriteClass);
+      }
+      */
 
       // Update the position of the entity element
       return this.updateEntityElementPosition(entityElement, entityData);
@@ -202,8 +308,8 @@ class CSSGraphics extends GraphicsInterface {
   updateEntityElementPosition(entityElement, { position, width, height, rotation = 0 }) {
     // Adjust the position based on the camera position
     const adjustedPosition = {
-      x: position.x - this.cameraPosition.x + window.innerWidth / 2,
-      y: position.y - this.cameraPosition.y + window.innerHeight / 2
+      x: position.x - this.cameraPosition.x + window.outerWidth / 2,
+      y: position.y - this.cameraPosition.y + window.outerHeight / 2
     };
 
     const domX = adjustedPosition.x - width / 2;

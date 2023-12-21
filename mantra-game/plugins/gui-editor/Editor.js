@@ -1,4 +1,5 @@
 import GraphicsSelector from './lib/GraphicsSelector.js';
+import WorldSelector from './lib/WorldSelector.js';
 
 class Editor {
 
@@ -43,20 +44,28 @@ class Editor {
 
     // Create menus
     const $fileMenu = this.createMenu('File');
-    const $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
+    // const $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
     const $eventsMenu = this.createMenu('Events', this.showEventsInspector.bind(this));
     const $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
     const $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
     const $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
     const $graphicsSelector = new GraphicsSelector(this.game);
+    const $worldSelector = new WorldSelector(this.game);
 
     // set css styles for $graphicsSelector
     $graphicsSelector.selectBox.style.position = 'absolute';
     $graphicsSelector.selectBox.style.right = '150px';
     $graphicsSelector.selectBox.style.top = '0px';
     $graphicsSelector.selectBox.style.fontSize = '22px';
-    // cursor pointer
     $graphicsSelector.selectBox.style.cursor = 'pointer';
+
+    // set css styles for $worldSelector
+    $worldSelector.selectBox.style.position = 'absolute';
+    $worldSelector.selectBox.style.right = '450px';
+    $worldSelector.selectBox.style.top = '0px';
+    $worldSelector.selectBox.style.fontSize = '22px';
+    $worldSelector.selectBox.style.cursor = 'pointer';
+
 
     const $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
     // const $aboutMenu = this.createMenu('About');
@@ -64,19 +73,20 @@ class Editor {
 
     // Populate menus
     this.populateFileMenu($fileMenu);
-    this.populatePluginsMenu($pluginsMenu);
+    // this.populatePluginsMenu($pluginsMenu);
 
     // TODO: about links
     //this.populateAboutMenu($aboutMenu);
 
     // Append menus to the toolbar
-    let toolBarItems = [$fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu];
+    let toolBarItems = [$fileMenu, $eventsMenu, $controlsMenu, $entitiesMenu];
     if (this.sutraEditor) {
      toolBarItems.push($rulesMenu)
     }
     toolBarItems.push($inspectorMenu)
     $toolbar.append(toolBarItems);
     $toolbar.append($graphicsSelector.selectBox);
+    $toolbar.append($worldSelector.selectBox);
 
     // Append the toolbar to the body
     $('body').append($toolbar);
@@ -125,6 +135,10 @@ class Editor {
 
     const $deployWorld = $('<a>', { href: 'https://yantra.gg/game-dev-quickstart/deploy-world', text: 'Deploy to Yantra Cloud', target: '_blank' });
     $dropdownContent.append($deployWorld);
+
+    const $pluginsView = $('<a>', { href: '#', text: 'Plugins' });
+    $pluginsView.on('click', () => this.showPluginsGUI()); // Add click handler
+    $dropdownContent.append($pluginsView);
 
     const $aboutMantra = $('<a>', { href: 'https://github.com/yantra-core/mantra', text: 'About Mantra', target: '_blank' });
     $dropdownContent.append($aboutMantra);

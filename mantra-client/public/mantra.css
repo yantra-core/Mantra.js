@@ -326,9 +326,7 @@ pre {
 .gui-container {
   z-index: 1000;
   background-color: #0a0f1b;
-
   color: #d3d9df;
-
   padding-bottom: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -336,6 +334,71 @@ pre {
   overflow: auto;
   position: absolute;
 }
+
+
+.gui-content {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.gui-header {
+  background: #f0f0f0;
+  color: #000;
+  cursor: move;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.gui-container-touch {
+  position: fixed; /* or 'absolute' if you prefer */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto; /* for smooth scrolling */
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+
+.gui-content-touch {
+  position: relative;
+  top: 25px; /* Adjust if needed */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  padding: 10px; /* Add padding for better touch interaction */
+}
+
+
+.gui-header-touch {
+  background: #f0f0f0;
+  color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px; /* Make it larger for easier touch */
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px; /* Adjust padding for touch targets */
+}
+
 
 .gui-container table {
   border-collapse: collapse;
@@ -407,21 +470,7 @@ pre {
   background-color: #00ca56;
 }
 
-.gui-header {
-  background: #f0f0f0;
-  color: #000;
-  cursor: move;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 25px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-}
+
 
 .gui-header h3 {
   position: relative;
@@ -448,18 +497,6 @@ pre {
   margin: 0 4px;
   display: inline-block;
   cursor: pointer;
-}
-
-.gui-content {
-  position: absolute;
-  top: 25px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-
-  overflow-x: hidden;
-
 }
 
 #entityView {
@@ -1630,6 +1667,59 @@ button[type="submit"]:disabled {
   }
 }
 
+
+
+.guy-down-0 {
+  background-image: url('./img/game/link-walk/sprite_0.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+.guy-down-1 {
+  background-image: url('./img/game/link-walk/sprite_1.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+.guy-up-0 {
+  background-image: url('./img/game/link-walk/sprite_5.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+.guy-up-1 {
+  background-image: url('./img/game/link-walk/sprite_3.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+/* actual movements */
+.guy-right-0 {
+  background-image: url('./img/game/link-walk/sprite_2.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+.guy-right-1 {
+  background-image: url('./img/game/link-walk/sprite_4.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+/* left needs to mirror right */
+.guy-left-0 {
+  background-image: url('./img/game/link-walk/sprite_6.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+.guy-left-1 {
+  background-image: url('./img/game/link-walk/sprite_7.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+
 /*
 
 @font-face {
@@ -1642,3 +1732,4 @@ button[type="submit"]:disabled {
   font-family: 'Bravura', sans-serif;
 }
 */
+

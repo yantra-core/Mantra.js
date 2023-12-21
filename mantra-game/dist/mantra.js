@@ -323,6 +323,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       collisions = _ref$collisions === void 0 ? true : _ref$collisions,
       _ref$camera = _ref.camera,
       camera = _ref$camera === void 0 ? {} : _ref$camera,
+      _ref$gravity = _ref.gravity,
+      gravity = _ref$gravity === void 0 ? {} : _ref$gravity,
       _ref$keyboard = _ref.keyboard,
       keyboard = _ref$keyboard === void 0 ? true : _ref$keyboard,
       _ref$mouse = _ref.mouse,
@@ -356,6 +358,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       loadDefaultPlugins: loadDefaultPlugins,
       width: width,
       height: height,
+      gravity: gravity,
       physics: physics,
       graphics: graphics,
       collisions: collisions,
@@ -761,9 +764,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function createPlayer(playerConfig) {
       var _this = this;
       return new Promise(function (resolve, reject) {
-        console.log(_this.listenerCount('player::joined'));
+        // console.log(this.listenerCount('player::joined'))
         if (_this.listenerCount('player::joined') === 0) {
-          var result = _this.defaultCreatePlayer(playerConfig);
+          var result = _this.createDefaultPlayer(playerConfig);
           resolve(result);
         } else {
           // Attach a one-time listener for handling the response
@@ -776,14 +779,20 @@ var Game = exports.Game = /*#__PURE__*/function () {
       });
     }
   }, {
-    key: "defaultCreatePlayer",
-    value: function defaultCreatePlayer(playerConfig) {
+    key: "createDefaultPlayer",
+    value: function createDefaultPlayer(playerConfig) {
       // console.log('creating default player')
       return this.createEntity({
         type: 'PLAYER',
         shape: 'triangle',
         width: 64,
         height: 64,
+        friction: 0.5,
+        // Default friction
+        frictionAir: 0.5,
+        // Default air friction
+        frictionStatic: 1,
+        // Default static friction
         color: 0x00ff00,
         position: {
           x: 0,

@@ -33,11 +33,29 @@ class MatterPhysics extends PhysicsInterface {
 
   }
 
+  setGravity({x = 0, y = 0} = {}) {
+    this.engine.gravity.x = x;
+    this.engine.gravity.y = y;
+  }
+
   init (game) {
 
     this.engine = Matter.Engine.create()
-    this.engine.gravity.x = 0;
-    this.engine.gravity.y = 0;
+
+    if (typeof game.config.gravity === 'undefined') {
+      game.config.gravity = { x: 0, y: 0 };
+    }
+
+    if (typeof game.config.gravity.x === 'undefined') {
+      game.config.gravity.x = 0;
+    }
+
+    if (typeof game.config.gravity.y === 'undefined') {
+      game.config.gravity.y = 0;
+    }
+
+    this.engine.gravity.x = game.config.gravity.x;
+    this.engine.gravity.y = game.config.gravity.y;
     this.world = this.engine.world;
 
     game.physics = this;
