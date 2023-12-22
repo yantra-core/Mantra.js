@@ -39,9 +39,7 @@ class Platform {
   
     console.log(game.systems)
 
-
     game.createDefaultPlayer();
-
 
   }
 

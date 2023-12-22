@@ -450,8 +450,12 @@ class Entity {
 
   }
 
-  clearAllEntities() {
+  clearAllEntities(clearCurrentPlayer) {
     this.game.entities.forEach(ent => {
+      // Do not remove the current player if clearCurrentPlayer is false
+      if (ent.id === this.game.currentPlayerId && !clearCurrentPlayer) {
+        return;
+      }
       if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
         ent.yCraft.part.unload();
       }

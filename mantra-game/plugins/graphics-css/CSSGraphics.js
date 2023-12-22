@@ -32,6 +32,8 @@ class CSSGraphics extends GraphicsInterface {
 
     this.id = CSSGraphics.id;
     this.cameraPosition = { x: 0, y: 0 };
+    this.mouseWheelEnabled = false;
+
 
     this.inflateBox = inflateBox.bind(this);
     this.inflateText = inflateText.bind(this);
@@ -52,6 +54,16 @@ class CSSGraphics extends GraphicsInterface {
     // this.depthChart = this.depthChart.reverse();
     this.mouseWheelZoom = mouseWheelZoom.bind(this);
 
+  }
+
+  zoom(scale) {
+    let gameViewport = document.getElementById('gameHolder');
+    gameViewport.style.transform = `scale(${scale})`;
+    gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
+    // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
+    this.game.zoomScale = scale;
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
   }
 
   init(game) {
@@ -81,7 +93,9 @@ class CSSGraphics extends GraphicsInterface {
     game.loadingPluginsCount--;
 
     // Add event listener for mouse wheel
+    console.log("BINDING AGAIN")
     document.addEventListener('wheel', this.mouseWheelZoom, { passive: false });
+    this.mouseWheelEnabled = true;
 
   }
 
@@ -409,13 +423,17 @@ class CSSGraphics extends GraphicsInterface {
 
   unload() {
 
+    // Reset Zoom
+    this.zoom(1);
+
     // TODO: consolidate graphics pipeline unloading into SystemsManager
     // TODO: remove duplicated unload() code in BabylonGraphics
     this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
     delete this.game._plugins['CSSGraphics'];
 
     // remove the wheel event listener
-    document.removeEventListener('wheel', this.cssMouseWheelZoom);
+    // document.removeEventListener('wheel', this.cssMouseWheelZoom);
+    this.mouseWheelEnabled = false;
 
     // iterate through all entities and remove existing css graphics
     for (let [eId, entity] of this.game.entities.entries()) {
@@ -429,6 +447,7 @@ class CSSGraphics extends GraphicsInterface {
     if (div) {
       div.remove();
     }
+
   }
 }
 

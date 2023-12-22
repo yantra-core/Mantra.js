@@ -15,6 +15,7 @@ export default function updatePlayerSprite (entityId, data) {
   }
 
   let direction = 'right';
+
   if (currentInputs) {
     if (currentInputs.W) {
       direction = 'up';

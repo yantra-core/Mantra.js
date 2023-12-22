@@ -56,7 +56,7 @@ class WorldSelector {
 
     let selectedWorld = event.target.value;
     // alert(selectedWorld)
-    game.systems.entity.clearAllEntities();
+    game.systems.entity.clearAllEntities(false);
     let worldName = 'XState';
     worldName = 'Sutra';
     worldName = selectedWorld;

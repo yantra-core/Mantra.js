@@ -12,6 +12,152 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var Home = /*#__PURE__*/function () {
+  function Home() {
+    _classCallCheck(this, Home);
+    this.id = Home.id;
+  }
+  _createClass(Home, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.createWorld();
+    }
+  }, {
+    key: "createWorld",
+    value: function createWorld() {
+      var game = this.game;
+      game.setGravity(0, 0, 0);
+      game.createEntity({
+        type: 'PLATFORM',
+        isStatic: true,
+        width: 1000,
+        height: 40,
+        position: {
+          x: 0,
+          y: 200
+        }
+      });
+      game.createEntity({
+        type: 'BLOCK',
+        width: 300,
+        height: 300,
+        position: {
+          x: 0,
+          y: -150
+        }
+      });
+      game.use('Border', {
+        autoBorder: true
+      });
+      console.log(game.systems);
+      game.createDefaultPlayer();
+
+      /*
+      game.systems.graphics.switchGraphics('BabylonGraphics', function(){
+        game.use('StarField');
+        game.createDefaultPlayer();
+      });
+      */
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }]);
+  return Home;
+}();
+_defineProperty(Home, "id", 'Home');
+var _default = exports["default"] = Home;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var Platform = /*#__PURE__*/function () {
+  function Platform(game) {
+    _classCallCheck(this, Platform);
+    this.game = game; // Store the reference to the game logic
+    this.id = Platform.id;
+  }
+  _createClass(Platform, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.createWorld();
+    }
+  }, {
+    key: "createWorld",
+    value: function createWorld() {
+      var game = this.game;
+      game.setGravity(0, 9.8, 0);
+      game.use('Platform');
+
+      // TODO:     game.on('game::ready', function () {
+      //           needs secound ready emit after plugins are loaded after start
+      game.on('plugin::ready::Platform', function () {
+        console.log(game.systems.platform.kinds);
+        game.createEntity({
+          type: 'PLATFORM',
+          isStatic: true,
+          width: 700,
+          height: 40,
+          position: {
+            x: 0,
+            y: 300
+          }
+        });
+        game.createDefaultPlayer();
+      });
+      game.use('Border', {
+        autoBorder: true
+      });
+      console.log(game.systems);
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }]);
+  return Platform;
+}();
+_defineProperty(Platform, "id", 'Platform');
+var _default = exports["default"] = Platform;
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Pong = /*#__PURE__*/function () {
   function Pong() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -183,7 +329,7 @@ var Pong = /*#__PURE__*/function () {
 _defineProperty(Pong, "id", 'world-pong');
 var _default = exports["default"] = Pong;
 
-},{}],2:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -221,6 +367,8 @@ var Space = /*#__PURE__*/function () {
       // game.systems['entity-movement'].unload();
       game.systemsManager.removeSystem('entity-input');
       game.systemsManager.removeSystem('entity-movement');
+
+      // TODO: Game.setPhysics('PhysXPhysics')
       game.use('PhysXPhysics');
       game.use('EntityInput');
       game.use('EntityMovement');
@@ -230,6 +378,8 @@ var Space = /*#__PURE__*/function () {
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/physx-babylon.html'
       });
+
+      // TODO: Game.setGraphics('BabylonGraphics')
       game.systems.graphics.switchGraphics('BabylonGraphics', function () {
         // Creates a single Block, since we have used Block plugin, this will be a destructible Block
         game.createEntity({
@@ -264,7 +414,7 @@ var Space = /*#__PURE__*/function () {
 _defineProperty(Space, "id", 'Space');
 var _default = exports["default"] = Space;
 
-},{}],3:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -315,13 +465,12 @@ var Sutra = /*#__PURE__*/function () {
         autoBorder: true,
         thickness: 200
       });
-
-      // Adds a nice StarField background
-      game.use('StarField');
-      game.use('TowerWorld', {
-        game: game
-      });
       game.systems.graphics.switchGraphics('BabylonGraphics', function () {
+        // Adds a nice StarField background
+        game.use('StarField');
+        game.use('TowerWorld', {
+          game: game
+        });
         game.data.roundEnded = false;
         game.data.roundStarted = true;
         game.createDefaultPlayer();
@@ -342,7 +491,7 @@ var Sutra = /*#__PURE__*/function () {
 _defineProperty(Sutra, "id", 'Sutra');
 var _default = exports["default"] = Sutra;
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -386,10 +535,13 @@ var XState = /*#__PURE__*/function () {
 
       // Adds a nice StarField background
       game.use('StarField');
-      game.use('CurrentFPS');
+
+      /*
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/xstate-matter-babylon.html'
       });
+      */
+
       function BossFightMiddleware() {
         var BossFight = {
           id: 'bossFightGame',
@@ -521,7 +673,7 @@ var XState = /*#__PURE__*/function () {
 _defineProperty(XState, "id", 'XState');
 var _default = exports["default"] = XState;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -552,7 +704,6 @@ var YCraft = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.use('YCraft');
-      game.use('Editor');
       game.use('YCraftGUI');
       game.start(function () {});
       game.systems.graphics.switchGraphics('CSSGraphics', function () {
@@ -574,7 +725,7 @@ var YCraft = /*#__PURE__*/function () {
 _defineProperty(YCraft, "id", 'YCraft');
 var _default = exports["default"] = YCraft;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -589,13 +740,15 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":7}],7:[function(require,module,exports){
+},{"./index.js":9}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _Home = _interopRequireDefault(require("./Home/Home.js"));
+var _Platform = _interopRequireDefault(require("./Platform/Platform.js"));
 var _Pong = _interopRequireDefault(require("./Pong/Pong.js"));
 var _Space = _interopRequireDefault(require("./Space/Space.js"));
 var _Sutra = _interopRequireDefault(require("./Sutra/Sutra.js"));
@@ -603,6 +756,8 @@ var _XState = _interopRequireDefault(require("./XState/XState.js"));
 var _YCraft = _interopRequireDefault(require("./YCraft/YCraft.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var worlds = {};
+worlds.Home = _Home["default"];
+worlds.Platform = _Platform["default"];
 worlds.Pong = _Pong["default"];
 worlds.Space = _Space["default"];
 worlds.Sutra = _Sutra["default"];
@@ -610,5 +765,5 @@ worlds.XState = _XState["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./Pong/Pong.js":1,"./Space/Space.js":2,"./Sutra/Sutra.js":3,"./XState/XState.js":4,"./YCraft/YCraft.js":5}]},{},[6])(6)
+},{"./Home/Home.js":1,"./Platform/Platform.js":2,"./Pong/Pong.js":3,"./Space/Space.js":4,"./Sutra/Sutra.js":5,"./XState/XState.js":6,"./YCraft/YCraft.js":7}]},{},[8])(8)
 });

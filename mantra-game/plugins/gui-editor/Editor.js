@@ -20,7 +20,8 @@ class Editor {
     if (typeof $ === 'undefined') {
       console.log('$ is not defined, attempting to load jQuery from vendor');
       game.loadScripts([
-        '/vendor/jquery.min.js'
+        '/vendor/jquery.min.js',
+        '/worlds.mantra.js'
       ], () => {
         console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
         this.jqueryReady();

@@ -1,14 +1,15 @@
 export default function cssMouseWheelZoom(event) {
-
+  if (!this.mouseWheelEnabled) {
+    return;
+  }
   let game = this.game;
   let scale = game.zoomScale;
   // Game viewport
   let gameViewport = document.getElementById('gameHolder');
 
-
   // Zoom settings
   const zoomSettings = {
-    intensity: 0.01, // Decreased zoom intensity for smoother zoom
+    intensity: 0.03, // Decreased zoom intensity for smoother zoom
     minScale: 0.1,   // Minimum scale limit
   };
 
@@ -24,10 +25,11 @@ export default function cssMouseWheelZoom(event) {
   scale += direction * zoomSettings.intensity;
   scale = Math.max(zoomSettings.minScale, scale); // Prevent zooming out too much
 
-  // Apply scale to viewport
-  gameViewport.style.transform = `scale(${scale})`;
+  this.zoom(scale);
 
-  game.zoomScale = scale;
+  // Apply scale to viewport
+  //gameViewport.style.transform = `scale(${scale})`;
+  //game.zoomScale = scale;
 
   const viewportCenterX = window.innerWidth / 2;
   const viewportCenterY = window.innerHeight / 2;
