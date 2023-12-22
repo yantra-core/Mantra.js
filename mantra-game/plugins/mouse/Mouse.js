@@ -8,6 +8,10 @@ export default class Mouse {
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };
+
+    this.isDragging = false;
+    this.dragStartPosition = { x: 0, y: 0 };
+
     this.mouseButtons = {
       LEFT: false,
       RIGHT: false,
@@ -29,6 +33,8 @@ export default class Mouse {
     document.addEventListener('pointermove', this.boundHandleMouseMove);
     document.addEventListener('pointerdown', this.boundHandleMouseDown);
     document.addEventListener('pointerup', this.boundHandleMouseUp);
+    // TODO: could be a config option
+    document.addEventListener('contextmenu', event => event.preventDefault());
   }
 
   handleMouseMove(event) {
@@ -41,6 +47,18 @@ export default class Mouse {
       // if not a canvas, set relative position to null or keep the previous position
       this.canvasPosition = null;
     }
+
+    // If dragging, calculate the delta and send drag data
+    if (this.isDragging) {
+      const dx = this.mousePosition.x - this.dragStartPosition.x;
+      const dy = this.mousePosition.y - this.dragStartPosition.y;
+      this.dx = dx;
+      this.dy = dy;
+
+      // Update the drag start position for the next movement
+      this.dragStartPosition = { x: this.mousePosition.x, y: this.mousePosition.y };
+    }
+
     this.sendMouseData();
   }
 
@@ -67,6 +85,16 @@ export default class Mouse {
         this.mouseButtons.RIGHT = true;
         break;
     }
+
+
+    if (event.button === 2) { // Right mouse button
+      this.isDragging = true;
+      this.dragStartPosition = { x: event.clientX, y: event.clientY };
+      // prevent default right click menu
+      event.preventDefault();
+    }
+
+
     this.sendMouseData();
   }
 
@@ -82,6 +110,13 @@ export default class Mouse {
         this.mouseButtons.RIGHT = false;
         break;
     }
+
+    if (event.button === 2) { // Right mouse button
+      this.isDragging = false;
+      // prevent default right click menu
+      event.preventDefault();
+    }
+
     this.sendMouseData();
   }
 
@@ -89,7 +124,11 @@ export default class Mouse {
     const mouseData = {
       position: this.mousePosition, // absolute position
       canvasPosition: this.canvasPosition, // relative position to any canvas
-      buttons: this.mouseButtons
+      buttons: this.mouseButtons,
+      isDragging: this.isDragging,
+      dragStartPosition: this.dragStartPosition,
+      dx: this.dx,
+      dy: this.dy
     };
     if (this.game.communicationClient) {
       this.game.communicationClient.sendMessage('player_input', { mouse: mouseData });

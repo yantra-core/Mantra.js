@@ -12,70 +12,83 @@ class CSSCamera {
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem('graphics-css-camera', this);
-    //this.initZoomControls();
 
     // Add event listener for mouse wheel
-    document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });
-    this.scene.mouseWheelEnabled = true;
     this.scene.zoom(this.game.config.camera.startingZoom);
+
+    this.initZoomControls();
+
+    game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
+        /*
+        // our MouseData looks like this:
+        data.mouse = {
+            position: this.mousePosition, // absolute position
+            canvasPosition: this.canvasPosition, // relative position to any canvas
+            buttons: this.mouseButtons,
+            isDragging: this.isDragging,
+            dragStartPosition: this.dragStartPosition,
+            dx: this.dx,
+            dy: this.dy
+          };
+      */
+      if (data.mouse && data.mouse.isDragging) {
+        // Update camera position based on drag deltas
+        this.updateCameraPosition(data.mouse.dx, data.mouse.dy);
+      }
+    });
 
   }
 
+  // Method to update camera position based on drag
+  updateCameraPosition(dx, dy) {
+    let game = this.game;
+
+    if (typeof game.viewportCenterXOffset === 'undefined') {
+      game.viewportCenterXOffset = 0;
+    }
+
+    if (typeof game.viewportCenterYOffset === 'undefined') {
+      game.viewportCenterYOffset = 0;
+    }
+
+
+    if (typeof dx === 'number') {
+      game.viewportCenterXOffset += dx;
+    }
+
+    if (typeof dy === 'number') {
+      game.viewportCenterYOffset += dy;
+    }
+
+    // Update the actual camera view, if needed
+    //this.applyCameraTransform();
+  }
   // update() is called each game tick, we may want to implement render() here instead for RAF
   update() {
+    let game = this.game;
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     let entityId = game.currentPlayerId;
+
+    if (typeof game.viewportCenterXOffset === 'undefined') {
+      game.viewportCenterXOffset = 0;
+    }
+
+    if (typeof game.viewportCenterYOffset === 'undefined') {
+      game.viewportCenterYOffset = 0;
+    }
 
     if (currentPlayer.position) {
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
       this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
     }
-    /*
-    let camera = this.scene.cameras.main;
-    let player = this.game.getEntity(this.game.currentPlayerId);
-    // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
-    if (camera && player.graphics && player.graphics['graphics-css']) {
-      camera.centerOn(player.position.x, player.position.y);
-      this.followingPlayer = true; // Set the flag to true
-    }
-    */
   }
 
   initZoomControls() {
-    /*
-    this.scene.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-      let currentZoom = zoom.current;
-      // Determine the zoom factor based on the wheel event.
-      const zoomFactor = deltaY < 0 ? 1.5 : 0.6;  // Adjust these numbers to your preference
-      // Calculate the target zoom level.
-      currentZoom *= zoomFactor;
-      // Clamp the zoom level to reasonable limits (e.g., between 0.2 to 2)
-      currentZoom = Math.min(Math.max(currentZoom, zoom.minZoom), zoom.maxZoom);
-      // Use zoom.tweenTo for smoother zoom transitions
-      zoom.tweenTo(this.scene, currentZoom, 666);  // 1000 ms duration for the tween
-    });
-    */
+    document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });
+    this.scene.mouseWheelEnabled = true;
   }
 
-  tweenToZoom(targetZoom, duration = 1000, callback) {
-    // Your existing tweenTo logic
-    // Use this.zoom and this.camera
-  }
 
-  zoomIn(amount = 0.01) {
-    zoom.zoomIn(this.scene, amount);
-  }
-
-  zoomOut(amount = 0.01) {
-    zoom.zoomOut(this.scene, amount);
-  }
-
-  setZoom(absoluteAmount) {
-    zoom.set(this.scene, absoluteAmount);
-  }
-
-  startFollowing(player) {
-  }
 }
 
 export default CSSCamera;
