@@ -83,7 +83,7 @@ class Graphics {
     document.body.style.cursor = 'wait';
     // Check if the selected graphics mode is already registered
     if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
-      this.game.use(graphicsInterfaceName, { camera: 'follow' });
+      this.game.use(graphicsInterfaceName /*, { camera: this.game.data.camera }*/);
 
       // Add event listeners for plugin ready events
       this.game.once(`plugin::ready::${graphicsInterfaceId}`, () => {

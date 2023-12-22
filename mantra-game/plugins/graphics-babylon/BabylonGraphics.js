@@ -15,7 +15,7 @@ class BabylonGraphics extends GraphicsInterface {
   static removable = false;
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  constructor({ camera = {} }) {
+  constructor({ camera = {}} = {}) {
     super();
     this.id = BabylonGraphics.id;
     this.async = BabylonGraphics.async;

@@ -98,10 +98,17 @@ class Game {
 
     this.config = config;
 
+    // Keeps a clean copy of current game state
+    // Game.data scope can be used for applying configuration settings while game is running
+    // Game.config scope is expected to be "immutablish" and should not be modified while game is running
     this.data = {
       width: config.width,
       height: config.height,
-      FPS: 60
+      FPS: 60,
+      camera: {
+        follow: config.camera.follow,
+        currentZoom: config.camera.startingZoom
+      }
     };
 
     console.log("Mantra starting...");

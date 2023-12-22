@@ -3,7 +3,8 @@ export default function cssMouseWheelZoom(event) {
     return;
   }
   let game = this.game;
-  let scale = game.zoomScale;
+  // console.log('game.data.camera', game.data.camera)
+  let scale = game.data.camera.currentZoom;
   // Game viewport
   let gameViewport = document.getElementById('gameHolder');
 
@@ -29,7 +30,6 @@ export default function cssMouseWheelZoom(event) {
 
   // Apply scale to viewport
   //gameViewport.style.transform = `scale(${scale})`;
-  //game.zoomScale = scale;
 
   const viewportCenterX = window.innerWidth / 2;
   const viewportCenterY = window.innerHeight / 2;

@@ -14,16 +14,24 @@ class PhaserGraphics extends GraphicsInterface {
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
-  constructor({ camera = { follow = true, startingZoom = 1 } = {}}) {
+  constructor({ camera = {}} = {}) {
     super();
     this.id = 'graphics-phaser';
     this.async = PhaserGraphics.async;
-
+    
     if (typeof camera === 'string') {
       // legacy API, remove in future
       camera = {
         follow: true
       }
+    }
+
+    if (typeof camera.follow === 'undefined') {
+      camera.follow = true;
+    }
+
+    if (typeof camera.startingZoom === 'undefined') {
+      camera.startingZoom = 0.5;
     }
 
     // alert(camera.follow)
@@ -81,8 +89,8 @@ class PhaserGraphics extends GraphicsInterface {
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'gameHolder',
-      width: 800, // TODO: config  
-      height: 600,
+      //width: 800, // TODO: config
+      //height: 600,
       transparent: true,
       scene: [_Main],
       scale: {

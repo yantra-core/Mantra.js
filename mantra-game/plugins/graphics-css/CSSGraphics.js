@@ -61,7 +61,7 @@ class CSSGraphics extends GraphicsInterface {
     gameViewport.style.transform = `scale(${scale})`;
     gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
     // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
-    this.game.zoomScale = scale;
+    this.game.data.camera.currentZoom = scale;
     const viewportCenterX = window.innerWidth / 2;
     const viewportCenterY = window.innerHeight / 2;
   }
@@ -69,7 +69,6 @@ class CSSGraphics extends GraphicsInterface {
   init(game) {
     // register renderer with graphics pipeline
     game.graphics.push(this);
-    game.zoomScale = 1;
     this.game = game;
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
@@ -93,9 +92,10 @@ class CSSGraphics extends GraphicsInterface {
     game.loadingPluginsCount--;
 
     // Add event listener for mouse wheel
-    console.log("BINDING AGAIN")
     document.addEventListener('wheel', this.mouseWheelZoom, { passive: false });
     this.mouseWheelEnabled = true;
+
+    this.zoom(this.game.config.camera.startingZoom);
 
   }
 
@@ -380,7 +380,7 @@ class CSSGraphics extends GraphicsInterface {
           dirY = 1;
           break;
       }
-      console.log("entityIdentityId", entityId, data);
+      // console.log("entityIdentityId", entityId, data);
       // this.updatePlayerSprite(entityId, data);
 
       // Apply the direction vector as force or movement
@@ -408,7 +408,6 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   inflateEntity(entity, alpha) {
-
     // checks for existence of entity, performs update or create
     if (entity.graphics && entity.graphics['graphics-css']) {
       let graphic = entity.graphics['graphics-css'];
