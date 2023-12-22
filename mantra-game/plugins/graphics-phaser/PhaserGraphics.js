@@ -70,22 +70,25 @@ class PhaserGraphics extends GraphicsInterface {
         },
       init() { },
       create() {
-        this.cameras.main.setBackgroundColor('#000000');
+        // Optionally, set the background color of the scene
+        // this.cameras.main.setBackgroundColor('#000000');
       },
       preload: function () {
         this.load.image('player', 'textures/flare.png');
       }
     });
+  
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'gameHolder',
       width: 800, // TODO: config  
       height: 600,
+      transparent: true,
       scene: [_Main],
       scale: {
-        //mode: Phaser.Scale.ENVELOP,
+        // mode: Phaser.Scale.FIT,
+        // mode: Phaser.Scale.ENVELOP,
         mode: Phaser.Scale.RESIZE_AND_FIT,
-        //mode: Phaser.Scale.FIT,
       }
     });
 

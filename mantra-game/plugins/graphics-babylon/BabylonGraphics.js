@@ -96,8 +96,20 @@ class BabylonGraphics extends GraphicsInterface {
       // renderCanvas.style.position = 'absolute';
       renderCanvas.style.top = '0px';
       renderCanvas.style.left = '0px';
-      renderCanvas.style.background = '#007fff';
+      // renderCanvas.style.background = '#007fff';
       // append the renderCanvas to the gameHolder
+
+      // Setup the canvas dimensions
+      if (typeof game.width === 'number') {
+        renderCanvas.width = game.width;
+      }
+      if (typeof game.height === 'number') {
+        renderCanvas.height = game.height;
+      }
+
+      // Ensure the canvas has a transparent background
+      renderCanvas.style.background = 'transparent';
+
       document.getElementById('gameHolder').appendChild(renderCanvas);
     }
 
@@ -112,7 +124,11 @@ class BabylonGraphics extends GraphicsInterface {
       renderCanvas.height = game.height; // Set canvas height in pixels
     }
 
-    this.engine = new BABYLON.Engine(renderCanvas, true);
+    // this.engine = new BABYLON.Engine(renderCanvas, true);
+
+    // Create the engine with alpha (transparency) enabled
+    this.engine = new BABYLON.Engine(renderCanvas, true, { preserveDrawingBuffer: true, stencil: true, alpha: true });
+
     // TODO: enabled WebGPU by default
     //this.engine = new BABYLON.WebGPUEngine(renderCanvas, true);
     // await this.engine.initAsync();
@@ -120,6 +136,8 @@ class BabylonGraphics extends GraphicsInterface {
     this.game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
     game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
 
+    // Set the scene's clear color to transparent
+    this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
     this.initializeObjectPools(3000);
 
