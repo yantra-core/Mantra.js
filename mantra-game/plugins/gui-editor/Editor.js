@@ -1,5 +1,6 @@
 import GraphicsSelector from './lib/GraphicsSelector.js';
 import WorldSelector from './lib/WorldSelector.js';
+import ToolbarMenu from './lib/ToolbarMenu.js';
 
 class Editor {
 
@@ -41,7 +42,7 @@ class Editor {
   }
 
   createToolbar() {
-    const $toolbar = $('<div>', { id: 'editorToolbar', class: 'editor-toolbar' });
+    // const $toolbar = $('<div>', { id: 'editorToolbar', class: 'editor-toolbar' });
 
     // Create menus
     const $fileMenu = this.createMenu('File');
@@ -52,6 +53,53 @@ class Editor {
     const $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
     const $graphicsSelector = new GraphicsSelector(this.game);
     const $worldSelector = new WorldSelector(this.game);
+
+    const toolbarMenu = new ToolbarMenu();
+    toolbarMenu.addItem('primary', {
+      text: 'Mantra', subItems: [
+        { text: 'View Source', onClick: () => this.showSourceCode() },
+        { text: 'About Mantra', onClick: () => alert('Open Mantra Github') },
+        { text: 'Deploy World to Yantra', onClick: () => alert('Open Yantra') }
+      ]
+    });
+
+    toolbarMenu.addItem('primary', {
+      text: 'Entities'
+    });
+
+    toolbarMenu.addItem('primary', {
+      text: 'Events'
+    });
+
+    /*
+    toolbarMenu.addItem('primary', {
+      text: 'Inspector'
+    });
+    */
+
+    toolbarMenu.addItem('primary', {
+      text: 'Rules'
+    });
+
+    toolbarMenu.addItem('primary', {
+      text: 'Crafting'
+    });
+
+
+    toolbarMenu.addItem('secondary', { text: 'Settings' });
+    /*
+    toolbarMenu.addItem('primary', {
+      text: 'Products',
+      subItems: [
+        { text: 'Product 1', onClick: () => console.log('Product 1 clicked') },
+        { text: 'Product 2', onClick: () => console.log('Product 2 clicked') },
+        { text: 'Product 3', onClick: () => console.log('Product 3 clicked') }
+      ]
+    });
+    */
+    // append the toolbarMenu to the toolbar
+    //$toolbar.append(toolbarMenu.toolbar);
+
 
     // set css styles for $graphicsSelector
     $graphicsSelector.selectBox.style.position = 'absolute';
@@ -82,15 +130,15 @@ class Editor {
     // Append menus to the toolbar
     let toolBarItems = [$fileMenu, $eventsMenu, $controlsMenu, $entitiesMenu];
     if (this.sutraEditor) {
-     toolBarItems.push($rulesMenu)
+      toolBarItems.push($rulesMenu)
     }
     toolBarItems.push($inspectorMenu)
-    $toolbar.append(toolBarItems);
-    $toolbar.append($graphicsSelector.selectBox);
-    $toolbar.append($worldSelector.selectBox);
+    //$toolbar.append(toolBarItems);
+    toolbarMenu.toolbar.append($graphicsSelector.selectBox);
+    toolbarMenu.toolbar.append($worldSelector.selectBox);
 
     // Append the toolbar to the body
-    $('body').append($toolbar);
+    $('body').append(toolbarMenu.toolbar);
   }
 
   createMenu(menuTitle, onClickAction = null) {
@@ -228,7 +276,7 @@ class Editor {
     }
   }
 
-  showInspector () {
+  showInspector() {
     let game = this.game;
     console.log('showInspector', game.systems['gui-inspector'])
     if (typeof game.systems['gui-inspector'] === 'undefined') {
@@ -246,28 +294,6 @@ class Editor {
     } else {
       this.game.systemsManager.removeSystem('gui-entities');
     }
-  }
-
-  createViewSourceModal() {
-    // Create modal structure
-    const $modal = $('<div>', { id: 'sourceCodeModal', class: 'modal' });
-    const $modalContent = $('<div>', { class: 'modal-content' });
-    const $closeSpan = $('<span>', { class: 'close', text: '×' });
-    const $sourcePre = $('<pre>', { id: 'sourceCode' });
-
-    $modalContent.append($closeSpan, $sourcePre);
-    $modal.append($modalContent);
-
-    // Append the modal to the body
-    $('body').append($modal);
-
-    // Close event
-    $closeSpan.on('click', () => $modal.hide());
-    $(window).on('click', (event) => {
-      if ($(event.target).is($modal)) {
-        $modal.hide();
-      }
-    });
   }
 
   showSourceCode() {
