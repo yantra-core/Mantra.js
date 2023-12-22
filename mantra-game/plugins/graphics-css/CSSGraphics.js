@@ -1,5 +1,7 @@
 // CSSGraphics.js - Marak Squires 2023
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
+import CSSCamera from './CSSCamera.js';
+
 import inflateBox from './lib/inflateBox.js';
 import inflateText from './lib/inflateText.js';
 
@@ -34,7 +36,6 @@ class CSSGraphics extends GraphicsInterface {
     this.cameraPosition = { x: 0, y: 0 };
     this.mouseWheelEnabled = false;
 
-
     this.inflateBox = inflateBox.bind(this);
     this.inflateText = inflateText.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
@@ -56,20 +57,14 @@ class CSSGraphics extends GraphicsInterface {
 
   }
 
-  zoom(scale) {
-    let gameViewport = document.getElementById('gameHolder');
-    gameViewport.style.transform = `scale(${scale})`;
-    gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
-    // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
-    this.game.data.camera.currentZoom = scale;
-    const viewportCenterX = window.innerWidth / 2;
-    const viewportCenterY = window.innerHeight / 2;
-  }
-
   init(game) {
+    this.game = game;
+
+    let cssCamera = new CSSCamera(this, this.camera);
+    this.game.use(cssCamera);
+
     // register renderer with graphics pipeline
     game.graphics.push(this);
-    this.game = game;
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
@@ -90,12 +85,6 @@ class CSSGraphics extends GraphicsInterface {
 
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
-
-    // Add event listener for mouse wheel
-    document.addEventListener('wheel', this.mouseWheelZoom, { passive: false });
-    this.mouseWheelEnabled = true;
-
-    this.zoom(this.game.config.camera.startingZoom);
 
   }
 
@@ -166,19 +155,7 @@ class CSSGraphics extends GraphicsInterface {
         //entityElement.style.borderBottom = entityData.height + 'px solid green';
         // entityElement.classList.add('pixelart-to-css');
 
-        /*
-
-        we have: 
-
-        .guy-down-0
-        .guy-down-1
-        .guy-up-0
-        .guy-up-1
-        .guy-right-0
-        .guy-right-1
-
-        */
-
+        // Set default sprite
         entityElement.classList.add('guy-right-0');
 
 
@@ -388,13 +365,6 @@ class CSSGraphics extends GraphicsInterface {
 
     }
 
-
-    if (this.config.camera && this.config.camera.follow && currentPlayer) {
-      if (currentPlayer.position) {
-        this.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
-        this.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
-      }
-    }
   }
 
   render(game, alpha) {
@@ -448,6 +418,19 @@ class CSSGraphics extends GraphicsInterface {
     }
 
   }
+
+
+  zoom(scale) {
+    let gameViewport = document.getElementById('gameHolder');
+    gameViewport.style.transform = `scale(${scale})`;
+    gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
+    // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
+    this.game.data.camera.currentZoom = scale;
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
+  }
+
+
 }
 
 export default CSSGraphics;
