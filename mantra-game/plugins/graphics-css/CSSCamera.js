@@ -8,6 +8,7 @@ class CSSCamera {
     this.scene = scene;
     this.config = config;
 
+    this.follow = true;
     this.isDragging = false;
     this.dragInertia = { x: 0, y: 0 };
     this.isThrowing = false;
@@ -146,7 +147,8 @@ class CSSCamera {
       game.viewportCenterYOffset = 0;
     }
 
-    if (currentPlayer.position) {
+    // TODO: add ability for this to work with dragging and follow false
+    if (this.follow && currentPlayer.position) {
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
       this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
     }

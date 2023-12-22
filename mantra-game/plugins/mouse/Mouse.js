@@ -93,7 +93,7 @@ export default class Mouse {
       this.isDragging = true;
       this.dragStartPosition = { x: event.clientX, y: event.clientY };
       // prevent default right click menu
-      event.preventDefault();
+      // event.preventDefault();
     }
 
 
