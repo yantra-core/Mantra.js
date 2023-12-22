@@ -8,7 +8,7 @@ export default class Mouse {
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };
-
+    this.disableContextMenu = true;
     this.isDragging = false;
     this.dragStartPosition = { x: 0, y: 0 };
 
@@ -34,7 +34,9 @@ export default class Mouse {
     document.addEventListener('pointerdown', this.boundHandleMouseDown);
     document.addEventListener('pointerup', this.boundHandleMouseUp);
     // TODO: could be a config option
-    document.addEventListener('contextmenu', event => event.preventDefault());
+    if (this.disableContextMenu) {
+      document.addEventListener('contextmenu', event => event.preventDefault());
+    }
   }
 
   handleMouseMove(event) {
