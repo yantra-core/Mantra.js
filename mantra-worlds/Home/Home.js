@@ -1,5 +1,10 @@
 class Home {
-  static id = 'Home';
+  static id = 'world-home';
+  // "world" type has special features in that it can be unloaded and reloaded.
+  //  with special rules such as merge, replace, etc.
+  //  this is currently used when switching between worlds in the GUI Editor
+  //  the default behavior is to unload the world, then load the new world
+  static type = 'world'; // type is optional for Plugins
   constructor() {
     this.id = Home.id;
   }
@@ -12,6 +17,7 @@ class Home {
   createWorld() {
 
     let game = this.game;
+
 
     game.setGravity(0, 0, 0);
 
@@ -28,14 +34,16 @@ class Home {
 
     game.createEntity({
       type: 'BLOCK',
-      width: 300,
-      height: 300,
+      width: 150,
+      height: 150,
       position: {
-        x: 0,
+        x: -400,
         y: -150
       }
     });
 
+    game.use('Block')
+    game.use('Bullet')
     game.use('Border', { autoBorder: true })
   
     console.log(game.systems)

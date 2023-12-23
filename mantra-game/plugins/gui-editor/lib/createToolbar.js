@@ -85,7 +85,7 @@ export default function createToolbar() {
 
   // create item holder for graphicsSelector
   let graphicsSelectorItem = document.createElement('div');
-  graphicsSelectorItem.appendChild(graphicsIcon);
+  // graphicsSelectorItem.appendChild(graphicsIcon);
   graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
   graphicsSelectorItem.title = 'Select Graphics Engine';
 
@@ -96,7 +96,7 @@ export default function createToolbar() {
 
 
   let worldSelectorItem = document.createElement('div');
-  worldSelectorItem.appendChild(worldIcon);
+  // worldSelectorItem.appendChild(worldIcon);
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
   /*

@@ -14,12 +14,22 @@ class WorldSelector {
 
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
+
+    // adds a choose your world option
+    this.addOption(selectBox, 'Choose Your World', 'Choose');
+
     this.addOption(selectBox, 'Home World', 'Home');
-    this.addOption(selectBox, '2D Platform', 'Platform');
+    this.addOption(selectBox, 'Platform World', 'Platform');
+    // this.addOption(selectBox, 'Space World', 'Platform');
     //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
-    this.addOption(selectBox, 'YCraft Crafting World', 'YCraft');
-    this.addOption(selectBox, 'Sutra Tree World', 'Sutra');
-    this.addOption(selectBox, 'XState Machines', 'XState');
+
+    // adds separator option
+    this.addOption(selectBox, '------Tutorial Worlds-----', '----------------', true);
+
+
+    this.addOption(selectBox, 'YCraft World', 'YCraft');
+    this.addOption(selectBox, 'Sutra World', 'Sutra');
+    this.addOption(selectBox, 'XState World', 'XState');
 
     // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
     return selectBox;
@@ -30,10 +40,13 @@ class WorldSelector {
     this.selectBox.value = value;
   }
 
-  addOption(selectBox, text, value) {
+  addOption(selectBox, text, value, disabled) {
     let option = document.createElement('option');
     option.text = text;
     option.value = value;
+    if (disabled) {
+      option.disabled = true;
+    }
     selectBox.add(option);
   }
 
@@ -52,6 +65,7 @@ class WorldSelector {
     });
   }
 
+  // TODO: refactor world change logic to separate function
   handleSelectionChange(event) {
     let game = this.game;
     let that = this;
@@ -59,28 +73,34 @@ class WorldSelector {
 
     let selectedWorld = event.target.value;
 
-    if (this.lastLoadedWorld) {
-      // unload the world
-      // console.log("this.lastLoadedWorld", this.lastLoadedWorld)
-      if (this.lastLoadedWorld.unload) {
-        this.lastLoadedWorld.unload();
-      }
-      // game.systemsManager.removeSystem(this.lastLoadedWorld);
+    // check to see if game.worlds has any entries
+    // if so, unload them if they have an unload method
+    if (game.worlds.length > 0) {
+      game.worlds.forEach((world, i) => {
+        if (world.unload) {
+          // alert(`Unloading ${world.id}`);
+          console.log(world.id, 'world.unload', world.unload)
+          // remove the world from the game.worlds array
+          // TODO: we could move this logic into Game.js
+          game.worlds.splice(i, 1);
+          world.unload();
+        }
+      });
     }
 
-    // alert(selectedWorld)
     game.systems.entity.clearAllEntities(false);
     let worldName = 'XState';
     worldName = 'Sutra';
     worldName = selectedWorld;
-    let worldInstance = new WORLDS.worlds[worldName]();
-    this.lastLoadedWorld = worldInstance;
+    
+    let worldClass = WORLDS.worlds[worldName];
+    let worldInstance = new worldClass();
 
-    game.on('plugin::ready::' + worldInstance.id, function () {
+    game.on('plugin::loaded::' + worldInstance.id, function () {
       that.hideLoadingSpinner();
     });
 
-    worldInstance.init(game);
+    game.use(worldInstance);
     
   }
 

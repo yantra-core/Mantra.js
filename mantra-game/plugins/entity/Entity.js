@@ -230,7 +230,8 @@ class Entity {
   }
 
   createEntity(config) {
-
+    // TODO: if config is string, use that as type property with default settings
+    // second argument is merged options hash
     // console.log('createEntity', config)
 
     let entityId = this._generateId();
@@ -330,7 +331,24 @@ class Entity {
 
  
     if (config.body) {
-      let body = this.createBody(config);
+      let body = this.createBody({
+        width: width,
+        height: height,
+        radius: radius,
+        type: type,
+        shape: shape,
+        position: position,
+        velocity: velocity,
+        rotation: rotation,
+        mass: mass,
+        density: density,
+        isStatic: isStatic,
+        isSensor: isSensor,
+        restitution: config.restitution,
+        friction: config.friction,
+        frictionAir: config.frictionAir,
+        frictionStatic: config.frictionStatic
+      });
       body.myEntityId = entityId;
       this.game.physics.addToWorld(this.game.engine, body);
       this.game.bodyMap[entityId] = body;
@@ -503,6 +521,10 @@ class Entity {
         break;
     }
 
+    if (typeof config.mass !== 'undefined') {
+      this.game.physics.setMass(body, config.mass);
+    }
+
     // TODO: move to BulletPlugin ?
     if (config.type === 'BULLET') {
       // set friction to 0 for bullets
@@ -511,7 +533,6 @@ class Entity {
       body.friction = 0;
       body.frictionAir = 0;
       body.frictionStatic = 0;
-
     }
 
     return body;

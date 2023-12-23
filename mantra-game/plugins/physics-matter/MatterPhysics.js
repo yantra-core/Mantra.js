@@ -183,6 +183,10 @@ class MatterPhysics extends PhysicsInterface {
     Matter.World.remove(this.engine.world, body);
   }
 
+  setMass (body, mass) {
+    Matter.Body.setMass(body, mass);
+  }
+
   // Equivalent to World.remove()
   removeFromWorld(engine, body) {
     Matter.World.remove(engine.world, body);

@@ -1,8 +1,10 @@
 class XState {
-  static id = 'XState';
+  static id = 'world-xstate';
+  static type = 'world'; // type is optional for Plugins
   constructor(game) {
     this.game = game; // Store the reference to the game logic
     this.id = XState.id;
+    this.type = XState.type;
   }
 
   init(game) {

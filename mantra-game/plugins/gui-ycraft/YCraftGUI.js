@@ -46,95 +46,135 @@ class YCraftGUI {
     //editorSystem.toolbarMenu.addElement('primary', this.container);
     //editorSystem.toolbarMenu.toolbar.appendChild(this.container);
 
-    this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {
-      game.systemsManager.removeSystem(YCraftGUI.id);
-      let contraptionsView = document.getElementById('contraptionsView');
-      if (contraptionsView) {
-        contraptionsView.remove();
+    // instead of a window, just add a dropdown to the toolbar ( for now alpha demo )
+
+    this.container = document.createElement('div');
+    this.container.style.display = 'flex';
+    this.container.style.flexDirection = 'row';
+    this.container.style.alignItems = 'center';
+
+    // this.container.style.width = '300px';
+    this.container.style.height = '100%';
+
+    // check to see if game.systems.editor exists
+    // TODO: remove this code and cross-plugin check
+    let that = this;
+    function attemptEditorAppend() {
+      if (game.systems && game.systems['gui-editor']) {
+        let toolBarComponent = game.systems['gui-editor'].toolbarMenu;
+        console.log('toolBarComponent', toolBarComponent)
+
+        if (toolBarComponent) {
+          toolBarComponent.addElement('primary', that.container);
+        }
+        _createContraptionViewer();
+      } else {
+        setTimeout(attemptEditorAppend, 3)
       }
-    });
-
-    // Create main container div
-    var mainContainer = document.createElement('div');
-    mainContainer.id = 'main-container';
-
-    // Create header and title
-    var header = document.createElement('header');
-
-    /*
-    var h1 = document.createElement('h1');
-    h1.textContent = 'YCraft Contraption Viewer';
-    header.appendChild(h1);
-    */
-
-    // Create contraption interface section
-    var section = document.createElement('section');
-    section.id = 'contraption-interface';
-
-    // Create display contraption div
-    var displayContraption = document.createElement('div');
-    displayContraption.id = 'display-contraption';
-    /*
-    var h3 = document.createElement('h3');
-    h3.innerHTML = 'Contraption Name: <span id="contraption-name-display"></span>';
-    displayContraption.appendChild(h3);
-    */
-
-    // Create form for saving contraption
-    var saveForm = document.createElement('form');
-    saveForm.id = 'save-contraption-form';
-    var label = document.createElement('label');
-    label.setAttribute('for', 'contraption-name');
-    label.textContent = 'Contraption Name:';
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.id = 'contraption-name';
-    input.placeholder = 'Enter contraption name';
-    input.required = true;
-    var saveButton = document.createElement('button');
-    saveButton.type = 'submit';
-    saveButton.textContent = 'Save Contraption';
-    //saveForm.appendChild(label);
-    //saveForm.appendChild(input);
-    //saveForm.appendChild(saveButton);
-
-    // Create form for running contraption
-    var runForm = document.createElement('form');
-    runForm.id = 'run-contraption-form';
-    var runButton = document.createElement('button');
-    runButton.type = 'submit';
-    runButton.textContent = 'Run Contraption';
-    runForm.appendChild(runButton);
-
-    // Append forms to section
-    section.appendChild(displayContraption);
-    section.appendChild(saveForm);
-    // section.appendChild(runForm);
-
-    // Create textarea for contraption code
-    var textarea = document.createElement('textarea');
-    textarea.id = 'contraption-code';
-    textarea.rows = 10;
-    textarea.cols = 50;
-    textarea.placeholder = 'Enter contraption code here';
-
-    if (this.game.systems.ycraft && this.game.systems.ycraft.contraption) {
-      textarea.value = this.game.systems.ycraft.contraptionSource;
     }
 
-    // Append elements to main container
-    mainContainer.appendChild(header);
-    mainContainer.appendChild(section);
-    mainContainer.appendChild(textarea);
-    // get gui-content from inside this.container
-    //let guiContent = this.container.querySelector('.gui-content');
-    // Append the main container to the body or another specific element
-    //guiContent.appendChild(mainContainer);
-    this.container.appendChild(mainContainer);
-    // document.body.appendChild(mainContainer);
+    attemptEditorAppend();
 
-    this.createDisplay();
-    this.adjustTextareaHeight(textarea);
+    function _createContraptionViewer() {
+      /*
+      this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {
+        game.systemsManager.removeSystem(YCraftGUI.id);
+        let contraptionsView = document.getElementById('contraptionsView');
+        if (contraptionsView) {
+          contraptionsView.remove();
+        }
+      });
+      */
+
+      // check to see if the container exists
+      let existingContainer = document.getElementById('ycraft-main-container');
+
+      if (existingContainer) {
+        return;
+      }
+      // Create main container div
+      var mainContainer = document.createElement('div');
+      mainContainer.id = 'ycraft-main-container';
+
+      // Create header and title
+      var header = document.createElement('header');
+
+      /*
+      var h1 = document.createElement('h1');
+      h1.textContent = 'YCraft Contraption Viewer';
+      header.appendChild(h1);
+      */
+
+      // Create contraption interface section
+      var section = document.createElement('section');
+      section.id = 'contraption-interface';
+
+      // Create display contraption div
+      var displayContraption = document.createElement('div');
+      displayContraption.id = 'display-contraption';
+      /*
+      var h3 = document.createElement('h3');
+      h3.innerHTML = 'Contraption Name: <span id="contraption-name-display"></span>';
+      displayContraption.appendChild(h3);
+      */
+
+      // Create form for saving contraption
+      var saveForm = document.createElement('form');
+      saveForm.id = 'save-contraption-form';
+      var label = document.createElement('label');
+      label.setAttribute('for', 'contraption-name');
+      label.textContent = 'Contraption Name:';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'contraption-name';
+      input.placeholder = 'Enter contraption name';
+      input.required = true;
+      var saveButton = document.createElement('button');
+      saveButton.type = 'submit';
+      saveButton.textContent = 'Save Contraption';
+      //saveForm.appendChild(label);
+      //saveForm.appendChild(input);
+      //saveForm.appendChild(saveButton);
+
+      // Create form for running contraption
+      var runForm = document.createElement('form');
+      runForm.id = 'run-contraption-form';
+      var runButton = document.createElement('button');
+      runButton.type = 'submit';
+      runButton.textContent = 'Run Contraption';
+      runForm.appendChild(runButton);
+
+      // Append forms to section
+      section.appendChild(displayContraption);
+      section.appendChild(saveForm);
+      // section.appendChild(runForm);
+
+      // Create textarea for contraption code
+      var textarea = document.createElement('textarea');
+      textarea.id = 'contraption-code';
+      textarea.rows = 10;
+      textarea.cols = 50;
+      textarea.placeholder = 'Enter contraption code here';
+      textarea.style.display = 'none';
+      if (that.game.systems.ycraft && that.game.systems.ycraft.contraption) {
+        textarea.value = that.game.systems.ycraft.contraptionSource;
+      }
+
+      // Append elements to main container
+      mainContainer.appendChild(header);
+      mainContainer.appendChild(section);
+      //mainContainer.appendChild(textarea);
+      // get gui-content from inside this.container
+      //let guiContent = this.container.querySelector('.gui-content');
+      // Append the main container to the body or another specific element
+      //guiContent.appendChild(mainContainer);
+      that.container.appendChild(mainContainer);
+      // document.body.appendChild(mainContainer);
+
+      that.createDisplay();
+      that.adjustTextareaHeight(textarea);
+    }
+
 
   }
 
@@ -246,8 +286,11 @@ class YCraftGUI {
     let displayContraption = document.getElementById('display-contraption');
 
     // Append the label and then the select element
-    displayContraption.appendChild(label);
-    displayContraption.appendChild(selectElement);
+    if (displayContraption) {
+      // displayContraption.appendChild(label);
+      displayContraption.appendChild(selectElement);
+
+    }
 
     // Optionally, add an event listener for when the user selects a contraption
     selectElement.addEventListener('change', (event) => {
@@ -257,7 +300,7 @@ class YCraftGUI {
       this.getContraption(selectedContraptionName);
     });
 
-    contraptionInterface.appendChild(displayContraption);
+    // contraptionInterface.appendChild(displayContraption);
   }
 
 
@@ -269,12 +312,14 @@ class YCraftGUI {
     const form = document.getElementById('save-contraption-form');
     const contraptionNameDisplay = document.getElementById('contraption-name-display');
 
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      const contraptionName = document.getElementById('contraption-name').value;
-      // Implement the POST request to save the contraption
-      saveContraption(contraptionName);
-    });
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const contraptionName = document.getElementById('contraption-name').value;
+        // Implement the POST request to save the contraption
+        saveContraption(contraptionName);
+      });
+    }
 
     /*
     const runContraptionForm = document.getElementById('run-contraption-form');
@@ -404,6 +449,12 @@ class YCraftGUI {
   }
 
   unload() {
+
+    let contraptionInterface = document.getElementById('contraption-interface');
+    if (contraptionInterface) {
+      contraptionInterface.remove();
+    }
+
     // Remove elements when the plugin is unloaded
     if (this.logContainer && this.logContainer.parentNode) {
       this.logContainer.parentNode.removeChild(this.logContainer);

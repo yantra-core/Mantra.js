@@ -1,8 +1,10 @@
 class Platform {
-  static id = 'Platform';
+  static id = 'world-platform';
+  static type = 'world'; // type is optional for Plugins
   constructor(game) {
     this.game = game; // Store the reference to the game logic
     this.id = Platform.id;
+    this.type = Platform.type;
   }
 
   init(game) {

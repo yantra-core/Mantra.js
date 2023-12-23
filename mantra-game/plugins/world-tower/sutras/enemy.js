@@ -28,7 +28,7 @@ export default function spawner() {
     .then('entity::updateEntity', {
       velocity: {
         x: -10,
-        y: 30
+        y: 10
       }
     })
 
@@ -37,7 +37,7 @@ export default function spawner() {
     .then('entity::updateEntity', {
       velocity: {
         x: 10,
-        y: 30
+        y: 10
       }
     })
 
@@ -51,7 +51,7 @@ export default function spawner() {
       },
       velocity: {
         x: 0,
-        y: 100
+        y: 50
       },
       width: 100,
       height: 100,

@@ -1,8 +1,10 @@
 class Sutra {
-  static id = 'Sutra';
+  static id = 'world-sutra';
+  static type = 'world'; // type is optional for Plugins
   constructor(game) {
     this.game = game; // Store the reference to the game logic
     this.id = Sutra.id;
+    this.type = Sutra.type;
   }
 
   init(game) {

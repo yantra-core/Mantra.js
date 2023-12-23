@@ -44,15 +44,28 @@ export default class ToolbarMenu {
     this.updateResponsiveStyles();
   }
 
-  addElement(group, element) {
-    if (group === 'primary') {
-      this.primaryGroup.appendChild(element);
-    } else if (group === 'secondary') {
-      this.secondaryGroup.appendChild(element);
+  addElement(group, element, prepend = false) {
+
+  
+    if (prepend) {
+      if (group === 'primary') {
+        this.primaryGroup.insertBefore(element, this.primaryGroup.firstChild);
+      } else if (group === 'secondary') {
+        this.secondaryGroup.insertBefore(element, this.secondaryGroup.firstChild);
+      }
+
+    } else {
+      if (group === 'primary') {
+        this.primaryGroup.appendChild(element);
+      } else if (group === 'secondary') {
+        this.secondaryGroup.appendChild(element);
+      }
+  
     }
+
   }
 
-  addItem(group, itemObj) {
+  addItem(group, itemObj, prepend = false) {
     const item = document.createElement('div');
     item.className = 'menu-item';
     item.style.textAlign = 'center';
@@ -66,10 +79,20 @@ export default class ToolbarMenu {
     
     itemText.style.textAlign = 'center';
 
-    item.appendChild(itemText);
+    if (prepend) {
+      item.appendChild(itemText, item.firstChild);
+    } else {
+      item.appendChild(itemText);
+    }
+
 
     if (typeof itemObj.icon === 'object') {
-      item.appendChild(itemObj.icon);
+      if (prepend) {
+        item.insertBefore(itemObj.icon, item.firstChild);
+      } else {
+        item.appendChild(itemObj.icon);
+  
+      }
     }
 
     this.setStyle(item, {
@@ -151,13 +174,10 @@ export default class ToolbarMenu {
     return subItem;
   }
 
-
-
   setStyle(element, styles) {
     // Apply each style to the element
     Object.assign(element.style, styles);
   }
-
 
   updateResponsiveStyles() {
     // Apply responsive styles based on the window width
@@ -172,4 +192,5 @@ export default class ToolbarMenu {
       });
     }
   }
+
 }

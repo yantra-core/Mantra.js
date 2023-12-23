@@ -147,6 +147,14 @@ class Game {
 
     this.tick = 0;
 
+    // Keeps track of array of worlds ( Plugins with type="world" )
+    // Each world is a Plugin and will run in left-to-right order
+    // The current default behavior is single world, so worlds[0] is always the current world
+    // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
+    // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
+    // TODO: move to worldManager
+    this.worlds = []
+
     // Game settings
     this.width = width;
     this.height = height;
@@ -342,6 +350,7 @@ class Game {
       const pluginId = pluginInstanceOrId;
       // Check if the plugin is already loaded or loading
       if (this._plugins[pluginId]) {
+        // maybe add world here?
         console.log(`Plugin ${pluginId} is already loaded or loading.`);
         return this;
       }
@@ -404,8 +413,13 @@ class Game {
 
     const pluginId = pluginInstanceOrId.id;
     this.loadedPlugins.push(pluginId);
+
     pluginInstanceOrId.init(this, this.engine, this.scene);
     this._plugins[pluginId] = pluginInstanceOrId;
+
+    if (pluginInstanceOrId.type === 'world') {
+      this.worlds.push(pluginInstanceOrId);
+    }
     this.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
     this.emit('plugin::loaded', pluginId);
     return this;
@@ -534,8 +548,10 @@ class Game {
   }
 
   zoom (scale) {
-    if (this.camera) {
+    if (this.camera && this.camera.zoom) {
       this.camera.zoom(scale);
+    } else {
+      console.log('warning: no camera.zoom method found')
     }
   }
 

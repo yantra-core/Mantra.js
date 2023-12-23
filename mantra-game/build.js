@@ -22,6 +22,7 @@ const plugins = [
   './plugins/entity-input/EntityInput.js',
   './plugins/entity-movement/EntityMovement.js',
   './plugins/gamepad/Gamepad.js',
+  './plugins/gui-gamepad/GamepadGUI.js',
   './plugins/graphics/Graphics.js',
   './plugins/health/Health.js',
   './plugins/timers/Timers.js',

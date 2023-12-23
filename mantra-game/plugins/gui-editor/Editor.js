@@ -1,7 +1,3 @@
-import GraphicsSelector from './lib/GraphicsSelector.js';
-import WorldSelector from './lib/WorldSelector.js';
-import ToolbarMenu from './lib/ToolbarMenu.js';
-
 import createToolbar from './lib/createToolbar.js';
 
 class Editor {
@@ -44,6 +40,7 @@ class Editor {
     this.createToolbar();
     this.setupGlobalClickListener();
     // this.createViewSourceModal();
+    this.game.systemsManager.addSystem(this.id, this);
 
   }
 
@@ -60,7 +57,6 @@ class Editor {
     return element
   }
 
-  
   createMenu(menuTitle, onClickAction = null) {
     const $menu = $('<div>', { class: 'menu' });
     const $button = $('<button>').text(menuTitle);
@@ -166,9 +162,11 @@ class Editor {
   showRules() {
     let game = this.game;
     if (typeof game.systems['gui-sutra'] === 'undefined') {
+      /*
       game.once('plugin::loaded::gui-sutra', () => {
         game.systems['gui-sutra'].drawTable();
       });
+      */
       game.use('SutraGUI');
 
     } else {

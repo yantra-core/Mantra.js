@@ -77,13 +77,38 @@ class SutraGUI {
       }
     });
 
+    this.drawTable();
+
     if (this.game.rules) {
       this.setRules(this.game.rules);
+    } else {
+      // add message to indicate no sutra
+      let container = document.getElementById('sutraTable');
+      let message = document.createElement('div');
+      message.className = 'sutra-message';
+      message.textContent = 'No Sutra Rules have been defined yet.';
+
+      let wrapper = document.createElement('div');
+      // create a new div with link that calls Game.switchWorld('SutraWorld')
+      let link = document.createElement('a');
+      link.href = '#';
+      link.textContent = 'Warp to Sutra Tree World for Tutorial';
+      link.onclick = (e) => {
+        e.preventDefault();
+        this.game.switchWorld('SutraWorld');
+      }
+      wrapper.appendChild(link);
+      wrapper.appendChild(link);
+
+      container.appendChild(message);
+      // container.appendChild(wrapper);      
     }
 
   }
 
   setRules(rules) {
+    alert('setting rules')
+    console.log('setting rules', rules)
     // let rules = testRules(game);
 
     // gui.setTheme('light');
@@ -110,10 +135,9 @@ class SutraGUI {
 
     this.behavior = rules;
 
-    let json = rules.serializeToJson();
     this.drawTable();
+    let json = rules.serializeToJson();
     this.drawBehaviorTree(JSON.parse(json));
-
 
   }
 

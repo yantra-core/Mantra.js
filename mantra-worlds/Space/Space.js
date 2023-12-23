@@ -1,8 +1,10 @@
 class Space {
-  static id = 'Space';
+  static id = 'world-space';
+  static type = 'world'; // type is optional for Plugins
   constructor(game) {
     this.game = game; // Store the reference to the game logic
     this.id = Space.id;
+    this.type = Space.type;
   }
 
   init(game) {
