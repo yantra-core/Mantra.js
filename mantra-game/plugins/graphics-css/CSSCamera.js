@@ -17,6 +17,10 @@ class CSSCamera {
 
   init(game) {
     this.game = game;
+
+    // sets auto-follow player when starting CSSGraphics ( for now )
+    this.follow = true;
+
     this.game.systemsManager.addSystem('graphics-css-camera', this);
 
     this.gameViewport = document.getElementById('gameHolder');
@@ -66,6 +70,7 @@ class CSSCamera {
       this.gameViewport.style.cursor = 'grabbing';
 
       this.isDragging = true;
+      // this.follow = false;
 
       if (typeof dx === 'number') {
         game.viewportCenterXOffset += dx;

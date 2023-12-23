@@ -419,17 +419,17 @@ class CSSGraphics extends GraphicsInterface {
 
   }
 
-
   zoom(scale) {
     let gameViewport = document.getElementById('gameHolder');
-    gameViewport.style.transform = `scale(${scale})`;
-    gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
-    // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
-    this.game.data.camera.currentZoom = scale;
-    const viewportCenterX = window.innerWidth / 2;
-    const viewportCenterY = window.innerHeight / 2;
+    if (gameViewport) {
+      gameViewport.style.transform = `scale(${scale})`;
+      gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
+      // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
+      this.game.data.camera.currentZoom = scale;
+      // const viewportCenterX = window.innerWidth / 2;
+      // const viewportCenterY = window.innerHeight / 2;
+    }
   }
-
 
 }
 

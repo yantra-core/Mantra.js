@@ -2,6 +2,7 @@ class WorldSelector {
   constructor(game) {
     this.game = game;
     this.selectBox = this.createElements(); // Now returns the select box element
+    this.lastLoadedWorld = null;
     this.addEventListeners();
   }
 
@@ -9,6 +10,8 @@ class WorldSelector {
     // Create the select box
     let selectBox = document.createElement('select');
     selectBox.id = 'graphicsSelect';
+    selectBox.style.maxHeight = '45px';
+
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
     this.addOption(selectBox, 'Home World', 'Home');
@@ -55,21 +58,29 @@ class WorldSelector {
     this.showLoadingSpinner();
 
     let selectedWorld = event.target.value;
+
+    if (this.lastLoadedWorld) {
+      // unload the world
+      // console.log("this.lastLoadedWorld", this.lastLoadedWorld)
+      if (this.lastLoadedWorld.unload) {
+        this.lastLoadedWorld.unload();
+      }
+      // game.systemsManager.removeSystem(this.lastLoadedWorld);
+    }
+
     // alert(selectedWorld)
     game.systems.entity.clearAllEntities(false);
     let worldName = 'XState';
     worldName = 'Sutra';
     worldName = selectedWorld;
     let worldInstance = new WORLDS.worlds[worldName]();
+    this.lastLoadedWorld = worldInstance;
 
     game.on('plugin::ready::' + worldInstance.id, function () {
       that.hideLoadingSpinner();
     });
 
     worldInstance.init(game);
-
-    //console.log(WORLDS.worlds['XState'])
-    // WORLDS.worlds['XState'].init();
     
   }
 

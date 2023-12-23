@@ -14,14 +14,18 @@ class YCraft {
 
     let game = this.game;
 
+    game.setGravity(0, 0, 0);
+
+    game.use('Bullet');
 
     game.use('YCraft');
-    game.use('Editor');
-    game.use('YCraftGUI');
+//    game.use('YCraftGUI');
 
-    game.start(function () {
+    game.use('Editor', {
+      sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-worlds/YCraft/YCraft.js',
+      sutraEditor: true
     });
-
+    
 
     game.systems.graphics.switchGraphics('CSSGraphics', function(){
       game.createDefaultPlayer();

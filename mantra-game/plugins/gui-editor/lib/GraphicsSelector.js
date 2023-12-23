@@ -1,14 +1,18 @@
 class GraphicsSelector {
-  constructor(game) {
-    this.game = game;
+  constructor(editor) {
+    this.editor = editor;
+    this.game = editor.game; // Store the reference to the game logic
     this.selectBox = this.createElements(); // Now returns the select box element
     this.addEventListeners();
   }
 
   createElements() {
+
     // Create the select box
     let selectBox = document.createElement('select');
     selectBox.id = 'graphicsSelect';
+
+    selectBox.style.maxHeight = '45px';
 
     // tool tip hint
     selectBox.title = 'Select graphics mode.\nMantra supports hot-swapping and multiplexing of graphics modes.';

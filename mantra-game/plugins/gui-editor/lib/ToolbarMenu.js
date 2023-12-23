@@ -26,6 +26,9 @@ export default class ToolbarMenu {
 
     // Style the toolbar
     this.setStyle(this.toolbar, {
+      position: 'fixed',
+      top: '0',
+      width: '100%',
       display: 'flex',
       justifyContent: 'space-between',
       // padding: '10px',
@@ -41,14 +44,44 @@ export default class ToolbarMenu {
     this.updateResponsiveStyles();
   }
 
+  addElement(group, element) {
+    if (group === 'primary') {
+      this.primaryGroup.appendChild(element);
+    } else if (group === 'secondary') {
+      this.secondaryGroup.appendChild(element);
+    }
+  }
+
   addItem(group, itemObj) {
     const item = document.createElement('div');
     item.className = 'menu-item';
-    item.textContent = itemObj.text;
+    item.style.textAlign = 'center';
+
+    if (itemObj.hint) {
+      item.title = itemObj.hint;
+    }
+    let itemText = document.createElement('div');
+    itemText.className = 'menu-item-text';
+    itemText.textContent = itemObj.text;
+    
+    itemText.style.textAlign = 'center';
+
+    item.appendChild(itemText);
+
+    if (typeof itemObj.icon === 'object') {
+      item.appendChild(itemObj.icon);
+    }
 
     this.setStyle(item, {
       margin: '5px',
-      padding: '5px 10px',
+      fontSize: '20px',
+      // padding: '5px 10px',
+      paddingLeft: '10px',
+      paddingRight: '10px',
+      paddingTop: '5px',
+      paddingBottom: '5px',
+//      fontWeight: 'bold',
+      minWidth: '60px',
       backgroundColor: '#ddd',
       borderRadius: '5px',
       cursor: 'pointer',
@@ -78,13 +111,17 @@ export default class ToolbarMenu {
     dropdown.className = 'dropdown';
     this.setStyle(dropdown, {
       display: 'none',
-      minWidth: '200px',
+      minWidth: '300px',
+      fontSize: '24px',
       position: 'absolute',
       backgroundColor: '#f9f9f9',
       boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)',
       padding: '5px',
       zIndex: 1,
-      left: '0',
+      textAlign: 'left',
+      //top: '78px',
+      // left: '-5px',
+      left: 0,
       right: '0',
     });
 

@@ -18,6 +18,7 @@ class YCraftGUI {
   }
   init(game) {
     this.game = game;
+    this.game.systemsManager.addSystem(this.id, this);
     // this.createDisplay();
 
     let self = this;
@@ -33,6 +34,17 @@ class YCraftGUI {
     if (contraptionsView) {
       contraptionsView.remove();
     }
+    // create empty div
+    this.container = document.createElement('div');
+    this.container.id = 'contraptionsView';
+    // add the container to the editor menu ( requires 'Editor' plugin is used )
+    /*
+    console.log('ae', game.systems)
+    let editorSystem = game.systems['gui-editor'];
+    console.log('eeee', editorSystem)
+    */
+    //editorSystem.toolbarMenu.addElement('primary', this.container);
+    //editorSystem.toolbarMenu.toolbar.appendChild(this.container);
 
     this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {
       game.systemsManager.removeSystem(YCraftGUI.id);
@@ -40,7 +52,7 @@ class YCraftGUI {
       if (contraptionsView) {
         contraptionsView.remove();
       }
-      });
+    });
 
     // Create main container div
     var mainContainer = document.createElement('div');
@@ -114,11 +126,11 @@ class YCraftGUI {
     mainContainer.appendChild(header);
     mainContainer.appendChild(section);
     mainContainer.appendChild(textarea);
-
     // get gui-content from inside this.container
-    let guiContent = this.container.querySelector('.gui-content');
+    //let guiContent = this.container.querySelector('.gui-content');
     // Append the main container to the body or another specific element
-    guiContent.appendChild(mainContainer);
+    //guiContent.appendChild(mainContainer);
+    this.container.appendChild(mainContainer);
     // document.body.appendChild(mainContainer);
 
     this.createDisplay();
@@ -396,9 +408,16 @@ class YCraftGUI {
     if (this.logContainer && this.logContainer.parentNode) {
       this.logContainer.parentNode.removeChild(this.logContainer);
     }
+    // Removes contraptionsView from editor menu
+    let contraptionsView = document.getElementById('contraptionsView');
+    if (contraptionsView) {
+      contraptionsView.remove();
+    }
+
     this.logContainer = null;
     this.logTextArea = null;
   }
+
 }
 
 // Exporting the plugin class

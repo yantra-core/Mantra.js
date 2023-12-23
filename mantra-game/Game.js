@@ -404,11 +404,12 @@ class Game {
 
     const pluginId = pluginInstanceOrId.id;
     this.loadedPlugins.push(pluginId);
-    this.emit('plugin::loaded', pluginId);
     pluginInstanceOrId.init(this, this.engine, this.scene);
     this._plugins[pluginId] = pluginInstanceOrId;
-
+    this.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
+    this.emit('plugin::loaded', pluginId);
     return this;
+
   }
 
   // Helper function to load plugin scripts

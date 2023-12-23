@@ -14,14 +14,12 @@ class Sutra {
 
     let game = this.game;
 
+    game.setGravity(0, 0, 0);
+
     game.use('Bullet')
-
-    game.use('CurrentFPS');
-
     game.use('Timers');
     game.use('Health');
     game.use('Sutra');
-
 
     /*
     // game.use(new Plugins.SutraGUI({ }));
@@ -38,12 +36,14 @@ class Sutra {
     game.use('StarField');
     game.use('TowerWorld', { game: game });
 
-    game.systems.graphics.switchGraphics('BabylonGraphics', function(){
-      game.data.roundEnded = false;
-      game.data.roundStarted = true;
-      game.createDefaultPlayer();
-    });
+    game.data.roundEnded = false;
+    game.data.roundStarted = true;
+    game.createDefaultPlayer();
 
+    /*
+    game.systems.graphics.switchGraphics('BabylonGraphics', function(){
+    });
+    */
 
   }
 

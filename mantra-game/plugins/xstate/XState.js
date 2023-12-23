@@ -46,6 +46,7 @@ class XState {
 
       // TODO: make this separate fn
       function applyStateChange (context) {
+        console.log('applyStateChange', context)
         // TODO: make this work for array of entities
         let ent = game.findEntity(context.name);
         if (ent) {
@@ -59,6 +60,7 @@ class XState {
               game.components[component].data[ent.id] = context[component];
             }
           });
+          console.log('updated entity', ent);
           game.inflateEntity(ent);
         }
       }
@@ -106,6 +108,11 @@ class XState {
   getCurrentState () {
     let game = this.game;
     return game.service.state.value;
+  }
+
+  unload () {
+    let game = this.game;
+    game.service.stop();
   }
 
 }

@@ -28,11 +28,11 @@ class XState {
     // Adds a nice StarField background
     game.use('StarField');
 
-    game.use('CurrentFPS');
-
+    /*
     game.use('Editor', {
       sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/xstate-matter-babylon.html'
     });
+    */
 
     function BossFightMiddleware() {
 
@@ -101,9 +101,11 @@ class XState {
 
       const Guards = {
         isBossDamaged: (context, event) => {
+          console.log('isBossDamaged', context, event);
           return event.name === context.name && event.type === 'entity::damage';
         },
         isBossDefeated: (context, event) => {
+          console.log('isBossDefeated', context, event);
           return event.name === context.name && event.type === 'ENTITY_DESTROYED';
         },
       };
@@ -136,28 +138,32 @@ class XState {
 
     }
 
-    game.use('XState', {
-      world: BossFightMiddleware()
-    })
-    game.use('StarField');
     game.on('plugin::ready::XState', () => {
+      game.createDefaultPlayer();
       game.systems['xstate'].loadEntities();
 
     });
 
-    game.systems.graphics.switchGraphics('BabylonGraphics', function(){
-      game.createDefaultPlayer();
+    game.use('XState', {
+      world: BossFightMiddleware()
+    })
+    // game.use('StarField');
+
+    game.systems.graphics.switchGraphics('PhaserGraphics', function(){
 
     });
 
   }
 
-  update() {
-  }
+  update() {}
 
   render() { }
 
   destroy() { }
+
+  unload () {
+    game.systems['xstate'].unload();
+  }
 
 }
 
