@@ -8,7 +8,7 @@ export default class Mouse {
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };
-    this.disableContextMenu = true;
+    this.disableContextMenu = false;
     this.isDragging = false;
     this.dragStartPosition = { x: 0, y: 0 };
 
@@ -40,6 +40,20 @@ export default class Mouse {
   }
 
   handleMouseMove(event) {
+
+    // TODO: common function for selecting entities
+    // TODO: have editor be aware if inspector is loaded
+    // if so, show additional UX for selecting entities
+    let target = event.target;
+    if (target && target.getAttribute) {
+      let mantraId = target.getAttribute('mantra-id');
+      if (mantraId) {
+        // if this is a Mantra entity, set the selectedEntityId
+        // this is used for GUI rendering and CSSGraphics
+        this.game.selectedEntityId = mantraId;
+      }
+    }
+
     this.mousePosition = { x: event.clientX, y: event.clientY };
     if (event.target instanceof HTMLCanvasElement) {
       const canvas = event.target;
@@ -66,6 +80,7 @@ export default class Mouse {
 
   handleMouseDown(event) {
     let target = event.target;
+
     // check to see if target has a mantra-id attribute
     if (target && target.getAttribute) {
       let mantraId = target.getAttribute('mantra-id');

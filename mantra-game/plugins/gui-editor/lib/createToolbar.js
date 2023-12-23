@@ -1,18 +1,11 @@
+import GraphicsSelector from './GraphicsSelector.js';
+import WorldSelector from './WorldSelector.js';
+import ToolbarMenu from './ToolbarMenu.js';
+
 export default function createToolbar() {
-  // const $toolbar = $('<div>', { id: 'editorToolbar', class: 'editor-toolbar' });
 
   // Create menus
   const $fileMenu = this.createMenu('File');
-  // const $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
-  /*
-  const $eventsMenu = this.createMenu('Events', this.showEventsInspector.bind(this));
-  const $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
-  const $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
-  const $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
-  */
-
-  const $graphicsSelector = new GraphicsSelector(this);
-  const $worldSelector = new WorldSelector(this.game);
 
   const toolbarMenu = new ToolbarMenu();
   this.toolbarMenu = toolbarMenu;
@@ -21,16 +14,15 @@ export default function createToolbar() {
   let inspectorIcon = this.createIcon('search');
   inspectorIcon.src = './vendor/feather/search.svg';
   inspectorIcon.style.cursor = 'pointer';
-  // adds helper tooltip
   inspectorIcon.title = 'Click to open Entity Inspector';
+  inspectorIcon.style.width = '36px';
+  inspectorIcon.style.height = '36px';
+  inspectorIcon.style.paddingTop = '24px';
+  inspectorIcon.style.marginRight = '30px';
+  inspectorIcon.style.marginLeft = '10px';
   // TODO: have this change values based on open / cloase state
   // . Click in-game on Entity to Inspect
   inspectorIcon.onclick = () => this.showInspector();
-  // black background
-  // invert color
-
-  let worldIcon = this.createIcon('globe');
-  let graphicsIcon = this.createIcon('tv');
 
   toolbarMenu.addElement('secondary', inspectorIcon);
 
@@ -50,13 +42,6 @@ export default function createToolbar() {
     icon: this.createIcon('box'),
     onClick: () => this.showEntities()
   });
-
-
-  /*
-  toolbarMenu.addItem('primary', {
-    text: 'Inspector'
-  });
-  */
 
   toolbarMenu.addItem('primary', {
     text: 'Rules',
@@ -79,19 +64,49 @@ export default function createToolbar() {
     onClick: () => this.showEventsInspector()
   });
 
+  let worldIcon = this.createIcon('globe');
+  worldIcon.style.marginTop = '0px';
+  worldIcon.style.paddingTop = '0px';
+  worldIcon.style.position = 'relative';
+  worldIcon.style.top = '10px';
+
+  let graphicsIcon = this.createIcon('tv');
+  graphicsIcon.style.marginTop = '0px';
+  graphicsIcon.style.paddingTop = '0px';
+  graphicsIcon.style.position = 'relative';
+  graphicsIcon.style.top = '10px';
 
   // toolbarMenu.addItem('secondary', { text: 'Settings' });
+  const graphicsSelector = new GraphicsSelector(this);
+  graphicsSelector.selectBox.style.fontSize = '22px';
+  graphicsSelector.selectBox.style.cursor = 'pointer';
+  graphicsSelector.selectBox.style.margin = '20px';
 
-  $graphicsSelector.selectBox.style.fontSize = '22px';
-  $graphicsSelector.selectBox.style.cursor = 'pointer';
-  $worldSelector.selectBox.style.fontSize = '22px';
-  $worldSelector.selectBox.style.cursor = 'pointer';
 
-  toolbarMenu.addElement('secondary', worldIcon);
+  // create item holder for graphicsSelector
+  let graphicsSelectorItem = document.createElement('div');
+  graphicsSelectorItem.appendChild(graphicsIcon);
+  graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
+  graphicsSelectorItem.title = 'Select Graphics Engine';
 
-  toolbarMenu.addElement('secondary',   $worldSelector.selectBox);
-  toolbarMenu.addElement('secondary', graphicsIcon);
-  toolbarMenu.addElement('secondary', $graphicsSelector.selectBox);
+  const worldSelector = new WorldSelector(this.game);
+  worldSelector.selectBox.style.fontSize = '22px';
+  worldSelector.selectBox.style.cursor = 'pointer';
+  worldSelector.selectBox.style.margin = '20px';
+
+
+  let worldSelectorItem = document.createElement('div');
+  worldSelectorItem.appendChild(worldIcon);
+  worldSelectorItem.appendChild(worldSelector.selectBox);
+  worldSelectorItem.title = 'Select World';
+  /*
+  worldSelectorItem.onmousedown = () => {
+    worldSelector.selectBox.click();
+  };
+  */
+
+  toolbarMenu.addElement('secondary', worldSelectorItem);
+  toolbarMenu.addElement('secondary', graphicsSelectorItem);
 
   // Append the toolbar to the body
   $('body').append(toolbarMenu.toolbar);
