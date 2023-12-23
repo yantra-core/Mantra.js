@@ -2,9 +2,10 @@ export default function cssMouseWheelZoom(event) {
   if (!this.mouseWheelEnabled) {
     return;
   }
+
   let game = this.game;
-  // console.log('game.data.camera', game.data.camera)
   let scale = game.data.camera.currentZoom;
+
   // Game viewport
   let gameViewport = document.getElementById('gameHolder');
 
@@ -14,7 +15,6 @@ export default function cssMouseWheelZoom(event) {
     minScale: 0.1,   // Minimum scale limit
   };
 
-  // Function to update scale
   // Prevent default scrolling behavior
   event.preventDefault();
 
@@ -28,16 +28,21 @@ export default function cssMouseWheelZoom(event) {
 
   this.zoom(scale);
 
-  // Apply scale to viewport
-  //gameViewport.style.transform = `scale(${scale})`;
-
+  // Calculate center of the viewport
   const viewportCenterX = window.innerWidth / 2;
   const viewportCenterY = window.innerHeight / 2;
 
-  // TODO: implement offset to ensure camera is center of screen after zoom
-  // gameViewport.style.transform = `translate(${-this.cameraPosition.x}px, ${-this.cameraPosition.y}px) scale(${scale})`;
+  scale = scale * 100;
+  // Calculate offset based on camera position and scale
+  let offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
+  let offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
 
-  //game.viewportCenterXOffset = (viewportCenterX) / scale;
-  //game.viewportCenterYOffset = (viewportCenterY) / scale;
 
+  offsetX += 100;
+  offsetY += 100;
+
+  //console.log('oooo', offsetX, offsetY, scale)
+  // Update game viewport offsets (if needed)
+  //game.viewportCenterXOffset = offsetX;
+  //game.viewportCenterYOffset = offsetY;
 }

@@ -533,6 +533,12 @@ class Game {
     }
   }
 
+  zoom (scale) {
+    if (this.camera) {
+      this.camera.zoom(scale);
+    }
+  }
+
   setPlayerId(playerId) {
     // console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;

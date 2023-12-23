@@ -86,6 +86,9 @@ class CSSGraphics extends GraphicsInterface {
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
 
+    this.zoom(1.1);
+
+
   }
 
   initCSSRenderDiv() {

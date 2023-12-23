@@ -16,6 +16,8 @@ class Sutra {
 
     game.setGravity(0, 0, 0);
 
+    // TODO: set default zoom to 0.3 ( zoomed out )
+    game.zoom(0.3);
     game.use('Bullet')
     game.use('Timers');
     game.use('Health');

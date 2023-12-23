@@ -30,7 +30,7 @@ class BabylonGraphics extends GraphicsInterface {
     }
 
     if (typeof camera.startingZoom !== 'number') {
-      camera.startingZoom = 1;
+      camera.startingZoom = 0.5;
     }
 
     if (typeof camera.follow === 'undefined') {

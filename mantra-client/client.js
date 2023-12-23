@@ -72,7 +72,7 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
-// window.game = game;
+window.game = game;
 //
 // Use Plugins to add systems to the game
 //
@@ -82,7 +82,6 @@ let game = new Game({
 // game.use(new plugins.Bullet())
 game.use(new plugins.Entity())
 game.use(new plugins.Platform());
-
 game.use(new plugins.MatterPhysics());
 // game.use(new plugins.CSSGraphics());
 
@@ -124,15 +123,15 @@ if (game.isOnline) {
 // game.use(new plugins.Behaviors());
 
 // Always show FPS
-game.use(new plugins.CurrentFPS());
+// game.use(new plugins.CurrentFPS());
+/*
 game.use(new plugins.Editor({
   sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js',
   sutraEditor: true
 }));
+*/
 
-game.use(new plugins.Sutra({ }));
-
-
+// game.use(new plugins.Sutra({ }));
 
 // import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 // import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
@@ -174,20 +173,24 @@ if (mode === 'online') {
     // see: @yantra-core/mantra-server
     game.connect('ws://192.168.1.80:8888/websocket');                   // websocket server
   }
-  game.use(new plugins.StarField())
+  // game.use(new plugins.StarField())
   game.use(new plugins.PingTime())
   game.use(new plugins.SnapshotSize())
 
 } else {
 
   // Single Player Offline Mode
+  //let home = new worlds.Home();
+  let home = new worlds.YCraft();
   game.start(function () {
-    game.use(new plugins.StarField())
-    game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
-    game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
-    game.use(new plugins.Bullet())
-    game.use(new worlds.Home());
-    game.use(new plugins.Tone());
+    // game.use(new plugins.StarField())
+    //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
+    //game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
+    //game.use(new plugins.Bullet())
+    game.use(home);
+
+    // game.use(new plugins.GamepadGUI())
+    //game.use(new plugins.Tone());
 
     // game.use(new plugins.XState({ world: BossFight() }));
     // game.use(new plugins.PluginExplorer({ }));

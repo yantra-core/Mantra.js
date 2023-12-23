@@ -29,7 +29,7 @@ class CSSCamera {
     this.scene.zoom(this.game.config.camera.startingZoom);
 
     game.viewportCenterXOffset = 0;
-    game.viewportCenterYOffset = 0;
+    game.viewportCenterYOffset = -200;
 
     this.initZoomControls();
 
@@ -144,14 +144,7 @@ class CSSCamera {
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     let entityId = game.currentPlayerId;
 
-    if (typeof game.viewportCenterXOffset === 'undefined') {
-      game.viewportCenterXOffset = 0;
-    }
-
-    if (typeof game.viewportCenterYOffset === 'undefined') {
-      game.viewportCenterYOffset = 0;
-    }
-
+    // console.log('game.viewportCenterXOffset', game.viewportCenterXOffset, game.viewportCenterYOffset)
     // TODO: add ability for this to work with dragging and follow false
     if (this.follow && currentPlayer.position) {
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;

@@ -77,6 +77,7 @@ import Creator from './plugins/gui-creator/Creator.js';
 import ControlsGUI from './plugins/gui-controls/ControlsGUI.js';
 import Editor from './plugins/gui-editor/Editor.js';
 import GameEditor from './plugins/gui-game-editor/GameEditorGui.js';
+import GamepadGUI from './plugins/gui-gamepad/GamepadGUI.js';
 import EntitiesGUI from './plugins/gui-entities/EntitiesGUI.js';
 import EntityEditor from './plugins/gui-entity-editor/EntityEditor.js';
 import EventInspector from './plugins/gui-event-inspector/EventInspector.js';
@@ -134,6 +135,7 @@ const plugins = {
   LoadingScreen,
   Editor,
   GameEditor,
+  GamepadGUI,
   EntityEditor,
   TowerWorld,
   EntitiesGUI,
