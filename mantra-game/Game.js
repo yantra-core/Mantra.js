@@ -8,13 +8,14 @@ import SystemsManager from './System/SystemsManager.js';
 // Game instances are event emitters
 import eventEmitter from './lib/eventEmitter.js';
 
-// Game loops
-// TODO: move to plugins
+// Game local data storage
+import storage from './lib/storage/storage.js';
+
+// Game loops, TODO: make game loops plugins / configurable
 // Local game loop is for single machine games ( no networking )
 import localGameLoop from './lib/localGameLoop.js';
 // Online game loop is for multiplayer games ( networking )
 import onlineGameLoop from './lib/onlineGameLoop.js';
-
 
 // Game tick, called once per tick from game loop
 import gameTick from './lib/gameTick.js';
@@ -98,6 +99,14 @@ class Game {
 
     this.config = config;
 
+    // fetch the gameConfig from localStorage
+    let localData = storage.getAllKeysWithData();
+
+    // Remark: We could merge this data back into the config / game.data
+
+    // set the last local start time
+    storage.set('lastLocalStartTime', Date.now());
+
     // Keeps a clean copy of current game state
     // Game.data scope can be used for applying configuration settings while game is running
     // Game.config scope is expected to be "immutablish" and should not be modified while game is running
@@ -142,6 +151,7 @@ class Game {
 
     this.bodyMap = {};
     this.systems = {};
+    this.storage = storage;
 
     this.snapshotQueue = [];
 
