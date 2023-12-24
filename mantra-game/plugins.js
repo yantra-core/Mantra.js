@@ -57,8 +57,9 @@ import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 import Platform from './plugins/platform/Platform.js';
-import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
+import Tile from './plugins/tile/Tile.js';
 
+import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
 import Sutra from './plugins/sutra/Sutra.js';
@@ -108,6 +109,7 @@ const plugins = {
   YCraft,
   Block,
   Platform,
+  Tile,
   Border,
   Bullet,
   Collision,

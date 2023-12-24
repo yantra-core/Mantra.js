@@ -120,6 +120,14 @@ class Game {
       }
     };
 
+    if (typeof this.data.camera.follow === 'undefined') {
+      this.data.camera.follow = true;
+    }
+
+    if (typeof this.data.camera.currentZoom === 'undefined') {
+      this.data.camera.currentZoom = 1;
+    }
+
     console.log("Mantra starting...");
 
     // Define the scriptRoot variable for loading external scripts
@@ -432,6 +440,11 @@ class Game {
     }
     this.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
     this.emit('plugin::loaded', pluginId);
+
+    game.data.plugins = game.data.plugins || {};
+
+    game.data.plugins[pluginId] = options;
+
     return this;
 
   }

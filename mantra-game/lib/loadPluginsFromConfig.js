@@ -51,11 +51,19 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     // TODO: move to Graphics.loadFromConfig() ?
     if (graphics) {
+
+      this.use('Graphics');
+
+      // check to see if user has specified a graphics engine in local storage
+      let storedGraphics = this.storage.get('graphics');
+      if (storedGraphics) {
+        this.use(storedGraphics, { camera: this.config.camera });
+        return;
+      }
+
       if (typeof graphics === 'string') {
         graphics = [graphics];
       }
-
-      this.use('Graphics');
 
       if (graphics.includes('babylon')) {
         this.use('BabylonGraphics', { camera: this.config.camera });
