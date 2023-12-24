@@ -51,6 +51,7 @@ class SutraGUI {
       this.game.systems['keyboard'].unbindAllEvents();
     }
 
+    // may need to be removed / moved higher up in the stack
     // add a global click handler to document that will delegate any clicks
     // that are not inside gui-windows to re-enable inputs
     document.addEventListener('click', (e) => {
@@ -107,12 +108,10 @@ class SutraGUI {
   }
 
   setRules(rules) {
-    alert('setting rules')
     console.log('setting rules', rules)
     // let rules = testRules(game);
 
     // gui.setTheme('light');
-    /*
     rules.onAny(function (ev, data, node) {
       let sutraPath = node.sutraPath;
       let humanReadablePath = rules.getReadableSutraPath(sutraPath);
@@ -131,11 +130,10 @@ class SutraGUI {
         });
       });
     });
-    */
 
     this.behavior = rules;
 
-    this.drawTable();
+    //this.drawTable();
     let json = rules.serializeToJson();
     this.drawBehaviorTree(JSON.parse(json));
 
@@ -317,7 +315,6 @@ class SutraGUI {
 
     if (node.data) {
 
-
       let dataContainer = document.createElement('div');
       dataContainer.className = 'data-container';
       dataContainer.classList.add('with-container');
@@ -328,7 +325,7 @@ class SutraGUI {
       withLabel.innerHTML = `<a href="#" class="sutra-keyword">WITH</a>`;
       //dataContainer.appendChild(withLabel);
 
-      actionSelectContainer.appendChild(withLabel);
+      // actionSelectContainer.appendChild(withLabel);
 
       //let dataView = this.dataView(node, indentLevel);
       // Append the data container to the main element

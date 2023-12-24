@@ -26,17 +26,10 @@ export default class Mouse {
 
   init(game) {
     this.game = game;
-    this.bindMouseControls();
-  }
+    this.id = Mouse.id;
+    this.bindInputControls();
 
-  bindMouseControls() {
-    document.addEventListener('pointermove', this.boundHandleMouseMove);
-    document.addEventListener('pointerdown', this.boundHandleMouseDown);
-    document.addEventListener('pointerup', this.boundHandleMouseUp);
-    // TODO: could be a config option
-    if (this.disableContextMenu) {
-      document.addEventListener('contextmenu', event => event.preventDefault());
-    }
+    this.game.systemsManager.addSystem(this.id, this);
   }
 
   handleMouseMove(event) {
@@ -112,6 +105,9 @@ export default class Mouse {
     }
 
 
+    // TODO: add conditional check here to see if we should be processing mouse events
+
+    
     this.sendMouseData();
   }
 
@@ -152,11 +148,24 @@ export default class Mouse {
     }
   }
 
-  unload() {
+  bindInputControls() {
+    document.addEventListener('pointermove', this.boundHandleMouseMove);
+    document.addEventListener('pointerdown', this.boundHandleMouseDown);
+    document.addEventListener('pointerup', this.boundHandleMouseUp);
+    // TODO: could be a config option
+    if (this.disableContextMenu) {
+      document.addEventListener('contextmenu', event => event.preventDefault());
+    }
+  }
+  unbindAllEvents() {
     // unbind all events
     document.removeEventListener('pointermove', this.boundHandleMouseMove);
     document.removeEventListener('pointerdown', this.boundHandleMouseDown);
     document.removeEventListener('pointerup', this.boundHandleMouseUp);
+  }
+
+  unload() {
+    this.unbindAllEvents();
   }
 
 }

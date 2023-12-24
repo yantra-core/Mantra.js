@@ -286,6 +286,9 @@ class CSSGraphics extends GraphicsInterface {
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     let entityId = game.currentPlayerId;
 
+
+    // PLAYER MOUSE MOVEMENT CODE< TODO MOVE THIS TO SEPARATE FILE
+    /*
     if (currentPlayer && currentPlayer.inputs && currentPlayer.inputs.mouse && currentPlayer.inputs.mouse.buttons.LEFT) {
       let data = currentPlayer.inputs;
       // Player's current position
@@ -309,12 +312,10 @@ class CSSGraphics extends GraphicsInterface {
         DOWN: Math.PI / 2,
         LEFT: Math.PI,
         RIGHT: 0,
-        /*
-        UP_LEFT: -3 * Math.PI / 4,
-        UP_RIGHT: -Math.PI / 4,
-        DOWN_LEFT: 3 * Math.PI / 4,
-        DOWN_RIGHT: Math.PI / 4
-        */
+        //UP_LEFT: -3 * Math.PI / 4,
+        //UP_RIGHT: -Math.PI / 4,
+        //DOWN_LEFT: 3 * Math.PI / 4,
+        //DOWN_RIGHT: Math.PI / 4
       };
 
       // Find the closest direction
@@ -367,6 +368,7 @@ class CSSGraphics extends GraphicsInterface {
       game.applyForce(entityId, { x: dirX, y: dirY });
 
     }
+    */
 
   }
 

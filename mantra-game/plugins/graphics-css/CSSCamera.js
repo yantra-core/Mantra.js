@@ -25,7 +25,6 @@ class CSSCamera {
 
     this.gameViewport = document.getElementById('gameHolder');
     
-    // Add event listener for mouse wheel
     this.scene.zoom(this.game.config.camera.startingZoom);
 
     game.viewportCenterXOffset = 0;

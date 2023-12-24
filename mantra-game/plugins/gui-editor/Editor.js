@@ -17,6 +17,9 @@ class Editor {
     // register the plugin with the game
     // this.game.systemsManager.addSystem(this.id, this);
 
+    document.body.style.perspective = 'none';
+
+
     this.dropdownTimers = new Map(); // To manage delayed close timers
 
     // Check for jQuery
@@ -39,6 +42,7 @@ class Editor {
   jqueryReady() {
     this.createToolbar();
     this.setupGlobalClickListener();
+
     // this.createViewSourceModal();
     this.game.systemsManager.addSystem(this.id, this);
 
@@ -135,7 +139,71 @@ class Editor {
       if (!$(event.target).closest('.menu button').length) {
         this.closeAllDropdowns();
       }
+
+      // TODO: remove this code and move it into Mouse.js
+      let toolbar = event.target.closest('.toolbar');
+
+      if (this.game && this.game.systems && this.game.systems['entity-input']) {
+        if (!toolbar) {
+          console.log("toolbar not found")
+          // re-enable inputs
+          this.game.systems['entity-input'].setInputsActive();
+          if (this.game.systems['keyboard']) {
+            this.game.systems['keyboard'].bindInputControls();
+          }
+          if (this.game.systems['mouse']) {
+            this.game.systems['mouse'].bindInputControls();
+          }
+        } else {
+          console.log("toolbar found")
+          // disable inputs
+          this.game.systems['entity-input'].disableInputs();
+
+          if (this.game.systems['keyboard']) {
+            this.game.systems['keyboard'].unbindAllEvents();
+          }
+          if (this.game.systems['mouse']) {
+            this.game.systems['mouse'].unbindAllEvents();
+          }
+          event.preventDefault();
+          return false;
+        }
+
+      }
+
+
     });
+
+    /*
+ // add a global click handler to document that will delegate any clicks
+    // that are not inside gui-windows to re-enable inputs
+    document.addEventListener('click', (e) => {
+      // check if the click was inside a gui-window
+      let guiWindow = e.target.closest('.gui-container');
+      if (this.game && this.game.systems && this.game.systems['entity-input'] && this.game.systems['keyboard']) {
+        if (!guiWindow) {
+          // re-enable inputs
+          this.game.systems['entity-input'].setInputsActive();
+          this.game.systems['keyboard'].bindInputControls();
+        } else {
+          // disable inputs
+          this.game.systems['entity-input'].disableInputs();
+          this.game.systems['keyboard'].unbindAllEvents();
+        }
+
+        // check to see if this is a class sutra-link, if so open the form editor
+        if (e.target.classList.contains('sutra-link')) {
+          let sutraPath = e.target.getAttribute('data-path');
+          let node = this.behavior.findNode(sutraPath);
+          // Remark: Editing / Viewing Conditionals is not yet supported
+          //this.showConditionalsForm(node);
+        }
+      }
+    });
+    */
+
+
+
   }
 
   closeAllDropdowns() {

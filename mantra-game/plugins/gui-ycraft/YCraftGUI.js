@@ -32,22 +32,13 @@ class YCraftGUI {
     // check for existing contraptionsView
     let contraptionsView = document.getElementById('contraptionsView');
     if (contraptionsView) {
-      contraptionsView.remove();
+      // TODO: contraptionsView.remove()
+      // Remark: Requires we have cash $ with closest parent
+      contraptionsView.display = 'block';
     }
     // create empty div
     this.container = document.createElement('div');
     this.container.id = 'contraptionsView';
-    // add the container to the editor menu ( requires 'Editor' plugin is used )
-    /*
-    console.log('ae', game.systems)
-    let editorSystem = game.systems['gui-editor'];
-    console.log('eeee', editorSystem)
-    */
-    //editorSystem.toolbarMenu.addElement('primary', this.container);
-    //editorSystem.toolbarMenu.toolbar.appendChild(this.container);
-
-    // instead of a window, just add a dropdown to the toolbar ( for now alpha demo )
-
     this.container = document.createElement('div');
     this.container.style.display = 'flex';
     this.container.style.flexDirection = 'row';
@@ -62,8 +53,6 @@ class YCraftGUI {
     function attemptEditorAppend() {
       if (game.systems && game.systems['gui-editor']) {
         let toolBarComponent = game.systems['gui-editor'].toolbarMenu;
-        console.log('toolBarComponent', toolBarComponent)
-
         if (toolBarComponent) {
           toolBarComponent.addElement('primary', that.container);
         }
@@ -87,11 +76,13 @@ class YCraftGUI {
       */
 
       // check to see if the container exists
+      /*
       let existingContainer = document.getElementById('ycraft-main-container');
 
       if (existingContainer) {
         return;
       }
+      */
       // Create main container div
       var mainContainer = document.createElement('div');
       mainContainer.id = 'ycraft-main-container';
@@ -462,7 +453,11 @@ class YCraftGUI {
     // Removes contraptionsView from editor menu
     let contraptionsView = document.getElementById('contraptionsView');
     if (contraptionsView) {
-      contraptionsView.remove();
+      contraptionsView.display = 'hidden';
+      // TODO: 
+      //       contraptionsView.remove();
+
+
     }
 
     this.logContainer = null;
