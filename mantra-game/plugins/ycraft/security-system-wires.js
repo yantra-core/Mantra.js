@@ -1,5 +1,5 @@
-// import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from 'ycraft';
-import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from '../../../../YCraft.js/index.js';
+import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
+//import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from '../../../../YCraft.js/index.js';
 
 export default function createColorPuzzle() {
 
