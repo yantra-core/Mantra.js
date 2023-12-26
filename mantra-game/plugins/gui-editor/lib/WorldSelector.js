@@ -3,10 +3,13 @@ class WorldSelector {
     this.game = game;
     this.selectBox = this.createElements(); // Now returns the select box element
     this.lastLoadedWorld = null;
+    this.currentWorld = null;
+
     this.addEventListeners();
   }
 
   createElements() {
+    let game = this.game;
     // Create the select box
     let selectBox = document.createElement('select');
     selectBox.id = 'graphicsSelect';
@@ -51,6 +54,8 @@ class WorldSelector {
   }
 
   addEventListeners() {
+    let that = this;
+    let game = this.game;
     /*
     this.game.on('plugin::ready::graphics-phaser', () => {
       this.selectElement('PhaserGraphics');
@@ -63,6 +68,17 @@ class WorldSelector {
     this.selectBox.addEventListener('change', (event) => {
       this.handleSelectionChange(event);
     });
+
+    game.on('world::loaded', function (pluginInstance) {
+      // alert('loaded')
+      console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
+      let worldName = pluginInstance.constructor.name
+      //console.log('world::loaded', worldName, pluginInstance);
+      that.selectElement(worldName);
+      //that.hideLoadingSpinner();
+    });
+
+
   }
 
   // TODO: refactor world change logic to separate function
@@ -96,11 +112,19 @@ class WorldSelector {
     let worldClass = WORLDS.worlds[worldName];
     let worldInstance = new worldClass();
 
-    game.on('plugin::loaded::' + worldInstance.id, function () {
+    game.once('plugin::loaded::' + worldInstance.id, function () {
       that.hideLoadingSpinner();
     });
 
     game.use(worldInstance);
+
+    // USER INTENT: Change world
+    // persist this intention to the local storage
+    // so that it can be restored on next page load
+    game.storage.set('world', selectedWorld);
+
+    // update the dropdown to show the current world
+    this.selectElement(selectedWorld);
     
   }
 

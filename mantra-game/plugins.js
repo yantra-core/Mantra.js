@@ -44,6 +44,7 @@ import Gamepad from './plugins/gamepad/Gamepad.js';
 import Midi from './plugins/midi/Midi.js';
 import MidiGUI from './plugins/gui-midi/MidiGUI.js';
 import FloatyTyper from './plugins/typer-floaty/FloatyTyper.js';
+import GhostTyper from './plugins/typer-ghost/GhostTyper.js';
 
 // Audio
 import Tone from './plugins/tone/Tone.js';
@@ -57,6 +58,7 @@ import Border from './plugins/border/Border.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 import Platform from './plugins/platform/Platform.js';
+import Sword from './plugins/sword/Sword.js';
 import Tile from './plugins/tile/Tile.js';
 
 import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
@@ -112,6 +114,7 @@ const plugins = {
   Tile,
   Border,
   Bullet,
+  Sword,
   Collision,
   ChronoControl,
   Client,
@@ -129,6 +132,7 @@ const plugins = {
   Midi,
   MidiGUI,
   FloatyTyper,
+  GhostTyper,
   Tone,
   Nes,
   Inspector,

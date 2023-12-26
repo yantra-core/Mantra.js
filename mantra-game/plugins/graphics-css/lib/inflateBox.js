@@ -18,15 +18,27 @@ export default function inflateBox(entityElement, entityData) {
 
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
 
+  // TODO: move to separate file for inflatePart,
+  // move this code to CSSGraphics switch case
   if (entityData.type === 'PART') {
 
-    if (entityData.name === 'Wire') {
-      // set a low z-index for wires
-      // entityElement.style.zIndex = depthChart.indexOf('wire');
-      entityElement.style.zIndex = -1;
-    } else {
-      // set 1000 z-index for parts
-      entityElement.style.zIndex = depthChart.indexOf('PART');
+
+    // TODO: part.kind, not name, name is the individual part name user defined
+    switch (entityData.name) {
+
+      case 'Wire':
+        entityElement.style.zIndex = -1;
+        break
+
+        case 'Display':
+          entityElement.style.zIndex = -1;
+          break
+  
+        default: 
+        // set 1000 z-index for parts
+        entityElement.style.zIndex = depthChart.indexOf('PART');
+        break
+
     }
 
     // add pointer cursor for buttons on hover

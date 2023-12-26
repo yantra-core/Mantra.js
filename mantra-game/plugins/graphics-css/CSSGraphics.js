@@ -34,6 +34,7 @@ class CSSGraphics extends GraphicsInterface {
 
     this.id = CSSGraphics.id;
     this.cameraPosition = { x: 0, y: 0 };
+    // this.game.data.camera.position = this.cameraPosition;
     this.mouseWheelEnabled = false;
 
     this.inflateBox = inflateBox.bind(this);
@@ -86,7 +87,7 @@ class CSSGraphics extends GraphicsInterface {
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
 
-    this.zoom(1.1);
+    // this.zoom(1.1);
 
 
   }
@@ -167,7 +168,13 @@ class CSSGraphics extends GraphicsInterface {
         entityElement = this.inflateText(entityElement, entityData);
         break;
       default:
-        this.inflateBox(entityElement, entityData);
+
+        if (entityData.type === 'PART' && entityData.name === 'Display') {
+          this.inflateText(entityElement, entityData);
+        } else {
+          this.inflateBox(entityElement, entityData);
+        }
+
         break;
     }
 
@@ -425,6 +432,7 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   zoom(scale) {
+    console.log("CSSGraphics zoom", scale)
     let gameViewport = document.getElementById('gameHolder');
     if (gameViewport) {
       gameViewport.style.transform = `scale(${scale})`;

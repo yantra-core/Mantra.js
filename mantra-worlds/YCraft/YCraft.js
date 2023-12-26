@@ -23,6 +23,11 @@ class YCraft {
     game.use('YCraft');
     game.use('YCraftGUI');
 
+    game.once('plugin::loaded::typer-ghost', function(){
+      game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'YCraft Crafting World', style: { color: 'white', fontSize: '144px' }, duration: 10000 });
+    })
+
+    //game.use('GhostTyper');
     /*
     game.use('Editor', {
       sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-worlds/YCraft/YCraft.js',
@@ -36,16 +41,16 @@ class YCraft {
       mass: 10000,
       height: 64,
       width: 64,
-      position: { x: 0, y: 0, z: 0 },
+      position: { x: 150, y: 300, z: 0 },
       friction: 1, 
       frictionAir: 1, 
       frictionStatic: 1
-
     });
+
+    game.createDefaultPlayer();
 
     /*
     game.systems.graphics.switchGraphics('CSSGraphics', function(){
-      game.createDefaultPlayer();
 
     });
     */

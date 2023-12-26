@@ -211,7 +211,9 @@ class Game {
       radius: new Component('radius', this),
       isSensor: new Component('isSensor', this),
       owner: new Component('owner', this),
-      inputs: new Component('inputs', this)
+      inputs: new Component('inputs', this),
+      items: new Component('items', this)
+
     };
 
     // define additional components for the game
@@ -228,6 +230,7 @@ class Game {
     this.components.timers = new TimersComponent('timers', this);
     this.components.yCraft = new Component('yCraft', this);
     this.components.text = new Component('text', this);
+    this.components.style = new Component('style', this);
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
@@ -440,6 +443,11 @@ class Game {
     }
     this.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
     this.emit('plugin::loaded', pluginId);
+
+    if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
+      this.emit(`world::loaded::${pluginInstanceOrId.id}`, pluginInstanceOrId);
+      this.emit('world::loaded', pluginInstanceOrId);
+    }
 
     game.data.plugins = game.data.plugins || {};
 

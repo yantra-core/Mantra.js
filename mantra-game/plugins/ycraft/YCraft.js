@@ -1,5 +1,5 @@
-// import { YCraft as YCraftActual } from '../../../../YCraft.js/index.js';
-import { YCraft as YCraftActual } from 'ycraft';
+import { YCraft as YCraftActual, ElectricalSignal } from '../../../../YCraft.js/index.js';
+// import { YCraft as YCraftActual } from 'ycraft';
 
 import Plugin from '../../Plugin.js';
 
@@ -9,6 +9,7 @@ import partEventListeners from './lib/bindPartEvents.js';
 import createWire from './lib/parts/createWire.js';
 import bindWire from './lib/events/bindWire.js';
 import bindButton from './lib/events/bindButton.js';
+import bindDisplay from './lib/events/bindDisplay.js';
 import bindLEDLight from './lib/events/bindLEDLight.js';
 import bindActuator from './lib/events/bindActuator.js';
 import bindAmplifier from './lib/events/bindAmplifer.js';
@@ -20,7 +21,7 @@ import bindRover from './lib/events/bindRover.js';
 
 import securitySystemWithWires from './security-system-wires.js';
 // import testContraption from './security-system.js';
-// import testLight from './button-wire-light.js';
+import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
 
 // handles input controller events and relays them to the game logic
@@ -45,6 +46,7 @@ class YCraft extends Plugin {
     this.createWire = createWire.bind(this);
 
     this.bindButton = bindButton.bind(this);
+    this.bindDisplay = bindDisplay.bind(this);
     this.bindLEDLight = bindLEDLight.bind(this);
     this.bindActuator = bindActuator.bind(this);
     this.bindAmplifier = bindAmplifier.bind(this);
@@ -82,7 +84,7 @@ class YCraft extends Plugin {
 
     // add the system to the systems manager
     this.game.systemsManager.addSystem(this.id, this);
-    console.log('YCraft.init()', YCraftActual);
+    // console.log('YCraft.init()', YCraftActual);
     if (self.contraption) {
       self.initContraption(self.contraption);
       if (self.contraption.start) {
@@ -111,6 +113,86 @@ class YCraft extends Plugin {
     contraption.onAny((event, ...args) => {
       // console.log('onAny contraption event', event, args);
     });
+
+    // render a border box around each contraption based on its bounding box
+    console.log('placing border box around contraption positoin', contraption.position);
+    /*
+    let boundingBox = this.game.createEntity({
+      type: 'BOX',
+      color: 0x00ff00,
+      width: contraption.width,
+      height: contraption.height,
+      position: contraption.position,
+      isSensor: true
+    });
+    */
+
+      // create a text label for the entity
+
+
+    if (contraption.contraptions.length > 0) {
+      // iterate through each contraption and create a corresponding entity
+      contraption.contraptions.forEach(contraption => {
+        // creates a bounding box around the contraption
+        // TODO: support hollow boxes with borders
+        // Remark: This will create a box around the contraption, filled
+        /*
+        let boundingBox = this.game.createEntity({
+          type: 'BOX',
+          // color: 0x00ff00,
+          width: contraption.width,
+          height: contraption.height,
+          position: {
+            x: contraption.position.x,
+            y: contraption.position.y,
+            z: -100
+          },
+          isSensor: true
+        });
+        */
+
+        // place the label in top left corner of the contraption
+        let contraptionLabelX = contraption.position.x + contraption.width / 10;
+        let contraptionLabelY = contraption.position.y - contraption.height / 2;
+        // creates a label for the contraption
+        let textLabel = this.game.createEntity({
+          type: 'TEXT',
+          text: contraption.description,
+          position: {
+            x: contraptionLabelX, // Center horizontally
+            y: contraptionLabelY    // Position inside the entity
+          },
+          style: {
+            fontSize: '32px',
+          },
+          width: contraption.width / 2,
+          height: contraption.height / 2,
+          isStatic: true,
+          isSensor: true
+        });
+
+        // bind any potential event listners for the part, based on the type of part
+        //this.partEventListeners(contraption, contraption);
+        //let ent = this.createEntityFromPart(contraption, contraption);
+        // console.log('created entity', ent);
+      });
+    } else {
+      // render a single contraption
+      /*
+      let boundingBox = this.game.createEntity({
+        type: 'BOX',
+        // color: 0x00ff00,
+        width: contraption.width,
+        height: contraption.height,
+        position: {
+          x: contraption.position.x,
+          y: contraption.position.y,
+          z: -100
+        },
+        isSensor: true
+      });
+      */
+    }
 
     // TODO: DRY this logic up with below
     if (contraption.parts.length > 0) {
@@ -190,9 +272,14 @@ class YCraft extends Plugin {
         // trigger the part if possible
         // console.log('entityA.yCraft', entityA.yCraft)
 
-    
+          let signal = new ElectricalSignal();
+          signal.data = {
+            entityId: entityIdB,
+            entity: entityB,
+            body: bodyB
+          };
           if (entityA.yCraft.part.trigger) {
-            entityA.yCraft.part.trigger();
+            entityA.yCraft.part.trigger(signal);
           }
           if (entityA.yCraft.part.press) {
             entityA.yCraft.part.press();
@@ -208,12 +295,16 @@ class YCraft extends Plugin {
         }
 
       if (entityB.yCraft) {
-
-
-          // trigger the part if possible
+        let signal = new ElectricalSignal();
+        signal.data = {
+          entityId: entityIdA,
+          entity: entityA,
+          body: bodyA
+        };
+        // trigger the part if possible
           // console.log('entityB.yCraft', entityB.yCraft)
           if (entityB.yCraft.part.trigger) {
-            entityB.yCraft.part.trigger();
+            entityB.yCraft.part.trigger(signal);
           }
           if (entityB.yCraft.part.press) {
             entityB.yCraft.part.press();

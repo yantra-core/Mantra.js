@@ -74,7 +74,7 @@ class GraphicsSelector {
 
     game.systems.graphics.switchGraphics(selectedGraphicsMode);
 
-    // user intent here was to change the graphics mode
+    // USER INTENT: Change graphics mode
     // persist this intention to the local storage
     // so that it can be restored on next page load
     game.storage.set('graphics', selectedGraphicsMode);

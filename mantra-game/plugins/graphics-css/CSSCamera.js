@@ -25,7 +25,7 @@ class CSSCamera {
 
     this.gameViewport = document.getElementById('gameHolder');
     
-    this.scene.zoom(this.game.config.camera.startingZoom);
+    // this.scene.zoom(this.game.config.camera.startingZoom);
 
     game.viewportCenterXOffset = 0;
     game.viewportCenterYOffset = -200;

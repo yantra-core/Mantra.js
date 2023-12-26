@@ -221,8 +221,14 @@ class Entity {
 
     if (typeof entityData.rotation !== 'undefined') {
       this.game.components.rotation.set(entityId, entityData.rotation);
-
       // TODO: update rotation in physics engine      
+    }
+
+    // Items
+    if (typeof entityData.items !== 'undefined') {
+      // overwrite all items ( for now )
+      // Remark: in the future we could merge instead of overwrite
+      this.game.components.items.set(entityId, entityData.items);
     }
 
     return ent;
@@ -258,6 +264,7 @@ class Entity {
       isStatic: false,
       isSensor: false,
       restitution: 0,
+      items: null,
       owner: 0, // 0 = server
       inputs: null,
       destroyed: false,
@@ -270,6 +277,7 @@ class Entity {
       timers: null, // object hash timers for TimersComponent.js
       yCraft: null, // object hash of properties for YCraft.js
       text: null,
+      style: null
     };
 
     // merge config with defaultConfig
@@ -284,7 +292,7 @@ class Entity {
     };
     */
 
-    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, owner, inputs, lifetime, yCraft, text } = config;
+    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, owner, inputs, lifetime, yCraft, text, style } = config;
     let { x, y } = position;
 
     /*
@@ -316,6 +324,7 @@ class Entity {
     this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
 
     this.game.addComponent(entityId, 'owner', owner);
+    this.game.addComponent(entityId, 'items', items);
     this.game.addComponent(entityId, 'inputs', inputs);
     this.game.addComponent(entityId, 'lifetime', lifetime);
     this.game.addComponent(entityId, 'destroyed', false);
@@ -328,7 +337,7 @@ class Entity {
     this.game.addComponent(entityId, 'timers', new TimersComponent('timers', entityId, this.game));
     this.game.addComponent(entityId, 'yCraft', yCraft);
     this.game.addComponent(entityId, 'text', text);
-
+    this.game.addComponent(entityId, 'style', style);
  
     if (config.body) {
       let body = this.createBody({

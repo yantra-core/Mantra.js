@@ -23,6 +23,15 @@ class Sutra {
     game.use('Bullet')
     game.use('Timers');
     game.use('Health');
+
+
+    game.on('plugin::loaded::sutra', function(){
+    // Adds a nice StarField background
+    game.use('StarField');
+    game.use('TowerWorld', { game: game });
+
+    })
+
     game.use('Sutra');
 
     /*
@@ -36,9 +45,6 @@ class Sutra {
     game.use('Block', { MIN_BLOCK_SIZE: 1000 });
     game.use('Border', { autoBorder: true, thickness: 200 });
 
-    // Adds a nice StarField background
-    game.use('StarField');
-    game.use('TowerWorld', { game: game });
 
     game.data.roundEnded = false;
     game.data.roundStarted = true;

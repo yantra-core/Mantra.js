@@ -19,7 +19,6 @@ class Editor {
 
     document.body.style.perspective = 'none';
 
-
     this.dropdownTimers = new Map(); // To manage delayed close timers
 
     // Check for jQuery
@@ -264,7 +263,6 @@ class Editor {
     let game = this.game;
     if (typeof game.systems['gui-controls'] === 'undefined') {
       game.once('plugin::ready::gui-controls', () => {
-        alert('plugin::ready::gui-controls')
         this.game.systems['gui-controls'].drawTable();
       });
       game.use('ControlsGUI');

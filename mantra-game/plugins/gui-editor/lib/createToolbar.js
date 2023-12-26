@@ -94,7 +94,6 @@ export default function createToolbar() {
   worldSelector.selectBox.style.cursor = 'pointer';
   worldSelector.selectBox.style.margin = '20px';
 
-
   let worldSelectorItem = document.createElement('div');
   // worldSelectorItem.appendChild(worldIcon);
   worldSelectorItem.appendChild(worldSelector.selectBox);
@@ -108,6 +107,14 @@ export default function createToolbar() {
   toolbarMenu.addElement('secondary', worldSelectorItem);
   toolbarMenu.addElement('secondary', graphicsSelectorItem);
 
+  if (game.worlds.length > 0) {
+    let currentWorldName = game.worlds[0].constructor.name;
+    worldSelector.selectElement(currentWorldName);
+  }
+
+  if (is_touch_enabled()) {
+    toolbarMenu.toolbar.style.display = 'none';
+  }
   // Append the toolbar to the body
   $('body').append(toolbarMenu.toolbar);
 }

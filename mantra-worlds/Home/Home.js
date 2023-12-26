@@ -43,11 +43,23 @@ class Home {
     });
 
     game.use('Block')
-    game.use('Bullet')
+  //  game.use('Bullet')
+    game.use('Sword')
+
     game.use('Border', { autoBorder: true })
-  
+
+
+    /*
+    game.once('plugin::loaded::typer-ghost', function(){
+      game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'Welcome to Mantra\n my friend.', style: { color: 'white', fontSize: '144px' }, duration: 10000 });
+    })
+    */
+
+    // game.use('GhostTyper');
     console.log(game.systems)
     game.createDefaultPlayer();
+
+
 
     /*
     game.systems.graphics.switchGraphics('BabylonGraphics', function(){

@@ -6,11 +6,10 @@ export default function inflateText(entityElement, entityData) {
   entityElement.className = 'chat-bubble-container';
   entityElement.style.position = 'absolute';
 
-
   // Create the chat bubble itself
   const chatBubble = document.createElement('div');
   chatBubble.className = 'chat-bubble';
-  chatBubble.style.position = 'absolute';
+  // chatBubble.style.position = 'absolute';
   chatBubble.style.border = '1px solid #000';
   chatBubble.style.borderRadius = '10px';
   // chatBubble.style.padding = '10px';
@@ -18,6 +17,12 @@ export default function inflateText(entityElement, entityData) {
   chatBubble.style.paddingLeft = '10px';
   chatBubble.style.paddingRight = '10px';
   chatBubble.style.background = '#fff';
+
+
+  if (typeof entityData.style === 'object') {
+    Object.assign(chatBubble.style, entityData.style);
+  }
+
   // chatBubble.style.maxWidth = '200px';
   //chatBubble.style.width = `${entityData.width}px`;
   //chatBubble.style.height = `${entityData.height}px`;

@@ -13,6 +13,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Home = /*#__PURE__*/function () {
+  // type is optional for Plugins
   function Home() {
     _classCallCheck(this, Home);
     this.id = Home.id;
@@ -40,16 +41,27 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'BLOCK',
-        width: 300,
-        height: 300,
+        width: 150,
+        height: 150,
         position: {
-          x: 0,
+          x: -400,
           y: -150
         }
       });
+      game.use('Block');
+      //  game.use('Bullet')
+      game.use('Sword');
       game.use('Border', {
         autoBorder: true
       });
+
+      /*
+      game.once('plugin::loaded::typer-ghost', function(){
+        game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'Welcome to Mantra\n my friend.', style: { color: 'white', fontSize: '144px' }, duration: 10000 });
+      })
+      */
+
+      // game.use('GhostTyper');
       console.log(game.systems);
       game.createDefaultPlayer();
 
@@ -72,7 +84,12 @@ var Home = /*#__PURE__*/function () {
   }]);
   return Home;
 }();
-_defineProperty(Home, "id", 'Home');
+_defineProperty(Home, "id", 'world-home');
+// "world" type has special features in that it can be unloaded and reloaded.
+//  with special rules such as merge, replace, etc.
+//  this is currently used when switching between worlds in the GUI Editor
+//  the default behavior is to unload the world, then load the new world
+_defineProperty(Home, "type", 'world');
 var _default = exports["default"] = Home;
 
 },{}],2:[function(require,module,exports){
@@ -90,10 +107,12 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Platform = /*#__PURE__*/function () {
+  // type is optional for Plugins
   function Platform(game) {
     _classCallCheck(this, Platform);
     this.game = game; // Store the reference to the game logic
     this.id = Platform.id;
+    this.type = Platform.type;
   }
   _createClass(Platform, [{
     key: "init",
@@ -122,12 +141,12 @@ var Platform = /*#__PURE__*/function () {
             y: 300
           }
         });
-        game.createDefaultPlayer();
       });
       game.use('Border', {
         autoBorder: true
       });
       console.log(game.systems);
+      game.createDefaultPlayer();
     }
   }, {
     key: "update",
@@ -141,7 +160,8 @@ var Platform = /*#__PURE__*/function () {
   }]);
   return Platform;
 }();
-_defineProperty(Platform, "id", 'Platform');
+_defineProperty(Platform, "id", 'world-platform');
+_defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
 },{}],3:[function(require,module,exports){
@@ -344,10 +364,12 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Space = /*#__PURE__*/function () {
+  // type is optional for Plugins
   function Space(game) {
     _classCallCheck(this, Space);
     this.game = game; // Store the reference to the game logic
     this.id = Space.id;
+    this.type = Space.type;
   }
   _createClass(Space, [{
     key: "init",
@@ -411,7 +433,8 @@ var Space = /*#__PURE__*/function () {
   }]);
   return Space;
 }();
-_defineProperty(Space, "id", 'Space');
+_defineProperty(Space, "id", 'world-space');
+_defineProperty(Space, "type", 'world');
 var _default = exports["default"] = Space;
 
 },{}],5:[function(require,module,exports){
@@ -429,10 +452,12 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Sutra = /*#__PURE__*/function () {
+  // type is optional for Plugins
   function Sutra(game) {
     _classCallCheck(this, Sutra);
     this.game = game; // Store the reference to the game logic
     this.id = Sutra.id;
+    this.type = Sutra.type;
   }
   _createClass(Sutra, [{
     key: "init",
@@ -444,10 +469,20 @@ var Sutra = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.setGravity(0, 0, 0);
+
+      // TODO: set default zoom to 0.3 ( zoomed out )
+      game.zoom(0.3);
       game.use('Bullet');
-      game.use('CurrentFPS');
       game.use('Timers');
       game.use('Health');
+      game.on('plugin::loaded::sutra', function () {
+        // Adds a nice StarField background
+        game.use('StarField');
+        game.use('TowerWorld', {
+          game: game
+        });
+      });
       game.use('Sutra');
 
       /*
@@ -465,16 +500,14 @@ var Sutra = /*#__PURE__*/function () {
         autoBorder: true,
         thickness: 200
       });
-      game.systems.graphics.switchGraphics('BabylonGraphics', function () {
-        // Adds a nice StarField background
-        game.use('StarField');
-        game.use('TowerWorld', {
-          game: game
-        });
-        game.data.roundEnded = false;
-        game.data.roundStarted = true;
-        game.createDefaultPlayer();
+      game.data.roundEnded = false;
+      game.data.roundStarted = true;
+      game.createDefaultPlayer();
+
+      /*
+      game.systems.graphics.switchGraphics('BabylonGraphics', function(){
       });
+      */
     }
   }, {
     key: "update",
@@ -488,7 +521,8 @@ var Sutra = /*#__PURE__*/function () {
   }]);
   return Sutra;
 }();
-_defineProperty(Sutra, "id", 'Sutra');
+_defineProperty(Sutra, "id", 'world-sutra');
+_defineProperty(Sutra, "type", 'world');
 var _default = exports["default"] = Sutra;
 
 },{}],6:[function(require,module,exports){
@@ -506,10 +540,12 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var XState = /*#__PURE__*/function () {
+  // type is optional for Plugins
   function XState(game) {
     _classCallCheck(this, XState);
     this.game = game; // Store the reference to the game logic
     this.id = XState.id;
+    this.type = XState.type;
   }
   _createClass(XState, [{
     key: "init",
@@ -615,9 +651,11 @@ var XState = /*#__PURE__*/function () {
         };
         var Guards = {
           isBossDamaged: function isBossDamaged(context, event) {
+            console.log('isBossDamaged', context, event);
             return event.name === context.name && event.type === 'entity::damage';
           },
           isBossDefeated: function isBossDefeated(context, event) {
+            console.log('isBossDefeated', context, event);
             return event.name === context.name && event.type === 'ENTITY_DESTROYED';
           }
         };
@@ -647,16 +685,16 @@ var XState = /*#__PURE__*/function () {
         };
         return Game;
       }
+      game.on('plugin::ready::XState', function () {
+        game.createDefaultPlayer();
+        game.systems['xstate'].loadEntities();
+      });
       game.use('XState', {
         world: BossFightMiddleware()
       });
-      game.use('StarField');
-      game.on('plugin::ready::XState', function () {
-        game.systems['xstate'].loadEntities();
-      });
-      game.systems.graphics.switchGraphics('BabylonGraphics', function () {
-        game.createDefaultPlayer();
-      });
+      // game.use('StarField');
+
+      game.systems.graphics.switchGraphics('PhaserGraphics', function () {});
     }
   }, {
     key: "update",
@@ -667,10 +705,16 @@ var XState = /*#__PURE__*/function () {
   }, {
     key: "destroy",
     value: function destroy() {}
+  }, {
+    key: "unload",
+    value: function unload() {
+      game.systems['xstate'].unload();
+    }
   }]);
   return XState;
 }();
-_defineProperty(XState, "id", 'XState');
+_defineProperty(XState, "id", 'world-xstate');
+_defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
 },{}],7:[function(require,module,exports){
@@ -688,10 +732,12 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var YCraft = /*#__PURE__*/function () {
+  // type is optional for Plugins
   function YCraft(game) {
     _classCallCheck(this, YCraft);
     this.game = game; // Store the reference to the game logic
     this.id = YCraft.id;
+    this.type = YCraft.type;
   }
   _createClass(YCraft, [{
     key: "init",
@@ -703,12 +749,52 @@ var YCraft = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.setGravity(0, 0, 0);
+      game.use('Bullet');
       game.use('YCraft');
       game.use('YCraftGUI');
-      game.start(function () {});
-      game.systems.graphics.switchGraphics('CSSGraphics', function () {
-        game.createDefaultPlayer();
+      game.once('plugin::loaded::typer-ghost', function () {
+        game.systems['typer-ghost'].createText({
+          x: 300,
+          y: 500,
+          text: 'YCraft Crafting World',
+          style: {
+            color: 'white',
+            fontSize: '144px'
+          },
+          duration: 10000
+        });
       });
+
+      //game.use('GhostTyper');
+      /*
+      game.use('Editor', {
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-worlds/YCraft/YCraft.js',
+        sutraEditor: true
+      });
+      */
+
+      game.createEntity({
+        type: 'BLOCK',
+        color: 0xcccccc,
+        mass: 10000,
+        height: 64,
+        width: 64,
+        position: {
+          x: 150,
+          y: 300,
+          z: 0
+        },
+        friction: 1,
+        frictionAir: 1,
+        frictionStatic: 1
+      });
+      game.createDefaultPlayer();
+
+      /*
+      game.systems.graphics.switchGraphics('CSSGraphics', function(){
+       });
+      */
     }
   }, {
     key: "update",
@@ -719,10 +805,16 @@ var YCraft = /*#__PURE__*/function () {
   }, {
     key: "destroy",
     value: function destroy() {}
+  }, {
+    key: "unload",
+    value: function unload() {
+      console.log('YCraft.unload()');
+    }
   }]);
   return YCraft;
 }();
-_defineProperty(YCraft, "id", 'YCraft');
+_defineProperty(YCraft, "id", 'world-ycraft');
+_defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
 },{}],8:[function(require,module,exports){

@@ -1,7 +1,7 @@
 const pluginsList = {
   "AsteroidsMovement": {
     "path": "./plugins/entity-movement/strategies/AsteroidsMovement.js",
-    "size": 4.953
+    "size": 4.952
   },
   "Behaviors": {
     "path": "./plugins/behaviors/Behaviors.js",
@@ -13,7 +13,7 @@ const pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 57.154
+    "size": 57.672
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -29,7 +29,7 @@ const pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 26.772
+    "size": 37.212
   },
   "Client": {
     "path": "./plugins/client/Client.js",
@@ -49,7 +49,7 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 40.503
+    "size": 40.95
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
@@ -57,7 +57,7 @@ const pluginsList = {
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 20.486
+    "size": 20.543
   },
   "Gamepad": {
     "path": "./plugins/gamepad/Gamepad.js",
@@ -65,7 +65,7 @@ const pluginsList = {
   },
   "Graphics": {
     "path": "./plugins/graphics/Graphics.js",
-    "size": 6.371
+    "size": 8.248
   },
   "Health": {
     "path": "./plugins/health/Health.js",
@@ -77,7 +77,7 @@ const pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 17.42
+    "size": 18.106
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
@@ -85,7 +85,7 @@ const pluginsList = {
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 20.667
+    "size": 22.898
   },
   "PingTime": {
     "path": "./plugins/ping-time/PingTime.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 23.918
+    "size": 24.604
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,11 +101,11 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 85.351
+    "size": 86.037
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 19.366
+    "size": 24.122
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -133,15 +133,15 @@ const pluginsList = {
   },
   "MatterPhysics": {
     "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 394.339
+    "size": 395.072
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
-    "size": 6.156
+    "size": 6.564
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 39.007
+    "size": 39.022
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",
