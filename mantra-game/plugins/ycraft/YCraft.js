@@ -21,7 +21,7 @@ import bindRover from './lib/events/bindRover.js';
 
 import contraptionExamples from './contraption-examples.js';
 // import testContraption from './security-system.js';
-import testLight from './button-wire-light.js';
+// import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
 
 // handles input controller events and relays them to the game logic

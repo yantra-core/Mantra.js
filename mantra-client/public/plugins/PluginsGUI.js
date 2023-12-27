@@ -590,7 +590,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 24.459
+    "size": 24.46
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -634,7 +634,7 @@ var pluginsList = {
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
-    "size": 8.75
+    "size": 8.749
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",

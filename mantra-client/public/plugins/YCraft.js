@@ -2258,7 +2258,6 @@ var _bindRelay = _interopRequireDefault(require("./lib/events/bindRelay.js"));
 var _bindPressureSensor = _interopRequireDefault(require("./lib/events/bindPressureSensor.js"));
 var _bindRover = _interopRequireDefault(require("./lib/events/bindRover.js"));
 var _contraptionExamples = _interopRequireDefault(require("./contraption-examples.js"));
-var _buttonWireLight = _interopRequireDefault(require("./button-wire-light.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2275,6 +2274,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { YCraft as YCraftActual } from 'ycraft';
 // import testContraption from './security-system.js';
+// import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
 // handles input controller events and relays them to the game logic
 var YCraft = /*#__PURE__*/function (_Plugin) {
@@ -2587,51 +2587,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
 _defineProperty(YCraft, "id", 'ycraft');
 var _default = exports["default"] = YCraft;
 
-},{"../../../../YCraft.js/index.js":1,"../../Plugin.js":20,"./button-wire-light.js":22,"./contraption-examples.js":23,"./lib/bindPartEvents.js":24,"./lib/createEntityFromPart.js":25,"./lib/events/bindActuator.js":26,"./lib/events/bindAmplifer.js":27,"./lib/events/bindButton.js":28,"./lib/events/bindDisplay.js":29,"./lib/events/bindLEDLight.js":30,"./lib/events/bindLatch.js":31,"./lib/events/bindMotionDetector.js":32,"./lib/events/bindPressureSensor.js":33,"./lib/events/bindRelay.js":34,"./lib/events/bindRover.js":35,"./lib/events/bindWire.js":36,"./lib/parts/createWire.js":37}],22:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = buttonLight;
-var _index = require("../../../../YCraft.js/index.js");
-function buttonLight() {
-  var yCraftSystem = new _index.YCraft({
-    powerRequired: false // default is false, set to true to enforce power requirements
-  });
-
-  // Create the button
-  var button = new _index.Button(0, -350, 0); // Positioned a bit below in the center
-
-  // Create three LED lights and position them on the top row
-  var ledLight1 = new _index.LEDLight(-200, 250, 0); // First light
-  var ledLight2 = new _index.LEDLight(0, 250, 0); // Second light, in the middle
-  var ledLight3 = new _index.LEDLight(200, 250, 0); // Third light
-
-  // Create wires to connect each LED light to the button
-  var wire = new _index.Wire();
-
-  // Connect button to each wire, and each wire to corresponding LED light
-  button.connect(wire);
-  wire.connect(ledLight1);
-  button.connect(wire);
-  wire.connect(ledLight2);
-  button.connect(wire);
-  wire.connect(ledLight3);
-
-  // Add parts to YCraft system
-  yCraftSystem.addPart(button);
-  yCraftSystem.addPart(wire);
-  yCraftSystem.addPart(ledLight1);
-  yCraftSystem.addPart(ledLight2);
-  yCraftSystem.addPart(ledLight3);
-
-  // Simulate pressing the button
-  // button.press();
-  return yCraftSystem;
-}
-
-},{"../../../../YCraft.js/index.js":1}],23:[function(require,module,exports){
+},{"../../../../YCraft.js/index.js":1,"../../Plugin.js":20,"./contraption-examples.js":22,"./lib/bindPartEvents.js":23,"./lib/createEntityFromPart.js":24,"./lib/events/bindActuator.js":25,"./lib/events/bindAmplifer.js":26,"./lib/events/bindButton.js":27,"./lib/events/bindDisplay.js":28,"./lib/events/bindLEDLight.js":29,"./lib/events/bindLatch.js":30,"./lib/events/bindMotionDetector.js":31,"./lib/events/bindPressureSensor.js":32,"./lib/events/bindRelay.js":33,"./lib/events/bindRover.js":34,"./lib/events/bindWire.js":35,"./lib/parts/createWire.js":36}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2639,7 +2595,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createColorPuzzle;
 var _index = require("../../../../YCraft.js/index.js");
-// import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
+//import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
 
 function createColorPuzzle() {
   /*
@@ -2785,7 +2741,7 @@ function createSecuritySystem() {
   return yCraftSystem;
 }
 
-},{"../../../../YCraft.js/index.js":1}],24:[function(require,module,exports){
+},{"../../../../YCraft.js/index.js":1}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2805,7 +2761,7 @@ function partEventListeners(part, contraption) {
   }
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2917,7 +2873,7 @@ var partColors = {
   "Rover": "#8B4513"
 };
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2962,7 +2918,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2986,7 +2942,7 @@ function bindAmpliferEvents(part, contraption) {
   });
 }
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3013,7 +2969,7 @@ function bindButtonEvents(part, contraption) {
   });
 }
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3024,7 +2980,7 @@ function bindDisplayEvents(part, contraption) {
   var game = this.game;
 }
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3056,7 +3012,7 @@ function bindLEDLightEvents(part, contraption) {
   });
 }
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3086,7 +3042,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3113,7 +3069,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3157,7 +3113,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3185,7 +3141,7 @@ function bindRelayEvents(part, contraption) {
   });
 }
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3205,7 +3161,7 @@ function bindRoverEvents(part, contraption) {
   });
 }
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3241,7 +3197,7 @@ function bindWireEvents(part, contraption) {
   });
 }
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
