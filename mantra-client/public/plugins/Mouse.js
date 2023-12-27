@@ -23,6 +23,12 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
+    this.disableContextMenu = false;
+    this.isDragging = false;
+    this.dragStartPosition = {
+      x: 0,
+      y: 0
+    };
     this.mouseButtons = {
       LEFT: false,
       RIGHT: false,
@@ -36,18 +42,25 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.bindMouseControls();
-    }
-  }, {
-    key: "bindMouseControls",
-    value: function bindMouseControls() {
-      document.addEventListener('pointermove', this.boundHandleMouseMove);
-      document.addEventListener('pointerdown', this.boundHandleMouseDown);
-      document.addEventListener('pointerup', this.boundHandleMouseUp);
+      this.id = Mouse.id;
+      this.bindInputControls();
+      this.game.systemsManager.addSystem(this.id, this);
     }
   }, {
     key: "handleMouseMove",
     value: function handleMouseMove(event) {
+      // TODO: common function for selecting entities
+      // TODO: have editor be aware if inspector is loaded
+      // if so, show additional UX for selecting entities
+      var target = event.target;
+      if (target && target.getAttribute) {
+        var mantraId = target.getAttribute('mantra-id');
+        if (mantraId) {
+          // if this is a Mantra entity, set the selectedEntityId
+          // this is used for GUI rendering and CSSGraphics
+          this.game.selectedEntityId = mantraId;
+        }
+      }
       this.mousePosition = {
         x: event.clientX,
         y: event.clientY
@@ -63,11 +76,36 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // if not a canvas, set relative position to null or keep the previous position
         this.canvasPosition = null;
       }
+
+      // If dragging, calculate the delta and send drag data
+      if (this.isDragging) {
+        var dx = this.mousePosition.x - this.dragStartPosition.x;
+        var dy = this.mousePosition.y - this.dragStartPosition.y;
+        this.dx = dx;
+        this.dy = dy;
+
+        // Update the drag start position for the next movement
+        this.dragStartPosition = {
+          x: this.mousePosition.x,
+          y: this.mousePosition.y
+        };
+      }
       this.sendMouseData();
     }
   }, {
     key: "handleMouseDown",
     value: function handleMouseDown(event) {
+      var target = event.target;
+
+      // check to see if target has a mantra-id attribute
+      if (target && target.getAttribute) {
+        var mantraId = target.getAttribute('mantra-id');
+        if (mantraId) {
+          // if this is a Mantra entity, set the selectedEntityId
+          // this is used for GUI rendering and CSSGraphics
+          this.game.selectedEntityId = mantraId;
+        }
+      }
       switch (event.button) {
         case 0:
           this.mouseButtons.LEFT = true;
@@ -79,6 +117,19 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           this.mouseButtons.RIGHT = true;
           break;
       }
+      if (event.button === 2) {
+        // Right mouse button
+        this.isDragging = true;
+        this.dragStartPosition = {
+          x: event.clientX,
+          y: event.clientY
+        };
+        // prevent default right click menu
+        // event.preventDefault();
+      }
+
+      // TODO: add conditional check here to see if we should be processing mouse events
+
       this.sendMouseData();
     }
   }, {
@@ -95,6 +146,12 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           this.mouseButtons.RIGHT = false;
           break;
       }
+      if (event.button === 2) {
+        // Right mouse button
+        this.isDragging = false;
+        // prevent default right click menu
+        event.preventDefault();
+      }
       this.sendMouseData();
     }
   }, {
@@ -105,7 +162,11 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // absolute position
         canvasPosition: this.canvasPosition,
         // relative position to any canvas
-        buttons: this.mouseButtons
+        buttons: this.mouseButtons,
+        isDragging: this.isDragging,
+        dragStartPosition: this.dragStartPosition,
+        dx: this.dx,
+        dy: this.dy
       };
       if (this.game.communicationClient) {
         this.game.communicationClient.sendMessage('player_input', {
@@ -114,12 +175,30 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "unload",
-    value: function unload() {
+    key: "bindInputControls",
+    value: function bindInputControls() {
+      document.addEventListener('pointermove', this.boundHandleMouseMove);
+      document.addEventListener('pointerdown', this.boundHandleMouseDown);
+      document.addEventListener('pointerup', this.boundHandleMouseUp);
+      // TODO: could be a config option
+      if (this.disableContextMenu) {
+        document.addEventListener('contextmenu', function (event) {
+          return event.preventDefault();
+        });
+      }
+    }
+  }, {
+    key: "unbindAllEvents",
+    value: function unbindAllEvents() {
       // unbind all events
       document.removeEventListener('pointermove', this.boundHandleMouseMove);
       document.removeEventListener('pointerdown', this.boundHandleMouseDown);
       document.removeEventListener('pointerup', this.boundHandleMouseUp);
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      this.unbindAllEvents();
     }
   }]);
   return Mouse;

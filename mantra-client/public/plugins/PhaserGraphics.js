@@ -100,6 +100,13 @@ var PhaserCamera = /*#__PURE__*/function () {
       tweening: false
     };
     */
+    this.follow = true;
+    this.isDragging = false;
+    this.dragInertia = {
+      x: 0,
+      y: 0
+    };
+    this.isThrowing = false;
     this.initZoomControls();
   }
   _createClass(PhaserCamera, [{
@@ -107,6 +114,9 @@ var PhaserCamera = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem('graphics-phaser-camera', this);
+      this.scene.input.on('pointerdown', this.onPointerDown.bind(this));
+      this.scene.input.on('pointermove', this.onPointerMove.bind(this));
+      this.scene.input.on('pointerup', this.onPointerUp.bind(this));
     }
 
     // update() is called each game tick, we may want to implement render() here instead for RAF
@@ -117,8 +127,53 @@ var PhaserCamera = /*#__PURE__*/function () {
       var player = this.game.getEntity(this.game.currentPlayerId);
       // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
       if (camera && player.graphics && player.graphics['graphics-phaser']) {
-        camera.centerOn(player.position.x, player.position.y);
+        if (this.follow && !this.isDragging && !this.isThrowing) {
+          camera.centerOn(player.position.x, player.position.y);
+        }
         this.followingPlayer = true; // Set the flag to true
+      }
+    }
+  }, {
+    key: "onPointerDown",
+    value: function onPointerDown(pointer) {
+      if (pointer.rightButtonDown()) {
+        this.isDragging = true;
+        this.follow = false;
+        this.lastPointerPosition = {
+          x: pointer.x,
+          y: pointer.y
+        };
+      }
+    }
+  }, {
+    key: "onPointerMove",
+    value: function onPointerMove(pointer) {
+      if (this.isDragging) {
+        var dx = pointer.x - this.lastPointerPosition.x;
+        var dy = pointer.y - this.lastPointerPosition.y;
+        this.camera.scrollX -= dx / this.camera.zoom;
+        this.camera.scrollY -= dy / this.camera.zoom;
+        this.lastPointerPosition = {
+          x: pointer.x,
+          y: pointer.y
+        };
+      }
+    }
+  }, {
+    key: "onPointerUp",
+    value: function onPointerUp(pointer) {
+      if (this.isDragging) {
+        /* TODO: implement inertial throwing
+        const dx = pointer.x - this.lastPointerPosition.x;
+        const dy = pointer.y - this.lastPointerPosition.y;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+          this.isThrowing = true;
+          this.dragInertia.x = dx;
+          this.dragInertia.y = dy;
+          this.scene.time.addEvent({ delay: 0, callback: this.applyThrow, callbackScope: this, loop: true });
+        }
+        */
+        this.isDragging = false;
       }
     }
   }, {
@@ -136,6 +191,20 @@ var PhaserCamera = /*#__PURE__*/function () {
         // Use zoom.tweenTo for smoother zoom transitions
         zoom.tweenTo(_this.scene, currentZoom, 666); // 1000 ms duration for the tween
       });
+    }
+  }, {
+    key: "applyThrow",
+    value: function applyThrow() {
+      if (!this.isThrowing) return;
+      var decayFactor = 0.95; // Adjust for desired inertia effect
+      this.camera.scrollX -= this.dragInertia.x / this.camera.zoom;
+      this.camera.scrollY -= this.dragInertia.y / this.camera.zoom;
+      this.dragInertia.x *= decayFactor;
+      this.dragInertia.y *= decayFactor;
+      if (Math.abs(this.dragInertia.x) < 0.1 && Math.abs(this.dragInertia.y) < 0.1) {
+        this.isThrowing = false;
+        this.scene.time.removeAllEvents();
+      }
     }
   }, {
     key: "tweenToZoom",
@@ -168,7 +237,7 @@ var PhaserCamera = /*#__PURE__*/function () {
   return PhaserCamera;
 }();
 _defineProperty(PhaserCamera, "id", 'phaser-camera');
-var _default = exports["default"] = PhaserCamera;
+var _default = exports["default"] = PhaserCamera; // TODO: refactor this code into above class
 var zoom = {};
 zoom.maxZoom = 16;
 zoom.minZoom = 0.05;
@@ -309,11 +378,11 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   // TODO: add PhaserGraphics.zoom ( from PhaserCamera.js )
-  function PhaserGraphics(_ref) {
-    var _ref2, _ref2$follow, _ref2$startingZoom;
+  function PhaserGraphics() {
     var _this;
-    var _ref$camera = _ref.camera,
-      camera = _ref$camera === void 0 ? (_ref2 = {}, _ref2$follow = _ref2.follow, follow = _ref2$follow === void 0 ? true : _ref2$follow, _ref2$startingZoom = _ref2.startingZoom, startingZoom = _ref2$startingZoom === void 0 ? 1 : _ref2$startingZoom, _ref2) : _ref$camera;
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$camera = _ref.camera,
+      camera = _ref$camera === void 0 ? {} : _ref$camera;
     _classCallCheck(this, PhaserGraphics);
     _this = _super.call(this);
     _this.id = 'graphics-phaser';
@@ -323,6 +392,12 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       camera = {
         follow: true
       };
+    }
+    if (typeof camera.follow === 'undefined') {
+      camera.follow = true;
+    }
+    if (typeof camera.startingZoom === 'undefined') {
+      camera.startingZoom = 0.5;
     }
 
     // alert(camera.follow)
@@ -370,7 +445,8 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         },
         init: function init() {},
         create: function create() {
-          this.cameras.main.setBackgroundColor('#000000');
+          // Optionally, set the background color of the scene
+          // this.cameras.main.setBackgroundColor('#000000');
         },
         preload: function preload() {
           this.load.image('player', 'textures/flare.png');
@@ -379,17 +455,16 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.phaserGame = new Phaser.Game({
         type: Phaser.AUTO,
         parent: 'gameHolder',
-        width: 800,
-        // TODO: config  
-        height: 600,
+        //width: 800, // TODO: config
+        //height: 600,
+        transparent: true,
         scene: [_Main],
         scale: {
-          //mode: Phaser.Scale.ENVELOP,
+          // mode: Phaser.Scale.FIT,
+          // mode: Phaser.Scale.ENVELOP,
           mode: Phaser.Scale.RESIZE_AND_FIT
-          //mode: Phaser.Scale.FIT,
         }
       });
-
       var self = this;
       function loadMainScene() {
         var scene = self.phaserGame.scene.getScene('Main');
@@ -678,7 +753,7 @@ function inflateCircle(entityData) {
     graphic.clear();
   }
   graphic.fillStyle(0xff0000, 1);
-  graphic.fillCircle(0, 0, 50);
+  graphic.fillCircle(0, 0, entityData.radius);
   graphic.setDepth(10);
   graphic.setPosition(entityData.position.x, entityData.position.y);
   return graphic;

@@ -29,6 +29,13 @@ var PhaserCamera = /*#__PURE__*/function () {
       tweening: false
     };
     */
+    this.follow = true;
+    this.isDragging = false;
+    this.dragInertia = {
+      x: 0,
+      y: 0
+    };
+    this.isThrowing = false;
     this.initZoomControls();
   }
   _createClass(PhaserCamera, [{
@@ -36,6 +43,9 @@ var PhaserCamera = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem('graphics-phaser-camera', this);
+      this.scene.input.on('pointerdown', this.onPointerDown.bind(this));
+      this.scene.input.on('pointermove', this.onPointerMove.bind(this));
+      this.scene.input.on('pointerup', this.onPointerUp.bind(this));
     }
 
     // update() is called each game tick, we may want to implement render() here instead for RAF
@@ -46,8 +56,53 @@ var PhaserCamera = /*#__PURE__*/function () {
       var player = this.game.getEntity(this.game.currentPlayerId);
       // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
       if (camera && player.graphics && player.graphics['graphics-phaser']) {
-        camera.centerOn(player.position.x, player.position.y);
+        if (this.follow && !this.isDragging && !this.isThrowing) {
+          camera.centerOn(player.position.x, player.position.y);
+        }
         this.followingPlayer = true; // Set the flag to true
+      }
+    }
+  }, {
+    key: "onPointerDown",
+    value: function onPointerDown(pointer) {
+      if (pointer.rightButtonDown()) {
+        this.isDragging = true;
+        this.follow = false;
+        this.lastPointerPosition = {
+          x: pointer.x,
+          y: pointer.y
+        };
+      }
+    }
+  }, {
+    key: "onPointerMove",
+    value: function onPointerMove(pointer) {
+      if (this.isDragging) {
+        var dx = pointer.x - this.lastPointerPosition.x;
+        var dy = pointer.y - this.lastPointerPosition.y;
+        this.camera.scrollX -= dx / this.camera.zoom;
+        this.camera.scrollY -= dy / this.camera.zoom;
+        this.lastPointerPosition = {
+          x: pointer.x,
+          y: pointer.y
+        };
+      }
+    }
+  }, {
+    key: "onPointerUp",
+    value: function onPointerUp(pointer) {
+      if (this.isDragging) {
+        /* TODO: implement inertial throwing
+        const dx = pointer.x - this.lastPointerPosition.x;
+        const dy = pointer.y - this.lastPointerPosition.y;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+          this.isThrowing = true;
+          this.dragInertia.x = dx;
+          this.dragInertia.y = dy;
+          this.scene.time.addEvent({ delay: 0, callback: this.applyThrow, callbackScope: this, loop: true });
+        }
+        */
+        this.isDragging = false;
       }
     }
   }, {
@@ -65,6 +120,20 @@ var PhaserCamera = /*#__PURE__*/function () {
         // Use zoom.tweenTo for smoother zoom transitions
         zoom.tweenTo(_this.scene, currentZoom, 666); // 1000 ms duration for the tween
       });
+    }
+  }, {
+    key: "applyThrow",
+    value: function applyThrow() {
+      if (!this.isThrowing) return;
+      var decayFactor = 0.95; // Adjust for desired inertia effect
+      this.camera.scrollX -= this.dragInertia.x / this.camera.zoom;
+      this.camera.scrollY -= this.dragInertia.y / this.camera.zoom;
+      this.dragInertia.x *= decayFactor;
+      this.dragInertia.y *= decayFactor;
+      if (Math.abs(this.dragInertia.x) < 0.1 && Math.abs(this.dragInertia.y) < 0.1) {
+        this.isThrowing = false;
+        this.scene.time.removeAllEvents();
+      }
     }
   }, {
     key: "tweenToZoom",
@@ -97,7 +166,7 @@ var PhaserCamera = /*#__PURE__*/function () {
   return PhaserCamera;
 }();
 _defineProperty(PhaserCamera, "id", 'phaser-camera');
-var _default = exports["default"] = PhaserCamera;
+var _default = exports["default"] = PhaserCamera; // TODO: refactor this code into above class
 var zoom = {};
 zoom.maxZoom = 16;
 zoom.minZoom = 0.05;

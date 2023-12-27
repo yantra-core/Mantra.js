@@ -264,6 +264,7 @@ exports.Game = void 0;
 var _Component = _interopRequireDefault(require("./Component/Component.js"));
 var _SystemsManager = _interopRequireDefault(require("./System/SystemsManager.js"));
 var _eventEmitter = _interopRequireDefault(require("./lib/eventEmitter.js"));
+var _storage = _interopRequireDefault(require("./lib/storage/storage.js"));
 var _localGameLoop = _interopRequireDefault(require("./lib/localGameLoop.js"));
 var _onlineGameLoop = _interopRequireDefault(require("./lib/onlineGameLoop.js"));
 var _gameTick = _interopRequireDefault(require("./lib/gameTick.js"));
@@ -282,8 +283,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // Game.js - Marak Squires 2023
 // Entity Component System
 // Game instances are event emitters
-// Game loops
-// TODO: move to plugins
+// Game local data storage
+// Game loops, TODO: make game loops plugins / configurable
 // Local game loop is for single machine games ( no networking )
 // Online game loop is for multiplayer games ( networking )
 // Game tick, called once per tick from game loop
@@ -377,11 +378,33 @@ var Game = exports.Game = /*#__PURE__*/function () {
     };
 
     this.config = config;
+
+    // fetch the gameConfig from localStorage
+    var localData = _storage["default"].getAllKeysWithData();
+
+    // Remark: We could merge this data back into the config / game.data
+
+    // set the last local start time
+    _storage["default"].set('lastLocalStartTime', Date.now());
+
+    // Keeps a clean copy of current game state
+    // Game.data scope can be used for applying configuration settings while game is running
+    // Game.config scope is expected to be "immutablish" and should not be modified while game is running
     this.data = {
       width: config.width,
       height: config.height,
-      FPS: 60
+      FPS: 60,
+      camera: {
+        follow: config.camera.follow,
+        currentZoom: config.camera.startingZoom
+      }
     };
+    if (typeof this.data.camera.follow === 'undefined') {
+      this.data.camera.follow = true;
+    }
+    if (typeof this.data.camera.currentZoom === 'undefined') {
+      this.data.camera.currentZoom = 1;
+    }
     console.log("Mantra starting...");
 
     // Define the scriptRoot variable for loading external scripts
@@ -411,8 +434,17 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.loadScripts = _loadScripts["default"].bind(this);
     this.bodyMap = {};
     this.systems = {};
+    this.storage = _storage["default"];
     this.snapshotQueue = [];
     this.tick = 0;
+
+    // Keeps track of array of worlds ( Plugins with type="world" )
+    // Each world is a Plugin and will run in left-to-right order
+    // The current default behavior is single world, so worlds[0] is always the current world
+    // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
+    // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
+    // TODO: move to worldManager
+    this.worlds = [];
 
     // Game settings
     this.width = width;
@@ -450,7 +482,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       depth: new _Component["default"]('depth', this),
       radius: new _Component["default"]('radius', this),
       isSensor: new _Component["default"]('isSensor', this),
-      owner: new _Component["default"]('owner', this)
+      owner: new _Component["default"]('owner', this),
+      inputs: new _Component["default"]('inputs', this),
+      items: new _Component["default"]('items', this)
     };
 
     // define additional components for the game
@@ -466,6 +500,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.timers = new _TimersComponent["default"]('timers', this);
     this.components.yCraft = new _Component["default"]('yCraft', this);
     this.components.text = new _Component["default"]('text', this);
+    this.components.style = new _Component["default"]('style', this);
 
     // Systems Manager
     this.systemsManager = new _SystemsManager["default"](this);
@@ -537,6 +572,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       } else {
         // Remark: If multiple graphics plugins are used, default behavior is to,
         //         horizontally stack the graphics plugins so they all fit on the screen
+        // TODO: move this to Graphics.js file
         if (game.config.multiplexGraphicsHorizontally) {
           // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
           var totalCount = game.graphics.length;
@@ -611,6 +647,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         var _pluginId = pluginInstanceOrId;
         // Check if the plugin is already loaded or loading
         if (this._plugins[_pluginId]) {
+          // maybe add world here?
           console.log("Plugin ".concat(_pluginId, " is already loaded or loading."));
           return this;
         }
@@ -673,9 +710,19 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
       var pluginId = pluginInstanceOrId.id;
       this.loadedPlugins.push(pluginId);
-      this.emit('plugin::loaded', pluginId);
       pluginInstanceOrId.init(this, this.engine, this.scene);
       this._plugins[pluginId] = pluginInstanceOrId;
+      if (pluginInstanceOrId.type === 'world') {
+        this.worlds.push(pluginInstanceOrId);
+      }
+      this.emit("plugin::loaded::".concat(pluginId), pluginInstanceOrId);
+      this.emit('plugin::loaded', pluginId);
+      if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
+        this.emit("world::loaded::".concat(pluginInstanceOrId.id), pluginInstanceOrId);
+        this.emit('world::loaded', pluginInstanceOrId);
+      }
+      game.data.plugins = game.data.plugins || {};
+      game.data.plugins[pluginId] = options;
       return this;
     }
 
@@ -782,11 +829,18 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "createDefaultPlayer",
     value: function createDefaultPlayer(playerConfig) {
       // console.log('creating default player')
-      return this.createEntity({
+
+      // check if game.currentPlayerId is already set,
+      // if so return
+      if (this.currentPlayerId) {
+        return this.getEntity(this.currentPlayerId);
+      }
+      var player = this.createEntity({
         type: 'PLAYER',
         shape: 'triangle',
-        width: 64,
-        height: 64,
+        width: 32,
+        height: 32,
+        mass: 222,
         friction: 0.5,
         // Default friction
         frictionAir: 0.5,
@@ -799,11 +853,32 @@ var Game = exports.Game = /*#__PURE__*/function () {
           y: 0
         }
       });
+      this.setPlayerId(player.id);
+      return player;
     }
   }, {
     key: "playNote",
     value: function playNote(note, duration) {
       // console.log('Tone Plugin not loaded. Cannot play tone.');
+    }
+  }, {
+    key: "setGravity",
+    value: function setGravity() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      if (this.physics) {
+        this.physics.setGravity(x, y, z);
+      }
+    }
+  }, {
+    key: "zoom",
+    value: function zoom(scale) {
+      if (this.camera && this.camera.zoom) {
+        this.camera.zoom(scale);
+      } else {
+        console.log('warning: no camera.zoom method found');
+      }
     }
   }, {
     key: "setPlayerId",
@@ -835,7 +910,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   return Game;
 }();
 
-},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":7,"./lib/gameTick.js":8,"./lib/loadPluginsFromConfig.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./lib/start/defaultGameStart.js":12,"./lib/util/loadScripts.js":13}],5:[function(require,module,exports){
+},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":7,"./lib/gameTick.js":8,"./lib/loadPluginsFromConfig.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./lib/start/defaultGameStart.js":12,"./lib/storage/storage.js":14,"./lib/util/loadScripts.js":15}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1256,10 +1331,17 @@ function loadPluginsFromConfig(_ref) {
 
     // TODO: move to Graphics.loadFromConfig() ?
     if (graphics) {
+      this.use('Graphics');
+
+      // check to see if user has specified a graphics engine in local storage
+      var storedGraphics = this.storage.get('graphics');
+      if (storedGraphics) {
+        //this.use(storedGraphics, { camera: this.config.camera });
+        //return;
+      }
       if (typeof graphics === 'string') {
         graphics = [graphics];
       }
-      this.use('Graphics');
       if (graphics.includes('babylon')) {
         this.use('BabylonGraphics', {
           camera: this.config.camera
@@ -1284,7 +1366,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":14}],10:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":16}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1471,6 +1553,139 @@ function defaultGameStart(game) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var MemoryBackend = /*#__PURE__*/function () {
+  function MemoryBackend() {
+    _classCallCheck(this, MemoryBackend);
+    this.data = {};
+  }
+  _createClass(MemoryBackend, [{
+    key: "clear",
+    value: function clear() {
+      this.data = {};
+    }
+  }, {
+    key: "setItem",
+    value: function setItem(key, value) {
+      this.data[key] = value;
+    }
+  }, {
+    key: "getItem",
+    value: function getItem(key) {
+      return this.data[key] || null;
+    }
+  }, {
+    key: "removeItem",
+    value: function removeItem(key) {
+      delete this.data[key];
+    }
+  }, {
+    key: "key",
+    value: function key(index) {
+      return Object.keys(this.data)[index] || null;
+    }
+  }, {
+    key: "length",
+    get: function get() {
+      return Object.keys(this.data).length;
+    }
+  }]);
+  return MemoryBackend;
+}();
+var _default = exports["default"] = MemoryBackend;
+
+},{}],14:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _MemoryBackend = _interopRequireDefault(require("./MemoryBackend.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var storage = function () {
+  var backend = null;
+  if (typeof window !== "undefined" && window.localStorage) {
+    backend = window.localStorage;
+  } else {
+    backend = new _MemoryBackend["default"]();
+  }
+  var prefix = 'mantra-';
+  var setBackend = function setBackend(newBackend) {
+    backend = newBackend;
+  };
+  var setPrefix = function setPrefix(newPrefix) {
+    prefix = newPrefix;
+  };
+  var clear = function clear() {
+    backend.clear();
+  };
+  var remove = function remove(key) {
+    backend.removeItem(prefix + key);
+  };
+  var set = function set(key, value) {
+    var stringValue = JSON.stringify(value);
+    backend.setItem(prefix + key, stringValue);
+  };
+  var get = function get(key) {
+    var stringValue = backend.getItem(prefix + key);
+    if (stringValue === null) {
+      return null;
+    }
+    try {
+      return JSON.parse(stringValue);
+    } catch (e) {
+      return stringValue;
+    }
+  };
+  var getAllKeys = function getAllKeys() {
+    var keys = [];
+    for (var i = 0; i < backend.length; i++) {
+      var key = backend.key(i);
+      if (key.startsWith(prefix)) {
+        keys.push(key.substring(prefix.length));
+      }
+    }
+    return keys;
+  };
+  var getAllKeysWithData = function getAllKeysWithData() {
+    var keyDataPairs = {};
+    for (var i = 0; i < backend.length; i++) {
+      var key = backend.key(i);
+      if (key && key.startsWith(prefix)) {
+        var originalKey = key.substring(prefix.length);
+        keyDataPairs[originalKey] = get(originalKey);
+      }
+    }
+    return keyDataPairs;
+  };
+
+  // Expose public methods
+  return {
+    setBackend: setBackend,
+    setPrefix: setPrefix,
+    clear: clear,
+    set: set,
+    get: get,
+    remove: remove,
+    getAllKeys: getAllKeys,
+    getAllKeysWithData: getAllKeysWithData
+  };
+}();
+var _default = exports["default"] = storage;
+
+},{"./MemoryBackend.js":13}],15:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = loadScripts;
 function loadScripts(scripts, finalCallback) {
   var _this = this;
@@ -1504,7 +1719,7 @@ function loadScripts(scripts, finalCallback) {
   loadScript(0); // Start loading the first script
 }
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

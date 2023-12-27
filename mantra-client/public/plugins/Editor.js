@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-var _GraphicsSelector = _interopRequireDefault(require("./lib/GraphicsSelector.js"));
+var _createToolbar = _interopRequireDefault(require("./lib/createToolbar.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -24,18 +24,23 @@ var Editor = /*#__PURE__*/function () {
     this.id = Editor.id;
     this.sourceCode = sourceCode;
     this.sutraEditor = sutraEditor;
+    this.createToolbar = _createToolbar["default"].bind(this);
   }
   _createClass(Editor, [{
     key: "init",
     value: function init(game) {
       var _this = this;
       this.game = game;
+      // register the plugin with the game
+      // this.game.systemsManager.addSystem(this.id, this);
+
+      document.body.style.perspective = 'none';
       this.dropdownTimers = new Map(); // To manage delayed close timers
 
       // Check for jQuery
       if (typeof $ === 'undefined') {
         console.log('$ is not defined, attempting to load jQuery from vendor');
-        game.loadScripts(['/vendor/jquery.min.js'], function () {
+        game.loadScripts(['/vendor/jquery.min.js', '/worlds.mantra.js'], function () {
           console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
           _this.jqueryReady();
         });
@@ -47,56 +52,25 @@ var Editor = /*#__PURE__*/function () {
   }, {
     key: "jqueryReady",
     value: function jqueryReady() {
-      this.createToolbar();
+      this.createToolbar(this.game);
       this.setupGlobalClickListener();
+
       // this.createViewSourceModal();
+      this.game.systemsManager.addSystem(this.id, this);
     }
   }, {
-    key: "createToolbar",
-    value: function createToolbar() {
-      var $toolbar = $('<div>', {
-        id: 'editorToolbar',
-        "class": 'editor-toolbar'
-      });
-
-      // Create menus
-      var $fileMenu = this.createMenu('File');
-      var $pluginsMenu = this.createMenu('Plugins', this.showPluginsGUI.bind(this));
-      var $eventsMenu = this.createMenu('Events', this.showEventsInspector.bind(this));
-      var $controlsMenu = this.createMenu('Controls', this.showControls.bind(this));
-      var $entitiesMenu = this.createMenu('Entities', this.showEntities.bind(this));
-      var $rulesMenu = this.createMenu('Rules', this.showRules.bind(this));
-      var $graphicsSelector = new _GraphicsSelector["default"](this.game);
-
-      // set css styles for $graphicsSelector
-      $graphicsSelector.selectBox.style.position = 'absolute';
-      $graphicsSelector.selectBox.style.right = '150px';
-      $graphicsSelector.selectBox.style.top = '0px';
-      $graphicsSelector.selectBox.style.fontSize = '22px';
-      // cursor pointer
-      $graphicsSelector.selectBox.style.cursor = 'pointer';
-      var $inspectorMenu = this.createMenu('Inspector', this.showInspector.bind(this));
-      // const $aboutMenu = this.createMenu('About');
-      // TODO: add optional xstate menu for editing / viewing state machines
-
-      // Populate menus
-      this.populateFileMenu($fileMenu);
-      this.populatePluginsMenu($pluginsMenu);
-
-      // TODO: about links
-      //this.populateAboutMenu($aboutMenu);
-
-      // Append menus to the toolbar
-      var toolBarItems = [$fileMenu, $pluginsMenu, $eventsMenu, $controlsMenu, $entitiesMenu];
-      if (this.sutraEditor) {
-        toolBarItems.push($rulesMenu);
-      }
-      toolBarItems.push($inspectorMenu);
-      $toolbar.append(toolBarItems);
-      $toolbar.append($graphicsSelector.selectBox);
-
-      // Append the toolbar to the body
-      $('body').append($toolbar);
+    key: "createIcon",
+    value: function createIcon(name) {
+      var element = document.createElement('img');
+      element.src = "/vendor/feather/".concat(name, ".svg");
+      element.classList.add('feather-icon');
+      element.style.width = '36px';
+      element.style.height = '36px';
+      element.style.paddingTop = '5px';
+      // element.style.marginRight = '10px';
+      element.style.cursor = 'pointer';
+      element.style.filter = 'invert(100%)';
+      return element;
     }
   }, {
     key: "createMenu",
@@ -156,6 +130,14 @@ var Editor = /*#__PURE__*/function () {
         target: '_blank'
       });
       $dropdownContent.append($deployWorld);
+      var $pluginsView = $('<a>', {
+        href: '#',
+        text: 'Plugins'
+      });
+      $pluginsView.on('click', function () {
+        return _this3.showPluginsGUI();
+      }); // Add click handler
+      $dropdownContent.append($pluginsView);
       var $aboutMantra = $('<a>', {
         href: 'https://github.com/yantra-core/mantra',
         text: 'About Mantra',
@@ -202,7 +184,62 @@ var Editor = /*#__PURE__*/function () {
         if (!$(event.target).closest('.menu button').length) {
           _this4.closeAllDropdowns();
         }
+
+        // TODO: remove this code and move it into Mouse.js
+        var toolbar = event.target.closest('.toolbar');
+        if (_this4.game && _this4.game.systems && _this4.game.systems['entity-input']) {
+          if (!toolbar) {
+            console.log("toolbar not found");
+            // re-enable inputs
+            _this4.game.systems['entity-input'].setInputsActive();
+            if (_this4.game.systems['keyboard']) {
+              _this4.game.systems['keyboard'].bindInputControls();
+            }
+            if (_this4.game.systems['mouse']) {
+              _this4.game.systems['mouse'].bindInputControls();
+            }
+          } else {
+            console.log("toolbar found");
+            // disable inputs
+            _this4.game.systems['entity-input'].disableInputs();
+            if (_this4.game.systems['keyboard']) {
+              _this4.game.systems['keyboard'].unbindAllEvents();
+            }
+            if (_this4.game.systems['mouse']) {
+              _this4.game.systems['mouse'].unbindAllEvents();
+            }
+            event.preventDefault();
+            return false;
+          }
+        }
       });
+
+      /*
+      // add a global click handler to document that will delegate any clicks
+      // that are not inside gui-windows to re-enable inputs
+      document.addEventListener('click', (e) => {
+        // check if the click was inside a gui-window
+        let guiWindow = e.target.closest('.gui-container');
+        if (this.game && this.game.systems && this.game.systems['entity-input'] && this.game.systems['keyboard']) {
+          if (!guiWindow) {
+            // re-enable inputs
+            this.game.systems['entity-input'].setInputsActive();
+            this.game.systems['keyboard'].bindInputControls();
+          } else {
+            // disable inputs
+            this.game.systems['entity-input'].disableInputs();
+            this.game.systems['keyboard'].unbindAllEvents();
+          }
+           // check to see if this is a class sutra-link, if so open the form editor
+          if (e.target.classList.contains('sutra-link')) {
+            let sutraPath = e.target.getAttribute('data-path');
+            let node = this.behavior.findNode(sutraPath);
+            // Remark: Editing / Viewing Conditionals is not yet supported
+            //this.showConditionalsForm(node);
+          }
+        }
+      });
+      */
     }
   }, {
     key: "closeAllDropdowns",
@@ -218,10 +255,26 @@ var Editor = /*#__PURE__*/function () {
       });
     }
   }, {
+    key: "showCrafting",
+    value: function showCrafting() {
+      var game = this.game;
+      if (typeof game.systems['gui-ycraft'] === 'undefined') {
+        game.use('YCraft');
+        game.use('YCraftGUI');
+      } else {
+        this.game.systemsManager.removeSystem('gui-ycraft');
+      }
+    }
+  }, {
     key: "showRules",
     value: function showRules() {
       var game = this.game;
       if (typeof game.systems['gui-sutra'] === 'undefined') {
+        /*
+        game.once('plugin::loaded::gui-sutra', () => {
+          game.systems['gui-sutra'].drawTable();
+        });
+        */
         game.use('SutraGUI');
       } else {
         this.game.systemsManager.removeSystem('gui-sutra');
@@ -241,7 +294,6 @@ var Editor = /*#__PURE__*/function () {
     key: "showEventsInspector",
     value: function showEventsInspector() {
       var game = this.game;
-      console.log('showEventsInspector', game.systems['gui-event-inspector']);
       if (typeof game.systems['gui-event-inspector'] === 'undefined') {
         game.use('EventInspector');
       } else {
@@ -255,7 +307,6 @@ var Editor = /*#__PURE__*/function () {
       var game = this.game;
       if (typeof game.systems['gui-controls'] === 'undefined') {
         game.once('plugin::ready::gui-controls', function () {
-          alert('plugin::ready::gui-controls');
           _this6.game.systems['gui-controls'].drawTable();
         });
         game.use('ControlsGUI');
@@ -267,7 +318,6 @@ var Editor = /*#__PURE__*/function () {
     key: "showInspector",
     value: function showInspector() {
       var game = this.game;
-      console.log('showInspector', game.systems['gui-inspector']);
       if (typeof game.systems['gui-inspector'] === 'undefined') {
         game.use('Inspector');
       } else {
@@ -286,40 +336,6 @@ var Editor = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "createViewSourceModal",
-    value: function createViewSourceModal() {
-      // Create modal structure
-      var $modal = $('<div>', {
-        id: 'sourceCodeModal',
-        "class": 'modal'
-      });
-      var $modalContent = $('<div>', {
-        "class": 'modal-content'
-      });
-      var $closeSpan = $('<span>', {
-        "class": 'close',
-        text: '×'
-      });
-      var $sourcePre = $('<pre>', {
-        id: 'sourceCode'
-      });
-      $modalContent.append($closeSpan, $sourcePre);
-      $modal.append($modalContent);
-
-      // Append the modal to the body
-      $('body').append($modal);
-
-      // Close event
-      $closeSpan.on('click', function () {
-        return $modal.hide();
-      });
-      $(window).on('click', function (event) {
-        if ($(event.target).is($modal)) {
-          $modal.hide();
-        }
-      });
-    }
-  }, {
     key: "showSourceCode",
     value: function showSourceCode() {
       var sourceCode = document.documentElement.outerHTML;
@@ -336,7 +352,7 @@ _defineProperty(Editor, "id", 'gui-editor');
 _defineProperty(Editor, "async", true);
 var _default = exports["default"] = Editor;
 
-},{"./lib/GraphicsSelector.js":2}],2:[function(require,module,exports){
+},{"./lib/createToolbar.js":5}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -350,9 +366,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var GraphicsSelector = /*#__PURE__*/function () {
-  function GraphicsSelector(game) {
+  function GraphicsSelector(editor) {
     _classCallCheck(this, GraphicsSelector);
-    this.game = game;
+    this.editor = editor;
+    this.game = editor.game; // Store the reference to the game logic
     this.selectBox = this.createElements(); // Now returns the select box element
     this.addEventListeners();
   }
@@ -362,9 +379,13 @@ var GraphicsSelector = /*#__PURE__*/function () {
       // Create the select box
       var selectBox = document.createElement('select');
       selectBox.id = 'graphicsSelect';
+      selectBox.style.maxHeight = '45px';
+
+      // tool tip hint
+      selectBox.title = 'Select graphics mode.\nMantra supports hot-swapping and multiplexing of graphics modes.';
       // TODO: Populate the select box with options as needed
       // Example: this.addOption(selectBox, 'Option 1', 'value1');
-      this.addOption(selectBox, 'Mantra CSS - v1.1.0', 'CSSGraphics');
+      this.addOption(selectBox, 'CSSGraphics - v1.1.0', 'CSSGraphics');
       this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
       this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
       return selectBox;
@@ -401,8 +422,10 @@ var GraphicsSelector = /*#__PURE__*/function () {
   }, {
     key: "handleSelectionChange",
     value: function handleSelectionChange(event) {
-      var _this2 = this;
       var game = this.game;
+
+      // TODO: figure out why cursor doesnt immediate change,
+      //       when switching to BabylonGraphics
       this.showLoadingSpinner();
 
       // Get the value of the selected graphics mode
@@ -417,34 +440,12 @@ var GraphicsSelector = /*#__PURE__*/function () {
       if (selectedGraphicsMode === 'CSSGraphics') {
         selectGraphicsId = 'graphics-css';
       }
+      game.systems.graphics.switchGraphics(selectedGraphicsMode);
 
-      // Check if the selected graphics mode is already registered
-      if (typeof this.game.systems[selectGraphicsId] === 'undefined') {
-        this.game.use(selectedGraphicsMode, {
-          camera: 'follow'
-        });
-
-        // Add event listeners for plugin ready events
-        this.game.once("plugin::ready::".concat(selectGraphicsId), function () {
-          // iterate through all existing graphics ( except this one ) and remove them
-          _this2.game.graphics.forEach(function (graphics) {
-            if (graphics.id !== selectGraphicsId) {
-              game.systemsManager.removeSystem(graphics.id);
-            }
-          });
-          _this2.hideLoadingSpinner();
-        });
-      } else {
-        // check to see if we already have multiple graphics plugins loaded
-        // if so, assume multiplex and remove all the others except this one
-        if (this.game.graphics.length > 1) {
-          this.game.graphics.forEach(function (graphics) {
-            if (graphics.id !== selectGraphicsId) {
-              game.systemsManager.removeSystem(graphics.id);
-            }
-          });
-        }
-      }
+      // USER INTENT: Change graphics mode
+      // persist this intention to the local storage
+      // so that it can be restored on next page load
+      game.storage.set('graphics', selectedGraphicsMode);
     }
   }, {
     key: "showLoadingSpinner",
@@ -461,5 +462,508 @@ var GraphicsSelector = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = GraphicsSelector;
 
-},{}]},{},[1])(1)
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
+  function ToolbarMenu() {
+    _classCallCheck(this, ToolbarMenu);
+    // Create the primary and secondary groups
+    this.primaryGroup = document.createElement('div');
+    this.secondaryGroup = document.createElement('div');
+
+    // Set classes for primary and secondary groups
+    this.primaryGroup.className = 'menu-group primary';
+    this.secondaryGroup.className = 'menu-group secondary';
+
+    // Style the primary and secondary groups
+    this.setStyle(this.primaryGroup, {
+      display: 'flex',
+      flexWrap: 'wrap'
+    });
+    this.setStyle(this.secondaryGroup, {
+      display: 'flex',
+      flexWrap: 'wrap'
+    });
+
+    // Create the toolbar and append the groups
+    this.toolbar = document.createElement('div');
+    this.toolbar.className = 'toolbar';
+    this.toolbar.appendChild(this.primaryGroup);
+    this.toolbar.appendChild(this.secondaryGroup);
+
+    // Style the toolbar
+    this.setStyle(this.toolbar, {
+      position: 'fixed',
+      top: '0',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'space-between',
+      // padding: '10px',
+      backgroundColor: '#f3f3f3',
+      zIndex: 1
+    });
+
+    // Add the toolbar to the document
+    document.body.appendChild(this.toolbar);
+
+    // Responsive design for smaller screens
+    window.addEventListener('resize', this.updateResponsiveStyles.bind(this));
+    this.updateResponsiveStyles();
+  }
+  _createClass(ToolbarMenu, [{
+    key: "addElement",
+    value: function addElement(group, element) {
+      var prepend = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      if (prepend) {
+        if (group === 'primary') {
+          this.primaryGroup.insertBefore(element, this.primaryGroup.firstChild);
+        } else if (group === 'secondary') {
+          this.secondaryGroup.insertBefore(element, this.secondaryGroup.firstChild);
+        }
+      } else {
+        if (group === 'primary') {
+          this.primaryGroup.appendChild(element);
+        } else if (group === 'secondary') {
+          this.secondaryGroup.appendChild(element);
+        }
+      }
+    }
+  }, {
+    key: "addItem",
+    value: function addItem(group, itemObj) {
+      var prepend = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var item = document.createElement('div');
+      item.className = 'menu-item';
+      item.style.textAlign = 'center';
+      if (itemObj.hint) {
+        item.title = itemObj.hint;
+      }
+      var itemText = document.createElement('div');
+      itemText.className = 'menu-item-text';
+      itemText.textContent = itemObj.text;
+      itemText.style.textAlign = 'center';
+      if (prepend) {
+        item.appendChild(itemText, item.firstChild);
+      } else {
+        item.appendChild(itemText);
+      }
+      if (_typeof(itemObj.icon) === 'object') {
+        if (prepend) {
+          item.insertBefore(itemObj.icon, item.firstChild);
+        } else {
+          item.appendChild(itemObj.icon);
+        }
+      }
+      this.setStyle(item, {
+        margin: '5px',
+        fontSize: '20px',
+        // padding: '5px 10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        paddingTop: '5px',
+        paddingBottom: '5px',
+        //      fontWeight: 'bold',
+        minWidth: '60px',
+        backgroundColor: '#ddd',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        position: 'relative' // For dropdown positioning
+      });
+
+      if (itemObj.onClick) {
+        item.onclick = itemObj.onClick;
+      }
+      if (itemObj.subItems && itemObj.subItems.length > 0) {
+        var dropdown = this.createDropdown(itemObj.subItems);
+        item.appendChild(dropdown);
+        item.onmouseenter = function () {
+          return dropdown.style.display = 'block';
+        };
+        item.onmouseleave = function () {
+          return dropdown.style.display = 'none';
+        };
+      }
+      if (group === 'primary') {
+        this.primaryGroup.appendChild(item);
+      } else if (group === 'secondary') {
+        this.secondaryGroup.appendChild(item);
+      }
+    }
+  }, {
+    key: "createDropdown",
+    value: function createDropdown(subItems) {
+      var _this = this;
+      var dropdown = document.createElement('div');
+      dropdown.className = 'dropdown';
+      this.setStyle(dropdown, {
+        display: 'none',
+        minWidth: '300px',
+        fontSize: '24px',
+        position: 'absolute',
+        backgroundColor: '#f9f9f9',
+        boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)',
+        padding: '5px',
+        zIndex: 1,
+        textAlign: 'left',
+        //top: '78px',
+        // left: '-5px',
+        left: 0,
+        right: '0'
+      });
+      subItems.forEach(function (subItemObj) {
+        var subItem = _this.createSubItem(subItemObj);
+        dropdown.appendChild(subItem);
+      });
+      return dropdown;
+    }
+  }, {
+    key: "createSubItem",
+    value: function createSubItem(subItemObj) {
+      var subItem = document.createElement('div');
+      subItem.textContent = subItemObj.text;
+      this.setStyle(subItem, {
+        padding: '5px 10px',
+        cursor: 'pointer',
+        borderBottom: '1px solid #ddd'
+      });
+      subItem.onmouseenter = function () {
+        return subItem.style.backgroundColor = '#ddd';
+      };
+      subItem.onmouseleave = function () {
+        return subItem.style.backgroundColor = 'transparent';
+      };
+      if (subItemObj.onClick) {
+        subItem.onclick = subItemObj.onClick;
+      }
+      return subItem;
+    }
+  }, {
+    key: "setStyle",
+    value: function setStyle(element, styles) {
+      // Apply each style to the element
+      Object.assign(element.style, styles);
+    }
+  }, {
+    key: "updateResponsiveStyles",
+    value: function updateResponsiveStyles() {
+      // Apply responsive styles based on the window width
+      if (window.innerWidth <= 600) {
+        this.setStyle(this.toolbar, {
+          flexDirection: 'column',
+          alignItems: 'flex-start'
+        });
+      } else {
+        this.setStyle(this.toolbar, {
+          flexDirection: 'row'
+        });
+      }
+    }
+  }]);
+  return ToolbarMenu;
+}();
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var WorldSelector = /*#__PURE__*/function () {
+  function WorldSelector(game) {
+    _classCallCheck(this, WorldSelector);
+    this.game = game;
+    this.selectBox = this.createElements(); // Now returns the select box element
+    this.lastLoadedWorld = null;
+    this.currentWorld = null;
+    this.addEventListeners();
+  }
+  _createClass(WorldSelector, [{
+    key: "createElements",
+    value: function createElements() {
+      var game = this.game;
+      // Create the select box
+      var selectBox = document.createElement('select');
+      selectBox.id = 'graphicsSelect';
+      selectBox.style.maxHeight = '45px';
+
+      // TODO: Populate the select box with options as needed
+      // Example: this.addOption(selectBox, 'Option 1', 'value1');
+
+      // adds a choose your world option
+      this.addOption(selectBox, 'Choose Your World', 'Choose');
+      this.addOption(selectBox, 'Home World', 'Home');
+      this.addOption(selectBox, 'Platform World', 'Platform');
+      // this.addOption(selectBox, 'Space World', 'Platform');
+      //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
+
+      // adds separator option
+      this.addOption(selectBox, '------Tutorial Worlds-----', '----------------', true);
+      this.addOption(selectBox, 'YCraft World', 'YCraft');
+      this.addOption(selectBox, 'Sutra World', 'Sutra');
+      this.addOption(selectBox, 'XState World', 'XState');
+
+      // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
+      return selectBox;
+    }
+  }, {
+    key: "selectElement",
+    value: function selectElement(value) {
+      // Select the option with the given value
+      this.selectBox.value = value;
+    }
+  }, {
+    key: "addOption",
+    value: function addOption(selectBox, text, value, disabled) {
+      var option = document.createElement('option');
+      option.text = text;
+      option.value = value;
+      if (disabled) {
+        option.disabled = true;
+      }
+      selectBox.add(option);
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      var _this = this;
+      var that = this;
+      var game = this.game;
+      /*
+      this.game.on('plugin::ready::graphics-phaser', () => {
+        this.selectElement('PhaserGraphics');
+      });
+      this.game.on('plugin::ready::graphics-babylon', () => {
+        this.selectElement('BabylonGraphics');
+      });
+      */
+      // Add event listener to the select box
+      this.selectBox.addEventListener('change', function (event) {
+        _this.handleSelectionChange(event);
+      });
+      game.on('world::loaded', function (pluginInstance) {
+        // alert('loaded')
+        console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
+        var worldName = pluginInstance.constructor.name;
+        //console.log('world::loaded', worldName, pluginInstance);
+        that.selectElement(worldName);
+        //that.hideLoadingSpinner();
+      });
+    }
+
+    // TODO: refactor world change logic to separate function
+  }, {
+    key: "handleSelectionChange",
+    value: function handleSelectionChange(event) {
+      var game = this.game;
+      var that = this;
+      this.showLoadingSpinner();
+      var selectedWorld = event.target.value;
+
+      // check to see if game.worlds has any entries
+      // if so, unload them if they have an unload method
+      if (game.worlds.length > 0) {
+        game.worlds.forEach(function (world, i) {
+          if (world.unload) {
+            // alert(`Unloading ${world.id}`);
+            console.log(world.id, 'world.unload', world.unload);
+            // remove the world from the game.worlds array
+            // TODO: we could move this logic into Game.js
+            game.worlds.splice(i, 1);
+            world.unload();
+          }
+        });
+      }
+      game.systems.entity.clearAllEntities(false);
+      var worldName = 'XState';
+      worldName = 'Sutra';
+      worldName = selectedWorld;
+      var worldClass = WORLDS.worlds[worldName];
+      var worldInstance = new worldClass();
+      game.once('plugin::loaded::' + worldInstance.id, function () {
+        that.hideLoadingSpinner();
+      });
+      game.use(worldInstance);
+
+      // USER INTENT: Change world
+      // persist this intention to the local storage
+      // so that it can be restored on next page load
+      game.storage.set('world', selectedWorld);
+
+      // update the dropdown to show the current world
+      this.selectElement(selectedWorld);
+    }
+  }, {
+    key: "showLoadingSpinner",
+    value: function showLoadingSpinner() {
+      document.body.style.cursor = 'wait';
+    }
+  }, {
+    key: "hideLoadingSpinner",
+    value: function hideLoadingSpinner() {
+      document.body.style.cursor = 'default';
+    }
+  }]);
+  return WorldSelector;
+}();
+var _default = exports["default"] = WorldSelector;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createToolbar;
+var _GraphicsSelector = _interopRequireDefault(require("./GraphicsSelector.js"));
+var _WorldSelector = _interopRequireDefault(require("./WorldSelector.js"));
+var _ToolbarMenu = _interopRequireDefault(require("./ToolbarMenu.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function createToolbar(game) {
+  var _this = this;
+  // Create menus
+  var $fileMenu = this.createMenu('File');
+  var toolbarMenu = new _ToolbarMenu["default"]();
+  this.toolbarMenu = toolbarMenu;
+
+  // create image icon with source of ./vendor/feather/eye.svg
+  var inspectorIcon = this.createIcon('search');
+  inspectorIcon.src = '/vendor/feather/search.svg';
+  inspectorIcon.style.cursor = 'pointer';
+  inspectorIcon.title = 'Click to open Entity Inspector';
+  inspectorIcon.style.width = '36px';
+  inspectorIcon.style.height = '36px';
+  inspectorIcon.style.paddingTop = '24px';
+  inspectorIcon.style.marginRight = '30px';
+  inspectorIcon.style.marginLeft = '10px';
+  // TODO: have this change values based on open / cloase state
+  // . Click in-game on Entity to Inspect
+  inspectorIcon.onclick = function () {
+    return _this.showInspector();
+  };
+  toolbarMenu.addElement('secondary', inspectorIcon);
+  toolbarMenu.addItem('primary', {
+    text: 'Mantra',
+    icon: this.createIcon('slack'),
+    subItems: [{
+      text: 'View Source',
+      onClick: function onClick() {
+        return _this.showSourceCode();
+      }
+    }, {
+      text: 'About Mantra',
+      onClick: function onClick() {
+        return alert('Open Mantra Github');
+      }
+    }, {
+      text: 'Deploy World to Yantra',
+      onClick: function onClick() {
+        return alert('Open Yantra');
+      }
+    }]
+  });
+  toolbarMenu.addItem('primary', {
+    text: 'Entities',
+    hint: 'Manage Game Entities',
+    icon: this.createIcon('box'),
+    onClick: function onClick() {
+      return _this.showEntities();
+    }
+  });
+  toolbarMenu.addItem('primary', {
+    text: 'Rules',
+    hint: 'Manage Game Rules with Sutra',
+    icon: this.createIcon('pocket'),
+    onClick: function onClick() {
+      return _this.showRules();
+    }
+  });
+  toolbarMenu.addItem('primary', {
+    text: 'Crafting',
+    hint: 'Manage Game Rules with YCraft',
+    icon: this.createIcon('codesandbox'),
+    onClick: function onClick() {
+      return _this.showCrafting();
+    }
+  });
+  toolbarMenu.addItem('primary', {
+    text: 'Events ',
+    hint: 'Manage Game Events',
+    icon: this.createIcon('activity'),
+    onClick: function onClick() {
+      return _this.showEventsInspector();
+    }
+  });
+  var worldIcon = this.createIcon('globe');
+  worldIcon.style.marginTop = '0px';
+  worldIcon.style.paddingTop = '0px';
+  worldIcon.style.position = 'relative';
+  worldIcon.style.top = '10px';
+  var graphicsIcon = this.createIcon('tv');
+  graphicsIcon.style.marginTop = '0px';
+  graphicsIcon.style.paddingTop = '0px';
+  graphicsIcon.style.position = 'relative';
+  graphicsIcon.style.top = '10px';
+
+  // toolbarMenu.addItem('secondary', { text: 'Settings' });
+  var graphicsSelector = new _GraphicsSelector["default"](this);
+  graphicsSelector.selectBox.style.fontSize = '22px';
+  graphicsSelector.selectBox.style.cursor = 'pointer';
+  graphicsSelector.selectBox.style.margin = '20px';
+
+  // create item holder for graphicsSelector
+  var graphicsSelectorItem = document.createElement('div');
+  // graphicsSelectorItem.appendChild(graphicsIcon);
+  graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
+  graphicsSelectorItem.title = 'Select Graphics Engine';
+  var worldSelector = new _WorldSelector["default"](this.game);
+  worldSelector.selectBox.style.fontSize = '22px';
+  worldSelector.selectBox.style.cursor = 'pointer';
+  worldSelector.selectBox.style.margin = '20px';
+  var worldSelectorItem = document.createElement('div');
+  // worldSelectorItem.appendChild(worldIcon);
+  worldSelectorItem.appendChild(worldSelector.selectBox);
+  worldSelectorItem.title = 'Select World';
+  /*
+  worldSelectorItem.onmousedown = () => {
+    worldSelector.selectBox.click();
+  };
+  */
+
+  toolbarMenu.addElement('secondary', worldSelectorItem);
+  toolbarMenu.addElement('secondary', graphicsSelectorItem);
+  if (game.worlds.length > 0) {
+    var currentWorldName = game.worlds[0].constructor.name;
+    worldSelector.selectElement(currentWorldName);
+  }
+  if (is_touch_enabled()) {
+    toolbarMenu.toolbar.style.display = 'none';
+  }
+  // Append the toolbar to the body
+  $('body').append(toolbarMenu.toolbar);
+}
+
+// TODO: move this to a utils file
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+
+},{"./GraphicsSelector.js":2,"./ToolbarMenu.js":3,"./WorldSelector.js":4}]},{},[1])(1)
 });

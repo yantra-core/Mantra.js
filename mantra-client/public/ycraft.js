@@ -22,6 +22,12 @@ Object.defineProperty(exports, "Button", {
     return _Button["default"];
   }
 });
+Object.defineProperty(exports, "Display", {
+  enumerable: true,
+  get: function get() {
+    return _Display["default"];
+  }
+});
 Object.defineProperty(exports, "ElectricalSignal", {
   enumerable: true,
   get: function get() {
@@ -76,6 +82,12 @@ Object.defineProperty(exports, "Rover", {
     return _Rover["default"];
   }
 });
+Object.defineProperty(exports, "VirtualMachine", {
+  enumerable: true,
+  get: function get() {
+    return _VirtualMachine["default"];
+  }
+});
 Object.defineProperty(exports, "Wire", {
   enumerable: true,
   get: function get() {
@@ -100,6 +112,7 @@ var _ElectricalSignal = _interopRequireDefault(require("./lib/signals/Electrical
 var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
 var _Amplifier = _interopRequireDefault(require("./lib/parts/Amplifier.js"));
 var _Button = _interopRequireDefault(require("./lib/parts/Button.js"));
+var _Display = _interopRequireDefault(require("./lib/parts/Display.js"));
 var _LaserSensor = _interopRequireDefault(require("./lib/parts/LaserSensor.js"));
 var _Latch = _interopRequireDefault(require("./lib/parts/Latch.js"));
 var _LEDLight = _interopRequireDefault(require("./lib/parts/LEDLight.js"));
@@ -109,13 +122,14 @@ var _PressureSensor = _interopRequireDefault(require("./lib/parts/PressureSensor
 var _Relay = _interopRequireDefault(require("./lib/parts/Relay.js"));
 var _Rover = _interopRequireDefault(require("./lib/parts/Rover.js"));
 var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
+var _VirtualMachine = _interopRequireDefault(require("./lib/parts/VirtualMachine.js"));
 var _allExamplesComposite = _interopRequireDefault(require("./examples/WIP/all-examples-composite.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function createContraption() {
   return new _YCraft["default"]();
 }
 
-},{"./examples/WIP/all-examples-composite.js":2,"./lib/YCraft.js":5,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/LEDLight.js":9,"./lib/parts/LaserSensor.js":10,"./lib/parts/Latch.js":11,"./lib/parts/Mirror.js":12,"./lib/parts/MotionDetector.js":13,"./lib/parts/PressureSensor.js":14,"./lib/parts/Relay.js":15,"./lib/parts/Rover.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],2:[function(require,module,exports){
+},{"./examples/WIP/all-examples-composite.js":2,"./lib/YCraft.js":5,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/Display.js":9,"./lib/parts/LEDLight.js":10,"./lib/parts/LaserSensor.js":11,"./lib/parts/Latch.js":12,"./lib/parts/Mirror.js":13,"./lib/parts/MotionDetector.js":14,"./lib/parts/PressureSensor.js":15,"./lib/parts/Relay.js":16,"./lib/parts/Rover.js":17,"./lib/parts/VirtualMachine.js":18,"./lib/parts/Wire.js":19,"./lib/signals/ElectricalSignal.js":20}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -188,6 +202,12 @@ Object.defineProperty(exports, "Button", {
     return _Button["default"];
   }
 });
+Object.defineProperty(exports, "Display", {
+  enumerable: true,
+  get: function get() {
+    return _Display["default"];
+  }
+});
 Object.defineProperty(exports, "ElectricalSignal", {
   enumerable: true,
   get: function get() {
@@ -242,6 +262,12 @@ Object.defineProperty(exports, "Rover", {
     return _Rover["default"];
   }
 });
+Object.defineProperty(exports, "VirtualMachine", {
+  enumerable: true,
+  get: function get() {
+    return _VirtualMachine["default"];
+  }
+});
 Object.defineProperty(exports, "Wire", {
   enumerable: true,
   get: function get() {
@@ -259,6 +285,7 @@ var _ElectricalSignal = _interopRequireDefault(require("./lib/signals/Electrical
 var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
 var _Amplifier = _interopRequireDefault(require("./lib/parts/Amplifier.js"));
 var _Button = _interopRequireDefault(require("./lib/parts/Button.js"));
+var _Display = _interopRequireDefault(require("./lib/parts/Display.js"));
 var _LaserSensor = _interopRequireDefault(require("./lib/parts/LaserSensor.js"));
 var _Latch = _interopRequireDefault(require("./lib/parts/Latch.js"));
 var _LEDLight = _interopRequireDefault(require("./lib/parts/LEDLight.js"));
@@ -267,10 +294,11 @@ var _MotionDetector = _interopRequireDefault(require("./lib/parts/MotionDetector
 var _PressureSensor = _interopRequireDefault(require("./lib/parts/PressureSensor.js"));
 var _Relay = _interopRequireDefault(require("./lib/parts/Relay.js"));
 var _Rover = _interopRequireDefault(require("./lib/parts/Rover.js"));
+var _VirtualMachine = _interopRequireDefault(require("./lib/parts/VirtualMachine.js"));
 var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./lib/YCraft.js":5,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/LEDLight.js":9,"./lib/parts/LaserSensor.js":10,"./lib/parts/Latch.js":11,"./lib/parts/Mirror.js":12,"./lib/parts/MotionDetector.js":13,"./lib/parts/PressureSensor.js":14,"./lib/parts/Relay.js":15,"./lib/parts/Rover.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],4:[function(require,module,exports){
+},{"./lib/YCraft.js":5,"./lib/parts/Actuator.js":6,"./lib/parts/Amplifier.js":7,"./lib/parts/Button.js":8,"./lib/parts/Display.js":9,"./lib/parts/LEDLight.js":10,"./lib/parts/LaserSensor.js":11,"./lib/parts/Latch.js":12,"./lib/parts/Mirror.js":13,"./lib/parts/MotionDetector.js":14,"./lib/parts/PressureSensor.js":15,"./lib/parts/Relay.js":16,"./lib/parts/Rover.js":17,"./lib/parts/VirtualMachine.js":18,"./lib/parts/Wire.js":19,"./lib/signals/ElectricalSignal.js":20}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -330,7 +358,7 @@ var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
 // for now, could also be a base Part class
 _defineProperty(Part, "idCounter", 0);
 
-},{"./utils/EventEmitter.js":19}],5:[function(require,module,exports){
+},{"./utils/EventEmitter.js":21}],5:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -592,7 +620,7 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
 }(_EventEmitter2["default"]);
 var _default = exports["default"] = YCraft;
 
-},{"./utils/EventEmitter.js":19}],6:[function(require,module,exports){
+},{"./utils/EventEmitter.js":21}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -846,7 +874,7 @@ var Amplifier = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Amplifier, "type", 'Amplifier');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],8:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -953,7 +981,85 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Button, "type", 'Button');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],9:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Part2 = require("../Part.js");
+var _ElectricalSignal = _interopRequireDefault(require("../signals/ElectricalSignal.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var Display = exports["default"] = /*#__PURE__*/function (_Part) {
+  _inherits(Display, _Part);
+  var _super = _createSuper(Display);
+  function Display() {
+    var _this;
+    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
+      _ref$text = _ref.text,
+      text = _ref$text === void 0 ? 'Your Sign Here' : _ref$text;
+    _classCallCheck(this, Display);
+    // curry the constructor to allow for multiple API styles
+    if (_typeof(x) === 'object') {
+      z = x.z || 0;
+      y = x.y || 0;
+      x = x.x || 0;
+    }
+    _this = _super.call(this, x, y, z);
+    _this.type = Display.type;
+    _this.text = text;
+    _this.connectedParts = [];
+    _this.inputs = []; // Parts that send signals to this display
+    return _this;
+  }
+  _createClass(Display, [{
+    key: "setText",
+    value: function setText(text) {
+      this.text = text;
+      console.log("Display text set to: ".concat(this.text));
+      // Additional logic to render the text can be implemented here
+    }
+  }, {
+    key: "connect",
+    value: function connect(part) {
+      this.connectedParts.push(part);
+      this.inputs.push(part);
+    }
+  }, {
+    key: "receive",
+    value: function receive(signal) {
+      if (signal instanceof _ElectricalSignal["default"]) {
+        // For now, we assume the signal carries simple text data
+        // In the future, this can be expanded to handle more complex data types
+        this.setText(signal.data); // Assuming 'data' property in the signal carries the text
+      }
+    }
+
+    // Additional methods and logic for the display can be added here...
+  }]);
+  return Display;
+}(_Part2.Part);
+_defineProperty(Display, "type", 'Display');
+
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1112,7 +1218,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(LEDLight, "type", 'LEDLight');
 
-},{"../Part.js":4}],10:[function(require,module,exports){
+},{"../Part.js":4}],11:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1173,7 +1279,7 @@ var LaserSensor = exports["default"] = /*#__PURE__*/function (_EventEmitter) {
   return LaserSensor;
 }(_EventEmitter2["default"]);
 
-},{"../signals/ElectricalSignal.js":18,"../utils/EventEmitter.js":19}],11:[function(require,module,exports){
+},{"../signals/ElectricalSignal.js":20,"../utils/EventEmitter.js":21}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1272,7 +1378,7 @@ var Latch = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Latch, "type", 'Latch');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],12:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],13:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1343,7 +1449,7 @@ var Mirror = exports["default"] = /*#__PURE__*/function (_EventEmitter) {
   return Mirror;
 }(_EventEmitter2["default"]);
 
-},{"../utils/EventEmitter.js":19}],13:[function(require,module,exports){
+},{"../utils/EventEmitter.js":21}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1451,7 +1557,7 @@ var MotionDetector = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(MotionDetector, "type", 'MotionDetector');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],14:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1560,7 +1666,7 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(PressureSensor, "type", 'PressureSensor');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],15:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1689,7 +1795,7 @@ var Relay = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Relay, "type", 'Relay');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],16:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1852,7 +1958,84 @@ var Rover = /*#__PURE__*/function (_Part) {
 _defineProperty(Rover, "type", 'Rover');
 var _default = exports["default"] = Rover;
 
-},{"../Part.js":4}],17:[function(require,module,exports){
+},{"../Part.js":4}],18:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Part2 = require("../Part.js");
+var _ElectricalSignal = _interopRequireDefault(require("../signals/ElectricalSignal.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // can run arbitrary code between parts
+// defaults to debian node.js sandbox
+// allows developers to write arbitrary code inside contraptions
+var VirtualMachine = exports["default"] = /*#__PURE__*/function (_Part) {
+  _inherits(VirtualMachine, _Part);
+  var _super = _createSuper(VirtualMachine);
+  function VirtualMachine() {
+    var _this;
+    _classCallCheck(this, VirtualMachine);
+    _this = _super.call(this);
+    _this.type = VirtualMachine.type;
+    _this.props = {};
+    _this.image = function noopImage(signal) {
+      return signal;
+    };
+    _this.connectedParts = [];
+    _this.inputs = [];
+    _this.outputs = [];
+    // this.mode = 'continuous'; // TODO: rename "mode", use mode for time-aware / immediate
+    return _this;
+  }
+  _createClass(VirtualMachine, [{
+    key: "setImage",
+    value: function setImage(fn) {
+      this.image = fn;
+    }
+  }, {
+    key: "connect",
+    value: function connect(part) {
+      this.connectedParts.push(part);
+      this.outputs.push(part);
+    }
+  }, {
+    key: "receive",
+    value: function receive(signal) {
+      var modified = this.image(signal);
+      this.transmit(modified);
+    }
+  }, {
+    key: "transmit",
+    value: function transmit(signal) {
+      this.emit('transmit', this.outputs, signal);
+      // Transmit signal to all connected parts
+      this.outputs.forEach(function (part) {
+        if (part.receive) {
+          part.receive(signal);
+        }
+      });
+    }
+  }]);
+  return VirtualMachine;
+}(_Part2.Part);
+_defineProperty(VirtualMachine, "type", 'VirtualMachine');
+
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2003,7 +2186,7 @@ var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Wire, "type", 'Wire');
 
-},{"../Part.js":4,"../signals/ElectricalSignal.js":18}],18:[function(require,module,exports){
+},{"../Part.js":4,"../signals/ElectricalSignal.js":20}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2073,7 +2256,7 @@ var ElectricalSignal = exports["default"] = /*#__PURE__*/function () {
   return ElectricalSignal;
 }();
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

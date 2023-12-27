@@ -5,65 +5,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-// TODO:
-// Allow option to set window as background
-// Allow option for simple 4x4 grid for windows
-// Default mode is to place 2x2 vertical on left side first,
-// then 2x2 vertical on right side
-// Then for 3, its top left, bottom left, top right, with bottom right empty
-// For 4 each is 1x1, the entire window is filled at 4x4
-// Repeat same logic in units of 4 for 8, 12, 16, etc
-// Max windows is 64
-
-// TODO: all windows should have footers with a toolbar ( empty for now )
-// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
-
-//import lightTheme from "./themes/light.js";
-//import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
 var gui = {
-  /*
-  setTheme: function (name) {
-    if (name === 'light') {
-      this.theme(lightTheme);
-    } else if (name === 'dark') {
-      this.theme(darkTheme);
-    } else {
-      console.log(`Theme ${name} not found, defaulting to light theme`);
-      this.theme(lightTheme);
-    }
-  },
-  theme: function (theme) {
-    // theme is an object gui-elements and cssObjects
-    // for each gui element type in the theme
-    // find *all* nodes that match the type
-    // iterate over each node and apply the cssObject
-    console.log('setting theme', theme)
-    for (let type in theme) {
-      let cssObject = theme[type];
-      let nodes = document.querySelectorAll(`.${type}`);
-      console.log('ffff', nodes)
-      nodes.forEach(node => {
-        this.skin(node, cssObject);
-      });
-    }
-  },
-  skin: function(guiElement, cssObject) {
-    // guiElement is a DOM element
-    // cssObject is an object with css properties
-    for (let property in cssObject) {
-      // update the live node style
-      guiElement.style[property] = cssObject[property];
-      // update the style sheet for all future nodes
-      // this will override any inline styles
-      let styleSheet = document.styleSheets[0];
-      let selector = `.${guiElement.className}`;
-      let rule = `${property}: ${cssObject[property]}`;
-      let index = styleSheet.cssRules.length;
-      styleSheet.insertRule(`${selector} { ${rule} }`, index);
-     }
-  },
-  */
   elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
   window: function window(id) {
     var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Window';
@@ -76,35 +19,35 @@ var gui = {
         document.getElementById(id).remove();
       };
     }
+    var guiClasses = {
+      'container': 'gui-container',
+      'content': 'gui-content',
+      'header': 'gui-header',
+      'header-title': 'gui-header-title'
+    };
+    if (is_touch_enabled()) {
+      /*
+      guiClasses = {
+        'container': 'gui-container-touch',
+        'content': 'gui-content-touch',
+        'header': 'gui-header-touch',
+        'header-title': 'gui-header-title-touch'
+      }
+      */
+    }
+
     // Create container
     var container = document.createElement('div');
     container.id = id;
-    container.className = 'gui-container';
+    container.className = guiClasses['container'];
 
     // Create the content of the container
     var content = document.createElement('div');
-    content.className = 'gui-content';
+    content.className = guiClasses['content'];
 
     // Create a draggable header
     var guiHeader = document.createElement('div');
-    guiHeader.className = 'gui-header';
-
-    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
-    if (false && pluginInstance) {
-      var gearIcon = document.createElement('i');
-      gearIcon.className = 'fas fa-cog';
-      gearIcon.style["float"] = 'right';
-      gearIcon.style.cursor = 'pointer';
-      gearIcon.style.top = '20px';
-      gearIcon.style.right = '20px';
-      gearIcon.style.fontSize = '50px';
-      gearIcon.innerHTML = "FFF";
-      gearIcon.onclick = function () {
-        console.log(pluginInstance);
-        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
-      };
-      guiHeader.appendChild(gearIcon);
-    }
+    guiHeader.className = guiClasses['header'];
 
     // Traffic light container
     var trafficLightContainer = document.createElement('div');
@@ -291,6 +234,89 @@ gui.init = function (game) {
   });
 };
 var _default = exports["default"] = gui;
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+
+/*
+ setTheme: function (name) {
+   if (name === 'light') {
+     this.theme(lightTheme);
+   } else if (name === 'dark') {
+     this.theme(darkTheme);
+   } else {
+     console.log(`Theme ${name} not found, defaulting to light theme`);
+     this.theme(lightTheme);
+   }
+ },
+ theme: function (theme) {
+   // theme is an object gui-elements and cssObjects
+   // for each gui element type in the theme
+   // find *all* nodes that match the type
+   // iterate over each node and apply the cssObject
+   console.log('setting theme', theme)
+   for (let type in theme) {
+     let cssObject = theme[type];
+     let nodes = document.querySelectorAll(`.${type}`);
+     console.log('ffff', nodes)
+     nodes.forEach(node => {
+       this.skin(node, cssObject);
+     });
+   }
+ },
+ skin: function(guiElement, cssObject) {
+   // guiElement is a DOM element
+   // cssObject is an object with css properties
+   for (let property in cssObject) {
+     // update the live node style
+     guiElement.style[property] = cssObject[property];
+     // update the style sheet for all future nodes
+     // this will override any inline styles
+     let styleSheet = document.styleSheets[0];
+     let selector = `.${guiElement.className}`;
+     let rule = `${property}: ${cssObject[property]}`;
+     let index = styleSheet.cssRules.length;
+     styleSheet.insertRule(`${selector} { ${rule} }`, index);
+    }
+ },
+ */
+
+// TODO:
+// Allow option to set window as background
+// Allow option for simple 4x4 grid for windows
+// Default mode is to place 2x2 vertical on left side first,
+// then 2x2 vertical on right side
+// Then for 3, its top left, bottom left, top right, with bottom right empty
+// For 4 each is 1x1, the entire window is filled at 4x4
+// Repeat same logic in units of 4 for 8, 12, 16, etc
+// Max windows is 64
+
+// TODO: all windows should have footers with a toolbar ( empty for now )
+// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
+
+//import lightTheme from "./themes/light.js";
+//import darkTheme from "./themes/dark.js";
+
+/*
+
+    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
+    if (true && pluginInstance) {
+      const gearIcon = document.createElement('i');
+      gearIcon.className = 'fas fa-cog';
+      gearIcon.style.float = 'right';
+      gearIcon.style.cursor = 'pointer';
+      gearIcon.style.top = '20px';
+      gearIcon.style.right = '20px';
+      gearIcon.style.fontSize = '50px';
+      gearIcon.innerHTML = "FFF";
+      gearIcon.onclick = () => {
+        console.log(pluginInstance)
+        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
+      };
+      guiHeader.appendChild(gearIcon);
+    }
+
+    */
 
 },{}],2:[function(require,module,exports){
 "use strict";
@@ -331,6 +357,7 @@ var YCraftGUI = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      this.game.systemsManager.addSystem(this.id, this);
       // this.createDisplay();
 
       var self = this;
@@ -344,96 +371,136 @@ var YCraftGUI = /*#__PURE__*/function () {
       // check for existing contraptionsView
       var contraptionsView = document.getElementById('contraptionsView');
       if (contraptionsView) {
-        contraptionsView.remove();
+        // TODO: contraptionsView.remove()
+        // Remark: Requires we have cash $ with closest parent
+        contraptionsView.display = 'block';
       }
-      this.container = _gui["default"].window('contraptionsView', 'YCraft Contraption Viewer', function () {
-        game.systemsManager.removeSystem(YCraftGUI.id);
-        var contraptionsView = document.getElementById('contraptionsView');
-        if (contraptionsView) {
-          contraptionsView.remove();
+      // create empty div
+      this.container = document.createElement('div');
+      this.container.id = 'contraptionsView';
+      this.container = document.createElement('div');
+      this.container.style.display = 'flex';
+      this.container.style.flexDirection = 'row';
+      this.container.style.alignItems = 'center';
+
+      // this.container.style.width = '300px';
+      this.container.style.height = '100%';
+
+      // check to see if game.systems.editor exists
+      // TODO: remove this code and cross-plugin check
+      var that = this;
+      function attemptEditorAppend() {
+        if (game.systems && game.systems['gui-editor']) {
+          var toolBarComponent = game.systems['gui-editor'].toolbarMenu;
+          if (toolBarComponent) {
+            toolBarComponent.addElement('primary', that.container);
+          }
+          _createContraptionViewer();
+        } else {
+          setTimeout(attemptEditorAppend, 3);
         }
-      });
-
-      // Create main container div
-      var mainContainer = document.createElement('div');
-      mainContainer.id = 'main-container';
-
-      // Create header and title
-      var header = document.createElement('header');
-
-      /*
-      var h1 = document.createElement('h1');
-      h1.textContent = 'YCraft Contraption Viewer';
-      header.appendChild(h1);
-      */
-
-      // Create contraption interface section
-      var section = document.createElement('section');
-      section.id = 'contraption-interface';
-
-      // Create display contraption div
-      var displayContraption = document.createElement('div');
-      displayContraption.id = 'display-contraption';
-      /*
-      var h3 = document.createElement('h3');
-      h3.innerHTML = 'Contraption Name: <span id="contraption-name-display"></span>';
-      displayContraption.appendChild(h3);
-      */
-
-      // Create form for saving contraption
-      var saveForm = document.createElement('form');
-      saveForm.id = 'save-contraption-form';
-      var label = document.createElement('label');
-      label.setAttribute('for', 'contraption-name');
-      label.textContent = 'Contraption Name:';
-      var input = document.createElement('input');
-      input.type = 'text';
-      input.id = 'contraption-name';
-      input.placeholder = 'Enter contraption name';
-      input.required = true;
-      var saveButton = document.createElement('button');
-      saveButton.type = 'submit';
-      saveButton.textContent = 'Save Contraption';
-      //saveForm.appendChild(label);
-      //saveForm.appendChild(input);
-      //saveForm.appendChild(saveButton);
-
-      // Create form for running contraption
-      var runForm = document.createElement('form');
-      runForm.id = 'run-contraption-form';
-      var runButton = document.createElement('button');
-      runButton.type = 'submit';
-      runButton.textContent = 'Run Contraption';
-      runForm.appendChild(runButton);
-
-      // Append forms to section
-      section.appendChild(displayContraption);
-      section.appendChild(saveForm);
-      // section.appendChild(runForm);
-
-      // Create textarea for contraption code
-      var textarea = document.createElement('textarea');
-      textarea.id = 'contraption-code';
-      textarea.rows = 10;
-      textarea.cols = 50;
-      textarea.placeholder = 'Enter contraption code here';
-      if (this.game.systems.ycraft && this.game.systems.ycraft.contraption) {
-        textarea.value = this.game.systems.ycraft.contraptionSource;
       }
+      attemptEditorAppend();
+      function _createContraptionViewer() {
+        /*
+        this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {
+          game.systemsManager.removeSystem(YCraftGUI.id);
+          let contraptionsView = document.getElementById('contraptionsView');
+          if (contraptionsView) {
+            contraptionsView.remove();
+          }
+        });
+        */
 
-      // Append elements to main container
-      mainContainer.appendChild(header);
-      mainContainer.appendChild(section);
-      mainContainer.appendChild(textarea);
+        // check to see if the container exists
+        /*
+        let existingContainer = document.getElementById('ycraft-main-container');
+         if (existingContainer) {
+          return;
+        }
+        */
+        // Create main container div
+        var mainContainer = document.createElement('div');
+        mainContainer.id = 'ycraft-main-container';
 
-      // get gui-content from inside this.container
-      var guiContent = this.container.querySelector('.gui-content');
-      // Append the main container to the body or another specific element
-      guiContent.appendChild(mainContainer);
-      // document.body.appendChild(mainContainer);
+        // Create header and title
+        var header = document.createElement('header');
 
-      this.createDisplay();
-      this.adjustTextareaHeight(textarea);
+        /*
+        var h1 = document.createElement('h1');
+        h1.textContent = 'YCraft Contraption Viewer';
+        header.appendChild(h1);
+        */
+
+        // Create contraption interface section
+        var section = document.createElement('section');
+        section.id = 'contraption-interface';
+
+        // Create display contraption div
+        var displayContraption = document.createElement('div');
+        displayContraption.id = 'display-contraption';
+        /*
+        var h3 = document.createElement('h3');
+        h3.innerHTML = 'Contraption Name: <span id="contraption-name-display"></span>';
+        displayContraption.appendChild(h3);
+        */
+
+        // Create form for saving contraption
+        var saveForm = document.createElement('form');
+        saveForm.id = 'save-contraption-form';
+        var label = document.createElement('label');
+        label.setAttribute('for', 'contraption-name');
+        label.textContent = 'Contraption Name:';
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'contraption-name';
+        input.placeholder = 'Enter contraption name';
+        input.required = true;
+        var saveButton = document.createElement('button');
+        saveButton.type = 'submit';
+        saveButton.textContent = 'Save Contraption';
+        //saveForm.appendChild(label);
+        //saveForm.appendChild(input);
+        //saveForm.appendChild(saveButton);
+
+        // Create form for running contraption
+        var runForm = document.createElement('form');
+        runForm.id = 'run-contraption-form';
+        var runButton = document.createElement('button');
+        runButton.type = 'submit';
+        runButton.textContent = 'Run Contraption';
+        runForm.appendChild(runButton);
+
+        // Append forms to section
+        section.appendChild(displayContraption);
+        section.appendChild(saveForm);
+        // section.appendChild(runForm);
+
+        // Create textarea for contraption code
+        var textarea = document.createElement('textarea');
+        textarea.id = 'contraption-code';
+        textarea.rows = 10;
+        textarea.cols = 50;
+        textarea.placeholder = 'Enter contraption code here';
+        textarea.style.display = 'none';
+        if (that.game.systems.ycraft && that.game.systems.ycraft.contraption) {
+          textarea.value = that.game.systems.ycraft.contraptionSource;
+        }
+
+        // Append elements to main container
+        mainContainer.appendChild(header);
+        mainContainer.appendChild(section);
+        //mainContainer.appendChild(textarea);
+        // get gui-content from inside this.container
+        //let guiContent = this.container.querySelector('.gui-content');
+        // Append the main container to the body or another specific element
+        //guiContent.appendChild(mainContainer);
+        that.container.appendChild(mainContainer);
+        // document.body.appendChild(mainContainer);
+
+        that.createDisplay();
+        that.adjustTextareaHeight(textarea);
+      }
     }
   }, {
     key: "updateSelectDropdown",
@@ -563,8 +630,10 @@ var YCraftGUI = /*#__PURE__*/function () {
       var displayContraption = document.getElementById('display-contraption');
 
       // Append the label and then the select element
-      displayContraption.appendChild(label);
-      displayContraption.appendChild(selectElement);
+      if (displayContraption) {
+        // displayContraption.appendChild(label);
+        displayContraption.appendChild(selectElement);
+      }
 
       // Optionally, add an event listener for when the user selects a contraption
       selectElement.addEventListener('change', function (event) {
@@ -573,7 +642,8 @@ var YCraftGUI = /*#__PURE__*/function () {
         // Additional code to handle the selection, like getting and loading the selected contraption
         _this.getContraption(selectedContraptionName);
       });
-      contraptionInterface.appendChild(displayContraption);
+
+      // contraptionInterface.appendChild(displayContraption);
     }
   }, {
     key: "createDisplay",
@@ -587,12 +657,14 @@ var YCraftGUI = /*#__PURE__*/function () {
               game = this.game;
               form = document.getElementById('save-contraption-form');
               contraptionNameDisplay = document.getElementById('contraption-name-display');
-              form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                var contraptionName = document.getElementById('contraption-name').value;
-                // Implement the POST request to save the contraption
-                saveContraption(contraptionName);
-              });
+              if (form) {
+                form.addEventListener('submit', function (event) {
+                  event.preventDefault();
+                  var contraptionName = document.getElementById('contraption-name').value;
+                  // Implement the POST request to save the contraption
+                  saveContraption(contraptionName);
+                });
+              }
 
               /*
               const runContraptionForm = document.getElementById('run-contraption-form');
@@ -781,10 +853,23 @@ var YCraftGUI = /*#__PURE__*/function () {
   }, {
     key: "unload",
     value: function unload() {
+      var contraptionInterface = document.getElementById('contraption-interface');
+      if (contraptionInterface) {
+        contraptionInterface.remove();
+      }
+
       // Remove elements when the plugin is unloaded
       if (this.logContainer && this.logContainer.parentNode) {
         this.logContainer.parentNode.removeChild(this.logContainer);
       }
+      // Removes contraptionsView from editor menu
+      var contraptionsView = document.getElementById('contraptionsView');
+      if (contraptionsView) {
+        contraptionsView.display = 'hidden';
+        // TODO: 
+        //       contraptionsView.remove();
+      }
+
       this.logContainer = null;
       this.logTextArea = null;
     }

@@ -22,6 +22,12 @@ Object.defineProperty(exports, "Button", {
     return _Button["default"];
   }
 });
+Object.defineProperty(exports, "Display", {
+  enumerable: true,
+  get: function get() {
+    return _Display["default"];
+  }
+});
 Object.defineProperty(exports, "ElectricalSignal", {
   enumerable: true,
   get: function get() {
@@ -76,6 +82,12 @@ Object.defineProperty(exports, "Rover", {
     return _Rover["default"];
   }
 });
+Object.defineProperty(exports, "VirtualMachine", {
+  enumerable: true,
+  get: function get() {
+    return _VirtualMachine["default"];
+  }
+});
 Object.defineProperty(exports, "Wire", {
   enumerable: true,
   get: function get() {
@@ -93,6 +105,7 @@ var _ElectricalSignal = _interopRequireDefault(require("./lib/signals/Electrical
 var _Actuator = _interopRequireDefault(require("./lib/parts/Actuator.js"));
 var _Amplifier = _interopRequireDefault(require("./lib/parts/Amplifier.js"));
 var _Button = _interopRequireDefault(require("./lib/parts/Button.js"));
+var _Display = _interopRequireDefault(require("./lib/parts/Display.js"));
 var _LaserSensor = _interopRequireDefault(require("./lib/parts/LaserSensor.js"));
 var _Latch = _interopRequireDefault(require("./lib/parts/Latch.js"));
 var _LEDLight = _interopRequireDefault(require("./lib/parts/LEDLight.js"));
@@ -101,10 +114,11 @@ var _MotionDetector = _interopRequireDefault(require("./lib/parts/MotionDetector
 var _PressureSensor = _interopRequireDefault(require("./lib/parts/PressureSensor.js"));
 var _Relay = _interopRequireDefault(require("./lib/parts/Relay.js"));
 var _Rover = _interopRequireDefault(require("./lib/parts/Rover.js"));
+var _VirtualMachine = _interopRequireDefault(require("./lib/parts/VirtualMachine.js"));
 var _Wire = _interopRequireDefault(require("./lib/parts/Wire.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./lib/YCraft.js":3,"./lib/parts/Actuator.js":4,"./lib/parts/Amplifier.js":5,"./lib/parts/Button.js":6,"./lib/parts/LEDLight.js":7,"./lib/parts/LaserSensor.js":8,"./lib/parts/Latch.js":9,"./lib/parts/Mirror.js":10,"./lib/parts/MotionDetector.js":11,"./lib/parts/PressureSensor.js":12,"./lib/parts/Relay.js":13,"./lib/parts/Rover.js":14,"./lib/parts/Wire.js":15,"./lib/signals/ElectricalSignal.js":16}],2:[function(require,module,exports){
+},{"./lib/YCraft.js":3,"./lib/parts/Actuator.js":4,"./lib/parts/Amplifier.js":5,"./lib/parts/Button.js":6,"./lib/parts/Display.js":7,"./lib/parts/LEDLight.js":8,"./lib/parts/LaserSensor.js":9,"./lib/parts/Latch.js":10,"./lib/parts/Mirror.js":11,"./lib/parts/MotionDetector.js":12,"./lib/parts/PressureSensor.js":13,"./lib/parts/Relay.js":14,"./lib/parts/Rover.js":15,"./lib/parts/VirtualMachine.js":16,"./lib/parts/Wire.js":17,"./lib/signals/ElectricalSignal.js":18}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -164,7 +178,7 @@ var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
 // for now, could also be a base Part class
 _defineProperty(Part, "idCounter", 0);
 
-},{"./utils/EventEmitter.js":17}],3:[function(require,module,exports){
+},{"./utils/EventEmitter.js":19}],3:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -196,7 +210,13 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
     var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
       _ref$powerRequired = _ref.powerRequired,
-      powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired;
+      powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired,
+      _ref$height = _ref.height,
+      height = _ref$height === void 0 ? 640 : _ref$height,
+      _ref$width = _ref.width,
+      width = _ref$width === void 0 ? 640 : _ref$width,
+      _ref$description = _ref.description,
+      description = _ref$description === void 0 ? 'A YCraft contraption' : _ref$description;
     _classCallCheck(this, YCraft);
     _this = _super.call(this);
 
@@ -206,6 +226,9 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
       y: y,
       z: z
     };
+    _this.height = height;
+    _this.width = width;
+    _this.description = description;
     _this.powerRequired = powerRequired;
 
     // parts of the contraption, added via addPart() method
@@ -426,7 +449,7 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
 }(_EventEmitter2["default"]);
 var _default = exports["default"] = YCraft;
 
-},{"./utils/EventEmitter.js":17}],4:[function(require,module,exports){
+},{"./utils/EventEmitter.js":19}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -680,7 +703,7 @@ var Amplifier = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Amplifier, "type", 'Amplifier');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],6:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -787,7 +810,85 @@ var Button = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Button, "type", 'Button');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],7:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Part2 = require("../Part.js");
+var _ElectricalSignal = _interopRequireDefault(require("../signals/ElectricalSignal.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var Display = exports["default"] = /*#__PURE__*/function (_Part) {
+  _inherits(Display, _Part);
+  var _super = _createSuper(Display);
+  function Display() {
+    var _this;
+    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
+      _ref$text = _ref.text,
+      text = _ref$text === void 0 ? 'Your Sign Here' : _ref$text;
+    _classCallCheck(this, Display);
+    // curry the constructor to allow for multiple API styles
+    if (_typeof(x) === 'object') {
+      z = x.z || 0;
+      y = x.y || 0;
+      x = x.x || 0;
+    }
+    _this = _super.call(this, x, y, z);
+    _this.type = Display.type;
+    _this.text = text;
+    _this.connectedParts = [];
+    _this.inputs = []; // Parts that send signals to this display
+    return _this;
+  }
+  _createClass(Display, [{
+    key: "setText",
+    value: function setText(text) {
+      this.text = text;
+      console.log("Display text set to: ".concat(this.text));
+      // Additional logic to render the text can be implemented here
+    }
+  }, {
+    key: "connect",
+    value: function connect(part) {
+      this.connectedParts.push(part);
+      this.inputs.push(part);
+    }
+  }, {
+    key: "receive",
+    value: function receive(signal) {
+      if (signal instanceof _ElectricalSignal["default"]) {
+        // For now, we assume the signal carries simple text data
+        // In the future, this can be expanded to handle more complex data types
+        this.setText(signal.data); // Assuming 'data' property in the signal carries the text
+      }
+    }
+
+    // Additional methods and logic for the display can be added here...
+  }]);
+  return Display;
+}(_Part2.Part);
+_defineProperty(Display, "type", 'Display');
+
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -946,7 +1047,7 @@ var LEDLight = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(LEDLight, "type", 'LEDLight');
 
-},{"../Part.js":2}],8:[function(require,module,exports){
+},{"../Part.js":2}],9:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1007,7 +1108,7 @@ var LaserSensor = exports["default"] = /*#__PURE__*/function (_EventEmitter) {
   return LaserSensor;
 }(_EventEmitter2["default"]);
 
-},{"../signals/ElectricalSignal.js":16,"../utils/EventEmitter.js":17}],9:[function(require,module,exports){
+},{"../signals/ElectricalSignal.js":18,"../utils/EventEmitter.js":19}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1106,7 +1207,7 @@ var Latch = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Latch, "type", 'Latch');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],10:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],11:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1177,7 +1278,7 @@ var Mirror = exports["default"] = /*#__PURE__*/function (_EventEmitter) {
   return Mirror;
 }(_EventEmitter2["default"]);
 
-},{"../utils/EventEmitter.js":17}],11:[function(require,module,exports){
+},{"../utils/EventEmitter.js":19}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1286,7 +1387,7 @@ var MotionDetector = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(MotionDetector, "type", 'MotionDetector');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],12:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1396,7 +1497,7 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(PressureSensor, "type", 'PressureSensor');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],13:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1525,7 +1626,7 @@ var Relay = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Relay, "type", 'Relay');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],14:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1688,7 +1789,84 @@ var Rover = /*#__PURE__*/function (_Part) {
 _defineProperty(Rover, "type", 'Rover');
 var _default = exports["default"] = Rover;
 
-},{"../Part.js":2}],15:[function(require,module,exports){
+},{"../Part.js":2}],16:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _Part2 = require("../Part.js");
+var _ElectricalSignal = _interopRequireDefault(require("../signals/ElectricalSignal.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // can run arbitrary code between parts
+// defaults to debian node.js sandbox
+// allows developers to write arbitrary code inside contraptions
+var VirtualMachine = exports["default"] = /*#__PURE__*/function (_Part) {
+  _inherits(VirtualMachine, _Part);
+  var _super = _createSuper(VirtualMachine);
+  function VirtualMachine() {
+    var _this;
+    _classCallCheck(this, VirtualMachine);
+    _this = _super.call(this);
+    _this.type = VirtualMachine.type;
+    _this.props = {};
+    _this.image = function noopImage(signal) {
+      return signal;
+    };
+    _this.connectedParts = [];
+    _this.inputs = [];
+    _this.outputs = [];
+    // this.mode = 'continuous'; // TODO: rename "mode", use mode for time-aware / immediate
+    return _this;
+  }
+  _createClass(VirtualMachine, [{
+    key: "setImage",
+    value: function setImage(fn) {
+      this.image = fn;
+    }
+  }, {
+    key: "connect",
+    value: function connect(part) {
+      this.connectedParts.push(part);
+      this.outputs.push(part);
+    }
+  }, {
+    key: "receive",
+    value: function receive(signal) {
+      var modified = this.image(signal);
+      this.transmit(modified);
+    }
+  }, {
+    key: "transmit",
+    value: function transmit(signal) {
+      this.emit('transmit', this.outputs, signal);
+      // Transmit signal to all connected parts
+      this.outputs.forEach(function (part) {
+        if (part.receive) {
+          part.receive(signal);
+        }
+      });
+    }
+  }]);
+  return VirtualMachine;
+}(_Part2.Part);
+_defineProperty(VirtualMachine, "type", 'VirtualMachine');
+
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1839,7 +2017,7 @@ var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
 }(_Part2.Part);
 _defineProperty(Wire, "type", 'Wire');
 
-},{"../Part.js":2,"../signals/ElectricalSignal.js":16}],16:[function(require,module,exports){
+},{"../Part.js":2,"../signals/ElectricalSignal.js":18}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1909,7 +2087,7 @@ var ElectricalSignal = exports["default"] = /*#__PURE__*/function () {
   return ElectricalSignal;
 }();
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2011,7 +2189,7 @@ var EventEmitter = exports["default"] = /*#__PURE__*/function () {
   return EventEmitter;
 }();
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2056,7 +2234,7 @@ var Plugin = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Plugin;
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2070,6 +2248,7 @@ var _bindPartEvents = _interopRequireDefault(require("./lib/bindPartEvents.js"))
 var _createWire = _interopRequireDefault(require("./lib/parts/createWire.js"));
 var _bindWire = _interopRequireDefault(require("./lib/events/bindWire.js"));
 var _bindButton = _interopRequireDefault(require("./lib/events/bindButton.js"));
+var _bindDisplay = _interopRequireDefault(require("./lib/events/bindDisplay.js"));
 var _bindLEDLight = _interopRequireDefault(require("./lib/events/bindLEDLight.js"));
 var _bindActuator = _interopRequireDefault(require("./lib/events/bindActuator.js"));
 var _bindAmplifer = _interopRequireDefault(require("./lib/events/bindAmplifer.js"));
@@ -2078,7 +2257,8 @@ var _bindMotionDetector = _interopRequireDefault(require("./lib/events/bindMotio
 var _bindRelay = _interopRequireDefault(require("./lib/events/bindRelay.js"));
 var _bindPressureSensor = _interopRequireDefault(require("./lib/events/bindPressureSensor.js"));
 var _bindRover = _interopRequireDefault(require("./lib/events/bindRover.js"));
-var _securitySystemWires = _interopRequireDefault(require("./security-system-wires.js"));
+var _contraptionExamples = _interopRequireDefault(require("./contraption-examples.js"));
+var _buttonWireLight = _interopRequireDefault(require("./button-wire-light.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2095,7 +2275,6 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { YCraft as YCraftActual } from 'ycraft';
 // import testContraption from './security-system.js';
-// import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
 // handles input controller events and relays them to the game logic
 var YCraft = /*#__PURE__*/function (_Plugin) {
@@ -2116,8 +2295,8 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
 
     // for now, default behavior so it won't crash if no contraption is passed
     if (typeof contraption !== 'function') {
-      console.log("securitySystemWithWires", _securitySystemWires["default"]);
-      contraption = _securitySystemWires["default"];
+      // console.log("contraptionExamples", contraptionExamples)
+      contraption = _contraptionExamples["default"];
     }
     _this.contraption = contraption();
     _this.contraptionSource = contraption.toString();
@@ -2126,6 +2305,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
     _this.bindWire = _bindWire["default"].bind(_assertThisInitialized(_this));
     _this.createWire = _createWire["default"].bind(_assertThisInitialized(_this));
     _this.bindButton = _bindButton["default"].bind(_assertThisInitialized(_this));
+    _this.bindDisplay = _bindDisplay["default"].bind(_assertThisInitialized(_this));
     _this.bindLEDLight = _bindLEDLight["default"].bind(_assertThisInitialized(_this));
     _this.bindActuator = _bindActuator["default"].bind(_assertThisInitialized(_this));
     _this.bindAmplifier = _bindAmplifer["default"].bind(_assertThisInitialized(_this));
@@ -2191,6 +2371,87 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
         // console.log('onAny contraption event', event, args);
       });
 
+      // render a border box around each contraption based on its bounding box
+      // console.log('placing border box around contraption positoin', contraption.position);
+      /*
+      let boundingBox = this.game.createEntity({
+        type: 'BOX',
+        color: 0x00ff00,
+        width: contraption.width,
+        height: contraption.height,
+        position: contraption.position,
+        isSensor: true
+      });
+      */
+
+      // create a text label for the entity
+
+      if (contraption.contraptions.length > 0) {
+        // iterate through each contraption and create a corresponding entity
+        contraption.contraptions.forEach(function (contraption) {
+          // creates a bounding box around the contraption
+          // TODO: support hollow boxes with borders
+          // Remark: This will create a box around the contraption, filled
+          /*
+          let boundingBox = this.game.createEntity({
+            type: 'BOX',
+            // color: 0x00ff00,
+            width: contraption.width,
+            height: contraption.height,
+            position: {
+              x: contraption.position.x,
+              y: contraption.position.y,
+              z: -100
+            },
+            isSensor: true
+          });
+          */
+
+          // place the label in top left corner of the contraption
+          var contraptionLabelX = contraption.position.x + contraption.width / 10;
+          var contraptionLabelY = contraption.position.y - contraption.height / 2;
+          // creates a label for the contraption
+          var textLabel = _this2.game.createEntity({
+            type: 'TEXT',
+            text: contraption.description,
+            position: {
+              x: contraptionLabelX,
+              // Center horizontally
+              y: contraptionLabelY // Position inside the entity
+            },
+
+            style: {
+              fontSize: '32px'
+            },
+            width: contraption.width / 2,
+            height: contraption.height / 2,
+            isStatic: true,
+            isSensor: true
+          });
+
+          // bind any potential event listners for the part, based on the type of part
+          //this.partEventListeners(contraption, contraption);
+          //let ent = this.createEntityFromPart(contraption, contraption);
+          // console.log('created entity', ent);
+        });
+      } else {
+        // render a single contraption
+        /*
+        let boundingBox = this.game.createEntity({
+          type: 'BOX',
+          // color: 0x00ff00,
+          width: contraption.width,
+          height: contraption.height,
+          position: {
+            x: contraption.position.x,
+            y: contraption.position.y,
+            z: -100
+          },
+          isSensor: true
+        });
+        */
+      }
+
       // TODO: DRY this logic up with below
       if (contraption.parts.length > 0) {
         // iterate through each part and create a corresponding entity
@@ -2223,7 +2484,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           // get the part and call .offFn if it exists
           var part = ent.yCraft.part;
           if (part.unload) {
-            console.log('calling part.unload', part.name);
+            // console.log('calling part.unload', part.name)
             part.unload();
           }
           _this3.game.removeEntity(ent.id);
@@ -2268,8 +2529,14 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           // trigger the part if possible
           // console.log('entityA.yCraft', entityA.yCraft)
 
+          var signal = new _index.ElectricalSignal();
+          signal.data = {
+            entityId: entityIdB,
+            entity: entityB,
+            body: bodyB
+          };
           if (entityA.yCraft.part.trigger) {
-            entityA.yCraft.part.trigger();
+            entityA.yCraft.part.trigger(signal);
           }
           if (entityA.yCraft.part.press) {
             entityA.yCraft.part.press();
@@ -2282,10 +2549,16 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           }
         }
         if (entityB.yCraft) {
+          var _signal = new _index.ElectricalSignal();
+          _signal.data = {
+            entityId: entityIdA,
+            entity: entityA,
+            body: bodyA
+          };
           // trigger the part if possible
           // console.log('entityB.yCraft', entityB.yCraft)
           if (entityB.yCraft.part.trigger) {
-            entityB.yCraft.part.trigger();
+            entityB.yCraft.part.trigger(_signal);
           }
           if (entityB.yCraft.part.press) {
             entityB.yCraft.part.press();
@@ -2314,7 +2587,205 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
 _defineProperty(YCraft, "id", 'ycraft');
 var _default = exports["default"] = YCraft;
 
-},{"../../../../YCraft.js/index.js":1,"../../Plugin.js":18,"./lib/bindPartEvents.js":20,"./lib/createEntityFromPart.js":21,"./lib/events/bindActuator.js":22,"./lib/events/bindAmplifer.js":23,"./lib/events/bindButton.js":24,"./lib/events/bindLEDLight.js":25,"./lib/events/bindLatch.js":26,"./lib/events/bindMotionDetector.js":27,"./lib/events/bindPressureSensor.js":28,"./lib/events/bindRelay.js":29,"./lib/events/bindRover.js":30,"./lib/events/bindWire.js":31,"./lib/parts/createWire.js":32,"./security-system-wires.js":33}],20:[function(require,module,exports){
+},{"../../../../YCraft.js/index.js":1,"../../Plugin.js":20,"./button-wire-light.js":22,"./contraption-examples.js":23,"./lib/bindPartEvents.js":24,"./lib/createEntityFromPart.js":25,"./lib/events/bindActuator.js":26,"./lib/events/bindAmplifer.js":27,"./lib/events/bindButton.js":28,"./lib/events/bindDisplay.js":29,"./lib/events/bindLEDLight.js":30,"./lib/events/bindLatch.js":31,"./lib/events/bindMotionDetector.js":32,"./lib/events/bindPressureSensor.js":33,"./lib/events/bindRelay.js":34,"./lib/events/bindRover.js":35,"./lib/events/bindWire.js":36,"./lib/parts/createWire.js":37}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = buttonLight;
+var _index = require("../../../../YCraft.js/index.js");
+function buttonLight() {
+  var yCraftSystem = new _index.YCraft({
+    powerRequired: false // default is false, set to true to enforce power requirements
+  });
+
+  // Create the button
+  var button = new _index.Button(0, -350, 0); // Positioned a bit below in the center
+
+  // Create three LED lights and position them on the top row
+  var ledLight1 = new _index.LEDLight(-200, 250, 0); // First light
+  var ledLight2 = new _index.LEDLight(0, 250, 0); // Second light, in the middle
+  var ledLight3 = new _index.LEDLight(200, 250, 0); // Third light
+
+  // Create wires to connect each LED light to the button
+  var wire = new _index.Wire();
+
+  // Connect button to each wire, and each wire to corresponding LED light
+  button.connect(wire);
+  wire.connect(ledLight1);
+  button.connect(wire);
+  wire.connect(ledLight2);
+  button.connect(wire);
+  wire.connect(ledLight3);
+
+  // Add parts to YCraft system
+  yCraftSystem.addPart(button);
+  yCraftSystem.addPart(wire);
+  yCraftSystem.addPart(ledLight1);
+  yCraftSystem.addPart(ledLight2);
+  yCraftSystem.addPart(ledLight3);
+
+  // Simulate pressing the button
+  // button.press();
+  return yCraftSystem;
+}
+
+},{"../../../../YCraft.js/index.js":1}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createColorPuzzle;
+var _index = require("../../../../YCraft.js/index.js");
+// import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
+
+function createColorPuzzle() {
+  /*
+  let pressureSensorRed = new PressureSensor(-150, -150, 0, {
+    color: 0xff0000
+  });
+  let pressureSensorGreen = new PressureSensor(150, -150, 0, {
+    color: 0x00ff00
+  });
+  */
+
+  var exampleA = new _index.YCraft(0, 150, 0, {
+    description: "Simple Light",
+    height: 350,
+    width: 800
+  });
+
+  // TODO: new Box() ?
+  var button0 = new _index.Button(-100, -150, 0);
+  var latch0 = new _index.Latch(-100, 0, 0);
+  var light0 = new _index.LEDLight(100, -75, 200, {
+    wattage: 60,
+    height: 250,
+    width: 250
+  });
+  button0.connect(light0);
+  latch0.connect(light0);
+  exampleA.addPart(light0);
+  exampleA.addPart(button0);
+  exampleA.addPart(latch0);
+
+  // TODO: render contraptions backgrounds in CSSGraphics, ect
+  var exampleB = new _index.YCraft(0, 600, 0, {
+    description: "Wired Light",
+    height: 400,
+    width: 800
+  });
+  var wire1 = new _index.Wire();
+  var wire2 = new _index.Wire();
+  var button1 = new _index.Button(-150, -150, 0);
+  var latch1 = new _index.Latch(-150, 0, 0);
+  var relay1 = new _index.Relay(0, -75, 0);
+  var light1 = new _index.LEDLight(150, -75, 800, {
+    wattage: 60,
+    height: 250,
+    width: 250
+  });
+  button1.connect(wire1);
+  latch1.connect(wire1);
+  wire1.connect(relay1);
+  relay1.connect(wire2);
+  wire2.connect(light1);
+  exampleB.addPart(light1);
+  exampleB.addPart(button1);
+  exampleB.addPart(latch1);
+  exampleB.addPart(relay1);
+  exampleB.addPart(wire1);
+  exampleB.addPart(wire2);
+
+  /*
+    - [x] Wire
+  - [x] Power Supply
+  - [x] Relay
+  - [x] Amplifier
+  - [x] LED Light
+  - [x] Button
+  - [x] Latch
+  - [x] Pressure Sensor
+  - [x] Motion Detector
+  - [x] Actuator
+  - [x] Rover
+  */
+
+  /*
+  let display = new Display(400, 200, 0);
+  display.setText('Hello World');
+  let vm = new VirtualMachine(-300, -300);
+   vm.setImage(function(signal){
+    // alert('got it')
+    console.log('processing signal', signal)
+    // TODO: check if object colliding with pressure sensor is block of correct color
+    // TODO: move this into Sutra
+    return signal;
+  })
+   pressureSensorRed.connect(vm);
+  pressureSensorGreen.connect(vm);
+  vm.connect(light);
+  */
+  // button0.connect(light);
+
+  //exampleA.addPart(pressureSensorRed);
+  //exampleA.addPart(pressureSensorGreen);
+
+  var examples = new _index.YCraft();
+  examples.addContraption(exampleA);
+  examples.addContraption(exampleB);
+  return examples;
+}
+function createSecuritySystem() {
+  var yCraftSystem = new _index.YCraft();
+
+  // Initialize and position components
+  var motionDetector = new _index.MotionDetector(-150, -150, 0);
+  var pressureSensor = new _index.PressureSensor(150, -150, 0);
+  var actuator = new _index.Actuator(450, -250, 0);
+  var securityLight = new _index.LEDLight(450, 0, 200, {
+    wattage: 60
+  });
+  var manualOverrideButton = new _index.Button(50, 200, 0);
+
+  // Initialize wires
+  var wireFromMotionDetector = new _index.Wire();
+  var wireFromPressureSensor = new _index.Wire();
+  var wireFromButton = new _index.Wire();
+  var wireToLight = new _index.Wire();
+
+  // Connect components with wires
+  motionDetector.connect(wireFromMotionDetector);
+  wireFromMotionDetector.connect(actuator);
+  pressureSensor.connect(wireFromPressureSensor);
+  wireFromPressureSensor.connect(actuator);
+  manualOverrideButton.connect(wireFromButton);
+  wireFromButton.connect(actuator);
+  actuator.connect(wireToLight);
+  wireToLight.connect(securityLight);
+
+  // Add components and wires to YCraft system
+  yCraftSystem.addPart(motionDetector);
+  yCraftSystem.addPart(pressureSensor);
+  yCraftSystem.addPart(securityLight);
+  yCraftSystem.addPart(manualOverrideButton);
+  yCraftSystem.addPart(actuator);
+  yCraftSystem.addPart(wireFromMotionDetector);
+  yCraftSystem.addPart(wireFromPressureSensor);
+  yCraftSystem.addPart(wireFromButton);
+  yCraftSystem.addPart(wireToLight);
+
+  // Simulate interactions
+  // motionDetector.detectMotion(); // Simulate motion detection
+
+  // Logging the system state
+  console.log(yCraftSystem);
+  return yCraftSystem;
+}
+
+},{"../../../../YCraft.js/index.js":1}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2322,6 +2793,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = partEventListeners;
 // Listens for events on parts
+// TODO: this can be replaced with a Sutra
 function partEventListeners(part, contraption) {
   var partType = part.type;
   var bindPartFnName = 'bind' + partType;
@@ -2333,7 +2805,7 @@ function partEventListeners(part, contraption) {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2345,41 +2817,49 @@ function createEntityFromPart(part, contraption) {
   // create the entity
 
   var entity;
+  function createPartEntity(entityData, part, contraption) {
+    //let centerX = part.position.x - part.size.width / 2;
+    //let centerY = part.position.y - part.size.height / 2;
+    // console.log("placing part on screen position", part.position)
+
+    var defaultConfig = {
+      name: part.type,
+      type: 'PART',
+      color: part.props.color,
+      position: part.position,
+      width: part.size.width,
+      height: part.size.height,
+      text: part.text || null,
+      isStatic: true,
+      yCraft: {
+        part: part,
+        contraption: contraption
+      }
+    };
+    for (var key in entityData) {
+      defaultConfig[key] = entityData[key];
+    }
+    // console.log('defaultConfig', defaultConfig)
+    // merge entityData into defaultConfig
+    // Object.assign(defaultConfig, entityData);
+
+    entity = game.createEntity(defaultConfig);
+    return entity;
+  }
   switch (part.type) {
     case 'Wire':
       entity = this.createWire(part, contraption);
       break;
+    case 'PressureSensor':
     case 'Rover':
-      entity = this.game.createEntity({
-        name: part.type,
-        type: 'PART',
-        color: part.props.color,
-        position: part.position,
-        width: part.size.width,
-        height: part.size.height,
+      entity = createPartEntity({
         isStatic: false,
-        isSensor: true,
-        yCraft: {
-          part: part,
-          contraption: contraption
-        }
-      });
+        isSensor: true
+      }, part, contraption);
       break;
     default:
       // Handle non-wire parts
-      entity = this.game.createEntity({
-        name: part.type,
-        type: 'PART',
-        color: part.props.color,
-        position: part.position,
-        width: part.size.width,
-        height: part.size.height,
-        isStatic: true,
-        yCraft: {
-          part: part,
-          contraption: contraption
-        }
-      });
+      entity = createPartEntity({}, part, contraption);
       break;
   }
 
@@ -2393,7 +2873,9 @@ function createEntityFromPart(part, contraption) {
   } else {
     part.entityId = entity.id;
   }
-  if (part.type !== 'Wire') {
+
+  // Create a label element, except for wires and displays
+  if (part.type !== 'Wire' && part.type !== 'Display') {
     // create a text label for the entity
 
     var entityCenterX = part.position.x - part.size.width / 4;
@@ -2435,7 +2917,7 @@ var partColors = {
   "Rover": "#8B4513"
 };
 
-},{}],22:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2480,7 +2962,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],23:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2504,7 +2986,7 @@ function bindAmpliferEvents(part, contraption) {
   });
 }
 
-},{}],24:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2531,7 +3013,18 @@ function bindButtonEvents(part, contraption) {
   });
 }
 
-},{}],25:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = bindDisplayEvents;
+function bindDisplayEvents(part, contraption) {
+  var game = this.game;
+}
+
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2563,7 +3056,7 @@ function bindLEDLightEvents(part, contraption) {
   });
 }
 
-},{}],26:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2593,7 +3086,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],27:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2620,16 +3113,33 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],28:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = bindLatchEvents;
+// TODO: move this code into a Sutra
+
 function bindLatchEvents(part, contraption) {
   var game = this.game;
-  part.on('trigger', function () {
+  part.on('trigger', function (signal) {
+    console.log('sssusu', signal);
+
+    // check to see if the signal is from matching color block
+    var collidedWith = signal.data.entity;
+
+    // TODO: implement logic for color puzzle ( for now just
+    // TODO: move this code into a Sutra
+    if (collidedWith.type === 'BLOCK'
+
+    //collidedWith.type === 'PART' &&
+    //collidedWith.name === 'Block'
+    ) {
+      console.log('collidedWith', collidedWith);
+    }
+
     // set the tint of the entity to yellow
     // console.log('PressureSensor on', part);
     game.updateEntity({
@@ -2647,7 +3157,7 @@ function bindLatchEvents(part, contraption) {
   });
 }
 
-},{}],29:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2675,7 +3185,7 @@ function bindRelayEvents(part, contraption) {
   });
 }
 
-},{}],30:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2695,7 +3205,7 @@ function bindRoverEvents(part, contraption) {
   });
 }
 
-},{}],31:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2731,7 +3241,7 @@ function bindWireEvents(part, contraption) {
   });
 }
 
-},{}],32:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2782,62 +3292,5 @@ function createWire(part, contraption) {
   return entities; // Return all created entities
 }
 
-},{}],33:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = createSecuritySystem;
-var _index = require("../../../../YCraft.js/index.js");
-// import { YCraft, Button, LEDLight, Wire, Actuator, MotionDetector, PressureSensor } from 'ycraft';
-
-function createSecuritySystem() {
-  var yCraftSystem = new _index.YCraft();
-
-  // Initialize and position components
-  var motionDetector = new _index.MotionDetector(-150, -250, 0);
-  var pressureSensor = new _index.PressureSensor(150, -250, 0);
-  var actuator = new _index.Actuator(450, -250, 0);
-  var securityLight = new _index.LEDLight(450, 0, 200, {
-    wattage: 60
-  });
-  var manualOverrideButton = new _index.Button(50, 450, 0);
-
-  // Initialize wires
-  var wireFromMotionDetector = new _index.Wire();
-  var wireFromPressureSensor = new _index.Wire();
-  var wireFromButton = new _index.Wire();
-  var wireToLight = new _index.Wire();
-
-  // Connect components with wires
-  motionDetector.connect(wireFromMotionDetector);
-  wireFromMotionDetector.connect(actuator);
-  pressureSensor.connect(wireFromPressureSensor);
-  wireFromPressureSensor.connect(actuator);
-  manualOverrideButton.connect(wireFromButton);
-  wireFromButton.connect(actuator);
-  actuator.connect(wireToLight);
-  wireToLight.connect(securityLight);
-
-  // Add components and wires to YCraft system
-  yCraftSystem.addPart(motionDetector);
-  yCraftSystem.addPart(pressureSensor);
-  yCraftSystem.addPart(securityLight);
-  yCraftSystem.addPart(manualOverrideButton);
-  yCraftSystem.addPart(actuator);
-  yCraftSystem.addPart(wireFromMotionDetector);
-  yCraftSystem.addPart(wireFromPressureSensor);
-  yCraftSystem.addPart(wireFromButton);
-  yCraftSystem.addPart(wireToLight);
-
-  // Simulate interactions
-  // motionDetector.detectMotion(); // Simulate motion detection
-
-  // Logging the system state
-  console.log(yCraftSystem);
-  return yCraftSystem;
-}
-
-},{"../../../../YCraft.js/index.js":1}]},{},[19])(19)
+},{}]},{},[21])(21)
 });

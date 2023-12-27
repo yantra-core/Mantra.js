@@ -1,6 +1,8 @@
 let mode = 'offline'; // online / offline
 let env = 'local'; // cloudflare / cloudflare-local / local
 
+window.c = console.log;
+
 // import roverLight from '../../YCraft.js/examples/rover-light.js'; // for now
 import worlds from '../mantra-worlds/index.js';
 
@@ -57,6 +59,7 @@ let game = new Game({
   physics: 'matter', // 'matter', 'physx'
   graphics: ['css'], // 'babylon', 'css', 'phaser'
   collisions: true,
+  showLoadingScreen: false,
   camera: {
     follow: true,
     startingZoom: 0.5
@@ -72,7 +75,7 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
-window.game = game;
+// window.game = game;
 //
 // Use Plugins to add systems to the game
 //
@@ -124,12 +127,11 @@ if (game.isOnline) {
 
 // Always show FPS
 // game.use(new plugins.CurrentFPS());
-/*
+
 game.use(new plugins.Editor({
   sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js',
   sutraEditor: true
 }));
-*/
 
 // game.use(new plugins.Sutra({ }));
 
@@ -179,14 +181,27 @@ if (mode === 'online') {
 
 } else {
 
+
+ // game.use(new plugins.Tile());
+
   // Single Player Offline Mode
-  //let home = new worlds.Home();
-  let home = new worlds.YCraft();
+
+  let home = new worlds.Home();
+
+  // check local storage to see if user has selected a world
+  let storedWorld = game.storage.get('world');
+
+  if (storedWorld) {
+    let worldClass = worlds[storedWorld];
+    home = new worldClass();
+  }
+
   game.start(function () {
     // game.use(new plugins.StarField())
     //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     //game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
     //game.use(new plugins.Bullet())
+    // let home = new worlds.YCraft();
     game.use(home);
 
     // game.use(new plugins.GamepadGUI())
@@ -233,3 +248,4 @@ function switchToOffline() {
   });
 }
 */
+

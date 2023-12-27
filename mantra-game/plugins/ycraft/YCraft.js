@@ -1,5 +1,5 @@
-// import { YCraft as YCraftActual, ElectricalSignal } from '../../../../YCraft.js/index.js';
-import { YCraft as YCraftActual } from 'ycraft';
+import { YCraft as YCraftActual, ElectricalSignal } from '../../../../YCraft.js/index.js';
+// import { YCraft as YCraftActual } from 'ycraft';
 
 import Plugin from '../../Plugin.js';
 

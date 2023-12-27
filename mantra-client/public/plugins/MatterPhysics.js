@@ -186,12 +186,33 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     return _this;
   }
   _createClass(MatterPhysics, [{
+    key: "setGravity",
+    value: function setGravity() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      // console.log('setting gravity', x, y)
+      this.engine.gravity.x = x;
+      this.engine.gravity.y = y;
+    }
+  }, {
     key: "init",
     value: function init(game) {
       var _this2 = this;
       this.engine = _matterJs["default"].Engine.create();
-      this.engine.gravity.x = 0;
-      this.engine.gravity.y = 0;
+      if (typeof game.config.gravity === 'undefined') {
+        game.config.gravity = {
+          x: 0,
+          y: 0
+        };
+      }
+      if (typeof game.config.gravity.x === 'undefined') {
+        game.config.gravity.x = 0;
+      }
+      if (typeof game.config.gravity.y === 'undefined') {
+        game.config.gravity.y = 0;
+      }
+      this.engine.gravity.x = game.config.gravity.x;
+      this.engine.gravity.y = game.config.gravity.y;
       this.world = this.engine.world;
       game.physics = this;
       game.engine = this.engine;
@@ -333,6 +354,11 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     key: "removeBody",
     value: function removeBody(body) {
       _matterJs["default"].World.remove(this.engine.world, body);
+    }
+  }, {
+    key: "setMass",
+    value: function setMass(body, mass) {
+      _matterJs["default"].Body.setMass(body, mass);
     }
 
     // Equivalent to World.remove()

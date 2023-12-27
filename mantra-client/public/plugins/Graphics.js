@@ -34,6 +34,22 @@ var Graphics = /*#__PURE__*/function () {
         gameHolder.id = 'gameHolder';
         document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
       }
+
+      this.preload();
+    }
+  }, {
+    key: "preload",
+    value: function preload() {
+      // preload the guy sprites ( for now )
+      var preload = ['guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1'];
+      var preloaderDiv = document.createElement('div');
+      preloaderDiv.id = 'preloader';
+      gameHolder.appendChild(preloaderDiv);
+      preload.forEach(function (spriteName) {
+        var img = document.createElement('span');
+        img.classList.add(spriteName);
+        preloaderDiv.appendChild(img);
+      });
     }
   }, {
     key: "update",
@@ -61,6 +77,39 @@ var Graphics = /*#__PURE__*/function () {
           // console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.id, graphic)
         }
       });
+    }
+  }, {
+    key: "switchGraphics",
+    value: function switchGraphics(graphicsInterfaceName, cb) {
+      var _this = this;
+      cb = cb || function noop() {};
+      var game = this.game;
+      var engines = {
+        'BabylonGraphics': 'graphics-babylon',
+        'PhaserGraphics': 'graphics-phaser',
+        'CSSGraphics': 'graphics-css'
+      };
+      var graphicsInterfaceId = engines[graphicsInterfaceName];
+      document.body.style.cursor = 'wait';
+      // Check if the selected graphics mode is already registered
+      if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
+        this.game.use(graphicsInterfaceName /*, { camera: this.game.data.camera }*/);
+
+        // Add event listeners for plugin ready events
+        this.game.once("plugin::ready::".concat(graphicsInterfaceId), function () {
+          // iterate through all existing graphics ( except this one ) and remove them
+          _this.game.graphics.forEach(function (graphics) {
+            if (graphics.id !== graphicsInterfaceId) {
+              game.systemsManager.removeSystem(graphics.id);
+            }
+          });
+          document.body.style.cursor = 'default';
+          cb(null);
+        });
+      } else {
+        document.body.style.cursor = 'default';
+        cb(null);
+      }
     }
   }, {
     key: "removeGraphic",

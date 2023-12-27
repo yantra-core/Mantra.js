@@ -96,7 +96,7 @@ var EntityMovement = /*#__PURE__*/function (_Plugin) {
         });
         // Other event listeners...
       }
-      */
+     */
   }, {
     key: "addStrategy",
     value: function addStrategy(strategy) {
@@ -145,6 +145,9 @@ var EntityMovement = /*#__PURE__*/function (_Plugin) {
   }, {
     key: "destroy",
     value: function destroy() {}
+  }, {
+    key: "unload",
+    value: function unload() {}
   }]);
   return EntityMovement;
 }(_Plugin2["default"]);
@@ -312,10 +315,10 @@ var DefaultMovementStrategy = /*#__PURE__*/function () {
         return;
       }
 
-      // TODO: this.game.applyForce()
+      // TODO: this.game.applyForce(), instead of this.game.physics.applyForce()
       var position = this.game.getComponent(entityId, 'position');
       if (position) {
-        var forceFactor = 0.05;
+        var forceFactor = 0.5;
         var force = {
           x: dx * forceFactor,
           y: -dy * forceFactor
@@ -330,10 +333,28 @@ var DefaultMovementStrategy = /*#__PURE__*/function () {
 
       // TODO: this.game.rotateBody()
       if (typeof rotation === 'number') {
-        var rotationSpeed = 0.022;
-        var rotationAmount = rotation * rotationSpeed;
-        var _body = this.game.bodyMap[entityId];
-        this.game.physics.rotateBody(_body, rotationAmount);
+        // assume rotation here means LEFT or RIGHT facing absolute
+        // -1 value means face left
+        // 1 value means face right
+        // 0 means no rotation
+        var degrees = 0;
+        if (rotation === -1) {
+          degrees = 180;
+        } else if (rotation === 1) {
+          degrees = 0;
+        }
+        var radians = degrees * (Math.PI / 180);
+
+        // console.log('radians', radians)
+        //this.game.physics.setRotation(this.game.bodyMap[entityId], radians);
+
+        /*
+        const rotationSpeed = 0.022;
+        let rotationAmount = rotation * rotationSpeed;
+        const body = this.game.bodyMap[entityId];
+        console.log("WTF", body, rotationAmount)
+        this.game.physics.rotateBody(body, rotationAmount);
+        */
       }
     }
   }]);

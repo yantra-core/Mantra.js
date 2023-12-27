@@ -6166,6 +6166,7 @@ var XState = /*#__PURE__*/function () {
 
         // TODO: make this separate fn
         function applyStateChange(context) {
+          console.log('applyStateChange', context);
           // TODO: make this work for array of entities
           var ent = game.findEntity(context.name);
           if (ent) {
@@ -6179,6 +6180,7 @@ var XState = /*#__PURE__*/function () {
                 game.components[component].data[ent.id] = context[component];
               }
             });
+            console.log('updated entity', ent);
             game.inflateEntity(ent);
           }
         }
@@ -6228,6 +6230,12 @@ var XState = /*#__PURE__*/function () {
     value: function getCurrentState() {
       var game = this.game;
       return game.service.state.value;
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      var game = this.game;
+      game.service.stop();
     }
   }]);
   return XState;

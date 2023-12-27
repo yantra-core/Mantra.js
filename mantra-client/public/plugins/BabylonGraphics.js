@@ -115,9 +115,10 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   var _super = _createSuper(BabylonGraphics);
   // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  function BabylonGraphics(_ref) {
+  function BabylonGraphics() {
     var _this;
-    var _ref$camera = _ref.camera,
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$camera = _ref.camera,
       camera = _ref$camera === void 0 ? {} : _ref$camera;
     _classCallCheck(this, BabylonGraphics);
     _this = _super.call(this);
@@ -178,7 +179,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     value: function () {
       var _babylonReady = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var _this3 = this;
-        var game, renderCanvas, light, reEmitEvent;
+        var game, renderCanvas, light, reEmitEvent, assetsManager;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -197,7 +198,19 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
                 // renderCanvas.style.position = 'absolute';
                 renderCanvas.style.top = '0px';
                 renderCanvas.style.left = '0px';
+                // renderCanvas.style.background = '#007fff';
                 // append the renderCanvas to the gameHolder
+
+                // Setup the canvas dimensions
+                if (typeof game.width === 'number') {
+                  renderCanvas.width = game.width;
+                }
+                if (typeof game.height === 'number') {
+                  renderCanvas.height = game.height;
+                }
+
+                // Ensure the canvas has a transparent background
+                renderCanvas.style.background = 'transparent';
                 document.getElementById('gameHolder').appendChild(renderCanvas);
               }
               if (renderCanvas) {
@@ -215,7 +228,15 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
                 renderCanvas.height = game.height; // Set canvas height in pixels
               }
 
-              this.engine = new BABYLON.Engine(renderCanvas, true);
+              // this.engine = new BABYLON.Engine(renderCanvas, true);
+
+              // Create the engine with alpha (transparency) enabled
+              this.engine = new BABYLON.Engine(renderCanvas, true, {
+                preserveDrawingBuffer: true,
+                stencil: true,
+                alpha: true
+              });
+
               // TODO: enabled WebGPU by default
               //this.engine = new BABYLON.WebGPUEngine(renderCanvas, true);
               // await this.engine.initAsync();
@@ -223,6 +244,8 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
               this.game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
               game.scene = this.scene; // Remark: We need a way for babylon components to access the scene
 
+              // Set the scene's clear color to transparent
+              this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
               this.initializeObjectPools(3000);
 
               // TODO: move this into Systems for Babylon client
@@ -274,11 +297,19 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
               // register this graphics pipline with the game
               game.graphics.push(this);
 
-              // async:true plugins *must* self report when they are ready
-              game.emit('plugin::ready::graphics-babylon', this);
-              // TODO: remove this line from plugin implementations
-              game.loadingPluginsCount--;
-            case 25:
+              // Setup AssetsManager or similar loader
+              assetsManager = new BABYLON.AssetsManager(this.scene); // Define your assets to be loaded here
+              // Example: var meshTask = assetsManager.addMeshTask("mesh task", "", "path/", "file.babylon");
+              // Check when all assets are loaded
+              assetsManager.onFinish = function (tasks) {
+                // All assets are loaded, now you can emit your ready event
+                game.emit('plugin::ready::graphics-babylon', _this3);
+                game.loadingPluginsCount--;
+              };
+
+              // Start loading the assets
+              assetsManager.load();
+            case 27:
             case "end":
               return _context.stop();
           }
@@ -424,6 +455,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // TODO: createDefault()
       }
 
+      // TODO: allow for setting of z position in 2d mode, if z exists
       if (this.game.physics.dimension === 2) {
         if (typeof entityData.position.z === 'undefined') {
           entityData.position.z = 1;
@@ -551,6 +583,19 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // Set rotation as needed
       }
 
+      // Incoming color is int color value
+      if (entityData.color) {
+        // alert(`entityData.color ${entityData.color}`);
+        // Set color as needed
+        box.material = new BABYLON.StandardMaterial("material", this.scene);
+        // Extract RGB components from the hexadecimal color value
+        var red = entityData.color >> 16 & 255;
+        var green = entityData.color >> 8 & 255;
+        var blue = entityData.color & 255;
+        // Set tint of graphic using the extracted RGB values
+        box.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
+      }
+
       // Ensure the box is actionable
       box.isPickable = true;
 
@@ -613,8 +658,8 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     value: function createTriangle(entityData) {
       var mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {
         diameterTop: 0,
-        diameterBottom: 100,
-        height: 100,
+        diameterBottom: entityData.width,
+        height: entityData.height,
         tessellation: 3
       }, this.scene);
 

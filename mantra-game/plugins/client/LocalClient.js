@@ -32,7 +32,6 @@ export default class LocalClient {
       this.game.systems.xstate.sendEvent('START');
     }
 
-
     this.game.localGameLoopRunning = true;
 
     this.game.localGameLoop(this.game);  // Start the local game loop when offline
@@ -44,7 +43,6 @@ export default class LocalClient {
     }).then(function (ent) {
       game.setPlayerId(ent.id);
     });
-
     
   }
   stop () {

@@ -5,65 +5,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-// TODO:
-// Allow option to set window as background
-// Allow option for simple 4x4 grid for windows
-// Default mode is to place 2x2 vertical on left side first,
-// then 2x2 vertical on right side
-// Then for 3, its top left, bottom left, top right, with bottom right empty
-// For 4 each is 1x1, the entire window is filled at 4x4
-// Repeat same logic in units of 4 for 8, 12, 16, etc
-// Max windows is 64
-
-// TODO: all windows should have footers with a toolbar ( empty for now )
-// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
-
-//import lightTheme from "./themes/light.js";
-//import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
 var gui = {
-  /*
-  setTheme: function (name) {
-    if (name === 'light') {
-      this.theme(lightTheme);
-    } else if (name === 'dark') {
-      this.theme(darkTheme);
-    } else {
-      console.log(`Theme ${name} not found, defaulting to light theme`);
-      this.theme(lightTheme);
-    }
-  },
-  theme: function (theme) {
-    // theme is an object gui-elements and cssObjects
-    // for each gui element type in the theme
-    // find *all* nodes that match the type
-    // iterate over each node and apply the cssObject
-    console.log('setting theme', theme)
-    for (let type in theme) {
-      let cssObject = theme[type];
-      let nodes = document.querySelectorAll(`.${type}`);
-      console.log('ffff', nodes)
-      nodes.forEach(node => {
-        this.skin(node, cssObject);
-      });
-    }
-  },
-  skin: function(guiElement, cssObject) {
-    // guiElement is a DOM element
-    // cssObject is an object with css properties
-    for (let property in cssObject) {
-      // update the live node style
-      guiElement.style[property] = cssObject[property];
-      // update the style sheet for all future nodes
-      // this will override any inline styles
-      let styleSheet = document.styleSheets[0];
-      let selector = `.${guiElement.className}`;
-      let rule = `${property}: ${cssObject[property]}`;
-      let index = styleSheet.cssRules.length;
-      styleSheet.insertRule(`${selector} { ${rule} }`, index);
-     }
-  },
-  */
   elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
   window: function window(id) {
     var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Window';
@@ -76,35 +19,35 @@ var gui = {
         document.getElementById(id).remove();
       };
     }
+    var guiClasses = {
+      'container': 'gui-container',
+      'content': 'gui-content',
+      'header': 'gui-header',
+      'header-title': 'gui-header-title'
+    };
+    if (is_touch_enabled()) {
+      /*
+      guiClasses = {
+        'container': 'gui-container-touch',
+        'content': 'gui-content-touch',
+        'header': 'gui-header-touch',
+        'header-title': 'gui-header-title-touch'
+      }
+      */
+    }
+
     // Create container
     var container = document.createElement('div');
     container.id = id;
-    container.className = 'gui-container';
+    container.className = guiClasses['container'];
 
     // Create the content of the container
     var content = document.createElement('div');
-    content.className = 'gui-content';
+    content.className = guiClasses['content'];
 
     // Create a draggable header
     var guiHeader = document.createElement('div');
-    guiHeader.className = 'gui-header';
-
-    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
-    if (false && pluginInstance) {
-      var gearIcon = document.createElement('i');
-      gearIcon.className = 'fas fa-cog';
-      gearIcon.style["float"] = 'right';
-      gearIcon.style.cursor = 'pointer';
-      gearIcon.style.top = '20px';
-      gearIcon.style.right = '20px';
-      gearIcon.style.fontSize = '50px';
-      gearIcon.innerHTML = "FFF";
-      gearIcon.onclick = function () {
-        console.log(pluginInstance);
-        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
-      };
-      guiHeader.appendChild(gearIcon);
-    }
+    guiHeader.className = guiClasses['header'];
 
     // Traffic light container
     var trafficLightContainer = document.createElement('div');
@@ -291,6 +234,89 @@ gui.init = function (game) {
   });
 };
 var _default = exports["default"] = gui;
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+
+/*
+ setTheme: function (name) {
+   if (name === 'light') {
+     this.theme(lightTheme);
+   } else if (name === 'dark') {
+     this.theme(darkTheme);
+   } else {
+     console.log(`Theme ${name} not found, defaulting to light theme`);
+     this.theme(lightTheme);
+   }
+ },
+ theme: function (theme) {
+   // theme is an object gui-elements and cssObjects
+   // for each gui element type in the theme
+   // find *all* nodes that match the type
+   // iterate over each node and apply the cssObject
+   console.log('setting theme', theme)
+   for (let type in theme) {
+     let cssObject = theme[type];
+     let nodes = document.querySelectorAll(`.${type}`);
+     console.log('ffff', nodes)
+     nodes.forEach(node => {
+       this.skin(node, cssObject);
+     });
+   }
+ },
+ skin: function(guiElement, cssObject) {
+   // guiElement is a DOM element
+   // cssObject is an object with css properties
+   for (let property in cssObject) {
+     // update the live node style
+     guiElement.style[property] = cssObject[property];
+     // update the style sheet for all future nodes
+     // this will override any inline styles
+     let styleSheet = document.styleSheets[0];
+     let selector = `.${guiElement.className}`;
+     let rule = `${property}: ${cssObject[property]}`;
+     let index = styleSheet.cssRules.length;
+     styleSheet.insertRule(`${selector} { ${rule} }`, index);
+    }
+ },
+ */
+
+// TODO:
+// Allow option to set window as background
+// Allow option for simple 4x4 grid for windows
+// Default mode is to place 2x2 vertical on left side first,
+// then 2x2 vertical on right side
+// Then for 3, its top left, bottom left, top right, with bottom right empty
+// For 4 each is 1x1, the entire window is filled at 4x4
+// Repeat same logic in units of 4 for 8, 12, 16, etc
+// Max windows is 64
+
+// TODO: all windows should have footers with a toolbar ( empty for now )
+// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
+
+//import lightTheme from "./themes/light.js";
+//import darkTheme from "./themes/dark.js";
+
+/*
+
+    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
+    if (true && pluginInstance) {
+      const gearIcon = document.createElement('i');
+      gearIcon.className = 'fas fa-cog';
+      gearIcon.style.float = 'right';
+      gearIcon.style.cursor = 'pointer';
+      gearIcon.style.top = '20px';
+      gearIcon.style.right = '20px';
+      gearIcon.style.fontSize = '50px';
+      gearIcon.innerHTML = "FFF";
+      gearIcon.onclick = () => {
+        console.log(pluginInstance)
+        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
+      };
+      guiHeader.appendChild(gearIcon);
+    }
+
+    */
 
 },{}],2:[function(require,module,exports){
 "use strict";

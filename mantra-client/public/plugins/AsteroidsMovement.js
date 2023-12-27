@@ -42,7 +42,7 @@ var AsteroidsMovementStrategy = /*#__PURE__*/function () {
       var bodyRotation = this.game.physics.getBodyRotation(body);
       if (dy !== 0) {
         // Thrust
-        var thrust = 0.05;
+        var thrust = 0.5;
         var angle = bodyRotation;
 
         // Adjusts for 3D space, remove this for 2d asteroids movements

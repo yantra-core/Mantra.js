@@ -481,15 +481,22 @@ var Entity = /*#__PURE__*/function () {
       }
       if (typeof entityData.rotation !== 'undefined') {
         this.game.components.rotation.set(entityId, entityData.rotation);
-
         // TODO: update rotation in physics engine      
       }
 
+      // Items
+      if (typeof entityData.items !== 'undefined') {
+        // overwrite all items ( for now )
+        // Remark: in the future we could merge instead of overwrite
+        this.game.components.items.set(entityId, entityData.items);
+      }
       return ent;
     }
   }, {
     key: "createEntity",
     value: function createEntity(config) {
+      // TODO: if config is string, use that as type property with default settings
+      // second argument is merged options hash
       // console.log('createEntity', config)
 
       var entityId = this._generateId();
@@ -527,8 +534,10 @@ var Entity = /*#__PURE__*/function () {
         isStatic: false,
         isSensor: false,
         restitution: 0,
+        items: null,
         owner: 0,
         // 0 = server
+        inputs: null,
         destroyed: false,
         type: 'PLAYER',
         friction: 0.1,
@@ -545,7 +554,8 @@ var Entity = /*#__PURE__*/function () {
         // object hash timers for TimersComponent.js
         yCraft: null,
         // object hash of properties for YCraft.js
-        text: null
+        text: null,
+        style: null
       };
 
       // merge config with defaultConfig
@@ -580,10 +590,13 @@ var Entity = /*#__PURE__*/function () {
         maxSpeed = _config.maxSpeed,
         health = _config.health,
         score = _config.score,
+        items = _config.items,
         owner = _config.owner,
+        inputs = _config.inputs,
         lifetime = _config.lifetime,
         yCraft = _config.yCraft,
-        text = _config.text;
+        text = _config.text,
+        style = _config.style;
       var x = position.x,
         y = position.y;
 
@@ -615,6 +628,8 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'color', color);
       this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
       this.game.addComponent(entityId, 'owner', owner);
+      this.game.addComponent(entityId, 'items', items);
+      this.game.addComponent(entityId, 'inputs', inputs);
       this.game.addComponent(entityId, 'lifetime', lifetime);
       this.game.addComponent(entityId, 'destroyed', false);
       this.game.addComponent(entityId, 'creationTime', Date.now()); // Current time in milliseconds
@@ -626,8 +641,26 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'timers', new _TimersComponent["default"]('timers', entityId, this.game));
       this.game.addComponent(entityId, 'yCraft', yCraft);
       this.game.addComponent(entityId, 'text', text);
+      this.game.addComponent(entityId, 'style', style);
       if (config.body) {
-        var body = this.createBody(config);
+        var body = this.createBody({
+          width: width,
+          height: height,
+          radius: radius,
+          type: type,
+          shape: shape,
+          position: position,
+          velocity: velocity,
+          rotation: rotation,
+          mass: mass,
+          density: density,
+          isStatic: isStatic,
+          isSensor: isSensor,
+          restitution: config.restitution,
+          friction: config.friction,
+          frictionAir: config.frictionAir,
+          frictionStatic: config.frictionStatic
+        });
         body.myEntityId = entityId;
         this.game.physics.addToWorld(this.game.engine, body);
         this.game.bodyMap[entityId] = body;
@@ -748,6 +781,21 @@ var Entity = /*#__PURE__*/function () {
         game.updateEntity(entityData);
       }
     }
+  }, {
+    key: "clearAllEntities",
+    value: function clearAllEntities(clearCurrentPlayer) {
+      var _this2 = this;
+      this.game.entities.forEach(function (ent) {
+        // Do not remove the current player if clearCurrentPlayer is false
+        if (ent.id === _this2.game.currentPlayerId && !clearCurrentPlayer) {
+          return;
+        }
+        if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
+          ent.yCraft.part.unload();
+        }
+        _this2.game.removeEntity(ent.id);
+      });
+    }
 
     // TODO: move this to PhysicsPlugin
   }, {
@@ -791,6 +839,11 @@ var Entity = /*#__PURE__*/function () {
           //body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
           body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
           break;
+      }
+      if (typeof config.mass !== 'undefined') {
+        if (this.game.physics && this.game.physics.setMass) {
+          this.game.physics.setMass(body, config.mass);
+        }
       }
 
       // TODO: move to BulletPlugin ?

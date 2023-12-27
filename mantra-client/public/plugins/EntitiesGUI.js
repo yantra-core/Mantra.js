@@ -5,65 +5,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-// TODO:
-// Allow option to set window as background
-// Allow option for simple 4x4 grid for windows
-// Default mode is to place 2x2 vertical on left side first,
-// then 2x2 vertical on right side
-// Then for 3, its top left, bottom left, top right, with bottom right empty
-// For 4 each is 1x1, the entire window is filled at 4x4
-// Repeat same logic in units of 4 for 8, 12, 16, etc
-// Max windows is 64
-
-// TODO: all windows should have footers with a toolbar ( empty for now )
-// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
-
-//import lightTheme from "./themes/light.js";
-//import darkTheme from "./themes/dark.js";
 // gui.js - Marak Squires 2023
 var gui = {
-  /*
-  setTheme: function (name) {
-    if (name === 'light') {
-      this.theme(lightTheme);
-    } else if (name === 'dark') {
-      this.theme(darkTheme);
-    } else {
-      console.log(`Theme ${name} not found, defaulting to light theme`);
-      this.theme(lightTheme);
-    }
-  },
-  theme: function (theme) {
-    // theme is an object gui-elements and cssObjects
-    // for each gui element type in the theme
-    // find *all* nodes that match the type
-    // iterate over each node and apply the cssObject
-    console.log('setting theme', theme)
-    for (let type in theme) {
-      let cssObject = theme[type];
-      let nodes = document.querySelectorAll(`.${type}`);
-      console.log('ffff', nodes)
-      nodes.forEach(node => {
-        this.skin(node, cssObject);
-      });
-    }
-  },
-  skin: function(guiElement, cssObject) {
-    // guiElement is a DOM element
-    // cssObject is an object with css properties
-    for (let property in cssObject) {
-      // update the live node style
-      guiElement.style[property] = cssObject[property];
-      // update the style sheet for all future nodes
-      // this will override any inline styles
-      let styleSheet = document.styleSheets[0];
-      let selector = `.${guiElement.className}`;
-      let rule = `${property}: ${cssObject[property]}`;
-      let index = styleSheet.cssRules.length;
-      styleSheet.insertRule(`${selector} { ${rule} }`, index);
-     }
-  },
-  */
   elementList: ['gui-container', 'gui-content', 'gui-header', 'gui-header-title', 'traffic-light', 'close', 'minimize', 'maximize', 'resizeHandle', 'gui-window-footer'],
   window: function window(id) {
     var title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Window';
@@ -76,35 +19,35 @@ var gui = {
         document.getElementById(id).remove();
       };
     }
+    var guiClasses = {
+      'container': 'gui-container',
+      'content': 'gui-content',
+      'header': 'gui-header',
+      'header-title': 'gui-header-title'
+    };
+    if (is_touch_enabled()) {
+      /*
+      guiClasses = {
+        'container': 'gui-container-touch',
+        'content': 'gui-content-touch',
+        'header': 'gui-header-touch',
+        'header-title': 'gui-header-title-touch'
+      }
+      */
+    }
+
     // Create container
     var container = document.createElement('div');
     container.id = id;
-    container.className = 'gui-container';
+    container.className = guiClasses['container'];
 
     // Create the content of the container
     var content = document.createElement('div');
-    content.className = 'gui-content';
+    content.className = guiClasses['content'];
 
     // Create a draggable header
     var guiHeader = document.createElement('div');
-    guiHeader.className = 'gui-header';
-
-    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
-    if (false && pluginInstance) {
-      var gearIcon = document.createElement('i');
-      gearIcon.className = 'fas fa-cog';
-      gearIcon.style["float"] = 'right';
-      gearIcon.style.cursor = 'pointer';
-      gearIcon.style.top = '20px';
-      gearIcon.style.right = '20px';
-      gearIcon.style.fontSize = '50px';
-      gearIcon.innerHTML = "FFF";
-      gearIcon.onclick = function () {
-        console.log(pluginInstance);
-        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
-      };
-      guiHeader.appendChild(gearIcon);
-    }
+    guiHeader.className = guiClasses['header'];
 
     // Traffic light container
     var trafficLightContainer = document.createElement('div');
@@ -291,6 +234,89 @@ gui.init = function (game) {
   });
 };
 var _default = exports["default"] = gui;
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+
+/*
+ setTheme: function (name) {
+   if (name === 'light') {
+     this.theme(lightTheme);
+   } else if (name === 'dark') {
+     this.theme(darkTheme);
+   } else {
+     console.log(`Theme ${name} not found, defaulting to light theme`);
+     this.theme(lightTheme);
+   }
+ },
+ theme: function (theme) {
+   // theme is an object gui-elements and cssObjects
+   // for each gui element type in the theme
+   // find *all* nodes that match the type
+   // iterate over each node and apply the cssObject
+   console.log('setting theme', theme)
+   for (let type in theme) {
+     let cssObject = theme[type];
+     let nodes = document.querySelectorAll(`.${type}`);
+     console.log('ffff', nodes)
+     nodes.forEach(node => {
+       this.skin(node, cssObject);
+     });
+   }
+ },
+ skin: function(guiElement, cssObject) {
+   // guiElement is a DOM element
+   // cssObject is an object with css properties
+   for (let property in cssObject) {
+     // update the live node style
+     guiElement.style[property] = cssObject[property];
+     // update the style sheet for all future nodes
+     // this will override any inline styles
+     let styleSheet = document.styleSheets[0];
+     let selector = `.${guiElement.className}`;
+     let rule = `${property}: ${cssObject[property]}`;
+     let index = styleSheet.cssRules.length;
+     styleSheet.insertRule(`${selector} { ${rule} }`, index);
+    }
+ },
+ */
+
+// TODO:
+// Allow option to set window as background
+// Allow option for simple 4x4 grid for windows
+// Default mode is to place 2x2 vertical on left side first,
+// then 2x2 vertical on right side
+// Then for 3, its top left, bottom left, top right, with bottom right empty
+// For 4 each is 1x1, the entire window is filled at 4x4
+// Repeat same logic in units of 4 for 8, 12, 16, etc
+// Max windows is 64
+
+// TODO: all windows should have footers with a toolbar ( empty for now )
+// TODO: windows should have option to run "skinless" with no header or footer, no traffic lights
+
+//import lightTheme from "./themes/light.js";
+//import darkTheme from "./themes/dark.js";
+
+/*
+
+    // create a utility gear icon in header that will call game.systems['gui-plugin-explorer'].drawPluginForm(pluginName)
+    if (true && pluginInstance) {
+      const gearIcon = document.createElement('i');
+      gearIcon.className = 'fas fa-cog';
+      gearIcon.style.float = 'right';
+      gearIcon.style.cursor = 'pointer';
+      gearIcon.style.top = '20px';
+      gearIcon.style.right = '20px';
+      gearIcon.style.fontSize = '50px';
+      gearIcon.innerHTML = "FFF";
+      gearIcon.onclick = () => {
+        console.log(pluginInstance)
+        game.systems['gui-plugin-explorer'].drawPluginForm(pluginInstance, game._plugins[pluginInstance.id]);
+      };
+      guiHeader.appendChild(gearIcon);
+    }
+
+    */
 
 },{}],2:[function(require,module,exports){
 "use strict";
@@ -324,6 +350,7 @@ var EntitiesGUI = /*#__PURE__*/function () {
     this.defaultProperties = ['id', 'type', 'name']; // Default properties to display
     this.knownProperties = new Set(this.defaultProperties);
     this.previousEntityStates = {}; // ...rest of the properties
+    this.pendingSort = true;
   }
   _createClass(EntitiesGUI, [{
     key: "init",
@@ -336,10 +363,38 @@ var EntitiesGUI = /*#__PURE__*/function () {
   }, {
     key: "update",
     value: function update() {
+      var _this = this;
       // console.log('EntitiesGUI update', this.game.tick);
-
+      var ents = [];
       for (var entityId in this.game.components.creationTime.data) {
         var entity = this.game.getEntity(entityId);
+        if (entity) {
+          ents.push(entity);
+        }
+      }
+
+      // console.log('Sorting by', this.sortBy);
+      var sortByProperty = this.sortBy.column;
+      var isAscending = this.sortBy.isAscending;
+      ents.sort(function (a, b) {
+        var aValue = a[sortByProperty];
+        var bValue = b[sortByProperty];
+
+        // Handle undefined values
+        if (aValue === undefined) return isAscending ? 1 : -1;
+        if (bValue === undefined) return isAscending ? -1 : 1;
+
+        // Unified comparison for both numbers and strings
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return isAscending ? aValue - bValue : bValue - aValue;
+        } else {
+          aValue = aValue.toString();
+          bValue = bValue.toString();
+          return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
+      });
+      ents.forEach(function (entity) {
+        var entityId = entity.id;
         // console.log('ent', entity);
 
         /*
@@ -350,22 +405,23 @@ var EntitiesGUI = /*#__PURE__*/function () {
         }
         */
 
-        if (entity.destroyed) {
+        if (entity.destroyed || _this.pendingSort) {
           // Remove the row from the table
-          var _row = this.entitiesTable.querySelector("tr[data-id='".concat(entityId, "']"));
+          var _row = _this.entitiesTable.querySelector("tr[data-id='".concat(entityId, "']"));
           if (_row) {
             _row.parentNode.removeChild(_row);
           }
-          continue;
+          return;
         }
 
         // check to see if row exists by id
-        var row = this.entitiesTable.querySelector("tr[data-id='".concat(entityId, "']"));
+        var row = _this.entitiesTable.querySelector("tr[data-id='".concat(entityId, "']"));
         if (!row) {
           // create row
-          this.updateRowForEntity(entityId, entity);
+          _this.updateRowForEntity(entityId, entity);
         }
-      }
+      });
+      this.pendingSort = false;
     }
   }, {
     key: "hasEntityChanged",
@@ -379,6 +435,7 @@ var EntitiesGUI = /*#__PURE__*/function () {
   }, {
     key: "createGlobalEventTable",
     value: function createGlobalEventTable() {
+      var _this2 = this;
       var game = this.game;
       this.container = _gui["default"].window('entitiesView', 'Entities', function () {
         game.systemsManager.removeSystem(EntitiesGUI.id);
@@ -390,12 +447,22 @@ var EntitiesGUI = /*#__PURE__*/function () {
       // add click event to table
       this.entitiesTable.addEventListener('click', function (e) {
         // find the data-id attribute to get the entityId
+
+        // check to see if this is table header
+        if (e.target.tagName === 'TH') {
+          // get the column index
+          var columnIndex = Array.from(e.target.parentNode.children).indexOf(e.target);
+          _this2.setSortBy(columnIndex);
+          return;
+        }
         var entityId = e.target.parentNode.getAttribute('data-id');
-        // set the global game selectedEntityId context so other guid components can use it
-        game.selectedEntityId = entityId;
-        // check if gui-inspector is loaded, if not, load it
-        if (!game.systems['gui-inspector']) {
-          game.use(new game.plugins.Inspector());
+        if (entityId) {
+          // set the global game selectedEntityId context so other guid components can use it
+          game.selectedEntityId = entityId;
+          // check if gui-inspector is loaded, if not, load it
+          if (!game.systems['gui-inspector']) {
+            game.use('Inspector');
+          }
         }
       });
 
@@ -408,22 +475,22 @@ var EntitiesGUI = /*#__PURE__*/function () {
   }, {
     key: "updateTableHeaders",
     value: function updateTableHeaders(properties) {
-      var _this = this;
+      var _this3 = this;
       this.headerRow.innerHTML = ''; // Clear existing headers
       properties.forEach(function (prop) {
         var header = document.createElement('th');
         header.textContent = prop;
-        _this.headerRow.appendChild(header);
+        _this3.headerRow.appendChild(header);
       });
     }
   }, {
     key: "updateRowForEntity",
     value: function updateRowForEntity(entityId, entity) {
-      var _this2 = this;
+      var _this4 = this;
       if (this.dynamicColumns) {
         // Update known properties if dynamic columns are enabled
         Object.keys(entity).forEach(function (prop) {
-          return _this2.knownProperties.add(prop);
+          return _this4.knownProperties.add(prop);
         });
       }
 
@@ -454,16 +521,18 @@ var EntitiesGUI = /*#__PURE__*/function () {
   }, {
     key: "setSortBy",
     value: function setSortBy(columnIndex) {
-      // console.log('setSortBy', columnIndex, this.sortBy.column, this.sortBy.isAscending);
-      if (this.sortBy.column === columnIndex) {
+      // Get property name from the header
+      var propertyName = this.headerRow.cells[columnIndex].textContent;
+      // console.log('setSortBy', propertyName, this.sortBy.column, this.sortBy.isAscending);
+      if (this.sortBy.column === propertyName) {
         this.sortBy.isAscending = !this.sortBy.isAscending; // Toggle sort order
       } else {
         this.sortBy = {
-          column: columnIndex,
+          column: propertyName,
           isAscending: true
         };
       }
-      this.updateGlobalEventTable();
+      this.pendingSort = true;
     }
   }, {
     key: "openEntityInEditor",
