@@ -47,12 +47,12 @@ class YCraft {
       frictionStatic: 1
     });
 
-    game.createDefaultPlayer();
+    // Remark: Players removed for initial demo, is working
+    // game.createDefaultPlayer();
 
-    /*
-    game.systems.graphics.switchGraphics('CSSGraphics', function(){
 
-    });
+    /* Not needed anymore?
+    game.systems.graphics.switchGraphics('CSSGraphics', function(){});
     */
 
   }

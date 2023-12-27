@@ -89,8 +89,8 @@ class DefaultTwoDimensionalInputStrategy {
     */
     if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
     if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
-    if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0);
-    if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0);
+    if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, -1);
+    if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 1);
 
     if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
     if (actions.includes('ROTATE_RIGHT')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);
@@ -98,6 +98,14 @@ class DefaultTwoDimensionalInputStrategy {
     if (game.systems.bullet) {
       if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
     }
+    if (game.systems.sword) {
+      if (actions.includes('FIRE_BULLET')) {
+        game.getSystem('sword').swingSword(entityId);
+      } else {
+        game.getSystem('sword').sheathSword(entityId);
+      }
+    }
+
   }
 }
 

@@ -18,7 +18,6 @@ class EntityMovement extends Plugin {
     this.game.systemsManager.addSystem(this.id, this);
   }
 
-
   /*
     // TODO: In EntityMovement.js
     init(game) {
@@ -28,7 +27,6 @@ class EntityMovement extends Plugin {
       });
       // Other event listeners...
     }
-
 
   */
 
@@ -83,6 +81,11 @@ class EntityMovement extends Plugin {
   render() { }
 
   destroy() { }
+
+  unload () {
+    
+
+  }
 
 }
 

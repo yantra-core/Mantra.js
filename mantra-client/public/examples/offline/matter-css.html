@@ -50,6 +50,9 @@
         console.log('player joined', playerData)
         let player = game.createEntity({
           type: 'PLAYER',
+          friction: 0.5,  // Default friction
+          frictionAir: 0.5, // Default air friction
+          frictionStatic: 1, // Default static friction
           position: {
             x: -100,
             y: 0

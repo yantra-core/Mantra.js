@@ -39,7 +39,7 @@ class Editor {
   }
 
   jqueryReady() {
-    this.createToolbar();
+    this.createToolbar(this.game);
     this.setupGlobalClickListener();
 
     // this.createViewSourceModal();
@@ -49,7 +49,7 @@ class Editor {
 
   createIcon (name) {
     let element = document.createElement('img');
-    element.src = `./vendor/feather/${name}.svg`;
+    element.src = `/vendor/feather/${name}.svg`;
     element.classList.add('feather-icon');
     element.style.width = '36px';
     element.style.height = '36px';
@@ -200,8 +200,6 @@ class Editor {
       }
     });
     */
-
-
 
   }
 

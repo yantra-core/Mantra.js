@@ -30,7 +30,7 @@ class BabylonGraphics extends GraphicsInterface {
     }
 
     if (typeof camera.startingZoom !== 'number') {
-      camera.startingZoom = 0.5;
+      camera.startingZoom = 1;
     }
 
     if (typeof camera.follow === 'undefined') {
@@ -351,6 +351,7 @@ class BabylonGraphics extends GraphicsInterface {
         graphic = this.createBox(entityData); // TODO: createDefault()
     }
 
+    // TODO: allow for setting of z position in 2d mode, if z exists
     if (this.game.physics.dimension === 2) {
       if (typeof entityData.position.z === 'undefined') {
         entityData.position.z = 1;
@@ -362,13 +363,11 @@ class BabylonGraphics extends GraphicsInterface {
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
     }
 
-
     if (typeof entityData.color === 'number') {
 
       if (!graphic.material) {
         graphic.material = new BABYLON.StandardMaterial("material", this.scene);
       }
-
 
       // console.log("setting color", entityData.color)
       // Extract RGB components from the hexadecimal color value
@@ -464,6 +463,20 @@ class BabylonGraphics extends GraphicsInterface {
     // Add rotation if present
     if (entityData.rotation) {
       // Set rotation as needed
+    }
+
+    // Incoming color is int color value
+    if (entityData.color) {
+      // alert(`entityData.color ${entityData.color}`);
+      // Set color as needed
+      box.material = new BABYLON.StandardMaterial("material", this.scene);
+      // Extract RGB components from the hexadecimal color value
+      var red = (entityData.color >> 16) & 255;
+      var green = (entityData.color >> 8) & 255;
+      var blue = entityData.color & 255;
+      // Set tint of graphic using the extracted RGB values
+      box.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
+
     }
 
     // Ensure the box is actionable

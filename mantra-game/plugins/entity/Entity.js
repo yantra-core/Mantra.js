@@ -531,7 +531,9 @@ class Entity {
     }
 
     if (typeof config.mass !== 'undefined') {
-      this.game.physics.setMass(body, config.mass);
+      if (this.game.physics && this.game.physics.setMass) {
+        this.game.physics.setMass(body, config.mass);
+      }
     }
 
     // TODO: move to BulletPlugin ?

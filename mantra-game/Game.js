@@ -301,6 +301,7 @@ class Game {
 
       // Remark: If multiple graphics plugins are used, default behavior is to,
       //         horizontally stack the graphics plugins so they all fit on the screen
+      // TODO: move this to Graphics.js file
       if (game.config.multiplexGraphicsHorizontally) {
         // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
         let totalCount = game.graphics.length;
@@ -553,8 +554,9 @@ class Game {
     let player = this.createEntity({
       type: 'PLAYER',
       shape: 'triangle',
-      width: 64,
-      height: 64,
+      width: 32,
+      height: 32,
+      mass: 222,
       friction: 0.5,  // Default friction
       frictionAir: 0.5, // Default air friction
       frictionStatic: 1, // Default static friction

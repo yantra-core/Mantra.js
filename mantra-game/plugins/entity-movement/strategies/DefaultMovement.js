@@ -21,7 +21,7 @@ class DefaultMovementStrategy {
       return;
     }
 
-    // TODO: this.game.applyForce()
+    // TODO: this.game.applyForce(), instead of this.game.physics.applyForce()
     const position = this.game.getComponent(entityId, 'position');
     if (position) {
       const forceFactor = 0.5;
@@ -33,10 +33,30 @@ class DefaultMovementStrategy {
 
     // TODO: this.game.rotateBody()
     if (typeof rotation === 'number') {
+      
+      // assume rotation here means LEFT or RIGHT facing absolute
+      // -1 value means face left
+      // 1 value means face right
+      // 0 means no rotation
+      let degrees = 0;
+      if (rotation === -1) {
+        degrees = 180;
+      } else if (rotation === 1) {
+        degrees = 0;
+      }
+      let radians = degrees * (Math.PI / 180);
+
+      // console.log('radians', radians)
+      //this.game.physics.setRotation(this.game.bodyMap[entityId], radians);
+
+      /*
       const rotationSpeed = 0.022;
       let rotationAmount = rotation * rotationSpeed;
       const body = this.game.bodyMap[entityId];
+      console.log("WTF", body, rotationAmount)
       this.game.physics.rotateBody(body, rotationAmount);
+      */
+
 
     }
 

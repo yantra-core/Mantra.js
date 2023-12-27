@@ -13,7 +13,6 @@ class AsteroidsMovementStrategy {
 
     game.systems['entity-movement'].strategies.push(this);
 
-
   }
 
   update(entityId, dx, dy) {
@@ -29,7 +28,7 @@ class AsteroidsMovementStrategy {
     let bodyRotation = this.game.physics.getBodyRotation(body);
 
     if (dy !== 0) { // Thrust
-      const thrust = 0.05;
+      const thrust = 0.5;
       let angle = bodyRotation;
 
       // Adjusts for 3D space, remove this for 2d asteroids movements

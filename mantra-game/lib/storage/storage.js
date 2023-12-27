@@ -23,6 +23,10 @@ const storage = (function () {
     backend.clear();
   };
 
+  const remove = (key) => {
+    backend.removeItem(prefix + key);
+  };
+
   const set = (key, value) => {
     const stringValue = JSON.stringify(value);
     backend.setItem(prefix + key, stringValue);
@@ -72,6 +76,7 @@ const storage = (function () {
     clear,
     set,
     get,
+    remove,
     getAllKeys,
     getAllKeysWithData
   };

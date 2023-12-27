@@ -11,7 +11,7 @@ body {
 }
 
 *:focus {
-  outline: 0.25vmin dashed red;
+  outline: 0.25vmin dashed #007fff;
   outline-offset: 0.5vmin;
 }
 

@@ -3,6 +3,9 @@ body {
   padding: 0;
   background: #007fff;
   overflow: hidden;
+  perspective: 0px;
+  width: 100vw;
+  height: 100vh;
 }
 
 #controlsView {
@@ -512,8 +515,8 @@ pre {
 }
 
 #eventsView {
-  top: 5%;
-  left: 40%;
+  top: 110px;
+  right: 30px;
   z-index: 1000;
   width: 30%;
   height: 60%;
@@ -523,7 +526,7 @@ pre {
 }
 
 #entitiesView {
-  top: 5%;
+  top: 120px;
   left: 20px;
   z-index: 1000;
   width: 30%;
@@ -534,8 +537,8 @@ pre {
 }
 
 #contraptionsView {
-  top: 70px;
-  left: 30px;
+  top: 110px;
+  left: 35vw;
   z-index: 1000;
   width: 385px;
   height: 80px;
@@ -567,8 +570,8 @@ pre {
 }
 
 #sutraView {
-  top: 10%;
-  left: 10%;
+  top: 120px;
+  left: 25vw;
   z-index: 1000;
   width: 550px;
   min-width: 460px;
@@ -999,7 +1002,7 @@ select {
   border-radius: 3px;
   border: 1px solid #2a3348;
   background-color: transparent;
-  color: #d3d9df;
+  /* color: #d3d9df; */
   box-sizing: border-box;
 }
 
@@ -1547,16 +1550,14 @@ button[type="submit"]:disabled {
 }
 
 #contraption-interface {
-  background-color: #1c2535;
-  color: #9a9cff;
-  padding-top: 20px;
+  /* background-color: #1c2535; */
+  /* color: #9a9cff; */
+  /* padding-top: 20px; */
   padding-left: 10px;
   padding-right: 10px;
-
   padding-bottom: 10px;
-
   /* border-radius: 8px; */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
   /* margin-bottom: 20px; */
 
 }
@@ -1565,6 +1566,8 @@ button[type="submit"]:disabled {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 32px;
+  min-width: 300px;
 }
 
 
@@ -1734,3 +1737,62 @@ button[type="submit"]:disabled {
 }
 */
 
+
+#doorContainer {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  overflow: hidden;
+}
+
+#doorPanel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #333; /* Change as per your color scheme */
+  animation: slideUp 5s forwards;
+}
+
+#contentArea {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Change as per your color scheme */
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-100%); }
+  60% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+}
+
+
+
+/* adds box shadow to the top of the door panel */
+.menu-item:hover {
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+}
+
+/*
+.feather-icon:hover {
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75) !important;
+}
+*/
+
+/* adds press / click effect to the door panel */
+.menu-item:active {
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75) inset;
+  /* this works, but for entire element */
+  /*filter: invert(100%);*/
+
+}
+
+.menu-item:active > .feather-icon:active {
+  /* this does not work */
+  /*filter: invert(100%);*/
+  /*background-color: #000000;*/
+}

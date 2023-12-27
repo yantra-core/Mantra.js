@@ -1,22 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sutra - Client Demo</title>
+  <title>Mantra - Client Demo</title>
   <link rel="stylesheet" href="/mantra.css">
 </head>
 
 <body>
   <script type="module" src="/mantra.js"></script>
-  <script type="module" src="/plugins/SutraGUI.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
       let game = new MANTRA.Game({
-        loadDefaultPlugins: false
+        height: 600 * 10,
+        width: 800 * 10,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '../../'
+        }
       });
-      let sutraGui = new window.PLUGINS.SutraGUI.default();
-      sutraGui.init(game);
+
+      // Use Plugins to extend the game with new functionality
+
+      // Adds projectile Bullets to the game
+      // test chanining
+      game.use('Bullet')
+
+      game.use('CurrentFPS');
+
+      game.use('Timers');
+      game.use('Health');
+      game.use('Sutra');
+
+
+      // game.use(new Plugins.SutraGUI({ }));
+      game.use('Editor', {
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/sutra-level-editor.html',
+        sutraEditor: true
+      });
+
+      // start the game loop
+      game.start(function () {
+        game.use('Block', { MIN_BLOCK_SIZE: 1000 });
+        game.use('Border', { autoBorder: true, thickness: 200 });
+
+        // Adds a nice StarField background
+        game.use('StarField');
+        game.use('TowerWorld', { game: game });
+
+        game.data.roundEnded = false;
+        game.data.roundStarted = true;
+
+
+      });
     });
   </script>
   <div id="gameHolder"></div>

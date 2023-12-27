@@ -62,7 +62,7 @@ class YCraftGUI {
       }
     }
 
-    // attemptEditorAppend();
+    attemptEditorAppend();
 
     function _createContraptionViewer() {
       /*

@@ -13,7 +13,7 @@ const pluginsList = {
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 57.672
+    "size": 59.249
   },
   "Block": {
     "path": "./plugins/block/Block.js",
@@ -29,7 +29,7 @@ const pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 37.212
+    "size": 45.968
   },
   "Client": {
     "path": "./plugins/client/Client.js",
@@ -49,15 +49,15 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 40.95
+    "size": 42.433
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.154
+    "size": 28.388
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 20.543
+    "size": 21.16
   },
   "Gamepad": {
     "path": "./plugins/gamepad/Gamepad.js",
@@ -77,7 +77,7 @@ const pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 18.106
+    "size": 18.15
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
@@ -85,7 +85,7 @@ const pluginsList = {
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 22.898
+    "size": 22.942
   },
   "PingTime": {
     "path": "./plugins/ping-time/PingTime.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 24.604
+    "size": 24.644
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -101,11 +101,11 @@ const pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 86.037
+    "size": 87.092
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 24.122
+    "size": 39.048
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -133,15 +133,15 @@ const pluginsList = {
   },
   "MatterPhysics": {
     "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 395.072
+    "size": 395.2
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
-    "size": 6.564
+    "size": 8.75
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 39.022
+    "size": 41.466
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",
@@ -173,7 +173,7 @@ const pluginsList = {
   },
   "XState": {
     "path": "./plugins/xstate/XState.js",
-    "size": 192.085
+    "size": 192.303
   }
 };
 export default pluginsList;

@@ -9,7 +9,7 @@ export default function createEntityFromPart(part, contraption) {
 
     //let centerX = part.position.x - part.size.width / 2;
     //let centerY = part.position.y - part.size.height / 2;
-    console.log("placing part on screen position", part.position)
+    // console.log("placing part on screen position", part.position)
 
     let defaultConfig = {
       name: part.type,
@@ -29,7 +29,7 @@ export default function createEntityFromPart(part, contraption) {
     for (let key in entityData) {
       defaultConfig[key] = entityData[key];
     }
-    console.log('defaultConfig', defaultConfig)
+    // console.log('defaultConfig', defaultConfig)
     // merge entityData into defaultConfig
     // Object.assign(defaultConfig, entityData);
 

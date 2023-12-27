@@ -19,7 +19,7 @@ import bindRelay from './lib/events/bindRelay.js';
 import bindPressureSensor from './lib/events/bindPressureSensor.js';
 import bindRover from './lib/events/bindRover.js';
 
-import securitySystemWithWires from './security-system-wires.js';
+import contraptionExamples from './contraption-examples.js';
 // import testContraption from './security-system.js';
 import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
@@ -33,8 +33,8 @@ class YCraft extends Plugin {
 
     // for now, default behavior so it won't crash if no contraption is passed
     if (typeof contraption !== 'function') {
-      console.log("securitySystemWithWires", securitySystemWithWires)
-      contraption = securitySystemWithWires;
+      // console.log("contraptionExamples", contraptionExamples)
+      contraption = contraptionExamples;
     }
     this.contraption = contraption();
     this.contraptionSource = contraption.toString();
@@ -115,7 +115,7 @@ class YCraft extends Plugin {
     });
 
     // render a border box around each contraption based on its bounding box
-    console.log('placing border box around contraption positoin', contraption.position);
+    // console.log('placing border box around contraption positoin', contraption.position);
     /*
     let boundingBox = this.game.createEntity({
       type: 'BOX',
@@ -226,7 +226,7 @@ class YCraft extends Plugin {
         // get the part and call .offFn if it exists
         let part = ent.yCraft.part;
         if (part.unload) {
-          console.log('calling part.unload', part.name)
+          // console.log('calling part.unload', part.name)
           part.unload();
         }
 

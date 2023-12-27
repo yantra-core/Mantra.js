@@ -2,7 +2,7 @@ import GraphicsSelector from './GraphicsSelector.js';
 import WorldSelector from './WorldSelector.js';
 import ToolbarMenu from './ToolbarMenu.js';
 
-export default function createToolbar() {
+export default function createToolbar(game) {
 
   // Create menus
   const $fileMenu = this.createMenu('File');
@@ -12,7 +12,7 @@ export default function createToolbar() {
 
   // create image icon with source of ./vendor/feather/eye.svg
   let inspectorIcon = this.createIcon('search');
-  inspectorIcon.src = './vendor/feather/search.svg';
+  inspectorIcon.src = '/vendor/feather/search.svg';
   inspectorIcon.style.cursor = 'pointer';
   inspectorIcon.title = 'Click to open Entity Inspector';
   inspectorIcon.style.width = '36px';
@@ -117,4 +117,9 @@ export default function createToolbar() {
   }
   // Append the toolbar to the body
   $('body').append(toolbarMenu.toolbar);
+}
+
+// TODO: move this to a utils file
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
