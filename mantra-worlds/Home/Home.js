@@ -67,8 +67,7 @@ class Home {
 
     // game.use('GhostTyper');
     console.log(game.systems)
-    game.createDefaultPlayer();
-
+    
 
 
     /*

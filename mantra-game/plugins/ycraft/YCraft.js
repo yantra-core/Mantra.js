@@ -34,10 +34,11 @@ class YCraft extends Plugin {
     // for now, default behavior so it won't crash if no contraption is passed
     if (typeof contraption !== 'function') {
       // console.log("contraptionExamples", contraptionExamples)
-      contraption = contraptionExamples;
+      // contraption = contraptionExamples;
+    } else {
+      this.contraption = contraption();
+      this.contraptionSource = contraption.toString();
     }
-    this.contraption = contraption();
-    this.contraptionSource = contraption.toString();
     this.contraptions = contraptions;
 
     this.createEntityFromPart = createEntityFromPart.bind(this);
@@ -90,10 +91,6 @@ class YCraft extends Plugin {
       if (self.contraption.start) {
         // self.contraption.start();
       }
-
-      /*
-      */
-
     } else {
       // TODO: add config option for default contraption if none is specified at construction
       if (self.useDefaultContraption) {
@@ -316,7 +313,6 @@ class YCraft extends Plugin {
           if (entityB.yCraft.part.toggle) {
             entityB.yCraft.part.toggle();
           }
-
 
       }
 
