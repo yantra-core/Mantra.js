@@ -62,7 +62,12 @@ class YCraftGUI {
       }
     }
 
-    attemptEditorAppend();
+    // check to see if #contraption-select exists
+    let contraptionSelect = document.getElementById('contraption-select');
+    if (!contraptionSelect) {
+      // attemptEditorAppend();
+    }
+
 
     function _createContraptionViewer() {
       /*

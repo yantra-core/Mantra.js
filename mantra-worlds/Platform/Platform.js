@@ -20,20 +20,57 @@ class Platform {
 
     game.use('Platform');
 
-    // TODO:     game.on('game::ready', function () {
-    //           needs secound ready emit after plugins are loaded after start
-    game.on('plugin::ready::Platform', function () {
-      console.log(game.systems.platform.kinds)
+    function createPlatform(platformData) {
       game.createEntity({
         type: 'PLATFORM',
         isStatic: true,
-        width: 700,
-        height: 40,
+        width: platformData.width,
+        height: platformData.height,
         position: {
-          x: 0,
-          y: 300
+          x: platformData.x,
+          y: platformData.y
         }
       });
+    }
+
+    // TODO: remap spacebar to jump
+
+    // TODO:     game.on('game::ready', function () {
+    //           needs secound ready emit after plugins are loaded after start
+    game.on('plugin::ready::Platform', function () {
+      //console.log(game.systems.platform.kinds)
+      game.systems.platform.kinds.forEach((platformData) => {
+        // TODO: arrange platforms in a grid
+      });
+
+      createPlatform({
+        x: 0,
+        y: 200,
+        width: 800,
+        height: 60
+      });
+
+      createPlatform({
+        x: 1200,
+        y: 200,
+        width: 800,
+        height: 60
+      });
+
+      createPlatform({
+        x: 0,
+        y: 600,
+        width: 500,
+        height: 60
+      });
+
+      createPlatform({
+        x: 1200,
+        y: 600,
+        width: 600,
+        height: 60
+      });
+
   
     });
 
@@ -41,7 +78,9 @@ class Platform {
   
     console.log(game.systems)
 
-    game.createDefaultPlayer();
+    game.createDefaultPlayer({
+      mass: 100
+    });
 
   }
 

@@ -1,5 +1,10 @@
 export default class ToolbarMenu {
   constructor() {
+
+    this.toggleStatus = 'open';
+     // Add an isTransitioning flag to track transition state
+     this.isTransitioning = false;
+
     // Create the primary and secondary groups
     this.primaryGroup = document.createElement('div');
     this.secondaryGroup = document.createElement('div');
@@ -33,7 +38,7 @@ export default class ToolbarMenu {
       justifyContent: 'space-between',
       // padding: '10px',
       backgroundColor: '#f3f3f3',
-      zIndex: 1,
+      zIndex: 9001,
     });
 
     // Add the toolbar to the document
@@ -42,6 +47,43 @@ export default class ToolbarMenu {
     // Responsive design for smaller screens
     window.addEventListener('resize', this.updateResponsiveStyles.bind(this));
     this.updateResponsiveStyles();
+  }
+
+  setTransitioningState(isTransitioning) {
+    this.isTransitioning = isTransitioning;
+
+    // Disable interaction during transition
+    this.toolbar.style.pointerEvents = isTransitioning ? 'none' : 'auto';
+  }
+
+  slideOutToolbar() {
+    if (this.isTransitioning || this.toggleStatus === 'closed') {
+      return;
+    }
+    this.setTransitioningState(true);
+    this.toggleStatus = 'closed';
+    this.setStyle(this.toolbar, {
+      transition: '0.5s',
+      top: '-100px',
+    });
+
+    // Reset isTransitioning flag after transition ends
+    setTimeout(() => this.setTransitioningState(false), 500);
+  }
+
+  slideInToolbar() {
+    if (this.isTransitioning || this.toggleStatus === 'open') {
+      return;
+    }
+    this.setTransitioningState(true);
+    this.toggleStatus = 'open';
+    this.setStyle(this.toolbar, {
+      transition: '0.5s',
+      top: '0',
+    });
+
+    // Reset isTransitioning flag after transition ends
+    setTimeout(() => this.setTransitioningState(false), 500);
   }
 
   addElement(group, element, prepend = false) {

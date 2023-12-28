@@ -18,6 +18,7 @@ export default function createEntityFromPart(part, contraption) {
       position: part.position,
       width: part.size.width,
       height: part.size.height,
+      // texture: 'img/game/tiles/tile-block.png',
       text: part.text || null,
       isStatic: true,
       yCraft: {

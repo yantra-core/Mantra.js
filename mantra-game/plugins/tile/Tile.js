@@ -101,11 +101,16 @@ class Tile {
     layer.data.forEach((tileId, index) => {
       if (tileId !== 0) { // Assuming 0 is an empty tile
         let scale = 1;
-        scale = 10;
+        scale = 2;
         // console.log('cccc', tileId, index)
         
         let x = (index % layer.width) * tileWidth;
         let y = Math.floor(index / layer.width) * tileHeight;
+
+        // these x y assume 0,0, shift the coords to center since map goes negative
+        x = x - (layer.width * tileWidth / 2);
+        y = y - (layer.height * tileHeight / 2);
+
         let height = tileHeight;
         let width = tileWidth;
 
@@ -115,14 +120,25 @@ class Tile {
         height = height * scale;
         width = width * scale;
 
-        console.log("placing at", x, y)
+
+        let body = false;
+        let isStatic = true;
+
+        if (tileId === 1) {
+          body = true;
+        }
+
+        // console.log("placing at", x, y)
         let ent = this.game.createEntity({
           // id: 'tile' + index,
           type: 'BLOCK',
-          body: false,
+          kind: 'Tile', // for now
+          body: body,
+          isStatic: isStatic,
           position: {
             x: x,
-            y: y
+            y: y,
+            z: -1
           },
           color: 0x00ff00,
           texture: 'img/game/tiles/' + tileId + '.png',
@@ -130,7 +146,7 @@ class Tile {
           height: height
           // tileId: tileId
         })
-        console.log("ent", ent)
+        // console.log("ent", ent)
         /*
         const tile = document.createElement('div');
         tile.style.width = tileWidth + 'px';

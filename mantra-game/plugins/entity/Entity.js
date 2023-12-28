@@ -245,6 +245,7 @@ class Entity {
     let defaultConfig = {
       id: entityId,
       name: null,
+      kind: null,
       body: true,
       shape: 'triangle',
       color: null,
@@ -277,7 +278,8 @@ class Entity {
       timers: null, // object hash timers for TimersComponent.js
       yCraft: null, // object hash of properties for YCraft.js
       text: null,
-      style: null
+      style: null,
+      texture: null
     };
 
     // merge config with defaultConfig
@@ -292,7 +294,7 @@ class Entity {
     };
     */
 
-    const { name, type, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, owner, inputs, lifetime, yCraft, text, style } = config;
+    const { name, type, kind, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, owner, inputs, lifetime, yCraft, text, style, texture } = config;
     let { x, y } = position;
 
     /*
@@ -307,6 +309,7 @@ class Entity {
     // alert(type)
     this.game.addComponent(entityId, 'type', type || 'PLAYER');
     this.game.addComponent(entityId, 'name', name || null);
+    this.game.addComponent(entityId, 'kind', kind);
     this.game.addComponent(entityId, 'position', position);
     this.game.addComponent(entityId, 'startingPosition', startingPosition);
     this.game.addComponent(entityId, 'velocity', velocity);
@@ -338,6 +341,7 @@ class Entity {
     this.game.addComponent(entityId, 'yCraft', yCraft);
     this.game.addComponent(entityId, 'text', text);
     this.game.addComponent(entityId, 'style', style);
+    this.game.addComponent(entityId, 'texture', texture);
  
     if (config.body) {
       let body = this.createBody({
@@ -372,6 +376,9 @@ class Entity {
           this.game.physics.setRotation(body, rotation);
         }
       }
+    } else {
+      // immediately add to changedEntities
+      // this.game.changedEntities.add(entityId);
     }
 
     // Add the entity to the game entities scope
@@ -380,6 +387,8 @@ class Entity {
     this.game.entities.set(entityId, {
       id: entityId
     });
+    // console.log("SETTING CHANGED", entityId)
+    // this.game.pendingRender.add(entityId);
 
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);
@@ -393,6 +402,7 @@ class Entity {
 
     // updates entity in the ECS entity Map scope
     this.game.entities.set(entityId, updatedEntity);
+
 
     // updates entity in the flat game.data scope
     this.game.data.ents = this.game.data.ents || {};

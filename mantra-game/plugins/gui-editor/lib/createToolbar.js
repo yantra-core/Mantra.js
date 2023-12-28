@@ -10,16 +10,30 @@ export default function createToolbar(game) {
   const toolbarMenu = new ToolbarMenu();
   this.toolbarMenu = toolbarMenu;
 
+  game.on('entityInput::handleInputs', (entityId, input) => {
+    if (input.controls && input.controls.U) {
+      console.log('entityInput::handleInputs', entityId, input)
+      if (toolbarMenu.toggleStatus === 'open') {
+        toolbarMenu.slideOutToolbar();
+      } else {
+        toolbarMenu.slideInToolbar();
+      }
+    }
+  }); 
+  
   // create image icon with source of ./vendor/feather/eye.svg
+  // TODO: remove featherRoot from code, quick fix for now
+  let featherRoot = 'https://yantra.gg';
   let inspectorIcon = this.createIcon('search');
-  inspectorIcon.src = '/vendor/feather/search.svg';
+  inspectorIcon.src = featherRoot + '/vendor/feather/search.svg';
   inspectorIcon.style.cursor = 'pointer';
   inspectorIcon.title = 'Click to open Entity Inspector';
-  inspectorIcon.style.width = '36px';
-  inspectorIcon.style.height = '36px';
-  inspectorIcon.style.paddingTop = '24px';
-  inspectorIcon.style.marginRight = '30px';
+  inspectorIcon.style.marginRight = '10px';
   inspectorIcon.style.marginLeft = '10px';
+  inspectorIcon.style.marginTop = '10px';
+  inspectorIcon.style.marginBottom = '10px';
+  inspectorIcon.style.filter = 'invert(100%)';
+  
   // TODO: have this change values based on open / cloase state
   // . Click in-game on Entity to Inspect
   inspectorIcon.onclick = () => this.showInspector();
@@ -29,11 +43,13 @@ export default function createToolbar(game) {
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
     icon: this.createIcon('slack'),
+    /*
     subItems: [
       { text: 'View Source', onClick: () => this.showSourceCode() },
       { text: 'About Mantra', onClick: () => alert('Open Mantra Github') },
       { text: 'Deploy World to Yantra', onClick: () => alert('Open Yantra') }
     ]
+    */
   });
 
   toolbarMenu.addItem('primary', {
@@ -85,7 +101,27 @@ export default function createToolbar(game) {
 
   // create item holder for graphicsSelector
   let graphicsSelectorItem = document.createElement('div');
-  // graphicsSelectorItem.appendChild(graphicsIcon);
+  graphicsSelectorItem.appendChild(graphicsIcon);
+
+  // create text label element to show current graphics engine
+  let graphicsSelectorLabel = document.createElement('span');
+  graphicsSelectorLabel.style.fontSize = '22px';
+  graphicsSelectorLabel.style.marginRight = '10px';
+  graphicsSelectorLabel.style.marginLeft = '10px';
+  graphicsSelectorLabel.style.marginTop = '10px';
+  graphicsSelectorLabel.style.marginBottom = '10px';
+  graphicsSelectorLabel.style.cursor = 'pointer';
+
+  // set value to foo
+  graphicsSelectorLabel.innerText = 'Switch Graphics';
+
+  // add label to graphicsSelectorItem
+  graphicsSelectorItem.appendChild(graphicsSelectorLabel);
+  graphicsSelectorItem.onpointerdown = () => {
+    // toggle select picker
+    graphicsSelector.selectPicker.toggle();
+  }
+
   graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
   graphicsSelectorItem.title = 'Select Graphics Engine';
 
@@ -95,7 +131,30 @@ export default function createToolbar(game) {
   worldSelector.selectBox.style.margin = '20px';
 
   let worldSelectorItem = document.createElement('div');
-  // worldSelectorItem.appendChild(worldIcon);
+  worldSelectorItem.appendChild(worldIcon);
+
+  // create text label element to show current world
+  let worldSelectorLabel = document.createElement('span');
+  worldSelectorLabel.style.fontSize = '22px';
+  worldSelectorLabel.style.marginRight = '10px';
+  worldSelectorLabel.style.marginLeft = '10px';
+  worldSelectorLabel.style.marginTop = '10px';
+  worldSelectorLabel.style.marginBottom = '10px';
+  worldSelectorLabel.style.cursor = 'pointer';
+
+  // set value to foo
+  worldSelectorLabel.innerText = 'Switch Worlds';
+
+  // add label to worldSelectorItem
+  worldSelectorItem.appendChild(worldSelectorLabel);
+  
+
+  worldSelectorItem.onpointerdown = () => {
+    // toggle select picker
+
+    worldSelector.selectPicker.toggle();
+  };
+
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
   /*

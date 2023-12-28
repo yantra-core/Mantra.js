@@ -1,3 +1,5 @@
+import SelectPicker from "../../graphics-css/lib/SelectPicker.js";
+
 class GraphicsSelector {
   constructor(editor) {
     this.editor = editor;
@@ -12,6 +14,9 @@ class GraphicsSelector {
     let selectBox = document.createElement('select');
     selectBox.id = 'graphicsSelect';
 
+    // hides by default
+    selectBox.style.display = 'none';
+
     selectBox.style.maxHeight = '45px';
 
     // tool tip hint
@@ -21,6 +26,9 @@ class GraphicsSelector {
     this.addOption(selectBox, 'CSSGraphics - v1.1.0', 'CSSGraphics');
     this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
     this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
+    this.selectPicker = new SelectPicker(selectBox, function(selectedGraphicsMode){
+      game.systems.graphics.switchGraphics(selectedGraphicsMode);
+    },game);
     return selectBox;
   }
 

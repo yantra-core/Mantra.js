@@ -1,4 +1,4 @@
-export default function inflateBox(entityElement, entityData) {
+export default function inflateTile(entityElement, entityData) {
   let game = this.game;
   let depthChart = this.depthChart;
   // For other entities, create a rectangle
@@ -15,7 +15,7 @@ export default function inflateBox(entityElement, entityData) {
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
 
-  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+  // console.log('inflateTile', entityData.type, entityElement.style.zIndex)
 
   // TODO: move to separate file for inflatePart,
   // move this code to CSSGraphics switch case
@@ -95,96 +95,77 @@ export default function inflateBox(entityElement, entityData) {
   // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
   // set border color to black
   entityElement.style.border = '1px solid black';
-
   if (entityData.texture) {
-
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
     entityElement.style.borderRadius = '0px';
 
-    if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
-      // Calculate animation duration based on X and Y coordinates
-      let duration = Math.abs(entityData.position.x) + Math.abs(entityData.position.y);
-      duration = duration / 500; // Divide by 1000 to get a duration in seconds
+    // Calculate animation duration based on X and Y coordinates
+    let duration = Math.abs(entityData.position.x) + Math.abs(entityData.position.y);
+    duration = duration / 1000; // Divide by 1000 to get a duration in seconds
 
-      // cap duration at min of 0.5
-      duration = Math.max(duration, 0.1);
-      duration = Math.min(duration, 3.3);
+    // cap duration at min of 0.5
+    //duration = Math.max(duration, 0.1);
+    //duration = Math.min(duration, 3.3);
 
-      // Create a wrapper element for the flip effect
-      const flipWrapper = document.createElement('div');
-      flipWrapper.style.position = 'relative';
-      flipWrapper.style.width = '100%';
-      flipWrapper.style.height = '100%';
-      flipWrapper.style.perspective = '1000px'; // Set the perspective for the 3D effect
+    // Create a wrapper element for the flip effect
+    const flipWrapper = document.createElement('div');
+    flipWrapper.style.position = 'relative';
+    flipWrapper.style.width = '100%';
+    flipWrapper.style.height = '100%';
+    flipWrapper.style.perspective = '1000px'; // Set the perspective for the 3D effect
 
-      // Create the front and back faces of the tile
-      const frontFace = document.createElement('div');
-      frontFace.style.position = 'absolute';
-      frontFace.style.width = '100%';
-      frontFace.style.height = '100%';
-      frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
-      frontFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
-      frontFace.style.background = `url('${entityData.texture}')`;
-      frontFace.style.backgroundRepeat = 'no-repeat';
-      frontFace.style.backgroundSize = 'cover';
+    // Create the front and back faces of the tile
+    const frontFace = document.createElement('div');
+    frontFace.style.position = 'absolute';
+    frontFace.style.width = '100%';
+    frontFace.style.height = '100%';
+    frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
+    frontFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
+    frontFace.style.background = `url('${entityData.texture}')`;
+    frontFace.style.backgroundRepeat = 'no-repeat';
+    frontFace.style.backgroundSize = 'cover';
 
-      const backFace = document.createElement('div');
-      backFace.style.position = 'absolute';
-      backFace.style.width = '100%';
-      backFace.style.height = '100%';
-      backFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
-      backFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
-      backFace.style.transform = 'rotateY(180deg)'; // Initial rotation for the back face, flipped
-      backFace.style.background = hexColor;
+    const backFace = document.createElement('div');
+    backFace.style.position = 'absolute';
+    backFace.style.width = '100%';
+    backFace.style.height = '100%';
+    backFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
+    backFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
+    backFace.style.transform = 'rotateY(180deg)'; // Initial rotation for the back face, flipped
+    backFace.style.background = hexColor;
 
-      // Append front and back faces to the wrapper
-      flipWrapper.appendChild(frontFace);
-      flipWrapper.appendChild(backFace);
+    // Append front and back faces to the wrapper
+    flipWrapper.appendChild(frontFace);
+    flipWrapper.appendChild(backFace);
 
-      // Append the wrapper to the entityElement
-      entityElement.appendChild(flipWrapper);
+    // Append the wrapper to the entityElement
+    entityElement.appendChild(flipWrapper);
 
-      // Remove the flipWrapper after animation is complete
-      flipWrapper.addEventListener('animationend', () => {
-        //entityElement.background = 
+    // Remove the flipWrapper after animation is complete
+    flipWrapper.addEventListener('animationend', () => {
+      //entityElement.background = 
 
-        entityElement.style.background = `url('${entityData.texture}')`;
-        entityElement.style.backgroundRepeat = 'no-repeat';
-        entityElement.style.backgroundSize = 'cover';
+      entityElement.style.background = `url('${entityData.texture}')`;
+      entityElement.style.backgroundRepeat = 'no-repeat';
+      entityElement.style.backgroundSize = 'cover';
+  
 
+      // clear animations styles
+      /*
+      frontFace.style.animation = '';
+      frontFace.style.transform = '';
+      backFace.style.animation = '';
+      backFace.style.transform = '';
+      */
 
-        // clear animations styles
-        /*
-        frontFace.style.animation = '';
-        frontFace.style.transform = '';
-        backFace.style.animation = '';
-        backFace.style.transform = '';
-        */
-
-        //flipWrapper.removeChild(frontFace);
-        //flipWrapper.removeChild(backFace);
-        //entityElement.removeChild(flipWrapper);
-        // flipWrapper.remove();
-      });
-    } else {
-
-      // TODO: move this closure
-      // rendering a texture without tile
-
-        entityElement.style.background = `url('${entityData.texture}')`;
-        entityElement.style.backgroundRepeat = 'no-repeat';
-        entityElement.style.backgroundSize = 'cover';
-
-
-    }
-
-
-
-
-  } else {
+      //flipWrapper.removeChild(frontFace);
+      //flipWrapper.removeChild(backFace);
+      entityElement.removeChild(flipWrapper);
+    });
+} else {
     entityElement.style.background = hexColor;
-  }
+}
 
 
 

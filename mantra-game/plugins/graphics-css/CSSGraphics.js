@@ -64,9 +64,6 @@ class CSSGraphics extends GraphicsInterface {
     let cssCamera = new CSSCamera(this, this.camera);
     this.game.use(cssCamera);
 
-    // register renderer with graphics pipeline
-    game.graphics.push(this);
-
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
     // Remark: CSSGraphics current requires no async external loading scripts
 

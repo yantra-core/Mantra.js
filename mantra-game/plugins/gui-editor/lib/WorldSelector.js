@@ -1,9 +1,13 @@
+import SelectPicker from '../../graphics-css/lib/SelectPicker.js';
+
 class WorldSelector {
   constructor(game) {
     this.game = game;
     this.selectBox = this.createElements(); // Now returns the select box element
     this.lastLoadedWorld = null;
     this.currentWorld = null;
+
+    this.pickerCreated = false;
 
     this.addEventListeners();
   }
@@ -14,6 +18,8 @@ class WorldSelector {
     let selectBox = document.createElement('select');
     selectBox.id = 'graphicsSelect';
     selectBox.style.maxHeight = '45px';
+    // hide by default
+    selectBox.style.display = 'none';
 
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
@@ -27,7 +33,7 @@ class WorldSelector {
     //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
 
     // adds separator option
-    this.addOption(selectBox, '------Tutorial Worlds-----', '----------------', true);
+    // this.addOption(selectBox, '------Tutorial Worlds-----', '----------------', true);
 
 
     this.addOption(selectBox, 'YCraft World', 'YCraft');
@@ -69,6 +75,41 @@ class WorldSelector {
       this.handleSelectionChange(event);
     });
 
+    this.selectPicker = new SelectPicker(this.selectBox, function(worldName){
+      game.switchWorlds(worldName);
+    },game);
+
+    game.on('entityInput::handleInputs', (entityId, input) => {
+      if (input.controls && input.controls.I !== undefined) {
+        if (input.controls.I === false) {
+          console.log("FALSE")
+        }
+        toggleModalOnKeyPress(input.controls.I);
+      }
+    });
+
+    let isKeyDown = false;
+
+    function toggleModalOnKeyPress(isKeyPressed) {
+      if (isKeyPressed && !isKeyDown) {
+        // Key is pressed down for the first time
+        isKeyDown = true;
+        toggleModal();
+      } else if (!isKeyPressed && isKeyDown) {
+        // Key is released
+        isKeyDown = false;
+        //toggleModal();
+      }
+    }
+
+    function toggleModal() {
+      if (that.selectPicker.showingModal) {
+        that.selectPicker.hideModal();
+      } else {
+        that.selectPicker.showModal();
+      }
+    }
+
     game.on('world::loaded', function (pluginInstance) {
       // alert('loaded')
       console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
@@ -77,7 +118,6 @@ class WorldSelector {
       that.selectElement(worldName);
       //that.hideLoadingSpinner();
     });
-
 
   }
 
@@ -89,43 +129,18 @@ class WorldSelector {
 
     let selectedWorld = event.target.value;
 
-    // check to see if game.worlds has any entries
-    // if so, unload them if they have an unload method
-    if (game.worlds.length > 0) {
-      game.worlds.forEach((world, i) => {
-        if (world.unload) {
-          // alert(`Unloading ${world.id}`);
-          console.log(world.id, 'world.unload', world.unload)
-          // remove the world from the game.worlds array
-          // TODO: we could move this logic into Game.js
-          game.worlds.splice(i, 1);
-          world.unload();
-        }
-      });
-    }
+    switchWorld(selectedWorld);
 
-    game.systems.entity.clearAllEntities(false);
-    let worldName = 'XState';
-    worldName = 'Sutra';
-    worldName = selectedWorld;
-    
-    let worldClass = WORLDS.worlds[worldName];
-    let worldInstance = new worldClass();
+    // alert('close modal')
+    // hide the modal if showing
+    this.selectPicker.hideModal();
 
-    game.once('plugin::loaded::' + worldInstance.id, function () {
-      that.hideLoadingSpinner();
-    });
-
-    game.use(worldInstance);
-
-    // USER INTENT: Change world
-    // persist this intention to the local storage
-    // so that it can be restored on next page load
-    game.storage.set('world', selectedWorld);
+    this.game.switchWorlds(selectedWorld);
 
     // update the dropdown to show the current world
     this.selectElement(selectedWorld);
-    
+
+
   }
 
   showLoadingSpinner() {
@@ -140,3 +155,4 @@ class WorldSelector {
 }
 
 export default WorldSelector;
+

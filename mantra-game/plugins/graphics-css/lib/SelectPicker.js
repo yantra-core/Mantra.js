@@ -1,16 +1,21 @@
 export default class SelectPicker {
-  constructor(selectElement) {
+  constructor(selectElement, click, game) {
     this.selectElement = selectElement;
+    this.game = game;
+    this.click = click;
     this.modal = this.createModal();
+    this.debounceTimer = null;
     this.addEventListeners();
   }
 
   createModal() {
+    let game = this.game;
     const modal = document.createElement('div');
     this.applyModalStyles(modal);
-
+    
     const picker = document.createElement('ul');
     this.applyPickerStyles(picker);
+    this.addPickerScrollEvents(picker);
 
     Array.from(this.selectElement.options).forEach(option => {
       const listItem = document.createElement('li');
@@ -19,6 +24,7 @@ export default class SelectPicker {
       listItem.textContent = option.text;
       listItem.onclick = () => {
         this.selectElement.value = option.value;
+        this.click(option.value)
         this.hideModal();
       };
 
@@ -29,6 +35,35 @@ export default class SelectPicker {
     document.body.appendChild(modal);
 
     return modal;
+  }
+
+  addPickerScrollEvents(picker) {
+    let isDragging = false;
+    let startY;
+    let scrollTop;
+
+    picker.onmousedown = (e) => {
+      isDragging = true;
+      startY = e.pageY - picker.offsetTop;
+      scrollTop = picker.scrollTop;
+      e.preventDefault();
+    };
+
+    picker.onmousemove = (e) => {
+      if (!isDragging) return;
+      const y = e.pageY - picker.offsetTop;
+      const scroll = y - startY;
+      picker.scrollTop = scrollTop - scroll;
+    };
+
+    window.onmouseup = () => {
+      isDragging = false;
+    };
+
+    picker.onwheel = (e) => {
+      picker.scrollTop += e.deltaY;
+      e.preventDefault();
+    };
   }
 
   applyModalStyles(modal) {
@@ -48,6 +83,8 @@ export default class SelectPicker {
 
   applyPickerStyles(picker) {
     Object.assign(picker.style, {
+      position: 'relative',
+      bottom: '160px',
       listStyle: 'none',
       margin: '0',
       padding: '0',
@@ -65,7 +102,7 @@ export default class SelectPicker {
       padding: '20px',
       cursor: 'pointer',
       borderBottom: '1px solid #ddd',
-      fontSize: '20px',
+      fontSize: '44px',
       textAlign: 'center',
       backgroundColor: '#f8f8f8',
       margin: '5px',
@@ -80,6 +117,7 @@ export default class SelectPicker {
   addEventListeners() {
     this.selectElement.addEventListener('focus', () => this.showModal());
     this.selectElement.addEventListener('click', () => this.showModal());
+    this.selectElement.addEventListener('click', (e) => e.stopPropagation());
     window.addEventListener('click', (e) => {
       if (e.target === this.modal) {
         this.hideModal();
@@ -87,6 +125,20 @@ export default class SelectPicker {
     });
   }
 
+  toggle() {
+    this.debounce(() => {
+      if (this.showingModal) {
+        this.hideModal();
+      } else {
+        this.showModal();
+      }
+    }, 300); // 300ms debounce time
+  }
+
+  debounce(func, delay) {
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(func, delay);
+  }
   showModal() {
     this.showingModal = true;
     this.modal.style.display = 'flex';

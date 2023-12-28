@@ -164,7 +164,7 @@ class XState {
   destroy() { }
 
   unload () {
-    game.systems['xstate'].unload();
+    this.game.systems['xstate'].unload();
   }
 
 }

@@ -48,8 +48,9 @@ class Editor {
   }
 
   createIcon (name) {
+    let featherRoot = 'https://yantra.gg';
     let element = document.createElement('img');
-    element.src = `/vendor/feather/${name}.svg`;
+    element.src = `${featherRoot}/vendor/feather/${name}.svg`;
     element.classList.add('feather-icon');
     element.style.width = '36px';
     element.style.height = '36px';

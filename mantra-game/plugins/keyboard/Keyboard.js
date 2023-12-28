@@ -87,10 +87,17 @@ export default class Keyboard {
   }
 
   sendInputs() {
+
+    const trueInputs = this.inputPool;
+
+    // Remark: Removed 12/28/23 in order to allow final "false" event on keyup
+    // Should be OK to remove
     // Filter the inputPool to only include keys with true values
-    const trueInputs = Object.fromEntries(
-      Object.entries(this.inputPool).filter(([key, value]) => value === true)
-    );
+    /*
+      const trueInputs = Object.fromEntries(
+        Object.entries(this.inputPool).filter(([key, value]) => value === true)
+      );
+    */
 
     // Send trueInputs if there are any
     if (Object.keys(trueInputs).length > 0) {

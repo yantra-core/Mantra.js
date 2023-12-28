@@ -23,6 +23,7 @@ import gameTick from './lib/gameTick.js';
 // Provides a default Game.start(fn) logic ( creates a single player and border )
 // Bind to event `player::joined` to override default player creation logic
 import defaultGameStart from './lib/start/defaultGameStart.js';
+import switchWorlds from './lib/switchWorlds.js';
 
 // Action Rate Limiter, suitable for any Systems action that should be rate limited
 import ActionRateLimiter from './Component/ActionRateLimiter.js';
@@ -157,6 +158,8 @@ class Game {
     // Bind loadScripts from util
     this.loadScripts = loadScripts.bind(this);
 
+    this.switchWorlds = switchWorlds.bind(this);
+
     this.bodyMap = {};
     this.systems = {};
     this.storage = storage;
@@ -183,6 +186,7 @@ class Game {
 
     this.changedEntities = new Set();
     this.removedEntities = new Set();
+    this.pendingRender = new Set();
 
     this.isClient = isClient;
     this.isEdgeClient = isEdgeClient;

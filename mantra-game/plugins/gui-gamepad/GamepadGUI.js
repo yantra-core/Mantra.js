@@ -8,15 +8,78 @@ class GamepadGUI {
   init(game) {
     this.game = game;
     let controllerHolder = document.createElement('div');
-    controllerHolder.style.position = 'absolute';
-    controllerHolder.style.top = '0';
-    controllerHolder.style.left = '0';
+    controllerHolder.style.position = 'fixed';
+    controllerHolder.style.bottom = '0';
+    //   touch-action: manipulation;
+
+    controllerHolder.style.touchAction = 'manipulation';
+    //   user-select: none;
+
+    controllerHolder.style.userSelect = 'none';
+    //controllerHolder.style.left = '0';
+
     controllerHolder.style.width = '100%';
-    controllerHolder.style.height = '100%';
+    controllerHolder.style.height = '150px';
     controllerHolder.style.zIndex = '9999';
     this.createSNESGamepad(controllerHolder);
     console.log('controllerHolder', controllerHolder)
     document.body.appendChild(controllerHolder);
+
+    let select = document.getElementById('select');
+    select.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyU' }));
+    });
+    select.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyU' }));
+    });
+
+    let start = document.getElementById('start');
+
+    start.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyI' }));
+    });
+    start.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyI' }));
+    });
+
+    // bind event for id dpad_up, dpad_down, etc
+    let dpad_up = document.getElementById('up');
+    let dpad_down = document.getElementById('down');
+    let dpad_left = document.getElementById('left');
+    let dpad_right = document.getElementById('right');
+
+    // use existing keyboard events
+    // trigger keydown event with keycode of W, A, S, D
+    // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
+
+    dpad_up.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyW' }));
+    });
+    dpad_up.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyW' }));
+    });
+
+    dpad_down.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyS' }));
+    });
+    dpad_down.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyS' }));
+    });
+
+    dpad_left.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyA' }));
+    });
+    dpad_left.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyA' }));
+    });
+
+    dpad_right.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyD' }));
+    });
+    dpad_right.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyD' }));
+    });
+
   }
 
   createSNESGamepad(parentElement) {
@@ -59,7 +122,7 @@ class GamepadGUI {
   <div class="face is3d"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   
   <!-- Letters and Text -->
-  <h1>SUPER NINTENDO</h1>
+  <h1>SUPER MANTRA</h1>
   <p>CSS ENTERTAINMENT SYSTEM</p>
   
   <p class="letter letter-x" aria-hidden="true">X</p>

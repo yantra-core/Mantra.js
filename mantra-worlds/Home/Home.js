@@ -21,6 +21,7 @@ class Home {
 
     game.setGravity(0, 0, 0);
 
+    /*
     game.createEntity({
       type: 'PLATFORM',
       isStatic: true,
@@ -31,16 +32,25 @@ class Home {
         y: 200
       }
     });
+    */
 
     game.createEntity({
       type: 'BLOCK',
-      width: 150,
-      height: 150,
+      texture: 'img/game/tiles/tile-block.png',
+      width: 32,
+      height: 32,
       position: {
         x: -400,
         y: -150
-      }
+      },
+      friction: 1, 
+      frictionAir: 1, 
+      frictionStatic: 1
     });
+
+
+    game.use('Tile');
+
 
     game.use('Block')
   //  game.use('Bullet')
