@@ -15,6 +15,7 @@ class DefaultTwoDimensionalInputStrategy {
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
+      U: 'SELECT_MENU',
       //LEFT: 'ROTATE_LEFT',
       //RIGHT: 'ROTATE_RIGHT'
     };
@@ -105,6 +106,8 @@ class DefaultTwoDimensionalInputStrategy {
         game.getSystem('sword').sheathSword(entityId);
       }
     }
+
+    if (actions.includes('SELECT_MENU')) {}
 
   }
 }

@@ -20,6 +20,8 @@ class Inspector {
     if (!this.game.selectedEntityId) {
       if (this.game.currentPlayerId) {
         this.game.selectedEntityId = this.game.currentPlayerId;
+      } else {
+        this.game.selectedEntityId = 1; // for now
       }
     }
 

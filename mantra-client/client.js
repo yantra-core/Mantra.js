@@ -59,7 +59,6 @@ let game = new Game({
   physics: 'matter', // 'matter', 'physx'
   graphics: ['css'], // 'babylon', 'css', 'phaser'
   collisions: true,
-  showLoadingScreen: false,
   camera: {
     follow: true,
     startingZoom: 0.5
@@ -75,7 +74,7 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
-// window.game = game;
+window.game = game;
 //
 // Use Plugins to add systems to the game
 //
@@ -185,6 +184,8 @@ if (mode === 'online') {
  // game.use(new plugins.Tile());
 
   // Single Player Offline Mode
+  //game.use('Gamepad');
+  //game.use('GamepadGUI');
 
   let home = new worlds.Home();
 
@@ -201,7 +202,7 @@ if (mode === 'online') {
     //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     //game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
     //game.use(new plugins.Bullet())
-    // let home = new worlds.YCraft();
+    let home = new worlds.YCraft();
     game.use(home);
 
     // game.use(new plugins.GamepadGUI())

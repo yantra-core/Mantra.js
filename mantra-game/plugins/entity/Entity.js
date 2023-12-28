@@ -388,7 +388,7 @@ class Entity {
       id: entityId
     });
     // console.log("SETTING CHANGED", entityId)
-    // this.game.pendingRender.add(entityId);
+    this.game.pendingRender.add(entityId);
 
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);

@@ -10,6 +10,8 @@
 
 <body>
   <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+
   <script type="module" src="/ycraft.js"></script>
 
   <script>
@@ -28,11 +30,12 @@
         }
       });
 
-      game.use('YCraft');
+      game.use(new WORLDS.worlds['YCraft']());
 
       game.start(function () {
         game.use('Editor');
-        game.use('YCraftGUI');
+
+        // game.use('YCraftGUI');
 
       });
       // game.use('Bullet');

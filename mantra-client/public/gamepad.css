@@ -50,7 +50,8 @@ input[type="radio"] {
   right: 2vmin;
   width: 10vmin;
   aspect-ratio: 1;
-  display: grid;
+  /* display: grid; */
+  display: none;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   background:
@@ -333,15 +334,21 @@ h1 + p {
   opacity: 0.9;
 }
 
-#up, #right, #left, #down {
-  width: 4.5vmin;
-  height: 4.5vmin;
+ #left, #right {
+  width: 10.5vmin; /* Adjust the size as needed */
+  height: 8.5vmin; /* Adjust the size as needed */
+}
+#up, #down {
+  width: 8.5vmin; /* Adjust the size as needed */
+  height: 10.5vmin; /* Adjust the size as needed */
 }
 
-#up { top: 9.75vmin; left: 15vmin; }
-#left { top: 14.25vmin; left: 10.5vmin; }
-#right { top: 14.25vmin; left: 19.5vmin; }
-#down { top: 18.75vmin; left: 15vmin; }
+
+#left { top: 12.25vmin; left: 3.5vmin; }
+#right { top: 12.25vmin; left: 19.5vmin; }
+
+#up { top: 3vmin; left: 13vmin; }
+#down { top: 18.75vmin; left: 13vmin; }
 
 #up.active ~ .axis div, /* gamepad js */
 #up:active ~ .axis div { 

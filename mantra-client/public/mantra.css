@@ -6,6 +6,11 @@ body {
   perspective: 0px;
   width: 100vw;
   height: 100vh;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  /* disable scrolling */
+  overflow: hidden;
 }
 
 #controlsView {
@@ -505,8 +510,8 @@ pre {
 
 #entityView {
   position: absolute;
-  bottom: 10%;
-  right: 20%;
+  top: 160px;
+  right: 60px;
   min-width: 440px;
   overflow: auto;
   z-index: 1000;
@@ -1440,7 +1445,7 @@ option {
 }
 
 .folder-icon {
-  background: url('/vendor/feather/folder.svg');
+  background: url('https://yantra.gg/vendor/feather/folder.svg');
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -1674,51 +1679,51 @@ button[type="submit"]:disabled {
 
 
 .guy-down-0 {
-  background-image: url('./img/game/link-walk/sprite_0.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_0.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 .guy-down-1 {
-  background-image: url('./img/game/link-walk/sprite_1.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_1.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 .guy-up-0 {
-  background-image: url('./img/game/link-walk/sprite_5.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_5.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 .guy-up-1 {
-  background-image: url('./img/game/link-walk/sprite_3.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_3.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 /* actual movements */
 .guy-right-0 {
-  background-image: url('./img/game/link-walk/sprite_2.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_2.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 .guy-right-1 {
-  background-image: url('./img/game/link-walk/sprite_4.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_4.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 /* left needs to mirror right */
 .guy-left-0 {
-  background-image: url('./img/game/link-walk/sprite_6.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_6.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
 
 .guy-left-1 {
-  background-image: url('./img/game/link-walk/sprite_7.png') !important;
+  background-image: url('https://yantra.gg/img/game/link-walk/sprite_7.png') !important;
   background-repeat: no-repeat !important;
   background-size: 100% 100% !important;
 }
@@ -1796,3 +1801,14 @@ button[type="submit"]:disabled {
   /*filter: invert(100%);*/
   /*background-color: #000000;*/
 }
+
+
+
+    @keyframes flip {
+        100% {
+            transform: rotateY(0deg);
+        }
+        0% {
+            transform: rotateY(180deg);
+        }
+    }

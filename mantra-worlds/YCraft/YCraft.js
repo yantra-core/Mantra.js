@@ -1,3 +1,5 @@
+import contraptionsExample from './contraptions-example.js';
+
 class YCraft {
   static id = 'world-ycraft';
   static type = 'world'; // type is optional for Plugins
@@ -15,12 +17,11 @@ class YCraft {
   createWorld() {
 
     let game = this.game;
-
     game.setGravity(0, 0, 0);
-
-    game.use('Bullet');
-
-    game.use('YCraft');
+    game.use('Entity')
+    game.use('YCraft', {
+      contraption: contraptionsExample
+    });
     game.use('YCraftGUI');
 
     game.once('plugin::loaded::typer-ghost', function(){
@@ -35,6 +36,7 @@ class YCraft {
     });
     */
     
+    /*
     game.createEntity({ 
       type: 'BLOCK',
       color: 0xcccccc,
@@ -46,6 +48,7 @@ class YCraft {
       frictionAir: 1, 
       frictionStatic: 1
     });
+    */
 
     // Remark: Players removed for initial demo, is working
     // game.createDefaultPlayer();

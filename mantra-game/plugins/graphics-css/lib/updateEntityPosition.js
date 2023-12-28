@@ -14,7 +14,7 @@ export default function updateEntityElementPosition(entityElement, { position, w
 
   this.setTransform(entityElement, domX, domY, rotation, angle);
 
-  //console.log('updated position', position, adjustedPosition, domX, domY)
+  // console.log('updated position', position, adjustedPosition, domX, domY)
 
   return entityElement;
 }

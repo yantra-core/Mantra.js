@@ -65,6 +65,7 @@ class Game {
     msgpack = false,
     deltaCompression = false,
     deltaEncoding = true,
+    defaultPlayer = true,
     options = {} } = {}) {
     if (isServer) {
       // override default
@@ -94,6 +95,7 @@ class Game {
       msgpack,
       deltaCompression,
       deltaEncoding,
+      defaultPlayer,
       options,
       multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
@@ -324,6 +326,13 @@ class Game {
 
       console.log('All Plugins are ready! Starting Mantra Game Client...');
       game.emit('game::ready');
+      if (this.config.defaultPlayer) {
+        this.createPlayer({
+          type: 'PLAYER'
+        }).then(function (ent) {
+          game.setPlayerId(ent.id);
+        });
+      }
 
       if (game.systems.client) {
         let client = this.getSystem('client');
@@ -570,8 +579,10 @@ class Game {
         y: 0
       },
     });
+
     this.setPlayerId(player.id);
     return player;
+
   }
 
   playNote(note, duration) {

@@ -30,8 +30,7 @@ export default function createToolbar(game) {
   inspectorIcon.title = 'Click to open Entity Inspector';
   inspectorIcon.style.marginRight = '10px';
   inspectorIcon.style.marginLeft = '10px';
-  inspectorIcon.style.marginTop = '10px';
-  inspectorIcon.style.marginBottom = '10px';
+  inspectorIcon.style.marginTop = '5px';
   inspectorIcon.style.filter = 'invert(100%)';
   
   // TODO: have this change values based on open / cloase state
@@ -66,12 +65,14 @@ export default function createToolbar(game) {
     onClick: () => this.showRules()
   });
 
+  /*
   toolbarMenu.addItem('primary', {
     text: 'Crafting',
     hint: 'Manage Game Rules with YCraft',
     icon: this.createIcon('codesandbox'),
     onClick: () => this.showCrafting()
   });
+  */
 
   toolbarMenu.addItem('primary', {
     text: 'Events ',

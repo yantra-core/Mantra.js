@@ -29,11 +29,11 @@ const pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 45.968
+    "size": 49.193
   },
   "Client": {
     "path": "./plugins/client/Client.js",
-    "size": 122.081
+    "size": 122.132
   },
   "ChronoControl": {
     "path": "./plugins/chrono-control/ChronoControl.js",
@@ -49,11 +49,11 @@ const pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 42.433
+    "size": 42.819
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.388
+    "size": 28.495
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
@@ -93,7 +93,7 @@ const pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 24.46
+    "size": 24.458
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -105,7 +105,7 @@ const pluginsList = {
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 39.048
+    "size": 47.876
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -137,7 +137,7 @@ const pluginsList = {
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
-    "size": 8.749
+    "size": 8.75
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
