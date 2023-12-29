@@ -24,7 +24,7 @@ export default function inflategraphic(entityData) {
     // console.log("COULD NOT FIND GRAPHICS FOR", entityData.id, entityData.type, entityData)
     if (entityData.texture) {
       // Use texture if available
-      console.log('texture', entityData.texture)
+      // console.log('texture', entityData.texture)
       graphic = this.scene.add.sprite(0, 0, entityData.texture);
       graphic.setDepth(entityData.position.z)
       entityData.graphic = graphic; // Store the reference in entityData for future updates
@@ -38,18 +38,22 @@ export default function inflategraphic(entityData) {
       graphic = this.scene.add.sprite(0, 0, 'pixel');
       entityData.graphic = graphic; // Store the reference in entityData for future updates
       graphic.setTint(entityData.color);
-
-      //entityData.color = entityData.color || 0xffffff; // Defaults to white
-      //graphic.setDepth(9999)
-      //graphic.fillStyle(entityData.color, 1);
-      // graphic.currentFillColor = entityData.color;
-      // graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
     }
 
     // Add interactive property to enable input events
-    const hitArea = new Phaser.Geom.Rectangle(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
+
+    // Create the hitArea as a Phaser.Geom.Rectangle
+    // The hitArea is initially positioned at (0,0) with the size of the entity
+    const hitArea = new Phaser.Geom.Rectangle(0, 0, entityData.width, entityData.height);
+
+    // Log the hitArea for debugging purposes
+    // console.log('hitArea', hitArea);
+
+    // Set the graphic to be interactive and use the hitArea for interaction checks
     graphic.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
 
+    // Set the size of the graphic
+    // It's important to use displayWidth and displayHeight for scaling purposes
     graphic.displayWidth = entityData.width;
     graphic.displayHeight = entityData.height;
 
@@ -99,9 +103,19 @@ export default function inflategraphic(entityData) {
     });
 
     this.scene.add.existing(graphic);
-    // this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
+
   } else {
-    // console.log('EXISTING GRAPHICS')
+
+    //
+    // Existing graphic
+    //
+
+    // check to see if color has changed, if so update the tint
+    if (typeof entityData.color !== 'undefined') {
+      // console.log('COLOR', entityData.color)
+      graphic.setTint(entityData.color);
+    }
+
   }
 
 

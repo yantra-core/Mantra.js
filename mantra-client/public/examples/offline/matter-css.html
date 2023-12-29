@@ -11,8 +11,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
       let game = new MANTRA.Game({
-        width: 2000,
-        height: 2000,
+        height: 600 * 10,
+        width: 800 * 10,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
@@ -34,10 +34,7 @@
 
       // Adds a nice StarField background
       game.use('StarField');
-
-      game.use('CurrentFPS');
-      game.use('ControlsGUI');
-
+      
 
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-css.html'

@@ -4,12 +4,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantra - Client</title>
+  <title>YCraft - Client Demo</title>
   <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
   <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+
   <script type="module" src="/ycraft.js"></script>
+
   <script>
-    document.addEventListener('DOMContentLoaded', async (event) => {
+    document.addEventListener('DOMContentLoaded', (event) => {
+      //let game = new MANTRA.Game({
+        //        loadDefaultPlugins: false
+      //});
+
       let game = new MANTRA.Game({
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
@@ -19,17 +29,20 @@
           scriptRoot: './'
         }
       });
-      game.start(function () {
-        game.use('YCraft');
 
-        game.use('Editor');
-        game.use('YCraftGUI');
-      });
       // game.use('Bullet');
+
+
+      game.start(function () {
+        game.use('Editor');
+        game.use(new WORLDS.worlds['YCraft']());
+      });
       window.game = game;
+
+
     });
   </script>
-</head>
-<body>
+  <div id="gameHolder"></div>
 </body>
+
 </html>

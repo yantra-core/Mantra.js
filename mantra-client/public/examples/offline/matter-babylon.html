@@ -11,10 +11,10 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
       let game = new MANTRA.Game({
-        width: 2000,
-        height: 2000,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
+        height: 600 * 10,
+        width: 800 * 10,
         graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
@@ -27,8 +27,6 @@
       // Adds projectile Bullets to the game
       // test chanining
       game.use('Bullet').use('Block');
-      game.use('CurrentFPS');
-      game.use('ControlsGUI');
 
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-babylon.html'
