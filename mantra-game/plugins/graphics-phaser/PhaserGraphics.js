@@ -31,7 +31,7 @@ class PhaserGraphics extends GraphicsInterface {
     }
 
     if (typeof camera.startingZoom === 'undefined') {
-      camera.startingZoom = 0.5;
+      camera.startingZoom = 1;
     }
 
     // alert(camera.follow)
@@ -50,6 +50,7 @@ class PhaserGraphics extends GraphicsInterface {
     this.scenesReady = false;
     this.scene = null;
     this.inflateGraphic = inflateGraphic.bind(this);
+    this.inflateEntity = inflateGraphic.bind(this);
     this.inflateBox = inflateBox.bind(this);
     this.inflateTriangle = inflateTriangle.bind(this);
     this.inflateCircle = inflateCircle.bind(this);
@@ -164,26 +165,8 @@ class PhaserGraphics extends GraphicsInterface {
   }
 
   render(game, alpha) {
-    // render is called at the browser's frame rate (typically 60fps)
-    let self = this;
-    for (let [eId, state] of this.game.entities.entries()) {
-      let ent = this.game.entities.get(eId);
-      // console.log('rendering', ent)
-      this.inflateGraphic(ent, alpha);
-      // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
-      //                    This could impact online mode, test for multiplayer
-      /*
-      // check if there is no graphic available, if so, inflate
-      if (!ent.graphics || !ent.graphics['graphics-phaser']) {
-        this.inflateGraphic(ent, alpha);
-        ent.pendingRender['graphics-phaser'] = false;
-      }
-      if (ent.pendingRender && ent.pendingRender['graphics-phaser']) {
-        this.inflateGraphic(ent, alpha);
-        ent.pendingRender['graphics-phaser'] = false;
-      }
-      */
-    }
+    // render will be called at the browser's refresh rate
+    // can be used for camera updates or local effects
   }
 
   unload() {

@@ -573,20 +573,7 @@ class BabylonGraphics extends GraphicsInterface {
 
   // called as much as the client requires in order to render
   render(game, alpha) {
-
     let self = this;
-    for (let [eId, state] of this.game.entities.entries()) {
-      let ent = this.game.entities.get(eId);
-      this.inflateEntity(ent, alpha);
-      // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
-      //                    This could impact online mode, test for multiplayer
-      /*
-      if (ent.pendingRender && ent.pendingRender['graphics-babylon']) {
-        this.inflateEntity(ent, alpha);
-        ent.pendingRender['graphics-babylon'] = false;
-      }
-      */
-    }
 
     if (game.systems['graphics-babylon-camera']) {
       let cameraSystem = game.getSystem('graphics-babylon-camera');

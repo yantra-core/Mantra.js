@@ -74,7 +74,6 @@ class BabylonCamera {
     this.camera._panningMouseButton = 0;
   }
   
-
   setupCameraControlsManual() {
     // Detach default controls from the canvas
     this.camera.detachControl(this.scene.getEngine().getRenderingCanvas());
@@ -110,6 +109,7 @@ class BabylonCamera {
   }
 
   render() {
+
     let game = this.game;
     if (this.config.camera && this.config.camera.follow) {
       let currentPlayer = this.game.getEntity(game.currentPlayerId);

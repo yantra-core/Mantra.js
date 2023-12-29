@@ -1,4 +1,4 @@
-export default function updateEntityElementPosition(entityElement, { position, width, height, rotation = 0 }) {
+export default function updateEntityPosition(entityElement, { position, width, height, rotation = 0 }) {
   // Adjust the position based on the camera position
   //console.log("og position", position, this.cameraPosition)
   const adjustedPosition = {

@@ -55,13 +55,13 @@ function localGameLoop(game, playerId) {
   let alpha = accumulator / fixedStep;
 
   // Render the local snapshot with interpolation
-  game.graphics.forEach(function (graphicsInterface) {
+  game.graphics.forEach(function localGameLoopGraphicsRender (graphicsInterface) {
     graphicsInterface.render(game, alpha); // Pass the alpha to the render method
   });
 
   // Call the next iteration of the loop using requestAnimationFrame
   if (game.localGameLoopRunning) {
-    requestAnimationFrame(function () {
+    requestAnimationFrame(function rafLocalGameLoop () {
       localGameLoop(game, playerId);
     });
   }

@@ -108,6 +108,8 @@ export default function inflateBox(entityElement, entityData) {
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
     entityElement.style.borderRadius = '0px';
+    entityElement.style.padding = '1px';
+
 
     if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
       // Calculate animation duration based on X and Y coordinates

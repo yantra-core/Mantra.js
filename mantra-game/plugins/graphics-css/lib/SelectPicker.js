@@ -71,13 +71,13 @@ export default class SelectPicker {
       position: 'fixed',
       width: '100%',
       height: '100%',
-      top: '0',
+      top: '110px',
       left: '0',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'none',
       justifyContent: 'center',
       alignItems: 'center',
-      zIndex: '1000'
+      zIndex: '9001'
     });
   }
 

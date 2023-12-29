@@ -4,7 +4,11 @@ import CSSCamera from './CSSCamera.js';
 
 import inflateBox from './lib/inflateBox.js';
 import inflateText from './lib/inflateText.js';
+import inflateEntity from './lib/inflateEntity.js';
 
+import setTransform from './lib/setTransform.js';
+
+import updateGraphic from './lib/updateGraphic.js';
 import updateEntityPosition from './lib/updateEntityPosition.js';
 import updatePlayerSprite from './lib/updatePlayerSprite.js';
 import mouseWheelZoom from './lib/mouseWheelZoom.js';
@@ -45,6 +49,11 @@ class CSSGraphics extends GraphicsInterface {
 
     this.inflateBox = inflateBox.bind(this);
     this.inflateText = inflateText.bind(this);
+    this.inflateEntity = inflateEntity.bind(this);
+
+    this.setTransform = setTransform.bind(this);
+
+    this.updateGraphic = updateGraphic.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
     this.handleInputs = handleInputs.bind(this);
     this.updatePlayerSprite = updatePlayerSprite.bind(this);
@@ -188,70 +197,7 @@ class CSSGraphics extends GraphicsInterface {
     return entityElement;
   }
 
-  updateGraphic(entityData) {
-
-    // TODO: move this to common 3D-2.5D transform function(s)
-    if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
-      if (typeof entityData.rotation === 'object') {
-        // transform 3d to 2.5d
-        entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
-      } else {
-        entityData.rotation = entityData.rotation;
-      }
-    }
-    const entityElement = document.getElementById(`entity-${entityData.id}`);
-    if (entityElement) {
-      // Update the entity color
-      if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
-        // entityData.color is int number here we need a hex
-        let hexColor = '#' + entityData.color.toString(16);
-        // update the background color
-        entityElement.style.background = hexColor;
-      }
-      // Update the background sprite if velocity is present
-      /*
-      if (entityData.type === 'PLAYER' && entityData.velocity && this.game.tick % 10 === 0 && Math.abs(entityData.velocity.x) > 0.001 && Math.abs(entityData.velocity.y) > 0.001) {
-
-        let angle = Math.atan2(entityData.velocity.y, entityData.velocity.x);
-        let angleDeg = angle * 180 / Math.PI;
-
-        // Remark: Move this logic to just listen for local entityInput
-        // we can revist this for server side prediction later
-        // Determine direction based on angle
-        let direction = "";
-        if (angleDeg >= -45 && angleDeg < 45) {
-          direction = "right";
-        } else if (angleDeg >= 45 && angleDeg < 135) {
-          direction = "down";
-        } else if (angleDeg >= -135 && angleDeg < -45) {
-          direction = "up";
-        } else {
-          direction = "left";
-        }
-
-        // Assume there's a way to determine whether to use -0 or -1 suffix
-        // For simplicity, let's alternate between -0 and -1
-        let spriteNumber = Math.round(Math.random()); // Randomly choose 0 or 1
-        let spriteClass = `guy-${direction}-${spriteNumber}`;
-
-        // First, clear previous sprite classes if any
-        entityElement.classList.remove('guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1');
-
-        // Add the new sprite class
-        entityElement.classList.add(spriteClass);
-
-        //console.log('Entity data:', entityData);
-        //console.log('Applied class:', spriteClass);
-      }
-      */
-
-      // Update the position of the entity element
-      return this.updateEntityPosition(entityElement, entityData);
-    } else {
-      // If the entity element does not exist, create it
-      return this.createGraphic(entityData);
-    }
-  }
+  
 
   removeGraphic(entityId) {
 
@@ -268,18 +214,7 @@ class CSSGraphics extends GraphicsInterface {
 
   }
 
-  setTransform(entityElement, domX, domY, rotation, angle) {
-    // Retrieve the last rotation value, default to 0 if not set
-    let lastRotation = entityElement.dataset.rotation || 0;
-    // Update rotation if provided
-    if (rotation) {
-      lastRotation = angle;
-      entityElement.dataset.rotation = angle;
-    }
 
-    // Update the transform property
-    entityElement.style.transform = `translate(${domX}px, ${domY}px) rotate(${lastRotation}deg)`;
-  }
   update() {
     let game = this.game;
 
@@ -386,38 +321,17 @@ class CSSGraphics extends GraphicsInterface {
   render(game, alpha) {
     // render is called at the browser's frame rate (typically 60fps)
     let self = this;
+    if (this.game.changedEntities.size > 0) {
+      // console.log('CHANGED', this.game.changedEntities)
+    }
+    // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
+    // This is not ideal and will yield low-entity count CSSGraphics performance
+    // Best to remove camera follow for CSSGraphics if possible
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       // console.log('rendering', ent)
       this.inflateEntity(ent, alpha);
-
       // this.game.changedEntities.delete(eId);
-      // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
-      //                    This could impact online mode, test for multiplayer
-      /*
-      // check if there is no graphic available, if so, inflate
-      if (!ent.graphics || !ent.graphics['graphics-phaser']) {
-        this.inflateGraphic(ent, alpha);
-        ent.pendingRender['graphics-phaser'] = false;
-      }
-      if (ent.pendingRender && ent.pendingRender['graphics-phaser']) {
-        this.inflateGraphic(ent, alpha);
-        ent.pendingRender['graphics-phaser'] = false;
-      }
-      */
-    }
-  }
-
-  inflateEntity(entity, alpha) {
-    // checks for existence of entity, performs update or create
-    if (entity.graphics && entity.graphics['graphics-css']) {
-      let graphic = entity.graphics['graphics-css'];
-      this.updateGraphic(entity, alpha);
-
-    } else {
-      let graphic = this.createGraphic(entity);
-      this.game.components.graphics.set([entity.id, 'graphics-css'], graphic);
-
     }
   }
 

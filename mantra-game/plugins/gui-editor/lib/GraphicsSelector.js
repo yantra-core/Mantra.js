@@ -55,6 +55,42 @@ class GraphicsSelector {
     this.selectBox.addEventListener('change', (event) => {
       this.handleSelectionChange(event);
     });
+
+    let that = this;
+
+    let isKeyDown = false;
+
+    function toggleModalOnKeyPress(isKeyPressed) {
+      if (isKeyPressed && !isKeyDown) {
+        // Key is pressed down for the first time
+        isKeyDown = true;
+        toggleModal();
+      } else if (!isKeyPressed && isKeyDown) {
+        // Key is released
+        isKeyDown = false;
+        //toggleModal();
+      }
+    }
+
+    function toggleModal() {
+      if (that.selectPicker.showingModal) {
+        that.selectPicker.hideModal();
+      } else {
+        that.selectPicker.showModal();
+      }
+    }
+
+
+    game.on('entityInput::handleInputs', (entityId, input) => {
+      if (input.controls && input.controls.U !== undefined) {
+        if (input.controls.U === false) {
+          console.log("FALSE")
+        }
+        toggleModalOnKeyPress(input.controls.U);
+      }
+    });
+
+
   }
 
   handleSelectionChange(event) {

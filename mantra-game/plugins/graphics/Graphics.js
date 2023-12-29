@@ -26,7 +26,6 @@ class Graphics {
     
   }
 
-
   preload () {
 
     // preload the guy sprites ( for now )
@@ -40,7 +39,6 @@ class Graphics {
       img.classList.add(spriteName);
       preloaderDiv.appendChild(img);
     });
-
 
   }
 
@@ -94,6 +92,17 @@ class Graphics {
             game.systemsManager.removeSystem(graphics.id);
           }
         });
+
+        // redraw all graphics
+        for (let [eId, state] of this.game.entities.entries()) {
+          let ent = this.game.entities.get(eId);
+          // console.log('rendering', ent)
+          game.graphics.forEach(function (graphicsInterface) {
+            graphicsInterface.inflateEntity(ent);
+          });
+          // this.game.changedEntities.delete(eId);
+        }
+
         document.body.style.cursor = 'default';
         cb(null);
       });
@@ -121,7 +130,6 @@ class Graphics {
 }
 
 export default Graphics;
-
 
 /*
 

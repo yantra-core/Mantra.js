@@ -3,6 +3,7 @@ class GamepadGUI {
   constructor(game) {
     this.game = game; // Store the reference to the game logic
     this.id = GamepadGUI.id;
+    this.hiding = false;
   }
 
   init(game) {
@@ -25,7 +26,18 @@ class GamepadGUI {
     console.log('controllerHolder', controllerHolder)
     document.body.appendChild(controllerHolder);
 
+
+    let controller = document.getElementById('snes-gamepad');
+
+
+    controller.style.position = 'fixed';
+    controller.style.left = '50%'; // Center horizontally
+    controller.style.bottom = '0'; // Align at the bottom
+    controller.style.transform = 'translateX(-50%)'; // Adjust for exact centering
+    
+
     let select = document.getElementById('select');
+
     select.addEventListener('pointerdown', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyU' }));
     });
@@ -47,6 +59,74 @@ class GamepadGUI {
     let dpad_down = document.getElementById('down');
     let dpad_left = document.getElementById('left');
     let dpad_right = document.getElementById('right');
+
+    let buttonL = document.getElementById('l');
+    let buttonR = document.getElementById('r');
+
+    buttonL.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyJ' }));
+    });
+    buttonL.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyJ' }));
+    });
+    
+    buttonR.addEventListener('pointerdown', (ev) => {
+      let controller = document.getElementById('snes-gamepad');
+      let controllerHeight = controller.offsetHeight;
+      let slideOutPosition = '-' + controllerHeight + 'px'; // Position to slide out
+    
+      if (this.hiding) {
+        // Slide in (show)
+        controller.style.bottom = '0px';
+        this.hiding = false;
+      } else {
+        // Slide out (hide)
+        controller.style.bottom = slideOutPosition;
+        this.hiding = true;
+      }
+    });
+    
+
+    if (!is_touch_enabled()) {
+      let controller = document.getElementById('snes-gamepad');
+      let controllerHeight = controller.offsetHeight;
+      let slideOutPosition = '-' + controllerHeight + 'px'; // Negative value of the controller's height
+      controller.style.bottom = slideOutPosition; // Move the controller outside the viewport
+      this.hiding = true;
+    }
+    
+    buttonR.addEventListener('pointerup', (ev) => {
+      //document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyK' }));
+    });
+
+    /*
+    game.on('entityInput::handleInputs', (entityId, input) => {
+      if (input.controls && input.controls.J !== undefined) {
+        if (input.controls.J === false) {
+          console.log("FALSE")
+        }
+        // toggleModalOnKeyPress(input.controls.I);
+      }
+      if (input.controls && input.controls.K !== undefined) {
+        if (input.controls.K === false) {
+          // side down the controller
+          //document.getElementById('snes-gamepad').style.display = 'block';
+          
+        } else {
+
+          if (!this.hiding) {
+            this.hiding = true;
+            document.getElementById('snes-gamepad').style.display = 'none';
+          } else {
+            this.hiding = false;
+            document.getElementById('snes-gamepad').style.display = 'block';
+          }
+
+        }
+      }
+    });
+    */
+
 
     // use existing keyboard events
     // trigger keydown event with keycode of W, A, S, D
@@ -80,6 +160,8 @@ class GamepadGUI {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyD' }));
     });
 
+
+   
   }
 
   createSNESGamepad(parentElement) {
@@ -173,3 +255,7 @@ class GamepadGUI {
 }
 
 export default GamepadGUI;
+
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}

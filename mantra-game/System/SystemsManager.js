@@ -17,7 +17,7 @@ class SystemsManager {
     // Remark: Defaulting all Plugins to event emitters has is currently enabled
     // This means all plugin methods will be emitted as events
     // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
-    eventEmitter.bindClass(system, systemId)
+    // eventEmitter.bindClass(system, systemId)
 
     // binds system to local instance Map
     this.systems.set(systemId, system);
@@ -66,10 +66,12 @@ class SystemsManager {
   }
 
   render() {
+    /*
     const renderSystem = this.systems.get('render');
     if (renderSystem && typeof renderSystem.render === "function") {
       renderSystem.render();
     }
+    */
   }
 
   /*

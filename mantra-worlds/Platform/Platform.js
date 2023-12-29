@@ -16,7 +16,7 @@ class Platform {
 
     let game = this.game;
 
-    game.setGravity(0, 9.8, 0);
+    game.setGravity(0, 3.3, 0);
 
     game.use('Platform');
 
@@ -77,6 +77,9 @@ class Platform {
     game.use('Border', { autoBorder: true })
   
     console.log(game.systems)
+
+    game.createDefaultPlayer();
+
 
 
   }
