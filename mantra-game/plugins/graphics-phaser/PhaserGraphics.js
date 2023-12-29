@@ -76,80 +76,65 @@ class PhaserGraphics extends GraphicsInterface {
         function Main() {
           Phaser.Scene.call(this, 'Main');
         },
-      init() { },
-      create() {
-        // Optionally, set the background color of the scene
-        // this.cameras.main.setBackgroundColor('#000000');
+      init() {
+        // Listen for the loadcomplete event
+        this.load.on('complete', () => {
+          this.scene.launch('Main');
+          this.gameReady();
+        });
+
       },
       preload: function () {
-        this.load.image('player', 'textures/flare.png');
+        this.load.image('player', '/img/game/link-walk/sprite_0.png');
+        this.load.image('pixel', '/img/game/pixel.png');
+        this.load.image('pixel-black', '/img/game/pixel-black.png');
+        this.load.image('tile-block', '/img/game/tiles/tile-block.png');
+        this.load.image('tile-grass', '/img/game/tiles/tile-grass.png');
+      },
+      create: function() {
+        // Optionally, set the background color of the scene
+        // this.cameras.main.setBackgroundColor('#000000');
       }
     });
   
     this.phaserGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'gameHolder',
-      //width: 800, // TODO: config
-      //height: 600,
       transparent: true,
       scene: [_Main],
       scale: {
-        // mode: Phaser.Scale.FIT,
-        // mode: Phaser.Scale.ENVELOP,
         mode: Phaser.Scale.RESIZE_AND_FIT,
       }
     });
-
+  
     let self = this;
-    function loadMainScene() {
+    function gameReady() {
       let scene = self.phaserGame.scene.getScene('Main');
-      if (!scene) {
-        setTimeout(loadMainScene.bind(self), 10);
-        return;
-      }
-
-      let canvas = self.phaserGame.canvas;
-      canvas.setAttribute('id', 'phaser-render-canvas');
       self.scene = scene;
       let camera = scene.cameras.main;
-
+  
       let phaserCamera = new PhaserCamera(scene, self.config.camera);
       this.game.use(phaserCamera);
-
+  
       self.scenesReady = true;
-
+  
       // register renderer with graphics pipeline
       game.graphics.push(this);
-
+  
       // wait until scene is loaded before letting systems know phaser graphics are ready
       this.game.systemsManager.addSystem('graphics-phaser', this);
-
+  
       // async:true plugins *must* self report when they are ready
       game.emit('plugin::ready::graphics-phaser', this);
       camera.zoom = this.config.camera.startingZoom;
-
+  
       // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
-
     }
-
-    let Main = new Phaser.Class({
-      Extends: Phaser.Scene,
-      initialize:
-        function Main() {
-          Phaser.Scene.call(this, 'Main');
-        },
-      init() { },
-      create() {
-        this.cameras.main.setBackgroundColor('#000000');
-      },
-      preload: function () {
-        this.load.image('player', 'textures/flare.png');
-      }
-    });
-    loadMainScene();
+  
+    _Main.prototype.gameReady = gameReady.bind(this);
   }
-
+  
   removeGraphic(entityId) {
     let entity = this.game.getEntity(entityId);
     if (!entity || !entity.graphics || !entity.graphics['graphics-phaser']) {

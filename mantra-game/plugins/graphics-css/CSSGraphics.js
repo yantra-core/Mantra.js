@@ -11,6 +11,12 @@ import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
 import handleInputs from './lib/handleInputs.js';
 
+let preload = {
+  'player': '/img/game/link-walk/sprite_0.png',
+  'tile-block': '/img/game/tiles/tile-block.png',
+  'tile-grass': '/img/game/tiles/tile-grass.png'
+};
+
 class CSSGraphics extends GraphicsInterface {
 
   static id = 'graphics-css';
@@ -193,10 +199,8 @@ class CSSGraphics extends GraphicsInterface {
         entityData.rotation = entityData.rotation;
       }
     }
-
     const entityElement = document.getElementById(`entity-${entityData.id}`);
     if (entityElement) {
-
       // Update the entity color
       if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
         // entityData.color is int number here we need a hex
@@ -279,6 +283,8 @@ class CSSGraphics extends GraphicsInterface {
   update() {
     let game = this.game;
 
+
+    /*
     if (typeof game.viewportCenterXOffset === 'undefined') {
       game.viewportCenterXOffset = 0;
     }
@@ -289,6 +295,7 @@ class CSSGraphics extends GraphicsInterface {
 
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     let entityId = game.currentPlayerId;
+    */
 
 
     // PLAYER MOUSE MOVEMENT CODE< TODO MOVE THIS TO SEPARATE FILE
@@ -377,12 +384,27 @@ class CSSGraphics extends GraphicsInterface {
   }
 
   render(game, alpha) {
+    // render is called at the browser's frame rate (typically 60fps)
+    let self = this;
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
+      // console.log('rendering', ent)
       this.inflateEntity(ent, alpha);
-      if (ent.pendingRender && ent.pendingRender['graphics-css']) {
-        ent.pendingRender['graphics-css'] = false;
+
+      // this.game.changedEntities.delete(eId);
+      // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
+      //                    This could impact online mode, test for multiplayer
+      /*
+      // check if there is no graphic available, if so, inflate
+      if (!ent.graphics || !ent.graphics['graphics-phaser']) {
+        this.inflateGraphic(ent, alpha);
+        ent.pendingRender['graphics-phaser'] = false;
       }
+      if (ent.pendingRender && ent.pendingRender['graphics-phaser']) {
+        this.inflateGraphic(ent, alpha);
+        ent.pendingRender['graphics-phaser'] = false;
+      }
+      */
     }
   }
 

@@ -5,7 +5,7 @@ export default function inflateGraphic (entity) {
       if (entity.shape === 'rectangle') {
         graphic = this.inflateBox(entity);
       } else {
-        graphic = this.inflateTriangle(entity);
+        graphic = this.inflateBox(entity);
       }
       break;
     case 'BULLET':

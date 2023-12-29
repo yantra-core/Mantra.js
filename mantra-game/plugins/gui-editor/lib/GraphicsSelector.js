@@ -9,7 +9,7 @@ class GraphicsSelector {
   }
 
   createElements() {
-
+    let game = this.game;
     // Create the select box
     let selectBox = document.createElement('select');
     selectBox.id = 'graphicsSelect';
@@ -28,7 +28,7 @@ class GraphicsSelector {
     this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
     this.selectPicker = new SelectPicker(selectBox, function(selectedGraphicsMode){
       game.systems.graphics.switchGraphics(selectedGraphicsMode);
-    },game);
+    }, game);
     return selectBox;
   }
 

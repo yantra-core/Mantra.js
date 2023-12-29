@@ -16,6 +16,9 @@ class XState {
 
     let game = this.game;
 
+    // Set gravity to zero
+    game.setGravity(0, 0, 0);
+
     // Use Plugins to extend the game with new functionality
 
     // Adds projectile Bullets to the game
@@ -151,9 +154,11 @@ class XState {
     })
     // game.use('StarField');
 
+    /*
     game.systems.graphics.switchGraphics('PhaserGraphics', function(){
 
     });
+    */
 
   }
 

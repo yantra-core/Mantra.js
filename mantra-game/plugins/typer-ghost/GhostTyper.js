@@ -25,11 +25,12 @@ class GhostTyper {
   }
 
   createText(options) {
-    const { x, y, text, style, duration } = options;
+    const { x, y, text, style, duration, removeDuration } = options;
     const typer = {
       text: text,
       ogText: text,
       duration: duration || 5000,
+      removeDuration: removeDuration,
       style: style,
       typerText: this.createTextElement(x, y, style),
       framesToWait: Math.floor((duration || 5000) / (33.33 * text.length)),
@@ -43,7 +44,6 @@ class GhostTyper {
   createTextElement(x, y, style) {
     
     let cameraPosition = this.game.data.camera.position;
-    console.log('ahhh',  this.game.data)
     let currentPlayer = this.game.getEntity(this.game.currentPlayerId);
 
 
@@ -71,6 +71,15 @@ class GhostTyper {
     if (typer.text.length) {
       typer.typerText.textContent += typer.text[0];
       typer.text = typer.text.substr(1);
+    } else {
+      // remove from typers array
+      this.typers = this.typers.filter(t => t !== typer);
+      if (typer.removeDuration) {
+        setTimeout(() => {
+          typer.text = typer.ogText;
+          typer.typerText.textContent = '';
+        }, typer.removeDuration);
+      }
     }
   }
 

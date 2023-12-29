@@ -79,4 +79,5 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       }
     }
   }
+
 }

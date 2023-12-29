@@ -78,9 +78,6 @@ class Platform {
   
     console.log(game.systems)
 
-    game.createDefaultPlayer({
-      mass: 100
-    });
 
   }
 

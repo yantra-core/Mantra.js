@@ -24,11 +24,11 @@ class Sutra {
     game.use('Timers');
     game.use('Health');
 
-
-    game.on('plugin::loaded::sutra', function(){
-    // Adds a nice StarField background
     game.use('StarField');
-    game.use('TowerWorld', { game: game });
+
+    game.on('plugin::loaded::sutra', function () {
+      // Adds a nice StarField background
+      game.use('TowerWorld', { game: game });
 
     })
 

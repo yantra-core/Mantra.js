@@ -298,7 +298,7 @@ class Game {
       };
     }
     // Wait for all systems to be ready before starting the game loop
-    if (game.loadingPluginsCount > 0) {
+    if (game.loadingPluginsCount > 0 || !game.physicsReady) {
       setTimeout(function () {
         game.start(cb);
       }, 4);
@@ -328,7 +328,8 @@ class Game {
       game.emit('game::ready');
       if (this.config.defaultPlayer) {
         this.createPlayer({
-          type: 'PLAYER'
+          type: 'PLAYER',
+          texture: 'player'
         }).then(function (ent) {
           game.setPlayerId(ent.id);
         });
@@ -569,6 +570,7 @@ class Game {
       shape: 'triangle',
       width: 32,
       height: 32,
+      texture: 'player',
       mass: 222,
       friction: 0.5,  // Default friction
       frictionAir: 0.5, // Default air friction

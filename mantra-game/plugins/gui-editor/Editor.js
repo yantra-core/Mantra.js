@@ -145,7 +145,7 @@ class Editor {
 
       if (this.game && this.game.systems && this.game.systems['entity-input']) {
         if (!toolbar) {
-          console.log("toolbar not found")
+          // console.log("toolbar not found")
           // re-enable inputs
           this.game.systems['entity-input'].setInputsActive();
           if (this.game.systems['keyboard']) {

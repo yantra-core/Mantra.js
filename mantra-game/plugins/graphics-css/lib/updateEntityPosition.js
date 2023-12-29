@@ -9,6 +9,8 @@ export default function updateEntityElementPosition(entityElement, { position, w
   const domX = adjustedPosition.x - width / 2;
   const domY = adjustedPosition.y - height / 2;
 
+  // console.log(position, adjustedPosition, domX, domY)
+
   // convert rotation to degrees
   let angle = rotation * (180 / Math.PI);
 

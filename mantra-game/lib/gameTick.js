@@ -12,7 +12,7 @@ function gameTick() {
   deltaTimeMS = Math.min(deltaTimeMS, hzMS);
 
   // Clear changed entities
-  this.changedEntities.clear();
+  //this.changedEntities.clear();
   this.removedEntities.clear();
 
   if (this.isClient) {
@@ -35,19 +35,21 @@ function gameTick() {
     // we need a way for the local game mode to know when to render entities
     if (this.isClient && this.isOnline === false) {
       let ent = this.entities.get(entityId);
-      // pendingRender is not a component property yet, just ad-hoc on client
-      ent.pendingRender = {};
-      // flag each graphics interface as needing to render this entity
-      // remark: this is local game mode only
-      this.graphics.forEach(function (graphicsInterface) {
-        ent.pendingRender[graphicsInterface.id] = true;
-      });
+      if (ent) {
+        // pendingRender is not a component property yet, just ad-hoc on client
+        ent.pendingRender = {};
+        // flag each graphics interface as needing to render this entity
+        // remark: this is local game mode only
+        this.graphics.forEach(function (graphicsInterface) {
+          ent.pendingRender[graphicsInterface.id] = true;
+        });
+      }
     }
 
     // TODO: move this to Bullet plugin
     let entity = this.getEntity(entityId);
     // kinematic bullet movements on client
-    if (this.isClient && entity.type === 'BULLET') {
+    if (this.isClient && entity && entity.type === 'BULLET') {
       // console.log("kinematic", entity)
       if (entity.graphics) {
         for (let g in entity.graphics) {

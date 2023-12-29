@@ -77,7 +77,7 @@ class WorldSelector {
 
     this.selectPicker = new SelectPicker(this.selectBox, function(worldName){
       game.switchWorlds(worldName);
-    },game);
+    }, game);
 
     game.on('entityInput::handleInputs', (entityId, input) => {
       if (input.controls && input.controls.I !== undefined) {

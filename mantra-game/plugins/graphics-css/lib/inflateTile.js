@@ -153,22 +153,21 @@ export default function inflateTile(entityElement, entityData) {
 
       // clear animations styles
       /*
+      */
       frontFace.style.animation = '';
       frontFace.style.transform = '';
       backFace.style.animation = '';
       backFace.style.transform = '';
-      */
 
-      //flipWrapper.removeChild(frontFace);
-      //flipWrapper.removeChild(backFace);
-      entityElement.removeChild(flipWrapper);
+      flipWrapper.removeChild(frontFace);
+      flipWrapper.removeChild(backFace);
+      flipWrapper.remove();
+      //entityElement.removeChild(flipWrapper);
+      entityElement.remove();
     });
 } else {
     entityElement.style.background = hexColor;
 }
-
-
-
 
   // console.log('entityElement', entityElement)
 

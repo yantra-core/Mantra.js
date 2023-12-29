@@ -180,9 +180,8 @@ class Entity {
     // TODO: add additional component types that can be updated ( should be most of them )
     if (entityData.color) {
       this.game.components.color.set(entityId, entityData.color);
-      if (!this.game.changedEntities.has(entityId)) {
-      }
-      this.game.changedEntities.add(entityId);
+      //if (!this.game.changedEntities.has(entityId)) {}
+      //this.game.changedEntities.add(entityId);
       // console.log("SETTING COLOR", entityData.color)
     }
 
@@ -388,7 +387,7 @@ class Entity {
       id: entityId
     });
     // console.log("SETTING CHANGED", entityId)
-    this.game.pendingRender.add(entityId);
+    this.game.changedEntities.add(entityId);
 
     // get updated entity with components
     let updatedEntity = this.game.getEntity(entityId);

@@ -34,9 +34,10 @@ class Home {
     });
     */
 
+    /*
     game.createEntity({
       type: 'BLOCK',
-      texture: 'img/game/tiles/tile-block.png',
+      texture: 'tile-block',
       width: 32,
       height: 32,
       position: {
@@ -47,14 +48,15 @@ class Home {
       frictionAir: 1, 
       frictionStatic: 1
     });
+    */
 
+    game.createDefaultPlayer();
 
     game.use('Tile');
 
-
     game.use('Block')
-  //  game.use('Bullet')
-    game.use('Sword')
+    //  game.use('Bullet')
+    // game.use('Sword')
 
     game.use('Border', { autoBorder: true })
 

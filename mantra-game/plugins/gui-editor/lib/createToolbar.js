@@ -119,6 +119,10 @@ export default function createToolbar(game) {
   // add label to graphicsSelectorItem
   graphicsSelectorItem.appendChild(graphicsSelectorLabel);
   graphicsSelectorItem.onpointerdown = () => {
+
+    // close world selector
+    worldSelector.selectPicker.hideModal();
+
     // toggle select picker
     graphicsSelector.selectPicker.toggle();
   }
@@ -151,18 +155,14 @@ export default function createToolbar(game) {
   
 
   worldSelectorItem.onpointerdown = () => {
+    // hide world selector
+    graphicsSelector.selectPicker.hideModal();
     // toggle select picker
-
     worldSelector.selectPicker.toggle();
   };
 
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
-  /*
-  worldSelectorItem.onmousedown = () => {
-    worldSelector.selectBox.click();
-  };
-  */
 
   toolbarMenu.addElement('secondary', worldSelectorItem);
   toolbarMenu.addElement('secondary', graphicsSelectorItem);

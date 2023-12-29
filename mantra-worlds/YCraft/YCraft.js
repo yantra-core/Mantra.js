@@ -18,17 +18,17 @@ class YCraft {
 
     let game = this.game;
     game.setGravity(0, 0, 0);
-    game.use('Entity')
+    //game.use('Entity')
     game.use('YCraft', {
       contraption: contraptionsExample
     });
     game.use('YCraftGUI');
 
     game.once('plugin::loaded::typer-ghost', function(){
-      game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'YCraft Crafting World', style: { color: 'white', fontSize: '144px' }, duration: 10000 });
+      game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'YCraft Crafting World', style: { color: 'white', fontSize: '144px' }, duration: 5000, removeDuration: 1000 });
     })
 
-    //game.use('GhostTyper');
+    // game.use('GhostTyper');
     /*
     game.use('Editor', {
       sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-worlds/YCraft/YCraft.js',
@@ -51,7 +51,7 @@ class YCraft {
     */
 
     // Remark: Players removed for initial demo, is working
-    // game.createDefaultPlayer();
+    game.createDefaultPlayer();
 
 
     /* Not needed anymore?

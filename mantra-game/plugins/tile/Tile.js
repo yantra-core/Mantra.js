@@ -2,6 +2,13 @@
 // Tile.js - Marak Squires 2023
 // Implements support for Tiled JSON maps via the Tiled JSON format
 // see: https://doc.mapeditor.org/en/stable/reference/json-map-format/
+
+let tilemap = {
+  1: 'block',
+  2: 'grass',
+  3: 'water'
+};
+
 class Tile {
   static id = 'tile';
   constructor(game) {
@@ -120,12 +127,14 @@ class Tile {
         height = height * scale;
         width = width * scale;
 
-
         let body = false;
         let isStatic = true;
+        let mass = 1;
 
         if (tileId === 1) {
           body = true;
+          mass = 5000;
+          isStatic = false;
         }
 
         // console.log("placing at", x, y)
@@ -134,16 +143,22 @@ class Tile {
           type: 'BLOCK',
           kind: 'Tile', // for now
           body: body,
+          mass: mass,
           isStatic: isStatic,
           position: {
             x: x,
             y: y,
-            z: -1
+            z: -10
           },
-          color: 0x00ff00,
-          texture: 'img/game/tiles/' + tileId + '.png',
+          // color: 0x00ff00,
+          texture: 'tile-' + tilemap[tileId],
+          // Remark: we could support path'd textures here; however some engines,
+          // like Phaser require we preload the textures before we can use them
+          // this can be solved by adding a formalized asset preloader to the game
+          // texture: 'img/game/tiles/' + tileId + '.png',
           width: width,
           height: height
+          // depth: width
           // tileId: tileId
         })
         // console.log("ent", ent)

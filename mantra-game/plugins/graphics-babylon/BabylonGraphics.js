@@ -4,6 +4,12 @@ import BabylonCamera from './camera/BabylonCamera.js';
 // import inflate3DText from './lib/inflate3DText.js';
 import inflateText from './lib/inflateText.js';
 
+let preload = {
+  'player': '/img/game/link-walk/sprite_0.png',
+  'tile-block': '/img/game/tiles/tile-block.png',
+  'tile-grass': '/img/game/tiles/tile-grass.png'
+};
+
 let lastKnownStates = {};
 const POOL_SIZE_BLOCK = 3000;
 const POOL_SIZE_BULLET = 1000;
@@ -15,7 +21,7 @@ class BabylonGraphics extends GraphicsInterface {
   static removable = false;
   static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
-  constructor({ camera = {}} = {}) {
+  constructor({ camera = {} } = {}) {
     super();
     this.id = BabylonGraphics.id;
     this.async = BabylonGraphics.async;
@@ -259,7 +265,6 @@ class BabylonGraphics extends GraphicsInterface {
       var red = (entityData.color >> 16) & 255;
       var green = (entityData.color >> 8) & 255;
       var blue = entityData.color & 255;
-      //console.log('setting color', red, green, blue)
       // Set tint of graphic using the extracted RGB values
       graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
       // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
@@ -327,7 +332,7 @@ class BabylonGraphics extends GraphicsInterface {
         if (entityData.shape === 'rectangle') {
           graphic = this.createBox(entityData);
         } else {
-          graphic = this.createTriangle(entityData);
+          graphic = this.getBlock(entityData);
         }
         break;
       case 'BULLET':
@@ -374,13 +379,11 @@ class BabylonGraphics extends GraphicsInterface {
       var red = (entityData.color >> 16) & 255;
       var green = (entityData.color >> 8) & 255;
       var blue = entityData.color & 255;
-      //console.log('setting color', red, green, blue)
       // Set tint of graphic using the extracted RGB values
       graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
       // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
 
     }
-
 
     return graphic;
   }
@@ -399,7 +402,6 @@ class BabylonGraphics extends GraphicsInterface {
       bullet.mantraPools = true;
       this.mantraPools.bullet.push(bullet);
     }
-
   }
 
   getBlock(entityData) {
@@ -409,9 +411,18 @@ class BabylonGraphics extends GraphicsInterface {
       // set height and width
       block.scaling.x = entityData.width;
       block.scaling.z = entityData.height;
-      block.scaling.y = entityData.depth;
+      block.scaling.y = entityData.width;
       // set position
       block.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+
+      // set material if preload[entityData.texture] is present
+      if (preload[entityData.texture]) {
+        let material = new BABYLON.StandardMaterial("material", this.scene);
+        material.diffuseTexture = new BABYLON.Texture(preload[entityData.texture], this.scene);
+        block.material = material;
+      } else {
+        console.log('missing block texture', entityData.texture)
+      }
 
       return block;
     }
@@ -451,11 +462,11 @@ class BabylonGraphics extends GraphicsInterface {
     // Reset bullet properties if necessary
   }
 
-
   createSphere(entityData) {
     let sphere = BABYLON.MeshBuilder.CreateSphere('bullet', { diameter: entityData.radius * 2 }, this.scene);
     return sphere;
   }
+
   createBox(entityData) {
     let game = this.game;
     let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.depth, depth: entityData.height }, this.scene);
@@ -464,20 +475,26 @@ class BabylonGraphics extends GraphicsInterface {
     if (entityData.rotation) {
       // Set rotation as needed
     }
-
-    // Incoming color is int color value
-    if (entityData.color) {
-      // alert(`entityData.color ${entityData.color}`);
-      // Set color as needed
-      box.material = new BABYLON.StandardMaterial("material", this.scene);
+    // Create a material for the box
+    let material = new BABYLON.StandardMaterial("material", this.scene);
+    console.log('preload[entityData.texture]', preload[entityData.texture])
+    // Check if texture is available
+    if (typeof preload[entityData.texture] !== 'undefined') {
+      // Apply texture
+      material.diffuseTexture = new BABYLON.Texture(preload[entityData.texture], this.scene);
+    } else if (entityData.color) {
+      // Incoming color is int color value
       // Extract RGB components from the hexadecimal color value
       var red = (entityData.color >> 16) & 255;
       var green = (entityData.color >> 8) & 255;
       var blue = entityData.color & 255;
       // Set tint of graphic using the extracted RGB values
-      box.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
-
+      // clear the existing material color
+      material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
     }
+
+    // Apply the material to the box
+    box.material = material;
 
     // Ensure the box is actionable
     box.isPickable = true;

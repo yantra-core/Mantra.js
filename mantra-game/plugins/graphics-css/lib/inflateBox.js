@@ -1,3 +1,10 @@
+
+let preload = {
+  'player': '/img/game/link-walk/sprite_0.png',
+  'tile-block': '/img/game/tiles/tile-block.png',
+  'tile-grass': '/img/game/tiles/tile-grass.png'
+};
+
 export default function inflateBox(entityElement, entityData) {
   let game = this.game;
   let depthChart = this.depthChart;
@@ -20,7 +27,7 @@ export default function inflateBox(entityElement, entityData) {
   // TODO: move to separate file for inflatePart,
   // move this code to CSSGraphics switch case
   if (entityData.type === 'PART') {
-
+    // console.log("SUPER INFLATE")
     // TODO: part.kind, not name, name is the individual part name user defined
     switch (entityData.name) {
 
@@ -96,7 +103,7 @@ export default function inflateBox(entityElement, entityData) {
   // set border color to black
   entityElement.style.border = '1px solid black';
 
-  if (entityData.texture) {
+  if (preload[entityData.texture]) {
 
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
@@ -125,7 +132,7 @@ export default function inflateBox(entityElement, entityData) {
       frontFace.style.height = '100%';
       frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
       frontFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
-      frontFace.style.background = `url('${entityData.texture}')`;
+      frontFace.style.background = `url('${preload[entityData.texture]}')`;
       frontFace.style.backgroundRepeat = 'no-repeat';
       frontFace.style.backgroundSize = 'cover';
 
@@ -148,38 +155,33 @@ export default function inflateBox(entityElement, entityData) {
       // Remove the flipWrapper after animation is complete
       flipWrapper.addEventListener('animationend', () => {
         //entityElement.background = 
-
-        entityElement.style.background = `url('${entityData.texture}')`;
+        entityElement.style.background = `url('${preload[entityData.texture]}')`;
         entityElement.style.backgroundRepeat = 'no-repeat';
         entityElement.style.backgroundSize = 'cover';
 
-
         // clear animations styles
-        /*
         frontFace.style.animation = '';
         frontFace.style.transform = '';
         backFace.style.animation = '';
         backFace.style.transform = '';
-        */
 
         //flipWrapper.removeChild(frontFace);
         //flipWrapper.removeChild(backFace);
-        //entityElement.removeChild(flipWrapper);
-        // flipWrapper.remove();
+        if (entityElement) {
+          //entityElement.removeChild(flipWrapper);
+
+        }
+        flipWrapper.remove();
       });
     } else {
 
       // TODO: move this closure
       // rendering a texture without tile
-
-        entityElement.style.background = `url('${entityData.texture}')`;
-        entityElement.style.backgroundRepeat = 'no-repeat';
-        entityElement.style.backgroundSize = 'cover';
-
+      entityElement.style.background = `url('${preload[entityData.texture]}')`;
+      entityElement.style.backgroundRepeat = 'no-repeat';
+      entityElement.style.backgroundSize = 'cover';
 
     }
-
-
 
 
   } else {

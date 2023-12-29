@@ -5,8 +5,9 @@ const depthChart = [
   'border',
   'wire',
   'part',
-  'PLAYER',
-  'BLOCK'
+  'TILE',
+  'BLOCK',
+  'PLAYER'
 ];
 
 export default function inflategraphic(entityData) {
@@ -18,24 +19,40 @@ export default function inflategraphic(entityData) {
   if (entityData.graphics && entityData.graphics['graphics-phaser']) {
     graphic = entityData.graphics['graphics-phaser'];
   }
-  
+
   if (!graphic) {
-    // Create a new triangle if it doesn't exist
-    graphic = this.scene.add.graphics();
-    entityData.graphic = graphic; // Store the reference in entityData for future updates
-    if (!entityData.color) {
-      // defaults to white
-      entityData.color = 0xffffff;
+    // console.log("COULD NOT FIND GRAPHICS FOR", entityData.id, entityData.type, entityData)
+    if (entityData.texture) {
+      // Use texture if available
+      console.log('texture', entityData.texture)
+      graphic = this.scene.add.sprite(0, 0, entityData.texture);
+      graphic.setDepth(entityData.position.z)
+      entityData.graphic = graphic; // Store the reference in entityData for future updates
+      if (entityData.color) {
+        // Apply tint if color is also defined
+        // graphic.setTint(entityData.color);
+      }
+    } else {
+      // Fallback to color fill if no texture
+      // console.log("FALLING BACK TO PIXEL TEXTURE", entityData.id, entityData.type, entityData)
+      graphic = this.scene.add.sprite(0, 0, 'pixel');
+      entityData.graphic = graphic; // Store the reference in entityData for future updates
+      graphic.setTint(entityData.color);
+
+      //entityData.color = entityData.color || 0xffffff; // Defaults to white
+      //graphic.setDepth(9999)
+      //graphic.fillStyle(entityData.color, 1);
+      // graphic.currentFillColor = entityData.color;
+      // graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
     }
-    graphic.setDepth(9999)
-    graphic.fillStyle(entityData.color, 1);
-    graphic.currentFillColor = entityData.color;
-    graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
 
     // Add interactive property to enable input events
     const hitArea = new Phaser.Geom.Rectangle(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
     graphic.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
-    
+
+    graphic.displayWidth = entityData.width;
+    graphic.displayHeight = entityData.height;
+
     // Add pointer events
     graphic.on('pointerover', () => {
       // console.log('pointerover', entityData.id, entityData.type, entityData)
@@ -82,20 +99,11 @@ export default function inflategraphic(entityData) {
     });
 
     this.scene.add.existing(graphic);
-    this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
+    // this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
+  } else {
+    // console.log('EXISTING GRAPHICS')
   }
 
-  // check to see if color is the same, if so, don't redraw
-  let currentGraphicsColor = graphic.currentFillColor;
-  let color = entityData.color || 0xff0000; // Use entityData.color or default to red
-  //console.log('checking color', currentGraphicsColor, color)
-  if (currentGraphicsColor !== color) {
-    graphic.clear();
-    // console.log('setting new color', color)
-    graphic.fillStyle(color, 1);
-    graphic.currentFillColor = color;
-    graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
-  }
 
   // check to see if position is the same, if so, don't redraw
   let currentGraphicsPosition = { x: graphic.x, y: graphic.y };
