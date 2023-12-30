@@ -113,6 +113,7 @@ class Tile {
         
         let x = (index % layer.width) * tileWidth;
         let y = Math.floor(index / layer.width) * tileHeight;
+        let z = -10;
 
         // these x y assume 0,0, shift the coords to center since map goes negative
         x = x - (layer.width * tileWidth / 2);
@@ -135,6 +136,7 @@ class Tile {
           body = true;
           mass = 5000;
           isStatic = false;
+          z = 16;
         }
 
         // console.log("placing at", x, y)
@@ -148,7 +150,7 @@ class Tile {
           position: {
             x: x,
             y: y,
-            z: -10
+            z: z
           },
           friction: 1,
           frictionAir: 1,
@@ -160,7 +162,8 @@ class Tile {
           // this can be solved by adding a formalized asset preloader to the game
           // texture: 'img/game/tiles/' + tileId + '.png',
           width: width,
-          height: height
+          height: height,
+          depth: width
           // depth: width
           // tileId: tileId
         })

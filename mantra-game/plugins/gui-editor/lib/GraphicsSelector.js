@@ -45,6 +45,7 @@ class GraphicsSelector {
   }
 
   addEventListeners() {
+    let game = this.game;
     this.game.on('plugin::ready::graphics-phaser', () => {
       this.selectElement('PhaserGraphics');
     });

@@ -75,10 +75,11 @@ export default function inflategraphic(entityData) {
       //setCursorStyle(graphic, this.scene, 'default');
     });
 
-    graphic.on('pointerdown', () => {
+    graphic.on('pointerdown', (pointer) => {
       // set closed hand cursor
       // setCursorStyle(graphic, this.scene, 'grabbing');
       // Handle pointer down events
+
       let ent = game.getEntity(entityData.id);
       if (ent && ent.yCraft && ent.yCraft.part) {
         let partType = ent.yCraft.part.type;
@@ -89,6 +90,32 @@ export default function inflategraphic(entityData) {
           ent.yCraft.part.toggle();
         }
       }
+
+      if (ent) {
+
+        const pointerX = pointer.worldX;
+        const pointerY = pointer.worldY;
+    
+        // Calculate the center of the graphic
+        const centerX = graphic.x + graphic.displayWidth / 2;
+        const centerY = graphic.y + graphic.displayHeight / 2;
+    
+        // Calculate the offset from the center
+        let offsetX = pointerX - centerX;
+        let offsetY = pointerY - centerY;
+
+        offsetX = offsetX + (entityData.width / 2);
+        offsetY = offsetY + (entityData.height / 2);
+
+        const convertedEvent = {
+          offsetX: offsetX,
+          offsetY: offsetY
+        };
+    
+        console.log('Converted Event', pointer, graphic, convertedEvent);
+        game.emit('pointerDown', ent, convertedEvent);
+      }
+
     });
 
     graphic.on('pointerup', () => {

@@ -1,8 +1,9 @@
-
+// TODO: formalize preloader
 let preload = {
   'player': '/img/game/link-walk/sprite_0.png',
   'tile-block': '/img/game/tiles/tile-block.png',
-  'tile-grass': '/img/game/tiles/tile-grass.png'
+  'tile-grass': '/img/game/tiles/tile-grass.png',
+  'fire': '/img/game/env/loz_fire.png',
 };
 
 export default function inflateBox(entityElement, entityData) {
@@ -23,6 +24,13 @@ export default function inflateBox(entityElement, entityData) {
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
 
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+  entityElement.addEventListener('pointerdown', (ev) => {
+    console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    let ent = game.getEntity(entityData.id);
+    game.emit('pointerDown', ent, ev);
+  });
+
 
   // TODO: move to separate file for inflatePart,
   // move this code to CSSGraphics switch case
@@ -83,6 +91,7 @@ export default function inflateBox(entityElement, entityData) {
       if (ent && ent.yCraft && ent.yCraft.part.toggle) {
         ent.yCraft.part.toggle();
       }
+
     });
     entityElement.addEventListener('pointerup', (ev) => {
       // console.log(ev.target, entityData.id, entityData.type, entityData)

@@ -33,6 +33,52 @@ class Platform {
       });
     }
 
+
+    game.use('Sutra')
+
+    game.once('plugin::loaded::sutra', function(){
+
+
+      let rules = game.createSutra();
+      rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
+  
+      game.setSutra(rules);
+  
+      rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
+        if (entity.type === 'COLLISION') {
+          // console.log('spawnUnitTouchedHomebase', entity)
+          if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
+            // console.log('spawnUnitTouchedHomebase', entity, gameState)
+            return true;
+          }
+          if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
+            // console.log('spawnUnitTouchedHomebase', entity, gameState)
+            return true;
+          }
+        }
+      });
+
+      rules
+        .if('playerTouchedWarpZone')
+        .then('switchWorld')
+
+      rules.on('switchWorld', (entity) => {
+        game.switchWorlds('Music');
+        console.log('switchWorld', entity)
+      });
+      console.log('created sutra', rules)
+    });
+
+    game.createEntity({
+      type: 'WARP',
+      width: 64,
+      height: 64,
+      isStatic: true,
+      position: {
+        x: -300,
+        y: 0
+      }
+    })
     // TODO: remap spacebar to jump
 
     // TODO:     game.on('game::ready', function () {

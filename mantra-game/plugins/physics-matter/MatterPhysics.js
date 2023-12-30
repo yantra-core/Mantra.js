@@ -67,7 +67,6 @@ class MatterPhysics extends PhysicsInterface {
 
     game.physicsReady = true;
 
-
     // should this be onAfterUpdate? since we are serializing the state of the world?
     // i would assume we want that data *after* the update?
     this.onAfterUpdate(this.engine, (event) => {
@@ -129,8 +128,21 @@ class MatterPhysics extends PhysicsInterface {
               }
               // TODO: rotation / velocity as well, use flag isChanged
 
+              // check it z position is undefined on body ( 2D physics )
+              // if there is no z position, check for previous z position on entity and use that
+              // if there is no previous z position on entity, use 0
+
+              let position = { x: body.position.x, y: body.position.y };
+              if (typeof body.position.z === 'undefined') {
+                if (typeof ent.position.z === 'undefined') {
+                  position.z = 0;
+                } else {
+                  position.z = ent.position.z;
+                }
+              }
+
               this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-              this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+              this.game.components.position.set(body.myEntityId, position);
               this.game.components.rotation.set(body.myEntityId, body.angle);
             }
 
@@ -140,7 +152,6 @@ class MatterPhysics extends PhysicsInterface {
               this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
               this.game.components.rotation.set(body.myEntityId, body.angle);
             }
-
 
           } else {
             // this is the logic for updating *all* entities positions

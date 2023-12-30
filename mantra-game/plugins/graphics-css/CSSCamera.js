@@ -137,14 +137,30 @@ class CSSCamera {
 
   }
 
-  // update() is called each game tick, we may want to implement render() here instead for RAF
   update() {
     let game = this.game;
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
-    let entityId = game.currentPlayerId;
+    //console.log('game.viewportCenterYOffset', game.viewportCenterYOffset)
+    let currentZoom = game.data.camera.currentZoom;
+    //console.log('currentZoom', currentZoom);
+  
+    // Get browser window dimensions
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+  
+    // Calculate scale factor based on current zoom
+    let scaleFactor = 1 / currentZoom;
+  
+    // Adjust offset based on window size and scale factor
+    //game.viewportCenterXOffset = (windowWidth / 2) * scaleFactor;
+    game.viewportCenterXOffset = game.viewportCenterXOffset / 2;
 
-    // console.log('game.viewportCenterXOffset', game.viewportCenterXOffset, game.viewportCenterYOffset)
-    // TODO: add ability for this to work with dragging and follow false
+    //game.viewportCenterYOffset = (windowHeight / 2) * scaleFactor;
+    game.viewportCenterYOffset = game.viewportCenterYOffset / 2;
+    
+    //console.log('Updated Offset X:', game.viewportCenterXOffset);
+    //console.log('Updated Offset Y:', game.viewportCenterYOffset);
+  
     if (this.follow && currentPlayer && currentPlayer.position) {
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
       this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
@@ -153,6 +169,7 @@ class CSSCamera {
       this.scene.cameraPosition.y = game.viewportCenterYOffset;
     }
   }
+  
 
   initZoomControls() {
     document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });

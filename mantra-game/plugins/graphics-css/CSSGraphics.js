@@ -18,7 +18,8 @@ import handleInputs from './lib/handleInputs.js';
 let preload = {
   'player': '/img/game/link-walk/sprite_0.png',
   'tile-block': '/img/game/tiles/tile-block.png',
-  'tile-grass': '/img/game/tiles/tile-grass.png'
+  'tile-grass': '/img/game/tiles/tile-grass.png',
+  'fire': '/img/game/env/loz_fire.png',
 };
 
 class CSSGraphics extends GraphicsInterface {
@@ -58,6 +59,7 @@ class CSSGraphics extends GraphicsInterface {
     this.handleInputs = handleInputs.bind(this);
     this.updatePlayerSprite = updatePlayerSprite.bind(this);
 
+    // TODO: make this function lookup with defaults ( instead of -1 )
     this.depthChart = [
       'background',
       'border',
@@ -65,7 +67,10 @@ class CSSGraphics extends GraphicsInterface {
       'PART',
       'TEXT',
       'PLAYER',
-      'BLOCK'
+      'BLOCK',
+      'FIRE',
+      'WARP',
+      'NOTE'
     ];
 
     // this.depthChart = this.depthChart.reverse();

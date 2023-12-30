@@ -91,6 +91,7 @@ class PhaserGraphics extends GraphicsInterface {
         this.load.image('pixel-black', '/img/game/pixel-black.png');
         this.load.image('tile-block', '/img/game/tiles/tile-block.png');
         this.load.image('tile-grass', '/img/game/tiles/tile-grass.png');
+        this.load.image('fire', '/img/game/env/loz_fire.png');
       },
       create: function() {
         // Optionally, set the background color of the scene

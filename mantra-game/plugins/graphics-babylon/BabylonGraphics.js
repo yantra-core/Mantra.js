@@ -7,7 +7,8 @@ import inflateText from './lib/inflateText.js';
 let preload = {
   'player': '/img/game/link-walk/sprite_0.png',
   'tile-block': '/img/game/tiles/tile-block.png',
-  'tile-grass': '/img/game/tiles/tile-grass.png'
+  'tile-grass': '/img/game/tiles/tile-grass.png',
+  'fire': '/img/game/env/loz_fire.png',
 };
 
 let lastKnownStates = {};
@@ -359,6 +360,7 @@ class BabylonGraphics extends GraphicsInterface {
     // TODO: allow for setting of z position in 2d mode, if z exists
     if (this.game.physics.dimension === 2) {
       if (typeof entityData.position.z === 'undefined') {
+        console.log("WARNING UNDEIFNED Z", entityData.type, entityData.position)
         entityData.position.z = 1;
       }
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
