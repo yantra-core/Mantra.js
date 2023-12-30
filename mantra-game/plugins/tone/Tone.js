@@ -3,6 +3,7 @@
 // import * as Tone from 'tone';
 
 import startUpJingle from './jingles/start-up.js';
+import keyCodes from './keyCodes.js';
 
 class TonePlugin {
 
@@ -12,12 +13,16 @@ class TonePlugin {
   constructor() {
     this.id = TonePlugin.id;
     this.synth = null;
-    this.playIntro = true;
+    this.playIntro = false;
     this.userEnabled = false;
+    this.lastNotePlayed = null;
+    this.keyCodes = keyCodes;
   }
 
   init(game) {
     this.game = game;
+    // register the plugin with the game
+    this.game.systemsManager.addSystem(this.id, this);
     // check to see if Tone scope is available, if not assume we need to inject it sequentially
     if (typeof Tone === 'undefined') {
       console.log('Tone is not defined, attempting to load it from vendor');
@@ -44,37 +49,14 @@ class TonePlugin {
       //play a middle 'C' for the duration of an 8th note
       self.playNote(note, duration);
     };
+    
 
     // Create a synth and connect it to the main output
     //const synth = new Tone.Synth().toDestination();
 
     console.log('Tone is ready', startUpJingle)
     if (this.playIntro) {
-      const synths = [];
-      let currentMidi = startUpJingle;
-      const now = Tone.now() + 0.5;
-      currentMidi.tracks.forEach((track) => {
-        //create a synth for each track
-       this.synth = new Tone.PolySynth(Tone.Synth, {
-          envelope: {
-            attack: 0.02,
-            decay: 0.1,
-            sustain: 0.3,
-            release: 1,
-          },
-        }).toDestination();
-        synths.push(that.synth);
-        //schedule all of the events
-        // we have access to that.synth, can we listen for play note events?
-        track.notes.forEach((note) => {
-          that.playNote(
-            note.name,
-            note.duration,
-            note.time + now,
-            note.velocity
-          )
-        });
-      });
+      this.playIntroJingle();
     }
 
     // Function to play the sound
@@ -90,13 +72,119 @@ class TonePlugin {
     game.emit('plugin::ready::tone', this);
   }
 
+  playIntroJingle() {
+    let that = this;
+    const synths = [];
+    let currentMidi = startUpJingle;
+    const now = Tone.now() + 0.5;
+    currentMidi.tracks.forEach((track) => {
+      //create a synth for each track
+     this.synth = new Tone.PolySynth(Tone.Synth, {
+        envelope: {
+          attack: 0.02,
+          decay: 0.1,
+          sustain: 0.3,
+          release: 1,
+        },
+      }).toDestination();
+      synths.push(that.synth);
+      //schedule all of the events
+      // we have access to that.synth, can we listen for play note events?
+      track.notes.forEach((note) => {
+        that.playNote(
+          note.name,
+          note.duration,
+          note.time + now,
+          note.velocity
+        )
+      });
+    });
+
+  }
+
   playNote(note, duration, now = 0, velocity = 1) {
+    if (typeof note === 'undefined') {
+      // if note is not defined, select a random note from the keyCodes object
+      let keys = Object.keys(this.keyCodes);
+      let randomKey = keys[Math.floor(Math.random() * keys.length)];
+
+      // check to see if this.lastNotePlayed is defined, if so perform harmonic shift
+      if (this.lastNotePlayed) {
+        console.log("performing harmonic shift")
+        randomKey = this.harmonicShift(this.lastNotePlayed, { type: 'perfectFifth' });
+      }
+
+      note = this.keyCodes[randomKey].toneCode;
+    }
+
+    this.lastNotePlayed = note;
+
     // console.log('playing ', note, duration)
     let game = this.game;
     // Play a note for a given duration
-    this.synth.triggerAttackRelease(note, duration, now, velocity);
+    try  { 
+      this.synth.triggerAttackRelease(note, duration, now, velocity);
+    } catch (err) {
+      console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err)
+    }
     // game.emit('playNote', note, duration, now, velocity);
   }
+
+  harmonicShift(traktorKeyCode, options = { type: 'perfectFifth' }) {
+    const wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];
+  
+    let currentIndex = wheelOrder.indexOf(traktorKeyCode);
+  
+    if (currentIndex === -1) {
+      // keycode wasn't found, try to find it in the toneCode property
+      let keys = Object.keys(this.keyCodes);
+      let foundKey = keys.find(key => this.keyCodes[key].toneCode === traktorKeyCode);
+      if (foundKey) {
+        currentIndex = wheelOrder.indexOf(foundKey);
+      }
+    }
+  
+    if (currentIndex === -1) {
+        throw new Error('Invalid Traktor Key Code');
+    }
+  
+    switch (options.type) {
+        case 'perfectFifth':
+            // 7 steps forward for major, 7 steps backward for minor
+            currentIndex += (traktorKeyCode.endsWith('m') ? -7 : 7);
+            break;
+        case 'majorMinorSwap':
+            // Toggle between major and minor
+            currentIndex += (traktorKeyCode.endsWith('m') ? 12 : -12);
+            break;
+        case 'shift':
+            // Shift by a specified amount
+            if (typeof options.amount !== 'number' || Math.abs(options.amount) > 3) {
+                throw new Error('Invalid shift amount');
+            }
+            currentIndex += options.amount;
+            break;
+        default:
+            throw new Error('Invalid transition type');
+    }
+  
+    // Ensure the index wraps around the wheel
+    currentIndex = (currentIndex + 24) % 24;
+  
+    return wheelOrder[currentIndex];
+  }
+
 }
 
 export default TonePlugin;
+
+
+
+
+
+/*
+// Example usage
+console.log(harmonicShift('5m', { type: 'perfectFifth' })); // Expected output: 10m
+console.log(harmonicShift('5m', { type: 'majorMinorSwap' })); // Expected output: 5d
+console.log(harmonicShift('5m', { type: 'shift', amount: -2 })); // Expected output: 3m
+*/

@@ -150,6 +150,9 @@ class Tile {
             y: y,
             z: -10
           },
+          friction: 1,
+          frictionAir: 1,
+          frictionStatic: 1,
           // color: 0x00ff00,
           texture: 'tile-' + tilemap[tileId],
           // Remark: we could support path'd textures here; however some engines,
