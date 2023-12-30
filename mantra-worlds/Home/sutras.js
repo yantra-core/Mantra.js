@@ -1,19 +1,13 @@
 export default function sutras (game) {
 
   let rules = game.createSutra();
-  rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
-
-
 
   rules.addCondition('playerTouchedStoneTile', (entity, gameState) => {
     if (entity.type === 'COLLISION') {
-      // console.log('spawnUnitTouchedHomebase', entity)
       if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'BLOCK') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
       if (entity.bodyB.type === 'BLOCK' && entity.bodyA.type === 'PLAYER') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
     }
@@ -21,13 +15,10 @@ export default function sutras (game) {
 
   rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
     if (entity.type === 'COLLISION') {
-      // console.log('spawnUnitTouchedHomebase', entity)
       if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
       if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
     }
@@ -35,13 +26,10 @@ export default function sutras (game) {
 
   rules.addCondition('entityTouchedFire', (entity, gameState) => {
     if (entity.type === 'COLLISION') {
-      // console.log('spawnUnitTouchedHomebase', entity)
       if (entity.bodyA.type === 'FIRE') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
       if (entity.bodyB.type === 'FIRE') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
     }
@@ -49,13 +37,10 @@ export default function sutras (game) {
 
   rules.addCondition('entityTouchedNote', (entity, gameState) => {
     if (entity.type === 'COLLISION') {
-      // console.log('spawnUnitTouchedHomebase', entity)
       if (entity.bodyA.type === 'NOTE') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
       if (entity.bodyB.type === 'NOTE') {
-        // console.log('spawnUnitTouchedHomebase', entity, gameState)
         return true;
       }
     }
@@ -76,7 +61,6 @@ export default function sutras (game) {
       note: 'F#4'
     })
     .then('damageEntity')
-    
 
   rules.if('playerTouchedStoneTile')
     .then('playNote', {
@@ -109,7 +93,6 @@ export default function sutras (game) {
     //game.systems.tone.playIntroJingle();
     game.playNote(collision.note);
   });
-
 
   // TODO: move pointerDown event into Sutra
   game.on('pointerDown', (entity, ev) => {
@@ -154,7 +137,6 @@ export default function sutras (game) {
    
   });
 
-
-  console.log('created sutra', rules)
+  console.log('created sutra', rules.toEnglish())
   return rules;
 }

@@ -48,8 +48,8 @@ class Game {
     showLoadingScreen = true,
     minLoadTime = 330, // minimum time to show loading screen
     loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
-    width = 1600,
-    height = 900,
+    width = 1600 * 10,
+    height = 900 * 10,
     // game systems / auto-load based on pluginsConfig
     physics = 'matter',
     graphics = ['babylon'],
@@ -201,8 +201,6 @@ class Game {
 
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
-
-
     this.components = {
       type: new Component('type', this),           // string type, name of Entity
       destroyed: new Component('destroyed', this), // boolean, if true, entity is pending destroy and will be removed from game
@@ -588,7 +586,7 @@ class Game {
   }
 
   playNote(note, duration) {
-    // console.log('Tone Plugin not loaded. Cannot play tone.');
+    console.log('Tone Plugin not loaded. Cannot play tone note.');
   }
 
   setGravity(x = 0, y = 0, z = 0) {
@@ -615,6 +613,21 @@ class Game {
     const body = this.bodyMap[entityId];
     this.physics.applyForce(body, body.position, force);
     this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
+  }
+
+  setPosition(entityId, position) {
+    const body = this.bodyMap[entityId];
+    this.physics.setPosition(body, position);
+  }
+
+  applyPosition(entityId, position) {
+    const body = this.bodyMap[entityId];
+    // takes the current position and adds the new position
+    let newPosition = {
+      x: body.position.x + position.x,
+      y: body.position.y + position.y
+    };
+    this.physics.setPosition(body, newPosition);
   }
 
   rotate(entityId, rotation) {

@@ -31,11 +31,14 @@ class Home {
     // game.use('Bullet')
     // game.use('Sword')
 
+
     game.use('Border', { autoBorder: true })
 
     welcomeMessage(game);
 
     // See: sutra.js for game logic
+    let rules = sutras(game);
+    game.setSutra(rules);
 
     // if touch warp, switch to Platform level
     game.createEntity({

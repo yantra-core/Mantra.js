@@ -9,8 +9,8 @@ export default function welcomeMessage(game) {
     y = 30;
   }
 
-  let typer = game.systems['typer-ghost'].createText({
-    x: x, y: y, text: 'Welcome to Mantra\n my friend.',
+  let typer = game.systems['typer-ghost'].createQueuedText({
+    x: x, y: y,
     style: {
       color: 'white',
       fontSize: fontSize,
@@ -27,23 +27,15 @@ export default function welcomeMessage(game) {
     duration: 5000, removeDuration: 6000
   });
 
-  setTimeout(function () {
-    let moveMessage = 'Use WASD to move.';
-    if (is_touch_enabled()) {
-      moveMessage = 'Touch Gamepad to move.';
-    }
-    typer.updateText(moveMessage, 5000, 6000);
+  // Queueing additional messages
+  typer.queueText('Welcome to Mantra Worlds', 5000, 2000);
+  typer.queueText('Use WASD to move', 5000, 3000);
+  typer.queueText('Press START to Switch Worlds', 5000, 2000);
+  typer.queueText('Press SELECT to Switch Graphics', 5000, 2000);
 
-  }, 6000)
+  // Start processing the queue
+  typer.processQueue();
 
-  setTimeout(function () {
-    typer.updateText('Switch Worlds by pressing START', 5000, 6000);
-  }, 12000)
-
-
-  setTimeout(function () {
-    typer.updateText('You can Switch Graphics by pressing SELECT', 5000, 6000);
-  }, 18000)
 
 }
 
