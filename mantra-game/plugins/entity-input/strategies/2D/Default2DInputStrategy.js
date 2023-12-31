@@ -78,7 +78,7 @@ class DefaultTwoDimensionalInputStrategy {
       }
     }
 
-    if (buttons.LEFT) actions.push('FIRE_BULLET');
+    // if (buttons.LEFT) actions.push('FIRE_BULLET');
 
     /* Remark: Removes in favor of input pooling on gametick
     if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
@@ -88,6 +88,7 @@ class DefaultTwoDimensionalInputStrategy {
     };
     plugin.lastBulletFireTime[entityId] = Date.now();
     */
+
     if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
     if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
     if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, -1);

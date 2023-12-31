@@ -13,6 +13,7 @@ class Graphics {
     this.game.createGraphic = this.createGraphic.bind(this);
     this.game.removeGraphic = this.removeGraphic.bind(this);
     this.game.updateGraphic = this.updateGraphic.bind(this);
+    this.game.getTexture = this.getTexture.bind(this);
 
     // Ensure the gameHolder div exists
     let gameHolder = document.getElementById('gameHolder');
@@ -22,12 +23,17 @@ class Graphics {
       document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
     }
 
+    // TODO: remove this preloader
     this.preload();
     
   }
 
+  // Remark: Putting preload in Graphics interface isn't exactly ideal
+  // We could use this for preloading required graphics and waiting for them to load before starting the game
+  // However; in most cases it's better to start Mantra and then preload in the Client before
   preload () {
 
+    // TODO: move guy sprites to new Preloader / Animations subsystem
     // preload the guy sprites ( for now )
     let preload = ['guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1'];
     let preloaderDiv = document.createElement('div');
@@ -43,6 +49,19 @@ class Graphics {
   }
 
   update() { }
+
+  getTexture(keyOrUrl) {
+    let game = this.game;
+    // returns the texture url for a given key
+    // if no key is found, checks if the key is a url and returns it
+    // this is useful in allowing parent APIs to still use urls as textures and bypass preloading
+    // as to not require preloading of all textures
+    let t = game.preloader.getItem(keyOrUrl);
+    if (t) {
+      return t.url;
+    }
+    return keyOrUrl;
+  }
 
   // Remark: Graphics.createGraphic() currently isn't used as each Graphics Interface is responsible for creating its own graphics
   //         By iterating through game.entities Map in the interfaces .render() method

@@ -13,6 +13,21 @@ class GhostTyper {
     this.game.systemsManager.addSystem(this.id, this);
   }
 
+  createQueuedText(options) {
+    const typer = new Typer(this.game, options.x, options.y, '', options.style, () => this.removeTyper(typer));
+    this.typers.push(typer);
+    return typer;
+  }
+  // Add text to the queue of a specific typer
+  queueTextForTyper(typer, text, duration, removeDuration) {
+    typer.queueText(text, duration, removeDuration);
+  }
+
+  // Start processing the queue for a specific typer
+  startTyperQueue(typer) {
+    typer.processQueue();
+  }
+
   createText(options) {
     const typer = new Typer(this.game, options.x, options.y, options.text, options.style, options.duration, options.removeDuration, () => this.removeTyper(typer));
     this.typers.push(typer);
@@ -27,17 +42,17 @@ class GhostTyper {
       }
     });
   }
-  
+
   removeTyper(typerToRemove) {
     this.typers = this.typers.filter(typer => typer !== typerToRemove);
   }
-  
+
 }
 
 class Typer {
-  constructor(game, x, y, text, style, duration, removeDuration, onRemove) {
+  constructor(game, x, y, text = '', style, duration, removeDuration, onRemove) {
     this.game = game;
-    this.text = text;
+    this.text = '';
     this.ogText = text;
     this.duration = duration || 5000;
     this.removeDuration = removeDuration;
@@ -48,7 +63,20 @@ class Typer {
     this.lastUpdate = 0;
     this.complete = false;
     this.removeTimer = null;
+    this.textQueue = [];
     this.onRemove = onRemove;
+  }
+
+  queueText(text, duration, removeDuration) {
+    this.textQueue.push({ text, duration, removeDuration });
+  }
+
+  // Method to start processing the queue
+  processQueue() {
+    if (this.textQueue.length > 0) {
+      const { text, duration, removeDuration } = this.textQueue.shift();
+      this.updateText(text, duration, removeDuration);
+    }
   }
 
   createTextElement(x, y, style) {
@@ -63,48 +91,41 @@ class Typer {
     document.body.appendChild(element);
     return element;
   }
- 
+
   type() {
     if (this.text.length) {
       this.typerText.textContent += this.text[0];
       this.text = this.text.substr(1);
-    } else {
+      this.isTyping = true;
+    } else if (this.isTyping) {
       this.complete = true;
+      this.isTyping = false;
       this.setRemoveTimer();
     }
   }
 
   setRemoveTimer() {
     if (this.removeDuration) {
-      clearTimeout(this.removeTimer);
+      // Wait for removeDuration before processing the next queue item
       this.removeTimer = setTimeout(() => {
-        this.text = this.ogText;
         this.typerText.textContent = '';
-        this.complete = false;
-        if (this.onRemove) {
-          this.onRemove();
-        }
+        this.processQueue();
       }, this.removeDuration);
+    } else {
+      // If there's no removeDuration, process the next item immediately
+      this.processQueue();
     }
   }
 
   updateText(newText, newDuration, newRemoveDuration) {
-    let now = new Date().getTime();
-    if (now - this.lastUpdate < 100) {
-      // console.log('ignoring update because it is too soon');
-      return;
-    }
-    this.lastUpdate = now;
     this.complete = false;
     this.text = newText;
     this.ogText = newText;
     this.duration = newDuration || this.duration;
+    this.removeDuration = newRemoveDuration;
     this.framesToWait = Math.floor(this.duration / (33.33 * newText.length));
     this.typerText.textContent = '';
-    if (typeof newRemoveDuration === 'number') {
-      this.removeDuration = newRemoveDuration;
-      this.setRemoveTimer();
-    }
+    this.isTyping = false;
   }
 }
 

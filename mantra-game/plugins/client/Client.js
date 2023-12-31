@@ -2,6 +2,8 @@
 // Mantra Client, connects to either local instance or remote websocket server
 import LocalClient from "./LocalClient.js";
 import WebSocketClient from "./WebSocketClient.js";
+import Preloader from "./lib/Preloader.js";
+import defaultAssets from './defaultAssets.js';
 
 export default class Client {
   static id = 'client';
@@ -16,10 +18,18 @@ export default class Client {
       deltaEncoding,
       deltaCompression
     };
+
+    this.preloading = false;
+
   }
 
   init (game) {
     this.game = game;
+
+    const preloader = new Preloader();
+
+    // hoist preloader to game scope
+    game.preloader = preloader;
     // Load all known client plugins
     // For now, this is just localClient and websocketClient
     // Remark: We load both of them to allow for switching of local / remote modes
@@ -31,10 +41,39 @@ export default class Client {
       deltaCompression: this.config.deltaCompression,
       deltaEncoding: this.config.deltaEncoding
     }));
+
+    game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
+    game.on('assetsLoaded', () => console.log('All assets loaded!'));
+
+    // load default assets
+    for (let key in defaultAssets) { // TODO: configurable assets
+      preloader.addAsset(defaultAssets[key], 'image', key);
+    }
+
+    this.preloading = true;
+    preloader.loadAll().then(() => {
+      console.log("All assets loaded", preloader)
+      let that = this;
+      that.preloading = false;
+      /* for dev testing
+      setTimeout(function(){
+        that.preloading = false;
+      }, 5000)
+      */
+      // console.log(preloader.getItem('player'))
+    });
+
     game.systemsManager.addSystem('client', this);
   }
 
   start (callback) {
+    if (this.preloading) {
+      // console.log('Client.js waiting for preloading to finish')
+      setTimeout(() => {
+        this.start(callback);
+      }, 4);
+      return;
+    }
     let localClient = this.game.getSystem('localClient');
     localClient.start(callback);
   }

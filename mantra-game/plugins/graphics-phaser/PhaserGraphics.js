@@ -86,12 +86,11 @@ class PhaserGraphics extends GraphicsInterface {
 
       },
       preload: function () {
-        this.load.image('player', '/img/game/link-walk/sprite_0.png');
-        this.load.image('pixel', '/img/game/pixel.png');
-        this.load.image('pixel-black', '/img/game/pixel-black.png');
-        this.load.image('tile-block', '/img/game/tiles/tile-block.png');
-        this.load.image('tile-grass', '/img/game/tiles/tile-grass.png');
-        this.load.image('fire', '/img/game/env/loz_fire.png');
+        // Mantra preloader should have already loaded all assets
+        // Phaser preloader should hit the cache and load them from there
+        game.preloader.assets.forEach((asset) => {
+          this.load.image(asset.key, asset.url);
+        })
       },
       create: function() {
         // Optionally, set the background color of the scene

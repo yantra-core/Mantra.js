@@ -4,13 +4,6 @@ import BabylonCamera from './camera/BabylonCamera.js';
 // import inflate3DText from './lib/inflate3DText.js';
 import inflateText from './lib/inflateText.js';
 
-let preload = {
-  'player': '/img/game/link-walk/sprite_0.png',
-  'tile-block': '/img/game/tiles/tile-block.png',
-  'tile-grass': '/img/game/tiles/tile-grass.png',
-  'fire': '/img/game/env/loz_fire.png',
-};
-
 let lastKnownStates = {};
 const POOL_SIZE_BLOCK = 3000;
 const POOL_SIZE_BULLET = 1000;
@@ -360,7 +353,7 @@ class BabylonGraphics extends GraphicsInterface {
     // TODO: allow for setting of z position in 2d mode, if z exists
     if (this.game.physics.dimension === 2) {
       if (typeof entityData.position.z === 'undefined') {
-        console.log("WARNING UNDEIFNED Z", entityData.type, entityData.position)
+        // console.log("undefined Z", entityData.type, entityData.position)
         entityData.position.z = 1;
       }
       graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
@@ -407,6 +400,7 @@ class BabylonGraphics extends GraphicsInterface {
   }
 
   getBlock(entityData) {
+    let game = this.game;
     let block = this.mantraPools.block.find(b => !b.isVisible);
     if (block) {
       block.isVisible = true;
@@ -417,10 +411,10 @@ class BabylonGraphics extends GraphicsInterface {
       // set position
       block.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
 
-      // set material if preload[entityData.texture] is present
-      if (preload[entityData.texture]) {
+      // set material if game.getTexture(entityData.texture) is present
+      if (game.getTexture(entityData.texture)) {
         let material = new BABYLON.StandardMaterial("material", this.scene);
-        material.diffuseTexture = new BABYLON.Texture(preload[entityData.texture], this.scene);
+        material.diffuseTexture = new BABYLON.Texture(game.getTexture(entityData.texture), this.scene);
         block.material = material;
       } else {
         console.log('missing block texture', entityData.texture)
@@ -479,11 +473,11 @@ class BabylonGraphics extends GraphicsInterface {
     }
     // Create a material for the box
     let material = new BABYLON.StandardMaterial("material", this.scene);
-    console.log('preload[entityData.texture]', preload[entityData.texture])
+    console.log('game.getTexture(entityData.texture)', game.getTexture(entityData.texture))
     // Check if texture is available
-    if (typeof preload[entityData.texture] !== 'undefined') {
+    if (typeof game.getTexture(entityData.texture) !== 'undefined') {
       // Apply texture
-      material.diffuseTexture = new BABYLON.Texture(preload[entityData.texture], this.scene);
+      material.diffuseTexture = new BABYLON.Texture(game.getTexture(entityData.texture), this.scene);
     } else if (entityData.color) {
       // Incoming color is int color value
       // Extract RGB components from the hexadecimal color value

@@ -49,6 +49,12 @@ export default function inflategraphic(entityData) {
     // Log the hitArea for debugging purposes
     // console.log('hitArea', hitArea);
 
+    if (entityData.style && entityData.style.display) {
+      if (entityData.style.display === 'none') {
+        graphic.setVisible(false);
+      }
+    }
+
     // Set the graphic to be interactive and use the hitArea for interaction checks
     graphic.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
 

@@ -1,13 +1,8 @@
-// TODO: formalize preloader
-let preload = {
-  'player': '/img/game/link-walk/sprite_0.png',
-  'tile-block': '/img/game/tiles/tile-block.png',
-  'tile-grass': '/img/game/tiles/tile-grass.png',
-  'fire': '/img/game/env/loz_fire.png',
-};
-
 export default function inflateBox(entityElement, entityData) {
   let game = this.game;
+
+  let getTexture = game.getTexture;
+  
   let depthChart = this.depthChart;
   // For other entities, create a rectangle
   let hexColor = 'white';
@@ -30,7 +25,6 @@ export default function inflateBox(entityElement, entityData) {
     let ent = game.getEntity(entityData.id);
     game.emit('pointerDown', ent, ev);
   });
-
 
   // TODO: move to separate file for inflatePart,
   // move this code to CSSGraphics switch case
@@ -112,7 +106,7 @@ export default function inflateBox(entityElement, entityData) {
   // set border color to black
   entityElement.style.border = '1px solid black';
 
-  if (preload[entityData.texture]) {
+  if (getTexture(entityData.texture)) {
 
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
@@ -143,7 +137,7 @@ export default function inflateBox(entityElement, entityData) {
       frontFace.style.height = '100%';
       frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
       frontFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
-      frontFace.style.background = `url('${preload[entityData.texture]}')`;
+      frontFace.style.background = `url('${getTexture(entityData.texture)}')`;
       frontFace.style.backgroundRepeat = 'no-repeat';
       frontFace.style.backgroundSize = 'cover';
 
@@ -166,7 +160,7 @@ export default function inflateBox(entityElement, entityData) {
       // Remove the flipWrapper after animation is complete
       flipWrapper.addEventListener('animationend', () => {
         //entityElement.background = 
-        entityElement.style.background = `url('${preload[entityData.texture]}')`;
+        entityElement.style.background = `url('${getTexture(entityData.texture)}')`;
         entityElement.style.backgroundRepeat = 'no-repeat';
         entityElement.style.backgroundSize = 'cover';
 
@@ -188,7 +182,7 @@ export default function inflateBox(entityElement, entityData) {
 
       // TODO: move this closure
       // rendering a texture without tile
-      entityElement.style.background = `url('${preload[entityData.texture]}')`;
+      entityElement.style.background = `url('${getTexture(entityData.texture)}')`;
       entityElement.style.backgroundRepeat = 'no-repeat';
       entityElement.style.backgroundSize = 'cover';
 

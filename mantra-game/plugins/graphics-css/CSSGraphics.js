@@ -15,13 +15,6 @@ import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
 import handleInputs from './lib/handleInputs.js';
 
-let preload = {
-  'player': '/img/game/link-walk/sprite_0.png',
-  'tile-block': '/img/game/tiles/tile-block.png',
-  'tile-grass': '/img/game/tiles/tile-grass.png',
-  'fire': '/img/game/env/loz_fire.png',
-};
-
 class CSSGraphics extends GraphicsInterface {
 
   static id = 'graphics-css';
