@@ -1,7 +1,9 @@
 // Graphics.js - Marak Squires 2023
 import updateSprite from "./lib/updateSprite.js";
 import SpriteSheet from "./lib/SpriteSheet.js";
-import handleInputs from "./lib/handleInputs.js"; // TODO: move out of CSSGraphics
+import handleInputs from "./lib/handleInputs.js";
+import getTexture from "./lib/getTexture.js";
+
 class Graphics {
   static id = 'graphics';
   static removable = false;
@@ -10,6 +12,7 @@ class Graphics {
     this.id = Graphics.id;
     this.updateSprite = updateSprite.bind(this);
     this.handleInputs = handleInputs.bind(this);
+    this.getTexture = getTexture.bind(this);
   }
 
   init(game) {
@@ -62,26 +65,6 @@ class Graphics {
 
   update() { }
 
-  getTexture(keyOrUrl) {
-    let game = this.game;
-    // returns the texture url for a given key
-    // if no key is found, checks if the key is a url and returns it
-    // this is useful in allowing parent APIs to still use urls as textures and bypass preloading
-    // as to not require preloading of all textures
-
-    let t;
-
-    if (typeof keyOrUrl === 'object') {
-      // could be sprite sheet
-      keyOrUrl = keyOrUrl.sheet;
-    }
-
-    t = game.preloader.getItem(keyOrUrl);
-    if (t) {
-      return t.url;
-    }
-    return keyOrUrl;
-  }
 
   // Remark: Graphics.createGraphic() currently isn't used as each Graphics Interface is responsible for creating its own graphics
   //         By iterating through game.entities Map in the interfaces .render() method
