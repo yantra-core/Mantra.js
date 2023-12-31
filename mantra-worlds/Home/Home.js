@@ -28,7 +28,7 @@ class Home {
     game.use('Tile');
     game.use('Tone');
 
-    // game.use('Bullet')
+    game.use('Bullet')
     // game.use('Sword')
 
 
