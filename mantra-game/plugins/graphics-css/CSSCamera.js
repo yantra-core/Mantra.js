@@ -27,8 +27,11 @@ class CSSCamera {
     
     // this.scene.zoom(this.game.config.camera.startingZoom);
 
+    let currentWindowHeight = window.innerHeight;
+    let offsetY = currentWindowHeight / 2 / game.data.camera.currentZoom;
+
     game.viewportCenterXOffset = 0;
-    game.viewportCenterYOffset = 0;
+    game.viewportCenterYOffset = -offsetY;
 
     this.initZoomControls();
 
@@ -153,10 +156,10 @@ class CSSCamera {
   
     // Adjust offset based on window size and scale factor
     //game.viewportCenterXOffset = (windowWidth / 2) * scaleFactor;
-    game.viewportCenterXOffset = game.viewportCenterXOffset / 2;
+    //game.viewportCenterXOffset = game.viewportCenterXOffset / 2;
 
     //game.viewportCenterYOffset = (windowHeight / 2) * scaleFactor;
-    game.viewportCenterYOffset = game.viewportCenterYOffset / 2;
+    //game.viewportCenterYOffset = game.viewportCenterYOffset / 2;
     
     //console.log('Updated Offset X:', game.viewportCenterXOffset);
     //console.log('Updated Offset Y:', game.viewportCenterYOffset);

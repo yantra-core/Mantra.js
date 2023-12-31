@@ -55,6 +55,14 @@ export default function updateGraphic(entityData) {
     }
     */
 
+
+    if (entityData.style) {
+      Object.keys(entityData.style).forEach((key) => {
+        entityElement.style[key] = entityData.style[key];
+      });
+    }
+
+
     // Update the position of the entity element
     return this.updateEntityPosition(entityElement, entityData);
   } else {

@@ -89,8 +89,17 @@ class PhaserGraphics extends GraphicsInterface {
         // Mantra preloader should have already loaded all assets
         // Phaser preloader should hit the cache and load them from there
         game.preloader.assets.forEach((asset) => {
-          this.load.image(asset.key, asset.url);
-        })
+          if (asset.type === 'spritesheet') {
+            this.load.spritesheet(asset.key, asset.url, {
+              frameWidth: 16,// TODO: config
+              frameHeight: 16,
+              endFrame: asset.endFrame
+            });
+          }
+          if (asset.type === 'image') {
+            this.load.image(asset.key, asset.url);
+          }
+        });
       },
       create: function() {
         // Optionally, set the background color of the scene

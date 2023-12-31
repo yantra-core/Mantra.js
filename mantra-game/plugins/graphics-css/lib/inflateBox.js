@@ -107,12 +107,10 @@ export default function inflateBox(entityElement, entityData) {
   entityElement.style.border = '1px solid black';
 
   if (getTexture(entityData.texture)) {
-
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
     entityElement.style.borderRadius = '0px';
     entityElement.style.padding = '1px';
-
 
     if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
       // Calculate animation duration based on X and Y coordinates
@@ -182,19 +180,26 @@ export default function inflateBox(entityElement, entityData) {
 
       // TODO: move this closure
       // rendering a texture without tile
+      // console.log('going to set texture', entityData.texture, getTexture(entityData.texture))
       entityElement.style.background = `url('${getTexture(entityData.texture)}')`;
       entityElement.style.backgroundRepeat = 'no-repeat';
       entityElement.style.backgroundSize = 'cover';
 
-    }
+      if (typeof entityData.texture === 'object' && entityData.texture.sheet) {
+        this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.frame);
+      }
 
+      if (entityData.style) {
+        Object.keys(entityData.style).forEach((key) => {
+          entityElement.style[key] = entityData.style[key];
+        });
+      }
+
+    }
 
   } else {
     entityElement.style.background = hexColor;
   }
-
-
-
 
   // console.log('entityElement', entityElement)
 

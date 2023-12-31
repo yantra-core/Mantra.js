@@ -230,6 +230,19 @@ class Entity {
       this.game.components.items.set(entityId, entityData.items);
     }
 
+    if (typeof entityData.style !== 'undefined') {
+      // overwrite all items ( for now )
+      // Remark: in the future we could merge instead of overwrite
+      this.game.components.style.set(entityId, entityData.style);
+    }
+
+    if (typeof entityData.texture !== 'undefined') {
+      // overwrite all items ( for now )
+      // Remark: in the future we could merge instead of overwrite
+      this.game.components.texture.set(entityId, entityData.texture);
+    }
+
+
     return ent;
 
   }
@@ -497,6 +510,9 @@ class Entity {
       }
       this.game.removeEntity(ent.id);
     });
+    if (clearCurrentPlayer) {
+      this.game.currentPlayerId = null;
+    }
   }
 
   // TODO: move this to PhysicsPlugin

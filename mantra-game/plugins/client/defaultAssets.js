@@ -6,6 +6,12 @@ let defaultAssets = {
   'tile-grass': '/img/game/tiles/tile-grass.png',
   'fire': '/img/game/env/loz_fire.png',
   'smb3-1-1': '/img/game/levels/smb3-1-1.png',
+  'loz_spritesheet': {
+    type: 'spritesheet',
+    url: '/img/game/sheets/loz_spritesheet.png',
+    frameWidth: 16,
+    frameHeight: 16
+  },
 };
 
 export default defaultAssets;

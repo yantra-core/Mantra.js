@@ -47,7 +47,23 @@ export default class Client {
 
     // load default assets
     for (let key in defaultAssets) { // TODO: configurable assets
-      preloader.addAsset(defaultAssets[key], 'image', key);
+
+      let asset = defaultAssets[key];
+      if (typeof asset === 'string') {
+        preloader.addAsset(asset, 'image', key);
+        continue;
+      }
+
+      if (asset.type === 'spritesheet') {
+        preloader.addAsset(asset.url, 'spritesheet', key, {
+          frameWidth: asset.frameWidth,
+          frameHeight: asset.frameHeight,
+          endFrame: asset.endFrame,
+        });
+        continue;
+      }
+
+      // preloader.addAsset(defaultAssets[key], 'image', key);
     }
 
     this.preloading = true;

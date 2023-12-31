@@ -10,7 +10,6 @@ import setTransform from './lib/setTransform.js';
 
 import updateGraphic from './lib/updateGraphic.js';
 import updateEntityPosition from './lib/updateEntityPosition.js';
-import updatePlayerSprite from './lib/updatePlayerSprite.js';
 import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
 import handleInputs from './lib/handleInputs.js';
@@ -50,7 +49,6 @@ class CSSGraphics extends GraphicsInterface {
     this.updateGraphic = updateGraphic.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
     this.handleInputs = handleInputs.bind(this);
-    this.updatePlayerSprite = updatePlayerSprite.bind(this);
 
     // TODO: make this function lookup with defaults ( instead of -1 )
     this.depthChart = [
@@ -83,9 +81,6 @@ class CSSGraphics extends GraphicsInterface {
     // Initialize the CSS render div
     this.initCSSRenderDiv();
 
-    // Bind event handlers for changing player sprite
-    this.handleInputs();
-
     // register renderer with graphics pipeline
     game.graphics.push(this);
 
@@ -97,8 +92,8 @@ class CSSGraphics extends GraphicsInterface {
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
 
-    // this.zoom(1.1);
-
+    // this.zoom(game.data.camera.currentZoom);
+    this.zoom(2.5);
 
   }
 
@@ -140,7 +135,6 @@ class CSSGraphics extends GraphicsInterface {
     entityElement.className = 'entity-element';
     entityElement.style.position = 'absolute';
 
-
     if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
       if (typeof entityData.rotation === 'object') {
         // transform 3d to 2.5d
@@ -170,7 +164,8 @@ class CSSGraphics extends GraphicsInterface {
         // entityElement.classList.add('pixelart-to-css');
 
         // Set default sprite
-        entityElement.classList.add('guy-right-0');
+        // entityElement.classList.add('guy-right-0');
+        this.inflateBox(entityElement, entityData);
 
 
         break;
@@ -195,10 +190,7 @@ class CSSGraphics extends GraphicsInterface {
     return entityElement;
   }
 
-  
-
   removeGraphic(entityId) {
-
     let entity = this.game.getEntity(entityId);
 
     if (!entity || !entity.graphics || !entity.graphics['graphics-css']) {
@@ -209,13 +201,10 @@ class CSSGraphics extends GraphicsInterface {
     if (renderDiv && renderDiv.contains(entity.graphics['graphics-css'])) {
       entity.graphics['graphics-css'].remove();
     }
-
   }
-
 
   update() {
     let game = this.game;
-
 
     /*
     if (typeof game.viewportCenterXOffset === 'undefined') {
@@ -306,7 +295,6 @@ class CSSGraphics extends GraphicsInterface {
           break;
       }
       // console.log("entityIdentityId", entityId, data);
-      // this.updatePlayerSprite(entityId, data);
 
       // Apply the direction vector as force or movement
       game.applyForce(entityId, { x: dirX, y: dirY });
@@ -362,16 +350,19 @@ class CSSGraphics extends GraphicsInterface {
 
   }
 
+  // TODO: adjust the viewportCenterXOffset and viewportCenterYOffset based on the new scale
+  // ensure that the center of the viewport remains the same
   zoom(scale) {
     console.log("CSSGraphics zoom", scale)
     let gameViewport = document.getElementById('gameHolder');
     if (gameViewport) {
       gameViewport.style.transform = `scale(${scale})`;
-      gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
-      // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
+      gameViewport.style.transition = 'transform 1s ease';
       this.game.data.camera.currentZoom = scale;
-      // const viewportCenterX = window.innerWidth / 2;
-      // const viewportCenterY = window.innerHeight / 2;
+      // TODO: adjust camera offsets based on scale
+      // Applying the calculated offsets
+      //game.viewportCenterXOffset = -offsetX;
+      //game.viewportCenterYOffset = -offsetY;
     }
   }
 

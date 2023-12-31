@@ -1,10 +1,15 @@
-// Graphics.js
+// Graphics.js - Marak Squires 2023
+import updateSprite from "./lib/updateSprite.js";
+import SpriteSheet from "./lib/SpriteSheet.js";
+import handleInputs from "../graphics-css/lib/handleInputs.js"; // TODO: move out of CSSGraphics
 class Graphics {
   static id = 'graphics';
   static removable = false;
 
   constructor() {
     this.id = Graphics.id;
+    this.updateSprite = updateSprite.bind(this);
+    this.handleInputs = handleInputs.bind(this);
   }
 
   init(game) {
@@ -14,6 +19,9 @@ class Graphics {
     this.game.removeGraphic = this.removeGraphic.bind(this);
     this.game.updateGraphic = this.updateGraphic.bind(this);
     this.game.getTexture = this.getTexture.bind(this);
+    this.game.updateSprite = this.updateSprite.bind(this);
+    // hoist SpriteSheet class to game scope
+    this.game.SpriteSheet = SpriteSheet;
 
     // Ensure the gameHolder div exists
     let gameHolder = document.getElementById('gameHolder');
@@ -24,7 +32,11 @@ class Graphics {
     }
 
     // TODO: remove this preloader
-    this.preload();
+    // Remark: Preload is not here, but is in Client?
+    // Is that best place for it?
+
+    // Bind event handlers for changing player sprite
+    this.handleInputs();
     
   }
 
@@ -56,7 +68,15 @@ class Graphics {
     // if no key is found, checks if the key is a url and returns it
     // this is useful in allowing parent APIs to still use urls as textures and bypass preloading
     // as to not require preloading of all textures
-    let t = game.preloader.getItem(keyOrUrl);
+
+    let t;
+
+    if (typeof keyOrUrl === 'object') {
+      // could be sprite sheet
+      keyOrUrl = keyOrUrl.sheet;
+    }
+
+    t = game.preloader.getItem(keyOrUrl);
     if (t) {
       return t.url;
     }

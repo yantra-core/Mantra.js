@@ -15,7 +15,7 @@ export default function switchWorlds (selectedWorld) {
     });
   }
 
-  game.systems.entity.clearAllEntities(false);
+  game.systems.entity.clearAllEntities(true);
   let worldName = 'XState';
   worldName = 'Sutra';
   worldName = selectedWorld;
@@ -28,12 +28,12 @@ export default function switchWorlds (selectedWorld) {
   }
 
   let worldInstance = new worldClass();
-
-  /*
+ 
   game.once('plugin::loaded::' + worldInstance.id, function () {
-    // that.hideLoadingSpinner();
+    // alert('loaded')
+    // call init?
+    //worldInstance.init(game);
   });
-  */
 
   game.use(worldInstance);
 

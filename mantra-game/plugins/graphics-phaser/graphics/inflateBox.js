@@ -26,7 +26,7 @@ export default function inflategraphic(entityData) {
       // Use texture if available
       // console.log('texture', entityData.texture)
       graphic = this.scene.add.sprite(0, 0, entityData.texture);
-      graphic.setDepth(entityData.position.z)
+      graphic.setDepth(entityData.position.z);
       entityData.graphic = graphic; // Store the reference in entityData for future updates
       if (entityData.color) {
         // Apply tint if color is also defined
@@ -149,6 +149,15 @@ export default function inflategraphic(entityData) {
       graphic.setTint(entityData.color);
     }
 
+    if (typeof entityData.texture !== 'undefined') {
+      console.log('TEXTURE', entityData.texture)
+      let randomOneOrZero = Math.round(Math.random());
+      console.log('graphic', graphic)
+      console.log('texture', graphic.texture)
+      graphic.setFrame(2)
+    }
+  
+
   }
 
 
@@ -158,9 +167,10 @@ export default function inflategraphic(entityData) {
 
   graphic.setPosition(position.x, position.y);
 
-  if (entityData.rotation) {
+  if (entityData.rotation && typeof entityData.texture === 'undefined') {
     graphic.setRotation(entityData.rotation);
   }
+
 
   return graphic;
 
