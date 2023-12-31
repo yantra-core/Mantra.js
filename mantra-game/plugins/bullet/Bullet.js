@@ -5,7 +5,7 @@ class Bullet {
     this.id = Bullet.id;
     this.bulletCount = 0;
     this.redGlowMaterial = null; // Used for caching the material
-    this.speed = config.speed || 22; // or 22?
+    this.speed = config.speed || 3; // or 22?
     this.direction = config.direction || { x: 0, y: 1 };
     this.damage = config.damage || 30;
     this.lifetime = config.lifetime || 2000;
@@ -17,7 +17,7 @@ class Bullet {
     this.game.systemsManager.addSystem('bullet', this);
   }
 
-  update() {} // not used, physics engine updates bullets based on velocity
+  update() { } // not used, physics engine updates bullets based on velocity
 
   fireBullet(entityId) {
 
@@ -25,12 +25,12 @@ class Bullet {
     let actionRateLimiterComponent = this.game.components.actionRateLimiter;
     let lastFired = actionRateLimiterComponent.getLastActionTime(entityId, 'fireBullet');
     let currentTime = Date.now();
-    
+
     if (currentTime - lastFired < this.fireRate) {
       // console.log('Rate limit hit for entity', entityId, ', cannot fire yet');
       return;
     }
-  
+
     actionRateLimiterComponent.recordAction(entityId, 'fireBullet');
     let playerPos = entity.position;
     let playerRotation = entity.rotation; // in radians
@@ -40,9 +40,18 @@ class Bullet {
       console.log('no player data available');
       return;
     }
-
     // Distance in front of the player where the bullet should start
-    let distanceInFront = 100; // TODO: make this a config
+    let distanceInFront = 16; // TODO: make this a config
+
+    if (typeof entity.radius !== 'undefined') {
+      entity.width = entity.radius * 2;
+      entity.height = entity.radius * 2;
+    }
+    let playerOffsetX = entity.width / 2; // Adjust this value to align the bullet properly
+    let playerOffsetY = entity.height / 2; // Adjust this value to align the bullet properly
+
+    playerOffsetX = 0;
+    playerOffsetY = 0;
 
     if (typeof playerRotation === 'undefined') {
       playerRotation = 0; // this should have a default
@@ -53,15 +62,15 @@ class Bullet {
       playerRotation = playerRotation.z;
     }
 
-    // Place the bullet in front of the player
-    let bulletStartPosition = {
-      x: playerPos.x + distanceInFront * Math.sin(playerRotation),
-      y: playerPos.y + distanceInFront * -Math.cos(playerRotation)
-    };
-
     // Compute the bullet's direction based on player's rotation
     const directionX = Math.sin(playerRotation);
     const directionY = -Math.cos(playerRotation);
+
+    // Place the bullet in front of the player
+    let bulletStartPosition = {
+      x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
+      y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation)
+    };
 
     this.bulletCount++;
     const bulletDirectionConfig = {
@@ -69,18 +78,19 @@ class Bullet {
       mass: 1,
       position: bulletStartPosition,
       lifetime: this.lifetime,
+      texture: 'fire',
       owner: entityId,
       rotation: playerRotation,
       isSensor: true,
-      color: entity.bulletColor || 0x000000,
+      //color: entity.bulletColor || 0x000000,
       velocity: {
         x: directionX * this.speed,
         y: directionY * this.speed
       },
-      radius: 16, // TODO: make this a config
+      radius: 8, // TODO: make this a config
       damage: 10, // TODO: make this a config
     };
-    // console.log('using bulletDirectionConfig', bulletDirectionConfig)
+    console.log('using bulletDirectionConfig', bulletDirectionConfig)
     this.game.createEntity(bulletDirectionConfig);
 
   }

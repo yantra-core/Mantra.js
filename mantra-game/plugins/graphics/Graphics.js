@@ -1,7 +1,7 @@
 // Graphics.js - Marak Squires 2023
 import updateSprite from "./lib/updateSprite.js";
 import SpriteSheet from "./lib/SpriteSheet.js";
-import handleInputs from "../graphics-css/lib/handleInputs.js"; // TODO: move out of CSSGraphics
+import handleInputs from "./lib/handleInputs.js"; // TODO: move out of CSSGraphics
 class Graphics {
   static id = 'graphics';
   static removable = false;

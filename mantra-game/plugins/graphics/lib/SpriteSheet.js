@@ -30,7 +30,7 @@ export default class SpriteSheetHandler {
     const styles = this.getBackgroundStyles(spriteData);
     // console.log('supdating', entity, spriteData, styles)
     // Remark: needs game reference here
-    console.log('SpirteSheet class updateEntity', styles, entity, textureSheetUrl, spriteData)
+    // console.log('SpirteSheet class updateEntity', styles, entity, textureSheetUrl, spriteData)
     game.updateEntity({
       id: entity.id,
       texture: {

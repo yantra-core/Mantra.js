@@ -12,7 +12,7 @@ import updateGraphic from './lib/updateGraphic.js';
 import updateEntityPosition from './lib/updateEntityPosition.js';
 import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
-import handleInputs from './lib/handleInputs.js';
+import handleInputs from '../graphics/lib/handleInputs.js';
 
 class CSSGraphics extends GraphicsInterface {
 
@@ -148,10 +148,16 @@ class CSSGraphics extends GraphicsInterface {
       case 'BULLET':
         // For BULLET entities, create a circle
         const radius = entityData.radius || 0;
-        entityElement.style.width = (radius * 2) + 'px';
-        entityElement.style.height = (radius * 2) + 'px';
-        entityElement.style.borderRadius = '50%';  // This will make the div a circle
-        entityElement.style.background = 'red';
+        entityElement.style.width = entityData.radius + 'px';
+        entityElement.style.height = entityData.radius + 'px';
+        // console.log('inflating bullet', entityData)
+        //entityElement.style.width = entityData.width + 'px';
+        //entityElement.style.height = entityData.height + 'px';
+        //entityElement.style.width = (radius / 2) + 'px';
+        //entityElement.style.height = (radius / 2) + 'px';
+        //entityElement.style.borderRadius = '50%';  // This will make the div a circle
+        //entityElement.style.background = 'red';
+        this.inflateBox(entityElement, entityData);
 
         break;
       case 'PLAYER':

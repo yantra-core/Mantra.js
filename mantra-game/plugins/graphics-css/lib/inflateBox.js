@@ -11,8 +11,14 @@ export default function inflateBox(entityElement, entityData) {
     hexColor = '#' + entityData.color.toString(16);
   }
 
-  entityElement.style.width = entityData.width + 'px';
-  entityElement.style.height = entityData.height + 'px';
+  if (typeof entityData.radius === 'number') {
+    entityElement.style.width = entityData.radius + 'px';
+    entityElement.style.height = entityData.radius + 'px';
+    } else {
+    entityElement.style.width = entityData.width + 'px';
+    entityElement.style.height = entityData.height + 'px';
+    }
+
   entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
   // set default depth based on type
