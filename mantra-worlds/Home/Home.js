@@ -25,6 +25,9 @@ class Home {
     game.createDefaultPlayer();
 
     game.use('Block')
+
+    // TODO: better control of loading tiles
+    // TODO: game.systems.tile.loadTilemap() -> Tiled JSON
     game.use('Tile');
     game.use('Tone');
 

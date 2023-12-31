@@ -26,12 +26,36 @@ class Platform {
         isStatic: true,
         width: platformData.width,
         height: platformData.height,
+        color: platformData.color,
+        style: {
+          display: 'none'
+        },
         position: {
           x: platformData.x,
-          y: platformData.y
+          y: platformData.y,
+          z: platformData.z
         }
       });
     }
+
+    // create some coin blocks near start like mario smb3-1-1
+    createPlatform({
+      x: 185,
+      y: -74,
+      z: -10,
+      color: 0xff0000,
+      width: 16,
+      height: 16
+    });
+
+    createPlatform({
+      x: 185 + 16,
+      y: -74,
+      z: -10,
+      color: 0xff0000,
+      width: 16,
+      height: 16
+    });
 
 
     game.use('Sutra')
@@ -43,16 +67,19 @@ class Platform {
       rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
   
       game.setSutra(rules);
-  
+
+      rules.on('switchWorld', (entity) => {
+        game.switchWorlds('Music');
+        console.log('switchWorld', entity)
+      });
+
       rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
         if (entity.type === 'COLLISION') {
           // console.log('spawnUnitTouchedHomebase', entity)
           if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
             return true;
           }
-          if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
             return true;
           }
         }
@@ -62,10 +89,6 @@ class Platform {
         .if('playerTouchedWarpZone')
         .then('switchWorld')
 
-      rules.on('switchWorld', (entity) => {
-        game.switchWorlds('Music');
-        console.log('switchWorld', entity)
-      });
       console.log('created sutra', rules)
     });
 
@@ -91,11 +114,13 @@ class Platform {
 
       createPlatform({
         x: 0,
-        y: 200,
-        width: 800,
+        y: 10,
+        z: -1,
+        width: 2816,
         height: 60
       });
 
+      /*
       createPlatform({
         x: 1200,
         y: 200,
@@ -116,17 +141,36 @@ class Platform {
         width: 600,
         height: 60
       });
+      */
 
   
     });
 
     game.use('Border', { autoBorder: true })
-  
+    game.use('Bullet')
+    // game.use('Sword')
+
+    game.createEntity({
+      type: 'BACKGROUND',
+      texture: 'smb3-1-1',
+      width: 2816,
+      height: 433,
+      body: false,
+      position: { // position to right
+        x: 0 + 1408,
+        y: 0 - 216.5,
+        z: -8
+      }
+    });
+
     console.log(game.systems)
 
-    game.createDefaultPlayer();
-
-
+    game.createDefaultPlayer({
+      position: {
+        x: 10,
+        y: -100
+      }
+    });
 
   }
 

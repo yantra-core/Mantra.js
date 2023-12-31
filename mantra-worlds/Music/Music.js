@@ -59,7 +59,7 @@ class Home {
     game.use('Bullet')
     // game.use('Sword')
 
-    game.use('Sutra')
+    game.use('Sutra');
 
     game.use('Border', { autoBorder: true })
 

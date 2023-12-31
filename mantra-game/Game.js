@@ -23,6 +23,7 @@ import gameTick from './lib/gameTick.js';
 // Provides a default Game.start(fn) logic ( creates a single player and border )
 // Bind to event `player::joined` to override default player creation logic
 import defaultGameStart from './lib/start/defaultGameStart.js';
+import createDefaultPlayer from './lib/createDefaultPlayer.js';
 import switchWorlds from './lib/switchWorlds.js';
 
 // Action Rate Limiter, suitable for any Systems action that should be rate limited
@@ -246,6 +247,7 @@ class Game {
     this.localGameLoop = localGameLoop.bind(this);
     this.onlineGameLoop = onlineGameLoop.bind(this);
     this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
+    this.createDefaultPlayer = createDefaultPlayer.bind(this);
 
     // keeps track of game.use('PluginStringName') async loading
     // game.start() will wait for all plugins to be loaded before starting
@@ -554,50 +556,6 @@ class Game {
     });
   }
 
-  createDefaultPlayer(playerConfig) {
-    // console.log('creating default player')
-
-    // check if game.currentPlayerId is already set,
-    // if so return
-    if (this.currentPlayerId) {
-      return this.getEntity(this.currentPlayerId);
-    }
-
-    let player = this.createEntity({
-      type: 'PLAYER',
-      shape: 'triangle',
-      width: 16,
-      height: 16,
-
-      // simple texture name
-      //      texture: 'player',
-      
-      // spritesheet
-      // TODO: refactor this out to SheetManager / game.updateSprite()
-      texture: {
-        sheet: 'loz_spritesheet',
-        frame: 'player'
-      },
-      style: {
-        backgroundPosition: `${-16}px ${-16}px`,
-        backgroundSize: `672px 672px`
-      },
-
-      mass: 222,
-      friction: 0.5,  // Default friction
-      frictionAir: 0.5, // Default air friction
-      frictionStatic: 1, // Default static friction
-      // color: 0x00ff00,
-      position: {
-        x: 0,
-        y: 0
-      },
-    });
-
-    this.setPlayerId(player.id);
-    return player;
-
-  }
 
   playNote(note, duration) {
     console.log('Tone Plugin not loaded. Cannot play tone note.');

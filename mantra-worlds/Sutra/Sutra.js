@@ -26,7 +26,7 @@ class Sutra {
 
     game.use('StarField');
 
-    game.on('plugin::loaded::sutra', function () {
+    game.once('plugin::loaded::sutra', function () {
       // Adds a nice StarField background
       game.use('TowerWorld', { game: game });
 

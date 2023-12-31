@@ -46,6 +46,18 @@ export default function sutras (game) {
     }
   });
 
+  rules.addCondition('bulletTouchedBlock', (entity, gameState) => {
+    if (entity.type === 'COLLISION') {
+      if (entity.bodyA.type === 'BULLET' && entity.bodyB.type === 'BLOCK') {
+        return true;
+      }
+      if (entity.bodyB.type === 'BLOCK' && entity.bodyA.type === 'BULLET') {
+        return true;
+      }
+    }
+  });
+
+
   rules
     .if('playerTouchedWarpZone')
     .then('switchWorld')
@@ -66,6 +78,14 @@ export default function sutras (game) {
     .then('playNote', {
       note: 'C2'
     })
+
+    rules.if('bulletTouchedBlock')
+    .then('playNote', {
+      note: 'C2'
+    })
+
+
+    
   
   rules.on('damageEntity', (collision) => {
     let ent;
