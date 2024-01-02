@@ -97,10 +97,11 @@ class Platform {
       game.setSutra(rules);
 
       rules.on('switchWorld', (entity) => {
-        game.switchWorlds('Music');
-        console.log('switchWorld', entity)
+        console.log('entityentity', entity)
+        let worldName = entity.WARP.kind || 'Home';
+        game.switchWorlds(worldName);
       });
-
+    
       rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
         if (entity.type === 'COLLISION') {
           // console.log('spawnUnitTouchedHomebase', entity)

@@ -62,9 +62,11 @@ export default function sutras(game) {
     .if('playerTouchedWarpZone')
     .then('switchWorld')
 
+  // TODO: make this common Sutra
   rules.on('switchWorld', (entity) => {
-    game.switchWorlds('Platform');
-    console.log('switchWorld', entity)
+    console.log('entityentity', entity)
+    let worldName = entity.WARP.kind || 'Home';
+    game.switchWorlds(worldName);
   });
 
   rules

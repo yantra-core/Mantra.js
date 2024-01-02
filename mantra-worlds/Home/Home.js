@@ -266,6 +266,7 @@ class Home {
 
     game.createEntity({
       type: 'WARP',
+      kind: 'Platform',
       width: 64,
       height: 64,
       depth: 64,
@@ -282,6 +283,7 @@ class Home {
     // if touch warp, switch to YCraft level
     game.createEntity({
       type: 'WARP',
+      kind: 'YCraft',
       width: 64,
       height: 64,
       depth: 64,
@@ -329,6 +331,27 @@ class Home {
     // switch to 3d text label
     game.createEntity({
       type: 'TEXT',
+      text: 'Rendered with CSSGraphics Engine',
+      width: 20,
+      color: 0x000000,
+      style: {
+        width: '150px',
+        fontSize: '12px',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: -72,
+        y: -30,
+        z: 64
+      }
+    });
+
+
+    
+    // switch to 3d text label
+    game.createEntity({
+      type: 'TEXT',
       text: 'Upgrade Graphics to 3D',
       width: 20,
       color: 0x000000,
@@ -345,10 +368,30 @@ class Home {
       }
     });
 
+    // switch to phaser 3
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Upgrade to Canvas Graphics',
+      width: 20,
+      color: 0x000000,
+      style: {
+        width: '60px',
+        fontSize: '12px',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: 0,
+        y: 0,
+        z: 64
+      }
+    });
+
 
     // if touch warp, switch to Music level
     game.createEntity({
       type: 'WARP',
+      kind: 'Music',
       width: 64,
       height: 64,
       depth: 64,

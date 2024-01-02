@@ -115,11 +115,12 @@ class Home {
         .if('playerTouchedWarpZone')
         .then('switchWorld')
 
-      rules.on('switchWorld', (entity) => {
-        game.switchWorlds('Home');
-        console.log('switchWorld', entity)
-      });
-
+        rules.on('switchWorld', (entity) => {
+          console.log('entityentity', entity)
+          let worldName = entity.WARP.kind || 'Home';
+          game.switchWorlds(worldName);
+        });
+      
 
       rules.on('damageEntity', (collision) => {
         let ent;
