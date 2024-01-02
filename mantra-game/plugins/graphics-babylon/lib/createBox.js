@@ -14,6 +14,9 @@ export default function createBox(entityData) {
     // Apply texture
     let texture = game.getTexture(entityData.texture);
     material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
+    material.diffuseTexture.wAng = -Math.PI / 2;
+    // ensure transparency is enabled
+    material.diffuseTexture.hasAlpha = true;
   } else if (entityData.color) {
     // Incoming color is int color value
     // Extract RGB components from the hexadecimal color value
