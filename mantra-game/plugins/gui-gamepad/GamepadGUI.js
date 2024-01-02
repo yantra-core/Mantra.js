@@ -23,6 +23,11 @@ class GamepadGUI {
     this.game = game;
     this.zoomSlider = new ZoomSlider(game);
 
+    // Remark: why is this needed for slider, but not for gamepad?
+    game.on('game::ready', () => {
+      this.zoomSlider.slider.style.display = 'block';
+    });
+
     let controllerHolder = document.createElement('div');
     controllerHolder.style.position = 'fixed';
     controllerHolder.style.bottom = '0';

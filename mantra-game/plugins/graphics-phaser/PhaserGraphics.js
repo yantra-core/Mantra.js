@@ -4,9 +4,11 @@ import GraphicsInterface from '../../lib/GraphicsInterface.js';
 import PhaserCamera from './PhaserCamera.js';
 import inflateGraphic from './graphics/inflateGraphic.js';
 import inflateTriangle from './graphics/inflateTriangle.js';
-import inflateBox from './graphics/inflateBox.js';
+import inflateBox from './graphics/box/inflateBox.js';
 import inflateCircle from './graphics/inflateCircle.js';
 import inflateText from './graphics/inflateText.js';
+
+import createBox from './graphics/box/createBox.js';
 
 class PhaserGraphics extends GraphicsInterface {
   static id = 'graphics-phaser';
@@ -55,6 +57,8 @@ class PhaserGraphics extends GraphicsInterface {
     this.inflateTriangle = inflateTriangle.bind(this);
     this.inflateCircle = inflateCircle.bind(this);
     this.inflateText = inflateText.bind(this);
+
+    this.createBox = createBox.bind(this);
   }
 
   init(game) {
@@ -91,6 +95,7 @@ class PhaserGraphics extends GraphicsInterface {
         game.preloader.assets.forEach((asset) => {
           if (asset.type === 'spritesheet') {
             // console.log('asset', asset)
+            // console.log("asset.key, asset.url", asset.key, asset.url, asset)
             this.load.spritesheet(asset.key, asset.url, {
               frameWidth: asset.frameWidth,// TODO: config
               frameHeight: asset.frameHeight,

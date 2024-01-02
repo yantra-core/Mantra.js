@@ -29,7 +29,12 @@ class Graphics {
     // hoist SpriteSheet class to game scope
     this.game.SpriteSheet = SpriteSheet;
 
-    this.game.data.camera = this.game.data.camera || {};
+    this.game.data.camera = this.game.data.camera || {
+      position: {
+        x: 0,
+        y: 0
+      }
+    };
 
     // Ensure the gameHolder div exists
     let gameHolder = document.getElementById('gameHolder');
@@ -78,17 +83,13 @@ class Graphics {
     game.graphics.forEach(function (graphicsInterface) {
       // don't recreate same graphic if already exists on interface
       let ent = game.getEntity(entityData.id);
-      // console.log(graphicsInterface.id, "CREATING FOR ENT", ent)
       if (ent && ent.graphics && ent.graphics[graphicsInterface.id]) {
-        // console.log("WILL NOT CREATE ALREADY EXISTING GRAPHIC", entityData.id, graphicsInterface.id, ent.graphics[graphicsInterface.id])
         return;
       }
       let graphic = graphicsInterface.createGraphic(entityData);
       if (graphic) {
-        // console.log("CREATING AND SETTING GRAPHIC", entityData.id, graphicsInterface.id, graphic)
         game.components.graphics.set([entityData.id, graphicsInterface.id], graphic);
       } else {
-        // console.log("ERROR CREATING GRAPHIC", entityData.id, graphicsInterface.id, graphic)
       }
     });
   }
