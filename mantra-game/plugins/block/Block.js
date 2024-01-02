@@ -90,7 +90,7 @@ class Block {
             y: (Math.random() * 2 - 1) * 10
           },
           // inherit color from parent
-          texture: 'tile-block',
+          texture: entityA.texture,
           // color: newColor,
           width: newWidth,
           height: newHeight,
