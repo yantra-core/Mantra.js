@@ -27,7 +27,7 @@ class Sutra {
     if (game.rules) {
 
       if (this.inputCache) {
-        if (Object.keys(this.inputCache).length > 0 ) {
+        if (Object.keys(this.inputCache).length > 0) {
           game.data.input = this.inputCache;
         }
       }
@@ -42,20 +42,23 @@ class Sutra {
         if (game.data.timers.length) {
           // console.log('game.data.timers', game.data.timers)
         }
-         game.data.timers.forEach((timer) => {
+        game.data.timers.forEach((timer) => {
           game.rules.tick(timer, game.data);
         });
         game.data.timers = [];
       }
 
       if (game.data && game.data.collisions) {
-        if (game.data.collisions.length > 0 ) {
+        if (game.data.collisions.length > 0) {
           // console.log(game.data.collisions)
         }
         game.data.collisions.forEach((collisionEvent) => {
           game.rules.tick(collisionEvent, game.data);
         });
-        game.data.collisions = [];
+        // remove all collisions that are not active
+        game.data.collisions = game.data.collisions.filter(collisionEvent => {
+          return collisionEvent.kind === 'ACTIVE';
+        });
       }
 
       game.data.input = {};

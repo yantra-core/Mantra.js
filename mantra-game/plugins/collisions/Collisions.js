@@ -95,6 +95,9 @@ class Collisions {
     }
   }
 
+  // TODO: Remark: Active collisions should be managed in a Map() with unique key,
+  //               being composite key of entityIdA and entityIdB
+  //               This will allow for optimized collision management and improved time complexity
   collisionEnd(pair, bodyA, bodyB) {
     // console.log('collisionEnd', pair, bodyA, bodyB);
 
@@ -123,6 +126,13 @@ class Collisions {
           bodyA: entityA,
           bodyB: entityB
         };
+
+        // Find and remove the active collision
+        this.game.data.collisions = this.game.data.collisions.filter(collision => {
+          return !(collision.entityIdA === bodyA.myEntityId &&
+            collision.entityIdB === bodyB.myEntityId &&
+            collision.kind === 'ACTIVE');
+        });
 
         // add entity onto the collision by type name
         collisionContext[entityA.type] = entityA;
@@ -158,6 +168,8 @@ class Collisions {
           kind: 'ACTIVE',
           entityIdA: bodyA.myEntityId,
           entityIdB: bodyB.myEntityId,
+          ticks: 1,
+          duration: 1,
           bodyA: entityA,
           bodyB: entityB
         };
@@ -166,7 +178,21 @@ class Collisions {
         collisionContext[entityA.type] = entityA;
         collisionContext[entityB.type] = entityB;
 
-        this.game.data.collisions.push(collisionContext);
+        // Find existing collision, if any
+        let existingCollision = this.game.data.collisions.find(collision =>
+          collision.entityIdA === collisionContext.entityIdA &&
+          collision.entityIdB === collisionContext.entityIdB &&
+          collision.kind === 'ACTIVE'
+        );
+
+        if (existingCollision) {
+          // Increment duration if collision is already active
+          existingCollision.duration += 1 / this.game.data.FPS; // Adds approximately 0.01667 seconds per tick at 60 FPS
+          existingCollision.ticks++;
+        } else {
+          // Add new collision if not found
+          this.game.data.collisions.push(collisionContext);
+        }
       }
 
     }
