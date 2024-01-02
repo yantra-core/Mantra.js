@@ -122,7 +122,6 @@ export default function sutras(game) {
     
 
   rules.on('hideLoader', (entity, node, gameState) => {
-    console.log("ELSE hideLoader", entity, node, gameState)
     if (loadingCircle) {
       loadingCircle.remove();
     }
@@ -135,7 +134,16 @@ export default function sutras(game) {
         loadingCircle = new game.systems.graphics.LoadingCircle(2000);
   
         // Set position of the loading circle
-        loadingCircle.setPosition(600, 600); // X and Y coordinates
+        let position = entity.TEXT.position;
+        const adjustedPosition = {
+          x: position.x - gameState.camera.position.x + window.outerWidth / 2,
+          y: position.y - gameState.camera.position.y + window.outerHeight / 2
+        };
+      
+        adjustedPosition.x += 45;
+        adjustedPosition.y += 255;
+
+        loadingCircle.setPosition(adjustedPosition.x, adjustedPosition.y); // X and Y coordinates
         loadingCircle.container.addEventListener('loadingComplete', (e) => {
           console.log('Loading complete:', e.detail);
             let graphicsName = entity.TEXT.name || 'PhaserGraphics';
@@ -145,7 +153,6 @@ export default function sutras(game) {
         });
       } else {
         // update circle
-        console.log(1 / gameState.FPS)
         loadingCircle.tick(1 / gameState.FPS * 1000);
       }
     }
@@ -157,7 +164,6 @@ export default function sutras(game) {
 
   // TODO: make this common Sutra
   rules.on('switchWorld', (entity) => {
-    console.log('entityentity', entity)
     let worldName = entity.WARP.kind || 'Home';
     game.switchWorlds(worldName);
   });
@@ -186,7 +192,6 @@ export default function sutras(game) {
     } else {
       ent = collision.bodyA;
     }
-    console.log('damageEntity', ent)
     game.removeEntity(ent.id);
     if (ent.type === 'PLAYER') {
       game.currentPlayerId = null;
@@ -222,7 +227,6 @@ export default function sutras(game) {
     }
 
     let ent = game.getEntity(eId);
-    console.log('aaaa', ent)
     if (eId) {
       console.log('using eId', eId)
       // update element with name noteInfo
@@ -246,7 +250,7 @@ export default function sutras(game) {
       game.playNote('G4');
     }
     if (entity.type === 'BLOCK' && entity.kind === 'Tile') {
-      console.log("pointerDown", entity, ev);
+
       game.playNote('C2');
 
       // Calculate the center of the tile

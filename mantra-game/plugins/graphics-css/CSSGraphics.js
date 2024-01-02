@@ -93,6 +93,7 @@ class CSSGraphics extends GraphicsInterface {
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
 
+    game.data.camera.currentZoom = 4.5;
     this.zoom(4.5);
     // this.zoom(game.data.camera.currentZoom);
     // this.zoom(game.data.camera.currentZoom);
@@ -361,7 +362,7 @@ class CSSGraphics extends GraphicsInterface {
   // TODO: adjust the viewportCenterXOffset and viewportCenterYOffset based on the new scale
   // ensure that the center of the viewport remains the same
   zoom(scale) {
-    console.log("CSSGraphics zoom", scale)
+    // console.log("CSSGraphics zoom", scale)
     let gameViewport = document.getElementById('gameHolder');
     if (gameViewport) {
       gameViewport.style.transform = `scale(${scale})`;

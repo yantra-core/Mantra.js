@@ -29,14 +29,8 @@ class CSSCamera {
 
     this.gameViewport = document.getElementById('gameHolder');
 
-    //this.scene.zoom(this.game.config.camera.startingZoom);
-
-    let currentWindowHeight = window.innerHeight;
-    let offsetY = currentWindowHeight / 2 / game.data.camera.currentZoom;
-
     game.viewportCenterXOffset = 0;
-    // game.viewportCenterYOffset = -offsetY;
-    game.viewportCenterYOffset = -580;
+    game.viewportCenterYOffset = 0;
 
     this.initZoomControls();
 
@@ -206,42 +200,51 @@ class CSSCamera {
   update() {
     let game = this.game;
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
-    //console.log('game.viewportCenterYOffset', game.viewportCenterYOffset)
+  
+    // Current zoom level
     let currentZoom = game.data.camera.currentZoom;
-    //console.log('currentZoom', currentZoom);
-
+  
     // Get browser window dimensions
-    let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
-
-    // Calculate scale factor based on current zoom
+  
+    // Define the adjustment value and scale factor
+    let adjustment = -400; // TODO: this should be window height or something similar
+    adjustment = (-windowHeight / 2) + 350;
+    //console.log('adjustment', adjustment);
     let scaleFactor = 1 / currentZoom;
-
-    // Adjust offset based on window size and scale factor
-    //game.viewportCenterXOffset = (windowWidth / 2) * scaleFactor;
-    //game.viewportCenterXOffset = game.viewportCenterXOffset / 2;
-
-    //game.viewportCenterYOffset = (windowHeight / 2) * scaleFactor;
-    //game.viewportCenterYOffset = game.viewportCenterYOffset / 2;
-
-    //console.log('Updated Offset X:', game.viewportCenterXOffset);
-    //console.log('Updated Offset Y:', game.viewportCenterYOffset);
-
+    //console.log('scaleFactor', scaleFactor);
+  
+    // Calculate the Y offset
+    let pixelAdjustment = adjustment * scaleFactor;
+    game.viewportCenterYOffset = -(windowHeight / 2) - pixelAdjustment;
+    //console.log('game.viewportCenterYOffset', game.viewportCenterYOffset);
+  
+    // Update the camera position
     if (this.follow && currentPlayer && currentPlayer.position) {
+      // If following a player, adjust the camera position based on the player's position and the calculated offset
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
       this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
     } else {
+      // If not following a player, use the calculated offsets directly
       this.scene.cameraPosition.x = game.viewportCenterXOffset;
       this.scene.cameraPosition.y = game.viewportCenterYOffset;
     }
+  
+    // Update the camera's position in the game data
+    this.game.data.camera.position = this.scene.cameraPosition;
   }
-
+  
+  
 
   initZoomControls() {
     document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });
     this.scene.mouseWheelEnabled = true;
   }
 
+}
+
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
 export default CSSCamera;

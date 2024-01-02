@@ -87,7 +87,7 @@ class Home {
     // See: sutra.js for game logic
     let rules = sutras(game);
     let e = enemy.call(this);
-    let w = walker(game,  {
+    let w = walker(game, {
       route: createRectangleRoute(-50, -150, 200, -150),
       // route: createLineRoute(-50, -150, 200, -150, 20),
       // route: createCircleRoute(0, 0, 100, 20),
@@ -162,23 +162,23 @@ class Home {
       .if('WalkerTouchedPlayer')
       .then('PlayerTakeDamage');
 
-      /*
-    game.createEntity({
-      type: 'Walker',
-      width: 16,
-      height: 16,
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'bomb',
-      },
-      depth: 64,
-      position: {
-        x: -50,
-        y: -150,
-        z: 32
-      }
-    });
-    */
+    /*
+  game.createEntity({
+    type: 'Walker',
+    width: 16,
+    height: 16,
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'bomb',
+    },
+    depth: 64,
+    position: {
+      x: -50,
+      y: -150,
+      z: 32
+    }
+  });
+  */
 
     game.createEntity({
       type: 'Walker',
@@ -328,7 +328,6 @@ class Home {
       }
     });
 
-
     // if touch warp, switch to YCraft level
     game.createEntity({
       type: 'WARP',
@@ -374,8 +373,8 @@ class Home {
       isSensor: true,
       // isStatic: true,
       position: {
-        x: -40,
-        y: 20,
+        x: -60,
+        y: 15,
         z: 32
       }
     });
@@ -401,16 +400,21 @@ class Home {
 
     // switch to 3d text label
     game.createEntity({
+      name: 'BabylonGraphics',
       type: 'TEXT',
       text: 'Upgrade Graphics to 3D',
-      width: 20,
+      width: 60,
+      height: 50,
       color: 0x000000,
       style: {
         width: '60px',
+        height: '45px',
         fontSize: '12px',
-        textAlign: 'center'
+        textAlign: 'center',
+        border: '1px solid black'
       },
-      body: false,
+      body: true,
+      isSensor: true,
       position: {
         x: -80,
         y: 100,
@@ -423,12 +427,16 @@ class Home {
       name: 'PhaserGraphics',
       type: 'TEXT',
       text: 'Upgrade to Canvas Graphics',
-      width: 20,
+      width: 60,
+      height: 50,
       color: 0x000000,
       style: {
         width: '60px',
+        height: '45px',
         fontSize: '12px',
-        textAlign: 'center'
+        textAlign: 'center',
+        border: '1px solid black'
+
       },
       body: true,
       isSensor: true,
@@ -525,7 +533,7 @@ class Home {
     */
 
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-
+    itemsList = [];
     itemsList.forEach((item, index) => {
       game.createEntity({
         type: item.toUpperCase(),

@@ -204,7 +204,7 @@ zoom.zoomIn = function (mainScene, amount) {
     return;
   }
   mainScene.cameras.main.zoom += amount;
-  mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
+  // mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
 };
 
 zoom.zoomOut = function (mainScene, amount) {

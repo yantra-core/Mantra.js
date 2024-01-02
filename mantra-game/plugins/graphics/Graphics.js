@@ -29,6 +29,8 @@ class Graphics {
     // hoist SpriteSheet class to game scope
     this.game.SpriteSheet = SpriteSheet;
 
+    this.game.data.camera = this.game.data.camera || {};
+
     // Ensure the gameHolder div exists
     let gameHolder = document.getElementById('gameHolder');
     if (!gameHolder) {

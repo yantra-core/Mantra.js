@@ -40,6 +40,7 @@ class GamepadGUI {
     this.createSNESGamepad(controllerHolder);
     document.body.appendChild(controllerHolder);
 
+    // TODO: refactor DPAD to allow for continuous movement with mouse over, no click required
     let dpadArea = document.createElement('div');
     dpadArea.id = 'dpad-area';
     dpadArea.style.position = 'absolute';
@@ -63,6 +64,7 @@ class GamepadGUI {
       if (isPointerDown) {
         handleDpadInput(ev);
       }
+
     });
 
     document.addEventListener('pointerup', (ev) => {
@@ -73,7 +75,6 @@ class GamepadGUI {
     let that = this;
 
     function handleDpadInput(ev) {
-
 
       // Assume dpadArea is the element representing the D-pad area
       let dpadRect = dpadArea.getBoundingClientRect();
