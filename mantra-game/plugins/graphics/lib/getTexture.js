@@ -31,6 +31,7 @@ export default function getTexture(config) {
       let sprite = t.frameTags[spriteName].frames[frameIndex];
       // t.frame = frame;
       return {
+        key: t.key,
         url: t.url,
         // asset: t.frameTags[spriteName],
         frames: t.frameTags[spriteName].frames,
@@ -42,6 +43,7 @@ export default function getTexture(config) {
 
   if (t) {
     return {
+      key: t.key,
       url: t.url
     };
   }

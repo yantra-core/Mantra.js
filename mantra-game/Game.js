@@ -611,6 +611,10 @@ class Game {
     this.physics.rotateBody(body, rotationAmount);
   }
 
+  rotateCamera(angle) {
+    // not implemented directly, Graphics plugin will handle this
+  }
+
 }
 
 export { Game };

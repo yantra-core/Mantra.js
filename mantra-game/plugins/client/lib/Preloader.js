@@ -10,7 +10,7 @@ export default class Preloader {
   }
 
   addAsset(url, type, key, data = {}) {
-    this.assets.push({ url, type, key, size: 0, frameTags: data.frameTags });
+    this.assets.push({ url, type, key, size: 0, frameWidth: data.frameWidth, frameHeight: data.frameHeight, frameTags: data.frameTags });
   }
 
   async loadAll() {

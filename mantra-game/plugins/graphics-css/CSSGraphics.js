@@ -85,7 +85,6 @@ class CSSGraphics extends GraphicsInterface {
     // register renderer with graphics pipeline
     game.graphics.push(this);
 
-
     this.game.systemsManager.addSystem('graphics-css', this);
 
     // is sync load; however we still need to let the graphics pipeline know we are ready

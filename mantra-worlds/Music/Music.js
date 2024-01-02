@@ -310,7 +310,7 @@ function createPiano(game, config) {
         position: {
           x: xPosition + keyWidth / 2,
           y: config.position.y + keyHeight / 3,
-          z: 999
+          z: 10
         }
       });
 
@@ -326,9 +326,13 @@ function createPiano(game, config) {
           width: blackKeyWidth,
           height: keyHeight,
           isStatic: true,
+          style: {
+            border: 'solid'
+          },
           position: {
             x: xPosition - blackKeyWidth, // Position the black key in the middle of two white keys
-            y: config.position.y - 20 // Slightly higher than white keys
+            y: config.position.y - 20, // Slightly higher than white keys
+            z: 10
           }
         });
       }

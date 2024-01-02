@@ -25,7 +25,23 @@ export default function inflategraphic(entityData) {
     if (entityData.texture) {
       // Use texture if available
       // console.log('texture', entityData.texture)
-      graphic = this.scene.add.sprite(0, 0, entityData.texture);
+
+      let texture = game.getTexture(entityData.texture);
+      let textureUrl = texture.url;
+      let spritePosition = texture.sprite || { x: 0, y: 0 };
+
+      graphic = this.scene.add.sprite(0, 0, texture.key);
+
+      if (typeof texture.frames === 'object') {
+       // get the texture from the sprite sheet
+       let t = this.scene.textures.get(texture.key);
+       let pos = texture.sprite;
+       // get specific area from the texture by x / y
+        let frame = t.get(pos.x, pos.y, 16, 16);
+        // set the graphic to frame texture
+        graphic.setTexture(frame);
+      }
+
       graphic.setDepth(entityData.position.z);
       entityData.graphic = graphic; // Store the reference in entityData for future updates
       if (entityData.color) {
@@ -40,8 +56,6 @@ export default function inflategraphic(entityData) {
       graphic.setTint(entityData.color);
     }
 
-    // Add interactive property to enable input events
-
     // Create the hitArea as a Phaser.Geom.Rectangle
     // The hitArea is initially positioned at (0,0) with the size of the entity
     const hitArea = new Phaser.Geom.Rectangle(0, 0, entityData.width, entityData.height);
@@ -52,6 +66,14 @@ export default function inflategraphic(entityData) {
     if (entityData.style && entityData.style.display) {
       if (entityData.style.display === 'none') {
         graphic.setVisible(false);
+      }
+    }
+
+    if (entityData.style && entityData.style.border) {
+      // console.log('entityData.style.border', entityData.style.border)
+      if (entityData.style.border) {
+        // graphic.setStrokeStyle(entityData.style.border.width, entityData.style.border.color);
+        // graphic.setStrokeStyle(2, 0x000000);
       }
     }
 
@@ -150,16 +172,43 @@ export default function inflategraphic(entityData) {
     }
 
     if (typeof entityData.texture !== 'undefined') {
-      console.log('TEXTURE', entityData.texture)
-      let randomOneOrZero = Math.round(Math.random());
-      console.log('graphic', graphic)
-      console.log('texture', graphic.texture)
-      graphic.setFrame(2)
+
+
+      let texture = game.getTexture(entityData.texture);
+      let textureUrl = texture.url;
+      let spritePosition = texture.sprite || { x: 0, y: 0 };
+      if (typeof entityData.texture.frame === 'number') {
+        // graphic.setFrame(entityData.texture.frame);
+      }
+
+      if (typeof texture.frames === 'object') {
+        // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
+        if (game.tick % 10 === 0) { // TODO: custom tick rate
+          // shift first frame from array
+          if (typeof entityData.frameIndex === 'undefined') {
+            entityData.frameIndex = 0;
+          }
+          if (entityData.frameIndex >= texture.frames.length) {
+            entityData.frameIndex = 0;
+          }
+
+          let frame = texture.frames[entityData.frameIndex];
+          if (typeof frame !== 'undefined') {
+            // console.log(frame)
+            // set position on graphic based on frame.x and frame.y
+            // graphic.setFrame(frame.frame);
+            //graphic.setFrame(2);
+            //console.log('frame', frame)
+            // graphic.setFrame(entityData.frameIndex);
+            // TODO: setFrame animation here
+            entityData.frameIndex++;
+            // add frame back to end of array
+          }
+        }
+      }
     }
-  
 
   }
-
 
   // check to see if position is the same, if so, don't redraw
   let currentGraphicsPosition = { x: graphic.x, y: graphic.y };
@@ -170,7 +219,6 @@ export default function inflategraphic(entityData) {
   if (entityData.rotation && typeof entityData.texture === 'undefined') {
     graphic.setRotation(entityData.rotation);
   }
-
 
   return graphic;
 

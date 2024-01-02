@@ -78,7 +78,7 @@ class Home {
     game.use('Tone');
     // TODO: better control of loading tiles
     // TODO: game.systems.tile.loadTilemap() -> Tiled JSON
-    game.use('Tile');
+    // game.use('Tile');
 
     //game.use('Sword')
 
@@ -219,6 +219,7 @@ class Home {
     game.createEntity({
       type: 'BACKGROUND',
       texture: 'robot-arms-apartment',
+      kind: 'building',
 
       width: 1340,
       height: 3668,
@@ -233,6 +234,7 @@ class Home {
     game.createEntity({
       type: 'BACKGROUND',
       texture: 'planet-express-base',
+      kind: 'building',
 
       width: 2048,
       height: 2048,
@@ -289,6 +291,44 @@ class Home {
       }
     });
 
+
+    game.createEntity({
+      name: 'raiden-left',
+      type: 'BACKGROUND',
+      width: 64,
+      height: 64,
+      depth: 64,
+      style: {
+        display: 'none'
+      },
+      texture: 'raiden',
+      body: false,
+      position: {
+        x: 0,
+        y: 10,
+        z: 32
+      }
+    });
+
+    game.createEntity({
+      name: 'raiden-right',
+      type: 'BACKGROUND',
+      width: 64,
+      height: 64,
+      depth: 64,
+      style: {
+        display: 'none'
+      },
+      texture: 'raiden',
+      body: false,
+      position: {
+        x: 100,
+        y: 10,
+        z: 32
+      }
+    });
+
+
     // if touch warp, switch to YCraft level
     game.createEntity({
       type: 'WARP',
@@ -309,7 +349,8 @@ class Home {
     // text label saying "Warp To YCraft World"
     game.createEntity({
       type: 'TEXT',
-      text: 'Warp To <br/> YCraft World',
+      text: 'Warp To YCraft World',
+      kind: 'dynamic',
       color: 0x000000,
       style: {
         fontSize: '16px',
@@ -379,6 +420,7 @@ class Home {
 
     // switch to phaser 3
     game.createEntity({
+      name: 'PhaserGraphics',
       type: 'TEXT',
       text: 'Upgrade to Canvas Graphics',
       width: 20,
@@ -388,7 +430,8 @@ class Home {
         fontSize: '12px',
         textAlign: 'center'
       },
-      body: false,
+      body: true,
+      isSensor: true,
       position: {
         x: 20,
         y: 100,
@@ -415,7 +458,8 @@ class Home {
     // text label saying "Warp To Platform World"
     game.createEntity({
       type: 'TEXT',
-      text: 'Warp To <br/> Music World',
+      text: 'Warp To Music World',
+      // width: 200,
       color: 0x000000,
       style: {
         fontSize: '16px',
@@ -432,7 +476,7 @@ class Home {
     // text label saying "Warp To Platform World"
     game.createEntity({
       type: 'TEXT',
-      text: 'Warp To <br/> Platform World',
+      text: 'Warp To Platform World',
       color: 0x000000,
       style: {
         fontSize: '16px',
@@ -499,6 +543,36 @@ class Home {
           z: 32
         }
       });
+    });
+
+    game.createEntity({
+      type: 'NPC',
+      texture: 'demon',
+      //texture: 'fire',
+      //color: 0xff0000,
+      width: 8,
+      height: 8,
+      depth: 64,
+      position: {
+        x: -80,
+        y: -60,
+        z: 32
+      }
+    });
+
+    game.createEntity({
+      type: 'NPC',
+      texture: 'demon',
+      //texture: 'fire',
+      //color: 0xff0000,
+      width: 8,
+      height: 8,
+      depth: 64,
+      position: {
+        x: 70,
+        y: -60,
+        z: 32
+      }
     });
 
     // if touch fire damage entity

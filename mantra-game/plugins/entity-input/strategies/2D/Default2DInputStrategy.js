@@ -16,6 +16,7 @@ class DefaultTwoDimensionalInputStrategy {
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
       K: 'FIRE_BULLET',
+      O: 'BARREL_ROLL',
 
       U: 'SELECT_MENU',
       //LEFT: 'ROTATE_LEFT',
@@ -26,12 +27,12 @@ class DefaultTwoDimensionalInputStrategy {
     // the new approach is to pool all inputs for a given tick, and send them to the server
     // this implies a button cool down of 1 tick, which is the same as no cooldown
     // Remark: bulletCooldown should be a property of the bullet system, not input system
-        // this.bulletCooldown = 1;
-        // this.buttonCooldown = 1;
-        // this.lastBulletFireTime = {};
+    // this.bulletCooldown = 1;
+    // this.buttonCooldown = 1;
+    // this.lastBulletFireTime = {};
 
     this.useMouseControls = false;
-    
+
     // check to see if entityInput system exists, if not throw error
     if (!game.systems['entity-input']) {
       throw new Error('DefaultTwoDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
@@ -110,7 +111,65 @@ class DefaultTwoDimensionalInputStrategy {
       }
     }
 
-    if (actions.includes('SELECT_MENU')) {}
+    if (actions.includes('SELECT_MENU')) { }
+
+    // barrel roll
+    if (actions.includes('BARREL_ROLL')) {
+      if (typeof this.game.data.camera.rotation === 'number') {
+        game.rotateCamera(this.game.data.camera.rotation + 360);
+        // console.log("this.game.data.camera.rotation", this.game.data.camera.rotation)
+      } else {
+        // rotate the camera 360 degrees
+        game.rotateCamera(360);
+      }
+
+      /* TODO: move this code to Home.js sutra ( should not be in entityInput system )
+      // show the raiden backgrounds for a few seconds
+      game.on('player::BARREL_ROLL', etc);
+      let backgrounds = this.game.data.ents.BACKGROUND;
+      let leftRaiden = backgrounds.filter(ent => ent.name === 'raiden-left')[0];
+      if (leftRaiden) {
+        game.updateEntity({
+          id: leftRaiden.id,
+          style: {
+            display: 'block'
+          },
+        });
+      }
+
+      let rightRaiden = backgrounds.filter(ent => ent.name === 'raiden-right')[0];
+      if (rightRaiden) {
+        game.updateEntity({
+          id: rightRaiden.id,
+          style: {
+            display: 'block'
+          },
+        });
+      }
+
+      setTimeout(() => {
+        if (leftRaiden) {
+          game.updateEntity({
+            id: leftRaiden.id,
+            style: {
+              display: 'none'
+            },
+          });
+        }
+        if (rightRaiden) {
+          game.updateEntity({
+            id: rightRaiden.id,
+            style: {
+              display: 'none'
+            },
+          });
+        }
+      }, 3000);
+
+      console.log('backgrounds', leftRaiden, backgrounds)
+      */
+
+    }
 
   }
 }

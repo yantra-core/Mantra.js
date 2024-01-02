@@ -12,19 +12,23 @@ class CSSCamera {
     this.isDragging = false;
     this.dragInertia = { x: 0, y: 0 };
     this.isThrowing = false;
+    this.rotating = false;
+    
 
   }
 
   init(game) {
     this.game = game;
 
+    //game.rotateCamera = this.rotateCamera.bind(this);
+    game.rotateCamera = this.rotateCameraOverTime.bind(this);
     // sets auto-follow player when starting CSSGraphics ( for now )
     this.follow = true;
 
     this.game.systemsManager.addSystem('graphics-css-camera', this);
 
     this.gameViewport = document.getElementById('gameHolder');
-    
+
     //this.scene.zoom(this.game.config.camera.startingZoom);
 
     let currentWindowHeight = window.innerHeight;
@@ -54,10 +58,72 @@ class CSSCamera {
         if (data.mouse.buttons.RIGHT) {
           this.gameViewport.style.cursor = 'grabbing';
         }
-        this.updateCameraPosition(data.mouse.dx, data.mouse.dy, data.mouse.isDragging);
+        // console.log('Current Zoom', game.data.camera.currentZoom);
+
+        // Adjust the drag deltas based on the current zoom level
+        // When zoomed out (lower zoom value), increase the drag deltas
+        // When zoomed in (higher zoom value), decrease the drag deltas
+        data.mouse.dx = data.mouse.dx || 0;
+        data.mouse.dy = data.mouse.dy || 0;
+        let zoomFactor = 1 / game.data.camera.currentZoom || 4.5;
+        let adjustedDx = data.mouse.dx * zoomFactor;
+        let adjustedDy = data.mouse.dy * zoomFactor;
+
+        //console.log('Adjusted Dx', adjustedDx, 'og', data.mouse.dx);
+        //console.log('Adjusted Dy', adjustedDy, 'og', data.mouse.dy);
+
+        this.updateCameraPosition(adjustedDx, adjustedDy, data.mouse.isDragging);
       }
+
     });
 
+  }
+
+ 
+  // Method to smoothly rotate the camera over a given duration using CSS transitions
+  rotateCameraOverTime(targetAngle = 90, duration = 800) {
+    if (typeof targetAngle !== 'number' || typeof duration !== 'number') {
+      console.error('Invalid arguments for rotateCameraOverTime. Both targetAngle and duration must be numbers.');
+      return;
+    }
+
+    if (this.rotating) {
+      return;
+    }
+
+    this.rotating = true;
+    this.game.data.camera.rotation = targetAngle;
+
+    // Retrieve the current zoom level
+    let currentZoom = this.game.data.camera.currentZoom;
+
+    // Set the transition property on the gameViewport
+    this.gameViewport.style.transition = `transform ${duration}ms`;
+
+    // TODO: better centering
+    // this.gameViewport.style.transformOrigin = 'center center 0';
+
+    // Apply the combined scale (for zoom) and rotation
+    this.gameViewport.style.transform = `scale(${currentZoom}) rotate(${targetAngle}deg)`;
+
+    // Reset the transition after the animation is complete
+    // TODO: remove setTimeout in favor of game.tick % N
+    setTimeout(() => {
+      this.gameViewport.style.transition = '';
+      this.rotating = false;
+    }, duration);
+  }
+
+  // Method to rotate the camera
+  rotateCamera(angle) {
+    // Ensure the angle is a number and set a default if not
+    if (typeof angle !== 'number') {
+      console.error('Invalid angle for rotateCamera. Must be a number.');
+      return;
+    }
+
+    // Update the CSS transform property to rotate the viewport
+    this.gameViewport.style.transform = `rotate(${angle}deg)`;
   }
 
   // Method to update camera position based on drag
@@ -143,24 +209,24 @@ class CSSCamera {
     //console.log('game.viewportCenterYOffset', game.viewportCenterYOffset)
     let currentZoom = game.data.camera.currentZoom;
     //console.log('currentZoom', currentZoom);
-  
+
     // Get browser window dimensions
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
-  
+
     // Calculate scale factor based on current zoom
     let scaleFactor = 1 / currentZoom;
-  
+
     // Adjust offset based on window size and scale factor
     //game.viewportCenterXOffset = (windowWidth / 2) * scaleFactor;
     //game.viewportCenterXOffset = game.viewportCenterXOffset / 2;
 
     //game.viewportCenterYOffset = (windowHeight / 2) * scaleFactor;
     //game.viewportCenterYOffset = game.viewportCenterYOffset / 2;
-    
+
     //console.log('Updated Offset X:', game.viewportCenterXOffset);
     //console.log('Updated Offset Y:', game.viewportCenterYOffset);
-  
+
     if (this.follow && currentPlayer && currentPlayer.position) {
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
       this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
@@ -169,7 +235,7 @@ class CSSCamera {
       this.scene.cameraPosition.y = game.viewportCenterYOffset;
     }
   }
-  
+
 
   initZoomControls() {
     document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });

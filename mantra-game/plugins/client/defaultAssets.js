@@ -12,10 +12,25 @@ let defaultAssets = {
   'planet-express-base': '/img/game/env/planet-express-base.png',
   'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   '3d-homer': '/img/game/env/3d-homer.gif',
+  'demon': '/img/game/npc/demon.gif',
+  'raiden': {
+    type: 'spritesheet',
+    url: '/img/game/sheets/raiden.png',
+    frameWidth: 32,
+    frameHeight: 32,
+    frameTags: {
+      swing: {
+        frames: [
+          { x: 0, y: 0 },
+          { x: 0, y: -32 },
+        ]
+      },
+    },
+  },
   'jogurt': {
     type: 'spritesheet',
     url: '/img/game/sheets/jogurt.png',
-    frameWidth: 18,
+    frameWidth: 20,
     frameHeight: 24,
     frameTags: {
       walkDown: {

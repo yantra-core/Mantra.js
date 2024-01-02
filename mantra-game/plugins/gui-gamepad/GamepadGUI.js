@@ -153,6 +153,7 @@ class GamepadGUI {
     let dpad_right = document.getElementById('right');
 
     let buttonY = document.getElementById('y');
+    let buttonX = document.getElementById('x');
 
     buttonY.addEventListener('pointerdown', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyK' }));
@@ -160,6 +161,14 @@ class GamepadGUI {
 
     buttonY.addEventListener('pointerup', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyK' }));
+    });
+
+    buttonX.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyO' }));
+    });
+
+    buttonX.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyO' }));
     });
 
     if (false && !is_touch_enabled()) {

@@ -90,10 +90,12 @@ class PhaserGraphics extends GraphicsInterface {
         // Phaser preloader should hit the cache and load them from there
         game.preloader.assets.forEach((asset) => {
           if (asset.type === 'spritesheet') {
+            // console.log('asset', asset)
             this.load.spritesheet(asset.key, asset.url, {
-              frameWidth: 16,// TODO: config
-              frameHeight: 16,
-              endFrame: asset.endFrame
+              frameWidth: asset.frameWidth,// TODO: config
+              frameHeight: asset.frameHeight,
+              startFrame: 0, // TODO: config
+              endFrame: 8
             });
           }
           if (asset.type === 'image') {
