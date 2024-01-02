@@ -55,11 +55,7 @@ export default class Client {
       }
 
       if (asset.type === 'spritesheet') {
-        preloader.addAsset(asset.url, 'spritesheet', key, {
-          frameWidth: asset.frameWidth,
-          frameHeight: asset.frameHeight,
-          endFrame: asset.endFrame,
-        });
+        preloader.addAsset(asset.url, 'spritesheet', key, asset);
         continue;
       }
 

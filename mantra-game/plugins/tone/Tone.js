@@ -2,6 +2,7 @@
 // Tone.js - https://tonejs.github.io/
 // import * as Tone from 'tone';
 
+import DrumKit from './instruments/DrumKit.js';
 import startUpJingle from './jingles/start-up.js';
 import keyCodes from './keyCodes.js';
 
@@ -21,6 +22,7 @@ class TonePlugin {
 
   init(game) {
     this.game = game;
+    
 
     // register the plugin with the game
     this.game.systemsManager.addSystem(this.id, this);
@@ -43,6 +45,8 @@ class TonePlugin {
     // Tone.context.latencyHint = 'interactive'; // or a number in seconds
     Tone.Transport.lookAhead = 0.5; // in seconds
 
+    this.drumKit = new DrumKit();
+
     const limiter = new Tone.Limiter(-6).toDestination();
 
     // Create a compressor
@@ -62,6 +66,12 @@ class TonePlugin {
     //this.synth.connect(compressor);
     this.synth.connect(limiter);
 
+
+    game.playDrum = function (sound = 'kick') {
+      Tone.start();
+
+      that.drumKit.play(sound);
+    };
 
     game.playNote = function (note, duration) {
       Tone.start();
@@ -205,9 +215,6 @@ class TonePlugin {
 }
 
 export default TonePlugin;
-
-
-
 
 
 /*

@@ -12,7 +12,6 @@ const gui = {
       };
     }
 
-
     let guiClasses = {
       'container': 'gui-container',
       'content': 'gui-content',
@@ -31,8 +30,6 @@ const gui = {
       */
     }
 
-
-    
     // Create container
     const container = document.createElement('div');
     container.id = id;
@@ -190,16 +187,17 @@ const gui = {
   },
 
   bringToFront(clickedContainer) {
+
     // Get all gui-containers
     const containers = document.querySelectorAll('.gui-container');
 
     // Set z-index of all containers to 1
     containers.forEach(container => {
-      container.style.zIndex = '1';
+      container.style.zIndex = '1000';
     });
 
     // Set z-index of the clicked container to 10
-    clickedContainer.style.zIndex = '10';
+    clickedContainer.style.zIndex = '1010';
   }
 
 };

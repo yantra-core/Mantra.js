@@ -1,4 +1,13 @@
-export default function updateEntityPosition(entityElement, { position, type, width, height, rotation = 0 }) {
+export default function updateEntityPosition(entityElement, entityData) {
+
+
+  let position = entityData.position;
+  let rotation = entityData.rotation;
+  let type = entityData.type;
+  let width = entityData.width;
+  let height = entityData.height;
+
+
   // Adjust the position based on the camera position
   if (type === 'BULLET') {
     // Some bug here, fix this in CSSGraphics
@@ -20,7 +29,7 @@ export default function updateEntityPosition(entityElement, { position, type, wi
   // convert rotation to degrees
   let angle = rotation * (180 / Math.PI);
 
-  this.setTransform(entityElement, domX, domY, rotation, angle);
+  this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
 
   // console.log('updated position', position, adjustedPosition, domX, domY)
 

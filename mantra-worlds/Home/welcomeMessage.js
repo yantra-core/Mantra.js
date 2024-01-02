@@ -26,7 +26,7 @@ export default function welcomeMessage(game) {
       left: '50%', // Center horizontally
       transform: 'translateX(-50%)', // Ensure exact centering
       lineHeight: '1',
-      zIndex: '3000'
+      zIndex: '999'
 
     },
     duration: 5000, removeDuration: 6000

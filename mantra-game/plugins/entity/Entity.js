@@ -223,6 +223,10 @@ class Entity {
       // TODO: update rotation in physics engine      
     }
 
+    if (typeof entityData.text !== 'undefined') {
+      this.game.components.text.set(entityId, entityData.text);
+    }
+
     // Items
     if (typeof entityData.items !== 'undefined') {
       // overwrite all items ( for now )
@@ -262,7 +266,7 @@ class Entity {
       shape: 'triangle',
       color: null,
       position: { x: 0, y: 0, z: 0 },
-      startingPosition: { x: 0, y: 0, z: 0 },
+      startingPosition: null,
       velocity: { x: 0, y: 0, z: 0 },
       rotation: 0,
       mass: 100,
@@ -305,6 +309,10 @@ class Entity {
       return this.game.components.timers.get(entityId, timerId);
     };
     */
+
+    if (!config.startingPosition) {
+      config.startingPosition = config.position;
+    }
 
     const { name, type, kind, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, owner, inputs, lifetime, yCraft, text, style, texture } = config;
     let { x, y } = position;

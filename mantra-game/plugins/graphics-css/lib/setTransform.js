@@ -1,14 +1,12 @@
-export default function setTransform(entityElement, domX, domY, rotation, angle) {
+export default function setTransform(entityData, entityElement, domX, domY, rotation, angle) {
   // Retrieve the last rotation value, default to 0 if not set
   let lastRotation = entityElement.dataset.rotation || 0;
   
   // Check if the element has a background image
-  // Remark: We could add more formalized support for spritesheets here
-  // The check is performed in order to not rotate the images on sprites that animate
   const hasBackgroundImage = entityElement.style.backgroundImage && entityElement.style.backgroundImage !== 'none';
 
   // Update rotation if provided and no background image
-  if (rotation && !hasBackgroundImage) {
+  if (rotation /*&& !hasBackgroundImage*/) {
       lastRotation = angle;
       entityElement.dataset.rotation = angle;
   }
@@ -18,7 +16,10 @@ export default function setTransform(entityElement, domX, domY, rotation, angle)
 
   // Add rotation to the transform if no background image
   if (!hasBackgroundImage) {
-      newTransform += ` rotate(${lastRotation}deg)`;
+  }
+
+  if (entityData.type !== 'PLAYER') {
+    newTransform += ` rotate(${lastRotation}deg)`;
   }
 
   // compare the new transform to the previous transform

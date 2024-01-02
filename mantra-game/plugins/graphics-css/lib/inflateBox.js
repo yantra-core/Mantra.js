@@ -116,23 +116,34 @@ export default function inflateBox(entityElement, entityData) {
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
     entityElement.style.borderRadius = '0px';
-    entityElement.style.padding = '1px';
-
+    // entityElement.style.padding = '1px';
     // optional tile flip CSS ( not great for performance better to use sprite animations )
     if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
       // TODO: refactor API
       tileFlip(entityElement, hexColor, getTexture, entityData);
     } else {
-
+      let texture = getTexture(entityData.texture);
+      let textureUrl = texture.url;
+      let spritePosition = texture.sprite || { x: 0, y: 0 };
+      // console.log('got back texture', textureUrl, texture, spritePosition)
       // TODO: move this closure
       // rendering a texture without tile
       // console.log('going to set texture', entityData.texture, getTexture(entityData.texture))
-      entityElement.style.background = `url('${getTexture(entityData.texture)}')`;
+      entityElement.style.background = `url('${textureUrl}')`;
       entityElement.style.backgroundRepeat = 'no-repeat';
-      entityElement.style.backgroundSize = 'cover';
+      entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
+      // entityElement.style.backgroundPosition = '-208px -544px';
+      // set background size to entity size
+      if (spritePosition.x === 0 && spritePosition.y === 0) {
+        // entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+      }
+      if (!texture.frames) {
+        entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+      }
+      // entityElement.style.zIndex = entityData.position.z;
 
       if (typeof entityData.texture === 'object' && entityData.texture.sheet) {
-        this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.frame);
+        // this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.sprite);
       }
 
       if (entityData.style) {
@@ -155,6 +166,7 @@ export default function inflateBox(entityElement, entityData) {
 
 function tileFlip(entityElement, hexColor, getTexture, entityData) {
 
+  let texture = getTexture(entityData.texture);
   // Calculate animation duration based on X and Y coordinates
   let duration = Math.abs(entityData.position.x) + Math.abs(entityData.position.y);
   duration = duration / 500; // Divide by 1000 to get a duration in seconds
@@ -177,7 +189,7 @@ function tileFlip(entityElement, hexColor, getTexture, entityData) {
   frontFace.style.height = '100%';
   frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
   frontFace.style.animation = `flip ${duration}s ease`; // Set the animation using keyframes
-  frontFace.style.background = `url('${getTexture(entityData.texture)}')`;
+  frontFace.style.background = `url('${texture.url}')`;
   frontFace.style.backgroundRepeat = 'no-repeat';
   frontFace.style.backgroundSize = 'cover';
 
@@ -200,7 +212,7 @@ function tileFlip(entityElement, hexColor, getTexture, entityData) {
   // Remove the flipWrapper after animation is complete
   flipWrapper.addEventListener('animationend', () => {
     //entityElement.background = 
-    entityElement.style.background = `url('${getTexture(entityData.texture)}')`;
+    entityElement.style.background = `url('${texture.url}')`;
     entityElement.style.backgroundRepeat = 'no-repeat';
     entityElement.style.backgroundSize = 'cover';
 

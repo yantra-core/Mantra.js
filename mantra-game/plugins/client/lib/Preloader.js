@@ -9,8 +9,8 @@ export default class Preloader {
     return this.assets.find(asset => asset.key === key);
   }
 
-  addAsset(url, type, key) {
-    this.assets.push({ url, type, key, size: 0 });
+  addAsset(url, type, key, data = {}) {
+    this.assets.push({ url, type, key, size: 0, frameTags: data.frameTags });
   }
 
   async loadAll() {

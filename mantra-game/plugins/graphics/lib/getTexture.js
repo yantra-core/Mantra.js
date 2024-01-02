@@ -1,4 +1,4 @@
-export default function getTexture(keyOrUrl) {
+export default function getTexture(config) {
   let game = this.game;
   // returns the texture url for a given key
   // if no key is found, checks if the key is a url and returns it
@@ -7,14 +7,43 @@ export default function getTexture(keyOrUrl) {
 
   let t;
 
-  if (typeof keyOrUrl === 'object') {
+  let assetName = config;
+
+  // console.log('getTexture', config);
+
+  if (typeof assetName === 'object') {
     // could be sprite sheet
-    keyOrUrl = keyOrUrl.sheet;
+    assetName = config.sheet;
   }
 
-  t = game.preloader.getItem(keyOrUrl);
-  if (t) {
-    return t.url;
+  t = game.preloader.getItem(assetName);
+
+  if (config && typeof config.sprite !== 'undefined') {
+    let spriteName = config.sprite;
+    let frameIndex = 0;
+
+    if (typeof config.frame === 'number') {
+      frameIndex = config.frame;
+    }
+
+    // check to see if frameName is present in spritesheet
+    if (t && t.frameTags && t.frameTags[spriteName]) {
+      let sprite = t.frameTags[spriteName].frames[frameIndex];
+      // t.frame = frame;
+      return {
+        url: t.url,
+        // asset: t.frameTags[spriteName],
+        frames: t.frameTags[spriteName].frames,
+        sprite
+      };
+    }
+    //console.log('frame name', t, config.frame);
   }
-  return keyOrUrl;
+
+  if (t) {
+    return {
+      url: t.url
+    };
+  }
+  return config;
 }

@@ -1,10 +1,10 @@
+// no longer being used?
 export default function cssHandleInputs() {
   let game = this.game;
   //
   // Updates the player sprite based on the current input
   // Remark: Input and Movement are handled in EntityInput and EntityMovement plugins
   //
-
   // Spritesheet dimensions
   const spritesheetWidth = 672;
   const spritesheetHeight = 672;

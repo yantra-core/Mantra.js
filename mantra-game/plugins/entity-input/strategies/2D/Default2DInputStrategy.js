@@ -15,6 +15,8 @@ class DefaultTwoDimensionalInputStrategy {
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
+      K: 'FIRE_BULLET',
+
       U: 'SELECT_MENU',
       //LEFT: 'ROTATE_LEFT',
       //RIGHT: 'ROTATE_RIGHT'

@@ -13,6 +13,7 @@ export default function inflateCircle(entityData) {
     // Clear the existing triangle if it exists
     graphic.clear();
   }
+
   graphic.fillStyle(0xff0000, 1);
   graphic.fillCircle(0, 0, entityData.radius);
   graphic.setDepth(10);

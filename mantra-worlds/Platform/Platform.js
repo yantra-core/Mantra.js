@@ -57,6 +57,34 @@ class Platform {
       height: 16
     });
 
+    createPlatform({
+      x: 200,
+      y: 10,
+      z: -1,
+      width: 850,
+      height: 60
+    });
+
+
+    createPlatform({
+      x: 925,
+      y: 0,
+      z: -1,
+      width: 600,
+      height: 60
+    });
+
+
+    /*
+    createPlatform({
+      x: 300,
+      y: 10,
+      z: -1,
+      width: 2000,
+      height: 60
+    });
+    */
+
 
     game.use('Sutra')
 
@@ -112,13 +140,7 @@ class Platform {
         // TODO: arrange platforms in a grid
       });
 
-      createPlatform({
-        x: 0,
-        y: 10,
-        z: -1,
-        width: 2816,
-        height: 60
-      });
+   
 
       /*
       createPlatform({
@@ -171,6 +193,29 @@ class Platform {
         y: -100
       }
     });
+
+
+    let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb'];
+
+    itemsList.forEach((item, index) => {
+      game.createEntity({
+        type: item.toUpperCase(),
+        kind: item,
+        width: 16,
+        height: 16,
+        depth: 32,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: item,
+        },
+        position: {
+          x: 150 + (index * 32),
+          y: -100,
+          z: 32
+        }
+      });
+    })
+
 
   }
 

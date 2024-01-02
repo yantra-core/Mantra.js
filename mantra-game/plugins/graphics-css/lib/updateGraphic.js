@@ -9,6 +9,7 @@ export default function updateGraphic(entityData) {
       entityData.rotation = entityData.rotation;
     }
   }
+
   const entityElement = document.getElementById(`entity-${entityData.id}`);
   if (entityElement) {
     // Update the entity color
@@ -62,6 +63,49 @@ export default function updateGraphic(entityData) {
       });
     }
 
+
+    if (entityData.texture /*entityData.type === 'FIRE'*/) {
+      // check to see if texture changed / sprite index changed
+
+      let texture = game.getTexture(entityData.texture);
+      let textureUrl = texture.url;
+      let spritePosition = texture.sprite || { x: 0, y: 0 };
+      if (typeof entityData.texture.frame === 'number') {
+        spritePosition = texture.frames[entityData.texture.frame];
+        entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+      }
+
+      if (typeof texture.frames === 'object') {
+        // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
+        if (game.tick % 10 === 0) { // TODO: custom tick rate
+          // shift first frame from array
+          if (typeof entityData.frameIndex === 'undefined') {
+            entityData.frameIndex = 0;
+          }
+          if (entityData.frameIndex >= texture.frames.length) {
+            entityData.frameIndex = 0;
+          }
+
+          let frame = texture.frames[entityData.frameIndex];
+          if (typeof frame !== 'undefined') {
+            spritePosition = frame;
+            entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+            entityData.frameIndex++;
+            // add frame back to end of array
+          }
+        }
+      }
+
+    }
+
+    if (entityData.type === 'TEXT' && typeof entityData.text !== 'undefined' && entityData.text !== null) {
+
+      // check that text has changed
+      if (entityElement.innerHTML !== entityData.text) {
+        entityElement.innerHTML = entityData.text;
+      }
+      // return this.inflateText(entityData);
+    }
 
     // Update the position of the entity element
     return this.updateEntityPosition(entityElement, entityData);
