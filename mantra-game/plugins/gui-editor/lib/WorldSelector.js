@@ -29,6 +29,8 @@ class WorldSelector {
 
     this.addOption(selectBox, 'Home World', 'Home');
     this.addOption(selectBox, 'Platform World', 'Platform');
+    this.addOption(selectBox, 'Music World', 'Music');
+
     // this.addOption(selectBox, 'Space World', 'Platform');
     //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
 

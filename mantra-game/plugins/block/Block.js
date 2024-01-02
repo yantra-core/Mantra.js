@@ -1,7 +1,7 @@
 // Block.js - Marak Squires 2023
 class Block {
   static id = 'block';
-  constructor({ MIN_BLOCK_SIZE = 10000, width = 40, height = 40 } = {}) {
+  constructor({ MIN_BLOCK_SIZE = 10, width = 40, height = 40 } = {}) {
     this.id = Block.id;
     // Assuming the config includes width and height properties
     this.width = width; // Default size if none provided
@@ -73,6 +73,7 @@ class Block {
       const newHeight = entityA.height / 2;
       const newSplits = entityA.splits + 1;
 
+      console.log('aaaa', entityA)
       // TODO: could we move this into a sutra rule instead?
       for (let i = 0; i < 4; i++) {
         let newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];
@@ -89,10 +90,15 @@ class Block {
             y: (Math.random() * 2 - 1) * 10
           },
           // inherit color from parent
-          color: newColor,
+          texture: 'tile-block',
+          // color: newColor,
           width: newWidth,
           height: newHeight,
-          splits: newSplits
+          splits: newSplits,
+          //friction: 0.5,
+          frictionAir: 0.2,
+          //frictionStatic: 0.5,
+          // TODO: needs to inherit other properties from parent such as frictoin
         });
       }
 

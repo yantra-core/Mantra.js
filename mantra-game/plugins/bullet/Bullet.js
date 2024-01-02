@@ -78,7 +78,10 @@ class Bullet {
       mass: 1,
       position: bulletStartPosition,
       lifetime: this.lifetime,
-      texture: 'fire',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'arrow'
+      },
       owner: entityId,
       rotation: playerRotation,
       isSensor: true,
@@ -87,7 +90,7 @@ class Bullet {
         x: directionX * this.speed,
         y: directionY * this.speed
       },
-      radius: 8, // TODO: make this a config
+      radius: 16, // TODO: make this a config
       damage: 10, // TODO: make this a config
     };
     console.log('using bulletDirectionConfig', bulletDirectionConfig)

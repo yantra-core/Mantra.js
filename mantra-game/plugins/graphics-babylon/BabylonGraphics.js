@@ -414,7 +414,8 @@ class BabylonGraphics extends GraphicsInterface {
       // set material if game.getTexture(entityData.texture) is present
       if (game.getTexture(entityData.texture)) {
         let material = new BABYLON.StandardMaterial("material", this.scene);
-        material.diffuseTexture = new BABYLON.Texture(game.getTexture(entityData.texture), this.scene);
+        let texture = game.getTexture(entityData.texture);
+        material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
         block.material = material;
       } else {
         console.log('missing block texture', entityData.texture)
@@ -473,11 +474,12 @@ class BabylonGraphics extends GraphicsInterface {
     }
     // Create a material for the box
     let material = new BABYLON.StandardMaterial("material", this.scene);
-    console.log('game.getTexture(entityData.texture)', game.getTexture(entityData.texture))
+    // console.log('game.getTexture(entityData.texture)', game.getTexture(entityData.texture))
     // Check if texture is available
     if (typeof game.getTexture(entityData.texture) !== 'undefined') {
       // Apply texture
-      material.diffuseTexture = new BABYLON.Texture(game.getTexture(entityData.texture), this.scene);
+      let texture = game.getTexture(entityData.texture);
+      material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
     } else if (entityData.color) {
       // Incoming color is int color value
       // Extract RGB components from the hexadecimal color value
