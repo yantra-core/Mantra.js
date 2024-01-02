@@ -13,56 +13,6 @@ body {
   outline-offset: 0.5vmin;
 }
 
-/* Camera angle */
-input[type="radio"] {
-  position: absolute;
-  left: -1000in;
-}
-
-#cam1:checked ~ #snes-gamepad { --x: -1; --y: 1; }
-#cam2:checked ~ #snes-gamepad { --x: -1; }
-#cam3:checked ~ #snes-gamepad { --x: -1; --y: -1; }
-#cam4:checked ~ #snes-gamepad { --y: 1; }
-#cam6:checked ~ #snes-gamepad { --y: -1; }
-#cam7:checked ~ #snes-gamepad { --x: 1; --y: 1; }
-#cam8:checked ~ #snes-gamepad { --x: 1; }
-#cam9:checked ~ #snes-gamepad { --x: 1; --y: -1; }
-
-#cam1:checked ~ #camera label:nth-child(1),
-#cam2:checked ~ #camera label:nth-child(2),
-#cam3:checked ~ #camera label:nth-child(3),
-#cam4:checked ~ #camera label:nth-child(4),
-#cam5:checked ~ #camera label:nth-child(5),
-#cam6:checked ~ #camera label:nth-child(6),
-#cam7:checked ~ #camera label:nth-child(7),
-#cam8:checked ~ #camera label:nth-child(8),
-#cam9:checked ~ #camera label:nth-child(9) { 
-  background: #f004; 
-  mix-blend-mode: color-burn;
-}
-
-#camera {
-  --color1: #ccc;
-  position: absolute;
-  top: 2vmin;
-  right: 2vmin;
-  width: 10vmin;
-  aspect-ratio: 1;
-  /* display: grid; */
-  display: none;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  background:
-    linear-gradient(#0000 0 30%, #fff 0 36.66%, #0000 0 63.33%, #fff 0 70%, #0000 0),
-    linear-gradient(90deg, #0000 0 30%, #fff 0 36.66%, #0000 0 63.33%, #fff 0 70%, #0000 0),
-    radial-gradient(closest-side, #ccc 33.33%, #0000 0 40%, #ccc 0 99.99%, #0000 0)
-    
-    ;
-  border-radius: 50%;
-  overflow: hidden;
-  gap: 0.125vmin;
-}
-
 /* Gamepad code */
 #snes-gamepad {
   --x: 0;
@@ -74,10 +24,15 @@ input[type="radio"] {
   --gray-dark: #585a58;
   --purple-light: #bbe;
   --purple-dark: #64b;
-  --button-x: #3c62f8; var(--purple-light);
-  --button-y: #14b161; var(--purple-light);
-  --button-a: #f03025; var(--purple-dark);
-  --button-b: #e9dd34; var(--purple-dark);
+  --button-x: #3c62f8;
+  var(--purple-light);
+  --button-y: #14b161;
+  var(--purple-light);
+  --button-a: #f03025;
+  var(--purple-dark);
+  --button-b: #e9dd34;
+  var(--purple-dark);
+  /*
   position: absolute;
   width: 80vmin;
   height: 34vmin;
@@ -86,33 +41,85 @@ input[type="radio"] {
   transform: translate(-50%, -50%) var(--rotate);
   transform-style: preserve-3d;
   transition: transform 1s;
+  */
+  position: fixed;
+  /* Changed from absolute to fixed */
+  width: 100vw;
+  /* Set width to 100% of the viewport width */
+  height: auto;
+  /* Adjust height automatically based on aspect ratio */
+  /*
+  bottom: 300px;
+  left: 60px; 
+  */
+  transform: none;
+  /* Remove transform to avoid misalignment */
+  transform-style: preserve-3d;
+  transition: transform 1s;
+
 }
 
 #snes-gamepad * {
   position: absolute;
   box-sizing: border-box;
   transform-style: preserve-3d;
+
 }
 
-.is3d > div {
+.is3d>div {
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
 }
 
-.is3d > div:nth-child(1) { transform: translateZ(calc(var(--pos) * 1)); }
-.is3d > div:nth-child(2) { transform: translateZ(calc(var(--pos) * 2)); }
-.is3d > div:nth-child(3) { transform: translateZ(calc(var(--pos) * 3)); }
-.is3d > div:nth-child(4) { transform: translateZ(calc(var(--pos) * 4)); }
-.is3d > div:nth-child(5) { transform: translateZ(calc(var(--pos) * 5)); }
-.is3d > div:nth-child(6) { transform: translateZ(calc(var(--pos) * 6)); }
-.is3d > div:nth-child(7) { transform: translateZ(calc(var(--pos) * 7)); }
-.is3d > div:nth-child(8) { transform: translateZ(calc(var(--pos) * 8)); }
-.is3d > div:nth-child(9) { transform: translateZ(calc(var(--pos) * 9)); }
-.is3d > div:nth-child(10) { transform: translateZ(calc(var(--pos) * 10)); }
-.is3d > div:nth-child(11) { transform: translateZ(calc(var(--pos) * 11)); }
-.is3d > div:nth-child(12) { transform: translateZ(calc(var(--pos) * 12)); }
+.is3d>div:nth-child(1) {
+  transform: translateZ(calc(var(--pos) * 1));
+}
+
+.is3d>div:nth-child(2) {
+  transform: translateZ(calc(var(--pos) * 2));
+}
+
+.is3d>div:nth-child(3) {
+  transform: translateZ(calc(var(--pos) * 3));
+}
+
+.is3d>div:nth-child(4) {
+  transform: translateZ(calc(var(--pos) * 4));
+}
+
+.is3d>div:nth-child(5) {
+  transform: translateZ(calc(var(--pos) * 5));
+}
+
+.is3d>div:nth-child(6) {
+  transform: translateZ(calc(var(--pos) * 6));
+}
+
+.is3d>div:nth-child(7) {
+  transform: translateZ(calc(var(--pos) * 7));
+}
+
+.is3d>div:nth-child(8) {
+  transform: translateZ(calc(var(--pos) * 8));
+}
+
+.is3d>div:nth-child(9) {
+  transform: translateZ(calc(var(--pos) * 9));
+}
+
+.is3d>div:nth-child(10) {
+  transform: translateZ(calc(var(--pos) * 10));
+}
+
+.is3d>div:nth-child(11) {
+  transform: translateZ(calc(var(--pos) * 11));
+}
+
+.is3d>div:nth-child(12) {
+  transform: translateZ(calc(var(--pos) * 12));
+}
 
 button {
   border: 0;
@@ -122,7 +129,8 @@ button {
   transform-style: preserve-3d;
 }
 
-button.active, /* gamepad controlled */
+button.active,
+/* gamepad controlled */
 button:active {
   --pos: 0.05;
 }
@@ -154,7 +162,7 @@ button:active {
 
 .face div {
   filter: contrast(0.9);
-  background: 
+  background:
     radial-gradient(circle at 17vmin 17vmin, var(--gray-light) 16.9vmin, #0000 17vmin),
     radial-gradient(circle at 63vmin 17vmin, var(--gray-light) 16.9vmin, #0000 17vmin),
     linear-gradient(var(--gray-light) 0 0) 50% 0 / 46vmin 30vmin no-repeat;
@@ -172,7 +180,7 @@ h1 {
   font-weight: 300;
 }
 
-h1 + p {
+h1+p {
   background: var(--gray-dark);
   color: var(--gray-light);
   margin: 0;
@@ -198,23 +206,39 @@ h1 + p {
   line-height: 0;
 }
 
-.letter-a { top: 28%; left: 92.9%; }
-.letter-b { top: 69%; left: 71.25%; }
-.letter-x { top: 11%; left: 83.5%; }
-.letter-y { top: 52%; left: 62%; }
+.letter-a {
+  top: 28%;
+  left: 92.9%;
+}
+
+.letter-b {
+  top: 69%;
+  left: 71.25%;
+}
+
+.letter-x {
+  top: 11%;
+  left: 83.5%;
+}
+
+.letter-y {
+  top: 52%;
+  left: 62%;
+}
 
 /* Top buttons */
-#l, #r {
+#l,
+#r {
   --pos: -0.2vmin;
   width: 17.25vmin;
   height: 5vmin;
   top: -1.5vmin;
   left: 8.75vmin;
-  background: 
+  background:
     linear-gradient(#fff0, #fff6),
     var(--gray-light);
   border-radius: 55% 1vmin 0 0;
-  box-shadow: 
+  box-shadow:
     inset 0 0.125vmin 0.25vmin #0002,
     inset 0 2.5vmin 0.5vmin -1vmin var(--gray-light),
     inset 0 3vmin 1vmin -1vmin #0004;
@@ -223,16 +247,17 @@ h1 + p {
 
 #l div,
 #r div {
-  box-shadow: 
+  box-shadow:
     inset 0 0.125vmin 0.25vmin #0002,
     inset 0 2.5vmin 0.5vmin -1vmin var(--gray-light),
     inset 0 3vmin 1vmin -1vmin #0004;
   border-radius: 55% 1vmin 0 0;
 }
 
-#l.active, /* gamepad js */
+#l.active,
+/* gamepad js */
 #l:active {
-  box-shadow: 
+  box-shadow:
     inset 0 0.125vmin 0.25vmin #0002,
     inset 0 2.5vmin 0.75vmin -1.66vmin var(--gray-light),
     inset 0 3vmin 1vmin -1vmin #0004;
@@ -246,37 +271,50 @@ h1 + p {
   transform: scaleX(-1) translateZ(-2.75vmin);
 }
 
-#r.active, /* gamepad js */
+#r.active,
+/* gamepad js */
 #r:active {
-  box-shadow: 
+  box-shadow:
     inset 0 0.125vmin 0.25vmin #0002,
     inset 0 2.5vmin 0.75vmin -1.66vmin var(--gray-light),
     inset 0 3vmin 1vmin -1vmin #0004;
-  transform: scaleX(-1)  translateZ(-2.75vmin) translateY(1vmin);
+  transform: scaleX(-1) translateZ(-2.75vmin) translateY(1vmin);
 }
 
 /* axis */
-.axis, .axis div {
+.axis,
+.axis div {
   --color: #111;
-  background: 
+  background:
     linear-gradient(#0000 31%, #000c 33.33% 66.66%, #0000 70%),
-    linear-gradient(90deg, #0000 31%, #000c 33.33% 66.66%, #0000 70%)
-    ;
-  width: 13.5vmin;
+    linear-gradient(90deg, #0000 31%, #000c 33.33% 66.66%, #0000 70%);
+  width: 30vmin;
+  /* Increase the width */
   aspect-ratio: 1;
+  /* Maintain the aspect ratio */
+  left: 30px;
+  /* Adjust position if necessary */
+  bottom: 30px;
+  /* Adjust position if necessary */
+  left: 30px;
+  /* Adjust position if necessary */
+  bottom: 30px;
+  /* Adjust position if necessary */
+
+
+  /*
   top: 9.75vmin;
   left: 10.5vmin;
+  */
   pointer-events: none;
-  box-shadow: 
-    -4.5vmin 0 0.25vmin -4.4vmin #000c,
-    4.5vmin 0 0.25vmin -4.4vmin #000c,
-    0 -4.5vmin 0.25vmin -4.4vmin #000c,
-    0 4.5vmin 0.25vmin -4.4vmin #000c
+  /* round corners */
+  border-radius: 80%;
 }
 
 .axis div {
-  --color: #34393a; #333;
-  --shadows: 
+  --color: #34393a;
+  #333;
+  --shadows:
     radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 36.66% 0% / 10% 10% no-repeat,
     radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 62.66% 0% / 10% 10% no-repeat,
     radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 36.66% 100% / 10% 10% no-repeat,
@@ -292,24 +330,22 @@ h1 + p {
   top: 0;
   left: 0;
   box-shadow: none;
-  background: 
-    var(--shadows)
-    ;
+  background:
+    var(--shadows);
 }
 
 .axis div:last-of-type {
-  --color: #3a4448;#3a3a3a;
+  --color: #3a4448;
+  #3a3a3a;
   background:
     linear-gradient(#fff1, #fff0 20% 80%, #fff1),
     linear-gradient(90deg, #fff1, #fff0 20% 80%, #fff1),
-    var(--shadows)
-    ;
-/*   width: 13.5vmin; */
-  box-shadow: 
+    var(--shadows);
+  /*   width: 13.5vmin; */
+  box-shadow:
     inset 0 0 2vmin -0.5vmin #0009,
     inset -4.5vmin -4.5vmin 3vmin #2102,
-    inset 4.5vmin 4.5vmin 3vmin #ffff0005
-    ;
+    inset 4.5vmin 4.5vmin 3vmin #ffff0005;
   clip-path: polygon(33.33% 0, 66.66% 0, 66.66% 33.33%, 100% 33.33%, 100% 66.66%, 66.66% 66.66%, 66.66% 100%, 33.33% 100%, 33.33% 66.66%, 0 66.66%, 0 33.33%, 33.33% 33.33%);
   -webkit-mask: var(--shadows);
   mask: var(--shadows)
@@ -323,56 +359,87 @@ h1 + p {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: 
+  background:
     radial-gradient(#0000, #0002);
   box-shadow:
-/*     inset 1vmin 1vmin 1vmin -0.5vmin #0002, */
+    /*     inset 1vmin 1vmin 1vmin -0.5vmin #0002, */
     inset -0.25vmin 0 0.5vmin #28282855,
     inset 0 0 1vmin 0.25vmin #28282855,
-    inset -1vmin -0.25vmin 0.5vmin -0.25vmin #ffffff11
-    ;
+    inset -1vmin -0.25vmin 0.5vmin -0.25vmin #ffffff11;
   border-radius: 50%;
   opacity: 0.9;
 }
 
- #left, #right {
-  width: 10.5vmin; /* Adjust the size as needed */
-  height: 8.5vmin; /* Adjust the size as needed */
-}
-#up, #down {
-  width: 8.5vmin; /* Adjust the size as needed */
-  height: 10.5vmin; /* Adjust the size as needed */
+#left,
+#right {
+  width: 12.5vmin;
+  height: 10.5vmin;
 }
 
+#up,
+#down {
+  width: 12.5vmin;
+  height: 12.5vmin;
+}
 
-#left { top: 12.25vmin; left: 3.5vmin; }
-#right { top: 12.25vmin; left: 19.5vmin; }
 
-#up { top: 3vmin; left: 13vmin; }
-#down { top: 18.75vmin; left: 13vmin; }
+#left {
+  bottom: 13.5vmin;
+  left: 2vmin;
+  background-color: aquamarine;
+  border: solid;
 
-#up.active ~ .axis div, /* gamepad js */
-#up:active ~ .axis div { 
+}
+
+#right {
+  left: 24.5vmin;
+  bottom: 13.5vmin;
+  background-color: red;
+  border: solid;
+
+}
+
+#up {
+  background-color: purple;
+  border: solid;
+  bottom: 22.5vmin;
+  left: 12vmin;
+
+}
+
+#down {
+  background-color: pink;
+  border: solid;
+  bottom: 2.5vmin;
+  left: 12vmin;
+}
+
+#up.active~.axis div,
+/* gamepad js */
+#up:active~.axis div {
   transform-origin: 50% 100%;
-  transform: translateZ(calc(var(--pos) * var(--z))) rotateX(5deg); 
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateX(5deg);
 }
 
-#down.active ~ .axis div, /* gamepad js */
-#down:active ~ .axis div{ 
+#down.active~.axis div,
+/* gamepad js */
+#down:active~.axis div {
   transform-origin: 50% 0%;
-  transform:  translateZ(calc(var(--pos) * var(--z))) rotateX(-5deg); 
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateX(-5deg);
 }
 
-#left.active ~ .axis div, /* gamepad js */
-#left:active ~ .axis div{ 
+#left.active~.axis div,
+/* gamepad js */
+#left:active~.axis div {
   transform-origin: 100% 50%;
-  transform:  translateZ(calc(var(--pos) * var(--z))) rotateY(-5deg); 
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateY(-5deg);
 }
 
-#right.active ~ .axis div, /* gamepad js */
-#right:active ~ .axis div{ 
+#right.active~.axis div,
+/* gamepad js */
+#right:active~.axis div {
   transform-origin: 0% 50%;
-  transform:  translateZ(calc(var(--pos) * var(--z))) rotateY(5deg); 
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateY(5deg);
 }
 
 /* Menu buttons */
@@ -383,31 +450,30 @@ h1 + p {
   border-radius: 2.5vmin;
   background: #444;
   transform: translate(-50%, -50%) rotate(-35deg);
-  top: 19.5vmin;
-  left: 32.5vmin;
-  box-shadow: 
-    0 0 0 0.2vmin #0007, 
-/*     0 0 0.3vmin 0.1vmin #0008, */
+  bottom: 6.5vmin;
+  left: 40%;
+  box-shadow:
+    0 0 0 0.2vmin #0007,
+    /*     0 0 0.3vmin 0.1vmin #0008, */
     0 0 0.3vmin 0.1vmin #fff4,
     0 0 0 0.2vmin #0002,
     0 0.5vmin 0.5vmin #0004;
 }
 
 #start {
-  left: 41vmin;
+  left: 60%;
 }
 
 button#start.is3d div,
 button#select.is3d div {
   --color: #222;
   top 0;
-  left: 0
-  width: 100%;
+  left: 0 width: 100%;
   height: 100%;
   transform: translateZ(calc(var(--pos) * var(--z))) scale(calc(1 - var(--z) * 0.03));
   border-radius: 2.5vmin;
   background: #444;
-  box-shadow: 
+  box-shadow:
     inset 0 0 0.5vmin var(--color),
     inset 2.25vmin 2.25vmin 0.5vmin -2.25vmin #fff2,
     inset -2.25vmin -0.5vmin 1vmin -2.25vmin #fff2,
@@ -419,7 +485,7 @@ button#select.is3d div {
 }
 
 #start div {
-  box-shadow: 
+  box-shadow:
     inset 0 0 0.5vmin var(--color),
     inset 2.25vmin 2.25vmin 0.5vmin -2.25vmin #fff2,
     inset 0.5vmin 1vmin 0.5vmin #0002,
@@ -444,8 +510,13 @@ button#select.is3d div {
   letter-spacing: 0.15vmin;
 }
 
-.letter-start { left: 41vmin; }
-.letter-select { left: 32.5vmin; }
+.letter-start {
+  left: 41vmin;
+}
+
+.letter-select {
+  left: 32.5vmin;
+}
 
 
 /* Action buttons */
@@ -459,16 +530,15 @@ button.circle div {
     inset 0.5vmin 1vmin 0.5vmin #0001,
     inset 1vmin 0vmin 0.5vmin #0001,
     inset -1.5vmin -1vmin 2vmin -0.5vmin #2583,
-    inset -1vmin -0.5vmin 0.5vmin #fff3
-    ;
+    inset -1vmin -0.5vmin 0.5vmin #fff3;
   width: 6vmin;
   aspect-ratio: 1;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background: var(--color);
   z-index: 2;
-  box-shadow: 
-    0 0 0 0.25vmin #0002, 
+  box-shadow:
+    0 0 0 0.25vmin #0002,
     0 0 0.3vmin 0.1vmin #0008,
     0 0 0.3vmin 0.1vmin #fff4,
     0 0 0 0.2vmin #0002,
@@ -476,8 +546,8 @@ button.circle div {
 }
 
 button.circle div {
-  box-shadow: 
-    0 0 0 0.25vmin #0002, 
+  box-shadow:
+    0 0 0 0.25vmin #0002,
     0 0 0.3vmin 0.1vmin #fff4,
     0 0 0 0.2vmin #0001,
     var(--shadow);
@@ -508,12 +578,14 @@ button.circle div {
 }
 
 .buttons {
+  position: absolute !important;
   width: 30vmin;
   height: 30vmin;
   border-radius: 50%;
-  right: 2vmin;
-  top: 2vmin;
-  box-shadow: 
+  right: 40px;
+  bottom: 40px;
+  z-index: 19999;
+  box-shadow:
     0vmin 0vmin 1vmin 1.4vmin var(--gray-light),
     1.25vmin 1vmin 1vmin 0vmin #fffc,
     1.25vmin -1vmin 1vmin 0vmin #fffa;
@@ -532,7 +604,7 @@ button.circle div {
   z-index: 1;
   top: 8.1vmin;
   left: 2.05vmin;
-  box-shadow: 
+  box-shadow:
     inset 0 0 0 0.125vmin #0003,
     inset 0 0 0 0.25vmin #fff2
 }
@@ -542,46 +614,15 @@ button.circle div {
   left: 9.75vmin;
 }
 
-/* cord */
-#cord {
-  display: none;
-  width: 2vmin;
-  aspect-ratio: 1;
-  background: var(--gray-dark);
-  border-radius: 50%;
-  left: 50%;
-  top: 0;
-  transform-origin: 50% 0%;
-  transform: translate(-50%, 0) rotateX(-90deg) translate(0, 3vmin);
-  box-shadow: 
-    0 0 1vmin 0.2vmin #000c,
-    0 0 0 1.5vmin var(--gray-light)
-    ;
-  outline: 0.0625vmin solid #0001;
-  outline-offset: 1.5vmin;
+
+/* Adjustments for smaller screens (Responsive Design) */
+@media (max-width: 768px) {
+  #snes-gamepad {
+    /* Additional responsive adjustments if needed */
+  }
 }
 
-#cord div {
-  width: 100%;
-  height: 600%;
-  background: linear-gradient(#585a58, #585a5888 20%, #585a5800);
-  top: 50%;
-  transform-origin: 50% 0%;
-  transform: rotateX(-90deg);
-}
-
-#cord div:nth-child(1) { transform: rotateX(-90deg) rotateY(calc(1 * 36deg)); }
-#cord div:nth-child(2) { transform: rotateX(-90deg) rotateY(calc(2 * 36deg)); }
-#cord div:nth-child(3) { transform: rotateX(-90deg) rotateY(calc(3 * 36deg)); }
-#cord div:nth-child(4) { transform: rotateX(-90deg) rotateY(calc(4 * 36deg)); }
-#cord div:nth-child(5) { transform: rotateX(-90deg) rotateY(calc(5 * 36deg)); }
-#cord div:nth-child(6) { transform: rotateX(-90deg) rotateY(calc(6 * 36deg)); }
-#cord div:nth-child(7) { transform: rotateX(-90deg) rotateY(calc(7 * 36deg)); }
-#cord div:nth-child(8) { transform: rotateX(-90deg) rotateY(calc(8 * 36deg)); }
-#cord div:nth-child(9) { transform: rotateX(-90deg) rotateY(calc(9 * 36deg)); }
-#cord div:nth-child(10) { transform: rotateX(-90deg) rotateY(calc(10 * 36deg)); }
-
-
+/* END GAMEPAD CODE */
 body {
   margin: 0;
   padding: 0;
@@ -2422,4 +2463,3 @@ button[type="submit"]:disabled {
     transform: rotateY(180deg);
   }
 }
-

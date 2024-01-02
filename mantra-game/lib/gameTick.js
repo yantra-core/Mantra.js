@@ -3,6 +3,7 @@ let hzMS = 16.666; // 60 FPS
 
 function gameTick() {
   this.tick++;
+  this.data.tick = this.tick;
   // Calculate deltaTime in milliseconds
   let now = Date.now();
   let deltaTimeMS = now - lastTick; // Delta time in milliseconds
@@ -36,7 +37,6 @@ function gameTick() {
           graphicsInterface.inflateEntity(ent);
         });
       }
-
     }
   }
 

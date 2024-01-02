@@ -113,7 +113,9 @@ class PhaserGraphics extends GraphicsInterface {
       transparent: true,
       scene: [_Main],
       scale: {
-        mode: Phaser.Scale.RESIZE_AND_FIT,
+        // mode: Phaser.Scale.RESIZE_AND_FIT,
+        // cover
+        mode: Phaser.Scale.ENVELOP
       }
     });
   
