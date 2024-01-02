@@ -1,3 +1,5 @@
+let loadingCircle;
+
 export default function sutras(game) {
 
   let rules = game.createSutra();
@@ -57,6 +59,97 @@ export default function sutras(game) {
     }
   });
 
+  rules.addCondition('playerTouchedPhaserGraphics', (entity, gameState) => {
+    if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE' && entity.TEXT.name === 'PhaserGraphics') {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
+        return true;
+      }
+      if (entity.bodyB.type === 'TEXT' && entity.bodyA.type === 'PLAYER') {
+        return true;
+      }
+    }
+  });
+
+  rules.addCondition('playerStoppedTouchedPhaserGraphics', (entity, gameState) => {
+    if (entity.type === 'COLLISION' && entity.kind === 'END' && entity.TEXT.name === 'PhaserGraphics') {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
+        return true;
+      }
+      if (entity.bodyB.type === 'TEXT' && entity.bodyA.type === 'PLAYER') {
+        return true;
+      }
+    }
+  });
+
+  rules
+    .if('playerTouchedPhaserGraphics')
+    .then('switchGraphics')
+  
+  rules.if('playerStoppedTouchedPhaserGraphics')
+    .then('hideLoader')
+
+
+  // babylon graphics
+  rules.addCondition('playerTouchedBabylonGraphics', (entity, gameState) => {
+    if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE' && entity.TEXT.name === 'BabylonGraphics') {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
+        return true;
+      }
+      if (entity.bodyB.type === 'TEXT' && entity.bodyA.type === 'PLAYER') {
+        return true;
+      }
+    }
+  });
+
+  rules.addCondition('playerStoppedTouchedBabylonGraphics', (entity, gameState) => {
+    if (entity.type === 'COLLISION' && entity.kind === 'END' && entity.TEXT.name === 'BabylonGraphics') {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
+        return true;
+      }
+      if (entity.bodyB.type === 'TEXT' && entity.bodyA.type === 'PLAYER') {
+        return true;
+      }
+    }
+  });
+
+  rules
+    .if('playerTouchedBabylonGraphics')
+    .then('switchGraphics')
+
+  rules.if('playerStoppedTouchedBabylonGraphics')
+    .then('hideLoader') 
+
+    
+
+  rules.on('hideLoader', (entity, node, gameState) => {
+    console.log("ELSE hideLoader", entity, node, gameState)
+    if (loadingCircle) {
+      loadingCircle.remove();
+    }
+  })
+  rules.on('switchGraphics', (entity, node, gameState) => {
+
+    if (typeof entity.duration === 'number') {
+      if (entity.duration === 1) {
+        // first time, show circle
+        loadingCircle = new game.systems.graphics.LoadingCircle(2000);
+  
+        // Set position of the loading circle
+        loadingCircle.setPosition(600, 600); // X and Y coordinates
+        loadingCircle.container.addEventListener('loadingComplete', (e) => {
+          console.log('Loading complete:', e.detail);
+            let graphicsName = entity.TEXT.name || 'PhaserGraphics';
+            game.switchGraphics(graphicsName);
+          // remove the loading circle
+          loadingCircle.remove();
+        });
+      } else {
+        // update circle
+        console.log(1 / gameState.FPS)
+        loadingCircle.tick(1 / gameState.FPS * 1000);
+      }
+    }
+  });
 
   rules
     .if('playerTouchedWarpZone')

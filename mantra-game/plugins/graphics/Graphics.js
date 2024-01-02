@@ -25,6 +25,7 @@ class Graphics {
     this.game.updateGraphic = this.updateGraphic.bind(this);
     this.game.getTexture = this.getTexture.bind(this);
     this.game.updateSprite = this.updateSprite.bind(this);
+    this.game.switchGraphics = this.switchGraphics.bind(this);
     // hoist SpriteSheet class to game scope
     this.game.SpriteSheet = SpriteSheet;
 
