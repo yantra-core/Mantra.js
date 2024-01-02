@@ -14,13 +14,14 @@ class Collisions {
     // TODO: this won't work unless game.physics exists
     // Binds our handleCollision method to the game physics engine's collisionStart event
     this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
-    this.game.physics.collisionActive(this.game, function noop() { });
-    this.game.physics.collisionEnd(this.game, function noop() { });
+    this.game.physics.collisionActive(this.game, this.collisionActive.bind(this));
+    this.game.physics.collisionEnd(this.game, this.collisionEnd.bind(this));
 
     // Binds game.handleCollision to the Game for convenience 
     this.game.handleCollision = this.handleCollision.bind(this);
 
   }
+
   handleCollision(pair, bodyA, bodyB) {
 
     // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
@@ -60,6 +61,7 @@ class Collisions {
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
         let collisionContext = {
           type: 'COLLISION',
+          kind: 'START',
           entityIdA: bodyA.myEntityId,
           entityIdB: bodyB.myEntityId,
           bodyA: entityA,
@@ -91,6 +93,84 @@ class Collisions {
         system.handleCollision(pair, bodyA, bodyB);
       }
     }
+  }
+
+  collisionEnd(pair, bodyA, bodyB) {
+    // console.log('collisionEnd', pair, bodyA, bodyB);
+
+    const entityIdA = bodyA.myEntityId;
+    const entityIdB = bodyB.myEntityId;
+
+    const entityA = this.game.getEntity(entityIdA);
+    const entityB = this.game.getEntity(entityIdB);
+
+    if (!entityA || !entityB) {
+      // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
+      return;
+    }
+
+    if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+
+
+      if (this.game.rules) {
+        this.game.data.collisions = this.game.data.collisions || [];
+        // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+        let collisionContext = {
+          type: 'COLLISION',
+          kind: 'END',
+          entityIdA: bodyA.myEntityId,
+          entityIdB: bodyB.myEntityId,
+          bodyA: entityA,
+          bodyB: entityB
+        };
+
+        // add entity onto the collision by type name
+        collisionContext[entityA.type] = entityA;
+        collisionContext[entityB.type] = entityB;
+
+        this.game.data.collisions.push(collisionContext);
+      }
+
+    }
+
+  }
+
+  collisionActive(pair, bodyA, bodyB) {
+
+    const entityIdA = bodyA.myEntityId;
+    const entityIdB = bodyB.myEntityId;
+
+    const entityA = this.game.getEntity(entityIdA);
+    const entityB = this.game.getEntity(entityIdB);
+    // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
+    if (!entityA || !entityB) {
+      // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
+      return;
+    }
+
+    if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+
+      if (this.game.rules) {
+        this.game.data.collisions = this.game.data.collisions || [];
+        // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+        let collisionContext = {
+          type: 'COLLISION',
+          kind: 'ACTIVE',
+          entityIdA: bodyA.myEntityId,
+          entityIdB: bodyB.myEntityId,
+          bodyA: entityA,
+          bodyB: entityB
+        };
+
+        // add entity onto the collision by type name
+        collisionContext[entityA.type] = entityA;
+        collisionContext[entityB.type] = entityB;
+
+        this.game.data.collisions.push(collisionContext);
+      }
+
+    }
+
   }
 
   shouldSendCollisionEvent(bodyA, bodyB) {

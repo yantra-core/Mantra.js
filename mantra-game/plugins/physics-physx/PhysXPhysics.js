@@ -269,6 +269,10 @@ class PhysXPhysics extends PhysicsInterface {
     */
   }
 
+  setGravity(gravity) {
+    // not yet implemented
+  }
+
   // Utility function to multiply two quaternions if not available in PhysX API
   quaternionMultiply(q1, q2) {
     return new this.PhysX.PxQuat(

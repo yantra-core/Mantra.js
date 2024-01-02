@@ -59,7 +59,15 @@ class PhysicsInterface {
   }
 
   collisionStart(engine, callback) {
-    throw new Error('Method "onCollision" must be implemented');
+    throw new Error('Method "collisionStart" must be implemented');
+  }
+
+  collisionActive(engine, callback) {
+    throw new Error('Method "collisionActive" must be implemented');
+  }
+
+  collisionEnd(engine, callback) {
+    throw new Error('Method "collisionEnd" must be implemented');
   }
 
 }
