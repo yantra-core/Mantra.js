@@ -3,6 +3,7 @@ import updateSprite from "./lib/updateSprite.js";
 import SpriteSheet from "./lib/SpriteSheet.js";
 import handleInputs from "./lib/handleInputs.js";
 import getTexture from "./lib/getTexture.js";
+import LoadingCircle from "./lib/LoadingCircle.js";
 
 class Graphics {
   static id = 'graphics';
@@ -13,6 +14,7 @@ class Graphics {
     this.updateSprite = updateSprite.bind(this);
     this.handleInputs = handleInputs.bind(this);
     this.getTexture = getTexture.bind(this);
+    this.LoadingCircle = LoadingCircle;
   }
 
   init(game) {
