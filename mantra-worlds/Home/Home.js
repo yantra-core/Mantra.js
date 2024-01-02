@@ -180,7 +180,6 @@ class Home {
     });
     */
 
-
     game.createEntity({
       type: 'Walker',
       sutra: 'walker',
@@ -219,23 +218,37 @@ class Home {
 
     game.createEntity({
       type: 'BACKGROUND',
-      texture: 'tile-block',
-      width: game.data.width * 0.125,
-      height: game.data.height * 0.125,
+      texture: 'robot-arms-apartment',
+
+      width: 1340,
+      height: 3668,
       body: false,
       position: { // position to right
-        x: game.data.width * 0.5 - game.data.width * 0.25,
-        y: 0,
-        z: -8
+        x: 900,
+        y: -1800,
+        z: 1
       }
     });
 
+    game.createEntity({
+      type: 'BACKGROUND',
+      texture: 'planet-express-base',
+
+      width: 2048,
+      height: 2048,
+      body: false,
+      position: { // position to right
+        x: -900,
+        y: -800,
+        z: 1
+      }
+    });
 
     game.createEntity({
       type: 'BLOCK',
       texture: 'tile-block',
-      width: 800,
-      height: 800,
+      width: 200,
+      height: 200,
       mass: 10000,
       // body: false,
       position: { // position to right
@@ -244,7 +257,6 @@ class Home {
         z: -8
       }
     });
-
 
     /*
     // text element to explain graphics engines
@@ -262,8 +274,6 @@ class Home {
     });
     */
 
-
-
     game.createEntity({
       type: 'WARP',
       kind: 'Platform',
@@ -278,7 +288,6 @@ class Home {
         z: 32
       }
     });
-
 
     // if touch warp, switch to YCraft level
     game.createEntity({
@@ -296,6 +305,7 @@ class Home {
         z: 32
       }
     });
+
     // text label saying "Warp To YCraft World"
     game.createEntity({
       type: 'TEXT',
@@ -320,6 +330,7 @@ class Home {
       height: 64,
       depth: 64,
       texture: '3d-homer',
+      isSensor: true,
       // isStatic: true,
       position: {
         x: -40,
@@ -347,8 +358,6 @@ class Home {
       }
     });
 
-
-    
     // switch to 3d text label
     game.createEntity({
       type: 'TEXT',
@@ -362,8 +371,8 @@ class Home {
       },
       body: false,
       position: {
-        x: -60,
-        y: 0,
+        x: -80,
+        y: 100,
         z: 64
       }
     });
@@ -381,12 +390,11 @@ class Home {
       },
       body: false,
       position: {
-        x: 0,
-        y: 0,
+        x: 20,
+        y: 100,
         z: 64
       }
     });
-
 
     // if touch warp, switch to Music level
     game.createEntity({
@@ -403,6 +411,7 @@ class Home {
         z: 32
       }
     });
+
     // text label saying "Warp To Platform World"
     game.createEntity({
       type: 'TEXT',
@@ -446,7 +455,7 @@ class Home {
       depth: 16,
       isStatic: true,
       position: {
-        x: 0,
+        x: -120,
         y: -200,
         z: 32
       }
@@ -471,7 +480,6 @@ class Home {
     });
     */
 
-
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
 
     itemsList.forEach((item, index) => {
@@ -486,13 +494,12 @@ class Home {
           sprite: item,
         },
         position: {
-          x: 50 + (index * 32),
-          y: -100,
+          x: -100 + (index * 32),
+          y: 150,
           z: 32
         }
       });
-    })
-
+    });
 
     // if touch fire damage entity
     game.createEntity({

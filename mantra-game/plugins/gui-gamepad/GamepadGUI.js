@@ -1,3 +1,5 @@
+import ZoomSlider from "./lib/ZoomSlider.js";
+
 let keyMap = {
   'up': 'KeyW',
   'down': 'KeyS',
@@ -8,7 +10,7 @@ let keyMap = {
 
 class GamepadGUI {
   static id = 'gui-gamepad';
-  constructor(game) {
+  constructor() {
     this.game = game; // Store the reference to the game logic
     this.id = GamepadGUI.id;
     this.hiding = false;
@@ -19,6 +21,8 @@ class GamepadGUI {
 
   init(game) {
     this.game = game;
+    this.zoomSlider = new ZoomSlider(game);
+
     let controllerHolder = document.createElement('div');
     controllerHolder.style.position = 'fixed';
     controllerHolder.style.bottom = '0';

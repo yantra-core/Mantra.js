@@ -86,7 +86,6 @@ export default function sutras(game) {
       note: 'C2'
     })
 
-
   rules.on('damageEntity', (collision) => {
     let ent;
     if (collision.bodyA.type === 'FIRE') {

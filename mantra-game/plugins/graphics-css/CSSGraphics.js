@@ -71,6 +71,7 @@ class CSSGraphics extends GraphicsInterface {
 
   init(game) {
     this.game = game;
+    game.setZoom = this.zoom.bind(this);
 
     let cssCamera = new CSSCamera(this, this.camera);
     this.game.use(cssCamera);
@@ -84,6 +85,7 @@ class CSSGraphics extends GraphicsInterface {
     // register renderer with graphics pipeline
     game.graphics.push(this);
 
+
     this.game.systemsManager.addSystem('graphics-css', this);
 
     // is sync load; however we still need to let the graphics pipeline know we are ready
@@ -92,8 +94,9 @@ class CSSGraphics extends GraphicsInterface {
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
 
+    this.zoom(4.5);
     // this.zoom(game.data.camera.currentZoom);
-    this.zoom(2.5);
+    // this.zoom(game.data.camera.currentZoom);
 
   }
 

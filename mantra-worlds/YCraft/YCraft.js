@@ -24,6 +24,54 @@ class YCraft {
     });
     game.use('YCraftGUI');
 
+
+    // create warp by back home entity
+
+    game.createEntity({
+      type: 'WARP',
+      kind: 'Home',
+      color: 0x00ff00,
+      width: 64,
+      isStatic: true,
+      // isSensor: false,
+      height: 64,
+      position: {
+        x: 0,
+        y: -200,
+        z: 0
+      }
+    });
+
+    let rules = game.createSutra();
+
+
+    rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
+      if (entity.type === 'COLLISION') {
+        console.log('entity', entity)
+
+        if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
+          return true;
+        }
+        if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
+          return true;
+        }
+      }
+    });
+
+    rules
+      .if('playerTouchedWarpZone')
+      .then('switchWorld')
+
+    // TODO: make this common Sutra
+    rules.on('switchWorld', (entity) => {
+      console.log('entityentity', entity)
+      let worldName = entity.WARP.kind || 'Home';
+      game.switchWorlds(worldName);
+    });
+
+    game.setSutra(rules);
+
+
     /*
     game.once('plugin::loaded::typer-ghost', function(){
       game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'YCraft Crafting World', style: { color: 'white', fontSize: '144px' }, duration: 5000, removeDuration: 1000 });
@@ -37,7 +85,7 @@ class YCraft {
       sutraEditor: true
     });
     */
-    
+
     /*
     game.createEntity({ 
       type: 'BLOCK',
@@ -69,7 +117,7 @@ class YCraft {
 
   destroy() { }
 
-  unload () {
+  unload() {
     console.log('YCraft.unload()');
 
   }

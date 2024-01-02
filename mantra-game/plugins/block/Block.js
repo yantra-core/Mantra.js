@@ -91,6 +91,7 @@ class Block {
           },
           // inherit color from parent
           texture: entityA.texture,
+          isSensor: entityA.isSensor,
           // color: newColor,
           width: newWidth,
           height: newHeight,

@@ -16,6 +16,8 @@ class BabylonCamera {
 
   init (game, engine, scene) {
 
+    // hoist and override
+    game.setZoom = this.setZoom.bind(this);
     this.scene = scene;
     this.game = game;
     this.engine = engine;
@@ -58,6 +60,10 @@ class BabylonCamera {
     this.camera.radius = 2560 * this.startingZoom;
     //alert(this.camera.radius)
     //console.log('this.camera.radiusthis.camera.radiusthis.camera.radius', this.camera.radius)
+  }
+
+  setZoom(zoom) {
+    this.camera.radius = 2560 * zoom;
   }
 
   setupCameraControls() {

@@ -1,6 +1,6 @@
 import LoadingScreen from "../plugins/loading-screen/LoadingScreen.js";
 
-export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, lifetime }) {
+export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, sutra, lifetime }) {
   let plugins = this.plugins;
   let gameConfig = this.config
 
@@ -48,6 +48,10 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
     if (gamepad) {
       this.use('Gamepad');
       this.use('GamepadGUI');
+    }
+
+    if (sutra) {
+      this.use('Sutra');
     }
 
     // TODO: move to Graphics.loadFromConfig() ?

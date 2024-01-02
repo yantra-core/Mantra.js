@@ -20,14 +20,14 @@ class Home {
 
     // Usage example
     const pianoConfig = {
-      position: { x: 0, y: 200 },
+      position: { x: -2200, y: 200 },
       width: 4096, // Total width for the piano
       height: 128 // Height of each key
     };
     createPiano(game, pianoConfig);
     // Usage example
     const drumKitConfig = {
-      position: { x: 200, y: 0 } // Base position of the drum kit
+      position: { x: 200, y: -200 } // Base position of the drum kit
     };
     createDrumKit(game, drumKitConfig);
 
@@ -63,7 +63,6 @@ class Home {
     });
     */
 
-    game.createDefaultPlayer();
 
     game.use('Block')
     // game.use('Tile');
@@ -72,81 +71,78 @@ class Home {
     game.use('Bullet')
     // game.use('Sword')
 
-    game.use('Sutra');
 
     game.use('Border', { autoBorder: true })
 
-    game.once('plugin::loaded::sutra', function () {
 
-      let rules = game.createSutra();
-      rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
+    let rules = game.createSutra();
+    rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-      game.setSutra(rules);
+    game.setSutra(rules);
 
-      rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-        if (entity.type === 'COLLISION') {
-          // console.log('spawnUnitTouchedHomebase', entity)
-          if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
-            return true;
-          }
-          if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
-            return true;
-          }
+    rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
+      if (entity.type === 'COLLISION') {
+        // console.log('spawnUnitTouchedHomebase', entity)
+        if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
+          // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          return true;
         }
-      });
-
-      rules.addCondition('entityTouchedNote', (entity, gameState) => {
-        if (entity.type === 'COLLISION') {
-          // console.log('spawnUnitTouchedHomebase', entity)
-          if (entity.bodyA.type === 'NOTE') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
-            return true;
-          }
-          if (entity.bodyB.type === 'NOTE') {
-            // console.log('spawnUnitTouchedHomebase', entity, gameState)
-            return true;
-          }
+        if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
+          // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          return true;
         }
-      });
-
-      rules
-        .if('playerTouchedWarpZone')
-        .then('switchWorld')
-
-        rules.on('switchWorld', (entity) => {
-          console.log('entityentity', entity)
-          let worldName = entity.WARP.kind || 'Home';
-          game.switchWorlds(worldName);
-        });
-      
-
-      rules.on('damageEntity', (collision) => {
-        let ent;
-        if (collision.bodyA.type === 'FIRE') {
-          ent = collision.bodyB;
-        } else {
-          ent = collision.bodyA;
-        }
-        console.log('damageEntity', ent)
-        game.removeEntity(ent.id);
-      });
-
-      rules
-        .if('entityTouchedNote')
-        .then('playNote')
-
-      // make this game::playNote
-      rules.on('playNote', (collision) => {
-        // collision.note = collision.note || 'C4';
-        console.log('playNote.collision', collision.NOTE.kind, collision.NOTE.text)
-        game.playNote(collision.NOTE.kind || collision.note);
-      });
-
-      console.log('created sutra', rules)
-
+      }
     });
+
+    rules.addCondition('entityTouchedNote', (entity, gameState) => {
+      if (entity.type === 'COLLISION') {
+        // console.log('spawnUnitTouchedHomebase', entity)
+        if (entity.bodyA.type === 'NOTE') {
+          // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          return true;
+        }
+        if (entity.bodyB.type === 'NOTE') {
+          // console.log('spawnUnitTouchedHomebase', entity, gameState)
+          return true;
+        }
+      }
+    });
+
+    rules
+      .if('playerTouchedWarpZone')
+      .then('switchWorld')
+
+    rules.on('switchWorld', (entity) => {
+      console.log('entityentity', entity)
+      let worldName = entity.WARP.kind || 'Home';
+      game.switchWorlds(worldName);
+    });
+
+
+    rules.on('damageEntity', (collision) => {
+      let ent;
+      if (collision.bodyA.type === 'FIRE') {
+        ent = collision.bodyB;
+      } else {
+        ent = collision.bodyA;
+      }
+      console.log('damageEntity', ent)
+      game.removeEntity(ent.id);
+    });
+
+    rules
+      .if('entityTouchedNote')
+      .then('playNote')
+
+    // make this game::playNote
+    rules.on('playNote', (collision) => {
+      // collision.note = collision.note || 'C4';
+      console.log('playNote.collision', collision.NOTE.kind, collision.NOTE.text)
+      game.playNote(collision.NOTE.kind || collision.note);
+    });
+
+    console.log('created sutra', rules)
+
 
     game.on('pointerDown', (entity) => {
 
@@ -254,6 +250,7 @@ class Home {
     */
 
 
+    game.createDefaultPlayer();
 
   }
 

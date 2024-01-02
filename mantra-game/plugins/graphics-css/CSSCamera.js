@@ -25,13 +25,14 @@ class CSSCamera {
 
     this.gameViewport = document.getElementById('gameHolder');
     
-    // this.scene.zoom(this.game.config.camera.startingZoom);
+    //this.scene.zoom(this.game.config.camera.startingZoom);
 
     let currentWindowHeight = window.innerHeight;
     let offsetY = currentWindowHeight / 2 / game.data.camera.currentZoom;
 
     game.viewportCenterXOffset = 0;
-    game.viewportCenterYOffset = -offsetY;
+    // game.viewportCenterYOffset = -offsetY;
+    game.viewportCenterYOffset = -580;
 
     this.initZoomControls();
 
@@ -70,18 +71,14 @@ class CSSCamera {
 
     if (isDragging) {
       this.gameViewport.style.cursor = 'grabbing';
-
       this.isDragging = true;
       // this.follow = false;
-
       if (typeof dx === 'number') {
         game.viewportCenterXOffset += dx;
       }
-  
       if (typeof dy === 'number') {
         game.viewportCenterYOffset += dy;
       }
-  
     }
 
     if (this.isDragging && !isDragging && (dx !== 0 || dy !== 0)) {

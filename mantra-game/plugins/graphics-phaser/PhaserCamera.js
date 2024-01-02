@@ -25,6 +25,8 @@ class PhaserCamera {
 
   init(game) {
     this.game = game;
+    // hoists and overrides
+    this.game.setZoom = this.setZoom.bind(this);
     this.game.systemsManager.addSystem('graphics-phaser-camera', this);
     this.scene.input.on('pointerdown', this.onPointerDown.bind(this));
     this.scene.input.on('pointermove', this.onPointerMove.bind(this));

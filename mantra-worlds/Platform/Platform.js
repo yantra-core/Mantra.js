@@ -86,40 +86,36 @@ class Platform {
     */
 
 
-    game.use('Sutra')
-
-    game.once('plugin::loaded::sutra', function(){
 
 
-      let rules = game.createSutra();
-      rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
-  
-      game.setSutra(rules);
+    let rules = game.createSutra();
+    rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-      rules.on('switchWorld', (entity) => {
-        console.log('entityentity', entity)
-        let worldName = entity.WARP.kind || 'Home';
-        game.switchWorlds(worldName);
-      });
-    
-      rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-        if (entity.type === 'COLLISION') {
-          // console.log('spawnUnitTouchedHomebase', entity)
-          if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-            return true;
-          }
-          if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
-            return true;
-          }
-        }
-      });
+    game.setSutra(rules);
 
-      rules
-        .if('playerTouchedWarpZone')
-        .then('switchWorld')
-
-      console.log('created sutra', rules)
+    rules.on('switchWorld', (entity) => {
+      console.log('entityentity', entity)
+      let worldName = entity.WARP.kind || 'Home';
+      game.switchWorlds(worldName);
     });
+
+    rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
+      if (entity.type === 'COLLISION') {
+        // console.log('spawnUnitTouchedHomebase', entity)
+        if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
+          return true;
+        }
+        if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
+          return true;
+        }
+      }
+    });
+
+    rules
+      .if('playerTouchedWarpZone')
+      .then('switchWorld')
+
+    console.log('created sutra', rules)
 
     game.createEntity({
       type: 'WARP',
@@ -141,7 +137,7 @@ class Platform {
         // TODO: arrange platforms in a grid
       });
 
-   
+
 
       /*
       createPlatform({
@@ -166,7 +162,7 @@ class Platform {
       });
       */
 
-  
+
     });
 
     game.use('Border', { autoBorder: true })
@@ -187,7 +183,6 @@ class Platform {
     });
 
     console.log(game.systems)
-
     game.createDefaultPlayer({
       position: {
         x: 10,

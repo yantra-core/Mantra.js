@@ -22,6 +22,11 @@ class Bullet {
   fireBullet(entityId) {
 
     let entity = this.game.getEntity(entityId);
+
+    if (!entity) {
+      console.log('Bullet.fireBullet no entity found for id', entityId);
+      return;
+    }
     let actionRateLimiterComponent = this.game.components.actionRateLimiter;
     let lastFired = actionRateLimiterComponent.getLastActionTime(entityId, 'fireBullet');
     let currentTime = Date.now();
