@@ -10,6 +10,8 @@ import inflateText from './graphics/inflateText.js';
 
 import createBox from './graphics/box/createBox.js';
 
+import preload from './preload.js';
+
 class PhaserGraphics extends GraphicsInterface {
   static id = 'graphics-phaser';
   static removable = false;
@@ -90,23 +92,7 @@ class PhaserGraphics extends GraphicsInterface {
 
       },
       preload: function () {
-        // Mantra preloader should have already loaded all assets
-        // Phaser preloader should hit the cache and load them from there
-        game.preloader.assets.forEach((asset) => {
-          if (asset.type === 'spritesheet') {
-            // console.log('asset', asset)
-            // console.log("asset.key, asset.url", asset.key, asset.url, asset)
-            this.load.spritesheet(asset.key, asset.url, {
-              frameWidth: asset.frameWidth,// TODO: config
-              frameHeight: asset.frameHeight,
-              startFrame: 0, // TODO: config
-              endFrame: 8
-            });
-          }
-          if (asset.type === 'image') {
-            this.load.image(asset.key, asset.url);
-          }
-        });
+        preload(this, game);
       },
       create: function() {
         // Optionally, set the background color of the scene
