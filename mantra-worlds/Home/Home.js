@@ -4,6 +4,8 @@ import welcomeMessage from './welcomeMessage.js';
 import enemy from '../../mantra-game/plugins/world-tower/sutras/enemy.js';
 import walker from '../../mantra-game/plugins/world-tower/sutras/walker.js';
 
+import warpToWorld from '../sutras/warpToWorld.js';
+
 function createLineRoute(startX, startY, endX, endY, step) {
   const route = [];
   const dx = endX - startX;
@@ -86,6 +88,9 @@ class Home {
 
     // See: sutra.js for game logic
     let rules = sutras(game);
+
+    let warp = warpToWorld(game);
+
     let e = enemy.call(this);
     let w = walker(game, {
       route: createRectangleRoute(-50, -150, 200, -150),
@@ -94,6 +99,7 @@ class Home {
       tolerance: 5
     });
     rules.use(w, 'walker');
+    rules.use(warp, 'warpToWorld');
 
     rules.addCondition('WalkerTouchedPlayer', (collision) => {
       console.log('ccc', collision)
@@ -162,23 +168,23 @@ class Home {
       .if('WalkerTouchedPlayer')
       .then('PlayerTakeDamage');
 
-    /*
-  game.createEntity({
-    type: 'Walker',
-    width: 16,
-    height: 16,
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'bomb',
-    },
-    depth: 64,
-    position: {
-      x: -50,
-      y: -150,
-      z: 32
-    }
-  });
-  */
+          /*
+        game.createEntity({
+          type: 'Walker',
+          width: 16,
+          height: 16,
+          texture: {
+            sheet: 'loz_spritesheet',
+            sprite: 'bomb',
+          },
+          depth: 64,
+          position: {
+            x: -50,
+            y: -150,
+            z: 32
+          }
+        });
+        */
 
     game.createEntity({
       type: 'Walker',
@@ -203,6 +209,7 @@ class Home {
 
     game.setSutra(rules);
 
+    /*
     game.createEntity({
       type: 'BACKGROUND',
       texture: 'tile-grass',
@@ -215,6 +222,7 @@ class Home {
         z: -10
       }
     });
+    */
 
     game.createEntity({
       type: 'BACKGROUND',
@@ -284,6 +292,7 @@ class Home {
       depth: 64,
       texture: 'warp-to-platform',
       isStatic: true,
+      isSensor: true,
       position: {
         x: 300,
         y: 0,
@@ -456,6 +465,7 @@ class Home {
       depth: 64,
       texture: 'warp-to-music',
       isStatic: true,
+      isSensor: true,
       position: {
         x: -300,
         y: 0,
@@ -466,10 +476,12 @@ class Home {
     // text label saying "Warp To Platform World"
     game.createEntity({
       type: 'TEXT',
+      width: 100,
       text: 'Warp To Music World',
       // width: 200,
       color: 0x000000,
       style: {
+        width: '100px',
         fontSize: '16px',
         textAlign: 'center'
       },
@@ -486,14 +498,17 @@ class Home {
       type: 'TEXT',
       text: 'Warp To Platform World',
       color: 0x000000,
+      width: 120,
+      height: 200,
       style: {
+        width: '120px',
         fontSize: '16px',
         textAlign: 'center'
       },
       body: false,
       position: {
         x: 300,
-        y: -30,
+        y: 20,
         z: 64
       }
     });
@@ -533,7 +548,7 @@ class Home {
     */
 
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-    itemsList = [];
+    // itemsList = [];
     itemsList.forEach((item, index) => {
       game.createEntity({
         type: item.toUpperCase(),

@@ -1,3 +1,5 @@
+import warpToWorld from "../sutras/warpToWorld.js";
+
 class Home {
   static id = 'world-home';
   // "world" type has special features in that it can be unloaded and reloaded.
@@ -78,21 +80,13 @@ class Home {
     let rules = game.createSutra();
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
+    let warp = warpToWorld(game);
+    rules.use(warp, 'warpToWorld');
+
+
     game.setSutra(rules);
 
-    rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-      if (entity.type === 'COLLISION') {
-        // console.log('spawnUnitTouchedHomebase', entity)
-        if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-          // console.log('spawnUnitTouchedHomebase', entity, gameState)
-          return true;
-        }
-        if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
-          // console.log('spawnUnitTouchedHomebase', entity, gameState)
-          return true;
-        }
-      }
-    });
+
 
     rules.addCondition('entityTouchedNote', (entity, gameState) => {
       if (entity.type === 'COLLISION') {
@@ -108,16 +102,7 @@ class Home {
       }
     });
 
-    rules
-      .if('playerTouchedWarpZone')
-      .then('switchWorld')
-
-    rules.on('switchWorld', (entity) => {
-      console.log('entityentity', entity)
-      let worldName = entity.WARP.kind || 'Home';
-      game.switchWorlds(worldName);
-    });
-
+  
 
     rules.on('damageEntity', (collision) => {
       let ent;

@@ -15,17 +15,6 @@ export default function sutras(game) {
     }
   });
 
-  rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-    if (entity.type === 'COLLISION') {
-      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-        return true;
-      }
-      if (entity.bodyB.type === 'WARP' && entity.bodyA.type === 'PLAYER') {
-        return true;
-      }
-    }
-  });
-
   rules.addCondition('entityTouchedFire', (entity, gameState) => {
     if (entity.type === 'COLLISION') {
       if (entity.bodyA.type === 'FIRE') {
@@ -156,16 +145,6 @@ export default function sutras(game) {
         loadingCircle.tick(1 / gameState.FPS * 1000);
       }
     }
-  });
-
-  rules
-    .if('playerTouchedWarpZone')
-    .then('switchWorld')
-
-  // TODO: make this common Sutra
-  rules.on('switchWorld', (entity) => {
-    let worldName = entity.WARP.kind || 'Home';
-    game.switchWorlds(worldName);
   });
 
   rules

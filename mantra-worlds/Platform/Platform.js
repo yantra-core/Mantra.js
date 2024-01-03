@@ -1,3 +1,5 @@
+import warpToWorld from '../sutras/warpToWorld.js';
+
 class Platform {
   static id = 'world-platform';
   static type = 'world'; // type is optional for Plugins
@@ -86,39 +88,20 @@ class Platform {
     */
 
 
-
-
     let rules = game.createSutra();
+
+    let warp = warpToWorld(game);
+    rules.use(warp, 'warpToWorld');
+
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
     game.setSutra(rules);
-
-    rules.on('switchWorld', (entity) => {
-      console.log('entityentity', entity)
-      let worldName = entity.WARP.kind || 'Home';
-      game.switchWorlds(worldName);
-    });
-
-    rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-      if (entity.type === 'COLLISION') {
-        // console.log('spawnUnitTouchedHomebase', entity)
-        if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-          return true;
-        }
-        if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
-          return true;
-        }
-      }
-    });
-
-    rules
-      .if('playerTouchedWarpZone')
-      .then('switchWorld')
 
     console.log('created sutra', rules)
 
     game.createEntity({
       type: 'WARP',
+      kind: 'Home',
       width: 64,
       height: 64,
       isStatic: true,
@@ -128,7 +111,6 @@ class Platform {
       }
     })
     // TODO: remap spacebar to jump
-
     // TODO:     game.on('game::ready', function () {
     //           needs secound ready emit after plugins are loaded after start
     game.on('plugin::ready::Platform', function () {
@@ -136,8 +118,6 @@ class Platform {
       game.systems.platform.kinds.forEach((platformData) => {
         // TODO: arrange platforms in a grid
       });
-
-
 
       /*
       createPlatform({
@@ -161,7 +141,6 @@ class Platform {
         height: 60
       });
       */
-
 
     });
 
@@ -190,9 +169,8 @@ class Platform {
       }
     });
 
-
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb'];
-
+    itemsList = [];
     itemsList.forEach((item, index) => {
       game.createEntity({
         type: item.toUpperCase(),
@@ -210,8 +188,7 @@ class Platform {
           z: 32
         }
       });
-    })
-
+    });
 
   }
 
