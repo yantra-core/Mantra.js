@@ -1,4 +1,23 @@
 export default function createWalker(game, config) {
+
+  game.createEntity({
+    type: 'Walker',
+    sutra: 'walker',
+    width: 22,
+    height: 24,
+    texture: {
+      sheet: 'jogurt',
+      sprite: 'walkLeft'
+    },
+    depth: 64,
+    position: {
+      x: 50,
+      y: -150,
+      z: 32
+    }
+  });
+
+
   let walker = game.createSutra();
 
   // Set properties from config

@@ -1,5 +1,6 @@
 // helper sutra for switching worlds
 import warpToWorld from '../sutras/warpToWorld.js';
+import switchGraphics from '../sutras/switchGraphics.js';
 
 // walker is npc that walks around route
 import walker from '../../mantra-game/plugins/world-tower/sutras/walker.js';
@@ -9,10 +10,16 @@ import routing from '../sutras/routing.js';
 
 import fire from "./sutras/fire.js";
 import block from "./sutras/block.js";
+import demon from "./sutras/demon.js";
 
 export default function sutras(game) {
 
   let rules = game.createSutra();
+
+  // helper for switching graphics
+  let switchGraphicsSutra = switchGraphics(game);
+  rules.use(switchGraphicsSutra, 'switchGraphics');
+
 
   // when touching WARP entity, warp to world
   let warp = warpToWorld(game);
@@ -34,6 +41,9 @@ export default function sutras(game) {
 
   // block entity
   rules.use(block(game), 'block');
+
+  // TODO: make sutra with entity::create helper
+  demon(game);
 
   console.log('created sutra', rules.toEnglish())
   return rules;

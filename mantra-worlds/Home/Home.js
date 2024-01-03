@@ -1,10 +1,6 @@
 import sutras from './sutras.js';
 import welcomeMessage from './welcomeMessage.js';
 
-import enemy from '../../mantra-game/plugins/world-tower/sutras/enemy.js';
-
-import switchGraphics from '../sutras/switchGraphics.js';
-
 class Home {
   static id = 'world-home';
   static type = 'world'; // type is optional for Plugins
@@ -36,49 +32,19 @@ class Home {
     game.use('Block')
     game.use('Border', { autoBorder: true })
     game.use('Bullet')
-    // game.use('Timers');
-
     game.use('Tone');
-    // TODO: better control of loading tiles
-    // TODO: game.systems.tile.loadTilemap() -> Tiled JSON
     game.use('Tile');
-    //game.use('Sword')
+    // game.use('Sword')
 
     // welcomeMessage(game);
 
-    // See: sutra.js for game logic
+    // See: sutras.js for World logic
     let rules = sutras(game);
 
-    let switchGraphicsSutra = switchGraphics(game);
-
-    let e = enemy.call(this);
-    rules.use(switchGraphicsSutra, 'switchGraphics');
-
-    game.createEntity({
-      type: 'Walker',
-      sutra: 'walker',
-      width: 22,
-      height: 24,
-      texture: {
-        sheet: 'jogurt',
-        sprite: 'walkLeft'
-      },
-      depth: 64,
-      position: {
-        x: 50,
-        y: -150,
-        z: 32
-      }
-    });
-
-    /*
-    rules.addCondition('true', () => {
-      return true;
-    })
-    */
-
+    // set the Sutra rules for Home world
     game.setSutra(rules);
 
+    // now create some background and text entities for navigation
     game.createEntity({
       type: 'BACKGROUND',
       texture: 'garden',
@@ -138,75 +104,6 @@ class Home {
       }
     });
 
-    /*
-    // text element to explain graphics engines
-    game.createEntity({
-      type: 'TEXT',
-      text: 'This is text on how to use game\n <----- Move this way',
-      fontSize: 144,
-      color: 0x000000,
-      body: false,
-      position: {
-        x: -800,
-        y: 0,
-        z: 10
-      }
-    });
-    */
-
-    game.createEntity({
-      type: 'WARP',
-      kind: 'Platform',
-      width: 64,
-      height: 64,
-      depth: 64,
-      texture: 'warp-to-platform',
-      isStatic: true,
-      isSensor: true,
-      position: {
-        x: 300,
-        y: 0,
-        z: 32
-      }
-    });
-
-
-    game.createEntity({
-      name: 'raiden-left',
-      type: 'BACKGROUND',
-      width: 64,
-      height: 64,
-      depth: 64,
-      style: {
-        display: 'none'
-      },
-      texture: 'raiden',
-      body: false,
-      position: {
-        x: 0,
-        y: 10,
-        z: 32
-      }
-    });
-
-    game.createEntity({
-      name: 'raiden-right',
-      type: 'BACKGROUND',
-      width: 64,
-      height: 64,
-      depth: 64,
-      style: {
-        display: 'none'
-      },
-      texture: 'raiden',
-      body: false,
-      position: {
-        x: 100,
-        y: 10,
-        z: 32
-      }
-    });
-
     // if touch warp, switch to YCraft level
     game.createEntity({
       type: 'WARP',
@@ -219,7 +116,7 @@ class Home {
       isSensor: true,
       position: {
         x: 0,
-        y: -150,
+        y: -210,
         z: 32
       }
     });
@@ -228,7 +125,7 @@ class Home {
     game.createEntity({
       type: 'TEXT',
       text: 'Warp To YCraft World',
-      kind: 'dynamic',
+      // kind: 'dynamic',
       color: 0x000000,
       style: {
         fontSize: '16px',
@@ -236,29 +133,29 @@ class Home {
       },
       body: false,
       position: {
-        x: 0,
-        y: -180,
+        x: -20,
+        y: -220,
         z: 64
       }
     });
 
     // if touch warp, switch to Babylon Graphics
+    /*
     game.createEntity({
       type: 'BLOCK',
       width: 64,
       height: 64,
       depth: 64,
       texture: '3d-homer',
-      // isSensor: true,
+      isSensor: true,
       // isStatic: true,
       position: {
         x: 80,
-        y: 15,
-        z: 32
+        y: 25,
+        z: 25
       }
     });
-
-   
+    */
 
     // switch to 3d text label
     game.createEntity({
@@ -279,7 +176,6 @@ class Home {
       }
     });
 
-
     // switch to phaser 3
     game.createEntity({
       name: 'PhaserGraphics',
@@ -294,7 +190,6 @@ class Home {
         fontSize: '12px',
         textAlign: 'center',
         border: '1px solid black'
-
       },
       body: true,
       isSensor: true,
@@ -306,8 +201,8 @@ class Home {
     });
 
 
-     // switch to 3d text label
-     game.createEntity({
+    // switch to 3d text label
+    game.createEntity({
       name: 'BabylonGraphics',
       type: 'TEXT',
       text: '3D Graphics',
@@ -342,7 +237,7 @@ class Home {
       isStatic: true,
       isSensor: true,
       position: {
-        x: -300,
+        x: -250,
         y: 0,
         z: 32
       }
@@ -362,7 +257,7 @@ class Home {
       },
       body: false,
       position: {
-        x: -300,
+        x: -250,
         y: -30,
         z: 64
       }
@@ -382,9 +277,25 @@ class Home {
       },
       body: false,
       position: {
-        x: 300,
+        x: 250,
         y: 20,
         z: 64
+      }
+    });
+
+    game.createEntity({
+      type: 'WARP',
+      kind: 'Platform',
+      width: 64,
+      height: 64,
+      depth: 64,
+      texture: 'warp-to-platform',
+      isStatic: true,
+      isSensor: true,
+      position: {
+        x: 250,
+        y: 0,
+        z: 32
       }
     });
 
@@ -422,8 +333,9 @@ class Home {
     });
     */
 
+    // displays some items from the spritesheet
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-    // itemsList = [];
+    itemsList = [];
     itemsList.forEach((item, index) => {
       game.createEntity({
         type: item.toUpperCase(),
@@ -443,75 +355,48 @@ class Home {
       });
     });
 
-    game.createEntity({
-      type: 'NPC',
-      texture: 'demon',
-      //texture: 'fire',
-      //color: 0xff0000,
-      width: 8,
-      height: 8,
-      depth: 64,
-      position: {
-        x: -60,
-        y: -60,
-        z: 32
-      }
-    });
+
+
+    /*
 
     game.createEntity({
-      type: 'NPC',
-      texture: 'demon',
-      //texture: 'fire',
-      //color: 0xff0000,
-      width: 8,
-      height: 8,
+      name: 'raiden-left',
+      type: 'BACKGROUND',
+      width: 64,
+      height: 64,
       depth: 64,
-      position: {
-        x: 64,
-        y: -60,
-        z: 32
-      }
-    });
-
-    game.createEntity({
-      type: 'FIRE',
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'fire',
-        // frame: 0 // TODO: support single frame / bypass animation of array
+      style: {
+        display: 'none'
       },
-      //texture: 'fire',
-      //color: 0xff0000,
-      width: 16,
-      height: 16,
-      depth: 64,
-      isStatic: true,
+      texture: 'raiden',
+      body: false,
       position: {
-        x: -80,
-        y: -60,
+        x: 0,
+        y: 10,
         z: 32
       }
     });
 
     game.createEntity({
-      type: 'FIRE',
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'fire',
-        // frame: 0 // TODO: support single frame / bypass animation of array
-      },
-      //texture: 'fire',
-      //color: 0xff0000,
-      width: 16,
-      height: 16,
+      name: 'raiden-right',
+      type: 'BACKGROUND',
+      width: 64,
+      height: 64,
       depth: 64,
-      isStatic: true,
+      style: {
+        display: 'none'
+      },
+      texture: 'raiden',
+      body: false,
       position: {
-        x: 80,
-        y: -60,
+        x: 100,
+        y: 10,
         z: 32
       }
     });
+
+    */
+
 
   }
 

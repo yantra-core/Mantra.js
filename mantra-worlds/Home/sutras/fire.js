@@ -1,5 +1,46 @@
 export default function fire(game) {
 
+  game.createEntity({
+    type: 'FIRE',
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'fire',
+      // frame: 0 // TODO: support single frame / bypass animation of array
+    },
+    //texture: 'fire',
+    //color: 0xff0000,
+    width: 16,
+    height: 16,
+    depth: 64,
+    isStatic: true,
+    position: {
+      x: -80,
+      y: -60,
+      z: 32
+    }
+  });
+
+  game.createEntity({
+    type: 'FIRE',
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'fire',
+      // frame: 0 // TODO: support single frame / bypass animation of array
+    },
+    //texture: 'fire',
+    //color: 0xff0000,
+    width: 16,
+    height: 16,
+    depth: 64,
+    isStatic: true,
+    position: {
+      x: 80,
+      y: -60,
+      z: 32
+    }
+  });
+
+
   let rules = game.createSutra();
 
   rules.addCondition('entityTouchedFire', (entity, gameState) => {
