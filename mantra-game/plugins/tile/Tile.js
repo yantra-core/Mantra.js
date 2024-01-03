@@ -1,7 +1,7 @@
-// WIP
 // Tile.js - Marak Squires 2023
 // Implements support for Tiled JSON maps via the Tiled JSON format
 // see: https://doc.mapeditor.org/en/stable/reference/json-map-format/
+import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 
 let tilemap = {
   1: 'block',
@@ -20,66 +20,12 @@ class Tile {
     this.game = game;
 
     // console.log('Tile.init()');
-
-    // Test map for orthogonal tilemap
-    let testJSON = {
-      "compressionlevel": -1,
-      "height": 20,
-      "infinite": false,
-      "layers": [
-        {
-          "data": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-          "height": 20,
-          "id": 1,
-          "name": "Tile Layer 1",
-          "opacity": 1,
-          "type": "tilelayer",
-          "visible": true,
-          "width": 30,
-          "x": 0,
-          "y": 0
-        }],
-      "nextlayerid": 2,
-      "nextobjectid": 1,
-      "orientation": "orthogonal",
-      "renderorder": "right-down",
-      "tiledversion": "1.10.2",
-      "tileheight": 16,
-      "tilesets": [
-        {
-          "firstgid": 1,
-          "source": "grass-land.tsx"
-        }],
-      "tilewidth": 16,
-      "type": "map",
-      "version": "1.10",
-      "width": 30
-    }
-
+    let defaultTileSet = defaultOrthogonalMap;
     let that = this;
     setTimeout(function(){
-      that.createTileMapFromTiledJSON(testJSON);
+      that.createTileMapFromTiledJSON(defaultTileSet);
 
-    }, 1000)
+    }, 222)
   }
 
   createTileMapFromTiledJSON(tiledJSON) {
@@ -106,9 +52,9 @@ class Tile {
 
   createLayer(container, layer, tileWidth, tileHeight) {
     layer.data.forEach((tileId, index) => {
-      if (tileId !== 0) { // Assuming 0 is an empty tile
+      if (tileId !== 0 && tileId !== 2) { // for now
         let scale = 1;
-        scale = 2;
+        scale = 1;
         // console.log('cccc', tileId, index)
         
         let x = (index % layer.width) * tileWidth;

@@ -362,17 +362,25 @@ class CSSGraphics extends GraphicsInterface {
   // TODO: adjust the viewportCenterXOffset and viewportCenterYOffset based on the new scale
   // ensure that the center of the viewport remains the same
   zoom(scale) {
+
     // console.log("CSSGraphics zoom", scale)
+    this.game.data.camera.currentZoom = scale;
+
     let gameViewport = document.getElementById('gameHolder');
     if (gameViewport) {
       gameViewport.style.transform = `scale(${scale})`;
-      gameViewport.style.transition = 'transform 1s ease';
-      this.game.data.camera.currentZoom = scale;
-      // TODO: adjust camera offsets based on scale
-      // Applying the calculated offsets
-      //game.viewportCenterXOffset = -offsetX;
-      //game.viewportCenterYOffset = -offsetY;
     }
+    let windowHeight = window.innerHeight;
+  
+    // Define the adjustment value and scale factor
+    let adjustment = -400; // TODO: this should be window height or something similar
+    adjustment = (-windowHeight / 2) + 350;
+    let scaleFactor = 1 / scale;
+    // Calculate the Y offset
+    let pixelAdjustment = adjustment * scaleFactor;
+    game.viewportCenterYOffset = -(windowHeight / 2) - pixelAdjustment;
+    //game.viewportCenterYOffset = -1600;
+
   }
 
 }

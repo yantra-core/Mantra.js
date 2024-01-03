@@ -216,7 +216,9 @@ class CSSCamera {
   
     // Calculate the Y offset
     let pixelAdjustment = adjustment * scaleFactor;
-    game.viewportCenterYOffset = -(windowHeight / 2) - pixelAdjustment;
+    // TODO: need to remove this line to add back dragging with mouse add flag
+    // game.viewportCenterYOffset = -(windowHeight / 2) - pixelAdjustment;
+    //game.viewportCenterXOffset = 0;
     //console.log('game.viewportCenterYOffset', game.viewportCenterYOffset);
   
     // Update the camera position

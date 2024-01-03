@@ -11,8 +11,9 @@ export default function cssMouseWheelZoom(event) {
 
   // Zoom settings
   const zoomSettings = {
-    intensity: 0.03, // Decreased zoom intensity for smoother zoom
+    intensity: 0.1, // Base zoom intensity
     minScale: 0.1,   // Minimum scale limit
+    logBase: 2       // Logarithmic base
   };
 
   // Prevent default scrolling behavior
@@ -22,8 +23,9 @@ export default function cssMouseWheelZoom(event) {
   const delta = event.wheelDelta ? event.wheelDelta : -event.detail;
   const direction = delta > 0 ? 1 : -1;
 
-  // Calculate new scale
-  const newScale = Math.max(zoomSettings.minScale, scale + direction * zoomSettings.intensity);
+  // Applying logarithmic scale for smooth zoom
+  let logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
+  const newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
 
   // Center of the viewport
   const viewportCenterX = window.innerWidth / 2;
@@ -33,17 +35,6 @@ export default function cssMouseWheelZoom(event) {
   let offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
   let offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
 
-  // Adjust camera position based on new scale
-  //this.cameraPosition.x = viewportCenterX - (offsetX * newScale);
-  // this.cameraPosition.y = offsetY;
-
   // Update scale
   this.zoom(newScale);
-
-  // Update game viewport offsets if necessary
-  //game.viewportCenterXOffset = offsetX;
-  //game.viewportCenterYOffset = offsetY;
-  // console.log(game.viewportCenterYOffset, offsetY)
-
-  // game.viewportCenterYOffset = 0;
 }
