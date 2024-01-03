@@ -4,45 +4,10 @@ import welcomeMessage from './welcomeMessage.js';
 import enemy from '../../mantra-game/plugins/world-tower/sutras/enemy.js';
 import walker from '../../mantra-game/plugins/world-tower/sutras/walker.js';
 
+import routing from '../sutras/routing.js';
+
 import warpToWorld from '../sutras/warpToWorld.js';
-
-function createLineRoute(startX, startY, endX, endY, step) {
-  const route = [];
-  const dx = endX - startX;
-  const dy = endY - startY;
-  const steps = Math.max(Math.abs(dx), Math.abs(dy)) / step;
-  for (let i = 0; i <= steps; i++) {
-    route.push([startX + dx * i / steps, startY + dy * i / steps]);
-  }
-  return route;
-}
-
-function createRectangleRoute(x, y, width, height) {
-  return [
-    [x, y],
-    [x + width, y],
-    [x + width, y + height],
-    [x, y + height],
-    [x, y]
-  ];
-}
-
-function createCircleRoute(centerX, centerY, radius, segments) {
-  const route = [];
-  for (let i = 0; i <= segments; i++) {
-    const angle = 2 * Math.PI * i / segments;
-    route.push([centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)]);
-  }
-  return route;
-}
-
-/*
-const lineRoute = createLineRoute(0, 0, 200, 200, 20);
-const rectangleRoute = createRectangleRoute(50, 50, 150, 100);
-const circleRoute = createCircleRoute(100, 100, 50, 20);
-*/
-
-
+import switchGraphics from '../sutras/switchGraphics.js';
 
 class Home {
   static id = 'world-home';
@@ -80,7 +45,7 @@ class Home {
     game.use('Tone');
     // TODO: better control of loading tiles
     // TODO: game.systems.tile.loadTilemap() -> Tiled JSON
-    // game.use('Tile');
+    game.use('Tile');
 
     //game.use('Sword')
 
@@ -90,16 +55,18 @@ class Home {
     let rules = sutras(game);
 
     let warp = warpToWorld(game);
+    let switchGraphicsSutra = switchGraphics(game);
 
     let e = enemy.call(this);
     let w = walker(game, {
-      route: createRectangleRoute(-50, -150, 200, -150),
+      route: routing.createRectangleRoute(-50, -150, 200, -150),
       // route: createLineRoute(-50, -150, 200, -150, 20),
       // route: createCircleRoute(0, 0, 100, 20),
       tolerance: 5
     });
     rules.use(w, 'walker');
     rules.use(warp, 'warpToWorld');
+    rules.use(switchGraphicsSutra, 'switchGraphics');
 
     rules.addCondition('WalkerTouchedPlayer', (collision) => {
       console.log('ccc', collision)
@@ -168,23 +135,23 @@ class Home {
       .if('WalkerTouchedPlayer')
       .then('PlayerTakeDamage');
 
-          /*
-        game.createEntity({
-          type: 'Walker',
-          width: 16,
-          height: 16,
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'bomb',
-          },
-          depth: 64,
-          position: {
-            x: -50,
-            y: -150,
-            z: 32
-          }
-        });
-        */
+    /*
+  game.createEntity({
+    type: 'Walker',
+    width: 16,
+    height: 16,
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'bomb',
+    },
+    depth: 64,
+    position: {
+      x: -50,
+      y: -150,
+      z: 32
+    }
+  });
+  */
 
     game.createEntity({
       type: 'Walker',
@@ -209,12 +176,13 @@ class Home {
 
     game.setSutra(rules);
 
-    /*
     game.createEntity({
       type: 'BACKGROUND',
-      texture: 'tile-grass',
-      width: game.data.width,
-      height: game.data.height,
+      texture: 'garden',
+      width: 300,
+      height: 300,
+      //width: game.data.width,
+      //height: game.data.height,
       body: false,
       position: {
         x: 0,
@@ -222,7 +190,6 @@ class Home {
         z: -10
       }
     });
-    */
 
     game.createEntity({
       type: 'BACKGROUND',
@@ -379,14 +346,16 @@ class Home {
       height: 64,
       depth: 64,
       texture: '3d-homer',
-      isSensor: true,
+      // isSensor: true,
       // isStatic: true,
       position: {
-        x: -60,
+        x: 80,
         y: 15,
         z: 32
       }
     });
+
+   
 
     // switch to 3d text label
     game.createEntity({
@@ -401,47 +370,24 @@ class Home {
       },
       body: false,
       position: {
-        x: -72,
+        x: -63,
         y: -30,
         z: 64
       }
     });
 
-    // switch to 3d text label
-    game.createEntity({
-      name: 'BabylonGraphics',
-      type: 'TEXT',
-      text: 'Upgrade Graphics to 3D',
-      width: 60,
-      height: 50,
-      color: 0x000000,
-      style: {
-        width: '60px',
-        height: '45px',
-        fontSize: '12px',
-        textAlign: 'center',
-        border: '1px solid black'
-      },
-      body: true,
-      isSensor: true,
-      position: {
-        x: -80,
-        y: 100,
-        z: 64
-      }
-    });
 
     // switch to phaser 3
     game.createEntity({
       name: 'PhaserGraphics',
       type: 'TEXT',
-      text: 'Upgrade to Canvas Graphics',
+      text: 'Canvas Graphics',
       width: 60,
       height: 50,
       color: 0x000000,
       style: {
         width: '60px',
-        height: '45px',
+        height: '30px',
         fontSize: '12px',
         textAlign: 'center',
         border: '1px solid black'
@@ -450,11 +396,37 @@ class Home {
       body: true,
       isSensor: true,
       position: {
-        x: 20,
-        y: 100,
+        x: -55,
+        y: 75,
         z: 64
       }
     });
+
+
+     // switch to 3d text label
+     game.createEntity({
+      name: 'BabylonGraphics',
+      type: 'TEXT',
+      text: '3D Graphics',
+      width: 60,
+      height: 50,
+      color: 0x000000,
+      style: {
+        width: '60px',
+        height: '30px',
+        fontSize: '12px',
+        textAlign: 'center',
+        border: '1px solid black'
+      },
+      body: true,
+      isSensor: true,
+      position: {
+        x: 55,
+        y: 75,
+        z: 64
+      }
+    });
+
 
     // if touch warp, switch to Music level
     game.createEntity({
@@ -577,7 +549,7 @@ class Home {
       height: 8,
       depth: 64,
       position: {
-        x: -80,
+        x: -60,
         y: -60,
         z: 32
       }
@@ -592,28 +564,7 @@ class Home {
       height: 8,
       depth: 64,
       position: {
-        x: 70,
-        y: -60,
-        z: 32
-      }
-    });
-
-    // if touch fire damage entity
-    game.createEntity({
-      type: 'FIRE',
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'fire',
-        // frame: 0 // TODO: support single frame / bypass animation of array
-      },
-      //texture: 'fire',
-      //color: 0xff0000,
-      width: 16,
-      height: 16,
-      depth: 64,
-      isStatic: true,
-      position: {
-        x: -120,
+        x: 64,
         y: -60,
         z: 32
       }
@@ -633,7 +584,27 @@ class Home {
       depth: 64,
       isStatic: true,
       position: {
-        x: 100,
+        x: -80,
+        y: -60,
+        z: 32
+      }
+    });
+
+    game.createEntity({
+      type: 'FIRE',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'fire',
+        // frame: 0 // TODO: support single frame / bypass animation of array
+      },
+      //texture: 'fire',
+      //color: 0xff0000,
+      width: 16,
+      height: 16,
+      depth: 64,
+      isStatic: true,
+      position: {
+        x: 80,
         y: -60,
         z: 32
       }

@@ -49,6 +49,15 @@ export default function createBox(entityData) {
     material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
   }
 
+  if (typeof entityData.style !== 'undefined') {
+    if (typeof entityData.style.display !== 'undefined') {
+      // console.log('entityData.style.display', entityData.style.display)
+      if (entityData.style.display === 'none') {
+        box.isVisible = false;
+      }
+    }
+  }
+
   // Apply the material to the box
   box.material = material;
 

@@ -5,7 +5,8 @@ class BabylonCamera {
 
   constructor({ camera }) {
     this.id = BabylonCamera.id;
-    this.startingZoom = camera.startingZoom;
+    // this.startingZoom = camera.startingZoom;
+    this.startingZoom = 0.25;
     // config scope for convenience
     let config = {
       camera

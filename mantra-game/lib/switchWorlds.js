@@ -35,7 +35,13 @@ export default function switchWorlds (selectedWorld) {
     //worldInstance.init(game);
   });
 
-  game.use(worldInstance);
+  // needs to wait at least 1 tick of game loop to ensure entities are cleared
+  // TODO: add Game.scheduleEvent(tickCount) method
+  //       this will allow us to schedule events to occur at a specific tick in the future
+  //       See: Timers.js file for example
+  setTimeout(() => {
+    game.use(worldInstance);
+  }, 1);
 
   // USER INTENT: Change world
   // persist this intention to the local storage

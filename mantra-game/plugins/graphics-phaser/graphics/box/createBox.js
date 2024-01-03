@@ -15,7 +15,6 @@ const depthChart = [
 
 export default function createBox (entityData) {
   let graphic;
-  console.log("COULD NOT FIND GRAPHICS FOR", entityData.id, entityData.type, entityData)
   if (entityData.texture) {
     // Use texture if available
     // console.log('texture', entityData.texture)
@@ -28,15 +27,14 @@ export default function createBox (entityData) {
       console.log("UUUUUUU", texture)
       // texture.key = 'tile-block'
     }
-    console.log("GOT TEXTURE", texture, texture.key)
+    //console.log("GOT TEXTURE", texture, texture.key)
     graphic = this.scene.add.sprite(0, 0, texture.key);
-
     if (typeof texture.frames === 'object') {
       // get the texture from the sprite sheet
-      let t = this.scene.textures.get(texture.key);
-      let pos = texture.sprite;
+      //let t = this.scene.textures.get(texture.key);
+      //let pos = texture.sprite;
       // get specific area from the texture by x / y
-      let frame = t.get(pos.x, pos.y, 16, 16);
+      //let frame = t.get(pos.x, pos.y, 16, 16);
       // set the graphic to frame texture
       // graphic.setTexture(frame);
     }

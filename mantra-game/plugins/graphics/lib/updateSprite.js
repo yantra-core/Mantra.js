@@ -14,7 +14,7 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
     return;
   }
 
-  let direction = 'right';
+  let direction = null;
 
   if (currentInputs) {
     if (currentInputs.W) {
@@ -25,6 +25,10 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
       direction = 'down';
     } else if (currentInputs.D) {
       direction = 'right';
+    }
+
+    if (!direction) {
+      return;
     }
 
     // Get the spritesheet URL

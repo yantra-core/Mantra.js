@@ -131,8 +131,9 @@ class PhaserGraphics extends GraphicsInterface {
   
       // async:true plugins *must* self report when they are ready
       game.emit('plugin::ready::graphics-phaser', this);
-      camera.zoom = this.config.camera.startingZoom;
-  
+      // TODO: add back configurable starting zoom
+      // camera.zoom = this.config.camera.startingZoom;
+      camera.zoom = 2.5;
       // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
     }

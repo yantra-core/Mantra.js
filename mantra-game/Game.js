@@ -300,7 +300,8 @@ class Game {
       };
     }
     // Wait for all systems to be ready before starting the game loop
-    if (game.loadingPluginsCount > 0 || !game.physicsReady) {
+    if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
+      // console.log('waiting for plugins to load...', game.physicsReady)
       setTimeout(function () {
         game.start(cb);
       }, 4);
@@ -396,7 +397,7 @@ class Game {
       if (this.isServer) {
         // console.log('pluginId', pluginId, this.plugins)
         if (this.plugins[pluginId]) {
-          console.log('loading plugin', pluginId, this.plugins[pluginId])
+          // console.log('loading plugin', pluginId, this.plugins[pluginId])
           return this.use(new this.plugins[pluginId](options));
         }
 
