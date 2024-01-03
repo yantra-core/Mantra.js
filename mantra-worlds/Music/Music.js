@@ -80,16 +80,14 @@ class Home {
     let rules = game.createSutra();
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
+    // when touching WARP entity, warp to world
     let warp = warpToWorld(game);
     rules.use(warp, 'warpToWorld');
 
-
     game.setSutra(rules);
 
-
-
     rules.addCondition('entityTouchedNote', (entity, gameState) => {
-      if (entity.type === 'COLLISION') {
+      if (entity.type === 'COLLISION' && entity.kind === 'START') {
         // console.log('spawnUnitTouchedHomebase', entity)
         if (entity.bodyA.type === 'NOTE') {
           // console.log('spawnUnitTouchedHomebase', entity, gameState)

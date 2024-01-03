@@ -2,11 +2,7 @@ import sutras from './sutras.js';
 import welcomeMessage from './welcomeMessage.js';
 
 import enemy from '../../mantra-game/plugins/world-tower/sutras/enemy.js';
-import walker from '../../mantra-game/plugins/world-tower/sutras/walker.js';
 
-import routing from '../sutras/routing.js';
-
-import warpToWorld from '../sutras/warpToWorld.js';
 import switchGraphics from '../sutras/switchGraphics.js';
 
 class Home {
@@ -46,7 +42,6 @@ class Home {
     // TODO: better control of loading tiles
     // TODO: game.systems.tile.loadTilemap() -> Tiled JSON
     game.use('Tile');
-
     //game.use('Sword')
 
     // welcomeMessage(game);
@@ -54,104 +49,10 @@ class Home {
     // See: sutra.js for game logic
     let rules = sutras(game);
 
-    let warp = warpToWorld(game);
     let switchGraphicsSutra = switchGraphics(game);
 
     let e = enemy.call(this);
-    let w = walker(game, {
-      route: routing.createRectangleRoute(-50, -150, 200, -150),
-      // route: createLineRoute(-50, -150, 200, -150, 20),
-      // route: createCircleRoute(0, 0, 100, 20),
-      tolerance: 5
-    });
-    rules.use(w, 'walker');
-    rules.use(warp, 'warpToWorld');
     rules.use(switchGraphicsSutra, 'switchGraphics');
-
-    rules.addCondition('WalkerTouchedPlayer', (collision) => {
-      console.log('ccc', collision)
-      return (collision.entityA.type === 'Walker' && collision.entityB.type === 'Player') || (collision.entityA.type === 'Player' && collision.entityB.type === 'Walker');
-    });
-
-    rules.addCondition('WalkerTouchedPlayer', (entity, gameState) => {
-      if (entity.type === 'COLLISION') {
-        if (entity.bodyA.type === 'Walker' && entity.bodyB.type === 'PLAYER') {
-          return true;
-        }
-        if (entity.bodyB.type === 'Walker' && entity.bodyA.type === 'PLAYER') {
-          return true;
-        }
-      }
-    });
-
-    rules.on('2PlayerTakeDamage', (collision, node, gameState) => {
-      console.log('PlayerTakeDamage', collision, gameState);
-
-      game.removeEntity(collision.Walker.id);
-
-      // get current walk count
-      let walkerCount = gameState.ents.Walker.length || 0;
-
-      if (walkerCount < 10) {
-        // create a new walker
-        game.createEntity({
-          type: 'Walker',
-          width: 16,
-          height: 16,
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'bomb',
-          },
-          depth: 64,
-          position: {
-            x: -50,
-            y: -150,
-            z: 32
-          }
-        });
-
-        game.createEntity({
-          type: 'Walker',
-          width: 16,
-          height: 16,
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'bomb',
-          },
-          depth: 64,
-          position: {
-            x: 50,
-            y: -150,
-            z: 32
-          }
-        });
-      }
-
-
-
-    });
-
-    rules
-      .if('WalkerTouchedPlayer')
-      .then('PlayerTakeDamage');
-
-    /*
-  game.createEntity({
-    type: 'Walker',
-    width: 16,
-    height: 16,
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'bomb',
-    },
-    depth: 64,
-    position: {
-      x: -50,
-      y: -150,
-      z: 32
-    }
-  });
-  */
 
     game.createEntity({
       type: 'Walker',
@@ -170,9 +71,11 @@ class Home {
       }
     });
 
+    /*
     rules.addCondition('true', () => {
       return true;
     })
+    */
 
     game.setSutra(rules);
 
@@ -217,7 +120,7 @@ class Home {
       position: { // position to right
         x: -900,
         y: -800,
-        z: 1
+        z: -1
       }
     });
 

@@ -52,6 +52,79 @@ export default function createWalker(game, config) {
     });
   });
 
+  /*
+  // Remark: We could add additional walker logic, and or create a new NPC sutra behavior for using weapons
+  rules.addCondition('WalkerTouchedPlayer', (collision) => {
+    console.log('ccc', collision)
+    return (collision.entityA.type === 'Walker' && collision.entityB.type === 'Player') || (collision.entityA.type === 'Player' && collision.entityB.type === 'Walker');
+  });
+
+  rules.addCondition('WalkerTouchedPlayer', (entity, gameState) => {
+    if (entity.type === 'COLLISION') {
+      if (entity.bodyA.type === 'Walker' && entity.bodyB.type === 'PLAYER') {
+        return true;
+      }
+      if (entity.bodyB.type === 'Walker' && entity.bodyA.type === 'PLAYER') {
+        return true;
+      }
+    }
+  });
+
+
+  rules.on('PlayerTakeDamage', (collision, node, gameState) => {
+    console.log('PlayerTakeDamage', collision, gameState);
+
+    game.removeEntity(collision.Walker.id);
+
+    // get current walk count
+    let walkerCount = gameState.ents.Walker.length || 0;
+
+    if (walkerCount < 10) {
+      // create a new walker
+      game.createEntity({
+        type: 'Walker',
+        width: 16,
+        height: 16,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'bomb',
+        },
+        depth: 64,
+        position: {
+          x: -50,
+          y: -150,
+          z: 32
+        }
+      });
+
+      game.createEntity({
+        type: 'Walker',
+        width: 16,
+        height: 16,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'bomb',
+        },
+        depth: 64,
+        position: {
+          x: 50,
+          y: -150,
+          z: 32
+        }
+      });
+    }
+
+
+
+  });
+
+  rules
+    .if('WalkerTouchedPlayer')
+    .then('PlayerTakeDamage');
+
+
+  */
+
 
   return walker;
 }
