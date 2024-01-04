@@ -11,6 +11,7 @@ import routing from '../sutras/routing.js';
 import fire from "./sutras/fire.js";
 import block from "./sutras/block.js";
 import demon from "./sutras/demon.js";
+import hexapod from './sutras/hexapod.js';
 
 export default function sutras(game) {
 
@@ -44,6 +45,9 @@ export default function sutras(game) {
 
   // demon entity
   rules.use(demon(game), 'demon');
+
+  // hexapod entity
+  rules.use(hexapod(game), 'hexapod');
 
   console.log('created sutra', rules.toEnglish())
   return rules;
