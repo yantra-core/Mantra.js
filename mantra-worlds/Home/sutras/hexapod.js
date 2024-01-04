@@ -63,7 +63,7 @@ export default function hexapod(game) {
 
     // Process each hexapod in the field of view
     hexapods.forEach(otherHexapod => {
-      // console.log("FML", otherHexapod)
+
       if (otherHexapod.id !== hexapod.id) {
         let d = Vector.magnitude(Vector.sub(hexapod.position, otherHexapod.position));
 

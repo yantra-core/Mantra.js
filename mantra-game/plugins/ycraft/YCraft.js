@@ -65,6 +65,10 @@ class YCraft extends Plugin {
     this.game = game;
     this.game.contraption = this.contraption;
 
+    /*
+    // Remark: This has been removed Jan 4 2023 since we manage disabling of 
+    // of inputs in Editor, or other system. This is not the responsibility of YCraft.js plugin
+    // can delete this code soon
     document.addEventListener('click', function (e) {
       // check to see if we are inside an input, textarea, button or submit
       // if so, disable inputs controls
@@ -81,6 +85,7 @@ class YCraft extends Plugin {
         game.systems['keyboard'].bindInputControls();
       }
     });
+    */
 
 
     // add the system to the systems manager
@@ -136,31 +141,31 @@ class YCraft extends Plugin {
         /*
         let boundingBox = this.game.createEntity({
           type: 'BOX',
-          // color: 0x00ff00,
+          color: 0x00ff00,
           width: contraption.width,
           height: contraption.height,
           position: {
-            x: contraption.position.x,
-            y: contraption.position.y,
+            x: contraption.position.x + contraption.width / 2,
+            y: contraption.position.y + contraption.height / 2,
             z: -100
           },
           isSensor: true
         });
         */
-
         // place the label in top left corner of the contraption
-        let contraptionLabelX = contraption.position.x + contraption.width / 10;
-        let contraptionLabelY = contraption.position.y - contraption.height / 2;
+        let contraptionLabelX = contraption.position.x + contraption.width / 4;
+        let contraptionLabelY = contraption.position.y + contraption.height / 10 - 5;
         // creates a label for the contraption
         let textLabel = this.game.createEntity({
           type: 'TEXT',
+          body: false,
           text: contraption.description,
           position: {
             x: contraptionLabelX, // Center horizontally
             y: contraptionLabelY    // Position inside the entity
           },
           style: {
-            fontSize: '32px',
+            fontSize: '16px',
           },
           width: contraption.width / 2,
           height: contraption.height / 2,

@@ -18,7 +18,8 @@ class YCraft {
 
     let game = this.game;
     game.setGravity(0, 0, 0);
-    game.use('Bullet')
+    game.use('Bullet');
+    game.use('Block');
     game.use('YCraft', {
       contraption: contraptionsExample
     });
@@ -42,6 +43,7 @@ class YCraft {
 
     let rules = game.createSutra();
 
+    // TODO: use common warp sutra
     rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
       if (entity.type === 'COLLISION') {
         console.log('entity', entity)
@@ -96,6 +98,26 @@ class YCraft {
       frictionStatic: 1
     });
     */
+
+
+    // create some blocks to use
+    for (let i = 0; i < 10; i++) {
+      game.createEntity({
+        type: 'BLOCK',
+        texture: 'tile-block',
+        mass: 10000,
+        height: 16,
+        width: 16,
+        position: {
+          x: 180,
+          y: 0 + i * 64,
+          z: 0
+        },
+        friction: 1,
+        frictionAir: 1,
+        frictionStatic: 1
+      });
+    }
 
     // Remark: Players removed for initial demo, is working
     game.createDefaultPlayer({

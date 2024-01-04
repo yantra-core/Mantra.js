@@ -39,13 +39,36 @@ class Home {
     game.use('Tile');
     // game.use('Sword')
 
-    // welcomeMessage(game);
+    welcomeMessage(game);
 
     // See: sutras.js for World logic
     let rules = sutras(game);
 
     // set the Sutra rules for Home world
     game.setSutra(rules);
+
+
+
+    /*    
+    game.createEntity({
+      type: 'KEY',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'ayyoKey',
+      },
+      width: 16,
+      height: 16,
+      body: false,
+      position: { // position to right
+        x: -185,
+        y: 45,
+        z: 10
+      }
+    });
+    */
+
+
+  
 
     // now create some background and text entities for navigation
     game.createEntity({
@@ -62,6 +85,59 @@ class Home {
         z: -10
       }
     });
+
+    game.createEntity({
+      name: 'sutra-tree',
+      type: 'BACKGROUND',
+      width: 1024 / 4,
+      height: 1024 / 4,
+      depth: 1,
+      texture: 'sutra-tree',
+      body: false,
+      position: {
+        x: 0,
+        y: 300,
+        z: 32
+      }
+    });
+
+
+    let rulesEnglish = rules.toEnglish();
+    console.log('rules', rules)
+    console.log('rules', rules.toJSON())
+
+    console.log('rulesEnglish', rulesEnglish)
+
+    // sutra rules text below the tree
+    // TODO: Show Sutra as english text
+    /* TODO: Sutra was having issues with toEnglish() on deeply nested
+             Issue is mostly likely one liner for loss of top-level scope of subsutra
+             as Sutra does support rendering deeply nested rules to english
+    */
+   /*
+    game.createEntity({
+      name: 'sutra-tree-text',
+      type: 'TEXT',
+      text: 'Sutra Rules ' + rulesEnglish,
+      width: 256,
+      height: 256,
+      depth: 1,
+      // texture: 'sutra-tree',
+      body: false,
+      style: {
+        // width: '150px',
+        // fontSize: '12px',
+        textAlign: 'center',
+        color: 'black',
+        opacity: 0.55
+      },
+      position: {
+        x: 40,
+        y: 550,
+        z: 32
+      }
+    });
+    */
 
     game.createEntity({
       type: 'BACKGROUND',
@@ -163,19 +239,21 @@ class Home {
     // switch to 3d text label
     game.createEntity({
       type: 'TEXT',
-      text: 'Rendered with CSSGraphics Engine',
+      text: 'CSSGraphics Engine',
       width: 20,
       color: 0x000000,
       style: {
         width: '150px',
         fontSize: '12px',
-        textAlign: 'center'
+        textAlign: 'center',
+        color: 'black',
+        opacity: 0.22
       },
       body: false,
       position: {
         x: -63,
-        y: -30,
-        z: 64
+        y: -16,
+        z: -2
       }
     });
 
@@ -183,23 +261,25 @@ class Home {
     game.createEntity({
       name: 'PhaserGraphics',
       type: 'TEXT',
-      text: 'Canvas Graphics',
+      text: 'Canvas',
       width: 60,
       height: 50,
-      color: 0x000000,
+      //color: 0xffffff,
       style: {
         width: '60px',
         height: '30px',
         fontSize: '12px',
+        color: 'white',
         textAlign: 'center',
-        border: '1px solid black'
+        // border: '1px solid white',
+        opacity: 0.7
       },
       body: true,
       isSensor: true,
       position: {
         x: -55,
         y: 75,
-        z: 64
+        z: 10
       }
     });
 
@@ -208,7 +288,7 @@ class Home {
     game.createEntity({
       name: 'BabylonGraphics',
       type: 'TEXT',
-      text: '3D Graphics',
+      text: '3D',
       width: 60,
       height: 50,
       color: 0x000000,
@@ -216,8 +296,9 @@ class Home {
         width: '60px',
         height: '30px',
         fontSize: '12px',
+        color: 'white',
         textAlign: 'center',
-        border: '1px solid black'
+        opacity: 0.7
       },
       body: true,
       isSensor: true,
@@ -227,6 +308,40 @@ class Home {
         z: 64
       }
     });
+
+    game.createEntity({
+      type: 'DOOR',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'ayyoDoor',
+      },
+      width: 16,
+      height: 16,
+      body: false,
+      position: { // position to right
+        x: 55,
+        y: 71,
+        z: 10
+      }
+    });
+
+
+    game.createEntity({
+      type: 'DOOR',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'ayyoDoor',
+      },
+      width: 16,
+      height: 16,
+      body: false,
+      position: { // position to right
+        x: -55,
+        y: 71,
+        z: 10
+      }
+    });
+
 
 
     // if touch warp, switch to Music level

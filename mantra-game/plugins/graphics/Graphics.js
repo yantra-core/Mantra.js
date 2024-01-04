@@ -26,6 +26,7 @@ class Graphics {
     this.game.getTexture = this.getTexture.bind(this);
     this.game.updateSprite = this.updateSprite.bind(this);
     this.game.switchGraphics = this.switchGraphics.bind(this);
+    this.game.setBackground = this.setBackground.bind(this);
     // hoist SpriteSheet class to game scope
     this.game.SpriteSheet = SpriteSheet;
 
@@ -153,6 +154,19 @@ class Graphics {
     game.graphics.forEach(function (graphicsInterface) {
       graphicsInterface.updateGraphic(entityData, alpha);
     });
+  }
+
+  setBackground (style) {
+    let game = this.game;
+
+    // assume style is CSS color, set body background
+    document.body.style.background = style;
+    /*
+    // TODO
+    game.graphics.forEach(function (graphicsInterface) {
+      graphicsInterface.setBackground(style);
+    })
+    */
   }
 
 }

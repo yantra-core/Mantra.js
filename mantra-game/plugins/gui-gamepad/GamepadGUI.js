@@ -7,16 +7,13 @@ let keyMap = {
   'right': 'KeyD'
 };
 
-
 class GamepadGUI {
   static id = 'gui-gamepad';
   constructor() {
-    this.game = game; // Store the reference to the game logic
     this.id = GamepadGUI.id;
     this.hiding = false;
     this.moving = null;
     this.lastDirection = null; // Add this line
-
   }
 
   init(game) {

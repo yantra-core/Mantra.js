@@ -1,4 +1,5 @@
 export default function inflateCircle(entityData) {
+  let game = this.game;
   // check to see if there is existing graphic on entity, if so, use that
   let graphic;
   if (entityData.graphics && entityData.graphics['graphics-phaser']) {
