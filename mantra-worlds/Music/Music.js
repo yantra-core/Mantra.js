@@ -167,7 +167,12 @@ class Home {
     */
 
 
-    game.createDefaultPlayer();
+    game.createDefaultPlayer({
+      position: {
+        x: 352,
+        y: 0
+      }
+    });
 
   }
 

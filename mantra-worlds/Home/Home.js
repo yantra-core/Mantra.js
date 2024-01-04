@@ -29,6 +29,9 @@ class Home {
       }
     });
 
+    // game.setBackground('#007F00');
+    game.setBackground('#007fff');
+
     game.use('Block')
     game.use('Border', { autoBorder: true })
     game.use('Bullet')

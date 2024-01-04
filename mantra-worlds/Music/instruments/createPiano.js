@@ -30,8 +30,11 @@ export default function createPiano(game, config) {
         }
       });
 
+      /* TODO: add back, was having issue getting pointerDown event context
       game.createEntity({
         type: 'TEXT',
+        name: 'piano-roll-text',
+        kind: key,
         text: key,
         color: 0x000000,
         style: {
@@ -46,6 +49,7 @@ export default function createPiano(game, config) {
           z: 10
         }
       });
+      */
 
       xPosition += keyWidth;
 
