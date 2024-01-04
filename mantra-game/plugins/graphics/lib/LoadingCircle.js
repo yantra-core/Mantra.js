@@ -22,11 +22,17 @@ export default class LoadingCircle {
     this.circle.style.height = '100%';
     this.circle.style.borderRadius = '50%';
     this.circle.style.backgroundImage = `conic-gradient(blue 0% 0%, transparent 0% 100%)`;
+    this.circle.style.border = 'solid';
+    this.circle.style.borderWidth = '3px';
+    this.circle.style.borderColor = 'white';
 
     // Create the countdown text
     this.countdownText = document.createElement('div');
     this.countdownText.style.position = 'absolute';
-    this.countdownText.style.color = 'black';
+    this.countdownText.style.color = 'white';
+    // bold
+    this.countdownText.style.fontWeight = 'bold';
+    this.countdownText.style.fontSize = '32px monospace';
     this.countdownText.innerText = (this.waitTime / 1000).toString();
 
     // Append elements
@@ -68,10 +74,25 @@ export default class LoadingCircle {
       this.container.style.display = 'flex';
     }
     this.elapsedTime += delta;
-    let progress = this.elapsedTime / this.waitTime;
+    // let progress = this.elapsedTime / this.waitTime;
     let remainingTime = Math.ceil((this.waitTime - this.elapsedTime) / 1000);
 
-    this.circle.style.backgroundImage = `conic-gradient(blue ${progress * 100}% 0%, transparent 0% 100%)`;
+    let progress = this.elapsedTime / this.waitTime;
+    let angle = progress * 360; // Calculate the angle for the gradient
+    
+    this.circle.style.backgroundImage = `conic-gradient(
+      red, 
+      orange, 
+      yellow, 
+      green, 
+      blue, 
+      indigo, 
+      violet, 
+      transparent, 
+      transparent ${angle}deg,
+      grey )`;
+
+    // this.circle.style.backgroundImage = `conic-gradient(grey ${progress * 100}% 0%, transparent 0% 100%)`;
     this.countdownText.innerText = remainingTime.toString();
     // console.log('LoadingCircle.tick', this.elapsedTime, this.waitTime, progress, remainingTime)
     if (this.elapsedTime >= this.waitTime) {
