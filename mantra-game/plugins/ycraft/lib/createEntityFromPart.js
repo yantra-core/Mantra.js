@@ -86,6 +86,9 @@ export default function createEntityFromPart(part, contraption) {
       height: part.size.height,
       isStatic: true,
       isSensor: true,
+      style: {
+        font: '10px monospace',
+      },
       yCraft: {
         part: part,
         contraption: contraption

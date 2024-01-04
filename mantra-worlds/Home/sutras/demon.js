@@ -1,7 +1,7 @@
 export default function demon(game) {
 
   game.createEntity({
-    type: 'NPC',
+    type: 'DEMON',
     texture: 'demon',
     //texture: 'fire',
     //color: 0xff0000,
@@ -16,7 +16,7 @@ export default function demon(game) {
   });
 
   game.createEntity({
-    type: 'NPC',
+    type: 'DEMON',
     texture: 'demon',
     //texture: 'fire',
     //color: 0xff0000,
@@ -30,5 +30,35 @@ export default function demon(game) {
     }
   });
 
+  let rules = game.createSutra();
+
+  rules.addCondition('entityTouchedDemon', (entity, gameState) => {
+    console.log('entityTouchedDemon check', entity)
+    if (entity.type === 'COLLISION' && entity.kind === 'START') {
+      if (typeof entity.DEMON !== 'undefined') {
+        return true;
+      }
+    }
+  });
+
+  /*
+  rules.on('entityTouchedDemon', function (collision) {
+    //let demonEntity = collision.bodyA.type === 'DEMON' ? collision.bodyA : collision.bodyB;
+
+    // Define the scale factor for how much bigger the demon should get
+    const scaleFactor = 2.1; // For example, 10% bigger
+    // TODO: figure out why collision not working
+    alert('aaa')
+    // Increase the size of the demon
+    game.updateEntity({
+      id: demonEntity.id,
+      width: demonEntity.width * scaleFactor,
+      height: demonEntity.height * scaleFactor,
+      depth: demonEntity.depth * scaleFactor
+    });
+  });
+  */
+
+  return rules;
 
 }

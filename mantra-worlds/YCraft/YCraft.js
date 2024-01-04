@@ -18,15 +18,13 @@ class YCraft {
 
     let game = this.game;
     game.setGravity(0, 0, 0);
-    //game.use('Entity')
+    game.use('Bullet')
     game.use('YCraft', {
       contraption: contraptionsExample
     });
     game.use('YCraftGUI');
 
-
     // create warp by back home entity
-
     game.createEntity({
       type: 'WARP',
       kind: 'Home',
@@ -43,7 +41,6 @@ class YCraft {
     });
 
     let rules = game.createSutra();
-
 
     rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
       if (entity.type === 'COLLISION') {
@@ -101,7 +98,13 @@ class YCraft {
     */
 
     // Remark: Players removed for initial demo, is working
-    game.createDefaultPlayer();
+    game.createDefaultPlayer({
+      position: {
+        x: 75,
+        y: 75,
+        z: 0
+      }
+    });
 
 
     /* Not needed anymore?
@@ -110,8 +113,7 @@ class YCraft {
 
   }
 
-  update() {
-  }
+  update() {}
 
   render() { }
 

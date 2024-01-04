@@ -37,7 +37,7 @@ class Home {
     createPiano(game, pianoConfig);
     // Usage example
     const drumKitConfig = {
-      position: { x: 200, y: -200 } // Base position of the drum kit
+      position: { x: 200, y: 50 } // Base position of the drum kit
     };
     createDrumKit(game, drumKitConfig);
 
@@ -100,6 +100,20 @@ class Home {
         y: 0
       }
     });
+
+    game.createEntity({
+      type: 'PLATFORM',
+      // kind: 'ice',
+      width: 200,
+      height: 16,
+      // color: 0x00ff00,
+      isStatic: true,
+      position: {
+        x: 220,
+        y: 110
+      }
+    });
+
 
     /*
     // if touch note play sound

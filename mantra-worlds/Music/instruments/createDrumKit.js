@@ -1,12 +1,12 @@
 export default function createDrumKit(game, config) {
   // Drum kit components with their properties
   const drumComponents = [
-    { type: 'kick', color: 0x0000ff, width: 100, height: 100, position: { x: 0, y: 50 } },
-    { type: 'snare', color: 0xff0000, width: 60, height: 60, position: { x: 0, y: -50 } },
-    { type: 'hiHatClosed', color: 0x00ff00, width: 40, height: 40, position: { x: -60, y: -30 } },
-    { type: 'hiHatOpen', color: 0x00ff00, width: 40, height: 40, position: { x: -60, y: 30 } },
-    { type: 'tomLow', color: 0xffff00, width: 70, height: 70, position: { x: 70, y: -30 } },
-    { type: 'tomHigh', color: 0xffff00, width: 50, height: 50, position: { x: 70, y: 30 } }
+    { type: 'kick', color: 0xffffff, width: 25, height: 25, position: { x: 0, y: 12.5 } },
+    { type: 'snare', color: 0xffffff, width: 15, height: 15, position: { x: 0, y: -12.5 } },
+    { type: 'hiHatClosed', color: 0xffffff, width: 10, height: 10, position: { x: -15, y: -7.5 } },
+    { type: 'hiHatOpen', color: 0xffffff, width: 10, height: 10, position: { x: -15, y: 7.5 } },
+    { type: 'tomLow', color: 0xffffff, width: 17.5, height: 17.5, position: { x: 17.5, y: -7.5 } },
+    { type: 'tomHigh', color: 0xffffff, width: 12.5, height: 12.5, position: { x: 17.5, y: 7.5 } }
   ];
 
   drumComponents.forEach(drum => {
@@ -15,7 +15,7 @@ export default function createDrumKit(game, config) {
     const posY = config.position.y + drum.position.y;
 
     game.createEntity({
-      type: 'NOTE',
+      type: 'DRUM',
       kind: drum.type,
       color: drum.color,
       width: drum.width,
@@ -27,21 +27,28 @@ export default function createDrumKit(game, config) {
       }
     });
 
+    // TODO: Remark: TEXT labels weren't aligned properly, removed for now
+    /*
+    // Adjust label positions
+    const labelX = posX + drum.width / 2; // centering the label over the drum
+    const labelY = posY + drum.height / 2; // centering the label over the drum
+
     game.createEntity({
       type: 'TEXT',
       text: drum.type,
       color: 0x000000,
       style: {
-        fontSize: '16px',
-        textAlign: 'center',
+        font: '3px monospace',
+        textAlign: 'right',
         zIndex: 999
       },
       body: false,
       position: {
-        x: posX,
-        y: posY - drum.height / 3,
+        x: labelX,
+        y: labelY,
         z: 999
       }
     });
+    */
   });
 }

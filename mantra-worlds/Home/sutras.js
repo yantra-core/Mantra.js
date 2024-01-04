@@ -42,8 +42,8 @@ export default function sutras(game) {
   // block entity
   rules.use(block(game), 'block');
 
-  // TODO: make sutra with entity::create helper
-  demon(game);
+  // demon entity
+  rules.use(demon(game), 'demon');
 
   console.log('created sutra', rules.toEnglish())
   return rules;
