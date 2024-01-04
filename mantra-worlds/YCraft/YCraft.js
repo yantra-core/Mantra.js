@@ -29,17 +29,37 @@ class YCraft {
     game.createEntity({
       type: 'WARP',
       kind: 'Home',
-      color: 0x00ff00,
+      // color: 0x00ff00,
       width: 64,
+      texture: 'warp-to-home',
       isStatic: true,
       // isSensor: false,
       height: 64,
       position: {
-        x: 0,
-        y: -200,
+        x: 260,
+        y: 60,
         z: 0
       }
     });
+
+    // text label saying "Warp To Mantra Home"
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Warp To Mantra',
+      // kind: 'dynamic',
+      color: 0x000000,
+      style: {
+        fontSize: '16px',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: 260,
+        y: 60,
+        z: 64
+      }
+    });
+
 
     let rules = game.createSutra();
 

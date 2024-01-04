@@ -1,9 +1,6 @@
-let hasRunOnce = false;
-
 export default function welcomeMessage(game) {
-
-  if (!hasRunOnce) {
-    hasRunOnce = true;
+  if (game.hasShownWelcomeMessage !== true) {
+    game.hasShownWelcomeMessage = true;
   } else {
     console.log('welcomeMessage already run once');
     return;
@@ -40,7 +37,6 @@ export default function welcomeMessage(game) {
   });
 
   // TODO: custom messages for mobile / vs desktop
-
   // Queueing additional messages
   typer.queueText('Welcome to Mantra Worlds', 5000, 2000);
   typer.queueText('Use WASD to move', 5000, 3000);
@@ -51,7 +47,6 @@ export default function welcomeMessage(game) {
 
   // Start processing the queue
   typer.processQueue();
-
 
 }
 

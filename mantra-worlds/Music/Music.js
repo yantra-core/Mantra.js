@@ -34,10 +34,30 @@ class Home {
       width: 1028,
       height: 64
     };
+
+    // text label for piano
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Click or Jump on the Piano',
+      // kind: 'dynamic',
+      //color: 0xffffff,
+      style: {
+        fontSize: '16px',
+        color: '#ffffff',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: 352,
+        y: 150,
+        z: 64
+      }
+    });
+
     createPiano(game, pianoConfig);
     // Usage example
     const drumKitConfig = {
-      position: { x: 200, y: 50 } // Base position of the drum kit
+      position: { x: 1000, y: 150 } // Base position of the drum kit
     };
     createDrumKit(game, drumKitConfig);
 
@@ -92,12 +112,30 @@ class Home {
     // warp to Platform level
     game.createEntity({
       type: 'WARP',
+      texture: 'warp-to-home',
       width: 64,
       height: 64,
       isStatic: true,
       position: {
-        x: -600,
-        y: 0
+        x: 200,
+        y: -10
+      }
+    });
+    // text "Warp to Mantra"
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Warp To Mantra',
+      // kind: 'dynamic',
+      color: 0xffffff,
+      style: {
+        padding: '2px',
+        fontSize: '16px',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: 195,
+        y: -20
       }
     });
 
@@ -109,8 +147,8 @@ class Home {
       // color: 0x00ff00,
       isStatic: true,
       position: {
-        x: 220,
-        y: 110
+        x: 1000,
+        y: 210
       }
     });
 
