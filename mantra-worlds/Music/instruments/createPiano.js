@@ -6,9 +6,10 @@ export default function createPiano(game, config) {
   // Calculate key widths based on total width and number of white keys
   const totalWhiteKeys = 52; // 7 white keys per octave, 7.5 octaves
   const keyWidth = config.width / totalWhiteKeys;
-  const blackKeyWidth = keyWidth / 2; // Black keys are usually narrower
+  const blackKeyWidth = keyWidth / 2.5; // Black keys are usually narrower
 
   const keyHeight = config.height;
+  const blackKeyHeight = keyHeight / 2;
 
   for (let octave = 0; octave < 8; octave++) {
     whiteKeys.forEach((note, index) => {
@@ -17,6 +18,9 @@ export default function createPiano(game, config) {
         type: 'NOTE',
         kind: key,
         color: 0xffffff, // White key color
+        style: {
+          borderRadius: '0px'
+        },
         width: keyWidth,
         height: keyHeight,
         isStatic: true,
@@ -31,14 +35,14 @@ export default function createPiano(game, config) {
         text: key,
         color: 0x000000,
         style: {
-          fontSize: '16px',
+          fontSize: '10px',
           textAlign: 'center',
           zIndex: 999
         },
         body: false,
         position: {
-          x: xPosition + keyWidth / 2,
-          y: config.position.y + keyHeight / 3,
+          x: xPosition + (keyWidth * 2) + 5,
+          y: config.position.y + keyHeight,
           z: 10
         }
       });
@@ -53,21 +57,24 @@ export default function createPiano(game, config) {
           kind: blackKey,
           color: 0xff0000, // Black key color
           width: blackKeyWidth,
-          height: keyHeight,
+          height: blackKeyHeight,
           isStatic: true,
           style: {
-            border: 'solid'
+            border: 'solid',
+            zIndex: 9999,
+            borderRadius: '0px'
           },
           position: {
             x: xPosition - blackKeyWidth, // Position the black key in the middle of two white keys
-            y: config.position.y - 20, // Slightly higher than white keys
-            z: 10
+            y: config.position.y - blackKeyHeight / 2, // Slightly higher than white keys
+            z: 9990
           }
         });
       }
     });
   }
 
+  /* removed ( for now, create common fn for creating keys )
   // Add the last key (C8)
   game.createEntity({
     type: 'NOTE',
@@ -97,4 +104,5 @@ export default function createPiano(game, config) {
       z: 64
     }
   });
+  */
 }

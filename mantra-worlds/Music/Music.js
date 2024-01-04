@@ -2,6 +2,8 @@ import warpToWorld from "../sutras/warpToWorld.js";
 import createPiano from "./instruments/createPiano.js";
 import createDrumKit from "./instruments/createDrumKit.js";
 
+import sutras from "./sutras.js";
+
 class Home {
   static id = 'world-home';
   // "world" type has special features in that it can be unloaded and reloaded.
@@ -27,8 +29,10 @@ class Home {
     // Usage example
     const pianoConfig = {
       position: { x: -200, y: 200 },
-      width: 4096 / 2, // Total width for the piano
-      height: 128 / 2// Height of each key
+      //width: 4096 / 2, // Total width for the piano
+      //height: 128 / 2// Height of each key
+      width: 1028,
+      height: 64
     };
     createPiano(game, pianoConfig);
     // Usage example
@@ -77,83 +81,13 @@ class Home {
 
     game.use('Border', { autoBorder: true })
 
-    let rules = game.createSutra();
-    rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-    // when touching WARP entity, warp to world
-    let warp = warpToWorld(game);
-    rules.use(warp, 'warpToWorld');
+   // See: sutras.js for World logic
+   let rules = sutras(game);
 
-    game.setSutra(rules);
+   // set the Sutra rules for Home world
+   game.setSutra(rules);
 
-    rules.addCondition('entityTouchedNote', (entity, gameState) => {
-      if (entity.type === 'COLLISION' && entity.kind === 'START') {
-        // console.log('spawnUnitTouchedHomebase', entity)
-        if (entity.bodyA.type === 'NOTE') {
-          // console.log('spawnUnitTouchedHomebase', entity, gameState)
-          return true;
-        }
-        if (entity.bodyB.type === 'NOTE') {
-          // console.log('spawnUnitTouchedHomebase', entity, gameState)
-          return true;
-        }
-      }
-    });
-
-
-
-    rules.on('damageEntity', (collision) => {
-      let ent;
-      if (collision.bodyA.type === 'FIRE') {
-        ent = collision.bodyB;
-      } else {
-        ent = collision.bodyA;
-      }
-      console.log('damageEntity', ent)
-      game.removeEntity(ent.id);
-    });
-
-    rules
-      .if('entityTouchedNote')
-      .then('playNote')
-
-    // make this game::playNote
-    rules.on('playNote', (collision) => {
-      // collision.note = collision.note || 'C4';
-      console.log('playNote.collision', collision.NOTE.kind, collision.NOTE.text)
-      game.playNote(collision.NOTE.kind || collision.note);
-    });
-
-    console.log('created sutra', rules)
-
-
-    game.on('pointerDown', (entity) => {
-
-
-      if (entity.type === 'NOTE') {
-        game.playNote();
-      }
-
-      if (entity.type === 'FIRE') {
-        game.playNote('G4');
-      }
-
-      console.log("PPPoiner down", entity)
-      if (this.game.rules) {
-        this.game.data.events = this.game.data.events || [];
-        // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-        var eventContext = {
-          type: 'POINTER',
-          entity: entity,
-        };
-
-        // add entity onto the collision by type name
-        //eventContext[entityA.type] = entityA;
-        // eventContext[entityB.type] = entityB;
-        this.game.data.events.push(eventContext);
-      }
-
-    });
 
     // warp to Platform level
     game.createEntity({
