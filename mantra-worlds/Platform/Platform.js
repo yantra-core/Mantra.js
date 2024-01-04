@@ -102,14 +102,35 @@ class Platform {
     game.createEntity({
       type: 'WARP',
       kind: 'Home',
+      texture: 'warp-to-home',
       width: 64,
       height: 64,
       isStatic: true,
       position: {
-        x: -300,
-        y: 0
+        x: -100,
+        y: -100
       }
-    })
+    });
+
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Warp To Mantra',
+      // kind: 'dynamic',
+      color: 0xffffff,
+      style: {
+        color: '#ffffff',
+        padding: '2px',
+        fontSize: '16px',
+        textAlign: 'center',
+        backgroundColor: 'transparent',
+      },
+      body: false,
+      position: {
+        x: -105,
+        y: -110
+      }
+    });
+
     // TODO: remap spacebar to jump
     // TODO:     game.on('game::ready', function () {
     //           needs secound ready emit after plugins are loaded after start
