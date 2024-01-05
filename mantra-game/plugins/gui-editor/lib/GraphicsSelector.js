@@ -82,6 +82,7 @@ class GraphicsSelector {
     }
 
 
+    /* Removed 1/5/2023, SELECT button now opens Toolbar instead of graphics selector
     game.on('entityInput::handleInputs', (entityId, input) => {
       if (input.controls && input.controls.U !== undefined) {
         if (input.controls.U === false) {
@@ -90,7 +91,7 @@ class GraphicsSelector {
         toggleModalOnKeyPress(input.controls.U);
       }
     });
-
+    */
 
   }
 

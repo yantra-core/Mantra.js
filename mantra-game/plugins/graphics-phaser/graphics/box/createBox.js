@@ -15,6 +15,7 @@ const depthChart = [
 
 export default function createBox (entityData) {
   let graphic;
+  let game = this.game;
   if (entityData.texture) {
     // Use texture if available
     // console.log('texture', entityData.texture)

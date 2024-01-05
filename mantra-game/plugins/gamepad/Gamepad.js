@@ -65,6 +65,14 @@ export default class Gamepad {
       // console.log('controls', controls)
       // Send the controls to the game logic or server
       if (this.game.communicationClient) {
+        // dont send controls if all false
+        const allFalse = Object.keys(controls).every(key => !controls[key]);
+        if (allFalse) {
+          // Remark: We may have to remove this
+          return;
+        }
+        // console.log('sending controls from gpad', controls)
+
         this.game.communicationClient.sendMessage('player_input', { controls });
       }
     }

@@ -44,6 +44,7 @@ export default function welcomeMessage(game) {
   typer.queueText('Zoom with Slider or Mouse Wheel', 5000, 3000);
   typer.queueText('Press START to Switch Worlds', 5000, 2000);
   typer.queueText('Press SELECT to Open Menu', 5000, 2000);
+  typer.queueText('USB Gamepad Support', 5000, 2000);
 
   // Start processing the queue
   typer.processQueue();

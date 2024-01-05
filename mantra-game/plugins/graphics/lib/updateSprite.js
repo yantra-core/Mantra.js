@@ -3,11 +3,7 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
   let game = this.game;
   let currentInputs = data.controls;
 
-  // only update sprite animations each 5 ticks
-  // Remark: we could use a config value for this based on animation speed
-  if (game.tick % 10 !== 0) {
-    // return;
-  }
+  // console.log('currentInputs', currentInputs)
   // check to see if we have a player entity
   let playerEntity = game.getEntity(entityId);
   if (!playerEntity) {
@@ -28,10 +24,14 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
     }
 
     if (!direction) {
+      // return;
+    }
+
+
+    if (!playerEntity.texture) {
       return;
     }
 
-    // assume "player" sprite for now
     let spriteName = playerEntity.texture.sprite;
 
     let newSpriteName = 'player' + direction;
@@ -40,15 +40,41 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
 
     // check to see if sprite is already set, if so, do not double set
     if (spriteName !== newSpriteName) {
-      console.log('updating sprite', spriteName, newSpriteName, 'on', entityId, 'to', newSpriteName)
+      // if the new sprite name doesn't match, update immediate
       game.updateEntity({
         id: entityId,
         texture: {
           sheet: playerEntity.texture.sheet,
           sprite: newSpriteName,
+          animationPlaying: true
         }
       })
+      return;
     }
+      // console.log('updating sprite', spriteName, newSpriteName, 'on', entityId, 'to', newSpriteName)
+      /*
+        // check to see if controls are all false, if so animationPlaying should be false
+        let allFalse = true;
+        // console.log('currentInputs', currentInputs)
+        for (let key in currentInputs) {
+          //console.log(key, currentInputs[key])
+          if (currentInputs[key] === true) {
+            allFalse = false;
+            break;
+          }
+        }
+
+        //console.log('allFalse', allFalse, currentInputs)
+        game.updateEntity({
+          id: entityId,
+          texture: {
+            sheet: playerEntity.texture.sheet,
+            sprite: newSpriteName,
+            animationPlaying: true
+          }
+        })
+      }
+      */
 
   }
 }

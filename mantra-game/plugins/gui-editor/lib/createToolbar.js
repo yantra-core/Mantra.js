@@ -10,17 +10,24 @@ export default function createToolbar(game) {
   const toolbarMenu = new ToolbarMenu();
   this.toolbarMenu = toolbarMenu;
 
+  let keyPressed = false;
+
   game.on('entityInput::handleInputs', (entityId, input) => {
-    if (input.controls && input.controls.U) {
-      console.log('entityInput::handleInputs', entityId, input)
-      if (toolbarMenu.toggleStatus === 'open') {
-        toolbarMenu.slideOutToolbar();
-      } else {
-        toolbarMenu.slideInToolbar();
+    if (input.controls && input.controls.U !== undefined) {
+      if (input.controls.U === true && !keyPressed) {
+        keyPressed = true; // Set the flag when key is initially pressed
+        // Toggle the toolbar based on its current state
+        if (toolbarMenu.toggleStatus === 'open') {
+          toolbarMenu.slideOutToolbar();
+        } else {
+          toolbarMenu.slideInToolbar();
+        }
+      } else if (input.controls.U === false) {
+        keyPressed = false; // Reset the flag when key is released
       }
     }
-  }); 
-  
+  });
+
   // create image icon with source of ./vendor/feather/eye.svg
   // TODO: remove featherRoot from code, quick fix for now
   let featherRoot = 'https://yantra.gg';
@@ -32,7 +39,7 @@ export default function createToolbar(game) {
   inspectorIcon.style.marginLeft = '10px';
   inspectorIcon.style.marginTop = '5px';
   inspectorIcon.style.filter = 'invert(100%)';
-  
+
   // TODO: have this change values based on open / cloase state
   // . Click in-game on Entity to Inspect
   inspectorIcon.onclick = () => this.showInspector();
@@ -152,7 +159,7 @@ export default function createToolbar(game) {
 
   // add label to worldSelectorItem
   worldSelectorItem.appendChild(worldSelectorLabel);
-  
+
 
   worldSelectorItem.onpointerdown = () => {
     // hide world selector
@@ -173,8 +180,10 @@ export default function createToolbar(game) {
   }
 
   if (is_touch_enabled()) {
-    toolbarMenu.toolbar.style.display = 'none';
   }
+  // toolbarMenu.toolbar.style.display = 'none';
+  toolbarMenu.slideOutToolbar()
+
   // Append the toolbar to the body
   $('body').append(toolbarMenu.toolbar);
 }

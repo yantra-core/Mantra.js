@@ -71,7 +71,7 @@ export default class SelectPicker {
       position: 'fixed',
       width: '100%',
       height: '100%',
-      top: '110px',
+      top: '0px',
       left: '0',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'none',
