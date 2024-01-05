@@ -38,7 +38,6 @@ export default function getTexture(config) {
         sprite
       };
     }
-    //console.log('frame name', t, config.frame);
   }
 
   if (t) {

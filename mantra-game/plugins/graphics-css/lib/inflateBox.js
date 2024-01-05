@@ -1,4 +1,7 @@
 export default function inflateBox(entityElement, entityData) {
+
+  // console.log('inflating entity', entityData.type, entityData.name)
+
   let game = this.game;
 
   let getTexture = game.getTexture;
@@ -26,11 +29,26 @@ export default function inflateBox(entityElement, entityData) {
 
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
   entityElement.addEventListener('pointerdown', (ev) => {
-    console.log(ev.target, entityData.id, entityData.type, entityData)
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
     // get the full ent from the game
     let ent = game.getEntity(entityData.id);
     game.emit('pointerDown', ent, ev);
   });
+
+  entityElement.addEventListener('pointerup', (ev) => {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    let ent = game.getEntity(entityData.id);
+    game.emit('pointerUp', ent, ev);
+  });
+
+  entityElement.addEventListener('pointermove', (ev) => {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    let ent = game.getEntity(entityData.id);
+    game.emit('pointerMove', ent, ev);
+  });
+
 
   // TODO: move to separate file for inflatePart,
   // move this code to CSSGraphics switch case
@@ -111,7 +129,6 @@ export default function inflateBox(entityElement, entityData) {
   // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
   // set border color to black
   entityElement.style.border = '1px solid black';
-
   if (getTexture(entityData.texture)) {
     entityElement.style.border = 'none';
     entityElement.style.zIndex = entityData.position.z;
@@ -125,13 +142,18 @@ export default function inflateBox(entityElement, entityData) {
       let texture = getTexture(entityData.texture);
       let textureUrl = texture.url;
       let spritePosition = texture.sprite || { x: 0, y: 0 };
+
+      //console.log("SETTING TEXTURE", textureUrl, texture, spritePosition)
+      //console.log('entityData', entityData)
       // console.log('got back texture', textureUrl, texture, spritePosition)
       // TODO: move this closure
       // rendering a texture without tile
       // console.log('going to set texture', entityData.texture, getTexture(entityData.texture))
       entityElement.style.background = `url('${textureUrl}')`;
       entityElement.style.backgroundRepeat = 'no-repeat';
-      entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
+      entityElement.style.backgroundPosition = 'center';
+      // entityElement.style.border = 'solid'
+      //entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
       // entityElement.style.backgroundPosition = '-208px -544px';
       // set background size to entity size
       if (spritePosition.x === 0 && spritePosition.y === 0) {
@@ -139,8 +161,9 @@ export default function inflateBox(entityElement, entityData) {
       }
       if (!texture.frames) {
         entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+        // align background in center no matter the size of the entity
       }
-      // entityElement.style.zIndex = entityData.position.z;
+      entityElement.style.zIndex = entityData.position.z;
 
       if (typeof entityData.texture === 'object' && entityData.texture.sheet) {
         // this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.sprite);

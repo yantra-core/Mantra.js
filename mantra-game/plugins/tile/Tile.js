@@ -78,11 +78,12 @@ class Tile {
         let isStatic = true;
         let mass = 1;
 
+        z = -1;
         if (tileId === 1) {
           body = true;
           mass = 5000;
           isStatic = false;
-          z = 16;
+          z = 0;
         }
 
         // console.log("placing at", x, y)

@@ -109,11 +109,9 @@ export default function sutras(game) {
       rules.emit('updateNoteColor', entity);
       isPressed = true; // Set the pressed state to true when mouse is clicked
     }
-
     if (entity.type === 'DRUM') {
       game.playDrum(entity.kind);
     }
-
   });
 
   game.on('pointerMove', (entity) => {

@@ -44,6 +44,11 @@ class Home {
     // See: sutras.js for World logic
     let rules = sutras(game);
 
+    console.log('toEnglish', rules.toEnglish())
+    console.log('toJSON', rules.toJSON())
+    console.log('rules', rules)
+
+
     // set the Sutra rules for Home world
     game.setSutra(rules);
 
@@ -101,33 +106,25 @@ class Home {
       }
     });
 
-
     let rulesEnglish = rules.toEnglish();
-    console.log('rules', rules)
-    console.log('rules', rules.toJSON())
 
-    console.log('rulesEnglish', rulesEnglish)
-
-    // sutra rules text below the tree
-    // TODO: Show Sutra as english text
-    /* TODO: Sutra was having issues with toEnglish() on deeply nested
-             Issue is mostly likely one liner for loss of top-level scope of subsutra
-             as Sutra does support rendering deeply nested rules to english
-    */
-   /*
     game.createEntity({
       name: 'sutra-tree-text',
       type: 'TEXT',
-      text: 'Sutra Rules ' + rulesEnglish,
+      text: 'Sutra Rules \n\n' + rulesEnglish,
       width: 256,
       height: 256,
       depth: 1,
       // texture: 'sutra-tree',
       body: false,
       style: {
+        // this is code and we need to preserve the spaces and \n
+        whiteSpace: 'pre',
+
         // width: '150px',
         // fontSize: '12px',
-        textAlign: 'center',
+
+        textAlign: 'left',
         color: 'black',
         opacity: 0.55
       },
@@ -137,7 +134,6 @@ class Home {
         z: 32
       }
     });
-    */
 
     game.createEntity({
       type: 'BACKGROUND',

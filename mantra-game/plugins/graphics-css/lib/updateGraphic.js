@@ -1,5 +1,4 @@
 export default function updateGraphic(entityData) {
-
   // TODO: move this to common 3D-2.5D transform function(s)
   if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
     if (typeof entityData.rotation === 'object') {
@@ -18,6 +17,11 @@ export default function updateGraphic(entityData) {
       let hexColor = '#' + entityData.color.toString(16);
       // update the background color
       entityElement.style.background = hexColor;
+    }
+
+
+    if (typeof entityData.position.z === 'number') {
+      entityElement.style.zIndex = entityData.position.z;
     }
     // Update the background sprite if velocity is present
     /*
@@ -55,14 +59,11 @@ export default function updateGraphic(entityData) {
       //console.log('Applied class:', spriteClass);
     }
     */
-
-
     if (entityData.style) {
       Object.keys(entityData.style).forEach((key) => {
         entityElement.style[key] = entityData.style[key];
       });
     }
-
 
     if (entityData.texture /*entityData.type === 'FIRE'*/) {
       // check to see if texture changed / sprite index changed
@@ -76,8 +77,10 @@ export default function updateGraphic(entityData) {
       }
 
       if (typeof texture.frames === 'object') {
+
         // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
         if (game.tick % 10 === 0) { // TODO: custom tick rate
+
           // shift first frame from array
           if (typeof entityData.frameIndex === 'undefined') {
             entityData.frameIndex = 0;
@@ -87,19 +90,20 @@ export default function updateGraphic(entityData) {
           }
 
           let frame = texture.frames[entityData.frameIndex];
+
           if (typeof frame !== 'undefined') {
             spritePosition = frame;
             entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
             entityData.frameIndex++;
-            // add frame back to end of array
           }
+
         }
+
       }
 
     }
 
     if (entityData.type === 'TEXT' && typeof entityData.text !== 'undefined' && entityData.text !== null) {
-
       // check that text has changed
       if (entityElement.innerHTML !== entityData.text) {
         entityElement.innerHTML = entityData.text;
@@ -107,8 +111,24 @@ export default function updateGraphic(entityData) {
       // return this.inflateText(entityData);
     }
 
-    // Update the position of the entity element
+      /* TODO: better support for static / less renders
+        look at camera position to determine if render of static required
+      if (typeof entityData.previousPosition === 'undefined') {
+        entityData.previousPosition = entityData.position;
+      }
+
+      if (entityData.previousPosition.x !== entityData.position.x || entityData.previousPosition.y !== entityData.position.y) {
+        entityData.previousPosition = entityData.position;
+        return this.updateEntityPosition(entityElement, entityData);
+      }
+      else {
+        return entityElement;
+      }
+      */
+
     return this.updateEntityPosition(entityElement, entityData);
+
+
   } else {
     // If the entity element does not exist, create it
     return this.createGraphic(entityData);

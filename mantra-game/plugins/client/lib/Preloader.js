@@ -1,8 +1,9 @@
 export default class Preloader {
-  constructor({ assets = [] } = {}) {
+  constructor(game, { assets = []} = {}) {
     this.assets = assets;
     this.totalAssetsSize = 0;
     this.loadedAssetsSize = 0;
+    this.game = game;
   }
 
   getItem(key) {
@@ -14,6 +15,7 @@ export default class Preloader {
   }
 
   async loadAll() {
+    let game = this.game;
     const loadPromises = this.assets.map(asset => this.loadAsset(asset));
     await Promise.all(loadPromises);
     game.emit('assetsLoaded');

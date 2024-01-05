@@ -28,7 +28,6 @@ export default class Mouse {
     this.game = game;
     this.id = Mouse.id;
     this.bindInputControls();
-
     this.game.systemsManager.addSystem(this.id, this);
   }
 
@@ -130,6 +129,7 @@ export default class Mouse {
       event.preventDefault();
     }
 
+    this.game.emit('pointerUp', this.game.selectedEntityId)
     this.sendMouseData();
   }
 

@@ -5,8 +5,8 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
 
   // only update sprite animations each 5 ticks
   // Remark: we could use a config value for this based on animation speed
-  if (game.tick % 5 !== 0) {
-    return;
+  if (game.tick % 10 !== 0) {
+    // return;
   }
   // check to see if we have a player entity
   let playerEntity = game.getEntity(entityId);
@@ -18,63 +18,37 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
 
   if (currentInputs) {
     if (currentInputs.W) {
-      direction = 'up';
+      direction = 'Up';
     } else if (currentInputs.A) {
-      direction = 'left';
+      direction = 'Left';
     } else if (currentInputs.S) {
-      direction = 'down';
+      direction = 'Down';
     } else if (currentInputs.D) {
-      direction = 'right';
+      direction = 'Right';
     }
 
     if (!direction) {
       return;
     }
 
-    // Get the spritesheet URL
-    const sheet = game.getTexture('loz_spritesheet');
+    // assume "player" sprite for now
+    let spriteName = playerEntity.texture.sprite;
 
-    let walkRight0 = anims.walkRight;
-    let walkDown0 = anims.walkDown;
-    let walkLeft0 = anims.walkLeft;
-    let walkUp0 = anims.walkUp;
+    let newSpriteName = 'player' + direction;
 
-    // Update an entity with the sprite
+    //console.log('updateSprite', newSpriteName ,direction, entityId, playerEntity, data);
 
-    if (direction === 'down') {
-      //console.log('walkDown0', walkDown0)
-      // pop first element from walkDown0
-      let spriteFrame = walkDown0.shift(); // Use shift() to remove the first element
-      SheetManager.updateEntity(playerEntity, sheet, spriteFrame);
-      // push it to the end
-      walkDown0.push(spriteFrame); // Use push() to add the element to the end
+    // check to see if sprite is already set, if so, do not double set
+    if (spriteName !== newSpriteName) {
+      console.log('updating sprite', spriteName, newSpriteName, 'on', entityId, 'to', newSpriteName)
+      game.updateEntity({
+        id: entityId,
+        texture: {
+          sheet: playerEntity.texture.sheet,
+          sprite: newSpriteName,
+        }
+      })
     }
-    
-    if (direction === 'right') {
-      let spriteFrame = walkRight0.shift(); // Use shift() to remove the first element
-      SheetManager.updateEntity(playerEntity, sheet, spriteFrame);
-      // push it to the end
-      walkRight0.push(spriteFrame); // Use push() to add the element to the end
-      // SheetManager.updateEntity(playerEntity, sheet, walkRight0);
-    }
-
-    if (direction === 'left') {
-      let spriteFrame = walkLeft0.shift(); // Use shift() to remove the first element
-      SheetManager.updateEntity(playerEntity, sheet, spriteFrame);
-      //SheetManager.updateEntity(playerEntity, sheet, walkLeft0);
-      // push it to the end
-      walkLeft0.push(spriteFrame); // Use push() to add the element to the end
-    }
-
-    if (direction === 'up') {
-      let spriteFrame = walkUp0.shift(); // Use shift() to remove the first element
-      SheetManager.updateEntity(playerEntity, sheet, spriteFrame);
-      //SheetManager.updateEntity(playerEntity, sheet, walkUp0);
-      // push it to the end
-      walkUp0.push(spriteFrame); // Use push() to add the element to the end
-    }
-
-    return;
 
   }
 }

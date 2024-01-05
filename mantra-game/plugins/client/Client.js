@@ -26,7 +26,7 @@ export default class Client {
   init (game) {
     this.game = game;
 
-    const preloader = new Preloader();
+    const preloader = new Preloader(game);
 
     // hoist preloader to game scope
     game.preloader = preloader;

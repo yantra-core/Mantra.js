@@ -1,6 +1,5 @@
 // Graphics.js - Marak Squires 2023
 import updateSprite from "./lib/updateSprite.js";
-import SpriteSheet from "./lib/SpriteSheet.js";
 import handleInputs from "./lib/handleInputs.js";
 import getTexture from "./lib/getTexture.js";
 import LoadingCircle from "./lib/LoadingCircle.js";
@@ -27,8 +26,6 @@ class Graphics {
     this.game.updateSprite = this.updateSprite.bind(this);
     this.game.switchGraphics = this.switchGraphics.bind(this);
     this.game.setBackground = this.setBackground.bind(this);
-    // hoist SpriteSheet class to game scope
-    this.game.SpriteSheet = SpriteSheet;
 
     this.game.data.camera = this.game.data.camera || {
       position: {

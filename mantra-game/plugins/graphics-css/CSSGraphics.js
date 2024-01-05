@@ -325,7 +325,10 @@ class CSSGraphics extends GraphicsInterface {
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       // console.log('rendering', ent)
-      this.inflateEntity(ent, alpha);
+      // do not re-inflate destroyed entities
+      if (ent.destroyed !== true) {
+        this.inflateEntity(ent, alpha);
+      }
       // this.game.changedEntities.delete(eId);
     }
   }

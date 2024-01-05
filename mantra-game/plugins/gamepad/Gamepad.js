@@ -62,7 +62,7 @@ export default class Gamepad {
         SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
       };
   
-      console.log('controls', controls)
+      // console.log('controls', controls)
       // Send the controls to the game logic or server
       if (this.game.communicationClient) {
         this.game.communicationClient.sendMessage('player_input', { controls });

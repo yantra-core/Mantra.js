@@ -74,7 +74,8 @@ class Bullet {
     // Place the bullet in front of the player
     let bulletStartPosition = {
       x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
-      y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation)
+      y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation),
+      //z: 10
     };
 
     this.bulletCount++;
@@ -83,6 +84,8 @@ class Bullet {
       mass: 1,
       position: bulletStartPosition,
       lifetime: this.lifetime,
+      //texture: 'tile-block',
+      /*      */
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'arrow'

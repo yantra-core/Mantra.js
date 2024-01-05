@@ -40,8 +40,8 @@ export default function switchWorlds (selectedWorld) {
   //       this will allow us to schedule events to occur at a specific tick in the future
   //       See: Timers.js file for example
   setTimeout(() => {
-    game.use(worldInstance);
-  }, 1);
+  }, 400);
+  game.use(worldInstance);
 
   // USER INTENT: Change world
   // persist this intention to the local storage

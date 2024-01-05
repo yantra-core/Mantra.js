@@ -15,10 +15,12 @@ export default function createDefaultPlayer(playerConfig = {}) {
     shape: 'triangle',
     width: 16,
     height: 16,
+    /*
     style: {
       width: '48px',
       height: '48px',
     },
+    */
     texture: {
       sheet: 'loz_spritesheet',
       sprite: 'player'

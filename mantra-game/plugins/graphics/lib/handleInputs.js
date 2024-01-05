@@ -61,7 +61,7 @@ export default function cssHandleInputs() {
         // TODO: make this generic for all graphic engines
         // simply apply a new graphic to the entity with updated sprite data
         // this.updatePlayerSprite(entityId, data);
-        game.updateSprite(entityId, data, spriteSheetHandler, anims);
+        game.updateSprite(entityId, data);
       }
 
     }

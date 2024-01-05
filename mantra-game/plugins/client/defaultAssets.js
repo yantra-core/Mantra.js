@@ -13,6 +13,9 @@ let defaultAssets = {
   'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
+  'garden': '/img/game/env/garden.png',
+  'sutra-tree': '/img/game/logos/sutra-tree.png',
+  'warp-to-home': '/img/game/env/warp-to-mantra-home.png',
   'raiden': {
     type: 'spritesheet',
     url: '/img/game/sheets/raiden.png',
@@ -63,6 +66,117 @@ let defaultAssets = {
     type: 'spritesheet',
     url: '/img/game/sheets/loz_spritesheet.png',
     frameTags: {
+
+
+      ayyoKey: {
+        frames: [
+          { x: -640, y: -656 },
+        ]
+      },
+
+      ayyoDoor: {
+        frames: [
+          { x: -656, y: -656 },
+        ]
+      },
+      
+
+      player: {
+        frames: [
+          { x: -592, y: -16 }
+        ]
+      },
+
+      playerIdle: {
+        frames: [
+          { x: -16, y: -16 },
+          { x: -64, y: -16 },
+
+        ]
+      },
+
+      playerUp: {
+        frames: [
+          { x: -304, y: -16 },
+          { x: -352, y: -16 },
+        ]
+      },
+
+
+      playerDown: {
+        frames: [
+          { x: -16, y: -16 },
+          { x: -64, y: -16 },
+        ]
+      },
+
+      playerLeft: {
+        frames: [
+          { x: -208, y: -16 },
+          { x: -256, y: -16 },
+        ]
+      },
+
+      playerRight: {
+        frames: [
+          { x: -112, y: -16 },
+          { x: -160, y: -16 },
+        ]
+      },
+
+      playerDamage: {
+        frames: [
+          { x: -16, y: -592 },
+          { x: -64, y: -592 },
+          { x: -112, y: -592 },
+          { x: -160, y: -592 },
+          { x: -208, y: -592 },
+          { x: -256, y: -592 },
+          { x: -304, y: -592 },
+          { x: -352, y: -592 },
+          { x: -400, y: -592 },
+          { x: -448, y: -592 },
+          { x: -496, y: -592 },
+        ]
+      },
+
+      playerRodDown: {
+        frames: [
+          { x: -496, y: -304 },
+          { x: -544, y: -304 },
+          { x: -592, y: -304 },
+          { x: -640, y: -304 },
+        ]
+      },
+
+      playerRodUp: {
+        frames: [
+          { x: -400, y: -352 },
+          { x: -448, y: -352 },
+          { x: -496, y: -352 },
+          { x: -544, y: -352 },
+        ]
+      },
+
+      playerRodLeft: {
+        frames: [
+          { x: -208, y: -352 },
+          { x: -256, y: -352 },
+          { x: -304, y: -352 },
+          { x: -352, y: -352 },
+        ]
+      },
+
+      playerRodRight: {
+        frames: [
+          { x: -16, y: -352 },
+          { x: -64, y: -352 },
+          { x: -112, y: -352 },
+          { x: -160, y: -352 },
+        ]
+      },
+
+
 
       arrow: {
         frames: [
