@@ -32,6 +32,7 @@ class Entity {
     this.game.inflateEntity = this.inflateEntity.bind(this);
     this.game.hasEntity = this.hasEntity.bind(this);
     this.game.findEntity = this.findEntity.bind(this);
+    this.game.removeAllEntities = this.clearAllEntities.bind(this);
   }
 
   hasEntity (entityId) {

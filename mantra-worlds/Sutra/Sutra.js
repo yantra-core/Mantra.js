@@ -1,3 +1,15 @@
+import demon from "../../mantra-sutras/demon.js";
+import hexapod from "../../mantra-sutras/hexapod.js";
+import note from "../../mantra-sutras/note.js";
+import fire from "../../mantra-sutras/fire.js";
+
+let agama = {
+  demon,
+  hexapod,
+  note,
+  fire
+};
+
 class Sutra {
   static id = 'world-sutra';
   static type = 'world'; // type is optional for Plugins
@@ -9,6 +21,7 @@ class Sutra {
 
   init(game) {
     this.game = game;
+    // alert('hi')
     this.createWorld();
   }
 
@@ -21,19 +34,10 @@ class Sutra {
     // TODO: set default zoom to 0.3 ( zoomed out )
     game.zoom(0.3);
     game.use('Bullet')
-    game.use('Timers');
+    //    game.use('Timers');
+    game.use('Tone');
     game.use('Health');
-
-    game.use('StarField');
-
-    game.once('plugin::loaded::sutra', function () {
-      // Adds a nice StarField background
-      game.use('TowerWorld', { game: game });
-
-    })
-
-    game.use('Sutra');
-
+    console.log('hexapod', hexapod)
     /*
     // game.use(new Plugins.SutraGUI({ }));
     game.use('Editor', {
@@ -44,12 +48,40 @@ class Sutra {
 
     game.use('Block', { MIN_BLOCK_SIZE: 1000 });
     game.use('Border', { autoBorder: true, thickness: 200 });
-
-
+    game.setSutra(hexapod(game));
     game.data.roundEnded = false;
     game.data.roundStarted = true;
     game.createDefaultPlayer();
 
+    function writeSutraLabel(sutraName) {
+      // text label for Sutra name
+      game.createEntity({
+        type: 'TEXT',
+        body: false,
+        text: sutraName,
+        position: {
+          x: 0,
+          y: 0
+        },
+        style: {
+          fontSize: 30,
+          color: '#ffffff'
+        }
+      });
+    }
+
+    writeSutraLabel('hexapod');
+
+    // set interval to iterate through agama
+    setInterval(() => {
+      let agamaKeys = Object.keys(agama);
+      let agamaIndex = Math.floor(Math.random() * agamaKeys.length);
+      let agamaKey = agamaKeys[agamaIndex];
+      let agamaSutra = agama[agamaKey];
+      game.removeAllEntities();
+      writeSutraLabel(agamaKey);
+      game.setSutra(agamaSutra(game));
+    }, 2000);
     /*
     game.systems.graphics.switchGraphics('BabylonGraphics', function(){
     });

@@ -8,10 +8,10 @@ import walker from '../../mantra-game/plugins/world-tower/sutras/walker.js';
 // routing helper to create vector routes
 import routing from '../sutras/routing.js';
 
-import fire from "./sutras/fire.js";
+import fire from "../../mantra-sutras/fire.js";
 import block from "./sutras/block.js";
-import demon from "./sutras/demon.js";
-import hexapod from './sutras/hexapod.js';
+import demon from "../../mantra-sutras/demon.js";
+import hexapod from '../../mantra-sutras/hexapod.js';
 
 export default function sutras(game) {
 

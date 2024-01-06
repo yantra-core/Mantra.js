@@ -2337,6 +2337,385 @@ function createWalker(game, config) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = demon;
+function demon(game) {
+  game.createEntity({
+    type: 'DEMON',
+    texture: 'demon',
+    //texture: 'fire',
+    //color: 0xff0000,
+    width: 8,
+    height: 8,
+    depth: 64,
+    position: {
+      x: -60,
+      y: -60,
+      z: 32
+    }
+  });
+  game.createEntity({
+    type: 'DEMON',
+    texture: 'demon',
+    //texture: 'fire',
+    //color: 0xff0000,
+    width: 8,
+    height: 8,
+    depth: 64,
+    position: {
+      x: 64,
+      y: -60,
+      z: 32
+    }
+  });
+  var rules = game.createSutra();
+  rules.addCondition('entityTouchedDemon', function (entity, gameState) {
+    console.log('entityTouchedDemon check', entity);
+    if (entity.type === 'COLLISION' && entity.kind === 'START') {
+      if (typeof entity.DEMON !== 'undefined') {
+        return true;
+      }
+    }
+  });
+
+  /*
+  rules.on('entityTouchedDemon', function (collision) {
+    //let demonEntity = collision.bodyA.type === 'DEMON' ? collision.bodyA : collision.bodyB;
+     // Define the scale factor for how much bigger the demon should get
+    const scaleFactor = 2.1; // For example, 10% bigger
+    // TODO: figure out why collision not working
+    alert('aaa')
+    // Increase the size of the demon
+    game.updateEntity({
+      id: demonEntity.id,
+      width: demonEntity.width * scaleFactor,
+      height: demonEntity.height * scaleFactor,
+      depth: demonEntity.depth * scaleFactor
+    });
+  });
+  */
+
+  return rules;
+}
+
+},{}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = fire;
+function fire(game) {
+  game.createEntity({
+    type: 'FIRE',
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'fire'
+      // frame: 0 // TODO: support single frame / bypass animation of array
+    },
+    //texture: 'fire',
+    //color: 0xff0000,
+    width: 16,
+    height: 16,
+    depth: 64,
+    isStatic: true,
+    position: {
+      x: -80,
+      y: -60,
+      z: 32
+    }
+  });
+  game.createEntity({
+    type: 'FIRE',
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'fire'
+      // frame: 0 // TODO: support single frame / bypass animation of array
+    },
+    //texture: 'fire',
+    //color: 0xff0000,
+    width: 16,
+    height: 16,
+    depth: 64,
+    isStatic: true,
+    position: {
+      x: 80,
+      y: -60,
+      z: 32
+    }
+  });
+  var rules = game.createSutra();
+  rules.addCondition('entityTouchedFire', function (entity, gameState) {
+    if (entity.type === 'COLLISION' && entity.kind === 'START') {
+      if (entity.bodyA.type === 'FIRE') {
+        return true;
+      }
+      if (entity.bodyB.type === 'FIRE') {
+        return true;
+      }
+    }
+  });
+  rules["if"]('entityTouchedFire').then('playNote', {
+    note: 'F#4'
+  }).then('damageEntity');
+  rules.on('damageEntity', function (collision) {
+    var ent;
+    if (collision.bodyA.type === 'FIRE') {
+      ent = collision.bodyB;
+    } else {
+      ent = collision.bodyA;
+    }
+    game.removeEntity(ent.id);
+    if (ent.type === 'PLAYER') {
+      game.currentPlayerId = null;
+      game.createDefaultPlayer();
+    }
+  });
+
+  // TODO: move pointerDown event into Sutra
+  game.on('pointerDown', function (entity, ev) {
+    if (entity.type === 'FIRE') {
+      game.playNote('G4');
+    }
+  });
+  return rules;
+}
+
+},{}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = hexapod;
+// hexapod.js - Marak Squires 2023
+
+function hexapod(game) {
+  // create 22 hexapods
+  // start at 0,0 and make them in a circle with radius 80
+  var numberOfHexapods = 22;
+  var radius = 80;
+  for (var i = 0; i < numberOfHexapods; i++) {
+    // Calculate the angle for each hexapod
+    var angle = i / numberOfHexapods * 2 * Math.PI;
+
+    // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
+    var x = radius * Math.cos(angle);
+    var y = radius * Math.sin(angle);
+    game.createEntity({
+      type: 'HEXAPOD',
+      texture: 'demon',
+      width: 8,
+      height: 8,
+      isStatic: false,
+      // isSensor: true,
+      position: {
+        x: x,
+        y: y
+      },
+      velocity: {
+        x: 0,
+        y: 0
+      } // Assuming velocity is part of the hexapod entity
+    });
+  }
+  var rules = game.createSutra();
+
+  // Define constant values for different forces and parameters
+  var ALIGNMENT_FORCE = 0.1;
+  var COHESION_FORCE = 0.4;
+  var SEPARATION_FORCE = 0.81;
+  var PERCEPTION_RADIUS = 1500;
+  var FIELD_OF_VIEW = 1500;
+
+  // hexapods grow on bullet hit
+  rules["if"]('bulletHitHexapod').then('hexapodGrow');
+  rules.addCondition('bulletHitHexapod', function (entity, gameState) {
+    return entity.type === 'COLLISION' && entity.kind === 'START' && entity.HEXAPOD && entity.BULLET;
+  });
+  rules.on('hexapodGrow', function (collision) {
+    var hexapod = collision.HEXAPOD;
+    // update entity size by 11%
+    game.updateEntity({
+      id: hexapod.id,
+      width: hexapod.width * 1.1,
+      height: hexapod.height * 1.1
+    });
+  });
+
+  // hexpods think each tick
+  rules["if"]('hexapodTick').then('hexapodThink');
+  rules.addCondition('hexapodTick', function (entity, gameState) {
+    return entity.type === 'HEXAPOD' && gameState.tick % 1 === 0;
+  });
+  rules.on('hexapodThink', function (entity, node, gameState) {
+    var hexapod = entity;
+    var hexapods = gameState.ents.HEXAPOD;
+    var alignment = {
+      x: 0,
+      y: 0
+    };
+    var cohesion = {
+      x: 0,
+      y: 0
+    };
+    var separation = {
+      x: 0,
+      y: 0
+    };
+    var planetAvoidance = {
+      x: 0,
+      y: 0
+    };
+
+    // Target movement implementation
+    var targetForce = {
+      x: 0,
+      y: 0
+    };
+    if (typeof gameState.currentPlayer !== 'undefined') {
+      if (gameState.currentPlayer) {
+        var target = gameState.currentPlayer.position;
+        var targetDirection = Vector.sub(target, hexapod.position);
+        targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+      }
+    }
+
+    // Process each hexapod in the field of view
+    hexapods.forEach(function (otherHexapod) {
+      if (otherHexapod.id !== hexapod.id) {
+        var d = Vector.magnitude(Vector.sub(hexapod.position, otherHexapod.position));
+
+        // Alignment
+        if (d < PERCEPTION_RADIUS) {
+          alignment = Vector.add(alignment, otherHexapod.velocity);
+        }
+
+        // Cohesion
+        if (d < PERCEPTION_RADIUS) {
+          cohesion = Vector.add(cohesion, otherHexapod.position);
+        }
+
+        // Separation
+        if (d < hexapod.width + otherHexapod.width) {
+          var diff = Vector.sub(hexapod.position, otherHexapod.position);
+          separation = Vector.add(separation, Vector.div(diff, d * d)); // Weight by distance
+        }
+      }
+    });
+
+    // Average out alignment, cohesion, and separation
+    if (hexapods.length > 1) {
+      alignment = Vector.div(alignment, hexapods.length - 1);
+      cohesion = Vector.div(cohesion, hexapods.length - 1);
+      cohesion = Vector.sub(cohesion, hexapod.position);
+      separation = Vector.div(separation, hexapods.length - 1);
+    }
+    alignment = Vector.mult(Vector.normalize(alignment), ALIGNMENT_FORCE);
+    cohesion = Vector.mult(Vector.normalize(cohesion), COHESION_FORCE);
+    separation = Vector.mult(Vector.normalize(separation), SEPARATION_FORCE);
+
+    // Apply forces
+    var force = Vector.add(Vector.add(Vector.add(alignment, cohesion), separation), targetForce);
+    // Update hexapod position
+    var newPosition = Vector.add(hexapod.position, Vector.mult(force, 1));
+    newPosition.z = 1; // for now
+    game.updateEntity({
+      id: hexapod.id,
+      position: newPosition
+    });
+  });
+  return rules;
+}
+
+// Basic vector operations
+var Vector = {
+  add: function add(v1, v2) {
+    return {
+      x: v1.x + v2.x,
+      y: v1.y + v2.y
+    };
+  },
+  sub: function sub(v1, v2) {
+    return {
+      x: v1.x - v2.x,
+      y: v1.y - v2.y
+    };
+  },
+  mult: function mult(v, factor) {
+    return {
+      x: v.x * factor,
+      y: v.y * factor
+    };
+  },
+  div: function div(v, factor) {
+    return {
+      x: v.x / factor,
+      y: v.y / factor
+    };
+  },
+  magnitude: function magnitude(v) {
+    return Math.sqrt(v.x * v.x + v.y * v.y);
+  },
+  normalize: function normalize(v) {
+    var mag = Vector.magnitude(v);
+    return mag > 0 ? Vector.div(v, mag) : {
+      x: 0,
+      y: 0
+    };
+  }
+};
+
+},{}],24:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = note;
+function note(game) {
+  // if touch note play sound
+  game.createEntity({
+    type: 'NOTE',
+    color: 0xccff00,
+    width: 32,
+    height: 32,
+    depth: 16,
+    isStatic: true,
+    position: {
+      x: 0,
+      y: 0,
+      z: 1
+    }
+  });
+  var rules = game.createSutra();
+  rules.addCondition('entityTouchedNote', function (entity, gameState) {
+    if (entity.type === 'COLLISION' && entity.kind === 'START') {
+      if (entity.bodyA.type === 'NOTE') {
+        return true;
+      }
+      if (entity.bodyB.type === 'NOTE') {
+        return true;
+      }
+    }
+  });
+
+  // TODO: move these events into a Sutra
+  game.on('pointerDown', function (entity) {
+    if (entity.type === 'NOTE') {
+      game.playNote(entity.kind);
+    }
+    if (entity.type === 'DRUM') {
+      game.playDrum(entity.kind);
+    }
+  });
+}
+
+},{}],25:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = void 0;
 var _sutras = _interopRequireDefault(require("./sutras.js"));
 var _welcomeMessage = _interopRequireDefault(require("./welcomeMessage.js"));
@@ -2844,7 +3223,7 @@ _defineProperty(Home, "id", 'world-home');
 _defineProperty(Home, "type", 'world');
 var _default = exports["default"] = Home;
 
-},{"./sutras.js":22,"./welcomeMessage.js":27}],22:[function(require,module,exports){
+},{"./sutras.js":26,"./welcomeMessage.js":28}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2855,10 +3234,10 @@ var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 var _switchGraphics = _interopRequireDefault(require("../sutras/switchGraphics.js"));
 var _walker = _interopRequireDefault(require("../../mantra-game/plugins/world-tower/sutras/walker.js"));
 var _routing = _interopRequireDefault(require("../sutras/routing.js"));
-var _fire = _interopRequireDefault(require("./sutras/fire.js"));
+var _fire = _interopRequireDefault(require("../../mantra-sutras/fire.js"));
 var _block = _interopRequireDefault(require("./sutras/block.js"));
-var _demon = _interopRequireDefault(require("./sutras/demon.js"));
-var _hexapod = _interopRequireDefault(require("./sutras/hexapod.js"));
+var _demon = _interopRequireDefault(require("../../mantra-sutras/demon.js"));
+var _hexapod = _interopRequireDefault(require("../../mantra-sutras/hexapod.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 // helper sutra for switching worlds
 
@@ -2909,7 +3288,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-game/plugins/world-tower/sutras/walker.js":20,"../sutras/routing.js":41,"../sutras/switchGraphics.js":42,"../sutras/warpToWorld.js":43,"./sutras/block.js":23,"./sutras/demon.js":24,"./sutras/fire.js":25,"./sutras/hexapod.js":26}],23:[function(require,module,exports){
+},{"../../mantra-game/plugins/world-tower/sutras/walker.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":23,"../sutras/routing.js":42,"../sutras/switchGraphics.js":43,"../sutras/warpToWorld.js":44,"./sutras/block.js":27}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2980,341 +3359,7 @@ function fire(game) {
 }
 ;
 
-},{}],24:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = demon;
-function demon(game) {
-  game.createEntity({
-    type: 'DEMON',
-    texture: 'demon',
-    //texture: 'fire',
-    //color: 0xff0000,
-    width: 8,
-    height: 8,
-    depth: 64,
-    position: {
-      x: -60,
-      y: -60,
-      z: 32
-    }
-  });
-  game.createEntity({
-    type: 'DEMON',
-    texture: 'demon',
-    //texture: 'fire',
-    //color: 0xff0000,
-    width: 8,
-    height: 8,
-    depth: 64,
-    position: {
-      x: 64,
-      y: -60,
-      z: 32
-    }
-  });
-  var rules = game.createSutra();
-  rules.addCondition('entityTouchedDemon', function (entity, gameState) {
-    console.log('entityTouchedDemon check', entity);
-    if (entity.type === 'COLLISION' && entity.kind === 'START') {
-      if (typeof entity.DEMON !== 'undefined') {
-        return true;
-      }
-    }
-  });
-
-  /*
-  rules.on('entityTouchedDemon', function (collision) {
-    //let demonEntity = collision.bodyA.type === 'DEMON' ? collision.bodyA : collision.bodyB;
-     // Define the scale factor for how much bigger the demon should get
-    const scaleFactor = 2.1; // For example, 10% bigger
-    // TODO: figure out why collision not working
-    alert('aaa')
-    // Increase the size of the demon
-    game.updateEntity({
-      id: demonEntity.id,
-      width: demonEntity.width * scaleFactor,
-      height: demonEntity.height * scaleFactor,
-      depth: demonEntity.depth * scaleFactor
-    });
-  });
-  */
-
-  return rules;
-}
-
-},{}],25:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = fire;
-function fire(game) {
-  game.createEntity({
-    type: 'FIRE',
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'fire'
-      // frame: 0 // TODO: support single frame / bypass animation of array
-    },
-    //texture: 'fire',
-    //color: 0xff0000,
-    width: 16,
-    height: 16,
-    depth: 64,
-    isStatic: true,
-    position: {
-      x: -80,
-      y: -60,
-      z: 32
-    }
-  });
-  game.createEntity({
-    type: 'FIRE',
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'fire'
-      // frame: 0 // TODO: support single frame / bypass animation of array
-    },
-    //texture: 'fire',
-    //color: 0xff0000,
-    width: 16,
-    height: 16,
-    depth: 64,
-    isStatic: true,
-    position: {
-      x: 80,
-      y: -60,
-      z: 32
-    }
-  });
-  var rules = game.createSutra();
-  rules.addCondition('entityTouchedFire', function (entity, gameState) {
-    if (entity.type === 'COLLISION' && entity.kind === 'START') {
-      if (entity.bodyA.type === 'FIRE') {
-        return true;
-      }
-      if (entity.bodyB.type === 'FIRE') {
-        return true;
-      }
-    }
-  });
-  rules["if"]('entityTouchedFire').then('playNote', {
-    note: 'F#4'
-  }).then('damageEntity');
-  rules.on('damageEntity', function (collision) {
-    var ent;
-    if (collision.bodyA.type === 'FIRE') {
-      ent = collision.bodyB;
-    } else {
-      ent = collision.bodyA;
-    }
-    game.removeEntity(ent.id);
-    if (ent.type === 'PLAYER') {
-      game.currentPlayerId = null;
-      game.createDefaultPlayer();
-    }
-  });
-
-  // TODO: move pointerDown event into Sutra
-  game.on('pointerDown', function (entity, ev) {
-    if (entity.type === 'FIRE') {
-      game.playNote('G4');
-    }
-  });
-  return rules;
-}
-
-},{}],26:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = hexapod;
-// hexapod.js - Marak Squires 2023
-
-function hexapod(game) {
-  // create 22 hexapods
-  // start at 0,0 and make them in a circle with radius 80
-  var numberOfHexapods = 22;
-  var radius = 80;
-  for (var i = 0; i < numberOfHexapods; i++) {
-    // Calculate the angle for each hexapod
-    var angle = i / numberOfHexapods * 2 * Math.PI;
-
-    // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
-    var x = radius * Math.cos(angle);
-    var y = radius * Math.sin(angle);
-    game.createEntity({
-      type: 'HEXAPOD',
-      texture: 'demon',
-      width: 8,
-      height: 8,
-      isStatic: false,
-      // isSensor: true,
-      position: {
-        x: x,
-        y: y
-      },
-      velocity: {
-        x: 0,
-        y: 0
-      } // Assuming velocity is part of the hexapod entity
-    });
-  }
-  var rules = game.createSutra();
-
-  // Define constant values for different forces and parameters
-  var ALIGNMENT_FORCE = 0.1;
-  var COHESION_FORCE = 0.4;
-  var SEPARATION_FORCE = 0.81;
-  var PERCEPTION_RADIUS = 1500;
-  var FIELD_OF_VIEW = 1500;
-
-  // hexapods grow on bullet hit
-  rules["if"]('bulletHitHexapod').then('hexapodGrow');
-  rules.addCondition('bulletHitHexapod', function (entity, gameState) {
-    return entity.type === 'COLLISION' && entity.kind === 'START' && entity.HEXAPOD && entity.BULLET;
-  });
-  rules.on('hexapodGrow', function (collision) {
-    var hexapod = collision.HEXAPOD;
-    // update entity size by 11%
-    game.updateEntity({
-      id: hexapod.id,
-      width: hexapod.width * 1.1,
-      height: hexapod.height * 1.1
-    });
-  });
-
-  // hexpods think each tick
-  rules["if"]('hexapodTick').then('hexapodThink');
-  rules.addCondition('hexapodTick', function (entity, gameState) {
-    return entity.type === 'HEXAPOD' && gameState.tick % 1 === 0;
-  });
-  rules.on('hexapodThink', function (entity, node, gameState) {
-    var hexapod = entity;
-    var hexapods = gameState.ents.HEXAPOD;
-    var alignment = {
-      x: 0,
-      y: 0
-    };
-    var cohesion = {
-      x: 0,
-      y: 0
-    };
-    var separation = {
-      x: 0,
-      y: 0
-    };
-    var planetAvoidance = {
-      x: 0,
-      y: 0
-    };
-
-    // Target movement implementation
-    var targetForce = {
-      x: 0,
-      y: 0
-    };
-    if (typeof gameState.currentPlayer !== 'undefined') {
-      if (gameState.currentPlayer) {
-        var target = gameState.currentPlayer.position;
-        var targetDirection = Vector.sub(target, hexapod.position);
-        targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
-      }
-    }
-
-    // Process each hexapod in the field of view
-    hexapods.forEach(function (otherHexapod) {
-      if (otherHexapod.id !== hexapod.id) {
-        var d = Vector.magnitude(Vector.sub(hexapod.position, otherHexapod.position));
-
-        // Alignment
-        if (d < PERCEPTION_RADIUS) {
-          alignment = Vector.add(alignment, otherHexapod.velocity);
-        }
-
-        // Cohesion
-        if (d < PERCEPTION_RADIUS) {
-          cohesion = Vector.add(cohesion, otherHexapod.position);
-        }
-
-        // Separation
-        if (d < hexapod.width + otherHexapod.width) {
-          var diff = Vector.sub(hexapod.position, otherHexapod.position);
-          separation = Vector.add(separation, Vector.div(diff, d * d)); // Weight by distance
-        }
-      }
-    });
-
-    // Average out alignment, cohesion, and separation
-    if (hexapods.length > 1) {
-      alignment = Vector.div(alignment, hexapods.length - 1);
-      cohesion = Vector.div(cohesion, hexapods.length - 1);
-      cohesion = Vector.sub(cohesion, hexapod.position);
-      separation = Vector.div(separation, hexapods.length - 1);
-    }
-    alignment = Vector.mult(Vector.normalize(alignment), ALIGNMENT_FORCE);
-    cohesion = Vector.mult(Vector.normalize(cohesion), COHESION_FORCE);
-    separation = Vector.mult(Vector.normalize(separation), SEPARATION_FORCE);
-
-    // Apply forces
-    var force = Vector.add(Vector.add(Vector.add(alignment, cohesion), separation), targetForce);
-    // Update hexapod position
-    var newPosition = Vector.add(hexapod.position, Vector.mult(force, 1));
-    newPosition.z = 1; // for now
-    game.updateEntity({
-      id: hexapod.id,
-      position: newPosition
-    });
-  });
-  return rules;
-}
-
-// Basic vector operations
-var Vector = {
-  add: function add(v1, v2) {
-    return {
-      x: v1.x + v2.x,
-      y: v1.y + v2.y
-    };
-  },
-  sub: function sub(v1, v2) {
-    return {
-      x: v1.x - v2.x,
-      y: v1.y - v2.y
-    };
-  },
-  mult: function mult(v, factor) {
-    return {
-      x: v.x * factor,
-      y: v.y * factor
-    };
-  },
-  div: function div(v, factor) {
-    return {
-      x: v.x / factor,
-      y: v.y / factor
-    };
-  },
-  magnitude: function magnitude(v) {
-    return Math.sqrt(v.x * v.x + v.y * v.y);
-  },
-  normalize: function normalize(v) {
-    var mag = Vector.magnitude(v);
-    return mag > 0 ? Vector.div(v, mag) : {
-      x: 0,
-      y: 0
-    };
-  }
-};
-
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3377,7 +3422,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3632,7 +3677,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../sutras/warpToWorld.js":43,"./instruments/createDrumKit.js":29,"./instruments/createPiano.js":30,"./sutras.js":31}],29:[function(require,module,exports){
+},{"../sutras/warpToWorld.js":44,"./instruments/createDrumKit.js":30,"./instruments/createPiano.js":31,"./sutras.js":32}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3738,7 +3783,7 @@ function createDrumKit(game, config) {
   });
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3863,7 +3908,7 @@ function createPiano(game, config) {
   */
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3989,7 +4034,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":42,"../sutras/warpToWorld.js":43}],32:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":43,"../sutras/warpToWorld.js":44}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4228,7 +4273,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../sutras/warpToWorld.js":43}],33:[function(require,module,exports){
+},{"../sutras/warpToWorld.js":44}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4413,7 +4458,7 @@ var Pong = /*#__PURE__*/function () {
 _defineProperty(Pong, "id", 'world-pong');
 var _default = exports["default"] = Pong;
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4501,13 +4546,18 @@ _defineProperty(Space, "id", 'world-space');
 _defineProperty(Space, "type", 'world');
 var _default = exports["default"] = Space;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _demon = _interopRequireDefault(require("../../mantra-sutras/demon.js"));
+var _hexapod = _interopRequireDefault(require("../../mantra-sutras/hexapod.js"));
+var _note = _interopRequireDefault(require("../../mantra-sutras/note.js"));
+var _fire = _interopRequireDefault(require("../../mantra-sutras/fire.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -4515,6 +4565,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var agama = {
+  demon: _demon["default"],
+  hexapod: _hexapod["default"],
+  note: _note["default"],
+  fire: _fire["default"]
+};
 var Sutra = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Sutra(game) {
@@ -4527,6 +4583,7 @@ var Sutra = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      // alert('hi')
       this.createWorld();
     }
   }, {
@@ -4539,16 +4596,9 @@ var Sutra = /*#__PURE__*/function () {
       game.zoom(0.3);
       game.use('Bullet');
       //    game.use('Timers');
+      game.use('Tone');
       game.use('Health');
-      game.use('StarField');
-      game.once('plugin::loaded::sutra', function () {
-        // Adds a nice StarField background
-        game.use('TowerWorld', {
-          game: game
-        });
-      });
-      game.use('Sutra');
-
+      console.log('hexapod', _hexapod["default"]);
       /*
       // game.use(new Plugins.SutraGUI({ }));
       game.use('Editor', {
@@ -4564,10 +4614,38 @@ var Sutra = /*#__PURE__*/function () {
         autoBorder: true,
         thickness: 200
       });
+      game.setSutra((0, _hexapod["default"])(game));
       game.data.roundEnded = false;
       game.data.roundStarted = true;
       game.createDefaultPlayer();
+      function writeSutraLabel(sutraName) {
+        // text label for Sutra name
+        game.createEntity({
+          type: 'TEXT',
+          body: false,
+          text: sutraName,
+          position: {
+            x: 0,
+            y: 0
+          },
+          style: {
+            fontSize: 30,
+            color: '#ffffff'
+          }
+        });
+      }
+      writeSutraLabel('hexapod');
 
+      // set interval to iterate through agama
+      setInterval(function () {
+        var agamaKeys = Object.keys(agama);
+        var agamaIndex = Math.floor(Math.random() * agamaKeys.length);
+        var agamaKey = agamaKeys[agamaIndex];
+        var agamaSutra = agama[agamaKey];
+        game.removeAllEntities();
+        writeSutraLabel(agamaKey);
+        game.setSutra(agamaSutra(game));
+      }, 2000);
       /*
       game.systems.graphics.switchGraphics('BabylonGraphics', function(){
       });
@@ -4589,7 +4667,7 @@ _defineProperty(Sutra, "id", 'world-sutra');
 _defineProperty(Sutra, "type", 'world');
 var _default = exports["default"] = Sutra;
 
-},{}],36:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":23,"../../mantra-sutras/note.js":24}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4787,7 +4865,7 @@ _defineProperty(XState, "id", 'world-xstate');
 _defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4967,7 +5045,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"./contraptions-example.js":38}],38:[function(require,module,exports){
+},{"./contraptions-example.js":39}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5030,7 +5108,7 @@ function createColorPuzzle() {
   return examples;
 }
 
-},{"../../../YCraft.js/index.js":1}],39:[function(require,module,exports){
+},{"../../../YCraft.js/index.js":1}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5045,7 +5123,7 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":40}],40:[function(require,module,exports){
+},{"./index.js":41}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5072,7 +5150,7 @@ worlds.XState = _XState["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./Home/Home.js":21,"./Music/Music.js":28,"./Platform/Platform.js":32,"./Pong/Pong.js":33,"./Space/Space.js":34,"./Sutra/Sutra.js":35,"./XState/XState.js":36,"./YCraft/YCraft.js":37}],41:[function(require,module,exports){
+},{"./Home/Home.js":25,"./Music/Music.js":29,"./Platform/Platform.js":33,"./Pong/Pong.js":34,"./Space/Space.js":35,"./Sutra/Sutra.js":36,"./XState/XState.js":37,"./YCraft/YCraft.js":38}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5109,7 +5187,7 @@ const circleRoute = createCircleRoute(100, 100, 50, 20);
 */
 var _default = exports["default"] = routing;
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5204,7 +5282,7 @@ function switchGraphics(game) {
   return rules;
 }
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5233,5 +5311,5 @@ function warpToWorld(game) {
   return rules;
 }
 
-},{}]},{},[39])(39)
+},{}]},{},[40])(40)
 });

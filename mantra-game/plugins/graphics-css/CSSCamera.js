@@ -237,7 +237,7 @@ class CSSCamera {
       //this.scene.cameraPosition.y = newY;
      //this.scene.cameraPosition.y = newY;
       // locks camera to not exceed bottom of screen for platformer mode
-      console.log('game.data.camera.mode', game.data.camera.mode, newY, windowHeight, windowHeight * 0.38)
+      // console.log('game.data.camera.mode', game.data.camera.mode, newY, windowHeight, windowHeight * 0.38)
       if (game.data.camera.mode === 'platformer') {
         if (newY < windowHeight * 0.35) {
           this.scene.cameraPosition.y = newY;
