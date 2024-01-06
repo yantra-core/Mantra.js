@@ -11,6 +11,7 @@ class Platform {
 
   init(game) {
     this.game = game;
+    game.data.camera.mode = 'platformer';
     this.createWorld();
   }
 
@@ -90,14 +91,14 @@ class Platform {
 
     let rules = game.createSutra();
 
+    // TODO: moves to sutras.js
     let warp = warpToWorld(game);
     rules.use(warp, 'warpToWorld');
-
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
     game.setSutra(rules);
 
-    console.log('created sutra', rules)
+    // console.log('created sutra', rules)
 
     game.createEntity({
       type: 'WARP',
@@ -182,7 +183,6 @@ class Platform {
       }
     });
 
-    console.log(game.systems)
     game.createDefaultPlayer({
       position: {
         x: 10,
@@ -219,6 +219,11 @@ class Platform {
   render() { }
 
   destroy() { }
+
+  unload () {
+    // reset camera mode
+    game.data.camera.mode = null;
+  }
 
 }
 

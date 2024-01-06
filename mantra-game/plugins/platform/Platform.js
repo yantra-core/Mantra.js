@@ -57,7 +57,7 @@ class Platform {
   }
 
   platformPlayerCollision (entityIdA, entityIdB, entityA, entityB) {
-    console.log('platformPlayerCollision', entityIdA, entityIdB, entityA, entityB);
+    // console.log('platformPlayerCollision', entityIdA, entityIdB, entityA, entityB);
   }
 
 }

@@ -9,12 +9,14 @@ export default function inflateText(entityData) {
     // textStyle = entityData.style;
     if (entityData.style.fontSize) {
       // textStyle.fontSize = entityData.fontSize;
-      textStyle.font = `${entityData.style.fontSize / 2}`;
+      textStyle.font = `${entityData.style.fontSize}`;
     }
     if (entityData.style.backgroundColor) {
       textStyle.backgroundColor = entityData.style.backgroundColor;
     }
   }
+
+  textStyle.font = '12px monospace';
 
   // color fill
   if (entityData.color) {

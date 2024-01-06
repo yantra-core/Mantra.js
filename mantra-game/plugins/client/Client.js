@@ -42,8 +42,8 @@ export default class Client {
       deltaEncoding: this.config.deltaEncoding
     }));
 
-    game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
-    game.on('assetsLoaded', () => console.log('All assets loaded!'));
+    //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
+    //game.on('assetsLoaded', () => console.log('All assets loaded!'));
 
     // load default assets
     for (let key in defaultAssets) { // TODO: configurable assets

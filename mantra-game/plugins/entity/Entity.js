@@ -243,9 +243,11 @@ class Entity {
     if (typeof entityData.texture !== 'undefined') {
       // overwrite all items ( for now )
       // Remark: in the future we could merge instead of overwrite
-      this.game.components.texture.set(entityId, entityData.texture);
+      // create new textures object by merging in the new texture
+      let prev = this.game.components.texture.get(entityId);
+      let newTexture = { ...prev, ...entityData.texture };
+      this.game.components.texture.set(entityId, newTexture);
     }
-
 
     return ent;
 

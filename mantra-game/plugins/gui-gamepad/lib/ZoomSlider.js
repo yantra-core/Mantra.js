@@ -21,7 +21,7 @@ export default class ZoomSlider {
     slider.style.margin = '10px';
     */
     slider.style.display = 'none';
-    slider.style.zIndex = 10000;
+    slider.style.zIndex = 9000;
 
     document.body.appendChild(slider);
 
@@ -32,6 +32,10 @@ export default class ZoomSlider {
     this.slider.addEventListener('input', (event) => {
       this.handleSliderChange(event);
     });
+  }
+
+  setValue (value) {
+    this.slider.value = this.logTransform(value);
   }
 
   handleSliderChange(event) {

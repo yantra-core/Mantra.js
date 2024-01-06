@@ -19,6 +19,8 @@ class GamepadGUI {
   init(game) {
     this.game = game;
     this.zoomSlider = new ZoomSlider(game);
+    // this.zoomSlider.setValue(game.data.camera.currentZoom);
+    this.zoomSlider.setValue(4.5);
 
     // Remark: why is this needed for slider, but not for gamepad?
     game.on('game::ready', () => {

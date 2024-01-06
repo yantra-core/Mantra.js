@@ -101,6 +101,7 @@ export default function hexapod(game) {
     let force = Vector.add(Vector.add(Vector.add(alignment, cohesion), separation), targetForce);
     // Update hexapod position
     let newPosition = Vector.add(hexapod.position, Vector.mult(force, 1));
+    newPosition.z = 1; // for now
     game.updateEntity({
       id: hexapod.id,
       position: newPosition

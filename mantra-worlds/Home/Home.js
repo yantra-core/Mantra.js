@@ -43,16 +43,7 @@ class Home {
 
     // See: sutras.js for World logic
     let rules = sutras(game);
-
-    console.log('toEnglish', rules.toEnglish())
-    console.log('toJSON', rules.toJSON())
-    console.log('rules', rules)
-
-
-    // set the Sutra rules for Home world
     game.setSutra(rules);
-
-
 
     /*    
     game.createEntity({
@@ -106,8 +97,8 @@ class Home {
       }
     });
 
+    // convert the Sutra.js rules to English text
     let rulesEnglish = rules.toEnglish();
-
     game.createEntity({
       name: 'sutra-tree-text',
       type: 'TEXT',

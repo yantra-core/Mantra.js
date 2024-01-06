@@ -92,9 +92,12 @@ class CSSGraphics extends GraphicsInterface {
 
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
-
-    game.data.camera.currentZoom = 4.5;
     this.zoom(4.5);
+
+    game.on('game::ready', () => {
+
+    });
+    // 
     // this.zoom(game.data.camera.currentZoom);
     // this.zoom(game.data.camera.currentZoom);
 
@@ -362,27 +365,16 @@ class CSSGraphics extends GraphicsInterface {
 
   }
 
-  // TODO: adjust the viewportCenterXOffset and viewportCenterYOffset based on the new scale
-  // ensure that the center of the viewport remains the same
   zoom(scale) {
-
     // console.log("CSSGraphics zoom", scale)
     this.game.data.camera.currentZoom = scale;
 
     let gameViewport = document.getElementById('gameHolder');
     if (gameViewport) {
       gameViewport.style.transform = `scale(${scale})`;
+    } else {
+      console.log('Warning: could not find gameHolder div, cannot zoom');
     }
-    let windowHeight = window.innerHeight;
-  
-    // Define the adjustment value and scale factor
-    let adjustment = -400; // TODO: this should be window height or something similar
-    adjustment = (-windowHeight / 2) + 350;
-    let scaleFactor = 1 / scale;
-    // Calculate the Y offset
-    let pixelAdjustment = adjustment * scaleFactor;
-    game.viewportCenterYOffset = -(windowHeight / 2) - pixelAdjustment;
-    //game.viewportCenterYOffset = -1600;
 
   }
 

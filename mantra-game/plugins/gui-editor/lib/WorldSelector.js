@@ -84,7 +84,7 @@ class WorldSelector {
     game.on('entityInput::handleInputs', (entityId, input) => {
       if (input.controls && input.controls.I !== undefined) {
         if (input.controls.I === false) {
-          console.log("FALSE")
+          // console.log("FALSE")
         }
         toggleModalOnKeyPress(input.controls.I);
       }
@@ -114,7 +114,7 @@ class WorldSelector {
 
     game.on('world::loaded', function (pluginInstance) {
       // alert('loaded')
-      console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
+      // console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
       let worldName = pluginInstance.constructor.name
       //console.log('world::loaded', worldName, pluginInstance);
       that.selectElement(worldName);

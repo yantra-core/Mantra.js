@@ -17,6 +17,9 @@ export default function sutras(game) {
 
   let rules = game.createSutra();
 
+//  rules.addCondition('isGameRunning', (game) => true);  
+//  rules.if('isGameRunning').then('warpToWorld');
+
   // helper for switching graphics
   let switchGraphicsSutra = switchGraphics(game);
   rules.use(switchGraphicsSutra, 'switchGraphics');
@@ -49,6 +52,6 @@ export default function sutras(game) {
   // hexapod entity
   rules.use(hexapod(game), 'hexapod');
 
-  console.log('created sutra', rules.toEnglish())
+  // console.log('created sutra', rules.toEnglish())
   return rules;
 }

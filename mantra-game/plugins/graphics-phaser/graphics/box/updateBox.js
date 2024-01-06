@@ -7,7 +7,6 @@ export default function updateBox(entityData, graphic) {
 
   if (typeof entityData.texture !== 'undefined') {
 
-
     let texture = game.getTexture(entityData.texture);
     let textureUrl = texture.url;
     let spritePosition = texture.sprite || { x: 0, y: 0 };

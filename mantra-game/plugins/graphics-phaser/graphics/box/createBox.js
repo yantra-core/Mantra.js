@@ -24,23 +24,27 @@ export default function createBox (entityData) {
     let textureUrl = texture.url;
     let spritePosition = texture.sprite || { x: 0, y: 0 };
 
-    if (entityData.type === 'PLAYER' || entityData.type === 'BULLET') {
-      console.log("UUUUUUU", texture)
-      // texture.key = 'tile-block'
+    // for now, TODO: fix phaser 3 sprite mappings
+    if (entityData.type === 'PLAYER') {
+     texture.key = 'player'
     }
+
     //console.log("GOT TEXTURE", texture, texture.key)
     graphic = this.scene.add.sprite(0, 0, texture.key);
     if (typeof texture.frames === 'object') {
       // get the texture from the sprite sheet
-      //let t = this.scene.textures.get(texture.key);
+      let t = this.scene.textures.get(texture.key);
       //let pos = texture.sprite;
       // get specific area from the texture by x / y
       //let frame = t.get(pos.x, pos.y, 16, 16);
       // set the graphic to frame texture
-      // graphic.setTexture(frame);
+      graphic.setTexture(t);
     }
 
     let depth = depthChart.indexOf(entityData.type);
+    if (typeof entityData.position.z === 'number') {
+      depth = entityData.position.z;
+    }
     graphic.setDepth(depth);
     entityData.graphic = graphic; // Store the reference in entityData for future updates
     if (entityData.color) {

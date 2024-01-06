@@ -10,6 +10,7 @@ body {
   width: 80%;
   margin: auto;
   overflow: hidden;
+  text-align: center;
 }
 
 h1 {
@@ -17,9 +18,14 @@ h1 {
   text-align: center;
 }
 
-.demo-category > h2,h3 {
+.demo-category > h2 {
   color: #9a9cff;
   text-align: center; /* Align section titles to the left */
+}
+
+.demo-category > h3 {
+  color: #9a9cff;
+  text-align: left; /* Align section titles to the left */
 }
 
 .demo-category > p {
@@ -40,7 +46,8 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  text-align: center;
+  text-align: left;
+  max-width: 330px;
   flex-basis: 45%; /* Each section takes up roughly half the container's width */
 }
 
@@ -82,6 +89,26 @@ h1 {
 .hathora-logo {
   height: 20px;
   margin: 0px;
+
+}
+
+.mantraLogo {
+  width: 512px;
+}
+
+/* box shadow 3d effect*/
+.mantraLogo:hover {
+  box-shadow: 0 0 10px #9a9cff;
+  /* drop shadow effect */
+  -webkit-box-shadow: 0 0 10px #9a9cff;
+  -moz-box-shadow: 0 0 10px #9a9cff;
+  box-shadow: 0 0 10px #9a9cff;
+  /* border radius */
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+
 
 }
 

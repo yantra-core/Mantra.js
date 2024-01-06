@@ -28,7 +28,7 @@ class Editor {
         '/vendor/jquery.min.js',
         '/worlds.mantra.js'
       ], () => {
-        console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
+        // console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
         this.jqueryReady();
       });
     } else {
@@ -41,13 +41,12 @@ class Editor {
   jqueryReady() {
     this.createToolbar(this.game);
     this.setupGlobalClickListener();
-
     // this.createViewSourceModal();
     this.game.systemsManager.addSystem(this.id, this);
 
   }
 
-  createIcon (name) {
+  createIcon(name) {
     let featherRoot = 'https://yantra.gg';
     let element = document.createElement('img');
     element.src = `${featherRoot}/vendor/feather/${name}.svg`;
@@ -171,36 +170,7 @@ class Editor {
 
       }
 
-
     });
-
-    /*
- // add a global click handler to document that will delegate any clicks
-    // that are not inside gui-windows to re-enable inputs
-    document.addEventListener('click', (e) => {
-      // check if the click was inside a gui-window
-      let guiWindow = e.target.closest('.gui-container');
-      if (this.game && this.game.systems && this.game.systems['entity-input'] && this.game.systems['keyboard']) {
-        if (!guiWindow) {
-          // re-enable inputs
-          this.game.systems['entity-input'].setInputsActive();
-          this.game.systems['keyboard'].bindInputControls();
-        } else {
-          // disable inputs
-          this.game.systems['entity-input'].disableInputs();
-          this.game.systems['keyboard'].unbindAllEvents();
-        }
-
-        // check to see if this is a class sutra-link, if so open the form editor
-        if (e.target.classList.contains('sutra-link')) {
-          let sutraPath = e.target.getAttribute('data-path');
-          let node = this.behavior.findNode(sutraPath);
-          // Remark: Editing / Viewing Conditionals is not yet supported
-          //this.showConditionalsForm(node);
-        }
-      }
-    });
-    */
 
   }
 
@@ -215,7 +185,7 @@ class Editor {
     });
   }
 
-  showCrafting () {
+  showCrafting() {
     let game = this.game;
     if (typeof game.systems['gui-ycraft'] === 'undefined') {
       game.use('YCraft');

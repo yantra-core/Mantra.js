@@ -19,6 +19,7 @@ class CSSCamera {
 
   init(game) {
     this.game = game;
+    this.resetCameraState();
 
     //game.rotateCamera = this.rotateCamera.bind(this);
     game.rotateCamera = this.rotateCameraOverTime.bind(this);
@@ -71,6 +72,13 @@ class CSSCamera {
 
     });
 
+  }
+
+  resetCameraState() {
+    // alert('reset')
+    this.game.viewportCenterXOffset = 0;
+    this.game.viewportCenterYOffset = 0;
+    // Reset other camera properties as needed
   }
 
  
@@ -208,24 +216,30 @@ class CSSCamera {
     let windowHeight = window.innerHeight;
   
     // Define the adjustment value and scale factor
+    //console.log('adjustment', adjustment);
+    // TODO: use pixelAdjustment based on zoom scale
+
+    let scaleFactor = 1 / currentZoom;
     let adjustment = -400; // TODO: this should be window height or something similar
     adjustment = (-windowHeight / 2) + 350;
-    //console.log('adjustment', adjustment);
-    let scaleFactor = 1 / currentZoom;
-    //console.log('scaleFactor', scaleFactor);
-  
-    // Calculate the Y offset
     let pixelAdjustment = adjustment * scaleFactor;
-    // TODO: need to remove this line to add back dragging with mouse add flag
-    // game.viewportCenterYOffset = -(windowHeight / 2) - pixelAdjustment;
-    //game.viewportCenterXOffset = 0;
-    //console.log('game.viewportCenterYOffset', game.viewportCenterYOffset);
-  
+
+    game.viewportCenterYOffset = -windowHeight / 2;
     // Update the camera position
     if (this.follow && currentPlayer && currentPlayer.position) {
       // If following a player, adjust the camera position based on the player's position and the calculated offset
-      this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
-      this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
+      
+      this.scene.cameraPosition.x = currentPlayer.position.x;
+
+      let newY = currentPlayer.position.y - game.viewportCenterYOffset;
+      // locks camera to not exceed bottom of screen for platformer mode
+      if (game.data.camera.mode === 'platformer') {
+        if (newY < windowHeight * 0.38) {
+          this.scene.cameraPosition.y = newY;
+        }
+      } else {
+        this.scene.cameraPosition.y = newY;
+      }
     } else {
       // If not following a player, use the calculated offsets directly
       this.scene.cameraPosition.x = game.viewportCenterXOffset;
@@ -236,8 +250,6 @@ class CSSCamera {
     this.game.data.camera.position = this.scene.cameraPosition;
   }
   
-  
-
   initZoomControls() {
     document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });
     this.scene.mouseWheelEnabled = true;

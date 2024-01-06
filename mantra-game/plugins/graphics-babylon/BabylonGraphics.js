@@ -71,7 +71,8 @@ class BabylonGraphics extends GraphicsInterface {
       game.loadScripts([
         '/vendor/babylon.js',
         '/vendor/babylon.gui.min.js',
-        '/vendor/babylonjs.materials.min.js'
+        '/vendor/babylonjs.materials.min.js',
+        //        '/vendor/babylonjs.loaders.min.js',
       ], () => {
 
         console.log('All BABYLON scripts loaded sequentially, proceeding with initialization');
@@ -211,6 +212,18 @@ class BabylonGraphics extends GraphicsInterface {
 
     // Start loading the assets
     assetsManager.load();
+
+    /* TODO load custom meshes from obj
+    BABYLON.SceneLoader.ImportMesh("helloMesh", "textures/", "monu3.obj", this.scene, function (newMeshes) {
+      // Set the target of the camera to the first imported mesh
+      newMeshes[0].position = new BABYLON.Vector3(-100, 2, 2000);
+      newMeshes[0].scaling = new BABYLON.Vector3(250, 250, 250);
+      camera.target = newMeshes[0];
+    });
+    */
+
+
+
   }
 
   updateGraphic(entityData /*, alpha*/) {
@@ -443,9 +456,8 @@ class BabylonGraphics extends GraphicsInterface {
 
       // Assuming the original diameter of the bullet is known. 
       // Replace `originalDiameter` with the actual value.
-      let originalDiameter = 1; // Example value
+      let originalDiameter = 4; // Example value
       let scale = (entityData.radius * 2) / originalDiameter;
-
       bullet.scaling.x = scale;
       bullet.scaling.y = scale;
       bullet.scaling.z = scale;

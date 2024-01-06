@@ -8,7 +8,13 @@ export default function inflateText(entityData, scene) {
   }
 
   const text = entityData.text || '';
-  const font = 'bold 244px monospace';
+  let font = '48px monospace';
+
+  if (typeof entityData.style !== 'undefined') {
+    if (entityData.style.fontSize !== 'undefined') {
+      // font = `${entityData.style.fontSize} monospace`;
+    }
+  }
 
   // Create a temporary canvas to measure text
   const tempCanvas = document.createElement('canvas');
@@ -46,7 +52,7 @@ export default function inflateText(entityData, scene) {
   entityData.graphics = { 'graphics-babylon': { plane, texture } };
 
   // Adjust plane position
-  plane.position = new BABYLON.Vector3(entityData.position.x, entityData.position.y + 200, entityData.position.z);
+  plane.position = new BABYLON.Vector3(entityData.position.x, entityData.position.y, entityData.position.z);
 
   return plane;
 }

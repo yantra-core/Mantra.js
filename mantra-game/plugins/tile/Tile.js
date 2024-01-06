@@ -94,6 +94,9 @@ class Tile {
           body: body,
           mass: mass,
           isStatic: isStatic,
+          style: {
+            cursor: 'pointer',
+          },
           position: {
             x: x,
             y: y,

@@ -42,6 +42,9 @@ class Graphics {
       document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
     }
 
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+
     // TODO: remove this preloader
     // Remark: Preload is not here, but is in Client?
     // Is that best place for it?

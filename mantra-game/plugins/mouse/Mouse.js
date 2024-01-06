@@ -21,6 +21,8 @@ export default class Mouse {
     this.boundHandleMouseMove = this.handleMouseMove.bind(this);
     this.boundHandleMouseDown = this.handleMouseDown.bind(this);
     this.boundHandleMouseUp = this.handleMouseUp.bind(this);
+    this.boundHandleMouseOut = this.handleMouseOut.bind(this);
+    this.boundHandleMouseOver = this.handleMouseOver.bind(this);
 
   }
 
@@ -133,6 +135,14 @@ export default class Mouse {
     this.sendMouseData();
   }
 
+  handleMouseOut(event) {
+    this.game.emit('pointerout', event)
+  }
+
+  handleMouseOver(event) {
+    this.game.emit('pointerover', event)
+  }
+
   sendMouseData() {
     const mouseData = {
       position: this.mousePosition, // absolute position
@@ -149,6 +159,8 @@ export default class Mouse {
   }
 
   bindInputControls() {
+    document.addEventListener('pointerover', this.boundHandleMouseOver);
+    document.addEventListener('pointerout', this.boundHandleMouseOut);
     document.addEventListener('pointermove', this.boundHandleMouseMove);
     document.addEventListener('pointerdown', this.boundHandleMouseDown);
     document.addEventListener('pointerup', this.boundHandleMouseUp);
@@ -159,6 +171,8 @@ export default class Mouse {
   }
   unbindAllEvents() {
     // unbind all events
+    document.removeEventListener('pointerover', this.boundHandleMouseOver);
+    document.removeEventListener('pointerout', this.boundHandleMouseOut);
     document.removeEventListener('pointermove', this.boundHandleMouseMove);
     document.removeEventListener('pointerdown', this.boundHandleMouseDown);
     document.removeEventListener('pointerup', this.boundHandleMouseUp);
