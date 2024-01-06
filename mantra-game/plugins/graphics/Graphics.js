@@ -45,32 +45,12 @@ class Graphics {
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
 
-    // TODO: remove this preloader
-    // Remark: Preload is not here, but is in Client?
-    // Is that best place for it?
-
     // Bind event handlers for changing player sprite
     this.handleInputs();
     
   }
 
-  // Remark: Putting preload in Graphics interface isn't exactly ideal
-  // We could use this for preloading required graphics and waiting for them to load before starting the game
-  // However; in most cases it's better to start Mantra and then preload in the Client before
   preload () {
-
-    // TODO: move guy sprites to new Preloader / Animations subsystem
-    // preload the guy sprites ( for now )
-    let preload = ['guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1'];
-    let preloaderDiv = document.createElement('div');
-    preloaderDiv.id = 'preloader';
-    gameHolder.appendChild(preloaderDiv);
-
-    preload.forEach(function (spriteName) {
-      let img = document.createElement('span');
-      img.classList.add(spriteName);
-      preloaderDiv.appendChild(img);
-    });
 
   }
 

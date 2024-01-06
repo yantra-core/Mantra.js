@@ -954,6 +954,21 @@ function createBox(entityData) {
         // material.diffuseTexture.vAng = Math.PI / 6; // not correct
       }
     */
+
+    if (entityData.kind === 'building') {
+      // Rotate the box by 30 degrees around the X-axis
+      var rotationAngle = 30 * (Math.PI / 180); // Convert 30 degrees to radians
+      box.rotation.x = rotationAngle;
+
+      // Adjust the position of the box if needed
+      var boxHeight = entityData.height;
+      var adjustment = boxHeight / 2 - boxHeight / 2 * Math.cos(rotationAngle);
+      entityData.position.z += adjustment;
+
+      // TODO: Implement a method to tilt the texture by 30 degrees
+      // This might require custom shaders or adjusting the mesh's UVs
+    }
+
     // ensure transparency is enabled
     material.diffuseTexture.hasAlpha = true;
   } else if (entityData.color) {

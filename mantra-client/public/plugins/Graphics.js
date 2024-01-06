@@ -63,32 +63,12 @@ var Graphics = /*#__PURE__*/function () {
       document.body.scrollTop = 0; // For Safari
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
 
-      // TODO: remove this preloader
-      // Remark: Preload is not here, but is in Client?
-      // Is that best place for it?
-
       // Bind event handlers for changing player sprite
       this.handleInputs();
     }
-
-    // Remark: Putting preload in Graphics interface isn't exactly ideal
-    // We could use this for preloading required graphics and waiting for them to load before starting the game
-    // However; in most cases it's better to start Mantra and then preload in the Client before
   }, {
     key: "preload",
-    value: function preload() {
-      // TODO: move guy sprites to new Preloader / Animations subsystem
-      // preload the guy sprites ( for now )
-      var preload = ['guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1'];
-      var preloaderDiv = document.createElement('div');
-      preloaderDiv.id = 'preloader';
-      gameHolder.appendChild(preloaderDiv);
-      preload.forEach(function (spriteName) {
-        var img = document.createElement('span');
-        img.classList.add(spriteName);
-        preloaderDiv.appendChild(img);
-      });
-    }
+    value: function preload() {}
   }, {
     key: "update",
     value: function update() {}
@@ -490,14 +470,18 @@ function updateSprite(entityId, data, SheetManager, anims) {
     } else if (currentInputs.D) {
       direction = 'Right';
     }
-    if (!direction) {
-      // return;
-    }
     if (!playerEntity.texture) {
       return;
     }
     var spriteName = playerEntity.texture.sprite;
-    var newSpriteName = 'player' + direction;
+    var newSpriteName;
+    if (!direction) {
+      //newSpriteName = 'playerDown';
+      // uncomment to re-enable animation
+      //return;
+    } else {
+      newSpriteName = 'player' + direction;
+    }
 
     //console.log('updateSprite', newSpriteName ,direction, entityId, playerEntity, data);
 
@@ -507,6 +491,7 @@ function updateSprite(entityId, data, SheetManager, anims) {
       game.updateEntity({
         id: entityId,
         texture: {
+          frameIndex: 0,
           sheet: playerEntity.texture.sheet,
           sprite: newSpriteName,
           animationPlaying: true

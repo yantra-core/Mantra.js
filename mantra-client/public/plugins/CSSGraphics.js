@@ -113,8 +113,10 @@ var CSSCamera = /*#__PURE__*/function () {
       this.follow = true;
       this.game.systemsManager.addSystem('graphics-css-camera', this);
       this.gameViewport = document.getElementById('gameHolder');
+      var windowHeight = window.innerHeight;
       game.viewportCenterXOffset = 0;
-      game.viewportCenterYOffset = 0;
+      game.viewportCenterYOffset = -windowHeight / 2;
+      //game.viewportCenterYOffset = 0;
       this.initZoomControls();
       game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
         /*
@@ -311,16 +313,22 @@ var CSSCamera = /*#__PURE__*/function () {
       adjustment = -windowHeight / 2 + 350;
       var pixelAdjustment = adjustment * scaleFactor;
       game.viewportCenterYOffset = -windowHeight / 2;
+      // game.viewportCenterYOffset = -windowHeight / 2;
       // Update the camera position
       if (this.follow && currentPlayer && currentPlayer.position) {
         // If following a player, adjust the camera position based on the player's position and the calculated offset
 
-        this.scene.cameraPosition.x = currentPlayer.position.x;
+        this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
         var newY = currentPlayer.position.y - game.viewportCenterYOffset;
+        //this.scene.cameraPosition.y = newY;
+        //this.scene.cameraPosition.y = newY;
         // locks camera to not exceed bottom of screen for platformer mode
+        console.log('game.data.camera.mode', game.data.camera.mode, newY, windowHeight, windowHeight * 0.38);
         if (game.data.camera.mode === 'platformer') {
-          if (newY < windowHeight * 0.38) {
+          if (newY < windowHeight * 0.35) {
             this.scene.cameraPosition.y = newY;
+          } else {
+            this.scene.cameraPosition.y = windowHeight * 0.35;
           }
         } else {
           this.scene.cameraPosition.y = newY;
@@ -661,6 +669,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       if (this.game.changedEntities.size > 0) {
         // console.log('CHANGED', this.game.changedEntities)
       }
+      // console.log('rendering', this.game.entities.size, 'entities')
       // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
       // This is not ideal and will yield low-entity count CSSGraphics performance
       // Best to remove camera follow for CSSGraphics if possible
@@ -922,6 +931,7 @@ function inflateBox(entityElement, entityData) {
 
   // console.log('entityElement', entityElement)
 
+  this.updateEntityPosition(entityElement, entityData);
   return entityElement;
 }
 function tileFlip(entityElement, hexColor, getTexture, entityData) {
@@ -1235,6 +1245,7 @@ function updateGraphic(entityData) {
     if (entityData.texture /*entityData.type === 'FIRE'*/) {
       // check to see if texture changed / sprite index changed
       var texture = game.getTexture(entityData.texture);
+      // console.log('GOT BACK TEXTURE', texture)
       var textureUrl = texture.url;
       var spritePosition = texture.sprite || {
         x: 0,
@@ -1249,24 +1260,26 @@ function updateGraphic(entityData) {
       // Animated sprite, since the texture has a frames array
       //
       // if the array exists and animation is not paused
+      // console.log('ttt', texture);
       if (_typeof(texture.frames) === 'object' /*&& !entityData.texture.animationPaused*/) {
+        //console.log('updating', game.tick)
         // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
         if (game.tick % 10 === 0) {
           // TODO: custom tick rate
-
+          //console.log('updating frame index', entityData)
           // shift first frame from array
-          if (typeof entityData.frameIndex === 'undefined') {
-            entityData.frameIndex = 0;
+          if (typeof entityData.texture.frameIndex === 'undefined') {
+            entityData.texture.frameIndex = 0;
           }
-          if (entityData.frameIndex >= texture.frames.length) {
-            entityData.frameIndex = 0;
+          if (entityData.texture.frameIndex >= texture.frames.length) {
+            entityData.texture.frameIndex = 0;
           }
-          var frame = texture.frames[entityData.frameIndex];
+          var frame = texture.frames[entityData.texture.frameIndex];
           if (typeof frame !== 'undefined') {
             // console.log('frame', entityData.frameIndex)
             spritePosition = frame;
             entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
-            entityData.frameIndex++;
+            entityData.texture.frameIndex++;
           }
         }
       } else {

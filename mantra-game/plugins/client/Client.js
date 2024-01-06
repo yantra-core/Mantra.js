@@ -63,6 +63,9 @@ export default class Client {
     }
 
     this.preloading = true;
+    // todo: create two preloadsers
+    // 1 for required assets to start game
+    // 2 for lazy loaded assets
     preloader.loadAll().then(() => {
       console.log("All assets loaded", preloader)
       let that = this;

@@ -132,7 +132,7 @@ class TonePlugin {
   }
 
   playNote(note, duration, now = 0, velocity = 0.5) {
-    console.log('playNote', note, duration, now, velocity)
+    // console.log('playNote', note, duration, now, velocity)
     if (typeof note === 'undefined') {
       // if note is not defined, select a random note from the keyCodes object
       let keys = Object.keys(this.keyCodes);
@@ -140,7 +140,7 @@ class TonePlugin {
 
       // check to see if this.lastNotePlayed is defined, if so perform harmonic shift
       if (this.lastNotePlayed) {
-        console.log("performing harmonic shift", this.lastNotePlayed)
+        // console.log("performing harmonic shift", this.lastNotePlayed)
         randomKey = this.harmonicShift(this.lastNotePlayed, { type: 'perfectFifth' });
         // exact key match was not available, default to C4 ( for now )
         // Remark: we could make a more approximate match based on letter of key / music theory
@@ -157,7 +157,7 @@ class TonePlugin {
     // console.log('playing ', note, duration)
     let game = this.game;
     // Play a note for a given duration
-    console.log('playing note', note, duration, now, velocity)
+    // console.log('playing note', note, duration, now, velocity)
     try {
       this.synth.triggerAttackRelease(note, duration, now, velocity);
     } catch (err) {

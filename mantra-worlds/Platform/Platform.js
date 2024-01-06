@@ -106,6 +106,7 @@ class Platform {
       texture: 'warp-to-home',
       width: 64,
       height: 64,
+      depth: 1,
       isStatic: true,
       position: {
         x: -100,

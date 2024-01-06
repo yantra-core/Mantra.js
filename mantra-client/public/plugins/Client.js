@@ -154,6 +154,9 @@ var Client = exports["default"] = /*#__PURE__*/function () {
       }
 
       this.preloading = true;
+      // todo: create two preloadsers
+      // 1 for required assets to start game
+      // 2 for lazy loaded assets
       preloader.loadAll().then(function () {
         console.log("All assets loaded", preloader);
         var that = _this;
@@ -762,11 +765,12 @@ var defaultAssets = {
   'smb3-1-1': '/img/game/levels/smb3-1-1.png',
   'planet-express-base': '/img/game/env/planet-express-base.png',
   'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
-  '3d-homer': '/img/game/env/3d-homer.gif',
+  // '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
   'garden': '/img/game/env/garden.png',
   'sutra-tree': '/img/game/logos/sutra-tree.png',
   'warp-to-home': '/img/game/env/warp-to-mantra-home.png',
+  /*
   'raiden': {
     type: 'spritesheet',
     url: '/img/game/sheets/raiden.png',
@@ -774,16 +778,14 @@ var defaultAssets = {
     frameHeight: 32,
     frameTags: {
       swing: {
-        frames: [{
-          x: 0,
-          y: 0
-        }, {
-          x: 0,
-          y: -32
-        }]
-      }
-    }
+        frames: [
+          { x: 0, y: 0 },
+          { x: 0, y: -32 },
+        ]
+      },
+    },
   },
+  */
   'jogurt': {
     type: 'spritesheet',
     url: '/img/game/sheets/jogurt.png',

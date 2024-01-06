@@ -85,8 +85,10 @@ class Home {
     game.createEntity({
       name: 'sutra-tree',
       type: 'BACKGROUND',
+      // kind: 'building',
       width: 1024 / 4,
       height: 1024 / 4,
+      //depth: 256,
       depth: 1,
       texture: 'sutra-tree',
       body: false,
@@ -130,6 +132,7 @@ class Home {
       type: 'BACKGROUND',
       texture: 'robot-arms-apartment',
       kind: 'building',
+      depth: 1,
 
       width: 1340,
       height: 3668,
@@ -148,6 +151,7 @@ class Home {
 
       width: 2048,
       height: 2048,
+      depth: 1,
       body: false,
       position: { // position to right
         x: -900,

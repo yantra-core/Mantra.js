@@ -13,7 +13,6 @@ class CSSCamera {
     this.dragInertia = { x: 0, y: 0 };
     this.isThrowing = false;
     this.rotating = false;
-    
 
   }
 
@@ -30,9 +29,11 @@ class CSSCamera {
 
     this.gameViewport = document.getElementById('gameHolder');
 
-    game.viewportCenterXOffset = 0;
-    game.viewportCenterYOffset = 0;
+    let windowHeight = window.innerHeight;
 
+    game.viewportCenterXOffset = 0;
+    game.viewportCenterYOffset = -windowHeight / 2;
+    //game.viewportCenterYOffset = 0;
     this.initZoomControls();
 
     game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
@@ -80,7 +81,6 @@ class CSSCamera {
     this.game.viewportCenterYOffset = 0;
     // Reset other camera properties as needed
   }
-
  
   // Method to smoothly rotate the camera over a given duration using CSS transitions
   rotateCameraOverTime(targetAngle = 90, duration = 800) {
@@ -223,19 +223,24 @@ class CSSCamera {
     let adjustment = -400; // TODO: this should be window height or something similar
     adjustment = (-windowHeight / 2) + 350;
     let pixelAdjustment = adjustment * scaleFactor;
-
     game.viewportCenterYOffset = -windowHeight / 2;
+    // game.viewportCenterYOffset = -windowHeight / 2;
     // Update the camera position
     if (this.follow && currentPlayer && currentPlayer.position) {
       // If following a player, adjust the camera position based on the player's position and the calculated offset
       
-      this.scene.cameraPosition.x = currentPlayer.position.x;
+      this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
 
       let newY = currentPlayer.position.y - game.viewportCenterYOffset;
+      //this.scene.cameraPosition.y = newY;
+     //this.scene.cameraPosition.y = newY;
       // locks camera to not exceed bottom of screen for platformer mode
+      console.log('game.data.camera.mode', game.data.camera.mode, newY, windowHeight, windowHeight * 0.38)
       if (game.data.camera.mode === 'platformer') {
-        if (newY < windowHeight * 0.38) {
+        if (newY < windowHeight * 0.35) {
           this.scene.cameraPosition.y = newY;
+        } else {
+          this.scene.cameraPosition.y = windowHeight * 0.35;
         }
       } else {
         this.scene.cameraPosition.y = newY;

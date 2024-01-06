@@ -23,9 +23,6 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
       direction = 'Right';
     }
 
-    if (!direction) {
-      // return;
-    }
 
 
     if (!playerEntity.texture) {
@@ -34,7 +31,17 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
 
     let spriteName = playerEntity.texture.sprite;
 
-    let newSpriteName = 'player' + direction;
+    let newSpriteName;
+    
+
+    if (!direction) {
+      //newSpriteName = 'playerDown';
+      // uncomment to re-enable animation
+      //return;
+    } else {
+      newSpriteName = 'player' + direction;
+    }
+
 
     //console.log('updateSprite', newSpriteName ,direction, entityId, playerEntity, data);
 
@@ -44,6 +51,7 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
       game.updateEntity({
         id: entityId,
         texture: {
+          frameIndex: 0,
           sheet: playerEntity.texture.sheet,
           sprite: newSpriteName,
           animationPlaying: true

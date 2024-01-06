@@ -322,6 +322,7 @@ class CSSGraphics extends GraphicsInterface {
     if (this.game.changedEntities.size > 0) {
       // console.log('CHANGED', this.game.changedEntities)
     }
+    // console.log('rendering', this.game.entities.size, 'entities')
     // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
     // This is not ideal and will yield low-entity count CSSGraphics performance
     // Best to remove camera follow for CSSGraphics if possible

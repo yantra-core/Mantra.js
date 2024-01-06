@@ -183,6 +183,7 @@ export default function inflateBox(entityElement, entityData) {
 
   // console.log('entityElement', entityElement)
 
+  this.updateEntityPosition(entityElement, entityData);
   return entityElement;
 }
 

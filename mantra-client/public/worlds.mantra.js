@@ -2429,8 +2429,10 @@ var Home = /*#__PURE__*/function () {
       game.createEntity({
         name: 'sutra-tree',
         type: 'BACKGROUND',
+        // kind: 'building',
         width: 1024 / 4,
         height: 1024 / 4,
+        //depth: 256,
         depth: 1,
         texture: 'sutra-tree',
         body: false,
@@ -2472,6 +2474,7 @@ var Home = /*#__PURE__*/function () {
         type: 'BACKGROUND',
         texture: 'robot-arms-apartment',
         kind: 'building',
+        depth: 1,
         width: 1340,
         height: 3668,
         body: false,
@@ -2488,6 +2491,7 @@ var Home = /*#__PURE__*/function () {
         kind: 'building',
         width: 2048,
         height: 2048,
+        depth: 1,
         body: false,
         position: {
           // position to right
@@ -4100,6 +4104,7 @@ var Platform = /*#__PURE__*/function () {
         texture: 'warp-to-home',
         width: 64,
         height: 64,
+        depth: 1,
         isStatic: true,
         position: {
           x: -100,

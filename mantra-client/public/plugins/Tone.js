@@ -140,7 +140,7 @@ var TonePlugin = /*#__PURE__*/function () {
     value: function playNote(note, duration) {
       var now = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var velocity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.5;
-      console.log('playNote', note, duration, now, velocity);
+      // console.log('playNote', note, duration, now, velocity)
       if (typeof note === 'undefined') {
         // if note is not defined, select a random note from the keyCodes object
         var keys = Object.keys(this.keyCodes);
@@ -148,7 +148,7 @@ var TonePlugin = /*#__PURE__*/function () {
 
         // check to see if this.lastNotePlayed is defined, if so perform harmonic shift
         if (this.lastNotePlayed) {
-          console.log("performing harmonic shift", this.lastNotePlayed);
+          // console.log("performing harmonic shift", this.lastNotePlayed)
           randomKey = this.harmonicShift(this.lastNotePlayed, {
             type: 'perfectFifth'
           });
@@ -167,7 +167,7 @@ var TonePlugin = /*#__PURE__*/function () {
       // console.log('playing ', note, duration)
       var game = this.game;
       // Play a note for a given duration
-      console.log('playing note', note, duration, now, velocity);
+      // console.log('playing note', note, duration, now, velocity)
       try {
         this.synth.triggerAttackRelease(note, duration, now, velocity);
       } catch (err) {
