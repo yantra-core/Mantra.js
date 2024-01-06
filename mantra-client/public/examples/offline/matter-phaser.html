@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mantra - Client Demo</title>
   <link rel="stylesheet" href="/mantra.css">
 </head>
+
 <body>
   <script type="module" src="/mantra.js"></script>
   <script>
@@ -38,45 +40,31 @@
       // Adds a nice StarField background
       game.use('StarField');
 
-      game.use('CurrentFPS');
+      // game.use('CurrentFPS');
 
-      game.use('ControlsGUI');
+      // game.use('ControlsGUI');
 
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-phaser.html'
       });
 
 
-      // custom player::joined handler, this is optional
-      // without setting a custom player::joined, the default event will be used
-      game.on('player::joined', function (playerData) {
-        console.log('player joined', playerData)
-        let player = game.createEntity({
-          type: 'PLAYER',
-          mass: 1320,
-          position: {
-            x: -100,
-            y: 0
-          }
-        });
-        console.log('player created', player)
-        // make sure to emit the player::created event
-        game.emit('player::created', player);
-      });
-
       // start the game loop
       game.start(function () {
-        // Creates a single Block, since we have used Block plugin, this will be a destructible Block
+
+        game.createDefaultPlayer();
+
         game.createEntity({
           type: 'BLOCK',
-          width: 500,
-          height: 500,
-          depth: 200,
+          width: 64,
+          height: 64,
+          depth: 64,
           position: {
             x: 0,
-            y: -500
+            y: -50
           },
         });
+
         game.use('Border', { autoBorder: true });
       });
     });

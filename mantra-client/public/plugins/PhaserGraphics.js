@@ -765,7 +765,7 @@ function inflategraphic(entityData) {
     this.scene.add.existing(graphic);
   } else {
     // EXISTING GRAPHIC
-    (0, _updateBox["default"])(entityData, graphic);
+    (0, _updateBox["default"])(entityData, graphic, game);
   }
 
   // check to see if position is the same, if so, don't redraw
@@ -789,7 +789,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = updateBox;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function updateBox(entityData, graphic) {
+function updateBox(entityData, graphic, game) {
   // check to see if color has changed, if so update the tint
   if (typeof entityData.color !== 'undefined') {
     // console.log('COLOR', entityData.color)

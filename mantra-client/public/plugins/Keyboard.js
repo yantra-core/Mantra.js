@@ -85,7 +85,6 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "handleKeyDown",
     value: function handleKeyDown(event) {
-      // console.log('handleKeyDown', event.code)
       if (MANTRA_KEY_MAP[event.code]) {
         this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
         if (this.preventDefaults === true) {
@@ -104,7 +103,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     key: "sendInputs",
     value: function sendInputs() {
       var trueInputs = this.inputPool;
-      // console.log("trueInputs", trueInputs)
+
       // Remark: Removed 12/28/23 in order to allow final "false" event on keyup
       // Should be OK to remove
       // Filter the inputPool to only include keys with true values

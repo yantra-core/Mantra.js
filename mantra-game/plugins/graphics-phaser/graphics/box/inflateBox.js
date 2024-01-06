@@ -15,7 +15,7 @@ export default function inflategraphic(entityData) {
     this.scene.add.existing(graphic);
   } else {
     // EXISTING GRAPHIC
-    updateBox(entityData, graphic);
+    updateBox(entityData, graphic, game);
   }
 
   // check to see if position is the same, if so, don't redraw

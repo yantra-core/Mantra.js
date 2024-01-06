@@ -661,18 +661,16 @@ button.circle div {
   }
 }
 
-
-
 /* END GAMEPAD CODE */
 
 #controlsView {
-  bottom: 30px;
-  right: 30px;
+  top: 30px;
+  right: 160px;
   z-index: 1000;
 
   width: 200px;
 
-  height: 300px;
+  height: 500px;
   min-width: 260px;
   min-height: 215px;
   resize: both;

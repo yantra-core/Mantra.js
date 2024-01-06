@@ -1,4 +1,4 @@
-export default function updateBox(entityData, graphic) {
+export default function updateBox(entityData, graphic, game) {
   // check to see if color has changed, if so update the tint
   if (typeof entityData.color !== 'undefined') {
     // console.log('COLOR', entityData.color)

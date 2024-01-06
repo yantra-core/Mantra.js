@@ -36,6 +36,9 @@ class CSSCamera {
     //game.viewportCenterYOffset = 0;
     this.initZoomControls();
 
+    game.viewportCenterYOffset = -windowHeight / 2;
+
+
     game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
       /*
       // our MouseData looks like this:
@@ -223,7 +226,6 @@ class CSSCamera {
     let adjustment = -400; // TODO: this should be window height or something similar
     adjustment = (-windowHeight / 2) + 350;
     let pixelAdjustment = adjustment * scaleFactor;
-    game.viewportCenterYOffset = -windowHeight / 2;
     // game.viewportCenterYOffset = -windowHeight / 2;
     // Update the camera position
     if (this.follow && currentPlayer && currentPlayer.position) {
@@ -245,6 +247,8 @@ class CSSCamera {
       } else {
         this.scene.cameraPosition.y = newY;
       }
+      // this.scene.cameraPosition.y = newY;
+
     } else {
       // If not following a player, use the calculated offsets directly
       this.scene.cameraPosition.x = game.viewportCenterXOffset;
