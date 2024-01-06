@@ -46,7 +46,6 @@ class Sword {
       swordEntity.rotation = ownerRotation;
     }
 
-
   }
 
   sheathSword(entityId) {
@@ -64,6 +63,7 @@ class Sword {
   }
 
   swingSword(entityId) {
+
     let entity = this.game.getEntity(entityId);
     let actionRateLimiterComponent = this.game.components.actionRateLimiter;
     let lastSwung = actionRateLimiterComponent.getLastActionTime(entityId, 'swingSword');
@@ -103,6 +103,11 @@ class Sword {
         mass: 10,
         position: swordStartPos,
         lifetime: Infinity,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'sword',
+          // frame: 1
+        },
         owner: entityId,
         rotation: playerRotation,
         isSensor: true,
@@ -113,12 +118,13 @@ class Sword {
           y: directionY * this.speed
         },
         */
-        height: 48, // TODO: make this a config
+        height: 16, // TODO: make this a config
         width: 16, // TODO: make this a config
         damage: 10, // TODO: make this a config
       };
 
       swordEntity = this.game.createEntity(swordDirectionConfig);
+      // TODO: push / filter items array with sword
       entity.items = [swordEntity.id]; // Overwrites all items on equip
       this.game.updateEntity(entity);
     } else {
@@ -129,7 +135,7 @@ class Sword {
       swordEntity.rotation = playerRotation;
     }
 
-    console.log(`Entity ${entityId} swung a sword at position ${playerPos.x}, ${playerPos.y}`);
+    // console.log(`Entity ${entityId} swung a sword at position ${playerPos.x}, ${playerPos.y}`);
   }
 
 
@@ -139,7 +145,7 @@ class Sword {
     // and then applying damage or other effects accordingly
 
     // For simplicity, let's just log a message
-    console.log('Sword collision detected:', pair);
+    // console.log('Sword collision detected:', pair);
   }
 }
 

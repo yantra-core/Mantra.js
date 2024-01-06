@@ -3171,10 +3171,27 @@ function hexapod(game) {
   var SEPARATION_FORCE = 0.81;
   var PERCEPTION_RADIUS = 1500;
   var FIELD_OF_VIEW = 1500;
+
+  // hexapods grow on bullet hit
+  rules["if"]('bulletHitHexapod').then('hexapodGrow');
+  rules.addCondition('bulletHitHexapod', function (entity, gameState) {
+    return entity.type === 'COLLISION' && entity.kind === 'START' && entity.HEXAPOD && entity.BULLET;
+  });
+  rules.on('hexapodGrow', function (collision) {
+    var hexapod = collision.HEXAPOD;
+    // update entity size by 11%
+    game.updateEntity({
+      id: hexapod.id,
+      width: hexapod.width * 1.1,
+      height: hexapod.height * 1.1
+    });
+  });
+
+  // hexpods think each tick
+  rules["if"]('hexapodTick').then('hexapodThink');
   rules.addCondition('hexapodTick', function (entity, gameState) {
     return entity.type === 'HEXAPOD' && gameState.tick % 1 === 0;
   });
-  rules["if"]('hexapodTick').then('hexapodThink');
   rules.on('hexapodThink', function (entity, node, gameState) {
     var hexapod = entity;
     var hexapods = gameState.ents.HEXAPOD;

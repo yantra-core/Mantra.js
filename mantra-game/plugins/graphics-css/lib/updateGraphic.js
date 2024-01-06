@@ -20,6 +20,8 @@ export default function updateGraphic(entityData) {
       entityElement.style.background = hexColor;
     }
 
+
+
     if (typeof entityData.position.z === 'number') {
       entityElement.style.zIndex = entityData.position.z;
     }
@@ -38,6 +40,8 @@ export default function updateGraphic(entityData) {
       if (typeof entityData.texture.frame === 'number') {
         spritePosition = texture.frames[entityData.texture.frame];
         entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+      } else {
+
       }
 
       //
@@ -66,6 +70,15 @@ export default function updateGraphic(entityData) {
           }
 
          }
+
+      } else {
+
+        if (entityData.type !== 'PLAYER') { // for now
+          entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+          entityElement.style.width = `${entityData.width}px`;
+          entityElement.style.height = `${entityData.height}px`;
+        }
+
 
       }
 

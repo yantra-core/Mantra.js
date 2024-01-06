@@ -38,9 +38,25 @@ export default function hexapod(game) {
   const PERCEPTION_RADIUS = 1500;
   const FIELD_OF_VIEW = 1500;
 
-  rules.addCondition('hexapodTick', (entity, gameState) => entity.type === 'HEXAPOD' && gameState.tick % 1 === 0);
-  rules.if('hexapodTick').then('hexapodThink');
 
+  // hexapods grow on bullet hit
+  rules.if('bulletHitHexapod').then('hexapodGrow');
+  rules.addCondition('bulletHitHexapod', (entity, gameState) => {
+    return entity.type === 'COLLISION' && entity.kind === 'START' && entity.HEXAPOD && entity.BULLET;
+  });
+  rules.on('hexapodGrow', (collision) => {
+    let hexapod = collision.HEXAPOD;
+    // update entity size by 11%
+    game.updateEntity({
+      id: hexapod.id,
+      width: hexapod.width * 1.1,
+      height: hexapod.height * 1.1
+    });
+  })
+
+  // hexpods think each tick
+  rules.if('hexapodTick').then('hexapodThink');
+  rules.addCondition('hexapodTick', (entity, gameState) => entity.type === 'HEXAPOD' && gameState.tick % 1 === 0);
   rules.on('hexapodThink', (entity, node, gameState) => {
     let hexapod = entity;
     let hexapods = gameState.ents.HEXAPOD;

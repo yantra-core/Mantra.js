@@ -1243,7 +1243,7 @@ function updateGraphic(entityData) {
       if (typeof entityData.texture.frame === 'number') {
         spritePosition = texture.frames[entityData.texture.frame];
         entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
-      }
+      } else {}
 
       //
       // Animated sprite, since the texture has a frames array
@@ -1268,6 +1268,13 @@ function updateGraphic(entityData) {
             entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
             entityData.frameIndex++;
           }
+        }
+      } else {
+        if (entityData.type !== 'PLAYER') {
+          // for now
+          entityElement.style.backgroundSize = "".concat(entityData.width, "px ").concat(entityData.height, "px");
+          entityElement.style.width = "".concat(entityData.width, "px");
+          entityElement.style.height = "".concat(entityData.height, "px");
         }
       }
     }

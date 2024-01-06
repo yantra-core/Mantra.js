@@ -8,11 +8,13 @@ export default function inflateCircle(entityData) {
   if (!graphic) {
 
     if (entityData.texture) {
-
+      
       let texture = game.getTexture(entityData.texture);
       let textureUrl = texture.url;
       let spritePosition = texture.sprite || { x: 0, y: 0 };
-
+      if (entityData.type === 'BULLET') {
+        texture = 'pixel';
+      }
       if (typeof entityData.texture.frame === 'number') {
         //spritePosition = texture.frames[entityData.texture.frame];
         //entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
@@ -40,7 +42,7 @@ export default function inflateCircle(entityData) {
         }
       }
       */
-      graphic = this.scene.add.sprite(0, 0, texture.key);
+      graphic = this.scene.add.sprite(0, 0, texture);
     } else {
       graphic = this.scene.add.graphics();
       graphic.fillStyle(0xff0000, 1);

@@ -150,7 +150,6 @@ class Bullet {
         //console.log('Bullet.handleCollision no entity found. Skipping...', entityA, entityB);
         return;
       }
-
       // console.log('Bullet.handleCollision', entityIdA, entityIdB, entityA.owner, entityB.owner);
 
       if (entityA.type !== 'BULLET' && entityB.type !== 'BULLET') {
@@ -172,6 +171,8 @@ class Bullet {
         return;
       }
 
+
+
       //
       // Bullets are destroyed if they hit a BLOCK
       //
@@ -184,13 +185,18 @@ class Bullet {
         return;
       }
 
+      // specific cancel of bullets to owner
       if (entityA.type === 'BULLET' && entityB.id === entityA.owner) {
-        // console.log('bullet owner collision', entityIdA, entityIdB);
+        return;
+      }
+      if (entityB.type === 'BULLET' && entityA.id === entityB.owner) {
         return;
       }
 
-      if (entityB.type === 'BULLET' && entityA.id === entityB.owner) {
-        // console.log('bullet owner collision', entityIdA, entityIdB);
+      // general cancel of all collisions between siblings
+      if (entityA.owner === entityB.owner) {
+        console.log('bullet owner collision', entityIdA, entityIdB);
+        // pair.isActive = false;
         return;
       }
 
@@ -262,7 +268,6 @@ class Bullet {
         this.game.components.health.set(entityIdB, entityB.health);
         this.game.removeEntity(entityIdA);
         if (entityB.health <= 0) {
-          // console.log('NPC died', entityB)
           this.game.removeEntity(entityIdB);
         }
         return;
@@ -274,7 +279,6 @@ class Bullet {
         this.game.components.health.set(entityIdA, entityA.health);
         this.game.removeEntity(entityIdB);
         if (entityA.health <= 0) {
-          // console.log('NPC died', entityA)
           this.game.removeEntity(entityIdA);
         }
         return;

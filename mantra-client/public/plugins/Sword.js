@@ -114,6 +114,12 @@ var Sword = /*#__PURE__*/function () {
           mass: 10,
           position: swordStartPos,
           lifetime: Infinity,
+          texture: {
+            sheet: 'loz_spritesheet',
+            sprite: 'sword'
+            // frame: 1
+          },
+
           owner: entityId,
           rotation: playerRotation,
           isSensor: true,
@@ -124,7 +130,7 @@ var Sword = /*#__PURE__*/function () {
             y: directionY * this.speed
           },
           */
-          height: 48,
+          height: 16,
           // TODO: make this a config
           width: 16,
           // TODO: make this a config
@@ -132,6 +138,7 @@ var Sword = /*#__PURE__*/function () {
         };
 
         swordEntity = this.game.createEntity(swordDirectionConfig);
+        // TODO: push / filter items array with sword
         entity.items = [swordEntity.id]; // Overwrites all items on equip
         this.game.updateEntity(entity);
       } else {
@@ -141,7 +148,8 @@ var Sword = /*#__PURE__*/function () {
         swordEntity.position.y = playerPos.y + _distanceInFront * -Math.cos(playerRotation);
         swordEntity.rotation = playerRotation;
       }
-      console.log("Entity ".concat(entityId, " swung a sword at position ").concat(playerPos.x, ", ").concat(playerPos.y));
+
+      // console.log(`Entity ${entityId} swung a sword at position ${playerPos.x}, ${playerPos.y}`);
     }
   }, {
     key: "handleCollision",
@@ -151,7 +159,7 @@ var Sword = /*#__PURE__*/function () {
       // and then applying damage or other effects accordingly
 
       // For simplicity, let's just log a message
-      console.log('Sword collision detected:', pair);
+      // console.log('Sword collision detected:', pair);
     }
   }]);
   return Sword;
