@@ -59,13 +59,15 @@ let game = new Game({
   physics: 'matter', // 'matter', 'physx'
   graphics: ['css'], // 'babylon', 'css', 'phaser'
   collisions: true,
+  sutra: true,
   camera: {
     follow: true,
-    startingZoom: 0.5
+    startingZoom: 1
   },
   protobuf: clientConfig.protobuf,
   msgpack: clientConfig.msgpack,
   deltaCompression: clientConfig.deltaCompression,
+  defaultPlayer: false,
   options: {
     scriptRoot: '.' // use local scripts instead of default yantra.gg CDN
   }
@@ -93,7 +95,8 @@ game.use(new plugins.MatterPhysics());
 // game.use(new plugins.PhaserCamera());
 // game.use(new plugins.Collision());
 
-// game.use(new plugins.FloatyTyper())
+game.use(new plugins.GhostTyper())
+
 
 game.use(new plugins.ChronoControl())
 //game.use(new plugins.PluginsGUI())
@@ -132,7 +135,7 @@ game.use(new plugins.Editor({
   sutraEditor: true
 }));
 
-// game.use(new plugins.Sutra({ }));
+game.use(new plugins.Sutra({ }));
 
 // import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 // import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
@@ -184,8 +187,6 @@ if (mode === 'online') {
  // game.use(new plugins.Tile());
 
   // Single Player Offline Mode
-  //game.use('Gamepad');
-  //game.use('GamepadGUI');
 
   let home = new worlds.Home();
 
@@ -197,12 +198,14 @@ if (mode === 'online') {
     home = new worldClass();
   }
 
+  // home = new worlds.YCraft();
+
   game.start(function () {
     // game.use(new plugins.StarField())
     //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
     //game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
-    //game.use(new plugins.Bullet())
-    let home = new worlds.YCraft();
+    // game.use(new plugins.Bullet())
+
     game.use(home);
 
     // game.use(new plugins.GamepadGUI())

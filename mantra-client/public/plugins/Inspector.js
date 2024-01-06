@@ -188,11 +188,11 @@ var gui = {
 
     // Set z-index of all containers to 1
     containers.forEach(function (container) {
-      container.style.zIndex = '1';
+      container.style.zIndex = '1000';
     });
 
     // Set z-index of the clicked container to 10
-    clickedContainer.style.zIndex = '10';
+    clickedContainer.style.zIndex = '1010';
   }
 };
 gui.init = function (game) {
@@ -363,6 +363,8 @@ var Inspector = /*#__PURE__*/function () {
       if (!this.game.selectedEntityId) {
         if (this.game.currentPlayerId) {
           this.game.selectedEntityId = this.game.currentPlayerId;
+        } else {
+          this.game.selectedEntityId = 1; // for now
         }
       }
 

@@ -79,6 +79,7 @@ exports["default"] = void 0;
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
 var _BabylonCamera = _interopRequireDefault(require("./camera/BabylonCamera.js"));
 var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
+var _createBox = _interopRequireDefault(require("./lib/createBox.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -126,6 +127,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.async = BabylonGraphics.async;
     _this.engine = null;
     _this.scene = null;
+    _this.createBox = _createBox["default"].bind(_assertThisInitialized(_this));
     if (typeof camera === 'string') {
       // legacy API, remove in future
       camera = {
@@ -165,7 +167,9 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
       if (typeof BABYLON === 'undefined') {
         console.log('BABYLON is not defined, attempting to load it from vendor');
-        game.loadScripts(['/vendor/babylon.js', '/vendor/babylon.gui.min.js', '/vendor/babylonjs.materials.min.js'], function () {
+        game.loadScripts(['/vendor/babylon.js', '/vendor/babylon.gui.min.js', '/vendor/babylonjs.materials.min.js'
+        //        '/vendor/babylonjs.loaders.min.js',
+        ], function () {
           console.log('All BABYLON scripts loaded sequentially, proceeding with initialization');
           // All scripts are loaded, proceed with initialization
           _this2.babylonReady();
@@ -309,6 +313,15 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
               // Start loading the assets
               assetsManager.load();
+
+              /* TODO load custom meshes from obj
+              BABYLON.SceneLoader.ImportMesh("helloMesh", "textures/", "monu3.obj", this.scene, function (newMeshes) {
+                // Set the target of the camera to the first imported mesh
+                newMeshes[0].position = new BABYLON.Vector3(-100, 2, 2000);
+                newMeshes[0].scaling = new BABYLON.Vector3(250, 250, 250);
+                camera.target = newMeshes[0];
+              });
+              */
             case 27:
             case "end":
               return _context.stop();
@@ -366,7 +379,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         var red = entityData.color >> 16 & 255;
         var green = entityData.color >> 8 & 255;
         var blue = entityData.color & 255;
-        //console.log('setting color', red, green, blue)
         // Set tint of graphic using the extracted RGB values
         graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
         // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
@@ -430,7 +442,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
           if (entityData.shape === 'rectangle') {
             graphic = this.createBox(entityData);
           } else {
-            graphic = this.createTriangle(entityData);
+            graphic = this.getBlock(entityData);
           }
           break;
         case 'BULLET':
@@ -458,6 +470,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // TODO: allow for setting of z position in 2d mode, if z exists
       if (this.game.physics.dimension === 2) {
         if (typeof entityData.position.z === 'undefined') {
+          // console.log("undefined Z", entityData.type, entityData.position)
           entityData.position.z = 1;
         }
         graphic.position = new BABYLON.Vector3(-entityData.position.x, entityData.position.z, entityData.position.y);
@@ -475,7 +488,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         var red = entityData.color >> 16 & 255;
         var green = entityData.color >> 8 & 255;
         var blue = entityData.color & 255;
-        //console.log('setting color', red, green, blue)
         // Set tint of graphic using the extracted RGB values
         graphic.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
         // console.log('updated graphic.diffuseColor', graphic.diffuseColor);
@@ -510,6 +522,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "getBlock",
     value: function getBlock(entityData) {
+      var game = this.game;
       var block = this.mantraPools.block.find(function (b) {
         return !b.isVisible;
       });
@@ -518,9 +531,19 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // set height and width
         block.scaling.x = entityData.width;
         block.scaling.z = entityData.height;
-        block.scaling.y = entityData.depth;
+        block.scaling.y = entityData.width;
         // set position
         block.position = new BABYLON.Vector3(-entityData.position.x, 1, entityData.position.y);
+
+        // set material if game.getTexture(entityData.texture) is present
+        if (game.getTexture(entityData.texture)) {
+          var material = new BABYLON.StandardMaterial("material", this.scene);
+          var texture = game.getTexture(entityData.texture);
+          material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
+          block.material = material;
+        } else {
+          console.log('missing block texture', entityData.texture);
+        }
         return block;
       }
       return this.createBox(entityData);
@@ -543,7 +566,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
         // Assuming the original diameter of the bullet is known. 
         // Replace `originalDiameter` with the actual value.
-        var originalDiameter = 1; // Example value
+        var originalDiameter = 4; // Example value
         var scale = entityData.radius * 2 / originalDiameter;
         bullet.scaling.x = scale;
         bullet.scaling.y = scale;
@@ -568,92 +591,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       return sphere;
     }
   }, {
-    key: "createBox",
-    value: function createBox(entityData) {
-      var _this4 = this;
-      var game = this.game;
-      var box = BABYLON.MeshBuilder.CreateBox('default', {
-        width: entityData.width,
-        height: entityData.depth,
-        depth: entityData.height
-      }, this.scene);
-
-      // Add rotation if present
-      if (entityData.rotation) {
-        // Set rotation as needed
-      }
-
-      // Incoming color is int color value
-      if (entityData.color) {
-        // alert(`entityData.color ${entityData.color}`);
-        // Set color as needed
-        box.material = new BABYLON.StandardMaterial("material", this.scene);
-        // Extract RGB components from the hexadecimal color value
-        var red = entityData.color >> 16 & 255;
-        var green = entityData.color >> 8 & 255;
-        var blue = entityData.color & 255;
-        // Set tint of graphic using the extracted RGB values
-        box.material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
-      }
-
-      // Ensure the box is actionable
-      box.isPickable = true;
-
-      // Create an action manager for the box
-      box.actionManager = new BABYLON.ActionManager(this.scene);
-
-      // Pointer over event
-      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function () {
-        // console.log('pointerover', entityData.id, entityData.type, entityData);
-        _this4.scene.getEngine().getRenderingCanvas().style.cursor = 'pointer';
-      }));
-
-      // Pointer out event
-      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function () {
-        // console.log('pointerout', entityData.id, entityData.type, entityData)
-        _this4.scene.getEngine().getRenderingCanvas().style.cursor = 'default';
-        // Additional logic if needed
-        // Get the full entity from the game and delegate based on part type
-        var ent = game.getEntity(entityData.id);
-        if (ent && ent.yCraft && ent.yCraft.part) {
-          var partType = ent.yCraft.part.type;
-          if (partType === 'MotionDetector') {
-            ent.yCraft.part.onFn();
-          }
-        }
-      }));
-
-      // Pointer down event
-      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, function () {
-        // console.log('pointerdown', entityData.id, entityData.type, entityData);
-        var ent = game.getEntity(entityData.id);
-        if (ent && ent.yCraft && ent.yCraft.part) {
-          var partType = ent.yCraft.part.type;
-          if (partType === 'Button') {
-            ent.yCraft.part.press();
-          }
-          if (ent.yCraft.part.toggle) {
-            ent.yCraft.part.toggle();
-          }
-        }
-        // Logic for pointer down
-      }));
-
-      // Pointer up event
-      box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
-        // Logic for pointer up
-        // console.log('pointerup', entityData.id, entityData.type, entityData)
-        var ent = game.getEntity(entityData.id);
-        if (ent && ent.yCraft && ent.yCraft.part) {
-          var partType = ent.yCraft.part.type;
-          if (partType === 'Button' && ent.yCraft.part.release) {
-            ent.yCraft.part.release();
-          }
-        }
-      }));
-      return box;
-    }
-  }, {
     key: "createTriangle",
     value: function createTriangle(entityData) {
       var mesh = BABYLON.MeshBuilder.CreateCylinder(entityData.id, {
@@ -675,29 +612,6 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "render",
     value: function render(game, alpha) {
       var self = this;
-      var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var _step$value = _slicedToArray(_step.value, 2),
-            eId = _step$value[0],
-            state = _step$value[1];
-          var ent = this.game.entities.get(eId);
-          this.inflateEntity(ent, alpha);
-          // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
-          //                    This could impact online mode, test for multiplayer
-          /*
-          if (ent.pendingRender && ent.pendingRender['graphics-babylon']) {
-            this.inflateEntity(ent, alpha);
-            ent.pendingRender['graphics-babylon'] = false;
-          }
-          */
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
       if (game.systems['graphics-babylon-camera']) {
         var cameraSystem = game.getSystem('graphics-babylon-camera');
         cameraSystem.render();
@@ -744,17 +658,17 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "unload",
     value: function unload() {
-      var _this5 = this;
+      var _this4 = this;
       // TODO: consolidate graphics pipeline unloading into SystemsManager
       // TODO: remove duplicated unload() code in PhaserGraphics
       // iterate through all entities and remove existing babylon graphics
-      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
-        _step2;
+      var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step;
       try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _step2$value = _slicedToArray(_step2.value, 2),
-            eId = _step2$value[0],
-            entity = _step2$value[1];
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+            eId = _step$value[0],
+            entity = _step$value[1];
           if (entity.graphics && entity.graphics['graphics-babylon']) {
             this.removeGraphic(eId);
             delete entity.graphics['graphics-babylon'];
@@ -764,13 +678,13 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // remove BabylonCamera as well
         // Remark: is this required? could we just leave it in memory?
       } catch (err) {
-        _iterator2.e(err);
+        _iterator.e(err);
       } finally {
-        _iterator2.f();
+        _iterator.f();
       }
       this.game.systemsManager.removeSystem('graphics-babylon-camera');
       this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this5.id;
+        return g.id !== _this4.id;
       });
       delete this.game._plugins['BabylonGraphics'];
 
@@ -792,7 +706,7 @@ _defineProperty(BabylonGraphics, "removable", false);
 _defineProperty(BabylonGraphics, "async", true);
 var _default = exports["default"] = BabylonGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./camera/BabylonCamera.js":3,"./lib/inflateText.js":4}],3:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./camera/BabylonCamera.js":3,"./lib/createBox.js":4,"./lib/inflateText.js":5}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -811,7 +725,8 @@ var BabylonCamera = /*#__PURE__*/function () {
     var camera = _ref.camera;
     _classCallCheck(this, BabylonCamera);
     this.id = BabylonCamera.id;
-    this.startingZoom = camera.startingZoom;
+    // this.startingZoom = camera.startingZoom;
+    this.startingZoom = 0.25;
     // config scope for convenience
     var config = {
       camera: camera
@@ -821,6 +736,8 @@ var BabylonCamera = /*#__PURE__*/function () {
   _createClass(BabylonCamera, [{
     key: "init",
     value: function init(game, engine, scene) {
+      // hoist and override
+      game.setZoom = this.setZoom.bind(this);
       this.scene = scene;
       this.game = game;
       this.engine = engine;
@@ -859,6 +776,11 @@ var BabylonCamera = /*#__PURE__*/function () {
       this.camera.radius = 2560 * this.startingZoom;
       //alert(this.camera.radius)
       //console.log('this.camera.radiusthis.camera.radiusthis.camera.radius', this.camera.radius)
+    }
+  }, {
+    key: "setZoom",
+    value: function setZoom(zoom) {
+      this.camera.radius = 2560 * zoom;
     }
   }, {
     key: "setupCameraControls",
@@ -988,20 +910,154 @@ var _default = exports["default"] = BabylonCamera;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = createBox;
+function createBox(entityData) {
+  var _this = this;
+  var game = this.game;
+  var box = BABYLON.MeshBuilder.CreateBox('default', {
+    width: entityData.width,
+    height: entityData.depth,
+    depth: entityData.height
+  }, this.scene);
+
+  // Add rotation if present
+  if (entityData.rotation) {
+    // Set rotation as needed
+  }
+  // Create a material for the box
+  var material = new BABYLON.StandardMaterial("material", this.scene);
+  // console.log('game.getTexture(entityData.texture)', game.getTexture(entityData.texture))
+  // Check if texture is available
+  if (typeof game.getTexture(entityData.texture) !== 'undefined') {
+    // Apply texture
+    var texture = game.getTexture(entityData.texture);
+    material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
+    material.diffuseTexture.wAng = -Math.PI / 2;
+
+    /*
+    // Remark: Attempting to tilt 2d texture box to achieve 30 degree perspective
+    // Not quite working yet
+      if (entityData.kind === 'building') {
+        const rotationAngle = 30 * (Math.PI / 180); // Convert 30 degrees to radians
+        box.rotation.x = rotationAngle; // Rotate around X-axis
+        // Assuming the height of the box is known (e.g., boxHeight)
+        const boxHeight = entityData.height; // Replace with the actual height of your box
+        let adjustment = (boxHeight / 2) - (boxHeight / 2) * Math.cos(rotationAngle);
+        // adjustment = 1000;
+        // Adjust the position of the box
+        //box.position = new BABYLON.Vector3(0, adjustment, 0);
+        // box.position.x = 0;
+        entityData.position.z = adjustment * 4;
+        // we now have a flat 2d texture added to a 3d box
+        // it has a depth of 1
+        // TODO: "tilt" the texture "up" by 30 degrees
+        // material.diffuseTexture.vAng = Math.PI / 6; // not correct
+      }
+    */
+    // ensure transparency is enabled
+    material.diffuseTexture.hasAlpha = true;
+  } else if (entityData.color) {
+    // Incoming color is int color value
+    // Extract RGB components from the hexadecimal color value
+    var red = entityData.color >> 16 & 255;
+    var green = entityData.color >> 8 & 255;
+    var blue = entityData.color & 255;
+    // Set tint of graphic using the extracted RGB values
+    // clear the existing material color
+    material.diffuseColor = new BABYLON.Color3.FromInts(red, green, blue);
+  }
+  if (typeof entityData.style !== 'undefined') {
+    if (typeof entityData.style.display !== 'undefined') {
+      // console.log('entityData.style.display', entityData.style.display)
+      if (entityData.style.display === 'none') {
+        box.isVisible = false;
+      }
+    }
+  }
+
+  // Apply the material to the box
+  box.material = material;
+
+  // Ensure the box is actionable
+  box.isPickable = true;
+
+  // Create an action manager for the box
+  box.actionManager = new BABYLON.ActionManager(this.scene);
+
+  // Pointer over event
+  box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, function () {
+    // console.log('pointerover', entityData.id, entityData.type, entityData);
+    _this.scene.getEngine().getRenderingCanvas().style.cursor = 'pointer';
+  }));
+
+  // Pointer out event
+  box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, function () {
+    // console.log('pointerout', entityData.id, entityData.type, entityData)
+    _this.scene.getEngine().getRenderingCanvas().style.cursor = 'default';
+    // Additional logic if needed
+    // Get the full entity from the game and delegate based on part type
+    var ent = game.getEntity(entityData.id);
+    if (ent && ent.yCraft && ent.yCraft.part) {
+      var partType = ent.yCraft.part.type;
+      if (partType === 'MotionDetector') {
+        ent.yCraft.part.onFn();
+      }
+    }
+  }));
+
+  // Pointer down event
+  box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, function () {
+    // console.log('pointerdown', entityData.id, entityData.type, entityData);
+    var ent = game.getEntity(entityData.id);
+    if (ent && ent.yCraft && ent.yCraft.part) {
+      var partType = ent.yCraft.part.type;
+      if (partType === 'Button') {
+        ent.yCraft.part.press();
+      }
+      if (ent.yCraft.part.toggle) {
+        ent.yCraft.part.toggle();
+      }
+    }
+    // Logic for pointer down
+  }));
+
+  // Pointer up event
+  box.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
+    // Logic for pointer up
+    // console.log('pointerup', entityData.id, entityData.type, entityData)
+    var ent = game.getEntity(entityData.id);
+    if (ent && ent.yCraft && ent.yCraft.part) {
+      var partType = ent.yCraft.part.type;
+      if (partType === 'Button' && ent.yCraft.part.release) {
+        ent.yCraft.part.release();
+      }
+    }
+  }));
+  return box;
+}
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = inflateText;
 function inflateText(entityData, scene) {
   var plane, texture;
 
-  // TODO: ensure this file won't be called each game tick, and only on update or create
-  // we cannot dispose of the texture and plane each tick, or we will get CPU spikes
-
+  // Dispose of existing texture and plane if they exist
   if (entityData.graphics && entityData.graphics['graphics-babylon']) {
-    // Dispose of existing texture and plane if they exist
     entityData.graphics['graphics-babylon'].texture.dispose();
     entityData.graphics['graphics-babylon'].plane.dispose();
   }
   var text = entityData.text || '';
-  var font = 'bold 244px monospace';
+  var font = '48px monospace';
+  if (typeof entityData.style !== 'undefined') {
+    if (entityData.style.fontSize !== 'undefined') {
+      // font = `${entityData.style.fontSize} monospace`;
+    }
+  }
 
   // Create a temporary canvas to measure text
   var tempCanvas = document.createElement('canvas');
@@ -1022,6 +1078,8 @@ function inflateText(entityData, scene) {
   var material = new BABYLON.StandardMaterial('textMaterial', scene);
   material.diffuseTexture = texture;
   material.backFaceCulling = false;
+  material.opacityTexture = texture; // Use the texture as an opacity map for transparency
+
   plane = new BABYLON.MeshBuilder.CreatePlane('signboard', {
     width: textureWidth / 10,
     height: textureHeight / 10
@@ -1033,7 +1091,10 @@ function inflateText(entityData, scene) {
   texture.getContext().clearRect(0, 0, textureWidth, textureHeight);
   var xPosition = 30; // Horizontal padding
   var yPosition = textureHeight / 2 + textSize.actualBoundingBoxAscent / 2 - 40; // Adjusted for vertical centering
-  texture.drawText(text, xPosition, yPosition, font, 'purple', 'white', true, true);
+
+  // Draw text with transparent background
+  // TODO: color config text
+  texture.drawText(text, xPosition, yPosition, font, 'white', 'transparent', true, true);
 
   // Update entityData with new graphics
   entityData.graphics = {
@@ -1044,7 +1105,7 @@ function inflateText(entityData, scene) {
   };
 
   // Adjust plane position
-  plane.position = new BABYLON.Vector3(entityData.position.x, entityData.position.y + 200, entityData.position.z);
+  plane.position = new BABYLON.Vector3(entityData.position.x, entityData.position.y, entityData.position.z);
   return plane;
 }
 

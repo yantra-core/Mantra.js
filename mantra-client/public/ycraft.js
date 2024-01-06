@@ -202,6 +202,12 @@ Object.defineProperty(exports, "Button", {
     return _Button["default"];
   }
 });
+Object.defineProperty(exports, "Craft", {
+  enumerable: true,
+  get: function get() {
+    return _YCraft["default"];
+  }
+});
 Object.defineProperty(exports, "Display", {
   enumerable: true,
   get: function get() {
@@ -390,7 +396,13 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
     var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
       _ref$powerRequired = _ref.powerRequired,
-      powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired;
+      powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired,
+      _ref$height = _ref.height,
+      height = _ref$height === void 0 ? 640 : _ref$height,
+      _ref$width = _ref.width,
+      width = _ref$width === void 0 ? 640 : _ref$width,
+      _ref$description = _ref.description,
+      description = _ref$description === void 0 ? 'A YCraft contraption' : _ref$description;
     _classCallCheck(this, YCraft);
     _this = _super.call(this);
 
@@ -400,6 +412,9 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
       y: y,
       z: z
     };
+    _this.height = height;
+    _this.width = width;
+    _this.description = description;
     _this.powerRequired = powerRequired;
 
     // parts of the contraption, added via addPart() method

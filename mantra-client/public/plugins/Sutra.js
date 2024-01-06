@@ -51,6 +51,11 @@ var Sutra = /*#__PURE__*/function () {
             game.data.input = this.inputCache;
           }
         }
+        game.data.camera = game.data.camera || {};
+        game.data.camera.position = game.data.camera.position || {
+          x: 0,
+          y: 0
+        };
 
         // TODO: can we consolidate these into a single rules.tick() call?
         var _iterator = _createForOfIteratorHelper(game.entities.entries()),
@@ -61,6 +66,7 @@ var Sutra = /*#__PURE__*/function () {
               entityId = _step$value[0],
               entity = _step$value[1];
             // console.log('entity', entityId, entity)
+            game.data.game = game;
             game.rules.tick(entity, game.data);
           }
         } catch (err) {
@@ -84,7 +90,10 @@ var Sutra = /*#__PURE__*/function () {
           game.data.collisions.forEach(function (collisionEvent) {
             game.rules.tick(collisionEvent, game.data);
           });
-          game.data.collisions = [];
+          // remove all collisions that are not active
+          game.data.collisions = game.data.collisions.filter(function (collisionEvent) {
+            return collisionEvent.kind === 'ACTIVE';
+          });
         }
         game.data.input = {};
         this.inputCache = {};
@@ -481,9 +490,22 @@ function exportToEnglish() {
     }
     return JSON.stringify(condition);
   };
+
+  // handle subtrees when this.tree is empty
+  // TODO: add case for root + subtrees
+  if (!this.tree || this.tree.length === 0 && this.subtrees) {
+    var subtreeOutputs = Object.keys(this.subtrees).map(function (subtreeKey) {
+      var subtree = _this.subtrees[subtreeKey];
+      return "@".concat(subtreeKey, "=>\n").concat(exportToEnglish.call(subtree, indentLevel + 1, lang));
+    });
+    return subtreeOutputs.join('\n') + '\n' + conditionDescriptions;
+  }
+
+  // Existing logic for handling this.tree
   return this.tree.map(function (node) {
     return describeAction(node, indentLevel);
   }).join('\n').concat('') + '\n' + conditionDescriptions;
+  //return this.tree.map(node => describeAction(node, indentLevel)).join('\n').concat('') + '\n' + conditionDescriptions;
 }
 
 },{"./i18n.js":8}],8:[function(require,module,exports){

@@ -20,7 +20,7 @@ var Bullet = /*#__PURE__*/function () {
     this.id = Bullet.id;
     this.bulletCount = 0;
     this.redGlowMaterial = null; // Used for caching the material
-    this.speed = config.speed || 22; // or 22?
+    this.speed = config.speed || 3; // or 22?
     this.direction = config.direction || {
       x: 0,
       y: 1
@@ -42,6 +42,10 @@ var Bullet = /*#__PURE__*/function () {
     key: "fireBullet",
     value: function fireBullet(entityId) {
       var entity = this.game.getEntity(entityId);
+      if (!entity) {
+        console.log('Bullet.fireBullet no entity found for id', entityId);
+        return;
+      }
       var actionRateLimiterComponent = this.game.components.actionRateLimiter;
       var lastFired = actionRateLimiterComponent.getLastActionTime(entityId, 'fireBullet');
       var currentTime = Date.now();
@@ -58,10 +62,18 @@ var Bullet = /*#__PURE__*/function () {
         console.log('no player data available');
         return;
       }
-
       // Distance in front of the player where the bullet should start
-      var distanceInFront = 100; // TODO: make this a config
+      var distanceInFront = 16; // TODO: make this a config
 
+      if (typeof entity.radius !== 'undefined') {
+        entity.width = entity.radius * 2;
+        entity.height = entity.radius * 2;
+      }
+      var playerOffsetX = entity.width / 2; // Adjust this value to align the bullet properly
+      var playerOffsetY = entity.height / 2; // Adjust this value to align the bullet properly
+
+      playerOffsetX = 0;
+      playerOffsetY = 0;
       if (typeof playerRotation === 'undefined') {
         playerRotation = 0; // this should have a default
       }
@@ -71,25 +83,33 @@ var Bullet = /*#__PURE__*/function () {
         playerRotation = playerRotation.z;
       }
 
-      // Place the bullet in front of the player
-      var bulletStartPosition = {
-        x: playerPos.x + distanceInFront * Math.sin(playerRotation),
-        y: playerPos.y + distanceInFront * -Math.cos(playerRotation)
-      };
-
       // Compute the bullet's direction based on player's rotation
       var directionX = Math.sin(playerRotation);
       var directionY = -Math.cos(playerRotation);
+
+      // Place the bullet in front of the player
+      var bulletStartPosition = {
+        x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
+        y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation)
+        //z: 10
+      };
+
       this.bulletCount++;
       var bulletDirectionConfig = {
         type: 'BULLET',
         mass: 1,
         position: bulletStartPosition,
         lifetime: this.lifetime,
+        //texture: 'tile-block',
+        /*      */
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'arrow'
+        },
         owner: entityId,
         rotation: playerRotation,
         isSensor: true,
-        color: entity.bulletColor || 0x000000,
+        //color: entity.bulletColor || 0x000000,
         velocity: {
           x: directionX * this.speed,
           y: directionY * this.speed
@@ -98,7 +118,8 @@ var Bullet = /*#__PURE__*/function () {
         // TODO: make this a config
         damage: 10 // TODO: make this a config
       };
-      // console.log('using bulletDirectionConfig', bulletDirectionConfig)
+
+      console.log('using bulletDirectionConfig', bulletDirectionConfig);
       this.game.createEntity(bulletDirectionConfig);
     }
   }, {

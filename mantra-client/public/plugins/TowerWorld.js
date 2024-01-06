@@ -88,19 +88,23 @@ var TowerWorld = /*#__PURE__*/function () {
         rules["if"]('blockIsRed').then('damagePlayer')["else"]('healPlayer');
       }).then('removeBlock');
       rules["if"]('roundRunning')["if"]('allWallsFallen').then('roundLost');
-      rules.addCondition('timerCompleted', function (entity) {
-        var timerDone = false;
-        // TODO: remove this, should iterate and know timer names
-        if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
-          timerDone = true;
-          // set time done to false on origin timer
-          entity.timers.timers['test-timer'].done = false;
-        }
-        if (timerDone) {
-          // console.log('timerDone', timerDone)
-        }
-        return timerDone;
+
+      /*
+      rules.addCondition('timerCompleted', entity => {
+      let timerDone = false;
+      // TODO: remove this, should iterate and know timer names
+      if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
+        timerDone = true;
+        // set time done to false on origin timer
+        entity.timers.timers['test-timer'].done = false;
+      }
+      if (timerDone) {
+        // console.log('timerDone', timerDone)
+      }
+      return timerDone;
       });
+      */
+
       rules.addCondition('allWallsFallen', function (entity, gameState) {
         // check see if any of UnitSpawners have been made it past the world height + 1000
         var height = gameState.height;
@@ -118,7 +122,13 @@ var TowerWorld = /*#__PURE__*/function () {
       rules.use(playerSutra, 'player');
       rules.use(colorChangesSutra, 'colorChanges');
       rules.use(inputSutra, 'input');
-      rules["if"]('roundRunning')["if"]('timerCompleted').then('spawner');
+
+      /*
+      rules
+        .if('roundRunning')
+        .if('timerCompleted')
+        .then('spawner');
+      */
 
       // rules.if('changesColorWithDamage').then('colorChanges');
       rules.addAction({
@@ -137,10 +147,14 @@ var TowerWorld = /*#__PURE__*/function () {
       game.setSutra(rules);
       game.data.roundStarted = true;
       game.data.roundRunning = false;
-      game.on('timer::done', function (entity, timerName, timer) {
+
+      /*
+      game.on('timer::done', (entity, timerName, timer) => {
         // console.log('timer done', entity, timerName, timer);
         // console.log(game.data)
       });
+      */
+
       return rules;
     }
   }, {
@@ -273,10 +287,13 @@ var TowerWorld = /*#__PURE__*/function () {
           };
           spawners.push(spawner);
         }
-        spawners.forEach(function (spawner) {
-          var ent = game.createEntity(spawner);
+
+        /*
+        spawners.forEach(spawner => {
+          let ent = game.createEntity(spawner);
           ent.timers.setTimer('test-timer', 2, true);
         });
+        */
       });
 
       /*
@@ -419,7 +436,11 @@ function spawner() {
   spawner.addCondition('moveRight', function (entity, gameState) {
     return entity.position.x < entity.startingPosition.x - 400;
   });
-  spawner["if"]('isSpawner').then('spawnBlock', {
+  spawner.addCondition('gameTickMod60', function (entity, gameState) {
+    // console.log('gameState.gameTick ', gameState.tick )
+    return gameState.tick % 25 === 0;
+  });
+  spawner["if"]('gameTickMod60')["if"]('isSpawner').then('spawnBlock', {
     x: 0,
     y: 100
   });
@@ -431,38 +452,49 @@ function spawner() {
   // spawner.define()
   // spawner.condition('isSpawner', (entity, gameState) => entity.type === 'UnitSpawner');
 
-  spawner["if"]('isSpawner', 'moveLeft').then('entity::updateEntity', {
+  spawner
+  //.if('gameTickMod60')
+  ["if"]('isSpawner' /*, 'moveLeft'*/).then('entity::updateEntity', {
     velocity: {
-      x: -10,
-      y: 10
+      x: -1,
+      y: 1
     }
   });
-  spawner["if"]('isSpawner', 'moveRight').then('entity::updateEntity', {
+  spawner
+  //.if('gameTickMod60')
+  ["if"]('isSpawner', 'moveRight').then('entity::updateEntity', {
     velocity: {
-      x: 10,
-      y: 10
+      x: 1,
+      y: 1
     }
   });
   spawner.on('spawnBlock', function (entity, data) {
-    // console.log('spawnBlock', entity, data)
+    console.log('spawnBlock', entity, data);
     var ent = game.createEntity({
       type: 'BLOCK',
       position: {
         x: entity.position.x,
-        y: entity.position.y + 300
+        y: entity.position.y
       },
+      mass: 10000,
+      texture: 'fire',
       velocity: {
         x: 0,
-        y: 50
+        y: 3
       },
-      width: 100,
-      height: 100,
-      color: 0xff0000
+      width: 16,
+      height: 16
+      // color: 0xff0000
     });
+    // console.log('aaaa', ent)
   });
+
   spawner.on('entity::updateEntity', function (data, node) {
-    // console.log('entity::updateEntity', data);
-    game.updateEntity(data);
+    // console.log('entity::updateEntity', data, node);
+    game.updateEntity({
+      id: data.id,
+      velocity: data.velocity
+    });
   });
   spawner.addCondition('spawnUnitTouchedHomebase', function (entity, gameState) {
     if (entity.type === 'COLLISION') {
@@ -488,9 +520,10 @@ function spawner() {
       color: 0x00ff00
     };
     newSpawner.startingPosition = previous.startingPosition;
-    var ent = game.createEntity(newSpawner);
-    ent.timers.setTimer('test-timer', 0.5, true);
+    //let ent = game.createEntity(newSpawner);
+    //ent.timers.setTimer('test-timer', 0.5, true);
   });
+
   return spawner;
 }
 

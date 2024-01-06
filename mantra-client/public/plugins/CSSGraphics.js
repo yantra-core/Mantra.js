@@ -98,22 +98,23 @@ var CSSCamera = /*#__PURE__*/function () {
       y: 0
     };
     this.isThrowing = false;
+    this.rotating = false;
   }
   _createClass(CSSCamera, [{
     key: "init",
     value: function init(game) {
       var _this = this;
       this.game = game;
+      this.resetCameraState();
 
+      //game.rotateCamera = this.rotateCamera.bind(this);
+      game.rotateCamera = this.rotateCameraOverTime.bind(this);
       // sets auto-follow player when starting CSSGraphics ( for now )
       this.follow = true;
       this.game.systemsManager.addSystem('graphics-css-camera', this);
       this.gameViewport = document.getElementById('gameHolder');
-
-      // this.scene.zoom(this.game.config.camera.startingZoom);
-
       game.viewportCenterXOffset = 0;
-      game.viewportCenterYOffset = -200;
+      game.viewportCenterYOffset = 0;
       this.initZoomControls();
       game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
         /*
@@ -133,9 +134,82 @@ var CSSCamera = /*#__PURE__*/function () {
           if (data.mouse.buttons.RIGHT) {
             _this.gameViewport.style.cursor = 'grabbing';
           }
-          _this.updateCameraPosition(data.mouse.dx, data.mouse.dy, data.mouse.isDragging);
+          // console.log('Current Zoom', game.data.camera.currentZoom);
+
+          // Adjust the drag deltas based on the current zoom level
+          // When zoomed out (lower zoom value), increase the drag deltas
+          // When zoomed in (higher zoom value), decrease the drag deltas
+          data.mouse.dx = data.mouse.dx || 0;
+          data.mouse.dy = data.mouse.dy || 0;
+          var zoomFactor = 1 / game.data.camera.currentZoom || 4.5;
+          var adjustedDx = data.mouse.dx * zoomFactor;
+          var adjustedDy = data.mouse.dy * zoomFactor;
+
+          //console.log('Adjusted Dx', adjustedDx, 'og', data.mouse.dx);
+          //console.log('Adjusted Dy', adjustedDy, 'og', data.mouse.dy);
+
+          _this.updateCameraPosition(adjustedDx, adjustedDy, data.mouse.isDragging);
         }
       });
+    }
+  }, {
+    key: "resetCameraState",
+    value: function resetCameraState() {
+      // alert('reset')
+      this.game.viewportCenterXOffset = 0;
+      this.game.viewportCenterYOffset = 0;
+      // Reset other camera properties as needed
+    }
+
+    // Method to smoothly rotate the camera over a given duration using CSS transitions
+  }, {
+    key: "rotateCameraOverTime",
+    value: function rotateCameraOverTime() {
+      var _this2 = this;
+      var targetAngle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 90;
+      var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 800;
+      if (typeof targetAngle !== 'number' || typeof duration !== 'number') {
+        console.error('Invalid arguments for rotateCameraOverTime. Both targetAngle and duration must be numbers.');
+        return;
+      }
+      if (this.rotating) {
+        return;
+      }
+      this.rotating = true;
+      this.game.data.camera.rotation = targetAngle;
+
+      // Retrieve the current zoom level
+      var currentZoom = this.game.data.camera.currentZoom;
+
+      // Set the transition property on the gameViewport
+      this.gameViewport.style.transition = "transform ".concat(duration, "ms");
+
+      // TODO: better centering
+      // this.gameViewport.style.transformOrigin = 'center center 0';
+
+      // Apply the combined scale (for zoom) and rotation
+      this.gameViewport.style.transform = "scale(".concat(currentZoom, ") rotate(").concat(targetAngle, "deg)");
+
+      // Reset the transition after the animation is complete
+      // TODO: remove setTimeout in favor of game.tick % N
+      setTimeout(function () {
+        _this2.gameViewport.style.transition = '';
+        _this2.rotating = false;
+      }, duration);
+    }
+
+    // Method to rotate the camera
+  }, {
+    key: "rotateCamera",
+    value: function rotateCamera(angle) {
+      // Ensure the angle is a number and set a default if not
+      if (typeof angle !== 'number') {
+        console.error('Invalid angle for rotateCamera. Must be a number.');
+        return;
+      }
+
+      // Update the CSS transform property to rotate the viewport
+      this.gameViewport.style.transform = "rotate(".concat(angle, "deg)");
     }
 
     // Method to update camera position based on drag
@@ -152,7 +226,6 @@ var CSSCamera = /*#__PURE__*/function () {
         this.gameViewport.style.cursor = 'grabbing';
         this.isDragging = true;
         // this.follow = false;
-
         if (typeof dx === 'number') {
           game.viewportCenterXOffset += dx;
         }
@@ -217,21 +290,49 @@ var CSSCamera = /*#__PURE__*/function () {
         //console.log("2 STOPPED THROWING")
       }
     }
-
-    // update() is called each game tick, we may want to implement render() here instead for RAF
   }, {
     key: "update",
     value: function update() {
       var game = this.game;
       var currentPlayer = this.game.getEntity(game.currentPlayerId);
-      var entityId = game.currentPlayerId;
 
-      // console.log('game.viewportCenterXOffset', game.viewportCenterXOffset, game.viewportCenterYOffset)
-      // TODO: add ability for this to work with dragging and follow false
-      if (this.follow && currentPlayer.position) {
-        this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
-        this.scene.cameraPosition.y = currentPlayer.position.y - game.viewportCenterYOffset;
+      // Current zoom level
+      var currentZoom = game.data.camera.currentZoom;
+
+      // Get browser window dimensions
+      var windowHeight = window.innerHeight;
+
+      // Define the adjustment value and scale factor
+      //console.log('adjustment', adjustment);
+      // TODO: use pixelAdjustment based on zoom scale
+
+      var scaleFactor = 1 / currentZoom;
+      var adjustment = -400; // TODO: this should be window height or something similar
+      adjustment = -windowHeight / 2 + 350;
+      var pixelAdjustment = adjustment * scaleFactor;
+      game.viewportCenterYOffset = -windowHeight / 2;
+      // Update the camera position
+      if (this.follow && currentPlayer && currentPlayer.position) {
+        // If following a player, adjust the camera position based on the player's position and the calculated offset
+
+        this.scene.cameraPosition.x = currentPlayer.position.x;
+        var newY = currentPlayer.position.y - game.viewportCenterYOffset;
+        // locks camera to not exceed bottom of screen for platformer mode
+        if (game.data.camera.mode === 'platformer') {
+          if (newY < windowHeight * 0.38) {
+            this.scene.cameraPosition.y = newY;
+          }
+        } else {
+          this.scene.cameraPosition.y = newY;
+        }
+      } else {
+        // If not following a player, use the calculated offsets directly
+        this.scene.cameraPosition.x = game.viewportCenterXOffset;
+        this.scene.cameraPosition.y = game.viewportCenterYOffset;
       }
+
+      // Update the camera's position in the game data
+      this.game.data.camera.position = this.scene.cameraPosition;
     }
   }, {
     key: "initZoomControls",
@@ -245,6 +346,9 @@ var CSSCamera = /*#__PURE__*/function () {
   return CSSCamera;
 }();
 _defineProperty(CSSCamera, "id", 'css-camera');
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
 var _default = exports["default"] = CSSCamera;
 
 },{}],3:[function(require,module,exports){
@@ -258,10 +362,12 @@ var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInte
 var _CSSCamera = _interopRequireDefault(require("./CSSCamera.js"));
 var _inflateBox = _interopRequireDefault(require("./lib/inflateBox.js"));
 var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
+var _inflateEntity = _interopRequireDefault(require("./lib/inflateEntity.js"));
+var _setTransform = _interopRequireDefault(require("./lib/setTransform.js"));
+var _updateGraphic = _interopRequireDefault(require("./lib/updateGraphic.js"));
 var _updateEntityPosition = _interopRequireDefault(require("./lib/updateEntityPosition.js"));
-var _updatePlayerSprite = _interopRequireDefault(require("./lib/updatePlayerSprite.js"));
 var _mouseWheelZoom = _interopRequireDefault(require("./lib/mouseWheelZoom.js"));
-var _handleInputs = _interopRequireDefault(require("./lib/handleInputs.js"));
+var _handleInputs = _interopRequireDefault(require("../graphics/lib/handleInputs.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -314,10 +420,14 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.mouseWheelEnabled = false;
     _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
     _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
+    _this.inflateEntity = _inflateEntity["default"].bind(_assertThisInitialized(_this));
+    _this.setTransform = _setTransform["default"].bind(_assertThisInitialized(_this));
+    _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.updateEntityPosition = _updateEntityPosition["default"].bind(_assertThisInitialized(_this));
     _this.handleInputs = _handleInputs["default"].bind(_assertThisInitialized(_this));
-    _this.updatePlayerSprite = _updatePlayerSprite["default"].bind(_assertThisInitialized(_this));
-    _this.depthChart = ['background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER', 'BLOCK'];
+
+    // TODO: make this function lookup with defaults ( instead of -1 )
+    _this.depthChart = ['background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER', 'BLOCK', 'FIRE', 'WARP', 'NOTE'];
 
     // this.depthChart = this.depthChart.reverse();
     _this.mouseWheelZoom = _mouseWheelZoom["default"].bind(_assertThisInitialized(_this));
@@ -327,20 +437,15 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "init",
     value: function init(game) {
       this.game = game;
+      game.setZoom = this.zoom.bind(this);
       var cssCamera = new _CSSCamera["default"](this, this.camera);
       this.game.use(cssCamera);
-
-      // register renderer with graphics pipeline
-      game.graphics.push(this);
 
       // let the graphics pipeline know the document is ready ( we could add document event listener here )
       // Remark: CSSGraphics current requires no async external loading scripts
 
       // Initialize the CSS render div
       this.initCSSRenderDiv();
-
-      // Bind event handlers for changing player sprite
-      this.handleInputs();
 
       // register renderer with graphics pipeline
       game.graphics.push(this);
@@ -351,8 +456,11 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
       // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
-
-      // this.zoom(1.1);
+      this.zoom(4.5);
+      game.on('game::ready', function () {});
+      // 
+      // this.zoom(game.data.camera.currentZoom);
+      // this.zoom(game.data.camera.currentZoom);
     }
   }, {
     key: "initCSSRenderDiv",
@@ -402,10 +510,16 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         case 'BULLET':
           // For BULLET entities, create a circle
           var radius = entityData.radius || 0;
-          entityElement.style.width = radius * 2 + 'px';
-          entityElement.style.height = radius * 2 + 'px';
-          entityElement.style.borderRadius = '50%'; // This will make the div a circle
-          entityElement.style.background = 'red';
+          entityElement.style.width = entityData.radius + 'px';
+          entityElement.style.height = entityData.radius + 'px';
+          // console.log('inflating bullet', entityData)
+          //entityElement.style.width = entityData.width + 'px';
+          //entityElement.style.height = entityData.height + 'px';
+          //entityElement.style.width = (radius / 2) + 'px';
+          //entityElement.style.height = (radius / 2) + 'px';
+          //entityElement.style.borderRadius = '50%';  // This will make the div a circle
+          //entityElement.style.background = 'red';
+          this.inflateBox(entityElement, entityData);
           break;
         case 'PLAYER':
           // For PLAYER entities, create a triangle
@@ -417,7 +531,8 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
           // entityElement.classList.add('pixelart-to-css');
 
           // Set default sprite
-          entityElement.classList.add('guy-right-0');
+          // entityElement.classList.add('guy-right-0');
+          this.inflateBox(entityElement, entityData);
           break;
         case 'TEXT':
           entityElement = this.inflateText(entityElement, entityData);
@@ -437,65 +552,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       return entityElement;
     }
   }, {
-    key: "updateGraphic",
-    value: function updateGraphic(entityData) {
-      // TODO: move this to common 3D-2.5D transform function(s)
-      if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
-        if (_typeof(entityData.rotation) === 'object') {
-          // transform 3d to 2.5d
-          entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
-        } else {
-          entityData.rotation = entityData.rotation;
-        }
-      }
-      var entityElement = document.getElementById("entity-".concat(entityData.id));
-      if (entityElement) {
-        // Update the entity color
-        if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
-          // entityData.color is int number here we need a hex
-          var hexColor = '#' + entityData.color.toString(16);
-          // update the background color
-          entityElement.style.background = hexColor;
-        }
-        // Update the background sprite if velocity is present
-        /*
-        if (entityData.type === 'PLAYER' && entityData.velocity && this.game.tick % 10 === 0 && Math.abs(entityData.velocity.x) > 0.001 && Math.abs(entityData.velocity.y) > 0.001) {
-           let angle = Math.atan2(entityData.velocity.y, entityData.velocity.x);
-          let angleDeg = angle * 180 / Math.PI;
-           // Remark: Move this logic to just listen for local entityInput
-          // we can revist this for server side prediction later
-          // Determine direction based on angle
-          let direction = "";
-          if (angleDeg >= -45 && angleDeg < 45) {
-            direction = "right";
-          } else if (angleDeg >= 45 && angleDeg < 135) {
-            direction = "down";
-          } else if (angleDeg >= -135 && angleDeg < -45) {
-            direction = "up";
-          } else {
-            direction = "left";
-          }
-           // Assume there's a way to determine whether to use -0 or -1 suffix
-          // For simplicity, let's alternate between -0 and -1
-          let spriteNumber = Math.round(Math.random()); // Randomly choose 0 or 1
-          let spriteClass = `guy-${direction}-${spriteNumber}`;
-           // First, clear previous sprite classes if any
-          entityElement.classList.remove('guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1');
-           // Add the new sprite class
-          entityElement.classList.add(spriteClass);
-           //console.log('Entity data:', entityData);
-          //console.log('Applied class:', spriteClass);
-        }
-        */
-
-        // Update the position of the entity element
-        return this.updateEntityPosition(entityElement, entityData);
-      } else {
-        // If the entity element does not exist, create it
-        return this.createGraphic(entityData);
-      }
-    }
-  }, {
     key: "removeGraphic",
     value: function removeGraphic(entityId) {
       var entity = this.game.getEntity(entityId);
@@ -508,31 +564,20 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       }
     }
   }, {
-    key: "setTransform",
-    value: function setTransform(entityElement, domX, domY, rotation, angle) {
-      // Retrieve the last rotation value, default to 0 if not set
-      var lastRotation = entityElement.dataset.rotation || 0;
-      // Update rotation if provided
-      if (rotation) {
-        lastRotation = angle;
-        entityElement.dataset.rotation = angle;
-      }
-
-      // Update the transform property
-      entityElement.style.transform = "translate(".concat(domX, "px, ").concat(domY, "px) rotate(").concat(lastRotation, "deg)");
-    }
-  }, {
     key: "update",
     value: function update() {
       var game = this.game;
+
+      /*
       if (typeof game.viewportCenterXOffset === 'undefined') {
         game.viewportCenterXOffset = 0;
       }
-      if (typeof game.viewportCenterYOffset === 'undefined') {
+       if (typeof game.viewportCenterYOffset === 'undefined') {
         game.viewportCenterYOffset = 0;
       }
-      var currentPlayer = this.game.getEntity(game.currentPlayerId);
-      var entityId = game.currentPlayerId;
+       const currentPlayer = this.game.getEntity(game.currentPlayerId);
+      let entityId = game.currentPlayerId;
+      */
 
       // PLAYER MOUSE MOVEMENT CODE< TODO MOVE THIS TO SEPARATE FILE
       /*
@@ -603,7 +648,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             break;
         }
         // console.log("entityIdentityId", entityId, data);
-        // this.updatePlayerSprite(entityId, data);
          // Apply the direction vector as force or movement
         game.applyForce(entityId, { x: dirX, y: dirY });
        }
@@ -612,6 +656,14 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "render",
     value: function render(game, alpha) {
+      // render is called at the browser's frame rate (typically 60fps)
+      var self = this;
+      if (this.game.changedEntities.size > 0) {
+        // console.log('CHANGED', this.game.changedEntities)
+      }
+      // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
+      // This is not ideal and will yield low-entity count CSSGraphics performance
+      // Best to remove camera follow for CSSGraphics if possible
       var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
         _step;
       try {
@@ -620,27 +672,17 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             eId = _step$value[0],
             state = _step$value[1];
           var ent = this.game.entities.get(eId);
-          this.inflateEntity(ent, alpha);
-          if (ent.pendingRender && ent.pendingRender['graphics-css']) {
-            ent.pendingRender['graphics-css'] = false;
+          // console.log('rendering', ent)
+          // do not re-inflate destroyed entities
+          if (ent.destroyed !== true) {
+            this.inflateEntity(ent, alpha);
           }
+          // this.game.changedEntities.delete(eId);
         }
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
-      }
-    }
-  }, {
-    key: "inflateEntity",
-    value: function inflateEntity(entity, alpha) {
-      // checks for existence of entity, performs update or create
-      if (entity.graphics && entity.graphics['graphics-css']) {
-        var graphic = entity.graphics['graphics-css'];
-        this.updateGraphic(entity, alpha);
-      } else {
-        var _graphic = this.createGraphic(entity);
-        this.game.components.graphics.set([entity.id, 'graphics-css'], _graphic);
       }
     }
   }, {
@@ -687,15 +729,13 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "zoom",
     value: function zoom(scale) {
-      console.log("CSSGraphics zoom", scale);
+      // console.log("CSSGraphics zoom", scale)
+      this.game.data.camera.currentZoom = scale;
       var gameViewport = document.getElementById('gameHolder');
       if (gameViewport) {
         gameViewport.style.transform = "scale(".concat(scale, ")");
-        gameViewport.style.transition = 'transform 1s ease'; // Adjust duration and easing as needed
-        // transition: transform 0.3s ease; /* Adjust duration and easing as needed */
-        this.game.data.camera.currentZoom = scale;
-        // const viewportCenterX = window.innerWidth / 2;
-        // const viewportCenterY = window.innerHeight / 2;
+      } else {
+        console.log('Warning: could not find gameHolder div, cannot zoom');
       }
     }
   }]);
@@ -705,47 +745,19 @@ _defineProperty(CSSGraphics, "id", 'graphics-css');
 _defineProperty(CSSGraphics, "removable", false);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/handleInputs.js":4,"./lib/inflateBox.js":5,"./lib/inflateText.js":6,"./lib/mouseWheelZoom.js":7,"./lib/updateEntityPosition.js":8,"./lib/updatePlayerSprite.js":9}],4:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = cssHandleInputs;
-function cssHandleInputs() {
-  var _this = this;
-  var game = this.game;
-  //
-  // Updates the player sprite based on the current input
-  // Remark: Input and Movement are handled in EntityInput and EntityMovement plugins
-  //
-  game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
-    var player = game.getEntity(entityId);
-    if (data && player) {
-      game.components.inputs.set(entityId, data);
-      //if (data.mouse.buttons.LEFT) {
-      // game.components.inputs.set(entityId, data);
-      // }
-      //console.log('setting', entityId, 'inputs to', data)
-      //player.inputs = data.controls;
-
-      // console.log(data.mouse.position)
-      if (data.controls) {
-        _this.updatePlayerSprite(entityId, data);
-      }
-    }
-  });
-}
-
-},{}],5:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":11,"./CSSCamera.js":2,"./lib/inflateBox.js":4,"./lib/inflateEntity.js":5,"./lib/inflateText.js":6,"./lib/mouseWheelZoom.js":7,"./lib/setTransform.js":8,"./lib/updateEntityPosition.js":9,"./lib/updateGraphic.js":10}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = inflateBox;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function inflateBox(entityElement, entityData) {
+  // console.log('inflating entity', entityData.type, entityData.name)
+
   var game = this.game;
+  var getTexture = game.getTexture;
   var depthChart = this.depthChart;
   // For other entities, create a rectangle
   var hexColor = 'white';
@@ -753,18 +765,42 @@ function inflateBox(entityElement, entityData) {
     // entityData.color is int number here we need a hex
     hexColor = '#' + entityData.color.toString(16);
   }
-  entityElement.style.width = entityData.width + 'px';
-  entityElement.style.height = entityData.height + 'px';
+  if (typeof entityData.radius === 'number') {
+    entityElement.style.width = entityData.radius + 'px';
+    entityElement.style.height = entityData.radius + 'px';
+  } else {
+    entityElement.style.width = entityData.width + 'px';
+    entityElement.style.height = entityData.height + 'px';
+  }
   entityElement.style.borderRadius = '10px'; // Optional: to make it rounded
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
 
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+  entityElement.addEventListener('pointerdown', function (ev) {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    game.emit('pointerDown', ent, ev);
+  });
+  entityElement.addEventListener('pointerup', function (ev) {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    game.emit('pointerUp', ent, ev);
+  });
+  entityElement.addEventListener('pointermove', function (ev) {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    game.emit('pointerMove', ent, ev);
+  });
 
   // TODO: move to separate file for inflatePart,
   // move this code to CSSGraphics switch case
   if (entityData.type === 'PART') {
+    // console.log("SUPER INFLATE")
     // TODO: part.kind, not name, name is the individual part name user defined
     switch (entityData.name) {
       case 'Wire':
@@ -832,8 +868,143 @@ function inflateBox(entityElement, entityData) {
   // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
   // set border color to black
   entityElement.style.border = '1px solid black';
-  entityElement.style.background = hexColor; // Move this line here
+  if (getTexture(entityData.texture)) {
+    entityElement.style.border = 'none';
+    entityElement.style.zIndex = entityData.position.z;
+    entityElement.style.borderRadius = '0px';
+    // entityElement.style.padding = '1px';
+    // optional tile flip CSS ( not great for performance better to use sprite animations )
+    if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
+      // TODO: refactor API
+      tileFlip(entityElement, hexColor, getTexture, entityData);
+    } else {
+      var texture = getTexture(entityData.texture);
+      var textureUrl = texture.url;
+      var spritePosition = texture.sprite || {
+        x: 0,
+        y: 0
+      };
+
+      //console.log("SETTING TEXTURE", textureUrl, texture, spritePosition)
+      //console.log('entityData', entityData)
+      // console.log('got back texture', textureUrl, texture, spritePosition)
+      // TODO: move this closure
+      // rendering a texture without tile
+      // console.log('going to set texture', entityData.texture, getTexture(entityData.texture))
+      entityElement.style.background = "url('".concat(textureUrl, "')");
+      entityElement.style.backgroundRepeat = 'no-repeat';
+      entityElement.style.backgroundPosition = 'center';
+      // entityElement.style.border = 'solid'
+      //entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
+      // entityElement.style.backgroundPosition = '-208px -544px';
+      // set background size to entity size
+      if (spritePosition.x === 0 && spritePosition.y === 0) {
+        // entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+      }
+      if (!texture.frames) {
+        entityElement.style.backgroundSize = "".concat(entityData.width, "px ").concat(entityData.height, "px");
+        // align background in center no matter the size of the entity
+      }
+
+      entityElement.style.zIndex = entityData.position.z;
+      if (_typeof(entityData.texture) === 'object' && entityData.texture.sheet) {
+        // this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.sprite);
+      }
+      if (entityData.style) {
+        Object.keys(entityData.style).forEach(function (key) {
+          entityElement.style[key] = entityData.style[key];
+        });
+      }
+    }
+  } else {
+    entityElement.style.background = hexColor;
+  }
+
+  // console.log('entityElement', entityElement)
+
   return entityElement;
+}
+function tileFlip(entityElement, hexColor, getTexture, entityData) {
+  var texture = getTexture(entityData.texture);
+  // Calculate animation duration based on X and Y coordinates
+  var duration = Math.abs(entityData.position.x) + Math.abs(entityData.position.y);
+  duration = duration / 500; // Divide by 1000 to get a duration in seconds
+
+  // cap duration at min of 0.5
+  duration = Math.max(duration, 0.1);
+  duration = Math.min(duration, 3.3);
+
+  // Create a wrapper element for the flip effect
+  var flipWrapper = document.createElement('div');
+  flipWrapper.style.position = 'relative';
+  flipWrapper.style.width = '100%';
+  flipWrapper.style.height = '100%';
+  flipWrapper.style.perspective = '1000px'; // Set the perspective for the 3D effect
+
+  // Create the front and back faces of the tile
+  var frontFace = document.createElement('div');
+  frontFace.style.position = 'absolute';
+  frontFace.style.width = '100%';
+  frontFace.style.height = '100%';
+  frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
+  frontFace.style.animation = "flip ".concat(duration, "s ease"); // Set the animation using keyframes
+  frontFace.style.background = "url('".concat(texture.url, "')");
+  frontFace.style.backgroundRepeat = 'no-repeat';
+  frontFace.style.backgroundSize = 'cover';
+  var backFace = document.createElement('div');
+  backFace.style.position = 'absolute';
+  backFace.style.width = '100%';
+  backFace.style.height = '100%';
+  backFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
+  backFace.style.animation = "flip ".concat(duration, "s ease"); // Set the animation using keyframes
+  backFace.style.transform = 'rotateY(180deg)'; // Initial rotation for the back face, flipped
+  backFace.style.background = hexColor;
+
+  // Append front and back faces to the wrapper
+  flipWrapper.appendChild(frontFace);
+  flipWrapper.appendChild(backFace);
+
+  // Append the wrapper to the entityElement
+  entityElement.appendChild(flipWrapper);
+
+  // Remove the flipWrapper after animation is complete
+  flipWrapper.addEventListener('animationend', function () {
+    //entityElement.background = 
+    entityElement.style.background = "url('".concat(texture.url, "')");
+    entityElement.style.backgroundRepeat = 'no-repeat';
+    entityElement.style.backgroundSize = 'cover';
+
+    // clear animations styles
+    frontFace.style.animation = '';
+    frontFace.style.transform = '';
+    backFace.style.animation = '';
+    backFace.style.transform = '';
+
+    //flipWrapper.removeChild(frontFace);
+    //flipWrapper.removeChild(backFace);
+    if (entityElement) {
+      //entityElement.removeChild(flipWrapper);
+    }
+    flipWrapper.remove();
+  });
+}
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateEntity;
+function inflateEntity(entity, alpha) {
+  // checks for existence of entity, performs update or create
+  if (entity.graphics && entity.graphics['graphics-css']) {
+    var graphic = entity.graphics['graphics-css'];
+    this.updateGraphic(entity, alpha);
+  } else {
+    var _graphic = this.createGraphic(entity);
+    this.game.components.graphics.set([entity.id, 'graphics-css'], _graphic);
+  }
 }
 
 },{}],6:[function(require,module,exports){
@@ -875,6 +1046,16 @@ function inflateText(entityElement, entityData) {
   // console.log(entityData.type, entityData.name, depthChart.indexOf(entityData.type))
   chatBubble.style.zIndex = depthChart.indexOf(entityData.type);
 
+  /* Remark: No need to bind each entity to a pointerdown event for CSSGraphics, we can delegate
+  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+  chatBubble.addEventListener('pointerdown', (ev) => {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    let ent = game.getEntity(entityData.id);
+    game.emit('pointerDown', ent, ev);
+  });
+  */
+
   // console.log('appending new text element')
   // Append the chat bubble to the container
   entityElement.appendChild(chatBubble);
@@ -903,9 +1084,11 @@ function cssMouseWheelZoom(event) {
 
   // Zoom settings
   var zoomSettings = {
-    intensity: 0.03,
-    // Decreased zoom intensity for smoother zoom
-    minScale: 0.1 // Minimum scale limit
+    intensity: 0.1,
+    // Base zoom intensity
+    minScale: 0.1,
+    // Minimum scale limit
+    logBase: 2 // Logarithmic base
   };
 
   // Prevent default scrolling behavior
@@ -915,26 +1098,20 @@ function cssMouseWheelZoom(event) {
   var delta = event.wheelDelta ? event.wheelDelta : -event.detail;
   var direction = delta > 0 ? 1 : -1;
 
-  // Update scale
-  scale += direction * zoomSettings.intensity;
-  scale = Math.max(zoomSettings.minScale, scale); // Prevent zooming out too much
+  // Applying logarithmic scale for smooth zoom
+  var logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
+  var newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
 
-  this.zoom(scale);
-
-  // Calculate center of the viewport
+  // Center of the viewport
   var viewportCenterX = window.innerWidth / 2;
   var viewportCenterY = window.innerHeight / 2;
-  scale = scale * 100;
-  // Calculate offset based on camera position and scale
+
+  // Calculate offsets based on the old scale
   var offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
   var offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
-  offsetX += 100;
-  offsetY += 100;
 
-  //console.log('oooo', offsetX, offsetY, scale)
-  // Update game viewport offsets (if needed)
-  //game.viewportCenterXOffset = offsetX;
-  //game.viewportCenterYOffset = offsetY;
+  // Update scale
+  this.zoom(newScale);
 }
 
 },{}],8:[function(require,module,exports){
@@ -943,29 +1120,39 @@ function cssMouseWheelZoom(event) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = updateEntityElementPosition;
-function updateEntityElementPosition(entityElement, _ref) {
-  var position = _ref.position,
-    width = _ref.width,
-    height = _ref.height,
-    _ref$rotation = _ref.rotation,
-    rotation = _ref$rotation === void 0 ? 0 : _ref$rotation;
-  // Adjust the position based on the camera position
-  //console.log("og position", position, this.cameraPosition)
-  var adjustedPosition = {
-    x: position.x - this.cameraPosition.x + window.outerWidth / 2,
-    y: position.y - this.cameraPosition.y + window.outerHeight / 2
-  };
-  var domX = adjustedPosition.x - width / 2;
-  var domY = adjustedPosition.y - height / 2;
+exports["default"] = setTransform;
+function setTransform(entityData, entityElement, domX, domY, rotation, angle) {
+  // Retrieve the last rotation value, default to 0 if not set
+  var lastRotation = entityElement.dataset.rotation || 0;
 
-  // convert rotation to degrees
-  var angle = rotation * (180 / Math.PI);
-  this.setTransform(entityElement, domX, domY, rotation, angle);
+  // Check if the element has a background image
+  var hasBackgroundImage = entityElement.style.backgroundImage && entityElement.style.backgroundImage !== 'none';
 
-  //console.log('updated position', position, adjustedPosition, domX, domY)
+  // Update rotation if provided and no background image
+  if (rotation /*&& !hasBackgroundImage*/) {
+    lastRotation = angle;
+    entityElement.dataset.rotation = angle;
+  }
 
-  return entityElement;
+  // Update the transform property
+  var newTransform = "translate(".concat(truncateToPrecision(domX, 2), "px, ").concat(truncateToPrecision(domY, 2), "px)");
+
+  // Add rotation to the transform if no background image
+  if (!hasBackgroundImage) {}
+  if (entityData.type !== 'PLAYER') {
+    newTransform += " rotate(".concat(lastRotation, "deg)");
+  }
+
+  // compare the new transform to the previous transform
+  // if they are the same, don't update
+  var prevTransform = entityElement.style.transform;
+  if (prevTransform !== newTransform) {
+    entityElement.style.transform = newTransform;
+  }
+}
+function truncateToPrecision(value, precision) {
+  var factor = Math.pow(10, precision);
+  return Math.round(value * factor) / factor;
 }
 
 },{}],9:[function(require,module,exports){
@@ -974,52 +1161,177 @@ function updateEntityElementPosition(entityElement, _ref) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = updatePlayerSprite;
-function updatePlayerSprite(entityId, data) {
+exports["default"] = updateEntityPosition;
+function updateEntityPosition(entityElement, entityData) {
+  var position = entityData.position;
+  var rotation = entityData.rotation;
+  var type = entityData.type;
+  var width = entityData.width;
+  var height = entityData.height;
+
+  // Adjust the position based on the camera position
+  if (type === 'BULLET') {
+    // Some bug here, fix this in CSSGraphics
+    position.x = position.x + 24;
+    position.y = position.y + 24;
+    //position.y = position.y + height / 2;
+    // console.log("og position", position, this.cameraPosition)
+  }
+
+  var adjustedPosition = {
+    x: position.x - this.cameraPosition.x + window.outerWidth / 2,
+    y: position.y - this.cameraPosition.y + window.outerHeight / 2
+  };
+  var domX = adjustedPosition.x - width / 2;
+  var domY = adjustedPosition.y - height / 2;
+
+  // console.log(position, adjustedPosition, domX, domY)
+
+  // convert rotation to degrees
+  var angle = rotation * (180 / Math.PI);
+  this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
+
+  // console.log('updated position', position, adjustedPosition, domX, domY)
+
+  return entityElement;
+}
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = updateGraphic;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function updateGraphic(entityData) {
   var game = this.game;
-  var currentInputs = data.controls;
-  if (game.tick % 5 !== 0) {
-    return;
-  }
-  // check to see if we have a player entity
-  var playerEntity = game.getEntity(entityId);
-  if (!playerEntity) {
-    return;
-  }
-  var graphic = playerEntity.graphics['graphics-css'];
-  if (!graphic) {
-    return;
-  }
-  var direction = 'right';
-  if (currentInputs) {
-    if (currentInputs.W) {
-      direction = 'up';
-    } else if (currentInputs.A) {
-      direction = 'left';
-    } else if (currentInputs.S) {
-      direction = 'down';
-    } else if (currentInputs.D) {
-      direction = 'right';
+  // TODO: move this to common 3D-2.5D transform function(s)
+  if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
+    if (_typeof(entityData.rotation) === 'object') {
+      // transform 3d to 2.5d
+      entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
+    } else {
+      entityData.rotation = entityData.rotation;
     }
-    // Assume there's a way to determine whether to use -0 or -1 suffix
-    // For simplicity, let's alternate between -0 and -1
-
-    // get current className from graphic
-    var spriteClass = graphic.className;
-
-    // check it spriteClass has "0" in it
-    var spriteNumber = spriteClass.indexOf('0') > -1 ? 1 : 0;
-
-    // let spriteNumber = Math.round(Math.random()); // Randomly choose 0 or 1
-    //let spriteNumber = playerEntity.bit;
-    spriteClass = "guy-".concat(direction, "-").concat(spriteNumber);
-
-    // First, clear previous sprite classes if any
-    graphic.classList.remove('guy-down-0', 'guy-down-1', 'guy-up-0', 'guy-up-1', 'guy-right-0', 'guy-right-1', 'guy-left-0', 'guy-left-1');
-
-    // Add the new sprite class
-    graphic.classList.add(spriteClass);
   }
+  var entityElement = document.getElementById("entity-".concat(entityData.id));
+  if (entityElement) {
+    // Update the entity color
+    if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+      // entityData.color is int number here we need a hex
+      var hexColor = '#' + entityData.color.toString(16);
+      // update the background color
+      entityElement.style.background = hexColor;
+    }
+    if (typeof entityData.position.z === 'number') {
+      entityElement.style.zIndex = entityData.position.z;
+    }
+    if (entityData.style) {
+      Object.keys(entityData.style).forEach(function (key) {
+        entityElement.style[key] = entityData.style[key];
+      });
+    }
+    if (entityData.texture /*entityData.type === 'FIRE'*/) {
+      // check to see if texture changed / sprite index changed
+      var texture = game.getTexture(entityData.texture);
+      var textureUrl = texture.url;
+      var spritePosition = texture.sprite || {
+        x: 0,
+        y: 0
+      };
+      if (typeof entityData.texture.frame === 'number') {
+        spritePosition = texture.frames[entityData.texture.frame];
+        entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
+      }
+
+      //
+      // Animated sprite, since the texture has a frames array
+      //
+      // if the array exists and animation is not paused
+      if (_typeof(texture.frames) === 'object' /*&& !entityData.texture.animationPaused*/) {
+        // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
+        if (game.tick % 10 === 0) {
+          // TODO: custom tick rate
+
+          // shift first frame from array
+          if (typeof entityData.frameIndex === 'undefined') {
+            entityData.frameIndex = 0;
+          }
+          if (entityData.frameIndex >= texture.frames.length) {
+            entityData.frameIndex = 0;
+          }
+          var frame = texture.frames[entityData.frameIndex];
+          if (typeof frame !== 'undefined') {
+            // console.log('frame', entityData.frameIndex)
+            spritePosition = frame;
+            entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
+            entityData.frameIndex++;
+          }
+        }
+      }
+    }
+    if (entityData.type === 'TEXT' && typeof entityData.text !== 'undefined' && entityData.text !== null) {
+      // check that text has changed
+      if (entityElement.innerHTML !== entityData.text) {
+        entityElement.innerHTML = entityData.text;
+      }
+      // return this.inflateText(entityData);
+    }
+
+    /* TODO: better support for static / less renders
+      look at camera position to determine if render of static required
+    if (typeof entityData.previousPosition === 'undefined') {
+      entityData.previousPosition = entityData.position;
+    }
+     if (entityData.previousPosition.x !== entityData.position.x || entityData.previousPosition.y !== entityData.position.y) {
+      entityData.previousPosition = entityData.position;
+      return this.updateEntityPosition(entityElement, entityData);
+    }
+    else {
+      return entityElement;
+    }
+    */
+
+    return this.updateEntityPosition(entityElement, entityData);
+  } else {
+    // If the entity element does not exist, create it
+    return this.createGraphic(entityData);
+  }
+}
+
+},{}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = cssHandleInputs;
+// no longer being used?
+function cssHandleInputs() {
+  var game = this.game;
+  //
+  // Updates the player sprite based on the current input
+  // Remark: Input and Movement are handled in EntityInput and EntityMovement plugins
+  //
+  // Spritesheet dimensions
+  var spritesheetWidth = 672;
+  var spritesheetHeight = 672;
+  var cellSize = 48; // Size of each cell in the spritesheet
+  var spriteSize = {
+    width: 16,
+    height: 16
+  }; // Actual size of the sprite
+
+  game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
+    // throw new Error('line')
+    var player = game.getEntity(entityId);
+    if (data && player) {
+      if (data.controls) {
+        game.updateSprite(entityId, data);
+      }
+    }
+  });
 }
 
 },{}]},{},[3])(3)

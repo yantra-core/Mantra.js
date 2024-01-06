@@ -193,7 +193,10 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
         S: 'MOVE_BACKWARD',
         A: 'MOVE_LEFT',
         D: 'MOVE_RIGHT',
-        SPACE: 'FIRE_BULLET'
+        SPACE: 'FIRE_BULLET',
+        K: 'FIRE_BULLET',
+        O: 'BARREL_ROLL',
+        U: 'SELECT_MENU'
         //LEFT: 'ROTATE_LEFT',
         //RIGHT: 'ROTATE_RIGHT'
       };
@@ -270,7 +273,8 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
           actions.push('MOVE_FORWARD');
         }
       }
-      if (buttons.LEFT) actions.push('FIRE_BULLET');
+
+      // if (buttons.LEFT) actions.push('FIRE_BULLET');
 
       /* Remark: Removes in favor of input pooling on gametick
       if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
@@ -280,6 +284,7 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       };
       plugin.lastBulletFireTime[entityId] = Date.now();
       */
+
       if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
       if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
       if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, -1);
@@ -295,6 +300,61 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
         } else {
           game.getSystem('sword').sheathSword(entityId);
         }
+      }
+      if (actions.includes('SELECT_MENU')) {}
+
+      // barrel roll
+      if (actions.includes('BARREL_ROLL')) {
+        if (typeof this.game.data.camera.rotation === 'number') {
+          game.rotateCamera(this.game.data.camera.rotation + 360);
+          // console.log("this.game.data.camera.rotation", this.game.data.camera.rotation)
+        } else {
+          // rotate the camera 360 degrees
+          game.rotateCamera(360);
+        }
+
+        /* TODO: move this code to Home.js sutra ( should not be in entityInput system )
+        // show the raiden backgrounds for a few seconds
+        game.on('player::BARREL_ROLL', etc);
+        let backgrounds = this.game.data.ents.BACKGROUND;
+        let leftRaiden = backgrounds.filter(ent => ent.name === 'raiden-left')[0];
+        if (leftRaiden) {
+          game.updateEntity({
+            id: leftRaiden.id,
+            style: {
+              display: 'block'
+            },
+          });
+        }
+         let rightRaiden = backgrounds.filter(ent => ent.name === 'raiden-right')[0];
+        if (rightRaiden) {
+          game.updateEntity({
+            id: rightRaiden.id,
+            style: {
+              display: 'block'
+            },
+          });
+        }
+         setTimeout(() => {
+          if (leftRaiden) {
+            game.updateEntity({
+              id: leftRaiden.id,
+              style: {
+                display: 'none'
+              },
+            });
+          }
+          if (rightRaiden) {
+            game.updateEntity({
+              id: rightRaiden.id,
+              style: {
+                display: 'none'
+              },
+            });
+          }
+        }, 3000);
+         console.log('backgrounds', leftRaiden, backgrounds)
+        */
       }
     }
   }]);

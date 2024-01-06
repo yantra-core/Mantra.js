@@ -46,11 +46,6 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
       this.game.localGameLoop(this.game); // Start the local game loop when offline
 
       this.game.communicationClient = this;
-      this.game.createPlayer({
-        type: 'PLAYER'
-      }).then(function (ent) {
-        game.setPlayerId(ent.id);
-      });
     }
   }, {
     key: "stop",

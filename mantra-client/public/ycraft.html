@@ -26,13 +26,12 @@
         graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
-          scriptRoot: './'
+          scriptRoot: '.'
         }
       });
 
       // game.use('Bullet');
-
-
+      game.use('Sutra');
       game.start(function () {
         game.use('Editor');
         game.use(new WORLDS.worlds['YCraft']());

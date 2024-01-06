@@ -11,6 +11,7 @@
 <body>
   <script type="module" src="/mantra.js"></script>
   <script type="module" src="/worlds.mantra.js"></script>
+
   <script type="module" src="/ycraft.js"></script>
 
   <script>
@@ -22,18 +23,15 @@
       let game = new MANTRA.Game({
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
-        height: 600 * 10,
-        width: 800 * 10,
         graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
-          scriptRoot: './'
+          scriptRoot: '.'
         }
       });
 
       // game.use('Bullet');
-
-
+      game.use('Sutra');
       game.start(function () {
         game.use('Editor');
         game.use(new WORLDS.worlds['Home']());

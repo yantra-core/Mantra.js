@@ -5,6 +5,187 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var SelectPicker = exports["default"] = /*#__PURE__*/function () {
+  function SelectPicker(selectElement, click, game) {
+    _classCallCheck(this, SelectPicker);
+    this.selectElement = selectElement;
+    this.game = game;
+    this.click = click;
+    this.modal = this.createModal();
+    this.debounceTimer = null;
+    this.addEventListeners();
+  }
+  _createClass(SelectPicker, [{
+    key: "createModal",
+    value: function createModal() {
+      var _this = this;
+      var game = this.game;
+      var modal = document.createElement('div');
+      this.applyModalStyles(modal);
+      var picker = document.createElement('ul');
+      this.applyPickerStyles(picker);
+      this.addPickerScrollEvents(picker);
+      Array.from(this.selectElement.options).forEach(function (option) {
+        var listItem = document.createElement('li');
+        _this.applyListItemStyles(listItem);
+        listItem.textContent = option.text;
+        listItem.onclick = function () {
+          _this.selectElement.value = option.value;
+          _this.click(option.value);
+          _this.hideModal();
+        };
+        picker.appendChild(listItem);
+      });
+      modal.appendChild(picker);
+      document.body.appendChild(modal);
+      return modal;
+    }
+  }, {
+    key: "addPickerScrollEvents",
+    value: function addPickerScrollEvents(picker) {
+      var isDragging = false;
+      var startY;
+      var scrollTop;
+      picker.onmousedown = function (e) {
+        isDragging = true;
+        startY = e.pageY - picker.offsetTop;
+        scrollTop = picker.scrollTop;
+        e.preventDefault();
+      };
+      picker.onmousemove = function (e) {
+        if (!isDragging) return;
+        var y = e.pageY - picker.offsetTop;
+        var scroll = y - startY;
+        picker.scrollTop = scrollTop - scroll;
+      };
+      window.onmouseup = function () {
+        isDragging = false;
+      };
+      picker.onwheel = function (e) {
+        picker.scrollTop += e.deltaY;
+        e.preventDefault();
+      };
+    }
+  }, {
+    key: "applyModalStyles",
+    value: function applyModalStyles(modal) {
+      Object.assign(modal.style, {
+        position: 'fixed',
+        width: '100%',
+        height: '100%',
+        top: '0px',
+        left: '0',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'none',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: '9001'
+      });
+    }
+  }, {
+    key: "applyPickerStyles",
+    value: function applyPickerStyles(picker) {
+      Object.assign(picker.style, {
+        position: 'relative',
+        bottom: '160px',
+        listStyle: 'none',
+        margin: '0',
+        padding: '0',
+        maxHeight: '50%',
+        overflowY: 'auto',
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+      });
+    }
+  }, {
+    key: "applyListItemStyles",
+    value: function applyListItemStyles(listItem) {
+      Object.assign(listItem.style, {
+        padding: '20px',
+        cursor: 'pointer',
+        borderBottom: '1px solid #ddd',
+        fontSize: '44px',
+        textAlign: 'center',
+        backgroundColor: '#f8f8f8',
+        margin: '5px',
+        borderRadius: '8px',
+        transition: 'background-color 0.3s'
+      });
+      listItem.onmouseover = function () {
+        return listItem.style.backgroundColor = '#e8e8e8';
+      };
+      listItem.onmouseout = function () {
+        return listItem.style.backgroundColor = '#f8f8f8';
+      };
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      var _this2 = this;
+      this.selectElement.addEventListener('focus', function () {
+        return _this2.showModal();
+      });
+      this.selectElement.addEventListener('click', function () {
+        return _this2.showModal();
+      });
+      this.selectElement.addEventListener('click', function (e) {
+        return e.stopPropagation();
+      });
+      window.addEventListener('click', function (e) {
+        if (e.target === _this2.modal) {
+          _this2.hideModal();
+        }
+      });
+    }
+  }, {
+    key: "toggle",
+    value: function toggle() {
+      var _this3 = this;
+      this.debounce(function () {
+        if (_this3.showingModal) {
+          _this3.hideModal();
+        } else {
+          _this3.showModal();
+        }
+      }, 300); // 300ms debounce time
+    }
+  }, {
+    key: "debounce",
+    value: function debounce(func, delay) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(func, delay);
+    }
+  }, {
+    key: "showModal",
+    value: function showModal() {
+      this.showingModal = true;
+      this.modal.style.display = 'flex';
+    }
+  }, {
+    key: "hideModal",
+    value: function hideModal() {
+      this.showingModal = false;
+      this.modal.style.display = 'none';
+    }
+  }]);
+  return SelectPicker;
+}();
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
 var _createToolbar = _interopRequireDefault(require("./lib/createToolbar.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -41,7 +222,7 @@ var Editor = /*#__PURE__*/function () {
       if (typeof $ === 'undefined') {
         console.log('$ is not defined, attempting to load jQuery from vendor');
         game.loadScripts(['/vendor/jquery.min.js', '/worlds.mantra.js'], function () {
-          console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
+          // console.log('All jQuery scripts loaded sequentially, proceeding with initialization');
           _this.jqueryReady();
         });
       } else {
@@ -54,15 +235,15 @@ var Editor = /*#__PURE__*/function () {
     value: function jqueryReady() {
       this.createToolbar(this.game);
       this.setupGlobalClickListener();
-
       // this.createViewSourceModal();
       this.game.systemsManager.addSystem(this.id, this);
     }
   }, {
     key: "createIcon",
     value: function createIcon(name) {
+      var featherRoot = 'https://yantra.gg';
       var element = document.createElement('img');
-      element.src = "/vendor/feather/".concat(name, ".svg");
+      element.src = "".concat(featherRoot, "/vendor/feather/").concat(name, ".svg");
       element.classList.add('feather-icon');
       element.style.width = '36px';
       element.style.height = '36px';
@@ -189,7 +370,7 @@ var Editor = /*#__PURE__*/function () {
         var toolbar = event.target.closest('.toolbar');
         if (_this4.game && _this4.game.systems && _this4.game.systems['entity-input']) {
           if (!toolbar) {
-            console.log("toolbar not found");
+            // console.log("toolbar not found")
             // re-enable inputs
             _this4.game.systems['entity-input'].setInputsActive();
             if (_this4.game.systems['keyboard']) {
@@ -213,33 +394,6 @@ var Editor = /*#__PURE__*/function () {
           }
         }
       });
-
-      /*
-      // add a global click handler to document that will delegate any clicks
-      // that are not inside gui-windows to re-enable inputs
-      document.addEventListener('click', (e) => {
-        // check if the click was inside a gui-window
-        let guiWindow = e.target.closest('.gui-container');
-        if (this.game && this.game.systems && this.game.systems['entity-input'] && this.game.systems['keyboard']) {
-          if (!guiWindow) {
-            // re-enable inputs
-            this.game.systems['entity-input'].setInputsActive();
-            this.game.systems['keyboard'].bindInputControls();
-          } else {
-            // disable inputs
-            this.game.systems['entity-input'].disableInputs();
-            this.game.systems['keyboard'].unbindAllEvents();
-          }
-           // check to see if this is a class sutra-link, if so open the form editor
-          if (e.target.classList.contains('sutra-link')) {
-            let sutraPath = e.target.getAttribute('data-path');
-            let node = this.behavior.findNode(sutraPath);
-            // Remark: Editing / Viewing Conditionals is not yet supported
-            //this.showConditionalsForm(node);
-          }
-        }
-      });
-      */
     }
   }, {
     key: "closeAllDropdowns",
@@ -352,13 +506,15 @@ _defineProperty(Editor, "id", 'gui-editor');
 _defineProperty(Editor, "async", true);
 var _default = exports["default"] = Editor;
 
-},{"./lib/createToolbar.js":5}],2:[function(require,module,exports){
+},{"./lib/createToolbar.js":6}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _SelectPicker = _interopRequireDefault(require("../../graphics-css/lib/SelectPicker.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -376,9 +532,13 @@ var GraphicsSelector = /*#__PURE__*/function () {
   _createClass(GraphicsSelector, [{
     key: "createElements",
     value: function createElements() {
+      var game = this.game;
       // Create the select box
       var selectBox = document.createElement('select');
       selectBox.id = 'graphicsSelect';
+
+      // hides by default
+      selectBox.style.display = 'none';
       selectBox.style.maxHeight = '45px';
 
       // tool tip hint
@@ -388,6 +548,9 @@ var GraphicsSelector = /*#__PURE__*/function () {
       this.addOption(selectBox, 'CSSGraphics - v1.1.0', 'CSSGraphics');
       this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
       this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
+      this.selectPicker = new _SelectPicker["default"](selectBox, function (selectedGraphicsMode) {
+        game.systems.graphics.switchGraphics(selectedGraphicsMode);
+      }, game);
       return selectBox;
     }
   }, {
@@ -408,6 +571,7 @@ var GraphicsSelector = /*#__PURE__*/function () {
     key: "addEventListeners",
     value: function addEventListeners() {
       var _this = this;
+      var game = this.game;
       this.game.on('plugin::ready::graphics-phaser', function () {
         _this.selectElement('PhaserGraphics');
       });
@@ -418,6 +582,38 @@ var GraphicsSelector = /*#__PURE__*/function () {
       this.selectBox.addEventListener('change', function (event) {
         _this.handleSelectionChange(event);
       });
+      var that = this;
+      var isKeyDown = false;
+      function toggleModalOnKeyPress(isKeyPressed) {
+        if (isKeyPressed && !isKeyDown) {
+          // Key is pressed down for the first time
+          isKeyDown = true;
+          toggleModal();
+        } else if (!isKeyPressed && isKeyDown) {
+          // Key is released
+          isKeyDown = false;
+          //toggleModal();
+        }
+      }
+
+      function toggleModal() {
+        if (that.selectPicker.showingModal) {
+          that.selectPicker.hideModal();
+        } else {
+          that.selectPicker.showModal();
+        }
+      }
+
+      /* Removed 1/5/2023, SELECT button now opens Toolbar instead of graphics selector
+      game.on('entityInput::handleInputs', (entityId, input) => {
+        if (input.controls && input.controls.U !== undefined) {
+          if (input.controls.U === false) {
+            console.log("FALSE")
+          }
+          toggleModalOnKeyPress(input.controls.U);
+        }
+      });
+      */
     }
   }, {
     key: "handleSelectionChange",
@@ -462,7 +658,7 @@ var GraphicsSelector = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = GraphicsSelector;
 
-},{}],3:[function(require,module,exports){
+},{"../../graphics-css/lib/SelectPicker.js":1}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -478,6 +674,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
   function ToolbarMenu() {
     _classCallCheck(this, ToolbarMenu);
+    this.toggleStatus = 'open';
+    // Add an isTransitioning flag to track transition state
+    this.isTransitioning = false;
+
     // Create the primary and secondary groups
     this.primaryGroup = document.createElement('div');
     this.secondaryGroup = document.createElement('div');
@@ -511,7 +711,7 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
       justifyContent: 'space-between',
       // padding: '10px',
       backgroundColor: '#f3f3f3',
-      zIndex: 1
+      zIndex: 9001
     });
 
     // Add the toolbar to the document
@@ -522,6 +722,52 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
     this.updateResponsiveStyles();
   }
   _createClass(ToolbarMenu, [{
+    key: "setTransitioningState",
+    value: function setTransitioningState(isTransitioning) {
+      this.isTransitioning = isTransitioning;
+
+      // Disable interaction during transition
+      this.toolbar.style.pointerEvents = isTransitioning ? 'none' : 'auto';
+    }
+  }, {
+    key: "slideOutToolbar",
+    value: function slideOutToolbar() {
+      var _this = this;
+      if (this.isTransitioning || this.toggleStatus === 'closed') {
+        return;
+      }
+      this.setTransitioningState(true);
+      this.toggleStatus = 'closed';
+      this.setStyle(this.toolbar, {
+        transition: '0.5s',
+        top: '-100px'
+      });
+
+      // Reset isTransitioning flag after transition ends
+      setTimeout(function () {
+        return _this.setTransitioningState(false);
+      }, 500);
+    }
+  }, {
+    key: "slideInToolbar",
+    value: function slideInToolbar() {
+      var _this2 = this;
+      if (this.isTransitioning || this.toggleStatus === 'open') {
+        return;
+      }
+      this.setTransitioningState(true);
+      this.toggleStatus = 'open';
+      this.setStyle(this.toolbar, {
+        transition: '0.5s',
+        top: '0'
+      });
+
+      // Reset isTransitioning flag after transition ends
+      setTimeout(function () {
+        return _this2.setTransitioningState(false);
+      }, 500);
+    }
+  }, {
     key: "addElement",
     value: function addElement(group, element) {
       var prepend = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
@@ -603,7 +849,7 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "createDropdown",
     value: function createDropdown(subItems) {
-      var _this = this;
+      var _this3 = this;
       var dropdown = document.createElement('div');
       dropdown.className = 'dropdown';
       this.setStyle(dropdown, {
@@ -622,7 +868,7 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
         right: '0'
       });
       subItems.forEach(function (subItemObj) {
-        var subItem = _this.createSubItem(subItemObj);
+        var subItem = _this3.createSubItem(subItemObj);
         dropdown.appendChild(subItem);
       });
       return dropdown;
@@ -673,13 +919,15 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
   return ToolbarMenu;
 }();
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _SelectPicker = _interopRequireDefault(require("../../graphics-css/lib/SelectPicker.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -693,6 +941,7 @@ var WorldSelector = /*#__PURE__*/function () {
     this.selectBox = this.createElements(); // Now returns the select box element
     this.lastLoadedWorld = null;
     this.currentWorld = null;
+    this.pickerCreated = false;
     this.addEventListeners();
   }
   _createClass(WorldSelector, [{
@@ -703,6 +952,8 @@ var WorldSelector = /*#__PURE__*/function () {
       var selectBox = document.createElement('select');
       selectBox.id = 'graphicsSelect';
       selectBox.style.maxHeight = '45px';
+      // hide by default
+      selectBox.style.display = 'none';
 
       // TODO: Populate the select box with options as needed
       // Example: this.addOption(selectBox, 'Option 1', 'value1');
@@ -711,11 +962,14 @@ var WorldSelector = /*#__PURE__*/function () {
       this.addOption(selectBox, 'Choose Your World', 'Choose');
       this.addOption(selectBox, 'Home World', 'Home');
       this.addOption(selectBox, 'Platform World', 'Platform');
+      this.addOption(selectBox, 'Music World', 'Music');
+
       // this.addOption(selectBox, 'Space World', 'Platform');
       //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
 
       // adds separator option
-      this.addOption(selectBox, '------Tutorial Worlds-----', '----------------', true);
+      // this.addOption(selectBox, '------Tutorial Worlds-----', '----------------', true);
+
       this.addOption(selectBox, 'YCraft World', 'YCraft');
       this.addOption(selectBox, 'Sutra World', 'Sutra');
       this.addOption(selectBox, 'XState World', 'XState');
@@ -758,9 +1012,40 @@ var WorldSelector = /*#__PURE__*/function () {
       this.selectBox.addEventListener('change', function (event) {
         _this.handleSelectionChange(event);
       });
+      this.selectPicker = new _SelectPicker["default"](this.selectBox, function (worldName) {
+        game.switchWorlds(worldName);
+      }, game);
+      game.on('entityInput::handleInputs', function (entityId, input) {
+        if (input.controls && input.controls.I !== undefined) {
+          if (input.controls.I === false) {
+            // console.log("FALSE")
+          }
+          toggleModalOnKeyPress(input.controls.I);
+        }
+      });
+      var isKeyDown = false;
+      function toggleModalOnKeyPress(isKeyPressed) {
+        if (isKeyPressed && !isKeyDown) {
+          // Key is pressed down for the first time
+          isKeyDown = true;
+          toggleModal();
+        } else if (!isKeyPressed && isKeyDown) {
+          // Key is released
+          isKeyDown = false;
+          //toggleModal();
+        }
+      }
+
+      function toggleModal() {
+        if (that.selectPicker.showingModal) {
+          that.selectPicker.hideModal();
+        } else {
+          that.selectPicker.showModal();
+        }
+      }
       game.on('world::loaded', function (pluginInstance) {
         // alert('loaded')
-        console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
+        // console.log("world::loaded", pluginInstance.constructor.name, pluginInstance.id);
         var worldName = pluginInstance.constructor.name;
         //console.log('world::loaded', worldName, pluginInstance);
         that.selectElement(worldName);
@@ -776,36 +1061,12 @@ var WorldSelector = /*#__PURE__*/function () {
       var that = this;
       this.showLoadingSpinner();
       var selectedWorld = event.target.value;
+      switchWorld(selectedWorld);
 
-      // check to see if game.worlds has any entries
-      // if so, unload them if they have an unload method
-      if (game.worlds.length > 0) {
-        game.worlds.forEach(function (world, i) {
-          if (world.unload) {
-            // alert(`Unloading ${world.id}`);
-            console.log(world.id, 'world.unload', world.unload);
-            // remove the world from the game.worlds array
-            // TODO: we could move this logic into Game.js
-            game.worlds.splice(i, 1);
-            world.unload();
-          }
-        });
-      }
-      game.systems.entity.clearAllEntities(false);
-      var worldName = 'XState';
-      worldName = 'Sutra';
-      worldName = selectedWorld;
-      var worldClass = WORLDS.worlds[worldName];
-      var worldInstance = new worldClass();
-      game.once('plugin::loaded::' + worldInstance.id, function () {
-        that.hideLoadingSpinner();
-      });
-      game.use(worldInstance);
-
-      // USER INTENT: Change world
-      // persist this intention to the local storage
-      // so that it can be restored on next page load
-      game.storage.set('world', selectedWorld);
+      // alert('close modal')
+      // hide the modal if showing
+      this.selectPicker.hideModal();
+      this.game.switchWorlds(selectedWorld);
 
       // update the dropdown to show the current world
       this.selectElement(selectedWorld);
@@ -825,7 +1086,7 @@ var WorldSelector = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = WorldSelector;
 
-},{}],5:[function(require,module,exports){
+},{"../../graphics-css/lib/SelectPicker.js":1}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -842,17 +1103,35 @@ function createToolbar(game) {
   var $fileMenu = this.createMenu('File');
   var toolbarMenu = new _ToolbarMenu["default"]();
   this.toolbarMenu = toolbarMenu;
+  var keyPressed = false;
+  game.on('entityInput::handleInputs', function (entityId, input) {
+    if (input.controls && input.controls.U !== undefined) {
+      if (input.controls.U === true && !keyPressed) {
+        keyPressed = true; // Set the flag when key is initially pressed
+        // Toggle the toolbar based on its current state
+        if (toolbarMenu.toggleStatus === 'open') {
+          toolbarMenu.slideOutToolbar();
+        } else {
+          toolbarMenu.slideInToolbar();
+        }
+      } else if (input.controls.U === false) {
+        keyPressed = false; // Reset the flag when key is released
+      }
+    }
+  });
 
   // create image icon with source of ./vendor/feather/eye.svg
+  // TODO: remove featherRoot from code, quick fix for now
+  var featherRoot = 'https://yantra.gg';
   var inspectorIcon = this.createIcon('search');
-  inspectorIcon.src = '/vendor/feather/search.svg';
+  inspectorIcon.src = featherRoot + '/vendor/feather/search.svg';
   inspectorIcon.style.cursor = 'pointer';
   inspectorIcon.title = 'Click to open Entity Inspector';
-  inspectorIcon.style.width = '36px';
-  inspectorIcon.style.height = '36px';
-  inspectorIcon.style.paddingTop = '24px';
-  inspectorIcon.style.marginRight = '30px';
+  inspectorIcon.style.marginRight = '10px';
   inspectorIcon.style.marginLeft = '10px';
+  inspectorIcon.style.marginTop = '5px';
+  inspectorIcon.style.filter = 'invert(100%)';
+
   // TODO: have this change values based on open / cloase state
   // . Click in-game on Entity to Inspect
   inspectorIcon.onclick = function () {
@@ -861,24 +1140,16 @@ function createToolbar(game) {
   toolbarMenu.addElement('secondary', inspectorIcon);
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
-    icon: this.createIcon('slack'),
-    subItems: [{
-      text: 'View Source',
-      onClick: function onClick() {
-        return _this.showSourceCode();
-      }
-    }, {
-      text: 'About Mantra',
-      onClick: function onClick() {
-        return alert('Open Mantra Github');
-      }
-    }, {
-      text: 'Deploy World to Yantra',
-      onClick: function onClick() {
-        return alert('Open Yantra');
-      }
-    }]
+    icon: this.createIcon('slack')
+    /*
+    subItems: [
+      { text: 'View Source', onClick: () => this.showSourceCode() },
+      { text: 'About Mantra', onClick: () => alert('Open Mantra Github') },
+      { text: 'Deploy World to Yantra', onClick: () => alert('Open Yantra') }
+    ]
+    */
   });
+
   toolbarMenu.addItem('primary', {
     text: 'Entities',
     hint: 'Manage Game Entities',
@@ -895,14 +1166,16 @@ function createToolbar(game) {
       return _this.showRules();
     }
   });
+
+  /*
   toolbarMenu.addItem('primary', {
     text: 'Crafting',
     hint: 'Manage Game Rules with YCraft',
     icon: this.createIcon('codesandbox'),
-    onClick: function onClick() {
-      return _this.showCrafting();
-    }
+    onClick: () => this.showCrafting()
   });
+  */
+
   toolbarMenu.addItem('primary', {
     text: 'Events ',
     hint: 'Manage Game Events',
@@ -930,7 +1203,29 @@ function createToolbar(game) {
 
   // create item holder for graphicsSelector
   var graphicsSelectorItem = document.createElement('div');
-  // graphicsSelectorItem.appendChild(graphicsIcon);
+  graphicsSelectorItem.appendChild(graphicsIcon);
+
+  // create text label element to show current graphics engine
+  var graphicsSelectorLabel = document.createElement('span');
+  graphicsSelectorLabel.style.fontSize = '22px';
+  graphicsSelectorLabel.style.marginRight = '10px';
+  graphicsSelectorLabel.style.marginLeft = '10px';
+  graphicsSelectorLabel.style.marginTop = '10px';
+  graphicsSelectorLabel.style.marginBottom = '10px';
+  graphicsSelectorLabel.style.cursor = 'pointer';
+
+  // set value to foo
+  graphicsSelectorLabel.innerText = 'Switch Graphics';
+
+  // add label to graphicsSelectorItem
+  graphicsSelectorItem.appendChild(graphicsSelectorLabel);
+  graphicsSelectorItem.onpointerdown = function () {
+    // close world selector
+    worldSelector.selectPicker.hideModal();
+
+    // toggle select picker
+    graphicsSelector.selectPicker.toggle();
+  };
   graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
   graphicsSelectorItem.title = 'Select Graphics Engine';
   var worldSelector = new _WorldSelector["default"](this.game);
@@ -938,24 +1233,40 @@ function createToolbar(game) {
   worldSelector.selectBox.style.cursor = 'pointer';
   worldSelector.selectBox.style.margin = '20px';
   var worldSelectorItem = document.createElement('div');
-  // worldSelectorItem.appendChild(worldIcon);
+  worldSelectorItem.appendChild(worldIcon);
+
+  // create text label element to show current world
+  var worldSelectorLabel = document.createElement('span');
+  worldSelectorLabel.style.fontSize = '22px';
+  worldSelectorLabel.style.marginRight = '10px';
+  worldSelectorLabel.style.marginLeft = '10px';
+  worldSelectorLabel.style.marginTop = '10px';
+  worldSelectorLabel.style.marginBottom = '10px';
+  worldSelectorLabel.style.cursor = 'pointer';
+
+  // set value to foo
+  worldSelectorLabel.innerText = 'Switch Worlds';
+
+  // add label to worldSelectorItem
+  worldSelectorItem.appendChild(worldSelectorLabel);
+  worldSelectorItem.onpointerdown = function () {
+    // hide world selector
+    graphicsSelector.selectPicker.hideModal();
+    // toggle select picker
+    worldSelector.selectPicker.toggle();
+  };
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
-  /*
-  worldSelectorItem.onmousedown = () => {
-    worldSelector.selectBox.click();
-  };
-  */
-
   toolbarMenu.addElement('secondary', worldSelectorItem);
   toolbarMenu.addElement('secondary', graphicsSelectorItem);
   if (game.worlds.length > 0) {
     var currentWorldName = game.worlds[0].constructor.name;
     worldSelector.selectElement(currentWorldName);
   }
-  if (is_touch_enabled()) {
-    toolbarMenu.toolbar.style.display = 'none';
-  }
+  if (is_touch_enabled()) {}
+  // toolbarMenu.toolbar.style.display = 'none';
+  toolbarMenu.slideOutToolbar();
+
   // Append the toolbar to the body
   $('body').append(toolbarMenu.toolbar);
 }
@@ -965,5 +1276,5 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"./GraphicsSelector.js":2,"./ToolbarMenu.js":3,"./WorldSelector.js":4}]},{},[1])(1)
+},{"./GraphicsSelector.js":3,"./ToolbarMenu.js":4,"./WorldSelector.js":5}]},{},[2])(2)
 });

@@ -73,7 +73,7 @@ var Platform = /*#__PURE__*/function () {
   }, {
     key: "platformPlayerCollision",
     value: function platformPlayerCollision(entityIdA, entityIdB, entityA, entityB) {
-      console.log('platformPlayerCollision', entityIdA, entityIdB, entityA, entityB);
+      // console.log('platformPlayerCollision', entityIdA, entityIdB, entityA, entityB);
     }
   }]);
   return Platform;

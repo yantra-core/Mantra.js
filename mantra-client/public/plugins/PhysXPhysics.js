@@ -93,7 +93,17 @@ var PhysicsInterface = /*#__PURE__*/function () {
   }, {
     key: "collisionStart",
     value: function collisionStart(engine, callback) {
-      throw new Error('Method "onCollision" must be implemented');
+      throw new Error('Method "collisionStart" must be implemented');
+    }
+  }, {
+    key: "collisionActive",
+    value: function collisionActive(engine, callback) {
+      throw new Error('Method "collisionActive" must be implemented');
+    }
+  }, {
+    key: "collisionEnd",
+    value: function collisionEnd(engine, callback) {
+      throw new Error('Method "collisionEnd" must be implemented');
     }
   }]);
   return PhysicsInterface;
@@ -389,6 +399,11 @@ var PhysXPhysics = /*#__PURE__*/function (_PhysicsInterface) {
         }
       });
       */
+    }
+  }, {
+    key: "setGravity",
+    value: function setGravity(gravity) {
+      // not yet implemented
     }
 
     // Utility function to multiply two quaternions if not available in PhysX API

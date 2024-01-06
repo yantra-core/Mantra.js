@@ -23,7 +23,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
-    this.disableContextMenu = true;
+    this.disableContextMenu = false;
     this.isDragging = false;
     this.dragStartPosition = {
       x: 0,
@@ -37,6 +37,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     this.boundHandleMouseMove = this.handleMouseMove.bind(this);
     this.boundHandleMouseDown = this.handleMouseDown.bind(this);
     this.boundHandleMouseUp = this.handleMouseUp.bind(this);
+    this.boundHandleMouseOut = this.handleMouseOut.bind(this);
+    this.boundHandleMouseOver = this.handleMouseOver.bind(this);
   }
   _createClass(Mouse, [{
     key: "init",
@@ -152,7 +154,18 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // prevent default right click menu
         event.preventDefault();
       }
+      this.game.emit('pointerUp', this.game.selectedEntityId);
       this.sendMouseData();
+    }
+  }, {
+    key: "handleMouseOut",
+    value: function handleMouseOut(event) {
+      this.game.emit('pointerout', event);
+    }
+  }, {
+    key: "handleMouseOver",
+    value: function handleMouseOver(event) {
+      this.game.emit('pointerover', event);
     }
   }, {
     key: "sendMouseData",
@@ -177,6 +190,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "bindInputControls",
     value: function bindInputControls() {
+      document.addEventListener('pointerover', this.boundHandleMouseOver);
+      document.addEventListener('pointerout', this.boundHandleMouseOut);
       document.addEventListener('pointermove', this.boundHandleMouseMove);
       document.addEventListener('pointerdown', this.boundHandleMouseDown);
       document.addEventListener('pointerup', this.boundHandleMouseUp);
@@ -191,6 +206,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     key: "unbindAllEvents",
     value: function unbindAllEvents() {
       // unbind all events
+      document.removeEventListener('pointerover', this.boundHandleMouseOver);
+      document.removeEventListener('pointerout', this.boundHandleMouseOut);
       document.removeEventListener('pointermove', this.boundHandleMouseMove);
       document.removeEventListener('pointerdown', this.boundHandleMouseDown);
       document.removeEventListener('pointerup', this.boundHandleMouseUp);

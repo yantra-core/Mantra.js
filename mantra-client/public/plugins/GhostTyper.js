@@ -12,12 +12,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// TODO: this needs to be a "kind" of text element entity and go through,
-// inflateText() code path with type: 'TEXT', kind: 'ghost'
-// this is required in order to get the text to adjust position based on camera movements
-// could be tricky to integrate with CSSCamera vs other camera systems
-// might do well to have game.data.camera.position scope updated regardless of camera system
-// current behavior of ghost text is to be fixed to the screen
 // GhostTyper.js - Marak Squires 2023
 var GhostTyper = /*#__PURE__*/function () {
   function GhostTyper() {
@@ -30,94 +24,164 @@ var GhostTyper = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem(this.id, this);
+    }
+  }, {
+    key: "createQueuedText",
+    value: function createQueuedText(options) {
+      var _this = this;
+      var typer = new Typer(this.game, options.x, options.y, '', options.style, function () {
+        return _this.removeTyper(typer);
+      });
+      this.typers.push(typer);
+      return typer;
+    }
+    // Add text to the queue of a specific typer
+  }, {
+    key: "queueTextForTyper",
+    value: function queueTextForTyper(typer, text, duration, removeDuration) {
+      typer.queueText(text, duration, removeDuration);
+    }
 
-      // TEST CODE DO NOT REMOVE
-      //let typerInstance = this.typers[0]; // Example: get the first typewriter instance
-      //this.updateText(typerInstance, "Welcome to Mantra\n my friend.", 10000, 10000);
-      // END TEST CODE
+    // Start processing the queue for a specific typer
+  }, {
+    key: "startTyperQueue",
+    value: function startTyperQueue(typer) {
+      typer.processQueue();
     }
   }, {
     key: "createText",
     value: function createText(options) {
-      var x = options.x,
-        y = options.y,
-        text = options.text,
-        style = options.style,
-        duration = options.duration;
-      var typer = {
-        text: text,
-        ogText: text,
-        duration: duration || 5000,
-        style: style,
-        typerText: this.createTextElement(x, y, style),
-        framesToWait: Math.floor((duration || 5000) / (33.33 * text.length)),
-        frameCounter: 0,
-        lastUpdate: 0
-      };
-      this.typers.push(typer);
-    }
-  }, {
-    key: "createTextElement",
-    value: function createTextElement(x, y, style) {
-      var cameraPosition = this.game.data.camera.position;
-      console.log('ahhh', this.game.data);
-      var currentPlayer = this.game.getEntity(this.game.currentPlayerId);
-      console.log("currentPlayercurrentPlayercurrentPlayer", currentPlayer);
-      //console.log('CSSGRA', this.game.systems['graphics-css']);
-      // alert(cameraPosition)
-      var element = document.createElement('div');
-      Object.assign(element.style, style, {
-        position: 'absolute',
-        left: "".concat(x, "px"),
-        top: "".concat(y, "px")
+      var _this2 = this;
+      var typer = new Typer(this.game, options.x, options.y, options.text, options.style, options.duration, options.removeDuration, function () {
+        return _this2.removeTyper(typer);
       });
-      document.body.appendChild(element);
-      return element;
+      this.typers.push(typer);
+      return typer;
     }
   }, {
     key: "update",
     value: function update() {
-      var _this = this;
+      var _this3 = this;
       // update gets called once per game tick at the games FPS rate
       this.typers.forEach(function (typer) {
-        if (_this.game.tick % typer.framesToWait === 0) {
-          _this.typeWriter(typer);
+        if (_this3.game.tick % typer.framesToWait === 0 && !typer.complete) {
+          typer.type();
         }
       });
     }
   }, {
-    key: "typeWriter",
-    value: function typeWriter(typer) {
-      if (typer.text.length) {
-        typer.typerText.textContent += typer.text[0];
-        typer.text = typer.text.substr(1);
-      }
-    }
-  }, {
-    key: "updateText",
-    value: function updateText(typer, newText, newDuration, removeDuration) {
-      var now = new Date().getTime();
-      if (now - typer.lastUpdate < 100) {
-        console.log('ignoring update because it is too soon');
-        return;
-      }
-      typer.lastUpdate = now;
-      typer.text = newText;
-      typer.ogText = newText;
-      typer.duration = newDuration || typer.duration;
-      typer.framesToWait = Math.floor(typer.duration / (33.33 * newText.length));
-      typer.typerText.textContent = '';
-      if (typeof removeDuration === 'number') {
-        setTimeout(function () {
-          typer.text = '';
-          typer.typerText.textContent = '';
-        }, removeDuration);
-      }
+    key: "removeTyper",
+    value: function removeTyper(typerToRemove) {
+      this.typers = this.typers.filter(function (typer) {
+        return typer !== typerToRemove;
+      });
     }
   }]);
   return GhostTyper;
 }();
 _defineProperty(GhostTyper, "id", 'typer-ghost');
+var Typer = /*#__PURE__*/function () {
+  function Typer(game, x, y) {
+    var text = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+    var style = arguments.length > 4 ? arguments[4] : undefined;
+    var duration = arguments.length > 5 ? arguments[5] : undefined;
+    var removeDuration = arguments.length > 6 ? arguments[6] : undefined;
+    var onRemove = arguments.length > 7 ? arguments[7] : undefined;
+    _classCallCheck(this, Typer);
+    this.game = game;
+    this.text = '';
+    this.ogText = text;
+    this.duration = duration || 5000;
+    this.removeDuration = removeDuration;
+    this.style = style;
+    this.typerText = this.createTextElement(x, y, style);
+    this.framesToWait = Math.floor((duration || 5000) / (33.33 * text.length));
+    this.frameCounter = 0;
+    this.lastUpdate = 0;
+    this.complete = false;
+    this.removeTimer = null;
+    this.textQueue = [];
+    this.onRemove = onRemove;
+  }
+  _createClass(Typer, [{
+    key: "queueText",
+    value: function queueText(text, duration, removeDuration) {
+      this.textQueue.push({
+        text: text,
+        duration: duration,
+        removeDuration: removeDuration
+      });
+    }
+
+    // Method to start processing the queue
+  }, {
+    key: "processQueue",
+    value: function processQueue() {
+      if (this.textQueue.length > 0) {
+        var _this$textQueue$shift = this.textQueue.shift(),
+          text = _this$textQueue$shift.text,
+          duration = _this$textQueue$shift.duration,
+          removeDuration = _this$textQueue$shift.removeDuration;
+        this.updateText(text, duration, removeDuration);
+      }
+    }
+  }, {
+    key: "createTextElement",
+    value: function createTextElement(x, y, style) {
+      var cameraPosition = this.game.data.camera.position;
+      var currentPlayer = this.game.getEntity(this.game.currentPlayerId);
+      var element = document.createElement('div');
+      Object.assign(element.style, style, {
+        position: 'absolute',
+        left: x + 'px',
+        top: y + 'px'
+      });
+      document.body.appendChild(element);
+      return element;
+    }
+  }, {
+    key: "type",
+    value: function type() {
+      if (this.text.length) {
+        this.typerText.textContent += this.text[0];
+        this.text = this.text.substr(1);
+        this.isTyping = true;
+      } else if (this.isTyping) {
+        this.complete = true;
+        this.isTyping = false;
+        this.setRemoveTimer();
+      }
+    }
+  }, {
+    key: "setRemoveTimer",
+    value: function setRemoveTimer() {
+      var _this4 = this;
+      if (this.removeDuration) {
+        // Wait for removeDuration before processing the next queue item
+        this.removeTimer = setTimeout(function () {
+          _this4.typerText.textContent = '';
+          _this4.processQueue();
+        }, this.removeDuration);
+      } else {
+        // If there's no removeDuration, process the next item immediately
+        this.processQueue();
+      }
+    }
+  }, {
+    key: "updateText",
+    value: function updateText(newText, newDuration, newRemoveDuration) {
+      this.complete = false;
+      this.text = newText;
+      this.ogText = newText;
+      this.duration = newDuration || this.duration;
+      this.removeDuration = newRemoveDuration;
+      this.framesToWait = Math.floor(this.duration / (33.33 * newText.length));
+      this.typerText.textContent = '';
+      this.isTyping = false;
+    }
+  }]);
+  return Typer;
+}();
 var _default = exports["default"] = GhostTyper;
 
 },{}]},{},[1])(1)

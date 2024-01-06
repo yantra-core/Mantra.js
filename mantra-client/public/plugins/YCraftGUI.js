@@ -188,11 +188,11 @@ var gui = {
 
     // Set z-index of all containers to 1
     containers.forEach(function (container) {
-      container.style.zIndex = '1';
+      container.style.zIndex = '1000';
     });
 
     // Set z-index of the clicked container to 10
-    clickedContainer.style.zIndex = '10';
+    clickedContainer.style.zIndex = '1010';
   }
 };
 gui.init = function (game) {
@@ -400,7 +400,12 @@ var YCraftGUI = /*#__PURE__*/function () {
           setTimeout(attemptEditorAppend, 3);
         }
       }
-      attemptEditorAppend();
+
+      // check to see if #contraption-select exists
+      var contraptionSelect = document.getElementById('contraption-select');
+      if (!contraptionSelect) {
+        // attemptEditorAppend();
+      }
       function _createContraptionViewer() {
         /*
         this.container = gui.window('contraptionsView', 'YCraft Contraption Viewer', function () {

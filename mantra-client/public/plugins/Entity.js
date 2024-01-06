@@ -448,7 +448,7 @@ var Entity = /*#__PURE__*/function () {
       // TODO: add additional component types that can be updated ( should be most of them )
       if (entityData.color) {
         this.game.components.color.set(entityId, entityData.color);
-        if (!this.game.changedEntities.has(entityId)) {}
+        //if (!this.game.changedEntities.has(entityId)) {}
         this.game.changedEntities.add(entityId);
         // console.log("SETTING COLOR", entityData.color)
       }
@@ -484,11 +484,28 @@ var Entity = /*#__PURE__*/function () {
         // TODO: update rotation in physics engine      
       }
 
+      if (typeof entityData.text !== 'undefined') {
+        this.game.components.text.set(entityId, entityData.text);
+      }
+
       // Items
       if (typeof entityData.items !== 'undefined') {
         // overwrite all items ( for now )
         // Remark: in the future we could merge instead of overwrite
         this.game.components.items.set(entityId, entityData.items);
+      }
+      if (typeof entityData.style !== 'undefined') {
+        // overwrite all items ( for now )
+        // Remark: in the future we could merge instead of overwrite
+        this.game.components.style.set(entityId, entityData.style);
+      }
+      if (typeof entityData.texture !== 'undefined') {
+        // overwrite all items ( for now )
+        // Remark: in the future we could merge instead of overwrite
+        // create new textures object by merging in the new texture
+        var prev = this.game.components.texture.get(entityId);
+        var newTexture = _objectSpread(_objectSpread({}, prev), entityData.texture);
+        this.game.components.texture.set(entityId, newTexture);
       }
       return ent;
     }
@@ -503,6 +520,7 @@ var Entity = /*#__PURE__*/function () {
       var defaultConfig = {
         id: entityId,
         name: null,
+        kind: null,
         body: true,
         shape: 'triangle',
         color: null,
@@ -511,11 +529,7 @@ var Entity = /*#__PURE__*/function () {
           y: 0,
           z: 0
         },
-        startingPosition: {
-          x: 0,
-          y: 0,
-          z: 0
-        },
+        startingPosition: null,
         velocity: {
           x: 0,
           y: 0,
@@ -555,7 +569,8 @@ var Entity = /*#__PURE__*/function () {
         yCraft: null,
         // object hash of properties for YCraft.js
         text: null,
-        style: null
+        style: null,
+        texture: null
       };
 
       // merge config with defaultConfig
@@ -569,9 +584,13 @@ var Entity = /*#__PURE__*/function () {
       };
       */
 
+      if (!config.startingPosition) {
+        config.startingPosition = config.position;
+      }
       var _config = config,
         name = _config.name,
         type = _config.type,
+        kind = _config.kind,
         position = _config.position,
         rotation = _config.rotation,
         startingPosition = _config.startingPosition,
@@ -596,7 +615,8 @@ var Entity = /*#__PURE__*/function () {
         lifetime = _config.lifetime,
         yCraft = _config.yCraft,
         text = _config.text,
-        style = _config.style;
+        style = _config.style,
+        texture = _config.texture;
       var x = position.x,
         y = position.y;
 
@@ -612,6 +632,7 @@ var Entity = /*#__PURE__*/function () {
       // alert(type)
       this.game.addComponent(entityId, 'type', type || 'PLAYER');
       this.game.addComponent(entityId, 'name', name || null);
+      this.game.addComponent(entityId, 'kind', kind);
       this.game.addComponent(entityId, 'position', position);
       this.game.addComponent(entityId, 'startingPosition', startingPosition);
       this.game.addComponent(entityId, 'velocity', velocity);
@@ -642,6 +663,7 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'yCraft', yCraft);
       this.game.addComponent(entityId, 'text', text);
       this.game.addComponent(entityId, 'style', style);
+      this.game.addComponent(entityId, 'texture', texture);
       if (config.body) {
         var body = this.createBody({
           width: width,
@@ -675,6 +697,9 @@ var Entity = /*#__PURE__*/function () {
             this.game.physics.setRotation(body, rotation);
           }
         }
+      } else {
+        // immediately add to changedEntities
+        // this.game.changedEntities.add(entityId);
       }
 
       // Add the entity to the game entities scope
@@ -683,6 +708,8 @@ var Entity = /*#__PURE__*/function () {
       this.game.entities.set(entityId, {
         id: entityId
       });
+      // console.log("SETTING CHANGED", entityId)
+      this.game.changedEntities.add(entityId);
 
       // get updated entity with components
       var updatedEntity = this.game.getEntity(entityId);
@@ -795,6 +822,9 @@ var Entity = /*#__PURE__*/function () {
         }
         _this2.game.removeEntity(ent.id);
       });
+      if (clearCurrentPlayer) {
+        this.game.currentPlayerId = null;
+      }
     }
 
     // TODO: move this to PhysicsPlugin

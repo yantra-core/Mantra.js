@@ -65,37 +65,55 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "sendInputs",
     value: function sendInputs() {
+      var _this2 = this;
+      var _loop = function _loop() {
+          var gamepad = _this2.gamepads[index];
+
+          // Axes for left analog stick
+          var xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
+          var yAxis = gamepad.axes[1]; // Up (-1) to Down (1)
+
+          // Deadzone for analog stick to prevent drift
+          var deadzone = 0.1;
+
+          // Map left stick to WASD keys
+          // TODO: move this code to part of the entityInput strategy
+          var controls = {
+            W: yAxis < -deadzone,
+            // Up
+            S: yAxis > deadzone,
+            // Down
+            A: xAxis < -deadzone,
+            // Left
+            D: xAxis > deadzone,
+            // Right
+            SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
+          };
+
+          // console.log('controls', controls)
+          // Send the controls to the game logic or server
+          if (_this2.game.communicationClient) {
+            // dont send controls if all false
+            var allFalse = Object.keys(controls).every(function (key) {
+              return !controls[key];
+            });
+            if (allFalse) {
+              // Remark: We may have to remove this
+              return {
+                v: void 0
+              };
+            }
+            // console.log('sending controls from gpad', controls)
+
+            _this2.game.communicationClient.sendMessage('player_input', {
+              controls: controls
+            });
+          }
+        },
+        _ret;
       for (var index in this.gamepads) {
-        var gamepad = this.gamepads[index];
-
-        // Axes for left analog stick
-        var xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
-        var yAxis = gamepad.axes[1]; // Up (-1) to Down (1)
-
-        // Deadzone for analog stick to prevent drift
-        var deadzone = 0.1;
-
-        // Map left stick to WASD keys
-        // TODO: move this code to part of the entityInput strategy
-        var controls = {
-          W: yAxis < -deadzone,
-          // Up
-          S: yAxis > deadzone,
-          // Down
-          A: xAxis < -deadzone,
-          // Left
-          D: xAxis > deadzone,
-          // Right
-          SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
-        };
-
-        console.log('controls', controls);
-        // Send the controls to the game logic or server
-        if (this.game.communicationClient) {
-          this.game.communicationClient.sendMessage('player_input', {
-            controls: controls
-          });
-        }
+        _ret = _loop();
+        if (_ret) return _ret.v;
       }
     }
   }]);

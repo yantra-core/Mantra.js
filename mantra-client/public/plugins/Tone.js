@@ -5,7 +5,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _DrumKit = _interopRequireDefault(require("./instruments/DrumKit.js"));
 var _startUp = _interopRequireDefault(require("./jingles/start-up.js"));
+var _keyCodes = _interopRequireDefault(require("./keyCodes.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23,14 +25,19 @@ var TonePlugin = /*#__PURE__*/function () {
     _classCallCheck(this, TonePlugin);
     this.id = TonePlugin.id;
     this.synth = null;
-    this.playIntro = true;
+    this.playIntro = false;
     this.userEnabled = false;
+    this.lastNotePlayed = null;
+    this.keyCodes = _keyCodes["default"];
   }
   _createClass(TonePlugin, [{
     key: "init",
     value: function init(game) {
       var _this = this;
       this.game = game;
+
+      // register the plugin with the game
+      this.game.systemsManager.addSystem(this.id, this);
       // check to see if Tone scope is available, if not assume we need to inject it sequentially
       if (typeof Tone === 'undefined') {
         console.log('Tone is not defined, attempting to load it from vendor');
@@ -44,13 +51,37 @@ var TonePlugin = /*#__PURE__*/function () {
   }, {
     key: "toneReady",
     value: function toneReady() {
-      var _this2 = this;
       var game = this.game;
       var self = this;
       var that = this;
 
+      // Tone.context.latencyHint = 'interactive'; // or a number in seconds
+      Tone.Transport.lookAhead = 0.5; // in seconds
+
+      this.drumKit = new _DrumKit["default"]();
+      var limiter = new Tone.Limiter(-6).toDestination();
+
+      // Create a compressor
+      /*
+      const compressor = new Tone.Compressor({
+        threshold: -3, // Threshold in dB
+        ratio: 4,       // Compression ratio
+        attack: 0.003,  // Attack time in seconds
+        release: 0.25   // Release time in seconds
+      }).toDestination();
+      */
+
       // TODO: game.createSynth = function() {};
-      this.synth = new Tone.Synth().toDestination();
+      this.synth = new Tone.Synth();
+      this.synth.volume.value = -3; // Lower volume
+
+      //this.synth.connect(compressor);
+      this.synth.connect(limiter);
+      game.playDrum = function () {
+        var sound = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'kick';
+        Tone.start();
+        that.drumKit.play(sound);
+      };
       game.playNote = function (note, duration) {
         Tone.start();
         // console.log('playing ', note, duration)
@@ -63,26 +94,7 @@ var TonePlugin = /*#__PURE__*/function () {
 
       console.log('Tone is ready', _startUp["default"]);
       if (this.playIntro) {
-        var synths = [];
-        var currentMidi = _startUp["default"];
-        var now = Tone.now() + 0.5;
-        currentMidi.tracks.forEach(function (track) {
-          //create a synth for each track
-          _this2.synth = new Tone.PolySynth(Tone.Synth, {
-            envelope: {
-              attack: 0.02,
-              decay: 0.1,
-              sustain: 0.3,
-              release: 1
-            }
-          }).toDestination();
-          synths.push(that.synth);
-          //schedule all of the events
-          // we have access to that.synth, can we listen for play note events?
-          track.notes.forEach(function (note) {
-            that.playNote(note.name, note.duration, note.time + now, note.velocity);
-          });
-        });
+        this.playIntroJingle();
       }
 
       // Function to play the sound
@@ -98,15 +110,118 @@ var TonePlugin = /*#__PURE__*/function () {
       game.emit('plugin::ready::tone', this);
     }
   }, {
+    key: "playIntroJingle",
+    value: function playIntroJingle() {
+      var _this2 = this;
+      var that = this;
+      var synths = [];
+      var currentMidi = _startUp["default"];
+      var now = Tone.now() + 0.5;
+      currentMidi.tracks.forEach(function (track) {
+        //create a synth for each track
+        _this2.synth = new Tone.PolySynth(Tone.Synth, {
+          envelope: {
+            attack: 0.02,
+            decay: 0.1,
+            sustain: 0.3,
+            release: 1
+          }
+        }).toDestination();
+        synths.push(that.synth);
+        //schedule all of the events
+        // we have access to that.synth, can we listen for play note events?
+        track.notes.forEach(function (note) {
+          that.playNote(note.name, note.duration, note.time + now, note.velocity);
+        });
+      });
+    }
+  }, {
     key: "playNote",
     value: function playNote(note, duration) {
       var now = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      var velocity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+      var velocity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.5;
+      console.log('playNote', note, duration, now, velocity);
+      if (typeof note === 'undefined') {
+        // if note is not defined, select a random note from the keyCodes object
+        var keys = Object.keys(this.keyCodes);
+        var randomKey = keys[Math.floor(Math.random() * keys.length)];
+
+        // check to see if this.lastNotePlayed is defined, if so perform harmonic shift
+        if (this.lastNotePlayed) {
+          console.log("performing harmonic shift", this.lastNotePlayed);
+          randomKey = this.harmonicShift(this.lastNotePlayed, {
+            type: 'perfectFifth'
+          });
+          // exact key match was not available, default to C4 ( for now )
+          // Remark: we could make a more approximate match based on letter of key / music theory
+          if (!randomKey) {
+            randomKey = this.harmonicShift('C4', {
+              type: 'perfectFifth'
+            });
+          }
+        }
+        note = this.keyCodes[randomKey].toneCode;
+      }
+      this.lastNotePlayed = note;
+
       // console.log('playing ', note, duration)
       var game = this.game;
       // Play a note for a given duration
-      this.synth.triggerAttackRelease(note, duration, now, velocity);
+      console.log('playing note', note, duration, now, velocity);
+      try {
+        this.synth.triggerAttackRelease(note, duration, now, velocity);
+      } catch (err) {
+        console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err);
+      }
       // game.emit('playNote', note, duration, now, velocity);
+    }
+  }, {
+    key: "harmonicShift",
+    value: function harmonicShift(traktorKeyCode) {
+      var _this3 = this;
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        type: 'perfectFifth'
+      };
+      var wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];
+      var currentIndex = wheelOrder.indexOf(traktorKeyCode);
+      if (currentIndex === -1) {
+        // keycode wasn't found, try to find it in the toneCode property
+        var keys = Object.keys(this.keyCodes);
+        var foundKey = keys.find(function (key) {
+          return _this3.keyCodes[key].toneCode === traktorKeyCode;
+        });
+        if (foundKey) {
+          currentIndex = wheelOrder.indexOf(foundKey);
+        }
+      }
+      if (currentIndex === -1) {
+        // throw new Error('Invalid Traktor Key Code');
+        console.log("WARNING: Could not find Traktor Key Code", traktorKeyCode);
+        return;
+      }
+      switch (options.type) {
+        case 'perfectFifth':
+          // 7 steps forward for major, 7 steps backward for minor
+          currentIndex += traktorKeyCode.endsWith('m') ? -7 : 7;
+          break;
+        case 'majorMinorSwap':
+          // Toggle between major and minor
+          currentIndex += traktorKeyCode.endsWith('m') ? 12 : -12;
+          break;
+        case 'shift':
+          // Shift by a specified amount
+          if (typeof options.amount !== 'number' || Math.abs(options.amount) > 3) {
+            throw new Error('Invalid shift amount');
+          }
+          currentIndex += options.amount;
+          break;
+        default:
+          throw new Error('Invalid transition type');
+      }
+
+      // Ensure the index wraps around the wheel
+      currentIndex = (currentIndex + 24) % 24;
+      return wheelOrder[currentIndex];
     }
   }]);
   return TonePlugin;
@@ -114,8 +229,123 @@ var TonePlugin = /*#__PURE__*/function () {
 _defineProperty(TonePlugin, "id", 'tone');
 _defineProperty(TonePlugin, "async", true);
 var _default = exports["default"] = TonePlugin;
+/*
+// Example usage
+console.log(harmonicShift('5m', { type: 'perfectFifth' })); // Expected output: 10m
+console.log(harmonicShift('5m', { type: 'majorMinorSwap' })); // Expected output: 5d
+console.log(harmonicShift('5m', { type: 'shift', amount: -2 })); // Expected output: 3m
+*/
 
-},{"./jingles/start-up.js":2}],2:[function(require,module,exports){
+},{"./instruments/DrumKit.js":2,"./jingles/start-up.js":3,"./keyCodes.js":4}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var DrumKit = exports["default"] = /*#__PURE__*/function () {
+  function DrumKit() {
+    _classCallCheck(this, DrumKit);
+    this.kick = new Tone.MembraneSynth().toDestination();
+    this.snare = new Tone.NoiseSynth({
+      noise: {
+        type: 'white'
+      },
+      envelope: {
+        attack: 0.005,
+        decay: 0.1,
+        sustain: 0
+      }
+    }).toDestination();
+    this.hiHatClosed = new Tone.MetalSynth({
+      frequency: 200,
+      envelope: {
+        attack: 0.001,
+        decay: 0.1,
+        sustain: 0
+      },
+      harmonicity: 5.1,
+      modulationIndex: 32,
+      resonance: 4000,
+      octaves: 1.5
+    }).toDestination();
+    this.hiHatOpen = new Tone.MetalSynth({
+      frequency: 200,
+      envelope: {
+        attack: 0.001,
+        decay: 0.3,
+        sustain: 0
+      },
+      harmonicity: 5.1,
+      modulationIndex: 32,
+      resonance: 4000,
+      octaves: 1.5
+    }).toDestination();
+    this.tomLow = new Tone.MembraneSynth({
+      pitchDecay: 0.05,
+      octaves: 4,
+      oscillator: {
+        type: 'sine'
+      },
+      envelope: {
+        attack: 0.001,
+        decay: 0.4,
+        sustain: 0.01
+      }
+    }).toDestination();
+    this.tomHigh = new Tone.MembraneSynth({
+      pitchDecay: 0.05,
+      octaves: 6,
+      oscillator: {
+        type: 'sine'
+      },
+      envelope: {
+        attack: 0.001,
+        decay: 0.2,
+        sustain: 0.01
+      }
+    }).toDestination();
+  }
+  _createClass(DrumKit, [{
+    key: "play",
+    value: function play(sound) {
+      switch (sound) {
+        case 'kick':
+          this.kick.triggerAttackRelease('C1', '8n');
+          break;
+        case 'snare':
+          this.snare.triggerAttackRelease('8n');
+          break;
+        case 'hat':
+          this.hiHatClosed.triggerAttackRelease('32n');
+          break;
+        case 'hiHatClosed':
+          this.hiHatClosed.triggerAttackRelease('32n');
+          break;
+        case 'hiHatOpen':
+          this.hiHatOpen.triggerAttackRelease('8n');
+          break;
+        case 'tomLow':
+          this.tomLow.triggerAttackRelease('G2', '8n');
+          break;
+        case 'tomHigh':
+          this.tomHigh.triggerAttackRelease('A4', '8n');
+          break;
+        default:
+          console.log('Unknown drum sound');
+      }
+    }
+  }]);
+  return DrumKit;
+}();
+
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -784,6 +1014,113 @@ var _default = exports["default"] = {
     }]
   }]
 };
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var keyCodes = {
+  "1m": {
+    "keyName": "A Minor",
+    "toneCode": "A4"
+  },
+  "2m": {
+    "keyName": "E Minor",
+    "toneCode": "E4"
+  },
+  "3m": {
+    "keyName": "B Minor",
+    "toneCode": "B4"
+  },
+  "4m": {
+    "keyName": "F♯ Minor",
+    "toneCode": "F#4"
+  },
+  "5m": {
+    "keyName": "C♯ Minor",
+    "toneCode": "C#4"
+  },
+  "6m": {
+    "keyName": "G♯ Minor",
+    "toneCode": "G#4"
+  },
+  "7m": {
+    "keyName": "D♯ Minor",
+    "toneCode": "D#4"
+  },
+  "8m": {
+    "keyName": "A♯ Minor",
+    "toneCode": "A#4"
+  },
+  "9m": {
+    "keyName": "F Minor",
+    "toneCode": "F4"
+  },
+  "10m": {
+    "keyName": "C Minor",
+    "toneCode": "C4"
+  },
+  "11m": {
+    "keyName": "G Minor",
+    "toneCode": "G4"
+  },
+  "12m": {
+    "keyName": "D Minor",
+    "toneCode": "D4"
+  },
+  "1d": {
+    "keyName": "A Major",
+    "toneCode": "A4"
+  },
+  "2d": {
+    "keyName": "E Major",
+    "toneCode": "E4"
+  },
+  "3d": {
+    "keyName": "B Major",
+    "toneCode": "B4"
+  },
+  "4d": {
+    "keyName": "F♯ Major",
+    "toneCode": "F#4"
+  },
+  "5d": {
+    "keyName": "C♯ Major",
+    "toneCode": "C#4"
+  },
+  "6d": {
+    "keyName": "G♯ Major",
+    "toneCode": "G#4"
+  },
+  "7d": {
+    "keyName": "D♯ Major",
+    "toneCode": "D#4"
+  },
+  "8d": {
+    "keyName": "A♯ Major",
+    "toneCode": "A#4"
+  },
+  "9d": {
+    "keyName": "F Major",
+    "toneCode": "F4"
+  },
+  "10d": {
+    "keyName": "C Major",
+    "toneCode": "C4"
+  },
+  "11d": {
+    "keyName": "G Major",
+    "toneCode": "G4"
+  },
+  "12d": {
+    "keyName": "D Major",
+    "toneCode": "D4"
+  }
+};
+var _default = exports["default"] = keyCodes;
 
 },{}]},{},[1])(1)
 });

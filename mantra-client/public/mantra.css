@@ -1,12 +1,20 @@
 body {
   --angle: 0deg;
   margin: 0;
+  padding: 0;
+  width: 100vw;
   height: 100vh;
-  perspective: 1500px;
-  overflow: hidden;
   font-family: Teko, Helvetica, Arial, sans-serif;
   font-size: 3vmin;
+  background: #007fff;
+  overflow: hidden; /* ensures no scrolling */
+  perspective: none;
+  transform: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
+
 
 *:focus {
   outline: 0.25vmin dashed #007fff;
@@ -25,13 +33,9 @@ body {
   --purple-light: #bbe;
   --purple-dark: #64b;
   --button-x: #3c62f8;
-  var(--purple-light);
   --button-y: #14b161;
-  var(--purple-light);
   --button-a: #f03025;
-  var(--purple-dark);
   --button-b: #e9dd34;
-  var(--purple-dark);
   /*
   position: absolute;
   width: 80vmin;
@@ -56,14 +60,16 @@ body {
   /* Remove transform to avoid misalignment */
   transform-style: preserve-3d;
   transition: transform 1s;
-
 }
 
 #snes-gamepad * {
   position: absolute;
   box-sizing: border-box;
   transform-style: preserve-3d;
+}
 
+#dpad-area {
+  cursor: pointer;
 }
 
 .is3d>div {
@@ -127,6 +133,7 @@ button {
   background: transparent;
   padding: 0;
   transform-style: preserve-3d;
+  cursor: pointer;
 }
 
 button.active,
@@ -289,31 +296,17 @@ h1+p {
     linear-gradient(#0000 31%, #000c 33.33% 66.66%, #0000 70%),
     linear-gradient(90deg, #0000 31%, #000c 33.33% 66.66%, #0000 70%);
   width: 30vmin;
-  /* Increase the width */
   aspect-ratio: 1;
-  /* Maintain the aspect ratio */
   left: 30px;
-  /* Adjust position if necessary */
   bottom: 30px;
-  /* Adjust position if necessary */
   left: 30px;
-  /* Adjust position if necessary */
   bottom: 30px;
-  /* Adjust position if necessary */
-
-
-  /*
-  top: 9.75vmin;
-  left: 10.5vmin;
-  */
   pointer-events: none;
-  /* round corners */
   border-radius: 80%;
 }
 
 .axis div {
   --color: #34393a;
-  #333;
   --shadows:
     radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 36.66% 0% / 10% 10% no-repeat,
     radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 62.66% 0% / 10% 10% no-repeat,
@@ -336,7 +329,6 @@ h1+p {
 
 .axis div:last-of-type {
   --color: #3a4448;
-  #3a3a3a;
   background:
     linear-gradient(#fff1, #fff0 20% 80%, #fff1),
     linear-gradient(90deg, #fff1, #fff0 20% 80%, #fff1),
@@ -451,6 +443,7 @@ h1+p {
   background: #444;
   transform: translate(-50%, -50%) rotate(-35deg);
   bottom: 6.5vmin;
+  cursor: pointer;
   left: 40%;
   box-shadow:
     0 0 0 0.2vmin #0007,
@@ -460,6 +453,11 @@ h1+p {
     0 0.5vmin 0.5vmin #0004;
 }
 
+#select,
+#start div {
+  cursor: pointer;
+}
+
 #start {
   left: 60%;
 }
@@ -467,8 +465,9 @@ h1+p {
 button#start.is3d div,
 button#select.is3d div {
   --color: #222;
-  top 0;
-  left: 0 width: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   transform: translateZ(calc(var(--pos) * var(--z))) scale(calc(1 - var(--z) * 0.03));
   border-radius: 2.5vmin;
@@ -537,6 +536,7 @@ button.circle div {
   transform: translate(-50%, -50%);
   background: var(--color);
   z-index: 2;
+  cursor: pointer;
   box-shadow:
     0 0 0 0.25vmin #0002,
     0 0 0.3vmin 0.1vmin #0008,
@@ -616,12 +616,12 @@ button.circle div {
 
 #zoomSlider {
   position: absolute;
-  top: 120px;          /* Adjusted to top */
+  top: 30px;          /* Adjusted to top */
   right: 60px;         /* Adjusted to right */
-  z-index: 10000;
+  z-index: 9002;
   -webkit-appearance: none;
   width: 60px;         /* Width for vertical slider */
-  height: 330px;       /* Height for vertical slider */
+  height: 33vh;       /* Height for vertical slider */
   background: transparent;
   outline: none;
   opacity: 0.7;
@@ -664,20 +664,6 @@ button.circle div {
 
 
 /* END GAMEPAD CODE */
-body {
-  margin: 0;
-  padding: 0;
-  background: #007fff;
-  overflow: hidden;
-  perspective: 0px;
-  width: 100vw;
-  height: 100vh;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-  /* disable scrolling */
-  overflow: hidden;
-}
 
 #controlsView {
   bottom: 30px;

@@ -17,7 +17,7 @@ var Block = /*#__PURE__*/function () {
   function Block() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$MIN_BLOCK_SIZE = _ref.MIN_BLOCK_SIZE,
-      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 10000 : _ref$MIN_BLOCK_SIZE,
+      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 100 : _ref$MIN_BLOCK_SIZE,
       _ref$width = _ref.width,
       width = _ref$width === void 0 ? 40 : _ref$width,
       _ref$height = _ref.height,
@@ -94,7 +94,7 @@ var Block = /*#__PURE__*/function () {
         var newWidth = entityA.width / 2;
         var newHeight = entityA.height / 2;
         var newSplits = entityA.splits + 1;
-
+        console.log('aaaa', entityA);
         // TODO: could we move this into a sutra rule instead?
         for (var i = 0; i < 4; i++) {
           var newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];
@@ -112,12 +112,19 @@ var Block = /*#__PURE__*/function () {
               y: (Math.random() * 2 - 1) * 10
             },
             // inherit color from parent
-            color: newColor,
+            texture: entityA.texture,
+            isSensor: entityA.isSensor,
+            // color: newColor,
             width: newWidth,
             height: newHeight,
-            splits: newSplits
+            splits: newSplits,
+            //friction: 0.5,
+            frictionAir: 0.2
+            //frictionStatic: 0.5,
+            // TODO: needs to inherit other properties from parent such as frictoin
           });
         }
+
         this.game.removeEntity(entityIdA);
       }
     }

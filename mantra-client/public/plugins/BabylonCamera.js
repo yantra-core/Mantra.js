@@ -17,7 +17,8 @@ var BabylonCamera = /*#__PURE__*/function () {
     var camera = _ref.camera;
     _classCallCheck(this, BabylonCamera);
     this.id = BabylonCamera.id;
-    this.startingZoom = camera.startingZoom;
+    // this.startingZoom = camera.startingZoom;
+    this.startingZoom = 0.25;
     // config scope for convenience
     var config = {
       camera: camera
@@ -27,6 +28,8 @@ var BabylonCamera = /*#__PURE__*/function () {
   _createClass(BabylonCamera, [{
     key: "init",
     value: function init(game, engine, scene) {
+      // hoist and override
+      game.setZoom = this.setZoom.bind(this);
       this.scene = scene;
       this.game = game;
       this.engine = engine;
@@ -65,6 +68,11 @@ var BabylonCamera = /*#__PURE__*/function () {
       this.camera.radius = 2560 * this.startingZoom;
       //alert(this.camera.radius)
       //console.log('this.camera.radiusthis.camera.radiusthis.camera.radius', this.camera.radius)
+    }
+  }, {
+    key: "setZoom",
+    value: function setZoom(zoom) {
+      this.camera.radius = 2560 * zoom;
     }
   }, {
     key: "setupCameraControls",

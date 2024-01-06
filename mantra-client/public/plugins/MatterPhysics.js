@@ -33,8 +33,8 @@ var Collisions = /*#__PURE__*/function () {
       // TODO: this won't work unless game.physics exists
       // Binds our handleCollision method to the game physics engine's collisionStart event
       this.game.physics.collisionStart(this.game, this.handleCollision.bind(this));
-      this.game.physics.collisionActive(this.game, function noop() {});
-      this.game.physics.collisionEnd(this.game, function noop() {});
+      this.game.physics.collisionActive(this.game, this.collisionActive.bind(this));
+      this.game.physics.collisionEnd(this.game, this.collisionEnd.bind(this));
 
       // Binds game.handleCollision to the Game for convenience 
       this.game.handleCollision = this.handleCollision.bind(this);
@@ -75,6 +75,7 @@ var Collisions = /*#__PURE__*/function () {
           // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
           var collisionContext = {
             type: 'COLLISION',
+            kind: 'START',
             entityIdA: bodyA.myEntityId,
             entityIdB: bodyB.myEntityId,
             bodyA: entityA,
@@ -115,6 +116,94 @@ var Collisions = /*#__PURE__*/function () {
         _iterator.e(err);
       } finally {
         _iterator.f();
+      }
+    }
+
+    // TODO: Remark: Active collisions should be managed in a Map() with unique key,
+    //               being composite key of entityIdA and entityIdB
+    //               This will allow for optimized collision management and improved time complexity
+  }, {
+    key: "collisionEnd",
+    value: function collisionEnd(pair, bodyA, bodyB) {
+      // console.log('collisionEnd', pair, bodyA, bodyB);
+
+      var entityIdA = bodyA.myEntityId;
+      var entityIdB = bodyB.myEntityId;
+      var entityA = this.game.getEntity(entityIdA);
+      var entityB = this.game.getEntity(entityIdB);
+      if (!entityA || !entityB) {
+        // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
+        return;
+      }
+      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+        if (this.game.rules) {
+          this.game.data.collisions = this.game.data.collisions || [];
+          // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+          var collisionContext = {
+            type: 'COLLISION',
+            kind: 'END',
+            entityIdA: bodyA.myEntityId,
+            entityIdB: bodyB.myEntityId,
+            bodyA: entityA,
+            bodyB: entityB
+          };
+
+          // Find and remove the active collision
+          this.game.data.collisions = this.game.data.collisions.filter(function (collision) {
+            return !(collision.entityIdA === bodyA.myEntityId && collision.entityIdB === bodyB.myEntityId && collision.kind === 'ACTIVE');
+          });
+
+          // add entity onto the collision by type name
+          collisionContext[entityA.type] = entityA;
+          collisionContext[entityB.type] = entityB;
+          this.game.data.collisions.push(collisionContext);
+        }
+      }
+    }
+  }, {
+    key: "collisionActive",
+    value: function collisionActive(pair, bodyA, bodyB) {
+      var entityIdA = bodyA.myEntityId;
+      var entityIdB = bodyB.myEntityId;
+      var entityA = this.game.getEntity(entityIdA);
+      var entityB = this.game.getEntity(entityIdB);
+      // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
+      if (!entityA || !entityB) {
+        // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
+        return;
+      }
+      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+        if (this.game.rules) {
+          this.game.data.collisions = this.game.data.collisions || [];
+          // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+          var collisionContext = {
+            type: 'COLLISION',
+            kind: 'ACTIVE',
+            entityIdA: bodyA.myEntityId,
+            entityIdB: bodyB.myEntityId,
+            ticks: 1,
+            duration: 1,
+            bodyA: entityA,
+            bodyB: entityB
+          };
+
+          // add entity onto the collision by type name
+          collisionContext[entityA.type] = entityA;
+          collisionContext[entityB.type] = entityB;
+
+          // Find existing collision, if any
+          var existingCollision = this.game.data.collisions.find(function (collision) {
+            return collision.entityIdA === collisionContext.entityIdA && collision.entityIdB === collisionContext.entityIdB && collision.kind === 'ACTIVE';
+          });
+          if (existingCollision) {
+            // Increment duration if collision is already active
+            existingCollision.duration += 1 / this.game.data.FPS; // Adds approximately 0.01667 seconds per tick at 60 FPS
+            existingCollision.ticks++;
+          } else {
+            // Add new collision if not found
+            this.game.data.collisions.push(collisionContext);
+          }
+        }
       }
     }
   }, {
@@ -280,14 +369,26 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                   }
                   // TODO: rotation / velocity as well, use flag isChanged
 
+                  // check it z position is undefined on body ( 2D physics )
+                  // if there is no z position, check for previous z position on entity and use that
+                  // if there is no previous z position on entity, use 0
+
+                  var position = {
+                    x: body.position.x,
+                    y: body.position.y
+                  };
+                  if (typeof body.position.z === 'undefined') {
+                    if (typeof ent.position.z === 'undefined') {
+                      position.z = 0;
+                    } else {
+                      position.z = ent.position.z;
+                    }
+                  }
                   _this2.game.components.velocity.set(body.myEntityId, {
                     x: body.velocity.x,
                     y: body.velocity.y
                   });
-                  _this2.game.components.position.set(body.myEntityId, {
-                    x: body.position.x,
-                    y: body.position.y
-                  });
+                  _this2.game.components.position.set(body.myEntityId, position);
                   _this2.game.components.rotation.set(body.myEntityId, body.angle);
                 }
                 if (ent.type === 'BULLET') {
@@ -751,7 +852,17 @@ var PhysicsInterface = /*#__PURE__*/function () {
   }, {
     key: "collisionStart",
     value: function collisionStart(engine, callback) {
-      throw new Error('Method "onCollision" must be implemented');
+      throw new Error('Method "collisionStart" must be implemented');
+    }
+  }, {
+    key: "collisionActive",
+    value: function collisionActive(engine, callback) {
+      throw new Error('Method "collisionActive" must be implemented');
+    }
+  }, {
+    key: "collisionEnd",
+    value: function collisionEnd(engine, callback) {
+      throw new Error('Method "collisionEnd" must be implemented');
     }
   }]);
   return PhysicsInterface;

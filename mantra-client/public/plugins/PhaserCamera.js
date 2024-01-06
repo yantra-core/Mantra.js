@@ -42,6 +42,8 @@ var PhaserCamera = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      // hoists and overrides
+      this.game.setZoom = this.setZoom.bind(this);
       this.game.systemsManager.addSystem('graphics-phaser-camera', this);
       this.scene.input.on('pointerdown', this.onPointerDown.bind(this));
       this.scene.input.on('pointermove', this.onPointerMove.bind(this));
@@ -55,7 +57,7 @@ var PhaserCamera = /*#__PURE__*/function () {
       var camera = this.scene.cameras.main;
       var player = this.game.getEntity(this.game.currentPlayerId);
       // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
-      if (camera && player.graphics && player.graphics['graphics-phaser']) {
+      if (camera && player && player.graphics && player.graphics['graphics-phaser']) {
         if (this.follow && !this.isDragging && !this.isThrowing) {
           camera.centerOn(player.position.x, player.position.y);
         }
@@ -232,8 +234,9 @@ zoom.zoomIn = function (mainScene, amount) {
     return;
   }
   mainScene.cameras.main.zoom += amount;
-  mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
+  // mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
 };
+
 zoom.zoomOut = function (mainScene, amount) {
   if (typeof amount === 'undefined') {
     amount = -0.01;

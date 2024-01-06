@@ -269,6 +269,8 @@ var _localGameLoop = _interopRequireDefault(require("./lib/localGameLoop.js"));
 var _onlineGameLoop = _interopRequireDefault(require("./lib/onlineGameLoop.js"));
 var _gameTick = _interopRequireDefault(require("./lib/gameTick.js"));
 var _defaultGameStart = _interopRequireDefault(require("./lib/start/defaultGameStart.js"));
+var _createDefaultPlayer = _interopRequireDefault(require("./lib/createDefaultPlayer.js"));
+var _switchWorlds = _interopRequireDefault(require("./lib/switchWorlds.js"));
 var _ActionRateLimiter = _interopRequireDefault(require("./Component/ActionRateLimiter.js"));
 var _TimersComponent = _interopRequireDefault(require("./Component/TimersComponent.js"));
 var _loadPluginsFromConfig = _interopRequireDefault(require("./lib/loadPluginsFromConfig.js"));
@@ -313,9 +315,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$loadDefaultPlugi = _ref.loadDefaultPlugins,
       loadDefaultPlugins = _ref$loadDefaultPlugi === void 0 ? true : _ref$loadDefaultPlugi,
       _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 1600 : _ref$width,
+      width = _ref$width === void 0 ? 1600 * 10 : _ref$width,
       _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 900 : _ref$height,
+      height = _ref$height === void 0 ? 900 * 10 : _ref$height,
       _ref$physics = _ref.physics,
       physics = _ref$physics === void 0 ? 'matter' : _ref$physics,
       _ref$graphics = _ref.graphics,
@@ -332,6 +334,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       mouse = _ref$mouse === void 0 ? true : _ref$mouse,
       _ref$gamepad = _ref.gamepad,
       gamepad = _ref$gamepad === void 0 ? true : _ref$gamepad,
+      _ref$sutra = _ref.sutra,
+      sutra = _ref$sutra === void 0 ? false : _ref$sutra,
       _ref$lifetime = _ref.lifetime,
       lifetime = _ref$lifetime === void 0 ? true : _ref$lifetime,
       _ref$protobuf = _ref.protobuf,
@@ -342,6 +346,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       deltaCompression = _ref$deltaCompression === void 0 ? false : _ref$deltaCompression,
       _ref$deltaEncoding = _ref.deltaEncoding,
       deltaEncoding = _ref$deltaEncoding === void 0 ? true : _ref$deltaEncoding,
+      _ref$defaultPlayer = _ref.defaultPlayer,
+      defaultPlayer = _ref$defaultPlayer === void 0 ? true : _ref$defaultPlayer,
       _ref$options = _ref.options,
       options = _ref$options === void 0 ? {} : _ref$options;
     _classCallCheck(this, Game);
@@ -373,6 +379,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       msgpack: msgpack,
       deltaCompression: deltaCompression,
       deltaEncoding: deltaEncoding,
+      defaultPlayer: defaultPlayer,
       options: options,
       multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
@@ -432,6 +439,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
 
     // Bind loadScripts from util
     this.loadScripts = _loadScripts["default"].bind(this);
+    this.switchWorlds = _switchWorlds["default"].bind(this);
     this.bodyMap = {};
     this.systems = {};
     this.storage = _storage["default"];
@@ -456,6 +464,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
 
     this.changedEntities = new Set();
     this.removedEntities = new Set();
+    this.pendingRender = new Set();
     this.isClient = isClient;
     this.isEdgeClient = isEdgeClient;
     this.isServer = isServer;
@@ -465,7 +474,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
 
     // ComponentManager.js? If so, what does it do and is it needed for our ECS?
     // Remark: I don't think we need to explicitly define components, we can just add them as needed
-
     this.components = {
       type: new _Component["default"]('type', this),
       // string type, name of Entity
@@ -511,6 +519,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.localGameLoop = _localGameLoop["default"].bind(this);
     this.onlineGameLoop = _onlineGameLoop["default"].bind(this);
     this.loadPluginsFromConfig = _loadPluginsFromConfig["default"].bind(this);
+    this.createDefaultPlayer = _createDefaultPlayer["default"].bind(this);
 
     // keeps track of game.use('PluginStringName') async loading
     // game.start() will wait for all plugins to be loaded before starting
@@ -532,6 +541,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         keyboard: keyboard,
         mouse: mouse,
         gamepad: gamepad,
+        sutra: sutra,
         lifetime: lifetime
       });
     }
@@ -564,7 +574,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
         };
       }
       // Wait for all systems to be ready before starting the game loop
-      if (game.loadingPluginsCount > 0) {
+      if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
+        // console.log('waiting for plugins to load...', game.physicsReady)
         setTimeout(function () {
           game.start(cb);
         }, 4);
@@ -590,6 +601,14 @@ var Game = exports.Game = /*#__PURE__*/function () {
         }
         console.log('All Plugins are ready! Starting Mantra Game Client...');
         game.emit('game::ready');
+        if (this.config.defaultPlayer) {
+          this.createPlayer({
+            type: 'PLAYER',
+            texture: 'player'
+          }).then(function (ent) {
+            game.setPlayerId(ent.id);
+          });
+        }
         if (game.systems.client) {
           var client = this.getSystem('client');
           client.start(cb);
@@ -654,7 +673,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         if (this.isServer) {
           // console.log('pluginId', pluginId, this.plugins)
           if (this.plugins[_pluginId]) {
-            console.log('loading plugin', _pluginId, this.plugins[_pluginId]);
+            // console.log('loading plugin', pluginId, this.plugins[pluginId])
             return this.use(new this.plugins[_pluginId](options));
           }
           console.log("Attempted to load plugin by string name \"".concat(_pluginId, "\"on server, could not find! skipping"));
@@ -826,40 +845,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       });
     }
   }, {
-    key: "createDefaultPlayer",
-    value: function createDefaultPlayer(playerConfig) {
-      // console.log('creating default player')
-
-      // check if game.currentPlayerId is already set,
-      // if so return
-      if (this.currentPlayerId) {
-        return this.getEntity(this.currentPlayerId);
-      }
-      var player = this.createEntity({
-        type: 'PLAYER',
-        shape: 'triangle',
-        width: 32,
-        height: 32,
-        mass: 222,
-        friction: 0.5,
-        // Default friction
-        frictionAir: 0.5,
-        // Default air friction
-        frictionStatic: 1,
-        // Default static friction
-        color: 0x00ff00,
-        position: {
-          x: 0,
-          y: 0
-        }
-      });
-      this.setPlayerId(player.id);
-      return player;
-    }
-  }, {
     key: "playNote",
     value: function playNote(note, duration) {
-      // console.log('Tone Plugin not loaded. Cannot play tone.');
+      console.log('Tone Plugin not loaded. Cannot play tone note.');
     }
   }, {
     key: "setGravity",
@@ -899,6 +887,23 @@ var Game = exports.Game = /*#__PURE__*/function () {
       };
     }
   }, {
+    key: "setPosition",
+    value: function setPosition(entityId, position) {
+      var body = this.bodyMap[entityId];
+      this.physics.setPosition(body, position);
+    }
+  }, {
+    key: "applyPosition",
+    value: function applyPosition(entityId, position) {
+      var body = this.bodyMap[entityId];
+      // takes the current position and adds the new position
+      var newPosition = {
+        x: body.position.x + position.x,
+        y: body.position.y + position.y
+      };
+      this.physics.setPosition(body, newPosition);
+    }
+  }, {
     key: "rotate",
     value: function rotate(entityId, rotation) {
       var rotationSpeed = 0.022; // TODO: config
@@ -906,11 +911,16 @@ var Game = exports.Game = /*#__PURE__*/function () {
       var body = this.bodyMap[entityId];
       this.physics.rotateBody(body, rotationAmount);
     }
+  }, {
+    key: "rotateCamera",
+    value: function rotateCamera(angle) {
+      // not implemented directly, Graphics plugin will handle this
+    }
   }]);
   return Game;
 }();
 
-},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/eventEmitter.js":7,"./lib/gameTick.js":8,"./lib/loadPluginsFromConfig.js":9,"./lib/localGameLoop.js":10,"./lib/onlineGameLoop.js":11,"./lib/start/defaultGameStart.js":12,"./lib/storage/storage.js":14,"./lib/util/loadScripts.js":15}],5:[function(require,module,exports){
+},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/createDefaultPlayer.js":7,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/loadPluginsFromConfig.js":10,"./lib/localGameLoop.js":11,"./lib/onlineGameLoop.js":12,"./lib/start/defaultGameStart.js":13,"./lib/storage/storage.js":15,"./lib/switchWorlds.js":16,"./lib/util/loadScripts.js":17}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -950,7 +960,7 @@ var SystemsManager = /*#__PURE__*/function () {
       // Remark: Defaulting all Plugins to event emitters has is currently enabled
       // This means all plugin methods will be emitted as events
       // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
-      _eventEmitter["default"].bindClass(system, systemId);
+      // eventEmitter.bindClass(system, systemId)
 
       // binds system to local instance Map
       this.systems.set(systemId, system);
@@ -1013,10 +1023,12 @@ var SystemsManager = /*#__PURE__*/function () {
   }, {
     key: "render",
     value: function render() {
-      var renderSystem = this.systems.get('render');
+      /*
+      const renderSystem = this.systems.get('render');
       if (renderSystem && typeof renderSystem.render === "function") {
         renderSystem.render();
       }
+      */
     }
 
     /*
@@ -1035,7 +1047,7 @@ var SystemsManager = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":7}],6:[function(require,module,exports){
+},{"../lib/eventEmitter.js":8}],6:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -1044,6 +1056,58 @@ MANTRA.plugins = {}; // empty plugin scope, may be populated by using plugins
 module.exports = MANTRA;
 
 },{"./Game.js":4}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createDefaultPlayer;
+function createDefaultPlayer() {
+  var playerConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  // console.log('creating default player')
+
+  if (typeof playerConfig.position === 'undefined') {
+    playerConfig.position = {
+      x: 0,
+      y: 0
+    };
+  }
+  // check if game.currentPlayerId is already set,
+  // if so return
+  if (this.currentPlayerId) {
+    return this.getEntity(this.currentPlayerId);
+  }
+  var player = this.createEntity({
+    type: 'PLAYER',
+    shape: 'triangle',
+    width: 16,
+    height: 16,
+    /*
+    style: {
+      width: '48px',
+      height: '48px',
+    },
+    */
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'player'
+    },
+    mass: 222,
+    friction: 0.5,
+    // Default friction
+    frictionAir: 0.5,
+    // Default air friction
+    frictionStatic: 1,
+    // Default static friction
+    // color: 0x00ff00,
+    position: playerConfig.position
+  });
+  this.setPlayerId(player.id);
+  return player;
+}
+;
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1185,7 +1249,7 @@ eventEmitter.listenerCount = function (eventPattern) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1201,6 +1265,8 @@ var hzMS = 16.666; // 60 FPS
 function gameTick() {
   var _this = this;
   this.tick++;
+  this.data.tick = this.tick;
+  this.data.currentPlayer = this.getEntity(this.currentPlayerId);
   // Calculate deltaTime in milliseconds
   var now = Date.now();
   var deltaTimeMS = now - lastTick; // Delta time in milliseconds
@@ -1210,7 +1276,6 @@ function gameTick() {
   deltaTimeMS = Math.min(deltaTimeMS, hzMS);
 
   // Clear changed entities
-  this.changedEntities.clear();
   this.removedEntities.clear();
   if (this.isClient) {
     // TODO: move to localGameLoop?
@@ -1226,56 +1291,37 @@ function gameTick() {
   }
 
   // Loop through entities that have changed
-  // TODO: move rendering logic out of gameTick to Graphics.js
   var _iterator = _createForOfIteratorHelper(this.changedEntities),
     _step;
   try {
     var _loop = function _loop() {
       var entityId = _step.value;
-      // we need a way for the local game mode to know when to render entities
       if (_this.isClient && _this.isOnline === false) {
         var ent = _this.entities.get(entityId);
-        // pendingRender is not a component property yet, just ad-hoc on client
-        ent.pendingRender = {};
-        // flag each graphics interface as needing to render this entity
-        // remark: this is local game mode only
-        _this.graphics.forEach(function (graphicsInterface) {
-          ent.pendingRender[graphicsInterface.id] = true;
-        });
-      }
-
-      // TODO: move this to Bullet plugin
-      var entity = _this.getEntity(entityId);
-      // kinematic bullet movements on client
-      if (_this.isClient && entity.type === 'BULLET') {
-        // console.log("kinematic", entity)
-        if (entity.graphics) {
-          for (var g in entity.graphics) {
-            var graphicInterface = _this.systems[g];
-            if (graphicInterface) {
-              graphicInterface.updateGraphic(entity);
-            }
-          }
+        if (ent) {
+          _this.graphics.forEach(function (graphicsInterface) {
+            graphicsInterface.inflateEntity(ent);
+          });
         }
       }
     };
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
       _loop();
     }
-
-    // Save the game snapshot
   } catch (err) {
     _iterator.e(err);
   } finally {
     _iterator.f();
   }
-  this.saveSnapshot(this.getEntities(), this.lastProcessedInput);
+  this.changedEntities.clear();
 
+  // Save the game snapshot
+  this.saveSnapshot(this.getEntities(), this.lastProcessedInput);
   // TODO: THESE should / could all be hooks, after::gameTick
 }
 var _default = exports["default"] = gameTick;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1283,6 +1329,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = loadPluginsFromConfig;
 var _LoadingScreen = _interopRequireDefault(require("../plugins/loading-screen/LoadingScreen.js"));
+var _GhostTyper = _interopRequireDefault(require("../plugins/typer-ghost/GhostTyper.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function loadPluginsFromConfig(_ref) {
   var physics = _ref.physics,
@@ -1291,6 +1338,8 @@ function loadPluginsFromConfig(_ref) {
     keyboard = _ref.keyboard,
     mouse = _ref.mouse,
     gamepad = _ref.gamepad,
+    sutra = _ref.sutra,
+    ghostTyper = _ref.ghostTyper,
     lifetime = _ref.lifetime;
   var plugins = this.plugins;
   var gameConfig = this.config;
@@ -1327,7 +1376,12 @@ function loadPluginsFromConfig(_ref) {
     }
     if (gamepad) {
       this.use('Gamepad');
+      this.use('GamepadGUI');
     }
+    if (sutra) {
+      this.use('Sutra');
+    }
+    this.use('GhostTyper');
 
     // TODO: move to Graphics.loadFromConfig() ?
     if (graphics) {
@@ -1366,7 +1420,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":16}],10:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":18,"../plugins/typer-ghost/GhostTyper.js":19}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1427,20 +1481,20 @@ function localGameLoop(game, playerId) {
   var alpha = accumulator / fixedStep;
 
   // Render the local snapshot with interpolation
-  game.graphics.forEach(function (graphicsInterface) {
+  game.graphics.forEach(function localGameLoopGraphicsRender(graphicsInterface) {
     graphicsInterface.render(game, alpha); // Pass the alpha to the render method
   });
 
   // Call the next iteration of the loop using requestAnimationFrame
   if (game.localGameLoopRunning) {
-    requestAnimationFrame(function () {
+    requestAnimationFrame(function rafLocalGameLoop() {
       localGameLoop(game, playerId);
     });
   }
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1528,7 +1582,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1547,7 +1601,7 @@ function defaultGameStart(game) {
   */
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1600,7 +1654,7 @@ var MemoryBackend = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = MemoryBackend;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1680,7 +1734,58 @@ var storage = function () {
 }();
 var _default = exports["default"] = storage;
 
-},{"./MemoryBackend.js":13}],15:[function(require,module,exports){
+},{"./MemoryBackend.js":14}],16:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = switchWorlds;
+function switchWorlds(selectedWorld) {
+  var game = this;
+  // check to see if game.worlds has any entries
+  // if so, unload them if they have an unload method
+  if (game.worlds.length > 0) {
+    game.worlds.forEach(function (world, i) {
+      if (world.unload) {
+        // alert(`Unloading ${world.id}`);
+        console.log(world.id, 'world.unload', world.unload);
+        // remove the world from the game.worlds array
+        game.worlds.splice(i, 1);
+        world.unload();
+      }
+    });
+  }
+  game.systems.entity.clearAllEntities(true);
+  var worldName = 'XState';
+  worldName = 'Sutra';
+  worldName = selectedWorld;
+  var worldClass = WORLDS.worlds[worldName];
+  if (!worldClass) {
+    console.error("World ".concat(worldName, " not found"));
+    return;
+  }
+  var worldInstance = new worldClass();
+  game.once('plugin::loaded::' + worldInstance.id, function () {
+    // alert('loaded')
+    // call init?
+    //worldInstance.init(game);
+  });
+
+  // needs to wait at least 1 tick of game loop to ensure entities are cleared
+  // TODO: add Game.scheduleEvent(tickCount) method
+  //       this will allow us to schedule events to occur at a specific tick in the future
+  //       See: Timers.js file for example
+  setTimeout(function () {}, 400);
+  game.use(worldInstance);
+
+  // USER INTENT: Change world
+  // persist this intention to the local storage
+  // so that it can be restored on next page load
+  game.storage.set('world', selectedWorld);
+}
+
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1719,7 +1824,7 @@ function loadScripts(scripts, finalCallback) {
   loadScript(0); // Start loading the first script
 }
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2043,6 +2148,192 @@ var LoadingScreen = /*#__PURE__*/function () {
 }();
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
+
+},{}],19:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// GhostTyper.js - Marak Squires 2023
+var GhostTyper = /*#__PURE__*/function () {
+  function GhostTyper() {
+    _classCallCheck(this, GhostTyper);
+    this.id = GhostTyper.id;
+    this.typers = [];
+  }
+  _createClass(GhostTyper, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.game.systemsManager.addSystem(this.id, this);
+    }
+  }, {
+    key: "createQueuedText",
+    value: function createQueuedText(options) {
+      var _this = this;
+      var typer = new Typer(this.game, options.x, options.y, '', options.style, function () {
+        return _this.removeTyper(typer);
+      });
+      this.typers.push(typer);
+      return typer;
+    }
+    // Add text to the queue of a specific typer
+  }, {
+    key: "queueTextForTyper",
+    value: function queueTextForTyper(typer, text, duration, removeDuration) {
+      typer.queueText(text, duration, removeDuration);
+    }
+
+    // Start processing the queue for a specific typer
+  }, {
+    key: "startTyperQueue",
+    value: function startTyperQueue(typer) {
+      typer.processQueue();
+    }
+  }, {
+    key: "createText",
+    value: function createText(options) {
+      var _this2 = this;
+      var typer = new Typer(this.game, options.x, options.y, options.text, options.style, options.duration, options.removeDuration, function () {
+        return _this2.removeTyper(typer);
+      });
+      this.typers.push(typer);
+      return typer;
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      var _this3 = this;
+      // update gets called once per game tick at the games FPS rate
+      this.typers.forEach(function (typer) {
+        if (_this3.game.tick % typer.framesToWait === 0 && !typer.complete) {
+          typer.type();
+        }
+      });
+    }
+  }, {
+    key: "removeTyper",
+    value: function removeTyper(typerToRemove) {
+      this.typers = this.typers.filter(function (typer) {
+        return typer !== typerToRemove;
+      });
+    }
+  }]);
+  return GhostTyper;
+}();
+_defineProperty(GhostTyper, "id", 'typer-ghost');
+var Typer = /*#__PURE__*/function () {
+  function Typer(game, x, y) {
+    var text = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+    var style = arguments.length > 4 ? arguments[4] : undefined;
+    var duration = arguments.length > 5 ? arguments[5] : undefined;
+    var removeDuration = arguments.length > 6 ? arguments[6] : undefined;
+    var onRemove = arguments.length > 7 ? arguments[7] : undefined;
+    _classCallCheck(this, Typer);
+    this.game = game;
+    this.text = '';
+    this.ogText = text;
+    this.duration = duration || 5000;
+    this.removeDuration = removeDuration;
+    this.style = style;
+    this.typerText = this.createTextElement(x, y, style);
+    this.framesToWait = Math.floor((duration || 5000) / (33.33 * text.length));
+    this.frameCounter = 0;
+    this.lastUpdate = 0;
+    this.complete = false;
+    this.removeTimer = null;
+    this.textQueue = [];
+    this.onRemove = onRemove;
+  }
+  _createClass(Typer, [{
+    key: "queueText",
+    value: function queueText(text, duration, removeDuration) {
+      this.textQueue.push({
+        text: text,
+        duration: duration,
+        removeDuration: removeDuration
+      });
+    }
+
+    // Method to start processing the queue
+  }, {
+    key: "processQueue",
+    value: function processQueue() {
+      if (this.textQueue.length > 0) {
+        var _this$textQueue$shift = this.textQueue.shift(),
+          text = _this$textQueue$shift.text,
+          duration = _this$textQueue$shift.duration,
+          removeDuration = _this$textQueue$shift.removeDuration;
+        this.updateText(text, duration, removeDuration);
+      }
+    }
+  }, {
+    key: "createTextElement",
+    value: function createTextElement(x, y, style) {
+      var cameraPosition = this.game.data.camera.position;
+      var currentPlayer = this.game.getEntity(this.game.currentPlayerId);
+      var element = document.createElement('div');
+      Object.assign(element.style, style, {
+        position: 'absolute',
+        left: x + 'px',
+        top: y + 'px'
+      });
+      document.body.appendChild(element);
+      return element;
+    }
+  }, {
+    key: "type",
+    value: function type() {
+      if (this.text.length) {
+        this.typerText.textContent += this.text[0];
+        this.text = this.text.substr(1);
+        this.isTyping = true;
+      } else if (this.isTyping) {
+        this.complete = true;
+        this.isTyping = false;
+        this.setRemoveTimer();
+      }
+    }
+  }, {
+    key: "setRemoveTimer",
+    value: function setRemoveTimer() {
+      var _this4 = this;
+      if (this.removeDuration) {
+        // Wait for removeDuration before processing the next queue item
+        this.removeTimer = setTimeout(function () {
+          _this4.typerText.textContent = '';
+          _this4.processQueue();
+        }, this.removeDuration);
+      } else {
+        // If there's no removeDuration, process the next item immediately
+        this.processQueue();
+      }
+    }
+  }, {
+    key: "updateText",
+    value: function updateText(newText, newDuration, newRemoveDuration) {
+      this.complete = false;
+      this.text = newText;
+      this.ogText = newText;
+      this.duration = newDuration || this.duration;
+      this.removeDuration = newRemoveDuration;
+      this.framesToWait = Math.floor(this.duration / (33.33 * newText.length));
+      this.typerText.textContent = '';
+      this.isTyping = false;
+    }
+  }]);
+  return Typer;
+}();
+var _default = exports["default"] = GhostTyper;
 
 },{}]},{},[6])(6)
 });

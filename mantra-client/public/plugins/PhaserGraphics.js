@@ -113,6 +113,8 @@ var PhaserCamera = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      // hoists and overrides
+      this.game.setZoom = this.setZoom.bind(this);
       this.game.systemsManager.addSystem('graphics-phaser-camera', this);
       this.scene.input.on('pointerdown', this.onPointerDown.bind(this));
       this.scene.input.on('pointermove', this.onPointerMove.bind(this));
@@ -126,7 +128,7 @@ var PhaserCamera = /*#__PURE__*/function () {
       var camera = this.scene.cameras.main;
       var player = this.game.getEntity(this.game.currentPlayerId);
       // let graphics = this.game.components.graphics.get(this.game.currentPlayerId);
-      if (camera && player.graphics && player.graphics['graphics-phaser']) {
+      if (camera && player && player.graphics && player.graphics['graphics-phaser']) {
         if (this.follow && !this.isDragging && !this.isThrowing) {
           camera.centerOn(player.position.x, player.position.y);
         }
@@ -303,8 +305,9 @@ zoom.zoomIn = function (mainScene, amount) {
     return;
   }
   mainScene.cameras.main.zoom += amount;
-  mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
+  // mainScene.game.G.currentZoom = mainScene.cameras.main.zoom;
 };
+
 zoom.zoomOut = function (mainScene, amount) {
   if (typeof amount === 'undefined') {
     amount = -0.01;
@@ -346,9 +349,11 @@ var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInte
 var _PhaserCamera = _interopRequireDefault(require("./PhaserCamera.js"));
 var _inflateGraphic = _interopRequireDefault(require("./graphics/inflateGraphic.js"));
 var _inflateTriangle = _interopRequireDefault(require("./graphics/inflateTriangle.js"));
-var _inflateBox = _interopRequireDefault(require("./graphics/inflateBox.js"));
+var _inflateBox = _interopRequireDefault(require("./graphics/box/inflateBox.js"));
 var _inflateCircle = _interopRequireDefault(require("./graphics/inflateCircle.js"));
 var _inflateText = _interopRequireDefault(require("./graphics/inflateText.js"));
+var _createBox = _interopRequireDefault(require("./graphics/box/createBox.js"));
+var _preload2 = _interopRequireDefault(require("./preload.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -397,7 +402,7 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       camera.follow = true;
     }
     if (typeof camera.startingZoom === 'undefined') {
-      camera.startingZoom = 0.5;
+      camera.startingZoom = 1;
     }
 
     // alert(camera.follow)
@@ -414,10 +419,12 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.scenesReady = false;
     _this.scene = null;
     _this.inflateGraphic = _inflateGraphic["default"].bind(_assertThisInitialized(_this));
+    _this.inflateEntity = _inflateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
     _this.inflateTriangle = _inflateTriangle["default"].bind(_assertThisInitialized(_this));
     _this.inflateCircle = _inflateCircle["default"].bind(_assertThisInitialized(_this));
     _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
+    _this.createBox = _createBox["default"].bind(_assertThisInitialized(_this));
     return _this;
   }
   _createClass(PhaserGraphics, [{
@@ -443,37 +450,36 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         initialize: function Main() {
           Phaser.Scene.call(this, 'Main');
         },
-        init: function init() {},
+        init: function init() {
+          var _this3 = this;
+          // Listen for the loadcomplete event
+          this.load.on('complete', function () {
+            _this3.scene.launch('Main');
+            _this3.gameReady();
+          });
+        },
+        preload: function preload() {
+          (0, _preload2["default"])(this, game);
+        },
         create: function create() {
           // Optionally, set the background color of the scene
           // this.cameras.main.setBackgroundColor('#000000');
-        },
-        preload: function preload() {
-          this.load.image('player', 'textures/flare.png');
         }
       });
       this.phaserGame = new Phaser.Game({
         type: Phaser.AUTO,
         parent: 'gameHolder',
-        //width: 800, // TODO: config
-        //height: 600,
         transparent: true,
         scene: [_Main],
         scale: {
-          // mode: Phaser.Scale.FIT,
-          // mode: Phaser.Scale.ENVELOP,
-          mode: Phaser.Scale.RESIZE_AND_FIT
+          // mode: Phaser.Scale.RESIZE_AND_FIT,
+          // cover
+          mode: Phaser.Scale.ENVELOP
         }
       });
       var self = this;
-      function loadMainScene() {
+      function gameReady() {
         var scene = self.phaserGame.scene.getScene('Main');
-        if (!scene) {
-          setTimeout(loadMainScene.bind(self), 10);
-          return;
-        }
-        var canvas = self.phaserGame.canvas;
-        canvas.setAttribute('id', 'phaser-render-canvas');
         self.scene = scene;
         var camera = scene.cameras.main;
         var phaserCamera = new _PhaserCamera["default"](scene, self.config.camera);
@@ -488,25 +494,13 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
         // async:true plugins *must* self report when they are ready
         game.emit('plugin::ready::graphics-phaser', this);
-        camera.zoom = this.config.camera.startingZoom;
-
+        // TODO: add back configurable starting zoom
+        // camera.zoom = this.config.camera.startingZoom;
+        camera.zoom = 2.5;
         // TODO: remove this line from plugin implementations
         game.loadingPluginsCount--;
       }
-      var Main = new Phaser.Class({
-        Extends: Phaser.Scene,
-        initialize: function Main() {
-          Phaser.Scene.call(this, 'Main');
-        },
-        init: function init() {},
-        create: function create() {
-          this.cameras.main.setBackgroundColor('#000000');
-        },
-        preload: function preload() {
-          this.load.image('player', 'textures/flare.png');
-        }
-      });
-      loadMainScene();
+      _Main.prototype.gameReady = gameReady.bind(this);
     }
   }, {
     key: "removeGraphic",
@@ -543,57 +537,28 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "render",
     value: function render(game, alpha) {
-      // render is called at the browser's frame rate (typically 60fps)
-      var self = this;
+      // render will be called at the browser's refresh rate
+      // can be used for camera updates or local effects
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      var _this4 = this;
+      // TODO: consolidate graphics pipeline unloading into SystemsManager
+      // TODO: remove duplicated unload() code in BabylonGraphics
+      this.game.graphics = this.game.graphics.filter(function (g) {
+        return g.id !== _this4.id;
+      });
+      delete this.game._plugins['PhaserGraphics'];
+
+      // iterate through all entities and remove existing phaser graphics
       var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
         _step;
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var _step$value = _slicedToArray(_step.value, 2),
             eId = _step$value[0],
-            state = _step$value[1];
-          var ent = this.game.entities.get(eId);
-          // console.log('rendering', ent)
-          this.inflateGraphic(ent, alpha);
-          // Remark: 12/13/23 - pendingRender check is removed for now, inflateEntity can be called multiple times per entity
-          //                    This could impact online mode, test for multiplayer
-          /*
-          // check if there is no graphic available, if so, inflate
-          if (!ent.graphics || !ent.graphics['graphics-phaser']) {
-            this.inflateGraphic(ent, alpha);
-            ent.pendingRender['graphics-phaser'] = false;
-          }
-          if (ent.pendingRender && ent.pendingRender['graphics-phaser']) {
-            this.inflateGraphic(ent, alpha);
-            ent.pendingRender['graphics-phaser'] = false;
-          }
-          */
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    }
-  }, {
-    key: "unload",
-    value: function unload() {
-      var _this3 = this;
-      // TODO: consolidate graphics pipeline unloading into SystemsManager
-      // TODO: remove duplicated unload() code in BabylonGraphics
-      this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this3.id;
-      });
-      delete this.game._plugins['PhaserGraphics'];
-
-      // iterate through all entities and remove existing phaser graphics
-      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
-        _step2;
-      try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _step2$value = _slicedToArray(_step2.value, 2),
-            eId = _step2$value[0],
-            entity = _step2$value[1];
+            entity = _step$value[1];
           if (entity.graphics && entity.graphics['graphics-phaser']) {
             this.removeGraphic(eId);
             delete entity.graphics['graphics-phaser'];
@@ -602,9 +567,9 @@ var PhaserGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
         // remove the PhaserCamera system plugin
       } catch (err) {
-        _iterator2.e(err);
+        _iterator.e(err);
       } finally {
-        _iterator2.f();
+        _iterator.f();
       }
       if (this.game.systems['graphics-phaser-camera']) {
         this.game.systemsManager.removeSystem('graphics-phaser-camera');
@@ -625,18 +590,170 @@ _defineProperty(PhaserGraphics, "removable", false);
 _defineProperty(PhaserGraphics, "async", true);
 var _default = exports["default"] = PhaserGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./PhaserCamera.js":2,"./graphics/inflateBox.js":4,"./graphics/inflateCircle.js":5,"./graphics/inflateGraphic.js":6,"./graphics/inflateText.js":7,"./graphics/inflateTriangle.js":8}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./PhaserCamera.js":2,"./graphics/box/createBox.js":4,"./graphics/box/inflateBox.js":5,"./graphics/inflateCircle.js":7,"./graphics/inflateGraphic.js":8,"./graphics/inflateText.js":9,"./graphics/inflateTriangle.js":10,"./preload.js":11}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createBox;
+var _setCursorStyle = _interopRequireDefault(require("../../util/setCursorStyle.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+// TODO: remove, use Z coordinate instead
+var depthChart = ['background', 'border', 'wire', 'part', 'TILE', 'PLAYER', 'BLOCK'];
+function createBox(entityData) {
+  var _this = this;
+  var graphic;
+  var game = this.game;
+  if (entityData.texture) {
+    // Use texture if available
+    // console.log('texture', entityData.texture)
+
+    var texture = game.getTexture(entityData.texture);
+    var textureUrl = texture.url;
+    var spritePosition = texture.sprite || {
+      x: 0,
+      y: 0
+    };
+
+    // for now, TODO: fix phaser 3 sprite mappings
+    if (entityData.type === 'PLAYER') {
+      texture.key = 'player';
+    }
+
+    //console.log("GOT TEXTURE", texture, texture.key)
+    graphic = this.scene.add.sprite(0, 0, texture.key);
+    if (_typeof(texture.frames) === 'object') {
+      // get the texture from the sprite sheet
+      var t = this.scene.textures.get(texture.key);
+      //let pos = texture.sprite;
+      // get specific area from the texture by x / y
+      //let frame = t.get(pos.x, pos.y, 16, 16);
+      // set the graphic to frame texture
+      graphic.setTexture(t);
+    }
+    var depth = depthChart.indexOf(entityData.type);
+    if (typeof entityData.position.z === 'number') {
+      depth = entityData.position.z;
+    }
+    graphic.setDepth(depth);
+    entityData.graphic = graphic; // Store the reference in entityData for future updates
+    if (entityData.color) {
+      // Apply tint if color is also defined
+      // graphic.setTint(entityData.color);
+    }
+  } else {
+    // Fallback to color fill if no texture
+    // console.log("FALLING BACK TO PIXEL TEXTURE", entityData.id, entityData.type, entityData)
+    graphic = this.scene.add.sprite(0, 0, 'pixel');
+    entityData.graphic = graphic; // Store the reference in entityData for future updates
+    graphic.setTint(entityData.color);
+  }
+
+  // Create the hitArea as a Phaser.Geom.Rectangle
+  // The hitArea is initially positioned at (0,0) with the size of the entity
+  var hitArea = new Phaser.Geom.Rectangle(0, 0, entityData.width, entityData.height);
+
+  // Log the hitArea for debugging purposes
+  // console.log('hitArea', hitArea);
+
+  if (entityData.style && entityData.style.display) {
+    if (entityData.style.display === 'none') {
+      graphic.setVisible(false);
+    }
+  }
+  if (entityData.style && entityData.style.border) {
+    // console.log('entityData.style.border', entityData.style.border)
+    if (entityData.style.border) {
+      // graphic.setStrokeStyle(entityData.style.border.width, entityData.style.border.color);
+      // graphic.setStrokeStyle(2, 0x000000);
+    }
+  }
+
+  // Set the graphic to be interactive and use the hitArea for interaction checks
+  graphic.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+
+  // Set the size of the graphic
+  // It's important to use displayWidth and displayHeight for scaling purposes
+  graphic.displayWidth = entityData.width;
+  graphic.displayHeight = entityData.height;
+
+  // Add pointer events
+  graphic.on('pointerover', function () {
+    // console.log('pointerover', entityData.id, entityData.type, entityData)
+    (0, _setCursorStyle["default"])(graphic, _this.scene, 'pointer');
+    // Get the full entity from the game and delegate based on part type
+    var ent = game.getEntity(entityData.id);
+    if (ent && ent.yCraft && ent.yCraft.part) {
+      var partType = ent.yCraft.part.type;
+      if (partType === 'MotionDetector') {
+        ent.yCraft.part.onFn();
+      }
+    }
+  });
+  graphic.on('pointerout', function () {
+    //setCursorStyle(graphic, this.scene, 'default');
+  });
+  graphic.on('pointerdown', function (pointer) {
+    // set closed hand cursor
+    // setCursorStyle(graphic, this.scene, 'grabbing');
+    // Handle pointer down events
+
+    var ent = game.getEntity(entityData.id);
+    if (ent && ent.yCraft && ent.yCraft.part) {
+      var partType = ent.yCraft.part.type;
+      if (partType === 'Button') {
+        ent.yCraft.part.press();
+      }
+      if (ent.yCraft.part.toggle) {
+        ent.yCraft.part.toggle();
+      }
+    }
+    if (ent) {
+      var pointerX = pointer.worldX;
+      var pointerY = pointer.worldY;
+
+      // Calculate the center of the graphic
+      var centerX = graphic.x + graphic.displayWidth / 2;
+      var centerY = graphic.y + graphic.displayHeight / 2;
+
+      // Calculate the offset from the center
+      var offsetX = pointerX - centerX;
+      var offsetY = pointerY - centerY;
+      offsetX = offsetX + entityData.width / 2;
+      offsetY = offsetY + entityData.height / 2;
+      var convertedEvent = {
+        offsetX: offsetX,
+        offsetY: offsetY
+      };
+      console.log('Converted Event', pointer, graphic, convertedEvent);
+      game.emit('pointerDown', ent, convertedEvent);
+    }
+  });
+  graphic.on('pointerup', function () {
+    // Handle pointer up events
+    var ent = game.getEntity(entityData.id);
+    if (ent && ent.yCraft && ent.yCraft.part) {
+      var partType = ent.yCraft.part.type;
+      if (partType === 'Button' && ent.yCraft.part.release) {
+        ent.yCraft.part.release();
+      }
+    }
+  });
+  return graphic;
+}
+
+},{"../../util/setCursorStyle.js":12}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = inflategraphic;
-var _setCursorStyle = _interopRequireDefault(require("../util/setCursorStyle.js"));
+var _updateBox = _interopRequireDefault(require("./updateBox.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-var depthChart = ['background', 'border', 'wire', 'part', 'PLAYER', 'BLOCK'];
 function inflategraphic(entityData) {
-  var _this = this;
   var game = this.game;
   // check to see if there is existing graphic on entity, if so, use that
   var graphic;
@@ -644,77 +761,11 @@ function inflategraphic(entityData) {
     graphic = entityData.graphics['graphics-phaser'];
   }
   if (!graphic) {
-    // Create a new triangle if it doesn't exist
-    graphic = this.scene.add.graphics();
-    entityData.graphic = graphic; // Store the reference in entityData for future updates
-    if (!entityData.color) {
-      // defaults to white
-      entityData.color = 0xffffff;
-    }
-    graphic.setDepth(9999);
-    graphic.fillStyle(entityData.color, 1);
-    graphic.currentFillColor = entityData.color;
-    graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
-
-    // Add interactive property to enable input events
-    var hitArea = new Phaser.Geom.Rectangle(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
-    graphic.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
-
-    // Add pointer events
-    graphic.on('pointerover', function () {
-      // console.log('pointerover', entityData.id, entityData.type, entityData)
-      (0, _setCursorStyle["default"])(graphic, _this.scene, 'pointer');
-      // Get the full entity from the game and delegate based on part type
-      var ent = game.getEntity(entityData.id);
-      if (ent && ent.yCraft && ent.yCraft.part) {
-        var partType = ent.yCraft.part.type;
-        if (partType === 'MotionDetector') {
-          ent.yCraft.part.onFn();
-        }
-      }
-    });
-    graphic.on('pointerout', function () {
-      //setCursorStyle(graphic, this.scene, 'default');
-    });
-    graphic.on('pointerdown', function () {
-      // set closed hand cursor
-      // setCursorStyle(graphic, this.scene, 'grabbing');
-      // Handle pointer down events
-      var ent = game.getEntity(entityData.id);
-      if (ent && ent.yCraft && ent.yCraft.part) {
-        var partType = ent.yCraft.part.type;
-        if (partType === 'Button') {
-          ent.yCraft.part.press();
-        }
-        if (ent.yCraft.part.toggle) {
-          ent.yCraft.part.toggle();
-        }
-      }
-    });
-    graphic.on('pointerup', function () {
-      // Handle pointer up events
-      var ent = game.getEntity(entityData.id);
-      if (ent && ent.yCraft && ent.yCraft.part) {
-        var partType = ent.yCraft.part.type;
-        if (partType === 'Button' && ent.yCraft.part.release) {
-          ent.yCraft.part.release();
-        }
-      }
-    });
+    graphic = this.createBox(entityData); // mutate graphic
     this.scene.add.existing(graphic);
-    this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
-  }
-
-  // check to see if color is the same, if so, don't redraw
-  var currentGraphicsColor = graphic.currentFillColor;
-  var color = entityData.color || 0xff0000; // Use entityData.color or default to red
-  //console.log('checking color', currentGraphicsColor, color)
-  if (currentGraphicsColor !== color) {
-    graphic.clear();
-    // console.log('setting new color', color)
-    graphic.fillStyle(color, 1);
-    graphic.currentFillColor = color;
-    graphic.fillRect(-entityData.width / 2, -entityData.height / 2, entityData.width, entityData.height);
+  } else {
+    // EXISTING GRAPHIC
+    (0, _updateBox["default"])(entityData, graphic);
   }
 
   // check to see if position is the same, if so, don't redraw
@@ -724,13 +775,65 @@ function inflategraphic(entityData) {
   };
   var position = entityData.position;
   graphic.setPosition(position.x, position.y);
-  if (entityData.rotation) {
+  if (entityData.rotation && typeof entityData.texture === 'undefined') {
     graphic.setRotation(entityData.rotation);
   }
   return graphic;
 }
 
-},{"../util/setCursorStyle.js":9}],5:[function(require,module,exports){
+},{"./updateBox.js":6}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = updateBox;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function updateBox(entityData, graphic) {
+  // check to see if color has changed, if so update the tint
+  if (typeof entityData.color !== 'undefined') {
+    // console.log('COLOR', entityData.color)
+    graphic.setTint(entityData.color);
+  }
+  if (typeof entityData.texture !== 'undefined') {
+    var texture = game.getTexture(entityData.texture);
+    var textureUrl = texture.url;
+    var spritePosition = texture.sprite || {
+      x: 0,
+      y: 0
+    };
+    if (typeof entityData.texture.frame === 'number') {
+      // graphic.setFrame(entityData.texture.frame);
+    }
+    if (_typeof(texture.frames) === 'object') {
+      // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
+      if (game.tick % 10 === 0) {
+        // TODO: custom tick rate
+        // shift first frame from array
+        if (typeof entityData.frameIndex === 'undefined') {
+          entityData.frameIndex = 0;
+        }
+        if (entityData.frameIndex >= texture.frames.length) {
+          entityData.frameIndex = 0;
+        }
+        var frame = texture.frames[entityData.frameIndex];
+        if (typeof frame !== 'undefined') {
+          // console.log(frame)
+          // set position on graphic based on frame.x and frame.y
+          // graphic.setFrame(frame.frame);
+          //graphic.setFrame(2);
+          //console.log('frame', frame)
+          // graphic.setFrame(entityData.frameIndex);
+          // TODO: setFrame animation here
+          entityData.frameIndex++;
+          // add frame back to end of array
+        }
+      }
+    }
+  }
+}
+
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -738,28 +841,65 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = inflateCircle;
 function inflateCircle(entityData) {
+  var game = this.game;
   // check to see if there is existing graphic on entity, if so, use that
   var graphic;
   if (entityData.graphics && entityData.graphics['graphics-phaser']) {
     graphic = entityData.graphics['graphics-phaser'];
   }
   if (!graphic) {
-    graphic = this.scene.add.graphics();
+    if (entityData.texture) {
+      var texture = game.getTexture(entityData.texture);
+      var textureUrl = texture.url;
+      var spritePosition = texture.sprite || {
+        x: 0,
+        y: 0
+      };
+      if (typeof entityData.texture.frame === 'number') {
+        //spritePosition = texture.frames[entityData.texture.frame];
+        //entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+      }
+
+      /*
+      if (typeof texture.frames === 'object') {
+        // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
+        if (game.tick % 10 === 0) { // TODO: custom tick rate
+          // shift first frame from array
+          if (typeof entityData.frameIndex === 'undefined') {
+            entityData.frameIndex = 0;
+          }
+          if (entityData.frameIndex >= texture.frames.length) {
+            entityData.frameIndex = 0;
+          }
+           let frame = texture.frames[entityData.frameIndex];
+          if (typeof frame !== 'undefined') {
+            spritePosition = frame;
+            entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+            entityData.frameIndex++;
+            // add frame back to end of array
+          }
+        }
+      }
+      */
+      graphic = this.scene.add.sprite(0, 0, texture.key);
+    } else {
+      graphic = this.scene.add.graphics();
+      graphic.fillStyle(0xff0000, 1);
+      graphic.fillCircle(0, 0, entityData.radius);
+      graphic.setDepth(10);
+    }
     entityData.graphic = graphic; // Store the reference in entityData for future updates
     this.scene.add.existing(graphic);
     this.game.components.graphics.set([entityData.id, 'graphics-phaser'], graphic);
   } else {
     // Clear the existing triangle if it exists
-    graphic.clear();
+    //  graphic.clear();
   }
-  graphic.fillStyle(0xff0000, 1);
-  graphic.fillCircle(0, 0, entityData.radius);
-  graphic.setDepth(10);
   graphic.setPosition(entityData.position.x, entityData.position.y);
   return graphic;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -773,7 +913,7 @@ function inflateGraphic(entity) {
       if (entity.shape === 'rectangle') {
         graphic = this.inflateBox(entity);
       } else {
-        graphic = this.inflateTriangle(entity);
+        graphic = this.inflateBox(entity);
       }
       break;
     case 'BULLET':
@@ -790,7 +930,7 @@ function inflateGraphic(entity) {
   this.game.components.graphics.set([entity.id, 'graphics-phaser'], graphic);
 }
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -800,37 +940,51 @@ exports["default"] = inflateText;
 function inflateText(entityData) {
   // Check if there is an existing container with the text and background
   var container = entityData.graphics && entityData.graphics['graphics-phaser'];
+
+  // set color to default white
   var textStyle = {
-    font: '22px Arial',
-    fill: '#f00fff',
-    backgroundColor: '#ffffff',
+    font: '22px',
+    fill: '#ffffff',
     padding: 3
   };
+  if (entityData.style) {
+    // textStyle = entityData.style;
+    if (entityData.style.fontSize) {
+      // textStyle.fontSize = entityData.fontSize;
+      textStyle.font = "".concat(entityData.style.fontSize);
+    }
+    if (entityData.style.backgroundColor) {
+      textStyle.backgroundColor = entityData.style.backgroundColor;
+    }
+  }
+  textStyle.font = '12px monospace';
+
+  // color fill
+  if (entityData.color) {
+    textStyle.fill = entityData.color;
+  }
+
+  // replaces <br> with \n
+  entityData.text = entityData.text.replace(/<br\/>/g, '\n');
 
   // If there's no existing container, create a new one
   if (!container) {
     // Create text and background graphic
     var textObject = this.scene.add.text(0, 0, entityData.text, textStyle).setOrigin(0.5, 0.5);
-    var backgroundGraphic = this.scene.add.graphics().fillStyle(0xffffff, 1);
     textObject.setAlpha(1);
-    backgroundGraphic.setAlpha(1);
     textObject.setDepth(9999);
-    backgroundGraphic.setDepth(9998);
-    backgroundGraphic.fillRect(-textObject.width / 2 - 5, -textObject.height / 2, textObject.displayWidth + 10, textObject.displayHeight);
-
+    textObject.visible = true;
     // Create a container and add the text and background graphic to it
-    container = this.scene.add.container(entityData.position.x, entityData.position.y, [backgroundGraphic, textObject]);
+    container = this.scene.add.container(entityData.position.x, entityData.position.y, [/*backgroundGraphic,*/textObject]);
     entityData.graphics = entityData.graphics || {};
     entityData.graphics['graphics-phaser'] = container;
   } else {
     // Update the text and background graphic if the text has changed
     var _textObject = container.list[1]; // Assuming textObject is the second item in the container
-    var _backgroundGraphic = container.list[0]; // Assuming backgroundGraphic is the first item
+    //const backgroundGraphic = container.list[0]; // Assuming backgroundGraphic is the first item
 
     if (_textObject.text !== entityData.text) {
       _textObject.setText(entityData.text);
-      _backgroundGraphic.clear();
-      _backgroundGraphic.fillRect(-_textObject.width / 2, -_textObject.height / 2, _textObject.width, _textObject.height);
     }
 
     // Update container position
@@ -839,7 +993,7 @@ function inflateText(entityData) {
   return container;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -908,7 +1062,58 @@ function inflateTriangle(entityData) {
   return graphic;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = preload;
+function preload(scene, game) {
+  game.preloader.assets.forEach(function (asset) {
+    if (asset.type === 'spritesheet') {
+      // Load the sprite sheet
+      scene.load.spritesheet(asset.key, asset.url, {
+        frameWidth: asset.frameWidth,
+        frameHeight: asset.frameHeight
+      });
+    } else if (asset.type === 'image') {
+      // Load image assets
+      scene.load.image(asset.key, asset.url);
+    }
+  });
+  scene.load.on('complete', function () {
+    game.preloader.assets.forEach(function (asset) {
+      if (asset.type === 'spritesheet') {
+        createCustomFramesAndAnimations(scene, asset);
+      }
+    });
+  });
+}
+function createCustomFramesAndAnimations(scene, asset) {
+  var _loop = function _loop(frameTagName) {
+    var frameTag = asset.frameTags[frameTagName];
+    var frames = frameTag.frames.map(function (frame, index) {
+      var frameKey = "".concat(asset.key, "-").concat(frameTagName, "-").concat(index);
+      console.log('scene.textures', scene.textures);
+      scene.textures.get(asset.key).add(frameKey, 0, frame.x, frame.y, asset.frameWidth, asset.frameHeight);
+      return {
+        key: frameKey
+      };
+    });
+    scene.anims.create({
+      key: frameTagName,
+      frames: frames,
+      frameRate: 10,
+      repeat: -1
+    });
+  };
+  for (var frameTagName in asset.frameTags) {
+    _loop(frameTagName);
+  }
+}
+
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

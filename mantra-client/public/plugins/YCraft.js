@@ -22,6 +22,12 @@ Object.defineProperty(exports, "Button", {
     return _Button["default"];
   }
 });
+Object.defineProperty(exports, "Craft", {
+  enumerable: true,
+  get: function get() {
+    return _YCraft["default"];
+  }
+});
 Object.defineProperty(exports, "Display", {
   enumerable: true,
   get: function get() {
@@ -158,9 +164,9 @@ var Part = exports.Part = /*#__PURE__*/function (_EventEmitter) {
       z: z
     };
     _this.size = {
-      width: 64,
-      height: 64,
-      depth: 64
+      width: 16,
+      height: 16,
+      depth: 16
     }; // Fixed size for each part
     _this.props = {}; // Properties specific to each part
     return _this;
@@ -212,9 +218,9 @@ var YCraft = /*#__PURE__*/function (_EventEmitter) {
       _ref$powerRequired = _ref.powerRequired,
       powerRequired = _ref$powerRequired === void 0 ? false : _ref$powerRequired,
       _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 640 : _ref$height,
+      height = _ref$height === void 0 ? 160 : _ref$height,
       _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 640 : _ref$width,
+      width = _ref$width === void 0 ? 160 : _ref$width,
       _ref$description = _ref.description,
       description = _ref$description === void 0 ? 'A YCraft contraption' : _ref$description;
     _classCallCheck(this, YCraft);
@@ -2296,10 +2302,11 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
     // for now, default behavior so it won't crash if no contraption is passed
     if (typeof contraption !== 'function') {
       // console.log("contraptionExamples", contraptionExamples)
-      contraption = _contraptionExamples["default"];
+      // contraption = contraptionExamples;
+    } else {
+      _this.contraption = contraption();
+      _this.contraptionSource = contraption.toString();
     }
-    _this.contraption = contraption();
-    _this.contraptionSource = contraption.toString();
     _this.contraptions = contraptions;
     _this.createEntityFromPart = _createEntityFromPart["default"].bind(_assertThisInitialized(_this));
     _this.bindWire = _bindWire["default"].bind(_assertThisInitialized(_this));
@@ -2323,15 +2330,20 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
       var self = this;
       this.game = game;
       this.game.contraption = this.contraption;
+
+      /*
+      // Remark: This has been removed Jan 4 2023 since we manage disabling of 
+      // of inputs in Editor, or other system. This is not the responsibility of YCraft.js plugin
+      // can delete this code soon
       document.addEventListener('click', function (e) {
         // check to see if we are inside an input, textarea, button or submit
         // if so, disable inputs controls
-        var target = e.target;
-        var tagName = target.tagName.toLowerCase();
-        var type = target.type;
-        // if (tagName === 'input' || tagName === 'textarea' || tagName === 'button' || tagName === 'submit') {
-        // TODO: move this to graphics plugin init?
-        if (tagName === 'div') {
+        let target = e.target;
+        let tagName = target.tagName.toLowerCase();
+        let type = target.type;
+       // if (tagName === 'input' || tagName === 'textarea' || tagName === 'button' || tagName === 'submit') {
+       // TODO: move this to graphics plugin init?
+       if (tagName === 'div') {
           game.systems['entity-input'].disableInputs();
           game.systems['keyboard'].unbindAllEvents();
         } else {
@@ -2339,6 +2351,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           game.systems['keyboard'].bindInputControls();
         }
       });
+      */
 
       // add the system to the systems manager
       this.game.systemsManager.addSystem(this.id, this);
@@ -2348,9 +2361,6 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
         if (self.contraption.start) {
           // self.contraption.start();
         }
-
-        /*
-        */
       } else {
         // TODO: add config option for default contraption if none is specified at construction
         if (self.useDefaultContraption) {
@@ -2395,24 +2405,24 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           /*
           let boundingBox = this.game.createEntity({
             type: 'BOX',
-            // color: 0x00ff00,
+            color: 0x00ff00,
             width: contraption.width,
             height: contraption.height,
             position: {
-              x: contraption.position.x,
-              y: contraption.position.y,
+              x: contraption.position.x + contraption.width / 2,
+              y: contraption.position.y + contraption.height / 2,
               z: -100
             },
             isSensor: true
           });
           */
-
           // place the label in top left corner of the contraption
-          var contraptionLabelX = contraption.position.x + contraption.width / 10;
-          var contraptionLabelY = contraption.position.y - contraption.height / 2;
+          var contraptionLabelX = contraption.position.x + contraption.width / 4;
+          var contraptionLabelY = contraption.position.y + contraption.height / 10 - 5;
           // creates a label for the contraption
           var textLabel = _this2.game.createEntity({
             type: 'TEXT',
+            body: false,
             text: contraption.description,
             position: {
               x: contraptionLabelX,
@@ -2421,7 +2431,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
             },
 
             style: {
-              fontSize: '32px'
+              fontSize: '16px'
             },
             width: contraption.width / 2,
             height: contraption.height / 2,
@@ -2607,10 +2617,10 @@ function createColorPuzzle() {
   });
   */
 
-  var exampleA = new _index.YCraft(0, 150, 0, {
+  var exampleA = new _index.YCraft(0, -150, 0, {
     description: "Simple Light",
     height: 350,
-    width: 800
+    width: 500
   });
 
   // TODO: new Box() ?
@@ -2651,7 +2661,7 @@ function createColorPuzzle() {
   exampleB.addPart(light1);
   exampleB.addPart(button1);
   exampleB.addPart(latch1);
-  exampleB.addPart(relay1);
+  //exampleB.addPart(relay1);
   exampleB.addPart(wire1);
   exampleB.addPart(wire2);
 
@@ -2785,6 +2795,7 @@ function createEntityFromPart(part, contraption) {
       position: part.position,
       width: part.size.width,
       height: part.size.height,
+      // texture: 'img/game/tiles/tile-block.png',
       text: part.text || null,
       isStatic: true,
       yCraft: {
@@ -2848,6 +2859,9 @@ function createEntityFromPart(part, contraption) {
       height: part.size.height,
       isStatic: true,
       isSensor: true,
+      style: {
+        font: '10px monospace'
+      },
       yCraft: {
         part: part,
         contraption: contraption
