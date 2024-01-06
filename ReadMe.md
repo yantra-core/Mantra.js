@@ -61,7 +61,19 @@ In addition to custom code and `sutra`, `mantra` game logic can be coded in a st
 
 [View All Demos on Yantra.gg](https://yantra.gg/mantra)
 
-### Offline
+### Mantra World
+
+#### Home World
+
+https://yantra.gg/mantra/home
+
+The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
+
+Be sure to find the `Warp Zones` to: `Music World`, `Platform World`, and `YCraft World`.
+
+#### Simple Configurations
+
+Simple configuration examples are available online and in `./examples`
 
 | Libraries        | Demo Link                                                                      | CodePen Link                                                                |
 |----------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
