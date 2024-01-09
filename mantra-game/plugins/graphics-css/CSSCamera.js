@@ -20,7 +20,6 @@ class CSSCamera {
     this.game = game;
     this.resetCameraState();
 
-    //game.rotateCamera = this.rotateCamera.bind(this);
     game.rotateCamera = this.rotateCameraOverTime.bind(this);
     // sets auto-follow player when starting CSSGraphics ( for now )
     this.follow = true;
@@ -31,8 +30,10 @@ class CSSCamera {
 
     let windowHeight = window.innerHeight;
 
-    game.viewportCenterXOffset = 0;
-    game.viewportCenterYOffset = -windowHeight / 2;
+    console.log('game.viewportCenterYOffset', game.viewportCenterYOffset)
+    this.scene.cameraPosition.x = 0 - game.viewportCenterXOffset;
+    this.scene.cameraPosition.y = 0 - game.viewportCenterYOffset;
+
     //game.viewportCenterYOffset = 0;
     this.initZoomControls();
 
@@ -218,27 +219,14 @@ class CSSCamera {
     // Get browser window dimensions
     let windowHeight = window.innerHeight;
   
-    // Define the adjustment value and scale factor
-    //console.log('adjustment', adjustment);
-    // TODO: use pixelAdjustment based on zoom scale
-
-    let scaleFactor = 1 / currentZoom;
-    let adjustment = -400; // TODO: this should be window height or something similar
-    adjustment = (-windowHeight / 2) + 350;
-    let pixelAdjustment = adjustment * scaleFactor;
-    // game.viewportCenterYOffset = -windowHeight / 2;
     // Update the camera position
     if (this.follow && currentPlayer && currentPlayer.position) {
       // If following a player, adjust the camera position based on the player's position and the calculated offset
-      
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
 
       let newY = currentPlayer.position.y - game.viewportCenterYOffset;
-      //this.scene.cameraPosition.y = newY;
-     //this.scene.cameraPosition.y = newY;
-      // locks camera to not exceed bottom of screen for platformer mode
-      // console.log('game.data.camera.mode', game.data.camera.mode, newY, windowHeight, windowHeight * 0.38)
       if (game.data.camera.mode === 'platformer') {
+        // locks camera to not exceed bottom of screen for platformer mode
         if (newY < windowHeight * 0.35) {
           this.scene.cameraPosition.y = newY;
         } else {
@@ -255,6 +243,12 @@ class CSSCamera {
       this.scene.cameraPosition.y = game.viewportCenterYOffset;
     }
   
+    // TODO adjust camera position based on current zoom level
+    // coordinate system is both positive and negative, so we need to adjust for that
+    // larger scale means smaller numbers
+    // this.scene.cameraPosition.y  = this.scene.cameraPosition.y / currentZoom;
+    // console.log(game.data.camera.currentZoom)
+
     // Update the camera's position in the game data
     this.game.data.camera.position = this.scene.cameraPosition;
   }

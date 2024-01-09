@@ -74,6 +74,8 @@ class CSSGraphics extends GraphicsInterface {
     game.setZoom = this.zoom.bind(this);
 
     let cssCamera = new CSSCamera(this, this.camera);
+    let windowHeight = window.innerHeight;
+
     this.game.use(cssCamera);
 
     // let the graphics pipeline know the document is ready ( we could add document event listener here )
@@ -92,14 +94,14 @@ class CSSGraphics extends GraphicsInterface {
 
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
-    this.zoom(4.5);
 
+    this.game.viewportCenterXOffset = 0;
+    this.game.viewportCenterYOffset = -windowHeight / 2;
+
+    let that = this;
     game.on('game::ready', () => {
-
+      that.zoom(4.5); // game.data.camera.currentZoom
     });
-    // 
-    // this.zoom(game.data.camera.currentZoom);
-    // this.zoom(game.data.camera.currentZoom);
 
   }
 
@@ -218,102 +220,6 @@ class CSSGraphics extends GraphicsInterface {
   update() {
     let game = this.game;
 
-    /*
-    if (typeof game.viewportCenterXOffset === 'undefined') {
-      game.viewportCenterXOffset = 0;
-    }
-
-    if (typeof game.viewportCenterYOffset === 'undefined') {
-      game.viewportCenterYOffset = 0;
-    }
-
-    const currentPlayer = this.game.getEntity(game.currentPlayerId);
-    let entityId = game.currentPlayerId;
-    */
-
-
-    // PLAYER MOUSE MOVEMENT CODE< TODO MOVE THIS TO SEPARATE FILE
-    /*
-    if (currentPlayer && currentPlayer.inputs && currentPlayer.inputs.mouse && currentPlayer.inputs.mouse.buttons.LEFT) {
-      let data = currentPlayer.inputs;
-      // Player's current position
-      const playerX = currentPlayer.position.x;
-      const playerY = currentPlayer.position.y;
-
-      // Get mouse position
-      const mouseX = data.mouse.position.x;
-      const mouseY = data.mouse.position.y;
-
-      // Calculate direction vector
-      let dirX = mouseX - playerX;
-      let dirY = mouseY - playerY;
-
-      // Calculate the angle in radians
-      const angle = Math.atan2(dirY, dirX);
-
-      // Define the fixed directions (in radians)
-      const directions = {
-        UP: -Math.PI / 2,
-        DOWN: Math.PI / 2,
-        LEFT: Math.PI,
-        RIGHT: 0,
-        //UP_LEFT: -3 * Math.PI / 4,
-        //UP_RIGHT: -Math.PI / 4,
-        //DOWN_LEFT: 3 * Math.PI / 4,
-        //DOWN_RIGHT: Math.PI / 4
-      };
-
-      // Find the closest direction
-      let closestDirection = Object.keys(directions).reduce((prev, curr) => {
-        if (Math.abs(angle - directions[curr]) < Math.abs(angle - directions[prev])) {
-          return curr;
-        }
-        return prev;
-      });
-
-      // Set direction vector based on the closest fixed direction
-      switch (closestDirection) {
-        case 'UP':
-          dirX = 0;
-          dirY = -1;
-          break;
-        case 'DOWN':
-          dirX = 0;
-          dirY = 1;
-          break;
-        case 'LEFT':
-          dirX = -1;
-          dirY = 0;
-          break;
-        case 'RIGHT':
-          dirX = 1;
-          dirY = 0;
-          break;
-        case 'UP_LEFT':
-          dirX = -1;
-          dirY = -1;
-          break;
-        case 'UP_RIGHT':
-          dirX = 1;
-          dirY = -1;
-          break;
-        case 'DOWN_LEFT':
-          dirX = -1;
-          dirY = 1;
-          break;
-        case 'DOWN_RIGHT':
-          dirX = 1;
-          dirY = 1;
-          break;
-      }
-      // console.log("entityIdentityId", entityId, data);
-
-      // Apply the direction vector as force or movement
-      game.applyForce(entityId, { x: dirX, y: dirY });
-
-    }
-    */
-
   }
 
   render(game, alpha) {
@@ -366,18 +272,22 @@ class CSSGraphics extends GraphicsInterface {
 
   }
 
-  zoom(scale) {
+  zoom(scale, transitionTime = '0s') {
     // console.log("CSSGraphics zoom", scale)
     this.game.data.camera.currentZoom = scale;
 
     let gameViewport = document.getElementById('gameHolder');
     if (gameViewport) {
+      // Set transition time
+      gameViewport.style.transition = `transform ${transitionTime}`;
+
+      // Apply scale transform
       gameViewport.style.transform = `scale(${scale})`;
     } else {
       console.log('Warning: could not find gameHolder div, cannot zoom');
     }
-
   }
+
 
 }
 
