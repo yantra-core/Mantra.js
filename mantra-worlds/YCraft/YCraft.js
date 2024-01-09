@@ -66,7 +66,7 @@ class YCraft {
     // TODO: use common warp sutra
     rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
       if (entity.type === 'COLLISION') {
-        console.log('entity', entity)
+        // console.log('entity', entity)
 
         if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
           return true;

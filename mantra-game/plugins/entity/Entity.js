@@ -27,12 +27,13 @@ class Entity {
     this.game.createEntity = this.createEntity.bind(this);
     this.game.removeEntity = this.removeEntity.bind(this);
     this.game.getEntity = this.getEntity.bind(this);
+    this.game.getEntityByName = this.getEntityByName.bind(this);
     this.game.getEntities = this.allEntities.bind(this);
     this.game.updateEntity = this.updateEntity.bind(this);
     this.game.inflateEntity = this.inflateEntity.bind(this);
     this.game.hasEntity = this.hasEntity.bind(this);
     this.game.findEntity = this.findEntity.bind(this);
-    this.game.removeAllEntities = this.clearAllEntities.bind(this);
+    this.game.removeAllEntities = this.removeAllEntities.bind(this);
   }
 
   hasEntity (entityId) {
@@ -88,6 +89,14 @@ class Entity {
 
   }
 
+  getEntityByName(name) {
+    for (let [entityId, entity] of this.game.entities) {
+      if (entity.name === name) {
+        return entity;
+      }
+    }
+  }
+
   removeEntity(entityId) {
     let ent = this.game.entities.get(entityId);
     if (ent && this.game.systems.graphics && ent.graphics) {
@@ -126,7 +135,7 @@ class Entity {
           if (this.game.bodyMap[entityId]) {
             this.game.physics.removeBody(this.game.bodyMap[entityId]);
           } else {
-            console.log('No body found for entityId', entityId);
+            // console.log('No body found for entityId', entityId);
           }
         }
         // Delete associated components for the entity using Component's remove method
@@ -153,7 +162,24 @@ class Entity {
   }
 
   updateEntity(entityData) {
-    const entityId = entityData.id;
+
+    let entityId = entityData.id;
+
+    if (typeof entityId === 'undefined') {
+      // check to see if we have a name, if so, find the entity by name
+      if (entityData.name) {
+        let ent = this.game.getEntityByName(entityData.name);
+        if (ent) {
+          entityId = ent.id;
+        }
+      }
+    }
+
+    if (typeof entityId === 'undefined') {
+      console.log('Error: updateEntity was not provided a valid entity.id or entity.name', entityData);
+      console.log('This is most likely the result of passing invalid data to updateEntity()');
+      return;
+    }
 
     let fullState = this.game.getEntity(entityId);
 
@@ -510,10 +536,26 @@ class Entity {
 
   }
 
-  clearAllEntities(clearCurrentPlayer) {
+  removeAllEntities(options) {
+
+    // curry arguments, legacy API
+    let clearCurrentPlayer = false;
+    let excludeByName = [];
+    if (typeof options === 'boolean') {
+      clearCurrentPlayer = options;
+    }
+
+    if (typeof options === 'object' && Array.isArray(options.excludeByName)) {
+      excludeByName = options.excludeByName;
+    }
+
     this.game.entities.forEach(ent => {
       // Do not remove the current player if clearCurrentPlayer is false
       if (ent.id === this.game.currentPlayerId && !clearCurrentPlayer) {
+        return;
+      }
+      // Do not remove entities that are excluded by name
+      if (excludeByName.includes(ent.name)) {
         return;
       }
       if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {

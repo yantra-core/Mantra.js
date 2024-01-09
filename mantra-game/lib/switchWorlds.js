@@ -15,7 +15,7 @@ export default function switchWorlds (selectedWorld) {
     });
   }
 
-  game.systems.entity.clearAllEntities(true);
+  game.systems.entity.removeAllEntities(true);
   let worldName = 'XState';
   worldName = 'Sutra';
   worldName = selectedWorld;

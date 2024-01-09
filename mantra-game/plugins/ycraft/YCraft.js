@@ -1,4 +1,4 @@
-// import { YCraft as YCraftActual, ElectricalSignal } from '../../../../YCraft.js/index.js';
+//import { YCraft as YCraftActual, ElectricalSignal } from '../../../../YCraft.js/index.js';
 import { YCraft as YCraftActual } from 'ycraft';
 
 import Plugin from '../../Plugin.js';
@@ -255,8 +255,12 @@ class YCraft extends Plugin {
     this.initContraption(contraption);
   }
 
-  handleCollision(pair, bodyA, bodyB) {
-    // console.log('real stone collisions check', pair, bodyA, bodyB)
+  collisionActive(pair, bodyA, bodyB) {
+    // console.log("YCRAFT collisionActive", pair, bodyA, bodyB)
+  }
+
+  collisionEnd(pair, bodyA, bodyB) {
+    // console.log('YCRAFT collisionEnd', pair, bodyA, bodyB)
 
     if (bodyA.myEntityId && bodyB.myEntityId) {
       const entityIdA = bodyA.myEntityId;
@@ -270,60 +274,79 @@ class YCraft extends Plugin {
         return;
       }
 
-      if (entityA.yCraft) {
-        // trigger the part if possible
-        // console.log('entityA.yCraft', entityA.yCraft)
-
-          let signal = new ElectricalSignal();
-          signal.data = {
-            entityId: entityIdB,
-            entity: entityB,
-            body: bodyB
-          };
-          if (entityA.yCraft.part.trigger) {
-            entityA.yCraft.part.trigger(signal);
-          }
-          if (entityA.yCraft.part.press) {
-            entityA.yCraft.part.press();
-          }
-          if (entityA.yCraft.part.detectMotion) {
-            entityA.yCraft.part.detectMotion();
-          }
-
-          if (entityA.yCraft.part.toggle) {
-            entityA.yCraft.part.toggle();
-          }
-
-        }
-
-      if (entityB.yCraft) {
-        let signal = new ElectricalSignal();
-        signal.data = {
-          entityId: entityIdA,
-          entity: entityA,
-          body: bodyA
-        };
-        // trigger the part if possible
-          // console.log('entityB.yCraft', entityB.yCraft)
-          if (entityB.yCraft.part.trigger) {
-            entityB.yCraft.part.trigger(signal);
-          }
-          if (entityB.yCraft.part.press) {
-            entityB.yCraft.part.press();
-          }
-          if (entityB.yCraft.part.detectMotion) {
-            entityB.yCraft.part.detectMotion();
-          }
-
-          if (entityB.yCraft.part.toggle) {
-            entityB.yCraft.part.toggle();
-          }
-
-      }
-
+      this.processCollisionEnd(entityA, entityB, bodyB, entityIdB);
+      this.processCollisionEnd(entityB, entityA, bodyA, entityIdA);
     }
-
   }
+
+  handleCollision(pair, bodyA, bodyB) {
+    console.log("YCRAFT handleCollision", pair, bodyA, bodyB);
+    // TODO: connect physics events for END and START
+  
+    if (bodyA.myEntityId && bodyB.myEntityId) {
+      const entityIdA = bodyA.myEntityId;
+      const entityIdB = bodyB.myEntityId;
+  
+      const entityA = this.game.entities.get(entityIdA);
+      const entityB = this.game.entities.get(entityIdB);
+  
+      if (!entityA || !entityB) {
+        console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
+        return;
+      }
+  
+      this.processCollisionStart(entityA, entityB, bodyB, entityIdB);
+      this.processCollisionStart(entityB, entityA, bodyA, entityIdA);
+    }
+  }
+  
+  processCollisionStart(primaryEntity, secondaryEntity, secondaryBody, secondaryEntityId) {
+    if (primaryEntity.yCraft) {
+      // don't let wires trigger collision events with parts ( for now )
+      if (primaryEntity.name === 'Wire' || (secondaryEntity.yCraft && secondaryEntity.name === 'Wire')) {
+        return;
+      }
+      let signal = new ElectricalSignal();
+      signal.data = {
+        entityId: secondaryEntityId,
+        entity: secondaryEntity,
+        body: secondaryBody
+      };
+  
+      this.triggerYCraftPart(primaryEntity.yCraft.part, signal);
+    }
+  }
+
+  processCollisionEnd(primaryEntity, secondaryEntity, secondaryBody, secondaryEntityId) {
+    // console.log('processCollisionEnd', primaryEntity, secondaryEntity, secondaryBody, secondaryEntityId)
+    if (primaryEntity.yCraft && !secondaryEntity.yCraft) {
+      this.releaseYCraftPart(primaryEntity.yCraft.part);
+    }
+  }
+
+  releaseYCraftPart(part) {
+    console.log("RELEASE PART", part)
+    if (part.release) {
+      part.release();
+    }
+  }
+  
+  triggerYCraftPart(part, signal) {
+    // console.log("trigger", part, signal)
+    if (part.trigger) {
+      part.trigger(signal);
+    }
+    if (part.press) {
+      part.press();
+    }
+    if (part.detectMotion) {
+      part.detectMotion();
+    }
+    if (part.toggle) {
+      part.toggle();
+    }
+  }
+  
 
   update() {
   }

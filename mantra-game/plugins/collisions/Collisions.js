@@ -143,6 +143,14 @@ class Collisions {
 
     }
 
+    // iterate through all systems and see if they have a handleCollision method
+    for (const [_, system] of this.game.systemsManager.systems) {
+      if (typeof system.collisionEnd === "function") {
+        // any system that has a handleCollision method will be called here
+        system.collisionEnd(pair, bodyA, bodyB);
+      }
+    }
+
   }
 
   collisionActive(pair, bodyA, bodyB) {
@@ -192,6 +200,14 @@ class Collisions {
         } else {
           // Add new collision if not found
           this.game.data.collisions.push(collisionContext);
+        }
+      }
+
+      // iterate through all systems and see if they have a handleCollision method
+      for (const [_, system] of this.game.systemsManager.systems) {
+        if (typeof system.collisionActive === "function") {
+          // any system that has a handleCollision method will be called here
+          system.collisionActive(pair, bodyA, bodyB);
         }
       }
 

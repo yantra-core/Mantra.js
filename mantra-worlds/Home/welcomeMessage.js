@@ -5,6 +5,11 @@ export default function welcomeMessage(game) {
     console.log('welcomeMessage already run once');
     return;
   }
+
+  if (typeof window === 'undefined') {
+    console.log('welcomeMessage only runs on client');
+    return;
+  }
   // calculate font size based on window size
   let fontSize = Math.floor(window.innerWidth / 15) + 'px';
   // calculate x / y based on window size

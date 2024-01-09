@@ -23,13 +23,9 @@ export default class Client {
 
   }
 
-  init (game) {
+  init(game) {
     this.game = game;
 
-    const preloader = new Preloader(game);
-
-    // hoist preloader to game scope
-    game.preloader = preloader;
     // Load all known client plugins
     // For now, this is just localClient and websocketClient
     // Remark: We load both of them to allow for switching of local / remote modes
@@ -42,46 +38,56 @@ export default class Client {
       deltaEncoding: this.config.deltaEncoding
     }));
 
-    //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
-    //game.on('assetsLoaded', () => console.log('All assets loaded!'));
+    if (!game.isServer) {
+      const preloader = new Preloader(game);
+      // hoist preloader to game scope
+      game.preloader = preloader;
 
-    // load default assets
-    for (let key in defaultAssets) { // TODO: configurable assets
 
-      let asset = defaultAssets[key];
-      if (typeof asset === 'string') {
-        preloader.addAsset(asset, 'image', key);
-        continue;
+      //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
+      //game.on('assetsLoaded', () => console.log('All assets loaded!'));
+
+      // load default assets
+      for (let key in defaultAssets) { // TODO: configurable assets
+
+        let asset = defaultAssets[key];
+        if (typeof asset === 'string') {
+          preloader.addAsset(asset, 'image', key);
+          continue;
+        }
+
+        if (asset.type === 'spritesheet') {
+          preloader.addAsset(asset.url, 'spritesheet', key, asset);
+          continue;
+        }
+
+        // preloader.addAsset(defaultAssets[key], 'image', key);
       }
 
-      if (asset.type === 'spritesheet') {
-        preloader.addAsset(asset.url, 'spritesheet', key, asset);
-        continue;
-      }
-
-      // preloader.addAsset(defaultAssets[key], 'image', key);
+      this.preloading = true;
+      // todo: create two preloadsers
+      // 1 for required assets to start game
+      // 2 for lazy loaded assets
+      preloader.loadAll().then(() => {
+        console.log("All assets loaded", preloader)
+        let that = this;
+        that.preloading = false;
+        /* for dev testing
+        setTimeout(function(){
+          that.preloading = false;
+        }, 5000)
+        */
+        // console.log(preloader.getItem('player'))
+      });
+    } else {
+      this.preloading = false;
     }
 
-    this.preloading = true;
-    // todo: create two preloadsers
-    // 1 for required assets to start game
-    // 2 for lazy loaded assets
-    preloader.loadAll().then(() => {
-      console.log("All assets loaded", preloader)
-      let that = this;
-      that.preloading = false;
-      /* for dev testing
-      setTimeout(function(){
-        that.preloading = false;
-      }, 5000)
-      */
-      // console.log(preloader.getItem('player'))
-    });
 
     game.systemsManager.addSystem('client', this);
   }
 
-  start (callback) {
+  start(callback) {
     if (this.preloading) {
       // console.log('Client.js waiting for preloading to finish')
       setTimeout(() => {
@@ -93,19 +99,19 @@ export default class Client {
     localClient.start(callback);
   }
 
-  stop () {
+  stop() {
     console.log('Client.js plugin stopping game', this.game)
     // this.game.localGameLoopRunning = false;
     let localClient = this.game.getSystem('localClient');
     localClient.stop();
   }
 
-  connect (url) {
+  connect(url) {
     let websocketClient = this.game.getSystem('websocketClient');
     websocketClient.connect(url);
   }
 
-  disconnect () {
+  disconnect() {
     let websocketClient = this.game.getSystem('websocketClient');
     websocketClient.disconnect();
   }

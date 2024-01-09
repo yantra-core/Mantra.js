@@ -1,10 +1,8 @@
 // TODO: move this code into a Sutra
-
 export default function bindLatchEvents (part, contraption) {
   let game = this.game;
   part.on('trigger', (signal) => {
-    console.log('sssusu', signal)
-
+    // console.log("triggered", signal)
     // check to see if the signal is from matching color block
     let collidedWith = signal.data.entity;
 

@@ -22,7 +22,7 @@ export default function inflateBox(entityElement, entityData) {
     entityElement.style.height = entityData.height + 'px';
   }
 
-  entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
+  // entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);

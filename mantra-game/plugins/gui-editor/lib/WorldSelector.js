@@ -40,7 +40,7 @@ class WorldSelector {
 
     this.addOption(selectBox, 'YCraft World', 'YCraft');
     this.addOption(selectBox, 'Sutra World', 'Sutra');
-    this.addOption(selectBox, 'XState World', 'XState');
+    // this.addOption(selectBox, 'XState World', 'XState');
 
     // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
     return selectBox;

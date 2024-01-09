@@ -61,9 +61,18 @@ function localGameLoop(game, playerId) {
 
   // Call the next iteration of the loop using requestAnimationFrame
   if (game.localGameLoopRunning) {
-    requestAnimationFrame(function rafLocalGameLoop () {
+    _requestAnimationFrame(function rafLocalGameLoop () {
       localGameLoop(game, playerId);
     });
+  }
+}
+
+
+function _requestAnimationFrame (callback) {
+  if (typeof window === 'undefined') {
+    return setTimeout(callback, 0);
+  } else {
+    return window.requestAnimationFrame(callback);
   }
 }
 

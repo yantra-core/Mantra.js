@@ -71,6 +71,7 @@ class Game {
     options = {} } = {}) {
     if (isServer) {
       // override default
+      showLoadingScreen = false;
       isClient = false;
     }
     // config scope for convenience
@@ -613,6 +614,10 @@ class Game {
   }
 
   rotateCamera(angle) {
+    // not implemented directly, Graphics plugin will handle this
+  }
+
+  setBackground(color) {
     // not implemented directly, Graphics plugin will handle this
   }
 
