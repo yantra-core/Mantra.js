@@ -1,5 +1,5 @@
-//import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
-import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from '../../../../YCraft.js/index.js';
+import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
+// import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from '../../../../YCraft.js/index.js';
 
 export default function createColorPuzzle() {
 
@@ -21,7 +21,7 @@ export default function createColorPuzzle() {
   // TODO: new Box() ?
   let button0 = new Button(-100, -150, 0);
   let latch0 = new Latch(-100, 0, 0);
-  let light0 = new LEDLight(100, -75, 200, { wattage: 60, height: 250, width: 250 });
+  let light0 = new LEDLight(100, -75, 10, { wattage: 60, height: 250, width: 250 });
 
   button0.connect(light0);
   latch0.connect(light0);
