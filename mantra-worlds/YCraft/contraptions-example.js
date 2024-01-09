@@ -1,5 +1,5 @@
-// import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
-import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine, Rover } from '../../../YCraft.js/index.js'
+import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
+//import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine, Rover } from '../../../YCraft.js/index.js'
 
 export default function createColorPuzzle() {
 
@@ -13,7 +13,7 @@ export default function createColorPuzzle() {
   // Updated positions
   let button0 = new Button(25, 15, 0);
   let latch0 = new Latch(25, 65, 0);
-  let light0 = new LEDLight(75, 15, 200, { wattage: 60, height: 250, width: 250 });
+  let light0 = new LEDLight(75, 15, 25, { wattage: 60, height: 250, width: 250 });
 
   button0.connect(light0);
   latch0.connect(light0);
@@ -34,7 +34,7 @@ export default function createColorPuzzle() {
   let button1 = new Button(25, 25, 1); // moved from (0, 0)
   let latch1 = new Latch(25, 75, 1);   // moved from (0, 37.5)
   let relay1 = new Relay(75, 50, 0);   // moved from (37.5, 18.75)
-  let light1 = new LEDLight(125, 50, 100, { wattage: 60, height: 250, width: 250 }); // moved from (75, 18.75)
+  let light1 = new LEDLight(125, 50, 25, { wattage: 60, height: 250, width: 250 }); // moved from (75, 18.75)
 
   button1.connect(wire1);
   latch1.connect(wire1);
@@ -60,7 +60,7 @@ export default function createColorPuzzle() {
 
   let pressureSensor = new PressureSensor(25, 25, 1);
   let wire3 = new Wire();
-  let light2 = new LEDLight(125, 25, 100, { wattage: 60, height: 250, width: 250 });
+  let light2 = new LEDLight(125, 25, 25, { wattage: 60, height: 250, width: 250 });
 
   pressureSensor.connect(wire3);
   wire3.connect(light2);
@@ -103,7 +103,7 @@ export default function createColorPuzzle() {
   let motionDetector2 = new MotionDetector(25, 25, 0);
   let pressureSensor2 = new PressureSensor(25, 75, 0);
   let actuator2 = new Actuator(125, 50, 0);
-  let light3 = new LEDLight(175, 50, 100, { wattage: 60, height: 250, width: 250 });
+  let light3 = new LEDLight(175, 50, 25, { wattage: 60, height: 250, width: 250 });
   let button2 = new Button(25, 125, 0);
 
   motionDetector2.connect(actuator2);
@@ -139,7 +139,7 @@ function roverLight(x, y, z) {
   });
 
   // Create the latchs
-  let latch = new Latch(25, 25, 2);
+let latch = new Latch(25, 25, 2);
   let latch2 = new Latch(100, 25, 2);
 
   // Create the LED lights
