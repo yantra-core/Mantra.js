@@ -210,6 +210,7 @@ class CSSCamera {
   }
 
   update() {
+
     let game = this.game;
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
   
@@ -221,6 +222,7 @@ class CSSCamera {
   
     // Update the camera position
     if (this.follow && currentPlayer && currentPlayer.position) {
+
       // If following a player, adjust the camera position based on the player's position and the calculated offset
       this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
 

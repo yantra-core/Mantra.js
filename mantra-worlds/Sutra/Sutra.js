@@ -2,12 +2,15 @@ import demon from "../../mantra-sutras/demon.js";
 import hexapod from "../../mantra-sutras/hexapod.js";
 import note from "../../mantra-sutras/note.js";
 import fire from "../../mantra-sutras/fire.js";
+//import langtonsLoop from "../../mantra-sutras/langston-loop.js";
+import gameOfLife from "../../mantra-sutras/game-of-life.js";
 
 let agama = {
   demon,
   hexapod,
   note,
-  fire
+  fire,
+  gameOfLife
 };
 
 class Sutra {
@@ -17,6 +20,7 @@ class Sutra {
     this.game = game; // Store the reference to the game logic
     this.id = Sutra.id;
     this.type = Sutra.type;
+    this.demoInterval = null;
   }
 
   init(game) {
@@ -28,6 +32,7 @@ class Sutra {
   createWorld() {
 
     let game = this.game;
+    let that = this;
 
     game.setGravity(0, 0, 0);
 
@@ -52,15 +57,48 @@ class Sutra {
     game.data.roundEnded = false;
     game.data.roundStarted = true;
     game.createDefaultPlayer();
+    //createPlayPauseButton();
+
+    function createPlayPauseButton() {
+      game.createEntity({
+        name: 'play-pause-button',
+        type: 'BUTTON',
+        body: false,
+        text: 'play',
+        width: 25,
+        height: 25,
+        position: {
+          x: -100,
+          y: 50
+        },
+        style: {
+          fontSize: 30,
+          color: '#ffffff'
+        },
+        /*
+        onClick: function () {
+          if (game.data.roundEnded) {
+            game.data.roundEnded = false;
+            game.data.roundStarted = true;
+            game.setSutra(hexapod(game));
+          } else {
+            game.data.roundEnded = true;
+            game.data.roundStarted = false;
+          }
+        }
+        */
+      });
+    }
 
     function writeSutraLabel(sutraName) {
       // text label for Sutra name
       game.createEntity({
+        name: 'sutra-label',
         type: 'TEXT',
         body: false,
         text: sutraName,
         position: {
-          x: 0,
+          x: -100,
           y: 0
         },
         style: {
@@ -70,22 +108,37 @@ class Sutra {
       });
     }
 
-    writeSutraLabel('hexapod');
+    function updateSutraLabel(sutraName) {
+      game.updateEntity({
+        name: 'sutra-label',
+        text: sutraName
+      })
+    }
 
-    // set interval to iterate through agama
-    setInterval(() => {
+    writeSutraLabel('hexapod');
+    function demoSutras() {
+      // set interval to iterate through agama
       let agamaKeys = Object.keys(agama);
-      let agamaIndex = Math.floor(Math.random() * agamaKeys.length);
-      let agamaKey = agamaKeys[agamaIndex];
-      let agamaSutra = agama[agamaKey];
-      game.removeAllEntities();
-      writeSutraLabel(agamaKey);
-      game.setSutra(agamaSutra(game));
-    }, 2000);
-    /*
-    game.systems.graphics.switchGraphics('BabylonGraphics', function(){
-    });
-    */
+      let agamaIndex = 0;
+
+      that.demoInterval = setInterval(() => {
+        let agamaKey = agamaKeys[agamaIndex];
+        let agamaSutra = agama[agamaKey];
+        // removes all entities except our sutra-label and play-pause-button
+        // TODO: containers
+        game.removeAllEntities({
+          excludeByName: ['sutra-label', 'play-pause-button']
+        });
+        updateSutraLabel(agamaKey);
+        // writeSutraLabel(agamaKey);
+        game.setSutra(agamaSutra(game));
+
+        // Increment the index and reset if it reaches the end of the array
+        agamaIndex = (agamaIndex + 1) % agamaKeys.length;
+      }, 3300);
+    
+    }
+    demoSutras();
 
   }
 
@@ -95,6 +148,13 @@ class Sutra {
   render() { }
 
   destroy() { }
+
+  unload () {
+    // clear the interval
+    if (this.demoSutras) {
+      clearInterval(this.demoSutras);
+    }
+  }
 
 }
 

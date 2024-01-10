@@ -16,6 +16,7 @@ export default function topdownMovement(game) {
   };
 
   function handleInputs (entityId, input) {
+
     const moveSpeed = 1.5;
     let actions = [];
 
@@ -52,7 +53,6 @@ export default function topdownMovement(game) {
       }
       if (force) {
         game.applyForce(entityId, force);
-        // console.log("setting rotation", entityId, rotation)
         game.updateEntity({
           id: entityId,
           rotation: rotation

@@ -24,7 +24,6 @@ export default function updateSprite(entityId, data, SheetManager, anims) {
     }
 
 
-
     if (!playerEntity.texture) {
       return;
     }

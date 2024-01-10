@@ -32,9 +32,18 @@ class Sutra {
         }
       }
 
+      // TODO: Remove this init, it should be a check and throw
+      // camera init is handled in Graphics.js and Camera system
+      game.data.camera = game.data.camera || {};
+      game.data.camera.position = game.data.camera.position || {
+        x: 0,
+        y: 0
+      };
+
       // TODO: can we consolidate these into a single rules.tick() call?
       for (let [entityId, entity] of game.entities.entries()) {
         // console.log('entity', entityId, entity)
+        game.data.game = game;
         game.rules.tick(entity, game.data);
       }
 

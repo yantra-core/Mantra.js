@@ -16,7 +16,6 @@ class Space {
 
     let game = this.game;
 
-
     // Adds projectile Bullets to the game
     game.use('Bullet')
 
