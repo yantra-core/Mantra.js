@@ -1,3 +1,4 @@
+import movement from '../../mantra-sutras/player-movement/platformer.js';
 import warpToWorld from '../sutras/warpToWorld.js';
 
 class Platform {
@@ -15,14 +16,23 @@ class Platform {
     this.createWorld();
   }
 
+  unload () {
+    // reset camera mode
+    game.data.camera.mode = null;
+    // remove event listeners
+    game.off('entityInput::handleInputs', this.handleInputs);
+  }
+
   createWorld() {
 
     let game = this.game;
+    game.customMovement = true;
 
     game.setGravity(0, 3.3, 0);
 
     game.use('Platform');
 
+   
     function createPlatform(platformData) {
       game.createEntity({
         type: 'PLATFORM',
@@ -68,7 +78,6 @@ class Platform {
       height: 60
     });
 
-
     createPlatform({
       x: 925,
       y: 0,
@@ -76,7 +85,6 @@ class Platform {
       width: 600,
       height: 60
     });
-
 
     /*
     createPlatform({
@@ -94,7 +102,14 @@ class Platform {
     // TODO: moves to sutras.js
     let warp = warpToWorld(game);
     rules.use(warp, 'warpToWorld');
+    rules.use(movement(game), 'movement');
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
+
+
+    this.handleInputs  = function (entityId, inputs){
+      rules.emit('entityInput::handleInputs', entityId, inputs)
+    }
+    game.on('entityInput::handleInputs', this.handleInputs);
 
     game.setSutra(rules);
 
@@ -220,11 +235,6 @@ class Platform {
   render() { }
 
   destroy() { }
-
-  unload () {
-    // reset camera mode
-    game.data.camera.mode = null;
-  }
 
 }
 

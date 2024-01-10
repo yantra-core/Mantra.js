@@ -9,6 +9,7 @@ class Home {
 
   constructor() {
     this.id = Home.id;
+    this.type = Home.type;
   }
 
   init(game) {
@@ -16,9 +17,19 @@ class Home {
     this.createWorld();
   }
 
+  unload () {
+    // remove event listeners
+    console.log('Home::unload')
+    this.game.off('entityInput::handleInputs', this.handleInputs);
+  }
+
   createWorld() {
 
     let game = this.game;
+
+    // bypass default input movement
+    game.customMovement = true;
+
     // game.data.camera.currentZoom = 2;
     game.setGravity(0, 0, 0);
 
@@ -43,28 +54,13 @@ class Home {
 
     // See: sutras.js for World logic
     let rules = sutras(game);
+
+    this.handleInputs = function (entityId, inputs) {
+      rules.emit('entityInput::handleInputs', entityId, inputs)
+    }
+    game.on('entityInput::handleInputs', this.handleInputs);
+
     game.setSutra(rules);
-
-    /*    
-    game.createEntity({
-      type: 'KEY',
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'ayyoKey',
-      },
-      width: 16,
-      height: 16,
-      body: false,
-      position: { // position to right
-        x: -185,
-        y: 45,
-        z: 10
-      }
-    });
-    */
-
-
-  
 
     // now create some background and text entities for navigation
     game.createEntity({
@@ -113,10 +109,8 @@ class Home {
       style: {
         // this is code and we need to preserve the spaces and \n
         whiteSpace: 'pre',
-
         // width: '150px',
         // fontSize: '12px',
-
         textAlign: 'left',
         color: 'black',
         opacity: 0.55
@@ -274,7 +268,6 @@ class Home {
       }
     });
 
-
     // switch to 3d text label
     game.createEntity({
       name: 'BabylonGraphics',
@@ -316,7 +309,6 @@ class Home {
       }
     });
 
-
     game.createEntity({
       type: 'DOOR',
       texture: {
@@ -332,8 +324,6 @@ class Home {
         z: 10
       }
     });
-
-
 
     // if touch warp, switch to Music level
     game.createEntity({
@@ -505,9 +495,9 @@ class Home {
     });
 
     */
-
-
+  
   }
+
 
 }
 

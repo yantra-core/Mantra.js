@@ -74,7 +74,8 @@ class Entity {
     // Iterate over all registered components and fetch their data if available
     for (const componentType in this.game.components) {
       const componentData = this.game.getComponent(entityId, componentType);
-      if (componentData) {
+      // console.log('componentData', componentData)
+      if (typeof componentData !== 'undefined' && componentData !== null) {
         entity[componentType] = componentData;
       }
     }
@@ -164,7 +165,6 @@ class Entity {
   updateEntity(entityData) {
 
     let entityId = entityData.id;
-
     if (typeof entityId === 'undefined') {
       // check to see if we have a name, if so, find the entity by name
       if (entityData.name) {
@@ -181,10 +181,10 @@ class Entity {
       return;
     }
 
-    let fullState = this.game.getEntity(entityId);
+    let ent = this.game.getEntity(entityId);
 
     // if the state doesn't exist, return error
-    if (!fullState) {
+    if (!ent) {
       console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
       console.log('This should not happen, if a new state came in it should be created');
       return;
@@ -195,8 +195,6 @@ class Entity {
       this.removeEntity(entityId);
       return;
     }
-
-    let ent = this.game.entities.get(entityId);
 
     // not a component property yet, just ad-hoc on client
     ent.pendingRender = {};
@@ -246,8 +244,16 @@ class Entity {
     }
 
     if (typeof entityData.rotation !== 'undefined') {
-      this.game.components.rotation.set(entityId, entityData.rotation);
-      // TODO: update rotation in physics engine      
+      if (this.game.physics && this.game.physics.setRotation) {
+        let body = this.game.bodyMap[entityId];
+        if (body) {
+          this.game.physics.setRotation(body, entityData.rotation);
+        }
+      } else {
+        console.log('WARNING: physics.setRotation is not defined');
+        // Remark: we could support direct rotation updates here if mantra was being run without physics engine
+        // this.game.components.rotation.set(entityId, entityData.rotation);
+      }
     }
 
     if (typeof entityData.text !== 'undefined') {

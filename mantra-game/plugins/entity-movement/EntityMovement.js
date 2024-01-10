@@ -53,9 +53,12 @@ class EntityMovement extends Plugin {
 
     }
 
-    this.strategies.forEach(function(strategy) {
-      strategy.update(entityId, x, y, z); // rename to handleInputs? handleMovement?
-    });
+    if (!this.game.customMovement) {
+      this.strategies.forEach(function(strategy) {
+        strategy.update(entityId, x, y, z); // rename to handleInputs? handleMovement?
+      });
+    }
+
 
   }
 

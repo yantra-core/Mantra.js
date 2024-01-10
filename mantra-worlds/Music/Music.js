@@ -23,7 +23,7 @@ class Home {
   createWorld() {
 
     let game = this.game;
-
+    game.customMovement = false;
     game.setBackground('black');
 
     // Usage example

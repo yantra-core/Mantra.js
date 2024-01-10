@@ -17,6 +17,7 @@ class YCraft {
   createWorld() {
 
     let game = this.game;
+    game.customMovement = false;
     game.setGravity(0, 0, 0);
     game.use('Bullet');
     game.use('Block');
