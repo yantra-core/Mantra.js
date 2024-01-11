@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+      let game = new MANTRA.Game({
+        height: 600 * 10,
+        width: 800 * 10,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '.'
+        }
+      });
+
+      // Use Plugins to extend the game with new functionality
+
+      // Adds projectile Bullets to the game
+      // test chanining
+      game.use('Sutra');
+      game.use('Gamepad');
+      game.use('Border');
+
+      game.use('GamepadGUI');
+
+
+      // game.use(new Plugins.SutraGUI({ }));
+      game.use('Editor', {
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/sutra-level-editor.html',
+        sutraEditor: true
+      });
+
+      // start the game loop
+      game.start(function () {
+
+        game.use(new WORLDS.worlds['TowerDefense']());
+
+        game.data.roundEnded = false;
+        game.data.roundStarted = true;
+
+
+      });
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

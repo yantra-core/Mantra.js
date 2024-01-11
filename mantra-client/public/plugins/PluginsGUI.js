@@ -506,31 +506,31 @@ var pluginsList = {
   },
   "BabylonCamera": {
     "path": "./plugins/graphics-babylon/camera/BabylonCamera.js",
-    "size": 9.131
+    "size": 9.347
   },
   "BabylonGraphics": {
     "path": "./plugins/graphics-babylon/BabylonGraphics.js",
-    "size": 59.249
+    "size": 63.786
   },
   "Block": {
     "path": "./plugins/block/Block.js",
-    "size": 6.845
+    "size": 7.14
   },
   "Border": {
     "path": "./plugins/border/Border.js",
-    "size": 9.126
+    "size": 9.319
   },
   "Bullet": {
     "path": "./plugins/bullet/Bullet.js",
-    "size": 13.116
+    "size": 13.857
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 49.193
+    "size": 61.213
   },
   "Client": {
     "path": "./plugins/client/Client.js",
-    "size": 122.132
+    "size": 144.788
   },
   "ChronoControl": {
     "path": "./plugins/chrono-control/ChronoControl.js",
@@ -538,7 +538,7 @@ var pluginsList = {
   },
   "Collisions": {
     "path": "./plugins/collisions/Collisions.js",
-    "size": 9.748
+    "size": 15.153
   },
   "Creator": {
     "path": "./plugins/gui-creator/Creator.js",
@@ -546,23 +546,23 @@ var pluginsList = {
   },
   "Entity": {
     "path": "./plugins/entity/Entity.js",
-    "size": 42.819
+    "size": 45.983
   },
   "EntityInput": {
     "path": "./plugins/entity-input/EntityInput.js",
-    "size": 28.495
+    "size": 30.423
   },
   "EntityMovement": {
     "path": "./plugins/entity-movement/EntityMovement.js",
-    "size": 21.153
+    "size": 21.204
   },
   "Gamepad": {
     "path": "./plugins/gamepad/Gamepad.js",
-    "size": 5.789
+    "size": 6.393
   },
   "Graphics": {
     "path": "./plugins/graphics/Graphics.js",
-    "size": 8.248
+    "size": 23.744
   },
   "Health": {
     "path": "./plugins/health/Health.js",
@@ -574,7 +574,7 @@ var pluginsList = {
   },
   "ControlsGUI": {
     "path": "./plugins/gui-controls/ControlsGUI.js",
-    "size": 17.963
+    "size": 17.968
   },
   "LoadingScreen": {
     "path": "./plugins/loading-screen/LoadingScreen.js",
@@ -582,7 +582,7 @@ var pluginsList = {
   },
   "EntitiesGUI": {
     "path": "./plugins/gui-entities/EntitiesGUI.js",
-    "size": 22.755
+    "size": 22.76
   },
   "PingTime": {
     "path": "./plugins/ping-time/PingTime.js",
@@ -590,7 +590,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 24.458
+    "size": 24.464
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",
@@ -598,11 +598,11 @@ var pluginsList = {
   },
   "SutraGUI": {
     "path": "./plugins/gui-sutra/SutraGUI.js",
-    "size": 86.905
+    "size": 86.91
   },
   "Editor": {
     "path": "./plugins/gui-editor/Editor.js",
-    "size": 47.876
+    "size": 49.993
   },
   "SnapshotSize": {
     "path": "./plugins/snapshot-size/SnapshotSize.js",
@@ -618,27 +618,27 @@ var pluginsList = {
   },
   "Keyboard": {
     "path": "./plugins/keyboard/Keyboard.js",
-    "size": 9.453
+    "size": 7.964
   },
   "Lifetime": {
     "path": "./plugins/lifetime/Lifetime.js",
-    "size": 3.929
+    "size": 4.08
   },
   "LocalClient": {
     "path": "./plugins/client/LocalClient.js",
-    "size": 4.988
+    "size": 4.859
   },
   "MatterPhysics": {
     "path": "./plugins/physics-matter/MatterPhysics.js",
-    "size": 395.2
+    "size": 401.519
   },
   "Mouse": {
     "path": "./plugins/mouse/Mouse.js",
-    "size": 8.75
+    "size": 9.499
   },
   "PhaserGraphics": {
     "path": "./plugins/graphics-phaser/PhaserGraphics.js",
-    "size": 41.466
+    "size": 48.461
   },
   "ThreeGraphics": {
     "path": "./plugins/graphics-three/ThreeGraphics.js",

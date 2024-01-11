@@ -159,6 +159,25 @@ var Collisions = /*#__PURE__*/function () {
           this.game.data.collisions.push(collisionContext);
         }
       }
+
+      // iterate through all systems and see if they have a handleCollision method
+      var _iterator2 = _createForOfIteratorHelper(this.game.systemsManager.systems),
+        _step2;
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            _ = _step2$value[0],
+            system = _step2$value[1];
+          if (typeof system.collisionEnd === "function") {
+            // any system that has a handleCollision method will be called here
+            system.collisionEnd(pair, bodyA, bodyB);
+          }
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
     }
   }, {
     key: "collisionActive",
@@ -203,6 +222,25 @@ var Collisions = /*#__PURE__*/function () {
             // Add new collision if not found
             this.game.data.collisions.push(collisionContext);
           }
+        }
+
+        // iterate through all systems and see if they have a handleCollision method
+        var _iterator3 = _createForOfIteratorHelper(this.game.systemsManager.systems),
+          _step3;
+        try {
+          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+            var _step3$value = _slicedToArray(_step3.value, 2),
+              _ = _step3$value[0],
+              system = _step3$value[1];
+            if (typeof system.collisionActive === "function") {
+              // any system that has a handleCollision method will be called here
+              system.collisionActive(pair, bodyA, bodyB);
+            }
+          }
+        } catch (err) {
+          _iterator3.e(err);
+        } finally {
+          _iterator3.f();
         }
       }
     }

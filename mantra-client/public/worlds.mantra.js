@@ -1472,8 +1472,8 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
       // Emit trigger event and send signal
       this.emit('trigger', signal);
       this.connectedParts.forEach(function (component) {
-        if (component.receive && typeof component.receive === 'function') {
-          component.receive(signal);
+        if (component.onFn && typeof component.onFn === 'function') {
+          component.onFn(signal);
         }
       });
     }
@@ -1482,12 +1482,11 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
     value: function release() {
       var _this2 = this;
       this.isOn = false;
-
       // Emit release event
       this.emit('release');
       this.connectedParts.forEach(function (component) {
-        if (component.off && typeof component.off === 'function') {
-          component.off(_this2.signal);
+        if (component.offFn && typeof component.offFn === 'function') {
+          component.offFn(_this2.signal);
         }
       });
     }
@@ -1914,6 +1913,8 @@ var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
     _this.segments = [];
     _this.inputs = [];
     _this.outputs = [];
+    _this.onFn = _this.receive.bind(_assertThisInitialized(_this));
+    _this.offFn = _this.stopTransmit.bind(_assertThisInitialized(_this));
     _this.mode = 'continuous'; // TODO: rename "mode", use mode for time-aware / immediate
     return _this;
   }
@@ -2199,144 +2200,6 @@ var EventEmitter = exports["default"] = /*#__PURE__*/function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = createWalker;
-function createWalker(game, config) {
-  game.createEntity({
-    type: 'Walker',
-    sutra: 'walker',
-    width: 22,
-    height: 24,
-    texture: {
-      sheet: 'jogurt',
-      sprite: 'walkLeft'
-    },
-    depth: 64,
-    position: {
-      x: 50,
-      y: -150,
-      z: 32
-    }
-  });
-  var walker = game.createSutra();
-
-  // Set properties from config
-  walker.route = config.route;
-  walker.routeIndex = 0;
-  walker.target = walker.route[walker.routeIndex];
-  walker.tolerance = config.tolerance || 5; // Default tolerance to 5 if not specified
-
-  walker.addCondition('isWalker', function (entity) {
-    return entity.type === 'Walker';
-  });
-
-  // Check if the walker is at the current target waypoint
-  walker.addCondition('atTarget', function (entity) {
-    var dx = entity.position.x - walker.target[0];
-    var dy = entity.position.y - walker.target[1];
-    return Math.sqrt(dx * dx + dy * dy) < walker.tolerance;
-  });
-
-  // Determine the next waypoint
-  walker.on('nextWaypoint', function (entity) {
-    if (walker.routeIndex < walker.route.length - 1) {
-      walker.routeIndex++;
-    } else {
-      walker.routeIndex = 0; // Loop back to the start
-    }
-    walker.target = walker.route[walker.routeIndex];
-  });
-
-  // Walker movement logic
-  walker["if"]('isWalker')["if"]('atTarget').then('nextWaypoint'); // Switch to next waypoint when current one is reached
-
-  walker["if"]('isWalker').then('entity::updateEntity');
-
-  // Updating the entity (used for both movement and firing)
-  walker.on('entity::updateEntity', function (entity) {
-    var dx = walker.target[0] - entity.position.x;
-    var dy = walker.target[1] - entity.position.y;
-    var distance = Math.sqrt(dx * dx + dy * dy);
-    var velocityX = distance > 0 ? dx / distance : 0;
-    var velocityY = distance > 0 ? dy / distance : 0;
-    game.updateEntity({
-      id: entity.id,
-      velocity: {
-        x: velocityX,
-        y: velocityY
-      }
-    });
-  });
-
-  /*
-  // Remark: We could add additional walker logic, and or create a new NPC sutra behavior for using weapons
-  rules.addCondition('WalkerTouchedPlayer', (collision) => {
-    console.log('ccc', collision)
-    return (collision.entityA.type === 'Walker' && collision.entityB.type === 'Player') || (collision.entityA.type === 'Player' && collision.entityB.type === 'Walker');
-  });
-   rules.addCondition('WalkerTouchedPlayer', (entity, gameState) => {
-    if (entity.type === 'COLLISION') {
-      if (entity.bodyA.type === 'Walker' && entity.bodyB.type === 'PLAYER') {
-        return true;
-      }
-      if (entity.bodyB.type === 'Walker' && entity.bodyA.type === 'PLAYER') {
-        return true;
-      }
-    }
-  });
-    rules.on('PlayerTakeDamage', (collision, node, gameState) => {
-    console.log('PlayerTakeDamage', collision, gameState);
-     game.removeEntity(collision.Walker.id);
-     // get current walk count
-    let walkerCount = gameState.ents.Walker.length || 0;
-     if (walkerCount < 10) {
-      // create a new walker
-      game.createEntity({
-        type: 'Walker',
-        width: 16,
-        height: 16,
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'bomb',
-        },
-        depth: 64,
-        position: {
-          x: -50,
-          y: -150,
-          z: 32
-        }
-      });
-       game.createEntity({
-        type: 'Walker',
-        width: 16,
-        height: 16,
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'bomb',
-        },
-        depth: 64,
-        position: {
-          x: 50,
-          y: -150,
-          z: 32
-        }
-      });
-    }
-  
-  });
-   rules
-    .if('WalkerTouchedPlayer')
-    .then('PlayerTakeDamage');
-    */
-
-  return walker;
-}
-
-},{}],21:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports["default"] = demon;
 function demon(game) {
   game.createEntity({
@@ -2397,7 +2260,7 @@ function demon(game) {
   return rules;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2478,6 +2341,170 @@ function fire(game) {
     }
   });
   return rules;
+}
+
+},{}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = gameOfLife;
+function gameOfLife(game) {
+  var GRID_SIZE = 150; // Define the size of the grid
+  var CELL_SIZE = 5; // Size of each cell
+
+  // Initialize grid cells
+  for (var x = 0; x < GRID_SIZE; x += CELL_SIZE) {
+    for (var y = 0; y < GRID_SIZE; y += CELL_SIZE) {
+      game.createEntity({
+        type: 'LIFE_CELL',
+        //health: Math.random() < 0.5 ? 1 : 2, // 1 is alive, 2 is dead
+        health: 2,
+        position: {
+          x: x,
+          y: y
+        },
+        body: false,
+        width: CELL_SIZE,
+        height: CELL_SIZE
+      });
+    }
+  }
+  function initializeGlider(x, y, cellSize, game) {
+    game.createEntity({
+      type: 'LIFE_CELL',
+      width: cellSize,
+      height: cellSize,
+      body: false,
+      health: 1,
+      position: {
+        x: x,
+        y: y
+      }
+    });
+    game.createEntity({
+      type: 'LIFE_CELL',
+      width: cellSize,
+      height: cellSize,
+      body: false,
+      health: 1,
+      position: {
+        x: x + cellSize,
+        y: y
+      }
+    });
+    game.createEntity({
+      type: 'LIFE_CELL',
+      width: cellSize,
+      height: cellSize,
+      body: false,
+      health: 1,
+      position: {
+        x: x + 2 * cellSize,
+        y: y
+      }
+    });
+    game.createEntity({
+      type: 'LIFE_CELL',
+      width: cellSize,
+      height: cellSize,
+      body: false,
+      health: 1,
+      position: {
+        x: x + 2 * cellSize,
+        y: y - cellSize
+      }
+    });
+    game.createEntity({
+      type: 'LIFE_CELL',
+      width: cellSize,
+      height: cellSize,
+      body: false,
+      health: 1,
+      position: {
+        x: x + cellSize,
+        y: y - 2 * cellSize
+      }
+    });
+  }
+  initializeGlider(100, 100, CELL_SIZE, game);
+  var rules = game.createSutra();
+
+  // Rule for updating cell state
+  rules["if"]('updateCellState').then('transitionCellState');
+  rules.addCondition('updateCellState', function (entity, gameState) {
+    return entity.type === 'LIFE_CELL' && gameState.tick % 10 === 0; // Update every 2 ticks
+  });
+  rules.on('transitionCellState', function (entity, node, gameState) {
+    var neighbors = getNeighbors(entity, node, gameState); // Function to get neighboring cells
+    var aliveNeighbors = neighbors.filter(function (neighbor) {
+      return neighbor.health === 1;
+    }).length;
+
+    // console.log(neighbors, aliveNeighbors)
+    // Game of Life rules
+    if (entity.health === 1 && (aliveNeighbors < 2 || aliveNeighbors > 3)) {
+      //entity.state = 'dead';
+      entity.health = 0;
+    } else if (entity.health === 2 && aliveNeighbors === 3) {
+      entity.health = 1;
+      //entity.state = 'alive';
+    }
+
+    // Update entity in the game
+    game.updateEntity({
+      id: entity.id,
+      health: entity.health,
+      style: {
+        backgroundColor: entity.health === 1 ? 'green' : 'black'
+      }
+    });
+  });
+  return rules;
+}
+function getNeighbors(cell, node, gameState) {
+  var gridSize = 150; // Define the size of the grid
+  var cellSize = 5; // Assuming each cell has a fixed size
+
+  var neighbors = [];
+  var neighborOffsets = [{
+    x: -cellSize,
+    y: -cellSize
+  }, {
+    x: 0,
+    y: -cellSize
+  }, {
+    x: cellSize,
+    y: -cellSize
+  }, {
+    x: -cellSize,
+    y: 0
+  }, /* Current Cell */{
+    x: cellSize,
+    y: 0
+  }, {
+    x: -cellSize,
+    y: cellSize
+  }, {
+    x: 0,
+    y: cellSize
+  }, {
+    x: cellSize,
+    y: cellSize
+  }];
+  gameState.ents.LIFE_CELL.forEach(function (otherCell) {
+    for (var _i = 0, _neighborOffsets = neighborOffsets; _i < _neighborOffsets.length; _i++) {
+      var offset = _neighborOffsets[_i];
+      var wrappedX = (cell.position.x + offset.x + gridSize) % gridSize;
+      var wrappedY = (cell.position.y + offset.y + gridSize) % gridSize;
+      if (otherCell.position.x === wrappedX && otherCell.position.y === wrappedY) {
+        neighbors.push(otherCell);
+        break; // Found neighbor, no need to check other offsets
+      }
+    }
+  });
+  return neighbors;
 }
 
 },{}],23:[function(require,module,exports){
@@ -2716,6 +2743,155 @@ function note(game) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = platformMovement;
+function platformMovement(game) {
+  var rules = game.createSutra();
+  var defaultControlsMapping = {
+    A: 'MOVE_LEFT',
+    D: 'MOVE_RIGHT',
+    SPACE: 'JUMP'
+    // Other controls can be mapped as needed
+  };
+  function handleInputs(entityId, input) {
+    var moveSpeed = 1.5;
+    var jumpForce = 1.5; // Adjust as needed
+    var actions = [];
+
+    // Map the input to actions
+    if (input.controls) {
+      Object.keys(input.controls).forEach(function (key) {
+        if (input.controls[key] && defaultControlsMapping[key]) {
+          actions.push(defaultControlsMapping[key]);
+        }
+      });
+    }
+
+    // Apply movement
+    actions.forEach(function (action) {
+      var force = {
+        x: 0,
+        y: 0
+      };
+      switch (action) {
+        case 'MOVE_LEFT':
+          force.x = -moveSpeed;
+          break;
+        case 'MOVE_RIGHT':
+          force.x = moveSpeed;
+          break;
+        case 'JUMP':
+          if (true /*|| game.isTouchingGround(entityId)*/) {
+            // Replace with actual condition check
+            force.y = -jumpForce;
+          }
+          break;
+      }
+      if (force.x !== 0 || force.y !== 0) {
+        game.applyForce(entityId, force);
+      }
+    });
+  }
+  rules.on('entityInput::handleInputs', handleInputs);
+  return rules;
+}
+
+},{}],26:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = topdownMovement;
+function topdownMovement(game) {
+  var rules = game.createSutra();
+  var defaultControlsMapping = {
+    W: 'MOVE_FORWARD',
+    S: 'MOVE_BACKWARD',
+    A: 'MOVE_LEFT',
+    D: 'MOVE_RIGHT',
+    SPACE: 'FIRE_BULLET',
+    K: 'FIRE_BULLET',
+    O: 'BARREL_ROLL',
+    U: 'SELECT_MENU'
+    //LEFT: 'ROTATE_LEFT',
+    //RIGHT: 'ROTATE_RIGHT'
+  };
+  function handleInputs(entityId, input) {
+    var moveSpeed = 1.5;
+    var actions = [];
+
+    // Map the input to actions
+    if (input.controls) {
+      Object.keys(input.controls).forEach(function (key) {
+        if (input.controls[key] && defaultControlsMapping[key]) {
+          actions.push(defaultControlsMapping[key]);
+        }
+      });
+    }
+
+    // Apply movement and rotation
+    actions.forEach(function (action) {
+      var force;
+      var rotation;
+      switch (action) {
+        case 'MOVE_FORWARD':
+          force = {
+            x: 0,
+            y: -moveSpeed
+          };
+          rotation = 0; // Facing up
+          break;
+        case 'MOVE_BACKWARD':
+          force = {
+            x: 0,
+            y: moveSpeed
+          };
+          rotation = Math.PI; // Facing down
+          break;
+        case 'MOVE_LEFT':
+          force = {
+            x: -moveSpeed,
+            y: 0
+          };
+          rotation = -Math.PI / 2; // Facing left
+          break;
+        case 'MOVE_RIGHT':
+          force = {
+            x: moveSpeed,
+            y: 0
+          };
+          rotation = Math.PI / 2; // Facing right
+          break;
+      }
+      if (force) {
+        game.applyForce(entityId, force);
+        game.updateEntity({
+          id: entityId,
+          rotation: rotation
+        });
+      }
+    });
+    if (game.systems.bullet) {
+      if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
+    }
+    if (game.systems.sword) {
+      if (actions.includes('FIRE_BULLET')) {
+        game.getSystem('sword').swingSword(entityId);
+      } else {
+        game.getSystem('sword').sheathSword(entityId);
+      }
+    }
+  }
+  rules.on('entityInput::handleInputs', handleInputs);
+  return rules;
+}
+
+},{}],27:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = void 0;
 var _sutras = _interopRequireDefault(require("./sutras.js"));
 var _welcomeMessage = _interopRequireDefault(require("./welcomeMessage.js"));
@@ -2735,6 +2911,7 @@ var Home = /*#__PURE__*/function () {
   function Home() {
     _classCallCheck(this, Home);
     this.id = Home.id;
+    this.type = Home.type;
   }
   _createClass(Home, [{
     key: "init",
@@ -2743,9 +2920,20 @@ var Home = /*#__PURE__*/function () {
       this.createWorld();
     }
   }, {
+    key: "unload",
+    value: function unload() {
+      // remove event listeners
+      console.log('Home::unload');
+      this.game.off('entityInput::handleInputs', this.handleInputs);
+    }
+  }, {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+
+      // bypass default input movement
+      game.customMovement = true;
+
       // game.data.camera.currentZoom = 2;
       game.setGravity(0, 0, 0);
       game.createDefaultPlayer({
@@ -2770,25 +2958,11 @@ var Home = /*#__PURE__*/function () {
 
       // See: sutras.js for World logic
       var rules = (0, _sutras["default"])(game);
+      this.handleInputs = function (entityId, inputs) {
+        rules.emit('entityInput::handleInputs', entityId, inputs);
+      };
+      game.on('entityInput::handleInputs', this.handleInputs);
       game.setSutra(rules);
-
-      /*    
-      game.createEntity({
-        type: 'KEY',
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'ayyoKey',
-        },
-        width: 16,
-        height: 16,
-        body: false,
-        position: { // position to right
-          x: -185,
-          y: 45,
-          z: 10
-        }
-      });
-      */
 
       // now create some background and text entities for navigation
       game.createEntity({
@@ -2838,7 +3012,6 @@ var Home = /*#__PURE__*/function () {
           whiteSpace: 'pre',
           // width: '150px',
           // fontSize: '12px',
-
           textAlign: 'left',
           color: 'black',
           opacity: 0.55
@@ -3223,7 +3396,7 @@ _defineProperty(Home, "id", 'world-home');
 _defineProperty(Home, "type", 'world');
 var _default = exports["default"] = Home;
 
-},{"./sutras.js":26,"./welcomeMessage.js":28}],26:[function(require,module,exports){
+},{"./sutras.js":28,"./welcomeMessage.js":30}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3232,12 +3405,13 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = sutras;
 var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 var _switchGraphics = _interopRequireDefault(require("../sutras/switchGraphics.js"));
-var _walker = _interopRequireDefault(require("../../mantra-game/plugins/world-tower/sutras/walker.js"));
+var _walker = _interopRequireDefault(require("../TowerDefense/sutras/walker.js"));
 var _routing = _interopRequireDefault(require("../sutras/routing.js"));
 var _fire = _interopRequireDefault(require("../../mantra-sutras/fire.js"));
 var _block = _interopRequireDefault(require("./sutras/block.js"));
 var _demon = _interopRequireDefault(require("../../mantra-sutras/demon.js"));
 var _hexapod = _interopRequireDefault(require("../../mantra-sutras/hexapod.js"));
+var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 // helper sutra for switching worlds
 
@@ -3284,11 +3458,14 @@ function sutras(game) {
   // hexapod entity
   rules.use((0, _hexapod["default"])(game), 'hexapod');
 
+  // movement
+  rules.use((0, _topDown["default"])(game), 'movement');
+
   // console.log('created sutra', rules.toEnglish())
   return rules;
 }
 
-},{"../../mantra-game/plugins/world-tower/sutras/walker.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":23,"../sutras/routing.js":42,"../sutras/switchGraphics.js":43,"../sutras/warpToWorld.js":44,"./sutras/block.js":27}],27:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":20,"../../mantra-sutras/fire.js":21,"../../mantra-sutras/hexapod.js":23,"../../mantra-sutras/player-movement/top-down.js":26,"../TowerDefense/sutras/walker.js":46,"../sutras/routing.js":52,"../sutras/switchGraphics.js":53,"../sutras/warpToWorld.js":54,"./sutras/block.js":29}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3359,7 +3536,7 @@ function fire(game) {
 }
 ;
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3371,6 +3548,10 @@ function welcomeMessage(game) {
     game.hasShownWelcomeMessage = true;
   } else {
     console.log('welcomeMessage already run once');
+    return;
+  }
+  if (typeof window === 'undefined') {
+    console.log('welcomeMessage only runs on client');
     return;
   }
   // calculate font size based on window size
@@ -3422,7 +3603,107 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var Maze = /*#__PURE__*/function () {
+  function Maze() {
+    _classCallCheck(this, Maze);
+    this.id = Maze.id;
+  }
+  _createClass(Maze, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.createWorld();
+    }
+  }, {
+    key: "createWorld",
+    value: function createWorld() {
+      var game = this.game;
+      game.setGravity(0, 0, 0);
+      game.createDefaultPlayer({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0
+        }
+      });
+      game.setBackground('#007fff');
+      game.use('Block');
+      game.use('Border', {
+        autoBorder: true
+      });
+      game.use('Bullet');
+      game.use('Tone');
+      game.use('Tile');
+      // Create walls for a simple hallway
+      //this.createHallwayWalls(game);
+    }
+  }, {
+    key: "createHallwayWalls",
+    value: function createHallwayWalls(game) {
+      // Define the dimensions of the hallway
+      var hallwayLength = 64; // Length of the hallway
+      var wallWidth = 32; // Width of the walls
+      var wallHeight = 100; // Height of the walls
+      var hallwayWidth = 100; // Width of the hallway
+
+      // Create left wall
+      for (var x = 0; x < hallwayLength; x += wallWidth) {
+        game.createEntity({
+          type: 'WALL',
+          isStatic: true,
+          width: wallWidth,
+          height: wallHeight,
+          rotation: Math.PI / 2,
+          // Rotate 90 degrees
+          position: {
+            x: x,
+            y: -hallwayWidth / 2,
+            // Positioning to the left of the center
+            z: 0
+          }
+        });
+      }
+
+      // Create right wall
+      for (var _x = 0; _x < hallwayLength; _x += wallWidth) {
+        game.createEntity({
+          type: 'WALL',
+          isStatic: true,
+          width: wallWidth,
+          height: wallHeight,
+          rotation: -Math.PI / 2,
+          // Rotate -90 degrees
+          position: {
+            x: _x,
+            y: hallwayWidth / 2,
+            // Positioning to the right of the center
+            z: 0
+          }
+        });
+      }
+    }
+  }]);
+  return Maze;
+}();
+_defineProperty(Maze, "id", 'world-maze');
+_defineProperty(Maze, "type", 'maze');
+var _default = exports["default"] = Maze;
+
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3457,6 +3738,7 @@ var Home = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.customMovement = false;
       game.setBackground('black');
 
       // Usage example
@@ -3677,7 +3959,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../sutras/warpToWorld.js":44,"./instruments/createDrumKit.js":30,"./instruments/createPiano.js":31,"./sutras.js":32}],30:[function(require,module,exports){
+},{"../sutras/warpToWorld.js":54,"./instruments/createDrumKit.js":33,"./instruments/createPiano.js":34,"./sutras.js":35}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3783,7 +4065,7 @@ function createDrumKit(game, config) {
   });
 }
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3908,7 +4190,7 @@ function createPiano(game, config) {
   */
 }
 
-},{}],32:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4034,13 +4316,14 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":43,"../sutras/warpToWorld.js":44}],33:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":53,"../sutras/warpToWorld.js":54}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _platformer = _interopRequireDefault(require("../../mantra-sutras/player-movement/platformer.js"));
 var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -4066,9 +4349,18 @@ var Platform = /*#__PURE__*/function () {
       this.createWorld();
     }
   }, {
+    key: "unload",
+    value: function unload() {
+      // reset camera mode
+      game.data.camera.mode = null;
+      // remove event listeners
+      game.off('entityInput::handleInputs', this.handleInputs);
+    }
+  }, {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.customMovement = true;
       game.setGravity(0, 3.3, 0);
       game.use('Platform');
       function createPlatform(platformData) {
@@ -4136,9 +4428,14 @@ var Platform = /*#__PURE__*/function () {
       // TODO: moves to sutras.js
       var warp = (0, _warpToWorld["default"])(game);
       rules.use(warp, 'warpToWorld');
+      rules.use((0, _platformer["default"])(game), 'movement');
       rules.addCondition('isTile', function (entity) {
         return entity.type === 'BLOCK';
       });
+      this.handleInputs = function (entityId, inputs) {
+        rules.emit('entityInput::handleInputs', entityId, inputs);
+      };
+      game.on('entityInput::handleInputs', this.handleInputs);
       game.setSutra(rules);
 
       // console.log('created sutra', rules)
@@ -4260,12 +4557,6 @@ var Platform = /*#__PURE__*/function () {
   }, {
     key: "destroy",
     value: function destroy() {}
-  }, {
-    key: "unload",
-    value: function unload() {
-      // reset camera mode
-      game.data.camera.mode = null;
-    }
   }]);
   return Platform;
 }();
@@ -4273,7 +4564,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../sutras/warpToWorld.js":44}],34:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/platformer.js":25,"../sutras/warpToWorld.js":54}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4458,7 +4749,7 @@ var Pong = /*#__PURE__*/function () {
 _defineProperty(Pong, "id", 'world-pong');
 var _default = exports["default"] = Pong;
 
-},{}],35:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4546,7 +4837,7 @@ _defineProperty(Space, "id", 'world-space');
 _defineProperty(Space, "type", 'world');
 var _default = exports["default"] = Space;
 
-},{}],36:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4557,6 +4848,7 @@ var _demon = _interopRequireDefault(require("../../mantra-sutras/demon.js"));
 var _hexapod = _interopRequireDefault(require("../../mantra-sutras/hexapod.js"));
 var _note = _interopRequireDefault(require("../../mantra-sutras/note.js"));
 var _fire = _interopRequireDefault(require("../../mantra-sutras/fire.js"));
+var _gameOfLife = _interopRequireDefault(require("../../mantra-sutras/game-of-life.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4564,12 +4856,13 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } //import langtonsLoop from "../../mantra-sutras/langston-loop.js";
 var agama = {
   demon: _demon["default"],
   hexapod: _hexapod["default"],
   note: _note["default"],
-  fire: _fire["default"]
+  fire: _fire["default"],
+  gameOfLife: _gameOfLife["default"]
 };
 var Sutra = /*#__PURE__*/function () {
   // type is optional for Plugins
@@ -4578,6 +4871,7 @@ var Sutra = /*#__PURE__*/function () {
     this.game = game; // Store the reference to the game logic
     this.id = Sutra.id;
     this.type = Sutra.type;
+    this.demoInterval = null;
   }
   _createClass(Sutra, [{
     key: "init",
@@ -4590,6 +4884,7 @@ var Sutra = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      var that = this;
       game.setGravity(0, 0, 0);
 
       // TODO: set default zoom to 0.3 ( zoomed out )
@@ -4618,14 +4913,47 @@ var Sutra = /*#__PURE__*/function () {
       game.data.roundEnded = false;
       game.data.roundStarted = true;
       game.createDefaultPlayer();
+      //createPlayPauseButton();
+
+      function createPlayPauseButton() {
+        game.createEntity({
+          name: 'play-pause-button',
+          type: 'BUTTON',
+          body: false,
+          text: 'play',
+          width: 25,
+          height: 25,
+          position: {
+            x: -100,
+            y: 50
+          },
+          style: {
+            fontSize: 30,
+            color: '#ffffff'
+          }
+          /*
+          onClick: function () {
+            if (game.data.roundEnded) {
+              game.data.roundEnded = false;
+              game.data.roundStarted = true;
+              game.setSutra(hexapod(game));
+            } else {
+              game.data.roundEnded = true;
+              game.data.roundStarted = false;
+            }
+          }
+          */
+        });
+      }
       function writeSutraLabel(sutraName) {
         // text label for Sutra name
         game.createEntity({
+          name: 'sutra-label',
           type: 'TEXT',
           body: false,
           text: sutraName,
           position: {
-            x: 0,
+            x: -100,
             y: 0
           },
           style: {
@@ -4634,22 +4962,34 @@ var Sutra = /*#__PURE__*/function () {
           }
         });
       }
+      function updateSutraLabel(sutraName) {
+        game.updateEntity({
+          name: 'sutra-label',
+          text: sutraName
+        });
+      }
       writeSutraLabel('hexapod');
-
-      // set interval to iterate through agama
-      setInterval(function () {
+      function demoSutras() {
+        // set interval to iterate through agama
         var agamaKeys = Object.keys(agama);
-        var agamaIndex = Math.floor(Math.random() * agamaKeys.length);
-        var agamaKey = agamaKeys[agamaIndex];
-        var agamaSutra = agama[agamaKey];
-        game.removeAllEntities();
-        writeSutraLabel(agamaKey);
-        game.setSutra(agamaSutra(game));
-      }, 2000);
-      /*
-      game.systems.graphics.switchGraphics('BabylonGraphics', function(){
-      });
-      */
+        var agamaIndex = 0;
+        that.demoInterval = setInterval(function () {
+          var agamaKey = agamaKeys[agamaIndex];
+          var agamaSutra = agama[agamaKey];
+          // removes all entities except our sutra-label and play-pause-button
+          // TODO: containers
+          game.removeAllEntities({
+            excludeByName: ['sutra-label', 'play-pause-button']
+          });
+          updateSutraLabel(agamaKey);
+          // writeSutraLabel(agamaKey);
+          game.setSutra(agamaSutra(game));
+
+          // Increment the index and reset if it reaches the end of the array
+          agamaIndex = (agamaIndex + 1) % agamaKeys.length;
+        }, 3300);
+      }
+      demoSutras();
     }
   }, {
     key: "update",
@@ -4660,6 +5000,14 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "destroy",
     value: function destroy() {}
+  }, {
+    key: "unload",
+    value: function unload() {
+      // clear the interval
+      if (this.demoSutras) {
+        clearInterval(this.demoSutras);
+      }
+    }
   }]);
   return Sutra;
 }();
@@ -4667,7 +5015,875 @@ _defineProperty(Sutra, "id", 'world-sutra');
 _defineProperty(Sutra, "type", 'world');
 var _default = exports["default"] = Sutra;
 
-},{"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":23,"../../mantra-sutras/note.js":24}],37:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":20,"../../mantra-sutras/fire.js":21,"../../mantra-sutras/game-of-life.js":22,"../../mantra-sutras/hexapod.js":23,"../../mantra-sutras/note.js":24}],40:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _round = _interopRequireDefault(require("./sutras/round.js"));
+var _player = _interopRequireDefault(require("./sutras/player.js"));
+var _colorChanges = _interopRequireDefault(require("./sutras/colorChanges.js"));
+var _enemy = _interopRequireDefault(require("./sutras/enemy.js"));
+var _input = _interopRequireDefault(require("./sutras/input.js"));
+var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var TowerWorld = /*#__PURE__*/function () {
+  function TowerWorld() {
+    _classCallCheck(this, TowerWorld);
+    _defineProperty(this, "sutras", {
+      'round': {
+        description: 'Round Logic. Adds conditions and actions related to the round.'
+      },
+      'spawner': {
+        description: 'Spawner Logic. Adds conditions and actions related to the spawner.'
+      },
+      'player': {
+        description: 'Player Logic. Adds conditions and actions related to the player.'
+      },
+      'collision': {
+        description: 'Collision Logic. Adds conditions and actions related to collisions.'
+      },
+      'colorChanges': {
+        description: 'Color Changes Logic. Adds conditions and actions related to color changes.'
+      }
+    });
+    _defineProperty(this, "entities", {
+      'UnitSpawner': {
+        type: 'UnitSpawner',
+        health: 100,
+        position: {
+          x: 0,
+          y: 0
+        },
+        width: 100,
+        height: 100,
+        color: 0x00ff00
+      }
+    });
+    this.id = TowerWorld.id;
+  }
+  _createClass(TowerWorld, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      for (var key in this.sutras) {
+        if (this[key]) {
+          this.sutras[key] = this[key]();
+        }
+      }
+
+      // bypass default input movement
+      game.customMovement = true;
+
+      // game.data.camera.currentZoom = 2;
+      game.setGravity(0, 0, 0);
+      game.createDefaultPlayer({
+        position: {
+          x: 0,
+          y: 0
+        },
+        texture: 'none'
+      });
+
+      // game.setBackground('#007F00');
+      game.setBackground('#007fff');
+      game.use('Block');
+      game.use('Border', {
+        autoBorder: true,
+        thickness: 20,
+        health: 100
+      });
+      game.use('Bullet');
+      game.use('Border');
+      game.use('StarField');
+
+      // game.use('Scoreboard');
+
+      // Create Sutras
+      var roundSutra = _round["default"].call(this);
+      var spawnerSutra = _enemy["default"].call(this);
+      var playerSutra = _player["default"].call(this);
+      var inputSutra = _input["default"].call(this);
+      var colorChangesSutra = _colorChanges["default"].call(this);
+
+      // Main rules Sutra
+      // TODO: ensure entire Sutra definition is exports on TowerWorld such that any
+      // node can be re-used in other Sutras
+      var rules = game.createSutra();
+
+      // movement
+      rules.use((0, _topDown["default"])(game), 'movement');
+      this.handleInputs = function (entityId, inputs) {
+        rules.emit('entityInput::handleInputs', entityId, inputs);
+      };
+      game.on('entityInput::handleInputs', this.handleInputs);
+      rules.addCondition('isBorder', function (entity) {
+        return entity.type === 'BORDER';
+      });
+      rules["if"]('roundNotPaused')["if"]('roundNotRunning').then('createBorders').then('spawnEnemyUnits').then('startRound');
+      rules["if"]('spawnUnitTouchedHomebase').then('removeSpawnUnit').then('resetSpawnerUnit');
+      rules["if"]('blockHitWall').then('damageWall').then('removeBlock');
+      rules["if"]('playerHealthBelow0').then('resetPlayerPosition');
+      rules["if"]('blockHitPlayer').then(function (rules) {
+        rules["if"]('blockIsRed').then('damagePlayer')["else"]('healPlayer');
+      }).then('removeBlock');
+      rules["if"]('roundRunning')["if"]('allWallsFallen').then('roundLost');
+      rules.addCondition('allWallsFallen', function (entity, gameState) {
+        // check see if any of UnitSpawners have been made it past the world height + 1000
+        var height = gameState.height;
+        var unitSpawners = gameState.ents.UnitSpawner;
+        var allWallsFallen = false;
+        unitSpawners.forEach(function (spawner) {
+          if (spawner.position.y > 4200) {
+            allWallsFallen = true;
+          }
+        });
+        return allWallsFallen;
+      });
+      rules.use(roundSutra, 'round');
+      rules.use(spawnerSutra, 'spawner');
+      rules.use(playerSutra, 'player');
+      rules.use(colorChangesSutra, 'colorChanges');
+      rules.use(inputSutra, 'input');
+      rules["if"]('roundRunning')["if"]('gameTickMod60').then('spawner');
+
+      // rules.if('changesColorWithDamage').then('colorChanges');
+      rules.addAction({
+        "if": 'changesColorWithDamage',
+        subtree: 'colorChanges'
+      });
+
+      // rules.if('isPlayer').then('input');
+      rules.addAction({
+        "if": 'isPlayer',
+        subtree: 'input'
+      });
+
+      // Additional rules
+      this.createAdditionalRules(rules);
+      console.log('rrr', rules);
+      game.setSutra(rules);
+      game.data.roundStarted = true;
+      game.data.roundRunning = false;
+      return rules;
+    }
+  }, {
+    key: "update",
+    value: function update() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+
+    // base unit spawner
+  }, {
+    key: "createBorders",
+    value: function createBorders(N) {
+      var game = this.game;
+      // TODO: move this a sutra
+      for (var i = 0; i < N; i++) {
+        var scaleFactor = 0.2 * (i + 1);
+        game.systems.border.createBorder({
+          height: game.height * scaleFactor + game.height,
+          width: game.width * scaleFactor + game.width,
+          thickness: 20,
+          health: 100
+          // depth: 100,
+        });
+      }
+    }
+  }, {
+    key: "createAdditionalRules",
+    value: function createAdditionalRules(rules) {
+      var game = this.game;
+      var self = this;
+      rules.on('removeSpawnUnit', function (event, data, node) {
+        if (event.bodyA.type === 'BORDER') {
+          game.removeEntity(event.bodyB.id);
+          // set the color of bodyB to red
+        }
+        if (event.bodyB.type === 'BORDER') {
+          game.removeEntity(event.bodyA.id);
+        }
+      });
+      rules.addCondition('blockHitWall', function (entity, data) {
+        if (entity.type === 'COLLISION') {
+          if (entity.bodyA.type === 'BORDER' || entity.bodyB.type === 'BORDER') {
+            // console.log('blockHitWall', entity, data)
+            if (entity.bodyA.type === 'BLOCK' || entity.bodyB.type === 'BLOCK') {
+              return true;
+            }
+          }
+        }
+      });
+      rules.on('removeBlock', function (context, node) {
+        var block = context.BLOCK;
+        game.removeEntity(block.id);
+      });
+      rules.on('damageWall', function (context, node) {
+        var border = context.BORDER;
+        border.health -= 1;
+        if (border.health <= 0) {
+          // remove the wall
+          game.removeEntity(border.id);
+          return;
+        }
+        // remove existing border
+        game.updateEntity({
+          id: border.id,
+          type: 'BORDER',
+          health: border.health
+          // color: 0xff0000
+        });
+      });
+
+      //
+      // Player / Block Collisions
+      //
+      rules.addCondition('blockHitPlayer', function (entity, data) {
+        if (entity.type === 'COLLISION') {
+          if (entity.bodyA.type === 'PLAYER' || entity.bodyB.type === 'PLAYER') {
+            // console.log('blockHitPlayer', entity, data)
+            if (entity.bodyA.type === 'BLOCK' || entity.bodyB.type === 'BLOCK') {
+              return true;
+            }
+          }
+        }
+      });
+      rules.addCondition('blockIsRed', function (data, node) {
+        var block;
+        if (data.bodyA.type === 'BLOCK') {
+          block = data.bodyA;
+        } else {
+          block = data.bodyB;
+        }
+        if (block.type === 'BLOCK') {
+          if (block.color === 0xff0000) {
+            return true;
+          }
+        }
+      });
+      rules.on('entity::updateEntity', function (data, node) {
+        // console.log('entity::updateEntity', data);
+        game.updateEntity(data);
+      });
+      rules.on('createBorders', function (data, node) {
+        self.createBorders(2);
+      });
+      rules.on('spawnEnemyUnits', function (data, node) {
+        console.log('data', data, node);
+        try {
+          // create 8 unit spawners at the top of the map border, left to right, evenly spaced
+          var spawners = [];
+          for (var i = 0; i < 8; i++) {
+            // create fresh clone of unitSpawner
+            var spawner = JSON.parse(JSON.stringify(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty({
+              type: 'UnitSpawner',
+              health: 100,
+              position: {
+                x: 0,
+                y: 0
+              }
+            }, "health", 100), "mass", 100), "width", 64), "height", 64), "color", 0x00ff00), "style", {
+              backgroundColor: '#000000'
+            })));
+            console.log('spawner', spawner);
+            var smallerWidth = game.width * 0.8;
+            spawner.position.x = -smallerWidth / 2 + smallerWidth / 8 * i;
+            spawner.position.y = -game.height / 2 + 100;
+            spawner.startingPosition = {
+              x: spawner.position.x,
+              y: spawner.position.y
+            };
+            spawners.push(spawner);
+          }
+          spawners.forEach(function (spawner) {
+            var ent = game.createEntity(spawner);
+          });
+        } catch (err) {
+          console.log('err', err);
+        }
+      });
+
+      /*
+      rules.on('roundLost', function (data, node, gameState) {
+        //console.log('roundLost!!!');
+        // stop the game
+        game.data.roundStarted = false;
+        game.data.roundRunning = false;
+        game.data.roundEnded = true;
+      });
+       rules.on('startRound', function (data, node, gameState) {
+        // set roundRunning to true
+        game.data.roundRunning = true;
+      });
+      */
+    }
+  }]);
+  return TowerWorld;
+}();
+_defineProperty(TowerWorld, "id", 'world-towerdefense');
+_defineProperty(TowerWorld, "type", 'world');
+var _default = exports["default"] = TowerWorld;
+/*
+
+  // TODO: round end / reset round / round start
+  // Custom function for 'isBoss' condition
+
+
+  rules.addCondition('scoreIsAbove10', {
+    op: 'greaterThan',
+    property: 'score',
+    value: 10
+  });
+
+  rules.addAction({
+    if: ['scoreIsAbove10'],
+    then: [{
+      action: 'upgradeWeapon'
+    }]
+  });
+
+  rules.on('upgradeWeapon', function (data, node) {
+    console.log('upgradeWeapon', data, node)
+    game.updateEntity({
+      id: data.id,
+      type: 'PLAYER',
+      bulletColor: 0x00ff00
+    });
+  });
+
+ 
+  rules.addCondition('allEnemiesCleared', function (entity, gameState) {
+    let length = gameState.ents.UnitSpawner.length;
+    return length <= 7;
+    // TODO: return length === 0;
+  })
+
+
+  rules.addAction({
+    if: ['allEnemiesCleared'],
+    then: [{
+      action: 'roundOver'
+    }]
+  })
+
+  rules.on('roundOver', function () {
+    // console.log('roundOver!!!')
+  });
+
+
+*/
+
+},{"../../mantra-sutras/player-movement/top-down.js":26,"./sutras/colorChanges.js":41,"./sutras/enemy.js":42,"./sutras/input.js":43,"./sutras/player.js":44,"./sutras/round.js":45}],41:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = colorChanges;
+function colorChanges() {
+  var game = this.game;
+  var colorChanges = this.game.createSutra();
+  colorChanges.addCondition('changesColorWithDamage', {
+    op: 'or',
+    conditions: ['isSpawner', 'isPlayer', 'isBorder']
+  });
+
+  // Define health level conditions for the boss
+  var healthLevels = [100, 80, 60, 40, 20];
+  var colors = [0x00ff00, 0x99ff00, 0xffff00, 0xff9900, 0xff0000]; // Green to Red
+
+  // Adding health level conditions
+  healthLevels.forEach(function (level, index) {
+    colorChanges.addCondition("isHealthBelow".concat(level), {
+      op: 'lessThan',
+      property: 'health',
+      value: level
+    });
+  });
+
+  // Action for the boss based on health levels
+  colorChanges.addAction({
+    "if": 'changesColorWithDamage',
+    then: healthLevels.map(function (level, index) {
+      return {
+        "if": "isHealthBelow".concat(level),
+        then: [{
+          action: 'entity::updateEntity',
+          data: {
+            color: colors[index]
+          }
+        }]
+      };
+    })
+  });
+  colorChanges.on('entity::updateEntity', function (data, node) {
+    // console.log('entity::updateEntity', data);
+    game.updateEntity(data);
+  });
+  return colorChanges;
+}
+
+},{}],42:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = spawner;
+function spawner() {
+  var game = this.game;
+  var spawner = this.game.createSutra();
+  spawner.addCondition('isSpawner', function (entity, gameState) {
+    return entity.type === 'UnitSpawner';
+  });
+
+  // Assuming the entity initially moves to the right
+  //spawner.addCondition('moveLeft', (entity, gameState) => entity.position.x >= entity.startingPosition.x);
+
+  //spawner.addCondition('moveRight', (entity, gameState) => entity.position.x < entity.startingPosition.x - 400);
+
+  var moveRange = 0; // Define the range of movement
+
+  spawner.addCondition('moveLeft', function (entity, gameState) {
+    //console.log('moveLeft Check', entity.position.x, entity.startingPosition.x + moveRange);
+    return entity.position.x > entity.startingPosition.x + moveRange;
+  });
+  spawner.addCondition('moveRight', function (entity, gameState) {
+    // console.log('moveRight Check', entity.position.x, entity.startingPosition.x - moveRange);
+    return entity.position.x <= entity.startingPosition.x - moveRange;
+  });
+  spawner.addCondition('gameTickMod60', function (entity, gameState) {
+    // console.log('gameState.gameTick')
+    return gameState.tick % 60 === 0;
+  });
+  spawner["if"]('gameTickMod60')["if"]('isSpawner').then('spawnBlock', {
+    x: 0,
+    y: 100
+  });
+
+  //
+  // Spawner Movement
+  //
+
+  // spawner.define()
+  // spawner.condition('isSpawner', (entity, gameState) => entity.type === 'UnitSpawner');
+
+  spawner["if"]('gameTickMod60')["if"]('isSpawner', 'moveLeft').then('entity::updateEntity', {
+    velocity: {
+      x: -10,
+      y: 10
+    }
+  });
+  spawner["if"]('gameTickMod60')["if"]('isSpawner', 'moveRight').then('entity::updateEntity', {
+    velocity: {
+      x: 1,
+      y: 10
+    }
+  });
+  spawner.on('spawnBlock', function (entity, data) {
+    // console.log('spawnBlock', entity, data)
+    var ent = game.createEntity({
+      type: 'BLOCK',
+      position: {
+        x: entity.position.x,
+        y: entity.position.y
+      },
+      mass: 100,
+      friction: 0,
+      frictionAir: 0,
+      frictionStatic: 0,
+      // texture: 'fire',
+      velocity: {
+        x: 0,
+        y: 30
+      },
+      width: 16,
+      height: 16
+
+      // color: 0xff0000
+    });
+    // console.log('aaaa', ent)
+  });
+  spawner.on('entity::updateEntity', function (data, node) {
+    // console.log('entity::updateEntity', data, node);
+    game.updateEntity({
+      id: data.id,
+      velocity: data.velocity
+    });
+  });
+  spawner.addCondition('spawnUnitTouchedHomebase', function (entity, gameState) {
+    if (entity.type === 'COLLISION') {
+      if (entity.bodyA.type === 'UnitSpawner' && entity.bodyB.type === 'BORDER') {
+        // console.log('spawnUnitTouchedHomebase', entity, gameState)
+        return true;
+      }
+      if (entity.bodyB.type === 'UnitSpawner' && entity.bodyA.type === 'BORDER') {
+        // console.log('spawnUnitTouchedHomebase', entity, gameState)
+        return true;
+      }
+    }
+  });
+  spawner.on('resetSpawnerUnit', function (data, node) {
+    var previous = data.UnitSpawner;
+    var newSpawner = {
+      type: 'UnitSpawner',
+      health: 100,
+      position: previous.startingPosition,
+      width: 64,
+      height: 64,
+      color: 0x00ff00,
+      style: {
+        backgroundColor: '#000000'
+      }
+    };
+    newSpawner.startingPosition = previous.startingPosition;
+    var ent = game.createEntity(newSpawner);
+    //ent.timers.setTimer('test-timer', 0.5, true);
+  });
+  return spawner;
+}
+
+},{}],43:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = input;
+var moveSpeed = 5;
+function input() {
+  var game = this.game;
+  var inputSutra = this.game.createSutra();
+  var inputMap = ['W', 'A', 'S', 'D'];
+  inputMap.forEach(function (key) {
+    inputSutra.addCondition("press".concat(key), function (data, gameState) {
+      if (gameState.input && gameState.input.controls[key]) {
+        //console.log(`press${key}`, gameState.input)
+        return true;
+      }
+      return false;
+    });
+  });
+
+  // Add actions corresponding to the conditions
+  inputSutra["if"]('pressW').then('moveForward');
+  inputSutra["if"]('pressA').then('moveLeft');
+  inputSutra["if"]('pressS').then('moveBackward');
+  inputSutra["if"]('pressD').then('moveRight');
+
+  // Sutra event listeners for executing actions
+  inputSutra.on('moveForward', function (entity) {
+    var dx = 0;
+    var dy = moveSpeed;
+    var forceFactor = 0.05;
+    var force = {
+      x: dx * forceFactor,
+      y: -dy * forceFactor
+    };
+    game.applyForce(entity.id, force);
+  });
+  inputSutra.on('moveLeft', function (entity) {
+    var dx = moveSpeed;
+    var dy = 0;
+    var forceFactor = 0.05;
+    var force = {
+      x: -dx * forceFactor,
+      y: dy * forceFactor
+    };
+    game.applyForce(entity.id, force);
+  });
+  inputSutra.on('moveRight', function (entity) {
+    var dx = moveSpeed;
+    var dy = 0;
+    var forceFactor = 0.05;
+    var force = {
+      x: dx * forceFactor,
+      y: dy * forceFactor
+    };
+    game.applyForce(entity.id, force);
+  });
+  inputSutra.on('moveBackward', function (entity) {
+    var dx = 0;
+    var dy = moveSpeed;
+    var forceFactor = 0.05;
+    var force = {
+      x: dx * forceFactor,
+      y: dy * forceFactor
+    };
+    game.applyForce(entity.id, force);
+  });
+  console.log('creating input sutra', inputSutra);
+  return inputSutra;
+}
+;
+
+},{}],44:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = player;
+function player() {
+  var game = this.game;
+  var player = this.game.createSutra();
+  player.addCondition('isPlayer', function (entity) {
+    return entity.type === 'PLAYER';
+  });
+  player.addCondition('playerHealthBelow0', function (entity, gameState) {
+    if (entity.type === 'PLAYER') {
+      if (entity.health <= 0) {
+        return true;
+      }
+    }
+  });
+  player.on('resetPlayerPosition', function (data, node) {
+    // console.log('resetPlayerPosition', data, node)
+    game.updateEntity({
+      id: data.id,
+      position: {
+        x: 0,
+        y: 0
+      },
+      velocity: {
+        x: 0,
+        y: 0
+      },
+      health: 100,
+      color: 0x00ff00,
+      score: 0
+    });
+  });
+  player.on('damagePlayer', function (data, node) {
+    var block = data.BLOCK;
+    var player = data.PLAYER;
+    player.health -= 10;
+    game.updateEntity({
+      id: player.id,
+      health: player.health
+    });
+  });
+  player.on('healPlayer', function (data, node) {
+    var block = data.BLOCK;
+    var player = data.PLAYER;
+    if (player) {
+      player.health += 5;
+      game.updateEntity({
+        id: player.id,
+        health: player.health
+      });
+    }
+  });
+  return player;
+}
+
+},{}],45:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = round;
+function round() {
+  var round = this.game.createSutra();
+
+  // Condition to check if a round has started
+  round.addCondition('roundStarted', function (entity, gameState) {
+    console.log('roundStarted', gameState.roundStarted);
+    return gameState.roundStarted === true;
+  });
+
+  // Condition to check if a round has ended
+  round.addCondition('roundEnded', function (entity, gameState) {
+    return gameState.roundEnded === true;
+  });
+  round.addCondition('roundRunning', function (entity, gameState) {
+    return gameState.roundRunning === true;
+  });
+  round.addCondition('roundNotRunning', function (entity, gameState) {
+    // console.log('roundNotRunning', gameState.roundRunning)
+    return gameState.roundRunning === false;
+  });
+  round.addCondition('roundPaused', function (entity, gameState) {
+    return gameState.roundPaused === true;
+  });
+
+  // TODO: remove add NOT condition
+  round.addCondition('roundNotPaused', function (entity, gameState) {
+    return gameState.roundPaused !== true;
+  });
+  round.on('roundLost', function (data, node, gameState) {
+    console.log('roundLost!!!');
+    // stop the game
+    gameState.roundStarted = false;
+    gameState.roundRunning = false;
+    gameState.roundEnded = true;
+    gameState.roundPaused = true;
+  });
+  round.on('startRound', function (data, node, gameState) {
+    // set roundRunning to true
+    console.log('startRound');
+    gameState.roundRunning = true;
+    gameState.roundEnded = false;
+  });
+
+  // round.if('startRound').then('startRound');
+
+  return round;
+}
+
+},{}],46:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createWalker;
+function createWalker(game, config) {
+  game.createEntity({
+    type: 'Walker',
+    sutra: 'walker',
+    width: 22,
+    height: 24,
+    texture: {
+      sheet: 'jogurt',
+      sprite: 'walkLeft'
+    },
+    depth: 64,
+    position: {
+      x: 50,
+      y: -150,
+      z: 32
+    }
+  });
+  var walker = game.createSutra();
+
+  // Set properties from config
+  walker.route = config.route;
+  walker.routeIndex = 0;
+  walker.target = walker.route[walker.routeIndex];
+  walker.tolerance = config.tolerance || 5; // Default tolerance to 5 if not specified
+
+  walker.addCondition('isWalker', function (entity) {
+    return entity.type === 'Walker';
+  });
+
+  // Check if the walker is at the current target waypoint
+  walker.addCondition('atTarget', function (entity) {
+    var dx = entity.position.x - walker.target[0];
+    var dy = entity.position.y - walker.target[1];
+    return Math.sqrt(dx * dx + dy * dy) < walker.tolerance;
+  });
+
+  // Determine the next waypoint
+  walker.on('nextWaypoint', function (entity) {
+    if (walker.routeIndex < walker.route.length - 1) {
+      walker.routeIndex++;
+    } else {
+      walker.routeIndex = 0; // Loop back to the start
+    }
+    walker.target = walker.route[walker.routeIndex];
+  });
+
+  // Walker movement logic
+  walker["if"]('isWalker')["if"]('atTarget').then('nextWaypoint'); // Switch to next waypoint when current one is reached
+
+  walker["if"]('isWalker').then('entity::updateEntity');
+
+  // Updating the entity (used for both movement and firing)
+  walker.on('entity::updateEntity', function (entity) {
+    var dx = walker.target[0] - entity.position.x;
+    var dy = walker.target[1] - entity.position.y;
+    var distance = Math.sqrt(dx * dx + dy * dy);
+    var velocityX = distance > 0 ? dx / distance : 0;
+    var velocityY = distance > 0 ? dy / distance : 0;
+    game.updateEntity({
+      id: entity.id,
+      velocity: {
+        x: velocityX,
+        y: velocityY
+      }
+    });
+  });
+
+  /*
+  // Remark: We could add additional walker logic, and or create a new NPC sutra behavior for using weapons
+  rules.addCondition('WalkerTouchedPlayer', (collision) => {
+    console.log('ccc', collision)
+    return (collision.entityA.type === 'Walker' && collision.entityB.type === 'Player') || (collision.entityA.type === 'Player' && collision.entityB.type === 'Walker');
+  });
+   rules.addCondition('WalkerTouchedPlayer', (entity, gameState) => {
+    if (entity.type === 'COLLISION') {
+      if (entity.bodyA.type === 'Walker' && entity.bodyB.type === 'PLAYER') {
+        return true;
+      }
+      if (entity.bodyB.type === 'Walker' && entity.bodyA.type === 'PLAYER') {
+        return true;
+      }
+    }
+  });
+    rules.on('PlayerTakeDamage', (collision, node, gameState) => {
+    console.log('PlayerTakeDamage', collision, gameState);
+     game.removeEntity(collision.Walker.id);
+     // get current walk count
+    let walkerCount = gameState.ents.Walker.length || 0;
+     if (walkerCount < 10) {
+      // create a new walker
+      game.createEntity({
+        type: 'Walker',
+        width: 16,
+        height: 16,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'bomb',
+        },
+        depth: 64,
+        position: {
+          x: -50,
+          y: -150,
+          z: 32
+        }
+      });
+       game.createEntity({
+        type: 'Walker',
+        width: 16,
+        height: 16,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'bomb',
+        },
+        depth: 64,
+        position: {
+          x: 50,
+          y: -150,
+          z: 32
+        }
+      });
+    }
+  
+  });
+   rules
+    .if('WalkerTouchedPlayer')
+    .then('PlayerTakeDamage');
+    */
+
+  return walker;
+}
+
+},{}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4865,7 +6081,7 @@ _defineProperty(XState, "id", 'world-xstate');
 _defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
-},{}],38:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4899,6 +6115,7 @@ var YCraft = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.customMovement = false;
       game.setGravity(0, 0, 0);
       game.use('Bullet');
       game.use('Block');
@@ -4946,7 +6163,8 @@ var YCraft = /*#__PURE__*/function () {
       // TODO: use common warp sutra
       rules.addCondition('playerTouchedWarpZone', function (entity, gameState) {
         if (entity.type === 'COLLISION') {
-          console.log('entity', entity);
+          // console.log('entity', entity)
+
           if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
             return true;
           }
@@ -5045,7 +6263,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"./contraptions-example.js":39}],39:[function(require,module,exports){
+},{"./contraptions-example.js":49}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5053,9 +6271,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createColorPuzzle;
 var _index = require("../../../YCraft.js/index.js");
-// import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
+//import { YCraft, Button, Display, Latch, LEDLight, Relay, Wire, Actuator, MotionDetector, PressureSensor, VirtualMachine } from 'ycraft';
 
 function createColorPuzzle() {
+  // simple light
   var exampleA = new _index.YCraft(0, 0, 0, {
     description: "Simple Light",
     height: 100,
@@ -5065,7 +6284,7 @@ function createColorPuzzle() {
   // Updated positions
   var button0 = new _index.Button(25, 15, 0);
   var latch0 = new _index.Latch(25, 65, 0);
-  var light0 = new _index.LEDLight(75, 15, 200, {
+  var light0 = new _index.LEDLight(75, 15, 25, {
     wattage: 60,
     height: 250,
     width: 250
@@ -5075,6 +6294,8 @@ function createColorPuzzle() {
   exampleA.addPart(light0);
   exampleA.addPart(button0);
   exampleA.addPart(latch0);
+
+  // wired light
   var exampleB = new _index.YCraft(0, 140, 0, {
     description: "Wired Light",
     height: 120,
@@ -5082,10 +6303,10 @@ function createColorPuzzle() {
   });
   var wire1 = new _index.Wire();
   var wire2 = new _index.Wire();
-  var button1 = new _index.Button(25, 25, 0); // moved from (0, 0)
-  var latch1 = new _index.Latch(25, 75, 0); // moved from (0, 37.5)
+  var button1 = new _index.Button(25, 25, 1); // moved from (0, 0)
+  var latch1 = new _index.Latch(25, 75, 1); // moved from (0, 37.5)
   var relay1 = new _index.Relay(75, 50, 0); // moved from (37.5, 18.75)
-  var light1 = new _index.LEDLight(125, 50, 100, {
+  var light1 = new _index.LEDLight(125, 50, 25, {
     wattage: 60,
     height: 250,
     width: 250
@@ -5102,13 +6323,140 @@ function createColorPuzzle() {
   exampleB.addPart(relay1);
   exampleB.addPart(wire1);
   exampleB.addPart(wire2);
+
+  // pressure sensor wire
+
+  var exampleC = new _index.YCraft(0, 280, 0, {
+    description: "Pressure Sensor Wire",
+    height: 120,
+    width: 200
+  });
+  var pressureSensor = new _index.PressureSensor(25, 25, 1);
+  var wire3 = new _index.Wire();
+  var light2 = new _index.LEDLight(125, 25, 25, {
+    wattage: 60,
+    height: 250,
+    width: 250
+  });
+  pressureSensor.connect(wire3);
+  wire3.connect(light2);
+  exampleC.addPart(pressureSensor);
+  exampleC.addPart(wire3);
+  exampleC.addPart(light2);
+
+  /*
+    const motionDetector = new MotionDetector(-150, -250, 0); // Position at top-left
+  const pressureSensor = new PressureSensor(150, -250, 0); // Next to the Motion Detector
+  const actuator = new Actuator(450, -250, 0); // Positioned appropriately
+  const securityLight = new LEDLight(450, 0, 0, { wattage: 60 }); // Near bottom-right
+  const manualOverrideButton = new Button(50, 450, 0); // Near bottom-left
+   // Connect components to the Actuator
+  motionDetector.connect(actuator);
+  pressureSensor.connect(actuator);
+  manualOverrideButton.connect(actuator);
+   // Connect Actuator to the Security Light
+  actuator.connect(securityLight);
+   // Add parts to YCraft system
+  yCraftSystem.addPart(motionDetector);
+  yCraftSystem.addPart(pressureSensor);
+  yCraftSystem.addPart(securityLight);
+  yCraftSystem.addPart(manualOverrideButton);
+  yCraftSystem.addPart(actuator);
+  */
+
+  // security system
+  var exampleD = new _index.YCraft(210, 140, 0, {
+    description: "Security System",
+    height: 120,
+    width: 200
+  });
+  var motionDetector2 = new _index.MotionDetector(25, 25, 0);
+  var pressureSensor2 = new _index.PressureSensor(25, 75, 0);
+  var actuator2 = new _index.Actuator(125, 50, 0);
+  var light3 = new _index.LEDLight(175, 50, 25, {
+    wattage: 60,
+    height: 250,
+    width: 250
+  });
+  var button2 = new _index.Button(25, 125, 0);
+  motionDetector2.connect(actuator2);
+  pressureSensor2.connect(actuator2);
+  button2.connect(actuator2);
+  actuator2.connect(light3);
+  exampleD.addPart(motionDetector2);
+  exampleD.addPart(pressureSensor2);
+  exampleD.addPart(actuator2);
+  exampleD.addPart(light3);
+  exampleD.addPart(button2);
   var examples = new _index.YCraft();
   examples.addContraption(exampleA);
   examples.addContraption(exampleB);
+  examples.addContraption(exampleC);
+  examples.addContraption(exampleD);
+  var rover = roverLight(-145, 145, 0);
+  examples.addContraption(rover);
   return examples;
 }
+function roverLight(x, y, z) {
+  var contraption = new _index.YCraft(x, y, z, {
+    description: "Rover Light",
+    powerRequired: false
+  });
 
-},{"../../../YCraft.js/index.js":1}],40:[function(require,module,exports){
+  // Create the latchs
+  var latch = new _index.Latch(25, 25, 2);
+  var latch2 = new _index.Latch(100, 25, 2);
+
+  // Create the LED lights
+  var ledLight1 = new _index.LEDLight(0, 100, 1);
+  var ledLight2 = new _index.LEDLight(50, 100, 1);
+  var ledLight3 = new _index.LEDLight(100, 100, 1);
+
+  // Create the Rover
+  var redRover = new _index.Rover(50, 25, 0, {
+    color: 0xff0000,
+    velocity: {
+      x: -2,
+      y: 0
+    }
+  });
+
+  // Create wires for each latch
+  var wire1 = new _index.Wire();
+  var wire2 = new _index.Wire();
+  contraption.addPart(redRover);
+
+  // Connect the first latch to the first and second LED lights
+  latch.connect(wire1);
+  wire1.connect(ledLight1);
+  wire1.connect(ledLight2);
+  wire1.connect(ledLight3);
+
+  // Connect the second latch to the third LED light
+  latch2.connect(wire2);
+  //wire2.connect(ledLight1);
+  //wire2.connect(ledLight2);
+  wire2.connect(ledLight3);
+
+  // Add parts to YCraft system
+  contraption.addPart(latch);
+  contraption.addPart(latch2);
+  contraption.addPart(wire1);
+  contraption.addPart(wire2);
+  contraption.addPart(ledLight1);
+  contraption.addPart(ledLight2);
+  contraption.addPart(ledLight3);
+  contraption.onAny(function (event, data) {
+    // console.log(event, data);
+  });
+
+  // Start moving the Rover
+  // Since no collision system is being used, the Rover will move through the LED lights without triggering them
+  redRover.start();
+  return contraption;
+}
+
+},{"../../../YCraft.js/index.js":1}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5123,7 +6471,7 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":41}],41:[function(require,module,exports){
+},{"./index.js":51}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5131,26 +6479,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _Home = _interopRequireDefault(require("./Home/Home.js"));
+var _Maze = _interopRequireDefault(require("./Maze/Maze.js"));
 var _Music = _interopRequireDefault(require("./Music/Music.js"));
 var _Platform = _interopRequireDefault(require("./Platform/Platform.js"));
 var _Pong = _interopRequireDefault(require("./Pong/Pong.js"));
 var _Space = _interopRequireDefault(require("./Space/Space.js"));
 var _Sutra = _interopRequireDefault(require("./Sutra/Sutra.js"));
+var _TowerDefense = _interopRequireDefault(require("./TowerDefense/TowerDefense.js"));
 var _XState = _interopRequireDefault(require("./XState/XState.js"));
 var _YCraft = _interopRequireDefault(require("./YCraft/YCraft.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var worlds = {};
 worlds.Home = _Home["default"];
+worlds.Maze = _Maze["default"];
 worlds.Music = _Music["default"];
 worlds.Platform = _Platform["default"];
 worlds.Pong = _Pong["default"];
 worlds.Space = _Space["default"];
 worlds.Sutra = _Sutra["default"];
 worlds.XState = _XState["default"];
+worlds.TowerDefense = _TowerDefense["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./Home/Home.js":25,"./Music/Music.js":29,"./Platform/Platform.js":33,"./Pong/Pong.js":34,"./Space/Space.js":35,"./Sutra/Sutra.js":36,"./XState/XState.js":37,"./YCraft/YCraft.js":38}],42:[function(require,module,exports){
+},{"./Home/Home.js":27,"./Maze/Maze.js":31,"./Music/Music.js":32,"./Platform/Platform.js":36,"./Pong/Pong.js":37,"./Space/Space.js":38,"./Sutra/Sutra.js":39,"./TowerDefense/TowerDefense.js":40,"./XState/XState.js":47,"./YCraft/YCraft.js":48}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5187,7 +6539,7 @@ const circleRoute = createCircleRoute(100, 100, 50, 20);
 */
 var _default = exports["default"] = routing;
 
-},{}],43:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5282,7 +6634,7 @@ function switchGraphics(game) {
   return rules;
 }
 
-},{}],44:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5291,11 +6643,16 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = warpToWorld;
 function warpToWorld(game) {
   var rules = game.createSutra();
-  game.on('pointerMove', function (entity) {
+
+  /*
+  // TODO: pointerMove and hold to warp with mouse
+  game.on('pointerMove', (entity) => {
     if (entity.type === 'WARP') {
-      console.log('pointerMove WARP', entity);
+      console.log('pointerMove WARP', entity)
     }
   });
+  */
+
   rules.addCondition('playerTouchedWarpZone', function (entity, gameState) {
     if (entity.type === 'COLLISION') {
       if (entity.PLAYER && entity.WARP) {
@@ -5311,5 +6668,5 @@ function warpToWorld(game) {
   return rules;
 }
 
-},{}]},{},[40])(40)
+},{}]},{},[50])(50)
 });

@@ -120,9 +120,11 @@ var EntityMovement = /*#__PURE__*/function (_Plugin) {
           this.game.use(new _DefaultMovement["default"]());
         }
       }
-      this.strategies.forEach(function (strategy) {
-        strategy.update(entityId, x, y, z); // rename to handleInputs? handleMovement?
-      });
+      if (!this.game.customMovement) {
+        this.strategies.forEach(function (strategy) {
+          strategy.update(entityId, x, y, z); // rename to handleInputs? handleMovement?
+        });
+      }
     }
   }, {
     key: "rotate",

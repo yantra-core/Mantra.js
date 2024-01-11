@@ -44,8 +44,8 @@ import plugins from '../mantra-game/plugins.js';
 // import Pong from '../mantra-worlds/Pong/Pong.js';
 
 let game = new Game({
-  height: 600 * 10,
-  width: 800 * 10,
+  height: 600 * 4,
+  width: 800 * 3,
   plugins: {},
   isClient: true,
   showLoadingScreen: true,
@@ -59,6 +59,7 @@ let game = new Game({
   physics: 'matter', // 'matter', 'physx'
   graphics: ['css'], // 'babylon', 'css', 'phaser'
   collisions: true,
+  gamepad: true,
   sutra: true,
   camera: {
     follow: true,
@@ -69,10 +70,10 @@ let game = new Game({
   deltaCompression: clientConfig.deltaCompression,
   defaultPlayer: false,
   options: {
-    scriptRoot: '.' // use local scripts instead of default yantra.gg CDN
+    scriptRoot: '.', // use local scripts instead of default yantra.gg CDN
+    assetRoot: '.', // use local assets instead of default yantra.gg CDN
   }
 });
-
 
 // game.gameConfig = TowerWorld;
 
@@ -198,8 +199,10 @@ if (mode === 'online') {
     home = new worldClass();
   }
 
-  // home = new worlds.YCraft();
+  
 
+  // home = new worlds.TowerDefense();
+  game.use(new plugins.Border());
   game.start(function () {
     // game.use(new plugins.StarField())
     //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));

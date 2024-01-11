@@ -1474,8 +1474,8 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
       // Emit trigger event and send signal
       this.emit('trigger', signal);
       this.connectedParts.forEach(function (component) {
-        if (component.receive && typeof component.receive === 'function') {
-          component.receive(signal);
+        if (component.onFn && typeof component.onFn === 'function') {
+          component.onFn(signal);
         }
       });
     }
@@ -1484,12 +1484,11 @@ var PressureSensor = exports["default"] = /*#__PURE__*/function (_Part) {
     value: function release() {
       var _this2 = this;
       this.isOn = false;
-
       // Emit release event
       this.emit('release');
       this.connectedParts.forEach(function (component) {
-        if (component.off && typeof component.off === 'function') {
-          component.off(_this2.signal);
+        if (component.offFn && typeof component.offFn === 'function') {
+          component.offFn(_this2.signal);
         }
       });
     }
@@ -1916,6 +1915,8 @@ var Wire = exports["default"] = /*#__PURE__*/function (_Part) {
     _this.segments = [];
     _this.inputs = [];
     _this.outputs = [];
+    _this.onFn = _this.receive.bind(_assertThisInitialized(_this));
+    _this.offFn = _this.stopTransmit.bind(_assertThisInitialized(_this));
     _this.mode = 'continuous'; // TODO: rename "mode", use mode for time-aware / immediate
     return _this;
   }
@@ -2522,9 +2523,14 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
       this.initContraption(contraption);
     }
   }, {
-    key: "handleCollision",
-    value: function handleCollision(pair, bodyA, bodyB) {
-      // console.log('real stone collisions check', pair, bodyA, bodyB)
+    key: "collisionActive",
+    value: function collisionActive(pair, bodyA, bodyB) {
+      // console.log("YCRAFT collisionActive", pair, bodyA, bodyB)
+    }
+  }, {
+    key: "collisionEnd",
+    value: function collisionEnd(pair, bodyA, bodyB) {
+      // console.log('YCRAFT collisionEnd', pair, bodyA, bodyB)
 
       if (bodyA.myEntityId && bodyB.myEntityId) {
         var entityIdA = bodyA.myEntityId;
@@ -2535,51 +2541,77 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
           return;
         }
-        if (entityA.yCraft) {
-          // trigger the part if possible
-          // console.log('entityA.yCraft', entityA.yCraft)
+        this.processCollisionEnd(entityA, entityB, bodyB, entityIdB);
+        this.processCollisionEnd(entityB, entityA, bodyA, entityIdA);
+      }
+    }
+  }, {
+    key: "handleCollision",
+    value: function handleCollision(pair, bodyA, bodyB) {
+      // console.log("YCRAFT handleCollision", pair, bodyA, bodyB);
+      // TODO: connect physics events for END and START
 
-          var signal = new _index.ElectricalSignal();
-          signal.data = {
-            entityId: entityIdB,
-            entity: entityB,
-            body: bodyB
-          };
-          if (entityA.yCraft.part.trigger) {
-            entityA.yCraft.part.trigger(signal);
-          }
-          if (entityA.yCraft.part.press) {
-            entityA.yCraft.part.press();
-          }
-          if (entityA.yCraft.part.detectMotion) {
-            entityA.yCraft.part.detectMotion();
-          }
-          if (entityA.yCraft.part.toggle) {
-            entityA.yCraft.part.toggle();
-          }
+      if (bodyA.myEntityId && bodyB.myEntityId) {
+        var entityIdA = bodyA.myEntityId;
+        var entityIdB = bodyB.myEntityId;
+        var entityA = this.game.entities.get(entityIdA);
+        var entityB = this.game.entities.get(entityIdB);
+        if (!entityA || !entityB) {
+          console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
+          return;
         }
-        if (entityB.yCraft) {
-          var _signal = new _index.ElectricalSignal();
-          _signal.data = {
-            entityId: entityIdA,
-            entity: entityA,
-            body: bodyA
-          };
-          // trigger the part if possible
-          // console.log('entityB.yCraft', entityB.yCraft)
-          if (entityB.yCraft.part.trigger) {
-            entityB.yCraft.part.trigger(_signal);
-          }
-          if (entityB.yCraft.part.press) {
-            entityB.yCraft.part.press();
-          }
-          if (entityB.yCraft.part.detectMotion) {
-            entityB.yCraft.part.detectMotion();
-          }
-          if (entityB.yCraft.part.toggle) {
-            entityB.yCraft.part.toggle();
-          }
+        this.processCollisionStart(entityA, entityB, bodyB, entityIdB);
+        this.processCollisionStart(entityB, entityA, bodyA, entityIdA);
+      }
+    }
+  }, {
+    key: "processCollisionStart",
+    value: function processCollisionStart(primaryEntity, secondaryEntity, secondaryBody, secondaryEntityId) {
+      if (primaryEntity.yCraft) {
+        // don't let wires trigger collision events with parts ( for now )
+        if (primaryEntity.name === 'Wire' || secondaryEntity.yCraft && secondaryEntity.name === 'Wire') {
+          return;
         }
+        var signal = new _index.ElectricalSignal();
+        signal.data = {
+          entityId: secondaryEntityId,
+          entity: secondaryEntity,
+          body: secondaryBody
+        };
+        this.triggerYCraftPart(primaryEntity.yCraft.part, signal);
+      }
+    }
+  }, {
+    key: "processCollisionEnd",
+    value: function processCollisionEnd(primaryEntity, secondaryEntity, secondaryBody, secondaryEntityId) {
+      // console.log('processCollisionEnd', primaryEntity, secondaryEntity, secondaryBody, secondaryEntityId)
+      if (primaryEntity.yCraft && !secondaryEntity.yCraft) {
+        this.releaseYCraftPart(primaryEntity.yCraft.part);
+      }
+    }
+  }, {
+    key: "releaseYCraftPart",
+    value: function releaseYCraftPart(part) {
+      console.log("RELEASE PART", part);
+      if (part.release) {
+        part.release();
+      }
+    }
+  }, {
+    key: "triggerYCraftPart",
+    value: function triggerYCraftPart(part, signal) {
+      // console.log("trigger", part, signal)
+      if (part.trigger) {
+        part.trigger(signal);
+      }
+      if (part.press) {
+        part.press();
+      }
+      if (part.detectMotion) {
+        part.detectMotion();
+      }
+      if (part.toggle) {
+        part.toggle();
       }
     }
   }, {
@@ -2626,7 +2658,7 @@ function createColorPuzzle() {
   // TODO: new Box() ?
   var button0 = new _index.Button(-100, -150, 0);
   var latch0 = new _index.Latch(-100, 0, 0);
-  var light0 = new _index.LEDLight(100, -75, 200, {
+  var light0 = new _index.LEDLight(100, -75, 10, {
     wattage: 60,
     height: 250,
     width: 250
@@ -3091,12 +3123,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = bindLatchEvents;
 // TODO: move this code into a Sutra
-
 function bindLatchEvents(part, contraption) {
   var game = this.game;
   part.on('trigger', function (signal) {
-    console.log('sssusu', signal);
-
+    // console.log("triggered", signal)
     // check to see if the signal is from matching color block
     var collidedWith = signal.data.entity;
 

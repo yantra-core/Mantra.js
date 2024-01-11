@@ -79,7 +79,6 @@ Simple configuration examples are available online and in `./examples`
 |----------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/offline/matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM)                     |
 | Matter.js + Babylon.js + `sutra`     | [Yantra](https://yantra.gg/mantra/examples/offline/sutra-level-editor.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/KKJbeva)                     |
-| Matter.js + Babylon.js + `xstate`     | [Yantra](https://yantra.gg/mantra/examples/offline/xstate-matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/wvNXRBW)                     |
 | Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/offline/matter-phaser.html)       | [CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr)                |
 | Matter.js + CSS Graphics   | [Yantra](https://yantra.gg/mantra/examples/offline/matter-css.html)                                                                                | [CodePen](https://codepen.io/Marak-Squires/pen/abXpEve)                |
 | NVIDIA PhysX 5.3.0 + Babylon.js | [Yantra](https://yantra.gg/mantra/examples/offline/physx-babylon.html)                                                                            | [CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR)                |

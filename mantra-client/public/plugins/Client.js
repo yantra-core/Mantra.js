@@ -117,10 +117,7 @@ var Client = exports["default"] = /*#__PURE__*/function () {
     value: function init(game) {
       var _this = this;
       this.game = game;
-      var preloader = new _Preloader["default"](game);
 
-      // hoist preloader to game scope
-      game.preloader = preloader;
       // Load all known client plugins
       // For now, this is just localClient and websocketClient
       // Remark: We load both of them to allow for switching of local / remote modes
@@ -132,43 +129,49 @@ var Client = exports["default"] = /*#__PURE__*/function () {
         deltaCompression: this.config.deltaCompression,
         deltaEncoding: this.config.deltaEncoding
       }));
+      if (!game.isServer) {
+        var preloader = new _Preloader["default"](game);
+        // hoist preloader to game scope
+        game.preloader = preloader;
 
-      //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
-      //game.on('assetsLoaded', () => console.log('All assets loaded!'));
+        //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
+        //game.on('assetsLoaded', () => console.log('All assets loaded!'));
 
-      // load default assets
-      for (var key in _defaultAssets["default"]) {
-        // TODO: configurable assets
+        // load default assets
+        for (var key in _defaultAssets["default"]) {
+          // TODO: configurable assets
 
-        var asset = _defaultAssets["default"][key];
-        if (typeof asset === 'string') {
-          preloader.addAsset(asset, 'image', key);
-          continue;
+          var asset = _defaultAssets["default"][key];
+          if (typeof asset === 'string') {
+            preloader.addAsset(asset, 'image', key);
+            continue;
+          }
+          if (asset.type === 'spritesheet') {
+            preloader.addAsset(asset.url, 'spritesheet', key, asset);
+            continue;
+          }
+
+          // preloader.addAsset(defaultAssets[key], 'image', key);
         }
-        if (asset.type === 'spritesheet') {
-          preloader.addAsset(asset.url, 'spritesheet', key, asset);
-          continue;
-        }
 
-        // preloader.addAsset(defaultAssets[key], 'image', key);
-      }
-
-      this.preloading = true;
-      // todo: create two preloadsers
-      // 1 for required assets to start game
-      // 2 for lazy loaded assets
-      preloader.loadAll().then(function () {
-        console.log("All assets loaded", preloader);
-        var that = _this;
-        that.preloading = false;
-        /* for dev testing
-        setTimeout(function(){
+        this.preloading = true;
+        // todo: create two preloadsers
+        // 1 for required assets to start game
+        // 2 for lazy loaded assets
+        preloader.loadAll().then(function () {
+          console.log("All assets loaded", preloader);
+          var that = _this;
           that.preloading = false;
-        }, 5000)
-        */
-        // console.log(preloader.getItem('player'))
-      });
-
+          /* for dev testing
+          setTimeout(function(){
+            that.preloading = false;
+          }, 5000)
+          */
+          // console.log(preloader.getItem('player'))
+        });
+      } else {
+        this.preloading = false;
+      }
       game.systemsManager.addSystem('client', this);
     }
   }, {
@@ -1097,6 +1100,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
     this.assets = assets;
     this.totalAssetsSize = 0;
     this.loadedAssetsSize = 0;
+    this.root = game.assetRoot;
     this.game = game;
   }
   _createClass(Preloader, [{
@@ -1178,6 +1182,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
     key: "loadImage",
     value: function () {
       var _loadImage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(asset) {
+        var _this2 = this;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
@@ -1191,7 +1196,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
                 img.onerror = function () {
                   reject("Failed to load image: ".concat(asset.url));
                 };
-                img.src = asset.url;
+                img.src = _this2.root + asset.url;
               }));
             case 1:
             case "end":

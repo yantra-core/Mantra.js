@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantra Home World</title>
+  <title>Sutra Gallery Demo</title>
   <link rel="stylesheet" href="/mantra.css">
 </head>
 
@@ -32,11 +32,9 @@
 
       // game.use('Bullet');
       game.use('Sutra');
-      game.use('Gamepad');
-      game.use('GamepadGUI');
       game.start(function () {
         game.use('Editor');
-        game.use(new WORLDS.worlds['Home']());
+        game.use(new WORLDS.worlds['Sutra']());
       });
       window.game = game;
 

@@ -5,187 +5,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-var SelectPicker = exports["default"] = /*#__PURE__*/function () {
-  function SelectPicker(selectElement, click, game) {
-    _classCallCheck(this, SelectPicker);
-    this.selectElement = selectElement;
-    this.game = game;
-    this.click = click;
-    this.modal = this.createModal();
-    this.debounceTimer = null;
-    this.addEventListeners();
-  }
-  _createClass(SelectPicker, [{
-    key: "createModal",
-    value: function createModal() {
-      var _this = this;
-      var game = this.game;
-      var modal = document.createElement('div');
-      this.applyModalStyles(modal);
-      var picker = document.createElement('ul');
-      this.applyPickerStyles(picker);
-      this.addPickerScrollEvents(picker);
-      Array.from(this.selectElement.options).forEach(function (option) {
-        var listItem = document.createElement('li');
-        _this.applyListItemStyles(listItem);
-        listItem.textContent = option.text;
-        listItem.onclick = function () {
-          _this.selectElement.value = option.value;
-          _this.click(option.value);
-          _this.hideModal();
-        };
-        picker.appendChild(listItem);
-      });
-      modal.appendChild(picker);
-      document.body.appendChild(modal);
-      return modal;
-    }
-  }, {
-    key: "addPickerScrollEvents",
-    value: function addPickerScrollEvents(picker) {
-      var isDragging = false;
-      var startY;
-      var scrollTop;
-      picker.onmousedown = function (e) {
-        isDragging = true;
-        startY = e.pageY - picker.offsetTop;
-        scrollTop = picker.scrollTop;
-        e.preventDefault();
-      };
-      picker.onmousemove = function (e) {
-        if (!isDragging) return;
-        var y = e.pageY - picker.offsetTop;
-        var scroll = y - startY;
-        picker.scrollTop = scrollTop - scroll;
-      };
-      window.onmouseup = function () {
-        isDragging = false;
-      };
-      picker.onwheel = function (e) {
-        picker.scrollTop += e.deltaY;
-        e.preventDefault();
-      };
-    }
-  }, {
-    key: "applyModalStyles",
-    value: function applyModalStyles(modal) {
-      Object.assign(modal.style, {
-        position: 'fixed',
-        width: '100%',
-        height: '100%',
-        top: '0px',
-        left: '0',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'none',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: '9001'
-      });
-    }
-  }, {
-    key: "applyPickerStyles",
-    value: function applyPickerStyles(picker) {
-      Object.assign(picker.style, {
-        position: 'relative',
-        bottom: '160px',
-        listStyle: 'none',
-        margin: '0',
-        padding: '0',
-        maxHeight: '50%',
-        overflowY: 'auto',
-        width: '80%',
-        backgroundColor: 'white',
-        borderRadius: '10px',
-        boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-      });
-    }
-  }, {
-    key: "applyListItemStyles",
-    value: function applyListItemStyles(listItem) {
-      Object.assign(listItem.style, {
-        padding: '20px',
-        cursor: 'pointer',
-        borderBottom: '1px solid #ddd',
-        fontSize: '44px',
-        textAlign: 'center',
-        backgroundColor: '#f8f8f8',
-        margin: '5px',
-        borderRadius: '8px',
-        transition: 'background-color 0.3s'
-      });
-      listItem.onmouseover = function () {
-        return listItem.style.backgroundColor = '#e8e8e8';
-      };
-      listItem.onmouseout = function () {
-        return listItem.style.backgroundColor = '#f8f8f8';
-      };
-    }
-  }, {
-    key: "addEventListeners",
-    value: function addEventListeners() {
-      var _this2 = this;
-      this.selectElement.addEventListener('focus', function () {
-        return _this2.showModal();
-      });
-      this.selectElement.addEventListener('click', function () {
-        return _this2.showModal();
-      });
-      this.selectElement.addEventListener('click', function (e) {
-        return e.stopPropagation();
-      });
-      window.addEventListener('click', function (e) {
-        if (e.target === _this2.modal) {
-          _this2.hideModal();
-        }
-      });
-    }
-  }, {
-    key: "toggle",
-    value: function toggle() {
-      var _this3 = this;
-      this.debounce(function () {
-        if (_this3.showingModal) {
-          _this3.hideModal();
-        } else {
-          _this3.showModal();
-        }
-      }, 300); // 300ms debounce time
-    }
-  }, {
-    key: "debounce",
-    value: function debounce(func, delay) {
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = setTimeout(func, delay);
-    }
-  }, {
-    key: "showModal",
-    value: function showModal() {
-      this.showingModal = true;
-      this.modal.style.display = 'flex';
-    }
-  }, {
-    key: "hideModal",
-    value: function hideModal() {
-      this.showingModal = false;
-      this.modal.style.display = 'none';
-    }
-  }]);
-  return SelectPicker;
-}();
-
-},{}],2:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
 var _createToolbar = _interopRequireDefault(require("./lib/createToolbar.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -506,14 +325,14 @@ _defineProperty(Editor, "id", 'gui-editor');
 _defineProperty(Editor, "async", true);
 var _default = exports["default"] = Editor;
 
-},{"./lib/createToolbar.js":6}],3:[function(require,module,exports){
+},{"./lib/createToolbar.js":6}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-var _SelectPicker = _interopRequireDefault(require("../../graphics-css/lib/SelectPicker.js"));
+var _SelectPicker = _interopRequireDefault(require("./SelectPicker.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -658,7 +477,188 @@ var GraphicsSelector = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = GraphicsSelector;
 
-},{"../../graphics-css/lib/SelectPicker.js":1}],4:[function(require,module,exports){
+},{"./SelectPicker.js":3}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var SelectPicker = exports["default"] = /*#__PURE__*/function () {
+  function SelectPicker(selectElement, click, game) {
+    _classCallCheck(this, SelectPicker);
+    this.selectElement = selectElement;
+    this.game = game;
+    this.click = click;
+    this.modal = this.createModal();
+    this.debounceTimer = null;
+    this.addEventListeners();
+  }
+  _createClass(SelectPicker, [{
+    key: "createModal",
+    value: function createModal() {
+      var _this = this;
+      var game = this.game;
+      var modal = document.createElement('div');
+      this.applyModalStyles(modal);
+      var picker = document.createElement('ul');
+      this.applyPickerStyles(picker);
+      this.addPickerScrollEvents(picker);
+      Array.from(this.selectElement.options).forEach(function (option) {
+        var listItem = document.createElement('li');
+        _this.applyListItemStyles(listItem);
+        listItem.textContent = option.text;
+        listItem.onclick = function () {
+          _this.selectElement.value = option.value;
+          _this.click(option.value);
+          _this.hideModal();
+        };
+        picker.appendChild(listItem);
+      });
+      modal.appendChild(picker);
+      document.body.appendChild(modal);
+      return modal;
+    }
+  }, {
+    key: "addPickerScrollEvents",
+    value: function addPickerScrollEvents(picker) {
+      var isDragging = false;
+      var startY;
+      var scrollTop;
+      picker.onmousedown = function (e) {
+        isDragging = true;
+        startY = e.pageY - picker.offsetTop;
+        scrollTop = picker.scrollTop;
+        e.preventDefault();
+      };
+      picker.onmousemove = function (e) {
+        if (!isDragging) return;
+        var y = e.pageY - picker.offsetTop;
+        var scroll = y - startY;
+        picker.scrollTop = scrollTop - scroll;
+      };
+      window.onmouseup = function () {
+        isDragging = false;
+      };
+      picker.onwheel = function (e) {
+        picker.scrollTop += e.deltaY;
+        e.preventDefault();
+      };
+    }
+  }, {
+    key: "applyModalStyles",
+    value: function applyModalStyles(modal) {
+      Object.assign(modal.style, {
+        position: 'fixed',
+        width: '100%',
+        height: '100%',
+        top: '0px',
+        left: '0',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'none',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: '9001'
+      });
+    }
+  }, {
+    key: "applyPickerStyles",
+    value: function applyPickerStyles(picker) {
+      Object.assign(picker.style, {
+        position: 'relative',
+        bottom: '160px',
+        listStyle: 'none',
+        margin: '0',
+        padding: '0',
+        maxHeight: '50%',
+        overflowY: 'auto',
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+      });
+    }
+  }, {
+    key: "applyListItemStyles",
+    value: function applyListItemStyles(listItem) {
+      Object.assign(listItem.style, {
+        padding: '20px',
+        cursor: 'pointer',
+        borderBottom: '1px solid #ddd',
+        fontSize: '44px',
+        textAlign: 'center',
+        backgroundColor: '#f8f8f8',
+        margin: '5px',
+        borderRadius: '8px',
+        transition: 'background-color 0.3s'
+      });
+      listItem.onmouseover = function () {
+        return listItem.style.backgroundColor = '#e8e8e8';
+      };
+      listItem.onmouseout = function () {
+        return listItem.style.backgroundColor = '#f8f8f8';
+      };
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      var _this2 = this;
+      this.selectElement.addEventListener('focus', function () {
+        return _this2.showModal();
+      });
+      this.selectElement.addEventListener('click', function () {
+        return _this2.showModal();
+      });
+      this.selectElement.addEventListener('click', function (e) {
+        return e.stopPropagation();
+      });
+      window.addEventListener('click', function (e) {
+        if (e.target === _this2.modal) {
+          _this2.hideModal();
+        }
+      });
+    }
+  }, {
+    key: "toggle",
+    value: function toggle() {
+      var _this3 = this;
+      this.debounce(function () {
+        if (_this3.showingModal) {
+          _this3.hideModal();
+        } else {
+          _this3.showModal();
+        }
+      }, 300); // 300ms debounce time
+    }
+  }, {
+    key: "debounce",
+    value: function debounce(func, delay) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(func, delay);
+    }
+  }, {
+    key: "showModal",
+    value: function showModal() {
+      this.showingModal = true;
+      this.modal.style.display = 'flex';
+    }
+  }, {
+    key: "hideModal",
+    value: function hideModal() {
+      this.showingModal = false;
+      this.modal.style.display = 'none';
+    }
+  }]);
+  return SelectPicker;
+}();
+
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -926,7 +926,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-var _SelectPicker = _interopRequireDefault(require("../../graphics-css/lib/SelectPicker.js"));
+var _SelectPicker = _interopRequireDefault(require("./SelectPicker.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -961,6 +961,8 @@ var WorldSelector = /*#__PURE__*/function () {
       // adds a choose your world option
       this.addOption(selectBox, 'Choose Your World', 'Choose');
       this.addOption(selectBox, 'Home World', 'Home');
+      // this.addOption(selectBox, 'Maze World', 'Maze');
+
       this.addOption(selectBox, 'Platform World', 'Platform');
       this.addOption(selectBox, 'Music World', 'Music');
 
@@ -972,7 +974,7 @@ var WorldSelector = /*#__PURE__*/function () {
 
       this.addOption(selectBox, 'YCraft World', 'YCraft');
       this.addOption(selectBox, 'Sutra World', 'Sutra');
-      this.addOption(selectBox, 'XState World', 'XState');
+      // this.addOption(selectBox, 'XState World', 'XState');
 
       // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
       return selectBox;
@@ -1086,7 +1088,7 @@ var WorldSelector = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = WorldSelector;
 
-},{"../../graphics-css/lib/SelectPicker.js":1}],6:[function(require,module,exports){
+},{"./SelectPicker.js":3}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1276,5 +1278,5 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"./GraphicsSelector.js":3,"./ToolbarMenu.js":4,"./WorldSelector.js":5}]},{},[2])(2)
+},{"./GraphicsSelector.js":2,"./ToolbarMenu.js":4,"./WorldSelector.js":5}]},{},[1])(1)
 });

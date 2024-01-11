@@ -31,12 +31,15 @@ var Border = /*#__PURE__*/function () {
         y: 0
       } : _ref$position,
       _ref$thickness = _ref.thickness,
-      thickness = _ref$thickness === void 0 ? 200 : _ref$thickness;
+      thickness = _ref$thickness === void 0 ? 200 : _ref$thickness,
+      _ref$health = _ref.health,
+      health = _ref$health === void 0 ? 100 : _ref$health;
     _classCallCheck(this, Border);
     this.id = Border.id;
     this.position = position;
     this.autoBorder = autoBorder;
     this.thickness = thickness;
+    this.health = health;
   }
   _createClass(Border, [{
     key: "init",
@@ -54,7 +57,8 @@ var Border = /*#__PURE__*/function () {
           position: {
             x: this.position.x,
             y: this.position.y
-          }
+          },
+          health: this.health
         });
       }
     }
@@ -125,7 +129,8 @@ var Border = /*#__PURE__*/function () {
           },
           width: border.size.width,
           height: border.size.height,
-          depth: 80
+          depth: 80,
+          health: entityData.health || 100
         });
       }
     }

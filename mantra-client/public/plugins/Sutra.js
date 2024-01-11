@@ -51,6 +51,9 @@ var Sutra = /*#__PURE__*/function () {
             game.data.input = this.inputCache;
           }
         }
+
+        // TODO: Remove this init, it should be a check and throw
+        // camera init is handled in Graphics.js and Camera system
         game.data.camera = game.data.camera || {};
         game.data.camera.position = game.data.camera.position || {
           x: 0,

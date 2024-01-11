@@ -106,16 +106,16 @@ var CSSCamera = /*#__PURE__*/function () {
       var _this = this;
       this.game = game;
       this.resetCameraState();
-
-      //game.rotateCamera = this.rotateCamera.bind(this);
       game.rotateCamera = this.rotateCameraOverTime.bind(this);
       // sets auto-follow player when starting CSSGraphics ( for now )
       this.follow = true;
       this.game.systemsManager.addSystem('graphics-css-camera', this);
       this.gameViewport = document.getElementById('gameHolder');
       var windowHeight = window.innerHeight;
-      game.viewportCenterXOffset = 0;
-      game.viewportCenterYOffset = -windowHeight / 2;
+      console.log('game.viewportCenterYOffset', game.viewportCenterYOffset);
+      this.scene.cameraPosition.x = 0 - game.viewportCenterXOffset;
+      this.scene.cameraPosition.y = 0 - game.viewportCenterYOffset;
+
       //game.viewportCenterYOffset = 0;
       this.initZoomControls();
       game.viewportCenterYOffset = -windowHeight / 2;
@@ -305,26 +305,13 @@ var CSSCamera = /*#__PURE__*/function () {
       // Get browser window dimensions
       var windowHeight = window.innerHeight;
 
-      // Define the adjustment value and scale factor
-      //console.log('adjustment', adjustment);
-      // TODO: use pixelAdjustment based on zoom scale
-
-      var scaleFactor = 1 / currentZoom;
-      var adjustment = -400; // TODO: this should be window height or something similar
-      adjustment = -windowHeight / 2 + 350;
-      var pixelAdjustment = adjustment * scaleFactor;
-      // game.viewportCenterYOffset = -windowHeight / 2;
       // Update the camera position
       if (this.follow && currentPlayer && currentPlayer.position) {
         // If following a player, adjust the camera position based on the player's position and the calculated offset
-
         this.scene.cameraPosition.x = currentPlayer.position.x - game.viewportCenterXOffset;
         var newY = currentPlayer.position.y - game.viewportCenterYOffset;
-        //this.scene.cameraPosition.y = newY;
-        //this.scene.cameraPosition.y = newY;
-        // locks camera to not exceed bottom of screen for platformer mode
-        // console.log('game.data.camera.mode', game.data.camera.mode, newY, windowHeight, windowHeight * 0.38)
         if (game.data.camera.mode === 'platformer') {
+          // locks camera to not exceed bottom of screen for platformer mode
           if (newY < windowHeight * 0.35) {
             this.scene.cameraPosition.y = newY;
           } else {
@@ -339,6 +326,12 @@ var CSSCamera = /*#__PURE__*/function () {
         this.scene.cameraPosition.x = game.viewportCenterXOffset;
         this.scene.cameraPosition.y = game.viewportCenterYOffset;
       }
+
+      // TODO adjust camera position based on current zoom level
+      // coordinate system is both positive and negative, so we need to adjust for that
+      // larger scale means smaller numbers
+      // this.scene.cameraPosition.y  = this.scene.cameraPosition.y / currentZoom;
+      // console.log(game.data.camera.currentZoom)
 
       // Update the camera's position in the game data
       this.game.data.camera.position = this.scene.cameraPosition;
@@ -372,19 +365,17 @@ var _CSSCamera = _interopRequireDefault(require("./CSSCamera.js"));
 var _inflateBox = _interopRequireDefault(require("./lib/inflateBox.js"));
 var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
 var _inflateEntity = _interopRequireDefault(require("./lib/inflateEntity.js"));
+var _createGraphic = _interopRequireDefault(require("./lib/createGraphic.js"));
 var _setTransform = _interopRequireDefault(require("./lib/setTransform.js"));
 var _updateGraphic = _interopRequireDefault(require("./lib/updateGraphic.js"));
 var _updateEntityPosition = _interopRequireDefault(require("./lib/updateEntityPosition.js"));
 var _mouseWheelZoom = _interopRequireDefault(require("./lib/mouseWheelZoom.js"));
+var _unload = _interopRequireDefault(require("./lib/unload.js"));
+var _zoom = _interopRequireDefault(require("./lib/zoom.js"));
+var _render = _interopRequireDefault(require("./lib/render.js"));
+var _removeGraphic = _interopRequireDefault(require("./lib/removeGraphic.js"));
 var _handleInputs = _interopRequireDefault(require("../graphics/lib/handleInputs.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -408,18 +399,18 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       camera = _ref.camera;
     _classCallCheck(this, CSSGraphics);
     _this = _super.call(this);
+
+    // legacy API, remove in future
     if (typeof camera === 'string') {
-      // legacy API, remove in future
       camera = {
         follow: true
       };
     }
 
-    // config scope for convenience
-    var config = {
+    // Config scope for convenience
+    _this.config = {
       camera: camera
     };
-    _this.config = config;
     _this.id = CSSGraphics.id;
     _this.cameraPosition = {
       x: 0,
@@ -427,6 +418,9 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     };
     // this.game.data.camera.position = this.cameraPosition;
     _this.mouseWheelEnabled = false;
+
+    // Binding methods to `this`
+    _this.createGraphic = _createGraphic["default"].bind(_assertThisInitialized(_this));
     _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
     _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
     _this.inflateEntity = _inflateEntity["default"].bind(_assertThisInitialized(_this));
@@ -434,29 +428,29 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.updateEntityPosition = _updateEntityPosition["default"].bind(_assertThisInitialized(_this));
     _this.handleInputs = _handleInputs["default"].bind(_assertThisInitialized(_this));
+    _this.render = _render["default"].bind(_assertThisInitialized(_this));
+    _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
+    _this.mouseWheelZoom = _mouseWheelZoom["default"].bind(_assertThisInitialized(_this));
+    _this.unload = _unload["default"].bind(_assertThisInitialized(_this));
+    _this.zoom = _zoom["default"].bind(_assertThisInitialized(_this));
 
     // TODO: make this function lookup with defaults ( instead of -1 )
     _this.depthChart = ['background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER', 'BLOCK', 'FIRE', 'WARP', 'NOTE'];
-
     // this.depthChart = this.depthChart.reverse();
-    _this.mouseWheelZoom = _mouseWheelZoom["default"].bind(_assertThisInitialized(_this));
     return _this;
   }
   _createClass(CSSGraphics, [{
     key: "init",
     value: function init(game) {
+      var _this2 = this;
       this.game = game;
       game.setZoom = this.zoom.bind(this);
       var cssCamera = new _CSSCamera["default"](this, this.camera);
+      var windowHeight = window.innerHeight;
       this.game.use(cssCamera);
-
-      // let the graphics pipeline know the document is ready ( we could add document event listener here )
-      // Remark: CSSGraphics current requires no async external loading scripts
 
       // Initialize the CSS render div
       this.initCSSRenderDiv();
-
-      // register renderer with graphics pipeline
       game.graphics.push(this);
       this.game.systemsManager.addSystem('graphics-css', this);
 
@@ -465,25 +459,21 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
       // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
-      this.zoom(4.5);
-      game.on('game::ready', function () {});
-      // 
-      // this.zoom(game.data.camera.currentZoom);
-      // this.zoom(game.data.camera.currentZoom);
+      this.game.viewportCenterXOffset = 0;
+      this.game.viewportCenterYOffset = -windowHeight / 2;
+      game.on('game::ready', function () {
+        _this2.zoom(4.5); // game.data.camera.currentZoom
+      });
     }
   }, {
     key: "initCSSRenderDiv",
     value: function initCSSRenderDiv() {
-      // Ensure the gameHolder div exists
-      // Remark: This is handled by `Graphics.js`; however in async loading with no priority
-      // It is currently possible that CSSGraphics will load before Graphics does, so we need this check
       var gameHolder = document.getElementById('gameHolder');
       if (!gameHolder) {
         gameHolder = document.createElement('div');
         gameHolder.id = 'gameHolder';
-        document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+        document.body.appendChild(gameHolder);
       }
-
       var renderDiv = document.getElementById('css-render-div');
       if (!renderDiv) {
         renderDiv = document.createElement('div');
@@ -494,259 +484,9 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.renderDiv = renderDiv;
     }
   }, {
-    key: "createGraphic",
-    value: function createGraphic(entityData) {
-      if (entityData.destroyed === true) {
-        // ignore, shouldn't have made it here, check upstream as well
-        return;
-      }
-      var entityElement = document.createElement('div');
-      entityElement.id = "entity-".concat(entityData.id);
-
-      // set data-id to entity id
-      entityElement.setAttribute('mantra-id', entityData.id);
-      entityElement.className = 'entity-element';
-      entityElement.style.position = 'absolute';
-      if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
-        if (_typeof(entityData.rotation) === 'object') {
-          // transform 3d to 2.5d
-          entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
-        } else {
-          entityData.rotation = entityData.rotation;
-        }
-      }
-      switch (entityData.type) {
-        case 'BULLET':
-          // For BULLET entities, create a circle
-          var radius = entityData.radius || 0;
-          entityElement.style.width = entityData.radius + 'px';
-          entityElement.style.height = entityData.radius + 'px';
-          // console.log('inflating bullet', entityData)
-          //entityElement.style.width = entityData.width + 'px';
-          //entityElement.style.height = entityData.height + 'px';
-          //entityElement.style.width = (radius / 2) + 'px';
-          //entityElement.style.height = (radius / 2) + 'px';
-          //entityElement.style.borderRadius = '50%';  // This will make the div a circle
-          //entityElement.style.background = 'red';
-          this.inflateBox(entityElement, entityData);
-          break;
-        case 'PLAYER':
-          // For PLAYER entities, create a triangle
-          entityElement.style.width = entityData.width + 'px';
-          entityElement.style.height = entityData.height + 'px';
-          //entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
-          //entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
-          //entityElement.style.borderBottom = entityData.height + 'px solid green';
-          // entityElement.classList.add('pixelart-to-css');
-
-          // Set default sprite
-          // entityElement.classList.add('guy-right-0');
-          this.inflateBox(entityElement, entityData);
-          break;
-        case 'TEXT':
-          entityElement = this.inflateText(entityElement, entityData);
-          break;
-        default:
-          if (entityData.type === 'PART' && entityData.name === 'Display') {
-            this.inflateText(entityElement, entityData);
-          } else {
-            this.inflateBox(entityElement, entityData);
-          }
-          break;
-      }
-      this.renderDiv.appendChild(entityElement);
-
-      // Update the position of the entity element
-      this.updateEntityPosition(entityElement, entityData);
-      return entityElement;
-    }
-  }, {
-    key: "removeGraphic",
-    value: function removeGraphic(entityId) {
-      var entity = this.game.getEntity(entityId);
-      if (!entity || !entity.graphics || !entity.graphics['graphics-css']) {
-        return;
-      }
-      var renderDiv = document.getElementById('css-render-div');
-      if (renderDiv && renderDiv.contains(entity.graphics['graphics-css'])) {
-        entity.graphics['graphics-css'].remove();
-      }
-    }
-  }, {
     key: "update",
     value: function update() {
-      var game = this.game;
-
-      /*
-      if (typeof game.viewportCenterXOffset === 'undefined') {
-        game.viewportCenterXOffset = 0;
-      }
-       if (typeof game.viewportCenterYOffset === 'undefined') {
-        game.viewportCenterYOffset = 0;
-      }
-       const currentPlayer = this.game.getEntity(game.currentPlayerId);
-      let entityId = game.currentPlayerId;
-      */
-
-      // PLAYER MOUSE MOVEMENT CODE< TODO MOVE THIS TO SEPARATE FILE
-      /*
-      if (currentPlayer && currentPlayer.inputs && currentPlayer.inputs.mouse && currentPlayer.inputs.mouse.buttons.LEFT) {
-        let data = currentPlayer.inputs;
-        // Player's current position
-        const playerX = currentPlayer.position.x;
-        const playerY = currentPlayer.position.y;
-         // Get mouse position
-        const mouseX = data.mouse.position.x;
-        const mouseY = data.mouse.position.y;
-         // Calculate direction vector
-        let dirX = mouseX - playerX;
-        let dirY = mouseY - playerY;
-         // Calculate the angle in radians
-        const angle = Math.atan2(dirY, dirX);
-         // Define the fixed directions (in radians)
-        const directions = {
-          UP: -Math.PI / 2,
-          DOWN: Math.PI / 2,
-          LEFT: Math.PI,
-          RIGHT: 0,
-          //UP_LEFT: -3 * Math.PI / 4,
-          //UP_RIGHT: -Math.PI / 4,
-          //DOWN_LEFT: 3 * Math.PI / 4,
-          //DOWN_RIGHT: Math.PI / 4
-        };
-         // Find the closest direction
-        let closestDirection = Object.keys(directions).reduce((prev, curr) => {
-          if (Math.abs(angle - directions[curr]) < Math.abs(angle - directions[prev])) {
-            return curr;
-          }
-          return prev;
-        });
-         // Set direction vector based on the closest fixed direction
-        switch (closestDirection) {
-          case 'UP':
-            dirX = 0;
-            dirY = -1;
-            break;
-          case 'DOWN':
-            dirX = 0;
-            dirY = 1;
-            break;
-          case 'LEFT':
-            dirX = -1;
-            dirY = 0;
-            break;
-          case 'RIGHT':
-            dirX = 1;
-            dirY = 0;
-            break;
-          case 'UP_LEFT':
-            dirX = -1;
-            dirY = -1;
-            break;
-          case 'UP_RIGHT':
-            dirX = 1;
-            dirY = -1;
-            break;
-          case 'DOWN_LEFT':
-            dirX = -1;
-            dirY = 1;
-            break;
-          case 'DOWN_RIGHT':
-            dirX = 1;
-            dirY = 1;
-            break;
-        }
-        // console.log("entityIdentityId", entityId, data);
-         // Apply the direction vector as force or movement
-        game.applyForce(entityId, { x: dirX, y: dirY });
-       }
-      */
-    }
-  }, {
-    key: "render",
-    value: function render(game, alpha) {
-      // render is called at the browser's frame rate (typically 60fps)
-      var self = this;
-      if (this.game.changedEntities.size > 0) {
-        // console.log('CHANGED', this.game.changedEntities)
-      }
-      // console.log('rendering', this.game.entities.size, 'entities')
-      // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
-      // This is not ideal and will yield low-entity count CSSGraphics performance
-      // Best to remove camera follow for CSSGraphics if possible
-      var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var _step$value = _slicedToArray(_step.value, 2),
-            eId = _step$value[0],
-            state = _step$value[1];
-          var ent = this.game.entities.get(eId);
-          // console.log('rendering', ent)
-          // do not re-inflate destroyed entities
-          if (ent.destroyed !== true) {
-            this.inflateEntity(ent, alpha);
-          }
-          // this.game.changedEntities.delete(eId);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    }
-  }, {
-    key: "unload",
-    value: function unload() {
-      var _this2 = this;
-      // Reset Zoom
-      this.zoom(1);
-
-      // TODO: consolidate graphics pipeline unloading into SystemsManager
-      // TODO: remove duplicated unload() code in BabylonGraphics
-      this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this2.id;
-      });
-      delete this.game._plugins['CSSGraphics'];
-
-      // remove the wheel event listener
-      // document.removeEventListener('wheel', this.cssMouseWheelZoom);
-      this.mouseWheelEnabled = false;
-
-      // iterate through all entities and remove existing css graphics
-      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
-        _step2;
-      try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _step2$value = _slicedToArray(_step2.value, 2),
-            eId = _step2$value[0],
-            entity = _step2$value[1];
-          if (entity.graphics && entity.graphics['graphics-css']) {
-            this.removeGraphic(eId);
-            delete entity.graphics['graphics-css'];
-          }
-        }
-      } catch (err) {
-        _iterator2.e(err);
-      } finally {
-        _iterator2.f();
-      }
-      var div = document.getElementById('css-render-canvas');
-      if (div) {
-        div.remove();
-      }
-    }
-  }, {
-    key: "zoom",
-    value: function zoom(scale) {
-      // console.log("CSSGraphics zoom", scale)
-      this.game.data.camera.currentZoom = scale;
-      var gameViewport = document.getElementById('gameHolder');
-      if (gameViewport) {
-        gameViewport.style.transform = "scale(".concat(scale, ")");
-      } else {
-        console.log('Warning: could not find gameHolder div, cannot zoom');
-      }
+      // Update logic goes here
     }
   }]);
   return CSSGraphics;
@@ -755,7 +495,81 @@ _defineProperty(CSSGraphics, "id", 'graphics-css');
 _defineProperty(CSSGraphics, "removable", false);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":11,"./CSSCamera.js":2,"./lib/inflateBox.js":4,"./lib/inflateEntity.js":5,"./lib/inflateText.js":6,"./lib/mouseWheelZoom.js":7,"./lib/setTransform.js":8,"./lib/updateEntityPosition.js":9,"./lib/updateGraphic.js":10}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":16,"./CSSCamera.js":2,"./lib/createGraphic.js":4,"./lib/inflateBox.js":5,"./lib/inflateEntity.js":6,"./lib/inflateText.js":7,"./lib/mouseWheelZoom.js":8,"./lib/removeGraphic.js":9,"./lib/render.js":10,"./lib/setTransform.js":11,"./lib/unload.js":12,"./lib/updateEntityPosition.js":13,"./lib/updateGraphic.js":14,"./lib/zoom.js":15}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createGraphic;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function createGraphic(entityData) {
+  if (entityData.destroyed === true) {
+    // ignore, shouldn't have made it here, check upstream as well
+    return;
+  }
+  var entityElement = document.createElement('div');
+  entityElement.id = "entity-".concat(entityData.id);
+
+  // set data-id to entity id
+  entityElement.setAttribute('mantra-id', entityData.id);
+  entityElement.className = 'entity-element';
+  entityElement.style.position = 'absolute';
+  if (typeof entityData.rotation !== 'undefined' && entityData.rotation !== null) {
+    if (_typeof(entityData.rotation) === 'object') {
+      // transform 3d to 2.5d
+      entityData.rotation = entityData.rotation.x; // might not be best to mutate entityData
+    } else {
+      entityData.rotation = entityData.rotation;
+    }
+  }
+  switch (entityData.type) {
+    case 'BULLET':
+      // For BULLET entities, create a circle
+      var radius = entityData.radius || 0;
+      entityElement.style.width = entityData.radius + 'px';
+      entityElement.style.height = entityData.radius + 'px';
+      // console.log('inflating bullet', entityData)
+      //entityElement.style.width = entityData.width + 'px';
+      //entityElement.style.height = entityData.height + 'px';
+      //entityElement.style.width = (radius / 2) + 'px';
+      //entityElement.style.height = (radius / 2) + 'px';
+      //entityElement.style.borderRadius = '50%';  // This will make the div a circle
+      //entityElement.style.background = 'red';
+      this.inflateBox(entityElement, entityData);
+      break;
+    case 'PLAYER':
+      // For PLAYER entities, create a triangle
+      entityElement.style.width = entityData.width + 'px';
+      entityElement.style.height = entityData.height + 'px';
+      //entityElement.style.borderLeft = entityData.width / 2 + 'px solid white';
+      //entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
+      //entityElement.style.borderBottom = entityData.height + 'px solid green';
+      // entityElement.classList.add('pixelart-to-css');
+
+      // Set default sprite
+      // entityElement.classList.add('guy-right-0');
+      this.inflateBox(entityElement, entityData);
+      break;
+    case 'TEXT':
+      entityElement = this.inflateText(entityElement, entityData);
+      break;
+    default:
+      if (entityData.type === 'PART' && entityData.name === 'Display') {
+        this.inflateText(entityElement, entityData);
+      } else {
+        this.inflateBox(entityElement, entityData);
+      }
+      break;
+  }
+  this.renderDiv.appendChild(entityElement);
+
+  // Update the position of the entity element
+  this.updateEntityPosition(entityElement, entityData);
+  return entityElement;
+}
+
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -782,7 +596,8 @@ function inflateBox(entityElement, entityData) {
     entityElement.style.width = entityData.width + 'px';
     entityElement.style.height = entityData.height + 'px';
   }
-  entityElement.style.borderRadius = '10px'; // Optional: to make it rounded
+
+  // entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
@@ -1000,7 +815,7 @@ function tileFlip(entityElement, hexColor, getTexture, entityData) {
   });
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1018,7 +833,7 @@ function inflateEntity(entity, alpha) {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1076,7 +891,7 @@ function inflateText(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1125,7 +940,71 @@ function cssMouseWheelZoom(event) {
   this.zoom(newScale);
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = removeGraphic;
+function removeGraphic(entityId) {
+  var entity = this.game.getEntity(entityId);
+  if (!entity || !entity.graphics || !entity.graphics['graphics-css']) {
+    return;
+  }
+  var renderDiv = document.getElementById('css-render-div');
+  if (renderDiv && renderDiv.contains(entity.graphics['graphics-css'])) {
+    entity.graphics['graphics-css'].remove();
+  }
+}
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = render;
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function render(game, alpha) {
+  // render is called at the browser's frame rate (typically 60fps)
+  var self = this;
+  if (this.game.changedEntities.size > 0) {
+    // console.log('CHANGED', this.game.changedEntities)
+  }
+  // console.log('rendering', this.game.entities.size, 'entities')
+  // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
+  // This is not ideal and will yield low-entity count CSSGraphics performance
+  // Best to remove camera follow for CSSGraphics if possible
+  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _step$value = _slicedToArray(_step.value, 2),
+        eId = _step$value[0],
+        state = _step$value[1];
+      var ent = this.game.entities.get(eId);
+      // console.log('rendering', ent)
+      // do not re-inflate destroyed entities
+      if (ent.destroyed !== true) {
+        this.inflateEntity(ent, alpha);
+      }
+      // this.game.changedEntities.delete(eId);
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+}
+
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1166,7 +1045,61 @@ function truncateToPrecision(value, precision) {
   return Math.round(value * factor) / factor;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = unload;
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function unload() {
+  var _this = this;
+  // Reset Zoom
+  this.zoom(1);
+
+  // TODO: consolidate graphics pipeline unloading into SystemsManager
+  // TODO: remove duplicated unload() code in BabylonGraphics
+  this.game.graphics = this.game.graphics.filter(function (g) {
+    return g.id !== _this.id;
+  });
+  delete this.game._plugins['CSSGraphics'];
+
+  // remove the wheel event listener
+  // document.removeEventListener('wheel', this.cssMouseWheelZoom);
+  this.mouseWheelEnabled = false;
+
+  // iterate through all entities and remove existing css graphics
+  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _step$value = _slicedToArray(_step.value, 2),
+        eId = _step$value[0],
+        entity = _step$value[1];
+      if (entity.graphics && entity.graphics['graphics-css']) {
+        this.removeGraphic(eId);
+        delete entity.graphics['graphics-css'];
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  var div = document.getElementById('css-render-canvas');
+  if (div) {
+    div.remove();
+  }
+}
+
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1196,6 +1129,14 @@ function updateEntityPosition(entityElement, entityData) {
   var domX = adjustedPosition.x - width / 2;
   var domY = adjustedPosition.y - height / 2;
 
+  /*
+  if (entityData.type === 'BACKGROUND') {
+    // set origin to bottom left
+    domX += entityData.width / 2;
+    domY -= entityData.height / 2;
+  }
+  */
+
   // console.log(position, adjustedPosition, domX, domY)
 
   // convert rotation to degrees
@@ -1207,7 +1148,7 @@ function updateEntityPosition(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1321,7 +1262,30 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = zoom;
+function zoom(scale) {
+  var transitionTime = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '0s';
+  // console.log("CSSGraphics zoom", scale)
+  this.game.data.camera.currentZoom = scale;
+  var gameViewport = document.getElementById('gameHolder');
+  if (gameViewport) {
+    // Set transition time
+    gameViewport.style.transition = "transform ".concat(transitionTime);
+
+    // Apply scale transform
+    gameViewport.style.transform = "scale(".concat(scale, ")");
+  } else {
+    console.log('Warning: could not find gameHolder div, cannot zoom');
+  }
+}
+
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

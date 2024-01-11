@@ -13,9 +13,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // Tile.js - Marak Squires 2023
-// Implements support for Tiled JSON maps via the Tiled JSON format
-// see: https://doc.mapeditor.org/en/stable/reference/json-map-format/
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var tilemap = {
   1: 'block',
   2: 'grass',
@@ -24,136 +22,88 @@ var tilemap = {
 var Tile = /*#__PURE__*/function () {
   function Tile(game) {
     _classCallCheck(this, Tile);
-    this.game = game; // Store the reference to the game logic
+    this.game = game;
     this.id = Tile.id;
   }
   _createClass(Tile, [{
     key: "init",
     value: function init(game) {
+      var _this = this;
       this.game = game;
-
-      // console.log('Tile.init()');
-      var defaultTileSet = _defaultOrthogonalMap["default"];
-      var that = this;
       setTimeout(function () {
-        that.createTileMapFromTiledJSON(defaultTileSet);
+        return _this.createTileMapFromTiledJSON(_defaultOrthogonalMap["default"]);
       }, 222);
     }
   }, {
     key: "createTileMapFromTiledJSON",
     value: function createTileMapFromTiledJSON(tiledJSON) {
-      var _this = this;
-      // Assuming the JSON data is already parsed into a JavaScript object
-      var mapData = tiledJSON;
-
-      // Create a container for the map
-      var mapContainer = document.createElement('div');
-      mapContainer.style.position = 'relative';
-      mapContainer.style.width = mapData.width * mapData.tilewidth + 'px';
-      mapContainer.style.height = mapData.height * mapData.tileheight + 'px';
-
-      // Process each layer
-      mapData.layers.forEach(function (layer) {
-        // Only process if it's a tile layer
+      var _this2 = this;
+      tiledJSON.layers.forEach(function (layer) {
         if (layer.type === 'tilelayer') {
-          _this.createLayer(mapContainer, layer, mapData.tilewidth, mapData.tileheight);
+          _this2.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
         }
       });
-
-      // Append the map container to the body or a specific element
-      document.body.appendChild(mapContainer);
     }
   }, {
     key: "createLayer",
-    value: function createLayer(container, layer, tileWidth, tileHeight) {
-      var _this2 = this;
+    value: function createLayer(layer, tileWidth, tileHeight) {
+      var _this3 = this;
       layer.data.forEach(function (tileId, index) {
-        if (tileId !== 0 && tileId !== 2) {
-          // for now
-          var scale = 1;
-          scale = 1;
-          // console.log('cccc', tileId, index)
-
-          var x = index % layer.width * tileWidth;
-          var y = Math.floor(index / layer.width) * tileHeight;
-          var z = -10;
-
-          // these x y assume 0,0, shift the coords to center since map goes negative
-          x = x - layer.width * tileWidth / 2;
-          y = y - layer.height * tileHeight / 2;
-          var height = tileHeight;
-          var width = tileWidth;
-
-          // apply scale
-          x = x * scale;
-          y = y * scale;
-          height = height * scale;
-          width = width * scale;
-          var body = false;
-          var isStatic = true;
-          var mass = 1;
-          z = -1;
-          if (tileId === 1) {
-            body = true;
-            mass = 5000;
-            isStatic = false;
-            z = 0;
-          }
-
-          // console.log("placing at", x, y)
-          var ent = _this2.game.createEntity({
-            // id: 'tile' + index,
-            type: 'BLOCK',
-            kind: 'Tile',
-            // for now
-            body: body,
-            mass: mass,
-            isStatic: isStatic,
-            style: {
-              cursor: 'pointer'
-            },
-            position: {
-              x: x,
-              y: y,
-              z: z
-            },
-            friction: 1,
-            frictionAir: 1,
-            frictionStatic: 1,
-            // color: 0x00ff00,
-            texture: 'tile-' + tilemap[tileId],
-            // Remark: we could support path'd textures here; however some engines,
-            // like Phaser require we preload the textures before we can use them
-            // this can be solved by adding a formalized asset preloader to the game
-            // texture: 'img/game/tiles/' + tileId + '.png',
-            width: width,
-            height: height,
-            depth: width
-            // depth: width
-            // tileId: tileId
-          });
-          // console.log("ent", ent)
-          /*
-          const tile = document.createElement('div');
-          tile.style.width = tileWidth + 'px';
-          tile.style.height = tileHeight + 'px';
-          tile.style.position = 'absolute';
-          tile.style.left = (index % layer.width) * tileWidth + 'px';
-          tile.style.top = Math.floor(index / layer.width) * tileHeight + 'px';
-           // Apply background image based on tileId - this needs a mapping from tileId to image
-          // For simplicity, let's assume a function getTileImageURL(tileId) that returns the image URL
-          tile.style.backgroundImage = `url('${this.getTileImageURL(tileId)}')`;
-           container.appendChild(tile);
-          */
+        if (tileId !== 0 && tileId !== 2 && tileId !== 4577 && tileId !== 4767) {
+          var _this3$calculateTileP = _this3.calculateTilePosition(index, layer, tileWidth, tileHeight, tileId),
+            x = _this3$calculateTileP.x,
+            y = _this3$calculateTileP.y,
+            z = _this3$calculateTileP.z;
+          _this3.createTile(tileId, x, y, z, tileWidth, tileHeight);
         }
+      });
+    }
+  }, {
+    key: "calculateTilePosition",
+    value: function calculateTilePosition(index, layer, tileWidth, tileHeight, tileId) {
+      var x = index % layer.width * tileWidth - layer.width * tileWidth / 2;
+      var y = Math.floor(index / layer.width) * tileHeight - layer.height * tileHeight / 2;
+      var z = tileId === 1 ? 0 : -1;
+      return {
+        x: x,
+        y: y,
+        z: z
+      };
+    }
+  }, {
+    key: "createTile",
+    value: function createTile(tileId, x, y, z, tileWidth, tileHeight) {
+      var scale = 1;
+      var body = tileId === 1;
+      var isStatic = tileId !== 1;
+      var mass = tileId === 1 ? 5000 : 1;
+      this.game.createEntity({
+        type: 'BLOCK',
+        kind: 'Tile',
+        body: body,
+        mass: mass,
+        isStatic: isStatic,
+        style: {
+          cursor: 'pointer'
+        },
+        position: {
+          x: x * scale,
+          y: y * scale,
+          z: z
+        },
+        friction: 1,
+        frictionAir: 1,
+        frictionStatic: 1,
+        texture: "tile-".concat(tilemap[tileId]),
+        width: tileWidth * scale,
+        height: tileHeight * scale,
+        depth: tileWidth * scale
       });
     }
   }, {
     key: "getTileImageURL",
     value: function getTileImageURL(tileId) {
-      // Placeholder function: implement mapping of tileId to actual image URLs
-      // For example, return 'path/to/image' + tileId + '.png';
-      return 'img/game/tiles/' + tileId + '.png';
+      return "img/game/tiles/".concat(tileId, ".png");
     }
   }, {
     key: "update",

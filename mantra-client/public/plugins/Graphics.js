@@ -389,10 +389,12 @@ function getTexture(config) {
     // check to see if frameName is present in spritesheet
     if (t && t.frameTags && t.frameTags[spriteName]) {
       var sprite = t.frameTags[spriteName].frames[frameIndex];
+      var url = game.assetRoot + t.url;
+      // console.log('returning url', url)
       // t.frame = frame;
       return {
         key: t.key,
-        url: t.url,
+        url: url,
         // asset: t.frameTags[spriteName],
         frames: t.frameTags[spriteName].frames,
         sprite: sprite
@@ -400,9 +402,11 @@ function getTexture(config) {
     }
   }
   if (t) {
+    var _url = game.assetRoot + t.url;
+    // console.log('returning url', url)
     return {
       key: t.key,
-      url: t.url
+      url: _url
     };
   }
   return config;

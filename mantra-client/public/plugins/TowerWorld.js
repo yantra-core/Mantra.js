@@ -517,7 +517,10 @@ function spawner() {
       position: previous.startingPosition,
       width: 100,
       height: 100,
-      color: 0x00ff00
+      color: 0x00ff00,
+      style: {
+        backgroundColor: '#000000'
+      }
     };
     newSpawner.startingPosition = previous.startingPosition;
     //let ent = game.createEntity(newSpawner);

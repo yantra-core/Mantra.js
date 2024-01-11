@@ -278,12 +278,13 @@ var Entity = /*#__PURE__*/function () {
       this.game.createEntity = this.createEntity.bind(this);
       this.game.removeEntity = this.removeEntity.bind(this);
       this.game.getEntity = this.getEntity.bind(this);
+      this.game.getEntityByName = this.getEntityByName.bind(this);
       this.game.getEntities = this.allEntities.bind(this);
       this.game.updateEntity = this.updateEntity.bind(this);
       this.game.inflateEntity = this.inflateEntity.bind(this);
       this.game.hasEntity = this.hasEntity.bind(this);
       this.game.findEntity = this.findEntity.bind(this);
-      this.game.removeAllEntities = this.clearAllEntities.bind(this);
+      this.game.removeAllEntities = this.removeAllEntities.bind(this);
     }
   }, {
     key: "hasEntity",
@@ -338,7 +339,8 @@ var Entity = /*#__PURE__*/function () {
       // Iterate over all registered components and fetch their data if available
       for (var componentType in this.game.components) {
         var componentData = this.game.getComponent(entityId, componentType);
-        if (componentData) {
+        // console.log('componentData', componentData)
+        if (typeof componentData !== 'undefined' && componentData !== null) {
           entity[componentType] = componentData;
         }
       }
@@ -347,6 +349,26 @@ var Entity = /*#__PURE__*/function () {
       }
       entity.id = entityId;
       return entity;
+    }
+  }, {
+    key: "getEntityByName",
+    value: function getEntityByName(name) {
+      var _iterator2 = _createForOfIteratorHelper(this.game.entities),
+        _step2;
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            entityId = _step2$value[0],
+            entity = _step2$value[1];
+          if (entity.name === name) {
+            return entity;
+          }
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
     }
   }, {
     key: "removeEntity",
@@ -390,7 +412,7 @@ var Entity = /*#__PURE__*/function () {
             if (_this.game.bodyMap[entityId]) {
               _this.game.physics.removeBody(_this.game.bodyMap[entityId]);
             } else {
-              console.log('No body found for entityId', entityId);
+              // console.log('No body found for entityId', entityId);
             }
           }
           // Delete associated components for the entity using Component's remove method
@@ -424,10 +446,24 @@ var Entity = /*#__PURE__*/function () {
     key: "updateEntity",
     value: function updateEntity(entityData) {
       var entityId = entityData.id;
-      var fullState = this.game.getEntity(entityId);
+      if (typeof entityId === 'undefined') {
+        // check to see if we have a name, if so, find the entity by name
+        if (entityData.name) {
+          var _ent = this.game.getEntityByName(entityData.name);
+          if (_ent) {
+            entityId = _ent.id;
+          }
+        }
+      }
+      if (typeof entityId === 'undefined') {
+        console.log('Error: updateEntity was not provided a valid entity.id or entity.name', entityData);
+        console.log('This is most likely the result of passing invalid data to updateEntity()');
+        return;
+      }
+      var ent = this.game.getEntity(entityId);
 
       // if the state doesn't exist, return error
-      if (!fullState) {
+      if (!ent) {
         console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
         console.log('This should not happen, if a new state came in it should be created');
         return;
@@ -438,7 +474,6 @@ var Entity = /*#__PURE__*/function () {
         this.removeEntity(entityId);
         return;
       }
-      var ent = this.game.entities.get(entityId);
 
       // not a component property yet, just ad-hoc on client
       ent.pendingRender = {};
@@ -481,8 +516,16 @@ var Entity = /*#__PURE__*/function () {
         this.game.components.score.set(entityId, entityData.score);
       }
       if (typeof entityData.rotation !== 'undefined') {
-        this.game.components.rotation.set(entityId, entityData.rotation);
-        // TODO: update rotation in physics engine      
+        if (this.game.physics && this.game.physics.setRotation) {
+          var _body = this.game.bodyMap[entityId];
+          if (_body) {
+            this.game.physics.setRotation(_body, entityData.rotation);
+          }
+        } else {
+          console.log('WARNING: physics.setRotation is not defined');
+          // Remark: we could support direct rotation updates here if mantra was being run without physics engine
+          // this.game.components.rotation.set(entityId, entityData.rotation);
+        }
       }
 
       if (typeof entityData.text !== 'undefined') {
@@ -810,12 +853,25 @@ var Entity = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "clearAllEntities",
-    value: function clearAllEntities(clearCurrentPlayer) {
+    key: "removeAllEntities",
+    value: function removeAllEntities(options) {
       var _this2 = this;
+      // curry arguments, legacy API
+      var clearCurrentPlayer = false;
+      var excludeByName = [];
+      if (typeof options === 'boolean') {
+        clearCurrentPlayer = options;
+      }
+      if (_typeof(options) === 'object' && Array.isArray(options.excludeByName)) {
+        excludeByName = options.excludeByName;
+      }
       this.game.entities.forEach(function (ent) {
         // Do not remove the current player if clearCurrentPlayer is false
         if (ent.id === _this2.game.currentPlayerId && !clearCurrentPlayer) {
+          return;
+        }
+        // Do not remove entities that are excluded by name
+        if (excludeByName.includes(ent.name)) {
           return;
         }
         if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {

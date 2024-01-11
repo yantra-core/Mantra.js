@@ -136,9 +136,14 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
       if (this.strategies.length === 0) {
         this.loadDefaultStrategy();
       }
-      this.strategies.forEach(function (strategy) {
-        strategy.handleInputs(entityId, controls, sequenceNumber);
-      });
+      if (this.game.customMovement !== true) {
+        // if customMovements are not enabled, used the registered input strategies to handle inputs
+        this.strategies.forEach(function (strategy) {
+          strategy.handleInputs(entityId, controls, sequenceNumber);
+        });
+      }
+
+      // always emit the entityInput::handleInputs event
       this.game.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
     }
   }, {
