@@ -16,6 +16,12 @@ Let us help guide you on your game development journey, and we promise you will 
 
 <a href="https://yantra.gg/docs/">Additional Documentation</a>
 
+![mantra](https://github.com/yantra-core/Mantra.js/assets/70011/9add326b-7f50-4bef-b5c0-ba301a6ae265)
+
+# Mantra itself is very small and very fast
+
+The Mantra.js file is currently under `111kb` and will most likely get smaller. It's best to think of Mantra as the orchestrator for your game. You can import Mantra once and immediately begin adding new functionality dynamically. 
+
 ## Super Simple Offline First
 
 Mantra is designed to start a full-featured local game instance in seconds using a simple:
