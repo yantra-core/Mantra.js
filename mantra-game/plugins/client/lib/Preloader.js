@@ -3,6 +3,7 @@ export default class Preloader {
     this.assets = assets;
     this.totalAssetsSize = 0;
     this.loadedAssetsSize = 0;
+    this.root = game.assetRoot;
     this.game = game;
   }
 
@@ -41,7 +42,7 @@ export default class Preloader {
       img.onerror = () => {
         reject(`Failed to load image: ${asset.url}`);
       };
-      img.src = asset.url;
+      img.src = this.root + asset.url;
     });
   }
 

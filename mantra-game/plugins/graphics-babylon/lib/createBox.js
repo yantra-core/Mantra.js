@@ -7,61 +7,37 @@ export default function createBox(entityData) {
   if (entityData.rotation) {
     // Set rotation as needed
   }
-  // Create a material for the box
-  // let material = new BABYLON.StandardMaterial("material", this.scene);
-  // console.log('game.getTexture(entityData.texture)', game.getTexture(entityData.texture))
-  // Check if texture is available
+
+  /*
+  if (entityData.kind === 'BACKGROUND') {
+    // set origin to bottom left
+    entityData.position.x += entityData.width / 2;
+    entityData.position.y += entityData.height / 2;
+  }
+  */
+
+
   if (typeof game.getTexture(entityData.texture) !== 'undefined') {
     let texture = game.getTexture(entityData.texture);
     let graphic = this.apply2DTexture(box, entityData);
     material = graphic.material;
 
-    
-  
-    /*
-material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
-material.diffuseTexture.wAng = -Math.PI / 2;
-// ensure transparency is enabled
-material.diffuseTexture.hasAlpha = true;
-      material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
-    material.diffuseTexture.wAng = -Math.PI / 2;
-    // ensure transparency is enabled
-    material.diffuseTexture.hasAlpha = true;
+    if (entityData.kind === 'building') {
+      // Rotate the box by 30 degrees around the X-axis
+      const rotationAngle = 30 * (Math.PI / 180); // Convert 30 degrees to radians
+      box.rotation.x = rotationAngle;
 
-    // Remark: Attempting to tilt 2d texture box to achieve 30 degree perspective
-    // Not quite working yet
-      if (entityData.kind === 'building') {
-        const rotationAngle = 30 * (Math.PI / 180); // Convert 30 degrees to radians
-        box.rotation.x = rotationAngle; // Rotate around X-axis
-        // Assuming the height of the box is known (e.g., boxHeight)
-        const boxHeight = entityData.height; // Replace with the actual height of your box
-        let adjustment = (boxHeight / 2) - (boxHeight / 2) * Math.cos(rotationAngle);
-        // adjustment = 1000;
-        // Adjust the position of the box
-        //box.position = new BABYLON.Vector3(0, adjustment, 0);
-        // box.position.x = 0;
-        entityData.position.z = adjustment * 4;
-        // we now have a flat 2d texture added to a 3d box
-        // it has a depth of 1
-        // TODO: "tilt" the texture "up" by 30 degrees
-        // material.diffuseTexture.vAng = Math.PI / 6; // not correct
-      }
-    */
+      // Adjust the position of the box if needed
+      const boxHeight = entityData.height;
+      let adjustment = (boxHeight / 2) - (boxHeight / 2) * Math.cos(rotationAngle);
+      entityData.position.z += adjustment;
 
-      if (entityData.kind === 'building') {
-        // Rotate the box by 30 degrees around the X-axis
-        const rotationAngle = 30 * (Math.PI / 180); // Convert 30 degrees to radians
-        box.rotation.x = rotationAngle;
-      
-        // Adjust the position of the box if needed
-        const boxHeight = entityData.height;
-        let adjustment = (boxHeight / 2) - (boxHeight / 2) * Math.cos(rotationAngle);
-        entityData.position.z += adjustment;
-      
-        // TODO: Implement a method to tilt the texture by 30 degrees
-        // This might require custom shaders or adjusting the mesh's UVs
-      }
-      
+      // TODO: Implement a method to tilt the texture by 30 degrees
+      // This might require custom shaders or adjusting the mesh's UVs
+    }
+
+
+
 
   } else if (entityData.color) {
     // Incoming color is int color value
@@ -82,6 +58,9 @@ material.diffuseTexture.hasAlpha = true;
       }
     }
   }
+
+  // set origin to bottom left
+  // box.setPivotPoint(new BABYLON.Vector3(0, 0, 0));
 
   // Apply the material to the box
   box.material = material;

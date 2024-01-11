@@ -28,7 +28,7 @@ class WorldSelector {
     this.addOption(selectBox, 'Choose Your World', 'Choose');
 
     this.addOption(selectBox, 'Home World', 'Home');
-    this.addOption(selectBox, 'Maze World', 'Maze');
+    // this.addOption(selectBox, 'Maze World', 'Maze');
 
     this.addOption(selectBox, 'Platform World', 'Platform');
     this.addOption(selectBox, 'Music World', 'Music');

@@ -79,6 +79,9 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       if (graphics.includes('css')) {
         this.use('CSSGraphics', { camera: this.config.camera });
       }
+      if (graphics.includes('css3D')) {
+        this.use('CSS3DGraphics', { camera: this.config.camera });
+      }
       if (graphics.includes('phaser')) {
         this.use('PhaserGraphics', { camera: this.config.camera });
       }

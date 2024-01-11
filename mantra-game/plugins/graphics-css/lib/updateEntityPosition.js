@@ -21,8 +21,17 @@ export default function updateEntityPosition(entityElement, entityData) {
     y: position.y - this.cameraPosition.y + window.outerHeight / 2
   };
 
-  const domX = adjustedPosition.x - width / 2;
-  const domY = adjustedPosition.y - height / 2;
+  let domX = adjustedPosition.x - width / 2;
+  let domY = adjustedPosition.y - height / 2;
+  
+
+  /*
+  if (entityData.type === 'BACKGROUND') {
+    // set origin to bottom left
+    domX += entityData.width / 2;
+    domY -= entityData.height / 2;
+  }
+  */
 
   // console.log(position, adjustedPosition, domX, domY)
 

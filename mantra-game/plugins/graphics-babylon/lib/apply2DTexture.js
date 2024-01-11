@@ -1,4 +1,5 @@
 export default function apply2DTexture(graphic, entityData) {
+  let game = this.game;
   let material = new BABYLON.StandardMaterial("material", this.scene);
   let texture = game.getTexture(entityData.texture);
   let spritePosition = texture.sprite;
