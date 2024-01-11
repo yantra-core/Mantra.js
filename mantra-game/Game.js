@@ -139,12 +139,18 @@ class Game {
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
     this.scriptRoot = 'https://yantra.gg/mantra';
+    this.assetRoot = 'https://yantra.gg/mantra';
 
     // Could be another CDN or other remote location
     // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
       console.log("Mantra is using the follow path as it's root:", options.scriptRoot)
       this.scriptRoot = options.scriptRoot;
+    }
+
+    if (options.assetRoot) {
+      console.log("Mantra is using the follow path as it's asset root:", options.assetRoot)
+      this.assetRoot = options.assetRoot;
     }
 
     console.log(`new Game(${JSON.stringify(config, true, 2)})`);

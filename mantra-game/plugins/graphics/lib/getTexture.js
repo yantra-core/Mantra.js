@@ -29,10 +29,12 @@ export default function getTexture(config) {
     // check to see if frameName is present in spritesheet
     if (t && t.frameTags && t.frameTags[spriteName]) {
       let sprite = t.frameTags[spriteName].frames[frameIndex];
+      let url = game.assetRoot + t.url;
+      // console.log('returning url', url)
       // t.frame = frame;
       return {
         key: t.key,
-        url: t.url,
+        url: url,
         // asset: t.frameTags[spriteName],
         frames: t.frameTags[spriteName].frames,
         sprite
@@ -41,9 +43,11 @@ export default function getTexture(config) {
   }
 
   if (t) {
+    let url = game.assetRoot + t.url;
+    // console.log('returning url', url)
     return {
       key: t.key,
-      url: t.url
+      url: url
     };
   }
   return config;
