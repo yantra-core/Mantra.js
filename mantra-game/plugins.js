@@ -30,7 +30,9 @@ import Camera from './plugins/graphics-babylon/camera/BabylonCamera.js'; // TODO
 import PhaserGraphics from './plugins/graphics-phaser/PhaserGraphics.js';
 import PhaserCamera from './plugins/graphics-phaser/PhaserCamera.js';
 import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
+// import CSS3DGraphics from './plugins/graphics-css-3d/CSS3DGraphics.js';
 import ThreeGraphics from './plugins/graphics-three/ThreeGraphics.js';
+// import BlessedGraphics from './plugins/graphics-blessed/BlessedGraphics.js';
 
 // Gaming devices
 import Nes from './plugins/nes/Nes.js';
@@ -102,9 +104,6 @@ import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.
 import MovementPong from './plugins/entity-movement/strategies/PongMovement.js';
 
 
-// World
-import TowerWorld from './plugins/world-tower/TowerWorld.js';
-
 const plugins = {
   Behaviors,
   Sutra,
@@ -143,7 +142,6 @@ const plugins = {
   GameEditor,
   GamepadGUI,
   EntityEditor,
-  TowerWorld,
   EntitiesGUI,
   EventInspector,
   PluginsGUI,
@@ -163,7 +161,9 @@ const plugins = {
   PhaserGraphics,
   PhaserCamera,
   ThreeGraphics,
+  // BlessedGraphics,
   CSSGraphics,
+  // CSS3DGraphics,
   Camera,
   StarField,
   BabylonStarField,

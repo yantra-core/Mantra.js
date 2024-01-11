@@ -3,7 +3,7 @@ import warpToWorld from '../sutras/warpToWorld.js';
 import switchGraphics from '../sutras/switchGraphics.js';
 
 // walker is npc that walks around route
-import walker from '../../mantra-game/plugins/world-tower/sutras/walker.js';
+import walker from '../TowerDefense/sutras/walker.js';
 
 // routing helper to create vector routes
 import routing from '../sutras/routing.js';

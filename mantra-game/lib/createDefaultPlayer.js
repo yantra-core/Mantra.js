@@ -4,6 +4,17 @@ export default function createDefaultPlayer(playerConfig = {}) {
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = { x: 0, y: 0 };
   }
+
+  if (typeof playerConfig.texture === 'undefined') {
+    playerConfig.texture = {
+      sheet: 'loz_spritesheet',
+      sprite: 'player'
+    };
+  }
+
+  if (playerConfig.texture === 'none') {
+    delete playerConfig.texture;
+  }
   // check if game.currentPlayerId is already set,
   // if so return
   if (this.currentPlayerId) {
@@ -21,10 +32,7 @@ export default function createDefaultPlayer(playerConfig = {}) {
       height: '48px',
     },
     */
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'player'
-    },
+    texture: playerConfig.texture,
     mass: 222,
     friction: 0.5,  // Default friction
     frictionAir: 0.5, // Default air friction

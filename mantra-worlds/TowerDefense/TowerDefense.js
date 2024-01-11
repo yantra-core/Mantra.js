@@ -3,9 +3,11 @@ import player from './sutras/player.js';
 import colorChanges from './sutras/colorChanges.js';
 import enemy from './sutras/enemy.js';
 import input from './sutras/input.js';
+import movement from "../../mantra-sutras/player-movement/top-down.js";
 
 class TowerWorld {
-  static id = 'world-tower';
+  static id = 'world-towerdefense';
+  static type = 'world';
   constructor() {
     this.id = TowerWorld.id;
   }
@@ -51,6 +53,31 @@ class TowerWorld {
       }
     }
 
+    // bypass default input movement
+    game.customMovement = true;
+
+    // game.data.camera.currentZoom = 2;
+    game.setGravity(0, 0, 0);
+
+    game.createDefaultPlayer({
+      position: {
+        x: 0,
+        y: 0
+      },
+      texture: 'none'
+    });
+
+    // game.setBackground('#007F00');
+    game.setBackground('#007fff');
+
+    game.use('Block')
+    game.use('Border', { autoBorder: true, thickness: 20, health: 100 });
+
+    game.use('Bullet')
+    game.use('Border');
+    game.use('StarField');
+
+
     // game.use('Scoreboard');
 
     // Create Sutras
@@ -64,9 +91,17 @@ class TowerWorld {
     // TODO: ensure entire Sutra definition is exports on TowerWorld such that any
     // node can be re-used in other Sutras
     let rules = game.createSutra();
-    rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
 
-    game.setSutra(rules);
+
+    // movement
+    rules.use(movement(game), 'movement');
+
+    this.handleInputs = function (entityId, inputs) {
+      rules.emit('entityInput::handleInputs', entityId, inputs)
+    }
+    game.on('entityInput::handleInputs', this.handleInputs);
+
+    rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
 
     rules
       .if('roundNotPaused')
@@ -89,34 +124,22 @@ class TowerWorld {
       .if('playerHealthBelow0')
       .then('resetPlayerPosition');
 
-  rules
-    .if('blockHitPlayer')
-    .then((rules) => {
-      rules
-        .if('blockIsRed')
-        .then('damagePlayer')
-        .else('healPlayer');
-    })
-    .then('removeBlock')
+    rules
+      .if('blockHitPlayer')
+      .then((rules) => {
+        rules
+          .if('blockIsRed')
+          .then('damagePlayer')
+          .else('healPlayer');
+      })
+      .then('removeBlock')
 
     rules
       .if('roundRunning')
       .if('allWallsFallen')
       .then('roundLost');
 
-    rules.addCondition('timerCompleted', entity => {
-      let timerDone = false;
-      // TODO: remove this, should iterate and know timer names
-      if (entity.timers && entity.timers.timers && entity.timers.timers['test-timer'] && entity.timers.timers['test-timer'].done) {
-        timerDone = true;
-        // set time done to false on origin timer
-        entity.timers.timers['test-timer'].done = false;
-      }
-      if (timerDone) {
-        // console.log('timerDone', timerDone)
-      }
-      return timerDone;
-    });
+   
 
     rules.addCondition('allWallsFallen', function (entity, gameState) {
       // check see if any of UnitSpawners have been made it past the world height + 1000
@@ -140,7 +163,7 @@ class TowerWorld {
 
     rules
       .if('roundRunning')
-      .if('timerCompleted')
+      .if('gameTickMod60')
       .then('spawner');
 
     // rules.if('changesColorWithDamage').then('colorChanges');
@@ -158,15 +181,12 @@ class TowerWorld {
     // Additional rules
     this.createAdditionalRules(rules);
 
+    console.log('rrr', rules)
     game.setSutra(rules);
 
     game.data.roundStarted = true;
     game.data.roundRunning = false;
 
-    game.on('timer::done', (entity, timerName, timer) => {
-      // console.log('timer done', entity, timerName, timer);
-      // console.log(game.data)
-    });
 
     return rules;
 
@@ -188,6 +208,8 @@ class TowerWorld {
       game.systems.border.createBorder({
         height: (game.height * scaleFactor) + game.height,
         width: (game.width * scaleFactor) + game.width,
+        thickness: 20,
+        health: 100
         // depth: 100,
       });
     }
@@ -274,42 +296,52 @@ class TowerWorld {
       game.updateEntity(data);
     });
 
-    rules.on('createBorders', function(data, node) {
+    rules.on('createBorders', function (data, node) {
       self.createBorders(2);
     })
-   
-    rules.on('spawnEnemyUnits', function (data, node) {
-      // console.log('spawnEnemyUnits', data, node);
-      // create 8 unit spawners at the top of the map border, left to right, evenly spaced
-      let spawners = [];
 
-      for (let i = 0; i < 8; i++) {
-        // create fresh clone of unitSpawner
-        let spawner = JSON.parse(JSON.stringify({
-          type: 'UnitSpawner',
-          health: 100,
-          position: {
-            x: 0,
-            y: 0
-          },
-          width: 100,
-          height: 100,
-          color: 0x00ff00
-        }));
-        let smallerWidth = game.width * 0.8;
-        spawner.position.x = -smallerWidth / 2 + (smallerWidth / 8) * i;
-        spawner.position.y = (-game.height / 2) + 100;
-        spawner.startingPosition = {
-          x: spawner.position.x,
-          y: spawner.position.y
+    rules.on('spawnEnemyUnits', function (data, node) {
+      console.log('data', data, node)
+      try {
+        // create 8 unit spawners at the top of the map border, left to right, evenly spaced
+        let spawners = [];
+
+        for (let i = 0; i < 8; i++) {
+          // create fresh clone of unitSpawner
+          let spawner = JSON.parse(JSON.stringify({
+            type: 'UnitSpawner',
+            health: 100,
+            position: {
+              x: 0,
+              y: 0
+            },
+            health: 100,
+            mass: 100,
+            width: 64,
+            height: 64,
+            color: 0x00ff00,
+            style: {
+              backgroundColor: '#000000'
+            },
+
+          }));
+          console.log('spawner', spawner)
+          let smallerWidth = game.width * 0.8;
+          spawner.position.x = -smallerWidth / 2 + (smallerWidth / 8) * i;
+          spawner.position.y = (-game.height / 2) + 100;
+          spawner.startingPosition = {
+            x: spawner.position.x,
+            y: spawner.position.y
+          }
+          spawners.push(spawner);
         }
-        spawners.push(spawner);
+        spawners.forEach(spawner => {
+          let ent = game.createEntity(spawner);
+        });
+      } catch (err) {
+        console.log('err', err)
       }
 
-      spawners.forEach(spawner => {
-        let ent = game.createEntity(spawner);
-        ent.timers.setTimer('test-timer', 2, true);
-      });
 
     });
 

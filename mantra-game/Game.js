@@ -53,13 +53,13 @@ class Game {
     height = 900 * 10,
     // game systems / auto-load based on pluginsConfig
     physics = 'matter',
-    graphics = ['babylon'],
+    graphics = ['css'],
     collisions = true,
     camera = {},
     gravity = {},
     keyboard = true,
     mouse = true,
-    gamepad = true,
+    gamepad = false,
     sutra = false,
     lifetime = true,
     // data compression

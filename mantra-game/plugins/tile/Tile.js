@@ -1,9 +1,6 @@
-// Tile.js - Marak Squires 2023
-// Implements support for Tiled JSON maps via the Tiled JSON format
-// see: https://doc.mapeditor.org/en/stable/reference/json-map-format/
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 
-let tilemap = {
+const tilemap = {
   1: 'block',
   2: 'grass',
   3: 'water'
@@ -11,145 +8,75 @@ let tilemap = {
 
 class Tile {
   static id = 'tile';
+
   constructor(game) {
-    this.game = game; // Store the reference to the game logic
+    this.game = game;
     this.id = Tile.id;
   }
 
   init(game) {
     this.game = game;
-
-    // console.log('Tile.init()');
-    let defaultTileSet = defaultOrthogonalMap;
-    let that = this;
-    setTimeout(function(){
-      that.createTileMapFromTiledJSON(defaultTileSet);
-
-    }, 222)
+    setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
   }
 
   createTileMapFromTiledJSON(tiledJSON) {
-    // Assuming the JSON data is already parsed into a JavaScript object
-    const mapData = tiledJSON;
-
-    // Create a container for the map
-    const mapContainer = document.createElement('div');
-    mapContainer.style.position = 'relative';
-    mapContainer.style.width = mapData.width * mapData.tilewidth + 'px';
-    mapContainer.style.height = mapData.height * mapData.tileheight + 'px';
-
-    // Process each layer
-    mapData.layers.forEach(layer => {
-      // Only process if it's a tile layer
+    tiledJSON.layers.forEach(layer => {
       if (layer.type === 'tilelayer') {
-        this.createLayer(mapContainer, layer, mapData.tilewidth, mapData.tileheight);
+        this.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
       }
     });
-
-    // Append the map container to the body or a specific element
-    document.body.appendChild(mapContainer);
   }
 
-  createLayer(container, layer, tileWidth, tileHeight) {
+  createLayer(layer, tileWidth, tileHeight) {
     layer.data.forEach((tileId, index) => {
-      if (tileId !== 0 && tileId !== 2) { // for now
-        let scale = 1;
-        scale = 1;
-        // console.log('cccc', tileId, index)
-        
-        let x = (index % layer.width) * tileWidth;
-        let y = Math.floor(index / layer.width) * tileHeight;
-        let z = -10;
-
-        // these x y assume 0,0, shift the coords to center since map goes negative
-        x = x - (layer.width * tileWidth / 2);
-        y = y - (layer.height * tileHeight / 2);
-
-        let height = tileHeight;
-        let width = tileWidth;
-
-        // apply scale
-        x = x * scale;
-        y = y * scale;
-        height = height * scale;
-        width = width * scale;
-
-        let body = false;
-        let isStatic = true;
-        let mass = 1;
-
-        z = -1;
-        if (tileId === 1) {
-          body = true;
-          mass = 5000;
-          isStatic = false;
-          z = 0;
-        }
-
-        // console.log("placing at", x, y)
-        let ent = this.game.createEntity({
-          // id: 'tile' + index,
-          type: 'BLOCK',
-          kind: 'Tile', // for now
-          body: body,
-          mass: mass,
-          isStatic: isStatic,
-          style: {
-            cursor: 'pointer',
-          },
-          position: {
-            x: x,
-            y: y,
-            z: z
-          },
-          friction: 1,
-          frictionAir: 1,
-          frictionStatic: 1,
-          // color: 0x00ff00,
-          texture: 'tile-' + tilemap[tileId],
-          // Remark: we could support path'd textures here; however some engines,
-          // like Phaser require we preload the textures before we can use them
-          // this can be solved by adding a formalized asset preloader to the game
-          // texture: 'img/game/tiles/' + tileId + '.png',
-          width: width,
-          height: height,
-          depth: width
-          // depth: width
-          // tileId: tileId
-        })
-        // console.log("ent", ent)
-        /*
-        const tile = document.createElement('div');
-        tile.style.width = tileWidth + 'px';
-        tile.style.height = tileHeight + 'px';
-        tile.style.position = 'absolute';
-        tile.style.left = (index % layer.width) * tileWidth + 'px';
-        tile.style.top = Math.floor(index / layer.width) * tileHeight + 'px';
-
-        // Apply background image based on tileId - this needs a mapping from tileId to image
-        // For simplicity, let's assume a function getTileImageURL(tileId) that returns the image URL
-        tile.style.backgroundImage = `url('${this.getTileImageURL(tileId)}')`;
-
-        container.appendChild(tile);
-        */
+      if (tileId !== 0 && tileId !== 2 && tileId !== 4577 && tileId !== 4767) {
+        const { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, tileId);
+        this.createTile(tileId, x, y, z, tileWidth, tileHeight);
       }
+    });
+  }
+
+  calculateTilePosition(index, layer, tileWidth, tileHeight, tileId) {
+    let x = (index % layer.width) * tileWidth - (layer.width * tileWidth / 2);
+    let y = Math.floor(index / layer.width) * tileHeight - (layer.height * tileHeight / 2);
+    let z = tileId === 1 ? 0 : -1;
+
+    return { x, y, z };
+  }
+
+  createTile(tileId, x, y, z, tileWidth, tileHeight) {
+    const scale = 1;
+    let body = tileId === 1;
+    let isStatic = tileId !== 1;
+    let mass = tileId === 1 ? 5000 : 1;
+
+    this.game.createEntity({
+      type: 'BLOCK',
+      kind: 'Tile',
+      body,
+      mass,
+      isStatic,
+      style: { cursor: 'pointer' },
+      position: { x: x * scale, y: y * scale, z },
+      friction: 1,
+      frictionAir: 1,
+      frictionStatic: 1,
+      texture: `tile-${tilemap[tileId]}`,
+      width: tileWidth * scale,
+      height: tileHeight * scale,
+      depth: tileWidth * scale
     });
   }
 
   getTileImageURL(tileId) {
-    // Placeholder function: implement mapping of tileId to actual image URLs
-    // For example, return 'path/to/image' + tileId + '.png';
-    return 'img/game/tiles/' + tileId + '.png';
+    return `img/game/tiles/${tileId}.png`;
   }
 
-
-  update() {
-  }
+  update() { }
 
   render() { }
 
   destroy() { }
-
 }
 
 export default Tile;

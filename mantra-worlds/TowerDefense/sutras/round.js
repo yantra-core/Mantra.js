@@ -4,6 +4,7 @@ export default function round() {
 
   // Condition to check if a round has started
   round.addCondition('roundStarted', (entity, gameState) => {
+    console.log('roundStarted', gameState.roundStarted)
     return gameState.roundStarted === true;
   });
 
@@ -17,6 +18,7 @@ export default function round() {
   });
 
   round.addCondition('roundNotRunning', (entity, gameState) => {
+    // console.log('roundNotRunning', gameState.roundRunning)
     return gameState.roundRunning === false;
   });
 
