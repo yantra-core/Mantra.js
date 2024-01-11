@@ -1,4 +1,4 @@
-import SelectPicker from "../../graphics-css/lib/SelectPicker.js";
+import SelectPicker from "./SelectPicker.js";
 
 class GraphicsSelector {
   constructor(editor) {
