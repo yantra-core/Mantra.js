@@ -16,7 +16,6 @@ export default function topdownMovement(game) {
   };
 
   function handleInputs (entityId, input) {
-
     const moveSpeed = 1.5;
     let actions = [];
 

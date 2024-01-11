@@ -44,11 +44,8 @@ export default function demon(game) {
   /*
   rules.on('entityTouchedDemon', function (collision) {
     //let demonEntity = collision.bodyA.type === 'DEMON' ? collision.bodyA : collision.bodyB;
-
     // Define the scale factor for how much bigger the demon should get
     const scaleFactor = 2.1; // For example, 10% bigger
-    // TODO: figure out why collision not working
-    alert('aaa')
     // Increase the size of the demon
     game.updateEntity({
       id: demonEntity.id,
