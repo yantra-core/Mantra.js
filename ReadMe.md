@@ -42,7 +42,7 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 
 ### Sutra Behavioral Trees
 
-Using the [Sutra.js](https://github.com/yantra-core/Sutra.js) library `mantra` game logic can be created using JSON files, a Fluent JavaScript API, or the *ALPHA* [Visual Editor](https://yantra.gg/mantra/examples/offline/sutra-level-editor). `sutra` supports `i18n` compatible exports to a human readable defintions like this:
+Using the [Sutra.js](https://github.com/yantra-core/Sutra.js) library `mantra` game logic can be created using JSON files or a Fluent JavaScript API. `sutra` supports `i18n` compatible exports to a human readable defintions like this:
 
 **Example Sutra**
 ```
