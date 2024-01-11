@@ -1,22 +1,33 @@
 export default function createBox(entityData) {
   let game = this.game;
   let box = BABYLON.MeshBuilder.CreateBox('default', { width: entityData.width, height: entityData.depth, depth: entityData.height }, this.scene);
+  let material = new BABYLON.StandardMaterial("material", this.scene);
 
   // Add rotation if present
   if (entityData.rotation) {
     // Set rotation as needed
   }
   // Create a material for the box
-  let material = new BABYLON.StandardMaterial("material", this.scene);
+  // let material = new BABYLON.StandardMaterial("material", this.scene);
   // console.log('game.getTexture(entityData.texture)', game.getTexture(entityData.texture))
   // Check if texture is available
   if (typeof game.getTexture(entityData.texture) !== 'undefined') {
-    // Apply texture
     let texture = game.getTexture(entityData.texture);
-    material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
-    material.diffuseTexture.wAng = -Math.PI / 2;
+    let graphic = this.apply2DTexture(box, entityData);
+    material = graphic.material;
 
+    
+  
     /*
+material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
+material.diffuseTexture.wAng = -Math.PI / 2;
+// ensure transparency is enabled
+material.diffuseTexture.hasAlpha = true;
+      material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
+    material.diffuseTexture.wAng = -Math.PI / 2;
+    // ensure transparency is enabled
+    material.diffuseTexture.hasAlpha = true;
+
     // Remark: Attempting to tilt 2d texture box to achieve 30 degree perspective
     // Not quite working yet
       if (entityData.kind === 'building') {
@@ -52,8 +63,6 @@ export default function createBox(entityData) {
       }
       
 
-    // ensure transparency is enabled
-    material.diffuseTexture.hasAlpha = true;
   } else if (entityData.color) {
     // Incoming color is int color value
     // Extract RGB components from the hexadecimal color value
