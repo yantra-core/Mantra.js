@@ -393,6 +393,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _inherits(CSSGraphics, _GraphicsInterface);
   var _super = _createSuper(CSSGraphics);
+  // indicates that this plugin has async initialization and should not auto-emit a ready event on return
+
   function CSSGraphics() {
     var _this;
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -412,6 +414,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       camera: camera
     };
     _this.id = CSSGraphics.id;
+    _this.async = CSSGraphics.async;
     _this.cameraPosition = {
       x: 0,
       y: 0
@@ -456,8 +459,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
       // is sync load; however we still need to let the graphics pipeline know we are ready
       game.emit('plugin::ready::graphics-css', this);
-
-      // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
       this.game.viewportCenterXOffset = 0;
       this.game.viewportCenterYOffset = -windowHeight / 2;
@@ -493,6 +494,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 }(_GraphicsInterface2["default"]);
 _defineProperty(CSSGraphics, "id", 'graphics-css');
 _defineProperty(CSSGraphics, "removable", false);
+_defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
 },{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":16,"./CSSCamera.js":2,"./lib/createGraphic.js":4,"./lib/inflateBox.js":5,"./lib/inflateEntity.js":6,"./lib/inflateText.js":7,"./lib/mouseWheelZoom.js":8,"./lib/removeGraphic.js":9,"./lib/render.js":10,"./lib/setTransform.js":11,"./lib/unload.js":12,"./lib/updateEntityPosition.js":13,"./lib/updateGraphic.js":14,"./lib/zoom.js":15}],4:[function(require,module,exports){

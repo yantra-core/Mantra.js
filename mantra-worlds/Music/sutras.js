@@ -123,7 +123,7 @@ export default function sutras(game) {
   });
 
   game.on('pointerUp', (entity) => {
-    console.log('pointerUp', entity);
+    // console.log('pointerUp', entity);
     isPressed = false; // Reset the pressed state when the mouse click is released
   });
 

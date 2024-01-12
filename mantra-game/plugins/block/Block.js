@@ -73,7 +73,6 @@ class Block {
       const newHeight = entityA.height / 2;
       const newSplits = entityA.splits + 1;
 
-      console.log('aaaa', entityA)
       // TODO: could we move this into a sutra rule instead?
       for (let i = 0; i < 4; i++) {
         let newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];

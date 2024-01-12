@@ -31,7 +31,7 @@ var Border = /*#__PURE__*/function () {
         y: 0
       } : _ref$position,
       _ref$thickness = _ref.thickness,
-      thickness = _ref$thickness === void 0 ? 200 : _ref$thickness,
+      thickness = _ref$thickness === void 0 ? 20 : _ref$thickness,
       _ref$health = _ref.health,
       health = _ref$health === void 0 ? 100 : _ref$health;
     _classCallCheck(this, Border);

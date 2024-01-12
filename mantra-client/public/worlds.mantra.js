@@ -2243,10 +2243,8 @@ function demon(game) {
   /*
   rules.on('entityTouchedDemon', function (collision) {
     //let demonEntity = collision.bodyA.type === 'DEMON' ? collision.bodyA : collision.bodyB;
-     // Define the scale factor for how much bigger the demon should get
+    // Define the scale factor for how much bigger the demon should get
     const scaleFactor = 2.1; // For example, 10% bigger
-    // TODO: figure out why collision not working
-    alert('aaa')
     // Increase the size of the demon
     game.updateEntity({
       id: demonEntity.id,
@@ -4310,7 +4308,7 @@ function sutras(game) {
     }
   });
   game.on('pointerUp', function (entity) {
-    console.log('pointerUp', entity);
+    // console.log('pointerUp', entity);
     isPressed = false; // Reset the pressed state when the mouse click is released
   });
   return rules;
@@ -4351,6 +4349,7 @@ var Platform = /*#__PURE__*/function () {
   }, {
     key: "unload",
     value: function unload() {
+      var game = this.game;
       // reset camera mode
       game.data.camera.mode = null;
       // remove event listeners

@@ -315,9 +315,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$loadDefaultPlugi = _ref.loadDefaultPlugins,
       loadDefaultPlugins = _ref$loadDefaultPlugi === void 0 ? true : _ref$loadDefaultPlugi,
       _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 1600 * 10 : _ref$width,
+      width = _ref$width === void 0 ? 800 : _ref$width,
       _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 900 * 10 : _ref$height,
+      height = _ref$height === void 0 ? 600 : _ref$height,
       _ref$physics = _ref.physics,
       physics = _ref$physics === void 0 ? 'matter' : _ref$physics,
       _ref$graphics = _ref.graphics,
@@ -609,8 +609,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         game.emit('game::ready');
         if (this.config.defaultPlayer) {
           this.createPlayer({
-            type: 'PLAYER',
-            texture: 'player'
+            type: 'PLAYER'
           }).then(function (ent) {
             game.setPlayerId(ent.id);
           });
@@ -715,6 +714,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
           } else {
             // decrement loadingPluginsCount even if it fails
             // this means applications will attempt to load even if plugins fail
+            console.log('Warning: PLUGINS object not found, cannot load plugin', _pluginId);
             delete game._plugins[_pluginId];
             game.loadingPluginsCount--;
           }
@@ -1084,10 +1084,12 @@ function createDefaultPlayer() {
     };
   }
   if (typeof playerConfig.texture === 'undefined') {
+    /*
     playerConfig.texture = {
       sheet: 'loz_spritesheet',
       sprite: 'player'
     };
+    */
   }
   if (playerConfig.texture === 'none') {
     delete playerConfig.texture;

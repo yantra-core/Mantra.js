@@ -49,8 +49,8 @@ class Game {
     showLoadingScreen = true,
     minLoadTime = 330, // minimum time to show loading screen
     loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
-    width = 1600 * 10,
-    height = 900 * 10,
+    width = 800,
+    height = 600,
     // game systems / auto-load based on pluginsConfig
     physics = 'matter',
     graphics = ['css'],
@@ -338,8 +338,7 @@ class Game {
       game.emit('game::ready');
       if (this.config.defaultPlayer) {
         this.createPlayer({
-          type: 'PLAYER',
-          texture: 'player'
+          type: 'PLAYER'
         }).then(function (ent) {
           game.setPlayerId(ent.id);
         });
@@ -439,6 +438,7 @@ class Game {
         } else {
           // decrement loadingPluginsCount even if it fails
           // this means applications will attempt to load even if plugins fail
+          console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
           delete game._plugins[pluginId];
           game.loadingPluginsCount--;
         }

@@ -6,10 +6,12 @@ export default function createDefaultPlayer(playerConfig = {}) {
   }
 
   if (typeof playerConfig.texture === 'undefined') {
+    /*
     playerConfig.texture = {
       sheet: 'loz_spritesheet',
       sprite: 'player'
     };
+    */
   }
 
   if (playerConfig.texture === 'none') {

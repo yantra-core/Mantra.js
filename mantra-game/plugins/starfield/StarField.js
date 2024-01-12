@@ -1,5 +1,6 @@
 // TODO: add starfields for other graphics engines
 import BabylonStarField from "./BabylonStarField.js";
+import CSSStarField from "./CSSStarField.js";
 class StarField {
 
   static id = 'starfield';
@@ -30,6 +31,9 @@ class StarField {
       game.graphics.forEach(function(graphicInterface){
         if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
           game.use(new BabylonStarField());
+        }
+        if (graphicInterface.id === 'graphics-css') { // hard-code per graphics pipeline for now
+          game.use(new CSSStarField());
         }
       });
     }

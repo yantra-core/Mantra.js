@@ -118,8 +118,7 @@ var Bullet = /*#__PURE__*/function () {
         // TODO: make this a config
         damage: 10 // TODO: make this a config
       };
-
-      console.log('using bulletDirectionConfig', bulletDirectionConfig);
+      // console.log('using bulletDirectionConfig', bulletDirectionConfig)
       this.game.createEntity(bulletDirectionConfig);
     }
   }, {

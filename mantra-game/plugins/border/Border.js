@@ -3,7 +3,7 @@ class Border {
 
   static id = 'border';
 
-  constructor({ autoBorder = false, position = { x: 0, y: 0 }, thickness = 200, health = 100 } = {}) {
+  constructor({ autoBorder = false, position = { x: 0, y: 0 }, thickness = 20, health = 100 } = {}) {
     this.id = Border.id;
     this.position = position;
     this.autoBorder = autoBorder;

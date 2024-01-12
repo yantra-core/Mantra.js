@@ -526,7 +526,7 @@ var pluginsList = {
   },
   "CSSGraphics": {
     "path": "./plugins/graphics-css/CSSGraphics.js",
-    "size": 61.213
+    "size": 61.118
   },
   "Client": {
     "path": "./plugins/client/Client.js",
@@ -590,7 +590,7 @@ var pluginsList = {
   },
   "PluginsGUI": {
     "path": "./plugins/gui-plugins/PluginsGUI.js",
-    "size": 24.464
+    "size": 24.465
   },
   "YantraGUI": {
     "path": "./plugins/gui-yantra/YantraGUI.js",

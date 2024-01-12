@@ -1106,6 +1106,8 @@ function createToolbar(game) {
   var toolbarMenu = new _ToolbarMenu["default"]();
   this.toolbarMenu = toolbarMenu;
   var keyPressed = false;
+
+  // TODO: this won't work if editor isn't already loaded
   game.on('entityInput::handleInputs', function (entityId, input) {
     if (input.controls && input.controls.U !== undefined) {
       if (input.controls.U === true && !keyPressed) {

@@ -24,6 +24,7 @@ import handleInputs from '../graphics/lib/handleInputs.js';
 class CSSGraphics extends GraphicsInterface {
   static id = 'graphics-css';
   static removable = false;
+  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   constructor({ camera } = {}) {
     super();
@@ -37,6 +38,7 @@ class CSSGraphics extends GraphicsInterface {
     this.config = { camera };
 
     this.id = CSSGraphics.id;
+    this.async = CSSGraphics.async;
     this.cameraPosition = { x: 0, y: 0 };
     // this.game.data.camera.position = this.cameraPosition;
     this.mouseWheelEnabled = false;
@@ -80,7 +82,6 @@ class CSSGraphics extends GraphicsInterface {
     // is sync load; however we still need to let the graphics pipeline know we are ready
     game.emit('plugin::ready::graphics-css', this);
 
-    // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
 
     this.game.viewportCenterXOffset = 0;

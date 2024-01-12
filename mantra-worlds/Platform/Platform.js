@@ -17,7 +17,7 @@ class Platform {
   }
 
   unload () {
-    let game = this;
+    let game = this.game;
     // reset camera mode
     game.data.camera.mode = null;
     // remove event listeners

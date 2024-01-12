@@ -94,7 +94,7 @@ var Block = /*#__PURE__*/function () {
         var newWidth = entityA.width / 2;
         var newHeight = entityA.height / 2;
         var newSplits = entityA.splits + 1;
-        console.log('aaaa', entityA);
+
         // TODO: could we move this into a sutra rule instead?
         for (var i = 0; i < 4; i++) {
           var newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];
