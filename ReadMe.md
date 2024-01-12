@@ -54,7 +54,7 @@ Using the [Sutra.js](https://github.com/yantra-core/Sutra.js) library `mantra` g
 ```
 if isBoss
   if isHealthLow
-    'entity::updateEntity'
+    entity::updateEntity
       color: 0xff0000
       speed: 5
 ```
