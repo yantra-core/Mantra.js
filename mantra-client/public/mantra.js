@@ -866,6 +866,12 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "setSize",
+    value: function setSize(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+  }, {
     key: "zoom",
     value: function zoom(scale) {
       if (this.camera && this.camera.zoom) {

@@ -315,13 +315,13 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$loadDefaultPlugi = _ref.loadDefaultPlugins,
       loadDefaultPlugins = _ref$loadDefaultPlugi === void 0 ? true : _ref$loadDefaultPlugi,
       _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 1600 * 10 : _ref$width,
+      width = _ref$width === void 0 ? 800 : _ref$width,
       _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 900 * 10 : _ref$height,
+      height = _ref$height === void 0 ? 600 : _ref$height,
       _ref$physics = _ref.physics,
       physics = _ref$physics === void 0 ? 'matter' : _ref$physics,
       _ref$graphics = _ref.graphics,
-      graphics = _ref$graphics === void 0 ? ['babylon'] : _ref$graphics,
+      graphics = _ref$graphics === void 0 ? ['css'] : _ref$graphics,
       _ref$collisions = _ref.collisions,
       collisions = _ref$collisions === void 0 ? true : _ref$collisions,
       _ref$camera = _ref.camera,
@@ -333,7 +333,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$mouse = _ref.mouse,
       mouse = _ref$mouse === void 0 ? true : _ref$mouse,
       _ref$gamepad = _ref.gamepad,
-      gamepad = _ref$gamepad === void 0 ? true : _ref$gamepad,
+      gamepad = _ref$gamepad === void 0 ? false : _ref$gamepad,
       _ref$sutra = _ref.sutra,
       sutra = _ref$sutra === void 0 ? false : _ref$sutra,
       _ref$lifetime = _ref.lifetime,
@@ -353,6 +353,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     _classCallCheck(this, Game);
     if (isServer) {
       // override default
+      showLoadingScreen = false;
       isClient = false;
     }
     // config scope for convenience
@@ -417,12 +418,17 @@ var Game = exports.Game = /*#__PURE__*/function () {
     // Define the scriptRoot variable for loading external scripts
     // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
     this.scriptRoot = 'https://yantra.gg/mantra';
+    this.assetRoot = 'https://yantra.gg/mantra';
 
     // Could be another CDN or other remote location
     // For local development, try this.scriptRoot = './';
     if (options.scriptRoot) {
       console.log("Mantra is using the follow path as it's root:", options.scriptRoot);
       this.scriptRoot = options.scriptRoot;
+    }
+    if (options.assetRoot) {
+      console.log("Mantra is using the follow path as it's asset root:", options.assetRoot);
+      this.assetRoot = options.assetRoot;
     }
     console.log("new Game(".concat(JSON.stringify(config, true, 2), ")"));
 
@@ -603,8 +609,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         game.emit('game::ready');
         if (this.config.defaultPlayer) {
           this.createPlayer({
-            type: 'PLAYER',
-            texture: 'player'
+            type: 'PLAYER'
           }).then(function (ent) {
             game.setPlayerId(ent.id);
           });
@@ -709,6 +714,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
           } else {
             // decrement loadingPluginsCount even if it fails
             // this means applications will attempt to load even if plugins fail
+            console.log('Warning: PLUGINS object not found, cannot load plugin', _pluginId);
             delete game._plugins[_pluginId];
             game.loadingPluginsCount--;
           }
@@ -860,6 +866,12 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "setSize",
+    value: function setSize(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+  }, {
     key: "zoom",
     value: function zoom(scale) {
       if (this.camera && this.camera.zoom) {
@@ -914,6 +926,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "rotateCamera",
     value: function rotateCamera(angle) {
+      // not implemented directly, Graphics plugin will handle this
+    }
+  }, {
+    key: "setBackground",
+    value: function setBackground(color) {
       // not implemented directly, Graphics plugin will handle this
     }
   }]);
@@ -1072,6 +1089,17 @@ function createDefaultPlayer() {
       y: 0
     };
   }
+  if (typeof playerConfig.texture === 'undefined') {
+    /*
+    playerConfig.texture = {
+      sheet: 'loz_spritesheet',
+      sprite: 'player'
+    };
+    */
+  }
+  if (playerConfig.texture === 'none') {
+    delete playerConfig.texture;
+  }
   // check if game.currentPlayerId is already set,
   // if so return
   if (this.currentPlayerId) {
@@ -1088,10 +1116,7 @@ function createDefaultPlayer() {
       height: '48px',
     },
     */
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'player'
-    },
+    texture: playerConfig.texture,
     mass: 222,
     friction: 0.5,
     // Default friction
@@ -1406,6 +1431,11 @@ function loadPluginsFromConfig(_ref) {
           camera: this.config.camera
         });
       }
+      if (graphics.includes('css3D')) {
+        this.use('CSS3DGraphics', {
+          camera: this.config.camera
+        });
+      }
       if (graphics.includes('phaser')) {
         this.use('PhaserGraphics', {
           camera: this.config.camera
@@ -1487,9 +1517,16 @@ function localGameLoop(game, playerId) {
 
   // Call the next iteration of the loop using requestAnimationFrame
   if (game.localGameLoopRunning) {
-    requestAnimationFrame(function rafLocalGameLoop() {
+    _requestAnimationFrame(function rafLocalGameLoop() {
       localGameLoop(game, playerId);
     });
+  }
+}
+function _requestAnimationFrame(callback) {
+  if (typeof window === 'undefined') {
+    return setTimeout(callback, 0);
+  } else {
+    return window.requestAnimationFrame(callback);
   }
 }
 var _default = exports["default"] = localGameLoop;
@@ -1756,7 +1793,7 @@ function switchWorlds(selectedWorld) {
       }
     });
   }
-  game.systems.entity.clearAllEntities(true);
+  game.systems.entity.removeAllEntities(true);
   var worldName = 'XState';
   worldName = 'Sutra';
   worldName = selectedWorld;

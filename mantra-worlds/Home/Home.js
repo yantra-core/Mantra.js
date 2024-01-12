@@ -31,9 +31,14 @@ class Home {
     game.customMovement = true;
 
     // game.data.camera.currentZoom = 2;
+    game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
     game.createDefaultPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
       position: {
         x: 0,
         y: 0

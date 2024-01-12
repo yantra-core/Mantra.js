@@ -577,6 +577,11 @@ class Game {
     }
   }
 
+  setSize(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
   zoom (scale) {
     if (this.camera && this.camera.zoom) {
       this.camera.zoom(scale);
