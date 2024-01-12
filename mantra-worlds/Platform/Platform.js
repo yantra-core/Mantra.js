@@ -201,6 +201,10 @@ class Platform {
     });
 
     game.createDefaultPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
       position: {
         x: 10,
         y: -100

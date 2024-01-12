@@ -202,7 +202,7 @@ if (mode === 'online') {
   
 
   // home = new worlds.TowerDefense();
-  game.use(new plugins.Border());
+  // game.use(new plugins.Border());
   game.start(function () {
     // game.use(new plugins.StarField())
     //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));

@@ -39,6 +39,8 @@ export default class Mouse {
     // TODO: have editor be aware if inspector is loaded
     // if so, show additional UX for selecting entities
     let target = event.target;
+    /* TODO: mouse over selects ent, make this configurable
+       was making it hard to debug the editor since it would switch entities
     if (target && target.getAttribute) {
       let mantraId = target.getAttribute('mantra-id');
       if (mantraId) {
@@ -47,6 +49,7 @@ export default class Mouse {
         this.game.selectedEntityId = mantraId;
       }
     }
+    */
 
     this.mousePosition = { x: event.clientX, y: event.clientY };
     if (event.target instanceof HTMLCanvasElement) {

@@ -220,6 +220,10 @@ class Home {
 
 
     game.createDefaultPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
       position: {
         x: 352,
         y: 0

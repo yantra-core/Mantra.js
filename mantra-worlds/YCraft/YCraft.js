@@ -19,6 +19,7 @@ class YCraft {
     let game = this.game;
     game.customMovement = false;
     game.setGravity(0, 0, 0);
+    game.setSize(1600, 900);
     game.use('Bullet');
     game.use('Block');
     game.use('YCraft', {
@@ -141,18 +142,17 @@ class YCraft {
     }
 
     // Remark: Players removed for initial demo, is working
+   
     game.createDefaultPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
       position: {
-        x: 75,
-        y: 75,
-        z: 0
+        x: 0,
+        y: 0
       }
     });
-
-
-    /* Not needed anymore?
-    game.systems.graphics.switchGraphics('CSSGraphics', function(){});
-    */
 
   }
 

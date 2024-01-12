@@ -1081,25 +1081,17 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = createDefaultPlayer;
 function createDefaultPlayer() {
   var playerConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  // console.log('creating default player')
-
+  console.log('creating default player', playerConfig);
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = {
       x: 0,
       y: 0
     };
   }
-  if (typeof playerConfig.texture === 'undefined') {
-    /*
-    playerConfig.texture = {
-      sheet: 'loz_spritesheet',
-      sprite: 'player'
-    };
-    */
-  }
   if (playerConfig.texture === 'none') {
     delete playerConfig.texture;
   }
+  console.log("using player texture", playerConfig);
   // check if game.currentPlayerId is already set,
   // if so return
   if (this.currentPlayerId) {

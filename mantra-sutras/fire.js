@@ -68,10 +68,17 @@ export default function fire(game) {
     } else {
       ent = collision.bodyA;
     }
+    // create a copy of the entity previous texture
+    // TODO: remove the createDefaultPlayer() call here
+    //       and instead have a game.on('player::death') event
+    //       listening in parent Sutra
+    let texture = ent.texture;
     game.removeEntity(ent.id);
     if (ent.type === 'PLAYER') {
       game.currentPlayerId = null;
-      game.createDefaultPlayer();
+      game.createDefaultPlayer({
+        texture
+      });
     }
   });
 

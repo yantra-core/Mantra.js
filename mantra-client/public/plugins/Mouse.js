@@ -23,7 +23,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
-    this.disableContextMenu = false;
+    this.disableContextMenu = true;
     this.isDragging = false;
     this.dragStartPosition = {
       x: 0,
@@ -55,14 +55,18 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       // TODO: have editor be aware if inspector is loaded
       // if so, show additional UX for selecting entities
       var target = event.target;
+      /* TODO: mouse over selects ent, make this configurable
+         was making it hard to debug the editor since it would switch entities
       if (target && target.getAttribute) {
-        var mantraId = target.getAttribute('mantra-id');
+        let mantraId = target.getAttribute('mantra-id');
         if (mantraId) {
           // if this is a Mantra entity, set the selectedEntityId
           // this is used for GUI rendering and CSSGraphics
           this.game.selectedEntityId = mantraId;
         }
       }
+      */
+
       this.mousePosition = {
         x: event.clientX,
         y: event.clientY

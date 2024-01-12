@@ -2325,10 +2325,17 @@ function fire(game) {
     } else {
       ent = collision.bodyA;
     }
+    // create a copy of the entity previous texture
+    // TODO: remove the createDefaultPlayer() call here
+    //       and instead have a game.on('player::death') event
+    //       listening in parent Sutra
+    var texture = ent.texture;
     game.removeEntity(ent.id);
     if (ent.type === 'PLAYER') {
       game.currentPlayerId = null;
-      game.createDefaultPlayer();
+      game.createDefaultPlayer({
+        texture: texture
+      });
     }
   });
 
@@ -3933,6 +3940,10 @@ var Home = /*#__PURE__*/function () {
       */
 
       game.createDefaultPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
         position: {
           x: 352,
           y: 0
@@ -4526,6 +4537,10 @@ var Platform = /*#__PURE__*/function () {
         }
       });
       game.createDefaultPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
         position: {
           x: 10,
           y: -100
@@ -6121,6 +6136,7 @@ var YCraft = /*#__PURE__*/function () {
       var game = this.game;
       game.customMovement = false;
       game.setGravity(0, 0, 0);
+      game.setSize(1600, 900);
       game.use('Bullet');
       game.use('Block');
       game.use('YCraft', {
@@ -6234,17 +6250,17 @@ var YCraft = /*#__PURE__*/function () {
       }
 
       // Remark: Players removed for initial demo, is working
+
       game.createDefaultPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
         position: {
-          x: 75,
-          y: 75,
-          z: 0
+          x: 0,
+          y: 0
         }
       });
-
-      /* Not needed anymore?
-      game.systems.graphics.switchGraphics('CSSGraphics', function(){});
-      */
     }
   }, {
     key: "update",
