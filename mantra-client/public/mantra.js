@@ -1081,7 +1081,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = createDefaultPlayer;
 function createDefaultPlayer() {
   var playerConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  console.log('creating default player', playerConfig);
+  //console.log('creating default player', playerConfig)
+
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = {
       x: 0,
@@ -1091,7 +1092,7 @@ function createDefaultPlayer() {
   if (playerConfig.texture === 'none') {
     delete playerConfig.texture;
   }
-  console.log("using player texture", playerConfig);
+
   // check if game.currentPlayerId is already set,
   // if so return
   if (this.currentPlayerId) {
@@ -1102,12 +1103,6 @@ function createDefaultPlayer() {
     shape: 'triangle',
     width: 16,
     height: 16,
-    /*
-    style: {
-      width: '48px',
-      height: '48px',
-    },
-    */
     texture: playerConfig.texture,
     mass: 222,
     friction: 0.5,

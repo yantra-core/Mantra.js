@@ -2520,7 +2520,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = hexapod;
 // hexapod.js - Marak Squires 2023
-
 function hexapod(game) {
   // create 22 hexapods
   // start at 0,0 and make them in a circle with radius 80
@@ -2538,16 +2537,10 @@ function hexapod(game) {
       texture: 'demon',
       width: 8,
       height: 8,
-      isStatic: false,
-      // isSensor: true,
       position: {
         x: x,
         y: y
-      },
-      velocity: {
-        x: 0,
-        y: 0
-      } // Assuming velocity is part of the hexapod entity
+      }
     });
   }
   var rules = game.createSutra();
@@ -2754,7 +2747,8 @@ function platformMovement(game) {
   var defaultControlsMapping = {
     A: 'MOVE_LEFT',
     D: 'MOVE_RIGHT',
-    SPACE: 'JUMP'
+    SPACE: 'JUMP',
+    O: 'JUMP' // virtual gamepad Y button
     // Other controls can be mapped as needed
   };
   function handleInputs(entityId, input) {
@@ -2938,8 +2932,7 @@ var Home = /*#__PURE__*/function () {
 
       // bypass default input movement
       game.customMovement = true;
-
-      // game.data.camera.currentZoom = 2;
+      game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
       game.createDefaultPlayer({
@@ -3093,6 +3086,25 @@ var Home = /*#__PURE__*/function () {
           z: 32
         }
       });
+
+      // if touch warp, switch to Sutra level
+      /*
+      game.createEntity({
+        type: 'WARP',
+        kind: 'Sutra',
+        width: 64,
+        height: 64,
+        depth: 64,
+        texture: 'warp-to-sutra',
+        isStatic: true,
+        isSensor: true,
+        position: {
+          x: 0,
+          y: 210,
+          z: 32
+        }
+      });
+      */
 
       // text label saying "Warp To YCraft World"
       game.createEntity({
@@ -4934,6 +4946,19 @@ var Sutra = /*#__PURE__*/function () {
       game.createDefaultPlayer();
       //createPlayPauseButton();
 
+      game.createEntity({
+        type: 'WARP',
+        kind: 'Home',
+        texture: 'warp-to-home',
+        width: 64,
+        height: 64,
+        depth: 1,
+        isStatic: true,
+        position: {
+          x: -100,
+          y: -100
+        }
+      });
       function createPlayPauseButton() {
         game.createEntity({
           name: 'play-pause-button',

@@ -8,7 +8,7 @@ export default class Mouse {
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };
-    this.disableContextMenu = true;
+    this.disableContextMenu = false;
     this.isDragging = false;
     this.dragStartPosition = { x: 0, y: 0 };
 
@@ -171,6 +171,15 @@ export default class Mouse {
     if (this.disableContextMenu) {
       document.addEventListener('contextmenu', event => event.preventDefault());
     }
+
+    // TODO: drag and drop to move map
+    // TODO: two finger pinch to zoom
+    document.addEventListener('touchmove', function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
   }
   unbindAllEvents() {
     // unbind all events

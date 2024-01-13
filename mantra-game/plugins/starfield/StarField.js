@@ -32,8 +32,11 @@ class StarField {
         if (graphicInterface.id === 'graphics-babylon') { // hard-code per graphics pipeline for now
           game.use(new BabylonStarField());
         }
+        // for now, current CSS StarField is fully intefactive
+        // we'll need to optimize the CSS entity rendering just a bit for this to work 
+        // more performantly with a large number of stars
         if (graphicInterface.id === 'graphics-css') { // hard-code per graphics pipeline for now
-          game.use(new CSSStarField());
+          // game.use(new CSSStarField());
         }
       });
     }

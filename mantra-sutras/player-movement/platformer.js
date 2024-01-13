@@ -6,6 +6,7 @@ export default function platformMovement(game) {
     A: 'MOVE_LEFT',
     D: 'MOVE_RIGHT',
     SPACE: 'JUMP',
+    O: 'JUMP', // virtual gamepad Y button
     // Other controls can be mapped as needed
   };
 

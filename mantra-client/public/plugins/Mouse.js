@@ -23,7 +23,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
-    this.disableContextMenu = true;
+    this.disableContextMenu = false;
     this.isDragging = false;
     this.dragStartPosition = {
       x: 0,
@@ -205,6 +205,16 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           return event.preventDefault();
         });
       }
+
+      // TODO: drag and drop to move map
+      // TODO: two finger pinch to zoom
+      document.addEventListener('touchmove', function (event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, {
+        passive: false
+      });
     }
   }, {
     key: "unbindAllEvents",

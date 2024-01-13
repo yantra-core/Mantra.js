@@ -68,7 +68,6 @@ class GamepadGUI {
       if (isPointerDown) {
         handleDpadInput(ev);
       }
-
     });
 
     document.addEventListener('pointerup', (ev) => {
@@ -116,7 +115,6 @@ class GamepadGUI {
 
       document.dispatchEvent(new KeyboardEvent('keydown', { 'code': keyMap[newDirection] }));
 
-
     }
 
     function cancelDpadInput() {
@@ -150,6 +148,12 @@ class GamepadGUI {
     start.addEventListener('pointerup', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyI' }));
     });
+
+    if (is_touch_enabled()) {
+      // hide start and select buttons
+      select.style.display = 'none';
+      start.style.display = 'none';
+    }
 
     // bind event for id dpad_up, dpad_down, etc
     let dpad_up = document.getElementById('up');
@@ -352,3 +356,16 @@ buttonR.addEventListener('pointerup', (ev) => {
 });
 
 */
+
+// TODO: implement haptic feedback for buttons ( if available )
+function triggerHapticFeedback() {
+  if (navigator.vibrate) {
+      // Vibration in milliseconds
+      // This is a simple vibration; you can also create patterns
+      navigator.vibrate(50); 
+      game.playNote('C4', 0.8);
+  } else {
+    // play low frequency tone
+    game.playNote('C4');
+  }
+}

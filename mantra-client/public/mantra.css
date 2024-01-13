@@ -7,12 +7,16 @@ body {
   font-family: Teko, Helvetica, Arial, sans-serif;
   font-size: 3vmin;
   background: #007fff;
+  position: fixed; /* Keeps the position */
+
   overflow: hidden; /* ensures no scrolling */
   perspective: none;
   transform: none;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
 }
 
 
@@ -70,6 +74,7 @@ body {
 
 #dpad-area {
   cursor: pointer;
+  transform: scale(1.2);
 }
 
 .is3d>div {
@@ -582,14 +587,10 @@ button.circle div {
   width: 30vmin;
   height: 30vmin;
   border-radius: 50%;
-  right: 40px;
+  right: 3vw;
   bottom: 40px;
   z-index: 19999;
-  box-shadow:
-    0vmin 0vmin 1vmin 1.4vmin var(--gray-light),
-    1.25vmin 1vmin 1vmin 0vmin #fffc,
-    1.25vmin -1vmin 1vmin 0vmin #fffa;
-  border: 1px solid #0001;
+  transform: scale(1.8);
 }
 
 .buttons::before,
@@ -613,6 +614,15 @@ button.circle div {
   top: 14.05vmin;
   left: 9.75vmin;
 }
+
+
+/* Adjustments for smaller screens (Responsive Design) */
+@media (max-width: 768px) {
+  .buttons {
+    right: 30px
+  }
+}
+
 
 #zoomSlider {
   position: absolute;
@@ -651,15 +661,6 @@ button.circle div {
   cursor: pointer;
 }
 
-/* You may add additional styles for the track if needed */
-
-
-/* Adjustments for smaller screens (Responsive Design) */
-@media (max-width: 768px) {
-  #snes-gamepad {
-    /* Additional responsive adjustments if needed */
-  }
-}
 
 /* END GAMEPAD CODE */
 

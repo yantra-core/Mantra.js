@@ -17,7 +17,7 @@ class Home {
     this.createWorld();
   }
 
-  unload () {
+  unload() {
     // remove event listeners
     console.log('Home::unload')
     this.game.off('entityInput::handleInputs', this.handleInputs);
@@ -30,7 +30,7 @@ class Home {
     // bypass default input movement
     game.customMovement = true;
 
-    // game.data.camera.currentZoom = 2;
+    game.setZoom(4.5);
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
@@ -189,6 +189,25 @@ class Home {
         z: 32
       }
     });
+
+    // if touch warp, switch to Sutra level
+    /*
+    game.createEntity({
+      type: 'WARP',
+      kind: 'Sutra',
+      width: 64,
+      height: 64,
+      depth: 64,
+      texture: 'warp-to-sutra',
+      isStatic: true,
+      isSensor: true,
+      position: {
+        x: 0,
+        y: 210,
+        z: 32
+      }
+    });
+    */
 
     // text label saying "Warp To YCraft World"
     game.createEntity({
@@ -500,7 +519,7 @@ class Home {
     });
 
     */
-  
+
   }
 
 
