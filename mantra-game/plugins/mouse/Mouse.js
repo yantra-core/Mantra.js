@@ -8,7 +8,7 @@ export default class Mouse {
     // this.communicationClient = communicationClient;
     // this.game = this.communicationClient.game;
     this.mousePosition = { x: 0, y: 0 };
-    this.disableContextMenu = false;
+    this.disableContextMenu = true;
     this.isDragging = false;
     this.dragStartPosition = { x: 0, y: 0 };
 

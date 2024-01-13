@@ -41,11 +41,16 @@ export default function createToolbar(game) {
   inspectorIcon.style.marginTop = '5px';
   inspectorIcon.style.filter = 'invert(100%)';
 
+  if (is_touch_enabled()) {
+    // hide inspector icon on touch devices
+    inspectorIcon.style.display = 'none';
+  }
+
   // TODO: have this change values based on open / cloase state
   // . Click in-game on Entity to Inspect
   inspectorIcon.onclick = () => this.showInspector();
 
-  toolbarMenu.addElement('secondary', inspectorIcon);
+  // toolbarMenu.addElement('secondary', inspectorIcon);
 
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
@@ -101,6 +106,8 @@ export default function createToolbar(game) {
   graphicsIcon.style.position = 'relative';
   graphicsIcon.style.top = '10px';
 
+
+
   // toolbarMenu.addItem('secondary', { text: 'Settings' });
   const graphicsSelector = new GraphicsSelector(this);
   graphicsSelector.selectBox.style.fontSize = '22px';
@@ -122,7 +129,7 @@ export default function createToolbar(game) {
   graphicsSelectorLabel.style.cursor = 'pointer';
 
   // set value to foo
-  graphicsSelectorLabel.innerText = 'Switch Graphics';
+  graphicsSelectorLabel.innerText = 'Graphics';
 
   // add label to graphicsSelectorItem
   graphicsSelectorItem.appendChild(graphicsSelectorLabel);
@@ -156,11 +163,10 @@ export default function createToolbar(game) {
   worldSelectorLabel.style.cursor = 'pointer';
 
   // set value to foo
-  worldSelectorLabel.innerText = 'Switch Worlds';
+  worldSelectorLabel.innerText = 'Worlds';
 
   // add label to worldSelectorItem
   worldSelectorItem.appendChild(worldSelectorLabel);
-
 
   worldSelectorItem.onpointerdown = () => {
     // hide world selector
@@ -172,16 +178,23 @@ export default function createToolbar(game) {
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
 
-  toolbarMenu.addElement('secondary', worldSelectorItem);
-  toolbarMenu.addElement('secondary', graphicsSelectorItem);
+  // Create a flex container for the selectors
+  let selectorsContainer = document.createElement('div');
+  selectorsContainer.style.display = 'flex'; // Enable Flexbox
+  selectorsContainer.style.alignItems = 'center'; // Align items vertically in the center
+  selectorsContainer.style.justifyContent = 'space-between'; // Space out items
+  selectorsContainer.style.margin = '20px'; // Add some margin for aesthetics
 
+  selectorsContainer.appendChild(inspectorIcon);
+  selectorsContainer.appendChild(graphicsSelectorItem);
+  selectorsContainer.appendChild(worldSelectorItem);
+  toolbarMenu.addElement('secondary', selectorsContainer);
+  
   if (game.worlds.length > 0) {
     let currentWorldName = game.worlds[0].constructor.name;
     worldSelector.selectElement(currentWorldName);
   }
 
-  if (is_touch_enabled()) {
-  }
   // toolbarMenu.toolbar.style.display = 'none';
   toolbarMenu.slideOutToolbar()
 

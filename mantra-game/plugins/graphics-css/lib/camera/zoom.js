@@ -13,20 +13,34 @@ export default function zoom(scale, transitionTime = '0s') {
       let centerX = window.innerWidth / 2;
       let centerY = window.innerHeight / 2;
 
+      /*
+      if (true || game.embed) {
+        // use the window frameHeight and frameWidth to calculate the center
+        centerX = window.frameElement.clientWidth / 2;
+        centerY = window.frameElement.clientHeight / 2;
+      }
+      */
+
       // The logic here ensures that the screen center remains constant during zoom
       // let newCameraX = (centerX - (centerX / scale));
       let newCameraX =  (centerY - (centerY / scale));
       let newCameraY = (centerY - (centerY / scale));
 
       //game.viewportCenterXOffset = newCameraX;
-      game.viewportCenterYOffset = newCameraY + 100;
-
-      // alert('zooming');
-      console.log('newCameraX', newCameraX, 'newCameraY', newCameraY);
+      let minDistanceFromTop = 50;
+      if (is_touch_enabled()) {
+        minDistanceFromTop = 100;
+      }
+      game.viewportCenterYOffset = newCameraY + minDistanceFromTop;
 
       // Apply scale and translate transform
       gameViewport.style.transform = `scale(${scale})`;
   } else {
       console.log('Warning: could not find gameHolder div, cannot zoom');
   }
+}
+
+
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
