@@ -1,12 +1,10 @@
 export default function updateEntityPosition(entityElement, entityData) {
 
-
   let position = entityData.position;
   let rotation = entityData.rotation;
   let type = entityData.type;
   let width = entityData.width;
   let height = entityData.height;
-
 
   // Adjust the position based on the camera position
   if (type === 'BULLET') {
@@ -16,6 +14,7 @@ export default function updateEntityPosition(entityElement, entityData) {
     //position.y = position.y + height / 2;
     // console.log("og position", position, this.cameraPosition)
   }
+
   const adjustedPosition = {
     x: position.x - this.cameraPosition.x + window.outerWidth / 2,
     y: position.y - this.cameraPosition.y + window.outerHeight / 2
@@ -23,17 +22,6 @@ export default function updateEntityPosition(entityElement, entityData) {
 
   let domX = adjustedPosition.x - width / 2;
   let domY = adjustedPosition.y - height / 2;
-  
-
-  /*
-  if (entityData.type === 'BACKGROUND') {
-    // set origin to bottom left
-    domX += entityData.width / 2;
-    domY -= entityData.height / 2;
-  }
-  */
-
-  // console.log(position, adjustedPosition, domX, domY)
 
   // convert rotation to degrees
   let angle = rotation * (180 / Math.PI);

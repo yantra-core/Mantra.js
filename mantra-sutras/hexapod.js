@@ -1,5 +1,4 @@
 // hexapod.js - Marak Squires 2023
-
 export default function hexapod(game) {
 
   // create 22 hexapods
@@ -19,13 +18,10 @@ export default function hexapod(game) {
       texture: 'demon',
       width: 8,
       height: 8,
-      isStatic: false,
-      // isSensor: true,
       position: {
         x: x,
         y: y
-      },
-      velocity: { x: 0, y: 0 } // Assuming velocity is part of the hexapod entity
+      }
     });
   }
 

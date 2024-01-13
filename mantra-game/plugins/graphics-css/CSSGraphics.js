@@ -14,7 +14,7 @@ import updateEntityPosition from './lib/updateEntityPosition.js';
 import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
 import unload from './lib/unload.js';
-import zoom from './lib/zoom.js';
+import zoom from './lib/camera/zoom.js';
 
 import render from './lib/render.js';
 import removeGraphic from './lib/removeGraphic.js';
@@ -85,10 +85,10 @@ class CSSGraphics extends GraphicsInterface {
     game.loadingPluginsCount--;
 
     this.game.viewportCenterXOffset = 0;
-    this.game.viewportCenterYOffset = -windowHeight / 2;
+    this.game.viewportCenterYOffset = 0;
 
     game.on('game::ready', () => {
-      this.zoom(4.5); // game.data.camera.currentZoom
+      this.zoom(1); // game.data.camera.currentZoom
     });
   }
 
