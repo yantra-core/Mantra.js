@@ -1,48 +1,88 @@
 // blackhole.js - Marak Squires 2023
-export default function blackHoleSutra(entityData, game) {
-
-  // Create the Black Hole entity
-  const blackHole = game.createEntity({
-    type: 'BLACK_HOLE',
-    texture: 'fire',
-    isStatic: true,
-    isSensor: true,
-    radius: 20,
-    position: {
-      x: entityData.position.x,
-      y: entityData.position.y
-    },
-    mass: 100
-  });
+export default function blackHoleSutra(game, context) {
 
   let rules = game.createSutra();
 
+  // Remark: Note namspace of sutraname::methodname
+  //         Mantra runs a single Sutra tree which all entities are bound to
+  //         This requires a unique namespace for each Sutra
+  rules.on('blackhole::create', (entityData = {
+    position: { x: 0, y: 0 }
+  }) => {
+
+    // Create the Black Hole entity
+    const blackHole = game.createEntity({
+      type: 'BLACK_HOLE',
+      texture: 'fire',
+      isStatic: true,
+      isSensor: true,
+      radius: 20,
+      position: {
+        x: entityData.position.x,
+        y: entityData.position.y
+      },
+      mass: 100
+    });
+
+  });
+
   // Define the gravitational constant
-  const GRAVITATIONAL_CONSTANT = 0.0001; // Adjust as needed for gameplay
+  const GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
 
   rules.addCondition('gravityTick', (entity, gameState) => gameState.tick % 5 === 0);
 
   rules.if('gravityTick').then('applyGravity');
 
   rules.on('applyGravity', (entityData, node, gameState) => {
-    // console.log('gameState', gameState)
-    Object.keys(gameState.ents._).forEach(eId => {
-      let entity = gameState.ents._[eId];
-      if (entity.type !== 'BLACK_HOLE') {
-        applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
-      }
-    });
+
+    // check if this running locally on a context or globally on all BLACK_HOLE entities
+    if (typeof context !== 'undefined') {
+      Object.keys(gameState.ents._).forEach(eId => {
+        let entity = gameState.ents._[eId];
+        if (entity.type !== 'BLACK_HOLE') {
+          applyGravity(context, entity, GRAVITATIONAL_CONSTANT);
+        }
+      });
+      return;
+    }
+
+    if (gameState.ents.BLACK_HOLE) {
+      gameState.ents.BLACK_HOLE.forEach(blackHole => {
+        Object.keys(gameState.ents._).forEach(eId => {
+          let entity = gameState.ents._[eId];
+          if (entity.type !== 'BLACK_HOLE') {
+            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+          }
+        });
+      });
+    }
   });
 
   rules.if('entTouchedBlackhole').then('blackHoleCollision');
   rules.addCondition('entTouchedBlackhole', (entity, gameState) => {
-    return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
+    // check if this running locally on a context or globally on all BLACK_HOLE entities
+    if (typeof context !== 'undefined') {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity[context.type];
+    } else {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
+    }
   });
+
   rules.on('blackHoleCollision', (collision) => {
     let pendingDestroy = collision.bodyA;
+
     if (collision.bodyA.type === 'BLACK_HOLE') {
       pendingDestroy = collision.bodyB;
     }
+
+    if (typeof context !== 'undefined') {
+      if (collision.bodyA.type === context.type) {
+        pendingDestroy = collision.bodyB;
+      } else {
+        pendingDestroy = collision.bodyA;
+      }
+    }
+
     game.removeEntity(pendingDestroy.id);
   });
 

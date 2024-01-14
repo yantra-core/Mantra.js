@@ -267,6 +267,12 @@ class Entity {
       this.game.components.items.set(entityId, entityData.items);
     }
 
+    // Sutra rules
+    if (typeof entityData.sutra !== 'undefined') {
+      // overwrite sutra ( for now )
+      this.game.components.sutra.set(entityId, entityData.sutra);
+    }
+
     if (typeof entityData.style !== 'undefined') {
       // overwrite all items ( for now )
       // Remark: in the future we could merge instead of overwrite
@@ -317,6 +323,7 @@ class Entity {
       isSensor: false,
       restitution: 0,
       items: null,
+      sutra: null,
       owner: 0, // 0 = server
       inputs: null,
       destroyed: false,
@@ -349,7 +356,7 @@ class Entity {
       config.startingPosition = config.position;
     }
 
-    const { name, type, kind, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, owner, inputs, lifetime, yCraft, text, style, texture } = config;
+    const { name, type, kind, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, sutra, owner, inputs, lifetime, yCraft, text, style, texture } = config;
     let { x, y } = position;
 
     /*
@@ -380,9 +387,9 @@ class Entity {
     this.game.addComponent(entityId, 'shape', shape);
     this.game.addComponent(entityId, 'color', color);
     this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
-
     this.game.addComponent(entityId, 'owner', owner);
     this.game.addComponent(entityId, 'items', items);
+    this.game.addComponent(entityId, 'sutra', sutra);
     this.game.addComponent(entityId, 'inputs', inputs);
     this.game.addComponent(entityId, 'lifetime', lifetime);
     this.game.addComponent(entityId, 'destroyed', false);
