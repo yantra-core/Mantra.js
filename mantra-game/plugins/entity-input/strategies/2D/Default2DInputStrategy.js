@@ -16,6 +16,7 @@ class DefaultTwoDimensionalInputStrategy {
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
       K: 'FIRE_BULLET',
+      L: 'DROP_BOMB',
       O: 'BARREL_ROLL',
 
       U: 'SELECT_MENU',
@@ -99,6 +100,16 @@ class DefaultTwoDimensionalInputStrategy {
 
     if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
     if (actions.includes('ROTATE_RIGHT')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);
+
+    if (actions.includes('ZOOM_IN')) {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom + 0.1);
+    }
+
+    if (actions.includes('ZOOM_OUT')) {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom - 0.1);
+    }
 
     if (game.systems.bullet) {
       if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);

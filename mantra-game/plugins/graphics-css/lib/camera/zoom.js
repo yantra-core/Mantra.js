@@ -1,4 +1,16 @@
+let minZoom = 0.1;
+let maxZoom = 10;
+
+
 export default function zoom(scale, transitionTime = '0s') {
+
+  if (scale < minZoom) {
+    scale = minZoom;
+  }
+  if (scale > maxZoom) {
+    scale = maxZoom;
+  }
+
   this.game.data.camera.currentZoom = scale;
 
   let gameViewport = document.getElementById('gameHolder');
@@ -29,7 +41,7 @@ export default function zoom(scale, transitionTime = '0s') {
       //game.viewportCenterXOffset = newCameraX;
       let minDistanceFromTop = 50;
       if (is_touch_enabled()) {
-        minDistanceFromTop = 100;
+        minDistanceFromTop = 0;
       }
       game.viewportCenterYOffset = newCameraY + minDistanceFromTop;
 

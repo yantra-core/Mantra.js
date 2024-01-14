@@ -9,23 +9,27 @@ let keyMap = {
 
 class GamepadGUI {
   static id = 'gui-gamepad';
-  constructor() {
+  constructor({ useZoomSlider = true } = {}) {
     this.id = GamepadGUI.id;
     this.hiding = false;
     this.moving = null;
+    this.useZoomSlider = useZoomSlider;
     this.lastDirection = null; // Add this line
   }
 
   init(game) {
     this.game = game;
-    this.zoomSlider = new ZoomSlider(game);
-    // this.zoomSlider.setValue(game.data.camera.currentZoom);
-    this.zoomSlider.setValue(4.5);
+    if (this.useZoomSlider) {
+      this.zoomSlider = new ZoomSlider(game);
+      // this.zoomSlider.setValue(game.data.camera.currentZoom);
+      this.zoomSlider.setValue(4.5);
 
-    // Remark: why is this needed for slider, but not for gamepad?
-    game.on('game::ready', () => {
-      this.zoomSlider.slider.style.display = 'block';
-    });
+      // Remark: why is this needed for slider, but not for gamepad?
+      game.on('game::ready', () => {
+        this.zoomSlider.slider.style.display = 'block';
+      });
+
+    }
 
     let controllerHolder = document.createElement('div');
     controllerHolder.style.position = 'fixed';
@@ -140,6 +144,24 @@ class GamepadGUI {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyU' }));
     });
 
+
+    graphics.addEventListener('pointerdown', (ev) => {
+      // show graphics menu
+      // get graphicsSelector element
+      // TOGGLE GRAPHICS SETTINGS
+      let current = game.graphics[0].constructor.name;
+      if (current === 'BabylonGraphics') {
+        game.switchGraphics('CSSGraphics')
+
+      } else if (current === 'CSSGraphics') {
+        game.switchGraphics('BabylonGraphics')
+      }
+      //document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyG' }));
+    });
+    graphics.addEventListener('pointerup', (ev) => {
+      //document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyG' }));
+    });
+
     let start = document.getElementById('start');
 
     start.addEventListener('pointerdown', (ev) => {
@@ -179,6 +201,26 @@ class GamepadGUI {
     buttonX.addEventListener('pointerup', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyO' }));
     });
+
+    let buttonB = document.getElementById('b');
+    let buttonA = document.getElementById('a');
+
+    buttonB.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyL' }));
+    });
+
+    buttonB.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyL' }));
+    });
+
+    buttonA.addEventListener('pointerdown', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyP' }));
+    });
+
+    buttonA.addEventListener('pointerup', (ev) => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyP' }));
+    });
+
 
     if (false && !is_touch_enabled()) {
       let controller = document.getElementById('snes-gamepad');
@@ -255,6 +297,9 @@ class GamepadGUI {
   
   <!-- Menu buttons (start/select) -->
   <button id="select" class="is3d">Select<div style="--z:1"></div><div style="--z:2"></div><div style="--z:3"></div><div style="--z:4"></div></button>
+
+  <button id="graphics" class="is3d">Graphics<div style="--z:1"></div><div style="--z:2"></div><div style="--z:3"></div><div style="--z:4"></div></button>
+
   <button id="start" class="is3d">Start<div style="--z:1"></div><div style="--z:2"></div><div style="--z:3"></div><div style="--z:4"></div></button>
   <!-- Action buttons -->
   <div class="buttons">
@@ -360,10 +405,10 @@ buttonR.addEventListener('pointerup', (ev) => {
 // TODO: implement haptic feedback for buttons ( if available )
 function triggerHapticFeedback() {
   if (navigator.vibrate) {
-      // Vibration in milliseconds
-      // This is a simple vibration; you can also create patterns
-      navigator.vibrate(50); 
-      game.playNote('C4', 0.8);
+    // Vibration in milliseconds
+    // This is a simple vibration; you can also create patterns
+    navigator.vibrate(50);
+    game.playNote('C4', 0.8);
   } else {
     // play low frequency tone
     game.playNote('C4');

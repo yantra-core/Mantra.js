@@ -31,7 +31,9 @@ class Graphics {
       position: {
         x: 0,
         y: 0
-      }
+      },
+      minZoom: 0.1,
+      maxZoom: 10,
     };
 
     // Ensure the gameHolder div exists
