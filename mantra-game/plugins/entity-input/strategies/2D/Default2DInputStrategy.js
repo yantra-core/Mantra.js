@@ -18,7 +18,8 @@ class DefaultTwoDimensionalInputStrategy {
       K: 'FIRE_BULLET',
       L: 'DROP_BOMB',
       O: 'BARREL_ROLL',
-
+      P: 'CAMERA_SHAKE',
+      Digit0: 'SELECT_WORLD',
       U: 'SELECT_MENU',
       //LEFT: 'ROTATE_LEFT',
       //RIGHT: 'ROTATE_RIGHT'
@@ -103,12 +104,12 @@ class DefaultTwoDimensionalInputStrategy {
 
     if (actions.includes('ZOOM_IN')) {
       let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom + 0.1);
+      game.setZoom(currentZoom + 0.05);
     }
 
     if (actions.includes('ZOOM_OUT')) {
       let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom - 0.1);
+      game.setZoom(currentZoom - 0.05);
     }
 
     if (game.systems.bullet) {
@@ -124,10 +125,15 @@ class DefaultTwoDimensionalInputStrategy {
 
     if (actions.includes('SELECT_MENU')) { }
 
+    // camera shake
+    if (actions.includes('CAMERA_SHAKE')) {
+      game.shakeCamera();
+    }
+
     // barrel roll
     if (actions.includes('BARREL_ROLL')) {
       if (typeof this.game.data.camera.rotation === 'number') {
-        game.rotateCamera(this.game.data.camera.rotation + 360);
+        game.rotateCamera(360);
         // console.log("this.game.data.camera.rotation", this.game.data.camera.rotation)
       } else {
         // rotate the camera 360 degrees

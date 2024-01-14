@@ -34,7 +34,6 @@ export default function hexapod(game) {
   const PERCEPTION_RADIUS = 1500;
   const FIELD_OF_VIEW = 1500;
 
-
   // hexapods grow on bullet hit
   rules.if('bulletHitHexapod').then('hexapodGrow');
   rules.addCondition('bulletHitHexapod', (entity, gameState) => {

@@ -37,6 +37,14 @@ class CSSCamera {
     this.follow = true;
 
     this.game.systemsManager.addSystem('graphics-css-camera', this);
+
+    let gameHolder = document.getElementById('gameHolder');
+    if (!gameHolder) {
+      gameHolder = document.createElement('div');
+      gameHolder.id = 'gameHolder';
+      document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+    }
+
     this.gameViewport = document.getElementById('gameHolder');
     this.gameViewport.style.transformOrigin = 'center center';
 

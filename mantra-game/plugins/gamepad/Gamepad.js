@@ -5,6 +5,8 @@ export default class Gamepad {
   constructor() {
     this.id = Gamepad.id;
     this.gamepads = {};
+    this.lastControlsAllFalse = true;
+
   }
 
   init(game) {
@@ -44,38 +46,52 @@ export default class Gamepad {
   sendInputs() {
     for (let index in this.gamepads) {
       const gamepad = this.gamepads[index];
-  
+
       // Axes for left analog stick
       const xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
       const yAxis = gamepad.axes[1]; // Up (-1) to Down (1)
-  
+
       // Deadzone for analog stick to prevent drift
       const deadzone = 0.1;
-  
+
       // Map left stick to WASD keys
-      // TODO: move this code to part of the entityInput strategy
       const controls = {
         W: yAxis < -deadzone, // Up
         S: yAxis > deadzone,  // Down
         A: xAxis < -deadzone, // Left
         D: xAxis > deadzone,  // Right
+        // y button
+        P: gamepad.buttons[1].pressed, // "Y" button 
+        // x button
+        K: gamepad.buttons[3].pressed, // "X" button
+        // b button
+        L: gamepad.buttons[2].pressed, // "B" button 
+        // a button
+        O: gamepad.buttons[0].pressed, // "A" button
+        // start button
+        I: gamepad.buttons[9].pressed, // "Start" button for "I" key
+        // select button
+        U: gamepad.buttons[8].pressed, // "Select" button for "U" key
         SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
       };
-  
-      // console.log('controls', controls)
-      // Send the controls to the game logic or server
-      if (this.game.communicationClient) {
-        // dont send controls if all false
-        const allFalse = Object.keys(controls).every(key => !controls[key]);
-        if (allFalse) {
-          // Remark: We may have to remove this
-          return;
-        }
-        // console.log('sending controls from gpad', controls)
 
-        this.game.communicationClient.sendMessage('player_input', { controls });
+      // console.log(gamepad.buttons, 'controls', controls)
+
+      // Send the controls to the game logic or server
+
+      // Check if all controls are false
+      const allFalse = Object.keys(controls).every(key => !controls[key]);
+
+
+      // Send controls if they are not all false or if the last controls were not all false
+      if (!allFalse /*|| !this.lastControlsAllFalse*/) {
+        this.lastControlsAllFalse = allFalse;
+        if (this.game.communicationClient) {
+          this.game.communicationClient.sendMessage('player_input', { controls });
+        }
       }
     }
+
   }
-  
 }
+  

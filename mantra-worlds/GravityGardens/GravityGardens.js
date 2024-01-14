@@ -40,7 +40,7 @@ class GravityGardens {
       L: 'ZOOM_OUT',
       O: 'BARREL_ROLL',
       P: 'CAMERA_SHAKE',
-      U: 'SELECT_MENU',
+      U: 'SELECT_MENU'
     });
 
     game.use('StarField');

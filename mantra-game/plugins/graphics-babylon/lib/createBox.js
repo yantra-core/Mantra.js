@@ -16,7 +16,6 @@ export default function createBox(entityData) {
   }
   */
 
-
   if (typeof game.getTexture(entityData.texture) !== 'undefined') {
     let texture = game.getTexture(entityData.texture);
     let graphic = this.apply2DTexture(box, entityData);
@@ -35,9 +34,6 @@ export default function createBox(entityData) {
       // TODO: Implement a method to tilt the texture by 30 degrees
       // This might require custom shaders or adjusting the mesh's UVs
     }
-
-
-
 
   } else if (entityData.color) {
     // Incoming color is int color value

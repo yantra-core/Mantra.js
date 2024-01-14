@@ -15,6 +15,9 @@ class Home {
   init(game) {
     this.game = game;
     this.createWorld();
+
+
+
   }
 
   unload() {
@@ -28,7 +31,7 @@ class Home {
     let game = this.game;
 
     // bypass default input movement
-    game.customMovement = true;
+    // game.customMovement = true;
 
     game.setZoom(4.5);
     game.setSize(16000, 9000);
@@ -43,6 +46,20 @@ class Home {
         x: 0,
         y: 0
       }
+    });
+
+    game.setControls({
+      W: 'MOVE_FORWARD',
+      S: 'MOVE_BACKWARD',
+      A: 'MOVE_LEFT',
+      D: 'MOVE_RIGHT',
+      SPACE: 'FIRE_BULLET',
+      // K: 'FIRE_BULLET',
+      K: 'ZOOM_IN',
+      L: 'ZOOM_OUT',
+      O: 'BARREL_ROLL',
+      P: 'CAMERA_SHAKE',
+      U: 'SELECT_MENU'
     });
 
     // game.setBackground('#007F00');

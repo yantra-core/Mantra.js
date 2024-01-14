@@ -25,7 +25,6 @@ class BabylonGraphics extends GraphicsInterface {
     this.async = BabylonGraphics.async;
     this.engine = null;
     this.scene = null;
-
     this.createBox = createBox.bind(this);
     this.getBlock = getBlock.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
@@ -214,6 +213,7 @@ class BabylonGraphics extends GraphicsInterface {
       // All assets are loaded, now you can emit your ready event
       game.emit('plugin::ready::graphics-babylon', this);
       game.loadingPluginsCount--;
+      document.body.style.cursor = 'default';
     };
 
     // Start loading the assets
@@ -455,10 +455,15 @@ class BabylonGraphics extends GraphicsInterface {
     this.engine.dispose();
     this.scene.dispose();
     // remove canvas
+
     let canvas = document.getElementById('babylon-render-canvas');
     if (canvas) {
+      // hide canvas
+      // canvas.style.display = 'none';
       canvas.remove();
     }
+
+
   }
 
 }

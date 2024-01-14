@@ -8,6 +8,9 @@ export default function unload () {
   this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
   delete this.game._plugins['CSSGraphics'];
 
+  // unload the CSSCamera
+  this.game.systemsManager.removeSystem('graphics-css-camera');
+
   // remove the wheel event listener
   // document.removeEventListener('wheel', this.cssMouseWheelZoom);
   this.mouseWheelEnabled = false;

@@ -46,7 +46,6 @@ export default function createGraphic(entityData) {
       //entityElement.style.borderRight = entityData.width / 2 + 'px solid white';
       //entityElement.style.borderBottom = entityData.height + 'px solid green';
       // entityElement.classList.add('pixelart-to-css');
-
       // Set default sprite
       // entityElement.classList.add('guy-right-0');
       this.inflateBox(entityElement, entityData);
@@ -65,6 +64,18 @@ export default function createGraphic(entityData) {
       }
 
       break;
+  }
+
+
+  // new api for entity.size
+  if (typeof entityData.radius !== 'undefined') {
+    // set circle size
+    entityElement.style.width = entityData.radius + 'px';
+    entityElement.style.height = entityData.radius + 'px';
+    entityElement.style.borderRadius = '50%';  // This will make the div a circle
+    // ensure background image will fit / cover expand
+    // entityElement.style.backgroundSize = `${entityData.radius}px ${entityData.radius}px`;
+    
   }
 
   this.renderDiv.appendChild(entityElement);

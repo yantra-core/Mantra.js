@@ -1,5 +1,5 @@
 // Method to smoothly rotate the camera over a given duration using CSS transitions
-export default function rotateCameraOverTime(targetAngle = 90, duration = 800) {
+export default function rotateCameraOverTime(targetAngle = 90, duration = 1100) {
   if (typeof targetAngle !== 'number' || typeof duration !== 'number') {
     console.error('Invalid arguments for rotateCameraOverTime. Both targetAngle and duration must be numbers.');
     return;
@@ -18,10 +18,13 @@ export default function rotateCameraOverTime(targetAngle = 90, duration = 800) {
   let centerX = window.innerWidth / 2;
   let centerY = window.innerHeight / 2;
 
-
+  // console.log('this.cameraPosition.y', this.game.data.camera.position.y)
+  // TODO: camera center is still not correct when zoom scale is not 1
   // no need for X?
   // centerX = centerX / currentZoom;
   // centerY = centerY / currentZoom;
+  // centerY = centerY + this.game.viewportCenterYOffset;
+  // centerY = centerY +  this.game.data.camera.position.y / currentZoom;
   // Set the transition property on the gameViewport
   this.gameViewport.style.transition = `transform ${duration}ms`;
 
@@ -36,6 +39,7 @@ export default function rotateCameraOverTime(targetAngle = 90, duration = 800) {
     this.gameViewport.style.transition = '';
     this.rotating = false;
     this.gameViewport.style.transformOrigin = '50% 50%';
+    this.gameViewport.style.transform = `scale(${currentZoom}) rotate(${0}deg)`;
 
   }, duration);
 }

@@ -21,7 +21,7 @@ class CurrentFPS {
     this.displayElement.style.position = 'absolute';
     this.displayElement.style.top = '8px'; // Adjusted from SnapshotSize plugin for spacing
     this.displayElement.style.right = '10px';
-    this.displayElement.style.zIndex = '9002';
+    this.displayElement.style.zIndex = '8889';
     this.displayElement.style.padding = '5px';
     this.displayElement.style.border = '1px solid #ddd';
     this.displayElement.style.borderRadius = '4px';

@@ -89,6 +89,8 @@ class CSSGraphics extends GraphicsInterface {
     this.game.viewportCenterXOffset = 0;
     this.game.viewportCenterYOffset = 0;
 
+    document.body.style.cursor = 'default';
+
     game.on('game::ready', () => {
       this.zoom(1); // game.data.camera.currentZoom
     });
