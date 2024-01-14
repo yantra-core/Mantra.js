@@ -2,7 +2,7 @@ export default function createWalker(game, config) {
 
   game.createEntity({
     type: 'Walker',
-    sutra: 'walker',
+    // sutra: 'walker', // TODO
     width: 22,
     height: 24,
     texture: {
@@ -16,7 +16,6 @@ export default function createWalker(game, config) {
       z: 32
     }
   });
-
 
   let walker = game.createSutra();
 
