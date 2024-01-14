@@ -59,7 +59,7 @@ class DefaultTwoDimensionalInputStrategy {
 
     const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
 
-    const actions = Object.keys(controls).filter(key => controls[key]).map(key => plugin.defaultControlsMapping[key]);
+    const actions = Object.keys(controls).filter(key => controls[key]).map(key => game.systems['entity-input'].controlMappings[key]);
 
     let entityData = game.getEntity(entityId);
 

@@ -2,6 +2,7 @@
 import Plugin from '../../Plugin.js';
 import DefaultInputStrategy from './strategies/2D/Default2DInputStrategy.js';
 import Default3DInputStrategy from './strategies/3D/Default3DInputStrategy.js';
+
 class EntityInput extends Plugin {
   static id = 'entity-input';
   static removable = false;
@@ -37,13 +38,19 @@ class EntityInput extends Plugin {
   }
 
   loadDefaultStrategy() {
+
     console.log('Warning: No input strategies registered, using default input strategy');
+    console.log('Current Game.controls', this.game.controls)
     if (this.game.physics && this.game.physics.dimension === 3) {
       //console.log('game.use(new Default3DInputStrategy())');
       this.game.use(new Default3DInputStrategy())
     } else {
       //console.log('game.use(new DefaultInputStrategy())');
       this.game.use(new DefaultInputStrategy())
+    }
+    if (this.game.controls) {
+      // update the controls based on developer usage
+      this.game.setControls(this.game.controls);
     }
     this.game.emit('inputStrategyRegistered', this.strategies)
   }

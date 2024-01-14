@@ -225,7 +225,8 @@ class Game {
       isSensor: new Component('isSensor', this),
       owner: new Component('owner', this),
       inputs: new Component('inputs', this),
-      items: new Component('items', this)
+      items: new Component('items', this),
+      sutra: new Component('sutra', this)
 
     };
 
@@ -574,6 +575,15 @@ class Game {
   setGravity(x = 0, y = 0, z = 0) {
     if (this.physics) {
       this.physics.setGravity(x, y, z);
+    }
+  }
+
+  setControls(controls) {
+    let game = this;
+    game.controls = controls;
+    if (game.systems['entity-input']) {
+      // TODO: update instead of replace?
+      game.systems['entity-input'].controlMappings = controls;
     }
   }
 
