@@ -15,6 +15,7 @@ import mouseWheelZoom from './lib/mouseWheelZoom.js';
 
 import unload from './lib/unload.js';
 import zoom from './lib/camera/zoom.js';
+import cameraShake from './lib/camera/cameraShake.js';
 
 import render from './lib/render.js';
 import removeGraphic from './lib/removeGraphic.js';
@@ -57,6 +58,7 @@ class CSSGraphics extends GraphicsInterface {
     this.mouseWheelZoom = mouseWheelZoom.bind(this);
     this.unload = unload.bind(this);
     this.zoom = zoom.bind(this);
+    this.cameraShake = cameraShake.bind(this);  
 
     // TODO: make this function lookup with defaults ( instead of -1 )
     this.depthChart = [

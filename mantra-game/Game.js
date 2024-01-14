@@ -600,6 +600,14 @@ class Game {
     }
   }
 
+  shakeCamera(intensity, duration) {
+    this.graphics.forEach(function (graphicsInterface) {
+      if (graphicsInterface.cameraShake) {
+        graphicsInterface.cameraShake(intensity, duration);
+      }
+    });
+  }
+
   setPlayerId(playerId) {
     // console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;

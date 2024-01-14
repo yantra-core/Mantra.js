@@ -48,7 +48,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     if (gamepad) {
       this.use('Gamepad');
-      this.use('GamepadGUI');
+      this.use('GamepadGUI', gamepad);
     }
 
     if (sutra) {
