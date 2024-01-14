@@ -766,6 +766,7 @@ var defaultAssets = {
   'warp-to-music': '/img/game/env/warp-to-music.gif',
   'warp-to-ycraft': '/img/game/env/warp-to-ycraft.gif',
   'smb3-1-1': '/img/game/levels/smb3-1-1.png',
+  // 'flare': '/img/game/particle/flare.png',
   'planet-express-base': '/img/game/env/planet-express-base.png',
   'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   // '3d-homer': '/img/game/env/3d-homer.gif',

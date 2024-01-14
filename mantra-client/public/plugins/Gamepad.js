@@ -17,6 +17,7 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
     _classCallCheck(this, Gamepad);
     this.id = Gamepad.id;
     this.gamepads = {};
+    this.lastControlsAllFalse = true;
   }
   _createClass(Gamepad, [{
     key: "init",
@@ -67,53 +68,67 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
     value: function sendInputs() {
       var _this2 = this;
       var _loop = function _loop() {
-          var gamepad = _this2.gamepads[index];
+        var gamepad = _this2.gamepads[index];
 
-          // Axes for left analog stick
-          var xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
-          var yAxis = gamepad.axes[1]; // Up (-1) to Down (1)
+        // Axes for left analog stick
+        var xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
+        var yAxis = gamepad.axes[1]; // Up (-1) to Down (1)
 
-          // Deadzone for analog stick to prevent drift
-          var deadzone = 0.1;
+        // Deadzone for analog stick to prevent drift
+        var deadzone = 0.1;
 
-          // Map left stick to WASD keys
-          // TODO: move this code to part of the entityInput strategy
-          var controls = {
-            W: yAxis < -deadzone,
-            // Up
-            S: yAxis > deadzone,
-            // Down
-            A: xAxis < -deadzone,
-            // Left
-            D: xAxis > deadzone,
-            // Right
-            SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
-          };
+        // Map left stick to WASD keys
+        var controls = {
+          W: yAxis < -deadzone,
+          // Up
+          S: yAxis > deadzone,
+          // Down
+          A: xAxis < -deadzone,
+          // Left
+          D: xAxis > deadzone,
+          // Right
+          // y button
+          P: gamepad.buttons[1].pressed,
+          // "Y" button 
+          // x button
+          K: gamepad.buttons[3].pressed,
+          // "X" button
+          // b button
+          L: gamepad.buttons[2].pressed,
+          // "B" button 
+          // a button
+          O: gamepad.buttons[0].pressed,
+          // "A" button
+          // start button
+          I: gamepad.buttons[9].pressed,
+          // "Start" button for "I" key
+          // select button
+          U: gamepad.buttons[8].pressed,
+          // "Select" button for "U" key
+          SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
+        };
 
-          // console.log('controls', controls)
-          // Send the controls to the game logic or server
+        // console.log(gamepad.buttons, 'controls', controls)
+
+        // Send the controls to the game logic or server
+
+        // Check if all controls are false
+        var allFalse = Object.keys(controls).every(function (key) {
+          return !controls[key];
+        });
+
+        // Send controls if they are not all false or if the last controls were not all false
+        if (!allFalse /*|| !this.lastControlsAllFalse*/) {
+          _this2.lastControlsAllFalse = allFalse;
           if (_this2.game.communicationClient) {
-            // dont send controls if all false
-            var allFalse = Object.keys(controls).every(function (key) {
-              return !controls[key];
-            });
-            if (allFalse) {
-              // Remark: We may have to remove this
-              return {
-                v: void 0
-              };
-            }
-            // console.log('sending controls from gpad', controls)
-
             _this2.game.communicationClient.sendMessage('player_input', {
               controls: controls
             });
           }
-        },
-        _ret;
+        }
+      };
       for (var index in this.gamepads) {
-        _ret = _loop();
-        if (_ret) return _ret.v;
+        _loop();
       }
     }
   }]);

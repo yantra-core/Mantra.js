@@ -408,9 +408,11 @@ var Entity = /*#__PURE__*/function () {
         if (destroyedComponentData[entityId]) {
           // Removes the body from the physics engine
           if (typeof _this.game.physics.removeBody === 'function') {
-            // TODO: fix this
             if (_this.game.bodyMap[entityId]) {
+              // removes body from physics engine
               _this.game.physics.removeBody(_this.game.bodyMap[entityId]);
+              // deletes reference to body
+              delete _this.game.bodyMap[entityId];
             } else {
               // console.log('No body found for entityId', entityId);
             }
@@ -489,18 +491,33 @@ var Entity = /*#__PURE__*/function () {
         // console.log("SETTING COLOR", entityData.color)
       }
 
+      var updateSize = false;
       if (entityData.height) {
+        updateSize = true;
         this.game.components.height.set(entityId, entityData.height);
       }
       if (entityData.width) {
+        updateSize = true;
         this.game.components.width.set(entityId, entityData.width);
+      }
+      if (entityData.radius) {
+        updateSize = true;
+        // this.game.components.radius.set(entityId, entityData.radius);
+      }
+
+      if (updateSize) {
+        var body = this.game.bodyMap[entityId];
+        if (body) {
+          // console.log('eeee', entityData.radius)
+          this.game.physics.setBodySize(body, entityData);
+        }
       }
       if (entityData.position) {
         // Remark: Tests require we update component, perhaps changed test?
         this.game.components.position.set(entityId, entityData.position);
-        var body = this.game.bodyMap[entityId];
-        if (body) {
-          this.game.physics.setPosition(body, entityData.position);
+        var _body = this.game.bodyMap[entityId];
+        if (_body) {
+          this.game.physics.setPosition(_body, entityData.position);
         }
       }
       if (entityData.velocity) {
@@ -517,9 +534,9 @@ var Entity = /*#__PURE__*/function () {
       }
       if (typeof entityData.rotation !== 'undefined') {
         if (this.game.physics && this.game.physics.setRotation) {
-          var _body = this.game.bodyMap[entityId];
-          if (_body) {
-            this.game.physics.setRotation(_body, entityData.rotation);
+          var _body2 = this.game.bodyMap[entityId];
+          if (_body2) {
+            this.game.physics.setRotation(_body2, entityData.rotation);
           }
         } else {
           console.log('WARNING: physics.setRotation is not defined');
@@ -537,6 +554,12 @@ var Entity = /*#__PURE__*/function () {
         // overwrite all items ( for now )
         // Remark: in the future we could merge instead of overwrite
         this.game.components.items.set(entityId, entityData.items);
+      }
+
+      // Sutra rules
+      if (typeof entityData.sutra !== 'undefined') {
+        // overwrite sutra ( for now )
+        this.game.components.sutra.set(entityId, entityData.sutra);
       }
       if (typeof entityData.style !== 'undefined') {
         // overwrite all items ( for now )
@@ -584,6 +607,7 @@ var Entity = /*#__PURE__*/function () {
         density: 100,
         health: Infinity,
         score: 0,
+        // radius: null,
         height: 100,
         width: 100,
         depth: 10,
@@ -593,6 +617,7 @@ var Entity = /*#__PURE__*/function () {
         isSensor: false,
         restitution: 0,
         items: null,
+        sutra: null,
         owner: 0,
         // 0 = server
         inputs: null,
@@ -654,6 +679,7 @@ var Entity = /*#__PURE__*/function () {
         health = _config.health,
         score = _config.score,
         items = _config.items,
+        sutra = _config.sutra,
         owner = _config.owner,
         inputs = _config.inputs,
         lifetime = _config.lifetime,
@@ -694,6 +720,7 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
       this.game.addComponent(entityId, 'owner', owner);
       this.game.addComponent(entityId, 'items', items);
+      this.game.addComponent(entityId, 'sutra', sutra);
       this.game.addComponent(entityId, 'inputs', inputs);
       this.game.addComponent(entityId, 'lifetime', lifetime);
       this.game.addComponent(entityId, 'destroyed', false);

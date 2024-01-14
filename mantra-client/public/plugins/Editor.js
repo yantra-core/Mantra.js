@@ -364,9 +364,15 @@ var GraphicsSelector = /*#__PURE__*/function () {
       selectBox.title = 'Select graphics mode.\nMantra supports hot-swapping and multiplexing of graphics modes.';
       // TODO: Populate the select box with options as needed
       // Example: this.addOption(selectBox, 'Option 1', 'value1');
-      this.addOption(selectBox, 'CSSGraphics - v1.1.0', 'CSSGraphics');
-      this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
-      this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
+      this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
+      this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
+      // Remark: Phaser 3 support removed 1/14/2023
+      //         With CSSGraphics engine working well, not much need for phaser 3
+      //         Babylon.js currently handles 3d
+      //         Improved Three.js support will be added in the future
+      // this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
+      // this.addOption(selectBox, 'Three.js', 'ThreeGraphics');
+
       this.selectPicker = new _SelectPicker["default"](selectBox, function (selectedGraphicsMode) {
         game.systems.graphics.switchGraphics(selectedGraphicsMode);
       }, game);
@@ -403,6 +409,8 @@ var GraphicsSelector = /*#__PURE__*/function () {
       });
       var that = this;
       var isKeyDown = false;
+
+      // TODO: refactor this to be members of the class
       function toggleModalOnKeyPress(isKeyPressed) {
         if (isKeyPressed && !isKeyDown) {
           // Key is pressed down for the first time
@@ -564,7 +572,7 @@ var SelectPicker = exports["default"] = /*#__PURE__*/function () {
         display: 'none',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: '9001'
+        zIndex: 22222
       });
     }
   }, {
@@ -572,11 +580,13 @@ var SelectPicker = exports["default"] = /*#__PURE__*/function () {
     value: function applyPickerStyles(picker) {
       Object.assign(picker.style, {
         position: 'relative',
-        bottom: '160px',
+        top: '0px',
+        zIndex: 22222,
         listStyle: 'none',
         margin: '0',
         padding: '0',
-        maxHeight: '50%',
+        maxHeight: '80%',
+        maxWidth: '1000px',
         overflowY: 'auto',
         width: '80%',
         backgroundColor: 'white',
@@ -588,10 +598,13 @@ var SelectPicker = exports["default"] = /*#__PURE__*/function () {
     key: "applyListItemStyles",
     value: function applyListItemStyles(listItem) {
       Object.assign(listItem.style, {
-        padding: '20px',
+        paddingTop: '20px',
+        paddingBottom: '20px',
+        paddingLeft: '5px',
+        paddingRight: '5px',
         cursor: 'pointer',
         borderBottom: '1px solid #ddd',
-        fontSize: '44px',
+        fontSize: '36px',
         textAlign: 'center',
         backgroundColor: '#f8f8f8',
         margin: '5px',
@@ -959,12 +972,14 @@ var WorldSelector = /*#__PURE__*/function () {
       // Example: this.addOption(selectBox, 'Option 1', 'value1');
 
       // adds a choose your world option
-      this.addOption(selectBox, 'Choose Your World', 'Choose');
+      // this.addOption(selectBox, 'Choose Your World', 'Choose');
+
       this.addOption(selectBox, 'Home World', 'Home');
       // this.addOption(selectBox, 'Maze World', 'Maze');
 
       this.addOption(selectBox, 'Platform World', 'Platform');
       this.addOption(selectBox, 'Music World', 'Music');
+      this.addOption(selectBox, 'Gravity Gardens', 'GravityGardens');
 
       // this.addOption(selectBox, 'Space World', 'Platform');
       //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');
@@ -1135,13 +1150,19 @@ function createToolbar(game) {
   inspectorIcon.style.marginLeft = '10px';
   inspectorIcon.style.marginTop = '5px';
   inspectorIcon.style.filter = 'invert(100%)';
+  if (is_touch_enabled()) {
+    // hide inspector icon on touch devices
+    inspectorIcon.style.display = 'none';
+  }
 
   // TODO: have this change values based on open / cloase state
   // . Click in-game on Entity to Inspect
   inspectorIcon.onclick = function () {
     return _this.showInspector();
   };
-  toolbarMenu.addElement('secondary', inspectorIcon);
+
+  // toolbarMenu.addElement('secondary', inspectorIcon);
+
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
     icon: this.createIcon('slack')
@@ -1219,7 +1240,7 @@ function createToolbar(game) {
   graphicsSelectorLabel.style.cursor = 'pointer';
 
   // set value to foo
-  graphicsSelectorLabel.innerText = 'Switch Graphics';
+  graphicsSelectorLabel.innerText = 'Graphics';
 
   // add label to graphicsSelectorItem
   graphicsSelectorItem.appendChild(graphicsSelectorLabel);
@@ -1249,7 +1270,7 @@ function createToolbar(game) {
   worldSelectorLabel.style.cursor = 'pointer';
 
   // set value to foo
-  worldSelectorLabel.innerText = 'Switch Worlds';
+  worldSelectorLabel.innerText = 'Worlds';
 
   // add label to worldSelectorItem
   worldSelectorItem.appendChild(worldSelectorLabel);
@@ -1261,13 +1282,23 @@ function createToolbar(game) {
   };
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
-  toolbarMenu.addElement('secondary', worldSelectorItem);
-  toolbarMenu.addElement('secondary', graphicsSelectorItem);
+
+  // Create a flex container for the selectors
+  var selectorsContainer = document.createElement('div');
+  selectorsContainer.style.display = 'flex'; // Enable Flexbox
+  selectorsContainer.style.alignItems = 'center'; // Align items vertically in the center
+  selectorsContainer.style.justifyContent = 'space-between'; // Space out items
+  selectorsContainer.style.margin = '20px'; // Add some margin for aesthetics
+
+  selectorsContainer.appendChild(inspectorIcon);
+  selectorsContainer.appendChild(graphicsSelectorItem);
+  selectorsContainer.appendChild(worldSelectorItem);
+  toolbarMenu.addElement('secondary', selectorsContainer);
   if (game.worlds.length > 0) {
     var currentWorldName = game.worlds[0].constructor.name;
     worldSelector.selectElement(currentWorldName);
   }
-  if (is_touch_enabled()) {}
+
   // toolbarMenu.toolbar.style.display = 'none';
   toolbarMenu.slideOutToolbar();
 

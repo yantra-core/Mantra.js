@@ -22,10 +22,14 @@ var keyMap = {
 };
 var GamepadGUI = /*#__PURE__*/function () {
   function GamepadGUI() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$useZoomSlider = _ref.useZoomSlider,
+      useZoomSlider = _ref$useZoomSlider === void 0 ? true : _ref$useZoomSlider;
     _classCallCheck(this, GamepadGUI);
     this.id = GamepadGUI.id;
     this.hiding = false;
     this.moving = null;
+    this.useZoomSlider = useZoomSlider;
     this.lastDirection = null; // Add this line
   }
   _createClass(GamepadGUI, [{
@@ -33,14 +37,16 @@ var GamepadGUI = /*#__PURE__*/function () {
     value: function init(game) {
       var _this = this;
       this.game = game;
-      this.zoomSlider = new _ZoomSlider["default"](game);
-      // this.zoomSlider.setValue(game.data.camera.currentZoom);
-      this.zoomSlider.setValue(4.5);
+      if (this.useZoomSlider) {
+        this.zoomSlider = new _ZoomSlider["default"](game);
+        // this.zoomSlider.setValue(game.data.camera.currentZoom);
+        this.zoomSlider.setValue(4.5);
 
-      // Remark: why is this needed for slider, but not for gamepad?
-      game.on('game::ready', function () {
-        _this.zoomSlider.slider.style.display = 'block';
-      });
+        // Remark: why is this needed for slider, but not for gamepad?
+        game.on('game::ready', function () {
+          _this.zoomSlider.slider.style.display = 'block';
+        });
+      }
       var controllerHolder = document.createElement('div');
       controllerHolder.style.position = 'fixed';
       controllerHolder.style.bottom = '0';
@@ -148,7 +154,30 @@ var GamepadGUI = /*#__PURE__*/function () {
           'code': 'KeyU'
         }));
       });
+
+      // tooltip text for select
+      select.title = 'Open Editor Menu';
+
+      // hidden ( for now )
+      graphics.style.display = 'none';
+      graphics.addEventListener('pointerdown', function (ev) {
+        // show graphics menu
+        // get graphicsSelector element
+        // TOGGLE GRAPHICS SETTINGS
+        var current = game.graphics[0].constructor.name;
+        if (current === 'BabylonGraphics') {
+          game.switchGraphics('CSSGraphics');
+        } else if (current === 'CSSGraphics') {
+          game.switchGraphics('BabylonGraphics');
+        }
+        //document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyG' }));
+      });
+
+      graphics.addEventListener('pointerup', function (ev) {
+        //document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyG' }));
+      });
       var start = document.getElementById('start');
+      start.title = 'Warp to World';
       start.addEventListener('pointerdown', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keydown', {
           'code': 'KeyI'
@@ -190,6 +219,28 @@ var GamepadGUI = /*#__PURE__*/function () {
       buttonX.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
           'code': 'KeyO'
+        }));
+      });
+      var buttonB = document.getElementById('b');
+      var buttonA = document.getElementById('a');
+      buttonB.addEventListener('pointerdown', function (ev) {
+        document.dispatchEvent(new KeyboardEvent('keydown', {
+          'code': 'KeyL'
+        }));
+      });
+      buttonB.addEventListener('pointerup', function (ev) {
+        document.dispatchEvent(new KeyboardEvent('keyup', {
+          'code': 'KeyL'
+        }));
+      });
+      buttonA.addEventListener('pointerdown', function (ev) {
+        document.dispatchEvent(new KeyboardEvent('keydown', {
+          'code': 'KeyP'
+        }));
+      });
+      buttonA.addEventListener('pointerup', function (ev) {
+        document.dispatchEvent(new KeyboardEvent('keyup', {
+          'code': 'KeyP'
         }));
       });
       if (false && !is_touch_enabled()) {
@@ -234,7 +285,7 @@ var GamepadGUI = /*#__PURE__*/function () {
   }, {
     key: "createSNESGamepad",
     value: function createSNESGamepad(parentElement) {
-      var str = "\n  \n  \n<article id=\"snes-gamepad\" aria-label=\"SNES controller\">\n\n  <!-- removed ( for now )\n  <button id=\"l\" class=\"is3d\">Top left<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></button>\n  <button id=\"r\" class=\"is3d\">Top Right<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></button>\n  -->\n  \n  <!-- frame -->\n  <div class=\"face is3d\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>\n  \n  <!-- Letters and Text -->\n  <h1>SUPER MANTRA</h1>\n  <p>CSS ENTERTAINMENT SYSTEM</p>\n  \n  <p class=\"letter letter-x\" aria-hidden=\"true\">X</p>\n  <p class=\"letter letter-y\" aria-hidden=\"true\">Y</p>\n  <p class=\"letter letter-a\" aria-hidden=\"true\">A</p>\n  <p class=\"letter letter-b\" aria-hidden=\"true\">B</p>\n  <p class=\"letter-start\" aria-hidden=\"true\">START</p>\n  <p class=\"letter-select\" aria-hidden=\"true\">SELECT</p>\n  \n  <!-- directional buttons + axis -->\n  <div class=\"axis is3d\"><div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div><div style=\"--z:5\"></div><div style=\"--z:6\"></div></div>\n  \n  <!-- Menu buttons (start/select) -->\n  <button id=\"select\" class=\"is3d\">Select<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n  <button id=\"start\" class=\"is3d\">Start<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n  <!-- Action buttons -->\n  <div class=\"buttons\">\n    <button id=\"x\" class=\"circle is3d\">x<div></div><div></div><div></div><div></div></button>\n    <button id=\"y\" class=\"circle is3d\">y<div></div><div></div><div></div><div></div></button>\n    <button id=\"a\" class=\"circle is3d\">a<div></div><div></div><div></div><div></div></button>\n    <button id=\"b\" class=\"circle is3d\">b<div></div><div></div><div></div><div></div></button>\n  </div>\n    \n</article>\n\n  \n    ";
+      var str = "\n  \n  \n<article id=\"snes-gamepad\" aria-label=\"SNES controller\">\n\n  <!-- removed ( for now )\n  <button id=\"l\" class=\"is3d\">Top left<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></button>\n  <button id=\"r\" class=\"is3d\">Top Right<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></button>\n  -->\n  \n  <!-- frame -->\n  <div class=\"face is3d\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>\n  \n  <!-- Letters and Text -->\n  <h1>SUPER MANTRA</h1>\n  <p>CSS ENTERTAINMENT SYSTEM</p>\n  \n  <p class=\"letter letter-x\" aria-hidden=\"true\">X</p>\n  <p class=\"letter letter-y\" aria-hidden=\"true\">Y</p>\n  <p class=\"letter letter-a\" aria-hidden=\"true\">A</p>\n  <p class=\"letter letter-b\" aria-hidden=\"true\">B</p>\n  <p class=\"letter-start\" aria-hidden=\"true\">START</p>\n  <p class=\"letter-select\" aria-hidden=\"true\">SELECT</p>\n  \n  <!-- directional buttons + axis -->\n  <div class=\"axis is3d\"><div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div><div style=\"--z:5\"></div><div style=\"--z:6\"></div></div>\n  \n  <!-- Menu buttons (start/select) -->\n  <button id=\"select\" class=\"is3d\">Select<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n\n  <button id=\"graphics\" class=\"is3d\">Graphics<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n\n  <button id=\"start\" class=\"is3d\">Start<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n  <!-- Action buttons -->\n  <div class=\"buttons\">\n    <button id=\"x\" class=\"circle is3d\">x<div></div><div></div><div></div><div></div></button>\n    <button id=\"y\" class=\"circle is3d\">y<div></div><div></div><div></div><div></div></button>\n    <button id=\"a\" class=\"circle is3d\">a<div></div><div></div><div></div><div></div></button>\n    <button id=\"b\" class=\"circle is3d\">b<div></div><div></div><div></div><div></div></button>\n  </div>\n    \n</article>\n\n  \n    ";
       parentElement.innerHTML = str;
     }
   }, {

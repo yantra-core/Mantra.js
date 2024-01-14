@@ -315,6 +315,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
                 // All assets are loaded, now you can emit your ready event
                 game.emit('plugin::ready::graphics-babylon', _this3);
                 game.loadingPluginsCount--;
+                document.body.style.cursor = 'default';
               };
 
               // Start loading the assets
@@ -593,8 +594,11 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.engine.dispose();
       this.scene.dispose();
       // remove canvas
+
       var canvas = document.getElementById('babylon-render-canvas');
       if (canvas) {
+        // hide canvas
+        // canvas.style.display = 'none';
         canvas.remove();
       }
     }

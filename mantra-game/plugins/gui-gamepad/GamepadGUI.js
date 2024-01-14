@@ -144,6 +144,11 @@ class GamepadGUI {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyU' }));
     });
 
+    // tooltip text for select
+    select.title = 'Open Editor Menu';
+
+    // hidden ( for now )
+    graphics.style.display = 'none';
 
     graphics.addEventListener('pointerdown', (ev) => {
       // show graphics menu
@@ -164,6 +169,7 @@ class GamepadGUI {
 
     let start = document.getElementById('start');
 
+    start.title = 'Warp to World';
     start.addEventListener('pointerdown', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyI' }));
     });

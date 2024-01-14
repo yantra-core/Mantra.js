@@ -41,11 +41,11 @@ import config from './config/config.js';
 //import { Game } from '../mantra-game/Game.js';
 import { Game } from '../mantra-game';
 import plugins from '../mantra-game/plugins.js';
-// import Pong from '../mantra-worlds/Pong/Pong.js';
+
 
 let game = new Game({
-  height: 600 * 4,
-  width: 800 * 3,
+  width: 800,
+  height: 600,
   plugins: {},
   isClient: true,
   showLoadingScreen: true,
@@ -59,7 +59,9 @@ let game = new Game({
   physics: 'matter', // 'matter', 'physx'
   graphics: ['css'], // 'babylon', 'css', 'phaser'
   collisions: true,
-  gamepad: true,
+  gamepad: {
+    useZoomSlider: false
+  },
   sutra: true,
   camera: {
     follow: true,
@@ -128,8 +130,7 @@ if (game.isOnline) {
 
 // game.use(new plugins.Behaviors());
 
-// Always show FPS
-// game.use(new plugins.CurrentFPS());
+game.use(new plugins.CurrentFPS());
 
 game.use(new plugins.Editor({
   sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/client.js',
@@ -198,11 +199,19 @@ if (mode === 'online') {
     let worldClass = worlds[storedWorld];
     home = new worldClass();
   }
-
-  
-
-  // home = new worlds.TowerDefense();
+  console.log("wwww", worlds)
+  // home = new worlds.GravityGardens();
   // game.use(new plugins.Border());
+
+  /*
+  --purple-light: #bbe;
+  --purple-dark: #64b;
+  --button-x: #3c62f8;
+  --button-y: #14b161;
+  --button-a: #f03025;
+  --button-b: #e9dd34;
+  */
+
   game.start(function () {
     // game.use(new plugins.StarField())
     //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));

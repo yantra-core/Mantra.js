@@ -70,27 +70,24 @@ var Collisions = /*#__PURE__*/function () {
             entityB.yCraft.part.handleCollision(entityA);
           }
         }
-        if (this.game.rules) {
-          this.game.data.collisions = this.game.data.collisions || [];
-          // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-          var collisionContext = {
-            type: 'COLLISION',
-            kind: 'START',
-            entityIdA: bodyA.myEntityId,
-            entityIdB: bodyB.myEntityId,
-            bodyA: entityA,
-            bodyB: entityB
-          };
 
-          // add entity onto the collision by type name
-          collisionContext[entityA.type] = entityA;
-          collisionContext[entityB.type] = entityB;
-          this.game.data.collisions.push(collisionContext);
-        }
+        // Remark: This could be this.game.systems.sutra
+        this.game.data.collisions = this.game.data.collisions || [];
+        // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+        var collisionContext = {
+          type: 'COLLISION',
+          kind: 'START',
+          entityIdA: bodyA.myEntityId,
+          entityIdB: bodyB.myEntityId,
+          bodyA: entityA,
+          bodyB: entityB
+        };
+
+        // add entity onto the collision by type name
+        collisionContext[entityA.type] = entityA;
+        collisionContext[entityB.type] = entityB;
+        this.game.data.collisions.push(collisionContext);
       }
-
-      //console.log(entityA)
-      //console.log(entityB)
 
       // do not process player collisions locally ( for now )
       if (this.game.isClient && entityA.type === 'PLAYER' && entityB.type === 'PLAYER') {
@@ -136,28 +133,26 @@ var Collisions = /*#__PURE__*/function () {
         return;
       }
       if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
-        if (this.game.rules) {
-          this.game.data.collisions = this.game.data.collisions || [];
-          // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-          var collisionContext = {
-            type: 'COLLISION',
-            kind: 'END',
-            entityIdA: bodyA.myEntityId,
-            entityIdB: bodyB.myEntityId,
-            bodyA: entityA,
-            bodyB: entityB
-          };
+        this.game.data.collisions = this.game.data.collisions || [];
+        // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+        var collisionContext = {
+          type: 'COLLISION',
+          kind: 'END',
+          entityIdA: bodyA.myEntityId,
+          entityIdB: bodyB.myEntityId,
+          bodyA: entityA,
+          bodyB: entityB
+        };
 
-          // Find and remove the active collision
-          this.game.data.collisions = this.game.data.collisions.filter(function (collision) {
-            return !(collision.entityIdA === bodyA.myEntityId && collision.entityIdB === bodyB.myEntityId && collision.kind === 'ACTIVE');
-          });
+        // Find and remove the active collision
+        this.game.data.collisions = this.game.data.collisions.filter(function (collision) {
+          return !(collision.entityIdA === bodyA.myEntityId && collision.entityIdB === bodyB.myEntityId && collision.kind === 'ACTIVE');
+        });
 
-          // add entity onto the collision by type name
-          collisionContext[entityA.type] = entityA;
-          collisionContext[entityB.type] = entityB;
-          this.game.data.collisions.push(collisionContext);
-        }
+        // add entity onto the collision by type name
+        collisionContext[entityA.type] = entityA;
+        collisionContext[entityB.type] = entityB;
+        this.game.data.collisions.push(collisionContext);
       }
 
       // iterate through all systems and see if they have a handleCollision method
@@ -192,56 +187,54 @@ var Collisions = /*#__PURE__*/function () {
         return;
       }
       if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
-        if (this.game.rules) {
-          this.game.data.collisions = this.game.data.collisions || [];
-          // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-          var collisionContext = {
-            type: 'COLLISION',
-            kind: 'ACTIVE',
-            entityIdA: bodyA.myEntityId,
-            entityIdB: bodyB.myEntityId,
-            ticks: 1,
-            duration: 1,
-            bodyA: entityA,
-            bodyB: entityB
-          };
+        this.game.data.collisions = this.game.data.collisions || [];
+        // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
+        var collisionContext = {
+          type: 'COLLISION',
+          kind: 'ACTIVE',
+          entityIdA: bodyA.myEntityId,
+          entityIdB: bodyB.myEntityId,
+          ticks: 1,
+          duration: 1,
+          bodyA: entityA,
+          bodyB: entityB
+        };
 
-          // add entity onto the collision by type name
-          collisionContext[entityA.type] = entityA;
-          collisionContext[entityB.type] = entityB;
+        // add entity onto the collision by type name
+        collisionContext[entityA.type] = entityA;
+        collisionContext[entityB.type] = entityB;
 
-          // Find existing collision, if any
-          var existingCollision = this.game.data.collisions.find(function (collision) {
-            return collision.entityIdA === collisionContext.entityIdA && collision.entityIdB === collisionContext.entityIdB && collision.kind === 'ACTIVE';
-          });
-          if (existingCollision) {
-            // Increment duration if collision is already active
-            existingCollision.duration += 1 / this.game.data.FPS; // Adds approximately 0.01667 seconds per tick at 60 FPS
-            existingCollision.ticks++;
-          } else {
-            // Add new collision if not found
-            this.game.data.collisions.push(collisionContext);
+        // Find existing collision, if any
+        var existingCollision = this.game.data.collisions.find(function (collision) {
+          return collision.entityIdA === collisionContext.entityIdA && collision.entityIdB === collisionContext.entityIdB && collision.kind === 'ACTIVE';
+        });
+        if (existingCollision) {
+          // Increment duration if collision is already active
+          existingCollision.duration += 1 / this.game.data.FPS; // Adds approximately 0.01667 seconds per tick at 60 FPS
+          existingCollision.ticks++;
+        } else {
+          // Add new collision if not found
+          this.game.data.collisions.push(collisionContext);
+        }
+      }
+
+      // iterate through all systems and see if they have a handleCollision method
+      var _iterator3 = _createForOfIteratorHelper(this.game.systemsManager.systems),
+        _step3;
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var _step3$value = _slicedToArray(_step3.value, 2),
+            _ = _step3$value[0],
+            system = _step3$value[1];
+          if (typeof system.collisionActive === "function") {
+            // any system that has a handleCollision method will be called here
+            system.collisionActive(pair, bodyA, bodyB);
           }
         }
-
-        // iterate through all systems and see if they have a handleCollision method
-        var _iterator3 = _createForOfIteratorHelper(this.game.systemsManager.systems),
-          _step3;
-        try {
-          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-            var _step3$value = _slicedToArray(_step3.value, 2),
-              _ = _step3$value[0],
-              system = _step3$value[1];
-            if (typeof system.collisionActive === "function") {
-              // any system that has a handleCollision method will be called here
-              system.collisionActive(pair, bodyA, bodyB);
-            }
-          }
-        } catch (err) {
-          _iterator3.e(err);
-        } finally {
-          _iterator3.f();
-        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
       }
     }
   }, {

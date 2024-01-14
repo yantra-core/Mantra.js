@@ -45,62 +45,62 @@ var Sutra = /*#__PURE__*/function () {
     key: "update",
     value: function update() {
       var game = this.game;
-      if (game.rules) {
-        if (this.inputCache) {
-          if (Object.keys(this.inputCache).length > 0) {
-            game.data.input = this.inputCache;
-          }
+      if (this.inputCache) {
+        if (Object.keys(this.inputCache).length > 0) {
+          game.data.input = this.inputCache;
         }
+      }
 
-        // TODO: Remove this init, it should be a check and throw
-        // camera init is handled in Graphics.js and Camera system
-        game.data.camera = game.data.camera || {};
-        game.data.camera.position = game.data.camera.position || {
-          x: 0,
-          y: 0
-        };
+      // TODO: Remove this init, it should be a check and throw
+      // camera init is handled in Graphics.js and Camera system
+      game.data.camera = game.data.camera || {};
+      game.data.camera.position = game.data.camera.position || {
+        x: 0,
+        y: 0
+      };
 
-        // TODO: can we consolidate these into a single rules.tick() call?
-        var _iterator = _createForOfIteratorHelper(game.entities.entries()),
-          _step;
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var _step$value = _slicedToArray(_step.value, 2),
-              entityId = _step$value[0],
-              entity = _step$value[1];
-            // console.log('entity', entityId, entity)
-            game.data.game = game;
+      // TODO: can we consolidate these into a single rules.tick() call?
+      var _iterator = _createForOfIteratorHelper(game.entities.entries()),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+            entityId = _step$value[0],
+            entity = _step$value[1];
+          // console.log('entity', entityId, entity)
+          game.data.game = game;
+          if (game.rules) {
             game.rules.tick(entity, game.data);
           }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
-        if (game.data && game.data.timers) {
-          if (game.data.timers.length) {
-            // console.log('game.data.timers', game.data.timers)
+          // check to see if entity itself has a valid entity.sutra, if so run it at entity level
+          if (entity.sutra) {
+            entity.sutra.tick(entity, game.data);
           }
-          game.data.timers.forEach(function (timer) {
-            game.rules.tick(timer, game.data);
-          });
-          game.data.timers = [];
         }
-        if (game.data && game.data.collisions) {
-          if (game.data.collisions.length > 0) {
-            // console.log(game.data.collisions)
-          }
-          game.data.collisions.forEach(function (collisionEvent) {
-            game.rules.tick(collisionEvent, game.data);
-          });
-          // remove all collisions that are not active
-          game.data.collisions = game.data.collisions.filter(function (collisionEvent) {
-            return collisionEvent.kind === 'ACTIVE';
-          });
-        }
-        game.data.input = {};
-        this.inputCache = {};
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
       }
+      if (game.data && game.data.collisions) {
+        game.data.collisions.forEach(function (collisionEvent) {
+          if (game.rules) {
+            game.rules.tick(collisionEvent, game.data);
+          }
+          if (collisionEvent.bodyA.sutra) {
+            collisionEvent.bodyA.sutra.tick(collisionEvent, game.data);
+          }
+          if (collisionEvent.bodyB.sutra) {
+            collisionEvent.bodyB.sutra.tick(collisionEvent, game.data);
+          }
+        });
+        // remove all collisions that are not active
+        game.data.collisions = game.data.collisions.filter(function (collisionEvent) {
+          return collisionEvent.kind === 'ACTIVE';
+        });
+      }
+      game.data.input = {};
+      this.inputCache = {};
     }
   }, {
     key: "setSutra",

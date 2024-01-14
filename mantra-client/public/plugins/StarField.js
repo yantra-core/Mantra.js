@@ -105,7 +105,7 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var CSSStarField = /*#__PURE__*/function () {
   function CSSStarField() {
-    var starCount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1000;
+    var starCount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
     var fieldWidth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 800;
     var fieldHeight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 600;
     _classCallCheck(this, CSSStarField);
@@ -130,23 +130,29 @@ var CSSStarField = /*#__PURE__*/function () {
     key: "generateStarfield",
     value: function generateStarfield() {
       var game = this.game;
-      this.game.createEntity({
-        type: 'STARFIELD',
-        body: false,
-        color: 0x000000,
-        width: this.fieldWidth,
-        height: this.fieldHeight,
-        style: {
-          backgroundColor: 'black',
-          overflow: 'hidden',
-          zIndex: -1
-        },
-        position: {
-          x: 0,
-          y: 0,
-          z: -10
-        }
-      });
+      game.setBackground('black');
+
+      /*
+        this.game.createEntity({
+          type: 'STARFIELD',
+          body: false,
+          // dark purple
+          color: 0x110022,
+          width: this.fieldWidth,
+          height: this.fieldHeight,
+          style: {
+            backgroundColor: 'black',
+            overflow: 'hidden',
+            zIndex: -1
+          },
+          position: {
+            x: 0,
+            y: 0,
+            z: -10
+          }
+        });
+        */
+
       for (var i = 0; i < this.starCount; i++) {
         // Adjusting star positions to be relative to the center
         var posX = Math.random() * this.fieldWidth - this.fieldWidth / 2;
@@ -154,8 +160,10 @@ var CSSStarField = /*#__PURE__*/function () {
         this.game.createEntity({
           type: 'STAR',
           // body: false,
-          width: 2,
-          height: 2,
+          isSensor: true,
+          width: 4,
+          height: 4,
+          mass: 100,
           color: 0xffffff,
           style: {
             zIndex: 2,
@@ -167,7 +175,7 @@ var CSSStarField = /*#__PURE__*/function () {
           position: {
             x: posX,
             y: posY,
-            z: -10
+            z: -5
           }
         });
       }
@@ -231,13 +239,14 @@ var StarField = /*#__PURE__*/function () {
         game.graphics.forEach(function (graphicInterface) {
           if (graphicInterface.id === 'graphics-babylon') {
             // hard-code per graphics pipeline for now
-            game.use(new _BabylonStarField["default"]());
+            game.use(new _CSSStarField["default"]());
           }
           // for now, current CSS StarField is fully intefactive
           // we'll need to optimize the CSS entity rendering just a bit for this to work 
           // more performantly with a large number of stars
-          if (graphicInterface.id === 'graphics-css') {// hard-code per graphics pipeline for now
-            // game.use(new CSSStarField());
+          if (graphicInterface.id === 'graphics-css') {
+            // hard-code per graphics pipeline for now
+            game.use(new _CSSStarField["default"]());
           }
         });
       }

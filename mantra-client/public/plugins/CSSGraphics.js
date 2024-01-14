@@ -121,6 +121,13 @@ var CSSCamera = /*#__PURE__*/function () {
       // sets auto-follow player when starting CSSGraphics ( for now )
       this.follow = true;
       this.game.systemsManager.addSystem('graphics-css-camera', this);
+      var gameHolder = document.getElementById('gameHolder');
+      if (!gameHolder) {
+        gameHolder = document.createElement('div');
+        gameHolder.id = 'gameHolder';
+        document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+      }
+
       this.gameViewport = document.getElementById('gameHolder');
       this.gameViewport.style.transformOrigin = 'center center';
       this.initZoomControls();
@@ -196,7 +203,7 @@ function is_touch_enabled() {
 _defineProperty(CSSCamera, "id", 'css-camera');
 var _default = exports["default"] = CSSCamera;
 
-},{"./lib/camera/applyThrow.js":4,"./lib/camera/rotateCameraOverTime.js":5,"./lib/camera/update.js":6,"./lib/camera/updateCameraPosition.js":7}],3:[function(require,module,exports){
+},{"./lib/camera/applyThrow.js":4,"./lib/camera/rotateCameraOverTime.js":6,"./lib/camera/update.js":7,"./lib/camera/updateCameraPosition.js":8}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -215,6 +222,7 @@ var _updateEntityPosition = _interopRequireDefault(require("./lib/updateEntityPo
 var _mouseWheelZoom = _interopRequireDefault(require("./lib/mouseWheelZoom.js"));
 var _unload = _interopRequireDefault(require("./lib/unload.js"));
 var _zoom = _interopRequireDefault(require("./lib/camera/zoom.js"));
+var _cameraShake = _interopRequireDefault(require("./lib/camera/cameraShake.js"));
 var _render = _interopRequireDefault(require("./lib/render.js"));
 var _removeGraphic = _interopRequireDefault(require("./lib/removeGraphic.js"));
 var _handleInputs = _interopRequireDefault(require("../graphics/lib/handleInputs.js"));
@@ -279,6 +287,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.mouseWheelZoom = _mouseWheelZoom["default"].bind(_assertThisInitialized(_this));
     _this.unload = _unload["default"].bind(_assertThisInitialized(_this));
     _this.zoom = _zoom["default"].bind(_assertThisInitialized(_this));
+    _this.cameraShake = _cameraShake["default"].bind(_assertThisInitialized(_this));
 
     // TODO: make this function lookup with defaults ( instead of -1 )
     _this.depthChart = ['background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER', 'BLOCK', 'FIRE', 'WARP', 'NOTE'];
@@ -305,6 +314,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       game.loadingPluginsCount--;
       this.game.viewportCenterXOffset = 0;
       this.game.viewportCenterYOffset = 0;
+      document.body.style.cursor = 'default';
       game.on('game::ready', function () {
         _this2.zoom(1); // game.data.camera.currentZoom
       });
@@ -340,7 +350,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":20,"./CSSCamera.js":2,"./lib/camera/zoom.js":8,"./lib/createGraphic.js":9,"./lib/inflateBox.js":10,"./lib/inflateEntity.js":11,"./lib/inflateText.js":12,"./lib/mouseWheelZoom.js":13,"./lib/removeGraphic.js":14,"./lib/render.js":15,"./lib/setTransform.js":16,"./lib/unload.js":17,"./lib/updateEntityPosition.js":18,"./lib/updateGraphic.js":19}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":21,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/zoom.js":9,"./lib/createGraphic.js":10,"./lib/inflateBox.js":11,"./lib/inflateEntity.js":12,"./lib/inflateText.js":13,"./lib/mouseWheelZoom.js":14,"./lib/removeGraphic.js":15,"./lib/render.js":16,"./lib/setTransform.js":17,"./lib/unload.js":18,"./lib/updateEntityPosition.js":19,"./lib/updateGraphic.js":20}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -381,12 +391,61 @@ function applyThrow() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = cameraShake;
+// cameraShake.js - Marak Squires 2023
+function cameraShake() {
+  var _this = this;
+  var initialIntensity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
+  var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1300;
+  var gameViewport = document.getElementById('gameHolder');
+  if (!gameViewport) {
+    console.log('Warning: could not find gameHolder div, cannot apply camera shake');
+    return;
+  }
+
+  // Debounce mechanism
+  if (gameViewport.dataset.isShaking === 'true') {
+    console.log('Camera is already shaking. Ignoring additional shake requests.');
+    return;
+  }
+  gameViewport.dataset.isShaking = 'true';
+  var startTime = Date.now();
+  var shake = function shake() {
+    var elapsedTime = Date.now() - startTime;
+    var remainingTime = duration - elapsedTime;
+    if (remainingTime <= 0) {
+      // Reset transform after shaking completes
+      gameViewport.style.transform = "scale(".concat(_this.game.data.camera.currentZoom, ")");
+      gameViewport.dataset.isShaking = 'false'; // Reset the debounce flag
+      return;
+    }
+
+    // Gradually reduce the intensity
+    var intensity = initialIntensity * (remainingTime / duration);
+
+    // Smooth shake effect using sine function
+    var x = intensity * Math.sin(elapsedTime / 100) * (Math.random() > 0.5 ? 1 : -1);
+    var y = intensity * Math.cos(elapsedTime / 100) * (Math.random() > 0.5 ? 1 : -1);
+
+    // Apply the shake with the current zoom
+    gameViewport.style.transform = "scale(".concat(_this.game.data.camera.currentZoom, ") translate(").concat(x, "px, ").concat(y, "px)");
+    requestAnimationFrame(shake);
+  };
+  shake();
+}
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = rotateCameraOverTime;
 // Method to smoothly rotate the camera over a given duration using CSS transitions
 function rotateCameraOverTime() {
   var _this = this;
   var targetAngle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 90;
-  var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 800;
+  var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1100;
   if (typeof targetAngle !== 'number' || typeof duration !== 'number') {
     console.error('Invalid arguments for rotateCameraOverTime. Both targetAngle and duration must be numbers.');
     return;
@@ -400,24 +459,36 @@ function rotateCameraOverTime() {
   // Retrieve the current zoom level
   var currentZoom = this.game.data.camera.currentZoom;
 
+  // Calculate the center of the screen
+  var centerX = window.innerWidth / 2;
+  var centerY = window.innerHeight / 2;
+
+  // console.log('this.cameraPosition.y', this.game.data.camera.position.y)
+  // TODO: camera center is still not correct when zoom scale is not 1
+  // no need for X?
+  // centerX = centerX / currentZoom;
+  // centerY = centerY / currentZoom;
+  // centerY = centerY + this.game.viewportCenterYOffset;
+  // centerY = centerY +  this.game.data.camera.position.y / currentZoom;
   // Set the transition property on the gameViewport
   this.gameViewport.style.transition = "transform ".concat(duration, "ms");
 
-  // TODO: better centering
-  // this.gameViewport.style.transformOrigin = 'center center 0';
+  // Set transform-origin to the calculated center
+  this.gameViewport.style.transformOrigin = "".concat(centerX, "px ").concat(centerY, "px");
 
   // Apply the combined scale (for zoom) and rotation
   this.gameViewport.style.transform = "scale(".concat(currentZoom, ") rotate(").concat(targetAngle, "deg)");
 
   // Reset the transition after the animation is complete
-  // TODO: remove setTimeout in favor of game.tick % N
   setTimeout(function () {
     _this.gameViewport.style.transition = '';
     _this.rotating = false;
+    _this.gameViewport.style.transformOrigin = '50% 50%';
+    _this.gameViewport.style.transform = "scale(".concat(currentZoom, ") rotate(", 0, "deg)");
   }, duration);
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -482,7 +553,7 @@ function update() {
   this.game.data.camera.position = this.scene.cameraPosition;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -525,15 +596,23 @@ function updateCameraPosition(dx, dy, isDragging) {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = zoom;
+var minZoom = 0.1;
+var maxZoom = 10;
 function zoom(scale) {
   var transitionTime = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '0s';
+  if (scale < minZoom) {
+    scale = minZoom;
+  }
+  if (scale > maxZoom) {
+    scale = maxZoom;
+  }
   this.game.data.camera.currentZoom = scale;
   var gameViewport = document.getElementById('gameHolder');
   if (gameViewport) {
@@ -561,10 +640,11 @@ function zoom(scale) {
     var newCameraY = centerY - centerY / scale;
 
     //game.viewportCenterXOffset = newCameraX;
-    game.viewportCenterYOffset = newCameraY + 100;
-
-    // alert('zooming');
-    console.log('newCameraX', newCameraX, 'newCameraY', newCameraY);
+    var minDistanceFromTop = 50;
+    if (is_touch_enabled()) {
+      minDistanceFromTop = 0;
+    }
+    game.viewportCenterYOffset = newCameraY + minDistanceFromTop;
 
     // Apply scale and translate transform
     gameViewport.style.transform = "scale(".concat(scale, ")");
@@ -572,8 +652,11 @@ function zoom(scale) {
     console.log('Warning: could not find gameHolder div, cannot zoom');
   }
 }
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -639,6 +722,17 @@ function createGraphic(entityData) {
       }
       break;
   }
+
+  // new api for entity.size
+  if (typeof entityData.radius !== 'undefined') {
+    // set circle size
+    entityElement.style.width = entityData.radius + 'px';
+    entityElement.style.height = entityData.radius + 'px';
+    entityElement.style.borderRadius = '50%'; // This will make the div a circle
+    // ensure background image will fit / cover expand
+    // entityElement.style.backgroundSize = `${entityData.radius}px ${entityData.radius}px`;
+  }
+
   this.renderDiv.appendChild(entityElement);
 
   // Update the position of the entity element
@@ -646,7 +740,7 @@ function createGraphic(entityData) {
   return entityElement;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -892,7 +986,7 @@ function tileFlip(entityElement, hexColor, getTexture, entityData) {
   });
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -910,7 +1004,7 @@ function inflateEntity(entity, alpha) {
   }
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -968,7 +1062,7 @@ function inflateText(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1017,7 +1111,7 @@ function cssMouseWheelZoom(event) {
   this.zoom(newScale);
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1035,7 +1129,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1050,15 +1144,26 @@ function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function render(game, alpha) {
+  // console.log('rendering', this.game.entities.size, 'entities')
+
   // render is called at the browser's frame rate (typically 60fps)
   var self = this;
-  if (this.game.changedEntities.size > 0) {
-    // console.log('CHANGED', this.game.changedEntities)
-  }
-  // console.log('rendering', this.game.entities.size, 'entities')
+
   // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
   // This is not ideal and will yield low-entity count CSSGraphics performance
   // Best to remove camera follow for CSSGraphics if possible
+  // We tried to only iterate changed entities, but this breaks camera follow
+  /*
+  for (let [eId, state] of this.game.changedEntities.entries()) {
+    let ent = this.game.entities.get(eId);
+    // console.log('rendering', ent)
+    // do not re-inflate destroyed entities
+    if (ent.destroyed !== true) {
+      this.inflateEntity(ent, alpha);
+    }
+    // this.game.changedEntities.delete(eId);
+  }
+  */
   var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
     _step;
   try {
@@ -1081,7 +1186,7 @@ function render(game, alpha) {
   }
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1122,7 +1227,7 @@ function truncateToPrecision(value, precision) {
   return Math.round(value * factor) / factor;
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1147,6 +1252,9 @@ function unload() {
     return g.id !== _this.id;
   });
   delete this.game._plugins['CSSGraphics'];
+
+  // unload the CSSCamera
+  this.game.systemsManager.removeSystem('graphics-css-camera');
 
   // remove the wheel event listener
   // document.removeEventListener('wheel', this.cssMouseWheelZoom);
@@ -1176,7 +1284,7 @@ function unload() {
   }
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1190,32 +1298,60 @@ function updateEntityPosition(entityElement, entityData) {
   var width = entityData.width;
   var height = entityData.height;
 
+  // Field of view (FoV) dimensions
+  var fovWidth = window.outerWidth;
+  var fovHeight = window.outerHeight;
+  fovWidth = 600;
+  fovHeight = 600;
   // Adjust the position based on the camera position
   if (type === 'BULLET') {
-    // Some bug here, fix this in CSSGraphics
-    position.x = position.x + 24;
-    position.y = position.y + 24;
-    //position.y = position.y + height / 2;
-    // console.log("og position", position, this.cameraPosition)
+    position.x += 24;
+    position.y += 24;
   }
-
   var adjustedPosition = {
-    x: position.x - this.cameraPosition.x + window.outerWidth / 2,
-    y: position.y - this.cameraPosition.y + window.outerHeight / 2
+    x: position.x - (this.cameraPosition.x - window.outerWidth / 2),
+    y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
   };
-  var domX = adjustedPosition.x - width / 2;
-  var domY = adjustedPosition.y - height / 2;
 
-  // convert rotation to degrees
-  var angle = rotation * (180 / Math.PI);
-  this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
+  // Check if the entity is within the field of view
+  if (true || isWithinFieldOfView(game, position, this.cameraPosition, width, height, fovWidth, fovHeight)) {
+    var domX = adjustedPosition.x - width / 2;
+    var domY = adjustedPosition.y - height / 2;
 
-  // console.log('updated position', position, adjustedPosition, domX, domY)
+    // Convert rotation to degrees
+    var angle = rotation * (180 / Math.PI);
 
+    // Apply transformation to the entity
+    this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
+    entityElement.style.display = ''; // Make sure the element is visible
+  } else {
+    if (entityData.type !== 'BACKGROUND' || entityData.type !== 'building') {
+      // Hide the entity if it's outside the field of view
+      entityElement.style.display = 'none';
+    }
+  }
   return entityElement;
 }
+function isWithinFieldOfView(game, position, cameraPosition, width, height, fovWidth, fovHeight) {
+  // Calculate the center position of the entity
+  var entityCenterX = position.x + width / 2;
+  var entityCenterY = position.y + height / 2;
 
-},{}],19:[function(require,module,exports){
+  // Calculate the distance from the entity center to the camera position
+  var distanceX = entityCenterX - cameraPosition.x;
+  var distanceY = entityCenterY - cameraPosition.y + 100;
+
+  // Calculate the maximum allowed distance for an entity to be within the FoV
+  // This can be half of the FoV width or height, depending on how you define the FoV area
+  var maxDistance = Math.min(fovWidth, fovHeight);
+  var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+  // console.log('distance', distance, maxDistance)
+  // Check if the entity is within the distance
+  return distance <= maxDistance;
+}
+
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1308,20 +1444,25 @@ function updateGraphic(entityData) {
       // return this.inflateText(entityData);
     }
 
-    /* TODO: better support for static / less renders
-      look at camera position to determine if render of static required
-    if (typeof entityData.previousPosition === 'undefined') {
-      entityData.previousPosition = entityData.position;
-    }
-     if (entityData.previousPosition.x !== entityData.position.x || entityData.previousPosition.y !== entityData.position.y) {
-      entityData.previousPosition = entityData.position;
-      return this.updateEntityPosition(entityElement, entityData);
-    }
-    else {
-      return entityElement;
-    }
-    */
+    // new api for Entity.size
+    if (typeof entityData.radius !== 'undefined') {
+      // Multiply the radius by 2 to get the diameter for CSS
+      var diameter = entityData.radius * 2;
+      entityElement.style.width = diameter + 'px';
+      entityElement.style.height = diameter + 'px';
 
+      // Adjust the position to align with the Matter.js body
+      // This moves the element left and up by half its width and height
+    }
+
+    // entityElement.style.transition = 'width 1.5s ease, height 1.5s ease';
+
+    if (typeof entityData.width !== 'undefined') {
+      entityElement.style.width = entityData.width + 'px';
+    }
+    if (typeof entityData.height !== 'undefined') {
+      entityElement.style.height = entityData.height + 'px';
+    }
     return this.updateEntityPosition(entityElement, entityData);
   } else {
     // If the entity element does not exist, create it
@@ -1329,7 +1470,130 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],20:[function(require,module,exports){
+/*
+
+export default function updateGraphic(entityData) {
+  let game = this.game;
+
+  // Rotation handling with type check
+  if (typeof entityData.rotation === 'object' && entityData.rotation !== null) {
+    entityData.rotation = entityData.rotation.x;
+  }
+
+  const entityElement = document.getElementById(`entity-${entityData.id}`);
+  if (entityElement) {
+    // Update entity color
+    updateEntityColor(entityData, entityElement);
+    // Update zIndex
+    updateEntityZIndex(entityData, entityElement);
+    // Update style
+    updateEntityStyle(entityData, entityElement);
+    // Update texture
+    updateEntityTexture(entityData, entityElement, game);
+    // Update text
+    updateEntityText(entityData, entityElement);
+    // console.log('entityData.previousPosition', entityData.previousPosition, entityData.position)
+    // Handling of entity position updates
+    // Check if the entity's position has changed
+    // this wont work since all graphics needs to move if camera moves
+    return this.updateEntityPosition(entityElement, entityData);
+
+  } else {
+    // Create the graphic if it doesn't exist
+    return this.createGraphic(entityData);
+  }
+}
+
+const truncate = (value, precision = 0) => { // FPS typically doesn't need decimals
+  return Math.round(value);
+};
+
+
+// Function to check if the entity's position has changed
+function hasPositionChanged(entityData) {
+  // Function to truncate a number to four decimal places
+  
+  if (!entityData.previousPosition) {
+    return true;
+  }
+
+  const prevPosX = truncate(entityData.previousPosition.x);
+  const prevPosY = truncate(entityData.previousPosition.y);
+  const currentPosX = truncate(entityData.position.x);
+  const currentPosY = truncate(entityData.position.y);
+
+  // console.log('prevPosX', prevPosX, 'prevPosY', prevPosY, 'currentPosX', currentPosX, 'currentPosY', currentPosY)
+
+  return prevPosX !== currentPosX || prevPosY !== currentPosY;
+}
+
+// Separate function to handle color update
+function updateEntityColor(entityData, entityElement) {
+  if (entityData.color !== undefined && entityData.color !== null) {
+    let hexColor = '#' + entityData.color.toString(16);
+    entityElement.style.background = hexColor;
+  }
+}
+
+// Separate function to handle zIndex update
+function updateEntityZIndex(entityData, entityElement) {
+  if (typeof entityData.position.z === 'number') {
+    entityElement.style.zIndex = entityData.position.z;
+  }
+}
+
+// Separate function to handle style update
+function updateEntityStyle(entityData, entityElement) {
+  if (entityData.style) {
+    Object.keys(entityData.style).forEach((key) => {
+      entityElement.style[key] = entityData.style[key];
+    });
+  }
+}
+
+// Separate function to handle texture update
+function updateEntityTexture(entityData, entityElement, game) {
+  if (entityData.texture) {
+    let texture = game.getTexture(entityData.texture);
+    let spritePosition = texture.sprite ? texture.sprite : { x: 0, y: 0 };
+
+    if (typeof entityData.texture.frame === 'number') {
+      spritePosition = texture.frames[entityData.texture.frame];
+    } else if (typeof texture.frames === 'object' && game.tick % 10 === 0) {
+      if (typeof entityData.texture.frameIndex === 'undefined') {
+        entityData.texture.frameIndex = 0;
+      }
+      if (entityData.texture.frameIndex >= texture.frames.length) {
+        entityData.texture.frameIndex = 0;
+      }
+
+      let frame = texture.frames[entityData.texture.frameIndex];
+      if (frame) spritePosition = frame;
+      entityData.texture.frameIndex++;
+    }
+
+    entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+
+    // Set background size for non-player entities
+    if (entityData.type !== 'PLAYER') {
+      entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+      entityElement.style.width = `${entityData.width}px`;
+      entityElement.style.height = `${entityData.height}px`;
+    }
+  }
+}
+
+// Separate function to handle text update
+function updateEntityText(entityData, entityElement) {
+  if (entityData.type === 'TEXT' && entityData.text !== undefined && entityData.text !== null) {
+    if (entityElement.innerHTML !== entityData.text) {
+      entityElement.innerHTML = entityData.text;
+    }
+  }
+}
+*/
+
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

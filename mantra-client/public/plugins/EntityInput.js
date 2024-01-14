@@ -108,12 +108,17 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
     key: "loadDefaultStrategy",
     value: function loadDefaultStrategy() {
       console.log('Warning: No input strategies registered, using default input strategy');
+      console.log('Current Game.controls', this.game.controls);
       if (this.game.physics && this.game.physics.dimension === 3) {
         //console.log('game.use(new Default3DInputStrategy())');
         this.game.use(new _Default3DInputStrategy["default"]());
       } else {
         //console.log('game.use(new DefaultInputStrategy())');
         this.game.use(new _Default2DInputStrategy["default"]());
+      }
+      if (this.game.controls) {
+        // update the controls based on developer usage
+        this.game.setControls(this.game.controls);
       }
       this.game.emit('inputStrategyRegistered', this.strategies);
     }
@@ -200,7 +205,9 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
         D: 'MOVE_RIGHT',
         SPACE: 'FIRE_BULLET',
         K: 'FIRE_BULLET',
+        L: 'DROP_BOMB',
         O: 'BARREL_ROLL',
+        P: 'CAMERA_SHAKE',
         U: 'SELECT_MENU'
         //LEFT: 'ROTATE_LEFT',
         //RIGHT: 'ROTATE_RIGHT'
@@ -256,7 +263,7 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       var actions = Object.keys(controls).filter(function (key) {
         return controls[key];
       }).map(function (key) {
-        return plugin.defaultControlsMapping[key];
+        return game.systems['entity-input'].controlMappings[key];
       });
       var entityData = game.getEntity(entityId);
       if (entityData && entityData.position && plugin.useMouseControls) {
@@ -296,6 +303,14 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 1);
       if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
       if (actions.includes('ROTATE_RIGHT')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);
+      if (actions.includes('ZOOM_IN')) {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom + 0.05);
+      }
+      if (actions.includes('ZOOM_OUT')) {
+        var _currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(_currentZoom - 0.05);
+      }
       if (game.systems.bullet) {
         if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
       }
@@ -308,10 +323,15 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       }
       if (actions.includes('SELECT_MENU')) {}
 
+      // camera shake
+      if (actions.includes('CAMERA_SHAKE')) {
+        game.shakeCamera();
+      }
+
       // barrel roll
       if (actions.includes('BARREL_ROLL')) {
         if (typeof this.game.data.camera.rotation === 'number') {
-          game.rotateCamera(this.game.data.camera.rotation + 360);
+          game.rotateCamera(360);
           // console.log("this.game.data.camera.rotation", this.game.data.camera.rotation)
         } else {
           // rotate the camera 360 degrees

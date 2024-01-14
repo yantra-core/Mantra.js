@@ -2200,6 +2200,173 @@ var EventEmitter = exports["default"] = /*#__PURE__*/function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = blackHoleSutra;
+// blackhole.js - Marak Squires 2023
+function blackHoleSutra(game, context) {
+  var rules = game.createSutra();
+
+  // Remark: Note namspace of sutraname::methodname
+  //         Mantra runs a single Sutra tree which all entities are bound to
+  //         This requires a unique namespace for each Sutra
+  rules.on('blackhole::create', function () {
+    var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      position: {
+        x: 0,
+        y: 0
+      }
+    };
+    // Create the Black Hole entity
+    var blackHole = game.createEntity({
+      type: 'BLACK_HOLE',
+      texture: 'fire',
+      isStatic: true,
+      isSensor: true,
+      width: 4,
+      height: 4,
+      //radius: 20,
+      position: {
+        x: entityData.position.x,
+        y: entityData.position.y
+      },
+      mass: 100
+    });
+  });
+
+  // Define the gravitational constant
+  var GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
+
+  rules.addCondition('gravityTick', function (entity, gameState) {
+    return gameState.tick % 5 === 0;
+  });
+  rules["if"]('gravityTick').then('applyGravity');
+  rules.on('applyGravity', function (entityData, node, gameState) {
+    // check if this running locally on a context or globally on all BLACK_HOLE entities
+    if (typeof context !== 'undefined') {
+      Object.keys(gameState.ents._).forEach(function (eId) {
+        var entity = gameState.ents._[eId];
+        if (entity.type !== 'BLACK_HOLE') {
+          applyGravity(context, entity, GRAVITATIONAL_CONSTANT);
+        }
+      });
+      return;
+    }
+    if (gameState.ents.BLACK_HOLE) {
+      gameState.ents.BLACK_HOLE.forEach(function (blackHole) {
+        Object.keys(gameState.ents._).forEach(function (eId) {
+          var entity = gameState.ents._[eId];
+          if (entity.type !== 'BLACK_HOLE') {
+            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+          }
+        });
+      });
+    }
+  });
+  rules["if"]('entTouchedBlackhole').then('blackHoleCollision');
+  rules.addCondition('entTouchedBlackhole', function (entity, gameState) {
+    // check if this running locally on a context or globally on all BLACK_HOLE entities
+    if (typeof context !== 'undefined') {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity[context.type];
+    } else {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
+    }
+  });
+  rules.on('blackHoleCollision', function (collision) {
+    var pendingDestroy = collision.bodyA;
+    var blackHole = collision.bodyB;
+    if (collision.bodyA.type === 'BLACK_HOLE') {
+      pendingDestroy = collision.bodyB;
+      blackHole = collision.bodyA;
+    }
+    if (typeof context !== 'undefined') {
+      if (collision.bodyA.type === context.type) {
+        pendingDestroy = collision.bodyB;
+      } else {
+        pendingDestroy = collision.bodyA;
+      }
+      blackHole = context;
+    }
+    if (blackHole) {
+      // increase size of black hole
+      // console.log(blackHole.height, blackHole.width)
+      /*
+      game.updateEntity({
+        id: blackHole.id,
+        height: blackHole.height + 0.1,
+        width: blackHole.width + 0.1,
+        // radius: blackHole.radius + 0.1,
+      });
+      */
+    }
+    game.removeEntity(pendingDestroy.id);
+  });
+
+  // Function to apply gravitational force
+  function applyGravity(body1, body2, gravity) {
+    var distance = Vector.sub(body2.position, body1.position);
+    var magnitude = Vector.magnitude(distance);
+    if (magnitude < 0.5) {
+      // This prevents extreme forces at very close distances
+      return;
+    }
+    distance = Vector.normalize(distance);
+    var force = gravity * body1.mass * body2.mass / (magnitude * magnitude);
+    var maxForce = 1; // Prevents excessively large forces
+    force = Math.min(force, maxForce);
+
+    // Apply the force towards the black hole
+    // TODO: add config flag for repulsion in addition to attraction
+    game.applyForce(body2.id, {
+      x: -distance.x * force,
+      y: -distance.y * force
+    });
+  }
+  return rules;
+}
+
+// Basic vector operations
+var Vector = {
+  add: function add(v1, v2) {
+    return {
+      x: v1.x + v2.x,
+      y: v1.y + v2.y
+    };
+  },
+  sub: function sub(v1, v2) {
+    return {
+      x: v1.x - v2.x,
+      y: v1.y - v2.y
+    };
+  },
+  mult: function mult(v, factor) {
+    return {
+      x: v.x * factor,
+      y: v.y * factor
+    };
+  },
+  div: function div(v, factor) {
+    return {
+      x: v.x / factor,
+      y: v.y / factor
+    };
+  },
+  magnitude: function magnitude(v) {
+    return Math.sqrt(v.x * v.x + v.y * v.y);
+  },
+  normalize: function normalize(v) {
+    var mag = Vector.magnitude(v);
+    return mag > 0 ? Vector.div(v, mag) : {
+      x: 0,
+      y: 0
+    };
+  }
+};
+
+},{}],21:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = demon;
 function demon(game) {
   game.createEntity({
@@ -2258,7 +2425,7 @@ function demon(game) {
   return rules;
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2348,7 +2515,94 @@ function fire(game) {
   return rules;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = fountSutra;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+// fount.js - Marak Squires 2023
+// Sutra for Generating Units
+function fountSutra(game, context) {
+  var sprayConfig = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var rules = game.createSutra();
+
+  // Default configuration for the Fount
+  var settings = _objectSpread({
+    unitType: 'PARTICLE',
+    // Type of unit to generate
+    texture: 'pixel',
+    // Texture for the unit
+    color: 0x00ff00,
+    // Color of the unit
+    unitSize: {
+      width: 4,
+      height: 4
+    },
+    // Size of the unit
+    sprayAngle: Math.PI / 8,
+    // Angle of the spray arc (in radians)
+    sprayWidth: Math.PI / 4,
+    // Width of the spray arc (in radians)
+    forceMagnitude: 0.5
+  }, sprayConfig);
+
+  // Function to create a unit
+  function createUnit(position) {
+    var rgbColor = settings.color;
+    // convert from int to rgb
+    rgbColor = [rgbColor >> 16 & 255, rgbColor >> 8 & 255, rgbColor & 255];
+    var rgbColorString = "rgba(".concat(rgbColor.join(','), ", 0.5)"); // Adjust opacity as needed
+    return game.createEntity({
+      type: settings.unitType,
+      // texture: settings.texture,
+      height: settings.unitSize.height,
+      color: settings.color,
+      width: settings.unitSize.width,
+      position: position,
+      style: {
+        backgroundColor: rgbColorString
+      },
+      isSensor: true
+    });
+  }
+  function applySprayForce(unit) {
+    var baseAngle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : settings.sprayAngle;
+    var angleOffset = (Math.random() - 0.5) * settings.sprayWidth; // Random offset within a specified width
+    var angle = baseAngle + angleOffset;
+    var force = {
+      x: settings.forceMagnitude * Math.cos(angle),
+      y: settings.forceMagnitude * Math.sin(angle)
+    };
+    game.applyForce(unit.id, force);
+  }
+
+  // Rule for generating and spraying units
+  rules["if"]('fountTick').then('fountSpray');
+  rules.addCondition('fountTick', function (entity, gameState) {
+    return entity.name === context.name && gameState.tick % 10 === 0;
+  });
+  rules.on('fountSpray', function (context, node, gameState) {
+    // Determine the position of the fount (can be context-dependent)
+    var fountPosition = typeof context !== 'undefined' ? context.position : {
+      x: 0,
+      y: 0
+    };
+    // Create a unit and apply force
+    var unit = createUnit(fountPosition);
+    applySprayForce(unit);
+  });
+  return rules;
+}
+
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2512,7 +2766,7 @@ function getNeighbors(cell, node, gameState) {
   return neighbors;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2690,7 +2944,7 @@ var Vector = {
   }
 };
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2735,7 +2989,7 @@ function note(game) {
   });
 }
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2794,7 +3048,7 @@ function platformMovement(game) {
   return rules;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2885,7 +3139,161 @@ function topdownMovement(game) {
   return rules;
 }
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _blackhole = _interopRequireDefault(require("../../mantra-sutras/blackhole.js"));
+var _fount = _interopRequireDefault(require("../../mantra-sutras/fount.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // GravityGardens.js - Marak Squires 2024
+var GravityGardens = /*#__PURE__*/function () {
+  function GravityGardens() {
+    _classCallCheck(this, GravityGardens);
+    this.id = GravityGardens.id;
+  }
+  _createClass(GravityGardens, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.createWorld();
+    }
+  }, {
+    key: "createWorld",
+    value: function createWorld() {
+      var game = this.game;
+      game.setGravity(0, 0, 0);
+      var player = game.createDefaultPlayer({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0
+        }
+      });
+      game.setBackground('#007fff');
+      game.setControls({
+        W: 'MOVE_FORWARD',
+        S: 'MOVE_BACKWARD',
+        A: 'MOVE_LEFT',
+        D: 'MOVE_RIGHT',
+        SPACE: 'FIRE_BULLET',
+        // K: 'FIRE_BULLET',
+        K: 'ZOOM_IN',
+        L: 'ZOOM_OUT',
+        O: 'BARREL_ROLL',
+        P: 'CAMERA_SHAKE',
+        U: 'SELECT_MENU'
+      });
+      game.use('StarField');
+      game.use('Border', {
+        autoBorder: true
+      });
+      var fountA = game.createEntity({
+        name: 'fountA',
+        type: 'FOUNT',
+        color: 0xf03025,
+        isStatic: true,
+        width: 8,
+        height: 8,
+        position: {
+          x: 200,
+          y: 0
+        }
+      });
+      game.updateEntity({
+        id: fountA.id,
+        sutra: (0, _fount["default"])(game, fountA, {
+          sprayAngle: 0,
+          color: 0xf03025
+        })
+      });
+      var fountB = game.createEntity({
+        name: 'fountB',
+        type: 'FOUNT',
+        color: 0x14b161,
+        isStatic: true,
+        width: 8,
+        height: 8,
+        position: {
+          x: -200,
+          y: 0
+        }
+      });
+      game.updateEntity({
+        id: fountB.id,
+        sutra: (0, _fount["default"])(game, fountB, {
+          sprayAngle: Math.PI,
+          color: 0x14b161
+        })
+      });
+      var fountC = game.createEntity({
+        name: 'fountC',
+        type: 'FOUNT',
+        color: 0x3c62f8,
+        isStatic: true,
+        width: 8,
+        height: 8,
+        position: {
+          x: 0,
+          y: -200
+        }
+      });
+      game.updateEntity({
+        id: fountC.id,
+        sutra: (0, _fount["default"])(game, fountC, {
+          sprayAngle: Math.PI / 2,
+          color: 0x3c62f8
+        })
+      });
+      var fountD = game.createEntity({
+        name: 'fountD',
+        type: 'FOUNT',
+        color: 0xe9dd34,
+        isStatic: true,
+        width: 8,
+        height: 8,
+        position: {
+          x: 0,
+          y: 200
+        }
+      });
+      game.updateEntity({
+        id: fountD.id,
+        sutra: (0, _fount["default"])(game, fountD, {
+          sprayAngle: -Math.PI / 2,
+          color: 0xe9dd34
+        })
+      });
+
+      // game.setSutra(blackhole(game));
+      // game.setSutra(fount(game));
+
+      // Create stand-alone black hole Sutra with entity
+      // game.rules.emit('blackhole::create');
+
+      // Apply the blackhole behavior to existing entities
+      game.updateEntity({
+        id: player.id,
+        sutra: (0, _blackhole["default"])(game, player)
+      });
+    }
+  }]);
+  return GravityGardens;
+}();
+_defineProperty(GravityGardens, "id", 'world-gravity-gardens');
+_defineProperty(GravityGardens, "type", 'gravity-gardens');
+var _default = exports["default"] = GravityGardens;
+
+},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":23}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2931,7 +3339,8 @@ var Home = /*#__PURE__*/function () {
       var game = this.game;
 
       // bypass default input movement
-      game.customMovement = true;
+      // game.customMovement = true;
+
       game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
@@ -2944,6 +3353,19 @@ var Home = /*#__PURE__*/function () {
           x: 0,
           y: 0
         }
+      });
+      game.setControls({
+        W: 'MOVE_FORWARD',
+        S: 'MOVE_BACKWARD',
+        A: 'MOVE_LEFT',
+        D: 'MOVE_RIGHT',
+        SPACE: 'FIRE_BULLET',
+        // K: 'FIRE_BULLET',
+        K: 'ZOOM_IN',
+        L: 'ZOOM_OUT',
+        O: 'BARREL_ROLL',
+        P: 'CAMERA_SHAKE',
+        U: 'SELECT_MENU'
       });
 
       // game.setBackground('#007F00');
@@ -3418,7 +3840,7 @@ _defineProperty(Home, "id", 'world-home');
 _defineProperty(Home, "type", 'world');
 var _default = exports["default"] = Home;
 
-},{"./sutras.js":28,"./welcomeMessage.js":30}],28:[function(require,module,exports){
+},{"./sutras.js":31,"./welcomeMessage.js":33}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3487,7 +3909,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/demon.js":20,"../../mantra-sutras/fire.js":21,"../../mantra-sutras/hexapod.js":23,"../../mantra-sutras/player-movement/top-down.js":26,"../TowerDefense/sutras/walker.js":46,"../sutras/routing.js":52,"../sutras/switchGraphics.js":53,"../sutras/warpToWorld.js":54,"./sutras/block.js":29}],29:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":25,"../../mantra-sutras/player-movement/top-down.js":28,"../TowerDefense/sutras/walker.js":49,"../sutras/routing.js":55,"../sutras/switchGraphics.js":56,"../sutras/warpToWorld.js":57,"./sutras/block.js":32}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3558,7 +3980,7 @@ function fire(game) {
 }
 ;
 
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3625,7 +4047,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3725,7 +4147,7 @@ _defineProperty(Maze, "id", 'world-maze');
 _defineProperty(Maze, "type", 'maze');
 var _default = exports["default"] = Maze;
 
-},{}],32:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3985,7 +4407,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../sutras/warpToWorld.js":54,"./instruments/createDrumKit.js":33,"./instruments/createPiano.js":34,"./sutras.js":35}],33:[function(require,module,exports){
+},{"../sutras/warpToWorld.js":57,"./instruments/createDrumKit.js":36,"./instruments/createPiano.js":37,"./sutras.js":38}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4091,7 +4513,7 @@ function createDrumKit(game, config) {
   });
 }
 
-},{}],34:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4216,7 +4638,7 @@ function createPiano(game, config) {
   */
 }
 
-},{}],35:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4342,7 +4764,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":53,"../sutras/warpToWorld.js":54}],36:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":56,"../sutras/warpToWorld.js":57}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4595,7 +5017,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../../mantra-sutras/player-movement/platformer.js":25,"../sutras/warpToWorld.js":54}],37:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/platformer.js":27,"../sutras/warpToWorld.js":57}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4780,7 +5202,7 @@ var Pong = /*#__PURE__*/function () {
 _defineProperty(Pong, "id", 'world-pong');
 var _default = exports["default"] = Pong;
 
-},{}],38:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4868,7 +5290,7 @@ _defineProperty(Space, "id", 'world-space');
 _defineProperty(Space, "type", 'world');
 var _default = exports["default"] = Space;
 
-},{}],39:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4946,6 +5368,7 @@ var Sutra = /*#__PURE__*/function () {
       game.createDefaultPlayer();
       //createPlayPauseButton();
 
+      /*
       game.createEntity({
         type: 'WARP',
         kind: 'Home',
@@ -4959,6 +5382,8 @@ var Sutra = /*#__PURE__*/function () {
           y: -100
         }
       });
+      */
+
       function createPlayPauseButton() {
         game.createEntity({
           name: 'play-pause-button',
@@ -5059,7 +5484,7 @@ _defineProperty(Sutra, "id", 'world-sutra');
 _defineProperty(Sutra, "type", 'world');
 var _default = exports["default"] = Sutra;
 
-},{"../../mantra-sutras/demon.js":20,"../../mantra-sutras/fire.js":21,"../../mantra-sutras/game-of-life.js":22,"../../mantra-sutras/hexapod.js":23,"../../mantra-sutras/note.js":24}],40:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/game-of-life.js":24,"../../mantra-sutras/hexapod.js":25,"../../mantra-sutras/note.js":26}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5430,7 +5855,7 @@ var _default = exports["default"] = TowerWorld;
 
 */
 
-},{"../../mantra-sutras/player-movement/top-down.js":26,"./sutras/colorChanges.js":41,"./sutras/enemy.js":42,"./sutras/input.js":43,"./sutras/player.js":44,"./sutras/round.js":45}],41:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":28,"./sutras/colorChanges.js":44,"./sutras/enemy.js":45,"./sutras/input.js":46,"./sutras/player.js":47,"./sutras/round.js":48}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5480,7 +5905,7 @@ function colorChanges() {
   return colorChanges;
 }
 
-},{}],42:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5600,7 +6025,7 @@ function spawner() {
   return spawner;
 }
 
-},{}],43:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5674,7 +6099,7 @@ function input() {
 }
 ;
 
-},{}],44:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5734,7 +6159,7 @@ function player() {
   return player;
 }
 
-},{}],45:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5789,7 +6214,7 @@ function round() {
   return round;
 }
 
-},{}],46:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5799,7 +6224,7 @@ exports["default"] = createWalker;
 function createWalker(game, config) {
   game.createEntity({
     type: 'Walker',
-    sutra: 'walker',
+    // sutra: 'walker', // TODO
     width: 22,
     height: 24,
     texture: {
@@ -5927,7 +6352,7 @@ function createWalker(game, config) {
   return walker;
 }
 
-},{}],47:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6125,7 +6550,7 @@ _defineProperty(XState, "id", 'world-xstate');
 _defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
-},{}],48:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6308,7 +6733,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"./contraptions-example.js":49}],49:[function(require,module,exports){
+},{"./contraptions-example.js":52}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6501,7 +6926,7 @@ function roverLight(x, y, z) {
   return contraption;
 }
 
-},{"../../../YCraft.js/index.js":1}],50:[function(require,module,exports){
+},{"../../../YCraft.js/index.js":1}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6516,7 +6941,7 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":51}],51:[function(require,module,exports){
+},{"./index.js":54}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6524,6 +6949,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _Home = _interopRequireDefault(require("./Home/Home.js"));
+var _GravityGardens = _interopRequireDefault(require("./GravityGardens/GravityGardens.js"));
 var _Maze = _interopRequireDefault(require("./Maze/Maze.js"));
 var _Music = _interopRequireDefault(require("./Music/Music.js"));
 var _Platform = _interopRequireDefault(require("./Platform/Platform.js"));
@@ -6536,6 +6962,7 @@ var _YCraft = _interopRequireDefault(require("./YCraft/YCraft.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var worlds = {};
 worlds.Home = _Home["default"];
+worlds.GravityGardens = _GravityGardens["default"];
 worlds.Maze = _Maze["default"];
 worlds.Music = _Music["default"];
 worlds.Platform = _Platform["default"];
@@ -6547,7 +6974,7 @@ worlds.TowerDefense = _TowerDefense["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./Home/Home.js":27,"./Maze/Maze.js":31,"./Music/Music.js":32,"./Platform/Platform.js":36,"./Pong/Pong.js":37,"./Space/Space.js":38,"./Sutra/Sutra.js":39,"./TowerDefense/TowerDefense.js":40,"./XState/XState.js":47,"./YCraft/YCraft.js":48}],52:[function(require,module,exports){
+},{"./GravityGardens/GravityGardens.js":29,"./Home/Home.js":30,"./Maze/Maze.js":34,"./Music/Music.js":35,"./Platform/Platform.js":39,"./Pong/Pong.js":40,"./Space/Space.js":41,"./Sutra/Sutra.js":42,"./TowerDefense/TowerDefense.js":43,"./XState/XState.js":50,"./YCraft/YCraft.js":51}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6584,7 +7011,7 @@ const circleRoute = createCircleRoute(100, 100, 50, 20);
 */
 var _default = exports["default"] = routing;
 
-},{}],53:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6679,7 +7106,7 @@ function switchGraphics(game) {
   return rules;
 }
 
-},{}],54:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6713,5 +7140,5 @@ function warpToWorld(game) {
   return rules;
 }
 
-},{}]},{},[50])(50)
+},{}]},{},[53])(53)
 });

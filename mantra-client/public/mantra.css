@@ -19,7 +19,6 @@ body {
 
 }
 
-
 *:focus {
   outline: 0.25vmin dashed #007fff;
   outline-offset: 0.5vmin;
@@ -441,6 +440,7 @@ h1+p {
 
 /* Menu buttons */
 #select,
+#graphics,
 #start {
   width: 6vmin;
   height: 2vmin;
@@ -467,7 +467,13 @@ h1+p {
   left: 60%;
 }
 
+#graphics {
+  left: 50%;
+
+}
+
 button#start.is3d div,
+button#graphics.is3d div,
 button#select.is3d div {
   --color: #222;
   top: 0;
@@ -587,7 +593,7 @@ button.circle div {
   width: 30vmin;
   height: 30vmin;
   border-radius: 50%;
-  right: 3vw;
+  right: 5vw;
   bottom: 40px;
   z-index: 19999;
   transform: scale(1.8);

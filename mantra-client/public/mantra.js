@@ -498,7 +498,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       isSensor: new _Component["default"]('isSensor', this),
       owner: new _Component["default"]('owner', this),
       inputs: new _Component["default"]('inputs', this),
-      items: new _Component["default"]('items', this)
+      items: new _Component["default"]('items', this),
+      sutra: new _Component["default"]('sutra', this)
     };
 
     // define additional components for the game
@@ -866,6 +867,16 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "setControls",
+    value: function setControls(controls) {
+      var game = this;
+      game.controls = controls;
+      if (game.systems['entity-input']) {
+        // TODO: update instead of replace?
+        game.systems['entity-input'].controlMappings = controls;
+      }
+    }
+  }, {
     key: "setSize",
     value: function setSize(width, height) {
       this.width = width;
@@ -879,6 +890,15 @@ var Game = exports.Game = /*#__PURE__*/function () {
       } else {
         console.log('warning: no camera.zoom method found');
       }
+    }
+  }, {
+    key: "shakeCamera",
+    value: function shakeCamera(intensity, duration) {
+      this.graphics.forEach(function (graphicsInterface) {
+        if (graphicsInterface.cameraShake) {
+          graphicsInterface.cameraShake(intensity, duration);
+        }
+      });
     }
   }, {
     key: "setPlayerId",
@@ -1103,6 +1123,8 @@ function createDefaultPlayer() {
     shape: 'triangle',
     width: 16,
     height: 16,
+    color: playerConfig.color,
+    radius: playerConfig.radius,
     texture: playerConfig.texture,
     mass: 222,
     friction: 0.5,
@@ -1388,7 +1410,7 @@ function loadPluginsFromConfig(_ref) {
     }
     if (gamepad) {
       this.use('Gamepad');
-      this.use('GamepadGUI');
+      this.use('GamepadGUI', gamepad);
     }
     if (sutra) {
       this.use('Sutra');

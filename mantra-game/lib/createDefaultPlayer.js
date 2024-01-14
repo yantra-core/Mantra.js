@@ -1,5 +1,5 @@
 export default function createDefaultPlayer(playerConfig = {}) {
-  // console.log('creating default player', playerConfig)
+  //console.log('creating default player', playerConfig)
 
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = { x: 0, y: 0 };
@@ -15,11 +15,14 @@ export default function createDefaultPlayer(playerConfig = {}) {
     return this.getEntity(this.currentPlayerId);
   }
 
+
   let player = this.createEntity({
     type: 'PLAYER',
     shape: 'triangle',
     width: 16,
     height: 16,
+    color: playerConfig.color,
+    radius: playerConfig.radius,
     texture: playerConfig.texture,
     mass: 222,
     friction: 0.5,  // Default friction
