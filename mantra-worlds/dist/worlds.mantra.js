@@ -2287,7 +2287,6 @@ function blackHoleSutra(game, context) {
     }
     if (blackHole) {
       // increase size of black hole
-      // console.log('supdating', blackHole.id, blackHole.radius)
       // console.log(blackHole.height, blackHole.width)
       /*
       game.updateEntity({
@@ -3340,7 +3339,8 @@ var Home = /*#__PURE__*/function () {
       var game = this.game;
 
       // bypass default input movement
-      game.customMovement = true;
+      // game.customMovement = true;
+
       game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
@@ -3353,6 +3353,19 @@ var Home = /*#__PURE__*/function () {
           x: 0,
           y: 0
         }
+      });
+      game.setControls({
+        W: 'MOVE_FORWARD',
+        S: 'MOVE_BACKWARD',
+        A: 'MOVE_LEFT',
+        D: 'MOVE_RIGHT',
+        SPACE: 'FIRE_BULLET',
+        // K: 'FIRE_BULLET',
+        K: 'ZOOM_IN',
+        L: 'ZOOM_OUT',
+        O: 'BARREL_ROLL',
+        P: 'CAMERA_SHAKE',
+        U: 'SELECT_MENU'
       });
 
       // game.setBackground('#007F00');
@@ -6936,7 +6949,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _Home = _interopRequireDefault(require("./Home/Home.js"));
-var _GravityGardens = _interopRequireDefault(require("./GravityGarden/GravityGardens.js"));
+var _GravityGardens = _interopRequireDefault(require("./GravityGardens/GravityGardens.js"));
 var _Maze = _interopRequireDefault(require("./Maze/Maze.js"));
 var _Music = _interopRequireDefault(require("./Music/Music.js"));
 var _Platform = _interopRequireDefault(require("./Platform/Platform.js"));
@@ -6961,7 +6974,7 @@ worlds.TowerDefense = _TowerDefense["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./GravityGarden/GravityGardens.js":29,"./Home/Home.js":30,"./Maze/Maze.js":34,"./Music/Music.js":35,"./Platform/Platform.js":39,"./Pong/Pong.js":40,"./Space/Space.js":41,"./Sutra/Sutra.js":42,"./TowerDefense/TowerDefense.js":43,"./XState/XState.js":50,"./YCraft/YCraft.js":51}],55:[function(require,module,exports){
+},{"./GravityGardens/GravityGardens.js":29,"./Home/Home.js":30,"./Maze/Maze.js":34,"./Music/Music.js":35,"./Platform/Platform.js":39,"./Pong/Pong.js":40,"./Space/Space.js":41,"./Sutra/Sutra.js":42,"./TowerDefense/TowerDefense.js":43,"./XState/XState.js":50,"./YCraft/YCraft.js":51}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

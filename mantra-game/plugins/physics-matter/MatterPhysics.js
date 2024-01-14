@@ -39,7 +39,7 @@ class MatterPhysics extends PhysicsInterface {
     this.engine.gravity.y = y;
   }
 
-  init (game) {
+  init(game) {
 
     this.engine = Matter.Engine.create()
 
@@ -71,6 +71,7 @@ class MatterPhysics extends PhysicsInterface {
     // i would assume we want that data *after* the update?
     this.onAfterUpdate(this.engine, (event) => {
 
+      // show total number of bodies in the world
       // Remark: should this and bodyMap be replaced with a more generic mapping
       // in order to allow non-physics backed entities to exist in the game?
       for (const body of event.source.world.bodies) {
@@ -144,6 +145,12 @@ class MatterPhysics extends PhysicsInterface {
               this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
               this.game.components.position.set(body.myEntityId, position);
               this.game.components.rotation.set(body.myEntityId, body.angle);
+
+              // update size as well
+              //this.game.components.height.set(body.myEntityId, body.bounds.max.y);
+              //this.game.components.width.set(body.myEntityId, body.bounds.max.x);
+              // this.game.components.radius.set(body.myEntityId, body.bounds.max.x / 2);
+
             }
 
             if (ent.type === 'BULLET') {
@@ -190,11 +197,11 @@ class MatterPhysics extends PhysicsInterface {
     Matter.World.add(engine.world, body);
   }
 
-  removeBody (body) {
+  removeBody(body) {
     Matter.World.remove(this.engine.world, body);
   }
 
-  setMass (body, mass) {
+  setMass(body, mass) {
     Matter.Body.setMass(body, mass);
   }
 
@@ -231,9 +238,35 @@ class MatterPhysics extends PhysicsInterface {
   getBodyRotation(body) {
     return body.angle;
   }
-   
+
   rotateBody(body, rotation) {
     Matter.Body.rotate(body, rotation);
+  }
+
+  setBodySize(body, size) {
+    // size may have height and width ( rect ), or radius ( circle )
+    /*
+    if (typeof size.width !== 'undefined') {
+      Matter.Body.scale(body, size.width / body.bounds.max.x, 1);
+    }
+    if (typeof size.height !== 'undefined') {
+      Matter.Body.scale(body, 1, size.height / body.bounds.max.y);
+    }
+    */
+    if (typeof size.radius !== 'undefined') {
+      // Estimate the current radius as the average of width and height
+      let currentRadius = (body.bounds.max.x - body.bounds.min.x + body.bounds.max.y - body.bounds.min.y) / 4;
+
+      //console.log('Current Radius:', currentRadius);
+      //console.log('New Radius:', size.radius);
+
+      // Calculate the scale factor
+      let scaleFactor = size.radius / currentRadius;
+      //console.log('Scaling Factor:', scaleFactor);
+
+      // Apply the scaling
+      Matter.Body.scale(body, scaleFactor, scaleFactor);
+    }
   }
 
   onBeforeUpdate(engine, callback) {
@@ -264,13 +297,13 @@ class MatterPhysics extends PhysicsInterface {
 
         const entityIdA = bodyA.myEntityId;
         const entityIdB = bodyB.myEntityId;
-    
+
         const entityA = this.game.getEntity(entityIdA);
         const entityB = this.game.getEntity(entityIdB);
-        
+
         bodyA.entity = entityA;
         bodyB.entity = entityB;
-        
+
         game.emit('collisionStart', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }
@@ -329,7 +362,7 @@ class MatterPhysics extends PhysicsInterface {
       }
     }
   }
-  
+
 }
 
 export default MatterPhysics;

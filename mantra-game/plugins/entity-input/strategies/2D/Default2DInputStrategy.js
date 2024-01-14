@@ -19,7 +19,6 @@ class DefaultTwoDimensionalInputStrategy {
       L: 'DROP_BOMB',
       O: 'BARREL_ROLL',
       P: 'CAMERA_SHAKE',
-      Digit0: 'SELECT_WORLD',
       U: 'SELECT_MENU',
       //LEFT: 'ROTATE_LEFT',
       //RIGHT: 'ROTATE_RIGHT'

@@ -132,9 +132,11 @@ class Entity {
       if (destroyedComponentData[entityId]) {
         // Removes the body from the physics engine
         if (typeof this.game.physics.removeBody === 'function') {
-          // TODO: fix this
           if (this.game.bodyMap[entityId]) {
+            // removes body from physics engine
             this.game.physics.removeBody(this.game.bodyMap[entityId]);
+            // deletes reference to body
+            delete this.game.bodyMap[entityId];
           } else {
             // console.log('No body found for entityId', entityId);
           }
@@ -210,12 +212,28 @@ class Entity {
       // console.log("SETTING COLOR", entityData.color)
     }
 
+    let updateSize = false;
     if (entityData.height) {
+      updateSize = true;
       this.game.components.height.set(entityId, entityData.height);
     }
 
     if (entityData.width) {
+      updateSize = true;
       this.game.components.width.set(entityId, entityData.width);
+    }
+
+    if (entityData.radius) {
+      updateSize = true;
+      // this.game.components.radius.set(entityId, entityData.radius);
+    }
+
+    if (updateSize) {
+      let body = this.game.bodyMap[entityId];
+      if (body) {
+        // console.log('eeee', entityData.radius)
+        this.game.physics.setBodySize(body, entityData);
+      }
     }
 
     if (entityData.position) {
@@ -314,6 +332,7 @@ class Entity {
       density: 100,
       health: Infinity,
       score: 0,
+      // radius: null,
       height: 100,
       width: 100,
       depth: 10,
@@ -365,6 +384,7 @@ class Entity {
       position.y = config.position.y;
     }
     */
+
 
     // console.log('position', position, 'width', width, 'height', height)
     // Using game's API to add components

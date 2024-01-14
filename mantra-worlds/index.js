@@ -1,5 +1,5 @@
 import Home from './Home/Home.js';
-import GravityGardens from './GravityGarden/GravityGardens.js';
+import GravityGardens from './GravityGardens/GravityGardens.js';
 import Maze from './Maze/Maze.js';
 import Music from './Music/Music.js';
 import Platform from './Platform/Platform.js';
