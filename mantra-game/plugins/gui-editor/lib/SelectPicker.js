@@ -77,18 +77,20 @@ export default class SelectPicker {
       display: 'none',
       justifyContent: 'center',
       alignItems: 'center',
-      zIndex: '9001'
+      zIndex: 22222,
     });
   }
 
   applyPickerStyles(picker) {
     Object.assign(picker.style, {
       position: 'relative',
-      bottom: '160px',
+      top: '0px',
+      zIndex: 22222,
       listStyle: 'none',
       margin: '0',
       padding: '0',
-      maxHeight: '50%',
+      maxHeight: '80%',
+      maxWidth: '1000px',
       overflowY: 'auto',
       width: '80%',
       backgroundColor: 'white',
@@ -99,10 +101,13 @@ export default class SelectPicker {
 
   applyListItemStyles(listItem) {
     Object.assign(listItem.style, {
-      padding: '20px',
+      paddingTop: '20px',
+      paddingBottom: '20px',
+      paddingLeft: '5px',
+      paddingRight: '5px',
       cursor: 'pointer',
       borderBottom: '1px solid #ddd',
-      fontSize: '44px',
+      fontSize: '36px',
       textAlign: 'center',
       backgroundColor: '#f8f8f8',
       margin: '5px',

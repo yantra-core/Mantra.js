@@ -2,7 +2,7 @@ class CSSStarField {
   static id = 'css-starfield';
   static removable = false;
 
-  constructor(starCount = 1000, fieldWidth = 800, fieldHeight = 600) {
+  constructor(starCount = 100, fieldWidth = 800, fieldHeight = 600) {
     this.id = CSSStarField.id;
     this.starCount = starCount;
     this.fieldWidth = fieldWidth;
@@ -21,10 +21,14 @@ class CSSStarField {
 
   generateStarfield() {
     let game = this.game;
+    game.setBackground('black');
+
+    /*
       this.game.createEntity({
         type: 'STARFIELD',
         body: false,
-        color: 0x000000,
+        // dark purple
+        color: 0x110022,
         width: this.fieldWidth,
         height: this.fieldHeight,
         style: {
@@ -38,6 +42,7 @@ class CSSStarField {
           z: -10
         }
       });
+      */
 
     for (let i = 0; i < this.starCount; i++) {
       // Adjusting star positions to be relative to the center
@@ -47,8 +52,10 @@ class CSSStarField {
       this.game.createEntity({
         type: 'STAR',
         // body: false,
-        width: 2,
-        height: 2,
+        isSensor: true,
+        width: 4,
+        height: 4,
+        mass: 100,
         color: 0xffffff,
         style: {
           zIndex: 2,
@@ -60,7 +67,7 @@ class CSSStarField {
         position: {
           x: posX,
           y: posY,
-          z: -10
+          z: -5
         }
       });
     }

@@ -23,9 +23,15 @@ class GraphicsSelector {
     selectBox.title = 'Select graphics mode.\nMantra supports hot-swapping and multiplexing of graphics modes.';
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
-    this.addOption(selectBox, 'CSSGraphics - v1.1.0', 'CSSGraphics');
-    this.addOption(selectBox, 'Babylon.js - v6.25.0', 'BabylonGraphics');
-    this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
+    this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
+    this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
+    // Remark: Phaser 3 support removed 1/14/2023
+    //         With CSSGraphics engine working well, not much need for phaser 3
+    //         Babylon.js currently handles 3d
+    //         Improved Three.js support will be added in the future
+    // this.addOption(selectBox, 'Phaser 3 - v3.60.0', 'PhaserGraphics');
+    // this.addOption(selectBox, 'Three.js', 'ThreeGraphics');
+
     this.selectPicker = new SelectPicker(selectBox, function(selectedGraphicsMode){
       game.systems.graphics.switchGraphics(selectedGraphicsMode);
     }, game);
@@ -61,6 +67,7 @@ class GraphicsSelector {
 
     let isKeyDown = false;
 
+    // TODO: refactor this to be members of the class
     function toggleModalOnKeyPress(isKeyPressed) {
       if (isKeyPressed && !isKeyDown) {
         // Key is pressed down for the first time

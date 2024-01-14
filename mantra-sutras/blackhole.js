@@ -16,7 +16,9 @@ export default function blackHoleSutra(game, context) {
       texture: 'fire',
       isStatic: true,
       isSensor: true,
-      radius: 20,
+      width: 4,
+      height: 4,
+      //radius: 20,
       position: {
         x: entityData.position.x,
         y: entityData.position.y
@@ -70,9 +72,11 @@ export default function blackHoleSutra(game, context) {
 
   rules.on('blackHoleCollision', (collision) => {
     let pendingDestroy = collision.bodyA;
+    let blackHole = collision.bodyB;
 
     if (collision.bodyA.type === 'BLACK_HOLE') {
       pendingDestroy = collision.bodyB;
+      blackHole = collision.bodyA;
     }
 
     if (typeof context !== 'undefined') {
@@ -81,6 +85,20 @@ export default function blackHoleSutra(game, context) {
       } else {
         pendingDestroy = collision.bodyA;
       }
+      blackHole = context;
+    }
+
+    if (blackHole) {
+      // increase size of black hole
+      // console.log(blackHole.height, blackHole.width)
+      /*
+      game.updateEntity({
+        id: blackHole.id,
+        height: blackHole.height + 0.1,
+        width: blackHole.width + 0.1,
+        // radius: blackHole.radius + 0.1,
+      });
+      */
     }
 
     game.removeEntity(pendingDestroy.id);

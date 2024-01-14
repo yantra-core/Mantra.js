@@ -1,4 +1,5 @@
 import Home from './Home/Home.js';
+import GravityGardens from './GravityGarden/GravityGardens.js';
 import Maze from './Maze/Maze.js';
 import Music from './Music/Music.js';
 import Platform from './Platform/Platform.js';
@@ -10,6 +11,7 @@ import XState from './XState/XState.js';
 import YCraft from './YCraft/YCraft.js';
 const worlds = {};
 worlds.Home = Home;
+worlds.GravityGardens = GravityGardens;
 worlds.Maze = Maze;
 worlds.Music = Music;
 worlds.Platform = Platform;

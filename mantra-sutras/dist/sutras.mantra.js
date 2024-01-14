@@ -5,32 +5,86 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = blackHoleSutra;
-// blackHoleSutra.js - Custom Sutra for Black Hole Entity
-function blackHoleSutra(game) {
-  // Create the Black Hole entity
-  var blackHole = game.createEntity({
-    type: 'BLACK_HOLE',
-    texture: 'blackHoleTexture',
-    radius: 20,
-    // Define the radius of the black hole
-    position: {
-      x: game.worldCenter.x,
-      y: game.worldCenter.y
-    },
-    mass: 1000 // A large mass to simulate strong gravity
-  });
+// blackhole.js - Marak Squires 2023
+function blackHoleSutra(game, context) {
   var rules = game.createSutra();
 
-  // Define the gravitational constant
-  var GRAVITATIONAL_CONSTANT = 0.05; // Adjust as needed for gameplay
-
-  // Rule for gravitational pull
-  rules.onEveryTick(function (gameState) {
-    gameState.ents.forEach(function (entity) {
-      if (entity.type !== 'BLACK_HOLE') {
-        applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+  // Remark: Note namspace of sutraname::methodname
+  //         Mantra runs a single Sutra tree which all entities are bound to
+  //         This requires a unique namespace for each Sutra
+  rules.on('blackhole::create', function () {
+    var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      position: {
+        x: 0,
+        y: 0
       }
+    };
+    // Create the Black Hole entity
+    var blackHole = game.createEntity({
+      type: 'BLACK_HOLE',
+      texture: 'fire',
+      isStatic: true,
+      isSensor: true,
+      radius: 20,
+      position: {
+        x: entityData.position.x,
+        y: entityData.position.y
+      },
+      mass: 100
     });
+  });
+
+  // Define the gravitational constant
+  var GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
+
+  rules.addCondition('gravityTick', function (entity, gameState) {
+    return gameState.tick % 5 === 0;
+  });
+  rules["if"]('gravityTick').then('applyGravity');
+  rules.on('applyGravity', function (entityData, node, gameState) {
+    // check if this running locally on a context or globally on all BLACK_HOLE entities
+    if (typeof context !== 'undefined') {
+      Object.keys(gameState.ents._).forEach(function (eId) {
+        var entity = gameState.ents._[eId];
+        if (entity.type !== 'BLACK_HOLE') {
+          applyGravity(context, entity, GRAVITATIONAL_CONSTANT);
+        }
+      });
+      return;
+    }
+    if (gameState.ents.BLACK_HOLE) {
+      gameState.ents.BLACK_HOLE.forEach(function (blackHole) {
+        Object.keys(gameState.ents._).forEach(function (eId) {
+          var entity = gameState.ents._[eId];
+          if (entity.type !== 'BLACK_HOLE') {
+            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+          }
+        });
+      });
+    }
+  });
+  rules["if"]('entTouchedBlackhole').then('blackHoleCollision');
+  rules.addCondition('entTouchedBlackhole', function (entity, gameState) {
+    // check if this running locally on a context or globally on all BLACK_HOLE entities
+    if (typeof context !== 'undefined') {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity[context.type];
+    } else {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
+    }
+  });
+  rules.on('blackHoleCollision', function (collision) {
+    var pendingDestroy = collision.bodyA;
+    if (collision.bodyA.type === 'BLACK_HOLE') {
+      pendingDestroy = collision.bodyB;
+    }
+    if (typeof context !== 'undefined') {
+      if (collision.bodyA.type === context.type) {
+        pendingDestroy = collision.bodyB;
+      } else {
+        pendingDestroy = collision.bodyA;
+      }
+    }
+    game.removeEntity(pendingDestroy.id);
   });
 
   // Function to apply gravitational force
@@ -38,18 +92,61 @@ function blackHoleSutra(game) {
     var distance = Vector.sub(body2.position, body1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
+      // This prevents extreme forces at very close distances
       return;
     }
     distance = Vector.normalize(distance);
     var force = gravity * body1.mass * body2.mass / (magnitude * magnitude);
-    var maxForce = 1;
+    var maxForce = 1; // Prevents excessively large forces
     force = Math.min(force, maxForce);
-    Matter.Body.applyForce(body2, body2.position, Vector.mult(distance, -force));
+
+    // Apply the force towards the black hole
+    // TODO: add config flag for repulsion in addition to attraction
+    game.applyForce(body2.id, {
+      x: -distance.x * force,
+      y: -distance.y * force
+    });
   }
   return rules;
 }
 
-// Vector operations can be reused or imported from your existing code
+// Basic vector operations
+var Vector = {
+  add: function add(v1, v2) {
+    return {
+      x: v1.x + v2.x,
+      y: v1.y + v2.y
+    };
+  },
+  sub: function sub(v1, v2) {
+    return {
+      x: v1.x - v2.x,
+      y: v1.y - v2.y
+    };
+  },
+  mult: function mult(v, factor) {
+    return {
+      x: v.x * factor,
+      y: v.y * factor
+    };
+  },
+  div: function div(v, factor) {
+    return {
+      x: v.x / factor,
+      y: v.y / factor
+    };
+  },
+  magnitude: function magnitude(v) {
+    return Math.sqrt(v.x * v.x + v.y * v.y);
+  },
+  normalize: function normalize(v) {
+    var mag = Vector.magnitude(v);
+    return mag > 0 ? Vector.div(v, mag) : {
+      x: 0,
+      y: 0
+    };
+  }
+};
 
 },{}],2:[function(require,module,exports){
 "use strict";
@@ -58,7 +155,7 @@ var SUTRAS = require('./index.js');
 console.log('SUTRAS', SUTRAS);
 module.exports = SUTRAS["default"];
 
-},{"./index.js":7}],3:[function(require,module,exports){
+},{"./index.js":8}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -213,6 +310,83 @@ function fire(game) {
 }
 
 },{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = fountSutra;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+// fount.js - Custom Sutra for Generating Units
+function fountSutra(game) {
+  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var rules = game.createSutra();
+
+  // Default configuration for the Fount
+  var settings = _objectSpread({
+    unitType: 'DEFAULT_UNIT',
+    // Type of unit to generate
+    texture: 'defaultTexture',
+    // Texture for the unit
+    unitSize: {
+      width: 10,
+      height: 10
+    },
+    // Size of the unit
+    sprayAngle: Math.PI / 4,
+    // Angle of the spray arc (in radians)
+    forceMagnitude: 0.5
+  }, config);
+
+  // Function to create a unit
+  function createUnit(position) {
+    return game.createEntity({
+      type: settings.unitType,
+      texture: settings.texture,
+      height: settings.unitSize.height,
+      width: settings.unitSize.width,
+      position: position
+    });
+  }
+
+  // Function to apply force to a unit in a given direction
+  function applySprayForce(unit) {
+    var angle = (Math.random() - 0.5) * settings.sprayAngle;
+    var force = {
+      x: settings.forceMagnitude * Math.cos(angle),
+      y: settings.forceMagnitude * Math.sin(angle)
+    };
+    game.applyForce(unit.id, force);
+  }
+
+  // Rule for generating and spraying units
+
+  rules["if"]('fountTick').then('fountSpray');
+  rules.addCondition('fountTick', function (entity, gameState) {
+    return gameState.tick % 60 === 0;
+  });
+  rules.on('fountSpray', function (gameState, context) {
+    // Determine the position of the fount (can be context-dependent)
+    var fountPosition = typeof context !== 'undefined' ? context.position : {
+      x: 0,
+      y: 0
+    };
+
+    // Create a unit and apply force
+    var unit = createUnit(fountPosition);
+    applySprayForce(unit);
+  });
+  return rules;
+}
+
+// Basic vector operations (can be reused or imported from existing code)
+
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -376,7 +550,7 @@ function getNeighbors(cell, node, gameState) {
   return neighbors;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -554,7 +728,7 @@ var Vector = {
   }
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -562,6 +736,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _demon = _interopRequireDefault(require("./demon.js"));
+var _fount = _interopRequireDefault(require("./fount.js"));
 var _gameOfLife = _interopRequireDefault(require("./game-of-life.js"));
 var _note = _interopRequireDefault(require("./note.js"));
 var _fire = _interopRequireDefault(require("./fire.js"));
@@ -570,6 +745,7 @@ var _hexapod = _interopRequireDefault(require("./hexapod.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var Sutras = {};
 Sutras.demon = _demon["default"];
+Sutras.fount = _fount["default"];
 Sutras.blackhole = _blackhole["default"];
 Sutras.fire = _fire["default"];
 Sutras.gameOfLife = _gameOfLife["default"];
@@ -577,7 +753,7 @@ Sutras.note = _note["default"];
 Sutras.hexapod = _hexapod["default"];
 var _default = exports["default"] = Sutras;
 
-},{"./blackhole.js":1,"./demon.js":3,"./fire.js":4,"./game-of-life.js":5,"./hexapod.js":6,"./note.js":8}],8:[function(require,module,exports){
+},{"./blackhole.js":1,"./demon.js":3,"./fire.js":4,"./fount.js":5,"./game-of-life.js":6,"./hexapod.js":7,"./note.js":9}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

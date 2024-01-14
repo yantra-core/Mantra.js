@@ -25,13 +25,14 @@ class WorldSelector {
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
 
     // adds a choose your world option
-    this.addOption(selectBox, 'Choose Your World', 'Choose');
+    // this.addOption(selectBox, 'Choose Your World', 'Choose');
 
     this.addOption(selectBox, 'Home World', 'Home');
     // this.addOption(selectBox, 'Maze World', 'Maze');
 
     this.addOption(selectBox, 'Platform World', 'Platform');
     this.addOption(selectBox, 'Music World', 'Music');
+    this.addOption(selectBox, 'Gravity Gardens', 'GravityGardens');
 
     // this.addOption(selectBox, 'Space World', 'Platform');
     //this.addOption(selectBox, '2D Overhead', 'BabylonGraphics');

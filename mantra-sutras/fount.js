@@ -6,12 +6,12 @@ export default function fountSutra(game, context, sprayConfig = {}) {
 
   // Default configuration for the Fount
   const settings = {
-    unitType: 'DEFAULT_UNIT', // Type of unit to generate
+    unitType: 'PARTICLE', // Type of unit to generate
     texture: 'pixel', // Texture for the unit
     color: 0x00ff00, // Color of the unit
     unitSize: { width: 4, height: 4 }, // Size of the unit
     sprayAngle: Math.PI / 8, // Angle of the spray arc (in radians)
-    sprayWidth: Math.PI / 8, // Width of the spray arc (in radians)
+    sprayWidth: Math.PI / 4, // Width of the spray arc (in radians)
     forceMagnitude: 0.5, // Magnitude of the force applied to each unit
     ...sprayConfig
   };
@@ -26,6 +26,7 @@ export default function fountSutra(game, context, sprayConfig = {}) {
       type: settings.unitType,
       // texture: settings.texture,
       height: settings.unitSize.height,
+      color: settings.color,
       width: settings.unitSize.width,
       position: position,
       style: {
