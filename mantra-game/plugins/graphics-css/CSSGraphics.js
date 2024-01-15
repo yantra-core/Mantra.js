@@ -5,6 +5,7 @@ import CSSCamera from './CSSCamera.js';
 import inflateBox from './lib/inflateBox.js';
 import inflateText from './lib/inflateText.js';
 import inflateEntity from './lib/inflateEntity.js';
+import inflateTexture from './lib/entity/inflateTexture.js';
 import createGraphic from './lib/createGraphic.js';
 
 import setTransform from './lib/setTransform.js';
@@ -49,6 +50,7 @@ class CSSGraphics extends GraphicsInterface {
     this.inflateBox = inflateBox.bind(this);
     this.inflateText = inflateText.bind(this);
     this.inflateEntity = inflateEntity.bind(this);
+    this.inflateTexture = inflateTexture.bind(this);
     this.setTransform = setTransform.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
