@@ -29,6 +29,7 @@ var TonePlugin = /*#__PURE__*/function () {
     this.userEnabled = false;
     this.lastNotePlayed = null;
     this.keyCodes = _keyCodes["default"];
+    this.toneStarted = false;
   }
   _createClass(TonePlugin, [{
     key: "init",
@@ -59,6 +60,7 @@ var TonePlugin = /*#__PURE__*/function () {
       Tone.Transport.lookAhead = 0.5; // in seconds
 
       this.drumKit = new _DrumKit["default"]();
+      this.game.playSpatialSound = this.playSpatialSound.bind(this);
       var limiter = new Tone.Limiter(-6).toDestination();
 
       // Create a compressor
@@ -79,12 +81,17 @@ var TonePlugin = /*#__PURE__*/function () {
       this.synth.connect(limiter);
       game.playDrum = function () {
         var sound = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'kick';
-        Tone.start();
+        if (!this.toneStarted) {
+          Tone.start();
+          this.toneStarted = true;
+        }
         that.drumKit.play(sound);
       };
       game.playNote = function (note, duration) {
-        Tone.start();
-        // console.log('playing ', note, duration)
+        if (!this.toneStarted) {
+          Tone.start();
+          this.toneStarted = true;
+        } // console.log('playing ', note, duration)
         //play a middle 'C' for the duration of an 8th note
         self.playNote(note, duration);
       };
@@ -99,8 +106,10 @@ var TonePlugin = /*#__PURE__*/function () {
 
       // Function to play the sound
       function playSound(sound) {
-        Tone.start(); // Start audio context - required for newer browsers
-
+        if (!this.toneStarted) {
+          Tone.start();
+          this.toneStarted = true;
+        }
         sound.notes.forEach(function (note) {
           synth.triggerAttackRelease(note, sound.duration);
         });
@@ -174,6 +183,66 @@ var TonePlugin = /*#__PURE__*/function () {
         console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err);
       }
       // game.emit('playNote', note, duration, now, velocity);
+    }
+
+    // Method to play spatial sound
+    // TODO: needs to use pool of synths, this creates too many synths
+  }, {
+    key: "playSpatialSound",
+    value: function playSpatialSound(particle, blackHole) {
+      if (!this.toneStarted) {
+        Tone.start();
+        this.toneStarted = true;
+      }
+
+      // Calculate panning based on particle's position relative to black hole
+      var gameWidth = this.game.width; // Use actual game width
+      var xPosition = (particle.position.x - blackHole.position.x) / gameWidth;
+      var panner = new Tone.Panner(xPosition).toDestination();
+
+      // Calculate velocity factor
+      var velocityMagnitude = Math.sqrt(Math.pow(particle.velocity.x, 2) + Math.pow(particle.velocity.y, 2));
+      var maxVelocity = 10; // Replace with maximum expected velocity in your game
+      var velocityFactor = velocityMagnitude / maxVelocity;
+
+      // Create FM Synth for water drop sound
+      var fmSynth = new Tone.FMSynth({
+        harmonicity: 8,
+        modulationIndex: 2,
+        oscillator: {
+          type: 'sine'
+        },
+        envelope: {
+          attack: 0.01,
+          decay: 0.2,
+          sustain: 0,
+          release: 0.1
+        },
+        modulation: {
+          type: 'square'
+        },
+        modulationEnvelope: {
+          attack: 0.01,
+          decay: 0.2,
+          sustain: 0,
+          release: 0.1
+        }
+      }).connect(panner);
+
+      // Adjust parameters based on velocity
+      var duration = 0.2 + 0.3 * (1 - velocityFactor); // Shorter duration for faster particles
+      var pitchDrop = velocityFactor * 24; // Higher drop for faster particles
+
+      // Trigger the FM Synth with a pitch drop
+      fmSynth.triggerAttack("C4", Tone.now());
+      setTimeout(function () {
+        fmSynth.setNote("C".concat(4 - pitchDrop), Tone.now());
+        fmSynth.triggerRelease(Tone.now() + duration);
+      }, 10);
+
+      // Optionally: Add a delay for a more spacious effect
+      // const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
+      // fmSynth.connect(feedbackDelay);
     }
   }, {
     key: "harmonicShift",

@@ -98,10 +98,10 @@ var Bullet = /*#__PURE__*/function () {
       var bulletDirectionConfig = {
         type: 'BULLET',
         mass: 1,
+        collisionStart: true,
         position: bulletStartPosition,
         lifetime: this.lifetime,
         //texture: 'tile-block',
-        /*      */
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'arrow'
@@ -114,7 +114,7 @@ var Bullet = /*#__PURE__*/function () {
           x: directionX * this.speed,
           y: directionY * this.speed
         },
-        radius: 16,
+        radius: 8,
         // TODO: make this a config
         damage: 10 // TODO: make this a config
       };

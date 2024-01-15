@@ -494,7 +494,7 @@ function updateSprite(entityId, data, SheetManager, anims) {
     var spriteName = playerEntity.texture.sprite;
     var newSpriteName;
     if (!direction) {
-      //newSpriteName = 'playerDown';
+      newSpriteName = spriteName;
       // uncomment to re-enable animation
       //return;
     } else {
@@ -515,6 +515,19 @@ function updateSprite(entityId, data, SheetManager, anims) {
           animationPlaying: true
         }
       });
+      return;
+    } else {
+      /*
+      game.updateEntity({
+        id: entityId,
+        texture: {
+          frameIndex: 0,
+          sheet: playerEntity.texture.sheet,
+          sprite: newSpriteName,
+          animationPlaying: false
+        }
+      })
+      */
       return;
     }
     // console.log('updating sprite', spriteName, newSpriteName, 'on', entityId, 'to', newSpriteName)

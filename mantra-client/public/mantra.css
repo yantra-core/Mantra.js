@@ -2495,3 +2495,12 @@ button[type="submit"]:disabled {
     transform: rotateY(180deg);
   }
 }
+
+@keyframes pulse-invert {
+  0% {
+    filter: invert(0%);
+  }
+  100% {
+    filter: invert(90%);
+  }
+}

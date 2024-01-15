@@ -89,7 +89,9 @@ function blackHoleSutra(game, context) {
       }
       blackHole = context;
     }
-    if (blackHole) {
+    if (pendingDestroy && blackHole) {
+      // here we have pendingDestroy.position, pendingDestroy.velocity, and blackHole.position
+      // game.playSpatialSound(pendingDestroy, blackHole);
       // increase size of black hole
       // console.log(blackHole.height, blackHole.width)
       /*
@@ -382,6 +384,7 @@ function fountSutra(game, context) {
       type: settings.unitType,
       collisionActive: false,
       collisionEnd: false,
+      collisionStart: false,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,
@@ -636,11 +639,22 @@ function hexapod(game) {
   });
   rules.on('hexapodGrow', function (collision) {
     var hexapod = collision.HEXAPOD;
+    var style;
+    // at a certain size, invert the colors
+    if (hexapod.width > 16) {
+      style = {
+        // Define the animation name and duration
+        animation: 'pulse-invert 5s',
+        // Initial filter style
+        filter: 'invert(90%)'
+      };
+    }
     // update entity size by 11%
     game.updateEntity({
       id: hexapod.id,
       width: hexapod.width * 1.1,
-      height: hexapod.height * 1.1
+      height: hexapod.height * 1.1,
+      style: style
     });
   });
 

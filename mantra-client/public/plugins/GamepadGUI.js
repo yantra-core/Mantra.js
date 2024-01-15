@@ -30,6 +30,7 @@ var GamepadGUI = /*#__PURE__*/function () {
     this.hiding = false;
     this.moving = null;
     this.useZoomSlider = useZoomSlider;
+    this.useZoomSlider = false;
     this.lastDirection = null; // Add this line
   }
   _createClass(GamepadGUI, [{

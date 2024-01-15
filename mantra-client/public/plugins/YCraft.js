@@ -2822,6 +2822,9 @@ function createEntityFromPart(part, contraption) {
 
     var defaultConfig = {
       name: part.type,
+      collisionActive: true,
+      collisionStart: true,
+      collisionEnd: true,
       type: 'PART',
       color: part.props.color,
       position: part.position,

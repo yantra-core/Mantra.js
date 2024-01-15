@@ -203,7 +203,7 @@ function is_touch_enabled() {
 _defineProperty(CSSCamera, "id", 'css-camera');
 var _default = exports["default"] = CSSCamera;
 
-},{"./lib/camera/applyThrow.js":4,"./lib/camera/rotateCameraOverTime.js":6,"./lib/camera/update.js":7,"./lib/camera/updateCameraPosition.js":8}],3:[function(require,module,exports){
+},{"./lib/camera/applyThrow.js":4,"./lib/camera/rotateCameraOverTime.js":7,"./lib/camera/update.js":9,"./lib/camera/updateCameraPosition.js":10}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -212,19 +212,22 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
 var _CSSCamera = _interopRequireDefault(require("./CSSCamera.js"));
-var _inflateBox = _interopRequireDefault(require("./lib/inflateBox.js"));
-var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
-var _inflateEntity = _interopRequireDefault(require("./lib/inflateEntity.js"));
-var _createGraphic = _interopRequireDefault(require("./lib/createGraphic.js"));
-var _setTransform = _interopRequireDefault(require("./lib/setTransform.js"));
-var _updateGraphic = _interopRequireDefault(require("./lib/updateGraphic.js"));
-var _updateEntityPosition = _interopRequireDefault(require("./lib/updateEntityPosition.js"));
-var _mouseWheelZoom = _interopRequireDefault(require("./lib/mouseWheelZoom.js"));
+var _inflateBox = _interopRequireDefault(require("./lib/entity/inflateBox.js"));
+var _inflateText = _interopRequireDefault(require("./lib/entity/inflateText.js"));
+var _inflateEntity = _interopRequireDefault(require("./lib/entity/inflateEntity.js"));
+var _inflateTexture = _interopRequireDefault(require("./lib/entity/inflateTexture.js"));
+var _createGraphic = _interopRequireDefault(require("./lib/entity/createGraphic.js"));
+var _setTransform = _interopRequireDefault(require("./lib/camera/setTransform.js"));
+var _updateGraphic = _interopRequireDefault(require("./lib/entity/updateGraphic.js"));
+var _updateEntityPosition = _interopRequireDefault(require("./lib/camera/updateEntityPosition.js"));
+var _mouseWheelZoom = _interopRequireDefault(require("./lib/camera/mouseWheelZoom.js"));
+var _bindEntityEvents = _interopRequireDefault(require("./lib/entity/bindEntityEvents.js"));
+var _bindYCraftEvents = _interopRequireDefault(require("./lib/entity/bindYCraftEvents.js"));
 var _unload = _interopRequireDefault(require("./lib/unload.js"));
 var _zoom = _interopRequireDefault(require("./lib/camera/zoom.js"));
 var _cameraShake = _interopRequireDefault(require("./lib/camera/cameraShake.js"));
 var _render = _interopRequireDefault(require("./lib/render.js"));
-var _removeGraphic = _interopRequireDefault(require("./lib/removeGraphic.js"));
+var _removeGraphic = _interopRequireDefault(require("./lib/entity/removeGraphic.js"));
 var _handleInputs = _interopRequireDefault(require("../graphics/lib/handleInputs.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -241,6 +244,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // CSSGraphics.js - Marak Squires 2023
+// touch / mouse events on entities
+// TODO: remove bindYCraftEvents.js file, replace with a Sutra
 var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _inherits(CSSGraphics, _GraphicsInterface);
   var _super = _createSuper(CSSGraphics);
@@ -278,12 +283,15 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
     _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
     _this.inflateEntity = _inflateEntity["default"].bind(_assertThisInitialized(_this));
+    _this.inflateTexture = _inflateTexture["default"].bind(_assertThisInitialized(_this));
     _this.setTransform = _setTransform["default"].bind(_assertThisInitialized(_this));
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.updateEntityPosition = _updateEntityPosition["default"].bind(_assertThisInitialized(_this));
     _this.handleInputs = _handleInputs["default"].bind(_assertThisInitialized(_this));
     _this.render = _render["default"].bind(_assertThisInitialized(_this));
     _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
+    _this.bindEntityEvents = _bindEntityEvents["default"].bind(_assertThisInitialized(_this));
+    _this.bindYCraftEvents = _bindYCraftEvents["default"].bind(_assertThisInitialized(_this));
     _this.mouseWheelZoom = _mouseWheelZoom["default"].bind(_assertThisInitialized(_this));
     _this.unload = _unload["default"].bind(_assertThisInitialized(_this));
     _this.zoom = _zoom["default"].bind(_assertThisInitialized(_this));
@@ -350,7 +358,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":21,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/zoom.js":9,"./lib/createGraphic.js":10,"./lib/inflateBox.js":11,"./lib/inflateEntity.js":12,"./lib/inflateText.js":13,"./lib/mouseWheelZoom.js":14,"./lib/removeGraphic.js":15,"./lib/render.js":16,"./lib/setTransform.js":17,"./lib/unload.js":18,"./lib/updateEntityPosition.js":19,"./lib/updateGraphic.js":20}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":24,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/setTransform.js":8,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateEntity.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -456,6 +464,55 @@ function cameraShake() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = cssMouseWheelZoom;
+function cssMouseWheelZoom(event) {
+  if (!this.mouseWheelEnabled) {
+    return;
+  }
+  var game = this.game;
+  var scale = game.data.camera.currentZoom;
+
+  // Game viewport
+  var gameViewport = document.getElementById('gameHolder');
+
+  // Zoom settings
+  var zoomSettings = {
+    intensity: 0.1,
+    // Base zoom intensity
+    minScale: 0.1,
+    // Minimum scale limit
+    logBase: 2 // Logarithmic base
+  };
+
+  // Prevent default scrolling behavior
+  event.preventDefault();
+
+  // Determine zoom direction
+  var delta = event.wheelDelta ? event.wheelDelta : -event.detail;
+  var direction = delta > 0 ? 1 : -1;
+
+  // Applying logarithmic scale for smooth zoom
+  var logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
+  var newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
+
+  // Center of the viewport
+  var viewportCenterX = window.innerWidth / 2;
+  var viewportCenterY = window.innerHeight / 2;
+
+  // Calculate offsets based on the old scale
+  var offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
+  var offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
+
+  // Update scale
+  this.zoom(newScale);
+}
+
+},{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = rotateCameraOverTime;
 // Method to smoothly rotate the camera over a given duration using CSS transitions
 function rotateCameraOverTime() {
@@ -504,7 +561,48 @@ function rotateCameraOverTime() {
   }, duration);
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = setTransform;
+function setTransform(entityData, entityElement, domX, domY, rotation, angle) {
+  // Retrieve the last rotation value, default to 0 if not set
+  var lastRotation = entityElement.dataset.rotation || 0;
+
+  // Check if the element has a background image
+  var hasBackgroundImage = entityElement.style.backgroundImage && entityElement.style.backgroundImage !== 'none';
+
+  // Update rotation if provided and no background image
+  if (rotation /*&& !hasBackgroundImage*/) {
+    lastRotation = angle;
+    entityElement.dataset.rotation = angle;
+  }
+
+  // Update the transform property
+  var newTransform = "translate(".concat(truncateToPrecision(domX, 2), "px, ").concat(truncateToPrecision(domY, 2), "px)");
+
+  // Add rotation to the transform if no background image
+  if (!hasBackgroundImage) {}
+  if (entityData.type !== 'PLAYER') {
+    newTransform += " rotate(".concat(lastRotation, "deg)");
+  }
+
+  // compare the new transform to the previous transform
+  // if they are the same, don't update
+  var prevTransform = entityElement.style.transform;
+  if (prevTransform !== newTransform) {
+    entityElement.style.transform = newTransform;
+  }
+}
+function truncateToPrecision(value, precision) {
+  var factor = Math.pow(10, precision);
+  return Math.round(value * factor) / factor;
+}
+
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -569,7 +667,7 @@ function update() {
   this.game.data.camera.position = this.scene.cameraPosition;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -612,7 +710,80 @@ function updateCameraPosition(dx, dy, isDragging) {
   }
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = updateEntityPosition;
+function updateEntityPosition(entityElement, entityData) {
+  var position = entityData.position;
+  var rotation = entityData.rotation;
+  var type = entityData.type;
+  var width = entityData.width;
+  var height = entityData.height;
+  if (typeof entityData.radius === 'number') {
+    width = entityData.radius;
+    height = entityData.radius;
+  }
+
+  // Field of view (FoV) dimensions
+  var fovWidth = window.outerWidth;
+  var fovHeight = window.outerHeight;
+  fovWidth = 600;
+  fovHeight = 600;
+  var adjustedPosition = {
+    x: position.x - (this.cameraPosition.x - window.outerWidth / 2),
+    y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
+  };
+
+  // Check if the entity is within the field of view
+  // Remark: Field of View is disabled ( for now ), it *should* be working as expected,
+  //         the current implementation will hide the entity, we should removeEntity() instead
+  if (true || isWithinFieldOfView(game, position, this.cameraPosition, width, height, fovWidth, fovHeight)) {
+    var domX = adjustedPosition.x - width / 2;
+    var domY = adjustedPosition.y - height / 2;
+
+    // Convert rotation to degrees
+    var angle = rotation * (180 / Math.PI);
+
+    // Apply transformation to the entity
+    this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
+    entityElement.style.display = ''; // Make sure the element is visible
+  } else {
+    /*
+    if (entityData.type !== 'BACKGROUND' || entityData.type !== 'building') {
+      // Hide the entity if it's outside the field of view
+      entityElement.style.display = 'none';
+    }
+    */
+  }
+  if (entityData.style && entityData.style.display === 'none') {
+    entityElement.style.display = 'none';
+  }
+  return entityElement;
+}
+function isWithinFieldOfView(game, position, cameraPosition, width, height, fovWidth, fovHeight) {
+  // Calculate the center position of the entity
+  var entityCenterX = position.x + width / 2;
+  var entityCenterY = position.y + height / 2;
+
+  // Calculate the distance from the entity center to the camera position
+  var distanceX = entityCenterX - cameraPosition.x;
+  var distanceY = entityCenterY - cameraPosition.y + 100;
+
+  // Calculate the maximum allowed distance for an entity to be within the FoV
+  // This can be half of the FoV width or height, depending on how you define the FoV area
+  var maxDistance = Math.min(fovWidth, fovHeight);
+  var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+  // console.log('distance', distance, maxDistance)
+  // Check if the entity is within the distance
+  return distance <= maxDistance;
+}
+
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -672,7 +843,95 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = bindEntityEvents;
+function bindEntityEvents(entityData, entityElement) {
+  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
+  entityElement.addEventListener('pointerdown', function (ev) {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    game.emit('pointerDown', ent, ev);
+  });
+  entityElement.addEventListener('pointerup', function (ev) {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    game.emit('pointerUp', ent, ev);
+  });
+  entityElement.addEventListener('pointermove', function (ev) {
+    //console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    game.emit('pointerMove', ent, ev);
+  });
+}
+
+},{}],14:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = bindYCraftEvents;
+// TODO: Remove this file and rely on a Sutra instead
+// We could also delegate to the part itself from bindEntityEvents.js handlers
+function bindYCraftEvents(entityData, entityElement) {
+  console.log("bindYCraftEvents", entityData, entityElement);
+  // add hover state with 3d drop shadow effect
+  entityElement.addEventListener('mouseover', function () {
+    entityElement.style.boxShadow = '5px 5px 10px rgba(0,0,0,0.5)';
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    // delgate based on part type name
+    var partName = ent.yCraft.part.name;
+    var partType = ent.yCraft.part.type;
+    var part = ent.yCraft.part;
+    if (partType === 'MotionDetector') {
+      // console.log('MotionDetector', part);
+      ent.yCraft.part.onFn();
+    }
+  });
+  entityElement.addEventListener('mouseout', function () {
+    entityElement.style.boxShadow = '';
+  });
+  entityElement.addEventListener('pointerdown', function (ev) {
+    // console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    // delgate based on part type name
+    var partName = ent.yCraft.part.name;
+    var partType = ent.yCraft.part.type;
+    var part = ent.yCraft.part;
+    if (partType === 'Button') {
+      ent.yCraft.part.press();
+    }
+    // LEDLight, Latch, Amplifier, etc
+    if (ent && ent.yCraft && ent.yCraft.part.toggle) {
+      ent.yCraft.part.toggle();
+    }
+  });
+  entityElement.addEventListener('pointerup', function (ev) {
+    // console.log(ev.target, entityData.id, entityData.type, entityData)
+    // get the full ent from the game
+    var ent = game.getEntity(entityData.id);
+    // delgate based on part type name
+    var partName = ent.yCraft.part.name;
+    var partType = ent.yCraft.part.type;
+    if (partType === 'Button') {
+      if (ent && ent.yCraft && ent.yCraft.part.release) {
+        ent.yCraft.part.release();
+      }
+    }
+  });
+}
+
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -704,6 +963,7 @@ function createGraphic(entityData) {
     case 'BULLET':
       // For BULLET entities, create a circle
       var radius = entityData.radius || 0;
+      // radius = 1;
       entityElement.style.width = entityData.radius + 'px';
       entityElement.style.height = entityData.radius + 'px';
       // console.log('inflating bullet', entityData)
@@ -756,17 +1016,15 @@ function createGraphic(entityData) {
   return entityElement;
 }
 
-},{}],11:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = inflateBox;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function inflateBox(entityElement, entityData) {
   // console.log('inflating entity', entityData.type, entityData.name)
-
   var game = this.game;
   var getTexture = game.getTexture;
   var depthChart = this.depthChart;
@@ -788,31 +1046,10 @@ function inflateBox(entityElement, entityData) {
 
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
-
-  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
-  entityElement.addEventListener('pointerdown', function (ev) {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    var ent = game.getEntity(entityData.id);
-    game.emit('pointerDown', ent, ev);
-  });
-  entityElement.addEventListener('pointerup', function (ev) {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    var ent = game.getEntity(entityData.id);
-    game.emit('pointerUp', ent, ev);
-  });
-  entityElement.addEventListener('pointermove', function (ev) {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    var ent = game.getEntity(entityData.id);
-    game.emit('pointerMove', ent, ev);
-  });
+  this.bindEntityEvents(entityData, entityElement);
 
   // TODO: move to separate file for inflatePart,
-  // move this code to CSSGraphics switch case
   if (entityData.type === 'PART') {
-    // console.log("SUPER INFLATE")
     // TODO: part.kind, not name, name is the individual part name user defined
     switch (entityData.name) {
       case 'Wire':
@@ -829,107 +1066,21 @@ function inflateBox(entityElement, entityData) {
 
     // add pointer cursor for buttons on hover
     entityElement.style.cursor = 'pointer';
-
-    // add hover state with 3d drop shadow effect
-    entityElement.addEventListener('mouseover', function () {
-      entityElement.style.boxShadow = '5px 5px 10px rgba(0,0,0,0.5)';
-      // get the full ent from the game
-      var ent = game.getEntity(entityData.id);
-      // delgate based on part type name
-      var partName = ent.yCraft.part.name;
-      var partType = ent.yCraft.part.type;
-      var part = ent.yCraft.part;
-      if (partType === 'MotionDetector') {
-        // console.log('MotionDetector', part);
-        ent.yCraft.part.onFn();
-      }
-    });
-    entityElement.addEventListener('mouseout', function () {
-      entityElement.style.boxShadow = '';
-    });
-    entityElement.addEventListener('pointerdown', function (ev) {
-      // console.log(ev.target, entityData.id, entityData.type, entityData)
-      // get the full ent from the game
-      var ent = game.getEntity(entityData.id);
-      // delgate based on part type name
-      var partName = ent.yCraft.part.name;
-      var partType = ent.yCraft.part.type;
-      var part = ent.yCraft.part;
-      if (partType === 'Button') {
-        ent.yCraft.part.press();
-      }
-      // LEDLight, Latch, Amplifier, etc
-      if (ent && ent.yCraft && ent.yCraft.part.toggle) {
-        ent.yCraft.part.toggle();
-      }
-    });
-    entityElement.addEventListener('pointerup', function (ev) {
-      // console.log(ev.target, entityData.id, entityData.type, entityData)
-      // get the full ent from the game
-      var ent = game.getEntity(entityData.id);
-      // delgate based on part type name
-      var partName = ent.yCraft.part.name;
-      var partType = ent.yCraft.part.type;
-      if (partType === 'Button') {
-        if (ent && ent.yCraft && ent.yCraft.part.release) {
-          ent.yCraft.part.release();
-        }
-      }
-    });
+    this.bindYCraftEvents(entityData, entityElement);
   }
+
   // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
   // set border color to black
   entityElement.style.border = '1px solid black';
-  if (getTexture(entityData.texture)) {
-    entityElement.style.border = 'none';
-    entityElement.style.zIndex = entityData.position.z;
-    entityElement.style.borderRadius = '0px';
-    // entityElement.style.padding = '1px';
-    // optional tile flip CSS ( not great for performance better to use sprite animations )
-    if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
-      // TODO: refactor API
-      tileFlip(entityElement, hexColor, getTexture, entityData);
-    } else {
-      var texture = getTexture(entityData.texture);
-      var textureUrl = texture.url;
-      var spritePosition = texture.sprite || {
-        x: 0,
-        y: 0
-      };
-
-      //console.log("SETTING TEXTURE", textureUrl, texture, spritePosition)
-      //console.log('entityData', entityData)
-      // console.log('got back texture', textureUrl, texture, spritePosition)
-      // TODO: move this closure
-      // rendering a texture without tile
-      // console.log('going to set texture', entityData.texture, getTexture(entityData.texture))
-      entityElement.style.background = "url('".concat(textureUrl, "')");
-      entityElement.style.backgroundRepeat = 'no-repeat';
-      entityElement.style.backgroundPosition = 'center';
-      // entityElement.style.border = 'solid'
-      //entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
-      // entityElement.style.backgroundPosition = '-208px -544px';
-      // set background size to entity size
-      if (spritePosition.x === 0 && spritePosition.y === 0) {
-        // entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
-      }
-      if (!texture.frames) {
-        entityElement.style.backgroundSize = "".concat(entityData.width, "px ").concat(entityData.height, "px");
-        // align background in center no matter the size of the entity
-      }
-
-      entityElement.style.zIndex = entityData.position.z;
-      if (_typeof(entityData.texture) === 'object' && entityData.texture.sheet) {
-        // this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.sprite);
-      }
-      if (entityData.style) {
-        Object.keys(entityData.style).forEach(function (key) {
-          entityElement.style[key] = entityData.style[key];
-        });
-      }
-    }
-  } else {
-    entityElement.style.background = hexColor;
+  entityElement.style.background = hexColor;
+  if (entityData.style) {
+    Object.keys(entityData.style).forEach(function (key) {
+      entityElement.style[key] = entityData.style[key];
+    });
+  }
+  if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
+    // TODO: refactor API
+    tileFlip(entityElement, hexColor, getTexture, entityData);
   }
 
   // console.log('entityElement', entityElement)
@@ -1002,7 +1153,7 @@ function tileFlip(entityElement, hexColor, getTexture, entityData) {
   });
 }
 
-},{}],12:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1011,53 +1162,46 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = inflateEntity;
 function inflateEntity(entity, alpha) {
   // checks for existence of entity, performs update or create
+  var graphic;
   if (entity.graphics && entity.graphics['graphics-css']) {
-    var graphic = entity.graphics['graphics-css'];
-    this.updateGraphic(entity, alpha);
+    graphic = this.updateGraphic(entity, alpha);
   } else {
-    var _graphic = this.createGraphic(entity);
-    this.game.components.graphics.set([entity.id, 'graphics-css'], _graphic);
+    graphic = this.createGraphic(entity);
+    this.game.components.graphics.set([entity.id, 'graphics-css'], graphic);
   }
+
+  // TODO: don't send .destroyed=true ents?
+  // after entity has been inflated, check to see if a texture should be applied
+  // this will also run any animations on the entity.animations component
+  if (!graphic) {
+    // console.log('warning: no graphic', entity)
+    return;
+  }
+  this.inflateTexture(entity, graphic);
 }
 
-},{}],13:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = inflateText;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function inflateText(entityElement, entityData) {
   var depthChart = this.depthChart;
   // TODO: check if chat bubble already exists, if so just update it
   // Create a container for the chat bubble
-  entityElement.className = 'chat-bubble-container';
-  entityElement.style.position = 'absolute';
 
-  // Create the chat bubble itself
-  var chatBubble = document.createElement('div');
-  chatBubble.className = 'chat-bubble';
-  // chatBubble.style.position = 'absolute';
-  chatBubble.style.border = '1px solid #000';
-  chatBubble.style.borderRadius = '10px';
-  // chatBubble.style.padding = '10px';
-  // set padding to left and right
-  chatBubble.style.paddingLeft = '10px';
-  chatBubble.style.paddingRight = '10px';
-  chatBubble.style.background = '#fff';
-  if (_typeof(entityData.style) === 'object') {
-    Object.assign(chatBubble.style, entityData.style);
+  entityElement.innerText = entityData.text;
+  if (entityData.style) {
+    // apply styles
+    for (var key in entityData.style) {
+      entityElement.style[key] = entityData.style[key];
+    }
   }
-
-  // chatBubble.style.maxWidth = '200px';
-  //chatBubble.style.width = `${entityData.width}px`;
-  //chatBubble.style.height = `${entityData.height}px`;
-  chatBubble.innerText = entityData.text || '';
-
-  // set default depth based on type
-  // console.log(entityData.type, entityData.name, depthChart.indexOf(entityData.type))
-  chatBubble.style.zIndex = depthChart.indexOf(entityData.type);
+  if (entityData.color) {
+    entityElement.style.color = entityData.color;
+  }
 
   /* Remark: No need to bind each entity to a pointerdown event for CSSGraphics, we can delegate
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
@@ -1071,63 +1215,76 @@ function inflateText(entityElement, entityData) {
 
   // console.log('appending new text element')
   // Append the chat bubble to the container
-  entityElement.appendChild(chatBubble);
+  // entityElement.appendChild(chatBubble);
   // Update the position of the chat bubble container
   //this.updateEntityElementPosition(entityElement, entityData);
 
   return entityElement;
 }
 
-},{}],14:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = cssMouseWheelZoom;
-function cssMouseWheelZoom(event) {
-  if (!this.mouseWheelEnabled) {
+exports["default"] = inflateTexture;
+function inflateTexture(entityData, entityElement) {
+  if (!entityData.texture) return;
+  var texture = game.getTexture(entityData.texture);
+  if (!texture) {
+    console.warn('Warning: Texture not found', entityData.texture);
     return;
   }
-  var game = this.game;
-  var scale = game.data.camera.currentZoom;
+  var textureUrl = texture.url,
+    _texture$sprite = texture.sprite,
+    spritePosition = _texture$sprite === void 0 ? {
+      x: 0,
+      y: 0
+    } : _texture$sprite,
+    frames = texture.frames;
 
-  // Game viewport
-  var gameViewport = document.getElementById('gameHolder');
+  // Check if the element already has a texture applied
+  var isTextureSet = entityElement.style.backgroundImage.includes(textureUrl);
 
-  // Zoom settings
-  var zoomSettings = {
-    intensity: 0.1,
-    // Base zoom intensity
-    minScale: 0.1,
-    // Minimum scale limit
-    logBase: 2 // Logarithmic base
-  };
+  // Set initial texture state only if no texture is applied
+  if (!isTextureSet) {
+    if (Array.isArray(frames) && frames.length > 0) {
+      spritePosition = frames[0];
+    } else if (typeof entityData.texture.frame === 'number') {
+      spritePosition = frames[entityData.texture.frame];
+    }
+    applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+  }
 
-  // Prevent default scrolling behavior
-  event.preventDefault();
-
-  // Determine zoom direction
-  var delta = event.wheelDelta ? event.wheelDelta : -event.detail;
-  var direction = delta > 0 ? 1 : -1;
-
-  // Applying logarithmic scale for smooth zoom
-  var logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
-  var newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
-
-  // Center of the viewport
-  var viewportCenterX = window.innerWidth / 2;
-  var viewportCenterY = window.innerHeight / 2;
-
-  // Calculate offsets based on the old scale
-  var offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
-  var offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
-
-  // Update scale
-  this.zoom(newScale);
+  // Update frame index and position for animated sprites
+  if (Array.isArray(frames)) {
+    var frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
+    if (game.tick % 30 === 0) {
+      var frame = frames[frameIndex];
+      if (frame) {
+        spritePosition = frame;
+        frameIndex = frameIndex >= frames.length - 1 ? 0 : frameIndex + 1;
+      }
+      entityElement.setAttribute('data-frame-index', frameIndex);
+      applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+    }
+  } else {
+    // Update the background size for non-animated textures
+    applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+  }
+}
+function applyTextureStyles(texture, element, textureUrl, spritePosition, entityData) {
+  Object.assign(element.style, {
+    background: "url('".concat(textureUrl, "') no-repeat ").concat(spritePosition.x, "px ").concat(spritePosition.y, "px"),
+    border: 'none',
+    zIndex: entityData.position.z,
+    borderRadius: '0px',
+    backgroundSize: !texture.frames ? "".concat(entityData.width, "px ").concat(entityData.height, "px") : ''
+  });
 }
 
-},{}],15:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1145,229 +1302,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],16:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = render;
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function render(game, alpha) {
-  // console.log('rendering', this.game.entities.size, 'entities')
-
-  // render is called at the browser's frame rate (typically 60fps)
-  var self = this;
-
-  // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
-  // This is not ideal and will yield low-entity count CSSGraphics performance
-  // Best to remove camera follow for CSSGraphics if possible
-  // We tried to only iterate changed entities, but this breaks camera follow
-  /*
-  for (let [eId, state] of this.game.changedEntities.entries()) {
-    let ent = this.game.entities.get(eId);
-    // console.log('rendering', ent)
-    // do not re-inflate destroyed entities
-    if (ent.destroyed !== true) {
-      this.inflateEntity(ent, alpha);
-    }
-    // this.game.changedEntities.delete(eId);
-  }
-  */
-  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var _step$value = _slicedToArray(_step.value, 2),
-        eId = _step$value[0],
-        state = _step$value[1];
-      var ent = this.game.entities.get(eId);
-      // console.log('rendering', ent)
-      // do not re-inflate destroyed entities
-      if (ent.destroyed !== true) {
-        this.inflateEntity(ent, alpha);
-      }
-      // this.game.changedEntities.delete(eId);
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-}
-
-},{}],17:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = setTransform;
-function setTransform(entityData, entityElement, domX, domY, rotation, angle) {
-  // Retrieve the last rotation value, default to 0 if not set
-  var lastRotation = entityElement.dataset.rotation || 0;
-
-  // Check if the element has a background image
-  var hasBackgroundImage = entityElement.style.backgroundImage && entityElement.style.backgroundImage !== 'none';
-
-  // Update rotation if provided and no background image
-  if (rotation /*&& !hasBackgroundImage*/) {
-    lastRotation = angle;
-    entityElement.dataset.rotation = angle;
-  }
-
-  // Update the transform property
-  var newTransform = "translate(".concat(truncateToPrecision(domX, 2), "px, ").concat(truncateToPrecision(domY, 2), "px)");
-
-  // Add rotation to the transform if no background image
-  if (!hasBackgroundImage) {}
-  if (entityData.type !== 'PLAYER') {
-    newTransform += " rotate(".concat(lastRotation, "deg)");
-  }
-
-  // compare the new transform to the previous transform
-  // if they are the same, don't update
-  var prevTransform = entityElement.style.transform;
-  if (prevTransform !== newTransform) {
-    entityElement.style.transform = newTransform;
-  }
-}
-function truncateToPrecision(value, precision) {
-  var factor = Math.pow(10, precision);
-  return Math.round(value * factor) / factor;
-}
-
-},{}],18:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = unload;
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function unload() {
-  var _this = this;
-  // Reset Zoom
-  this.zoom(1);
-
-  // TODO: consolidate graphics pipeline unloading into SystemsManager
-  // TODO: remove duplicated unload() code in BabylonGraphics
-  this.game.graphics = this.game.graphics.filter(function (g) {
-    return g.id !== _this.id;
-  });
-  delete this.game._plugins['CSSGraphics'];
-
-  // unload the CSSCamera
-  this.game.systemsManager.removeSystem('graphics-css-camera');
-
-  // remove the wheel event listener
-  // document.removeEventListener('wheel', this.cssMouseWheelZoom);
-  this.mouseWheelEnabled = false;
-
-  // iterate through all entities and remove existing css graphics
-  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var _step$value = _slicedToArray(_step.value, 2),
-        eId = _step$value[0],
-        entity = _step$value[1];
-      if (entity.graphics && entity.graphics['graphics-css']) {
-        this.removeGraphic(eId);
-        delete entity.graphics['graphics-css'];
-      }
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-  var div = document.getElementById('css-render-canvas');
-  if (div) {
-    div.remove();
-  }
-}
-
-},{}],19:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = updateEntityPosition;
-function updateEntityPosition(entityElement, entityData) {
-  var position = entityData.position;
-  var rotation = entityData.rotation;
-  var type = entityData.type;
-  var width = entityData.width;
-  var height = entityData.height;
-
-  // Field of view (FoV) dimensions
-  var fovWidth = window.outerWidth;
-  var fovHeight = window.outerHeight;
-  fovWidth = 600;
-  fovHeight = 600;
-  // Adjust the position based on the camera position
-  if (type === 'BULLET') {
-    position.x += 24;
-    position.y += 24;
-  }
-  var adjustedPosition = {
-    x: position.x - (this.cameraPosition.x - window.outerWidth / 2),
-    y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
-  };
-
-  // Check if the entity is within the field of view
-  if (true || isWithinFieldOfView(game, position, this.cameraPosition, width, height, fovWidth, fovHeight)) {
-    var domX = adjustedPosition.x - width / 2;
-    var domY = adjustedPosition.y - height / 2;
-
-    // Convert rotation to degrees
-    var angle = rotation * (180 / Math.PI);
-
-    // Apply transformation to the entity
-    this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
-    entityElement.style.display = ''; // Make sure the element is visible
-  } else {
-    if (entityData.type !== 'BACKGROUND' || entityData.type !== 'building') {
-      // Hide the entity if it's outside the field of view
-      entityElement.style.display = 'none';
-    }
-  }
-  return entityElement;
-}
-function isWithinFieldOfView(game, position, cameraPosition, width, height, fovWidth, fovHeight) {
-  // Calculate the center position of the entity
-  var entityCenterX = position.x + width / 2;
-  var entityCenterY = position.y + height / 2;
-
-  // Calculate the distance from the entity center to the camera position
-  var distanceX = entityCenterX - cameraPosition.x;
-  var distanceY = entityCenterY - cameraPosition.y + 100;
-
-  // Calculate the maximum allowed distance for an entity to be within the FoV
-  // This can be half of the FoV width or height, depending on how you define the FoV area
-  var maxDistance = Math.min(fovWidth, fovHeight);
-  var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-  // console.log('distance', distance, maxDistance)
-  // Check if the entity is within the distance
-  return distance <= maxDistance;
-}
-
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1398,60 +1333,6 @@ function updateGraphic(entityData) {
     if (typeof entityData.position.z === 'number') {
       entityElement.style.zIndex = entityData.position.z;
     }
-    if (entityData.style) {
-      Object.keys(entityData.style).forEach(function (key) {
-        entityElement.style[key] = entityData.style[key];
-      });
-    }
-    if (entityData.texture /*entityData.type === 'FIRE'*/) {
-      // check to see if texture changed / sprite index changed
-      var texture = game.getTexture(entityData.texture);
-      // console.log('GOT BACK TEXTURE', texture)
-      var textureUrl = texture.url;
-      var spritePosition = texture.sprite || {
-        x: 0,
-        y: 0
-      };
-      if (typeof entityData.texture.frame === 'number') {
-        spritePosition = texture.frames[entityData.texture.frame];
-        entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
-      } else {}
-
-      //
-      // Animated sprite, since the texture has a frames array
-      //
-      // if the array exists and animation is not paused
-      // console.log('ttt', texture);
-      if (_typeof(texture.frames) === 'object' /*&& !entityData.texture.animationPaused*/) {
-        //console.log('updating', game.tick)
-        // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
-        if (game.tick % 10 === 0) {
-          // TODO: custom tick rate
-          //console.log('updating frame index', entityData)
-          // shift first frame from array
-          if (typeof entityData.texture.frameIndex === 'undefined') {
-            entityData.texture.frameIndex = 0;
-          }
-          if (entityData.texture.frameIndex >= texture.frames.length) {
-            entityData.texture.frameIndex = 0;
-          }
-          var frame = texture.frames[entityData.texture.frameIndex];
-          if (typeof frame !== 'undefined') {
-            // console.log('frame', entityData.frameIndex)
-            spritePosition = frame;
-            entityElement.style.backgroundPosition = "".concat(spritePosition.x, "px ").concat(spritePosition.y, "px");
-            entityData.texture.frameIndex++;
-          }
-        }
-      } else {
-        if (entityData.type !== 'PLAYER') {
-          // for now
-          entityElement.style.backgroundSize = "".concat(entityData.width, "px ").concat(entityData.height, "px");
-          entityElement.style.width = "".concat(entityData.width, "px");
-          entityElement.style.height = "".concat(entityData.height, "px");
-        }
-      }
-    }
     if (entityData.type === 'TEXT' && typeof entityData.text !== 'undefined' && entityData.text !== null) {
       // check that text has changed
       if (entityElement.innerHTML !== entityData.text) {
@@ -1464,8 +1345,8 @@ function updateGraphic(entityData) {
     if (typeof entityData.radius !== 'undefined') {
       // Multiply the radius by 2 to get the diameter for CSS
       var diameter = entityData.radius * 2;
-      entityElement.style.width = diameter + 'px';
-      entityElement.style.height = diameter + 'px';
+      //entityElement.style.width = diameter + 'px';
+      //entityElement.style.height = diameter + 'px';
 
       // Adjust the position to align with the Matter.js body
       // This moves the element left and up by half its width and height
@@ -1473,11 +1354,23 @@ function updateGraphic(entityData) {
 
     // entityElement.style.transition = 'width 1.5s ease, height 1.5s ease';
 
-    if (typeof entityData.width !== 'undefined') {
-      entityElement.style.width = entityData.width + 'px';
+    if (typeof entityData.radius !== 'number') {
+      if (typeof entityData.width !== 'undefined') {
+        entityElement.style.width = entityData.width + 'px';
+      }
+      if (typeof entityData.height !== 'undefined') {
+        entityElement.style.height = entityData.height + 'px';
+      }
+    } else {
+      // Multiply the radius by 2 to get the diameter for CSS
+      var _diameter = entityData.radius * 2;
+      entityElement.style.width = _diameter + 'px';
+      entityElement.style.height = _diameter + 'px';
     }
-    if (typeof entityData.height !== 'undefined') {
-      entityElement.style.height = entityData.height + 'px';
+    if (entityData.style) {
+      Object.keys(entityData.style).forEach(function (key) {
+        entityElement.style[key] = entityData.style[key];
+      });
     }
     return this.updateEntityPosition(entityElement, entityData);
   } else {
@@ -1609,7 +1502,121 @@ function updateEntityText(entityData, entityElement) {
 }
 */
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = render;
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function render(game, alpha) {
+  // console.log('rendering', this.game.entities.size, 'entities')
+
+  // render is called at the browser's frame rate (typically 60fps)
+  var self = this;
+
+  // Remark: In order for CSSCamera follow to work, we *must* iterate all entities
+  // This is not ideal and will yield low-entity count CSSGraphics performance
+  // Best to remove camera follow for CSSGraphics if possible
+  // We tried to only iterate changed entities, but this breaks camera follow
+  /*
+  for (let [eId, state] of this.game.changedEntities.entries()) {
+    let ent = this.game.entities.get(eId);
+    // console.log('rendering', ent)
+    // do not re-inflate destroyed entities
+    if (ent.destroyed !== true) {
+      this.inflateEntity(ent, alpha);
+    }
+    // this.game.changedEntities.delete(eId);
+  }
+  */
+  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _step$value = _slicedToArray(_step.value, 2),
+        eId = _step$value[0],
+        state = _step$value[1];
+      var ent = this.game.entities.get(eId);
+      // console.log('rendering', ent)
+      // do not re-inflate destroyed entities
+      if (ent.destroyed !== true) {
+        this.inflateEntity(ent, alpha);
+      }
+      // this.game.changedEntities.delete(eId);
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+}
+
+},{}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = unload;
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function unload() {
+  var _this = this;
+  // Reset Zoom
+  this.zoom(1);
+
+  // TODO: consolidate graphics pipeline unloading into SystemsManager
+  // TODO: remove duplicated unload() code in BabylonGraphics
+  this.game.graphics = this.game.graphics.filter(function (g) {
+    return g.id !== _this.id;
+  });
+  delete this.game._plugins['CSSGraphics'];
+
+  // unload the CSSCamera
+  this.game.systemsManager.removeSystem('graphics-css-camera');
+
+  // remove the wheel event listener
+  // document.removeEventListener('wheel', this.cssMouseWheelZoom);
+  this.mouseWheelEnabled = false;
+
+  // iterate through all entities and remove existing css graphics
+  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _step$value = _slicedToArray(_step.value, 2),
+        eId = _step$value[0],
+        entity = _step$value[1];
+      if (entity.graphics && entity.graphics['graphics-css']) {
+        this.removeGraphic(eId);
+        delete entity.graphics['graphics-css'];
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  var div = document.getElementById('css-render-canvas');
+  if (div) {
+    div.remove();
+  }
+}
+
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

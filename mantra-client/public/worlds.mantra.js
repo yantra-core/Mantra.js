@@ -2285,7 +2285,9 @@ function blackHoleSutra(game, context) {
       }
       blackHole = context;
     }
-    if (blackHole) {
+    if (pendingDestroy && blackHole) {
+      // here we have pendingDestroy.position, pendingDestroy.velocity, and blackHole.position
+      // game.playSpatialSound(pendingDestroy, blackHole);
       // increase size of black hole
       // console.log(blackHole.height, blackHole.width)
       /*
@@ -2571,6 +2573,7 @@ function fountSutra(game, context) {
       type: settings.unitType,
       collisionActive: false,
       collisionEnd: false,
+      collisionStart: false,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,
@@ -2825,11 +2828,22 @@ function hexapod(game) {
   });
   rules.on('hexapodGrow', function (collision) {
     var hexapod = collision.HEXAPOD;
+    var style;
+    // at a certain size, invert the colors
+    if (hexapod.width > 16) {
+      style = {
+        // Define the animation name and duration
+        animation: 'pulse-invert 5s',
+        // Initial filter style
+        filter: 'invert(90%)'
+      };
+    }
     // update entity size by 11%
     game.updateEntity({
       id: hexapod.id,
       width: hexapod.width * 1.1,
-      height: hexapod.height * 1.1
+      height: hexapod.height * 1.1,
+      style: style
     });
   });
 
@@ -3619,11 +3633,15 @@ var Home = /*#__PURE__*/function () {
         }
       });
 
-      // switch to phaser 3
+      // switch to CSSGraphics
       game.createEntity({
-        name: 'PhaserGraphics',
+        name: 'CSSGraphics',
+        kind: 'CSSGraphics',
+        collisionActive: true,
+        collisionEnd: true,
+        collisionStart: true,
         type: 'TEXT',
-        text: 'Canvas',
+        text: 'CSS',
         width: 60,
         height: 50,
         //color: 0xffffff,
@@ -3648,6 +3666,10 @@ var Home = /*#__PURE__*/function () {
       // switch to 3d text label
       game.createEntity({
         name: 'BabylonGraphics',
+        collisionActive: true,
+        collisionEnd: true,
+        collisionStart: true,
+        kind: 'BabylonGraphics',
         type: 'TEXT',
         text: '3D',
         width: 60,
@@ -3671,6 +3693,10 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'DOOR',
+        kind: 'BabylonGraphics',
+        collisionActive: true,
+        collisionEnd: true,
+        collisionStart: true,
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'ayyoDoor'
@@ -3810,7 +3836,7 @@ var Home = /*#__PURE__*/function () {
 
       // displays some items from the spritesheet
       var itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-      itemsList = [];
+      // itemsList = [];
       itemsList.forEach(function (item, index) {
         game.createEntity({
           type: item.toUpperCase(),
@@ -4216,10 +4242,9 @@ var Home = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.setSize(2200, 600);
       game.customMovement = false;
       game.setBackground('black');
-
-      // Usage example
       var pianoConfig = {
         position: {
           x: -200,
@@ -4308,24 +4333,27 @@ var Home = /*#__PURE__*/function () {
       // warp to Platform level
       game.createEntity({
         type: 'WARP',
+        kind: 'Home',
         texture: 'warp-to-home',
         width: 64,
         height: 64,
         isStatic: true,
         position: {
           x: 200,
-          y: -10
+          y: -10,
+          z: 0
         }
       });
+
       // text "Warp to Mantra"
       game.createEntity({
         type: 'TEXT',
         text: 'Warp To Mantra',
         // kind: 'dynamic',
-        color: 0xffffff,
         style: {
           padding: '2px',
           fontSize: '16px',
+          color: '#ffffff',
           textAlign: 'center'
         },
         body: false,
@@ -4852,7 +4880,7 @@ var Platform = /*#__PURE__*/function () {
           isStatic: true,
           width: platformData.width,
           height: platformData.height,
-          color: platformData.color,
+          // color: platformData.color,
           style: {
             display: 'none'
           },
@@ -4884,14 +4912,14 @@ var Platform = /*#__PURE__*/function () {
       createPlatform({
         x: 200,
         y: 10,
-        z: -1,
+        z: -10,
         width: 850,
         height: 60
       });
       createPlatform({
         x: 925,
         y: 0,
-        z: -1,
+        z: -10,
         width: 600,
         height: 60
       });
@@ -4985,9 +5013,8 @@ var Platform = /*#__PURE__*/function () {
         });
         */
       });
-      game.use('Border', {
-        autoBorder: true
-      });
+
+      // game.use('Border', { autoBorder: true })
       game.use('Bullet');
       // game.use('Sword')
 
@@ -7082,18 +7109,20 @@ function switchGraphics(game) {
   rules["if"]('playerStoppedTouchedPhaserGraphics').then('hideLoader');
 
   // babylon graphics
+  // TODO: clean up the collision handler to use a specific TYPE of entity for switching graphics, don't overlead TEXT
+  // perhaps use Door, with KIND property being a Plugin spec
   rules.addCondition('playerTouchedBabylonGraphics', function (entity, gameState) {
-    if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE' && entity.TEXT.name === 'BabylonGraphics') {
-      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
+    if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE') {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
         return true;
       }
-      if (entity.bodyB.type === 'TEXT' && entity.bodyA.type === 'PLAYER') {
+      if (entity.bodyA.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics') && entity.bodyB.type === 'PLAYER') {
         return true;
       }
     }
   });
   rules.addCondition('playerStoppedTouchedBabylonGraphics', function (entity, gameState) {
-    if (entity.type === 'COLLISION' && entity.kind === 'END' && entity.TEXT.name === 'BabylonGraphics') {
+    if (entity.type === 'COLLISION' && entity.kind === 'END' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
       if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
         return true;
       }
