@@ -27,6 +27,7 @@ export default function fountSutra(game, context, sprayConfig = {}) {
       type: settings.unitType,
       collisionActive: false,
       collisionEnd: false,
+      collisionStart: false,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,

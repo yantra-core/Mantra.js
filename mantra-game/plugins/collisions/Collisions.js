@@ -206,21 +206,22 @@ class Collisions {
 
   }
 
+  // Remark: In most cases this code path will not be reached since the Physics interface,
+  //         should be responsible for delegating collisions based on the collision type
+  //         We keep this additional check for future proofing and additional gaurds on collision logic
+  //         In the future, we would expect to see collision layers and collision groups here
   shouldSendCollisionEvent(bodyA, bodyB, kind = 'START') {
     // for now, send all events to the stateMachine
-    if (kind === 'ACTIVE' && (bodyA.entity.collisionActive === false || bodyB.entity.collisionActive === false)) {
-      return false;
+    if (kind === 'ACTIVE' && (bodyA.entity.collisionActive === true || bodyB.entity.collisionActive === true)) {
+      return true;
     }
-
-    if (kind === 'START' && (bodyA.entity.collisionStart === false || bodyB.entity.collisionStart === false)) {
-      return false;
+    if (kind === 'START' && (bodyA.entity.collisionStart === true || bodyB.entity.collisionStart === true)) {
+      return true;
     }
-
-    if (kind === 'END' && (bodyA.entity.collisionEnd === false || bodyB.entity.collisionEnd === false)) {
-      return false;
+    if (kind === 'END' && (bodyA.entity.collisionEnd === true || bodyB.entity.collisionEnd === true)) {
+      return true;
     }
-    
-    return true;
+    return false;
   }
 
 }

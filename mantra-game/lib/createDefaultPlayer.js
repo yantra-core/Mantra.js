@@ -15,10 +15,12 @@ export default function createDefaultPlayer(playerConfig = {}) {
     return this.getEntity(this.currentPlayerId);
   }
 
-
   let player = this.createEntity({
     type: 'PLAYER',
     shape: 'triangle',
+    collisionActive: true,
+    collisionStart: true,
+    collisionEnd: true,
     width: 16,
     height: 16,
     color: playerConfig.color,
