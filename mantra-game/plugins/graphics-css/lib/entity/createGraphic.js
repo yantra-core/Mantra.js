@@ -25,7 +25,8 @@ export default function createGraphic(entityData) {
   switch (entityData.type) {
     case 'BULLET':
       // For BULLET entities, create a circle
-      const radius = entityData.radius || 0;
+      let radius = entityData.radius || 0;
+      // radius = 1;
       entityElement.style.width = entityData.radius + 'px';
       entityElement.style.height = entityData.radius + 'px';
       // console.log('inflating bullet', entityData)
@@ -49,7 +50,6 @@ export default function createGraphic(entityData) {
       // Set default sprite
       // entityElement.classList.add('guy-right-0');
       this.inflateBox(entityElement, entityData);
-
 
       break;
     case 'TEXT':

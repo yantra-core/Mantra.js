@@ -5,17 +5,17 @@ export default function updateEntityPosition(entityElement, entityData) {
   let width = entityData.width;
   let height = entityData.height;
 
+  if (typeof entityData.radius === 'number') {
+    width = entityData.radius;
+    height = entityData.radius;
+  }
+
   // Field of view (FoV) dimensions
   let fovWidth = window.outerWidth;
   let fovHeight = window.outerHeight;
 
   fovWidth = 600;
   fovHeight = 600;
-  // Adjust the position based on the camera position
-  if (type === 'BULLET') {
-    position.x += 24;
-    position.y += 24;
-  }
 
   const adjustedPosition = {
     x: position.x - (this.cameraPosition.x -  window.outerWidth / 2),
@@ -23,6 +23,8 @@ export default function updateEntityPosition(entityElement, entityData) {
   };
 
   // Check if the entity is within the field of view
+  // Remark: Field of View is disabled ( for now ), it *should* be working as expected,
+  //         the current implementation will hide the entity, we should removeEntity() instead
   if (true || isWithinFieldOfView(game, position, this.cameraPosition, width, height, fovWidth, fovHeight)) {
     let domX = adjustedPosition.x - width / 2;
     let domY = adjustedPosition.y - height / 2;
@@ -34,10 +36,12 @@ export default function updateEntityPosition(entityElement, entityData) {
     this.setTransform(entityData, entityElement, domX, domY, rotation, angle);
     entityElement.style.display = ''; // Make sure the element is visible
   } else {
+    /*
     if (entityData.type !== 'BACKGROUND' || entityData.type !== 'building') {
-          // Hide the entity if it's outside the field of view
+      // Hide the entity if it's outside the field of view
       entityElement.style.display = 'none';
     }
+    */
   }
 
   if (entityData.style && entityData.style.display === 'none') {

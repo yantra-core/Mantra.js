@@ -24,11 +24,6 @@ export default function updateGraphic(entityData) {
       entityElement.style.zIndex = entityData.position.z;
     }
   
-    if (entityData.style) {
-      Object.keys(entityData.style).forEach((key) => {
-        entityElement.style[key] = entityData.style[key];
-      });
-    }
 
     if (entityData.type === 'TEXT' && typeof entityData.text !== 'undefined' && entityData.text !== null) {
       // check that text has changed
@@ -43,8 +38,8 @@ export default function updateGraphic(entityData) {
     if (typeof entityData.radius !== 'undefined') {
       // Multiply the radius by 2 to get the diameter for CSS
       let diameter = entityData.radius * 2;
-      entityElement.style.width = diameter + 'px';
-      entityElement.style.height = diameter + 'px';
+      //entityElement.style.width = diameter + 'px';
+      //entityElement.style.height = diameter + 'px';
     
       // Adjust the position to align with the Matter.js body
       // This moves the element left and up by half its width and height
@@ -52,13 +47,21 @@ export default function updateGraphic(entityData) {
 
     // entityElement.style.transition = 'width 1.5s ease, height 1.5s ease';
 
-    if (typeof entityData.width !== 'undefined') {
-      entityElement.style.width = entityData.width + 'px';
+    if (typeof entityData.radius !== 'number') {
+      if (typeof entityData.width !== 'undefined') {
+        entityElement.style.width = entityData.width + 'px';
+      }
+  
+      if (typeof entityData.height !== 'undefined') {
+        entityElement.style.height = entityData.height + 'px';
+      }
+    } else {
+      // Multiply the radius by 2 to get the diameter for CSS
+      let diameter = entityData.radius * 2;
+      entityElement.style.width = diameter + 'px';
+      entityElement.style.height = diameter + 'px';
     }
 
-    if (typeof entityData.height !== 'undefined') {
-      entityElement.style.height = entityData.height + 'px';
-    }
 
     if (entityData.style) {
       Object.keys(entityData.style).forEach((key) => {

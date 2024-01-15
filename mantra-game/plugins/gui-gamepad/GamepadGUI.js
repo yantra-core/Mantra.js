@@ -14,6 +14,7 @@ class GamepadGUI {
     this.hiding = false;
     this.moving = null;
     this.useZoomSlider = useZoomSlider;
+    this.useZoomSlider = false;
     this.lastDirection = null; // Add this line
   }
 

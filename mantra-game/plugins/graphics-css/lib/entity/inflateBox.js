@@ -21,6 +21,7 @@ export default function inflateBox(entityElement, entityData) {
     entityElement.style.height = entityData.height + 'px';
   }
 
+  
   // entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
   // set default depth based on type
@@ -30,7 +31,6 @@ export default function inflateBox(entityElement, entityData) {
 
   // TODO: move to separate file for inflatePart,
   if (entityData.type === 'PART') {
-    // console.log("SUPER INFLATE")
     // TODO: part.kind, not name, name is the individual part name user defined
     switch (entityData.name) {
 

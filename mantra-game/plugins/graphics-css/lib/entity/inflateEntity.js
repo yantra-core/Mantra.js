@@ -12,7 +12,7 @@ export default function inflateEntity(entity, alpha) {
   // after entity has been inflated, check to see if a texture should be applied
   // this will also run any animations on the entity.animations component
   if (!graphic) {
-    console.log('warning: no graphic', entity)
+    // console.log('warning: no graphic', entity)
     return;
   }
   this.inflateTexture(entity, graphic);
