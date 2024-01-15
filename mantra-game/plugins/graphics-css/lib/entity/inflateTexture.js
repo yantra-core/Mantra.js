@@ -1,6 +1,5 @@
 export default function inflateTexture(entityData, entityElement) {
 
-
   if (entityData.texture) {
 
     // first check to see if texture exists
@@ -18,11 +17,41 @@ export default function inflateTexture(entityData, entityElement) {
 
     if (typeof entityData.texture.frame === 'number') {
       spritePosition = texture.frames[entityData.texture.frame];
-      entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
-    } else {
-
+      // entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
     }
-    
+
+    entityElement.style.border = 'none';
+    entityElement.style.zIndex = entityData.position.z;
+    entityElement.style.borderRadius = '0px';
+    // entityElement.style.padding = '1px';
+
+    entityElement.style.background = `url('${textureUrl}')`;
+    entityElement.style.backgroundRepeat = 'no-repeat';
+    entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
+
+    // set background size to entity size
+    if (spritePosition.x === 0 && spritePosition.y === 0) {
+      // entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+    }
+
+    if (!texture.frames) {
+      entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
+      // align background in center no matter the size of the entity
+    }
+
+    entityElement.style.zIndex = entityData.position.z;
+
+    if (typeof entityData.texture === 'object' && entityData.texture.sheet) {
+      // this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.sprite);
+    }
+
+
+    if (entityData.style) {
+      Object.keys(entityData.style).forEach((key) => {
+        entityElement.style[key] = entityData.style[key];
+      });
+    }
+
     //
     // Animated sprite, since the texture has a frames array
     //
@@ -30,7 +59,8 @@ export default function inflateTexture(entityData, entityElement) {
     if (typeof texture.frames === 'object' /*&& !entityData.texture.animationPaused*/) {
       //console.log('updating', game.tick)
       // console.log('got back texture', spritePosition, texture, spritePosition, entityData)
-      if (game.tick % 10 === 0) { // TODO: custom tick rate
+      // TODO: add back animations
+      if (false && game.tick % 5 === 0) { // TODO: custom tick rate
         //console.log('updating frame index', entityData)
         // shift first frame from array
         if (typeof entityData.texture.frameIndex === 'undefined') {
@@ -41,22 +71,26 @@ export default function inflateTexture(entityData, entityElement) {
         }
 
         let frame = texture.frames[entityData.texture.frameIndex];
+
         if (typeof frame !== 'undefined') {
           // console.log('frame', entityData.frameIndex)
           spritePosition = frame;
-          entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
+          // console.log('spritePosition', spritePosition)
           entityData.texture.frameIndex++;
         }
+        entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;
 
-       }
+
+      }
 
     } else {
-
+      /*
       if (entityData.type !== 'PLAYER') { // for now
         entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
         entityElement.style.width = `${entityData.width}px`;
         entityElement.style.height = `${entityData.height}px`;
       }
+      */
 
     }
 

@@ -1,7 +1,6 @@
 export default function inflateBox(entityElement, entityData) {
-
+  
   // console.log('inflating entity', entityData.type, entityData.name)
-
   let game = this.game;
 
   let getTexture = game.getTexture;
@@ -27,31 +26,9 @@ export default function inflateBox(entityElement, entityData) {
   // set default depth based on type
   entityElement.style.zIndex = depthChart.indexOf(entityData.type);
 
-  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
-  entityElement.addEventListener('pointerdown', (ev) => {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    let ent = game.getEntity(entityData.id);
-    game.emit('pointerDown', ent, ev);
-  });
-
-  entityElement.addEventListener('pointerup', (ev) => {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    let ent = game.getEntity(entityData.id);
-    game.emit('pointerUp', ent, ev);
-  });
-
-  entityElement.addEventListener('pointermove', (ev) => {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    let ent = game.getEntity(entityData.id);
-    game.emit('pointerMove', ent, ev);
-  });
-
+  this.bindEntityEvents(entityData, entityElement);
 
   // TODO: move to separate file for inflatePart,
-  // move this code to CSSGraphics switch case
   if (entityData.type === 'PART') {
     // console.log("SUPER INFLATE")
     // TODO: part.kind, not name, name is the individual part name user defined
@@ -74,119 +51,25 @@ export default function inflateBox(entityElement, entityData) {
 
     // add pointer cursor for buttons on hover
     entityElement.style.cursor = 'pointer';
-
-    // add hover state with 3d drop shadow effect
-    entityElement.addEventListener('mouseover', () => {
-      entityElement.style.boxShadow = '5px 5px 10px rgba(0,0,0,0.5)';
-      // get the full ent from the game
-      let ent = game.getEntity(entityData.id);
-      // delgate based on part type name
-      let partName = ent.yCraft.part.name;
-      let partType = ent.yCraft.part.type;
-      let part = ent.yCraft.part;
-      if (partType === 'MotionDetector') {
-        // console.log('MotionDetector', part);
-        ent.yCraft.part.onFn();
-      }
-    });
-
-    entityElement.addEventListener('mouseout', () => {
-      entityElement.style.boxShadow = '';
-    });
-
-    entityElement.addEventListener('pointerdown', (ev) => {
-      // console.log(ev.target, entityData.id, entityData.type, entityData)
-      // get the full ent from the game
-      let ent = game.getEntity(entityData.id);
-      // delgate based on part type name
-      let partName = ent.yCraft.part.name;
-      let partType = ent.yCraft.part.type;
-      let part = ent.yCraft.part;
-      if (partType === 'Button') {
-        ent.yCraft.part.press();
-      }
-      // LEDLight, Latch, Amplifier, etc
-      if (ent && ent.yCraft && ent.yCraft.part.toggle) {
-        ent.yCraft.part.toggle();
-      }
-
-    });
-    entityElement.addEventListener('pointerup', (ev) => {
-      // console.log(ev.target, entityData.id, entityData.type, entityData)
-      // get the full ent from the game
-      let ent = game.getEntity(entityData.id);
-      // delgate based on part type name
-      let partName = ent.yCraft.part.name;
-      let partType = ent.yCraft.part.type;
-      if (partType === 'Button') {
-        if (ent && ent.yCraft && ent.yCraft.part.release) {
-          ent.yCraft.part.release();
-        }
-      }
-    });
-
+    this.bindYCraftEvents(entityData, entityElement);
   }
+
   // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
   // set border color to black
   entityElement.style.border = '1px solid black';
-  if (getTexture(entityData.texture)) {
-    entityElement.style.border = 'none';
-    entityElement.style.zIndex = entityData.position.z;
-    entityElement.style.borderRadius = '0px';
-    // entityElement.style.padding = '1px';
-    // optional tile flip CSS ( not great for performance better to use sprite animations )
-    if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
-      // TODO: refactor API
-      tileFlip(entityElement, hexColor, getTexture, entityData);
-    } else {
-      let texture = getTexture(entityData.texture);
-      let textureUrl = texture.url;
-      let spritePosition = texture.sprite || { x: 0, y: 0 };
 
-      //console.log("SETTING TEXTURE", textureUrl, texture, spritePosition)
-      //console.log('entityData', entityData)
-      // console.log('got back texture', textureUrl, texture, spritePosition)
-      // TODO: move this closure
-      // rendering a texture without tile
-      // console.log('going to set texture', entityData.texture, getTexture(entityData.texture))
-      entityElement.style.background = `url('${textureUrl}')`;
-      entityElement.style.backgroundRepeat = 'no-repeat';
-      entityElement.style.backgroundPosition = 'center';
-      // entityElement.style.border = 'solid'
-      //entityElement.style.backgroundPosition  = `${spritePosition.x}px ${spritePosition.y}px`;
-      // entityElement.style.backgroundPosition = '-208px -544px';
-      // set background size to entity size
-      if (spritePosition.x === 0 && spritePosition.y === 0) {
-        // entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
-      }
-      if (!texture.frames) {
-        entityElement.style.backgroundSize = `${entityData.width}px ${entityData.height}px`;
-        // align background in center no matter the size of the entity
-      }
-      entityElement.style.zIndex = entityData.position.z;
+  entityElement.style.background = hexColor;
 
-      if (typeof entityData.texture === 'object' && entityData.texture.sheet) {
-        // this.game.updateSprite(entityData.id, entityData.texture.sheet, entityData.texture.sprite);
-      }
-
-      if (entityData.style) {
-        Object.keys(entityData.style).forEach((key) => {
-          entityElement.style[key] = entityData.style[key];
-        });
-      }
-
-    }
-
-  } else {
-    entityElement.style.background = hexColor;
-
-    if (entityData.style) {
-      Object.keys(entityData.style).forEach((key) => {
-        entityElement.style[key] = entityData.style[key];
-      });
-    }
-
+  if (entityData.style) {
+    Object.keys(entityData.style).forEach((key) => {
+      entityElement.style[key] = entityData.style[key];
+    });
   }
+
+  if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
+    // TODO: refactor API
+    tileFlip(entityElement, hexColor, getTexture, entityData);
+  } 
 
   // console.log('entityElement', entityElement)
 

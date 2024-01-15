@@ -14,6 +14,12 @@ import updateGraphic from './lib/entity/updateGraphic.js';
 import updateEntityPosition from './lib/camera/updateEntityPosition.js';
 import mouseWheelZoom from './lib/camera/mouseWheelZoom.js';
 
+// touch / mouse events on entities
+import bindEntityEvents from './lib/entity/bindEntityEvents.js';
+
+// TODO: remove bindYCraftEvents.js file, replace with a Sutra
+import bindYCraftEvents from './lib/entity/bindYCraftEvents.js';
+
 import unload from './lib/unload.js';
 import zoom from './lib/camera/zoom.js';
 import cameraShake from './lib/camera/cameraShake.js';
@@ -57,6 +63,8 @@ class CSSGraphics extends GraphicsInterface {
     this.handleInputs = handleInputs.bind(this);
     this.render = render.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
+    this.bindEntityEvents = bindEntityEvents.bind(this);
+    this.bindYCraftEvents = bindYCraftEvents.bind(this);
     this.mouseWheelZoom = mouseWheelZoom.bind(this);
     this.unload = unload.bind(this);
     this.zoom = zoom.bind(this);
