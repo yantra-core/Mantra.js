@@ -62,6 +62,7 @@ class DefaultTwoDimensionalInputStrategy {
 
     const actions = Object.keys(controls).filter(key => controls[key]).map(key => game.systems['entity-input'].controlMappings[key]);
 
+
     let entityData = game.getEntity(entityId);
 
     if (entityData && entityData.position && plugin.useMouseControls) {
@@ -186,6 +187,14 @@ class DefaultTwoDimensionalInputStrategy {
       */
 
     }
+
+    // custom actions as anonymous functions
+    // iterate all actions, if any are functions, run them
+    actions.forEach(action => {
+      if (typeof action === 'function') {
+        action(game);
+      }
+    });
 
   }
 }

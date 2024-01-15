@@ -1,5 +1,5 @@
 // cameraShake.js - Marak Squires 2023
-export default function cameraShake(initialIntensity = 100, duration = 1300) {
+export default function cameraShake(initialIntensity = 100, duration = 777) {
   let gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');
@@ -33,6 +33,19 @@ export default function cameraShake(initialIntensity = 100, duration = 1300) {
 
     // Apply the shake with the current zoom
     gameViewport.style.transform = `scale(${this.game.data.camera.currentZoom}) translate(${x}px, ${y}px)`;
+
+    // Apply a random force to each entity
+    Object.keys(this.game.data.ents._).forEach(eId => {
+      let entity = this.game.data.ents._[eId];
+      // TODO: make more configurable / part of constructor config
+      if (entity.type === 'PARTICLE' || entity.type === 'STAR') {
+        let forceX = Math.random() * intensity - intensity / 2;
+        let forceY = Math.random() * intensity - intensity / 2;
+        forceX = forceX * 0.01;
+        forceY = forceY * 0.01
+        game.applyForce(eId, { x: forceX, y: forceY });
+      }
+    });
 
     requestAnimationFrame(shake);
   };

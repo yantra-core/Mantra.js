@@ -38,7 +38,15 @@ class GravityGardens {
       // K: 'FIRE_BULLET',
       K: 'ZOOM_IN',
       L: 'ZOOM_OUT',
-      O: 'BARREL_ROLL',
+      O: function (game) {
+        if (typeof game.data.lastGravitySwitch === 'undefined') {
+          game.data.lastGravitySwitch = 0;
+        }
+        if (Date.now() - game.data.lastGravitySwitch >= 1000) {
+          game.data.repulsion = !game.data.repulsion;
+          game.data.lastGravitySwitch = Date.now();
+        }
+      },
       P: 'CAMERA_SHAKE',
       U: 'SELECT_MENU'
     });
@@ -106,6 +114,25 @@ class GravityGardens {
       sutra: fount(game, fountD, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
     });
 
+
+    // Particles will be removed when they collide with the wall
+    let wallCollision = game.createSutra();
+
+    wallCollision.addCondition('particleTouchedWall', (entity, gameState) => {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BORDER;
+    });
+
+    wallCollision.if('particleTouchedWall').then('particleWallCollision');
+
+    wallCollision.on('particleWallCollision', (collision) => {
+      let particle = collision.PARTICLE || collision.STAR;
+      if (particle) {
+        // remove the entity
+        game.removeEntity(particle.id);
+      }
+    });
+
+    game.setSutra(wallCollision);
     // game.setSutra(blackhole(game));
     // game.setSutra(fount(game));
 
