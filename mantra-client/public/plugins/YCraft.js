@@ -2279,7 +2279,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { YCraft as YCraftActual } from 'ycraft';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //import { YCraft as YCraftActual } from 'ycraft';
 // import testContraption from './security-system.js';
 // import testLight from './button-wire-light.js';
 // import roverLight from './rover-light.js';
@@ -2418,7 +2418,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
           });
           */
           // place the label in top left corner of the contraption
-          var contraptionLabelX = contraption.position.x + contraption.width / 4;
+          var contraptionLabelX = contraption.position.x + contraption.width / 2;
           var contraptionLabelY = contraption.position.y + contraption.height / 10 - 5;
           // creates a label for the contraption
           var textLabel = _this2.game.createEntity({
@@ -2434,7 +2434,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
             style: {
               fontSize: '16px'
             },
-            width: contraption.width / 2,
+            width: contraption.width,
             height: contraption.height / 2,
             isStatic: true,
             isSensor: true

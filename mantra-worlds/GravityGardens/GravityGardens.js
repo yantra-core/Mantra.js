@@ -13,6 +13,7 @@ class GravityGardens {
   init(game) {
     this.game = game;
     this.createWorld();
+    game.use('CurrentFPS');
   }
 
   createWorld() {

@@ -39,19 +39,21 @@ export default function switchGraphics(game) {
 
 
   // babylon graphics
+  // TODO: clean up the collision handler to use a specific TYPE of entity for switching graphics, don't overlead TEXT
+  // perhaps use Door, with KIND property being a Plugin spec
   rules.addCondition('playerTouchedBabylonGraphics', (entity, gameState) => {
-    if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE' && entity.TEXT.name === 'BabylonGraphics') {
-      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
+    if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE') {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
         return true;
       }
-      if (entity.bodyB.type === 'TEXT' && entity.bodyA.type === 'PLAYER') {
+      if (entity.bodyA.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics') && entity.bodyB.type === 'PLAYER') {
         return true;
       }
     }
   });
 
   rules.addCondition('playerStoppedTouchedBabylonGraphics', (entity, gameState) => {
-    if (entity.type === 'COLLISION' && entity.kind === 'END' && entity.TEXT.name === 'BabylonGraphics') {
+    if (entity.type === 'COLLISION' && entity.kind === 'END' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
       if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
         return true;
       }

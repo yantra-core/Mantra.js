@@ -230,11 +230,14 @@ class Home {
     game.createEntity({
       type: 'TEXT',
       text: 'Warp To YCraft World',
+      width: 164,
       // kind: 'dynamic',
       color: 0x000000,
       style: {
         fontSize: '16px',
-        textAlign: 'center'
+        textAlign: 'center',
+        paddingLeft: '20px', // for now
+
       },
       body: false,
       position: {
@@ -283,11 +286,16 @@ class Home {
       }
     });
 
-    // switch to phaser 3
+    // switch to CSSGraphics
     game.createEntity({
-      name: 'PhaserGraphics',
+      name: 'CSSGraphics',
+      kind: 'CSSGraphics',
+      collisionActive: true,
+      collisionEnd: true,
+      collisionStart: true,
+
       type: 'TEXT',
-      text: 'Canvas',
+      text: 'CSS',
       width: 60,
       height: 50,
       //color: 0xffffff,
@@ -312,6 +320,10 @@ class Home {
     // switch to 3d text label
     game.createEntity({
       name: 'BabylonGraphics',
+      collisionActive: true,
+      collisionEnd: true,
+      collisionStart: true,
+      kind: 'BabylonGraphics',
       type: 'TEXT',
       text: '3D',
       width: 60,
@@ -336,6 +348,10 @@ class Home {
 
     game.createEntity({
       type: 'DOOR',
+      kind: 'BabylonGraphics',
+      collisionActive: true,
+      collisionEnd: true,
+      collisionStart: true,
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'ayyoDoor',
@@ -475,7 +491,7 @@ class Home {
 
     // displays some items from the spritesheet
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-    itemsList = [];
+    itemsList = []; // for now
     itemsList.forEach((item, index) => {
       game.createEntity({
         type: item.toUpperCase(),

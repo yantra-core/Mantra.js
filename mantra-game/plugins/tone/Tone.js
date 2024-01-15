@@ -18,6 +18,7 @@ class TonePlugin {
     this.userEnabled = false;
     this.lastNotePlayed = null;
     this.keyCodes = keyCodes;
+    this.toneStarted = false;
   }
 
   init(game) {
@@ -47,6 +48,9 @@ class TonePlugin {
 
     this.drumKit = new DrumKit();
 
+
+    this.game.playSpatialSound = this.playSpatialSound.bind(this);
+      
     const limiter = new Tone.Limiter(-6).toDestination();
 
     // Create a compressor
@@ -68,17 +72,22 @@ class TonePlugin {
 
 
     game.playDrum = function (sound = 'kick') {
-      Tone.start();
-
+      if (!this.toneStarted) {
+        Tone.start();
+        this.toneStarted = true;
+      }
       that.drumKit.play(sound);
     };
 
     game.playNote = function (note, duration) {
-      Tone.start();
-      // console.log('playing ', note, duration)
+      if (!this.toneStarted) {
+        Tone.start();
+        this.toneStarted = true;
+      }      // console.log('playing ', note, duration)
       //play a middle 'C' for the duration of an 8th note
       self.playNote(note, duration);
     };
+
 
     // Create a synth and connect it to the main output
     //const synth = new Tone.Synth().toDestination();
@@ -90,8 +99,10 @@ class TonePlugin {
 
     // Function to play the sound
     function playSound(sound) {
-      Tone.start(); // Start audio context - required for newer browsers
-
+      if (!this.toneStarted) {
+        Tone.start();
+        this.toneStarted = true;
+      }
       sound.notes.forEach(note => {
         synth.triggerAttackRelease(note, sound.duration);
       });
@@ -165,6 +176,65 @@ class TonePlugin {
     }
     // game.emit('playNote', note, duration, now, velocity);
   }
+
+
+  // Method to play spatial sound
+  // TODO: needs to use pool of synths, this creates too many synths
+  playSpatialSound(particle, blackHole) {
+    if (!this.toneStarted) {
+      Tone.start();
+      this.toneStarted = true;
+    }
+  
+    // Calculate panning based on particle's position relative to black hole
+    const gameWidth = this.game.width; // Use actual game width
+    const xPosition = (particle.position.x - blackHole.position.x) / gameWidth;
+    const panner = new Tone.Panner(xPosition).toDestination();
+  
+    // Calculate velocity factor
+    const velocityMagnitude = Math.sqrt(particle.velocity.x ** 2 + particle.velocity.y ** 2);
+    const maxVelocity = 10; // Replace with maximum expected velocity in your game
+    const velocityFactor = velocityMagnitude / maxVelocity;
+  
+    // Create FM Synth for water drop sound
+    const fmSynth = new Tone.FMSynth({
+      harmonicity: 8,
+      modulationIndex: 2,
+      oscillator: { type: 'sine' },
+      envelope: {
+        attack: 0.01,
+        decay: 0.2,
+        sustain: 0,
+        release: 0.1
+      },
+      modulation: { type: 'square' },
+      modulationEnvelope: {
+        attack: 0.01,
+        decay: 0.2,
+        sustain: 0,
+        release: 0.1
+      }
+    }).connect(panner);
+  
+    // Adjust parameters based on velocity
+    const duration = 0.2 + (0.3 * (1 - velocityFactor)); // Shorter duration for faster particles
+    const pitchDrop = velocityFactor * 24; // Higher drop for faster particles
+  
+    // Trigger the FM Synth with a pitch drop
+    fmSynth.triggerAttack("C4", Tone.now());
+    setTimeout(() => {
+      fmSynth.setNote(`C${4 - pitchDrop}`, Tone.now());
+      fmSynth.triggerRelease(Tone.now() + duration);
+    }, 10);
+  
+    // Optionally: Add a delay for a more spacious effect
+    // const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
+    // fmSynth.connect(feedbackDelay);
+  }
+  
+  
+  
+
 
   harmonicShift(traktorKeyCode, options = { type: 'perfectFifth' }) {
     const wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];

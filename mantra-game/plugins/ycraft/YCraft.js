@@ -153,7 +153,7 @@ class YCraft extends Plugin {
         });
         */
         // place the label in top left corner of the contraption
-        let contraptionLabelX = contraption.position.x + contraption.width / 4;
+        let contraptionLabelX = contraption.position.x + contraption.width / 2;
         let contraptionLabelY = contraption.position.y + contraption.height / 10 - 5;
         // creates a label for the contraption
         let textLabel = this.game.createEntity({
@@ -165,9 +165,9 @@ class YCraft extends Plugin {
             y: contraptionLabelY    // Position inside the entity
           },
           style: {
-            fontSize: '16px',
+            fontSize: '16px'
           },
-          width: contraption.width / 2,
+          width: contraption.width,
           height: contraption.height / 2,
           isStatic: true,
           isSensor: true
@@ -280,7 +280,7 @@ class YCraft extends Plugin {
   }
 
   handleCollision(pair, bodyA, bodyB) {
-    console.log("YCRAFT handleCollision", pair, bodyA, bodyB);
+    // console.log("YCRAFT handleCollision", pair, bodyA, bodyB);
     // TODO: connect physics events for END and START
   
     if (bodyA.myEntityId && bodyB.myEntityId) {

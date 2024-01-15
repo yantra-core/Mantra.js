@@ -48,6 +48,7 @@ class YCraft {
     game.createEntity({
       type: 'TEXT',
       text: 'Warp To Mantra',
+      width: 120,
       // kind: 'dynamic',
       color: 0x000000,
       style: {

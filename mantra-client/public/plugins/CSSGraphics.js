@@ -1199,6 +1199,9 @@ function inflateText(entityElement, entityData) {
       entityElement.style[key] = entityData.style[key];
     }
   }
+  if (entityData.width) {
+    entityElement.style.width = entityData.width + 'px';
+  }
   if (entityData.color) {
     entityElement.style.color = entityData.color;
   }
@@ -1244,11 +1247,21 @@ function inflateTexture(entityData, entityElement) {
     } : _texture$sprite,
     frames = texture.frames;
 
+  // Extract the current texture URL from the element's style
+  var currentTextureUrl = entityElement.style.backgroundImage.slice(5, -2);
+
+  // Extract the current sprite name from the data attribute
+  var currentSpriteName = entityElement.getAttribute('data-texture-sprite');
+  var newSpriteName = entityData.texture.sprite;
+
+  // Check if the texture or its sprite name has changed
+  var isTextureChanged = currentTextureUrl !== textureUrl || currentSpriteName !== newSpriteName;
+
   // Check if the element already has a texture applied
   var isTextureSet = entityElement.style.backgroundImage.includes(textureUrl);
 
-  // Set initial texture state only if no texture is applied
-  if (!isTextureSet) {
+  // Set initial texture state only if no texture is applied or if the texture has changed
+  if (!isTextureSet || isTextureChanged) {
     if (Array.isArray(frames) && frames.length > 0) {
       spritePosition = frames[0];
     } else if (typeof entityData.texture.frame === 'number') {
@@ -1260,11 +1273,14 @@ function inflateTexture(entityData, entityElement) {
   // Update frame index and position for animated sprites
   if (Array.isArray(frames)) {
     var frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
+
+    // TODO: use config setting for tick rate per animation
     if (game.tick % 30 === 0) {
       var frame = frames[frameIndex];
       if (frame) {
         spritePosition = frame;
         frameIndex = frameIndex >= frames.length - 1 ? 0 : frameIndex + 1;
+        entityElement.setAttribute('data-texture-sprite', texture.sprite.name);
       }
       entityElement.setAttribute('data-frame-index', frameIndex);
       applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);

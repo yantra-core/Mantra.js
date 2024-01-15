@@ -12,6 +12,10 @@ export default function inflateText(entityElement, entityData) {
     }
   }
 
+  if (entityData.width) {
+    entityElement.style.width = entityData.width + 'px';
+  }
+
   if (entityData.color) {
     entityElement.style.color = entityData.color;
   }

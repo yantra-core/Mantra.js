@@ -23,10 +23,11 @@ class Home {
   createWorld() {
 
     let game = this.game;
+
+    game.setSize(2200, 600);
     game.customMovement = false;
     game.setBackground('black');
 
-    // Usage example
     const pianoConfig = {
       position: { x: -200, y: 200 },
       //width: 4096 / 2, // Total width for the piano
@@ -101,35 +102,37 @@ class Home {
 
     game.use('Border', { autoBorder: true })
 
+    // See: sutras.js for World logic
+    let rules = sutras(game);
 
-   // See: sutras.js for World logic
-   let rules = sutras(game);
-
-   // set the Sutra rules for Home world
-   game.setSutra(rules);
-
+    // set the Sutra rules for Home world
+    game.setSutra(rules);
 
     // warp to Platform level
     game.createEntity({
       type: 'WARP',
+      kind: 'Home',
       texture: 'warp-to-home',
       width: 64,
       height: 64,
       isStatic: true,
       position: {
         x: 200,
-        y: -10
+        y: -10,
+        z: 0
       }
     });
+
+
     // text "Warp to Mantra"
     game.createEntity({
       type: 'TEXT',
       text: 'Warp To Mantra',
       // kind: 'dynamic',
-      color: 0xffffff,
       style: {
         padding: '2px',
         fontSize: '16px',
+        color: '#ffffff',
         textAlign: 'center'
       },
       body: false,
@@ -151,7 +154,6 @@ class Home {
         y: 210
       }
     });
-
 
     /*
     // if touch note play sound

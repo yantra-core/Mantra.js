@@ -218,7 +218,17 @@ if (mode === 'online') {
     //game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
     // game.use(new plugins.Bullet())
 
-    game.use(home);
+   game.use(home);
+/*
+    game.createDefaultPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'fire'
+      },
+    });
+
+    game.setZoom(4.5);
+    */
 
     // game.use(new plugins.GamepadGUI())
     //game.use(new plugins.Tone());

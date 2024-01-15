@@ -59,6 +59,24 @@ class Sutra {
     game.createDefaultPlayer();
     //createPlayPauseButton();
 
+
+    /*
+    game.createEntity({
+      type: 'WARP',
+      kind: 'Home',
+      texture: 'warp-to-home',
+      width: 64,
+      height: 64,
+      depth: 1,
+      isStatic: true,
+      position: {
+        x: -100,
+        y: -100
+      }
+    });
+    */
+
+
     function createPlayPauseButton() {
       game.createEntity({
         name: 'play-pause-button',

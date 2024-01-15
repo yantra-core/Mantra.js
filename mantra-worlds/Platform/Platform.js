@@ -30,9 +30,9 @@ class Platform {
     game.customMovement = true;
 
     game.setGravity(0, 3.3, 0);
+    game.setZoom(4.5);
 
     game.use('Platform');
-
    
     function createPlatform(platformData) {
       game.createEntity({
@@ -40,7 +40,7 @@ class Platform {
         isStatic: true,
         width: platformData.width,
         height: platformData.height,
-        color: platformData.color,
+        // color: platformData.color,
         style: {
           display: 'none'
         },
@@ -74,7 +74,7 @@ class Platform {
     createPlatform({
       x: 200,
       y: 10,
-      z: -1,
+      z: -10,
       width: 850,
       height: 60
     });
@@ -82,7 +82,7 @@ class Platform {
     createPlatform({
       x: 925,
       y: 0,
-      z: -1,
+      z: -10,
       width: 600,
       height: 60
     });
@@ -133,11 +133,13 @@ class Platform {
     game.createEntity({
       type: 'TEXT',
       text: 'Warp To Mantra',
+      width: 120,
       // kind: 'dynamic',
       color: 0xffffff,
       style: {
         color: '#ffffff',
         padding: '2px',
+        paddingLeft: '10px', // for now
         fontSize: '16px',
         textAlign: 'center',
         backgroundColor: 'transparent',
@@ -183,7 +185,7 @@ class Platform {
 
     });
 
-    game.use('Border', { autoBorder: true })
+    // game.use('Border', { autoBorder: true })
     game.use('Bullet')
     // game.use('Sword')
 

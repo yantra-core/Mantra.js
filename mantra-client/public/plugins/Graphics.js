@@ -329,6 +329,7 @@ function getTexture(config) {
     // check to see if frameName is present in spritesheet
     if (t && t.frameTags && t.frameTags[spriteName]) {
       var sprite = t.frameTags[spriteName].frames[frameIndex];
+      sprite.name = spriteName;
       var url = game.assetRoot + t.url;
       // console.log('returning url', url)
       // t.frame = frame;

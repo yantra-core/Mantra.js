@@ -3192,6 +3192,7 @@ var GravityGardens = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.createWorld();
+      game.use('CurrentFPS');
     }
   }, {
     key: "createWorld",
@@ -3580,11 +3581,13 @@ var Home = /*#__PURE__*/function () {
       game.createEntity({
         type: 'TEXT',
         text: 'Warp To YCraft World',
+        width: 164,
         // kind: 'dynamic',
         color: 0x000000,
         style: {
           fontSize: '16px',
-          textAlign: 'center'
+          textAlign: 'center',
+          paddingLeft: '20px' // for now
         },
         body: false,
         position: {
@@ -3836,7 +3839,7 @@ var Home = /*#__PURE__*/function () {
 
       // displays some items from the spritesheet
       var itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-      // itemsList = [];
+      itemsList = []; // for now
       itemsList.forEach(function (item, index) {
         game.createEntity({
           type: item.toUpperCase(),
@@ -4873,6 +4876,7 @@ var Platform = /*#__PURE__*/function () {
       var game = this.game;
       game.customMovement = true;
       game.setGravity(0, 3.3, 0);
+      game.setZoom(4.5);
       game.use('Platform');
       function createPlatform(platformData) {
         game.createEntity({
@@ -4967,11 +4971,14 @@ var Platform = /*#__PURE__*/function () {
       game.createEntity({
         type: 'TEXT',
         text: 'Warp To Mantra',
+        width: 120,
         // kind: 'dynamic',
         color: 0xffffff,
         style: {
           color: '#ffffff',
           padding: '2px',
+          paddingLeft: '10px',
+          // for now
           fontSize: '16px',
           textAlign: 'center',
           backgroundColor: 'transparent'
@@ -6676,6 +6683,7 @@ var YCraft = /*#__PURE__*/function () {
       game.createEntity({
         type: 'TEXT',
         text: 'Warp To Mantra',
+        width: 120,
         // kind: 'dynamic',
         color: 0x000000,
         style: {
