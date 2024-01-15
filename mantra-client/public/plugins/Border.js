@@ -49,18 +49,23 @@ var Border = /*#__PURE__*/function () {
 
       // create the border based on the game size
       if (this.autoBorder) {
-        this.createBorder({
-          id: 'border',
-          height: this.game.height,
-          width: this.game.width,
-          thickness: this.thickness,
-          position: {
-            x: this.position.x,
-            y: this.position.y
-          },
-          health: this.health
-        });
+        this.createAutoBorder();
       }
+    }
+  }, {
+    key: "createAutoBorder",
+    value: function createAutoBorder() {
+      this.createBorder({
+        id: 'border',
+        height: this.game.height,
+        width: this.game.width,
+        thickness: this.thickness,
+        position: {
+          x: this.position.x,
+          y: this.position.y
+        },
+        health: this.health
+      });
     }
   }, {
     key: "update",

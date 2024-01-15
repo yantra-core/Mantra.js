@@ -3199,6 +3199,7 @@ var GravityGardens = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.setGravity(0, 0, 0);
+      game.setSize(800, 600);
       var player = game.createDefaultPlayer({
         position: {
           x: 0,
@@ -3207,12 +3208,13 @@ var GravityGardens = /*#__PURE__*/function () {
         }
       });
       game.setBackground('#007fff');
+      game.customMovement = false;
       game.setControls({
         W: 'MOVE_FORWARD',
         S: 'MOVE_BACKWARD',
         A: 'MOVE_LEFT',
         D: 'MOVE_RIGHT',
-        SPACE: 'FIRE_BULLET',
+        // SPACE: 'FIRE_BULLET',
         // K: 'FIRE_BULLET',
         K: 'ZOOM_IN',
         L: 'ZOOM_OUT',
@@ -3229,9 +3231,13 @@ var GravityGardens = /*#__PURE__*/function () {
         U: 'SELECT_MENU'
       });
       game.use('StarField');
-      game.use('Border', {
-        autoBorder: true
-      });
+      if (game.systems.border) {
+        game.systems.border.createAutoBorder();
+      } else {
+        game.use('Border', {
+          autoBorder: true
+        });
+      }
       var fountA = game.createEntity({
         name: 'fountA',
         type: 'FOUNT',
@@ -3388,8 +3394,7 @@ var Home = /*#__PURE__*/function () {
       var game = this.game;
 
       // bypass default input movement
-      // game.customMovement = true;
-
+      game.customMovement = true;
       game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
@@ -3402,19 +3407,6 @@ var Home = /*#__PURE__*/function () {
           x: 0,
           y: 0
         }
-      });
-      game.setControls({
-        W: 'MOVE_FORWARD',
-        S: 'MOVE_BACKWARD',
-        A: 'MOVE_LEFT',
-        D: 'MOVE_RIGHT',
-        SPACE: 'FIRE_BULLET',
-        // K: 'FIRE_BULLET',
-        K: 'ZOOM_IN',
-        L: 'ZOOM_OUT',
-        O: 'BARREL_ROLL',
-        P: 'CAMERA_SHAKE',
-        U: 'SELECT_MENU'
       });
 
       // game.setBackground('#007F00');
@@ -3432,6 +3424,20 @@ var Home = /*#__PURE__*/function () {
 
       // See: sutras.js for World logic
       var rules = (0, _sutras["default"])(game);
+      game.setControls({
+        W: 'MOVE_FORWARD',
+        S: 'MOVE_BACKWARD',
+        A: 'MOVE_LEFT',
+        D: 'MOVE_RIGHT',
+        SPACE: 'FIRE_BULLET',
+        K: 'FIRE_BULLET',
+        // K: 'ZOOM_IN',
+        // L: 'ZOOM_OUT',
+        O: 'BARREL_ROLL',
+        P: 'CAMERA_SHAKE',
+        U: 'SELECT_MENU'
+      });
+      // ^^^^ TODO: remove custom handleInputs function over using game.setControls()
       this.handleInputs = function (entityId, inputs) {
         rules.emit('entityInput::handleInputs', entityId, inputs);
       };

@@ -31,7 +31,7 @@ class Home {
     let game = this.game;
 
     // bypass default input movement
-    // game.customMovement = true;
+    game.customMovement = true;
 
     game.setZoom(4.5);
     game.setSize(16000, 9000);
@@ -48,19 +48,7 @@ class Home {
       }
     });
 
-    game.setControls({
-      W: 'MOVE_FORWARD',
-      S: 'MOVE_BACKWARD',
-      A: 'MOVE_LEFT',
-      D: 'MOVE_RIGHT',
-      SPACE: 'FIRE_BULLET',
-      // K: 'FIRE_BULLET',
-      K: 'ZOOM_IN',
-      L: 'ZOOM_OUT',
-      O: 'BARREL_ROLL',
-      P: 'CAMERA_SHAKE',
-      U: 'SELECT_MENU'
-    });
+
 
     // game.setBackground('#007F00');
     game.setBackground('#007fff');
@@ -77,6 +65,21 @@ class Home {
     // See: sutras.js for World logic
     let rules = sutras(game);
 
+
+    game.setControls({
+      W: 'MOVE_FORWARD',
+      S: 'MOVE_BACKWARD',
+      A: 'MOVE_LEFT',
+      D: 'MOVE_RIGHT',
+      SPACE: 'FIRE_BULLET',
+      K: 'FIRE_BULLET',
+      // K: 'ZOOM_IN',
+      // L: 'ZOOM_OUT',
+      O: 'BARREL_ROLL',
+      P: 'CAMERA_SHAKE',
+      U: 'SELECT_MENU'
+    });
+    // ^^^^ TODO: remove custom handleInputs function over using game.setControls()
     this.handleInputs = function (entityId, inputs) {
       rules.emit('entityInput::handleInputs', entityId, inputs)
     }

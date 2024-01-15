@@ -19,6 +19,7 @@ class GravityGardens {
   createWorld() {
     let game = this.game;
     game.setGravity(0, 0, 0);
+    game.setSize(800, 600);
 
     let player = game.createDefaultPlayer({
       position: {
@@ -30,12 +31,13 @@ class GravityGardens {
 
     game.setBackground('#007fff');
 
+    game.customMovement = false;
     game.setControls({
       W: 'MOVE_FORWARD',
       S: 'MOVE_BACKWARD',
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
-      SPACE: 'FIRE_BULLET',
+      // SPACE: 'FIRE_BULLET',
       // K: 'FIRE_BULLET',
       K: 'ZOOM_IN',
       L: 'ZOOM_OUT',
@@ -53,7 +55,12 @@ class GravityGardens {
     });
 
     game.use('StarField');
-    game.use('Border', { autoBorder: true })
+
+    if (game.systems.border) {
+      game.systems.border.createAutoBorder();
+    } else {
+      game.use('Border', { autoBorder: true })
+    }
 
     let fountA = game.createEntity({
       name: 'fountA',

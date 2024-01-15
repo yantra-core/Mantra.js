@@ -241,7 +241,7 @@ var StarField = /*#__PURE__*/function () {
         game.graphics.forEach(function (graphicInterface) {
           if (graphicInterface.id === 'graphics-babylon') {
             // hard-code per graphics pipeline for now
-            game.use(new _CSSStarField["default"]());
+            game.use(new _BabylonStarField["default"]());
           }
           // for now, current CSS StarField is fully intefactive
           // we'll need to optimize the CSS entity rendering just a bit for this to work 
