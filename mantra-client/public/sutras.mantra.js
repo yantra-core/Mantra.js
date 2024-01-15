@@ -25,7 +25,9 @@ function blackHoleSutra(game, context) {
       texture: 'fire',
       isStatic: true,
       isSensor: true,
-      radius: 20,
+      width: 4,
+      height: 4,
+      //radius: 20,
       position: {
         x: entityData.position.x,
         y: entityData.position.y
@@ -47,7 +49,7 @@ function blackHoleSutra(game, context) {
       Object.keys(gameState.ents._).forEach(function (eId) {
         var entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT);
+          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;
@@ -57,7 +59,7 @@ function blackHoleSutra(game, context) {
         Object.keys(gameState.ents._).forEach(function (eId) {
           var entity = gameState.ents._[eId];
           if (entity.type !== 'BLACK_HOLE') {
-            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT, gameState);
           }
         });
       });
@@ -72,10 +74,12 @@ function blackHoleSutra(game, context) {
       return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
     }
   });
-  rules.on('blackHoleCollision', function (collision) {
+  rules.on('blackHoleCollision', function (collision, node, gameState) {
     var pendingDestroy = collision.bodyA;
+    var blackHole = collision.bodyB;
     if (collision.bodyA.type === 'BLACK_HOLE') {
       pendingDestroy = collision.bodyB;
+      blackHole = collision.bodyA;
     }
     if (typeof context !== 'undefined') {
       if (collision.bodyA.type === context.type) {
@@ -83,12 +87,25 @@ function blackHoleSutra(game, context) {
       } else {
         pendingDestroy = collision.bodyA;
       }
+      blackHole = context;
+    }
+    if (blackHole) {
+      // increase size of black hole
+      // console.log(blackHole.height, blackHole.width)
+      /*
+      game.updateEntity({
+        id: blackHole.id,
+        height: blackHole.height + 0.1,
+        width: blackHole.width + 0.1,
+        // radius: blackHole.radius + 0.1,
+      });
+      */
     }
     game.removeEntity(pendingDestroy.id);
   });
 
   // Function to apply gravitational force
-  function applyGravity(body1, body2, gravity) {
+  function applyGravity(body1, body2, gravity, gameState) {
     var distance = Vector.sub(body2.position, body1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
@@ -102,9 +119,14 @@ function blackHoleSutra(game, context) {
 
     // Apply the force towards the black hole
     // TODO: add config flag for repulsion in addition to attraction
+    var repulsion = false;
+    if (typeof gameState.repulsion !== 'undefined') {
+      repulsion = gameState.repulsion;
+    }
+    var sign = repulsion ? 1 : -1;
     game.applyForce(body2.id, {
-      x: -distance.x * force,
-      y: -distance.y * force
+      x: sign * distance.x * force,
+      y: sign * distance.y * force
     });
   }
   return rules;
@@ -322,41 +344,62 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-// fount.js - Custom Sutra for Generating Units
-function fountSutra(game) {
-  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+// fount.js - Marak Squires 2023
+// Sutra for Generating Units
+function fountSutra(game, context) {
+  var sprayConfig = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var rules = game.createSutra();
 
   // Default configuration for the Fount
   var settings = _objectSpread({
-    unitType: 'DEFAULT_UNIT',
+    unitType: 'PARTICLE',
     // Type of unit to generate
-    texture: 'defaultTexture',
+    collisionActive: false,
+    // Whether or not the unit will emit collisionActive actives ( performance hit )
+    texture: 'pixel',
     // Texture for the unit
+    color: 0x00ff00,
+    // Color of the unit
     unitSize: {
-      width: 10,
-      height: 10
+      width: 4,
+      height: 4
     },
     // Size of the unit
-    sprayAngle: Math.PI / 4,
+    sprayAngle: Math.PI / 8,
     // Angle of the spray arc (in radians)
+    sprayWidth: Math.PI / 4,
+    // Width of the spray arc (in radians)
     forceMagnitude: 0.5
-  }, config);
+  }, sprayConfig);
 
   // Function to create a unit
   function createUnit(position) {
+    var rgbColor = settings.color;
+    // convert from int to rgb
+    rgbColor = [rgbColor >> 16 & 255, rgbColor >> 8 & 255, rgbColor & 255];
+    var rgbColorString = "rgba(".concat(rgbColor.join(','), ", 0.5)"); // Adjust opacity as needed
     return game.createEntity({
       type: settings.unitType,
-      texture: settings.texture,
+      collisionActive: false,
+      collisionEnd: false,
+      // texture: settings.texture,
       height: settings.unitSize.height,
+      color: settings.color,
       width: settings.unitSize.width,
-      position: position
+      position: position,
+      friction: 0.05,
+      frictionAir: 0.005,
+      frictionStatic: 0.25,
+      style: {
+        backgroundColor: rgbColorString
+      },
+      isSensor: true
     });
   }
-
-  // Function to apply force to a unit in a given direction
   function applySprayForce(unit) {
-    var angle = (Math.random() - 0.5) * settings.sprayAngle;
+    var baseAngle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : settings.sprayAngle;
+    var angleOffset = (Math.random() - 0.5) * settings.sprayWidth; // Random offset within a specified width
+    var angle = baseAngle + angleOffset;
     var force = {
       x: settings.forceMagnitude * Math.cos(angle),
       y: settings.forceMagnitude * Math.sin(angle)
@@ -365,26 +408,22 @@ function fountSutra(game) {
   }
 
   // Rule for generating and spraying units
-
   rules["if"]('fountTick').then('fountSpray');
   rules.addCondition('fountTick', function (entity, gameState) {
-    return gameState.tick % 60 === 0;
+    return entity.name === context.name && gameState.tick % 10 === 0;
   });
-  rules.on('fountSpray', function (gameState, context) {
+  rules.on('fountSpray', function (context, node, gameState) {
     // Determine the position of the fount (can be context-dependent)
     var fountPosition = typeof context !== 'undefined' ? context.position : {
       x: 0,
       y: 0
     };
-
     // Create a unit and apply force
     var unit = createUnit(fountPosition);
     applySprayForce(unit);
   });
   return rules;
 }
-
-// Basic vector operations (can be reused or imported from existing code)
 
 },{}],6:[function(require,module,exports){
 "use strict";

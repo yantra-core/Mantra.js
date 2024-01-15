@@ -51,7 +51,12 @@ class Component {
       }
       return current;
     }
-    return this.data[key] || null;
+
+    if (typeof this.data[key] === 'undefined' || this.data[key] === null) {
+      return null;
+    }
+
+    return this.data[key];
   }
 
   remove(key) {

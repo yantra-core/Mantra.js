@@ -304,8 +304,10 @@ class MatterPhysics extends PhysicsInterface {
         bodyA.entity = entityA;
         bodyB.entity = entityB;
 
-        game.emit('collisionStart', { pair, bodyA, bodyB })
-        callback(pair, bodyA, bodyB);
+        if (bodyA.entity.collisionStart !== false && bodyB.entity.collisionStart !== false) {
+          game.emit('collisionStart', { pair, bodyA, bodyB })
+          callback(pair, bodyA, bodyB);
+        }
       }
     });
   }
@@ -315,8 +317,11 @@ class MatterPhysics extends PhysicsInterface {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-        game.emit('collision::active', { pair, bodyA, bodyB })
-        callback(pair, bodyA, bodyB);
+        // console.log('collisionActive', bodyA.entity, bodyB.entity)
+        if (bodyA.entity.collisionActive !== false && bodyB.entity.collisionActive !== false) {
+          game.emit('collision::active', { pair, bodyA, bodyB })
+          callback(pair, bodyA, bodyB);
+        }
       }
     });
   }
@@ -326,8 +331,10 @@ class MatterPhysics extends PhysicsInterface {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-        game.emit('collision::end', { pair, bodyA, bodyB })
-        callback(pair, bodyA, bodyB);
+        if (bodyA.entity.collisionEnd !== false && bodyB.entity.collisionEnd !== false) {
+          game.emit('collision::end', { pair, bodyA, bodyB })
+          callback(pair, bodyA, bodyB);
+        }
       }
     });
   }

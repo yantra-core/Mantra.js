@@ -2245,7 +2245,7 @@ function blackHoleSutra(game, context) {
       Object.keys(gameState.ents._).forEach(function (eId) {
         var entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT);
+          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;
@@ -2255,7 +2255,7 @@ function blackHoleSutra(game, context) {
         Object.keys(gameState.ents._).forEach(function (eId) {
           var entity = gameState.ents._[eId];
           if (entity.type !== 'BLACK_HOLE') {
-            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT, gameState);
           }
         });
       });
@@ -2270,7 +2270,7 @@ function blackHoleSutra(game, context) {
       return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
     }
   });
-  rules.on('blackHoleCollision', function (collision) {
+  rules.on('blackHoleCollision', function (collision, node, gameState) {
     var pendingDestroy = collision.bodyA;
     var blackHole = collision.bodyB;
     if (collision.bodyA.type === 'BLACK_HOLE') {
@@ -2301,7 +2301,7 @@ function blackHoleSutra(game, context) {
   });
 
   // Function to apply gravitational force
-  function applyGravity(body1, body2, gravity) {
+  function applyGravity(body1, body2, gravity, gameState) {
     var distance = Vector.sub(body2.position, body1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
@@ -2315,9 +2315,14 @@ function blackHoleSutra(game, context) {
 
     // Apply the force towards the black hole
     // TODO: add config flag for repulsion in addition to attraction
+    var repulsion = false;
+    if (typeof gameState.repulsion !== 'undefined') {
+      repulsion = gameState.repulsion;
+    }
+    var sign = repulsion ? 1 : -1;
     game.applyForce(body2.id, {
-      x: -distance.x * force,
-      y: -distance.y * force
+      x: sign * distance.x * force,
+      y: sign * distance.y * force
     });
   }
   return rules;
@@ -2538,6 +2543,8 @@ function fountSutra(game, context) {
   var settings = _objectSpread({
     unitType: 'PARTICLE',
     // Type of unit to generate
+    collisionActive: false,
+    // Whether or not the unit will emit collisionActive actives ( performance hit )
     texture: 'pixel',
     // Texture for the unit
     color: 0x00ff00,
@@ -2562,11 +2569,16 @@ function fountSutra(game, context) {
     var rgbColorString = "rgba(".concat(rgbColor.join(','), ", 0.5)"); // Adjust opacity as needed
     return game.createEntity({
       type: settings.unitType,
+      collisionActive: false,
+      collisionEnd: false,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,
       width: settings.unitSize.width,
       position: position,
+      friction: 0.05,
+      frictionAir: 0.005,
+      frictionStatic: 0.25,
       style: {
         backgroundColor: rgbColorString
       },
@@ -3189,7 +3201,15 @@ var GravityGardens = /*#__PURE__*/function () {
         // K: 'FIRE_BULLET',
         K: 'ZOOM_IN',
         L: 'ZOOM_OUT',
-        O: 'BARREL_ROLL',
+        O: function O(game) {
+          if (typeof game.data.lastGravitySwitch === 'undefined') {
+            game.data.lastGravitySwitch = 0;
+          }
+          if (Date.now() - game.data.lastGravitySwitch >= 1000) {
+            game.data.repulsion = !game.data.repulsion;
+            game.data.lastGravitySwitch = Date.now();
+          }
+        },
         P: 'CAMERA_SHAKE',
         U: 'SELECT_MENU'
       });
@@ -3274,6 +3294,20 @@ var GravityGardens = /*#__PURE__*/function () {
         })
       });
 
+      // Particles will be removed when they collide with the wall
+      var wallCollision = game.createSutra();
+      wallCollision.addCondition('particleTouchedWall', function (entity, gameState) {
+        return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BORDER;
+      });
+      wallCollision["if"]('particleTouchedWall').then('particleWallCollision');
+      wallCollision.on('particleWallCollision', function (collision) {
+        var particle = collision.PARTICLE || collision.STAR;
+        if (particle) {
+          // remove the entity
+          game.removeEntity(particle.id);
+        }
+      });
+      game.setSutra(wallCollision);
       // game.setSutra(blackhole(game));
       // game.setSutra(fount(game));
 

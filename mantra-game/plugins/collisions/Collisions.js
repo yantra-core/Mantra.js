@@ -36,7 +36,7 @@ class Collisions {
       return;
     }
     // Check for specific collision cases and send events to the state machine
-    if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+    if (this.shouldSendCollisionEvent(bodyA, bodyB, 'START')) {
       if (this.game.machine && this.game.machine.sendEvent) {
         // console.log('sending machine event', 'COLLISION');
         this.game.machine.sendEvent('COLLISION', {
@@ -108,7 +108,7 @@ class Collisions {
       return;
     }
 
-    if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+    if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
 
 
       this.game.data.collisions = this.game.data.collisions || [];
@@ -160,7 +160,7 @@ class Collisions {
       return;
     }
 
-    if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+    if (this.shouldSendCollisionEvent(bodyA, bodyB, 'ACTIVE')) {
 
       this.game.data.collisions = this.game.data.collisions || [];
       // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
@@ -206,8 +206,20 @@ class Collisions {
 
   }
 
-  shouldSendCollisionEvent(bodyA, bodyB) {
+  shouldSendCollisionEvent(bodyA, bodyB, kind = 'START') {
     // for now, send all events to the stateMachine
+    if (kind === 'ACTIVE' && (bodyA.entity.collisionActive === false || bodyB.entity.collisionActive === false)) {
+      return false;
+    }
+
+    if (kind === 'START' && (bodyA.entity.collisionStart === false || bodyB.entity.collisionStart === false)) {
+      return false;
+    }
+
+    if (kind === 'END' && (bodyA.entity.collisionEnd === false || bodyB.entity.collisionEnd === false)) {
+      return false;
+    }
+    
     return true;
   }
 

@@ -51,6 +51,8 @@ class CSSStarField {
 
       this.game.createEntity({
         type: 'STAR',
+        collisionActive: false,
+        collisionEnd: false,
         // body: false,
         isSensor: true,
         width: 4,

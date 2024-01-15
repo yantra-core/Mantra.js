@@ -52,7 +52,7 @@ var Collisions = /*#__PURE__*/function () {
         return;
       }
       // Check for specific collision cases and send events to the state machine
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.shouldSendCollisionEvent(bodyA, bodyB, 'START')) {
         if (this.game.machine && this.game.machine.sendEvent) {
           // console.log('sending machine event', 'COLLISION');
           this.game.machine.sendEvent('COLLISION', {
@@ -132,7 +132,7 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
         var collisionContext = {
@@ -186,7 +186,7 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.shouldSendCollisionEvent(bodyA, bodyB, 'ACTIVE')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
         var collisionContext = {
@@ -240,7 +240,17 @@ var Collisions = /*#__PURE__*/function () {
   }, {
     key: "shouldSendCollisionEvent",
     value: function shouldSendCollisionEvent(bodyA, bodyB) {
+      var kind = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'START';
       // for now, send all events to the stateMachine
+      if (kind === 'ACTIVE' && (bodyA.entity.collisionActive === false || bodyB.entity.collisionActive === false)) {
+        return false;
+      }
+      if (kind === 'START' && (bodyA.entity.collisionStart === false || bodyB.entity.collisionStart === false)) {
+        return false;
+      }
+      if (kind === 'END' && (bodyA.entity.collisionEnd === false || bodyB.entity.collisionEnd === false)) {
+        return false;
+      }
       return true;
     }
   }]);

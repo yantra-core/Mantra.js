@@ -245,6 +245,9 @@ class Game {
     this.components.yCraft = new Component('yCraft', this);
     this.components.text = new Component('text', this);
     this.components.style = new Component('style', this);
+    this.components.collisionActive = new Component('collisionActive', this);
+    this.components.collisionStart = new Component('collisionStart', this);
+    this.components.collisionEnd = new Component('collisionEnd', this);
 
     // Systems Manager
     this.systemsManager = new SystemsManager(this);
@@ -527,9 +530,12 @@ class Game {
   }
 
   getComponent(entityId, componentType) {
-    return this.components[componentType] ? this.components[componentType].get(entityId) : null;
+    if (this.components.hasOwnProperty(componentType)) {
+      return this.components[componentType].get(entityId);
+    }
+    return null;
   }
-
+  
   addSystem(systemName, system) {
     return this.systemsManager.addSystem(systemName, system);
   }

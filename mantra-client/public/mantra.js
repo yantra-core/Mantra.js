@@ -120,7 +120,10 @@ var Component = /*#__PURE__*/function () {
         }
         return current;
       }
-      return this.data[key] || null;
+      if (typeof this.data[key] === 'undefined' || this.data[key] === null) {
+        return null;
+      }
+      return this.data[key];
     }
   }, {
     key: "remove",
@@ -516,6 +519,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.yCraft = new _Component["default"]('yCraft', this);
     this.components.text = new _Component["default"]('text', this);
     this.components.style = new _Component["default"]('style', this);
+    this.components.collisionActive = new _Component["default"]('collisionActive', this);
+    this.components.collisionStart = new _Component["default"]('collisionStart', this);
+    this.components.collisionEnd = new _Component["default"]('collisionEnd', this);
 
     // Systems Manager
     this.systemsManager = new _SystemsManager["default"](this);
@@ -805,7 +811,10 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "getComponent",
     value: function getComponent(entityId, componentType) {
-      return this.components[componentType] ? this.components[componentType].get(entityId) : null;
+      if (this.components.hasOwnProperty(componentType)) {
+        return this.components[componentType].get(entityId);
+      }
+      return null;
     }
   }, {
     key: "addSystem",
@@ -1333,7 +1342,7 @@ function gameTick() {
       if (_this.isClient && _this.isOnline === false) {
         var ent = _this.entities.get(entityId);
         if (ent) {
-          _this.graphics.forEach(function (graphicsInterface) {
+          _this.graphics.forEach(function inflateEntityPerInterface(graphicsInterface) {
             graphicsInterface.inflateEntity(ent);
           });
         }

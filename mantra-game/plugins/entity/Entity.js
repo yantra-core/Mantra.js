@@ -73,8 +73,7 @@ class Entity {
 
     // Iterate over all registered components and fetch their data if available
     for (const componentType in this.game.components) {
-      const componentData = this.game.getComponent(entityId, componentType);
-      // console.log('componentData', componentData)
+      let componentData = this.game.getComponent(entityId, componentType);
       if (typeof componentData !== 'undefined' && componentData !== null) {
         entity[componentType] = componentData;
       }
@@ -356,7 +355,10 @@ class Entity {
       yCraft: null, // object hash of properties for YCraft.js
       text: null,
       style: null,
-      texture: null
+      texture: null,
+      collisionActive: false,
+      collisionStart: true,
+      collisionEnd: false
     };
 
     // merge config with defaultConfig
@@ -375,7 +377,7 @@ class Entity {
       config.startingPosition = config.position;
     }
 
-    const { name, type, kind, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, sutra, owner, inputs, lifetime, yCraft, text, style, texture } = config;
+    const { name, type, kind, position, rotation, startingPosition, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, sutra, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd } = config;
     let { x, y } = position;
 
     /*
@@ -424,6 +426,9 @@ class Entity {
     this.game.addComponent(entityId, 'text', text);
     this.game.addComponent(entityId, 'style', style);
     this.game.addComponent(entityId, 'texture', texture);
+    this.game.addComponent(entityId, 'collisionActive', collisionActive);
+    this.game.addComponent(entityId, 'collisionStart', collisionStart);
+    this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
  
     if (config.body) {
       let body = this.createBody({
@@ -484,7 +489,6 @@ class Entity {
 
     // updates entity in the ECS entity Map scope
     this.game.entities.set(entityId, updatedEntity);
-
 
     // updates entity in the flat game.data scope
     this.game.data.ents = this.game.data.ents || {};

@@ -42,7 +42,7 @@ export default function blackHoleSutra(game, context) {
       Object.keys(gameState.ents._).forEach(eId => {
         let entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT);
+          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;
@@ -53,7 +53,7 @@ export default function blackHoleSutra(game, context) {
         Object.keys(gameState.ents._).forEach(eId => {
           let entity = gameState.ents._[eId];
           if (entity.type !== 'BLACK_HOLE') {
-            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT);
+            applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT, gameState);
           }
         });
       });
@@ -70,7 +70,7 @@ export default function blackHoleSutra(game, context) {
     }
   });
 
-  rules.on('blackHoleCollision', (collision) => {
+  rules.on('blackHoleCollision', (collision, node, gameState) => {
     let pendingDestroy = collision.bodyA;
     let blackHole = collision.bodyB;
 
@@ -105,7 +105,7 @@ export default function blackHoleSutra(game, context) {
   });
 
   // Function to apply gravitational force
-  function applyGravity(body1, body2, gravity) {
+  function applyGravity(body1, body2, gravity, gameState) {
     var distance = Vector.sub(body2.position, body1.position);
     var magnitude = Vector.magnitude(distance);
 
@@ -120,9 +120,14 @@ export default function blackHoleSutra(game, context) {
 
     // Apply the force towards the black hole
     // TODO: add config flag for repulsion in addition to attraction
+    let repulsion = false;
+    if (typeof gameState.repulsion !== 'undefined') {
+      repulsion = gameState.repulsion;
+    }
+    let sign = repulsion ? 1 : -1;
     game.applyForce(body2.id, {
-      x: -distance.x * force,
-      y: -distance.y * force
+      x: sign * distance.x * force,
+      y: sign * distance.y * force
     });
   }
 

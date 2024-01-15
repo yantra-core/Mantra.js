@@ -2543,6 +2543,8 @@ function fountSutra(game, context) {
   var settings = _objectSpread({
     unitType: 'PARTICLE',
     // Type of unit to generate
+    collisionActive: false,
+    // Whether or not the unit will emit collisionActive actives ( performance hit )
     texture: 'pixel',
     // Texture for the unit
     color: 0x00ff00,
@@ -2567,11 +2569,16 @@ function fountSutra(game, context) {
     var rgbColorString = "rgba(".concat(rgbColor.join(','), ", 0.5)"); // Adjust opacity as needed
     return game.createEntity({
       type: settings.unitType,
+      collisionActive: false,
+      collisionEnd: false,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,
       width: settings.unitSize.width,
       position: position,
+      friction: 0.05,
+      frictionAir: 0.005,
+      frictionStatic: 0.25,
       style: {
         backgroundColor: rgbColorString
       },
@@ -3177,9 +3184,6 @@ var GravityGardens = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.setGravity(0, 0, 0);
-
-      //game.setSize(600, 600);
-
       var player = game.createDefaultPlayer({
         position: {
           x: 0,
@@ -3202,7 +3206,6 @@ var GravityGardens = /*#__PURE__*/function () {
             game.data.lastGravitySwitch = 0;
           }
           if (Date.now() - game.data.lastGravitySwitch >= 1000) {
-            console.log("o action");
             game.data.repulsion = !game.data.repulsion;
             game.data.lastGravitySwitch = Date.now();
           }

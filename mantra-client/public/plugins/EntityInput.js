@@ -381,6 +381,14 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
          console.log('backgrounds', leftRaiden, backgrounds)
         */
       }
+
+      // custom actions as anonymous functions
+      // iterate all actions, if any are functions, run them
+      actions.forEach(function (action) {
+        if (typeof action === 'function') {
+          action(game);
+        }
+      });
     }
   }]);
   return DefaultTwoDimensionalInputStrategy;

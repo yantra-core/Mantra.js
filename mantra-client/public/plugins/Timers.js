@@ -66,7 +66,10 @@ var Component = /*#__PURE__*/function () {
         }
         return current;
       }
-      return this.data[key] || null;
+      if (typeof this.data[key] === 'undefined' || this.data[key] === null) {
+        return null;
+      }
+      return this.data[key];
     }
   }, {
     key: "remove",

@@ -396,7 +396,7 @@ exports["default"] = cameraShake;
 function cameraShake() {
   var _this = this;
   var initialIntensity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-  var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1300;
+  var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 777;
   var gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');
@@ -429,6 +429,22 @@ function cameraShake() {
 
     // Apply the shake with the current zoom
     gameViewport.style.transform = "scale(".concat(_this.game.data.camera.currentZoom, ") translate(").concat(x, "px, ").concat(y, "px)");
+
+    // Apply a random force to each entity
+    Object.keys(_this.game.data.ents._).forEach(function (eId) {
+      var entity = _this.game.data.ents._[eId];
+      // TODO: make more configurable / part of constructor config
+      if (entity.type === 'PARTICLE' || entity.type === 'STAR') {
+        var forceX = Math.random() * intensity - intensity / 2;
+        var forceY = Math.random() * intensity - intensity / 2;
+        forceX = forceX * 0.01;
+        forceY = forceY * 0.01;
+        game.applyForce(eId, {
+          x: forceX,
+          y: forceY
+        });
+      }
+    });
     requestAnimationFrame(shake);
   };
   shake();

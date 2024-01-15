@@ -66,7 +66,10 @@ var Component = /*#__PURE__*/function () {
         }
         return current;
       }
-      return this.data[key] || null;
+      if (typeof this.data[key] === 'undefined' || this.data[key] === null) {
+        return null;
+      }
+      return this.data[key];
     }
   }, {
     key: "remove",
@@ -339,7 +342,6 @@ var Entity = /*#__PURE__*/function () {
       // Iterate over all registered components and fetch their data if available
       for (var componentType in this.game.components) {
         var componentData = this.game.getComponent(entityId, componentType);
-        // console.log('componentData', componentData)
         if (typeof componentData !== 'undefined' && componentData !== null) {
           entity[componentType] = componentData;
         }
@@ -639,7 +641,10 @@ var Entity = /*#__PURE__*/function () {
         // object hash of properties for YCraft.js
         text: null,
         style: null,
-        texture: null
+        texture: null,
+        collisionActive: false,
+        collisionStart: true,
+        collisionEnd: false
       };
 
       // merge config with defaultConfig
@@ -686,7 +691,10 @@ var Entity = /*#__PURE__*/function () {
         yCraft = _config.yCraft,
         text = _config.text,
         style = _config.style,
-        texture = _config.texture;
+        texture = _config.texture,
+        collisionActive = _config.collisionActive,
+        collisionStart = _config.collisionStart,
+        collisionEnd = _config.collisionEnd;
       var x = position.x,
         y = position.y;
 
@@ -735,6 +743,9 @@ var Entity = /*#__PURE__*/function () {
       this.game.addComponent(entityId, 'text', text);
       this.game.addComponent(entityId, 'style', style);
       this.game.addComponent(entityId, 'texture', texture);
+      this.game.addComponent(entityId, 'collisionActive', collisionActive);
+      this.game.addComponent(entityId, 'collisionStart', collisionStart);
+      this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
       if (config.body) {
         var body = this.createBody({
           width: width,

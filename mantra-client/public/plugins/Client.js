@@ -48,7 +48,7 @@ function gameTick() {
       if (_this.isClient && _this.isOnline === false) {
         var ent = _this.entities.get(entityId);
         if (ent) {
-          _this.graphics.forEach(function (graphicsInterface) {
+          _this.graphics.forEach(function inflateEntityPerInterface(graphicsInterface) {
             graphicsInterface.inflateEntity(ent);
           });
         }

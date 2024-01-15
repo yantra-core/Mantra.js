@@ -52,7 +52,7 @@ var Collisions = /*#__PURE__*/function () {
         return;
       }
       // Check for specific collision cases and send events to the state machine
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.shouldSendCollisionEvent(bodyA, bodyB, 'START')) {
         if (this.game.machine && this.game.machine.sendEvent) {
           // console.log('sending machine event', 'COLLISION');
           this.game.machine.sendEvent('COLLISION', {
@@ -132,7 +132,7 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
         var collisionContext = {
@@ -186,7 +186,7 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
-      if (this.shouldSendCollisionEvent(bodyA, bodyB)) {
+      if (this.shouldSendCollisionEvent(bodyA, bodyB, 'ACTIVE')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
         var collisionContext = {
@@ -240,7 +240,17 @@ var Collisions = /*#__PURE__*/function () {
   }, {
     key: "shouldSendCollisionEvent",
     value: function shouldSendCollisionEvent(bodyA, bodyB) {
+      var kind = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'START';
       // for now, send all events to the stateMachine
+      if (kind === 'ACTIVE' && (bodyA.entity.collisionActive === false || bodyB.entity.collisionActive === false)) {
+        return false;
+      }
+      if (kind === 'START' && (bodyA.entity.collisionStart === false || bodyB.entity.collisionStart === false)) {
+        return false;
+      }
+      if (kind === 'END' && (bodyA.entity.collisionEnd === false || bodyB.entity.collisionEnd === false)) {
+        return false;
+      }
       return true;
     }
   }]);
@@ -621,12 +631,14 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
             var entityB = _this3.game.getEntity(entityIdB);
             bodyA.entity = entityA;
             bodyB.entity = entityB;
-            game.emit('collisionStart', {
-              pair: pair,
-              bodyA: bodyA,
-              bodyB: bodyB
-            });
-            callback(pair, bodyA, bodyB);
+            if (bodyA.entity.collisionStart !== false && bodyB.entity.collisionStart !== false) {
+              game.emit('collisionStart', {
+                pair: pair,
+                bodyA: bodyA,
+                bodyB: bodyB
+              });
+              callback(pair, bodyA, bodyB);
+            }
           }
         } catch (err) {
           _iterator2.e(err);
@@ -646,12 +658,15 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
             var pair = _step3.value;
             var bodyA = pair.bodyA;
             var bodyB = pair.bodyB;
-            game.emit('collision::active', {
-              pair: pair,
-              bodyA: bodyA,
-              bodyB: bodyB
-            });
-            callback(pair, bodyA, bodyB);
+            // console.log('collisionActive', bodyA.entity, bodyB.entity)
+            if (bodyA.entity.collisionActive !== false && bodyB.entity.collisionActive !== false) {
+              game.emit('collision::active', {
+                pair: pair,
+                bodyA: bodyA,
+                bodyB: bodyB
+              });
+              callback(pair, bodyA, bodyB);
+            }
           }
         } catch (err) {
           _iterator3.e(err);
@@ -671,12 +686,14 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
             var pair = _step4.value;
             var bodyA = pair.bodyA;
             var bodyB = pair.bodyB;
-            game.emit('collision::end', {
-              pair: pair,
-              bodyA: bodyA,
-              bodyB: bodyB
-            });
-            callback(pair, bodyA, bodyB);
+            if (bodyA.entity.collisionEnd !== false && bodyB.entity.collisionEnd !== false) {
+              game.emit('collision::end', {
+                pair: pair,
+                bodyA: bodyA,
+                bodyB: bodyB
+              });
+              callback(pair, bodyA, bodyB);
+            }
           }
         } catch (err) {
           _iterator4.e(err);

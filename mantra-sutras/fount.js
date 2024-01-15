@@ -7,6 +7,7 @@ export default function fountSutra(game, context, sprayConfig = {}) {
   // Default configuration for the Fount
   const settings = {
     unitType: 'PARTICLE', // Type of unit to generate
+    collisionActive: false, // Whether or not the unit will emit collisionActive actives ( performance hit )
     texture: 'pixel', // Texture for the unit
     color: 0x00ff00, // Color of the unit
     unitSize: { width: 4, height: 4 }, // Size of the unit
@@ -24,11 +25,16 @@ export default function fountSutra(game, context, sprayConfig = {}) {
     let rgbColorString = `rgba(${rgbColor.join(',')}, 0.5)`; // Adjust opacity as needed
     return game.createEntity({
       type: settings.unitType,
+      collisionActive: false,
+      collisionEnd: false,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,
       width: settings.unitSize.width,
       position: position,
+      friction: 0.05,
+      frictionAir: 0.005,
+      frictionStatic: 0.25,
       style: {
         backgroundColor: rgbColorString
       },

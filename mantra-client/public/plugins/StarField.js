@@ -159,6 +159,8 @@ var CSSStarField = /*#__PURE__*/function () {
         var posY = Math.random() * this.fieldHeight - this.fieldHeight / 2;
         this.game.createEntity({
           type: 'STAR',
+          collisionActive: false,
+          collisionEnd: false,
           // body: false,
           isSensor: true,
           width: 4,

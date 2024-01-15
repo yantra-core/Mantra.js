@@ -20,7 +20,7 @@ Let us help guide you on your game development journey, and we promise you will 
 
 # Mantra itself is very small and very fast
 
-The Mantra.js file is currently under `111kb` and will most likely get smaller. It's best to think of Mantra as the orchestrator for your game. You can import Mantra once and immediately begin adding new functionality dynamically. 
+The [Mantra.js](https://yantra.gg/mantra.js) file is currently under `111kb` and will most likely get smaller. It's best to think of Mantra as the orchestrator for your game. You can import Mantra once and immediately begin adding new functionality dynamically. 
 
 ## Super Simple Offline First
 
