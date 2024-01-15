@@ -1,14 +1,21 @@
 export default function inflateTexture(entityData, entityElement) {
 
-  // console.log('inflateTexture', entityData)
 
-  if (entityData.texture /*entityData.type === 'FIRE'*/) {
+  if (entityData.texture) {
+
+    // first check to see if texture exists
+    let texture = game.getTexture(entityData.texture);
+
+    if (!texture) {
+      console.log('warning: texture not found', entityData.texture)
+      return;
+    }
 
     // check to see if texture changed / sprite index changed
-    let texture = game.getTexture(entityData.texture);
-    // console.log('GOT BACK TEXTURE', texture)
+
     let textureUrl = texture.url;
     let spritePosition = texture.sprite || { x: 0, y: 0 };
+
     if (typeof entityData.texture.frame === 'number') {
       spritePosition = texture.frames[entityData.texture.frame];
       entityElement.style.backgroundPosition = `${spritePosition.x}px ${spritePosition.y}px`;

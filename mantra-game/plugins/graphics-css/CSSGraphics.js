@@ -2,24 +2,24 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 import CSSCamera from './CSSCamera.js';
 
-import inflateBox from './lib/inflateBox.js';
-import inflateText from './lib/inflateText.js';
-import inflateEntity from './lib/inflateEntity.js';
+import inflateBox from './lib/entity/inflateBox.js';
+import inflateText from './lib/entity/inflateText.js';
+import inflateEntity from './lib/entity/inflateEntity.js';
 import inflateTexture from './lib/entity/inflateTexture.js';
-import createGraphic from './lib/createGraphic.js';
+import createGraphic from './lib/entity/createGraphic.js';
 
-import setTransform from './lib/setTransform.js';
+import setTransform from './lib/camera/setTransform.js';
 
-import updateGraphic from './lib/updateGraphic.js';
-import updateEntityPosition from './lib/updateEntityPosition.js';
-import mouseWheelZoom from './lib/mouseWheelZoom.js';
+import updateGraphic from './lib/entity/updateGraphic.js';
+import updateEntityPosition from './lib/camera/updateEntityPosition.js';
+import mouseWheelZoom from './lib/camera/mouseWheelZoom.js';
 
 import unload from './lib/unload.js';
 import zoom from './lib/camera/zoom.js';
 import cameraShake from './lib/camera/cameraShake.js';
 
 import render from './lib/render.js';
-import removeGraphic from './lib/removeGraphic.js';
+import removeGraphic from './lib/entity/removeGraphic.js';
 
 import handleInputs from '../graphics/lib/handleInputs.js';
 
