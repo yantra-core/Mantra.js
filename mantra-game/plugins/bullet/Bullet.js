@@ -82,10 +82,10 @@ class Bullet {
     const bulletDirectionConfig = {
       type: 'BULLET',
       mass: 1,
+      collisionStart: true,
       position: bulletStartPosition,
       lifetime: this.lifetime,
       //texture: 'tile-block',
-      /*      */
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'arrow'
@@ -98,7 +98,7 @@ class Bullet {
         x: directionX * this.speed,
         y: directionY * this.speed
       },
-      radius: 16, // TODO: make this a config
+      radius: 8, // TODO: make this a config
       damage: 10, // TODO: make this a config
     };
     // console.log('using bulletDirectionConfig', bulletDirectionConfig)

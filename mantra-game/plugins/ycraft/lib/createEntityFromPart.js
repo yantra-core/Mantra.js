@@ -13,6 +13,9 @@ export default function createEntityFromPart(part, contraption) {
 
     let defaultConfig = {
       name: part.type,
+      collisionActive: true,
+      collisionStart: true,
+      collisionEnd: true,
       type: 'PART',
       color: part.props.color,
       position: part.position,

@@ -41,13 +41,24 @@ export default function hexapod(game) {
   });
   rules.on('hexapodGrow', (collision) => {
     let hexapod = collision.HEXAPOD;
+    let style;
+    // at a certain size, invert the colors
+    if (hexapod.width > 16) {
+      style = {
+        // Define the animation name and duration
+        animation: 'pulse-invert 5s',
+        // Initial filter style
+        filter: 'invert(90%)'
+      }
+    }
     // update entity size by 11%
     game.updateEntity({
       id: hexapod.id,
       width: hexapod.width * 1.1,
-      height: hexapod.height * 1.1
+      height: hexapod.height * 1.1,
+      style: style
     });
-  })
+  });
 
   // hexpods think each tick
   rules.if('hexapodTick').then('hexapodThink');

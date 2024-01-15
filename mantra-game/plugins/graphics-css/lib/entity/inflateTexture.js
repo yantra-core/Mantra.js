@@ -35,6 +35,9 @@ export default function inflateTexture(entityData, entityElement) {
       entityElement.setAttribute('data-frame-index', frameIndex);
       applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
     }
+  } else {
+    // Update the background size for non-animated textures
+    applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
   }
 
 }

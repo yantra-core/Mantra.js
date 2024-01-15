@@ -88,7 +88,9 @@ export default function blackHoleSutra(game, context) {
       blackHole = context;
     }
 
-    if (blackHole) {
+    if (pendingDestroy && blackHole) {
+      // here we have pendingDestroy.position, pendingDestroy.velocity, and blackHole.position
+      // game.playSpatialSound(pendingDestroy, blackHole);
       // increase size of black hole
       // console.log(blackHole.height, blackHole.width)
       /*
