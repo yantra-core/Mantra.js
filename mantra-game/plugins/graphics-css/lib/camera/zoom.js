@@ -23,15 +23,21 @@ export default function zoom(scale, transitionTime = '0s') {
     // Calculate the translation needed to keep the screen's center constant
     let centerX = window.innerWidth / 2;
     let centerY = window.outerHeight / 2;
+    let playerHeightOffset = 16;
+
+    if (window === top) {
+    } else {
+      // if embed in iframe, adjust for iframe offset
+      playerHeightOffset = 32;
+    }
 
     // The logic here ensures that the screen center remains constant during zoom
     // X adjustment not needed for default zoom behavior
     // let newCameraX = (centerX - (centerX / scale));
     let newCameraY = (centerY - (centerY / scale));
     //game.viewportCenterXOffset = newCameraX;
-
-    let playerHeight = 16;
-    game.viewportCenterYOffset = newCameraY + playerHeight;
+    // alert()
+    game.viewportCenterYOffset = newCameraY + playerHeightOffset;
 
     // Apply scale and translate transform
     gameViewport.style.transform = `scale(${scale})`;

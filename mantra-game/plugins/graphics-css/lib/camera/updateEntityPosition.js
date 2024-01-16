@@ -18,7 +18,7 @@ export default function updateEntityPosition(entityElement, entityData) {
   fovHeight = 600;
 
   const adjustedPosition = {
-    x: position.x - (this.cameraPosition.x -  window.outerWidth / 2),
+    x: position.x - (this.cameraPosition.x -  window.innerWidth / 2),
     y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
   };
 
