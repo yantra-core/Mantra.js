@@ -1,7 +1,7 @@
 // TODO: Remove this file and rely on a Sutra instead
 // We could also delegate to the part itself from bindEntityEvents.js handlers
 export default function bindYCraftEvents(entityData, entityElement) {
-  console.log("bindYCraftEvents", entityData, entityElement)
+  // console.log("bindYCraftEvents", entityData, entityElement)
   // add hover state with 3d drop shadow effect
   entityElement.addEventListener('mouseover', () => {
     entityElement.style.boxShadow = '5px 5px 10px rgba(0,0,0,0.5)';

@@ -42,7 +42,7 @@ export default async function loadCSS(stylesheets, finalCallback) {
   }
 
   // Call the final callback after all stylesheets are loaded
-  if (finalCallback) {
+  if (typeof finalCallback === 'function') {
     finalCallback();
   }
 }

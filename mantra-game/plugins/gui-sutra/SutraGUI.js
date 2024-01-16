@@ -78,6 +78,8 @@ class SutraGUI {
       }
     });
 
+    game.loadCSS('./plugins/SutraGUI/Sutra.css');
+
     this.drawTable();
 
     if (this.game.rules) {

@@ -35,7 +35,6 @@ class Editor {
       this.jqueryReady();
     }
     // game.use(new this.game.plugins.PluginsGUI());
-
   }
 
   jqueryReady() {
@@ -43,7 +42,7 @@ class Editor {
     this.setupGlobalClickListener();
     // this.createViewSourceModal();
     this.game.systemsManager.addSystem(this.id, this);
-
+    this.game.loadCSS('./plugins/Editor/Editor.css');
   }
 
   createIcon(name) {
@@ -154,7 +153,7 @@ class Editor {
             this.game.systems['mouse'].bindInputControls();
           }
         } else {
-          console.log("toolbar found")
+          // console.log("toolbar found")
           // disable inputs
           this.game.systems['entity-input'].disableInputs();
 

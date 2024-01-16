@@ -32,6 +32,8 @@ class GamepadGUI {
 
     }
 
+    game.loadCSS('/plugins/GamepadGUI/gamepad.css');
+
     let controllerHolder = document.createElement('div');
     controllerHolder.style.position = 'fixed';
     controllerHolder.style.bottom = '0';

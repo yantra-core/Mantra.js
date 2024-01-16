@@ -76,7 +76,7 @@ export default class Client {
       // and loaded async in the plugin.init() methods
       console.log('Loading Mantra.css file...')
       game.loadCSS('./mantra.css', function(err, d){
-        console.log("Mantra.css loaded!", err, d)
+        console.log("mantra.css loaded!");
         preloader.loadAll().then(() => {
           console.log("All assets loaded", preloader)
           that.preloading = false;

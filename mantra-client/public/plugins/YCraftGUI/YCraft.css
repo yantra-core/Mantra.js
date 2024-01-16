@@ -1,0 +1,62 @@
+
+#contraption-interface {
+  /* background-color: #1c2535; */
+  /* color: #9a9cff; */
+  /* padding-top: 20px; */
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  /* border-radius: 8px; */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  /* margin-bottom: 20px; */
+
+}
+
+#contraption-interface select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 32px;
+  min-width: 300px;
+}
+
+
+#save-contraption-form {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#display-contraption {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+#run-contraption-form {
+  display: none;
+}
+
+#save-contraption-form label {
+  font-weight: bold;
+}
+
+#save-contraption-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#save-contraption-form button {
+  padding: 10px 15px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#save-contraption-form button:hover {
+  background-color: #003d82;
+}
