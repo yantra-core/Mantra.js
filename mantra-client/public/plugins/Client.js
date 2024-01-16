@@ -115,7 +115,6 @@ var Client = exports["default"] = /*#__PURE__*/function () {
   _createClass(Client, [{
     key: "init",
     value: function init(game) {
-      var _this = this;
       this.game = game;
 
       // Load all known client plugins
@@ -158,16 +157,25 @@ var Client = exports["default"] = /*#__PURE__*/function () {
         // todo: create two preloadsers
         // 1 for required assets to start game
         // 2 for lazy loaded assets
-        preloader.loadAll().then(function () {
-          console.log("All assets loaded", preloader);
-          var that = _this;
-          that.preloading = false;
-          /* for dev testing
-          setTimeout(function(){
+
+        var that = this;
+        // load main mantra.CSS ( required for game to start ) ( for now )
+        // Remark: Actual CSS required for Mantra.js proper should be almost none
+        // All CSS from current Mantra.css should be split into separate CSS files per Plugin
+        // and loaded async in the plugin.init() methods
+        console.log('Loading Mantra.css file...');
+        game.loadCSS('./mantra.css', function (err, d) {
+          console.log("mantra.css loaded!");
+          preloader.loadAll().then(function () {
+            console.log("All assets loaded", preloader);
             that.preloading = false;
-          }, 5000)
-          */
-          // console.log(preloader.getItem('player'))
+            /* for dev testing
+            setTimeout(function(){
+              that.preloading = false;
+            }, 5000)
+            */
+            // console.log(preloader.getItem('player'))
+          });
         });
       } else {
         this.preloading = false;
@@ -177,11 +185,11 @@ var Client = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "start",
     value: function start(callback) {
-      var _this2 = this;
+      var _this = this;
       if (this.preloading) {
         // console.log('Client.js waiting for preloading to finish')
         setTimeout(function () {
-          _this2.start(callback);
+          _this.start(callback);
         }, 4);
         return;
       }

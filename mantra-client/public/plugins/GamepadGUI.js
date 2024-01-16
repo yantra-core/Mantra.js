@@ -48,6 +48,7 @@ var GamepadGUI = /*#__PURE__*/function () {
           _this.zoomSlider.slider.style.display = 'block';
         });
       }
+      game.loadCSS('/plugins/GamepadGUI/gamepad.css');
       var controllerHolder = document.createElement('div');
       controllerHolder.style.position = 'fixed';
       controllerHolder.style.bottom = '0';

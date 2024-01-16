@@ -3200,6 +3200,7 @@ var GravityGardens = /*#__PURE__*/function () {
       var game = this.game;
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
+      game.setZoom(2.5);
       var player = game.createDefaultPlayer({
         position: {
           x: 0,

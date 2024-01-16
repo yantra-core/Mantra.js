@@ -56,6 +56,7 @@ var Editor = /*#__PURE__*/function () {
       this.setupGlobalClickListener();
       // this.createViewSourceModal();
       this.game.systemsManager.addSystem(this.id, this);
+      this.game.loadCSS('./plugins/Editor/Editor.css');
     }
   }, {
     key: "createIcon",
@@ -199,7 +200,7 @@ var Editor = /*#__PURE__*/function () {
               _this4.game.systems['mouse'].bindInputControls();
             }
           } else {
-            console.log("toolbar found");
+            // console.log("toolbar found")
             // disable inputs
             _this4.game.systems['entity-input'].disableInputs();
             if (_this4.game.systems['keyboard']) {
