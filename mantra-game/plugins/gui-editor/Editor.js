@@ -1,5 +1,4 @@
 import createToolbar from './lib/createToolbar.js';
-
 class Editor {
 
   static id = 'gui-editor';
@@ -42,7 +41,7 @@ class Editor {
     this.setupGlobalClickListener();
     // this.createViewSourceModal();
     this.game.systemsManager.addSystem(this.id, this);
-    this.game.loadCSS('./plugins/Editor/Editor.css');
+    this.game.loadCSS('/plugins/Editor/Editor.css');
   }
 
   createIcon(name) {

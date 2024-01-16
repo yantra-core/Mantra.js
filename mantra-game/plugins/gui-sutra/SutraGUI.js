@@ -78,7 +78,7 @@ class SutraGUI {
       }
     });
 
-    game.loadCSS('./plugins/SutraGUI/Sutra.css');
+    game.loadCSS('/plugins/SutraGUI/Sutra.css');
 
     this.drawTable();
 

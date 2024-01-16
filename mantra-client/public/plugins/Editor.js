@@ -56,7 +56,7 @@ var Editor = /*#__PURE__*/function () {
       this.setupGlobalClickListener();
       // this.createViewSourceModal();
       this.game.systemsManager.addSystem(this.id, this);
-      this.game.loadCSS('./plugins/Editor/Editor.css');
+      this.game.loadCSS('/plugins/Editor/Editor.css');
     }
   }, {
     key: "createIcon",

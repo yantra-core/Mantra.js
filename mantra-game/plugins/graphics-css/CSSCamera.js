@@ -24,7 +24,7 @@ class CSSCamera {
 
   init(game) {
     this.game = game;
-    this.resetCameraState();
+    // this.resetCameraState();
 
     this.updateCameraPosition = updateCameraPosition.bind(this);
     this.applyThrow = applyThrow.bind(this);
@@ -73,11 +73,9 @@ class CSSCamera {
   }
 
   resetCameraState() {
-    // alert('reset')
-    // ?? this is firing on game load? check timing
-    //this.game.viewportCenterXOffset = 0;
-    //this.game.viewportCenterYOffset = 0;
     // Reset other camera properties as needed
+    this.game.viewportCenterXOffset = 0;
+    this.game.viewportCenterYOffset = 0;
   }
 
   initZoomControls() {
@@ -106,11 +104,5 @@ class CSSCamera {
   }
 
 }
-
-/*
-function is_touch_enabled() {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-}
-*/
 
 export default CSSCamera;

@@ -12,8 +12,7 @@ export default function update() {
 
   let zoomFactor = this.game.data.camera.currentZoom;
   // console.log('zoomFactor', zoomFactor)
-  //game.viewportCenterXOffset = (windowWidth / 20) / zoomFactor;
-  //game.viewportCenterYOffset = (windowHeight / 2) / zoomFactor;
+
   if (typeof game.viewportCenterXOffset !== 'number') {
     game.viewportCenterXOffset = 0;
   }
@@ -21,12 +20,13 @@ export default function update() {
     game.viewportCenterYOffset = 0;
   }
 
+  // game.viewportCenterYOffset = 500;
+  // console.log('game.viewportCenterYOffset ', game.viewportCenterYOffset )
+
   // console.log(zoomFactor, game.viewportCenterXOffset, game.viewportCenterYOffset)
 
   // Update the camera position
   if (this.follow && currentPlayer && currentPlayer.position) {
-    
-
 
     // If following a player, adjust the camera position based on the player's position and the calculated offset
     this.scene.cameraPosition.x = currentPlayer.position.x + game.viewportCenterXOffset;
@@ -51,12 +51,6 @@ export default function update() {
     this.scene.cameraPosition.x = game.viewportCenterXOffset;
     this.scene.cameraPosition.y = game.viewportCenterYOffset;
   }
-
-  // TODO adjust camera position based on current zoom level
-  // coordinate system is both positive and negative, so we need to adjust for that
-  // larger scale means smaller numbers
-  // this.scene.cameraPosition.y  = this.scene.cameraPosition.y / currentZoom;
-  // console.log(game.data.camera.currentZoom)
 
   // Update the camera's position in the game data
   this.game.data.camera.position = this.scene.cameraPosition;

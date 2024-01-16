@@ -408,7 +408,7 @@ var SutraGUI = /*#__PURE__*/function () {
         }
       });
 
-      game.loadCSS('./plugins/SutraGUI/Sutra.css');
+      game.loadCSS('/plugins/SutraGUI/Sutra.css');
       this.drawTable();
       if (this.game.rules) {
         this.setRules(this.game.rules);

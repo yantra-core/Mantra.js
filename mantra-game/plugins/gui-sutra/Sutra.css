@@ -1,0 +1,704 @@
+
+select {
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  background-color: transparent;
+  /* color: #d3d9df; */
+  box-sizing: border-box;
+}
+
+option {
+  background-color: transparent;
+  color: #000000;
+}
+
+.input-group option {
+  background-color: transparent;
+  color: #000000;
+}
+
+.action-select option {
+  background-color: transparent;
+  color: #000000;
+}
+
+.input-group input:hover,
+.input-group select:hover {
+
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+.action-node-form .node-element {
+  margin-left: 0px;
+  padding-bottom: 0px !important;
+}
+
+.condition-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.condition {
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 5px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  cursor: pointer;
+}
+
+.condition:hover {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.4);
+}
+
+/* add class to .condition when pressed */
+.condition:active {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.4);
+}
+
+.condition-separator {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.action-select {
+  margin-bottom: 0;
+  width: 230px;
+
+}
+
+.action-select-container {
+  color: #d3d9df;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+
+.action-select-container:hover {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.4);
+}
+
+/* add class to .condition when pressed */
+.action-select-container:active {
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.4);
+}
+
+.action-select-container select {
+  flex-grow: 1;
+
+}
+
+.sutra-keyword {
+  color: #9a9cff !important;
+  font-size: 16px !important;
+}
+
+.then-label {
+  color: #d3d9df;
+  margin-bottom: 5px;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  padding-left: 5px;
+  border-radius: 5px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.then-label span {
+  margin-right: 10px;
+
+}
+
+.with-label {
+  color: #d3d9df;
+  margin-bottom: 5px;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  padding-top: 5px;
+  padding-left: 5px;
+
+}
+
+.with-container {
+  margin: 0px;
+  padding: 0px;
+}
+
+.data-border {
+  border: 1px solid #2a3348;
+}
+
+.data-value-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.data-key {
+  color: #ffffff;
+  background-color: #2a3348;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Adjust as needed to align with your design */
+}
+
+.data-value {
+  color: #ffffff;
+  background-color: #2a3348;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Adjust as needed to align with your design */
+}
+
+
+/* Optional: Hover and focus effects for data values */
+.data-value:hover {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+.data-value:focus {
+  outline: none;
+  border-color: #9a9cff;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+}
+
+
+.nested-data-container {
+  margin-left: 20px;
+
+}
+
+.nested-level-1 {
+  margin-left: 20px;
+}
+
+.nested-level-2 {
+  margin-left: 40px;
+}
+
+.nested-level-3 {
+  margin-left: 60px;
+}
+
+.nested-level-4 {
+  margin-left: 80px;
+}
+
+.nested-level-5 {
+  margin-left: 100px;
+}
+
+.pluginList {
+  list-style: none;
+  font-size: 10px;
+  padding: 0;
+  padding-left: 10px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.pluginLabel {
+  padding-left: 10px;
+  font-size: 22px;
+  width: 80px;
+  text-overflow: ellipsis;
+  display: inline-flex;
+}
+
+.plugin-form-container {
+  font-family: Arial, sans-serif;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.method-form {
+  margin-bottom: 15px;
+}
+
+.method-label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.method-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+
+.rule-button {
+  padding: 4px 8px;
+  font-size: 12px;
+  margin: 0 4px;
+}
+
+.rule-button-add {}
+
+.rule-button-remove {
+
+  position: absolute !important;
+  right: -2px;
+  bottom: -3px;
+  margin: 5px;
+  padding: 4px;
+  width: 20px;
+
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.collapsible-content-open {
+  max-height: 500px;
+
+}
+
+.remove-condition-button,
+.add-condition-below-button {
+  right: 25px;
+  background-color: #5021FF;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+}
+
+.remove-condition-button:hover,
+.add-condition-below-button:hover {
+  background-color: #2160FF;
+}
+
+.conditional-editor-container {
+  background-color: #162238;
+  padding: 25px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  color: #d3d9df;
+  margin-bottom: 25px;
+  font-size: 22px;
+}
+
+.conditional-editor-container label {
+  color: #d3d9df;
+  font-size: 22px !important;
+}
+
+.conditional-editor-container span {
+  font-size: 22px !important;
+  font-weight: normal;
+}
+
+.conditional-editor-container select {
+  font-size: 22px !important;
+}
+
+.conditional-editor-container option {
+  color: #000000;
+}
+
+.conditional-editor-container input {
+  font-size: 22px !important;
+}
+
+.field-container {
+  margin-bottom: 15px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #d3d9df;
+  font-weight: bold;
+}
+
+.field-input {
+
+  background-color: transparent;
+  border: 1px solid #d3d9df;
+  color: #d3d9df;
+  padding: 5px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.operator-container {
+  margin-bottom: 15px;
+}
+
+.operator-select {
+  background-color: transparent;
+  border: 1px solid #d3d9df;
+  color: #d3d9df;
+  padding: 5px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.save-button {
+  background-color: #5021FF;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 5px 10px;
+}
+
+.save-button:hover {
+  background-color: #2160FF;
+}
+
+.conditional-editor-container h3 {
+  color: #9a9cff;
+}
+
+#colorPicker {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),
+    linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),
+    linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);
+  cursor: crosshair;
+  border: 1px solid #ccc;
+}
+
+#folder-explorer ul {
+  list-style-type: none;
+}
+
+#folder-explorer li {
+  cursor: pointer;
+  padding: 5px;
+}
+
+#folder-explorer li:hover {
+  background-color: lightgrey;
+}
+
+.folder-structure {
+  list-style-type: none;
+}
+
+.entity {
+  margin-left: 20px;
+}
+
+.folder-icon {
+  background: url('https://yantra.gg/vendor/feather/folder.svg');
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: 24px 24px;
+  /* Resize the background image */
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+  background-size: 24px 24px;
+  /* Resize the background image */
+}
+
+.folder-icon:hover {
+  color: #9a9cff;
+}
+
+.folder-label {
+  display: flex;
+  /* Use flexbox for alignment */
+  align-items: center;
+  /* Align items vertically in the center */
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  color: #d3d9df;
+}
+
+
+.entity-label {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #d3d9df;
+  cursor: pointer;
+}
+
+#entity-edit-form {
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin: 20px;
+}
+
+.form-field {
+  margin: 10px 0;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-field input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+fieldset {
+  border: none;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+legend {
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+
+.node-element {
+  color: #d3d9df;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  margin-top: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  padding-bottom: 15px;
+}
+
+.node-element.collapsed .node-element {
+  display: none;
+}
+
+.collapsed {
+  display: none;
+}
+
+.node-element-form,
+.action-select-container,
+.data-container,
+.input-group,
+button {
+  cursor: default;
+}
+
+
+.node-element-form {
+  border: 1px solid #2a3348;
+  margin: 0px;
+  padding: 0px;
+}
+
+.action-select,
+.param-input,
+#sutraView select {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: #d3d9df;
+  padding: 5px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+.condition,
+.else-branch {
+  color: #d3d9df;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#sutraView button {
+  position: relative;
+
+  background-color: #5021FF;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+#sutraView button:hover {
+  background-color: #2160FF;
+}
+
+#sutraTable {
+  padding: 10px;
+  margin: 10px;
+}
+
+
+
+.highlighted-sutra-node {
+  border: 1px solid 9a9cff !important;
+  box-shadow: 0 0 15px rgba(154, 156, 255, 0.6) !important;
+
+  transition: border 0.3s ease, box-shadow 0.3s ease !important;
+
+}
+
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  margin-left: 20px;
+}
+
+.input-group label {
+
+  margin-bottom: 5px;
+  display: block;
+}
+
+.input-group input,
+.input-group select {
+
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  border: 1px solid #2a3348;
+  background-color: transparent;
+  color: #d3d9df;
+  box-sizing: border-box;
+}
+
+.param-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #d3d9df;
+}
+
+
+#sutraFormView .gui-content {
+  padding: 25px;
+}
+
+#sutraActionEditor .gui-content {
+  padding: 25px;
+}
+
+.node-info {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.node-path,
+.node-action {
+  color: #4CAF50;
+
+  font-weight: bold;
+}
+
+.sutra-form {
+  background-color: #162238;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-form {
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.radio-group {
+  margin-bottom: 15px;
+}
+
+.radio-label {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.radio-input {
+  margin-right: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.save-button {
+  background-color: #2196F3;
+
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.save-button:hover {
+  background-color: #1976D2;
+}

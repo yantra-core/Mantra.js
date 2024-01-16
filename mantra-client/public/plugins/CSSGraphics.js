@@ -110,7 +110,8 @@ var CSSCamera = /*#__PURE__*/function () {
     value: function init(game) {
       var _this = this;
       this.game = game;
-      this.resetCameraState();
+      // this.resetCameraState();
+
       this.updateCameraPosition = _updateCameraPosition["default"].bind(this);
       this.applyThrow = _applyThrow["default"].bind(this);
       this.update = _update["default"].bind(this);
@@ -152,11 +153,9 @@ var CSSCamera = /*#__PURE__*/function () {
   }, {
     key: "resetCameraState",
     value: function resetCameraState() {
-      // alert('reset')
-      // ?? this is firing on game load? check timing
-      //this.game.viewportCenterXOffset = 0;
-      //this.game.viewportCenterYOffset = 0;
       // Reset other camera properties as needed
+      this.game.viewportCenterXOffset = 0;
+      this.game.viewportCenterYOffset = 0;
     }
   }, {
     key: "initZoomControls",
@@ -195,11 +194,6 @@ var CSSCamera = /*#__PURE__*/function () {
   }]);
   return CSSCamera;
 }();
-/*
-function is_touch_enabled() {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-}
-*/
 _defineProperty(CSSCamera, "id", 'css-camera');
 var _default = exports["default"] = CSSCamera;
 
@@ -621,14 +615,16 @@ function update() {
   var windowWidth = window.innerWidth;
   var zoomFactor = this.game.data.camera.currentZoom;
   // console.log('zoomFactor', zoomFactor)
-  //game.viewportCenterXOffset = (windowWidth / 20) / zoomFactor;
-  //game.viewportCenterYOffset = (windowHeight / 2) / zoomFactor;
+
   if (typeof game.viewportCenterXOffset !== 'number') {
     game.viewportCenterXOffset = 0;
   }
   if (typeof game.viewportCenterYOffset !== 'number') {
     game.viewportCenterYOffset = 0;
   }
+
+  // game.viewportCenterYOffset = 500;
+  // console.log('game.viewportCenterYOffset ', game.viewportCenterYOffset )
 
   // console.log(zoomFactor, game.viewportCenterXOffset, game.viewportCenterYOffset)
 
@@ -656,12 +652,6 @@ function update() {
     this.scene.cameraPosition.x = game.viewportCenterXOffset;
     this.scene.cameraPosition.y = game.viewportCenterYOffset;
   }
-
-  // TODO adjust camera position based on current zoom level
-  // coordinate system is both positive and negative, so we need to adjust for that
-  // larger scale means smaller numbers
-  // this.scene.cameraPosition.y  = this.scene.cameraPosition.y / currentZoom;
-  // console.log(game.data.camera.currentZoom)
 
   // Update the camera's position in the game data
   this.game.data.camera.position = this.scene.cameraPosition;
@@ -811,36 +801,22 @@ function zoom(scale) {
 
     // Calculate the translation needed to keep the screen's center constant
     var centerX = window.innerWidth / 2;
-    var centerY = window.innerHeight / 2;
-
-    /*
-    if (true || game.embed) {
-      // use the window frameHeight and frameWidth to calculate the center
-      centerX = window.frameElement.clientWidth / 2;
-      centerY = window.frameElement.clientHeight / 2;
-    }
-    */
+    var centerY = window.outerHeight / 2;
 
     // The logic here ensures that the screen center remains constant during zoom
+    // X adjustment not needed for default zoom behavior
     // let newCameraX = (centerX - (centerX / scale));
-    var newCameraX = centerY - centerY / scale;
     var newCameraY = centerY - centerY / scale;
-
     //game.viewportCenterXOffset = newCameraX;
-    var minDistanceFromTop = 50;
-    if (is_touch_enabled()) {
-      minDistanceFromTop = 0;
-    }
-    game.viewportCenterYOffset = newCameraY + minDistanceFromTop;
+
+    var playerHeight = 16;
+    game.viewportCenterYOffset = newCameraY + playerHeight;
 
     // Apply scale and translate transform
     gameViewport.style.transform = "scale(".concat(scale, ")");
   } else {
     console.log('Warning: could not find gameHolder div, cannot zoom');
   }
-}
-function is_touch_enabled() {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
 },{}],13:[function(require,module,exports){
