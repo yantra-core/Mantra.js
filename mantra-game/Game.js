@@ -33,8 +33,9 @@ import TimersComponent from './Component/TimersComponent.js';
 // Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
 import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
 
-// Utility function for loading external script assets
+// Utility function for loading external assets
 import loadScripts from './lib/util/loadScripts.js';
+import loadCSS from './lib/util/loadCSS.js';
 
 // The Game class is the main entry point for Mantra games
 class Game {
@@ -168,6 +169,8 @@ class Game {
 
     // Bind loadScripts from util
     this.loadScripts = loadScripts.bind(this);
+    // Bind loadCSS from util
+    this.loadCSS = loadCSS.bind(this);
 
     this.switchWorlds = switchWorlds.bind(this);
 

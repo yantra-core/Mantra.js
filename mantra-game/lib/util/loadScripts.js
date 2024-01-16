@@ -1,33 +1,42 @@
-export default function loadScripts(scripts, finalCallback) {
+// loadScripts.js - Marak Squires 2023
+export default async function loadScripts(scripts, finalCallback) {
   if (this.isServer) {
     return;
   }
 
-  const loadScript = (index) => {
-    if (index < scripts.length) {
-      let script = document.createElement('script');
-      script.type = 'text/javascript';
-      // script.async = true; // Enable asynchronous loading
-      script.defer = true;
+  // Function to load an individual script and return a Promise
+  const loadScript = async (script) => {
+    return new Promise((resolve, reject) => {
+      let scriptElement = document.createElement('script');
+      scriptElement.type = 'text/javascript';
+      scriptElement.defer = true;
+      scriptElement.src = this.scriptRoot + script;
 
-      script.src = this.scriptRoot + scripts[index];
-
-      script.onload = () => {
-        // console.log(`${scripts[index]} loaded`);
-        loadScript(index + 1); // Load the next script after the current one finishes loading
+      scriptElement.onload = () => {
+        resolve(script);
       };
 
-      // Handle script loading errors
-      script.onerror = () => {
-        console.error(`Error loading script: ${scripts[index]}`);
-        // Optionally, proceed to the next script or handle the error
+      scriptElement.onerror = () => {
+        reject(`Error loading script: ${script}`);
       };
 
-      document.head.appendChild(script);
-    } else {
-      finalCallback(); // All scripts have been loaded
-    }
+      document.head.appendChild(scriptElement);
+    });
   };
 
-  loadScript(0); // Start loading the first script
+  // Sequentially load each script
+  for (let i = 0; i < scripts.length; i++) {
+    try {
+      await loadScript(scripts[i]);
+      // console.log(`${scripts[i]} loaded`);
+    } catch (error) {
+      console.error(error);
+      // Optionally handle the error and decide whether to continue or stop
+    }
+  }
+
+  // Call the final callback after all scripts are loaded
+  if (finalCallback) {
+    finalCallback();
+  }
 }

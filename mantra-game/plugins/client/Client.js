@@ -68,16 +68,25 @@ export default class Client {
       // todo: create two preloadsers
       // 1 for required assets to start game
       // 2 for lazy loaded assets
-      preloader.loadAll().then(() => {
-        console.log("All assets loaded", preloader)
-        let that = this;
-        that.preloading = false;
-        /* for dev testing
-        setTimeout(function(){
+
+      let that = this;
+      // load main mantra.CSS ( required for game to start ) ( for now )
+      // Remark: Actual CSS required for Mantra.js proper should be almost none
+      // All CSS from current Mantra.css should be split into separate CSS files per Plugin
+      // and loaded async in the plugin.init() methods
+      console.log('Loading Mantra.css file...')
+      game.loadCSS('./mantra.css', function(err, d){
+        console.log("Mantra.css loaded!", err, d)
+        preloader.loadAll().then(() => {
+          console.log("All assets loaded", preloader)
           that.preloading = false;
-        }, 5000)
-        */
-        // console.log(preloader.getItem('player'))
+          /* for dev testing
+          setTimeout(function(){
+            that.preloading = false;
+          }, 5000)
+          */
+          // console.log(preloader.getItem('player'))
+        });
       });
     } else {
       this.preloading = false;

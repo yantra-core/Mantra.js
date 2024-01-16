@@ -20,6 +20,7 @@ class GravityGardens {
     let game = this.game;
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
+    game.setZoom(2.5);
 
     let player = game.createDefaultPlayer({
       position: {

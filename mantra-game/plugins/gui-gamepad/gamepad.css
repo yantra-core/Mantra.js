@@ -1,0 +1,648 @@
+
+*:focus {
+  outline: 0.25vmin dashed #007fff;
+  outline-offset: 0.5vmin;
+}
+
+/* Gamepad code */
+#snes-gamepad {
+  --x: 0;
+  --y: 0;
+  --pos: 0.2vmin;
+  --rotate: rotate3d(var(--x), var(--y), 0, var(--angle));
+  --gray-light: #ccc;
+  --gray: #b5b5bb;
+  --gray-dark: #585a58;
+  --purple-light: #bbe;
+  --purple-dark: #64b;
+  --button-x: #3c62f8;
+  --button-y: #14b161;
+  --button-a: #f03025;
+  --button-b: #e9dd34;
+  /*
+  position: absolute;
+  width: 80vmin;
+  height: 34vmin;
+  bottom: 0px;
+  left: 50%;
+  transform: translate(-50%, -50%) var(--rotate);
+  transform-style: preserve-3d;
+  transition: transform 1s;
+  */
+  position: fixed;
+  /* Changed from absolute to fixed */
+  width: 100vw;
+  /* Set width to 100% of the viewport width */
+  height: auto;
+  /* Adjust height automatically based on aspect ratio */
+  /*
+  bottom: 300px;
+  left: 60px; 
+  */
+  transform: none;
+  /* Remove transform to avoid misalignment */
+  transform-style: preserve-3d;
+  transition: transform 1s;
+}
+
+#snes-gamepad * {
+  position: absolute;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+}
+
+#dpad-area {
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+.is3d>div {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.is3d>div:nth-child(1) {
+  transform: translateZ(calc(var(--pos) * 1));
+}
+
+.is3d>div:nth-child(2) {
+  transform: translateZ(calc(var(--pos) * 2));
+}
+
+.is3d>div:nth-child(3) {
+  transform: translateZ(calc(var(--pos) * 3));
+}
+
+.is3d>div:nth-child(4) {
+  transform: translateZ(calc(var(--pos) * 4));
+}
+
+.is3d>div:nth-child(5) {
+  transform: translateZ(calc(var(--pos) * 5));
+}
+
+.is3d>div:nth-child(6) {
+  transform: translateZ(calc(var(--pos) * 6));
+}
+
+.is3d>div:nth-child(7) {
+  transform: translateZ(calc(var(--pos) * 7));
+}
+
+.is3d>div:nth-child(8) {
+  transform: translateZ(calc(var(--pos) * 8));
+}
+
+.is3d>div:nth-child(9) {
+  transform: translateZ(calc(var(--pos) * 9));
+}
+
+.is3d>div:nth-child(10) {
+  transform: translateZ(calc(var(--pos) * 10));
+}
+
+.is3d>div:nth-child(11) {
+  transform: translateZ(calc(var(--pos) * 11));
+}
+
+.is3d>div:nth-child(12) {
+  transform: translateZ(calc(var(--pos) * 12));
+}
+
+button {
+  border: 0;
+  color: transparent;
+  background: transparent;
+  padding: 0;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+button.active,
+/* gamepad controlled */
+button:active {
+  --pos: 0.05;
+}
+
+
+/* general frame */
+.face,
+.face div {
+  --pos: -0.7vmin;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    /* buttons circle */
+    radial-gradient(closest-side, #0000 97%, #fff2 99%, #0000 0) 48vmin 2vmin / 30vmin 30vmin no-repeat,
+    radial-gradient(closest-side, var(--gray) 99%, #0002 99.8%, #0000 100%) 48vmin 2vmin / 30vmin 30vmin no-repeat,
+    /* axis circle */
+    radial-gradient(farthest-side at 100% 50%, #0000 94%, #00000002 99.9%, #0000 0) 7.5vmin 7.5vmin / 9.5vmin 19vmin no-repeat,
+    radial-gradient(farthest-side at 1vmin 50%, #0000 96%, #ffffff1f 99.9%, #0000 0) 16vmin 7.5vmin / 10.5vmin 19vmin no-repeat,
+    radial-gradient(farthest-side, #0000 80%, #00000004 99.9%, #0000 0) 7.5vmin 7.5vmin / 19vmin 19vmin no-repeat,
+    /* general shape */
+    radial-gradient(circle at 17vmin 17vmin, var(--gray-light) 16.95vmin, #0000 17vmin),
+    radial-gradient(circle at 63vmin 17vmin, var(--gray-light) 16.95vmin, #0000 17vmin),
+    linear-gradient(#0000, #fff2 0.01%, #0000 2% 98%, #0001) 50% 0 / 46vmin 30vmin no-repeat,
+    linear-gradient(var(--gray-light) 0 0) 50% 0 / 46vmin 30vmin no-repeat;
+  pointer-events: none;
+}
+
+.face div {
+  filter: contrast(0.9);
+  background:
+    radial-gradient(circle at 17vmin 17vmin, var(--gray-light) 16.9vmin, #0000 17vmin),
+    radial-gradient(circle at 63vmin 17vmin, var(--gray-light) 16.9vmin, #0000 17vmin),
+    linear-gradient(var(--gray-light) 0 0) 50% 0 / 46vmin 30vmin no-repeat;
+}
+
+/* Text (all) */
+h1 {
+  top: 3.5vmin;
+  left: 45%;
+  margin: 0;
+  transform: translate(-50%, 0%);
+  font-size: 3.3vmin;
+  font-style: italic;
+  color: var(--gray-dark);
+  font-weight: 300;
+}
+
+h1+p {
+  background: var(--gray-dark);
+  color: var(--gray-light);
+  margin: 0;
+  padding-top: 0vmin;
+  padding-bottom: 1vmin;
+  padding-left: 1vmin;
+  padding-right: 1vmin;
+  line-height: 3vmin;
+  height: 2.5vmin;
+  font-style: italic;
+  font-size: 1.11vmin;
+  top: 8vmin;
+  left: 45.25%;
+  transform: translate(-50%, 0);
+  letter-spacing: 0.2vmin;
+}
+
+.letter {
+  color: var(--gray-light);
+  font-style: italic;
+  font-size: 3.75vmin;
+  transform: skew(3deg);
+  line-height: 0;
+}
+
+.letter-a {
+  top: 28%;
+  left: 92.9%;
+}
+
+.letter-b {
+  top: 69%;
+  left: 71.25%;
+}
+
+.letter-x {
+  top: 11%;
+  left: 83.5%;
+}
+
+.letter-y {
+  top: 52%;
+  left: 62%;
+}
+
+/* Top buttons */
+#l,
+#r {
+  --pos: -0.2vmin;
+  width: 17.25vmin;
+  height: 5vmin;
+  top: -1.5vmin;
+  left: 8.75vmin;
+  background:
+    linear-gradient(#fff0, #fff6),
+    var(--gray-light);
+  border-radius: 55% 1vmin 0 0;
+  box-shadow:
+    inset 0 0.125vmin 0.25vmin #0002,
+    inset 0 2.5vmin 0.5vmin -1vmin var(--gray-light),
+    inset 0 3vmin 1vmin -1vmin #0004;
+  transform: translateZ(-2.75vmin);
+}
+
+#l div,
+#r div {
+  box-shadow:
+    inset 0 0.125vmin 0.25vmin #0002,
+    inset 0 2.5vmin 0.5vmin -1vmin var(--gray-light),
+    inset 0 3vmin 1vmin -1vmin #0004;
+  border-radius: 55% 1vmin 0 0;
+}
+
+#l.active,
+/* gamepad js */
+#l:active {
+  box-shadow:
+    inset 0 0.125vmin 0.25vmin #0002,
+    inset 0 2.5vmin 0.75vmin -1.66vmin var(--gray-light),
+    inset 0 3vmin 1vmin -1vmin #0004;
+  transform: translateZ(-2.75vmin) translateY(1vmin);
+}
+
+#r {
+  top: -1.5vmin;
+  left: auto;
+  right: 8.75vmin;
+  transform: scaleX(-1) translateZ(-2.75vmin);
+}
+
+#r.active,
+/* gamepad js */
+#r:active {
+  box-shadow:
+    inset 0 0.125vmin 0.25vmin #0002,
+    inset 0 2.5vmin 0.75vmin -1.66vmin var(--gray-light),
+    inset 0 3vmin 1vmin -1vmin #0004;
+  transform: scaleX(-1) translateZ(-2.75vmin) translateY(1vmin);
+}
+
+/* axis */
+.axis,
+.axis div {
+  --color: #111;
+  background:
+    linear-gradient(#0000 31%, #000c 33.33% 66.66%, #0000 70%),
+    linear-gradient(90deg, #0000 31%, #000c 33.33% 66.66%, #0000 70%);
+  width: 30vmin;
+  aspect-ratio: 1;
+  left: 30px;
+  bottom: 30px;
+  left: 30px;
+  bottom: 30px;
+  pointer-events: none;
+  border-radius: 80%;
+}
+
+.axis div {
+  --color: #34393a;
+  --shadows:
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 36.66% 0% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 62.66% 0% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 36.66% 100% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 62.66% 100% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 0 36.66% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 0 62.66% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 100% 36.66% / 10% 10% no-repeat,
+    radial-gradient(closest-side, var(--color) 93%, #0000 99.9%) 100% 62.66% / 10% 10% no-repeat,
+    linear-gradient(var(--color) 0 0) 50% 50% / 100% 26.66% no-repeat,
+    linear-gradient(var(--color) 0 0) 50% 50% / 26.66% 100% no-repeat,
+    linear-gradient(var(--color) 0 0) 50% 50% / 93.33% 33.33% no-repeat,
+    linear-gradient(var(--color) 0 0) 50% 50% / 33.33% 93.33% no-repeat;
+  top: 0;
+  left: 0;
+  box-shadow: none;
+  background:
+    var(--shadows);
+}
+
+.axis div:last-of-type {
+  --color: #3a4448;
+  background:
+    linear-gradient(#fff1, #fff0 20% 80%, #fff1),
+    linear-gradient(90deg, #fff1, #fff0 20% 80%, #fff1),
+    var(--shadows);
+  /*   width: 13.5vmin; */
+  box-shadow:
+    inset 0 0 2vmin -0.5vmin #0009,
+    inset -4.5vmin -4.5vmin 3vmin #2102,
+    inset 4.5vmin 4.5vmin 3vmin #ffff0005;
+  clip-path: polygon(33.33% 0, 66.66% 0, 66.66% 33.33%, 100% 33.33%, 100% 66.66%, 66.66% 66.66%, 66.66% 100%, 33.33% 100%, 33.33% 66.66%, 0 66.66%, 0 33.33%, 33.33% 33.33%);
+  -webkit-mask: var(--shadows);
+  mask: var(--shadows)
+}
+
+.axis div:last-of-type::before {
+  content: "";
+  position: absolute;
+  width: 25%;
+  aspect-ratio: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(#0000, #0002);
+  box-shadow:
+    /*     inset 1vmin 1vmin 1vmin -0.5vmin #0002, */
+    inset -0.25vmin 0 0.5vmin #28282855,
+    inset 0 0 1vmin 0.25vmin #28282855,
+    inset -1vmin -0.25vmin 0.5vmin -0.25vmin #ffffff11;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+#left,
+#right {
+  width: 12.5vmin;
+  height: 10.5vmin;
+}
+
+#up,
+#down {
+  width: 12.5vmin;
+  height: 12.5vmin;
+}
+
+
+#left {
+  bottom: 13.5vmin;
+  left: 2vmin;
+  background-color: aquamarine;
+  border: solid;
+
+}
+
+#right {
+  left: 24.5vmin;
+  bottom: 13.5vmin;
+  background-color: red;
+  border: solid;
+
+}
+
+#up {
+  background-color: purple;
+  border: solid;
+  bottom: 22.5vmin;
+  left: 12vmin;
+
+}
+
+#down {
+  background-color: pink;
+  border: solid;
+  bottom: 2.5vmin;
+  left: 12vmin;
+}
+
+#up.active~.axis div,
+/* gamepad js */
+#up:active~.axis div {
+  transform-origin: 50% 100%;
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateX(5deg);
+}
+
+#down.active~.axis div,
+/* gamepad js */
+#down:active~.axis div {
+  transform-origin: 50% 0%;
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateX(-5deg);
+}
+
+#left.active~.axis div,
+/* gamepad js */
+#left:active~.axis div {
+  transform-origin: 100% 50%;
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateY(-5deg);
+}
+
+#right.active~.axis div,
+/* gamepad js */
+#right:active~.axis div {
+  transform-origin: 0% 50%;
+  transform: translateZ(calc(var(--pos) * var(--z))) rotateY(5deg);
+}
+
+/* Menu buttons */
+#select,
+#graphics,
+#start {
+  width: 6vmin;
+  height: 2vmin;
+  border-radius: 2.5vmin;
+  background: #444;
+  transform: translate(-50%, -50%) rotate(-35deg);
+  bottom: 6.5vmin;
+  cursor: pointer;
+  left: 40%;
+  box-shadow:
+    0 0 0 0.2vmin #0007,
+    /*     0 0 0.3vmin 0.1vmin #0008, */
+    0 0 0.3vmin 0.1vmin #fff4,
+    0 0 0 0.2vmin #0002,
+    0 0.5vmin 0.5vmin #0004;
+}
+
+#select,
+#start div {
+  cursor: pointer;
+}
+
+#start {
+  left: 60%;
+}
+
+#graphics {
+  left: 50%;
+
+}
+
+button#start.is3d div,
+button#graphics.is3d div,
+button#select.is3d div {
+  --color: #222;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(calc(var(--pos) * var(--z))) scale(calc(1 - var(--z) * 0.03));
+  border-radius: 2.5vmin;
+  background: #444;
+  box-shadow:
+    inset 0 0 0.5vmin var(--color),
+    inset 2.25vmin 2.25vmin 0.5vmin -2.25vmin #fff2,
+    inset -2.25vmin -0.5vmin 1vmin -2.25vmin #fff2,
+    inset -2.25vmin -0.5vmin 1.5vmin #fff1,
+    inset 0.5vmin 1vmin 0.5vmin #0002,
+    inset 1vmin 0vmin 0.5vmin #0002,
+    inset -1.5vmin -1vmin 2vmin -0.5vmin #2583,
+    inset -1vmin -0.5vmin 0.5vmin #fff3
+}
+
+#start div {
+  box-shadow:
+    inset 0 0 0.5vmin var(--color),
+    inset 2.25vmin 2.25vmin 0.5vmin -2.25vmin #fff2,
+    inset 0.5vmin 1vmin 0.5vmin #0002,
+    inset 1vmin 0vmin 0.5vmin #0002,
+    inset -1.5vmin -1vmin 2vmin -0.5vmin #2583,
+    inset -1vmin -0.5vmin 0.5vmin #fff3
+}
+
+#start:active div,
+#select:active div {
+  transform: translateZ(calc(var(--pos) * var(--z))) scale(calc(1 - var(--z) * 0.03));
+}
+
+.letter-start,
+.letter-select {
+  color: var(--gray);
+  font-size: 2vmin;
+  transform: translate(-50%, 0);
+  filter: brightness(0.8);
+  top: 60%;
+  font-style: italic;
+  letter-spacing: 0.15vmin;
+}
+
+.letter-start {
+  left: 41vmin;
+}
+
+.letter-select {
+  left: 32.5vmin;
+}
+
+
+/* Action buttons */
+button.circle,
+button.circle div {
+  --shadow:
+    inset 0 0 0 0.25vmin var(--color),
+    inset 2.25vmin 2.25vmin 0.5vmin -2.25vmin #fff8,
+    inset -2.25vmin -0.5vmin 1vmin -2.25vmin #fff8,
+    inset -2.25vmin -0.5vmin 1.5vmin #fff2,
+    inset 0.5vmin 1vmin 0.5vmin #0001,
+    inset 1vmin 0vmin 0.5vmin #0001,
+    inset -1.5vmin -1vmin 2vmin -0.5vmin #2583,
+    inset -1vmin -0.5vmin 0.5vmin #fff3;
+  width: 6vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color);
+  z-index: 2;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 0.25vmin #0002,
+    0 0 0.3vmin 0.1vmin #0008,
+    0 0 0.3vmin 0.1vmin #fff4,
+    0 0 0 0.2vmin #0002,
+    var(--shadow);
+}
+
+button.circle div {
+  box-shadow:
+    0 0 0 0.25vmin #0002,
+    0 0 0.3vmin 0.1vmin #fff4,
+    0 0 0 0.2vmin #0001,
+    var(--shadow);
+}
+
+#x {
+  top: 9vmin;
+  left: 14.75vmin;
+  --color: var(--button-x);
+}
+
+#y {
+  top: 15vmin;
+  left: 7.125vmin;
+  --color: var(--button-y);
+}
+
+#a {
+  top: 15vmin;
+  right: 1.5vmin;
+  --color: var(--button-a);
+}
+
+#b {
+  top: 21vmin;
+  left: 14.75vmin;
+  --color: var(--button-b);
+}
+
+.buttons {
+  position: absolute !important;
+  width: 30vmin;
+  height: 30vmin;
+  border-radius: 50%;
+  right: 5vw;
+  bottom: 40px;
+  z-index: 19999;
+  transform: scale(1.8);
+}
+
+.buttons::before,
+.buttons::after {
+  content: "";
+  position: absolute;
+  border-radius: 10vmin;
+  transform: rotate(-38deg);
+  width: 17.75vmin;
+  height: 7.75vmin;
+  background: var(--gray-light);
+  z-index: 1;
+  top: 8.1vmin;
+  left: 2.05vmin;
+  box-shadow:
+    inset 0 0 0 0.125vmin #0003,
+    inset 0 0 0 0.25vmin #fff2
+}
+
+.buttons::after {
+  top: 14.05vmin;
+  left: 9.75vmin;
+}
+
+
+/* Adjustments for smaller screens (Responsive Design) */
+@media (max-width: 768px) {
+  .buttons {
+    right: 30px
+  }
+}
+
+
+#zoomSlider {
+  position: absolute;
+  top: 30px;          /* Adjusted to top */
+  right: 60px;         /* Adjusted to right */
+  z-index: 9002;
+  -webkit-appearance: none;
+  width: 60px;         /* Width for vertical slider */
+  height: 33vh;       /* Height for vertical slider */
+  background: transparent;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  writing-mode: bt-lr; /* for Internet Explorer */
+  -webkit-appearance: slider-vertical; /* Webkit browsers */
+}
+
+#zoomSlider:hover {
+  opacity: 1;
+}
+
+#zoomSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60px;
+  height: 60px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+#zoomSlider::-moz-range-thumb {
+  width: 60px;
+  height: 60px;
+  background: #4CAF50;
+  cursor: pointer;
+}
