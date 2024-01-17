@@ -1,7 +1,8 @@
 import LoadingScreen from "../plugins/loading-screen/LoadingScreen.js";
 import GhostTyper from "../plugins/typer-ghost/GhostTyper.js";
 
-export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, sutra, ghostTyper, lifetime }) {
+export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, editor, sutra, ghostTyper, lifetime }) {
+
   let plugins = this.plugins;
   let gameConfig = this.config
 
@@ -37,6 +38,10 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       msgpack: gameConfig.msgpack
     };
     this.use('Client', clientConfig);
+
+    if (editor) {
+      this.use('Editor');
+    }
 
     if (keyboard) {
       this.use('Keyboard');

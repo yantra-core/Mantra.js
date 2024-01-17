@@ -61,6 +61,7 @@ class Game {
     keyboard = true,
     mouse = true,
     gamepad = true,
+    editor = true,
     sutra = false,
     lifetime = true,
     // data compression
@@ -93,6 +94,7 @@ class Game {
       keyboard,
       mouse,
       gamepad,
+      editor,
       lifetime,
       isOfflineMode,
       protobuf,
@@ -288,6 +290,7 @@ class Game {
         keyboard,
         mouse,
         gamepad,
+        editor,
         sutra,
         lifetime
       });
