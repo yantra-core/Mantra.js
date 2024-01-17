@@ -32,6 +32,8 @@ class GravityGardens {
 
     game.setBackground('#007fff');
 
+    game.useMouseControls = true;
+
     game.customMovement = false;
     game.setControls({
       W: 'MOVE_FORWARD',

@@ -26,10 +26,12 @@ export default function fire(game) {
   });
 
 
+  /*
   rules.if('playerTouchedBlock')
     .then('playNote', {
       note: 'C2'
     })
+  */
 
   rules.if('bulletTouchedBlock')
     .then('playNote', {

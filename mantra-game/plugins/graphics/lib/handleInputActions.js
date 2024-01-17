@@ -10,14 +10,12 @@ export default function cssHandleInputs() {
   const spritesheetHeight = 672;
   const cellSize = 48; // Size of each cell in the spritesheet
   const spriteSize = { width: 16, height: 16 }; // Actual size of the sprite
- 
-  game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
-    // throw new Error('line')
+
+  game.on('entityInput::handleActions', (entityId, actions, sequenceNumber) => {
     let player = game.getEntity(entityId);
-    if (data && player) {
-      if (data.controls) {
-        game.updateSprite(entityId, data);
-      }
+    if (actions && player) {
+      game.updateSprite(entityId, actions);
     }
   });
+
 }

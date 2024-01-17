@@ -27,7 +27,7 @@ import cameraShake from './lib/camera/cameraShake.js';
 import render from './lib/render.js';
 import removeGraphic from './lib/entity/removeGraphic.js';
 
-import handleInputs from '../graphics/lib/handleInputs.js';
+import handleInputs from '../graphics/lib/handleInputActions.js';
 
 class CSSGraphics extends GraphicsInterface {
   static id = 'graphics-css';

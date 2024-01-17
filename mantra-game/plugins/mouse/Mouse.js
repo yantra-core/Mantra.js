@@ -13,9 +13,9 @@ export default class Mouse {
     this.dragStartPosition = { x: 0, y: 0 };
 
     this.mouseButtons = {
-      LEFT: false,
-      RIGHT: false,
-      MIDDLE: false
+      LEFT: null,
+      RIGHT: null,
+      MIDDLE: null
     };
 
     this.boundHandleMouseMove = this.handleMouseMove.bind(this);
@@ -77,7 +77,7 @@ export default class Mouse {
 
   handleMouseDown(event) {
     let target = event.target;
-
+    // console.log('handleMouseDown', target)
     // check to see if target has a mantra-id attribute
     if (target && target.getAttribute) {
       let mantraId = target.getAttribute('mantra-id');
@@ -86,6 +86,23 @@ export default class Mouse {
         // this is used for GUI rendering and CSSGraphics
         this.game.selectedEntityId = mantraId;
       }
+
+      if (!mantraId) {
+        // if no mantraID was found, a non-game element was clicked
+        // in most cases this is a GUI element, so we should clear the selectedEntityId
+        this.game.selectedEntityId = null;
+        // and do nothing else
+        // if it happens to be the body, it could still be the game canvas ( empty area )
+        // in that case, we still want to process the mouse event
+        // check to see if the target is not the body
+        if (target.tagName != 'BODY') {
+          this.game.selectedEntityId = null;
+          return;
+        }
+      }
+    } else {
+      // no target, do nothing
+      return;
     }
 
     switch (event.button) {
@@ -108,11 +125,12 @@ export default class Mouse {
       // event.preventDefault();
     }
 
-
+    // Remark: We may need better logic here to determine intent of the user pointerDown
     // TODO: add conditional check here to see if we should be processing mouse events
+    //       should support configurable options for mouse events
+    this.game.emit('pointerDown', this.game.selectedEntityId || {}, event)
+    this.sendMouseData(event);
 
-    
-    this.sendMouseData();
   }
 
   handleMouseUp(event) {
@@ -134,19 +152,21 @@ export default class Mouse {
       event.preventDefault();
     }
 
-    this.game.emit('pointerUp', this.game.selectedEntityId)
-    this.sendMouseData();
+    this.game.emit('pointerUp', this.game.selectedEntityId, event)
+    this.sendMouseData(event);
   }
 
   handleMouseOut(event) {
-    this.game.emit('pointerout', event)
+    this.game.emit('pointerOut', event)
   }
 
   handleMouseOver(event) {
-    this.game.emit('pointerover', event)
+    let target = event.target;
+    this.game.emit('pointerMove', this.game.selectedEntityId || {}, event)
+    this.sendMouseData(event);
   }
 
-  sendMouseData() {
+  sendMouseData(event) {
     const mouseData = {
       position: this.mousePosition, // absolute position
       canvasPosition: this.canvasPosition, // relative position to any canvas
@@ -154,7 +174,8 @@ export default class Mouse {
       isDragging: this.isDragging,
       dragStartPosition: this.dragStartPosition,
       dx: this.dx,
-      dy: this.dy
+      dy: this.dy,
+      event: event
     };
     if (this.game.communicationClient) {
       this.game.communicationClient.sendMessage('player_input', { mouse: mouseData });

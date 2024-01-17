@@ -48,8 +48,6 @@ class Home {
       }
     });
 
-
-
     // game.setBackground('#007F00');
     game.setBackground('#007fff');
 
@@ -65,6 +63,11 @@ class Home {
     // See: sutras.js for World logic
     let rules = sutras(game);
 
+    rules.addCondition('isGameRunning', (game) => true);
+    rules.if('isGameRunning').then('checkMovement');
+    rules.on('checkMovement', (game) => {
+
+    });
 
     game.setControls({
       W: 'MOVE_FORWARD',
@@ -73,17 +76,14 @@ class Home {
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
       K: 'FIRE_BULLET',
-      // K: 'ZOOM_IN',
+      L: 'CAMERA_SHAKE',
+      O: 'ZOOM_IN',
+      P: 'ZOOM_OUT',
       // L: 'ZOOM_OUT',
-      O: 'BARREL_ROLL',
-      P: 'CAMERA_SHAKE',
+      // O: 'BARREL_ROLL',
+      // P: 'CAMERA_SHAKE',
       U: 'SELECT_MENU'
     });
-    // ^^^^ TODO: remove custom handleInputs function over using game.setControls()
-    this.handleInputs = function (entityId, inputs) {
-      rules.emit('entityInput::handleInputs', entityId, inputs)
-    }
-    game.on('entityInput::handleInputs', this.handleInputs);
 
     game.setSutra(rules);
 

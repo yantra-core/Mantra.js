@@ -174,6 +174,9 @@ class Game {
 
     this.switchWorlds = switchWorlds.bind(this);
 
+    // TODO: common helper mappings for all create / update / remove entities
+    this.createPlayer = this.createPlayer.bind(this);
+
     this.bodyMap = {};
     this.systems = {};
     this.storage = storage;

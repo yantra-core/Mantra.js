@@ -5,6 +5,8 @@ class DefaultTwoDimensionalInputStrategy {
   constructor(plugin) {
     this.id = DefaultTwoDimensionalInputStrategy.id;
     this.plugin = plugin;
+    this.isPressed = false;
+    this.continuousActions = [];
   }
 
   init(game) {
@@ -49,50 +51,107 @@ class DefaultTwoDimensionalInputStrategy {
 
   }
 
-  handleInputs(entityId, { controls = {}, mouse = {} }, sequenceNumber) {
+  detectAndSendControls(entityData, ev) {
+
+    if (this.game.useMouseControls !== true) {
+      return;
+    }
+
+    if (!this.isPressed) {
+      return;
+    }
+    // console.log('pointerDown', entityData, ev);
+    let currentPlayer = game.getEntity(game.currentPlayerId);
+
+    if (currentPlayer && game.communicationClient) {
+      // Get browser window dimensions
+      let windowWidth = window.innerWidth;
+      let windowHeight = window.innerHeight;
+      // console.log('currentPlayer', currentPlayer.position);
+      // console.log("Event", ev);
+
+      // Calculate deltas
+      let deltaX = ev.x - (windowWidth / 2);
+      let deltaY = ev.y - (windowHeight / 2);
+      // console.log('deltaX', deltaX, 'deltaY', deltaY);
+
+      // Calculate angle in degrees
+      let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+      // console.log('Angle:', angle);
+
+      // Calculate actions based on the angle
+      let actions = [];
+      if (angle >= -22.5 && angle < 22.5) {
+        actions.push('MOVE_RIGHT');
+      } else if (angle >= 22.5 && angle < 67.5) {
+        actions.push('MOVE_RIGHT', 'MOVE_BACKWARD');
+      } else if (angle >= 67.5 && angle < 112.5) {
+        actions.push('MOVE_BACKWARD');
+      } else if (angle >= 112.5 && angle < 157.5) {
+        actions.push('MOVE_LEFT', 'MOVE_BACKWARD');
+      } else if (angle >= 157.5 || angle < -157.5) {
+        actions.push('MOVE_LEFT');
+      } else if (angle >= -157.5 && angle < -112.5) {
+        actions.push('MOVE_LEFT', 'MOVE_FORWARD');
+      } else if (angle >= -112.5 && angle < -67.5) {
+        actions.push('MOVE_FORWARD');
+      } else if (angle >= -67.5 && angle < -22.5) {
+        actions.push('MOVE_RIGHT', 'MOVE_FORWARD');
+      }
+
+      this.continuousActions = actions;
+      this.isPressed = true;
+    }
+  }
+
+  update() {
+    // If the input is pressed, keep applying the continuous actions
+    if (this.isPressed) {
+      let actions = this.continuousActions;
+      this.handleInputs(this.game.currentPlayerId, { actions });
+    }
+  }
+
+  handleInputs(entityId, { controls = {}, mouse = {}, actions = [] }, sequenceNumber) {
     const plugin = this;
     const game = this.game;
 
     game.lastProcessedInput[entityId] = sequenceNumber;
+
+    // console.log('mmmm', mouse.buttons)
+    // Determine if the mouse button is pressed or released
+    if (mouse.buttons && mouse.buttons.LEFT === true) {
+      this.isPressed = true; // Button is pressed
+      if (mouse.event) {
+        // Calculate continuous actions based on mouse event
+        this.detectAndSendControls(entityId, mouse.event);
+      }
+    } 
+
+    if (mouse.buttons && mouse.buttons.LEFT === false) {
+      this.isPressed = false; // Button is released, stop continuous actions
+      this.continuousActions = [];
+
+    }
+
+    // add any actions that were passed in to the continuousActions array, if not already present
+    actions.forEach(action => {
+      if (!this.continuousActions.includes(action)) {
+        this.continuousActions.push(action);
+      }
+    });
 
     const moveSpeed = 5;
     let entityMovementSystem = game.getSystem('entity-movement');
 
     const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
 
-    const actions = Object.keys(controls).filter(key => controls[key]).map(key => game.systems['entity-input'].controlMappings[key]);
-
-
-    let entityData = game.getEntity(entityId);
-
-    if (entityData && entityData.position && plugin.useMouseControls) {
-      const canvasCenter = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-      const deltaX = position.x - (entityData.position.x + canvasCenter.x);
-      const deltaY = position.y - (entityData.position.y + canvasCenter.y);
-      const angle = Math.atan2(deltaY, deltaX);
-      const angleDeg = angle * (180 / Math.PI);
-
-      if (angleDeg >= -45 && angleDeg < 45) {
-        actions.push('MOVE_RIGHT');
-      } else if (angleDeg >= 45 && angleDeg < 135) {
-        actions.push('MOVE_BACKWARD');
-      } else if (angleDeg >= 135 || angleDeg < -135) {
-        actions.push('MOVE_LEFT');
-      } else if (angleDeg >= -135 && angleDeg < -45) {
-        actions.push('MOVE_FORWARD');
-      }
+    if (actions.length === 0) {
+      // if no actions were manually sent, assume default controls
+      actions = Object.keys(controls).filter(key => controls[key]).map(key => game.systems['entity-input'].controlMappings[key]);
+    } else {
+      // actions is already populated, use those actions as continuous action controls
     }
-
-    // if (buttons.LEFT) actions.push('FIRE_BULLET');
-
-    /* Remark: Removes in favor of input pooling on gametick
-    if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
-    if (Date.now() - plugin.lastBulletFireTime[entityId] <= plugin.bulletCooldown) {
-      console.log('bullet cooldown', Date.now() - plugin.lastBulletFireTime[entityId]);
-      return;
-    };
-    plugin.lastBulletFireTime[entityId] = Date.now();
-    */
 
     if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
     if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
@@ -140,52 +199,6 @@ class DefaultTwoDimensionalInputStrategy {
         game.rotateCamera(360);
       }
 
-      /* TODO: move this code to Home.js sutra ( should not be in entityInput system )
-      // show the raiden backgrounds for a few seconds
-      game.on('player::BARREL_ROLL', etc);
-      let backgrounds = this.game.data.ents.BACKGROUND;
-      let leftRaiden = backgrounds.filter(ent => ent.name === 'raiden-left')[0];
-      if (leftRaiden) {
-        game.updateEntity({
-          id: leftRaiden.id,
-          style: {
-            display: 'block'
-          },
-        });
-      }
-
-      let rightRaiden = backgrounds.filter(ent => ent.name === 'raiden-right')[0];
-      if (rightRaiden) {
-        game.updateEntity({
-          id: rightRaiden.id,
-          style: {
-            display: 'block'
-          },
-        });
-      }
-
-      setTimeout(() => {
-        if (leftRaiden) {
-          game.updateEntity({
-            id: leftRaiden.id,
-            style: {
-              display: 'none'
-            },
-          });
-        }
-        if (rightRaiden) {
-          game.updateEntity({
-            id: rightRaiden.id,
-            style: {
-              display: 'none'
-            },
-          });
-        }
-      }, 3000);
-
-      console.log('backgrounds', leftRaiden, backgrounds)
-      */
-
     }
 
     // custom actions as anonymous functions
@@ -195,6 +208,9 @@ class DefaultTwoDimensionalInputStrategy {
         action(game);
       }
     });
+
+    // emit the actions for local processing ( sprite updates , sounds, etc )
+    game.emit('entityInput::handleActions', entityId, actions, sequenceNumber);
 
   }
 }

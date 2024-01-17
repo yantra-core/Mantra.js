@@ -59,7 +59,6 @@ class EntityMovement extends Plugin {
       });
     }
 
-
   }
 
   rotate (entityId, x, y, z) {

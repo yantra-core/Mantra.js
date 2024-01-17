@@ -50,7 +50,7 @@ export default class LocalClient {
         return;
       }
       let entityInput = this.game.getSystem('entity-input');
-      entityInput.handleInputs(this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse });
+      entityInput.handleInputs(this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse, actions: data.actions });
     }
   }
 }

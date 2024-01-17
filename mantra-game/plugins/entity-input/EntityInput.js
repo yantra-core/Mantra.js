@@ -71,11 +71,14 @@ class EntityInput extends Plugin {
       this.loadDefaultStrategy();
     }
 
-    if (this.game.customMovement !== true) {
-      // if customMovements are not enabled, used the registered input strategies to handle inputs
+    if (this.game.customInput !== false) {
       this.strategies.forEach(function (strategy) {
         strategy.handleInputs(entityId, controls, sequenceNumber);
       });
+    }
+
+    if (this.game.rules) {
+      this.game.rules.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
     }
 
     // always emit the entityInput::handleInputs event

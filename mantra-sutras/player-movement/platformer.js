@@ -2,6 +2,7 @@ export default function platformMovement(game) {
 
   let rules = game.createSutra();
 
+  // TODO: remove this? the Sutra should only be concerned with the control name, not the key
   let defaultControlsMapping = {
     A: 'MOVE_LEFT',
     D: 'MOVE_RIGHT',
@@ -16,6 +17,7 @@ export default function platformMovement(game) {
     let actions = [];
 
     // Map the input to actions
+    // use game.setControls() instead?
     if (input.controls) {
       Object.keys(input.controls).forEach(key => {
         if (input.controls[key] && defaultControlsMapping[key]) {

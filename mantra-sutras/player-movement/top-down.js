@@ -16,7 +16,7 @@ export default function topdownMovement(game) {
   };
 
   function handleInputs (entityId, input) {
-    const moveSpeed = 1.5;
+    const moveSpeed = 1;
     let actions = [];
 
     // Map the input to actions
@@ -69,6 +69,8 @@ export default function topdownMovement(game) {
         game.getSystem('sword').sheathSword(entityId);
       }
     }
+
+    game.emit('entityInput::handleActions', entityId, actions);
 
   }
 

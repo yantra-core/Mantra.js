@@ -21,7 +21,7 @@ class Platform {
     // reset camera mode
     game.data.camera.mode = null;
     // remove event listeners
-    game.off('entityInput::handleInputs', this.handleInputs);
+    // game.off('entityInput::handleInputs', this.handleInputs);
   }
 
   createWorld() {
@@ -32,6 +32,13 @@ class Platform {
     game.setGravity(0, 3.3, 0);
     game.setZoom(4.5);
 
+    game.setControls({
+      A: 'MOVE_LEFT',
+      D: 'MOVE_RIGHT',
+      SPACE: 'JUMP',
+      O: 'JUMP', // virtual gamepad Y button
+    });
+    
     game.use('Platform');
    
     function createPlatform(platformData) {
@@ -105,12 +112,6 @@ class Platform {
     rules.use(warp, 'warpToWorld');
     rules.use(movement(game), 'movement');
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
-
-
-    this.handleInputs  = function (entityId, inputs){
-      rules.emit('entityInput::handleInputs', entityId, inputs)
-    }
-    game.on('entityInput::handleInputs', this.handleInputs);
 
     game.setSutra(rules);
 

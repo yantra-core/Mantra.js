@@ -1,6 +1,6 @@
 // Graphics.js - Marak Squires 2023
 import updateSprite from "./lib/updateSprite.js";
-import handleInputs from "./lib/handleInputs.js";
+import handleInputs from "./lib/handleInputActions.js";
 import getTexture from "./lib/getTexture.js";
 import LoadingCircle from "./lib/LoadingCircle.js";
 import switchGraphics from "./lib/switchGraphics.js";

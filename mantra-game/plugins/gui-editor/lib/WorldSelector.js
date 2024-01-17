@@ -85,7 +85,7 @@ class WorldSelector {
     }, game);
 
     game.on('entityInput::handleInputs', (entityId, input) => {
-      if (input.controls && input.controls.I !== undefined) {
+      if (input && input.controls && (input.controls.I === true || input.controls.I === false)) {
         if (input.controls.I === false) {
           // console.log("FALSE")
         }
@@ -99,7 +99,7 @@ class WorldSelector {
       if (isKeyPressed && !isKeyDown) {
         // Key is pressed down for the first time
         isKeyDown = true;
-        toggleModal();
+        toggleModal(isKeyPressed);
       } else if (!isKeyPressed && isKeyDown) {
         // Key is released
         isKeyDown = false;
@@ -107,7 +107,7 @@ class WorldSelector {
       }
     }
 
-    function toggleModal() {
+    function toggleModal(isKeyPressed) {
       if (that.selectPicker.showingModal) {
         that.selectPicker.hideModal();
       } else {

@@ -4,15 +4,15 @@ import createDrumKit from "./instruments/createDrumKit.js";
 
 import sutras from "./sutras.js";
 
-class Home {
-  static id = 'world-home';
+class Music {
+  static id = 'world-music';
   // "world" type has special features in that it can be unloaded and reloaded.
   //  with special rules such as merge, replace, etc.
   //  this is currently used when switching between worlds in the GUI Editor
   //  the default behavior is to unload the world, then load the new world
   static type = 'world'; // type is optional for Plugins
   constructor() {
-    this.id = Home.id;
+    this.id = Music.id;
   }
 
   init(game) {
@@ -25,6 +25,26 @@ class Home {
     let game = this.game;
 
     game.setSize(2200, 600);
+    //game.setGravity(0, 4.3, 0);
+    game.setGravity(0, 0, 0);
+
+    game.setControls({
+      W: 'MOVE_FORWARD',
+      S: 'MOVE_BACKWARD',
+      A: 'MOVE_LEFT',
+      D: 'MOVE_RIGHT',
+      SPACE: 'FIRE_BULLET',
+      K: 'FIRE_BULLET',
+      L: 'CAMERA_SHAKE',
+      O: 'ZOOM_IN',
+      P: 'ZOOM_OUT',
+      // L: 'ZOOM_OUT',
+      // O: 'BARREL_ROLL',
+      // P: 'CAMERA_SHAKE',
+      U: 'SELECT_MENU'
+    });
+
+
     game.customMovement = false;
     game.setBackground('black');
 
@@ -62,7 +82,6 @@ class Home {
     };
     createDrumKit(game, drumKitConfig);
 
-    game.setGravity(0, 4.3, 0);
 
     /*
     game.createEntity({
@@ -243,7 +262,7 @@ class Home {
 
 }
 
-export default Home;
+export default Music;
 
 function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
