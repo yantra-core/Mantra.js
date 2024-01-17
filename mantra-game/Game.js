@@ -60,7 +60,7 @@ class Game {
     gravity = {},
     keyboard = true,
     mouse = true,
-    gamepad = false,
+    gamepad = true,
     sutra = false,
     lifetime = true,
     // data compression
@@ -391,9 +391,13 @@ class Game {
 
   // All Systems are Plugins, but not all Plugins are Systems
   // TODO: move to separate file
-  use(pluginInstanceOrId, options = {}) {
+  use(pluginInstanceOrId, options = {}, cb) {
 
     let game = this;
+
+    if (typeof cb === 'undefined') {
+      cb = function noop () { };
+    }
 
     // TODO: make this configurable
     let basePath = '/plugins/'; // Base path for loading plugins
@@ -444,6 +448,7 @@ class Game {
             game.loadingPluginsCount--;
             delete game._plugins[pluginId];
             game.emit('plugin::ready::' + pluginId, pluginInstance);
+            cb();
           }
         } else {
           // decrement loadingPluginsCount even if it fails
@@ -451,6 +456,7 @@ class Game {
           console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
           delete game._plugins[pluginId];
           game.loadingPluginsCount--;
+          cb(new Error('PLUGINS object not found, cannot load plugin'));
         }
       }).catch(function (err) {
         console.error(`Error loading plugin ${pluginId}:`, err);
@@ -660,6 +666,25 @@ class Game {
 
   setBackground(color) {
     // not implemented directly, Graphics plugin will handle this
+  }
+
+  createBorder({ width, height, thickness = 8, color }) {
+    let game = this;
+    if (game.systems.border) {
+      game.systems.border.createBorder({
+        width: game.width,
+        height: game.height,
+        thickness: thickness
+    });
+    } else {
+      game.use('Border', {}, function () {
+        game.systems.border.createBorder({
+          width: game.width,
+          height: game.height,
+          thickness: thickness
+        });
+      });
+    }
   }
 
 }
