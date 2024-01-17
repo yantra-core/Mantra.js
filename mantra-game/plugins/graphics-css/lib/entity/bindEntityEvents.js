@@ -1,5 +1,6 @@
 export default function bindEntityEvents(entityData, entityElement) {
 
+  let game = this.game;
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
   entityElement.addEventListener('pointerdown', (ev) => {
     //console.log(ev.target, entityData.id, entityData.type, entityData)

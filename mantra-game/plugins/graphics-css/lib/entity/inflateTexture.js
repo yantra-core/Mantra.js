@@ -1,5 +1,6 @@
 export default function inflateTexture(entityData, entityElement) {
   if (!entityData.texture) return;
+  let game = this.game;
 
   let texture = game.getTexture(entityData.texture);
   if (!texture) {

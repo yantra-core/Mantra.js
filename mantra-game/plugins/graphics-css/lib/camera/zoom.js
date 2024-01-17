@@ -37,7 +37,7 @@ export default function zoom(scale, transitionTime = '0s') {
     let newCameraY = (centerY - (centerY / scale));
     //game.viewportCenterXOffset = newCameraX;
     // alert()
-    game.viewportCenterYOffset = newCameraY + playerHeightOffset;
+    this.game.viewportCenterYOffset = newCameraY + playerHeightOffset;
 
     // Apply scale and translate transform
     gameViewport.style.transform = `scale(${scale})`;

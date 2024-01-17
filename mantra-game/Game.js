@@ -62,7 +62,7 @@ class Game {
     mouse = true,
     gamepad = true,
     editor = true,
-    sutra = false,
+    sutra = true,
     lifetime = true,
     // data compression
     protobuf = false,

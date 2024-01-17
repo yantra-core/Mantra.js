@@ -1,5 +1,6 @@
 // Entity.js - Marak Squires 2023
 import EntityClass from '../../Entity/Entity.js';
+// TODO: remove import, use game reference instead ( reduce imported code )
 import TimersComponent from '../../Component/TimersComponent.js';
 class Entity {
 
