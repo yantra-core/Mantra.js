@@ -1057,6 +1057,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       if (this.systems.sutra) {
         this.systems.sutra.bindKeyCodesToSutraConditions();
       }
+
+      // reset the default player controls
+      this.setControls({});
     }
   }]);
   return Game;
