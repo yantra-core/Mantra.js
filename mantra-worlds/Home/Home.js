@@ -69,23 +69,23 @@ class Home {
 
     rules
       .if('W')
-        .then('MOVE_FORWARD')
-        .then('updateSprite', { sprite: 'playerUp' });
-    
+      .then('MOVE_FORWARD')
+      .then('updateSprite', { sprite: 'playerUp' });
+
     rules
       .if('A')
-        .then('MOVE_LEFT')
-        .then('updateSprite', { sprite: 'playerLeft' });
-    
+      .then('MOVE_LEFT')
+      .then('updateSprite', { sprite: 'playerLeft' });
+
     rules
       .if('S')
-        .then('MOVE_BACKWARD')
-        .then('updateSprite', { sprite: 'playerDown' });
+      .then('MOVE_BACKWARD')
+      .then('updateSprite', { sprite: 'playerDown' });
 
     rules
       .if('D')
-        .then('MOVE_RIGHT')
-        .then('updateSprite', { sprite: 'playerRight' })
+      .then('MOVE_RIGHT')
+      .then('updateSprite', { sprite: 'playerRight' })
 
     rules.if('SPACE').then('FIRE_BULLET');
     rules.if('K').then('SWING_SWORD');
@@ -93,7 +93,7 @@ class Home {
     rules.if('O').then('ZOOM_IN');
     rules.if('P').then('ZOOM_OUT');
 
-    rules.on('updateSprite', function(player, node){
+    rules.on('updateSprite', function (player, node) {
       game.updateEntity({
         id: player.id,
         texture: {
@@ -105,28 +105,28 @@ class Home {
       })
     });
 
-    rules.on('MOVE_FORWARD', function(player){
+    rules.on('MOVE_FORWARD', function (player) {
       game.applyForce(player.id, { x: 0, y: -1, z: 0 });
       game.updateEntity({ id: player.id, rotation: 0 });
     });
 
-    rules.on('MOVE_BACKWARD', function(player){
+    rules.on('MOVE_BACKWARD', function (player) {
       game.applyForce(player.id, { x: 0, y: 1, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI });
     });
 
-    rules.on('MOVE_LEFT', function(player, node, gameState){
+    rules.on('MOVE_LEFT', function (player, node, gameState) {
       console.log(gameState.tick)
       game.applyForce(player.id, { x: -1, y: 0, z: 0 });
       game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
     });
 
-    rules.on('MOVE_RIGHT', function(player){
+    rules.on('MOVE_RIGHT', function (player) {
       game.applyForce(player.id, { x: 1, y: 0, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
     });
-    
-    rules.on('FIRE_BULLET', function(player){
+
+    rules.on('FIRE_BULLET', function (player) {
       game.systems.bullet.fireBullet(player.id);
     });
 
@@ -141,15 +141,15 @@ class Home {
     });
     */
 
-    rules.on('ZOOM_IN', function(){
+    rules.on('ZOOM_IN', function () {
       let currentZoom = game.data.camera.currentZoom || 1;
       game.setZoom(currentZoom + 0.05);
     });
-    rules.on('ZOOM_OUT', function(){
+    rules.on('ZOOM_OUT', function () {
       let currentZoom = game.data.camera.currentZoom || 1;
       game.setZoom(currentZoom - 0.05);
     });
-    
+
     game.useSutra(sutras(game), 'HOME');
 
     // now create some background and text entities for navigation
@@ -499,6 +499,42 @@ class Home {
       position: {
         x: 250,
         y: 0,
+        z: 32
+      }
+    });
+
+    game.createEntity({
+      type: 'WARP',
+      kind: 'GravityGardens',
+      width: 64,
+      height: 64,
+      depth: 64,
+      // texture: 'warp-to-platform',
+      isStatic: true,
+      isSensor: true,
+      position: {
+        x: 250,
+        y: 250,
+        z: 32
+      }
+    });
+
+    // text label saying "Warp To Platform World"
+    game.createEntity({
+      type: 'TEXT',
+      width: 80,
+      text: 'Gravity Gardens',
+      // width: 200,
+      color: 0x000000,
+      style: {
+        width: '100px',
+        fontSize: '16px',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: 240,
+        y: 280,
         z: 32
       }
     });

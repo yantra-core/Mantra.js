@@ -252,6 +252,8 @@ class Game {
     this.components.lockedProperties = new Component('lockedProperties', this);
     this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
 
+    // TODO: add body component and remove game.bodyMap[] API
+
     this.components.timers = new TimersComponent('timers', this);
     this.components.yCraft = new Component('yCraft', this);
     this.components.text = new Component('text', this);

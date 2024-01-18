@@ -1,6 +1,8 @@
 // GravityGardens.js - Marak Squires 2024
 import blackhole from '../../mantra-sutras/blackhole.js'
 import fount from '../../mantra-sutras/fount.js'
+import warpToWorld from '../sutras/warpToWorld.js';
+
 
 class GravityGardens {
   static id = 'world-gravity-gardens';
@@ -18,6 +20,8 @@ class GravityGardens {
 
   createWorld() {
     let game = this.game;
+
+    game.reset();
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
     game.setZoom(2.5);
@@ -32,9 +36,38 @@ class GravityGardens {
 
     game.setBackground('#007fff');
 
-    game.useMouseControls = true;
-    game.customMovement = true;
+    let rules = game.rules;
 
+    rules.on('MOVE_FORWARD', function (player) {
+      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: 0 });
+    });
+
+    rules.on('MOVE_BACKWARD', function (player) {
+      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI });
+    });
+
+    rules.on('MOVE_LEFT', function (player, node, gameState) {
+      console.log(gameState.tick)
+      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+    });
+
+    rules.on('MOVE_RIGHT', function (player) {
+      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+    });
+
+    rules.on('ZOOM_IN', function () {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom + 0.05);
+    });
+
+    rules.on('ZOOM_OUT', function () {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom - 0.05);
+    });
 
     // game.customMovement = false;
     game.setControls({
@@ -46,7 +79,7 @@ class GravityGardens {
       // K: 'FIRE_BULLET',
       K: 'ZOOM_IN',
       L: 'ZOOM_OUT',
-      O: function (game) {
+      O: function (entity, game) {
         if (typeof game.data.lastGravitySwitch === 'undefined') {
           game.data.lastGravitySwitch = 0;
         }
@@ -58,6 +91,11 @@ class GravityGardens {
       P: 'CAMERA_SHAKE',
       U: 'SELECT_MENU'
     });
+
+
+    // when touching WARP entity, warp to world
+    let warp = warpToWorld(game);
+    rules.use(warp, 'warpToWorld');
 
     game.use('StarField');
 
@@ -111,7 +149,7 @@ class GravityGardens {
       id: fountC.id,
       sutra: fount(game, fountC, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
     });
-    
+
     let fountD = game.createEntity({
       name: 'fountD',
       type: 'FOUNT',
@@ -158,6 +196,40 @@ class GravityGardens {
       sutra: blackhole(game, player)
     });
 
+
+    // warp to Platform level
+    game.createEntity({
+      type: 'WARP',
+      kind: 'Home',
+      texture: 'warp-to-home',
+      width: 64,
+      height: 64,
+      isStatic: true,
+      position: {
+        x: 600,
+        y: -30,
+        z: 0
+      }
+    });
+
+
+    // text "Warp to Mantra"
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Warp To Mantra',
+      // kind: 'dynamic',
+      style: {
+        padding: '2px',
+        fontSize: '16px',
+        color: '#ffffff',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: 595,
+        y: -60
+      }
+    });
   }
 
 

@@ -161,7 +161,6 @@ class Music {
       }
     });
 
-
     // text "Warp to Mantra"
     game.createEntity({
       type: 'TEXT',

@@ -28,9 +28,10 @@ class Sutra {
     // Once the game is ready, register the keyboard controls as conditions
     // This allows for game.rules.if('keycode').then('action') style rules
     game.on('game::ready', function(){
+      // for each key in game.controls, add a condition that checks if the key is pressed
+      // these are currently explicitly bound to the player entity, we may want to make this more generic
       self.bindKeyCodesToSutraConditions();
     });
-
   }
 
   bindKeyCodesToSutraConditions() {
@@ -74,7 +75,6 @@ class Sutra {
           }
         }
 
-
         for (let c in this.inputCache.controls) {
           if (this.inputCache.controls[c] === true) {
             this.inputTickCount[c] = this.inputTickCount[c] || 0;
@@ -93,9 +93,6 @@ class Sutra {
             this.inputDuration[c] = this.inputDuration[c] || 0;
             this.inputDuration[c] = 0;
           }
-
-
-
         }
 
         game.data.inputTicks = this.inputTickCount;

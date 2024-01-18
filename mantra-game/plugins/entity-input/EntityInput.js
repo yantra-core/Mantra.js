@@ -77,10 +77,17 @@ class EntityInput extends Plugin {
       });
 
       if (typeof controls !== 'undefined') {
+        // TODO: remove excessive calls to getEntity
+        let ent = this.game.getEntity(entityId);
         let actions = Object.keys(controls).filter(key => controls[key]).map(key => this.controlMappings[key]);
         actions.forEach(action => {
           if (typeof action === 'function') {
-            action(game);
+            action(ent, game);
+          }
+          if (this.game.rules && typeof action === 'string') {
+            this.game.rules.emit(action, ent, {
+              note: 'node data not available. emitted from entityInput::handleInputs directly from control mapping. this is most likely a result of game.setControls() being called.'
+            }, this.game.data);
           }
         });
       }
