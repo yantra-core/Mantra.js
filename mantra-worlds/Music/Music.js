@@ -29,22 +29,7 @@ class Music {
     //game.setGravity(0, 4.3, 0);
     game.setGravity(0, 0, 0);
 
-    game.setControls({
-      W: 'MOVE_FORWARD',
-      S: 'MOVE_BACKWARD',
-      A: 'MOVE_LEFT',
-      D: 'MOVE_RIGHT',
-      SPACE: 'FIRE_BULLET',
-      K: 'FIRE_BULLET',
-      L: 'CAMERA_SHAKE',
-      O: 'ZOOM_IN',
-      P: 'ZOOM_OUT',
-      // L: 'ZOOM_OUT',
-      // O: 'BARREL_ROLL',
-      // P: 'CAMERA_SHAKE',
-      U: 'SELECT_MENU'
-    });
-
+   
 
     game.customMovement = false;
     game.setBackground('black');
@@ -122,12 +107,50 @@ class Music {
 
     game.use('Border', { autoBorder: true })
 
-    // See: sutras.js for World logic
-    let rules = sutras(game);
+
+    let rules = game.rules;
+    rules.if('W').then('MOVE_FORWARD');
+    rules.if('A').then('MOVE_LEFT');
+    rules.if('S').then('MOVE_BACKWARD');
+    rules.if('D').then('MOVE_RIGHT');
+
+    rules.if('SPACE').then('FIRE_BULLET');
+    rules.if('K').then('SWING_SWORD');
+    rules.if('L').then('SWING_SWORD');
+    rules.if('O').then('ZOOM_IN');
+    rules.if('P').then('ZOOM_OUT');
+
+    rules.on('MOVE_FORWARD', function(player){
+      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: 0 });
+    });
+
+    rules.on('MOVE_BACKWARD', function(player){
+      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI });
+    });
+
+    rules.on('MOVE_LEFT', function(player, node, gameState){
+      console.log(gameState.tick)
+      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
+      //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+    });
+
+    rules.on('MOVE_RIGHT', function(player){
+      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+    });
+    
+    rules.on('FIRE_BULLET', function(player){
+      game.systems.bullet.fireBullet(player.id);
+    });
+
+    rules.on('SWING_SWORD', function(player){
+      game.systems.sword.swingSword(player.id);
+    })
 
     // set the Sutra rules for Home world
-    game.useSutra(rules, 'MUSIC');
-
+    game.useSutra(sutras(game), 'MUSIC');
 
     // warp to Platform level
     game.createEntity({

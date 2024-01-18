@@ -33,8 +33,10 @@ class GravityGardens {
     game.setBackground('#007fff');
 
     game.useMouseControls = true;
+    game.customMovement = true;
 
-    game.customMovement = false;
+
+    // game.customMovement = false;
     game.setControls({
       W: 'MOVE_FORWARD',
       S: 'MOVE_BACKWARD',
@@ -143,7 +145,7 @@ class GravityGardens {
       }
     });
 
-    game.setSutra(wallCollision);
+    game.useSutra(wallCollision, 'wallCollision');
     // game.setSutra(blackhole(game));
     // game.setSutra(fount(game));
 

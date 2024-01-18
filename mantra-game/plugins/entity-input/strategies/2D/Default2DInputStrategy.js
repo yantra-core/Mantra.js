@@ -200,9 +200,6 @@ class DefaultTwoDimensionalInputStrategy {
 
     }
 
-    // emit the actions for local processing ( sprite updates , sounds, etc )
-    game.emit('entityInput::handleActions', entityId, actions, sequenceNumber);
-
   }
 }
 

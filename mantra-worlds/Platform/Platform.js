@@ -29,17 +29,23 @@ class Platform {
     let game = this.game;
     game.customMovement = true;
 
+    game.reset();
     game.setGravity(0, 3.3, 0);
     game.setZoom(4.5);
 
-    game.setControls({
-      A: 'MOVE_LEFT',
-      D: 'MOVE_RIGHT',
-      SPACE: 'JUMP',
-      O: 'JUMP', // virtual gamepad Y button
+    game.createDefaultPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
+      position: {
+        x: 10,
+        y: -100
+      }
     });
-    
+   
     game.use('Platform');
+    game.use('Sword');
    
     function createPlatform(platformData) {
       game.createEntity({
@@ -104,16 +110,115 @@ class Platform {
     });
     */
 
-
-    let rules = game.createSutra();
+    let rules = game.rules;
 
     // TODO: moves to sutras.js
     let warp = warpToWorld(game);
     rules.use(warp, 'warpToWorld');
-    rules.use(movement(game), 'movement');
+    // rules.use(movement(game), 'movement');
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-    game.setSutra(rules);
+    // rules.if('W').then('JUMP');
+    rules.if('A').then('MOVE_LEFT');
+    rules.if('S').then('DUCK');
+    rules.if('D').then('MOVE_RIGHT');
+
+    // rules.if('SPACE').then('JUMP');
+    rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
+    rules.addCondition('isRunning', {
+      op: 'or',
+      conditions: ['W', 'K'] // defaults UP key, or B button on Gamepad
+    });  
+
+    let maxJumpTicks = 50;
+    // Remark: isPlayer is already implied for all Key inputs,
+    //         however we add the additional check here for the negative case,
+    //         in order to not let other ents reset player walk speed
+    rules
+      .if('isPlayer')
+      .then((rules) => {
+        rules
+        .if('isRunning')
+        .then('RUN')
+        .else('WALK');
+      })
+
+      rules
+      .if('isPlayer')
+      .then((rules) => {
+      rules
+        .if('SPACE')
+        // .if('doesntExceedDuration')
+        .then('JUMP')
+      })
+    
+    //rules.if('L').then('SWING_SWORD');
+    //rules.if('O').then('ZOOM_IN');
+    //rules.if('P').then('ZOOM_OUT');
+
+    rules.on('JUMP', function(player, node, gameState){
+      console.log('jumpTicks', gameState.inputTicks.SPACE,  gameState.inputDuration.SPACE)
+      if (gameState.inputTicks.SPACE >= maxJumpTicks) {
+        return;
+      }
+      game.applyForce(player.id, { x: 0, y: -1.2, z: 0 });
+      game.updateEntity({ id: player.id, rotation: 0 });
+    });
+
+    let runningForce = 1;
+
+    rules.on('RUN', function(player){
+      runningForce = 1.6;
+      maxJumpTicks = 70;
+    });
+
+    rules.on('WALK', function(player){
+      runningForce = 1;
+      maxJumpTicks = 50;
+    });
+
+    rules.on('DUCK', function(player){
+      game.applyForce(player.id, { x: 0, y: 0.5, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI });
+    });
+
+    rules.on('MOVE_LEFT', function(player, node, gameState){
+      console.log(gameState.tick)
+      game.applyForce(player.id, { x: -runningForce, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+    });
+
+    rules.on('MOVE_RIGHT', function(player){
+      game.applyForce(player.id, { x: runningForce, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+    });
+    
+    rules.on('FIRE_BULLET', function(player){
+      game.systems.bullet.fireBullet(player.id);
+    });
+
+    rules.on('SWING_SWORD', function(player){
+      if (game.systems.sword) {
+        game.systems.sword.swingSword(player.id);
+
+      }
+    })
+
+    /*
+    rules.on('CAMERA_SHAKE', function(player){
+      game.shakeCamera(1000);
+    });
+    */
+    rules.on('ZOOM_IN', function(){
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom + 0.05);
+    });
+    rules.on('ZOOM_OUT', function(){
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom - 0.05);
+    });
+
+    // game.useSutra(rules, 'PLATFORM');
 
     // console.log('created sutra', rules)
 
@@ -203,19 +308,10 @@ class Platform {
       }
     });
 
-    game.createDefaultPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'player'
-      },
-      position: {
-        x: 10,
-        y: -100
-      }
-    });
+ 
 
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb'];
-    itemsList = [];
+    //itemsList = [];
     itemsList.forEach((item, index) => {
       game.createEntity({
         type: item.toUpperCase(),

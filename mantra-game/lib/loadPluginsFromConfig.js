@@ -17,7 +17,7 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
   this.on('game::ready', () => {
     // when the game is ready, create the sutra for default top-down movements
-    this.useSutra(movement(this), 'movement');
+    // this.useSutra(movement(this), 'movement');
   });
 
   this.use('Entity');

@@ -65,35 +65,74 @@ class YCraft {
     });
 
 
-    let rules = game.createSutra();
+    let rules = game.rules;
+    rules.if('W').then('MOVE_FORWARD');
+    rules.if('A').then('MOVE_LEFT');
+    rules.if('S').then('MOVE_BACKWARD');
+    rules.if('D').then('MOVE_RIGHT');
 
-    // TODO: use common warp sutra
-    rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-      if (entity.type === 'COLLISION') {
-        // console.log('entity', entity)
+    rules.if('SPACE').then('FIRE_BULLET');
+    rules.if('O').then('ZOOM_IN');
+    rules.if('P').then('ZOOM_OUT');
 
-        if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-          return true;
-        }
-        if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
-          return true;
-        }
-      }
+    rules.on('MOVE_FORWARD', function(player){
+      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: 0 });
     });
 
-    rules
-      .if('playerTouchedWarpZone')
-      .then('switchWorld')
-
-    // TODO: make this common Sutra
-    rules.on('switchWorld', (entity) => {
-      console.log('entityentity', entity)
-      let worldName = entity.WARP.kind || 'Home';
-      game.switchWorlds(worldName);
+    rules.on('MOVE_BACKWARD', function(player){
+      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI });
     });
 
-    game.useSutra(rules, 'YCRAFT');
+    rules.on('MOVE_LEFT', function(player, node, gameState){
+      console.log(gameState.tick)
+      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
+      //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+    });
 
+    rules.on('MOVE_RIGHT', function(player){
+      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+    });
+    
+    rules.on('FIRE_BULLET', function(player){
+      game.systems.bullet.fireBullet(player.id);
+    });
+
+    function yCraftRules () {
+      let rules = game.createSutra();
+
+      // TODO: use common warp sutra
+      rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
+        if (entity.type === 'COLLISION') {
+          // console.log('entity', entity)
+  
+          if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
+            return true;
+          }
+          if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
+            return true;
+          }
+        }
+      });
+  
+      rules
+        .if('playerTouchedWarpZone')
+        .then('switchWorld')
+  
+      // TODO: make this common Sutra
+      rules.on('switchWorld', (entity) => {
+        console.log('entityentity', entity)
+        let worldName = entity.WARP.kind || 'Home';
+        game.switchWorlds(worldName);
+      });
+  
+      game.useSutra(rules, 'YCRAFT');
+  
+    }
+
+    yCraftRules();
     /*
     game.once('plugin::loaded::typer-ghost', function(){
       game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'YCraft Crafting World', style: { color: 'white', fontSize: '144px' }, duration: 5000, removeDuration: 1000 });

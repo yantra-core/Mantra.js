@@ -27,8 +27,6 @@ import cameraShake from './lib/camera/cameraShake.js';
 import render from './lib/render.js';
 import removeGraphic from './lib/entity/removeGraphic.js';
 
-import handleInputs from '../graphics/lib/handleInputActions.js';
-
 class CSSGraphics extends GraphicsInterface {
   static id = 'graphics-css';
   static removable = false;
@@ -60,7 +58,6 @@ class CSSGraphics extends GraphicsInterface {
     this.setTransform = setTransform.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
-    this.handleInputs = handleInputs.bind(this);
     this.render = render.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
     this.bindEntityEvents = bindEntityEvents.bind(this);

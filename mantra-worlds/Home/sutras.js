@@ -54,7 +54,8 @@ export default function sutras(game) {
   rules.use(hexapod(game), 'hexapod');
 
   // movement
-  rules.use(movement(game), 'movement');
+  //rules.use(movement(game), 'movement');
+  
 
   // console.log('created sutra', rules.toEnglish())
   return rules;

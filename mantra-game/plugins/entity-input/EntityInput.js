@@ -88,7 +88,8 @@ class EntityInput extends Plugin {
     }
 
     if (this.game.rules) {
-      this.game.rules.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
+      // not needed? As Sutra plugin will use game.systems.sutra.inputCache?
+      // this.game.rules.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
     }
 
     // always emit the entityInput::handleInputs event

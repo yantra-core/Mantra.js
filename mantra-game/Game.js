@@ -358,10 +358,12 @@ class Game {
         }).then(function (ent) {
           game.setPlayerId(ent.id);
         });
+        /*
         game.createBorder({
           height: 2000,
           width: 2000
         });
+        */
       }
 
       if (game.systems.client) {
@@ -724,8 +726,16 @@ class Game {
   reset () {
     // not a full game reset ( yet )
     // reset default entity input
-    let movementRules = movement(this);
-    this.rules.use(movementRules, 'movement');
+    //let movementRules = movement(this);
+    //this.rules.use(movementRules, 'movement');
+
+    // reset all Sutra rules
+    this.rules = this.createSutra();
+
+    // remap the keyboard mappings to Sutra by default
+    if (this.systems.sutra) {
+      this.systems.sutra.bindKeyCodesToSutraConditions();
+    }
   }
 
 }

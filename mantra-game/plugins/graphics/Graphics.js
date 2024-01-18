@@ -1,6 +1,5 @@
 // Graphics.js - Marak Squires 2023
 import updateSprite from "./lib/updateSprite.js";
-import handleInputs from "./lib/handleInputActions.js";
 import getTexture from "./lib/getTexture.js";
 import LoadingCircle from "./lib/LoadingCircle.js";
 import switchGraphics from "./lib/switchGraphics.js";
@@ -12,7 +11,6 @@ class Graphics {
   constructor() {
     this.id = Graphics.id;
     this.updateSprite = updateSprite.bind(this);
-    this.handleInputs = handleInputs.bind(this);
     this.getTexture = getTexture.bind(this);
     this.switchGraphics = switchGraphics.bind(this);
     this.LoadingCircle = LoadingCircle;
@@ -49,9 +47,6 @@ class Graphics {
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
 
-    // Bind event handlers for changing player sprite
-    this.handleInputs();
-    
   }
 
   preload () {
