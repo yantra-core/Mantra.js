@@ -5,6 +5,7 @@ import PhysicsMatter from '../plugins/physics-matter/MatterPhysics.js';
 import Entity from '../plugins/entity/Entity.js';
 import EntityInput from '../plugins/entity-input/EntityInput.js';
 import EntityMovement from '../plugins/entity-movement/EntityMovement.js';
+import DefaultTwoDimensionalInputStrategy from '../plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
 import Bullet from '../plugins/bullet/Bullet.js';
 import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
 import hasStateChanged from '../plugins/snapshot-manager/SnapshotManager/hasStateChanged.js';
@@ -19,6 +20,7 @@ game.use(new SnapshotManager());
 game.use(new EntityInput());
 game.use(new EntityMovement());
 game.use(new Bullet());
+game.use(new DefaultTwoDimensionalInputStrategy());
 
 let bobby = {
   id: 1

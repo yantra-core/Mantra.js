@@ -28,21 +28,21 @@ class EntityInput extends Plugin {
 
   init(game) {
     this.game = game;
+    this.controlMappings = game.controls || {};
     this.game.systemsManager.addSystem('entity-input', this);
-    let self = this;
-    this.game.on('start', function () {
-      if (self.strategies.length === 0) {
-        self.loadDefaultStrategy();
-      }
-    });
   }
 
+  // Remark: 1/17/24 - Previous API relied on loadDefaultStrategy() in order to establish the default input strategy
+  //                   This logic has been moved to loadPluginsFromConfig.js file
+  //                   We also are now using Sutra movements as the default input strategy
+  //                   The Default2DInputStrategy can still be used as an explicit input strategy
+  //                    
   loadDefaultStrategy() {
-
     console.log('Warning: No input strategies registered, using default input strategy');
     console.log('Current Game.controls', this.game.controls)
     if (this.game.physics && this.game.physics.dimension === 3) {
       //console.log('game.use(new Default3DInputStrategy())');
+      // TODO: add this to the physix demo as default plugin
       this.game.use(new Default3DInputStrategy())
     } else {
       //console.log('game.use(new DefaultInputStrategy())');
@@ -63,26 +63,36 @@ class EntityInput extends Plugin {
     this.inputsActive = false;
   }
 
-  handleInputs(entityId, controls, sequenceNumber) {
+  handleInputs(entityId, input, sequenceNumber) {
     if (!this.inputsActive) {
       return;
     }
-    if (this.strategies.length === 0) {
-      this.loadDefaultStrategy();
-    }
+
+    let controls = input.controls;
 
     if (this.game.customInput !== false) {
+
       this.strategies.forEach(function (strategy) {
-        strategy.handleInputs(entityId, controls, sequenceNumber);
+        strategy.handleInputs(entityId, input, sequenceNumber);
       });
+
+      if (typeof controls !== 'undefined') {
+        let actions = Object.keys(controls).filter(key => controls[key]).map(key => this.controlMappings[key]);
+        actions.forEach(action => {
+          if (typeof action === 'function') {
+            action(game);
+          }
+        });
+      }
+
     }
 
     if (this.game.rules) {
-      this.game.rules.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
+      this.game.rules.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
     }
 
     // always emit the entityInput::handleInputs event
-    this.game.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
+    this.game.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
 
   }
 

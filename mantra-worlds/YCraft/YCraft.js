@@ -18,6 +18,7 @@ class YCraft {
 
     let game = this.game;
     game.customMovement = false;
+    game.reset();
     game.setGravity(0, 0, 0);
     game.setSize(1600, 900);
     game.use('Bullet');
@@ -91,8 +92,7 @@ class YCraft {
       game.switchWorlds(worldName);
     });
 
-    game.setSutra(rules);
-
+    game.useSutra(rules, 'YCRAFT');
 
     /*
     game.once('plugin::loaded::typer-ghost', function(){

@@ -37,6 +37,9 @@ import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
 import loadScripts from './lib/util/loadScripts.js';
 import loadCSS from './lib/util/loadCSS.js';
 
+// default player movement, this could be also be set in defaultGameStart.js
+import movement from '../mantra-sutras/player-movement/top-down.js';
+
 // The Game class is the main entry point for Mantra games
 class Game {
   constructor({
@@ -355,6 +358,10 @@ class Game {
         }).then(function (ent) {
           game.setPlayerId(ent.id);
         });
+        game.createBorder({
+          height: 2000,
+          width: 2000
+        });
       }
 
       if (game.systems.client) {
@@ -608,6 +615,15 @@ class Game {
     }
   }
 
+  setActions(actions) {
+    let game = this;
+    let actionNames = Object.keys(actions);
+    actionNames.forEach(function (actionName) {
+      let action = actions[actionName];
+      game.rules.on(actionName, action);
+    });
+  }
+
   setSize(width, height) {
     this.width = width;
     this.height = height;
@@ -632,6 +648,10 @@ class Game {
   setPlayerId(playerId) {
     // console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;
+  }
+
+  getCurrentPlayer() {
+    return this.getEntity(this.currentPlayerId);
   }
 
   // TODO: should physics plugin mount these instead of direct map to game?
@@ -688,6 +708,24 @@ class Game {
         });
       });
     }
+  }
+
+  useSutra(subSutra, name) {
+    if (this.rules) {
+      this.rules.use(subSutra, name);
+      if (this.systems['gui-sutra']) {
+        this.systems['gui-sutra'].setRules(this.rules);
+      }
+    } else {
+      console.log('Warning: no rules engine found, cannot use sutra', subSutra, name);
+    }
+  }
+
+  reset () {
+    // not a full game reset ( yet )
+    // reset default entity input
+    let movementRules = movement(this);
+    this.rules.use(movementRules, 'movement');
   }
 
 }

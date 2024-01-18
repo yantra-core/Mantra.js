@@ -9,8 +9,10 @@ export default function topdownMovement(game) {
     D: 'MOVE_RIGHT',
     SPACE: 'FIRE_BULLET',
     K: 'FIRE_BULLET',
-    O: 'BARREL_ROLL',
     U: 'SELECT_MENU',
+    O: 'ZOOM_OUT',
+    P: 'ZOOM_IN',
+
     //LEFT: 'ROTATE_LEFT',
     //RIGHT: 'ROTATE_RIGHT'
   };
@@ -68,6 +70,16 @@ export default function topdownMovement(game) {
       } else {
         game.getSystem('sword').sheathSword(entityId);
       }
+    }
+
+    if (actions.includes('ZOOM_IN')) {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom + 0.05);
+    }
+
+    if (actions.includes('ZOOM_OUT')) {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom - 0.05);
     }
 
     game.emit('entityInput::handleActions', entityId, actions);

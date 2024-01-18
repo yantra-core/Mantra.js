@@ -1,5 +1,5 @@
-// import { createSutra } from '../../../../sutra/index.js';
-import { createSutra } from '@yantra-core/sutra';
+import { createSutra } from '../../../../sutra/index.js';
+// import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 class Sutra {
   static id = 'sutra';
@@ -18,6 +18,22 @@ class Sutra {
     let self = this;
     this.game.on('entityInput::handleInputs', (entityId, input) => {
       self.inputCache = input;
+    });
+
+    let rules = createSutra(game);
+    this.setSutra(rules);
+
+    // Once the game is ready, register the keyboard controls as conditions
+    // This allows for game.rules.if('keycode').then('action') style rules
+    game.on('game::ready', function(){
+      if (game.systems.keyboard) {
+        let keyControls = game.systems.keyboard.controls;
+        for (let mantraCode in keyControls) {
+          game.rules.addCondition(mantraCode, (entity, gameState) =>
+            gameState.input.controls[mantraCode]
+          );
+        }
+      }
     });
 
   }
@@ -77,6 +93,7 @@ class Sutra {
   }
 
   setSutra (rules) {
+    // TODO: needs to merge here, maybe add useSutra() method instead
     this.game.rules = rules;
     if (this.game.systems['gui-sutra']) {
       this.game.systems['gui-sutra'].setRules(rules);

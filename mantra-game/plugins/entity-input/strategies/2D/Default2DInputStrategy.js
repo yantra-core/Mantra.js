@@ -143,7 +143,6 @@ class DefaultTwoDimensionalInputStrategy {
 
     const moveSpeed = 5;
     let entityMovementSystem = game.getSystem('entity-movement');
-
     const { position = { x: 0, y: 0 }, canvasPosition = { x: 0, y: 0 }, buttons = { LEFT: false, RIGHT: false, MIDDLE: false } } = mouse;
 
     if (actions.length === 0) {
@@ -200,14 +199,6 @@ class DefaultTwoDimensionalInputStrategy {
       }
 
     }
-
-    // custom actions as anonymous functions
-    // iterate all actions, if any are functions, run them
-    actions.forEach(action => {
-      if (typeof action === 'function') {
-        action(game);
-      }
-    });
 
     // emit the actions for local processing ( sprite updates , sounds, etc )
     game.emit('entityInput::handleActions', entityId, actions, sequenceNumber);

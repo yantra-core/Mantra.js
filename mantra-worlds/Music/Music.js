@@ -17,6 +17,7 @@ class Music {
 
   init(game) {
     this.game = game;
+    game.reset();
     this.createWorld();
   }
 
@@ -125,7 +126,8 @@ class Music {
     let rules = sutras(game);
 
     // set the Sutra rules for Home world
-    game.setSutra(rules);
+    game.useSutra(rules, 'MUSIC');
+
 
     // warp to Platform level
     game.createEntity({

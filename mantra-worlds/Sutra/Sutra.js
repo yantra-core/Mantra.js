@@ -44,6 +44,9 @@ class Sutra {
     game.use('Health');
     console.log('hexapod', hexapod)
     /*
+
+    TODO: add back game.setSource(), which populates editor menu for code
+          can open github link as default action ( for now )
     // game.use(new Plugins.SutraGUI({ }));
     game.use('Editor', {
       sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/sutra-level-editor.html',
@@ -52,7 +55,7 @@ class Sutra {
     */
 
     game.use('Block', { MIN_BLOCK_SIZE: 1000 });
-    game.use('Border', { autoBorder: true, thickness: 200 });
+    // game.use('Border', { autoBorder: true, thickness: 200 });
     game.setSutra(hexapod(game));
     game.data.roundEnded = false;
     game.data.roundStarted = true;

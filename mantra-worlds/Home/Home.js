@@ -15,15 +15,12 @@ class Home {
   init(game) {
     this.game = game;
     this.createWorld();
-
-
-
   }
 
   unload() {
     // remove event listeners
     console.log('Home::unload')
-    this.game.off('entityInput::handleInputs', this.handleInputs);
+    // this.game.off('entityInput::handleInputs', this.handleInputs);
   }
 
   createWorld() {
@@ -85,7 +82,7 @@ class Home {
       U: 'SELECT_MENU'
     });
 
-    game.setSutra(rules);
+    game.useSutra(rules, 'HOME');
 
     // now create some background and text entities for navigation
     game.createEntity({
