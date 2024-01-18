@@ -45,7 +45,7 @@ class Editor {
   }
 
   createIcon(name) {
-    let featherRoot = 'https://yantra.gg';
+    let featherRoot = this.game.assetRoot || 'https://yantra.gg';
     let element = document.createElement('img');
     element.src = `${featherRoot}/vendor/feather/${name}.svg`;
     element.classList.add('feather-icon');

@@ -31,7 +31,7 @@ export default function createToolbar(game) {
 
   // create image icon with source of ./vendor/feather/eye.svg
   // TODO: remove featherRoot from code, quick fix for now
-  let featherRoot = 'https://yantra.gg';
+  let featherRoot = this.game.assetRoot || 'https://yantra.gg';
   let inspectorIcon = this.createIcon('search');
   inspectorIcon.src = featherRoot + '/vendor/feather/search.svg';
   inspectorIcon.style.cursor = 'pointer';
