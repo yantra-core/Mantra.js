@@ -2,7 +2,7 @@ import LoadingScreen from "../plugins/loading-screen/LoadingScreen.js";
 import GhostTyper from "../plugins/typer-ghost/GhostTyper.js";
 
 // default player movement, this could be also be set in defaultGameStart.js
-import movement from '../../mantra-sutras/player-movement/top-down.js';
+import movement from './defaultPlayerMovement.js';
 
 export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, editor, sutra, ghostTyper, lifetime }) {
 
