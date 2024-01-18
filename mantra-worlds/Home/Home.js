@@ -4,8 +4,6 @@ import welcomeMessage from './welcomeMessage.js';
 class Home {
   static id = 'world-home';
   static type = 'world'; // type is optional for Plugins
-  // "world" type has special features in that it can be unloaded and reloaded.
-  //  with special rules such as merge, replace, etc.
 
   constructor() {
     this.id = Home.id;
@@ -17,23 +15,16 @@ class Home {
     this.createWorld();
   }
 
-  unload() {
-    // remove event listeners
-    console.log('Home::unload')
-    // this.game.off('entityInput::handleInputs', this.handleInputs);
-  }
-
   createWorld() {
 
     let game = this.game;
 
-    // bypass default input movement
-    // game.customMovement = true;
     game.reset();
     game.setZoom(4.5);
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
+    // sprite sheet has been defined in defaultAssets.js
     game.createPlayer({
       texture: {
         sheet: 'loz_spritesheet',
@@ -44,7 +35,8 @@ class Home {
         y: 0
       }
     });
-    /* supports in-line cutting of sprites
+
+    /* TODO supports in-line cutting of sprites
     game.createPlayer({
       texture: {
         sheet: 'loz_spritesheet',
@@ -62,7 +54,6 @@ class Home {
     });
     */
 
-    // game.setBackground('#007F00');
     game.setBackground('#007fff');
 
     game.use('Block');
@@ -144,12 +135,12 @@ class Home {
       game.systems.sword.swingSword(player.id);
     })
     */
-
     /*
     rules.on('CAMERA_SHAKE', function(player){
       game.shakeCamera(1000);
     });
     */
+
     rules.on('ZOOM_IN', function(){
       let currentZoom = game.data.camera.currentZoom || 1;
       game.setZoom(currentZoom + 0.05);
@@ -167,8 +158,6 @@ class Home {
       texture: 'garden',
       width: 300,
       height: 300,
-      //width: game.data.width,
-      //height: game.data.height,
       body: false,
       position: {
         x: 0,
@@ -323,24 +312,6 @@ class Home {
         z: 64
       }
     });
-
-    // if touch warp, switch to Babylon Graphics
-    /*
-    game.createEntity({
-      type: 'BLOCK',
-      width: 64,
-      height: 64,
-      depth: 64,
-      texture: '3d-homer',
-      isSensor: true,
-      // isStatic: true,
-      position: {
-        x: 80,
-        y: 25,
-        z: 25
-      }
-    });
-    */
 
     // switch to 3d text label
     game.createEntity({
@@ -588,8 +559,6 @@ class Home {
       });
     });
 
-
-
     /*
 
     game.createEntity({
@@ -632,6 +601,10 @@ class Home {
 
   }
 
+  unload() {
+    // optionally unload assets
+    // in most cases calling game.reset() is sufficient
+  }
 
 }
 
