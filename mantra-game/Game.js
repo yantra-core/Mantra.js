@@ -38,7 +38,7 @@ import loadScripts from './lib/util/loadScripts.js';
 import loadCSS from './lib/util/loadCSS.js';
 
 // default player movement, this could be also be set in defaultGameStart.js
-import movement from '../mantra-sutras/player-movement/top-down.js';
+import movement from './lib/defaultPlayerMovement.js';
 
 // The Game class is the main entry point for Mantra games
 class Game {
