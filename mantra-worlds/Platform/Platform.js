@@ -118,10 +118,23 @@ class Platform {
     // rules.use(movement(game), 'movement');
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-    // rules.if('W').then('JUMP');
-    rules.if('A').then('MOVE_LEFT');
-    rules.if('S').then('DUCK');
-    rules.if('D').then('MOVE_RIGHT');
+
+    rules.if('A').then('MOVE_LEFT').then('updateSprite', { sprite: 'playerLeft' });
+    rules.if('S').then('DUCK').then('updateSprite', { sprite: 'playerDown' });
+    rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRight' });
+
+
+    rules.on('updateSprite', function(player, node){
+      game.updateEntity({
+        id: player.id,
+        texture: {
+          frameIndex: 0,
+          sheet: player.texture.sheet,
+          sprite: node.data.sprite,
+          animationPlaying: true
+        }
+      })
+    });
 
     // rules.if('SPACE').then('JUMP');
     rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
@@ -161,6 +174,7 @@ class Platform {
       if (gameState.inputTicks.SPACE >= maxJumpTicks) {
         return;
       }
+      console.log('apply force')
       game.applyForce(player.id, { x: 0, y: -1.2, z: 0 });
       game.updateEntity({ id: player.id, rotation: 0 });
     });

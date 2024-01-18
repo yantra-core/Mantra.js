@@ -115,8 +115,6 @@ class Music {
     rules.if('D').then('MOVE_RIGHT');
 
     rules.if('SPACE').then('FIRE_BULLET');
-    rules.if('K').then('SWING_SWORD');
-    rules.if('L').then('SWING_SWORD');
     rules.if('O').then('ZOOM_IN');
     rules.if('P').then('ZOOM_OUT');
 
@@ -144,10 +142,6 @@ class Music {
     rules.on('FIRE_BULLET', function(player){
       game.systems.bullet.fireBullet(player.id);
     });
-
-    rules.on('SWING_SWORD', function(player){
-      game.systems.sword.swingSword(player.id);
-    })
 
     // set the Sutra rules for Home world
     game.useSutra(sutras(game), 'MUSIC');

@@ -34,7 +34,7 @@ class Home {
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
-    game.createDefaultPlayer({
+    game.createPlayer({
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'player'
@@ -44,6 +44,23 @@ class Home {
         y: 0
       }
     });
+    /* supports in-line cutting of sprites
+    game.createPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: {
+          x: 120,
+          y: 435,
+          height: 16,
+          width: 16
+        }
+      },
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+    */
 
     // game.setBackground('#007F00');
     game.setBackground('#007fff');
@@ -57,12 +74,27 @@ class Home {
 
     welcomeMessage(game);
 
-    /* ^^^ is the same as the following--> */
     let rules = game.rules;
-    rules.if('W').then('MOVE_FORWARD').then('updateSprite', { sprite: 'playerUp' })
-    rules.if('A').then('MOVE_LEFT').then('updateSprite', { sprite: 'playerLeft' })
-    rules.if('S').then('MOVE_BACKWARD').then('updateSprite', { sprite: 'playerDown' })
-    rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRight' })
+
+    rules
+      .if('W')
+        .then('MOVE_FORWARD')
+        .then('updateSprite', { sprite: 'playerUp' });
+    
+    rules
+      .if('A')
+        .then('MOVE_LEFT')
+        .then('updateSprite', { sprite: 'playerLeft' });
+    
+    rules
+      .if('S')
+        .then('MOVE_BACKWARD')
+        .then('updateSprite', { sprite: 'playerDown' });
+
+    rules
+      .if('D')
+        .then('MOVE_RIGHT')
+        .then('updateSprite', { sprite: 'playerRight' })
 
     rules.if('SPACE').then('FIRE_BULLET');
     rules.if('K').then('SWING_SWORD');
