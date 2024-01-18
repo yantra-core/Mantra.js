@@ -2303,15 +2303,20 @@ function blackHoleSutra(game, context) {
   });
 
   // Function to apply gravitational force
-  function applyGravity(body1, body2, gravity, gameState) {
-    var distance = Vector.sub(body2.position, body1.position);
+  function applyGravity(ent1, ent2, gravity, gameState) {
+    // TODO: refactor to use Entity.body component, removes game.bodyMap
+    var body = game.bodyMap[ent2.id];
+    if (!body) {
+      return;
+    }
+    var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
       // This prevents extreme forces at very close distances
       return;
     }
     distance = Vector.normalize(distance);
-    var force = gravity * body1.mass * body2.mass / (magnitude * magnitude);
+    var force = gravity * ent1.mass * ent2.mass / (magnitude * magnitude);
     var maxForce = 1; // Prevents excessively large forces
     force = Math.min(force, maxForce);
 
@@ -2322,7 +2327,7 @@ function blackHoleSutra(game, context) {
       repulsion = gameState.repulsion;
     }
     var sign = repulsion ? 1 : -1;
-    game.applyForce(body2.id, {
+    game.applyForce(ent2.id, {
       x: sign * distance.x * force,
       y: sign * distance.y * force
     });
@@ -3024,6 +3029,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = platformMovement;
 function platformMovement(game) {
   var rules = game.createSutra();
+
+  // TODO: remove this? the Sutra should only be concerned with the control name, not the key
   var defaultControlsMapping = {
     A: 'MOVE_LEFT',
     D: 'MOVE_RIGHT',
@@ -3037,6 +3044,7 @@ function platformMovement(game) {
     var actions = [];
 
     // Map the input to actions
+    // use game.setControls() instead?
     if (input.controls) {
       Object.keys(input.controls).forEach(function (key) {
         if (input.controls[key] && defaultControlsMapping[key]) {
@@ -3083,85 +3091,70 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = topdownMovement;
 function topdownMovement(game) {
   var rules = game.createSutra();
-  var defaultControlsMapping = {
-    W: 'MOVE_FORWARD',
-    S: 'MOVE_BACKWARD',
-    A: 'MOVE_LEFT',
-    D: 'MOVE_RIGHT',
-    SPACE: 'FIRE_BULLET',
-    K: 'FIRE_BULLET',
-    O: 'BARREL_ROLL',
-    U: 'SELECT_MENU'
-    //LEFT: 'ROTATE_LEFT',
-    //RIGHT: 'ROTATE_RIGHT'
-  };
-  function handleInputs(entityId, input) {
-    var moveSpeed = 1.5;
-    var actions = [];
-
-    // Map the input to actions
-    if (input.controls) {
-      Object.keys(input.controls).forEach(function (key) {
-        if (input.controls[key] && defaultControlsMapping[key]) {
-          actions.push(defaultControlsMapping[key]);
-        }
-      });
-    }
-
-    // Apply movement and rotation
-    actions.forEach(function (action) {
-      var force;
-      var rotation;
-      switch (action) {
-        case 'MOVE_FORWARD':
-          force = {
-            x: 0,
-            y: -moveSpeed
-          };
-          rotation = 0; // Facing up
-          break;
-        case 'MOVE_BACKWARD':
-          force = {
-            x: 0,
-            y: moveSpeed
-          };
-          rotation = Math.PI; // Facing down
-          break;
-        case 'MOVE_LEFT':
-          force = {
-            x: -moveSpeed,
-            y: 0
-          };
-          rotation = -Math.PI / 2; // Facing left
-          break;
-        case 'MOVE_RIGHT':
-          force = {
-            x: moveSpeed,
-            y: 0
-          };
-          rotation = Math.PI / 2; // Facing right
-          break;
-      }
-      if (force) {
-        game.applyForce(entityId, force);
-        game.updateEntity({
-          id: entityId,
-          rotation: rotation
-        });
-      }
+  rules.on('MOVE_FORWARD', function (entity) {
+    game.applyForce(entity.id, {
+      x: 0,
+      y: -1,
+      z: 0
     });
-    if (game.systems.bullet) {
-      if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
-    }
-    if (game.systems.sword) {
-      if (actions.includes('FIRE_BULLET')) {
-        game.getSystem('sword').swingSword(entityId);
-      } else {
-        game.getSystem('sword').sheathSword(entityId);
-      }
-    }
-  }
-  rules.on('entityInput::handleInputs', handleInputs);
+    game.updateEntity({
+      id: entity.id,
+      rotation: 0
+    });
+  });
+  rules.on('MOVE_BACKWARD', function (entity) {
+    game.applyForce(entity.id, {
+      x: 0,
+      y: 1,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: Math.PI
+    });
+  });
+  rules.on('MOVE_LEFT', function (entity) {
+    game.applyForce(entity.id, {
+      x: -1,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: -Math.PI / 2
+    });
+  });
+  rules.on('MOVE_RIGHT', function (entity) {
+    game.applyForce(entity.id, {
+      x: 1,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: Math.PI / 2
+    });
+  });
+  rules.on('FIRE_BULLET', function (entity) {
+    game.systems.bullet.fireBullet(entity.id);
+  });
+  rules.on('SWING_SWORD', function (entity) {
+    game.systems.sword.swingSword(entity.id);
+  });
+  rules.on('CAMERA_SHAKE', function (entity) {
+    game.shakeCamera(1000);
+  });
+  rules.on('ZOOM_IN', function (entity) {
+    var currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom + 0.05);
+  });
+  rules.on('ZOOM_OUT', function (entity) {
+    var currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom - 0.05);
+  });
+
+  // game.emit('entityInput::handleActions', entityId, actions);
+
   return rules;
 }
 
@@ -3174,6 +3167,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _blackhole = _interopRequireDefault(require("../../mantra-sutras/blackhole.js"));
 var _fount = _interopRequireDefault(require("../../mantra-sutras/fount.js"));
+var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3198,6 +3192,7 @@ var GravityGardens = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
+      game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
       game.setZoom(2.5);
@@ -3209,7 +3204,65 @@ var GravityGardens = /*#__PURE__*/function () {
         }
       });
       game.setBackground('#007fff');
-      game.customMovement = false;
+      var rules = game.rules;
+      rules.on('MOVE_FORWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: -1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: 0
+        });
+      });
+      rules.on('MOVE_BACKWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: 1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI
+        });
+      });
+      rules.on('MOVE_LEFT', function (player, node, gameState) {
+        console.log(gameState.tick);
+        game.applyForce(player.id, {
+          x: -1,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: -Math.PI / 2
+        });
+      });
+      rules.on('MOVE_RIGHT', function (player) {
+        game.applyForce(player.id, {
+          x: 1,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI / 2
+        });
+      });
+      rules.on('ZOOM_IN', function () {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom + 0.05);
+      });
+      rules.on('ZOOM_OUT', function () {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom - 0.05);
+      });
+      rules.on('CAMERA_SHAKE', function (player) {
+        game.shakeCamera(60);
+      });
+
+      // game.customMovement = false;
       game.setControls({
         W: 'MOVE_FORWARD',
         S: 'MOVE_BACKWARD',
@@ -3217,9 +3270,9 @@ var GravityGardens = /*#__PURE__*/function () {
         D: 'MOVE_RIGHT',
         // SPACE: 'FIRE_BULLET',
         // K: 'FIRE_BULLET',
-        K: 'ZOOM_IN',
-        L: 'ZOOM_OUT',
-        O: function O(game) {
+        O: 'ZOOM_IN',
+        P: 'ZOOM_OUT',
+        L: function L(entity, game) {
           if (typeof game.data.lastGravitySwitch === 'undefined') {
             game.data.lastGravitySwitch = 0;
           }
@@ -3228,9 +3281,13 @@ var GravityGardens = /*#__PURE__*/function () {
             game.data.lastGravitySwitch = Date.now();
           }
         },
-        P: 'CAMERA_SHAKE',
+        K: 'CAMERA_SHAKE',
         U: 'SELECT_MENU'
       });
+
+      // when touching WARP entity, warp to world
+      var warp = (0, _warpToWorld["default"])(game);
+      rules.use(warp, 'warpToWorld');
       game.use('StarField');
       if (game.systems.border) {
         game.systems.border.createAutoBorder();
@@ -3329,7 +3386,7 @@ var GravityGardens = /*#__PURE__*/function () {
           game.removeEntity(particle.id);
         }
       });
-      game.setSutra(wallCollision);
+      game.useSutra(wallCollision, 'wallCollision');
       // game.setSutra(blackhole(game));
       // game.setSutra(fount(game));
 
@@ -3341,6 +3398,39 @@ var GravityGardens = /*#__PURE__*/function () {
         id: player.id,
         sutra: (0, _blackhole["default"])(game, player)
       });
+
+      // warp to Platform level
+      game.createEntity({
+        type: 'WARP',
+        kind: 'Home',
+        texture: 'warp-to-home',
+        width: 64,
+        height: 64,
+        isStatic: true,
+        position: {
+          x: 600,
+          y: -30,
+          z: 0
+        }
+      });
+
+      // text "Warp to Mantra"
+      game.createEntity({
+        type: 'TEXT',
+        text: 'Warp To Mantra',
+        // kind: 'dynamic',
+        style: {
+          padding: '2px',
+          fontSize: '16px',
+          color: '#ffffff',
+          textAlign: 'center'
+        },
+        body: false,
+        position: {
+          x: 595,
+          y: -60
+        }
+      });
     }
   }]);
   return GravityGardens;
@@ -3349,7 +3439,7 @@ _defineProperty(GravityGardens, "id", 'world-gravity-gardens');
 _defineProperty(GravityGardens, "type", 'gravity-gardens');
 var _default = exports["default"] = GravityGardens;
 
-},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":23}],30:[function(require,module,exports){
+},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":23,"../sutras/warpToWorld.js":57}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3368,8 +3458,6 @@ function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" 
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Home = /*#__PURE__*/function () {
   // type is optional for Plugins
-  // "world" type has special features in that it can be unloaded and reloaded.
-  //  with special rules such as merge, replace, etc.
 
   function Home() {
     _classCallCheck(this, Home);
@@ -3383,23 +3471,16 @@ var Home = /*#__PURE__*/function () {
       this.createWorld();
     }
   }, {
-    key: "unload",
-    value: function unload() {
-      // remove event listeners
-      console.log('Home::unload');
-      this.game.off('entityInput::handleInputs', this.handleInputs);
-    }
-  }, {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
-
-      // bypass default input movement
-      game.customMovement = true;
+      game.reset();
       game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
-      game.createDefaultPlayer({
+
+      // sprite sheet has been defined in defaultAssets.js
+      game.createPlayer({
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'player'
@@ -3410,40 +3491,132 @@ var Home = /*#__PURE__*/function () {
         }
       });
 
-      // game.setBackground('#007F00');
+      /* TODO supports in-line cutting of sprites
+      game.createPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: {
+            x: 120,
+            y: 435,
+            height: 16,
+            width: 16
+          }
+        },
+        position: {
+          x: 0,
+          y: 0
+        }
+      });
+      */
+
       game.setBackground('#007fff');
       game.use('Block');
       game.use('Border', {
         autoBorder: true
       });
       game.use('Bullet');
-      game.use('Tone');
-      game.use('Tile');
       // game.use('Sword')
-
+      game.use('Tile');
+      game.use('Tone');
       (0, _welcomeMessage["default"])(game);
-
-      // See: sutras.js for World logic
-      var rules = (0, _sutras["default"])(game);
-      game.setControls({
-        W: 'MOVE_FORWARD',
-        S: 'MOVE_BACKWARD',
-        A: 'MOVE_LEFT',
-        D: 'MOVE_RIGHT',
-        SPACE: 'FIRE_BULLET',
-        K: 'FIRE_BULLET',
-        // K: 'ZOOM_IN',
-        // L: 'ZOOM_OUT',
-        O: 'BARREL_ROLL',
-        P: 'CAMERA_SHAKE',
-        U: 'SELECT_MENU'
+      var rules = game.rules;
+      rules["if"]('W').then('MOVE_FORWARD').then('updateSprite', {
+        sprite: 'playerUp'
       });
-      // ^^^^ TODO: remove custom handleInputs function over using game.setControls()
-      this.handleInputs = function (entityId, inputs) {
-        rules.emit('entityInput::handleInputs', entityId, inputs);
-      };
-      game.on('entityInput::handleInputs', this.handleInputs);
-      game.setSutra(rules);
+      rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+        sprite: 'playerLeft'
+      });
+      rules["if"]('S').then('MOVE_BACKWARD').then('updateSprite', {
+        sprite: 'playerDown'
+      });
+      rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
+        sprite: 'playerRight'
+      });
+      rules["if"]('SPACE').then('FIRE_BULLET');
+      rules["if"]('K').then('SWING_SWORD');
+      rules["if"]('L').then('SWING_SWORD');
+      rules["if"]('O').then('ZOOM_IN');
+      rules["if"]('P').then('ZOOM_OUT');
+      rules.on('updateSprite', function (player, node) {
+        game.updateEntity({
+          id: player.id,
+          texture: {
+            frameIndex: 0,
+            sheet: player.texture.sheet,
+            sprite: node.data.sprite,
+            animationPlaying: true
+          }
+        });
+      });
+      rules.on('MOVE_FORWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: -1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: 0
+        });
+      });
+      rules.on('MOVE_BACKWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: 1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI
+        });
+      });
+      rules.on('MOVE_LEFT', function (player, node, gameState) {
+        console.log(gameState.tick);
+        game.applyForce(player.id, {
+          x: -1,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: -Math.PI / 2
+        });
+      });
+      rules.on('MOVE_RIGHT', function (player) {
+        game.applyForce(player.id, {
+          x: 1,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI / 2
+        });
+      });
+      rules.on('FIRE_BULLET', function (player) {
+        game.systems.bullet.fireBullet(player.id);
+      });
+
+      /*
+      rules.on('SWING_SWORD', function(player){
+        game.systems.sword.swingSword(player.id);
+      })
+      */
+      /*
+      rules.on('CAMERA_SHAKE', function(player){
+        game.shakeCamera(1000);
+      });
+      */
+
+      rules.on('ZOOM_IN', function () {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom + 0.05);
+      });
+      rules.on('ZOOM_OUT', function () {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom - 0.05);
+      });
+      game.useSutra((0, _sutras["default"])(game), 'HOME');
 
       // now create some background and text entities for navigation
       game.createEntity({
@@ -3451,8 +3624,6 @@ var Home = /*#__PURE__*/function () {
         texture: 'garden',
         width: 300,
         height: 300,
-        //width: game.data.width,
-        //height: game.data.height,
         body: false,
         position: {
           x: 0,
@@ -3603,24 +3774,6 @@ var Home = /*#__PURE__*/function () {
           z: 64
         }
       });
-
-      // if touch warp, switch to Babylon Graphics
-      /*
-      game.createEntity({
-        type: 'BLOCK',
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: '3d-homer',
-        isSensor: true,
-        // isStatic: true,
-        position: {
-          x: 80,
-          y: 25,
-          z: 25
-        }
-      });
-      */
 
       // switch to 3d text label
       game.createEntity({
@@ -3809,6 +3962,41 @@ var Home = /*#__PURE__*/function () {
           z: 32
         }
       });
+      game.createEntity({
+        type: 'WARP',
+        kind: 'GravityGardens',
+        width: 64,
+        height: 64,
+        depth: 64,
+        // texture: 'warp-to-platform',
+        isStatic: true,
+        isSensor: true,
+        position: {
+          x: 250,
+          y: 250,
+          z: 32
+        }
+      });
+
+      // text label saying "Warp To Platform World"
+      game.createEntity({
+        type: 'TEXT',
+        width: 80,
+        text: 'Gravity Gardens',
+        // width: 200,
+        color: 0x000000,
+        style: {
+          width: '100px',
+          fontSize: '16px',
+          textAlign: 'center'
+        },
+        body: false,
+        position: {
+          x: 240,
+          y: 280,
+          z: 32
+        }
+      });
 
       // if touch note play sound
       game.createEntity({
@@ -3903,6 +4091,12 @@ var Home = /*#__PURE__*/function () {
       });
        */
     }
+  }, {
+    key: "unload",
+    value: function unload() {
+      // optionally unload assets
+      // in most cases calling game.reset() is sufficient
+    }
   }]);
   return Home;
 }();
@@ -3973,7 +4167,7 @@ function sutras(game) {
   rules.use((0, _hexapod["default"])(game), 'hexapod');
 
   // movement
-  rules.use((0, _topDown["default"])(game), 'movement');
+  //rules.use(movement(game), 'movement');
 
   // console.log('created sutra', rules.toEnglish())
   return rules;
@@ -4008,9 +4202,14 @@ function fire(game) {
       }
     }
   });
-  rules["if"]('playerTouchedBlock').then('playNote', {
-    note: 'C2'
-  });
+
+  /*
+  rules.if('playerTouchedBlock')
+    .then('playNote', {
+      note: 'C2'
+    })
+  */
+
   rules["if"]('bulletTouchedBlock').then('playNote', {
     note: 'C4'
   });
@@ -4236,16 +4435,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-var Home = /*#__PURE__*/function () {
+var Music = /*#__PURE__*/function () {
   // type is optional for Plugins
-  function Home() {
-    _classCallCheck(this, Home);
-    this.id = Home.id;
+  function Music() {
+    _classCallCheck(this, Music);
+    this.id = Music.id;
   }
-  _createClass(Home, [{
+  _createClass(Music, [{
     key: "init",
     value: function init(game) {
       this.game = game;
+      game.reset();
       this.createWorld();
     }
   }, {
@@ -4253,6 +4453,8 @@ var Home = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.setSize(2200, 600);
+      //game.setGravity(0, 4.3, 0);
+      game.setGravity(0, 0, 0);
       game.customMovement = false;
       game.setBackground('black');
       var pianoConfig = {
@@ -4293,7 +4495,6 @@ var Home = /*#__PURE__*/function () {
         } // Base position of the drum kit
       };
       (0, _createDrumKit["default"])(game, drumKitConfig);
-      game.setGravity(0, 4.3, 0);
 
       /*
       game.createEntity({
@@ -4333,12 +4534,62 @@ var Home = /*#__PURE__*/function () {
       game.use('Border', {
         autoBorder: true
       });
-
-      // See: sutras.js for World logic
-      var rules = (0, _sutras["default"])(game);
+      var rules = game.rules;
+      rules["if"]('W').then('MOVE_FORWARD');
+      rules["if"]('A').then('MOVE_LEFT');
+      rules["if"]('S').then('MOVE_BACKWARD');
+      rules["if"]('D').then('MOVE_RIGHT');
+      rules["if"]('SPACE').then('FIRE_BULLET');
+      rules["if"]('O').then('ZOOM_IN');
+      rules["if"]('P').then('ZOOM_OUT');
+      rules.on('MOVE_FORWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: -1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: 0
+        });
+      });
+      rules.on('MOVE_BACKWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: 1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI
+        });
+      });
+      rules.on('MOVE_LEFT', function (player, node, gameState) {
+        console.log(gameState.tick);
+        game.applyForce(player.id, {
+          x: -1,
+          y: 0,
+          z: 0
+        });
+        //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+      });
+      rules.on('MOVE_RIGHT', function (player) {
+        game.applyForce(player.id, {
+          x: 1,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI / 2
+        });
+      });
+      rules.on('FIRE_BULLET', function (player) {
+        game.systems.bullet.fireBullet(player.id);
+      });
 
       // set the Sutra rules for Home world
-      game.setSutra(rules);
+      game.useSutra((0, _sutras["default"])(game), 'MUSIC');
 
       // warp to Platform level
       game.createEntity({
@@ -4466,15 +4717,15 @@ var Home = /*#__PURE__*/function () {
     key: "destroy",
     value: function destroy() {}
   }]);
-  return Home;
+  return Music;
 }();
-_defineProperty(Home, "id", 'world-home');
+_defineProperty(Music, "id", 'world-music');
 // "world" type has special features in that it can be unloaded and reloaded.
 //  with special rules such as merge, replace, etc.
 //  this is currently used when switching between worlds in the GUI Editor
 //  the default behavior is to unload the world, then load the new world
-_defineProperty(Home, "type", 'world');
-var _default = exports["default"] = Home;
+_defineProperty(Music, "type", 'world');
+var _default = exports["default"] = Music;
 function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
@@ -4875,16 +5126,28 @@ var Platform = /*#__PURE__*/function () {
       // reset camera mode
       game.data.camera.mode = null;
       // remove event listeners
-      game.off('entityInput::handleInputs', this.handleInputs);
+      // game.off('entityInput::handleInputs', this.handleInputs);
     }
   }, {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
       game.customMovement = true;
+      game.reset();
       game.setGravity(0, 3.3, 0);
       game.setZoom(4.5);
+      game.createDefaultPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
+        position: {
+          x: 10,
+          y: -100
+        }
+      });
       game.use('Platform');
+      game.use('Sword');
       function createPlatform(platformData) {
         game.createEntity({
           type: 'PLATFORM',
@@ -4945,20 +5208,144 @@ var Platform = /*#__PURE__*/function () {
       });
       */
 
-      var rules = game.createSutra();
+      var rules = game.rules;
 
       // TODO: moves to sutras.js
       var warp = (0, _warpToWorld["default"])(game);
       rules.use(warp, 'warpToWorld');
-      rules.use((0, _platformer["default"])(game), 'movement');
+      // rules.use(movement(game), 'movement');
       rules.addCondition('isTile', function (entity) {
         return entity.type === 'BLOCK';
       });
-      this.handleInputs = function (entityId, inputs) {
-        rules.emit('entityInput::handleInputs', entityId, inputs);
-      };
-      game.on('entityInput::handleInputs', this.handleInputs);
-      game.setSutra(rules);
+      rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+        sprite: 'playerLeft'
+      });
+      rules["if"]('S').then('DUCK').then('updateSprite', {
+        sprite: 'playerDown'
+      });
+      rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
+        sprite: 'playerRight'
+      });
+      rules.on('updateSprite', function (player, node) {
+        game.updateEntity({
+          id: player.id,
+          texture: {
+            frameIndex: 0,
+            sheet: player.texture.sheet,
+            sprite: node.data.sprite,
+            animationPlaying: true
+          }
+        });
+      });
+
+      // rules.if('SPACE').then('JUMP');
+      rules.addCondition('isPlayer', function (entity) {
+        return entity.type === 'PLAYER';
+      });
+      rules.addCondition('isRunning', {
+        op: 'or',
+        conditions: ['W', 'K'] // defaults UP key, or B button on Gamepad
+      });
+      var maxJumpTicks = 50;
+      // Remark: isPlayer is already implied for all Key inputs,
+      //         however we add the additional check here for the negative case,
+      //         in order to not let other ents reset player walk speed
+      rules["if"]('isPlayer').then(function (rules) {
+        rules["if"]('isRunning').then('RUN')["else"]('WALK');
+      });
+      rules["if"]('isPlayer').then(function (rules) {
+        rules["if"]('SPACE')
+        // .if('doesntExceedDuration')
+        .then('JUMP');
+      });
+
+      //rules.if('L').then('SWING_SWORD');
+      //rules.if('O').then('ZOOM_IN');
+      //rules.if('P').then('ZOOM_OUT');
+
+      rules.on('JUMP', function (player, node, gameState) {
+        console.log('jumpTicks', gameState.inputTicks.SPACE, gameState.inputDuration.SPACE);
+        if (gameState.inputTicks.SPACE >= maxJumpTicks) {
+          return;
+        }
+        console.log('apply force');
+        game.applyForce(player.id, {
+          x: 0,
+          y: -1.2,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: 0
+        });
+      });
+      var runningForce = 1;
+      rules.on('RUN', function (player) {
+        runningForce = 1.6;
+        maxJumpTicks = 70;
+      });
+      rules.on('WALK', function (player) {
+        runningForce = 1;
+        maxJumpTicks = 50;
+      });
+      rules.on('DUCK', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: 0.5,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI
+        });
+      });
+      rules.on('MOVE_LEFT', function (player, node, gameState) {
+        console.log(gameState.tick);
+        game.applyForce(player.id, {
+          x: -runningForce,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: -Math.PI / 2
+        });
+      });
+      rules.on('MOVE_RIGHT', function (player) {
+        game.applyForce(player.id, {
+          x: runningForce,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI / 2
+        });
+      });
+      rules.on('FIRE_BULLET', function (player) {
+        game.systems.bullet.fireBullet(player.id);
+      });
+      rules.on('SWING_SWORD', function (player) {
+        if (game.systems.sword) {
+          game.systems.sword.swingSword(player.id);
+        }
+      });
+
+      /*
+      rules.on('CAMERA_SHAKE', function(player){
+        game.shakeCamera(1000);
+      });
+      */
+      rules.on('ZOOM_IN', function () {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom + 0.05);
+      });
+      rules.on('ZOOM_OUT', function () {
+        var currentZoom = game.data.camera.currentZoom || 1;
+        game.setZoom(currentZoom - 0.05);
+      });
+
+      // game.useSutra(rules, 'PLATFORM');
 
       // console.log('created sutra', rules)
 
@@ -5045,18 +5432,8 @@ var Platform = /*#__PURE__*/function () {
           z: -8
         }
       });
-      game.createDefaultPlayer({
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
-        },
-        position: {
-          x: 10,
-          y: -100
-        }
-      });
       var itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb'];
-      itemsList = [];
+      //itemsList = [];
       itemsList.forEach(function (item, index) {
         game.createEntity({
           type: item.toUpperCase(),
@@ -5423,6 +5800,8 @@ var Sutra = /*#__PURE__*/function () {
       game.use('Health');
       console.log('hexapod', _hexapod["default"]);
       /*
+       TODO: add back game.setSource(), which populates editor menu for code
+            can open github link as default action ( for now )
       // game.use(new Plugins.SutraGUI({ }));
       game.use('Editor', {
         sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/sutra-level-editor.html',
@@ -5433,10 +5812,7 @@ var Sutra = /*#__PURE__*/function () {
       game.use('Block', {
         MIN_BLOCK_SIZE: 1000
       });
-      game.use('Border', {
-        autoBorder: true,
-        thickness: 200
-      });
+      // game.use('Border', { autoBorder: true, thickness: 200 });
       game.setSutra((0, _hexapod["default"])(game));
       game.data.roundEnded = false;
       game.data.roundStarted = true;
@@ -6660,6 +7036,7 @@ var YCraft = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.customMovement = false;
+      game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(1600, 900);
       game.use('Bullet');
@@ -6704,31 +7081,105 @@ var YCraft = /*#__PURE__*/function () {
           z: 64
         }
       });
-      var rules = game.createSutra();
-
-      // TODO: use common warp sutra
-      rules.addCondition('playerTouchedWarpZone', function (entity, gameState) {
-        if (entity.type === 'COLLISION') {
-          // console.log('entity', entity)
-
-          if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-            return true;
-          }
-          if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
-            return true;
-          }
-        }
+      var rules = game.rules;
+      rules["if"]('W').then('MOVE_FORWARD').then('updateSprite', {
+        sprite: 'playerUp'
       });
-      rules["if"]('playerTouchedWarpZone').then('switchWorld');
-
-      // TODO: make this common Sutra
-      rules.on('switchWorld', function (entity) {
-        console.log('entityentity', entity);
-        var worldName = entity.WARP.kind || 'Home';
-        game.switchWorlds(worldName);
+      rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+        sprite: 'playerLeft'
       });
-      game.setSutra(rules);
+      rules["if"]('S').then('MOVE_BACKWARD').then('updateSprite', {
+        sprite: 'playerDown'
+      });
+      rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
+        sprite: 'playerRight'
+      });
+      rules.on('updateSprite', function (player, node) {
+        game.updateEntity({
+          id: player.id,
+          texture: {
+            frameIndex: 0,
+            sheet: player.texture.sheet,
+            sprite: node.data.sprite,
+            animationPlaying: true
+          }
+        });
+      });
+      rules["if"]('SPACE').then('FIRE_BULLET');
+      rules["if"]('O').then('ZOOM_IN');
+      rules["if"]('P').then('ZOOM_OUT');
+      rules.on('MOVE_FORWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: -1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: 0
+        });
+      });
+      rules.on('MOVE_BACKWARD', function (player) {
+        game.applyForce(player.id, {
+          x: 0,
+          y: 1,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI
+        });
+      });
+      rules.on('MOVE_LEFT', function (player, node, gameState) {
+        console.log(gameState.tick);
+        game.applyForce(player.id, {
+          x: -1,
+          y: 0,
+          z: 0
+        });
+        //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+      });
+      rules.on('MOVE_RIGHT', function (player) {
+        game.applyForce(player.id, {
+          x: 1,
+          y: 0,
+          z: 0
+        });
+        game.updateEntity({
+          id: player.id,
+          rotation: Math.PI / 2
+        });
+      });
+      rules.on('FIRE_BULLET', function (player) {
+        game.systems.bullet.fireBullet(player.id);
+      });
+      function yCraftRules() {
+        var rules = game.createSutra();
 
+        // TODO: use common warp sutra
+        rules.addCondition('playerTouchedWarpZone', function (entity, gameState) {
+          if (entity.type === 'COLLISION') {
+            // console.log('entity', entity)
+
+            if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
+              return true;
+            }
+            if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
+              return true;
+            }
+          }
+        });
+        rules["if"]('playerTouchedWarpZone').then('switchWorld');
+
+        // TODO: make this common Sutra
+        rules.on('switchWorld', function (entity) {
+          console.log('entityentity', entity);
+          var worldName = entity.WARP.kind || 'Home';
+          game.switchWorlds(worldName);
+        });
+        game.useSutra(rules, 'YCRAFT');
+      }
+      yCraftRules();
       /*
       game.once('plugin::loaded::typer-ghost', function(){
         game.systems['typer-ghost'].createText({ x: 300, y: 500, text: 'YCraft Crafting World', style: { color: 'white', fontSize: '144px' }, duration: 5000, removeDuration: 1000 });

@@ -27,6 +27,8 @@ var Sutra = /*#__PURE__*/function () {
     _classCallCheck(this, Sutra);
     this.id = Sutra.id;
     this.inputCache = {};
+    this.inputTickCount = {};
+    this.inputDuration = {};
   }
   _createClass(Sutra, [{
     key: "init",
@@ -40,6 +42,34 @@ var Sutra = /*#__PURE__*/function () {
       this.game.on('entityInput::handleInputs', function (entityId, input) {
         self.inputCache = input;
       });
+      var rules = (0, _index.createSutra)(game);
+      this.setSutra(rules);
+
+      // Once the game is ready, register the keyboard controls as conditions
+      // This allows for game.rules.if('keycode').then('action') style rules
+      game.on('game::ready', function () {
+        // for each key in game.controls, add a condition that checks if the key is pressed
+        // these are currently explicitly bound to the player entity, we may want to make this more generic
+        self.bindKeyCodesToSutraConditions();
+      });
+    }
+  }, {
+    key: "bindKeyCodesToSutraConditions",
+    value: function bindKeyCodesToSutraConditions() {
+      if (game.systems.keyboard) {
+        var keyControls = game.systems.keyboard.controls;
+        var _loop = function _loop(mantraCode) {
+          // Remark: Do we want to imply isPlayer here?
+          // Is there a valid case for not defaulting to isPlayer?
+          // It may be required for complex play movements?
+          game.rules.addCondition(mantraCode, function (entity, gameState) {
+            return entity.id === game.currentPlayerId && gameState.input.controls[mantraCode];
+          });
+        };
+        for (var mantraCode in keyControls) {
+          _loop(mantraCode);
+        }
+      }
     }
   }, {
     key: "update",
@@ -49,6 +79,42 @@ var Sutra = /*#__PURE__*/function () {
         if (Object.keys(this.inputCache).length > 0) {
           game.data.input = this.inputCache;
         }
+        for (var tc in this.inputTickCount) {
+          // tc is name of input
+          // check if this input is not present in inputCache
+          if (this.inputCache.controls && !this.inputCache.controls[tc]) {
+            // reset the tick count
+            this.inputTickCount[tc] = 0;
+          }
+        }
+        for (var _tc in this.inputDuration) {
+          // tc is name of input
+          // check if this input is not present in inputCache
+          if (this.inputCache.controls && !this.inputCache.controls[_tc]) {
+            // reset the duration count
+            this.inputDuration[_tc] = 0;
+          }
+        }
+        for (var c in this.inputCache.controls) {
+          if (this.inputCache.controls[c] === true) {
+            this.inputTickCount[c] = this.inputTickCount[c] || 0;
+            this.inputTickCount[c]++;
+          }
+          if (this.inputCache.controls[c] === false) {
+            this.inputTickCount[c] = this.inputTickCount[c] || 0;
+            this.inputTickCount[c] = 0;
+          }
+          if (this.inputCache.controls[c] === true) {
+            this.inputDuration[c] = this.inputDuration[c] || 0;
+            this.inputDuration[c] += 1000 / game.data.FPS;
+          }
+          if (this.inputCache.controls[c] === false) {
+            this.inputDuration[c] = this.inputDuration[c] || 0;
+            this.inputDuration[c] = 0;
+          }
+        }
+        game.data.inputTicks = this.inputTickCount;
+        game.data.inputDuration = this.inputDuration;
       }
 
       // TODO: Remove this init, it should be a check and throw
@@ -100,11 +166,14 @@ var Sutra = /*#__PURE__*/function () {
         });
       }
       game.data.input = {};
+      game.data.inputTicks = {};
+      game.data.inputDuration = {};
       this.inputCache = {};
     }
   }, {
     key: "setSutra",
     value: function setSutra(rules) {
+      // TODO: needs to merge here, maybe add useSutra() method instead
       this.game.rules = rules;
       if (this.game.systems['gui-sutra']) {
         this.game.systems['gui-sutra'].setRules(rules);

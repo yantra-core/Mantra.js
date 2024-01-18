@@ -23,8 +23,11 @@ class GraphicsSelector {
     selectBox.title = 'Select graphics mode.\nMantra supports hot-swapping and multiplexing of graphics modes.';
     // TODO: Populate the select box with options as needed
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
-    this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
-    this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
+    //this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
+    //this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
+    this.addOption(selectBox, '2D', 'CSSGraphics');
+    this.addOption(selectBox, '3D', 'BabylonGraphics');
+
     // Remark: Phaser 3 support removed 1/14/2023
     //         With CSSGraphics engine working well, not much need for phaser 3
     //         Babylon.js currently handles 3d

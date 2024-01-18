@@ -199,8 +199,8 @@ if (mode === 'online') {
     let worldClass = worlds[storedWorld];
     home = new worldClass();
   }
-  console.log("wwww", worlds)
-  // home = new worlds.GravityGardens();
+  //console.log("wwww", worlds)
+  // home = new worlds.Platform();
   // game.use(new plugins.Border());
 
   /*
@@ -212,43 +212,73 @@ if (mode === 'online') {
   --button-b: #e9dd34;
   */
 
-  game.start(function () {
-    // game.use(new plugins.StarField())
-    //game.use(new plugins.Border({ autoBorder: true, thickness: 200 }));
-    //game.use(new plugins.Block({ MIN_BLOCK_SIZE: 1000 }));
-    // game.use(new plugins.Bullet())
+  game.start(function(){
+    game.use(home);
 
-   game.use(home);
-/*
-    game.createDefaultPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'fire'
+    /*
+    game.setControls({
+      // Press "T" key to move forward
+      W: function(ev){
+        console.log("W", ev);
+        let currentPlayer = game.getCurrentPlayer();
+        game.applyForce(currentPlayer.id, { x: 0, y: 4, z: 0 });
       },
+      SPACE: function(ev){
+        console.log("SPACE", ev)
+        if (game.systems.bullet) {
+          game.systems.bullet.fireBullet(game.currentPlayerId);
+        }
+      }
+    });
+    */
+  
+    // create names Actions
+    /*
+    game.setActions({
+      JUMP: function (entity) {
+        console.log("jump", entity)
+        game.applyForce(entity.id, { x: 0, y: -1, z: 0 });
+      },
+      SHOOT: function (entityId) {
+        console.log("shoot", entityId)
+        // for example, fire a bullet via direct access to the bullet system
+        game.systems.bullet.fireBullet(entityId);
+      }
+    });
+    */
+  
+    // call actions from key press
+    // game.rules.if('W').then('JUMP');
+
+    // can also support key combinations
+    // see: Sutra.js documentation for more details
+    // game.rules.if('W', 'S').then('JUMP');
+
+
+    /*
+    game.rules.on('JUMP', function(entity){
+
+      console.log("jump", entity)
+      game.applyForce(entity.id, { x: 0, y: -1, z: 0 });
+
     });
 
-    game.setZoom(4.5);
     */
 
-    // game.use(new plugins.GamepadGUI())
-    //game.use(new plugins.Tone());
+    // support this syntax?
+    /*
+    game.setActions({
+      W: function(){}
+    });
+    game.rules.if('W').then('W');
+    */
 
-    // game.use(new plugins.XState({ world: BossFight() }));
-    // game.use(new plugins.PluginExplorer({ }));
-    // game.systems['gui-plugin-explorer'].drawPluginForm(game.systems.block, plugins.Block)
-    // game.use(new plugins.YCraft({ contraption: roverLight }))
-    // game.use(new plugins.YCraftGUI())
-    // game.use(new plugins.SutraGUI({ }));
-    // game.use(new plugins.Scoreboard());
-    // game.use(new plugins.MidiGUI())
-    // game.use(new plugins.Midi())
-    // game.use(new plugins.Nes());
-   
-    // game.use(new plugins.TowerWorld());
-    game.data.roundEnded = false;
-    game.data.roundStarted = true;
+
   });
 
+
+  game.data.roundEnded = false;
+  game.data.roundStarted = true;
 }
 
 

@@ -96,14 +96,15 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
     key: "init",
     value: function init(game) {
       this.game = game;
+      this.controlMappings = game.controls || {};
       this.game.systemsManager.addSystem('entity-input', this);
-      var self = this;
-      this.game.on('start', function () {
-        if (self.strategies.length === 0) {
-          self.loadDefaultStrategy();
-        }
-      });
     }
+
+    // Remark: 1/17/24 - Previous API relied on loadDefaultStrategy() in order to establish the default input strategy
+    //                   This logic has been moved to loadPluginsFromConfig.js file
+    //                   We also are now using Sutra movements as the default input strategy
+    //                   The Default2DInputStrategy can still be used as an explicit input strategy
+    //                    
   }, {
     key: "loadDefaultStrategy",
     value: function loadDefaultStrategy() {
@@ -111,6 +112,7 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
       console.log('Current Game.controls', this.game.controls);
       if (this.game.physics && this.game.physics.dimension === 3) {
         //console.log('game.use(new Default3DInputStrategy())');
+        // TODO: add this to the physix demo as default plugin
         this.game.use(new _Default3DInputStrategy["default"]());
       } else {
         //console.log('game.use(new DefaultInputStrategy())');
@@ -134,22 +136,43 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
     }
   }, {
     key: "handleInputs",
-    value: function handleInputs(entityId, controls, sequenceNumber) {
+    value: function handleInputs(entityId, input, sequenceNumber) {
+      var _this2 = this;
       if (!this.inputsActive) {
         return;
       }
-      if (this.strategies.length === 0) {
-        this.loadDefaultStrategy();
-      }
-      if (this.game.customMovement !== true) {
-        // if customMovements are not enabled, used the registered input strategies to handle inputs
+      var controls = input.controls;
+      if (this.game.customInput !== false) {
         this.strategies.forEach(function (strategy) {
-          strategy.handleInputs(entityId, controls, sequenceNumber);
+          strategy.handleInputs(entityId, input, sequenceNumber);
         });
+        if (typeof controls !== 'undefined') {
+          // TODO: remove excessive calls to getEntity
+          var ent = this.game.getEntity(entityId);
+          var actions = Object.keys(controls).filter(function (key) {
+            return controls[key];
+          }).map(function (key) {
+            return _this2.controlMappings[key];
+          });
+          actions.forEach(function (action) {
+            if (typeof action === 'function') {
+              action(ent, game);
+            }
+            if (_this2.game.rules && typeof action === 'string') {
+              _this2.game.rules.emit(action, ent, {
+                note: 'node data not available. emitted from entityInput::handleInputs directly from control mapping. this is most likely a result of game.setControls() being called.'
+              }, _this2.game.data);
+            }
+          });
+        }
+      }
+      if (this.game.rules) {
+        // not needed? As Sutra plugin will use game.systems.sutra.inputCache?
+        // this.game.rules.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
       }
 
       // always emit the entityInput::handleInputs event
-      this.game.emit('entityInput::handleInputs', entityId, controls, sequenceNumber);
+      this.game.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
     }
   }, {
     key: "update",
@@ -193,6 +216,8 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
     _classCallCheck(this, DefaultTwoDimensionalInputStrategy);
     this.id = DefaultTwoDimensionalInputStrategy.id;
     this.plugin = plugin;
+    this.isPressed = false;
+    this.continuousActions = [];
   }
   _createClass(DefaultTwoDimensionalInputStrategy, [{
     key: "init",
@@ -205,9 +230,9 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
         D: 'MOVE_RIGHT',
         SPACE: 'FIRE_BULLET',
         K: 'FIRE_BULLET',
-        L: 'DROP_BOMB',
-        O: 'BARREL_ROLL',
-        P: 'CAMERA_SHAKE',
+        L: 'CAMERA_SHAKE',
+        O: 'ZOOM_OUT',
+        P: 'ZOOM_IN',
         U: 'SELECT_MENU'
         //LEFT: 'ROTATE_LEFT',
         //RIGHT: 'ROTATE_RIGHT'
@@ -233,15 +258,100 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       game.systems['entity-input'].controlMappings = _objectSpread(_objectSpread({}, game.systems['entity-input'].controlMappings), this.defaultControlsMapping);
     }
   }, {
+    key: "detectAndSendControls",
+    value: function detectAndSendControls(entityData, ev) {
+      if (this.game.useMouseControls !== true) {
+        return;
+      }
+      if (!this.isPressed) {
+        return;
+      }
+      // console.log('pointerDown', entityData, ev);
+      var currentPlayer = game.getEntity(game.currentPlayerId);
+      if (currentPlayer && game.communicationClient) {
+        // Get browser window dimensions
+        var windowWidth = window.innerWidth;
+        var windowHeight = window.innerHeight;
+        // console.log('currentPlayer', currentPlayer.position);
+        // console.log("Event", ev);
+
+        // Calculate deltas
+        var deltaX = ev.x - windowWidth / 2;
+        var deltaY = ev.y - windowHeight / 2;
+        // console.log('deltaX', deltaX, 'deltaY', deltaY);
+
+        // Calculate angle in degrees
+        var angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+        // console.log('Angle:', angle);
+
+        // Calculate actions based on the angle
+        var actions = [];
+        if (angle >= -22.5 && angle < 22.5) {
+          actions.push('MOVE_RIGHT');
+        } else if (angle >= 22.5 && angle < 67.5) {
+          actions.push('MOVE_RIGHT', 'MOVE_BACKWARD');
+        } else if (angle >= 67.5 && angle < 112.5) {
+          actions.push('MOVE_BACKWARD');
+        } else if (angle >= 112.5 && angle < 157.5) {
+          actions.push('MOVE_LEFT', 'MOVE_BACKWARD');
+        } else if (angle >= 157.5 || angle < -157.5) {
+          actions.push('MOVE_LEFT');
+        } else if (angle >= -157.5 && angle < -112.5) {
+          actions.push('MOVE_LEFT', 'MOVE_FORWARD');
+        } else if (angle >= -112.5 && angle < -67.5) {
+          actions.push('MOVE_FORWARD');
+        } else if (angle >= -67.5 && angle < -22.5) {
+          actions.push('MOVE_RIGHT', 'MOVE_FORWARD');
+        }
+        this.continuousActions = actions;
+        this.isPressed = true;
+      }
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      // If the input is pressed, keep applying the continuous actions
+      if (this.isPressed) {
+        var actions = this.continuousActions;
+        this.handleInputs(this.game.currentPlayerId, {
+          actions: actions
+        });
+      }
+    }
+  }, {
     key: "handleInputs",
     value: function handleInputs(entityId, _ref, sequenceNumber) {
+      var _this = this;
       var _ref$controls = _ref.controls,
         controls = _ref$controls === void 0 ? {} : _ref$controls,
         _ref$mouse = _ref.mouse,
-        mouse = _ref$mouse === void 0 ? {} : _ref$mouse;
+        mouse = _ref$mouse === void 0 ? {} : _ref$mouse,
+        _ref$actions = _ref.actions,
+        actions = _ref$actions === void 0 ? [] : _ref$actions;
       var plugin = this;
       var game = this.game;
       game.lastProcessedInput[entityId] = sequenceNumber;
+
+      // console.log('mmmm', mouse.buttons)
+      // Determine if the mouse button is pressed or released
+      if (mouse.buttons && mouse.buttons.LEFT === true) {
+        this.isPressed = true; // Button is pressed
+        if (mouse.event) {
+          // Calculate continuous actions based on mouse event
+          this.detectAndSendControls(entityId, mouse.event);
+        }
+      }
+      if (mouse.buttons && mouse.buttons.LEFT === false) {
+        this.isPressed = false; // Button is released, stop continuous actions
+        this.continuousActions = [];
+      }
+
+      // add any actions that were passed in to the continuousActions array, if not already present
+      actions.forEach(function (action) {
+        if (!_this.continuousActions.includes(action)) {
+          _this.continuousActions.push(action);
+        }
+      });
       var moveSpeed = 5;
       var entityMovementSystem = game.getSystem('entity-movement');
       var _mouse$position = mouse.position,
@@ -260,43 +370,16 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
           RIGHT: false,
           MIDDLE: false
         } : _mouse$buttons;
-      var actions = Object.keys(controls).filter(function (key) {
-        return controls[key];
-      }).map(function (key) {
-        return game.systems['entity-input'].controlMappings[key];
-      });
-      var entityData = game.getEntity(entityId);
-      if (entityData && entityData.position && plugin.useMouseControls) {
-        var canvasCenter = {
-          x: window.innerWidth / 2,
-          y: window.innerHeight / 2
-        };
-        var deltaX = position.x - (entityData.position.x + canvasCenter.x);
-        var deltaY = position.y - (entityData.position.y + canvasCenter.y);
-        var angle = Math.atan2(deltaY, deltaX);
-        var angleDeg = angle * (180 / Math.PI);
-        if (angleDeg >= -45 && angleDeg < 45) {
-          actions.push('MOVE_RIGHT');
-        } else if (angleDeg >= 45 && angleDeg < 135) {
-          actions.push('MOVE_BACKWARD');
-        } else if (angleDeg >= 135 || angleDeg < -135) {
-          actions.push('MOVE_LEFT');
-        } else if (angleDeg >= -135 && angleDeg < -45) {
-          actions.push('MOVE_FORWARD');
-        }
+      if (actions.length === 0) {
+        // if no actions were manually sent, assume default controls
+        actions = Object.keys(controls).filter(function (key) {
+          return controls[key];
+        }).map(function (key) {
+          return game.systems['entity-input'].controlMappings[key];
+        });
+      } else {
+        // actions is already populated, use those actions as continuous action controls
       }
-
-      // if (buttons.LEFT) actions.push('FIRE_BULLET');
-
-      /* Remark: Removes in favor of input pooling on gametick
-      if (typeof plugin.lastBulletFireTime[entityId] === 'undefined') plugin.lastBulletFireTime[entityId] = 0;
-      if (Date.now() - plugin.lastBulletFireTime[entityId] <= plugin.bulletCooldown) {
-        console.log('bullet cooldown', Date.now() - plugin.lastBulletFireTime[entityId]);
-        return;
-      };
-      plugin.lastBulletFireTime[entityId] = Date.now();
-      */
-
       if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
       if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
       if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, -1);
@@ -337,58 +420,7 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
           // rotate the camera 360 degrees
           game.rotateCamera(360);
         }
-
-        /* TODO: move this code to Home.js sutra ( should not be in entityInput system )
-        // show the raiden backgrounds for a few seconds
-        game.on('player::BARREL_ROLL', etc);
-        let backgrounds = this.game.data.ents.BACKGROUND;
-        let leftRaiden = backgrounds.filter(ent => ent.name === 'raiden-left')[0];
-        if (leftRaiden) {
-          game.updateEntity({
-            id: leftRaiden.id,
-            style: {
-              display: 'block'
-            },
-          });
-        }
-         let rightRaiden = backgrounds.filter(ent => ent.name === 'raiden-right')[0];
-        if (rightRaiden) {
-          game.updateEntity({
-            id: rightRaiden.id,
-            style: {
-              display: 'block'
-            },
-          });
-        }
-         setTimeout(() => {
-          if (leftRaiden) {
-            game.updateEntity({
-              id: leftRaiden.id,
-              style: {
-                display: 'none'
-              },
-            });
-          }
-          if (rightRaiden) {
-            game.updateEntity({
-              id: rightRaiden.id,
-              style: {
-                display: 'none'
-              },
-            });
-          }
-        }, 3000);
-         console.log('backgrounds', leftRaiden, backgrounds)
-        */
       }
-
-      // custom actions as anonymous functions
-      // iterate all actions, if any are functions, run them
-      actions.forEach(function (action) {
-        if (typeof action === 'function') {
-          action(game);
-        }
-      });
     }
   }]);
   return DefaultTwoDimensionalInputStrategy;

@@ -76,6 +76,8 @@ var Border = /*#__PURE__*/function () {
       var height = entityData.height;
       var width = entityData.width;
       var WALL_THICKNESS = entityData.thickness || 200;
+      var paddingOffset = 1; // TODO: remove this, was required to get borders to align on screen
+
       var borders = {
         top: {
           position: {
@@ -85,16 +87,22 @@ var Border = /*#__PURE__*/function () {
           size: {
             width: width + WALL_THICKNESS * 2,
             height: WALL_THICKNESS
+          },
+          style: {
+            borderBottomStyle: 'none'
           }
         },
         bottom: {
           position: {
             x: 0,
-            y: height / 2 + WALL_THICKNESS / 2
+            y: height / 2 + WALL_THICKNESS / 2 - paddingOffset
           },
           size: {
             width: width + WALL_THICKNESS * 2,
             height: WALL_THICKNESS
+          },
+          style: {
+            borderTopStyle: 'none'
           }
         },
         left: {
@@ -105,16 +113,26 @@ var Border = /*#__PURE__*/function () {
           size: {
             width: WALL_THICKNESS,
             height: height
+          },
+          style: {
+            borderRightStyle: 'none',
+            borderTopStyle: 'none',
+            borderBottomStyle: 'none'
           }
         },
         right: {
           position: {
-            x: width / 2 + WALL_THICKNESS / 2,
+            x: width / 2 + WALL_THICKNESS / 2 + paddingOffset,
             y: 0
           },
           size: {
             width: WALL_THICKNESS,
             height: height
+          },
+          style: {
+            borderLeftStyle: 'none',
+            borderTopStyle: 'none',
+            borderBottomStyle: 'none'
           }
         }
       };
@@ -132,6 +150,7 @@ var Border = /*#__PURE__*/function () {
             x: border.position.x,
             y: border.position.y
           },
+          style: border.style,
           width: border.size.width,
           height: border.size.height,
           depth: 80,

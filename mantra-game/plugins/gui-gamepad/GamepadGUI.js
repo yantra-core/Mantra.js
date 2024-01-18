@@ -230,7 +230,6 @@ class GamepadGUI {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyP' }));
     });
 
-
     if (false && !is_touch_enabled()) {
       let controller = document.getElementById('snes-gamepad');
       let controllerHeight = controller.offsetHeight;

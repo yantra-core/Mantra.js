@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra Home World</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+
+  <script type="module" src="/ycraft.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+      let game = new MANTRA.Game({
+        options: {
+          scriptRoot: '.'
+        }
+      });
+
+      game.start();
+
+
+      // TODO: should merge, not overwrite
+      /*
+      game.setControls({
+        T: function(ev){
+          console.log("T", ev)
+        },
+        SPACE: function(ev){
+          console.log("SPACE", ev)
+        }
+      });
+      */
+
+      // bind inputs to any Keyboard key by name
+      game.setControls({
+        T: function(ev){
+          console.log("T", ev);
+          let currentPlayer = game.getCurrentPlayer();
+          game.applyForce(currentPlayer.id, { x: 0, y: 10, z: 0 });
+        },
+        SPACE: function(ev){
+          console.log("SPACE", ev)
+        }
+      });
+
+
+      /*
+
+      // create entity actions by name
+      game.setActions({
+        JUMP: function (entityId) {
+          console.log("jump", entityId)
+          game.applyForce(entityId, { x: 0, y: 10, z: 0 });
+        },
+        SHOOT: function (entityId) {
+          console.log("shoot", entityId)
+          // for example, fire a bullet via direct access to the bullet system
+          game.systems.bullet.fireBullet(entityId);
+        }
+      });
+
+      game.rules.on('SHOOT', function (entityId) {
+        console.log("SHOOT", entityId)
+      });
+
+      game.rules.if('INPUT_FORWARD').then('MOVEMENT_FORWARD');
+
+      game.rules.if('pressW').then('SHOOT');
+      game.rules.if('JUMP').then('SHOOT');
+
+      game.setControls({
+        SPACE: 'SHOOT',
+        W: 'SHOOT'
+      });
+      */
+
+     /*
+      function handleInputs (entityId, input) {
+        console.log('handleInputs', entityId, input);
+
+      }
+
+      game.on('entityInput::handleInputs', function(){
+        console.log("FFF")
+      });
+      */
+
+
+      window.game = game;
+
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

@@ -61,7 +61,7 @@ var Editor = /*#__PURE__*/function () {
   }, {
     key: "createIcon",
     value: function createIcon(name) {
-      var featherRoot = 'https://yantra.gg';
+      var featherRoot = this.game.assetRoot || 'https://yantra.gg';
       var element = document.createElement('img');
       element.src = "".concat(featherRoot, "/vendor/feather/").concat(name, ".svg");
       element.classList.add('feather-icon');
@@ -365,8 +365,11 @@ var GraphicsSelector = /*#__PURE__*/function () {
       selectBox.title = 'Select graphics mode.\nMantra supports hot-swapping and multiplexing of graphics modes.';
       // TODO: Populate the select box with options as needed
       // Example: this.addOption(selectBox, 'Option 1', 'value1');
-      this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
-      this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
+      //this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
+      //this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
+      this.addOption(selectBox, '2D', 'CSSGraphics');
+      this.addOption(selectBox, '3D', 'BabylonGraphics');
+
       // Remark: Phaser 3 support removed 1/14/2023
       //         With CSSGraphics engine working well, not much need for phaser 3
       //         Babylon.js currently handles 3d
@@ -1034,7 +1037,7 @@ var WorldSelector = /*#__PURE__*/function () {
         game.switchWorlds(worldName);
       }, game);
       game.on('entityInput::handleInputs', function (entityId, input) {
-        if (input.controls && input.controls.I !== undefined) {
+        if (input && input.controls && (input.controls.I === true || input.controls.I === false)) {
           if (input.controls.I === false) {
             // console.log("FALSE")
           }
@@ -1046,7 +1049,7 @@ var WorldSelector = /*#__PURE__*/function () {
         if (isKeyPressed && !isKeyDown) {
           // Key is pressed down for the first time
           isKeyDown = true;
-          toggleModal();
+          toggleModal(isKeyPressed);
         } else if (!isKeyPressed && isKeyDown) {
           // Key is released
           isKeyDown = false;
@@ -1054,7 +1057,7 @@ var WorldSelector = /*#__PURE__*/function () {
         }
       }
 
-      function toggleModal() {
+      function toggleModal(isKeyPressed) {
         if (that.selectPicker.showingModal) {
           that.selectPicker.hideModal();
         } else {
@@ -1142,7 +1145,7 @@ function createToolbar(game) {
 
   // create image icon with source of ./vendor/feather/eye.svg
   // TODO: remove featherRoot from code, quick fix for now
-  var featherRoot = 'https://yantra.gg';
+  var featherRoot = this.game.assetRoot || 'https://yantra.gg';
   var inspectorIcon = this.createIcon('search');
   inspectorIcon.src = featherRoot + '/vendor/feather/search.svg';
   inspectorIcon.style.cursor = 'pointer';

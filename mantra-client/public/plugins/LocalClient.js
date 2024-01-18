@@ -63,7 +63,8 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
         var entityInput = this.game.getSystem('entity-input');
         entityInput.handleInputs(this.game.currentPlayerId, {
           controls: data.controls,
-          mouse: data.mouse
+          mouse: data.mouse,
+          actions: data.actions
         });
       }
     }

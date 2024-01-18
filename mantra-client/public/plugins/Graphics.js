@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _updateSprite = _interopRequireDefault(require("./lib/updateSprite.js"));
-var _handleInputs = _interopRequireDefault(require("./lib/handleInputs.js"));
 var _getTexture = _interopRequireDefault(require("./lib/getTexture.js"));
 var _LoadingCircle = _interopRequireDefault(require("./lib/LoadingCircle.js"));
 var _switchGraphics = _interopRequireDefault(require("./lib/switchGraphics.js"));
@@ -23,7 +22,6 @@ var Graphics = /*#__PURE__*/function () {
     _classCallCheck(this, Graphics);
     this.id = Graphics.id;
     this.updateSprite = _updateSprite["default"].bind(this);
-    this.handleInputs = _handleInputs["default"].bind(this);
     this.getTexture = _getTexture["default"].bind(this);
     this.switchGraphics = _switchGraphics["default"].bind(this);
     this.LoadingCircle = _LoadingCircle["default"];
@@ -59,9 +57,6 @@ var Graphics = /*#__PURE__*/function () {
 
       document.body.scrollTop = 0; // For Safari
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
-
-      // Bind event handlers for changing player sprite
-      this.handleInputs();
     }
   }, {
     key: "preload",
@@ -148,7 +143,7 @@ function downloadCanvasAsImage(canvasElement, filename) {
 
 */
 
-},{"./lib/LoadingCircle.js":2,"./lib/getTexture.js":3,"./lib/handleInputs.js":4,"./lib/switchGraphics.js":5,"./lib/updateSprite.js":6}],2:[function(require,module,exports){
+},{"./lib/LoadingCircle.js":2,"./lib/getTexture.js":3,"./lib/switchGraphics.js":4,"./lib/updateSprite.js":5}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -359,40 +354,6 @@ function getTexture(config) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = cssHandleInputs;
-// no longer being used?
-function cssHandleInputs() {
-  var game = this.game;
-  //
-  // Updates the player sprite based on the current input
-  // Remark: Input and Movement are handled in EntityInput and EntityMovement plugins
-  //
-  // Spritesheet dimensions
-  var spritesheetWidth = 672;
-  var spritesheetHeight = 672;
-  var cellSize = 48; // Size of each cell in the spritesheet
-  var spriteSize = {
-    width: 16,
-    height: 16
-  }; // Actual size of the sprite
-
-  game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
-    // throw new Error('line')
-    var player = game.getEntity(entityId);
-    if (data && player) {
-      if (data.controls) {
-        game.updateSprite(entityId, data);
-      }
-    }
-  });
-}
-
-},{}],5:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports["default"] = switchGraphics;
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -461,17 +422,18 @@ function switchGraphics(graphicsInterfaceName, cb) {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = updateSprite;
-function updateSprite(entityId, data, SheetManager, anims) {
+function updateSprite(entityId, actions, SheetManager, anims) {
   var game = this.game;
-  var currentInputs = data.controls;
+  var currentActions = actions;
 
+  // console.log('updateSprite', entityId, actions, SheetManager, anims)
   // console.log('currentInputs', currentInputs)
   // check to see if we have a player entity
   var playerEntity = game.getEntity(entityId);
@@ -479,82 +441,91 @@ function updateSprite(entityId, data, SheetManager, anims) {
     return;
   }
   var direction = null;
-  if (currentInputs) {
-    if (currentInputs.W) {
-      direction = 'Up';
-    } else if (currentInputs.A) {
-      direction = 'Left';
-    } else if (currentInputs.S) {
-      direction = 'Down';
-    } else if (currentInputs.D) {
-      direction = 'Right';
-    }
-    if (!playerEntity.texture) {
-      return;
-    }
-    var spriteName = playerEntity.texture.sprite;
-    var newSpriteName;
-    if (!direction) {
-      newSpriteName = spriteName;
-      // uncomment to re-enable animation
-      //return;
-    } else {
-      newSpriteName = 'player' + direction;
-    }
-
-    //console.log('updateSprite', newSpriteName ,direction, entityId, playerEntity, data);
-
-    // check to see if sprite is already set, if so, do not double set
-    if (spriteName !== newSpriteName) {
-      // if the new sprite name doesn't match, update immediate
-      game.updateEntity({
-        id: entityId,
-        texture: {
-          frameIndex: 0,
-          sheet: playerEntity.texture.sheet,
-          sprite: newSpriteName,
-          animationPlaying: true
-        }
-      });
-      return;
-    } else {
-      /*
-      game.updateEntity({
-        id: entityId,
-        texture: {
-          frameIndex: 0,
-          sheet: playerEntity.texture.sheet,
-          sprite: newSpriteName,
-          animationPlaying: false
-        }
-      })
-      */
-      return;
-    }
-    // console.log('updating sprite', spriteName, newSpriteName, 'on', entityId, 'to', newSpriteName)
-    /*
-      // check to see if controls are all false, if so animationPlaying should be false
-      let allFalse = true;
-      // console.log('currentInputs', currentInputs)
-      for (let key in currentInputs) {
-        //console.log(key, currentInputs[key])
-        if (currentInputs[key] === true) {
-          allFalse = false;
-          break;
-        }
-      }
-       //console.log('allFalse', allFalse, currentInputs)
-      game.updateEntity({
-        id: entityId,
-        texture: {
-          sheet: playerEntity.texture.sheet,
-          sprite: newSpriteName,
-          animationPlaying: true
-        }
-      })
-    }
-    */
+  if (!currentActions) {
+    return;
   }
+  if (!playerEntity.texture) {
+    return;
+  }
+  var currentAction = currentActions[0];
+  switch (currentAction) {
+    case 'MOVE_LEFT':
+      direction = 'Left';
+      break;
+    case 'MOVE_RIGHT':
+      direction = 'Right';
+      break;
+    case 'MOVE_FORWARD':
+      direction = 'Up';
+      break;
+    case 'MOVE_BACKWARD':
+      direction = 'Down';
+      break;
+    default:
+      direction = null;
+  }
+  var spriteName = playerEntity.texture.sprite;
+  var newSpriteName;
+  if (!direction) {
+    newSpriteName = spriteName;
+    // uncomment to re-enable animation
+    //return;
+  } else {
+    newSpriteName = 'player' + direction;
+  }
+
+  //console.log('updateSprite', newSpriteName ,direction, entityId, playerEntity, data);
+
+  // check to see if sprite is already set, if so, do not double set
+  if (spriteName !== newSpriteName) {
+    // if the new sprite name doesn't match, update immediate
+    game.updateEntity({
+      id: entityId,
+      texture: {
+        frameIndex: 0,
+        sheet: playerEntity.texture.sheet,
+        sprite: newSpriteName,
+        animationPlaying: true
+      }
+    });
+    return;
+  } else {
+    /*
+    game.updateEntity({
+      id: entityId,
+      texture: {
+        frameIndex: 0,
+        sheet: playerEntity.texture.sheet,
+        sprite: newSpriteName,
+        animationPlaying: false
+      }
+    })
+    */
+    return;
+  }
+  // console.log('updating sprite', spriteName, newSpriteName, 'on', entityId, 'to', newSpriteName)
+  /*
+    // check to see if controls are all false, if so animationPlaying should be false
+    let allFalse = true;
+    // console.log('currentInputs', currentInputs)
+    for (let key in currentInputs) {
+      //console.log(key, currentInputs[key])
+      if (currentInputs[key] === true) {
+        allFalse = false;
+        break;
+      }
+    }
+     //console.log('allFalse', allFalse, currentInputs)
+    game.updateEntity({
+      id: entityId,
+      texture: {
+        sheet: playerEntity.texture.sheet,
+        sprite: newSpriteName,
+        animationPlaying: true
+      }
+    })
+  }
+  */
 }
 
 },{}]},{},[1])(1)

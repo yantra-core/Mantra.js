@@ -69,6 +69,10 @@ class GravityGardens {
       game.setZoom(currentZoom - 0.05);
     });
 
+    rules.on('CAMERA_SHAKE', function (player) {
+      game.shakeCamera(60);
+    });
+
     // game.customMovement = false;
     game.setControls({
       W: 'MOVE_FORWARD',
@@ -77,9 +81,9 @@ class GravityGardens {
       D: 'MOVE_RIGHT',
       // SPACE: 'FIRE_BULLET',
       // K: 'FIRE_BULLET',
-      K: 'ZOOM_IN',
-      L: 'ZOOM_OUT',
-      O: function (entity, game) {
+      O: 'ZOOM_IN',
+      P: 'ZOOM_OUT',
+      L: function (entity, game) {
         if (typeof game.data.lastGravitySwitch === 'undefined') {
           game.data.lastGravitySwitch = 0;
         }
@@ -88,7 +92,7 @@ class GravityGardens {
           game.data.lastGravitySwitch = Date.now();
         }
       },
-      P: 'CAMERA_SHAKE',
+      K: 'CAMERA_SHAKE',
       U: 'SELECT_MENU'
     });
 

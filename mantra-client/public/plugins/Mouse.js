@@ -30,9 +30,9 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       y: 0
     };
     this.mouseButtons = {
-      LEFT: false,
-      RIGHT: false,
-      MIDDLE: false
+      LEFT: null,
+      RIGHT: null,
+      MIDDLE: null
     };
     this.boundHandleMouseMove = this.handleMouseMove.bind(this);
     this.boundHandleMouseDown = this.handleMouseDown.bind(this);
@@ -102,7 +102,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     key: "handleMouseDown",
     value: function handleMouseDown(event) {
       var target = event.target;
-
+      // console.log('handleMouseDown', target)
       // check to see if target has a mantra-id attribute
       if (target && target.getAttribute) {
         var mantraId = target.getAttribute('mantra-id');
@@ -111,6 +111,22 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           // this is used for GUI rendering and CSSGraphics
           this.game.selectedEntityId = mantraId;
         }
+        if (!mantraId) {
+          // if no mantraID was found, a non-game element was clicked
+          // in most cases this is a GUI element, so we should clear the selectedEntityId
+          this.game.selectedEntityId = null;
+          // and do nothing else
+          // if it happens to be the body, it could still be the game canvas ( empty area )
+          // in that case, we still want to process the mouse event
+          // check to see if the target is not the body
+          if (target.tagName != 'BODY') {
+            this.game.selectedEntityId = null;
+            return;
+          }
+        }
+      } else {
+        // no target, do nothing
+        return;
       }
       switch (event.button) {
         case 0:
@@ -134,9 +150,11 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // event.preventDefault();
       }
 
+      // Remark: We may need better logic here to determine intent of the user pointerDown
       // TODO: add conditional check here to see if we should be processing mouse events
-
-      this.sendMouseData();
+      //       should support configurable options for mouse events
+      this.game.emit('pointerDown', this.game.selectedEntityId || {}, event);
+      this.sendMouseData(event);
     }
   }, {
     key: "handleMouseUp",
@@ -158,22 +176,24 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // prevent default right click menu
         event.preventDefault();
       }
-      this.game.emit('pointerUp', this.game.selectedEntityId);
-      this.sendMouseData();
+      this.game.emit('pointerUp', this.game.selectedEntityId, event);
+      this.sendMouseData(event);
     }
   }, {
     key: "handleMouseOut",
     value: function handleMouseOut(event) {
-      this.game.emit('pointerout', event);
+      this.game.emit('pointerOut', event);
     }
   }, {
     key: "handleMouseOver",
     value: function handleMouseOver(event) {
-      this.game.emit('pointerover', event);
+      var target = event.target;
+      this.game.emit('pointerMove', this.game.selectedEntityId || {}, event);
+      this.sendMouseData(event);
     }
   }, {
     key: "sendMouseData",
-    value: function sendMouseData() {
+    value: function sendMouseData(event) {
       var mouseData = {
         position: this.mousePosition,
         // absolute position
@@ -183,7 +203,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         isDragging: this.isDragging,
         dragStartPosition: this.dragStartPosition,
         dx: this.dx,
-        dy: this.dy
+        dy: this.dy,
+        event: event
       };
       if (this.game.communicationClient) {
         this.game.communicationClient.sendMessage('player_input', {

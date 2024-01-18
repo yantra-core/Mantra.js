@@ -321,7 +321,7 @@ var DefaultMovementStrategy = /*#__PURE__*/function () {
       var position = this.game.getComponent(entityId, 'position');
       var rotation = this.game.getComponent(entityId, 'rotation');
       if (position) {
-        var forceFactor = 0.4;
+        var forceFactor = 0.15;
         var force = {
           x: dx * forceFactor,
           y: -dy * forceFactor

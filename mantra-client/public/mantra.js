@@ -279,6 +279,7 @@ var _TimersComponent = _interopRequireDefault(require("./Component/TimersCompone
 var _loadPluginsFromConfig = _interopRequireDefault(require("./lib/loadPluginsFromConfig.js"));
 var _loadScripts = _interopRequireDefault(require("./lib/util/loadScripts.js"));
 var _loadCSS = _interopRequireDefault(require("./lib/util/loadCSS.js"));
+var _defaultPlayerMovement = _interopRequireDefault(require("./lib/defaultPlayerMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -299,6 +300,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // Action Rate Limiter, suitable for any Systems action that should be rate limited
 // Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
 // Utility function for loading external assets
+// default player movement, this could be also be set in defaultGameStart.js
 // The Game class is the main entry point for Mantra games
 var Game = exports.Game = /*#__PURE__*/function () {
   function Game() {
@@ -337,9 +339,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
       _ref$mouse = _ref.mouse,
       mouse = _ref$mouse === void 0 ? true : _ref$mouse,
       _ref$gamepad = _ref.gamepad,
-      gamepad = _ref$gamepad === void 0 ? false : _ref$gamepad,
+      gamepad = _ref$gamepad === void 0 ? true : _ref$gamepad,
+      _ref$editor = _ref.editor,
+      editor = _ref$editor === void 0 ? true : _ref$editor,
       _ref$sutra = _ref.sutra,
-      sutra = _ref$sutra === void 0 ? false : _ref$sutra,
+      sutra = _ref$sutra === void 0 ? true : _ref$sutra,
       _ref$lifetime = _ref.lifetime,
       lifetime = _ref$lifetime === void 0 ? true : _ref$lifetime,
       _ref$protobuf = _ref.protobuf,
@@ -378,6 +382,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       keyboard: keyboard,
       mouse: mouse,
       gamepad: gamepad,
+      editor: editor,
       lifetime: lifetime,
       isOfflineMode: isOfflineMode,
       protobuf: protobuf,
@@ -452,6 +457,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     // Bind loadCSS from util
     this.loadCSS = _loadCSS["default"].bind(this);
     this.switchWorlds = _switchWorlds["default"].bind(this);
+
+    // TODO: common helper mappings for all create / update / remove entities
+    this.createPlayer = this.createPlayer.bind(this);
     this.bodyMap = {};
     this.systems = {};
     this.storage = _storage["default"];
@@ -518,6 +526,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     this.components.graphics = new _Component["default"]('graphics', this);
     this.components.lockedProperties = new _Component["default"]('lockedProperties', this);
     this.components.actionRateLimiter = new _ActionRateLimiter["default"]('actionRateLimiter', this);
+
+    // TODO: add body component and remove game.bodyMap[] API
+
     this.components.timers = new _TimersComponent["default"]('timers', this);
     this.components.yCraft = new _Component["default"]('yCraft', this);
     this.components.text = new _Component["default"]('text', this);
@@ -557,6 +568,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
         keyboard: keyboard,
         mouse: mouse,
         gamepad: gamepad,
+        editor: editor,
         sutra: sutra,
         lifetime: lifetime
       });
@@ -623,7 +635,14 @@ var Game = exports.Game = /*#__PURE__*/function () {
           }).then(function (ent) {
             game.setPlayerId(ent.id);
           });
+          /*
+          game.createBorder({
+            height: 2000,
+            width: 2000
+          });
+          */
         }
+
         if (game.systems.client) {
           var client = this.getSystem('client');
           client.start(cb);
@@ -669,7 +688,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "use",
     value: function use(pluginInstanceOrId) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var cb = arguments.length > 2 ? arguments[2] : undefined;
       var game = this;
+      if (typeof cb === 'undefined') {
+        cb = function noop() {};
+      }
 
       // TODO: make this configurable
       var basePath = '/plugins/'; // Base path for loading plugins
@@ -720,6 +743,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
               game.loadingPluginsCount--;
               delete game._plugins[_pluginId];
               game.emit('plugin::ready::' + _pluginId, pluginInstance);
+              cb();
             }
           } else {
             // decrement loadingPluginsCount even if it fails
@@ -727,6 +751,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
             console.log('Warning: PLUGINS object not found, cannot load plugin', _pluginId);
             delete game._plugins[_pluginId];
             game.loadingPluginsCount--;
+            cb(new Error('PLUGINS object not found, cannot load plugin'));
           }
         })["catch"](function (err) {
           console.error("Error loading plugin ".concat(_pluginId, ":"), err);
@@ -889,6 +914,16 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "setActions",
+    value: function setActions(actions) {
+      var game = this;
+      var actionNames = Object.keys(actions);
+      actionNames.forEach(function (actionName) {
+        var action = actions[actionName];
+        game.rules.on(actionName, action);
+      });
+    }
+  }, {
     key: "setSize",
     value: function setSize(width, height) {
       this.width = width;
@@ -917,6 +952,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function setPlayerId(playerId) {
       // console.log('setting playerID', playerId)
       this.currentPlayerId = playerId;
+    }
+  }, {
+    key: "getCurrentPlayer",
+    value: function getCurrentPlayer() {
+      return this.getEntity(this.currentPlayerId);
     }
 
     // TODO: should physics plugin mount these instead of direct map to game?
@@ -965,11 +1005,64 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function setBackground(color) {
       // not implemented directly, Graphics plugin will handle this
     }
+  }, {
+    key: "createBorder",
+    value: function createBorder(_ref2) {
+      var width = _ref2.width,
+        height = _ref2.height,
+        _ref2$thickness = _ref2.thickness,
+        thickness = _ref2$thickness === void 0 ? 8 : _ref2$thickness,
+        color = _ref2.color;
+      var game = this;
+      if (game.systems.border) {
+        game.systems.border.createBorder({
+          width: game.width,
+          height: game.height,
+          thickness: thickness
+        });
+      } else {
+        game.use('Border', {}, function () {
+          game.systems.border.createBorder({
+            width: game.width,
+            height: game.height,
+            thickness: thickness
+          });
+        });
+      }
+    }
+  }, {
+    key: "useSutra",
+    value: function useSutra(subSutra, name) {
+      if (this.rules) {
+        this.rules.use(subSutra, name);
+        if (this.systems['gui-sutra']) {
+          this.systems['gui-sutra'].setRules(this.rules);
+        }
+      } else {
+        console.log('Warning: no rules engine found, cannot use sutra', subSutra, name);
+      }
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      // not a full game reset ( yet )
+      // reset default entity input
+      //let movementRules = movement(this);
+      //this.rules.use(movementRules, 'movement');
+
+      // reset all Sutra rules
+      this.rules = this.createSutra();
+
+      // remap the keyboard mappings to Sutra by default
+      if (this.systems.sutra) {
+        this.systems.sutra.bindKeyCodesToSutraConditions();
+      }
+    }
   }]);
   return Game;
 }();
 
-},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/createDefaultPlayer.js":7,"./lib/eventEmitter.js":8,"./lib/gameTick.js":9,"./lib/loadPluginsFromConfig.js":10,"./lib/localGameLoop.js":11,"./lib/onlineGameLoop.js":12,"./lib/start/defaultGameStart.js":13,"./lib/storage/storage.js":15,"./lib/switchWorlds.js":16,"./lib/util/loadCSS.js":17,"./lib/util/loadScripts.js":18}],5:[function(require,module,exports){
+},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/createDefaultPlayer.js":7,"./lib/defaultPlayerMovement.js":8,"./lib/eventEmitter.js":9,"./lib/gameTick.js":10,"./lib/loadPluginsFromConfig.js":11,"./lib/localGameLoop.js":12,"./lib/onlineGameLoop.js":13,"./lib/start/defaultGameStart.js":14,"./lib/storage/storage.js":16,"./lib/switchWorlds.js":17,"./lib/util/loadCSS.js":18,"./lib/util/loadScripts.js":19}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1096,7 +1189,7 @@ var SystemsManager = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":8}],6:[function(require,module,exports){
+},{"../lib/eventEmitter.js":9}],6:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -1157,6 +1250,92 @@ function createDefaultPlayer() {
 ;
 
 },{}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = topdownMovement;
+function topdownMovement(game) {
+  return;
+  var rules = game.createSutra();
+  rules["if"]('W').then('MOVE_FORWARD');
+  rules["if"]('A').then('MOVE_LEFT');
+  rules["if"]('S').then('MOVE_BACKWARD');
+  rules["if"]('D').then('MOVE_RIGHT');
+  rules["if"]('SPACE').then('FIRE_BULLET');
+  rules["if"]('K').then('SWING_SWORD');
+  rules["if"]('L').then('SWING_SWORD');
+  rules["if"]('O').then('ZOOM_IN');
+  rules["if"]('P').then('ZOOM_OUT');
+  rules.on('MOVE_FORWARD', function (entity) {
+    game.applyForce(entity.id, {
+      x: 0,
+      y: -1,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: 0
+    });
+  });
+  rules.on('MOVE_BACKWARD', function (entity) {
+    game.applyForce(entity.id, {
+      x: 0,
+      y: 1,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: Math.PI
+    });
+  });
+  rules.on('MOVE_LEFT', function (entity) {
+    game.applyForce(entity.id, {
+      x: -1,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: -Math.PI / 2
+    });
+  });
+  rules.on('MOVE_RIGHT', function (entity) {
+    game.applyForce(entity.id, {
+      x: 1,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: Math.PI / 2
+    });
+  });
+  rules.on('FIRE_BULLET', function (entity) {
+    game.systems.bullet.fireBullet(entity.id);
+  });
+  rules.on('SWING_SWORD', function (entity) {
+    game.systems.sword.swingSword(entity.id);
+  });
+  rules.on('CAMERA_SHAKE', function (entity) {
+    game.shakeCamera(1000);
+  });
+  rules.on('ZOOM_IN', function (entity) {
+    var currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom + 0.05);
+  });
+  rules.on('ZOOM_OUT', function (entity) {
+    var currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom - 0.05);
+  });
+
+  // game.emit('entityInput::handleActions', entityId, actions);
+
+  return rules;
+}
+
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1298,7 +1477,7 @@ eventEmitter.listenerCount = function (eventPattern) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1370,7 +1549,7 @@ function gameTick() {
 }
 var _default = exports["default"] = gameTick;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1379,7 +1558,10 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = loadPluginsFromConfig;
 var _LoadingScreen = _interopRequireDefault(require("../plugins/loading-screen/LoadingScreen.js"));
 var _GhostTyper = _interopRequireDefault(require("../plugins/typer-ghost/GhostTyper.js"));
+var _defaultPlayerMovement = _interopRequireDefault(require("./defaultPlayerMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+// default player movement, this could be also be set in defaultGameStart.js
+
 function loadPluginsFromConfig(_ref) {
   var physics = _ref.physics,
     graphics = _ref.graphics,
@@ -1387,6 +1569,7 @@ function loadPluginsFromConfig(_ref) {
     keyboard = _ref.keyboard,
     mouse = _ref.mouse,
     gamepad = _ref.gamepad,
+    editor = _ref.editor,
     sutra = _ref.sutra,
     ghostTyper = _ref.ghostTyper,
     lifetime = _ref.lifetime;
@@ -1397,6 +1580,10 @@ function loadPluginsFromConfig(_ref) {
       minLoadTime: gameConfig.minLoadTime
     }));
   }
+  this.on('game::ready', function () {
+    // when the game is ready, create the sutra for default top-down movements
+    // this.useSutra(movement(this), 'movement');
+  });
   this.use('Entity');
   if (physics === 'matter') {
     this.use('MatterPhysics');
@@ -1417,6 +1604,9 @@ function loadPluginsFromConfig(_ref) {
       msgpack: gameConfig.msgpack
     };
     this.use('Client', clientConfig);
+    if (editor) {
+      this.use('Editor');
+    }
     if (keyboard) {
       this.use('Keyboard');
     }
@@ -1474,7 +1664,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":19,"../plugins/typer-ghost/GhostTyper.js":20}],11:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":20,"../plugins/typer-ghost/GhostTyper.js":21,"./defaultPlayerMovement.js":8}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1555,7 +1745,7 @@ function _requestAnimationFrame(callback) {
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1643,7 +1833,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1651,18 +1841,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = defaultGameStart;
 function defaultGameStart(game) {
-  var plugins = game.plugins;
-  // creates a game border
-  /*
-  game.use(new plugins.Border({ autoBorder: false }));
-  game.systems.border.createBorder({
+  game.use('Bullet');
+  game.createBorder({
     height: 2000,
-    width: 2000,
+    width: 2000
   });
-  */
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1715,7 +1901,7 @@ var MemoryBackend = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = MemoryBackend;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1795,7 +1981,7 @@ var storage = function () {
 }();
 var _default = exports["default"] = storage;
 
-},{"./MemoryBackend.js":14}],16:[function(require,module,exports){
+},{"./MemoryBackend.js":15}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1846,7 +2032,7 @@ function switchWorlds(selectedWorld) {
   game.storage.set('world', selectedWorld);
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1943,7 +2129,7 @@ function _loadCSS() {
   return _loadCSS.apply(this, arguments);
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2035,7 +2221,7 @@ function _loadScripts() {
   return _loadScripts.apply(this, arguments);
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2360,7 +2546,7 @@ var LoadingScreen = /*#__PURE__*/function () {
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

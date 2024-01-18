@@ -149,6 +149,9 @@ var TonePlugin = /*#__PURE__*/function () {
     value: function playNote(note, duration) {
       var now = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var velocity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.5;
+      // Ensure velocity is within range
+      velocity = Math.min(Math.max(velocity, 0), 0.5);
+
       // console.log('playNote', note, duration, now, velocity)
       if (typeof note === 'undefined') {
         // if note is not defined, select a random note from the keyCodes object
@@ -177,7 +180,9 @@ var TonePlugin = /*#__PURE__*/function () {
       var game = this.game;
       // Play a note for a given duration
       // console.log('playing note', note, duration, now, velocity)
+
       try {
+        // this.synth.triggerAttack(note, now, velocity * 0.1);
         this.synth.triggerAttackRelease(note, duration, now, velocity);
       } catch (err) {
         console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err);

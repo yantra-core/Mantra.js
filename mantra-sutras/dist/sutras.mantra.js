@@ -107,15 +107,20 @@ function blackHoleSutra(game, context) {
   });
 
   // Function to apply gravitational force
-  function applyGravity(body1, body2, gravity, gameState) {
-    var distance = Vector.sub(body2.position, body1.position);
+  function applyGravity(ent1, ent2, gravity, gameState) {
+    // TODO: refactor to use Entity.body component, removes game.bodyMap
+    var body = game.bodyMap[ent2.id];
+    if (!body) {
+      return;
+    }
+    var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
       // This prevents extreme forces at very close distances
       return;
     }
     distance = Vector.normalize(distance);
-    var force = gravity * body1.mass * body2.mass / (magnitude * magnitude);
+    var force = gravity * ent1.mass * ent2.mass / (magnitude * magnitude);
     var maxForce = 1; // Prevents excessively large forces
     force = Math.min(force, maxForce);
 
@@ -126,7 +131,7 @@ function blackHoleSutra(game, context) {
       repulsion = gameState.repulsion;
     }
     var sign = repulsion ? 1 : -1;
-    game.applyForce(body2.id, {
+    game.applyForce(ent2.id, {
       x: sign * distance.x * force,
       y: sign * distance.y * force
     });

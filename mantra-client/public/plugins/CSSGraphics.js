@@ -222,7 +222,6 @@ var _zoom = _interopRequireDefault(require("./lib/camera/zoom.js"));
 var _cameraShake = _interopRequireDefault(require("./lib/camera/cameraShake.js"));
 var _render = _interopRequireDefault(require("./lib/render.js"));
 var _removeGraphic = _interopRequireDefault(require("./lib/entity/removeGraphic.js"));
-var _handleInputs = _interopRequireDefault(require("../graphics/lib/handleInputs.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -281,7 +280,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.setTransform = _setTransform["default"].bind(_assertThisInitialized(_this));
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.updateEntityPosition = _updateEntityPosition["default"].bind(_assertThisInitialized(_this));
-    _this.handleInputs = _handleInputs["default"].bind(_assertThisInitialized(_this));
     _this.render = _render["default"].bind(_assertThisInitialized(_this));
     _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
     _this.bindEntityEvents = _bindEntityEvents["default"].bind(_assertThisInitialized(_this));
@@ -352,7 +350,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"../graphics/lib/handleInputs.js":24,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/setTransform.js":8,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateEntity.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/setTransform.js":8,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateEntity.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -436,7 +434,8 @@ function cameraShake() {
     Object.keys(_this.game.data.ents._).forEach(function (eId) {
       var entity = _this.game.data.ents._[eId];
       // TODO: make more configurable / part of constructor config
-      if (entity.type === 'PARTICLE' || entity.type === 'STAR') {
+      // TODO: add a shakeable flag to entities / add parameter for tracking "shakeability", etc
+      if (entity.type === 'PARTICLE' || entity.type === 'STAR' || entity.type === 'HEXAPOD' || entity.type === 'DEMON') {
         var forceX = Math.random() * intensity - intensity / 2;
         var forceY = Math.random() * intensity - intensity / 2;
         forceX = forceX * 0.01;
@@ -724,7 +723,7 @@ function updateEntityPosition(entityElement, entityData) {
   fovWidth = 600;
   fovHeight = 600;
   var adjustedPosition = {
-    x: position.x - (this.cameraPosition.x - window.outerWidth / 2),
+    x: position.x - (this.cameraPosition.x - window.innerWidth / 2),
     y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
   };
 
@@ -802,15 +801,19 @@ function zoom(scale) {
     // Calculate the translation needed to keep the screen's center constant
     var centerX = window.innerWidth / 2;
     var centerY = window.outerHeight / 2;
+    var playerHeightOffset = 16;
+    if (window === top) {} else {
+      // if embed in iframe, adjust for iframe offset
+      playerHeightOffset = 32;
+    }
 
     // The logic here ensures that the screen center remains constant during zoom
     // X adjustment not needed for default zoom behavior
     // let newCameraX = (centerX - (centerX / scale));
     var newCameraY = centerY - centerY / scale;
     //game.viewportCenterXOffset = newCameraX;
-
-    var playerHeight = 16;
-    game.viewportCenterYOffset = newCameraY + playerHeight;
+    // alert()
+    this.game.viewportCenterYOffset = newCameraY + playerHeightOffset;
 
     // Apply scale and translate transform
     gameViewport.style.transform = "scale(".concat(scale, ")");
@@ -827,6 +830,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = bindEntityEvents;
 function bindEntityEvents(entityData, entityElement) {
+  var game = this.game;
   // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
   entityElement.addEventListener('pointerdown', function (ev) {
     //console.log(ev.target, entityData.id, entityData.type, entityData)
@@ -1210,6 +1214,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = inflateTexture;
 function inflateTexture(entityData, entityElement) {
   if (!entityData.texture) return;
+  var game = this.game;
   var texture = game.getTexture(entityData.texture);
   if (!texture) {
     console.warn('Warning: Texture not found', entityData.texture);
@@ -1606,40 +1611,6 @@ function unload() {
   if (div) {
     div.remove();
   }
-}
-
-},{}],24:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = cssHandleInputs;
-// no longer being used?
-function cssHandleInputs() {
-  var game = this.game;
-  //
-  // Updates the player sprite based on the current input
-  // Remark: Input and Movement are handled in EntityInput and EntityMovement plugins
-  //
-  // Spritesheet dimensions
-  var spritesheetWidth = 672;
-  var spritesheetHeight = 672;
-  var cellSize = 48; // Size of each cell in the spritesheet
-  var spriteSize = {
-    width: 16,
-    height: 16
-  }; // Actual size of the sprite
-
-  game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
-    // throw new Error('line')
-    var player = game.getEntity(entityId);
-    if (data && player) {
-      if (data.controls) {
-        game.updateSprite(entityId, data);
-      }
-    }
-  });
 }
 
 },{}]},{},[3])(3)

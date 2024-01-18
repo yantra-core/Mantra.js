@@ -143,6 +143,10 @@ class TonePlugin {
   }
 
   playNote(note, duration, now = 0, velocity = 0.5) {
+
+     // Ensure velocity is within range
+    velocity = Math.min(Math.max(velocity, 0), 0.5);
+
     // console.log('playNote', note, duration, now, velocity)
     if (typeof note === 'undefined') {
       // if note is not defined, select a random note from the keyCodes object
@@ -169,7 +173,9 @@ class TonePlugin {
     let game = this.game;
     // Play a note for a given duration
     // console.log('playing note', note, duration, now, velocity)
+
     try {
+      // this.synth.triggerAttack(note, now, velocity * 0.1);
       this.synth.triggerAttackRelease(note, duration, now, velocity);
     } catch (err) {
       console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err)
@@ -232,9 +238,6 @@ class TonePlugin {
     // fmSynth.connect(feedbackDelay);
   }
   
-  
-  
-
 
   harmonicShift(traktorKeyCode, options = { type: 'perfectFifth' }) {
     const wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];
