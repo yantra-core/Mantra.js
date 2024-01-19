@@ -166,10 +166,7 @@ class ThreeGraphics extends GraphicsInterface {
     // Follow the player entity with the camera
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
-      if (ent.pendingRender['graphics-three']) {
-        this.inflateEntity(ent, alpha);
-        ent.pendingRender['graphics-three'] = false;
-      }
+      this.inflateEntity(ent, alpha);
     }
     this.renderer.render(this.scene, this.camera);
   }

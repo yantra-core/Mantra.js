@@ -211,6 +211,7 @@ class Game {
     this.changedEntities = new Set();
     this.removedEntities = new Set();
     this.pendingRender = new Set();
+    this.queuedAssets = {};
 
     this.isClient = isClient;
     this.isEdgeClient = isEdgeClient;
@@ -764,6 +765,16 @@ class Game {
 
   setZoom() {
     // noop
+  }
+
+  addAsset(key, path) {
+    // game.addAsset needs to work immediately, potentially before game.start()
+    // the preloader won't be available until the `Client` system is loaded
+    if (this.preloader) {
+      this.preloader.addAsset(path, 'spritesheet', key);
+    } else {
+      this.queuedAssets[key] = path;
+    }
   }
 
 }

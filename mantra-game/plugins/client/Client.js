@@ -43,6 +43,12 @@ export default class Client {
       // hoist preloader to game scope
       game.preloader = preloader;
 
+      // for all game.queuedAssets Set, add to preloader
+      for (let key in game.queuedAssets) {
+        let path = game.queuedAssets[key];
+        preloader.addAsset(path, 'image', key);
+      }
+      game.queuedAssets = {}; // for now
 
       //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
       //game.on('assetsLoaded', () => console.log('All assets loaded!'));
