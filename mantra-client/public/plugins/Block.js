@@ -17,7 +17,7 @@ var Block = /*#__PURE__*/function () {
   function Block() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$MIN_BLOCK_SIZE = _ref.MIN_BLOCK_SIZE,
-      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 100 : _ref$MIN_BLOCK_SIZE,
+      MIN_BLOCK_SIZE = _ref$MIN_BLOCK_SIZE === void 0 ? 50 : _ref$MIN_BLOCK_SIZE,
       _ref$width = _ref.width,
       width = _ref$width === void 0 ? 40 : _ref$width,
       _ref$height = _ref.height,
@@ -77,6 +77,7 @@ var Block = /*#__PURE__*/function () {
     }
 
     // TODO: add option to cancel collision pairs
+    // TODO: move the block splitting logic into separate function
   }, {
     key: "blockBulletCollision",
     value: function blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
@@ -101,7 +102,7 @@ var Block = /*#__PURE__*/function () {
           var xOffset = i % 2 * newWidth;
           var yOffset = Math.floor(i / 2) * newHeight;
           this.game.createEntity({
-            type: 'BLOCK',
+            type: entityA.type,
             position: {
               x: entityA.position.x + xOffset,
               y: entityA.position.y + yOffset

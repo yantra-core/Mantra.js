@@ -324,25 +324,47 @@ function getTexture(config) {
     // check to see if frameName is present in spritesheet
     if (t && t.frameTags && t.frameTags[spriteName]) {
       var sprite = t.frameTags[spriteName].frames[frameIndex];
+      var rate = t.frameTags[spriteName].rate || 30;
       sprite.name = spriteName;
       var url = game.assetRoot + t.url;
-      // console.log('returning url', url)
-      // t.frame = frame;
       return {
         key: t.key,
         url: url,
         // asset: t.frameTags[spriteName],
         frames: t.frameTags[spriteName].frames,
-        sprite: sprite
+        sprite: sprite,
+        rate: rate,
+        playing: config.playing
+      };
+    }
+
+    // sprite name is an object, check for x / y positions with width / height
+    if (_typeof(spriteName) === 'object') {
+      var _sprite = {};
+      _sprite.x = spriteName.x;
+      _sprite.y = spriteName.y;
+      _sprite.width = spriteName.width;
+      _sprite.height = spriteName.height;
+      _sprite.name = spriteName.name;
+      var _url = game.assetRoot + t.url;
+      return {
+        key: t.key,
+        url: _url,
+        frames: [{
+          x: _sprite.x,
+          y: _sprite.y
+        }],
+        sprite: _sprite,
+        rate: spriteName.rate || 30
       };
     }
   }
   if (t) {
-    var _url = game.assetRoot + t.url;
+    var _url2 = game.assetRoot + t.url;
     // console.log('returning url', url)
     return {
       key: t.key,
-      url: _url
+      url: _url2
     };
   }
   return config;

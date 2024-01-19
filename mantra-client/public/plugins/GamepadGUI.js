@@ -184,7 +184,13 @@ var GamepadGUI = /*#__PURE__*/function () {
         document.dispatchEvent(new KeyboardEvent('keydown', {
           'code': 'KeyI'
         }));
+        /*
+          TODO: implement pause and rewind
+          game.pause();
+          game.rewind(500);
+        */
       });
+
       start.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
           'code': 'KeyI'

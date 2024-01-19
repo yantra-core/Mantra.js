@@ -725,6 +725,18 @@ class Game {
     }
   }
 
+  pause () {
+    if (this.systems['chrono-control']) {
+      this.systems['chrono-control'].pause();
+    }
+  }
+
+  rewind(ticks) {
+    if (this.systems['chrono-control']) {
+      this.systems['chrono-control'].rewind(ticks);
+    }
+  }
+
   reset () {
     // not a full game reset ( yet )
     // reset default entity input

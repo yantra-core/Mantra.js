@@ -60,6 +60,13 @@ class SystemsManager {
   update(deltaTime) {
     for (const [_, system] of this.systems) {
       if (typeof system.update === "function") {
+
+        // check to see if the game is paused, if not, skip updates for systems without flag
+        if (this.game.paused) {
+          continue;
+        }
+
+
         system.update(deltaTime);
       }
     }

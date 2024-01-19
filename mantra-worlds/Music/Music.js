@@ -129,9 +129,8 @@ class Music {
     });
 
     rules.on('MOVE_LEFT', function(player, node, gameState){
-      console.log(gameState.tick)
       game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
     });
 
     rules.on('MOVE_RIGHT', function(player){

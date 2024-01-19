@@ -210,7 +210,7 @@ var Bullet = /*#__PURE__*/function () {
 
         // general cancel of all collisions between siblings
         if (entityA.owner === entityB.owner) {
-          console.log('bullet owner collision', entityIdA, entityIdB);
+          // console.log('bullet owner collision', entityIdA, entityIdB);
           // pair.isActive = false;
           return;
         }

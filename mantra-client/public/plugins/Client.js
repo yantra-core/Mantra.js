@@ -843,6 +843,51 @@ var defaultAssets = {
       }
     }
   },
+  'mage_sheet': {
+    type: 'spritesheet',
+    url: '/img/game/sheets/mage.png',
+    frameTags: {
+      mageLeft: {
+        rate: 100,
+        frames: [{
+          x: 0,
+          y: 0
+        }, {
+          x: -32,
+          y: 0
+        }, {
+          x: -64,
+          y: 0
+        }]
+      },
+      mageRight: {
+        frames: [{
+          x: -32,
+          y: -192
+        }]
+      },
+      mageWalkLeft: {
+        rate: 16,
+        frames: [{
+          x: -96,
+          y: 0
+        }, {
+          x: -128,
+          y: 0
+        }, {
+          x: -160,
+          y: 0
+        }]
+      },
+      mageJump: {
+        rate: 100,
+        frames: [{
+          x: -192,
+          y: 0
+        }]
+      }
+    }
+  },
   'loz_spritesheet': {
     type: 'spritesheet',
     url: '/img/game/sheets/loz_spritesheet.png',
@@ -860,8 +905,30 @@ var defaultAssets = {
         }]
       },
       player: {
+        rate: 100,
         frames: [{
           x: -592,
+          y: -16
+        }, {
+          x: -640,
+          y: -16
+        }, {
+          x: -592,
+          y: -16
+        }, {
+          x: -640,
+          y: -16
+        }, {
+          x: -656,
+          y: -16
+        }, {
+          x: -640,
+          y: -16
+        }, {
+          x: -640,
+          y: -16
+        }, {
+          x: -608,
           y: -16
         }]
       },
@@ -893,6 +960,7 @@ var defaultAssets = {
         }]
       },
       playerLeft: {
+        rate: 100,
         frames: [{
           x: -208,
           y: -16
@@ -908,6 +976,12 @@ var defaultAssets = {
         }, {
           x: -160,
           y: -16
+        }]
+      },
+      playerShoot: {
+        frames: [{
+          x: -16,
+          y: -352
         }]
       },
       playerDamage: {
@@ -950,62 +1024,50 @@ var defaultAssets = {
         frames: [{
           x: -496,
           y: -304
-        }, {
-          x: -544,
-          y: -304
-        }, {
-          x: -592,
-          y: -304
-        }, {
-          x: -640,
-          y: -304
-        }]
+        }
+        /*
+        { x: -544, y: -304 },
+        { x: -592, y: -304 },
+        { x: -640, y: -304 },
+        */]
       },
+
       playerRodUp: {
         frames: [{
           x: -400,
           y: -352
-        }, {
-          x: -448,
-          y: -352
-        }, {
-          x: -496,
-          y: -352
-        }, {
-          x: -544,
-          y: -352
-        }]
+        }
+        /*
+        { x: -448, y: -352 },
+        { x: -496, y: -352 },
+        { x: -544, y: -352 },
+        */]
       },
+
       playerRodLeft: {
         frames: [{
           x: -208,
           y: -352
-        }, {
-          x: -256,
-          y: -352
-        }, {
-          x: -304,
-          y: -352
-        }, {
-          x: -352,
-          y: -352
-        }]
+        }
+        /*
+        { x: -256, y: -352 },
+        { x: -304, y: -352 },
+        { x: -352, y: -352 },
+        */]
       },
+
       playerRodRight: {
         frames: [{
           x: -16,
           y: -352
-        }, {
-          x: -64,
-          y: -352
-        }, {
-          x: -112,
-          y: -352
-        }, {
-          x: -160,
-          y: -352
-        }]
+        }
+        /*
+        { x: -64, y: -352 },
+        { x: -112, y: -352 },
+        { x: -160, y: -352 },
+        */]
       },
+
       arrow: {
         frames: [{
           x: -16,

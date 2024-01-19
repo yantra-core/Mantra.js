@@ -1527,6 +1527,44 @@ var Sutra = /*#__PURE__*/function () {
   return Sutra;
 }();
 var _default = exports["default"] = Sutra;
+/*
+  use(subSutra, name = null, insertAt = this.tree.length, shareListeners = true, prefixSubSutra = true) {
+    // Store a reference to the subSutra for subtree-specific logic
+    this.subtrees = this.subtrees || {};
+    subSutra.isSubtree = true;
+    subSutra.parent = this;
+    this.subtrees[name] = subSutra;
+  
+    // Function to prefix keys of an object with the subtree name
+    const prefixKeys = (obj, prefix) => {
+      return Object.keys(obj).reduce((prefixedObj, key) => {
+        prefixedObj[`${prefix}::${key}`] = obj[key];
+        return prefixedObj;
+      }, {});
+    };
+  
+    if (shareListeners) {
+      this.sharedListeners = true;
+  
+      // Prefix and merge subtree's listeners and conditions if required
+      let prefixedListeners = prefixSubSutra && name ? prefixKeys(subSutra.listeners, name) : subSutra.listeners;
+      let prefixedConditions = prefixSubSutra && name ? prefixKeys(subSutra.conditions, name) : subSutra.conditions;
+  
+      this.listeners = { ...this.listeners, ...prefixedListeners };
+      this.conditions = { ...this.conditions, ...prefixedConditions };
+  
+      this.anyListeners = [...(this.anyListeners || []), ...(subSutra.anyListeners || [])];
+  
+      // Optionally, update the subtree's listeners and conditions to reflect this change
+      subSutra.listeners = this.listeners;
+      subSutra.conditions = this.conditions;
+      subSutra.anyListeners = this.anyListeners;
+    }
+  
+    // Insert the subtree at the specified position
+    this.tree.splice(insertAt, 0, ...subSutra.tree);
+  }
+  */
 
 },{"./evaluateCompositeCondition.js":3,"./evaluateCondition.js":4,"./evaluateDSLCondition.js":5,"./evaluateSingleCondition.js":6,"./exportToEnglish.js":7,"./operatorAliases.js":9,"./parsePath.js":10,"./serializeToJson.js":11}]},{},[1])(1)
 });

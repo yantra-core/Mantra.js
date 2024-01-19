@@ -1043,6 +1043,20 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "pause",
+    value: function pause() {
+      if (this.systems['chrono-control']) {
+        this.systems['chrono-control'].pause();
+      }
+    }
+  }, {
+    key: "rewind",
+    value: function rewind(ticks) {
+      if (this.systems['chrono-control']) {
+        this.systems['chrono-control'].rewind(ticks);
+      }
+    }
+  }, {
     key: "reset",
     value: function reset() {
       // not a full game reset ( yet )
@@ -1156,6 +1170,10 @@ var SystemsManager = /*#__PURE__*/function () {
             _ = _step$value[0],
             system = _step$value[1];
           if (typeof system.update === "function") {
+            // check to see if the game is paused, if not, skip updates for systems without flag
+            if (this.game.paused) {
+              continue;
+            }
             system.update(deltaTime);
           }
         }
@@ -1232,8 +1250,8 @@ function createDefaultPlayer() {
     collisionActive: true,
     collisionStart: true,
     collisionEnd: true,
-    width: 16,
-    height: 16,
+    width: playerConfig.width || 16,
+    height: playerConfig.height || 16,
     color: playerConfig.color,
     radius: playerConfig.radius,
     texture: playerConfig.texture,

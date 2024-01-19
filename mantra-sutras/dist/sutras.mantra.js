@@ -180,11 +180,150 @@ var Vector = {
 },{}],2:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = bomb;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+// bomb.js - Marak Squires 2024
+function bomb(game) {
+  var rules = game.createSutra();
+
+  // Rate at which the player can drop bombs
+  var fireRate = 1000;
+  // Distance in front of the player where the bomb should start
+  var distanceInFront = 16;
+  // Speed at which the bomb is thrown
+  var speed = 0.05;
+  // TODO: ^^^ make these config
+
+  rules.addCondition('canDropBomb', function (entity, gameState) {
+    // TODO: better fluent integration of Action Rate Limiter into Sutra
+    var actionRateLimiterComponent = game.components.actionRateLimiter;
+    var lastFired = actionRateLimiterComponent.getLastActionTime(entity.id, 'dropBomb');
+    var currentTime = Date.now();
+    return currentTime - lastFired >= fireRate;
+  });
+
+  // Define actions
+  rules.addAction({
+    "if": 'canDropBomb',
+    then: 'dropBomb'
+  });
+
+  // Event listeners for actions
+  rules.on('dropBomb', function (entity, node, gameState) {
+    var playerPos = entity.position;
+    var playerRotation = entity.rotation; // in radians
+
+    if (!playerPos) {
+      // client might not have the position or rotation component, don't client-side predict
+      console.log('no player data available');
+      return;
+    }
+
+    // TODO: better fluent integration of Action Rate Limiter into Sutra
+    var actionRateLimiterComponent = game.components.actionRateLimiter;
+    actionRateLimiterComponent.recordAction(entity.id, 'dropBomb');
+    if (typeof entity.radius !== 'undefined') {
+      entity.width = entity.radius * 2;
+      entity.height = entity.radius * 2;
+    }
+    var playerOffsetX = entity.width / 2; // Adjust this value to align the bomb properly
+    var playerOffsetY = entity.height / 2; // Adjust this value to align the bomb properly
+
+    playerOffsetX = 0;
+    playerOffsetY = 0;
+    if (typeof playerRotation === 'undefined') {
+      playerRotation = 0; // this should have a default
+    }
+
+    // convert to 3d if rotation object
+    if (_typeof(playerRotation) === 'object') {
+      playerRotation = playerRotation.z;
+    }
+
+    // Compute the bomb's direction based on player's rotation
+    var directionX = Math.sin(playerRotation);
+    var directionY = -Math.cos(playerRotation);
+
+    // Place the bomb in front of the player
+    var bombStartPosition = {
+      x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
+      y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation)
+      //z: 10
+    };
+    var bombDirectionConfig = {
+      type: 'BOMB',
+      mass: 10000,
+      collisionStart: true,
+      position: bombStartPosition,
+      lifetime: 2000,
+      friction: 0.5,
+      frictionStatic: 0.5,
+      frictionAir: 0.01,
+      //texture: 'tile-block',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'bomb',
+        playing: false
+      },
+      owner: entity.id,
+      rotation: 0,
+      //color: entity.bombColor || 0x000000,
+      velocity: {
+        x: directionX * speed,
+        y: directionY * speed
+      },
+      height: 16,
+      width: 16,
+      damage: 10 // TODO: make this a config
+    };
+    // console.log('using bombDirectionConfig', bombDirectionConfig)
+    game.createEntity(bombDirectionConfig);
+  });
+
+  // Handling collisions
+  rules["if"]('entTouchedBomb').then('bombCollision');
+  rules.addCondition('entTouchedBomb', function (entity, gameState) {
+    if (entity.type === 'COLLISION' && entity.kind === 'START') {
+      if (entity.bodyA.type === 'BOMB') {
+        return true;
+      }
+      if (entity.bodyB.type === 'BOMB') {
+        return true;
+      }
+    }
+  });
+  rules.on('bombCollision', function (collision, node, gameState) {
+    var bombEntity = collision.bodyA.type === 'BOMB' ? collision.bodyA : collision.bodyB;
+    var otherEntity = collision.bodyA.type === 'BOMB' ? collision.bodyB : collision.bodyA;
+
+    // TODO: check the ctime of bomb to now, do not explode if too new
+    // TODO: Apply damage or other effects to otherEntity
+    // TODO: configurable collision groups
+    if (['DEMON', 'HEXAPOD', 'FIRE', 'NPC', 'BLOCK', 'DOOR'].indexOf(otherEntity.type) !== -1) {
+      // TODO: remove this to work with generic collision handler for Block types
+      //       no need for explict call here, is simple refactor
+      if (otherEntity.type === 'BLOCK' || otherEntity.type === 'HEXAPOD') {
+        game.systems.block.blockBulletCollision(otherEntity.id, bombEntity.id, otherEntity, bombEntity);
+      } else {
+        game.removeEntity(otherEntity.id);
+        game.removeEntity(bombEntity.id);
+      }
+    }
+  });
+  return rules;
+}
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
 var SUTRAS = require('./index.js');
 console.log('SUTRAS', SUTRAS);
 module.exports = SUTRAS["default"];
 
-},{"./index.js":8}],3:[function(require,module,exports){
+},{"./index.js":9}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -248,7 +387,7 @@ function demon(game) {
   return rules;
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -338,7 +477,7 @@ function fire(game) {
   return rules;
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -433,7 +572,7 @@ function fountSutra(game, context) {
   return rules;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -597,7 +736,7 @@ function getNeighbors(cell, node, gameState) {
   return neighbors;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -786,13 +925,14 @@ var Vector = {
   }
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _bomb = _interopRequireDefault(require("./bomb.js"));
 var _demon = _interopRequireDefault(require("./demon.js"));
 var _fount = _interopRequireDefault(require("./fount.js"));
 var _gameOfLife = _interopRequireDefault(require("./game-of-life.js"));
@@ -802,6 +942,7 @@ var _blackhole = _interopRequireDefault(require("./blackhole.js"));
 var _hexapod = _interopRequireDefault(require("./hexapod.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var Sutras = {};
+Sutras.bomb = _bomb["default"];
 Sutras.demon = _demon["default"];
 Sutras.fount = _fount["default"];
 Sutras.blackhole = _blackhole["default"];
@@ -811,7 +952,7 @@ Sutras.note = _note["default"];
 Sutras.hexapod = _hexapod["default"];
 var _default = exports["default"] = Sutras;
 
-},{"./blackhole.js":1,"./demon.js":3,"./fire.js":4,"./fount.js":5,"./game-of-life.js":6,"./hexapod.js":7,"./note.js":9}],9:[function(require,module,exports){
+},{"./blackhole.js":1,"./bomb.js":2,"./demon.js":4,"./fire.js":5,"./fount.js":6,"./game-of-life.js":7,"./hexapod.js":8,"./note.js":10}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -856,5 +997,5 @@ function note(game) {
   });
 }
 
-},{}]},{},[2])(2)
+},{}]},{},[3])(3)
 });

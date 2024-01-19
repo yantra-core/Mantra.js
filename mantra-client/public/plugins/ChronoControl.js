@@ -75,6 +75,9 @@ var ChronoControl = /*#__PURE__*/function (_Plugin) {
     _this = _super.call(this, game);
     _this.game = game;
     _this.id = ChronoControl.id;
+    _this.gameStates = []; // Array to store game states
+    _this.maxStates = 1000; // Maximum number of states to store
+    _this.isPaused = false; // Flag to indicate if the game is paused
     return _this;
   }
   _createClass(ChronoControl, [{
@@ -88,7 +91,18 @@ var ChronoControl = /*#__PURE__*/function (_Plugin) {
   }, {
     key: "update",
     value: function update() {
-      // Update logic here
+      if (this.isPaused) return; // Skip updates if the game is paused
+
+      // Clone and store the current game data
+      var currentGameState = this.game.data;
+
+      // Add the cloned state to the gameStates array
+      this.gameStates.push(currentGameState);
+
+      // Ensure the gameStates array does not exceed maxStates
+      if (this.gameStates.length > this.maxStates) {
+        this.gameStates.shift(); // Remove the oldest state
+      }
     }
 
     // Starts the game loop
@@ -108,19 +122,19 @@ var ChronoControl = /*#__PURE__*/function (_Plugin) {
       console.log('ChronoControl stopping game', game);
       game.stop();
     }
-
-    // Pauses the game loop
   }, {
     key: "pause",
     value: function pause() {
-      // Implementation for pausing the game loop
+      this.isPaused = true;
+      this.game.paused = true;
+      console.log('Game paused');
     }
-
-    // Resumes the game loop from a paused state
   }, {
     key: "resume",
     value: function resume() {
-      // Implementation for resuming the game loop
+      this.isPaused = false;
+      this.game.paused = false;
+      console.log('Game resumed');
     }
 
     // Sets the game's frames per second
@@ -133,8 +147,28 @@ var ChronoControl = /*#__PURE__*/function (_Plugin) {
     // Rewinds the game by a specified amount
   }, {
     key: "rewind",
-    value: function rewind(time) {
+    value: function rewind(ticks) {
       // Implementation for rewinding the game
+      // console.log('rewind', ticks)
+      /*
+      TODO: Have update() loop handle rewinding
+      let snapshots = this.gameStates;
+      snapshots.forEach(function (state) {
+        for (let eId in state.ents._) {
+          let ent = state.ents._[eId];
+          let shallowEnt = {
+            id: ent.id,
+            type: ent.type,
+            position: ent.position,
+            rotation: ent.rotation,
+            width: ent.width,
+            height: ent.height,
+          };
+          // console.log('shallowEnt', shallowEnt)
+          game.inflateEntity(shallowEnt);
+        }
+      });
+      */
     }
 
     // Fast forwards the game by a specified amount

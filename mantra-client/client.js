@@ -142,7 +142,7 @@ game.use(new plugins.Sutra({ }));
 // import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 // import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
 
-
+game.use(new plugins.ChronoControl())
 // for local / offline play we can use any id we want
 function randomId() {
   return 'player_' + Math.random().toString(36).substr(2, 9);

@@ -1226,8 +1226,9 @@ function inflateTexture(entityData, entityElement) {
       x: 0,
       y: 0
     } : _texture$sprite,
-    frames = texture.frames;
-
+    frames = texture.frames,
+    _texture$playing = texture.playing,
+    playing = _texture$playing === void 0 ? true : _texture$playing;
   // Extract the current texture URL from the element's style
   var currentTextureUrl = entityElement.style.backgroundImage.slice(5, -2);
 
@@ -1252,7 +1253,7 @@ function inflateTexture(entityData, entityElement) {
   }
 
   // Update frame index and position for animated sprites
-  if (Array.isArray(frames)) {
+  if (Array.isArray(frames) && playing) {
     var frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
 
     // TODO: use config setting for tick rate per animation

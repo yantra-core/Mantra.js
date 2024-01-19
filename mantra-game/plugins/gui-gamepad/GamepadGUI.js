@@ -175,6 +175,11 @@ class GamepadGUI {
     start.title = 'Warp to World';
     start.addEventListener('pointerdown', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyI' }));
+      /*
+        TODO: implement pause and rewind
+        game.pause();
+        game.rewind(500);
+      */
     });
     start.addEventListener('pointerup', (ev) => {
       document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyI' }));
