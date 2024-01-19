@@ -25,10 +25,6 @@ The [Mantra.js](https://yantra.gg/mantra.js) file is currently under `111kb` and
 
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
-<a class="callToActionLink" href="https://yantra.gg/blog/build-games-with-mantra">Read More about Building Games with Mantra and Yantra</a>
-
-<a href="https://yantra.gg/docs/">Additional Documentation</a>
-
 ## Super Simple Offline First
 
 Mantra is designed to start a full-featured local game instance in seconds using a simple:
@@ -334,6 +330,12 @@ As v1 alpha software, `@yantra-core/mantra` is currently under active developmen
 Mantra follows an odd / even version release schedule for stable / unstable versions. v1 is considered unstabled. v2 will be considered stable.
 
 <a name="contributing"></a>
+
+## Read More
+
+<a class="callToActionLink" href="https://yantra.gg/blog/build-games-with-mantra">Read More about Building Games with Mantra and Yantra</a>
+
+<a href="https://yantra.gg/docs/">Additional Documentation</a>
 
 ## Contributing
 
