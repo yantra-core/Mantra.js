@@ -13,6 +13,7 @@ const plugins = [
   './plugins/tile/Tile.js',
   './plugins/platform/Platform.js',
   './plugins/border/Border.js',
+  './plugins/bomb/Bomb.js',
   './plugins/bullet/Bullet.js',
   './plugins/sword/Sword.js',
   './plugins/graphics-css/CSSGraphics.js',

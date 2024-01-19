@@ -28,7 +28,7 @@ class Home {
     game.createPlayer({
       texture: {
         sheet: 'loz_spritesheet',
-        sprite: 'player'
+        sprite: 'player',
       },
       position: {
         x: 0,
@@ -59,6 +59,7 @@ class Home {
     game.use('Block');
     game.use('Border', { autoBorder: true })
     game.use('Bullet');
+    game.use('Bomb');
     // game.use('Sword')
     game.use('Tile');
     game.use('Tone');
@@ -87,19 +88,43 @@ class Home {
       .then('MOVE_RIGHT')
       .then('updateSprite', { sprite: 'playerRight' })
 
-    rules.if('SPACE').then('FIRE_BULLET');
-    rules.if('K').then('SWING_SWORD');
-    rules.if('L').then('SWING_SWORD');
+    rules
+      .if('SPACE')
+        .then('FIRE_BULLET')
+          .map('determineShootingSprite')
+          .then('updateSprite');
+
+    //rules.if('K').then('SWING_SWORD');
+    //rules.if('L').then('SWING_SWORD');
+    rules.if('K').then('DROP_BOMB');
+    // rules.if('L').then('DROP_BOMB');
+
     rules.if('O').then('ZOOM_IN');
     rules.if('P').then('ZOOM_OUT');
 
+    rules.addMap('determineShootingSprite', (player, node) => {
+      // Normalize the rotation within the range of 0 to 2π
+      const normalizedRotation = player.rotation % (2 * Math.PI);
+      // Define a mapping from radians to sprites
+      const rotationToSpriteMap = {
+        0: 'playerRodUp',
+        [Math.PI / 2]: 'playerRodRight',
+        [Math.PI]: 'playerRodDown',
+        [-Math.PI / 2]: 'playerRodLeft'
+      };
+      // Set the sprite based on the rotation, default to the current sprite
+      player.texture.sprite = rotationToSpriteMap[normalizedRotation] || player.currentSprite;
+      return player;
+    });
+
     rules.on('updateSprite', function (player, node) {
+      let sprite = node.data.sprite || player.texture.sprite;
       game.updateEntity({
         id: player.id,
         texture: {
           frameIndex: 0,
           sheet: player.texture.sheet,
-          sprite: node.data.sprite,
+          sprite: sprite,
           animationPlaying: true
         }
       })
@@ -116,7 +141,6 @@ class Home {
     });
 
     rules.on('MOVE_LEFT', function (player, node, gameState) {
-      console.log(gameState.tick)
       game.applyForce(player.id, { x: -1, y: 0, z: 0 });
       game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
     });
@@ -128,6 +152,10 @@ class Home {
 
     rules.on('FIRE_BULLET', function (player) {
       game.systems.bullet.fireBullet(player.id);
+    });
+
+    rules.on('DROP_BOMB', function (player) {
+      game.systems.bomb.dropBomb(player.id);
     });
 
     /*

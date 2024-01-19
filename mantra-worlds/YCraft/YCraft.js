@@ -21,6 +21,7 @@ class YCraft {
     game.reset();
     game.setGravity(0, 0, 0);
     game.setSize(1600, 900);
+    game.setZoom(3.5);
     game.use('Bullet');
     game.use('Block');
     game.use('YCraft', {

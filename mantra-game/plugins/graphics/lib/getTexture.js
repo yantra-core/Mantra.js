@@ -22,6 +22,7 @@ export default function getTexture(config) {
     let spriteName = config.sprite;
     let frameIndex = 0;
 
+
     if (typeof config.frame === 'number') {
       frameIndex = config.frame;
     }
@@ -29,18 +30,38 @@ export default function getTexture(config) {
     // check to see if frameName is present in spritesheet
     if (t && t.frameTags && t.frameTags[spriteName]) {
       let sprite = t.frameTags[spriteName].frames[frameIndex];
+      let rate =  t.frameTags[spriteName].rate || 30;
       sprite.name = spriteName;
       let url = game.assetRoot + t.url;
-      // console.log('returning url', url)
-      // t.frame = frame;
       return {
         key: t.key,
         url: url,
         // asset: t.frameTags[spriteName],
         frames: t.frameTags[spriteName].frames,
-        sprite
+        sprite,
+        rate: rate,
+        playing: config.playing
       };
     }
+
+    // sprite name is an object, check for x / y positions with width / height
+    if (typeof spriteName === 'object') {
+      let sprite = {};
+      sprite.x = spriteName.x;
+      sprite.y = spriteName.y;
+      sprite.width = spriteName.width;
+      sprite.height = spriteName.height;
+      sprite.name = spriteName.name;
+      let url = game.assetRoot + t.url;
+      return {
+        key: t.key,
+        url: url,
+        frames: [{ x: sprite.x, y: sprite.y }],
+        sprite,
+        rate: spriteName.rate || 30
+      };
+    }
+
   }
 
   if (t) {

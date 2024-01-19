@@ -8,8 +8,7 @@ export default function inflateTexture(entityData, entityElement) {
     return;
   }
 
-  let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames } = texture;
-
+  let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames, playing = true} = texture;
   // Extract the current texture URL from the element's style
   let currentTextureUrl = entityElement.style.backgroundImage.slice(5, -2);
 
@@ -34,7 +33,7 @@ export default function inflateTexture(entityData, entityElement) {
   }
 
   // Update frame index and position for animated sprites
-  if (Array.isArray(frames)) {
+  if (Array.isArray(frames) && playing) {
     let frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
 
     // TODO: use config setting for tick rate per animation

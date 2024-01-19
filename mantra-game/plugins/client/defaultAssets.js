@@ -9,6 +9,7 @@ let defaultAssets = {
   'warp-to-music': '/img/game/env/warp-to-music.gif',
   'warp-to-ycraft': '/img/game/env/warp-to-ycraft.gif',
   'smb3-1-1': '/img/game/levels/smb3-1-1.png',
+  // 'flare': '/img/game/particle/flare.png',
   'planet-express-base': '/img/game/env/planet-express-base.png',
   'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   // '3d-homer': '/img/game/env/3d-homer.gif',
@@ -64,6 +65,40 @@ let defaultAssets = {
       },
     },
   },
+  'mage_sheet': {
+    type: 'spritesheet',
+    url: '/img/game/sheets/mage.png',
+    frameTags: {
+      mageLeft: {
+        rate: 100,
+        frames: [
+          { x: 0, y: 0 },
+          { x: -32, y: 0 },
+          { x: -64, y: 0 },
+        ]
+      },
+      mageRight: {
+        frames: [
+          { x: -32, y: -192 }
+        ]
+      },
+      mageWalkLeft: {
+        rate: 16,
+        frames: [
+          { x: -96, y: 0 },
+          { x: -128, y: 0 },
+          { x: -160, y: 0 },
+        ]
+      },
+      mageJump: {
+        rate: 100,
+        frames: [
+          { x: -192, y: 0 }
+        ]
+      }
+
+    },
+  },
   'loz_spritesheet': {
     type: 'spritesheet',
     url: '/img/game/sheets/loz_spritesheet.png',
@@ -84,8 +119,17 @@ let defaultAssets = {
       
 
       player: {
+        rate: 100,
         frames: [
-          { x: -592, y: -16 }
+          { x: -592, y: -16 },
+          { x: -640, y: -16 },
+          { x: -592, y: -16 },
+          { x: -640, y: -16 },
+          { x: -656, y: -16 },
+          { x: -640, y: -16 },
+          { x: -640, y: -16 },
+          { x: -608, y: -16 },
+
         ]
       },
 
@@ -93,7 +137,6 @@ let defaultAssets = {
         frames: [
           { x: -16, y: -16 },
           { x: -64, y: -16 },
-
         ]
       },
 
@@ -113,6 +156,7 @@ let defaultAssets = {
       },
 
       playerLeft: {
+        rate: 100,
         frames: [
           { x: -208, y: -16 },
           { x: -256, y: -16 },
@@ -123,6 +167,12 @@ let defaultAssets = {
         frames: [
           { x: -112, y: -16 },
           { x: -160, y: -16 },
+        ]
+      },
+
+      playerShoot: {
+        frames: [
+          { x: -16, y: -352 },
         ]
       },
 
@@ -145,40 +195,46 @@ let defaultAssets = {
       playerRodDown: {
         frames: [
           { x: -496, y: -304 },
+          /*
           { x: -544, y: -304 },
           { x: -592, y: -304 },
           { x: -640, y: -304 },
+          */
         ]
       },
 
       playerRodUp: {
         frames: [
           { x: -400, y: -352 },
+          /*
           { x: -448, y: -352 },
           { x: -496, y: -352 },
           { x: -544, y: -352 },
+          */
         ]
       },
 
       playerRodLeft: {
         frames: [
           { x: -208, y: -352 },
+          /*
           { x: -256, y: -352 },
           { x: -304, y: -352 },
           { x: -352, y: -352 },
+          */
         ]
       },
 
       playerRodRight: {
         frames: [
           { x: -16, y: -352 },
+          /*
           { x: -64, y: -352 },
           { x: -112, y: -352 },
           { x: -160, y: -352 },
+          */
         ]
       },
-
-
 
       arrow: {
         frames: [

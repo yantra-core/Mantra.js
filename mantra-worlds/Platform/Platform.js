@@ -33,10 +33,12 @@ class Platform {
     game.setGravity(0, 3.3, 0);
     game.setZoom(4.5);
 
-    game.createDefaultPlayer({
+    game.createPlayer({
+      height: 16,
+      width: 16,
       texture: {
         sheet: 'loz_spritesheet',
-        sprite: 'player'
+        sprite: 'player',
       },
       position: {
         x: 10,
@@ -86,7 +88,7 @@ class Platform {
 
     createPlatform({
       x: 200,
-      y: 10,
+      y: 13,
       z: -10,
       width: 850,
       height: 60
@@ -94,7 +96,7 @@ class Platform {
 
     createPlatform({
       x: 925,
-      y: 0,
+      y: 10,
       z: -10,
       width: 600,
       height: 60
@@ -124,17 +126,50 @@ class Platform {
     rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRight' });
 
 
-    rules.on('updateSprite', function(player, node){
+    /*
+
+     Adding textures to Entities
       game.updateEntity({
         id: player.id,
         texture: {
           frameIndex: 0,
           sheet: player.texture.sheet,
-          sprite: node.data.sprite,
-          animationPlaying: true
+          sprite: { // sets directly to sprite, no animations
+            x: -112,
+            y: -16,
+            height: 16,
+            width: 16
+          }
         }
       })
+
+    */
+
+
+    rules.on('updateSprite', function(player, node){
+
+
+
     });
+
+
+    /*
+    game.createPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: {
+          x: 120,
+          y: 435,
+          height: 16,
+          width: 16
+        }
+      },
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+    */
 
     // rules.if('SPACE').then('JUMP');
     rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
@@ -163,6 +198,7 @@ class Platform {
         .if('SPACE')
         // .if('doesntExceedDuration')
         .then('JUMP')
+        .then('updateSprite', { sprite: 'mageJump' })
       })
     
     //rules.if('L').then('SWING_SWORD');
