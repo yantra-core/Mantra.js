@@ -1,6 +1,15 @@
-# `@yantra-core/mantra` -  [v1 Alpha](#alpha-notice)
+<h4 align="center">
 
-![Build Status](https://github.com/yantra-core/mantra/actions/workflows/nodejs.yml/badge.svg)
+![mantra-logo-smol](https://github.com/yantra-core/Mantra.js/assets/70011/3a10c09f-3d19-458a-b0c2-a8910420aee1)
+
+  <a href="https://yantra.gg/mantra">Live Demos</a> •
+  <a href="#alpha-notice">v1 Alpha</a> •
+  <a href="#contributing">Contributing</a>
+  
+  ![Build Status](https://github.com/yantra-core/mantra/actions/workflows/nodejs.yml/badge.svg)
+</h4>
+
+
 
 ## Introduction
 
@@ -10,17 +19,14 @@ Mantra lets you focus on game logic and design without worrying about the comple
 
 You can start building a simple offline game in seconds using your favorite libraries, take this same game code, and effortlessly run it later as a high-performance authoritative game server in a serverless environment. 
 
-Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
-
-<a class="callToActionLink" href="https://yantra.gg/blog/build-games-with-mantra">Read More about Building Games with Mantra and Yantra</a>
-
-<a href="https://yantra.gg/docs/">Additional Documentation</a>
-
-![mantra](https://github.com/yantra-core/Mantra.js/assets/70011/9add326b-7f50-4bef-b5c0-ba301a6ae265)
-
 # Mantra itself is very small and very fast
 
 The [Mantra.js](https://yantra.gg/mantra.js) file is currently under `111kb` and will most likely get smaller. It's best to think of Mantra as the orchestrator for your game. You can import Mantra once and immediately begin adding new functionality dynamically. 
+
+Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
+
+<a class="callToActionLink" href="https://yantra.gg/blog/build-games-with-mantra">Read More about Building Games with Mantra and Yantra</a>
+<a href="https://yantra.gg/docs/">Additional Documentation</a>
 
 ## Super Simple Offline First
 
@@ -46,7 +52,10 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 
 `mantra` games can be customized in several intuitive ways. At the lowest levels, you can customize your games using JavaScript or TypeScript code, generally writing new Systems Plugins and working with the Event Emitter API.
 
+
 ### Sutra Behavioral Trees
+
+![sutra-logo-smol](https://github.com/yantra-core/Mantra.js/assets/70011/8f2ca7f9-a422-4252-93e4-a7a1098216f9)
 
 Using the [Sutra.js](https://github.com/yantra-core/Sutra.js) library `mantra` game logic can be created using JSON files or a Fluent JavaScript API. `sutra` supports `i18n` compatible exports to a human readable defintions like this:
 
@@ -59,29 +68,29 @@ if isBoss
       speed: 5
 ```
 
-### Finite State Machines
-
-In addition to custom code and `sutra`, `mantra` game logic can be coded in a standard [xstate](https://github.com/statelyai/xstate) machines via the `XState` plugin.
-
 ## Demos
 
 [View All Demos on Yantra.gg](https://yantra.gg/mantra)
 
-### Mantra World
+### Mantra World ( ALPHA )
+
+The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
 
 #### Home World
 
 https://yantra.gg/mantra/home
 
+#### YCraft World
 
+https://yantra.gg/mantra/ycraft
 
-https://github.com/yantra-core/Mantra.js/assets/70011/d938c488-3669-4e2e-94a1-70660f931da6
+#### Music World
 
+https://yantra.gg/mantra/music
 
+#### Platform World
 
-The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
-
-Be sure to find the `Warp Zones` to: `Music World`, `Platform World`, and `YCraft World`.
+https://yantra.gg/mantra/platform
 
 #### Simple Configurations
 
@@ -322,5 +331,11 @@ The following checklist outlines the planned features and their current status:
 As v1 alpha software, `@yantra-core/mantra` is currently under active development. [Features](#Features) are being added and refined. Users should anticipate changes and potential instabilities. Your feedback and contributions at this stage are invaluable and will shape the future of this framework.
 
 Mantra follows an odd / even version release schedule for stable / unstable versions. v1 is considered unstabled. v2 will be considered stable.
+
+<a name="contributing"></a>
+
+## Contributing
+
+If you have any issues using Mantra.js or wish to improve the Mantra.js please feel free to [Open An Issue](https://github.com/yantra-core/Mantra.js/issues) or [Open A Pull Request](https://github.com/yantra-core/Mantra.js/pulls)
 
 Come join the [AYYO Discord](https://discord.gg/bbyjf6MXC2) if you have any questions!
