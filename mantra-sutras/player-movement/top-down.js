@@ -2,91 +2,47 @@ export default function topdownMovement(game) {
 
   let rules = game.createSutra();
 
-  let defaultControlsMapping = {
-    W: 'MOVE_FORWARD',
-    S: 'MOVE_BACKWARD',
-    A: 'MOVE_LEFT',
-    D: 'MOVE_RIGHT',
-    SPACE: 'FIRE_BULLET',
-    K: 'FIRE_BULLET',
-    U: 'SELECT_MENU',
-    O: 'ZOOM_OUT',
-    P: 'ZOOM_IN',
+  rules.on('MOVE_FORWARD', function (entity) {
+    game.applyForce(entity.id, { x: 0, y: -1, z: 0 });
+    game.updateEntity({ id: entity.id, rotation: 0 });
+  });
 
-    //LEFT: 'ROTATE_LEFT',
-    //RIGHT: 'ROTATE_RIGHT'
-  };
+  rules.on('MOVE_BACKWARD', function (entity) {
+    game.applyForce(entity.id, { x: 0, y: 1, z: 0 });
+    game.updateEntity({ id: entity.id, rotation: Math.PI });
+  });
 
-  function handleInputs (entityId, input) {
-    const moveSpeed = 1;
-    let actions = [];
+  rules.on('MOVE_LEFT', function (entity) {
+    game.applyForce(entity.id, { x: -1, y: 0, z: 0 });
+    game.updateEntity({ id: entity.id, rotation: -Math.PI / 2 });
+  });
 
-    // Map the input to actions
-    if (input.controls) {
-      Object.keys(input.controls).forEach(key => {
-        if (input.controls[key] && defaultControlsMapping[key]) {
-          actions.push(defaultControlsMapping[key]);
-        }
-      });
-    }
+  rules.on('MOVE_RIGHT', function (entity) {
+    game.applyForce(entity.id, { x: 1, y: 0, z: 0 });
+    game.updateEntity({ id: entity.id, rotation: Math.PI / 2 });
+  });
 
-    // Apply movement and rotation
-    actions.forEach(action => {
-      let force;
-      let rotation;
-      switch (action) {
-        case 'MOVE_FORWARD':
-          force = { x: 0, y: -moveSpeed };
-          rotation = 0; // Facing up
-          break;
-        case 'MOVE_BACKWARD':
-          force = { x: 0, y: moveSpeed };
-          rotation = Math.PI; // Facing down
-          break;
-        case 'MOVE_LEFT':
-          force = { x: -moveSpeed, y: 0 };
-          rotation = -Math.PI / 2; // Facing left
-          break;
-        case 'MOVE_RIGHT':
-          force = { x: moveSpeed, y: 0 };
-          rotation = Math.PI / 2; // Facing right
-          break;
-      }
-      if (force) {
-        game.applyForce(entityId, force);
-        game.updateEntity({
-          id: entityId,
-          rotation: rotation
-        });
-      }
-    });
+  rules.on('FIRE_BULLET', function (entity) {
+    game.systems.bullet.fireBullet(entity.id);
+  });
 
-    if (game.systems.bullet) {
-      if (actions.includes('FIRE_BULLET')) game.getSystem('bullet').fireBullet(entityId);
-    }
-    if (game.systems.sword) {
-      if (actions.includes('FIRE_BULLET')) {
-        game.getSystem('sword').swingSword(entityId);
-      } else {
-        game.getSystem('sword').sheathSword(entityId);
-      }
-    }
+  rules.on('SWING_SWORD', function (entity) {
+    game.systems.sword.swingSword(entity.id);
+  })
 
-    if (actions.includes('ZOOM_IN')) {
-      let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom + 0.05);
-    }
+  rules.on('CAMERA_SHAKE', function (entity) {
+    game.shakeCamera(1000);
+  });
+  rules.on('ZOOM_IN', function (entity) {
+    let currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom + 0.05);
+  });
+  rules.on('ZOOM_OUT', function (entity) {
+    let currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom - 0.05);
+  });
 
-    if (actions.includes('ZOOM_OUT')) {
-      let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom - 0.05);
-    }
-
-    game.emit('entityInput::handleActions', entityId, actions);
-
-  }
-
-  rules.on('entityInput::handleInputs', handleInputs);
+  // game.emit('entityInput::handleActions', entityId, actions);
 
   return rules;
 }

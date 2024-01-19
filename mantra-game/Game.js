@@ -67,6 +67,7 @@ class Game {
     editor = true,
     sutra = true,
     lifetime = true,
+    defaultMovement = true,
     // data compression
     protobuf = false,
     msgpack = false,
@@ -99,6 +100,7 @@ class Game {
       gamepad,
       editor,
       lifetime,
+      defaultMovement,
       isOfflineMode,
       protobuf,
       msgpack,
@@ -297,7 +299,8 @@ class Game {
         gamepad,
         editor,
         sutra,
-        lifetime
+        lifetime,
+        defaultMovement
       });
     }
   }

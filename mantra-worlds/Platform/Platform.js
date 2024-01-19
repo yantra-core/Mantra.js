@@ -206,11 +206,9 @@ class Platform {
     //rules.if('P').then('ZOOM_OUT');
 
     rules.on('JUMP', function(player, node, gameState){
-      console.log('jumpTicks', gameState.inputTicks.SPACE,  gameState.inputDuration.SPACE)
       if (gameState.inputTicks.SPACE >= maxJumpTicks) {
         return;
       }
-      console.log('apply force')
       game.applyForce(player.id, { x: 0, y: -1.2, z: 0 });
       game.updateEntity({ id: player.id, rotation: 0 });
     });
@@ -267,10 +265,6 @@ class Platform {
       let currentZoom = game.data.camera.currentZoom || 1;
       game.setZoom(currentZoom - 0.05);
     });
-
-    // game.useSutra(rules, 'PLATFORM');
-
-    // console.log('created sutra', rules)
 
     game.createEntity({
       type: 'WARP',
@@ -357,8 +351,6 @@ class Platform {
         z: -8
       }
     });
-
- 
 
     let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb'];
     //itemsList = [];

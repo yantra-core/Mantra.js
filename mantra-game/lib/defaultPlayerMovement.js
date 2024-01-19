@@ -1,5 +1,5 @@
 export default function topdownMovement(game) {
-  return;
+
   let rules = game.createSutra();
 
   rules.if('W').then('MOVE_FORWARD');
@@ -7,9 +7,6 @@ export default function topdownMovement(game) {
   rules.if('S').then('MOVE_BACKWARD');
   rules.if('D').then('MOVE_RIGHT');
 
-  rules.if('SPACE').then('FIRE_BULLET');
-  rules.if('K').then('SWING_SWORD');
-  rules.if('L').then('SWING_SWORD');
   rules.if('O').then('ZOOM_IN');
   rules.if('P').then('ZOOM_OUT');
 
@@ -33,14 +30,6 @@ export default function topdownMovement(game) {
     game.updateEntity({ id: entity.id, rotation: Math.PI / 2 });
   });
 
-  rules.on('FIRE_BULLET', function (entity) {
-    game.systems.bullet.fireBullet(entity.id);
-  });
-
-  rules.on('SWING_SWORD', function (entity) {
-    game.systems.sword.swingSword(entity.id);
-  })
-
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);
   });
@@ -52,8 +41,6 @@ export default function topdownMovement(game) {
     let currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });
-
-  // game.emit('entityInput::handleActions', entityId, actions);
 
   return rules;
 }

@@ -1,16 +1,19 @@
 // import { createSutra } from '../../../../sutra/index.js';
 import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
+import movement from '../../lib/defaultPlayerMovement.js';
+
 class Sutra {
   static id = 'sutra';
-  constructor() {
+  constructor({ defaultMovement = false }) {
     this.id = Sutra.id;
     this.inputCache = {};
     this.inputTickCount = {};
     this.inputDuration = {};
+    this.defaultMovement = defaultMovement;
   }
 
-  init(game) {
+  init(game, ) {
     this.game = game;
     this.game.createSutra = createSutra;
     this.game.setSutra = this.setSutra.bind(this);
@@ -25,13 +28,18 @@ class Sutra {
     let rules = createSutra(game);
     this.setSutra(rules);
 
+  
     // Once the game is ready, register the keyboard controls as conditions
     // This allows for game.rules.if('keycode').then('action') style rules
     game.on('game::ready', function(){
       // for each key in game.controls, add a condition that checks if the key is pressed
       // these are currently explicitly bound to the player entity, we may want to make this more generic
       self.bindKeyCodesToSutraConditions();
+      if (self.defaultMovement) {
+        game.useSutra(movement(game), 'movement');
+      }
     });
+
   }
 
   bindKeyCodesToSutraConditions() {
