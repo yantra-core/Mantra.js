@@ -346,6 +346,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       sutra = _ref$sutra === void 0 ? true : _ref$sutra,
       _ref$lifetime = _ref.lifetime,
       lifetime = _ref$lifetime === void 0 ? true : _ref$lifetime,
+      _ref$defaultMovement = _ref.defaultMovement,
+      defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement,
       _ref$protobuf = _ref.protobuf,
       protobuf = _ref$protobuf === void 0 ? false : _ref$protobuf,
       _ref$msgpack = _ref.msgpack,
@@ -384,6 +386,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       gamepad: gamepad,
       editor: editor,
       lifetime: lifetime,
+      defaultMovement: defaultMovement,
       isOfflineMode: isOfflineMode,
       protobuf: protobuf,
       msgpack: msgpack,
@@ -570,7 +573,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
         gamepad: gamepad,
         editor: editor,
         sutra: sutra,
-        lifetime: lifetime
+        lifetime: lifetime,
+        defaultMovement: defaultMovement
       });
     }
   }
@@ -1278,15 +1282,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = topdownMovement;
 function topdownMovement(game) {
-  return;
   var rules = game.createSutra();
   rules["if"]('W').then('MOVE_FORWARD');
   rules["if"]('A').then('MOVE_LEFT');
   rules["if"]('S').then('MOVE_BACKWARD');
   rules["if"]('D').then('MOVE_RIGHT');
-  rules["if"]('SPACE').then('FIRE_BULLET');
-  rules["if"]('K').then('SWING_SWORD');
-  rules["if"]('L').then('SWING_SWORD');
   rules["if"]('O').then('ZOOM_IN');
   rules["if"]('P').then('ZOOM_OUT');
   rules.on('MOVE_FORWARD', function (entity) {
@@ -1333,12 +1333,6 @@ function topdownMovement(game) {
       rotation: Math.PI / 2
     });
   });
-  rules.on('FIRE_BULLET', function (entity) {
-    game.systems.bullet.fireBullet(entity.id);
-  });
-  rules.on('SWING_SWORD', function (entity) {
-    game.systems.sword.swingSword(entity.id);
-  });
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);
   });
@@ -1350,9 +1344,6 @@ function topdownMovement(game) {
     var currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });
-
-  // game.emit('entityInput::handleActions', entityId, actions);
-
   return rules;
 }
 
@@ -1593,7 +1584,9 @@ function loadPluginsFromConfig(_ref) {
     editor = _ref.editor,
     sutra = _ref.sutra,
     ghostTyper = _ref.ghostTyper,
-    lifetime = _ref.lifetime;
+    lifetime = _ref.lifetime,
+    _ref$defaultMovement = _ref.defaultMovement,
+    defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement;
   var plugins = this.plugins;
   var gameConfig = this.config;
   if (gameConfig.showLoadingScreen && !this.isServer) {
@@ -1601,10 +1594,6 @@ function loadPluginsFromConfig(_ref) {
       minLoadTime: gameConfig.minLoadTime
     }));
   }
-  this.on('game::ready', function () {
-    // when the game is ready, create the sutra for default top-down movements
-    // this.useSutra(movement(this), 'movement');
-  });
   this.use('Entity');
   if (physics === 'matter') {
     this.use('MatterPhysics');
@@ -1639,7 +1628,9 @@ function loadPluginsFromConfig(_ref) {
       this.use('GamepadGUI', gamepad);
     }
     if (sutra) {
-      this.use('Sutra');
+      this.use('Sutra', {
+        defaultMovement: defaultMovement
+      });
     }
     this.use('GhostTyper');
 

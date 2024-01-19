@@ -4,8 +4,83 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = topdownMovement;
+function topdownMovement(game) {
+  var rules = game.createSutra();
+  rules["if"]('W').then('MOVE_FORWARD');
+  rules["if"]('A').then('MOVE_LEFT');
+  rules["if"]('S').then('MOVE_BACKWARD');
+  rules["if"]('D').then('MOVE_RIGHT');
+  rules["if"]('O').then('ZOOM_IN');
+  rules["if"]('P').then('ZOOM_OUT');
+  rules.on('MOVE_FORWARD', function (entity) {
+    game.applyForce(entity.id, {
+      x: 0,
+      y: -1,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: 0
+    });
+  });
+  rules.on('MOVE_BACKWARD', function (entity) {
+    game.applyForce(entity.id, {
+      x: 0,
+      y: 1,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: Math.PI
+    });
+  });
+  rules.on('MOVE_LEFT', function (entity) {
+    game.applyForce(entity.id, {
+      x: -1,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: -Math.PI / 2
+    });
+  });
+  rules.on('MOVE_RIGHT', function (entity) {
+    game.applyForce(entity.id, {
+      x: 1,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: entity.id,
+      rotation: Math.PI / 2
+    });
+  });
+  rules.on('CAMERA_SHAKE', function (entity) {
+    game.shakeCamera(1000);
+  });
+  rules.on('ZOOM_IN', function (entity) {
+    var currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom + 0.05);
+  });
+  rules.on('ZOOM_OUT', function (entity) {
+    var currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom - 0.05);
+  });
+  return rules;
+}
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = void 0;
 var _index = require("../../../../sutra/index.js");
+var _defaultPlayerMovement = _interopRequireDefault(require("../../lib/defaultPlayerMovement.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -19,16 +94,18 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// import { createSutra } from '@yantra-core/sutra';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 var Sutra = /*#__PURE__*/function () {
-  function Sutra() {
+  function Sutra(_ref) {
+    var _ref$defaultMovement = _ref.defaultMovement,
+      defaultMovement = _ref$defaultMovement === void 0 ? false : _ref$defaultMovement;
     _classCallCheck(this, Sutra);
     this.id = Sutra.id;
     this.inputCache = {};
     this.inputTickCount = {};
     this.inputDuration = {};
+    this.defaultMovement = defaultMovement;
   }
   _createClass(Sutra, [{
     key: "init",
@@ -51,6 +128,9 @@ var Sutra = /*#__PURE__*/function () {
         // for each key in game.controls, add a condition that checks if the key is pressed
         // these are currently explicitly bound to the player entity, we may want to make this more generic
         self.bindKeyCodesToSutraConditions();
+        if (self.defaultMovement) {
+          game.useSutra((0, _defaultPlayerMovement["default"])(game), 'movement');
+        }
       });
     }
   }, {
@@ -191,7 +271,7 @@ var Sutra = /*#__PURE__*/function () {
 _defineProperty(Sutra, "id", 'sutra');
 var _default = exports["default"] = Sutra;
 
-},{"../../../../sutra/index.js":2}],2:[function(require,module,exports){
+},{"../../../../sutra/index.js":3,"../../lib/defaultPlayerMovement.js":1}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -210,7 +290,7 @@ function createSutra() {
   return new _sutra["default"]();
 }
 
-},{"./lib/sutra.js":12}],3:[function(require,module,exports){
+},{"./lib/sutra.js":13}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -242,7 +322,7 @@ function evaluateCompositeCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -296,7 +376,7 @@ function evaluateCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -354,7 +434,7 @@ function evaluateDSLCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -407,7 +487,7 @@ function evaluateSingleCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -580,7 +660,7 @@ function exportToEnglish() {
   //return this.tree.map(node => describeAction(node, indentLevel)).join('\n').concat('') + '\n' + conditionDescriptions;
 }
 
-},{"./i18n.js":8}],8:[function(require,module,exports){
+},{"./i18n.js":9}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -628,7 +708,7 @@ var languageConfig = {
 };
 var _default = exports["default"] = languageConfig;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -653,7 +733,7 @@ var _default = exports["default"] = {
   '!': 'not'
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -673,7 +753,7 @@ function parsePath(path) {
   }, []);
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -722,7 +802,7 @@ function serializeNode(node) {
   return serializedNode;
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1566,5 +1646,5 @@ var _default = exports["default"] = Sutra;
   }
   */
 
-},{"./evaluateCompositeCondition.js":3,"./evaluateCondition.js":4,"./evaluateDSLCondition.js":5,"./evaluateSingleCondition.js":6,"./exportToEnglish.js":7,"./operatorAliases.js":9,"./parsePath.js":10,"./serializeToJson.js":11}]},{},[1])(1)
+},{"./evaluateCompositeCondition.js":4,"./evaluateCondition.js":5,"./evaluateDSLCondition.js":6,"./evaluateSingleCondition.js":7,"./exportToEnglish.js":8,"./operatorAliases.js":10,"./parsePath.js":11,"./serializeToJson.js":12}]},{},[2])(2)
 });
