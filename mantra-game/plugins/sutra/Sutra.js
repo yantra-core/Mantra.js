@@ -36,20 +36,20 @@ class Sutra {
       // these are currently explicitly bound to the player entity, we may want to make this more generic
       self.bindKeyCodesToSutraConditions();
       if (self.defaultMovement) {
-        game.useSutra(movement(game), 'movement');
+        self.game.useSutra(movement(self.game), 'movement');
       }
     });
 
   }
 
   bindKeyCodesToSutraConditions() {
-    if (game.systems.keyboard) {
-      let keyControls = game.systems.keyboard.controls;
+    if (this.game.systems.keyboard) {
+      let keyControls = this.game.systems.keyboard.controls;
       for (let mantraCode in keyControls) {
         // Remark: Do we want to imply isPlayer here?
         // Is there a valid case for not defaulting to isPlayer?
         // It may be required for complex play movements?
-        game.rules.addCondition(mantraCode, (entity, gameState) =>
+        this.game.rules.addCondition(mantraCode, (entity, gameState) =>
           entity.id === game.currentPlayerId && gameState.input.controls[mantraCode]
         );
       }

@@ -21,33 +21,13 @@
           scriptRoot: '../../'
         }
       });
+      window.game = game;
 
       // Use Plugins to extend the game with new functionality
 
       // Adds projectile Bullets to the game
       // test chanining
       game.use('Bullet').use('Block');
-
-      game.use('Editor', {
-        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-babylon.html'
-      });
-
-      // custom player::joined handler, this is optional
-      // without setting a custom player::joined, the default event will be used
-      game.on('player::joined', function (playerData) {
-        console.log('player joined', playerData)
-        let player = game.createEntity({
-          type: 'PLAYER',
-          mass: 1320,
-          position: {
-            x: -100,
-            y: 0
-          }
-        });
-        console.log('player created', player)
-        // make sure to emit the player::created event
-        game.emit('player::created', player);
-      });
 
       // start the game loop
       game.start(function () {

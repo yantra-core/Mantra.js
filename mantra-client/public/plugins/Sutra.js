@@ -129,20 +129,21 @@ var Sutra = /*#__PURE__*/function () {
         // these are currently explicitly bound to the player entity, we may want to make this more generic
         self.bindKeyCodesToSutraConditions();
         if (self.defaultMovement) {
-          game.useSutra((0, _defaultPlayerMovement["default"])(game), 'movement');
+          self.game.useSutra((0, _defaultPlayerMovement["default"])(self.game), 'movement');
         }
       });
     }
   }, {
     key: "bindKeyCodesToSutraConditions",
     value: function bindKeyCodesToSutraConditions() {
-      if (game.systems.keyboard) {
-        var keyControls = game.systems.keyboard.controls;
+      var _this = this;
+      if (this.game.systems.keyboard) {
+        var keyControls = this.game.systems.keyboard.controls;
         var _loop = function _loop(mantraCode) {
           // Remark: Do we want to imply isPlayer here?
           // Is there a valid case for not defaulting to isPlayer?
           // It may be required for complex play movements?
-          game.rules.addCondition(mantraCode, function (entity, gameState) {
+          _this.game.rules.addCondition(mantraCode, function (entity, gameState) {
             return entity.id === game.currentPlayerId && gameState.input.controls[mantraCode];
           });
         };
