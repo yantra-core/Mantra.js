@@ -262,7 +262,6 @@ function bomb(game) {
       friction: 0.5,
       frictionStatic: 0.5,
       frictionAir: 0.01,
-      //texture: 'tile-block',
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'bomb',
@@ -270,7 +269,6 @@ function bomb(game) {
       },
       owner: entity.id,
       rotation: 0,
-      //color: entity.bombColor || 0x000000,
       velocity: {
         x: directionX * speed,
         y: directionY * speed

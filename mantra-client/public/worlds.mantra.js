@@ -2458,7 +2458,6 @@ function bomb(game) {
       friction: 0.5,
       frictionStatic: 0.5,
       frictionAir: 0.01,
-      //texture: 'tile-block',
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'bomb',
@@ -2466,7 +2465,6 @@ function bomb(game) {
       },
       owner: entity.id,
       rotation: 0,
-      //color: entity.bombColor || 0x000000,
       velocity: {
         x: directionX * speed,
         y: directionY * speed
@@ -5457,11 +5455,9 @@ var Platform = /*#__PURE__*/function () {
       //rules.if('P').then('ZOOM_OUT');
 
       rules.on('JUMP', function (player, node, gameState) {
-        console.log('jumpTicks', gameState.inputTicks.SPACE, gameState.inputDuration.SPACE);
         if (gameState.inputTicks.SPACE >= maxJumpTicks) {
           return;
         }
-        console.log('apply force');
         game.applyForce(player.id, {
           x: 0,
           y: -1.2,
@@ -5537,11 +5533,6 @@ var Platform = /*#__PURE__*/function () {
         var currentZoom = game.data.camera.currentZoom || 1;
         game.setZoom(currentZoom - 0.05);
       });
-
-      // game.useSutra(rules, 'PLATFORM');
-
-      // console.log('created sutra', rules)
-
       game.createEntity({
         type: 'WARP',
         kind: 'Home',
