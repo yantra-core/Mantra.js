@@ -318,66 +318,69 @@ class Game {
   }
 
   start(cb) {
-    let game = this;
-    if (typeof cb !== 'function') {
-      console.log('No game.start() was callback provided. Using default callback.');
-      console.log("You can provide a callback to game.start() to create your game's entities and systems.");
-      // Default local game start function if none provided
-      cb = function () {
-        defaultGameStart(game);
-      };
-    }
-    // Wait for all systems to be ready before starting the game loop
-    if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
-      // console.log('waiting for plugins to load...', game.physicsReady)
-      setTimeout(function () {
-        game.start(cb);
-      }, 4);
-      return
-    } else {
+    return new Promise((resolve, reject) => {
+      let game = this;
 
-      // Remark: If multiple graphics plugins are used, default behavior is to,
-      //         horizontally stack the graphics plugins so they all fit on the screen
-      // TODO: move this to Graphics.js file
-      if (game.config.multiplexGraphicsHorizontally) {
-        // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
-        let totalCount = game.graphics.length;
-        let newWidth = 100 / totalCount;
-        // find each canvas in the #gameHolder and apply the new width
-        if (totalCount > 1) {
-          if (document && document.querySelectorAll) {
-            let canvasList = document.querySelectorAll('#gameHolder canvas');
-            for (let i = 0; i < canvasList.length; i++) {
-              // console.log('setting new width for', canvasList[i], 'to', newWidth + '%')
-              canvasList[i].style.width = newWidth + '%';
+      // Define a wrapper for the callback to also resolve the promise
+      const callbackWrapper = (err, result) => {
+        if (err) {
+          reject(err);
+          if (cb) cb(err);
+          return;
+        }
+        resolve(result);
+        if (cb) cb(null, result);
+      };
+
+      if (typeof cb !== 'function') {
+        cb = function () { // noop 
+        };
+      }
+      // Wait for all systems to be ready before starting the game loop
+      if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
+        // console.log('waiting for plugins to load...', game.physicsReady)
+        setTimeout(() => {
+          game.start(cb).then(resolve).catch(reject);
+        }, 4);
+        return
+      } else {
+        // Remark: If multiple graphics plugins are used, default behavior is to,
+        //         horizontally stack the graphics plugins so they all fit on the screen
+        // TODO: move this to Graphics.js file
+        if (game.config.multiplexGraphicsHorizontally) {
+          // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
+          let totalCount = game.graphics.length;
+          let newWidth = 100 / totalCount;
+          // find each canvas in the #gameHolder and apply the new width
+          if (totalCount > 1) {
+            if (document && document.querySelectorAll) {
+              let canvasList = document.querySelectorAll('#gameHolder canvas');
+              for (let i = 0; i < canvasList.length; i++) {
+                // console.log('setting new width for', canvasList[i], 'to', newWidth + '%')
+                canvasList[i].style.width = newWidth + '%';
+              }
             }
           }
         }
-      }
 
-      console.log('All Plugins are ready! Starting Mantra Game Client...');
-      game.emit('game::ready');
-      if (this.config.defaultPlayer) {
-        this.createPlayer({
-          type: 'PLAYER'
-        }).then(function (ent) {
-          game.setPlayerId(ent.id);
-        });
-        /*
-        game.createBorder({
-          height: 2000,
-          width: 2000
-        });
-        */
-      }
+        console.log('All Plugins are ready! Starting Mantra Game Client...');
+        game.emit('game::ready');
+        if (this.config.defaultPlayer) {
+          this.createPlayer({
+            type: 'PLAYER'
+          }).then(function (ent) {
+            game.setPlayerId(ent.id);
+          });
+        }
 
-      if (game.systems.client) {
-        let client = this.getSystem('client');
-        client.start(cb);
-      } else {
-        console.log('Warning: No Client System found, will not start game loop.');
+        if (game.systems.client) {
+          let client = this.getSystem('client');
+          client.start(callbackWrapper);
+        } else {
+          console.log('Warning: No Client System found, will not start game loop.');
+        }
       }
-    }
+    });
   }
 
   // TODO: move to client, let client hoist the connection logic to game
@@ -413,7 +416,7 @@ class Game {
     let game = this;
 
     if (typeof cb === 'undefined') {
-      cb = function noop () { };
+      cb = function noop() { };
     }
 
     // TODO: make this configurable
@@ -564,7 +567,7 @@ class Game {
     }
     return null;
   }
-  
+
   addSystem(systemName, system) {
     return this.systemsManager.addSystem(systemName, system);
   }
@@ -636,7 +639,7 @@ class Game {
     this.height = height;
   }
 
-  zoom (scale) {
+  zoom(scale) {
     if (this.camera && this.camera.zoom) {
       this.camera.zoom(scale);
     } else {
@@ -705,7 +708,7 @@ class Game {
         width: game.width,
         height: game.height,
         thickness: thickness
-    });
+      });
     } else {
       game.use('Border', {}, function () {
         game.systems.border.createBorder({
@@ -728,7 +731,7 @@ class Game {
     }
   }
 
-  pause () {
+  pause() {
     if (this.systems['chrono-control']) {
       this.systems['chrono-control'].pause();
     }
@@ -740,7 +743,7 @@ class Game {
     }
   }
 
-  reset () {
+  reset() {
     // not a full game reset ( yet )
     // reset default entity input
     //let movementRules = movement(this);
@@ -757,6 +760,10 @@ class Game {
     // reset the default player controls
     this.setControls({});
 
+  }
+
+  setZoom() {
+    // noop
   }
 
 }

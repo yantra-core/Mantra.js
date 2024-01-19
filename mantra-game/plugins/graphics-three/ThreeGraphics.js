@@ -75,7 +75,7 @@ class ThreeGraphics extends GraphicsInterface {
     // game.graphicsReady.push(this.name);
 
     // Position the camera for a bird's eye view
-    this.camera.position.set(0, 200, 200);
+    this.camera.position.set(0, 0, 0);
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
     // TODO: Initialize controls for camera interaction
     // this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -106,12 +106,18 @@ class ThreeGraphics extends GraphicsInterface {
     }
 
     // Basic white material, replace with textures/materials as needed
-    material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    material = new THREE.MeshBasicMaterial({ 
+      color: 0xffffff,
+      wireframe: true // Set wireframe to true
+    });
+
     mesh = new THREE.Mesh(geometry, material);
 
     this.scene.add(mesh); // Add the mesh to the scene
     // Store the mesh in the 'graphics' component
     this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
+    mesh.position.set(entityData.position.x, 1, entityData.position.y);
+
     return mesh;
   }
 
@@ -133,7 +139,7 @@ class ThreeGraphics extends GraphicsInterface {
     }
     
     // TODO: Add support for 3D position with entityData.position.z if available
-    mesh.position.set(entityData.position.x, 1, entityData.position.y);
+    mesh.position.set(-entityData.position.x, 1, -entityData.position.y);
 
   }
 
@@ -176,7 +182,7 @@ class ThreeGraphics extends GraphicsInterface {
       const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
       if (playerGraphic) {
         // Calculate the new camera position with a slight offset above and behind the player
-        const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 50, -100));
+        const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
         const lookAtPosition = playerGraphic.position.clone();
   
         // Use a smaller lerp factor for smoother camera movement
