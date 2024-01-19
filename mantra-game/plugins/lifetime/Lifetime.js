@@ -13,6 +13,9 @@ class Lifetime {
 
   update () {
     const now = Date.now();
+    // TODO: iterate through lifetime instead of creationTime
+    // TODO: ensure that lifetime is only added if non Infinity
+    // TODO: check performance of lifetime again after these changes
     for (let entityId in this.game.components.creationTime.data) {
       let ent = this.game.getEntity(entityId);
       if (ent && this.game.components.lifetime[entityId] !== Infinity) {

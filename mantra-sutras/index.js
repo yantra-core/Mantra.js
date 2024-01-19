@@ -1,3 +1,4 @@
+import bomb from './bomb.js';
 import demon from './demon.js';
 import fount from './fount.js';
 import gameOfLife from './game-of-life.js';
@@ -8,6 +9,7 @@ import hexapod from './hexapod.js';
 
 const Sutras = {};
 
+Sutras.bomb = bomb;
 Sutras.demon = demon;
 Sutras.fount = fount;
 Sutras.blackhole = blackhole;

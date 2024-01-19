@@ -1,7 +1,7 @@
 // Block.js - Marak Squires 2023
 class Block {
   static id = 'block';
-  constructor({ MIN_BLOCK_SIZE = 100, width = 40, height = 40 } = {}) {
+  constructor({ MIN_BLOCK_SIZE = 50, width = 40, height = 40 } = {}) {
     this.id = Block.id;
     // Assuming the config includes width and height properties
     this.width = width; // Default size if none provided
@@ -54,6 +54,7 @@ class Block {
   }
 
   // TODO: add option to cancel collision pairs
+  // TODO: move the block splitting logic into separate function
   blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
     if (this.game.mode === 'local' || !this.game.isClient) {
 
@@ -79,7 +80,7 @@ class Block {
         const xOffset = (i % 2) * newWidth;
         const yOffset = Math.floor(i / 2) * newHeight;
         this.game.createEntity({
-          type: 'BLOCK',
+          type: entityA.type,
           position: {
             x: entityA.position.x + xOffset,
             y: entityA.position.y + yOffset

@@ -59,7 +59,6 @@ class Home {
     game.use('Block');
     game.use('Border', { autoBorder: true })
     game.use('Bullet');
-    game.use('Bomb');
     // game.use('Sword')
     game.use('Tile');
     game.use('Tone');
@@ -96,7 +95,7 @@ class Home {
 
     //rules.if('K').then('SWING_SWORD');
     //rules.if('L').then('SWING_SWORD');
-    rules.if('K').then('DROP_BOMB');
+    rules.if('K').if('canDropBomb').then('DROP_BOMB');
     // rules.if('L').then('DROP_BOMB');
 
     rules.if('O').then('ZOOM_IN');
@@ -155,7 +154,7 @@ class Home {
     });
 
     rules.on('DROP_BOMB', function (player) {
-      game.systems.bomb.dropBomb(player.id);
+      rules.emit('dropBomb', player)
     });
 
     /*

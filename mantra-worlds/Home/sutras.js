@@ -14,6 +14,9 @@ import demon from "../../mantra-sutras/demon.js";
 import hexapod from '../../mantra-sutras/hexapod.js';
 import movement from "../../mantra-sutras/player-movement/top-down.js";
 
+import bomb from '../../mantra-sutras/bomb.js';
+
+
 export default function sutras(game) {
 
   let rules = game.createSutra();
@@ -52,6 +55,9 @@ export default function sutras(game) {
 
   // hexapod entity
   rules.use(hexapod(game), 'hexapod');
+
+  // bomb item
+  rules.use(bomb(game), 'bomb');
 
   // movement
   //rules.use(movement(game), 'movement');
