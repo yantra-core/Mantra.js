@@ -26,6 +26,7 @@ The [Mantra.js](https://yantra.gg/mantra.js) file is currently under `111kb` and
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
 <a class="callToActionLink" href="https://yantra.gg/blog/build-games-with-mantra">Read More about Building Games with Mantra and Yantra</a>
+
 <a href="https://yantra.gg/docs/">Additional Documentation</a>
 
 ## Super Simple Offline First
