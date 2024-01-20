@@ -1,6 +1,6 @@
 // Tone.js - Mantra Plugin - Marak Squires 2023
 // Tone.js - https://tonejs.github.io/
-// import * as Tone from 'tone';
+// import * as Tone from 'tone'; <-- import if needed, otherwise it will be loaded from vendor
 
 import DrumKit from './instruments/DrumKit.js';
 import startUpJingle from './jingles/start-up.js';
@@ -10,13 +10,11 @@ import playJingle from './util/playJingle.js';
 import playSpatialSound from './util/playSpatialSound.js';
 
 class TonePlugin {
-
   static id = 'tone';
-  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
+  static async = true; // indicates that this plugin has async initialization and should should emit ready event
 
   constructor() {
     this.id = TonePlugin.id;
-    this.synth = null;
     this.playIntro = false;
     this.userEnabled = false;
     this.lastNotePlayed = null;
@@ -26,136 +24,78 @@ class TonePlugin {
 
   init(game) {
     this.game = game;
-    
-    this.harmonicShift = harmonicShift.bind(this);
-    this.playJingle = playJingle.bind(this);
-    this.playSpatialSound = playSpatialSound.bind(this);
-    // register the plugin with the game
-    this.game.systemsManager.addSystem(this.id, this);
-    // check to see if Tone scope is available, if not assume we need to inject it sequentially
+    this.bindUtilityFunctions();
+
     if (typeof Tone === 'undefined') {
       console.log('Tone is not defined, attempting to load it from vendor');
-      game.loadScripts(['/vendor/tone.min.js'], () => {
-        this.toneReady(game);
-      });
+      game.loadScripts(['/vendor/tone.min.js'], () => this.toneReady());
     } else {
-      this.toneReady(game);
+      this.toneReady();
     }
   }
 
+  bindUtilityFunctions() {
+    this.harmonicShift = harmonicShift.bind(this);
+    this.playJingle = playJingle.bind(this);
+    this.playSpatialSound = playSpatialSound.bind(this);
+    this.game.systemsManager.addSystem(this.id, this);
+  }
+
   toneReady() {
-    let game = this.game;
-    let self = this;
-    let that = this;
 
-    // Tone.context.latencyHint = 'interactive'; // or a number in seconds
-    Tone.Transport.lookAhead = 0.5; // in seconds
-
+    this.synth = new Tone.Synth().toDestination();
     this.drumKit = new DrumKit();
+    this.limiter = new Tone.Limiter(-6).toDestination();
+    this.synth.connect(this.limiter);
+    this.synth.volume.value = -3;
 
 
-    this.game.playSpatialSound = this.playSpatialSound.bind(this);
-      
-    const limiter = new Tone.Limiter(-6).toDestination();
+    Tone.Transport.lookAhead = 0.5;
 
-    // Create a compressor
-    /*
-    const compressor = new Tone.Compressor({
-      threshold: -3, // Threshold in dB
-      ratio: 4,       // Compression ratio
-      attack: 0.003,  // Attack time in seconds
-      release: 0.25   // Release time in seconds
-    }).toDestination();
-    */
+    this.game.playSpatialSound = this.playSpatialSound;
+    this.game.playDrum = this.playDrum.bind(this);
+    this.game.playNote = this.playNote.bind(this);
 
-    // TODO: game.createSynth = function() {};
-    this.synth = new Tone.Synth();
-    this.synth.volume.value = -3; // Lower volume
-
-    //this.synth.connect(compressor);
-    this.synth.connect(limiter);
-
-
-    game.playDrum = function (sound = 'kick') {
-      if (!this.toneStarted) {
-        Tone.start();
-        this.toneStarted = true;
-      }
-      that.drumKit.play(sound);
-    };
-
-    game.playNote = function (note, duration) {
-      if (!this.toneStarted) {
-        Tone.start();
-        this.toneStarted = true;
-      }      // console.log('playing ', note, duration)
-      //play a middle 'C' for the duration of an 8th note
-      self.playNote(note, duration);
-    };
-
-    // Create a synth and connect it to the main output
-    //const synth = new Tone.Synth().toDestination();
-    console.log('Tone is ready', startUpJingle)
+    console.log('Tone is ready', startUpJingle);
     if (this.playIntro) {
       this.playJingle(startUpJingle);
     }
 
-    // Function to play the sound
-    function playSound(sound) {
-      if (!this.toneStarted) {
-        Tone.start();
-        this.toneStarted = true;
-      }
-      sound.notes.forEach(note => {
-        synth.triggerAttackRelease(note, sound.duration);
-      });
-    }
-
-    // async:true plugins *must* self report when they are ready
-    game.emit('plugin::ready::tone', this);
+    this.game.emit('plugin::ready::tone', this);
   }
 
   playNote(note, duration, now = 0, velocity = 0.5) {
-
-     // Ensure velocity is within range
     velocity = Math.min(Math.max(velocity, 0), 0.5);
-
-    // console.log('playNote', note, duration, now, velocity)
-    if (typeof note === 'undefined') {
-      // if note is not defined, select a random note from the keyCodes object
-      let keys = Object.keys(this.keyCodes);
-      let randomKey = keys[Math.floor(Math.random() * keys.length)];
-
-      // check to see if this.lastNotePlayed is defined, if so perform harmonic shift
-      if (this.lastNotePlayed) {
-        // console.log("performing harmonic shift", this.lastNotePlayed)
-        randomKey = this.harmonicShift(this.lastNotePlayed, { type: 'perfectFifth' });
-        // exact key match was not available, default to C4 ( for now )
-        // Remark: we could make a more approximate match based on letter of key / music theory
-        if (!randomKey) {
-          randomKey = this.harmonicShift('C4', { type: 'perfectFifth' });
-        }
-      }
-
-      note = this.keyCodes[randomKey].toneCode;
-    }
-
+    note = note || this.selectRandomNote();
     this.lastNotePlayed = note;
 
-    // console.log('playing ', note, duration)
-    let game = this.game;
-    // Play a note for a given duration
-    // console.log('playing note', note, duration, now, velocity)
-
     try {
-      // this.synth.triggerAttack(note, now, velocity * 0.1);
       this.synth.triggerAttackRelease(note, duration, now, velocity);
     } catch (err) {
-      console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err)
+      console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err);
     }
-    // game.emit('playNote', note, duration, now, velocity);
   }
 
+  playDrum(sound = 'kick') {
+    this.startTone();
+    this.drumKit.play(sound);
+  }
+
+  startTone() {
+    if (!this.toneStarted) {
+      Tone.start();
+      this.toneStarted = true;
+    }
+  }
+
+  selectRandomNote() {
+    let keys = Object.keys(this.keyCodes);
+    let randomKey = keys[Math.floor(Math.random() * keys.length)];
+    if (this.lastNotePlayed) {
+      randomKey = this.harmonicShift(this.lastNotePlayed, { type: 'perfectFifth' }) || this.harmonicShift('C4', { type: 'perfectFifth' });
+    }
+    return this.keyCodes[randomKey].toneCode;
+  }
 }
 
 export default TonePlugin;
