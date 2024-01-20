@@ -81,10 +81,6 @@ https://yantra.gg/mantra/home
 
 https://yantra.gg/mantra/ycraft
 
-#### Music World
-
-https://yantra.gg/mantra/music
-
 #### Platform World
 
 https://yantra.gg/mantra/platform
