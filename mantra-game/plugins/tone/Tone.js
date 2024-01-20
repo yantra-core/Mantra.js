@@ -5,6 +5,9 @@
 import DrumKit from './instruments/DrumKit.js';
 import startUpJingle from './jingles/start-up.js';
 import keyCodes from './keyCodes.js';
+import harmonicShift from './util/harmonicShift.js';
+import playJingle from './util/playJingle.js';
+import playSpatialSound from './util/playSpatialSound.js';
 
 class TonePlugin {
 
@@ -24,7 +27,9 @@ class TonePlugin {
   init(game) {
     this.game = game;
     
-
+    this.harmonicShift = harmonicShift.bind(this);
+    this.playJingle = playJingle.bind(this);
+    this.playSpatialSound = playSpatialSound.bind(this);
     // register the plugin with the game
     this.game.systemsManager.addSystem(this.id, this);
     // check to see if Tone scope is available, if not assume we need to inject it sequentially
@@ -88,13 +93,11 @@ class TonePlugin {
       self.playNote(note, duration);
     };
 
-
     // Create a synth and connect it to the main output
     //const synth = new Tone.Synth().toDestination();
-
     console.log('Tone is ready', startUpJingle)
     if (this.playIntro) {
-      this.playIntroJingle();
+      this.playJingle(startUpJingle);
     }
 
     // Function to play the sound
@@ -110,36 +113,6 @@ class TonePlugin {
 
     // async:true plugins *must* self report when they are ready
     game.emit('plugin::ready::tone', this);
-  }
-
-  playIntroJingle() {
-    let that = this;
-    const synths = [];
-    let currentMidi = startUpJingle;
-    const now = Tone.now() + 0.5;
-    currentMidi.tracks.forEach((track) => {
-      //create a synth for each track
-      this.synth = new Tone.PolySynth(Tone.Synth, {
-        envelope: {
-          attack: 0.02,
-          decay: 0.1,
-          sustain: 0.3,
-          release: 1,
-        },
-      }).toDestination();
-      synths.push(that.synth);
-      //schedule all of the events
-      // we have access to that.synth, can we listen for play note events?
-      track.notes.forEach((note) => {
-        that.playNote(
-          note.name,
-          note.duration,
-          note.time + now,
-          note.velocity
-        )
-      });
-    });
-
   }
 
   playNote(note, duration, now = 0, velocity = 0.5) {
@@ -183,116 +156,6 @@ class TonePlugin {
     // game.emit('playNote', note, duration, now, velocity);
   }
 
-
-  // Method to play spatial sound
-  // TODO: needs to use pool of synths, this creates too many synths
-  playSpatialSound(particle, blackHole) {
-    if (!this.toneStarted) {
-      Tone.start();
-      this.toneStarted = true;
-    }
-  
-    // Calculate panning based on particle's position relative to black hole
-    const gameWidth = this.game.width; // Use actual game width
-    const xPosition = (particle.position.x - blackHole.position.x) / gameWidth;
-    const panner = new Tone.Panner(xPosition).toDestination();
-  
-    // Calculate velocity factor
-    const velocityMagnitude = Math.sqrt(particle.velocity.x ** 2 + particle.velocity.y ** 2);
-    const maxVelocity = 10; // Replace with maximum expected velocity in your game
-    const velocityFactor = velocityMagnitude / maxVelocity;
-  
-    // Create FM Synth for water drop sound
-    const fmSynth = new Tone.FMSynth({
-      harmonicity: 8,
-      modulationIndex: 2,
-      oscillator: { type: 'sine' },
-      envelope: {
-        attack: 0.01,
-        decay: 0.2,
-        sustain: 0,
-        release: 0.1
-      },
-      modulation: { type: 'square' },
-      modulationEnvelope: {
-        attack: 0.01,
-        decay: 0.2,
-        sustain: 0,
-        release: 0.1
-      }
-    }).connect(panner);
-  
-    // Adjust parameters based on velocity
-    const duration = 0.2 + (0.3 * (1 - velocityFactor)); // Shorter duration for faster particles
-    const pitchDrop = velocityFactor * 24; // Higher drop for faster particles
-  
-    // Trigger the FM Synth with a pitch drop
-    fmSynth.triggerAttack("C4", Tone.now());
-    setTimeout(() => {
-      fmSynth.setNote(`C${4 - pitchDrop}`, Tone.now());
-      fmSynth.triggerRelease(Tone.now() + duration);
-    }, 10);
-  
-    // Optionally: Add a delay for a more spacious effect
-    // const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
-    // fmSynth.connect(feedbackDelay);
-  }
-  
-
-  harmonicShift(traktorKeyCode, options = { type: 'perfectFifth' }) {
-    const wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];
-
-    let currentIndex = wheelOrder.indexOf(traktorKeyCode);
-
-    if (currentIndex === -1) {
-      // keycode wasn't found, try to find it in the toneCode property
-      let keys = Object.keys(this.keyCodes);
-      let foundKey = keys.find(key => this.keyCodes[key].toneCode === traktorKeyCode);
-      if (foundKey) {
-        currentIndex = wheelOrder.indexOf(foundKey);
-      }
-    }
-
-    if (currentIndex === -1) {
-      // throw new Error('Invalid Traktor Key Code');
-      console.log("WARNING: Could not find Traktor Key Code", traktorKeyCode)
-      return;
-    }
-
-    switch (options.type) {
-      case 'perfectFifth':
-        // 7 steps forward for major, 7 steps backward for minor
-        currentIndex += (traktorKeyCode.endsWith('m') ? -7 : 7);
-        break;
-      case 'majorMinorSwap':
-        // Toggle between major and minor
-        currentIndex += (traktorKeyCode.endsWith('m') ? 12 : -12);
-        break;
-      case 'shift':
-        // Shift by a specified amount
-        if (typeof options.amount !== 'number' || Math.abs(options.amount) > 3) {
-          throw new Error('Invalid shift amount');
-        }
-        currentIndex += options.amount;
-        break;
-      default:
-        throw new Error('Invalid transition type');
-    }
-
-    // Ensure the index wraps around the wheel
-    currentIndex = (currentIndex + 24) % 24;
-
-    return wheelOrder[currentIndex];
-  }
-
 }
 
 export default TonePlugin;
-
-
-/*
-// Example usage
-console.log(harmonicShift('5m', { type: 'perfectFifth' })); // Expected output: 10m
-console.log(harmonicShift('5m', { type: 'majorMinorSwap' })); // Expected output: 5d
-console.log(harmonicShift('5m', { type: 'shift', amount: -2 })); // Expected output: 3m
-*/
