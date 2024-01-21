@@ -32,197 +32,197 @@ import createDefaultPlayer from '../createDefaultPlayer.js';
 
 export default function construct(game, plugins = []) {
 
-    // fetch the gamegame.config from localStorage
-    let localData = storage.getAllKeysWithData();
+  // fetch the gamegame.config from localStorage
+  let localData = storage.getAllKeysWithData();
 
-    // Remark: We could merge game data back into the game.config / game.data
+  // Remark: We could merge game data back into the game.config / game.data
 
-    // set the last local start time
-    storage.set('lastLocalStartTime', Date.now());
+  // set the last local start time
+  storage.set('lastLocalStartTime', Date.now());
 
-    // Keeps a clean copy of current game state
-    // Game.data scope can be used for applying game.configuration settings while game is running
-    // Game.game.config scope is expected to be "immutablish" and should not be modified while game is running
-    game.data = {
-      width: game.config.width,
-      height: game.config.height,
-      FPS: 60,
-      camera: {
-        follow: game.config.camera.follow,
-        currentZoom: game.config.camera.startingZoom
-      }
-    };
-
-    if (typeof game.data.camera.follow === 'undefined') {
-      game.data.camera.follow = true;
+  // Keeps a clean copy of current game state
+  // Game.data scope can be used for applying game.configuration settings while game is running
+  // Game.game.config scope is expected to be "immutablish" and should not be modified while game is running
+  game.data = {
+    width: game.config.width,
+    height: game.config.height,
+    FPS: 60,
+    camera: {
+      follow: game.config.camera.follow,
+      currentZoom: game.config.camera.startingZoom
     }
+  };
 
-    if (typeof game.data.camera.currentZoom === 'undefined') {
-      game.data.camera.currentZoom = 1;
-    }
+  if (typeof game.data.camera.follow === 'undefined') {
+    game.data.camera.follow = true;
+  }
 
-    console.log("Mantra starting...");
+  if (typeof game.data.camera.currentZoom === 'undefined') {
+    game.data.camera.currentZoom = 1;
+  }
 
-    // Define the scriptRoot variable for loading external scripts
-    // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
-    game.scriptRoot = 'https://yantra.gg/mantra';
-    game.assetRoot = 'https://yantra.gg/mantra';
+  console.log("Mantra starting...");
 
-    // Could be another CDN or other remote location
-    // For local development, try game.scriptRoot = './';
-    if (game.config.options.scriptRoot) {
-      console.log("Mantra is using the follow path as it's root:", game.config.options.scriptRoot)
-      game.scriptRoot = game.config.options.scriptRoot;
-    }
+  // Define the scriptRoot variable for loading external scripts
+  // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
+  game.scriptRoot = 'https://yantra.gg/mantra';
+  game.assetRoot = 'https://yantra.gg/mantra';
 
-    if (game.config.options.assetRoot) {
-      console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot)
-      game.assetRoot = game.config.options.assetRoot;
-    }
+  // Could be another CDN or other remote location
+  // For local development, try game.scriptRoot = './';
+  if (game.config.options.scriptRoot) {
+    console.log("Mantra is using the follow path as it's root:", game.config.options.scriptRoot)
+    game.scriptRoot = game.config.options.scriptRoot;
+  }
 
-    console.log(`new Game(${JSON.stringify(game.config, true, 2)})`);
+  if (game.config.options.assetRoot) {
+    console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot)
+    game.assetRoot = game.config.options.assetRoot;
+  }
 
-    // Bind eventEmitter methods to maintain correct scope
-    game.on = eventEmitter.on.bind(eventEmitter);
-    game.off = eventEmitter.off.bind(eventEmitter);
-    game.once = eventEmitter.once.bind(eventEmitter);
-    game.emit = eventEmitter.emit.bind(eventEmitter);
-    game.onAny = eventEmitter.onAny.bind(eventEmitter);
-    game.offAny = eventEmitter.offAny.bind(eventEmitter);
-    game.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
-    game.listeners = eventEmitter.listeners;
-    game.emitters = eventEmitter.emitters;
+  console.log(`new Game(${JSON.stringify(game.config, true, 2)})`);
 
-    // Bind loadScripts from util
-    game.loadScripts = loadScripts.bind(game);
-    // Bind loadCSS from util
-    game.loadCSS = loadCSS.bind(game);
+  // Bind eventEmitter methods to maintain correct scope
+  game.on = eventEmitter.on.bind(eventEmitter);
+  game.off = eventEmitter.off.bind(eventEmitter);
+  game.once = eventEmitter.once.bind(eventEmitter);
+  game.emit = eventEmitter.emit.bind(eventEmitter);
+  game.onAny = eventEmitter.onAny.bind(eventEmitter);
+  game.offAny = eventEmitter.offAny.bind(eventEmitter);
+  game.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
+  game.listeners = eventEmitter.listeners;
+  game.emitters = eventEmitter.emitters;
 
-    game.switchWorlds = switchWorlds.bind(game);
+  // Bind loadScripts from util
+  game.loadScripts = loadScripts.bind(game);
+  // Bind loadCSS from util
+  game.loadCSS = loadCSS.bind(game);
 
-    // TODO: common helper mappings for all create / update / remove entities
-    game.createPlayer = game.createPlayer.bind(game);
+  game.switchWorlds = switchWorlds.bind(game);
 
-    game.bodyMap = {};
-    game.systems = {};
-    game.storage = storage;
+  // TODO: common helper mappings for all create / update / remove entities
+  game.createPlayer = game.createPlayer.bind(game);
 
-    game.snapshotQueue = [];
+  game.bodyMap = {};
+  game.systems = {};
+  game.storage = storage;
 
-    game.tick = 0;
+  game.snapshotQueue = [];
 
-    // Keeps track of array of worlds ( Plugins with type="world" )
-    // Each world is a Plugin and will run in left-to-right order
-    // The current default behavior is single world, so worlds[0] is always the current world
-    // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
-    // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
-    // TODO: move to worldManager
-    game.worlds = []
+  game.tick = 0;
 
-    // Game settings
-    game.width = game.config.width;
-    game.height = game.config.height;
+  // Keeps track of array of worlds ( Plugins with type="world" )
+  // Each world is a Plugin and will run in left-to-right order
+  // The current default behavior is single world, so worlds[0] is always the current world
+  // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
+  // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
+  // TODO: move to worldManager
+  game.worlds = []
 
-    // Remark: Currently, only (1) physics engine is supported at a time
-    // If we want to run multiple physics engines, we'll want to make game array
-    // game.physics = [];
+  // Game settings
+  game.width = game.config.width;
+  game.height = game.config.height;
 
-    game.changedEntities = new Set();
-    game.removedEntities = new Set();
-    game.pendingRender = new Set();
-    game.queuedAssets = {};
+  // Remark: Currently, only (1) physics engine is supported at a time
+  // If we want to run multiple physics engines, we'll want to make game array
+  // game.physics = [];
 
-    game.isClient = game.config.isClient;
-    game.isEdgeClient = game.config.isEdgeClient;
-    game.isServer = game.config.isServer;
+  game.changedEntities = new Set();
+  game.removedEntities = new Set();
+  game.pendingRender = new Set();
+  game.queuedAssets = {};
 
-    game.localGameLoopRunning = false;
-    game.onlineGameLoopRunning = false;
+  game.isClient = game.config.isClient;
+  game.isEdgeClient = game.config.isEdgeClient;
+  game.isServer = game.config.isServer;
 
-    game.currentPlayerId = null;
+  game.localGameLoopRunning = false;
+  game.onlineGameLoopRunning = false;
 
-    // ComponentManager.js? If so, what does it do and is it needed for our ECS?
-    // Remark: I don't think we need to explicitly define components, we can just add them as needed
-    game.components = {
-      type: new Component('type', game),           // string type, name of Entity
-      destroyed: new Component('destroyed', game), // boolean, if true, entity is pending destroy and will be removed from game
-      position: new Component('position', game),   // object, { x: 0, y: 0, z: 0 }
-      velocity: new Component('velocity', game),
-      rotation: new Component('rotation', game),
-      mass: new Component('mass', game),
-      density: new Component('density', game),
-      width: new Component('width', game),
-      height: new Component('height', game),
-      depth: new Component('depth', game),
-      radius: new Component('radius', game),
-      isSensor: new Component('isSensor', game),
-      owner: new Component('owner', game),
-      inputs: new Component('inputs', game),
-      items: new Component('items', game),
-      sutra: new Component('sutra', game)
+  game.currentPlayerId = null;
 
-    };
+  // ComponentManager.js? If so, what does it do and is it needed for our ECS?
+  // Remark: I don't think we need to explicitly define components, we can just add them as needed
+  game.components = {
+    type: new Component('type', game),           // string type, name of Entity
+    destroyed: new Component('destroyed', game), // boolean, if true, entity is pending destroy and will be removed from game
+    position: new Component('position', game),   // object, { x: 0, y: 0, z: 0 }
+    velocity: new Component('velocity', game),
+    rotation: new Component('rotation', game),
+    mass: new Component('mass', game),
+    density: new Component('density', game),
+    width: new Component('width', game),
+    height: new Component('height', game),
+    depth: new Component('depth', game),
+    radius: new Component('radius', game),
+    isSensor: new Component('isSensor', game),
+    owner: new Component('owner', game),
+    inputs: new Component('inputs', game),
+    items: new Component('items', game),
+    sutra: new Component('sutra', game)
 
-    // define additional components for the game
-    game.components.color = new Component('color', game);
-    game.components.health = new Component('health', game);
-    game.components.target = new Component('target', game);
-    game.components.lifetime = new Component('lifetime', game);
-    game.components.creationTime = new Component('creationTime', game);
-    game.components.BulletComponent = new Component('BulletComponent', game);
-    game.components.graphics = new Component('graphics', game);
-    game.components.lockedProperties = new Component('lockedProperties', game);
-    game.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', game);
+  };
 
-    // TODO: add body component and remove game.bodyMap[] API
+  // define additional components for the game
+  game.components.color = new Component('color', game);
+  game.components.health = new Component('health', game);
+  game.components.target = new Component('target', game);
+  game.components.lifetime = new Component('lifetime', game);
+  game.components.creationTime = new Component('creationTime', game);
+  game.components.BulletComponent = new Component('BulletComponent', game);
+  game.components.graphics = new Component('graphics', game);
+  game.components.lockedProperties = new Component('lockedProperties', game);
+  game.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', game);
 
-    game.components.timers = new TimersComponent('timers', game);
-    game.components.yCraft = new Component('yCraft', game);
-    game.components.text = new Component('text', game);
-    game.components.style = new Component('style', game);
-    game.components.collisionActive = new Component('collisionActive', game);
-    game.components.collisionStart = new Component('collisionStart', game);
-    game.components.collisionEnd = new Component('collisionEnd', game);
+  // TODO: add body component and remove game.bodyMap[] API
 
-    // Systems Manager
-    game.systemsManager = new SystemsManager(game);
+  game.components.timers = new TimersComponent('timers', game);
+  game.components.yCraft = new Component('yCraft', game);
+  game.components.text = new Component('text', game);
+  game.components.style = new Component('style', game);
+  game.components.collisionActive = new Component('collisionActive', game);
+  game.components.collisionStart = new Component('collisionStart', game);
+  game.components.collisionEnd = new Component('collisionEnd', game);
 
-    // Graphics rendering pipeline
-    game.graphics = [];
+  // Systems Manager
+  game.systemsManager = new SystemsManager(game);
 
-    game.gameTick = gameTick.bind(game);
-    game.localGameLoop = localGameLoop.bind(game);
-    game.onlineGameLoop = onlineGameLoop.bind(game);
-    game.loadPluginsFromConfig = loadPluginsFromConfig.bind(game);
-    game.createDefaultPlayer = createDefaultPlayer.bind(game);
+  // Graphics rendering pipeline
+  game.graphics = [];
 
-    // keeps track of game.use('PluginStringName') async loading
-    // game.start() will wait for all plugins to be loaded before starting
-    // game means any plugins which are game.use('PluginStringName') will "block" the game from starting
-    game.loadingPluginsCount = 0;
-    // game.plugins represents the initial plugins the Game wil have access to
-    // subsequent plugins will be loaded dynamically with game.use()
-    game.plugins = plugins;
+  game.gameTick = gameTick.bind(game);
+  game.localGameLoop = localGameLoop.bind(game);
+  game.onlineGameLoop = onlineGameLoop.bind(game);
+  game.loadPluginsFromConfig = loadPluginsFromConfig.bind(game);
+  game.createDefaultPlayer = createDefaultPlayer.bind(game);
 
-    // game._plugins represents all plugin instances that have been loaded
-    game._plugins = {};
+  // keeps track of game.use('PluginStringName') async loading
+  // game.start() will wait for all plugins to be loaded before starting
+  // game means any plugins which are game.use('PluginStringName') will "block" the game from starting
+  game.loadingPluginsCount = 0;
+  // game.plugins represents the initial plugins the Game wil have access to
+  // subsequent plugins will be loaded dynamically with game.use()
+  game.plugins = plugins;
 
-    game.loadedPlugins = [];
-    // load default plugins
-    if (game.config.loadDefaultPlugins) {
-      console.log('CCCC', game.config)
-      game.loadPluginsFromConfig({
-        physics: game.config.physics,
-        graphics: game.config.graphics,
-        collisions: game.config.collisions,
-        keyboard: game.config.keyboard,
-        mouse: game.config.mouse,
-        gamepad: game.config.gamepad,
-        editor : game.config.editor,
-        sutra : game.config.sutra,
-        lifetime : game.config.lifetime,
-        defaultMovement: game.config.defaultMovement
-      });
-    }
+  // game._plugins represents all plugin instances that have been loaded
+  game._plugins = {};
+
+  game.loadedPlugins = [];
+  // load default plugins
+  if (game.config.loadDefaultPlugins) {
+    console.log('CCCC', game.config)
+    game.loadPluginsFromConfig({
+      physics: game.config.physics,
+      graphics: game.config.graphics,
+      collisions: game.config.collisions,
+      keyboard: game.config.keyboard,
+      mouse: game.config.mouse,
+      gamepad: game.config.gamepad,
+      editor: game.config.editor,
+      sutra: game.config.sutra,
+      lifetime: game.config.lifetime,
+      defaultMovement: game.config.defaultMovement
+    });
+  }
 
 }
