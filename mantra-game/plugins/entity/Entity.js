@@ -119,10 +119,10 @@ class Entity {
       let updatedEntity = this.game.getEntity(entityId);
       this.game.entities.set(entityId, updatedEntity);
 
-    }
-
-    if (this.game.systems.rbush) {
-      this.game.systems.rbush.removeEntity(updatedEntity);
+      if (updatedEntity && this.game.systems.rbush) {
+        this.game.systems.rbush.removeEntity(updatedEntity);
+      }
+  
     }
 
   }
