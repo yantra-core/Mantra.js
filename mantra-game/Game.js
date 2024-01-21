@@ -14,84 +14,62 @@ import start from './lib/Game/start.js';
 
 // The Game class is the main entry point for Mantra games
 class Game {
-  constructor({
-    // game modes
-    isClient = true,
-    isEdgeClient = false,
-    isServer = false,
-    isOfflineMode,
-    plugins = {}, // Plugin Classes that will be bound to the game instance
-    // game options
-    showLoadingScreen = true,
-    minLoadTime = 330, // minimum time to show loading screen
-    loadDefaultPlugins = true, // auto-laods default plugins based on pluginsConfig
-    width = 800,
-    height = 600,
-    // game systems / auto-load based on pluginsConfig
-    physics = 'matter',
-    graphics = ['css'],
-    collisions = true,
-    camera = {},
-    gravity = {},
-    keyboard = true,
-    mouse = true,
-    gamepad = true,
-    editor = true,
-    sutra = true,
-    lifetime = true,
-    defaultMovement = true,
-    // data compression
-    protobuf = false,
-    msgpack = false,
-    deltaCompression = false,
-    deltaEncoding = true,
-    defaultPlayer = true,
-    options = {} } = {}) {
-    if (isServer) {
-      // override default
-      showLoadingScreen = false;
-      isClient = false;
-    }
-    // config scope for convenience
-    const config = {
-      isClient,
-      isEdgeClient,
-      isServer,
-      showLoadingScreen,
-      minLoadTime,
-      loadDefaultPlugins,
-      width,
-      height,
-      gravity,
-      physics,
-      graphics,
-      collisions,
-      camera,
-      keyboard,
-      mouse,
-      gamepad,
-      editor,
-      lifetime,
-      defaultMovement,
-      isOfflineMode,
-      protobuf,
-      msgpack,
-      deltaCompression,
-      deltaEncoding,
-      defaultPlayer,
-      options,
+  constructor(customConfig = {}) {
+    // Default configuration
+    const defaultConfig = {
+      // game modes
+      isClient: true,
+      isEdgeClient: false,
+      isServer: false,
+      isOfflineMode: undefined,
+      plugins: {}, // Plugin Classes that will be bound to the game instance
+      // game options
+      showLoadingScreen: true,
+      minLoadTime: 330, // minimum time to show loading screen
+      loadDefaultPlugins: true, // auto-loads default plugins based on pluginsConfig
+      width: 800,
+      height: 600,
+      // game systems / auto-load based on pluginsConfig
+      physics: 'matter',
+      graphics: ['css'],
+      collisions: true,
+      camera: {},
+      gravity: {},
+      keyboard: true,
+      mouse: true,
+      gamepad: true,
+      editor: true,
+      sutra: true,
+      lifetime: true,
+      defaultMovement: true,
+      // data compression
+      protobuf: false,
+      msgpack: false,
+      deltaCompression: false,
+      deltaEncoding: true,
+      defaultPlayer: true,
+      options: {},
       multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
 
+    // Merge custom configuration with defaults
+    const config = { ...defaultConfig, ...customConfig };
+
+    // Override for server-specific defaults
+    if (config.isServer) {
+      config.showLoadingScreen = false;
+      config.isClient = false;
+    }
+
+    // Assigning the final configuration to this.config
     this.config = config;
 
-
-    this.use = use(this, plugins);
+    // Plugin handling
+    this.use = use(this, config.plugins);
     this.start = start.bind(this);
-    
-    // Adds internal properties to the game instance
-    construct(this, plugins);
 
+    // Additional construction logic
+    construct(this, config.plugins);
   }
 
   // TODO: hoist to systemsManager
