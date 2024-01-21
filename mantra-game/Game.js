@@ -1,8 +1,8 @@
 // MANTRA - Yantra Works 2023
 // Game.js - Marak Squires 2023
-
 import Component from './Component/Component.js';
 import construct from './lib/Game/construct.js';
+import use from './lib/Game/use.js';
 
 // Provides a default Game.start(fn) logic ( creates a single player and border )
 // Bind to event `player::joined` to override default player creation logic
@@ -84,6 +84,9 @@ class Game {
 
     this.config = config;
 
+
+    this.use = use(this, plugins);
+    
     // Adds internal properties to the game instance
     construct(this, plugins);
 
@@ -196,112 +199,7 @@ class Game {
 
   // All Systems are Plugins, but not all Plugins are Systems
   // TODO: move to separate file
-  use(pluginInstanceOrId, options = {}, cb) {
 
-    let game = this;
-
-    if (typeof cb === 'undefined') {
-      cb = function noop() { };
-    }
-
-    // TODO: make this configurable
-    let basePath = '/plugins/'; // Base path for loading plugins
-    basePath = this.scriptRoot + basePath;
-    //console.log("FOUND SCRIPT ROOT", this.scriptRoot)
-    //console.log("LOADING FROM BASEPATH", basePath)
-    // Check if the argument is a string (plugin ID)
-    if (typeof pluginInstanceOrId === 'string') {
-      const pluginId = pluginInstanceOrId;
-      // Check if the plugin is already loaded or loading
-      if (this._plugins[pluginId]) {
-        // maybe add world here?
-        console.log(`Plugin ${pluginId} is already loaded or loading.`);
-        return this;
-      }
-
-      if (this.isServer) {
-        // console.log('pluginId', pluginId, this.plugins)
-        if (this.plugins[pluginId]) {
-          // console.log('loading plugin', pluginId, this.plugins[pluginId])
-          return this.use(new this.plugins[pluginId](options));
-        }
-
-        console.log(`Attempted to load plugin by string name "${pluginId}"on server, could not find! skipping`);
-        return;
-      }
-
-      // Mark the plugin as loading
-      this._plugins[pluginId] = { status: 'loading' };
-      this.loadingPluginsCount++;
-      this.emit('plugin::loading', pluginId);
-
-      // Dynamically load the plugin script
-      const scriptUrl = `${basePath}${pluginId}.js`;
-      this.loadPluginScript(scriptUrl).then(function () {
-        // The script is expected to call `game.use(pluginInstance)` after loading
-        console.log(`Loaded: ${pluginId}`);
-        if (typeof PLUGINS === 'object') {
-          //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
-          let pluginInstance = new PLUGINS[pluginId].default(options);
-          game.use(pluginInstance);
-          // check to see if pluginInstance is async, if so
-          // we'll assume it will emit a ready event when it's ready
-          if (pluginInstance.async) {
-            // plugin must perform async operation before it's ready
-            // plugin author *must* emit their own ready event game will not start
-          } else {
-            game.loadingPluginsCount--;
-            delete game._plugins[pluginId];
-            game.emit('plugin::ready::' + pluginId, pluginInstance);
-            cb();
-          }
-        } else {
-          // decrement loadingPluginsCount even if it fails
-          // this means applications will attempt to load even if plugins fail
-          console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
-          delete game._plugins[pluginId];
-          game.loadingPluginsCount--;
-          cb(new Error('PLUGINS object not found, cannot load plugin'));
-        }
-      }).catch(function (err) {
-        console.error(`Error loading plugin ${pluginId}:`, err);
-        game._plugins[pluginId] = { status: 'error' };
-        throw err;
-      });
-
-      return this;
-    }
-
-    // Handling plugin instances
-    if (typeof pluginInstanceOrId.id === 'undefined') {
-      console.log('Error with pluginInstance', pluginInstanceOrId);
-      throw new Error('All plugins must have a static id property');
-    }
-
-    const pluginId = pluginInstanceOrId.id;
-    this.loadedPlugins.push(pluginId);
-
-    pluginInstanceOrId.init(this, this.engine, this.scene);
-    this._plugins[pluginId] = pluginInstanceOrId;
-
-    if (pluginInstanceOrId.type === 'world') {
-      this.worlds.push(pluginInstanceOrId);
-    }
-    this.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
-    this.emit('plugin::loaded', pluginId);
-
-    if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
-      this.emit(`world::loaded::${pluginInstanceOrId.id}`, pluginInstanceOrId);
-      this.emit('world::loaded', pluginInstanceOrId);
-    }
-
-    game.data.plugins = game.data.plugins || {};
-
-    game.data.plugins[pluginId] = options;
-
-    return this;
-
-  }
 
   // Helper function to load plugin scripts
   loadPluginScript(scriptUrl) {
@@ -389,7 +287,6 @@ class Game {
       }
     });
   }
-
 
   playNote(note, duration) {
     console.log('Tone Plugin not loaded. Cannot play tone note.');
