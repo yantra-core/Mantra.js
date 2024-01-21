@@ -67,36 +67,43 @@ class Home {
 
     let rules = game.rules;
 
+    rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
+    rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
+    rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
+    rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
+    rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_X'] });
+
+    // see: ../mantra-sutras/movement/top-down.js events MOVE_UP, MOVE_DOWN, etc.
     rules
-      .if('W')
-      .then('MOVE_FORWARD')
+      .if('PLAYER_UP')
+      .then('MOVE_UP')
       .then('updateSprite', { sprite: 'playerUp' });
 
     rules
-      .if('A')
+      .if('PLAYER_LEFT')
       .then('MOVE_LEFT')
       .then('updateSprite', { sprite: 'playerLeft' });
 
     rules
-      .if('S')
-      .then('MOVE_BACKWARD')
+      .if('PLAYER_DOWN')
+      .then('MOVE_DOWN')
       .then('updateSprite', { sprite: 'playerDown' });
 
     rules
-      .if('D')
+      .if('PLAYER_RIGHT')
       .then('MOVE_RIGHT')
       .then('updateSprite', { sprite: 'playerRight' })
 
     rules
-      .if('SPACE')
+      .if('USE_ITEM_1')
         .then('FIRE_BULLET')
           .map('determineShootingSprite')
           .then('updateSprite');
 
     //rules.if('K').then('SWING_SWORD');
     //rules.if('L').then('SWING_SWORD');
-    rules.if('K').if('canDropBomb').then('DROP_BOMB');
     // rules.if('L').then('DROP_BOMB');
+    rules.if('K').if('canDropBomb').then('DROP_BOMB');
 
     rules.if('O').then('ZOOM_IN');
     rules.if('P').then('ZOOM_OUT');
@@ -129,12 +136,13 @@ class Home {
       })
     });
 
-    rules.on('MOVE_FORWARD', function (player) {
+    /*
+    rules.on('MOVE_UP', function (player) {
       game.applyForce(player.id, { x: 0, y: -1, z: 0 });
       game.updateEntity({ id: player.id, rotation: 0 });
     });
 
-    rules.on('MOVE_BACKWARD', function (player) {
+    rules.on('MOVE_DOWN', function (player) {
       game.applyForce(player.id, { x: 0, y: 1, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI });
     });
@@ -148,6 +156,8 @@ class Home {
       game.applyForce(player.id, { x: 1, y: 0, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
     });
+    */
+
 
     rules.on('FIRE_BULLET', function (player) {
       game.systems.bullet.fireBullet(player.id);

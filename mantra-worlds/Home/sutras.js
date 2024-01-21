@@ -60,8 +60,7 @@ export default function sutras(game) {
   rules.use(bomb(game), 'bomb');
 
   // movement
-  //rules.use(movement(game), 'movement');
-  
+  rules.use(movement(game), 'movement');
 
   // console.log('created sutra', rules.toEnglish())
   return rules;

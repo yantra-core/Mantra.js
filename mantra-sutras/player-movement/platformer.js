@@ -2,6 +2,31 @@ export default function platformMovement(game) {
 
   let rules = game.createSutra();
 
+  /*
+
+
+   rules.on('MOVE_UP', function (player) {
+      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: 0 });
+    });
+
+    rules.on('MOVE_DOWN', function (player) {
+      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI });
+    });
+
+    rules.on('MOVE_LEFT', function (player, node, gameState) {
+      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+    });
+
+    rules.on('MOVE_RIGHT', function (player) {
+      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+    });
+
+    */
+
   // TODO: remove this? the Sutra should only be concerned with the control name, not the key
   let defaultControlsMapping = {
     A: 'MOVE_LEFT',

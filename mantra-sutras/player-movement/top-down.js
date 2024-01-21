@@ -2,12 +2,12 @@ export default function topdownMovement(game) {
 
   let rules = game.createSutra();
 
-  rules.on('MOVE_FORWARD', function (entity) {
+  rules.on('MOVE_UP', function (entity) {
     game.applyForce(entity.id, { x: 0, y: -1, z: 0 });
     game.updateEntity({ id: entity.id, rotation: 0 });
   });
 
-  rules.on('MOVE_BACKWARD', function (entity) {
+  rules.on('MOVE_DOWN', function (entity) {
     game.applyForce(entity.id, { x: 0, y: 1, z: 0 });
     game.updateEntity({ id: entity.id, rotation: Math.PI });
   });

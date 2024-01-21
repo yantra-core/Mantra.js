@@ -19,6 +19,7 @@ export default class Client {
       deltaCompression
     };
 
+    this.started = false;
     this.preloading = false;
 
   }
@@ -112,15 +113,17 @@ export default class Client {
     }
     let localClient = this.game.getSystem('localClient');
     localClient.start(callback);
+    this.started = true;
   }
 
   stop() {
     console.log('Client.js plugin stopping game', this.game)
-    // this.game.localGameLoopRunning = false;
+    this.started = false;
     let localClient = this.game.getSystem('localClient');
     localClient.stop();
   }
 
+  // remote methods here to allow for switching between local / remote modes
   connect(url) {
     let websocketClient = this.game.getSystem('websocketClient');
     websocketClient.connect(url);

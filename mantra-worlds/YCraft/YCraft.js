@@ -1,4 +1,5 @@
 import contraptionsExample from './contraptions-example.js';
+import movement from '../../mantra-sutras/player-movement/top-down.js';
 
 class YCraft {
   static id = 'world-ycraft';
@@ -68,26 +69,44 @@ class YCraft {
 
     let rules = game.rules;
 
+
+    rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
+    rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
+    rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
+    rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
+    rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_X'] });
+
+    rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['O', 'BUTTON_L1'] });
+    rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['P', 'BUTTON_R1'] });
+
+    rules.use(movement(game), 'movement');
+
     rules
-      .if('W')
-      .then('MOVE_FORWARD')
+      .if('PLAYER_UP')
+      .then('MOVE_UP')
       .then('updateSprite', { sprite: 'playerUp' });
 
     rules
-      .if('A')
+      .if('PLAYER_LEFT')
       .then('MOVE_LEFT')
       .then('updateSprite', { sprite: 'playerLeft' });
 
     rules
-      .if('S')
-      .then('MOVE_BACKWARD')
+      .if('PLAYER_DOWN')
+      .then('MOVE_DOWN')
       .then('updateSprite', { sprite: 'playerDown' });
 
     rules
-      .if('D')
+      .if('PLAYER_RIGHT')
       .then('MOVE_RIGHT')
       .then('updateSprite', { sprite: 'playerRight' })
 
+
+    rules.if('USE_ITEM_1').then('FIRE_BULLET');
+
+    // Remark: We could introduce a sutra.do('ZOOM_IN') directive
+    rules.if('ZOOM_IN').then('ZOOM_IN');
+    rules.if('ZOOM_OUT').then('ZOOM_OUT');
 
     rules.on('updateSprite', function (player, node) {
       game.updateEntity({
@@ -101,30 +120,6 @@ class YCraft {
       })
     });
 
-    rules.if('SPACE').then('FIRE_BULLET');
-    rules.if('O').then('ZOOM_IN');
-    rules.if('P').then('ZOOM_OUT');
-
-    rules.on('MOVE_FORWARD', function (player) {
-      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
-    });
-
-    rules.on('MOVE_BACKWARD', function (player) {
-      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI });
-    });
-
-    rules.on('MOVE_LEFT', function (player, node, gameState) {
-      console.log(gameState.tick)
-      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-    });
-
-    rules.on('MOVE_RIGHT', function (player) {
-      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
-    });
 
     rules.on('FIRE_BULLET', function (player) {
       game.systems.bullet.fireBullet(player.id);

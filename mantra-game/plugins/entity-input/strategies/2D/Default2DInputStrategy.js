@@ -12,6 +12,7 @@ class DefaultTwoDimensionalInputStrategy {
   init(game) {
     this.game = game;
     this.defaultControlsMapping = {
+      // Default 2D Keyboard Controls
       W: 'MOVE_FORWARD',
       S: 'MOVE_BACKWARD',
       A: 'MOVE_LEFT',
@@ -22,8 +23,19 @@ class DefaultTwoDimensionalInputStrategy {
       O: 'ZOOM_OUT',
       P: 'ZOOM_IN',
       U: 'SELECT_MENU',
-      //LEFT: 'ROTATE_LEFT',
-      //RIGHT: 'ROTATE_RIGHT'
+
+      // Default 2D Gamepad Controls
+      DPAD_UP: 'MOVE_FORWARD',
+      DPAD_DOWN: 'MOVE_BACKWARD',
+      DPAD_LEFT: 'MOVE_LEFT',
+      DPAD_RIGHT: 'MOVE_RIGHT',
+      BUTTON_A: 'FIRE_BULLET',
+      BUTTON_X: 'FIRE_BULLET',
+      BUTTON_B: 'CAMERA_SHAKE',
+      BUTTON_Y: 'ZOOM_OUT',
+      BUTTON_L1: 'ZOOM_IN',
+      BUTTON_SELECT: 'SELECT_MENU'
+      // BUTTON_START: 'PAUSE_MENU',
     };
 
     // Remark: Button / Input cooldown has been removed in favor of input pooling on gametick

@@ -337,6 +337,7 @@ class Game {
         cb = function () { // noop 
         };
       }
+
       // Wait for all systems to be ready before starting the game loop
       if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
         // console.log('waiting for plugins to load...', game.physicsReady)
@@ -755,7 +756,7 @@ class Game {
 
     // remap the keyboard mappings to Sutra by default
     if (this.systems.sutra) {
-      this.systems.sutra.bindKeyCodesToSutraConditions();
+      this.systems.sutra.bindInputsToSutraConditions();
     }
 
     // reset the default player controls

@@ -1,6 +1,7 @@
 import warpToWorld from "../sutras/warpToWorld.js";
 import createPiano from "./instruments/createPiano.js";
 import createDrumKit from "./instruments/createDrumKit.js";
+import movement from '../../mantra-sutras/player-movement/top-down.js';
 
 import sutras from "./sutras.js";
 
@@ -29,7 +30,7 @@ class Music {
     //game.setGravity(0, 4.3, 0);
     game.setGravity(0, 0, 0);
 
-   
+
 
     game.customMovement = false;
     game.setBackground('black');
@@ -107,38 +108,91 @@ class Music {
 
     game.use('Border', { autoBorder: true })
 
-
     let rules = game.rules;
-    rules.if('W').then('MOVE_FORWARD');
-    rules.if('A').then('MOVE_LEFT');
-    rules.if('S').then('MOVE_BACKWARD');
-    rules.if('D').then('MOVE_RIGHT');
+
+    rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
+    rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
+    rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
+    rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
+    rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_X'] });
+
+    rules.use(movement(game), 'movement');
+
+    rules
+      .if('PLAYER_UP')
+      .then('MOVE_UP')
+      .then('updateSprite', { sprite: 'playerUp' });
+
+    rules
+      .if('PLAYER_LEFT')
+      .then('MOVE_LEFT')
+      .then('updateSprite', { sprite: 'playerLeft' });
+
+    rules
+      .if('PLAYER_DOWN')
+      .then('MOVE_DOWN')
+      .then('updateSprite', { sprite: 'playerDown' });
+
+    rules
+      .if('PLAYER_RIGHT')
+      .then('MOVE_RIGHT')
+      .then('updateSprite', { sprite: 'playerRight' })
+
 
     rules.if('SPACE').then('FIRE_BULLET');
+    rules.if('H').if('rateAllowed').then('PLAY_DRUM', { drum: 'kick' });
+    rules.if('J').if('rateAllowed').then('PLAY_DRUM', { drum: 'snare' });
+    rules.if('K').if('rateAllowed').then('PLAY_DRUM', { drum: 'hat' });
+    rules.if('L').if('rateAllowed').then('PLAY_DRUM', { drum: 'hiHatClosed' });
+
+
+    // TODO: implies once key pressed, then key released
+    //    rules.if('H_DOWN').then('PLAY_DRUM', { drum: 'kick' });
+
+
+    // TODO: better action rate component api
+    rules.addCondition('rateAllowed', (entity, gameState) => {
+      return true;
+      let actionRateLimiterComponent = game.components.actionRateLimiter;
+      let lastFired = actionRateLimiterComponent.getLastActionTime(entity.id, 'PLAY_DRUM');
+      let currentTime = Date.now();
+      if (currentTime - lastFired < 200) {
+        // console.log('Rate limit hit for entity', entityId, ', cannot fire yet');
+        return false;
+      }
+      actionRateLimiterComponent.recordAction(entity.id, 'PLAY_DRUM');
+      return true;
+    });
+
     rules.if('O').then('ZOOM_IN');
     rules.if('P').then('ZOOM_OUT');
 
-    rules.on('MOVE_FORWARD', function(player){
-      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
+    rules.on('PLAY_DRUM', function (player, node, gameState) {
+      console.log('nnn', node)
+      game.systems.tone.playDrum(node.data.drum || 'kick');
     });
 
-    rules.on('MOVE_BACKWARD', function(player){
+    rules.on('MOVE_FORWARD', function (player) {
+      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+      game.updateEntity({ id: player.id });
+    });
+
+    rules.on('MOVE_BACKWARD', function (player) {
       game.applyForce(player.id, { x: 0, y: 1, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI });
     });
 
-    rules.on('MOVE_LEFT', function(player, node, gameState){
+    rules.on('MOVE_LEFT', function (player, node, gameState) {
       game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+      game.updateEntity({ id: player.id });
     });
 
-    rules.on('MOVE_RIGHT', function(player){
+    rules.on('MOVE_RIGHT', function (player) {
       game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+      game.updateEntity({ id: player.id });
     });
-    
-    rules.on('FIRE_BULLET', function(player){
+
+    rules.on('FIRE_BULLET', function (player) {
       game.systems.bullet.fireBullet(player.id);
     });
 

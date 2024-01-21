@@ -34,11 +34,11 @@ class Platform {
     game.setZoom(4.5);
 
     game.createPlayer({
-      height: 16,
-      width: 16,
+      height: 32,
+      width: 32 ,
       texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'player',
+        sheet: 'blackMage',
+        sprite: 'playerRight',
       },
       position: {
         x: 10,
@@ -121,9 +121,27 @@ class Platform {
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
 
-    rules.if('A').then('MOVE_LEFT').then('updateSprite', { sprite: 'playerLeft' });
-    rules.if('S').then('DUCK').then('updateSprite', { sprite: 'playerDown' });
-    rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRight' });
+    rules.if('A').then('MOVE_LEFT').then('updateSprite', { sprite: 'playerLeftWalk' });
+
+
+    rules.addMap('determineDuckingSprite', (player, node) => {
+
+      let sprite = 'playerDownRight';
+      if (player.texture.sprite === 'playerLeftWalk') {
+        player.texture.sprite = 'playerDownLeft';
+      } else {
+        player.texture.sprite = 'playerDownRight';
+      }
+
+      return player;
+
+    });
+  
+
+    rules.if('S').then('DUCK').map('determineDuckingSprite').then('updateSprite');
+
+
+    rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRightWalk' });
 
 
     /*
@@ -147,6 +165,18 @@ class Platform {
 
 
     rules.on('updateSprite', function(player, node){
+      let sprite = node.data.sprite || player.texture.sprite;
+
+      console.log('updateSprite', sprite)
+      game.updateEntity({
+        id: player.id,
+        texture: {
+          frameIndex: 0,
+          sheet: player.texture.sheet,
+          sprite: sprite,
+          animationPlaying: true
+        }
+      })
 
 
 
@@ -175,7 +205,7 @@ class Platform {
     rules.addCondition('isPlayer', (entity) => entity.type === 'PLAYER');
     rules.addCondition('isRunning', {
       op: 'or',
-      conditions: ['W', 'K'] // defaults UP key, or B button on Gamepad
+      conditions: ['S', 'K'] // defaults DOWN key, or B button on Gamepad
     });  
 
     let maxJumpTicks = 50;
@@ -198,7 +228,7 @@ class Platform {
         .if('SPACE')
         // .if('doesntExceedDuration')
         .then('JUMP')
-        .then('updateSprite', { sprite: 'mageJump' })
+        .then('updateSprite', { sprite: 'playerRightJump' })
       })
     
     //rules.if('L').then('SWING_SWORD');
@@ -210,7 +240,7 @@ class Platform {
         return;
       }
       game.applyForce(player.id, { x: 0, y: -1.2, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
+      game.updateEntity({ id: player.id, rotation: 0, sprite: 'playerRightJump' });
     });
 
     let runningForce = 1;
