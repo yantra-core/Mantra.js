@@ -64,6 +64,9 @@ import Platform from './plugins/platform/Platform.js';
 import Sword from './plugins/sword/Sword.js';
 import Tile from './plugins/tile/Tile.js';
 
+// Geospatial
+import RBush from './plugins/rbush/RBush.js';
+
 import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
@@ -130,6 +133,7 @@ const plugins = {
   Keyboard,
   Lifetime,
   Timers,
+  RBush,
   Midi,
   MidiGUI,
   FloatyTyper,

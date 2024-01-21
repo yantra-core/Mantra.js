@@ -120,6 +120,11 @@ class Entity {
       this.game.entities.set(entityId, updatedEntity);
 
     }
+
+    if (this.game.systems.rbush) {
+      this.game.systems.rbush.removeEntity(updatedEntity);
+    }
+
   }
 
   cleanupDestroyedEntities() {
@@ -304,6 +309,12 @@ class Entity {
       let prev = this.game.components.texture.get(entityId);
       let newTexture = { ...prev, ...entityData.texture };
       this.game.components.texture.set(entityId, newTexture);
+    }
+
+    // Remark: The physics engine update will update the position
+    //         If we update the position here, it's most likely going to be overwritten by the physics engine
+    if (this.game.systems.rbush) {
+      // this.game.systems.rbush.updateEntity(ent);
     }
 
     return ent;
@@ -497,6 +508,10 @@ class Entity {
     this.game.data.ents._[entityId] = updatedEntity;
     this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
     this.game.data.ents[updatedEntity.type].push(updatedEntity);
+
+    if (this.game.systems.rbush) {
+      this.game.systems.rbush.addEntity(updatedEntity);
+    }
 
     return updatedEntity;
   }

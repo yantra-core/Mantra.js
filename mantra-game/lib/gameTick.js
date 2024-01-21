@@ -22,7 +22,7 @@ function gameTick() {
   }
 
   // Update the physics engine
-  this.physics.updateEngine(this.physics.engine, deltaTimeMS);
+  this.physics.updateEngine(deltaTimeMS);
 
   // run the .update() method of all registered systems
   if (this.systemsManager) {

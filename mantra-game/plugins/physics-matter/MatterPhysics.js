@@ -42,7 +42,9 @@ class MatterPhysics extends PhysicsInterface {
   init(game) {
 
     this.engine = Matter.Engine.create()
+    game.systemsManager.addSystem('physics', this);
 
+    // TODO: register system
     if (typeof game.config.gravity === 'undefined') {
       game.config.gravity = { x: 0, y: 0 };
     }
@@ -70,7 +72,6 @@ class MatterPhysics extends PhysicsInterface {
     // should this be onAfterUpdate? since we are serializing the state of the world?
     // i would assume we want that data *after* the update?
     this.onAfterUpdate(this.engine, (event) => {
-
       // show total number of bodies in the world
       // Remark: should this and bodyMap be replaced with a more generic mapping
       // in order to allow non-physics backed entities to exist in the game?
@@ -146,11 +147,25 @@ class MatterPhysics extends PhysicsInterface {
               this.game.components.position.set(body.myEntityId, position);
               this.game.components.rotation.set(body.myEntityId, body.angle);
 
+        
               // update size as well
               //this.game.components.height.set(body.myEntityId, body.bounds.max.y);
               //this.game.components.width.set(body.myEntityId, body.bounds.max.x);
               // this.game.components.radius.set(body.myEntityId, body.bounds.max.x / 2);
 
+            }
+
+            if (body) {
+              if (this.game.systems.rbush) {
+                let ent = this.game.entities.get(body.myEntityId);
+                let position = { x: body.position.x, y: body.position.y };
+                this.game.systems.rbush.updateEntity({
+                  id: body.myEntityId,
+                  position: position,
+                  width: ent.width,
+                  height: ent.height
+                });
+              }
             }
 
             if (ent.type === 'BULLET') {
@@ -211,8 +226,8 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   // Equivalent to Engine.update()
-  updateEngine(engine, delta) {
-    Matter.Engine.update(engine, delta);
+  updateEngine(delta) {
+    Matter.Engine.update(this.engine, delta);
   }
 
   // Equivalent to Bodies.rectangle()
