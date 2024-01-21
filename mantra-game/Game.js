@@ -1,44 +1,15 @@
 // MANTRA - Yantra Works 2023
 // Game.js - Marak Squires 2023
 
-// Entity Component System
 import Component from './Component/Component.js';
-import SystemsManager from './System/SystemsManager.js';
-
-// Game instances are event emitters
-import eventEmitter from './lib/eventEmitter.js';
-
-// Game local data storage
-import storage from './lib/storage/storage.js';
-
-// Game loops, TODO: make game loops plugins / configurable
-// Local game loop is for single machine games ( no networking )
-import localGameLoop from './lib/localGameLoop.js';
-// Online game loop is for multiplayer games ( networking )
-import onlineGameLoop from './lib/onlineGameLoop.js';
-
-// Game tick, called once per tick from game loop
-import gameTick from './lib/gameTick.js';
+import construct from './lib/Game/construct.js';
 
 // Provides a default Game.start(fn) logic ( creates a single player and border )
 // Bind to event `player::joined` to override default player creation logic
-import defaultGameStart from './lib/start/defaultGameStart.js';
-import createDefaultPlayer from './lib/createDefaultPlayer.js';
-import switchWorlds from './lib/switchWorlds.js';
-
-// Action Rate Limiter, suitable for any Systems action that should be rate limited
-import ActionRateLimiter from './Component/ActionRateLimiter.js';
-import TimersComponent from './Component/TimersComponent.js';
-
-// Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
-import loadPluginsFromConfig from './lib/loadPluginsFromConfig.js';
-
-// Utility function for loading external assets
-import loadScripts from './lib/util/loadScripts.js';
-import loadCSS from './lib/util/loadCSS.js';
+// import defaultGameStart from './lib/start/defaultGameStart.js';
 
 // default player movement, this could be also be set in defaultGameStart.js
-import movement from './lib/defaultPlayerMovement.js';
+// import movement from './lib/defaultPlayerMovement.js';
 
 // The Game class is the main entry point for Mantra games
 class Game {
@@ -113,197 +84,9 @@ class Game {
 
     this.config = config;
 
-    // fetch the gameConfig from localStorage
-    let localData = storage.getAllKeysWithData();
+    // Adds internal properties to the game instance
+    construct(this, plugins);
 
-    // Remark: We could merge this data back into the config / game.data
-
-    // set the last local start time
-    storage.set('lastLocalStartTime', Date.now());
-
-    // Keeps a clean copy of current game state
-    // Game.data scope can be used for applying configuration settings while game is running
-    // Game.config scope is expected to be "immutablish" and should not be modified while game is running
-    this.data = {
-      width: config.width,
-      height: config.height,
-      FPS: 60,
-      camera: {
-        follow: config.camera.follow,
-        currentZoom: config.camera.startingZoom
-      }
-    };
-
-    if (typeof this.data.camera.follow === 'undefined') {
-      this.data.camera.follow = true;
-    }
-
-    if (typeof this.data.camera.currentZoom === 'undefined') {
-      this.data.camera.currentZoom = 1;
-    }
-
-    console.log("Mantra starting...");
-
-    // Define the scriptRoot variable for loading external scripts
-    // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
-    this.scriptRoot = 'https://yantra.gg/mantra';
-    this.assetRoot = 'https://yantra.gg/mantra';
-
-    // Could be another CDN or other remote location
-    // For local development, try this.scriptRoot = './';
-    if (options.scriptRoot) {
-      console.log("Mantra is using the follow path as it's root:", options.scriptRoot)
-      this.scriptRoot = options.scriptRoot;
-    }
-
-    if (options.assetRoot) {
-      console.log("Mantra is using the follow path as it's asset root:", options.assetRoot)
-      this.assetRoot = options.assetRoot;
-    }
-
-    console.log(`new Game(${JSON.stringify(config, true, 2)})`);
-
-    // Bind eventEmitter methods to maintain correct scope
-    this.on = eventEmitter.on.bind(eventEmitter);
-    this.off = eventEmitter.off.bind(eventEmitter);
-    this.once = eventEmitter.once.bind(eventEmitter);
-    this.emit = eventEmitter.emit.bind(eventEmitter);
-    this.onAny = eventEmitter.onAny.bind(eventEmitter);
-    this.offAny = eventEmitter.offAny.bind(eventEmitter);
-    this.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
-    this.listeners = eventEmitter.listeners;
-    this.emitters = eventEmitter.emitters;
-
-    // Bind loadScripts from util
-    this.loadScripts = loadScripts.bind(this);
-    // Bind loadCSS from util
-    this.loadCSS = loadCSS.bind(this);
-
-    this.switchWorlds = switchWorlds.bind(this);
-
-    // TODO: common helper mappings for all create / update / remove entities
-    this.createPlayer = this.createPlayer.bind(this);
-
-    this.bodyMap = {};
-    this.systems = {};
-    this.storage = storage;
-
-    this.snapshotQueue = [];
-
-    this.tick = 0;
-
-    // Keeps track of array of worlds ( Plugins with type="world" )
-    // Each world is a Plugin and will run in left-to-right order
-    // The current default behavior is single world, so worlds[0] is always the current world
-    // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
-    // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
-    // TODO: move to worldManager
-    this.worlds = []
-
-    // Game settings
-    this.width = width;
-    this.height = height;
-
-    // Remark: Currently, only (1) physics engine is supported at a time
-    // If we want to run multiple physics engines, we'll want to make this array
-    // this.physics = [];
-
-    this.changedEntities = new Set();
-    this.removedEntities = new Set();
-    this.pendingRender = new Set();
-    this.queuedAssets = {};
-
-    this.isClient = isClient;
-    this.isEdgeClient = isEdgeClient;
-    this.isServer = isServer;
-
-    this.localGameLoopRunning = false;
-    this.onlineGameLoopRunning = false;
-
-    this.currentPlayerId = null;
-
-    // ComponentManager.js? If so, what does it do and is it needed for our ECS?
-    // Remark: I don't think we need to explicitly define components, we can just add them as needed
-    this.components = {
-      type: new Component('type', this),           // string type, name of Entity
-      destroyed: new Component('destroyed', this), // boolean, if true, entity is pending destroy and will be removed from game
-      position: new Component('position', this),   // object, { x: 0, y: 0, z: 0 }
-      velocity: new Component('velocity', this),
-      rotation: new Component('rotation', this),
-      mass: new Component('mass', this),
-      density: new Component('density', this),
-      width: new Component('width', this),
-      height: new Component('height', this),
-      depth: new Component('depth', this),
-      radius: new Component('radius', this),
-      isSensor: new Component('isSensor', this),
-      owner: new Component('owner', this),
-      inputs: new Component('inputs', this),
-      items: new Component('items', this),
-      sutra: new Component('sutra', this)
-
-    };
-
-    // define additional components for the game
-    this.components.color = new Component('color', this);
-    this.components.health = new Component('health', this);
-    this.components.target = new Component('target', this);
-    this.components.lifetime = new Component('lifetime', this);
-    this.components.creationTime = new Component('creationTime', this);
-    this.components.BulletComponent = new Component('BulletComponent', this);
-    this.components.graphics = new Component('graphics', this);
-    this.components.lockedProperties = new Component('lockedProperties', this);
-    this.components.actionRateLimiter = new ActionRateLimiter('actionRateLimiter', this);
-
-    // TODO: add body component and remove game.bodyMap[] API
-
-    this.components.timers = new TimersComponent('timers', this);
-    this.components.yCraft = new Component('yCraft', this);
-    this.components.text = new Component('text', this);
-    this.components.style = new Component('style', this);
-    this.components.collisionActive = new Component('collisionActive', this);
-    this.components.collisionStart = new Component('collisionStart', this);
-    this.components.collisionEnd = new Component('collisionEnd', this);
-
-    // Systems Manager
-    this.systemsManager = new SystemsManager(this);
-
-    // Graphics rendering pipeline
-    this.graphics = [];
-
-    this.gameTick = gameTick.bind(this);
-    this.localGameLoop = localGameLoop.bind(this);
-    this.onlineGameLoop = onlineGameLoop.bind(this);
-    this.loadPluginsFromConfig = loadPluginsFromConfig.bind(this);
-    this.createDefaultPlayer = createDefaultPlayer.bind(this);
-
-    // keeps track of game.use('PluginStringName') async loading
-    // game.start() will wait for all plugins to be loaded before starting
-    // this means any plugins which are game.use('PluginStringName') will "block" the game from starting
-    this.loadingPluginsCount = 0;
-    // this.plugins represents the initial plugins the Game wil have access to
-    // subsequent plugins will be loaded dynamically with game.use()
-    this.plugins = plugins;
-
-    // this._plugins represents all plugin instances that have been loaded
-    this._plugins = {};
-
-    this.loadedPlugins = [];
-    // load default plugins
-    if (loadDefaultPlugins) {
-      this.loadPluginsFromConfig({
-        physics,
-        graphics,
-        collisions,
-        keyboard,
-        mouse,
-        gamepad,
-        editor,
-        sutra,
-        lifetime,
-        defaultMovement
-      });
-    }
   }
 
   // TODO: hoist to systemsManager

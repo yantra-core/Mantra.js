@@ -305,7 +305,7 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   collisionStart(game, callback) {
-    Matter.Events.on(game.engine, 'collisionStart', (event) => {
+    Matter.Events.on(this.engine, 'collisionStart', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
@@ -328,7 +328,7 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   collisionActive(game, callback) {
-    Matter.Events.on(game.engine, 'collisionActive', (event) => {
+    Matter.Events.on(this.engine, 'collisionActive', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
@@ -342,7 +342,7 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   collisionEnd(game, callback) {
-    Matter.Events.on(game.engine, 'collisionEnd', (event) => {
+    Matter.Events.on(this.engine, 'collisionEnd', (event) => {
       for (let pair of event.pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
@@ -357,15 +357,15 @@ class MatterPhysics extends PhysicsInterface {
   // Remark: This may not work as expected, since the callback is not the same function reference
   // TODO: remove anonymous functions for collision handlers and have them be returned named functions
   removeCollisionStart(game, callback) {
-    Matter.Events.off(game.engine, 'collisionStart', callback);
+    Matter.Events.off(this.engine, 'collisionStart', callback);
   }
 
   removeCollisionActive(game, callback) {
-    Matter.Events.off(game.engine, 'collisionActive', callback);
+    Matter.Events.off(this.engine, 'collisionActive', callback);
   }
 
   removeCollisionEnd(game, callback) {
-    Matter.Events.off(game.engine, 'collisionEnd', callback);
+    Matter.Events.off(this.engine, 'collisionEnd', callback);
   }
 
   lockedProperties(body) {
