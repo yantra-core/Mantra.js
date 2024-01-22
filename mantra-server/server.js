@@ -5,6 +5,7 @@ import plugins from '../mantra-game/plugins.js';
 // TODO: mantra dependency
 //import WebsocketServer from '@yantra-core/server-websocket';
 import WebsocketServer from '../mantra-game/plugins/server/WebsocketServer.js';
+import DefaultTwoDimensionalInputStrategy from '../mantra-game/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
 
 import { fileURLToPath, pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -27,6 +28,8 @@ game.use(new plugins.SnapshotManager());
 game.use(new plugins.Entity());
 game.use(new plugins.EntityInput());
 game.use(new plugins.EntityMovement());
+game.use(new DefaultTwoDimensionalInputStrategy());
+
 game.use(new plugins.Schema());
 game.use(new plugins.Bullet());
 game.use(new plugins.Block());
@@ -42,27 +45,6 @@ game.use(new WebsocketServer({
 }));
 
 game.use(new plugins.Border({ autoBorder: false }));
-// game.use(new Pong());
-/*
-// custom player join logic
-game.on('player::joined', function (playerData) {
-  console.log('a player has joined the server', playerData);
-  let player = game.createEntity({
-    type: 'PLAYER}',
-    shape: 'rectangle',
-    width: 500,
-    height: 500,
-    position: {
-      x: 0,
-      y: 0
-    },
-  });
-
-  // make sure to let the game know that the player has been created
-  game.emit('player::created', player);
-
-});
-*/
 
 game.on('listening', function (port) {
 

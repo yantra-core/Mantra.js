@@ -100,9 +100,6 @@ export default function construct(game, plugins = []) {
 
   game.switchWorlds = switchWorlds.bind(game);
 
-  // TODO: common helper mappings for all create / update / remove entities
-  game.createPlayer = game.createPlayer.bind(game);
-
   game.bodyMap = {};
   game.systems = {};
   game.storage = storage;
@@ -195,6 +192,7 @@ export default function construct(game, plugins = []) {
   game.onlineGameLoop = onlineGameLoop.bind(game);
   game.loadPluginsFromConfig = loadPluginsFromConfig.bind(game);
   game.createDefaultPlayer = createDefaultPlayer.bind(game);
+  game.createPlayer = createDefaultPlayer.bind(game);
 
   // keeps track of game.use('PluginStringName') async loading
   // game.start() will wait for all plugins to be loaded before starting

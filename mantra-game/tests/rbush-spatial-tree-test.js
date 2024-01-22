@@ -75,7 +75,7 @@ tap.test('RBush plugin integration tests', (t) => {
     });
 
     // move physics forward
-    game.systems.physics.updateEngine(1000);
+    game.physics.updateEngine(1000);
     // Re-search in the previous area
     let rbushSystem = game.systemsManager.getSystem('rbush');
     let foundEntities = rbushSystem.search({

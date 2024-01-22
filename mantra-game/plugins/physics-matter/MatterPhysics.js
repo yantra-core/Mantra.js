@@ -42,7 +42,7 @@ class MatterPhysics extends PhysicsInterface {
   init(game) {
 
     this.engine = Matter.Engine.create()
-    game.systemsManager.addSystem('physics', this);
+    // game.systemsManager.addSystem('physics', this);
 
     // TODO: register system
     if (typeof game.config.gravity === 'undefined') {
@@ -304,6 +304,9 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Body.setVelocity(body, velocity);
   }
 
+  // Remark: These namespaces collisionStart, collisionActive, etc, are considerd from ECS perspective
+  // If we register this plugin as a system these methods will be called on the system update, which is not what we want
+  // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
   collisionStart(game, callback) {
     Matter.Events.on(this.engine, 'collisionStart', (event) => {
       for (let pair of event.pairs) {

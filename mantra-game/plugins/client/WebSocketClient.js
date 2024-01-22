@@ -3,7 +3,6 @@ import { decode, decodeAsync } from "@msgpack/msgpack";
 import deltaCompression from "../snapshot-manager/SnapshotManager/deltaCompression.js";
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 import messageSchema from "../server/messageSchema.js";
-import gameTick from "../../lib/gameTick.js";
 let encoder = new TextEncoder();
 let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
@@ -158,6 +157,15 @@ export default class WebSocketClient {
       return;
     }
     if (action === 'player_input') {
+
+      // Do not send mouse events to server if no mouse buttons or keyboard controls are pressed
+      if (typeof data.controls === 'undefined' && typeof data.mouse !== 'undefined' && data.mouse.LEFT == null && data.mouse.RIGHT == null && data.mouse.MIDDLE == null) {
+        // Remark: This is a special case to ignore Mouse move events when no mouse buttons are pressed
+        //         This is done for performance reasons, as we don't want to send too much data to the server
+        //         ^^^ This line would need to be configurable in order to allow mouse position updates to be sent to the server
+        return;
+      }
+
       this.inputSequenceNumber++;
       this.inputBuffer[this.inputSequenceNumber] = data;
       let entityInput = this.game.getSystem('entity-input');
@@ -193,7 +201,6 @@ export default class WebSocketClient {
 
     // Track the size of the snapshot
     this.trackSnapshotSize(data);
-
 
     if (typeof event.data === 'string') {
       data = JSON.parse(event.data);
@@ -303,7 +310,6 @@ export default class WebSocketClient {
 
   // This method tracks the size of each snapshot and calculates the average
   trackSnapshotSize(data) {
-
 
     // if data is string convert to blob
     // in most cases message with be binary blob already

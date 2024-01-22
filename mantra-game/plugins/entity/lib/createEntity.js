@@ -28,7 +28,7 @@ export default function createEntity(config) {
     height: 100,
     width: 100,
     depth: 10,
-    lifetime: Infinity,
+    lifetime: -1,
     maxSpeed: 9999,
     isStatic: false,
     isSensor: false,

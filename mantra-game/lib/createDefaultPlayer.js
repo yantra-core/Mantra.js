@@ -1,5 +1,5 @@
 export default function createDefaultPlayer(playerConfig = {}) {
-  //console.log('creating default player', playerConfig)
+  console.log('creating default player', playerConfig, this.currentPlayerId)
 
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = { x: 0, y: 0 };
@@ -9,13 +9,15 @@ export default function createDefaultPlayer(playerConfig = {}) {
     delete playerConfig.texture;
   }
 
-  // check if game.currentPlayerId is already set,
-  // if so return
+  // check if game.currentPlayerId is already set, if so, return that entity
   if (this.currentPlayerId) {
-    return this.getEntity(this.currentPlayerId);
+    // Remark: Removed 1/22/24 as part of bringing multiplayer back
+    //         Can we remove this entirely?
+    // return this.getEntity(this.currentPlayerId);
   }
 
   let player = this.createEntity({
+    name: playerConfig.name,
     type: 'PLAYER',
     shape: 'triangle',
     collisionActive: true,

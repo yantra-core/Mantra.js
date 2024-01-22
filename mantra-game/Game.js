@@ -149,23 +149,6 @@ class Game {
       delete this._plugins[pluginName];
     }
   }
-  
-  createPlayer(playerConfig) {
-    return new Promise((resolve, reject) => {
-      // console.log(this.listenerCount('player::joined'))
-      if (this.listenerCount('player::joined') === 0) {
-        let result = this.createDefaultPlayer(playerConfig);
-        resolve(result);
-      } else {
-        // Attach a one-time listener for handling the response
-        this.once('player::created', (entity) => {
-          resolve(entity);
-        });
-        // Emit the player::joined event
-        this.emit('player::joined', playerConfig);
-      }
-    });
-  }
 
   playNote(note, duration) {
     console.log('Tone Plugin not loaded. Cannot play tone note.');
@@ -186,7 +169,7 @@ class Game {
   }
 
   setPlayerId(playerId) {
-    // console.log('setting playerID', playerId)
+    console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;
   }
 

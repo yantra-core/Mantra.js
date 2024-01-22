@@ -18,7 +18,7 @@ class Lifetime {
     // TODO: check performance of lifetime again after these changes
     for (let entityId in this.game.components.creationTime.data) {
       let ent = this.game.getEntity(entityId);
-      if (ent && this.game.components.lifetime[entityId] !== Infinity) {
+      if (ent && this.game.components.lifetime[entityId] > 0 && this.game.components.lifetime[entityId] !== Infinity) { // Remark: protobuf didn't like Infinity, -1 is probably better choice
         const elapsedTime = now - ent.creationTime; 
         if (elapsedTime > ent.lifetime) {
           this.game.removeEntity(Number(entityId)); // TODO: remove Number(), refactor Components to use Map

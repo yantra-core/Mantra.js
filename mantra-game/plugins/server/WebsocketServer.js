@@ -92,20 +92,20 @@ class WebSocketServer {
 
   async handleConnection(ws) {
 
-    const playerEntityId = 'player_' + nanoid(7);
-    ws.playerEntityId = playerEntityId;
+    const playerConnectionId = 'player_' + nanoid(7);
+    ws.playerConnectionId = playerConnectionId;
 
-    this.game.createPlayer({
-      id: playerEntityId,
+    let ent = this.game.createPlayer({
+      name: playerConnectionId,
       type: 'PLAYER',
-    }).then((ent) => {
-      ws.playerId = ent.id;
-      ws.send(JSON.stringify({
-        action: 'ASSIGN_ID',
-        playerName: playerEntityId,
-        playerId: ent.id
-      }));
     });
+
+    ws.playerId = ent.id;
+    ws.send(JSON.stringify({
+      action: 'ASSIGN_ID',
+      playerName: ent.name,
+      playerId: ent.id
+    }));
 
     ws.on('error', (error) => this.handleError(ws, error));
     ws.on('close', () => this.handleClose(ws));
@@ -114,7 +114,7 @@ class WebSocketServer {
 
   handleError(ws, error) {
     console.error('WebSocket error:', error);
-    this.game.removeEntity(ws.playerEntityId);
+    this.game.removeEntity(ws.playerConnectionId);
   }
 
   handleClose(ws) {
@@ -127,7 +127,7 @@ class WebSocketServer {
     // Existing switch-case logic goes here...
     let game = this.game;
     const parsedMessage = JSON.parse(message);
-    //console.log('parsedMessage', parsedMessage)
+    // console.log('parsedMessage', ws.playerId, parsedMessage)
     switch (parsedMessage.action) {
       case 'createEntity':
         game.createEntity(parsedMessage.entityId);
@@ -170,7 +170,7 @@ class WebSocketServer {
 
       case 'player_input':
         let entityInputSystem = game.systemsManager.getSystem('entity-input');
-        //console.log('ws.playerEntityId', ws.playerEntityId)
+        // console.log('ws.playerConnectionId', ws.playerConnectionId, parsedMessage.controls)
         entityInputSystem.handleInputs(ws.playerId, { controls: parsedMessage.controls, mouse: parsedMessage.mouse }, parsedMessage.sequenceNumber);
         break;
 
@@ -225,13 +225,11 @@ class WebSocketServer {
       console.error('no server');
       return;
     }
-
     // Usage in your server context
     this.wsServer.clients.forEach(client => {
       this.processClient(client, game, this.config);
     });
-}
-
+  }
 
   sendSnapshot(client, snapshot, lastProcessedInput, encoder = null) {
     let message = {
@@ -249,10 +247,11 @@ class WebSocketServer {
   }
 
   processClient(client, game, config) {
-    if (!client.playerEntityId || client.readyState !== WebSocket.OPEN) return;
+    if (!client.playerConnectionId || client.readyState !== WebSocket.OPEN) return;
 
-    const lastProcessedInput = game.lastProcessedInput[client.playerEntityId];
-    const playerSnapshot = game.getPlayerSnapshot(client.playerEntityId);
+    const lastProcessedInput = game.lastProcessedInput[client.playerConnectionId];
+    const playerSnapshot = game.getPlayerSnapshot(client.playerConnectionId);
+
 
     if (!playerSnapshot) return;
 
@@ -260,7 +259,7 @@ class WebSocketServer {
     let encoder = null;
 
     if (this.config.deltaEncoding) {
-      let deltaEncodedSnapshot = deltaEncoding.encode(client.playerEntityId, snapshotToSend);
+      let deltaEncodedSnapshot = deltaEncoding.encode(client.playerConnectionId, snapshotToSend);
       if (!deltaEncodedSnapshot) {
         return;
       }
@@ -288,7 +287,6 @@ class WebSocketServer {
         }
       }; // Assuming msgpack is a global encoder object
     }
-    // console.log(JSON.stringify(snapshotToSend, true, 2))
     this.sendSnapshot(client, snapshotToSend, lastProcessedInput, encoder);
   }
 
