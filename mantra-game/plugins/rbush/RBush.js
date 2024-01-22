@@ -31,11 +31,15 @@ class RBush {
     this.tree.remove(spatialData, (a, b) => a.id === b.id);
   }
 
-  search(query) {
+  search(query, mergeData = false) {
     // Query should be an object with {minX, minY, maxX, maxY}
-    return this.tree.search(query).map(item => this.game.getEntity(item.id));
-    //    TODO: optionally for performance, we can return the raw data with flag
-    //    return this.tree.search(query);
+
+    if (mergeData) {
+      return this.tree.search(query).map(item => this.game.getEntity(item.id));
+    } else {
+      return this.tree.search(query).map(item => item.id);
+    }
+
   }
 
   all() {

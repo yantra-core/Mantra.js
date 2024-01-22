@@ -47,11 +47,14 @@ export default function construct(game, plugins = []) {
     width: game.config.width,
     height: game.config.height,
     FPS: 60,
+    fieldOfView: 500, // global for game, not camera specific
     camera: {
       follow: game.config.camera.follow,
-      currentZoom: game.config.camera.startingZoom
+      currentZoom: game.config.camera.startingZoom,
     }
   };
+
+  game.useFoV = false; // for now
 
   if (typeof game.data.camera.follow === 'undefined') {
     game.data.camera.follow = true;

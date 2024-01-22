@@ -8,26 +8,20 @@ export default function render(game, alpha) {
   // This is not ideal and will yield low-entity count CSSGraphics performance
   // Best to remove camera follow for CSSGraphics if possible
   // We tried to only iterate changed entities, but this breaks camera follow
-  /*
-  for (let [eId, state] of this.game.changedEntities.entries()) {
-    let ent = this.game.entities.get(eId);
-    // console.log('rendering', ent)
-    // do not re-inflate destroyed entities
-    if (ent.destroyed !== true) {
-      this.inflateEntity(ent, alpha);
-    }
-    // this.game.changedEntities.delete(eId);
-  }
-  */
+ 
+  let fovEntities = new Map();
+  let currentPlayer = this.game.data.currentPlayer;
+  //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
+  let itemsInFov = game.getPlayerFieldOfView(currentPlayer, 32, false);
 
   for (let [eId, state] of this.game.entities.entries()) {
-    let ent = this.game.entities.get(eId);
-    // console.log('rendering', ent)
-    // do not re-inflate destroyed entities
-    if (ent.destroyed !== true) {
-      this.inflateEntity(ent, alpha);
+    //console.log('eId',eId, itemsInFov)
+    if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
+      game.removeGraphic(eId);
+      continue;
     }
-    // this.game.changedEntities.delete(eId);
+    let ent = this.game.entities.get(eId);
+    this.inflateEntity(ent, alpha);
   }
 
 }

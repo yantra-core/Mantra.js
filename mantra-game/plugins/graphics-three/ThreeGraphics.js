@@ -116,7 +116,8 @@ class ThreeGraphics extends GraphicsInterface {
     this.scene.add(mesh); // Add the mesh to the scene
     // Store the mesh in the 'graphics' component
     this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
-    mesh.position.set(entityData.position.x, 1, entityData.position.y);
+    mesh.position.set(-entityData.position.x, 1, -entityData.position.y);
+
 
     return mesh;
   }
@@ -164,7 +165,18 @@ class ThreeGraphics extends GraphicsInterface {
     // Update the controls on each frame
     // this.controls.update();
     // Follow the player entity with the camera
+
+    let fovEntities = new Map();
+    let currentPlayer = this.game.data.currentPlayer;
+    //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
+    let itemsInFov = game.getPlayerFieldOfView(currentPlayer, 16, false);
+
     for (let [eId, state] of this.game.entities.entries()) {
+      //console.log('eId',eId, itemsInFov)
+      if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
+        game.removeGraphic(eId);
+        continue;
+      }
       let ent = this.game.entities.get(eId);
       this.inflateEntity(ent, alpha);
     }

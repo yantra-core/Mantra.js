@@ -29,17 +29,27 @@ function gameTick() {
     this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
   }
 
-  // Loop through entities that have changed
+  
+  
+  /*
+  Remark: Removed 1/22/24, this is directly handled by the graphics system in offline mode
   for (let entityId of this.changedEntities) {
     if (this.isClient && this.isOnline === false) {
+      // only consider entities that are within the field of view of the current player
+      // check to see if entityId is not within ItemsInFov array
+      console.log("itemInFov.indexOf(entityId)", itemInFov.indexOf(entityId))
+      if (itemInFov.indexOf(entityId) === -1) {
+        continue;
+      }
       let ent = this.entities.get(entityId);
       if (ent) {
         this.graphics.forEach(function inflateEntityPerInterface (graphicsInterface) {
-          graphicsInterface.inflateEntity(ent);
+          // graphicsInterface.inflateEntity(ent);
         });
       }
     }
   }
+  */
 
   this.changedEntities.clear();
 

@@ -176,7 +176,7 @@ class Game {
     return this.getEntity(this.currentPlayerId);
   }
 
-  getPlayerFieldOfView(entId, distance = 1000) {
+  getPlayerFieldOfView(entId, distance = 1000, mergeData = true) {
     let ent;
 
     if (typeof entId === 'object') {
@@ -199,7 +199,7 @@ class Game {
     };
 
     if (this.systems.rbush) {
-      return this.systems.rbush.search(query)
+      return this.systems.rbush.search(query, mergeData)
     } else {
       console.log('Warning: no rbush system found, cannot perform getPlayerFieldOfView query');
     }

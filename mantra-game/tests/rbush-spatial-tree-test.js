@@ -53,7 +53,7 @@ tap.test('RBush plugin integration tests', (t) => {
       minY: 19,
       maxX: 16,
       maxY: 26
-    });
+    }, true);
 
     // Check if the correct entities are returned
     t.equal(foundEntities.some(e => e.name === 'entity1'), true, 'Entity1 should be found in the search area');
