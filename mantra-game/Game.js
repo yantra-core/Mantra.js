@@ -150,10 +150,6 @@ class Game {
     }
   }
 
-  playNote(note, duration) {
-    console.log('Tone Plugin not loaded. Cannot play tone note.');
-  }
-
   setControls(controls) {
     let game = this;
     game.controls = controls;
@@ -168,6 +164,9 @@ class Game {
     this.height = height;
   }
 
+  //
+  // Player specific APIs
+  //
   setPlayerId(playerId) {
     console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;
@@ -175,6 +174,43 @@ class Game {
 
   getCurrentPlayer() {
     return this.getEntity(this.currentPlayerId);
+  }
+
+  getPlayerFieldOfView(entId, distance = 1000) {
+    let ent;
+
+    if (typeof entId === 'object') {
+      ent = entId;
+    } else {
+      ent = this.getEntity(entId);
+    }
+
+    if (!ent) {
+      console.log('Warning: no entity found for entId', entId);
+      return [];
+    }
+
+    let centerPosition = ent.position;
+    let query = {
+      minX: centerPosition.x - distance,
+      minY: centerPosition.y - distance,
+      maxX: centerPosition.x + distance,
+      maxY: centerPosition.y + distance
+    };
+
+    if (this.systems.rbush) {
+      return this.systems.rbush.search(query)
+    } else {
+      console.log('Warning: no rbush system found, cannot perform getPlayerFieldOfView query');
+    }
+
+  }
+
+  //
+  // Audio / Multimedia APIs
+  //
+  playNote(note, duration) {
+    console.log('Tone Plugin not loaded. Cannot play tone note.');
   }
 
   //
