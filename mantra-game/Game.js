@@ -5,13 +5,6 @@ import construct from './lib/Game/construct.js';
 import use from './lib/Game/use.js';
 import start from './lib/Game/start.js';
 
-// Provides a default Game.start(fn) logic ( creates a single player and border )
-// Bind to event `player::joined` to override default player creation logic
-// import defaultGameStart from './lib/start/defaultGameStart.js';
-
-// default player movement, this could be also be set in defaultGameStart.js
-// import movement from './lib/defaultPlayerMovement.js';
-
 // The Game class is the main entry point for Mantra games
 class Game {
   constructor(customConfig = {}) {
@@ -72,7 +65,6 @@ class Game {
     construct(this, config.plugins);
   }
 
-  // TODO: hoist to systemsManager
   update(deltaTime) {
     // Call update method of SystemsManager, which delegate to all Systems which have an update method
     this.systemsManager.update(deltaTime);
@@ -80,41 +72,56 @@ class Game {
 
   render() {
     // Call render method of SystemsManager, which will delegate to all Graphics systems
-    // TODO: should we remove this and hoist it to the systemsManager?
     this.systemsManager.render();
   }
 
-  // TODO: move to client, let client hoist the connection logic to game
-  stop() {
-    let client = this.getSystem('client');
-    client.stop();
-  }
 
-  connect(url) {
-    let game = this;
-    // Wait for all systems to be ready before starting the game loop
-    if (game.loadingPluginsCount > 0) {
-      setTimeout(function () {
-        game.connect(url);
-      }, 4);
-      return
-    } else {
-      console.log('All Plugins are ready! Starting Mantra Game Client...');
-      let client = this.getSystem('client');
-      client.connect(url);
+  //
+  // Component APIs
+  //
+  addComponent(entityId, componentType, data) {
+    if (!this.components[componentType]) {
+      this.components[componentType] = new Component(componentType, this);
     }
+    // Initialize an empty map for the actionRateLimiter component
+    // TODO: remove this hard-coded check for actionRateLimiter
+    if (componentType === 'actionRateLimiter') {
+      data = new Map();
+    }
+    this.components[componentType].set(entityId, data);
   }
 
-  disconnect() {
-    let client = this.getSystem('client');
-    client.disconnect();
+  getComponent(entityId, componentType) {
+    if (this.components.hasOwnProperty(componentType)) {
+      return this.components[componentType].get(entityId);
+    }
+    return null;
   }
 
-  // All Systems are Plugins, but not all Plugins are Systems
-  // TODO: move to separate file
+  //
+  // System APIs
+  //
+  addSystem(systemName, system) {
+    return this.systemsManager.addSystem(systemName, system);
+  }
 
+  getSystem(systemName) {
+    return this.systemsManager.getSystem(systemName);
+  }
 
-  // Helper function to load plugin scripts
+  removeSystem(systemName) {
+    return this.systemsManager.removeSystem(systemName.toLowerCase());
+  }
+
+  updateGraphic(entityData) {
+    this.graphics.forEach(function (graphicsInterface) {
+      graphicsInterface.updateGraphic(entityData);
+    });
+  }
+
+  //
+  // Plugin APIs
+  //
   loadPluginScript(scriptUrl) {
     console.log('Loading', scriptUrl)
     return new Promise((resolve, reject) => {
@@ -122,7 +129,6 @@ class Game {
       script.src = scriptUrl;
       //script.async = true;
       script.defer = true;
-
       script.onload = () => resolve();
       script.onerror = () => reject(new Error(`Failed to load script: ${scriptUrl}`));
       document.head.appendChild(script);
@@ -143,47 +149,7 @@ class Game {
       delete this._plugins[pluginName];
     }
   }
-
-  // TODO: move to componentManager
-  addComponent(entityId, componentType, data) {
-    if (!this.components[componentType]) {
-      this.components[componentType] = new Component(componentType, this);
-    }
-    // Initialize an empty map for the actionRateLimiter component
-    // TODO: remove this hard-coded check for actionRateLimiter
-    if (componentType === 'actionRateLimiter') {
-      data = new Map();
-    }
-    this.components[componentType].set(entityId, data);
-  }
-
-  getComponent(entityId, componentType) {
-    if (this.components.hasOwnProperty(componentType)) {
-      return this.components[componentType].get(entityId);
-    }
-    return null;
-  }
-
-  addSystem(systemName, system) {
-    return this.systemsManager.addSystem(systemName, system);
-  }
-
-  getSystem(systemName) {
-    return this.systemsManager.getSystem(systemName);
-  }
-
-  removeSystem(systemName) {
-    return this.systemsManager.removeSystem(systemName.toLowerCase());
-  }
-
-  updateGraphic(entityData) {
-    this.graphics.forEach(function (graphicsInterface) {
-      graphicsInterface.updateGraphic(entityData);
-    });
-  }
-
-  // TODO: move to playerManager
-  // allows for custom player creation logic, or default player creation logic
+  
   createPlayer(playerConfig) {
     return new Promise((resolve, reject) => {
       // console.log(this.listenerCount('player::joined'))
@@ -205,12 +171,6 @@ class Game {
     console.log('Tone Plugin not loaded. Cannot play tone note.');
   }
 
-  setGravity(x = 0, y = 0, z = 0) {
-    if (this.physics) {
-      this.physics.setGravity(x, y, z);
-    }
-  }
-
   setControls(controls) {
     let game = this;
     game.controls = controls;
@@ -220,34 +180,9 @@ class Game {
     }
   }
 
-  setActions(actions) {
-    let game = this;
-    let actionNames = Object.keys(actions);
-    actionNames.forEach(function (actionName) {
-      let action = actions[actionName];
-      game.rules.on(actionName, action);
-    });
-  }
-
   setSize(width, height) {
     this.width = width;
     this.height = height;
-  }
-
-  zoom(scale) {
-    if (this.camera && this.camera.zoom) {
-      this.camera.zoom(scale);
-    } else {
-      console.log('warning: no camera.zoom method found')
-    }
-  }
-
-  shakeCamera(intensity, duration) {
-    this.graphics.forEach(function (graphicsInterface) {
-      if (graphicsInterface.cameraShake) {
-        graphicsInterface.cameraShake(intensity, duration);
-      }
-    });
   }
 
   setPlayerId(playerId) {
@@ -259,16 +194,24 @@ class Game {
     return this.getEntity(this.currentPlayerId);
   }
 
-  // TODO: should physics plugin mount these instead of direct map to game?
-  applyForce(entityId, force) {
-    const body = this.bodyMap[entityId];
-    this.physics.applyForce(body, body.position, force);
-    this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
+  //
+  // Physics Engine APIs
+  //
+  setGravity(x = 0, y = 0, z = 0) {
+    if (this.physics) {
+      this.physics.setGravity(x, y, z);
+    }
   }
 
   setPosition(entityId, position) {
     const body = this.bodyMap[entityId];
     this.physics.setPosition(body, position);
+  }
+
+  applyForce(entityId, force) {
+    const body = this.bodyMap[entityId];
+    this.physics.applyForce(body, body.position, force);
+    this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
   }
 
   applyPosition(entityId, position) {
@@ -288,8 +231,42 @@ class Game {
     this.physics.rotateBody(body, rotationAmount);
   }
 
+  //
+  // Camera APIs
+  //
   rotateCamera(angle) {
-    // not implemented directly, Graphics plugin will handle this
+    // not implemented directly, Graphics plugin will hoist this
+  }
+  setZoom() {
+    // not implemented directly, Graphics plugin will hoist this
+  }
+  zoom(scale) {
+    if (this.camera && this.camera.zoom) {
+      this.camera.zoom(scale);
+    } else {
+      console.log('warning: no camera.zoom method found')
+    }
+  }
+
+  shakeCamera(intensity, duration) {
+    this.graphics.forEach(function (graphicsInterface) {
+      if (graphicsInterface.cameraShake) {
+        graphicsInterface.cameraShake(intensity, duration);
+      }
+    });
+  }
+
+  //
+  // Asset and Styling APIs
+  //
+  addAsset(key, path) {
+    // game.addAsset needs to work immediately, potentially before game.start()
+    // the preloader won't be available until the `Client` system is loaded
+    if (this.preloader) {
+      this.preloader.addAsset(path, 'spritesheet', key);
+    } else {
+      this.queuedAssets[key] = path;
+    }
   }
 
   setBackground(color) {
@@ -315,15 +292,12 @@ class Game {
     }
   }
 
-  useSutra(subSutra, name) {
-    if (this.rules) {
-      this.rules.use(subSutra, name);
-      if (this.systems['gui-sutra']) {
-        this.systems['gui-sutra'].setRules(this.rules);
-      }
-    } else {
-      console.log('Warning: no rules engine found, cannot use sutra', subSutra, name);
-    }
+  //
+  // Time APIs / ChronoControl
+  //
+  stop() {
+    let client = this.getSystem('client');
+    client.stop();
   }
 
   pause() {
@@ -339,36 +313,61 @@ class Game {
   }
 
   reset() {
-    // not a full game reset ( yet )
-    // reset default entity input
-    //let movementRules = movement(this);
-    //this.rules.use(movementRules, 'movement');
-
     // reset all Sutra rules
     this.rules = this.createSutra();
-
     // remap the keyboard mappings to Sutra by default
     if (this.systems.sutra) {
       this.systems.sutra.bindInputsToSutraConditions();
     }
-
     // reset the default player controls
     this.setControls({});
-
   }
 
-  setZoom() {
-    // noop
-  }
-
-  addAsset(key, path) {
-    // game.addAsset needs to work immediately, potentially before game.start()
-    // the preloader won't be available until the `Client` system is loaded
-    if (this.preloader) {
-      this.preloader.addAsset(path, 'spritesheet', key);
+  //
+  // Sutra Behavior Tree APIs
+  //
+  useSutra(subSutra, name) {
+    if (this.rules) {
+      this.rules.use(subSutra, name);
+      if (this.systems['gui-sutra']) {
+        this.systems['gui-sutra'].setRules(this.rules);
+      }
     } else {
-      this.queuedAssets[key] = path;
+      console.log('Warning: no rules engine found, cannot use sutra', subSutra, name);
     }
+  }
+
+  setActions(actions) {
+    let game = this;
+    let actionNames = Object.keys(actions);
+    actionNames.forEach(function (actionName) {
+      let action = actions[actionName];
+      game.rules.on(actionName, action);
+    });
+  }
+
+
+  //
+  // Networking APIs
+  //
+  connect(url) {
+    let game = this;
+    // Wait for all systems to be ready before starting the game loop
+    if (game.loadingPluginsCount > 0) {
+      setTimeout(function () {
+        game.connect(url);
+      }, 4);
+      return
+    } else {
+      console.log('All Plugins are ready! Starting Mantra Game Client...');
+      let client = this.getSystem('client');
+      client.connect(url);
+    }
+  }
+
+  disconnect() {
+    let client = this.getSystem('client');
+    client.disconnect();
   }
 
 }
