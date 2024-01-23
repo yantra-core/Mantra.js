@@ -5,6 +5,8 @@ import render from './lib/render.js';
 import createGraphic from './lib/createGraphic.js';
 import updateGraphic from './lib/updateGraphic.js';
 import removeGraphic from './lib/removeGraphic.js';
+import inflateGraphic from './lib/inflateGraphic.js';
+import inflateTexture from './lib/inflateTexture.js';
 
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
@@ -36,9 +38,11 @@ class ThreeGraphics extends GraphicsInterface {
   init(game) {
 
     this.render = render.bind(this);
+    this.inflateGraphic = inflateGraphic.bind(this);
     this.createGraphic = createGraphic.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
+    this.inflateTexture = inflateTexture.bind(this);
 
     this.game = game;
     this.game.systemsManager.addSystem('graphics-three', this);
@@ -121,18 +125,6 @@ class ThreeGraphics extends GraphicsInterface {
         this.camera.position.lerp(newPosition, 0.05);
         this.camera.lookAt(lookAtPosition);
       }
-    }
-  }
-
-  inflateEntity(entity, alpha) {
-    if (entity.graphics && entity.graphics['graphics-three']) {
-      let graphic = entity.graphics['graphics-three'];
-      if (entity.type !== 'BORDER') { // TODO: remove this
-        this.updateGraphic(entity, alpha);
-      }
-    } else {
-      let graphic = this.createGraphic(entity);
-      this.game.components.graphics.set([entity.id, 'graphics-three'], graphic);
     }
   }
 

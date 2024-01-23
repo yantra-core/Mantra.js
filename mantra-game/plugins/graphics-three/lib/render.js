@@ -17,7 +17,7 @@ export default function render(game, alpha) {
       continue;
     }
     let ent = this.game.entities.get(eId);
-    this.inflateEntity(ent, alpha);
+    this.inflateGraphic(ent, alpha);
   }
   this.renderer.render(this.scene, this.camera);
 }
