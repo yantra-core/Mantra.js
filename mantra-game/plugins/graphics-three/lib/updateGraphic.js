@@ -16,6 +16,6 @@ export default function updateGraphic(entityData) {
   }
   
   // TODO: Add support for 3D position with entityData.position.z if available
-  mesh.position.set(-entityData.position.x, 1, -entityData.position.y);
+  mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
 
 }

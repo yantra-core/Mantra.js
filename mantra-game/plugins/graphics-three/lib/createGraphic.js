@@ -12,22 +12,35 @@ export default function createGraphic(entityData) {
       geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       break;
     default:
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.width, entityData.width); // Default to a unit cube if no shape is specified
+      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
   }
 
-  // Basic white material, replace with textures/materials as needed
-  material = new THREE.MeshBasicMaterial({ 
-    color: 0xffffff,
-    wireframe: true // Set wireframe to true
-  });
+  let texture = this.game.getTexture(entityData.texture);
+  // console.log('Texture', texture);
+
+  if (texture) {
+    // Load the texture using THREE.TextureLoader
+    const textureLoader = new THREE.TextureLoader();
+    const loadedTexture = textureLoader.load(texture.url);
+    // console.log('loadedTexture', loadedTexture)
+    // Apply the loaded texture to the material
+    material = new THREE.MeshBasicMaterial({
+      map: loadedTexture // Use the loaded texture
+    });
+
+
+  } else {
+    material = new THREE.MeshBasicMaterial({
+      wireframe: true,
+    });
+
+  }
 
   mesh = new THREE.Mesh(geometry, material);
 
-  this.scene.add(mesh); // Add the mesh to the scene
-  // Store the mesh in the 'graphics' component
+  this.scene.add(mesh);
   this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
-  mesh.position.set(-entityData.position.x, 1, -entityData.position.y);
-
+  mesh.position.set(-entityData.position.x, entityData.z, -entityData.position.y);
 
   return mesh;
 }
