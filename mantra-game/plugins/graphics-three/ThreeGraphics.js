@@ -39,8 +39,6 @@ class ThreeGraphics extends GraphicsInterface {
     this.createGraphic = createGraphic.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
-    
-    game.graphics.push(this);
 
     this.game = game;
     this.game.systemsManager.addSystem('graphics-three', this);
@@ -96,6 +94,10 @@ class ThreeGraphics extends GraphicsInterface {
     game.emit('plugin::ready::graphics-three', this);
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
+        
+    game.graphics.push(this);
+
+    document.body.style.cursor = 'default';
 
   }
 

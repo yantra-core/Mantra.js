@@ -7,6 +7,7 @@ class RBush {
 
   constructor() {
     this.id = RBush.id;
+
   }
 
   init(game) {
@@ -60,10 +61,21 @@ class RBush {
 
     let tick = this.game.tick;
 
-    // each 30 game ticks check game.deferredEntities and add them to the tree
-    if (tick % 30 !== 0) return;
+    if (tick % 3 !== 0) return;
 
     let currentPlayer = this.game.getCurrentPlayer();
+    
+    //
+    // If there is a current player and the `Tile` plugin is loaded,
+    // Check the players position and load the tiles for the area around the player
+    //
+    if (currentPlayer) {
+      if (this.game.systems.tile) {
+        this.game.systems.tile.loadTilesForArea(currentPlayer.position);
+      }
+    }
+
+    if (tick % 30 !== 0) return;
 
     // get all items, plus a buffer of 1.5x the field of view
     let nearbyEntities = game.getPlayerFieldOfView(currentPlayer, this.game.data.fieldOfView * 1.5, false);
@@ -81,6 +93,9 @@ class RBush {
     });
 
   }
+
+
+
 
   render() { }
   destroy() { }

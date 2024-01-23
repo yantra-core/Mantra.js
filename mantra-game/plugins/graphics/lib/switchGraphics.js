@@ -6,7 +6,8 @@ export default function switchGraphics(graphicsInterfaceName, cb) {
   let engines = {
     'BabylonGraphics': 'graphics-babylon',
     'PhaserGraphics': 'graphics-phaser',
-    'CSSGraphics': 'graphics-css'
+    'CSSGraphics': 'graphics-css',
+    'ThreeGraphics': 'graphics-three'
   };
 
   let graphicsInterfaceId = engines[graphicsInterfaceName];

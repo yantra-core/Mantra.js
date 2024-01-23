@@ -16,7 +16,7 @@ function loadTiledMap(filePath) {
   return JSON.parse(rawData);
 }
 
-tap.test('splitTiledChunks integration test', async t => {
+tap.test('tiledChunks integration test', async t => {
   // Ensure the output directory exists
   if (!fs.existsSync(testOutputDir)) {
     fs.mkdirSync(testOutputDir, { recursive: true });
@@ -32,12 +32,14 @@ tap.test('splitTiledChunks integration test', async t => {
   tiledMap.layers.forEach(layer => {
     if (layer.chunks) {
       layer.chunks.forEach(chunk => {
-        const expectedFilePath = path.join(testOutputDir, `chunk_x${chunk.x}_y${chunk.y}.js`);
+        const chunkKey = `chunk_x${chunk.x}_y${chunk.y}`;
+        const expectedFilePath = path.join(testOutputDir, `${chunkKey}.js`);
         t.ok(fs.existsSync(expectedFilePath), `File should exist: ${expectedFilePath}`);
         
-        // Optional: Read and verify file content
+        // Read and verify file content
         const content = fs.readFileSync(expectedFilePath, 'utf8');
-        t.match(content, /export const chunk =/, 'File content should match expected format');
+        const expectedContentPattern = new RegExp(`game\\.data\\.chunks\\['${chunkKey}'\\] =`);
+        t.match(content, expectedContentPattern, 'File content should match expected format');
       });
     }
   });

@@ -51,7 +51,8 @@ export default function construct(game, plugins = []) {
     camera: {
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
-    }
+    },
+    chunks: {}
   };
 
   game.useFoV = false; // for now
