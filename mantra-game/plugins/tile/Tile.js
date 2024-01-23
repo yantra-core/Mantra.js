@@ -1,7 +1,8 @@
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
-import getChunkFiles from '../../../mantra-tiled-server/lib/getChunkFiles.js';
+
+// import getChunkFiles from '../../../mantra-tiled-server/lib/getChunkFiles.js';
 
 const tilemap = {
   0: 'block',
