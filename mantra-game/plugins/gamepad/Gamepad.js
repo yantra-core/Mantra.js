@@ -48,8 +48,10 @@ export default class Gamepad {
     }
 
     game.systemsManager.addSystem('gamepad', this);
-    window.addEventListener("gamepadconnected", (event) => this.connectHandler(event));
-    window.addEventListener("gamepaddisconnected", (event) => this.disconnectHandler(event));
+    if (!this.game.isServer) {
+      window.addEventListener("gamepadconnected", (event) => this.connectHandler(event));
+      window.addEventListener("gamepaddisconnected", (event) => this.disconnectHandler(event));
+    }
   }
 
   connectHandler(event) {
@@ -63,8 +65,10 @@ export default class Gamepad {
   }
 
   update() {
-    this.pollGamepads();
-    this.sendInputs();
+    if (!this.game.isServer) {
+      this.pollGamepads();
+      this.sendInputs();
+    }
   }
 
   pollGamepads() {

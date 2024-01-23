@@ -20,6 +20,7 @@ export default function switchWorlds (selectedWorld) {
   worldName = 'Sutra';
   worldName = selectedWorld;
 
+  // TODO: remove global WORLDS reference for server
   let worldClass = WORLDS.worlds[worldName];
 
   if (!worldClass) {

@@ -32,7 +32,7 @@ message Velocity {
 message Player {
   uint32 id = 1; 
   string name = 2; // String size limit can be enforced in application logic
-  EntityTypes type = 3;
+  string type = 3;
   Position position = 4;
   Velocity velocity = 5;
   int32 width = 6;
@@ -48,6 +48,7 @@ message Player {
   bool destroyed = 16;
   uint32 owner = 17; 
   int32 maxSpeed = 18;
+  Texture texture = 19;
 }
 
 message Message {
@@ -55,4 +56,17 @@ message Message {
   ActionTypes action = 2;
   repeated Player state = 3;
   uint32 lastProcessedInput = 4; 
+}
+
+message Texture {
+  string key = 1;
+  string url = 2;
+  repeated Frame frames = 3;
+  string sprite = 4;
+  int32 rate = 5;
+}
+
+message Frame {
+  int32 x = 1;
+  int32 y = 2;
 }

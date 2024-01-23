@@ -6,6 +6,7 @@ import plugins from '../mantra-game/plugins.js';
 //import WebsocketServer from '@yantra-core/server-websocket';
 import WebsocketServer from '../mantra-game/plugins/server/WebsocketServer.js';
 import DefaultTwoDimensionalInputStrategy from '../mantra-game/plugins/entity-input/strategies/2D/Default2DInputStrategy.js';
+import Home from '../mantra-worlds/Home/Home.js';
 
 import { fileURLToPath, pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -23,20 +24,28 @@ const game = new Game({
   isServer: true
 });
 
+
 game.use(new plugins.MatterPhysics());
 game.use(new plugins.SnapshotManager());
 game.use(new plugins.Entity());
 game.use(new plugins.EntityInput());
 game.use(new plugins.EntityMovement());
+game.use(new plugins.Keyboard({}));
+game.use(new plugins.Gamepad({}));
+
 game.use(new DefaultTwoDimensionalInputStrategy());
+game.use(new plugins.Sutra({}));
+
 
 game.use(new plugins.Schema());
 game.use(new plugins.Bullet());
 game.use(new plugins.Block());
 
+// game.use(new Home());
+
 //game.use(new plugins.Border({ autoBorder: true }));
 game.use(new WebsocketServer({
-  protobuf: true,
+  protobuf: false,
   msgpack: false,
   deltaCompression: true,
   deltaEncoding: true,

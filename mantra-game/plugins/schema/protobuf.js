@@ -3,17 +3,18 @@ const protobuf = require('protobufjs');
 const fs = require('fs');
 const { performance } = require('perf_hooks');
 
-
-
-
-
-
 protobuf.load("./messageSchema.proto", function (err, root) {
   if (err)
     throw err;
 
   // Obtain a message type
   var AwesomeMessage = root.lookupType("Message");
+
+  let jsonDescriptor = root.toJSON();
+
+  // write descriptor to file
+  fs.writeFileSync(__dirname + "/Message.json", JSON.stringify(jsonDescriptor, null, 2));
+
 
   runBenchmark(AwesomeMessage);
 

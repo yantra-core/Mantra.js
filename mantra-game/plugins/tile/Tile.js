@@ -1,5 +1,6 @@
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
-
+// import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
+//import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 const tilemap = {
   1: 'block',
   2: 'grass',
@@ -17,6 +18,9 @@ class Tile {
   init(game) {
     this.game = game;
     setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
+    //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
+
+    //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
   }
 
   createTileMapFromTiledJSON(tiledJSON) {
@@ -28,6 +32,7 @@ class Tile {
   }
 
   createLayer(layer, tileWidth, tileHeight) {
+    let max = 1000;
     layer.data.forEach((tileId, index) => {
       if (tileId !== 0 && tileId !== 2 && tileId !== 4577 && tileId !== 4767) {
         const { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, tileId);
@@ -49,6 +54,7 @@ class Tile {
     let body = tileId === 1;
     let isStatic = tileId !== 1;
     let mass = tileId === 1 ? 5000 : 1;
+
 
     this.game.createEntity({
       type: 'BLOCK',

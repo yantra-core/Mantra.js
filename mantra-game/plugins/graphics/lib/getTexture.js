@@ -46,6 +46,7 @@ export default function getTexture(config) {
 
     // sprite name is an object, check for x / y positions with width / height
     if (typeof spriteName === 'object') {
+      // TODO: add check here for literal sprites unbound to a spritesheet
       let sprite = {};
       sprite.x = spriteName.x;
       sprite.y = spriteName.y;

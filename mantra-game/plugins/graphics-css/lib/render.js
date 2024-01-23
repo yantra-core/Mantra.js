@@ -12,7 +12,7 @@ export default function render(game, alpha) {
   let fovEntities = new Map();
   let currentPlayer = this.game.data.currentPlayer;
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
-  let itemsInFov = game.getPlayerFieldOfView(currentPlayer, 32, false);
+  let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
 
   for (let [eId, state] of this.game.entities.entries()) {
     //console.log('eId',eId, itemsInFov)

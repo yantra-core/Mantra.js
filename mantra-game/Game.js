@@ -22,6 +22,7 @@ class Game {
       loadDefaultPlugins: true, // auto-loads default plugins based on pluginsConfig
       width: 800,
       height: 600,
+      fieldOfView: 1600,
       // game systems / auto-load based on pluginsConfig
       physics: 'matter',
       graphics: ['css'],

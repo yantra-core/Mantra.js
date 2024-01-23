@@ -58,7 +58,9 @@ export default class Keyboard {
 
   init(game) {
     this.game = game;
-    this.bindInputControls();
+    if (!this.game.isServer) {
+      this.bindInputControls();
+    }
     this.name = 'keyboard';
 
     // register the Plugin as a system, on each update() we will send the inputPool to the server

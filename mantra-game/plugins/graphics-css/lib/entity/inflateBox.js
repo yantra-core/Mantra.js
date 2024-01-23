@@ -68,7 +68,7 @@ export default function inflateBox(entityElement, entityData) {
 
   if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
     // TODO: refactor API
-    tileFlip(entityElement, hexColor, getTexture, entityData);
+    // tileFlip(entityElement, hexColor, getTexture, entityData);
   } 
 
   // console.log('entityElement', entityElement)

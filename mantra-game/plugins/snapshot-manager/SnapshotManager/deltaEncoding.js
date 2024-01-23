@@ -8,7 +8,7 @@ let playerStateCache = {};
 const deltaEncoding = {};
 
 // TODO: auto-generate this list from the components
-const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner'];
+const componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner', 'texture'];
 
 deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
   // console.log('playerStateCache', Object.keys(playerStateCache).length)
@@ -86,7 +86,14 @@ deltaEncoding.encode = function encodeDelta(playerId, snapshot) {
       }
     }
 
-    // deltaState.type = state.type;
+    // TODO: better delta encoding for textures
+    if (typeof state.texture === 'string') {
+      deltaState.texture = {
+        name: state.texture
+      };
+    } else {
+      deltaState.texture = state.texture;
+    }
 
     if (hasChanges) {
       differentialSnapshotState.push(deltaState);

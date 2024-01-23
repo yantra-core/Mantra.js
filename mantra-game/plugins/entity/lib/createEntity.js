@@ -2,60 +2,97 @@ import EntityClass from '../../../Entity/Entity.js';
 // TODO: remove TimersComponent import, use game reference instead ( reduce imported code )
 import TimersComponent from '../../../Component/TimersComponent.js';
 
-export default function createEntity(config) {
-  // TODO: if config is string, use that as type property with default settings
-  // second argument is merged options hash
+function distanceSquared(x1, y1, x2, y2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  return dx * dx + dy * dy;
+}
+
+function deferEntityCreation(entityData) {
+  // Add entity data to a spatial data structure
+  spatialStructure.add(entityData);
+}
+
+// ignoreSetup set to true will ignore the setup phase of createEntity
+// the setup phase assigns default values to the entity and auto-id
+// this is currently being used from `rbush` plugin when creating deferred entities
+export default function createEntity(config, ignoreSetup = false) {
   // console.log('createEntity', config)
 
-  let entityId = this._generateId();
+  let entityId;
 
-  let defaultConfig = {
-    id: entityId,
-    name: null,
-    kind: null,
-    body: true,
-    shape: 'triangle',
-    color: null,
-    position: { x: 0, y: 0, z: 0 },
-    startingPosition: null,
-    velocity: { x: 0, y: 0, z: 0 },
-    rotation: 0,
-    mass: 100,
-    density: 100,
-    health: Infinity,
-    score: 0,
-    // radius: null,
-    height: 100,
-    width: 100,
-    depth: 10,
-    lifetime: -1,
-    maxSpeed: 9999,
-    isStatic: false,
-    isSensor: false,
-    restitution: 0,
-    items: null,
-    sutra: null,
-    owner: 0, // 0 = server
-    inputs: null,
-    destroyed: false,
-    type: 'PLAYER',
-    friction: 0.1,  // Default friction
-    frictionAir: 0.01, // Default air friction
-    frictionStatic: 0.5, // Default static friction
-    lockedProperties: null, // object hash of properties that should never be updated
-    actionRateLimiter: null, // object hash of state history
-    timers: null, // object hash timers for TimersComponent.js
-    yCraft: null, // object hash of properties for YCraft.js
-    text: null,
-    style: null,
-    texture: null,
-    collisionActive: false,
-    collisionStart: true,
-    collisionEnd: false
-  };
+  if (!ignoreSetup) {
+    entityId = this._generateId();
 
-  // merge config with defaultConfig
-  config = { ...defaultConfig, ...config };
+    let defaultConfig = {
+      id: entityId,
+      name: null,
+      kind: null,
+      body: true,
+      shape: 'triangle',
+      color: null,
+      position: { x: 0, y: 0, z: 0 },
+      startingPosition: null,
+      velocity: { x: 0, y: 0, z: 0 },
+      rotation: 0,
+      mass: 100,
+      density: 100,
+      health: Infinity,
+      score: 0,
+      // radius: null,
+      height: 100,
+      width: 100,
+      depth: 10,
+      lifetime: -1,
+      maxSpeed: 9999,
+      isStatic: false,
+      isSensor: false,
+      restitution: 0,
+      items: null,
+      sutra: null,
+      owner: 0, // 0 = server
+      inputs: null,
+      destroyed: false,
+      type: 'PLAYER',
+      friction: 0.1,  // Default friction
+      frictionAir: 0.01, // Default air friction
+      frictionStatic: 0.5, // Default static friction
+      lockedProperties: null, // object hash of properties that should never be updated
+      actionRateLimiter: null, // object hash of state history
+      timers: null, // object hash timers for TimersComponent.js
+      yCraft: null, // object hash of properties for YCraft.js
+      text: null,
+      style: null,
+      texture: null,
+      collisionActive: false,
+      collisionStart: true,
+      collisionEnd: false
+    };
+  
+    // merge config with defaultConfig
+    config = { ...defaultConfig, ...config };
+  
+    if (this.game.systems.rbush) {
+      this.game.systems.rbush.addEntity(config);
+    }
+  
+    if (this.game.useFoV) {
+      // check to see if entity is within game.data.fieldOfView,
+      // if not, we will defer creation until it is
+      let currentPlayer = this.game.getCurrentPlayer();
+      if (currentPlayer) {
+        let incomingPosition = config.position || { x: 0, y: 0, z: 0};
+        let distance = distanceSquared(currentPlayer.position.x, currentPlayer.position.y, incomingPosition.x, incomingPosition.y);
+        let fieldOfViewSquared = this.game.data.fieldOfView * this.game.data.fieldOfView;
+        if (distance > fieldOfViewSquared) {
+          game.deferredEntities[config.id.toString()] = config;
+          return;
+        }
+      }
+  
+    }
+  
+  }
 
   entityId = config.id;
   const entity = new EntityClass(entityId);
@@ -189,10 +226,6 @@ export default function createEntity(config) {
   this.game.data.ents._[entityId] = updatedEntity;
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
-
-  if (this.game.systems.rbush) {
-    this.game.systems.rbush.addEntity(updatedEntity);
-  }
 
   return updatedEntity;
 }

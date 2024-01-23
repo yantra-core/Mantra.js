@@ -47,7 +47,7 @@ export default function construct(game, plugins = []) {
     width: game.config.width,
     height: game.config.height,
     FPS: 60,
-    fieldOfView: 500, // global for game, not camera specific
+    fieldOfView: game.config.fieldOfView, // global for game, not camera specific
     camera: {
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
@@ -130,6 +130,10 @@ export default function construct(game, plugins = []) {
   game.changedEntities = new Set();
   game.removedEntities = new Set();
   game.pendingRender = new Set();
+
+  // spatial tree
+  game.deferredEntities = {};
+
   game.queuedAssets = {};
 
   game.isClient = game.config.isClient;
