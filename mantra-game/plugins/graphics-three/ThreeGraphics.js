@@ -1,6 +1,11 @@
 // ThreeGraphics.js - Marak Squires 2023
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
+import render from './lib/render.js';
+import createGraphic from './lib/createGraphic.js';
+import updateGraphic from './lib/updateGraphic.js';
+import removeGraphic from './lib/removeGraphic.js';
+
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
   static removable = false;
@@ -29,6 +34,12 @@ class ThreeGraphics extends GraphicsInterface {
   }
 
   init(game) {
+
+    this.render = render.bind(this);
+    this.createGraphic = createGraphic.bind(this);
+    this.updateGraphic = updateGraphic.bind(this);
+    this.removeGraphic = removeGraphic.bind(this);
+    
     game.graphics.push(this);
 
     this.game = game;
@@ -88,99 +99,9 @@ class ThreeGraphics extends GraphicsInterface {
 
   }
 
-  createGraphic(entityData) {
-    let geometry, material, mesh;
-
-    switch (entityData.type) {
-      case 'BORDER':
-        geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
-        break;
-      case 'BULLET':
-        geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
-        break;
-      case 'PLAYER':
-        geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
-        break;
-      default:
-        geometry = new THREE.BoxGeometry(entityData.width, entityData.width, entityData.width); // Default to a unit cube if no shape is specified
-    }
-
-    // Basic white material, replace with textures/materials as needed
-    material = new THREE.MeshBasicMaterial({ 
-      color: 0xffffff,
-      wireframe: true // Set wireframe to true
-    });
-
-    mesh = new THREE.Mesh(geometry, material);
-
-    this.scene.add(mesh); // Add the mesh to the scene
-    // Store the mesh in the 'graphics' component
-    this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
-    mesh.position.set(-entityData.position.x, 1, -entityData.position.y);
-
-
-    return mesh;
-  }
-
-  updateGraphic(entityData) {
-    const mesh = this.game.components.graphics.get([entityData.id, 'graphics-three']);
-    if (!mesh) {
-      console.error('No mesh found for entity', entityData.id);
-      return;
-    }
-
-    // Update mesh position and rotation
-    if (typeof entityData.rotation === 'object' && entityData.rotation !== null) {
-      // 3D
-      mesh.rotation.set(entityData.rotation.x, entityData.rotation.y, entityData.rotation.z);
-
-    } else {
-      // 2D / 2.5D
-      mesh.rotation.set(0, entityData.rotation, 0);
-    }
-    
-    // TODO: Add support for 3D position with entityData.position.z if available
-    mesh.position.set(-entityData.position.x, 1, -entityData.position.y);
-
-  }
-
-  removeGraphic(entityId) {
-    // Fetch the mesh from the 'graphics' component
-    const mesh = this.game.components.graphics.get([entityId, 'graphics-three']);
-    if (mesh) {
-      this.scene.remove(mesh);
-      // Remove the mesh from the 'graphics' component
-      this.game.components.graphics.remove([entityId, 'graphics-three']);
-    }
-  }
-
   // called by systemsManager on each game tick
   update() {
     this.updateCameraFollow();
-  }
-
-  // called as much as the client requires in order to render
-  render(game, alpha) {
-    let self = this;
-    // Update the controls on each frame
-    // this.controls.update();
-    // Follow the player entity with the camera
-
-    let fovEntities = new Map();
-    let currentPlayer = this.game.data.currentPlayer;
-    //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
-    let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
-
-    for (let [eId, state] of this.game.entities.entries()) {
-      //console.log('eId',eId, itemsInFov)
-      if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
-        game.removeGraphic(eId);
-        continue;
-      }
-      let ent = this.game.entities.get(eId);
-      this.inflateEntity(ent, alpha);
-    }
-    this.renderer.render(this.scene, this.camera);
   }
 
   updateCameraFollow() {
