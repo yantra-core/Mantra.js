@@ -37,7 +37,7 @@
       game.use('GamepadGUI');
       game.useFoV = true;
       game.start(function () {
-
+        game.use('DragAndDropFileUpload')
         game.createPlayer({
           position: {
             x: 0,
@@ -47,12 +47,14 @@
           width: 16
         });
         game.use('Tile', {
-          tiledServer: true,
+          loadInitialChunk: false,
+          tiledServer: false,
           tileSize: 16,
           chunkUnitSize: 8,
-          proceduralGenerateMissingChunks: true,
-        });
-
+          proceduralGenerateMissingChunks: false,
+          lazyLoadTiles: false,
+          loadDefaultTileMap: false
+        })
       });
       window.game = game;
 

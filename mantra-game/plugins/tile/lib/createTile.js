@@ -22,7 +22,7 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
   let mass = tile.mass || 1
 
   let _color;
-  if (color) {
+  if (color && this.debug) {
     _color = color;
   }
 

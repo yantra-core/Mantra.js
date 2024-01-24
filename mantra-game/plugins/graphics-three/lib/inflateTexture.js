@@ -97,6 +97,10 @@ function applyTextureToMesh(game, entityData, mesh) {
   }
 
   const textureLoader = new THREE.TextureLoader();
+  if (!texture.url) {
+    mesh.visible = true;
+    return mesh;
+  }
   textureLoader.load(texture.url, (loadedTexture) => {
     if (texture.sprite) {
       const sprite = texture.sprite;

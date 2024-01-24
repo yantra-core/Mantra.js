@@ -450,6 +450,10 @@ function applyTextureToMesh(game, entityData, mesh) {
     return mesh;
   }
   var textureLoader = new THREE.TextureLoader();
+  if (!texture.url) {
+    mesh.visible = true;
+    return mesh;
+  }
   textureLoader.load(texture.url, function (loadedTexture) {
     if (texture.sprite) {
       var sprite = texture.sprite;

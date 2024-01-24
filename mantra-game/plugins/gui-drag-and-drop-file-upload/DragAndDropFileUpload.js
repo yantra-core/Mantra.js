@@ -5,49 +5,130 @@ class DragAndDropFileUpload {
     this.game = game;
     this.id = DragAndDropFileUpload.id;
     this.dropArea = null;
+    this.defaultDataButton = null;
     this.overlay = null;
   }
 
   init(game) {
     this.game = game;
+    this.createOverlay();
+
     this.createDropArea();
+    this.createDefaultDataButton();
+
+    this.createOptionsSection();
+
     this.bindEvents();
   }
 
-  createDropArea() {
+  createOverlay() {
     // Create overlay
     this.overlay = document.createElement('div');
-    // id
     this.overlay.id = 'drag-and-drop-file-upload-overlay';
-    this.overlay.style.position = 'fixed';
-    this.overlay.style.top = '0';
-    this.overlay.style.left = '0';
-    this.overlay.style.width = '100%';
-    this.overlay.style.height = '100%';
-    //this.overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    this.overlay.style.backgroundColor = 'red';
-    this.overlay.style.display = 'flex';
-    this.overlay.style.justifyContent = 'center';
-    this.overlay.style.alignItems = 'center';
-    this.overlay.style.zIndex = '1000';
-    this.overlay.style.visibility = 'block';
+    this.setStyle(this.overlay, {
+      position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+      backgroundColor: 'red', display: 'flex', flexDirection: 'column',
+      justifyContent: 'center', alignItems: 'center', zIndex: '1000',
+      visibility: 'block', padding: '20px'
+    });
+
+    let gameHolder = document.getElementById('gameHolder');
+    gameHolder.appendChild(this.overlay);
+  }
+
+
+  createDropArea() {
+    // Create drop area container
+    const dropAreaContainer = document.createElement('div');
+    this.setStyle(dropAreaContainer, {
+      display: 'flex', justifyContent: 'center', alignItems: 'center'
+    });
 
     // Create drop area
     this.dropArea = document.createElement('div');
-    this.dropArea.style.width = '300px';
-    this.dropArea.style.height = '200px';
-    this.dropArea.style.border = '2px dashed #fff';
-    this.dropArea.style.borderRadius = '10px';
-    this.dropArea.style.display = 'flex';
-    this.dropArea.style.justifyContent = 'center';
-    this.dropArea.style.alignItems = 'center';
-    this.dropArea.innerText = 'Drop files here';
+    this.setStyle(this.dropArea, {
+      width: '300px', height: '200px', border: '2px dashed #fff', borderRadius: '10px',
+      display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '10px'
+    });
+    this.dropArea.innerText = 'Drop Tiled .tmj file here';
 
-    this.overlay.appendChild(this.dropArea);
+    dropAreaContainer.appendChild(this.dropArea);
+    this.overlay.appendChild(dropAreaContainer);
+  }
 
-    let gameHolder = document.getElementById('gameHolder');
+  createDefaultDataButton() {
+    // Create Load Default Data button
+    this.defaultDataButton = document.createElement('button');
+    this.setStyle(this.defaultDataButton, {
+      width: '300px', height: '200px', border: '2px solid #fff',
+      borderRadius: '5px', backgroundColor: '#444', color: '#fff', fontSize: '24px',
+      cursor: 'pointer'
+    });
+    this.defaultDataButton.innerText = 'Load Default Tiled Data';
+    this.defaultDataButton.onclick = () => this.loadDefaultData();
 
-    gameHolder.appendChild(this.overlay);
+    // Append to the drop area container
+    const dropAreaContainer = this.overlay.children[0]; // Assuming it's the first child
+    dropAreaContainer.appendChild(this.defaultDataButton);
+  }
+
+  setStyle(element, styles) {
+    for (let property in styles) {
+      element.style[property] = styles[property];
+    }
+  }
+
+  createOptionsSection() {
+    // Create options section container
+    this.optionsSection = document.createElement('div');
+    this.setStyle(this.optionsSection, {
+      marginTop: '20px', padding: '10px', border: '2px solid #fff', borderRadius: '5px',
+      backgroundColor: '#222', color: '#fff'
+    });
+
+    // Create tiledServer checkbox
+    this.tiledServerCheckbox = this.createCheckboxOption('tiledServer', 'Use Serverless Tiled Chunks');
+
+    // Create proceduralGenerateMissingChunks checkbox
+    this.proceduralGenerateCheckbox = this.createCheckboxOption('proceduralGenerateMissingChunks', 'Procedural Generate Missing Chunks');
+
+    this.optionsSection.appendChild(this.tiledServerCheckbox.container);
+    this.optionsSection.appendChild(this.proceduralGenerateCheckbox.container);
+
+
+    this.overlay.appendChild(this.optionsSection);
+  }
+
+  createCheckboxOption(id, label) {
+    let container = document.createElement('div');
+    let checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = id;
+    checkbox.name = id;
+    checkbox.value = id;
+    // set size to bigger
+    checkbox.style.width = '24px';
+    checkbox.style.height = '24px';
+
+    // set to checked by default
+    checkbox.checked = true;
+
+    let labelElement = document.createElement('label');
+    labelElement.htmlFor = id;
+    labelElement.innerText = label;
+    labelElement.style.marginLeft = '8px';
+
+    container.appendChild(checkbox);
+    container.appendChild(labelElement);
+
+    return { container, checkbox };
+  }
+
+  getCheckboxValues() {
+    return {
+      tiledServer: this.tiledServerCheckbox.checkbox.checked,
+      proceduralGenerateMissingChunks: this.proceduralGenerateCheckbox.checkbox.checked
+    };
   }
 
   bindEvents() {
@@ -55,7 +136,6 @@ class DragAndDropFileUpload {
       this.overlay.addEventListener(eventName, (e) => this.preventDefaults(e), false);
     });
 
-    // Highlight drop area when item is dragged over it
     ['dragenter', 'dragover'].forEach(eventName => {
       this.dropArea.addEventListener(eventName, () => this.highlight(), false);
     });
@@ -64,7 +144,6 @@ class DragAndDropFileUpload {
       this.dropArea.addEventListener(eventName, () => this.unhighlight(), false);
     });
 
-    // Handle dropped files
     this.dropArea.addEventListener('drop', (e) => this.handleDrop(e), false);
   }
 
@@ -75,24 +154,26 @@ class DragAndDropFileUpload {
 
   highlight() {
     this.dropArea.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
-    this.overlay.style.visibility = 'visible';
   }
 
   unhighlight() {
     this.dropArea.style.backgroundColor = '';
-    this.overlay.style.visibility = 'hidden';
   }
 
   handleDrop(e) {
     let dt = e.dataTransfer;
     let files = dt.files;
-
     this.handleFiles(files);
   }
 
   handleFiles(files) {
     let game = this.game;
-    // Process the files
+
+    let tilePluginOptions = this.getCheckboxValues();
+    if (game.systems.tile) {
+      game.systems.tile.setOptions(tilePluginOptions);
+    }
+
     [...files].forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -101,22 +182,36 @@ class DragAndDropFileUpload {
         try {
           jsonData = JSON.parse(text);
           console.log('Parsed JSON:', jsonData);
-          // Here you can call your tile creation plugin and pass the jsonData
+          if (jsonData) {
+            game.emit('file::upload', jsonData);
+          }
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }
-        if (jsonData) {
-          game.emit('file::upload', jsonData)
-        }
-
+        // hide overlay
+        this.overlay.style.visibility = 'hidden';
       };
       reader.onerror = (error) => {
         console.error('Error reading file:', error);
+
       };
-      reader.readAsText(file); // Read the file as text
+      reader.readAsText(file);
     });
   }
-  
+
+  loadDefaultData() {
+    // Custom function to load default map data
+    // Placeholder for now, can be filled out later
+    console.log('Loading default map data...');
+    if (this.game.systems.tile) {
+
+      let tilePluginOptions = this.getCheckboxValues();
+      this.game.systems.tile.setOptions(tilePluginOptions);
+
+      this.game.systems.tile.createTileMapFromTiledJSON(this.game.systems.tile.tileMap); // for now
+      this.overlay.style.visibility = 'hidden';
+    }
+  }
 
   update() {
     // Update logic if necessary

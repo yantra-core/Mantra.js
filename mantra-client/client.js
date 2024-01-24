@@ -219,7 +219,7 @@ if (mode === 'online') {
   //  game.use(home);
 
     /*    */
-    // game.use(new plugins.DragAndDropFileUpload)
+    game.use(new plugins.DragAndDropFileUpload)
     game.createPlayer({
       position: {
         x: 0,
@@ -229,11 +229,13 @@ if (mode === 'online') {
       width: 16
     });
     game.use(new plugins.Tile({
-      loadInitialChunk: true,
+      loadInitialChunk: false,
       tiledServer: true,
       tileSize: 16,
       chunkUnitSize: 8,
       proceduralGenerateMissingChunks: true,
+      lazyLoadTiles: false,
+      loadDefaultTileMap: false
     }))
      /*
     game.use(new plugins.Bullet())

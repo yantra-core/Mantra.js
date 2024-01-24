@@ -25,6 +25,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 // TODO: mantra-tiled-server needs to be a package.json
 var tileKinds = [{
+  id: 0,
+  kind: 'grass',
+  weight: 10
+}, {
   id: 1,
   kind: 'bush',
   weight: 5,
@@ -34,7 +38,7 @@ var tileKinds = [{
 }, {
   id: 2,
   kind: 'grass',
-  weight: 70
+  weight: 60
 }, {
   id: 3,
   kind: 'block',
@@ -64,7 +68,9 @@ var Tile = /*#__PURE__*/function () {
       _ref$proceduralGenera = _ref.proceduralGenerateMissingChunks,
       proceduralGenerateMissingChunks = _ref$proceduralGenera === void 0 ? false : _ref$proceduralGenera,
       _ref$loadInitialChunk = _ref.loadInitialChunk,
-      loadInitialChunk = _ref$loadInitialChunk === void 0 ? true : _ref$loadInitialChunk;
+      loadInitialChunk = _ref$loadInitialChunk === void 0 ? true : _ref$loadInitialChunk,
+      _ref$loadDefaultTileM = _ref.loadDefaultTileMap,
+      loadDefaultTileMap = _ref$loadDefaultTileM === void 0 ? true : _ref$loadDefaultTileM;
     _classCallCheck(this, Tile);
     this.id = Tile.id;
 
@@ -85,6 +91,7 @@ var Tile = /*#__PURE__*/function () {
     // tiledServer is a boolean flag to indicate if we are using mantra-tiled-server
     // tile chunks will be loaded on demand based on the mantra-tiled-server specs
     this.tiledServer = tiledServer;
+    this.loadDefaultTileMap = loadDefaultTileMap;
 
     // if true, will load tiles on demand based on mantra-tiled-server specs
     this.lazyLoadTiles = false;
@@ -104,6 +111,21 @@ var Tile = /*#__PURE__*/function () {
     this.createTile = _createTile["default"].bind(this);
   }
   _createClass(Tile, [{
+    key: "setOptions",
+    value: function setOptions(TileConfig) {
+      // console.log("SET NEW OPTIONS", TileConfig)
+      this.tiledServer = TileConfig.tiledServer;
+      this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
+      //this.tileMap = TileConfig.tileMap;
+      //this.loadInitialChunk = TileConfig.loadInitialChunk;
+      //this.chunkUnitSize = TileConfig.chunkUnitSize;
+      //this.tileSize = TileConfig.tileSize;
+      //this.chunkPixelSize = TileConfig.chunkPixelSize;
+      //this.debug = TileConfig.debug;
+      //this.lazyLoadTiles = TileConfig.lazyLoadTiles;
+      //this.tileIds = TileConfig.tileIds;
+    }
+  }, {
     key: "init",
     value: function init(game) {
       var _this = this;
@@ -119,10 +141,13 @@ var Tile = /*#__PURE__*/function () {
           _this.createLayer(_this.game.data.chunks.chunk_x0_y0, _this.tileSize, _this.tileSize);
         });
       } else {
-        this.createTileMapFromTiledJSON(this.tileMap);
+
         //setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
         //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
         //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
+      }
+      if (this.loadDefaultTileMap) {
+        this.createTileMapFromTiledJSON(this.tileMap);
       }
 
       // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
@@ -160,6 +185,8 @@ var Tile = /*#__PURE__*/function () {
           });
           if (tileKind) {
             tile = tileKind;
+          } else {
+            tile = tileKinds[3];
           }
         }
         //if (tileId !== 0 && /* tileId !== 2 && */ tileId !== 4577 && tileId !== 4767) {
@@ -602,7 +629,7 @@ var defaultOrthogonalMap = {
   "height": 20,
   "infinite": false,
   "layers": [{
-    "data": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    "data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     "height": 20,
     "id": 1,
     "name": "Tile Layer 1",

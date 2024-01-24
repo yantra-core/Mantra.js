@@ -13,8 +13,9 @@ import randomTileFromDistribution from './lib/randomTileFromDistribution.js';
 import createTile from './lib/createTile.js'; 
 
 const tileKinds = [
+  { id: 0, kind: 'grass', weight: 10 },
   { id: 1, kind: 'bush', weight: 5, body: true, isStatic: true, z: 0 },
-  { id: 2, kind: 'grass', weight: 70 },
+  { id: 2, kind: 'grass', weight: 60 },
   { id: 3, kind: 'block', weight: 5, body: true, z: 0  },
   { id: 4, kind: 'path-green', weight: 10 },
   { id: 5, kind: 'path-brown', weight: 10 },
@@ -30,6 +31,7 @@ class Tile {
     tileSize = 16,
     proceduralGenerateMissingChunks = false,
     loadInitialChunk = true,
+    loadDefaultTileMap = true,
   } = {}) {
   
     this.id = Tile.id;
@@ -53,6 +55,7 @@ class Tile {
     // tiledServer is a boolean flag to indicate if we are using mantra-tiled-server
     // tile chunks will be loaded on demand based on the mantra-tiled-server specs
     this.tiledServer = tiledServer;
+    this.loadDefaultTileMap = loadDefaultTileMap;
 
     // if true, will load tiles on demand based on mantra-tiled-server specs
     this.lazyLoadTiles = false;
@@ -72,8 +75,21 @@ class Tile {
     this.generateChunkWithFractal = generateChunkWithFractal.bind(this);
     this.randomTileFromDistribution = randomTileFromDistribution.bind(this);
     this.createTile = createTile.bind(this);
-    
 
+  }
+
+  setOptions (TileConfig) {
+    // console.log("SET NEW OPTIONS", TileConfig)
+    this.tiledServer = TileConfig.tiledServer;
+    this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
+    //this.tileMap = TileConfig.tileMap;
+    //this.loadInitialChunk = TileConfig.loadInitialChunk;
+    //this.chunkUnitSize = TileConfig.chunkUnitSize;
+    //this.tileSize = TileConfig.tileSize;
+    //this.chunkPixelSize = TileConfig.chunkPixelSize;
+    //this.debug = TileConfig.debug;
+    //this.lazyLoadTiles = TileConfig.lazyLoadTiles;
+    //this.tileIds = TileConfig.tileIds;
   }
 
   init(game) {
@@ -94,10 +110,15 @@ class Tile {
       });
   
     } else {
-      this.createTileMapFromTiledJSON(this.tileMap);
+
+
       //setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
       //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
       //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
+    }
+
+    if (this.loadDefaultTileMap) {
+      this.createTileMapFromTiledJSON(this.tileMap);
     }
 
     // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
@@ -132,6 +153,8 @@ class Tile {
         let tileKind = tileKinds.find(tileKind => tileKind.id === tileId);
         if (tileKind) {
           tile = tileKind;
+        } else {
+          tile = tileKinds[3];
         }
       }
       //if (tileId !== 0 && /* tileId !== 2 && */ tileId !== 4577 && tileId !== 4767) {
