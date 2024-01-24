@@ -336,11 +336,11 @@ function demon(game) {
     //color: 0xff0000,
     width: 8,
     height: 8,
-    depth: 64,
+    depth: 8,
     position: {
       x: -60,
       y: -60,
-      z: 32
+      z: 8
     }
   });
   game.createEntity({
@@ -350,11 +350,11 @@ function demon(game) {
     //color: 0xff0000,
     width: 8,
     height: 8,
-    depth: 64,
+    depth: 8,
     position: {
       x: 64,
       y: -60,
-      z: 32
+      z: 8
     }
   });
   var rules = game.createSutra();
@@ -404,12 +404,12 @@ function fire(game) {
     //color: 0xff0000,
     width: 16,
     height: 16,
-    depth: 64,
+    depth: 16,
     isStatic: true,
     position: {
       x: -80,
       y: -60,
-      z: 32
+      z: 16
     }
   });
   game.createEntity({
@@ -423,12 +423,12 @@ function fire(game) {
     //color: 0xff0000,
     width: 16,
     height: 16,
-    depth: 64,
+    depth: 16,
     isStatic: true,
     position: {
       x: 80,
       y: -60,
-      z: 32
+      z: 16
     }
   });
   var rules = game.createSutra();

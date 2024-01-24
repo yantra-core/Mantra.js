@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra Home World</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+
+  <script type="module" src="/ycraft.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+      let game = new MANTRA.Game({
+        defaultPlayer: false,
+        fieldOfView: 128,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '.',
+          assetRoot: '.'
+        }
+      });
+
+      // game.use('Bullet');
+      game.use('Sutra');
+      game.use('RBush');
+      game.use('Gamepad');
+      game.use('GamepadGUI');
+      game.useFoV = true;
+      game.start(function () {
+
+        game.createPlayer({
+          position: {
+            x: 0,
+            y: 0
+          },
+          height: 16,
+          width: 16
+        });
+        game.use('Tile', {
+          tiledServer: true,
+          tileSize: 16,
+          chunkUnitSize: 8,
+          proceduralGenerateMissingChunks: true,
+        });
+
+      });
+      window.game = game;
+
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

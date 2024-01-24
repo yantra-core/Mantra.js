@@ -8,6 +8,9 @@ exports["default"] = void 0;
 var _DrumKit = _interopRequireDefault(require("./instruments/DrumKit.js"));
 var _startUp = _interopRequireDefault(require("./jingles/start-up.js"));
 var _keyCodes = _interopRequireDefault(require("./keyCodes.js"));
+var _harmonicShift = _interopRequireDefault(require("./util/harmonicShift.js"));
+var _playJingle = _interopRequireDefault(require("./util/playJingle.js"));
+var _playSpatialSound = _interopRequireDefault(require("./util/playSpatialSound.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17,14 +20,13 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // Tone.js - Mantra Plugin - Marak Squires 2023
 // Tone.js - https://tonejs.github.io/
-// import * as Tone from 'tone';
+// import * as Tone from 'tone'; <-- import if needed, otherwise it will be loaded from vendor
 var TonePlugin = /*#__PURE__*/function () {
-  // indicates that this plugin has async initialization and should not auto-emit a ready event on return
+  // indicates that this plugin has async initialization and should should emit ready event
 
   function TonePlugin() {
     _classCallCheck(this, TonePlugin);
     this.id = TonePlugin.id;
-    this.synth = null;
     this.playIntro = false;
     this.userEnabled = false;
     this.lastNotePlayed = null;
@@ -36,266 +38,84 @@ var TonePlugin = /*#__PURE__*/function () {
     value: function init(game) {
       var _this = this;
       this.game = game;
-
-      // register the plugin with the game
-      this.game.systemsManager.addSystem(this.id, this);
-      // check to see if Tone scope is available, if not assume we need to inject it sequentially
+      this.bindUtilityFunctions();
       if (typeof Tone === 'undefined') {
         console.log('Tone is not defined, attempting to load it from vendor');
         game.loadScripts(['/vendor/tone.min.js'], function () {
-          _this.toneReady(game);
+          return _this.toneReady();
         });
       } else {
-        this.toneReady(game);
+        this.toneReady();
       }
+    }
+  }, {
+    key: "bindUtilityFunctions",
+    value: function bindUtilityFunctions() {
+      this.harmonicShift = _harmonicShift["default"].bind(this);
+      this.playJingle = _playJingle["default"].bind(this);
+      this.playSpatialSound = _playSpatialSound["default"].bind(this);
+      this.game.systemsManager.addSystem(this.id, this);
     }
   }, {
     key: "toneReady",
     value: function toneReady() {
-      var game = this.game;
-      var self = this;
-      var that = this;
-
-      // Tone.context.latencyHint = 'interactive'; // or a number in seconds
-      Tone.Transport.lookAhead = 0.5; // in seconds
-
+      this.synth = new Tone.Synth().toDestination();
       this.drumKit = new _DrumKit["default"]();
-      this.game.playSpatialSound = this.playSpatialSound.bind(this);
-      var limiter = new Tone.Limiter(-6).toDestination();
-
-      // Create a compressor
-      /*
-      const compressor = new Tone.Compressor({
-        threshold: -3, // Threshold in dB
-        ratio: 4,       // Compression ratio
-        attack: 0.003,  // Attack time in seconds
-        release: 0.25   // Release time in seconds
-      }).toDestination();
-      */
-
-      // TODO: game.createSynth = function() {};
-      this.synth = new Tone.Synth();
-      this.synth.volume.value = -3; // Lower volume
-
-      //this.synth.connect(compressor);
-      this.synth.connect(limiter);
-      game.playDrum = function () {
-        var sound = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'kick';
-        if (!this.toneStarted) {
-          Tone.start();
-          this.toneStarted = true;
-        }
-        that.drumKit.play(sound);
-      };
-      game.playNote = function (note, duration) {
-        if (!this.toneStarted) {
-          Tone.start();
-          this.toneStarted = true;
-        } // console.log('playing ', note, duration)
-        //play a middle 'C' for the duration of an 8th note
-        self.playNote(note, duration);
-      };
-
-      // Create a synth and connect it to the main output
-      //const synth = new Tone.Synth().toDestination();
-
+      this.limiter = new Tone.Limiter(-6).toDestination();
+      this.synth.connect(this.limiter);
+      this.synth.volume.value = -3;
+      Tone.Transport.lookAhead = 0.5;
+      this.game.playSpatialSound = this.playSpatialSound;
+      this.game.playDrum = this.playDrum.bind(this);
+      this.game.playNote = this.playNote.bind(this);
       console.log('Tone is ready', _startUp["default"]);
       if (this.playIntro) {
-        this.playIntroJingle();
+        this.playJingle(_startUp["default"]);
       }
-
-      // Function to play the sound
-      function playSound(sound) {
-        if (!this.toneStarted) {
-          Tone.start();
-          this.toneStarted = true;
-        }
-        sound.notes.forEach(function (note) {
-          synth.triggerAttackRelease(note, sound.duration);
-        });
-      }
-
-      // async:true plugins *must* self report when they are ready
-      game.emit('plugin::ready::tone', this);
-    }
-  }, {
-    key: "playIntroJingle",
-    value: function playIntroJingle() {
-      var _this2 = this;
-      var that = this;
-      var synths = [];
-      var currentMidi = _startUp["default"];
-      var now = Tone.now() + 0.5;
-      currentMidi.tracks.forEach(function (track) {
-        //create a synth for each track
-        _this2.synth = new Tone.PolySynth(Tone.Synth, {
-          envelope: {
-            attack: 0.02,
-            decay: 0.1,
-            sustain: 0.3,
-            release: 1
-          }
-        }).toDestination();
-        synths.push(that.synth);
-        //schedule all of the events
-        // we have access to that.synth, can we listen for play note events?
-        track.notes.forEach(function (note) {
-          that.playNote(note.name, note.duration, note.time + now, note.velocity);
-        });
-      });
+      this.game.emit('plugin::ready::tone', this);
     }
   }, {
     key: "playNote",
     value: function playNote(note, duration) {
       var now = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var velocity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.5;
-      // Ensure velocity is within range
       velocity = Math.min(Math.max(velocity, 0), 0.5);
-
-      // console.log('playNote', note, duration, now, velocity)
-      if (typeof note === 'undefined') {
-        // if note is not defined, select a random note from the keyCodes object
-        var keys = Object.keys(this.keyCodes);
-        var randomKey = keys[Math.floor(Math.random() * keys.length)];
-
-        // check to see if this.lastNotePlayed is defined, if so perform harmonic shift
-        if (this.lastNotePlayed) {
-          // console.log("performing harmonic shift", this.lastNotePlayed)
-          randomKey = this.harmonicShift(this.lastNotePlayed, {
-            type: 'perfectFifth'
-          });
-          // exact key match was not available, default to C4 ( for now )
-          // Remark: we could make a more approximate match based on letter of key / music theory
-          if (!randomKey) {
-            randomKey = this.harmonicShift('C4', {
-              type: 'perfectFifth'
-            });
-          }
-        }
-        note = this.keyCodes[randomKey].toneCode;
-      }
+      note = note || this.selectRandomNote();
       this.lastNotePlayed = note;
-
-      // console.log('playing ', note, duration)
-      var game = this.game;
-      // Play a note for a given duration
-      // console.log('playing note', note, duration, now, velocity)
-
       try {
-        // this.synth.triggerAttack(note, now, velocity * 0.1);
         this.synth.triggerAttackRelease(note, duration, now, velocity);
       } catch (err) {
         console.log('WARNING: Tone.js synth not ready yet. Skipping note play', err);
       }
-      // game.emit('playNote', note, duration, now, velocity);
     }
-
-    // Method to play spatial sound
-    // TODO: needs to use pool of synths, this creates too many synths
   }, {
-    key: "playSpatialSound",
-    value: function playSpatialSound(particle, blackHole) {
+    key: "playDrum",
+    value: function playDrum() {
+      var sound = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'kick';
+      this.startTone();
+      this.drumKit.play(sound);
+    }
+  }, {
+    key: "startTone",
+    value: function startTone() {
       if (!this.toneStarted) {
         Tone.start();
         this.toneStarted = true;
       }
-
-      // Calculate panning based on particle's position relative to black hole
-      var gameWidth = this.game.width; // Use actual game width
-      var xPosition = (particle.position.x - blackHole.position.x) / gameWidth;
-      var panner = new Tone.Panner(xPosition).toDestination();
-
-      // Calculate velocity factor
-      var velocityMagnitude = Math.sqrt(Math.pow(particle.velocity.x, 2) + Math.pow(particle.velocity.y, 2));
-      var maxVelocity = 10; // Replace with maximum expected velocity in your game
-      var velocityFactor = velocityMagnitude / maxVelocity;
-
-      // Create FM Synth for water drop sound
-      var fmSynth = new Tone.FMSynth({
-        harmonicity: 8,
-        modulationIndex: 2,
-        oscillator: {
-          type: 'sine'
-        },
-        envelope: {
-          attack: 0.01,
-          decay: 0.2,
-          sustain: 0,
-          release: 0.1
-        },
-        modulation: {
-          type: 'square'
-        },
-        modulationEnvelope: {
-          attack: 0.01,
-          decay: 0.2,
-          sustain: 0,
-          release: 0.1
-        }
-      }).connect(panner);
-
-      // Adjust parameters based on velocity
-      var duration = 0.2 + 0.3 * (1 - velocityFactor); // Shorter duration for faster particles
-      var pitchDrop = velocityFactor * 24; // Higher drop for faster particles
-
-      // Trigger the FM Synth with a pitch drop
-      fmSynth.triggerAttack("C4", Tone.now());
-      setTimeout(function () {
-        fmSynth.setNote("C".concat(4 - pitchDrop), Tone.now());
-        fmSynth.triggerRelease(Tone.now() + duration);
-      }, 10);
-
-      // Optionally: Add a delay for a more spacious effect
-      // const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
-      // fmSynth.connect(feedbackDelay);
     }
   }, {
-    key: "harmonicShift",
-    value: function harmonicShift(traktorKeyCode) {
-      var _this3 = this;
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-        type: 'perfectFifth'
-      };
-      var wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];
-      var currentIndex = wheelOrder.indexOf(traktorKeyCode);
-      if (currentIndex === -1) {
-        // keycode wasn't found, try to find it in the toneCode property
-        var keys = Object.keys(this.keyCodes);
-        var foundKey = keys.find(function (key) {
-          return _this3.keyCodes[key].toneCode === traktorKeyCode;
+    key: "selectRandomNote",
+    value: function selectRandomNote() {
+      var keys = Object.keys(this.keyCodes);
+      var randomKey = keys[Math.floor(Math.random() * keys.length)];
+      if (this.lastNotePlayed) {
+        randomKey = this.harmonicShift(this.lastNotePlayed, {
+          type: 'perfectFifth'
+        }) || this.harmonicShift('C4', {
+          type: 'perfectFifth'
         });
-        if (foundKey) {
-          currentIndex = wheelOrder.indexOf(foundKey);
-        }
       }
-      if (currentIndex === -1) {
-        // throw new Error('Invalid Traktor Key Code');
-        console.log("WARNING: Could not find Traktor Key Code", traktorKeyCode);
-        return;
-      }
-      switch (options.type) {
-        case 'perfectFifth':
-          // 7 steps forward for major, 7 steps backward for minor
-          currentIndex += traktorKeyCode.endsWith('m') ? -7 : 7;
-          break;
-        case 'majorMinorSwap':
-          // Toggle between major and minor
-          currentIndex += traktorKeyCode.endsWith('m') ? 12 : -12;
-          break;
-        case 'shift':
-          // Shift by a specified amount
-          if (typeof options.amount !== 'number' || Math.abs(options.amount) > 3) {
-            throw new Error('Invalid shift amount');
-          }
-          currentIndex += options.amount;
-          break;
-        default:
-          throw new Error('Invalid transition type');
-      }
-
-      // Ensure the index wraps around the wheel
-      currentIndex = (currentIndex + 24) % 24;
-      return wheelOrder[currentIndex];
+      return this.keyCodes[randomKey].toneCode;
     }
   }]);
   return TonePlugin;
@@ -303,14 +123,8 @@ var TonePlugin = /*#__PURE__*/function () {
 _defineProperty(TonePlugin, "id", 'tone');
 _defineProperty(TonePlugin, "async", true);
 var _default = exports["default"] = TonePlugin;
-/*
-// Example usage
-console.log(harmonicShift('5m', { type: 'perfectFifth' })); // Expected output: 10m
-console.log(harmonicShift('5m', { type: 'majorMinorSwap' })); // Expected output: 5d
-console.log(harmonicShift('5m', { type: 'shift', amount: -2 })); // Expected output: 3m
-*/
 
-},{"./instruments/DrumKit.js":2,"./jingles/start-up.js":3,"./keyCodes.js":4}],2:[function(require,module,exports){
+},{"./instruments/DrumKit.js":2,"./jingles/start-up.js":3,"./keyCodes.js":4,"./util/harmonicShift.js":5,"./util/playJingle.js":6,"./util/playSpatialSound.js":7}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1195,6 +1009,164 @@ var keyCodes = {
   }
 };
 var _default = exports["default"] = keyCodes;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = harmonicShift;
+function harmonicShift(traktorKeyCode) {
+  var _this = this;
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    type: 'perfectFifth'
+  };
+  var wheelOrder = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m', '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d'];
+  var currentIndex = wheelOrder.indexOf(traktorKeyCode);
+  if (currentIndex === -1) {
+    // keycode wasn't found, try to find it in the toneCode property
+    var keys = Object.keys(this.keyCodes);
+    var foundKey = keys.find(function (key) {
+      return _this.keyCodes[key].toneCode === traktorKeyCode;
+    });
+    if (foundKey) {
+      currentIndex = wheelOrder.indexOf(foundKey);
+    }
+  }
+  if (currentIndex === -1) {
+    // throw new Error('Invalid Traktor Key Code');
+    console.log("WARNING: Could not find Traktor Key Code", traktorKeyCode);
+    return;
+  }
+  switch (options.type) {
+    case 'perfectFifth':
+      // 7 steps forward for major, 7 steps backward for minor
+      currentIndex += traktorKeyCode.endsWith('m') ? -7 : 7;
+      break;
+    case 'majorMinorSwap':
+      // Toggle between major and minor
+      currentIndex += traktorKeyCode.endsWith('m') ? 12 : -12;
+      break;
+    case 'shift':
+      // Shift by a specified amount
+      if (typeof options.amount !== 'number' || Math.abs(options.amount) > 3) {
+        throw new Error('Invalid shift amount');
+      }
+      currentIndex += options.amount;
+      break;
+    default:
+      throw new Error('Invalid transition type');
+  }
+
+  // Ensure the index wraps around the wheel
+  currentIndex = (currentIndex + 24) % 24;
+  return wheelOrder[currentIndex];
+}
+
+/*
+// Example usage
+console.log(harmonicShift('5m', { type: 'perfectFifth' })); // Expected output: 10m
+console.log(harmonicShift('5m', { type: 'majorMinorSwap' })); // Expected output: 5d
+console.log(harmonicShift('5m', { type: 'shift', amount: -2 })); // Expected output: 3m
+*/
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = playIntroJingle;
+function playIntroJingle(currentMidi) {
+  var _this = this;
+  var that = this;
+  var synths = [];
+  //let currentMidi = startUpJingle;
+  var now = Tone.now() + 0.5;
+  currentMidi.tracks.forEach(function (track) {
+    //create a synth for each track
+    _this.synth = new Tone.PolySynth(Tone.Synth, {
+      envelope: {
+        attack: 0.02,
+        decay: 0.1,
+        sustain: 0.3,
+        release: 1
+      }
+    }).toDestination();
+    synths.push(that.synth);
+    //schedule all of the events
+    // we have access to that.synth, can we listen for play note events?
+    track.notes.forEach(function (note) {
+      that.playNote(note.name, note.duration, note.time + now, note.velocity);
+    });
+  });
+}
+
+},{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = playSpatialSound;
+// Method to play spatial sound
+// TODO: needs to use pool of synths, this creates too many synths
+function playSpatialSound(particle, blackHole) {
+  if (!this.toneStarted) {
+    Tone.start();
+    this.toneStarted = true;
+  }
+
+  // Calculate panning based on particle's position relative to black hole
+  var gameWidth = this.game.width; // Use actual game width
+  var xPosition = (particle.position.x - blackHole.position.x) / gameWidth;
+  var panner = new Tone.Panner(xPosition).toDestination();
+
+  // Calculate velocity factor
+  var velocityMagnitude = Math.sqrt(Math.pow(particle.velocity.x, 2) + Math.pow(particle.velocity.y, 2));
+  var maxVelocity = 10; // Replace with maximum expected velocity in your game
+  var velocityFactor = velocityMagnitude / maxVelocity;
+
+  // Create FM Synth for water drop sound
+  var fmSynth = new Tone.FMSynth({
+    harmonicity: 8,
+    modulationIndex: 2,
+    oscillator: {
+      type: 'sine'
+    },
+    envelope: {
+      attack: 0.01,
+      decay: 0.2,
+      sustain: 0,
+      release: 0.1
+    },
+    modulation: {
+      type: 'square'
+    },
+    modulationEnvelope: {
+      attack: 0.01,
+      decay: 0.2,
+      sustain: 0,
+      release: 0.1
+    }
+  }).connect(panner);
+
+  // Adjust parameters based on velocity
+  var duration = 0.2 + 0.3 * (1 - velocityFactor); // Shorter duration for faster particles
+  var pitchDrop = velocityFactor * 24; // Higher drop for faster particles
+
+  // Trigger the FM Synth with a pitch drop
+  fmSynth.triggerAttack("C4", Tone.now());
+  setTimeout(function () {
+    fmSynth.setNote("C".concat(4 - pitchDrop), Tone.now());
+    fmSynth.triggerRelease(Tone.now() + duration);
+  }, 10);
+
+  // Optionally: Add a delay for a more spacious effect
+  // const feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toDestination();
+  // fmSynth.connect(feedbackDelay);
+}
 
 },{}]},{},[1])(1)
 });

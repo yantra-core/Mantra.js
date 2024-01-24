@@ -19,9 +19,10 @@
         isClient: true, // TODO: remove this
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
-        protobuf: true,
+        protobuf: false,
         deltaCompression: true,
-        graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        showLoadingScreen: false, // for now
+        graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
           scriptRoot: './'
@@ -33,7 +34,8 @@
       // Use Plugins to add systems to the game
       // game.use(new Plugins.Bullet())
       game.use('Schema')
-      game.use('StarField');
+      game.use('RBush')
+      // game.use('StarField');
       //game.use(new Plugins.ControlsGUI());
       game.use('Block');
       game.use('Editor', {
@@ -46,7 +48,7 @@
       game.use('SnapshotSize');
 
       game.connect(); 
-     
+      window.game = game;
     });
   </script>
 

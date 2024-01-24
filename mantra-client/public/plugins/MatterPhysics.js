@@ -334,6 +334,9 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     value: function init(game) {
       var _this2 = this;
       this.engine = _matterJs["default"].Engine.create();
+      // game.systemsManager.addSystem('physics', this);
+
+      // TODO: register system
       if (typeof game.config.gravity === 'undefined') {
         game.config.gravity = {
           x: 0,
@@ -444,6 +447,21 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                   // this.game.components.radius.set(body.myEntityId, body.bounds.max.x / 2);
                 }
 
+                if (body) {
+                  if (_this2.game.systems.rbush) {
+                    var _ent = _this2.game.entities.get(body.myEntityId);
+                    var _position = {
+                      x: body.position.x,
+                      y: body.position.y
+                    };
+                    _this2.game.systems.rbush.updateEntity({
+                      id: body.myEntityId,
+                      position: _position,
+                      width: _ent.width,
+                      height: _ent.height
+                    });
+                  }
+                }
                 if (ent.type === 'BULLET') {
                   _this2.game.changedEntities.add(body.myEntityId);
                   _this2.game.components.velocity.set(body.myEntityId, {
@@ -460,7 +478,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                 // this is the logic for updating *all* entities positions
                 // this should probably be in entity-movement plugin
 
-                var _ent = _this2.game.getEntity(body.myEntityId);
+                var _ent2 = _this2.game.getEntity(body.myEntityId);
                 //console.log('server ent', ent)
                 _this2.game.changedEntities.add(body.myEntityId);
                 _this2.game.components.velocity.set(body.myEntityId, {
@@ -525,8 +543,8 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     // Equivalent to Engine.update()
   }, {
     key: "updateEngine",
-    value: function updateEngine(engine, delta) {
-      _matterJs["default"].Engine.update(engine, delta);
+    value: function updateEngine(delta) {
+      _matterJs["default"].Engine.update(this.engine, delta);
     }
 
     // Equivalent to Bodies.rectangle()
@@ -618,11 +636,15 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     value: function setVelocity(body, velocity) {
       _matterJs["default"].Body.setVelocity(body, velocity);
     }
+
+    // Remark: These namespaces collisionStart, collisionActive, etc, are considerd from ECS perspective
+    // If we register this plugin as a system these methods will be called on the system update, which is not what we want
+    // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
   }, {
     key: "collisionStart",
     value: function collisionStart(game, callback) {
       var _this3 = this;
-      _matterJs["default"].Events.on(game.engine, 'collisionStart', function (event) {
+      _matterJs["default"].Events.on(this.engine, 'collisionStart', function (event) {
         var _iterator2 = _createForOfIteratorHelper(event.pairs),
           _step2;
         try {
@@ -655,7 +677,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
   }, {
     key: "collisionActive",
     value: function collisionActive(game, callback) {
-      _matterJs["default"].Events.on(game.engine, 'collisionActive', function (event) {
+      _matterJs["default"].Events.on(this.engine, 'collisionActive', function (event) {
         var _iterator3 = _createForOfIteratorHelper(event.pairs),
           _step3;
         try {
@@ -683,7 +705,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
   }, {
     key: "collisionEnd",
     value: function collisionEnd(game, callback) {
-      _matterJs["default"].Events.on(game.engine, 'collisionEnd', function (event) {
+      _matterJs["default"].Events.on(this.engine, 'collisionEnd', function (event) {
         var _iterator4 = _createForOfIteratorHelper(event.pairs),
           _step4;
         try {
@@ -713,17 +735,17 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
   }, {
     key: "removeCollisionStart",
     value: function removeCollisionStart(game, callback) {
-      _matterJs["default"].Events.off(game.engine, 'collisionStart', callback);
+      _matterJs["default"].Events.off(this.engine, 'collisionStart', callback);
     }
   }, {
     key: "removeCollisionActive",
     value: function removeCollisionActive(game, callback) {
-      _matterJs["default"].Events.off(game.engine, 'collisionActive', callback);
+      _matterJs["default"].Events.off(this.engine, 'collisionActive', callback);
     }
   }, {
     key: "removeCollisionEnd",
     value: function removeCollisionEnd(game, callback) {
-      _matterJs["default"].Events.off(game.engine, 'collisionEnd', callback);
+      _matterJs["default"].Events.off(this.engine, 'collisionEnd', callback);
     }
   }, {
     key: "lockedProperties",

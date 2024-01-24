@@ -9072,15 +9072,6 @@ var messageSchema = {
         "PONG": 3
       }
     },
-    "EntityTypes": {
-      "values": {
-        "PLAYER": 0,
-        "BULLET": 1,
-        "BLOCK": 2,
-        "BORDER": 3,
-        "BODY": 4
-      }
-    },
     "Position": {
       "fields": {
         "x": {
@@ -9116,7 +9107,7 @@ var messageSchema = {
           "id": 2
         },
         "type": {
-          "type": "EntityTypes",
+          "type": "string",
           "id": 3
         },
         "position": {
@@ -9178,6 +9169,10 @@ var messageSchema = {
         "maxSpeed": {
           "type": "int32",
           "id": 18
+        },
+        "texture": {
+          "type": "Texture",
+          "id": 19
         }
       }
     },
@@ -9199,6 +9194,43 @@ var messageSchema = {
         "lastProcessedInput": {
           "type": "uint32",
           "id": 4
+        }
+      }
+    },
+    "Texture": {
+      "fields": {
+        "key": {
+          "type": "string",
+          "id": 1
+        },
+        "url": {
+          "type": "string",
+          "id": 2
+        },
+        "frames": {
+          "rule": "repeated",
+          "type": "Frame",
+          "id": 3
+        },
+        "sprite": {
+          "type": "string",
+          "id": 4
+        },
+        "rate": {
+          "type": "int32",
+          "id": 5
+        }
+      }
+    },
+    "Frame": {
+      "fields": {
+        "x": {
+          "type": "int32",
+          "id": 1
+        },
+        "y": {
+          "type": "int32",
+          "id": 2
         }
       }
     }
@@ -9235,6 +9267,7 @@ var Schema = exports["default"] = /*#__PURE__*/function () {
       game.schemaReady = true;
       var root = _protobufjs["default"].Root.fromJSON(_Message["default"]);
       game.Message = root.lookupType("Message");
+      console.log(game.Message);
     }
   }]);
   return Schema;

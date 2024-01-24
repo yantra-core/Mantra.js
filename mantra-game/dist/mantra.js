@@ -265,321 +265,85 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Game = void 0;
 var _Component = _interopRequireDefault(require("./Component/Component.js"));
-var _SystemsManager = _interopRequireDefault(require("./System/SystemsManager.js"));
-var _eventEmitter = _interopRequireDefault(require("./lib/eventEmitter.js"));
-var _storage = _interopRequireDefault(require("./lib/storage/storage.js"));
-var _localGameLoop = _interopRequireDefault(require("./lib/localGameLoop.js"));
-var _onlineGameLoop = _interopRequireDefault(require("./lib/onlineGameLoop.js"));
-var _gameTick = _interopRequireDefault(require("./lib/gameTick.js"));
-var _defaultGameStart = _interopRequireDefault(require("./lib/start/defaultGameStart.js"));
-var _createDefaultPlayer = _interopRequireDefault(require("./lib/createDefaultPlayer.js"));
-var _switchWorlds = _interopRequireDefault(require("./lib/switchWorlds.js"));
-var _ActionRateLimiter = _interopRequireDefault(require("./Component/ActionRateLimiter.js"));
-var _TimersComponent = _interopRequireDefault(require("./Component/TimersComponent.js"));
-var _loadPluginsFromConfig = _interopRequireDefault(require("./lib/loadPluginsFromConfig.js"));
-var _loadScripts = _interopRequireDefault(require("./lib/util/loadScripts.js"));
-var _loadCSS = _interopRequireDefault(require("./lib/util/loadCSS.js"));
-var _defaultPlayerMovement = _interopRequireDefault(require("./lib/defaultPlayerMovement.js"));
+var _construct = _interopRequireDefault(require("./lib/Game/construct.js"));
+var _use = _interopRequireDefault(require("./lib/Game/use.js"));
+var _start = _interopRequireDefault(require("./lib/Game/start.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // MANTRA - Yantra Works 2023
 // Game.js - Marak Squires 2023
-// Entity Component System
-// Game instances are event emitters
-// Game local data storage
-// Game loops, TODO: make game loops plugins / configurable
-// Local game loop is for single machine games ( no networking )
-// Online game loop is for multiplayer games ( networking )
-// Game tick, called once per tick from game loop
-// Provides a default Game.start(fn) logic ( creates a single player and border )
-// Bind to event `player::joined` to override default player creation logic
-// Action Rate Limiter, suitable for any Systems action that should be rate limited
-// Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
-// Utility function for loading external assets
-// default player movement, this could be also be set in defaultGameStart.js
 // The Game class is the main entry point for Mantra games
 var Game = exports.Game = /*#__PURE__*/function () {
   function Game() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      _ref$isClient = _ref.isClient,
-      isClient = _ref$isClient === void 0 ? true : _ref$isClient,
-      _ref$isEdgeClient = _ref.isEdgeClient,
-      isEdgeClient = _ref$isEdgeClient === void 0 ? false : _ref$isEdgeClient,
-      _ref$isServer = _ref.isServer,
-      isServer = _ref$isServer === void 0 ? false : _ref$isServer,
-      isOfflineMode = _ref.isOfflineMode,
-      _ref$plugins = _ref.plugins,
-      plugins = _ref$plugins === void 0 ? {} : _ref$plugins,
-      _ref$showLoadingScree = _ref.showLoadingScreen,
-      showLoadingScreen = _ref$showLoadingScree === void 0 ? true : _ref$showLoadingScree,
-      _ref$minLoadTime = _ref.minLoadTime,
-      minLoadTime = _ref$minLoadTime === void 0 ? 330 : _ref$minLoadTime,
-      _ref$loadDefaultPlugi = _ref.loadDefaultPlugins,
-      loadDefaultPlugins = _ref$loadDefaultPlugi === void 0 ? true : _ref$loadDefaultPlugi,
-      _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 800 : _ref$width,
-      _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 600 : _ref$height,
-      _ref$physics = _ref.physics,
-      physics = _ref$physics === void 0 ? 'matter' : _ref$physics,
-      _ref$graphics = _ref.graphics,
-      graphics = _ref$graphics === void 0 ? ['css'] : _ref$graphics,
-      _ref$collisions = _ref.collisions,
-      collisions = _ref$collisions === void 0 ? true : _ref$collisions,
-      _ref$camera = _ref.camera,
-      camera = _ref$camera === void 0 ? {} : _ref$camera,
-      _ref$gravity = _ref.gravity,
-      gravity = _ref$gravity === void 0 ? {} : _ref$gravity,
-      _ref$keyboard = _ref.keyboard,
-      keyboard = _ref$keyboard === void 0 ? true : _ref$keyboard,
-      _ref$mouse = _ref.mouse,
-      mouse = _ref$mouse === void 0 ? true : _ref$mouse,
-      _ref$gamepad = _ref.gamepad,
-      gamepad = _ref$gamepad === void 0 ? true : _ref$gamepad,
-      _ref$editor = _ref.editor,
-      editor = _ref$editor === void 0 ? true : _ref$editor,
-      _ref$sutra = _ref.sutra,
-      sutra = _ref$sutra === void 0 ? true : _ref$sutra,
-      _ref$lifetime = _ref.lifetime,
-      lifetime = _ref$lifetime === void 0 ? true : _ref$lifetime,
-      _ref$defaultMovement = _ref.defaultMovement,
-      defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement,
-      _ref$protobuf = _ref.protobuf,
-      protobuf = _ref$protobuf === void 0 ? false : _ref$protobuf,
-      _ref$msgpack = _ref.msgpack,
-      msgpack = _ref$msgpack === void 0 ? false : _ref$msgpack,
-      _ref$deltaCompression = _ref.deltaCompression,
-      deltaCompression = _ref$deltaCompression === void 0 ? false : _ref$deltaCompression,
-      _ref$deltaEncoding = _ref.deltaEncoding,
-      deltaEncoding = _ref$deltaEncoding === void 0 ? true : _ref$deltaEncoding,
-      _ref$defaultPlayer = _ref.defaultPlayer,
-      defaultPlayer = _ref$defaultPlayer === void 0 ? true : _ref$defaultPlayer,
-      _ref$options = _ref.options,
-      options = _ref$options === void 0 ? {} : _ref$options;
+    var customConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, Game);
-    if (isServer) {
-      // override default
-      showLoadingScreen = false;
-      isClient = false;
-    }
-    // config scope for convenience
-    var config = {
-      isClient: isClient,
-      isEdgeClient: isEdgeClient,
-      isServer: isServer,
-      showLoadingScreen: showLoadingScreen,
-      minLoadTime: minLoadTime,
-      loadDefaultPlugins: loadDefaultPlugins,
-      width: width,
-      height: height,
-      gravity: gravity,
-      physics: physics,
-      graphics: graphics,
-      collisions: collisions,
-      camera: camera,
-      keyboard: keyboard,
-      mouse: mouse,
-      gamepad: gamepad,
-      editor: editor,
-      lifetime: lifetime,
-      defaultMovement: defaultMovement,
-      isOfflineMode: isOfflineMode,
-      protobuf: protobuf,
-      msgpack: msgpack,
-      deltaCompression: deltaCompression,
-      deltaEncoding: deltaEncoding,
-      defaultPlayer: defaultPlayer,
-      options: options,
+    // Default configuration
+    var defaultConfig = {
+      // game modes
+      isClient: true,
+      isEdgeClient: false,
+      isServer: false,
+      isOfflineMode: undefined,
+      plugins: {},
+      // Plugin Classes that will be bound to the game instance
+      // game options
+      showLoadingScreen: true,
+      minLoadTime: 330,
+      // minimum time to show loading screen
+      loadDefaultPlugins: true,
+      // auto-loads default plugins based on pluginsConfig
+      width: 800,
+      height: 600,
+      fieldOfView: 1600,
+      // game systems / auto-load based on pluginsConfig
+      physics: 'matter',
+      graphics: ['css'],
+      collisions: true,
+      camera: {},
+      gravity: {},
+      keyboard: true,
+      mouse: true,
+      gamepad: true,
+      editor: true,
+      sutra: true,
+      lifetime: true,
+      defaultMovement: true,
+      // data compression
+      protobuf: false,
+      msgpack: false,
+      deltaCompression: false,
+      deltaEncoding: true,
+      defaultPlayer: true,
+      options: {},
       multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
 
+    // Merge custom configuration with defaults
+    var config = _objectSpread(_objectSpread({}, defaultConfig), customConfig);
+
+    // Override for server-specific defaults
+    if (config.isServer) {
+      config.showLoadingScreen = false;
+      config.isClient = false;
+    }
+
+    // Assigning the final configuration to this.config
     this.config = config;
 
-    // fetch the gameConfig from localStorage
-    var localData = _storage["default"].getAllKeysWithData();
+    // Plugin handling
+    this.use = (0, _use["default"])(this, config.plugins);
+    this.start = _start["default"].bind(this);
 
-    // Remark: We could merge this data back into the config / game.data
-
-    // set the last local start time
-    _storage["default"].set('lastLocalStartTime', Date.now());
-
-    // Keeps a clean copy of current game state
-    // Game.data scope can be used for applying configuration settings while game is running
-    // Game.config scope is expected to be "immutablish" and should not be modified while game is running
-    this.data = {
-      width: config.width,
-      height: config.height,
-      FPS: 60,
-      camera: {
-        follow: config.camera.follow,
-        currentZoom: config.camera.startingZoom
-      }
-    };
-    if (typeof this.data.camera.follow === 'undefined') {
-      this.data.camera.follow = true;
-    }
-    if (typeof this.data.camera.currentZoom === 'undefined') {
-      this.data.camera.currentZoom = 1;
-    }
-    console.log("Mantra starting...");
-
-    // Define the scriptRoot variable for loading external scripts
-    // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
-    this.scriptRoot = 'https://yantra.gg/mantra';
-    this.assetRoot = 'https://yantra.gg/mantra';
-
-    // Could be another CDN or other remote location
-    // For local development, try this.scriptRoot = './';
-    if (options.scriptRoot) {
-      console.log("Mantra is using the follow path as it's root:", options.scriptRoot);
-      this.scriptRoot = options.scriptRoot;
-    }
-    if (options.assetRoot) {
-      console.log("Mantra is using the follow path as it's asset root:", options.assetRoot);
-      this.assetRoot = options.assetRoot;
-    }
-    console.log("new Game(".concat(JSON.stringify(config, true, 2), ")"));
-
-    // Bind eventEmitter methods to maintain correct scope
-    this.on = _eventEmitter["default"].on.bind(_eventEmitter["default"]);
-    this.off = _eventEmitter["default"].off.bind(_eventEmitter["default"]);
-    this.once = _eventEmitter["default"].once.bind(_eventEmitter["default"]);
-    this.emit = _eventEmitter["default"].emit.bind(_eventEmitter["default"]);
-    this.onAny = _eventEmitter["default"].onAny.bind(_eventEmitter["default"]);
-    this.offAny = _eventEmitter["default"].offAny.bind(_eventEmitter["default"]);
-    this.listenerCount = _eventEmitter["default"].listenerCount.bind(_eventEmitter["default"]);
-    this.listeners = _eventEmitter["default"].listeners;
-    this.emitters = _eventEmitter["default"].emitters;
-
-    // Bind loadScripts from util
-    this.loadScripts = _loadScripts["default"].bind(this);
-    // Bind loadCSS from util
-    this.loadCSS = _loadCSS["default"].bind(this);
-    this.switchWorlds = _switchWorlds["default"].bind(this);
-
-    // TODO: common helper mappings for all create / update / remove entities
-    this.createPlayer = this.createPlayer.bind(this);
-    this.bodyMap = {};
-    this.systems = {};
-    this.storage = _storage["default"];
-    this.snapshotQueue = [];
-    this.tick = 0;
-
-    // Keeps track of array of worlds ( Plugins with type="world" )
-    // Each world is a Plugin and will run in left-to-right order
-    // The current default behavior is single world, so worlds[0] is always the current world
-    // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
-    // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
-    // TODO: move to worldManager
-    this.worlds = [];
-
-    // Game settings
-    this.width = width;
-    this.height = height;
-
-    // Remark: Currently, only (1) physics engine is supported at a time
-    // If we want to run multiple physics engines, we'll want to make this array
-    // this.physics = [];
-
-    this.changedEntities = new Set();
-    this.removedEntities = new Set();
-    this.pendingRender = new Set();
-    this.isClient = isClient;
-    this.isEdgeClient = isEdgeClient;
-    this.isServer = isServer;
-    this.localGameLoopRunning = false;
-    this.onlineGameLoopRunning = false;
-    this.currentPlayerId = null;
-
-    // ComponentManager.js? If so, what does it do and is it needed for our ECS?
-    // Remark: I don't think we need to explicitly define components, we can just add them as needed
-    this.components = {
-      type: new _Component["default"]('type', this),
-      // string type, name of Entity
-      destroyed: new _Component["default"]('destroyed', this),
-      // boolean, if true, entity is pending destroy and will be removed from game
-      position: new _Component["default"]('position', this),
-      // object, { x: 0, y: 0, z: 0 }
-      velocity: new _Component["default"]('velocity', this),
-      rotation: new _Component["default"]('rotation', this),
-      mass: new _Component["default"]('mass', this),
-      density: new _Component["default"]('density', this),
-      width: new _Component["default"]('width', this),
-      height: new _Component["default"]('height', this),
-      depth: new _Component["default"]('depth', this),
-      radius: new _Component["default"]('radius', this),
-      isSensor: new _Component["default"]('isSensor', this),
-      owner: new _Component["default"]('owner', this),
-      inputs: new _Component["default"]('inputs', this),
-      items: new _Component["default"]('items', this),
-      sutra: new _Component["default"]('sutra', this)
-    };
-
-    // define additional components for the game
-    this.components.color = new _Component["default"]('color', this);
-    this.components.health = new _Component["default"]('health', this);
-    this.components.target = new _Component["default"]('target', this);
-    this.components.lifetime = new _Component["default"]('lifetime', this);
-    this.components.creationTime = new _Component["default"]('creationTime', this);
-    this.components.BulletComponent = new _Component["default"]('BulletComponent', this);
-    this.components.graphics = new _Component["default"]('graphics', this);
-    this.components.lockedProperties = new _Component["default"]('lockedProperties', this);
-    this.components.actionRateLimiter = new _ActionRateLimiter["default"]('actionRateLimiter', this);
-
-    // TODO: add body component and remove game.bodyMap[] API
-
-    this.components.timers = new _TimersComponent["default"]('timers', this);
-    this.components.yCraft = new _Component["default"]('yCraft', this);
-    this.components.text = new _Component["default"]('text', this);
-    this.components.style = new _Component["default"]('style', this);
-    this.components.collisionActive = new _Component["default"]('collisionActive', this);
-    this.components.collisionStart = new _Component["default"]('collisionStart', this);
-    this.components.collisionEnd = new _Component["default"]('collisionEnd', this);
-
-    // Systems Manager
-    this.systemsManager = new _SystemsManager["default"](this);
-
-    // Graphics rendering pipeline
-    this.graphics = [];
-    this.gameTick = _gameTick["default"].bind(this);
-    this.localGameLoop = _localGameLoop["default"].bind(this);
-    this.onlineGameLoop = _onlineGameLoop["default"].bind(this);
-    this.loadPluginsFromConfig = _loadPluginsFromConfig["default"].bind(this);
-    this.createDefaultPlayer = _createDefaultPlayer["default"].bind(this);
-
-    // keeps track of game.use('PluginStringName') async loading
-    // game.start() will wait for all plugins to be loaded before starting
-    // this means any plugins which are game.use('PluginStringName') will "block" the game from starting
-    this.loadingPluginsCount = 0;
-    // this.plugins represents the initial plugins the Game wil have access to
-    // subsequent plugins will be loaded dynamically with game.use()
-    this.plugins = plugins;
-
-    // this._plugins represents all plugin instances that have been loaded
-    this._plugins = {};
-    this.loadedPlugins = [];
-    // load default plugins
-    if (loadDefaultPlugins) {
-      this.loadPluginsFromConfig({
-        physics: physics,
-        graphics: graphics,
-        collisions: collisions,
-        keyboard: keyboard,
-        mouse: mouse,
-        gamepad: gamepad,
-        editor: editor,
-        sutra: sutra,
-        lifetime: lifetime,
-        defaultMovement: defaultMovement
-      });
-    }
+    // Additional construction logic
+    (0, _construct["default"])(this, config.plugins);
   }
-
-  // TODO: hoist to systemsManager
   _createClass(Game, [{
     key: "update",
     value: function update(deltaTime) {
@@ -590,207 +354,63 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "render",
     value: function render() {
       // Call render method of SystemsManager, which will delegate to all Graphics systems
-      // TODO: should we remove this and hoist it to the systemsManager?
       this.systemsManager.render();
     }
-  }, {
-    key: "start",
-    value: function start(cb) {
-      var game = this;
-      if (typeof cb !== 'function') {
-        console.log('No game.start() was callback provided. Using default callback.');
-        console.log("You can provide a callback to game.start() to create your game's entities and systems.");
-        // Default local game start function if none provided
-        cb = function cb() {
-          (0, _defaultGameStart["default"])(game);
-        };
-      }
-      // Wait for all systems to be ready before starting the game loop
-      if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
-        // console.log('waiting for plugins to load...', game.physicsReady)
-        setTimeout(function () {
-          game.start(cb);
-        }, 4);
-        return;
-      } else {
-        // Remark: If multiple graphics plugins are used, default behavior is to,
-        //         horizontally stack the graphics plugins so they all fit on the screen
-        // TODO: move this to Graphics.js file
-        if (game.config.multiplexGraphicsHorizontally) {
-          // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
-          var totalCount = game.graphics.length;
-          var newWidth = 100 / totalCount;
-          // find each canvas in the #gameHolder and apply the new width
-          if (totalCount > 1) {
-            if (document && document.querySelectorAll) {
-              var canvasList = document.querySelectorAll('#gameHolder canvas');
-              for (var i = 0; i < canvasList.length; i++) {
-                // console.log('setting new width for', canvasList[i], 'to', newWidth + '%')
-                canvasList[i].style.width = newWidth + '%';
-              }
-            }
-          }
-        }
-        console.log('All Plugins are ready! Starting Mantra Game Client...');
-        game.emit('game::ready');
-        if (this.config.defaultPlayer) {
-          this.createPlayer({
-            type: 'PLAYER'
-          }).then(function (ent) {
-            game.setPlayerId(ent.id);
-          });
-          /*
-          game.createBorder({
-            height: 2000,
-            width: 2000
-          });
-          */
-        }
 
-        if (game.systems.client) {
-          var client = this.getSystem('client');
-          client.start(cb);
-        } else {
-          console.log('Warning: No Client System found, will not start game loop.');
-        }
-      }
-    }
-
-    // TODO: move to client, let client hoist the connection logic to game
+    //
+    // Component APIs
+    //
   }, {
-    key: "stop",
-    value: function stop() {
-      var client = this.getSystem('client');
-      client.stop();
+    key: "addComponent",
+    value: function addComponent(entityId, componentType, data) {
+      if (!this.components[componentType]) {
+        this.components[componentType] = new _Component["default"](componentType, this);
+      }
+      // Initialize an empty map for the actionRateLimiter component
+      // TODO: remove this hard-coded check for actionRateLimiter
+      if (componentType === 'actionRateLimiter') {
+        data = new Map();
+      }
+      this.components[componentType].set(entityId, data);
     }
   }, {
-    key: "connect",
-    value: function connect(url) {
-      var game = this;
-      // Wait for all systems to be ready before starting the game loop
-      if (game.loadingPluginsCount > 0) {
-        setTimeout(function () {
-          game.connect(url);
-        }, 4);
-        return;
-      } else {
-        console.log('All Plugins are ready! Starting Mantra Game Client...');
-        var client = this.getSystem('client');
-        client.connect(url);
+    key: "getComponent",
+    value: function getComponent(entityId, componentType) {
+      if (this.components.hasOwnProperty(componentType)) {
+        return this.components[componentType].get(entityId);
       }
+      return null;
+    }
+
+    //
+    // System APIs
+    //
+  }, {
+    key: "addSystem",
+    value: function addSystem(systemName, system) {
+      return this.systemsManager.addSystem(systemName, system);
     }
   }, {
-    key: "disconnect",
-    value: function disconnect() {
-      var client = this.getSystem('client');
-      client.disconnect();
+    key: "getSystem",
+    value: function getSystem(systemName) {
+      return this.systemsManager.getSystem(systemName);
     }
-
-    // All Systems are Plugins, but not all Plugins are Systems
-    // TODO: move to separate file
   }, {
-    key: "use",
-    value: function use(pluginInstanceOrId) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var cb = arguments.length > 2 ? arguments[2] : undefined;
-      var game = this;
-      if (typeof cb === 'undefined') {
-        cb = function noop() {};
-      }
-
-      // TODO: make this configurable
-      var basePath = '/plugins/'; // Base path for loading plugins
-      basePath = this.scriptRoot + basePath;
-      //console.log("FOUND SCRIPT ROOT", this.scriptRoot)
-      //console.log("LOADING FROM BASEPATH", basePath)
-      // Check if the argument is a string (plugin ID)
-      if (typeof pluginInstanceOrId === 'string') {
-        var _pluginId = pluginInstanceOrId;
-        // Check if the plugin is already loaded or loading
-        if (this._plugins[_pluginId]) {
-          // maybe add world here?
-          console.log("Plugin ".concat(_pluginId, " is already loaded or loading."));
-          return this;
-        }
-        if (this.isServer) {
-          // console.log('pluginId', pluginId, this.plugins)
-          if (this.plugins[_pluginId]) {
-            // console.log('loading plugin', pluginId, this.plugins[pluginId])
-            return this.use(new this.plugins[_pluginId](options));
-          }
-          console.log("Attempted to load plugin by string name \"".concat(_pluginId, "\"on server, could not find! skipping"));
-          return;
-        }
-
-        // Mark the plugin as loading
-        this._plugins[_pluginId] = {
-          status: 'loading'
-        };
-        this.loadingPluginsCount++;
-        this.emit('plugin::loading', _pluginId);
-
-        // Dynamically load the plugin script
-        var scriptUrl = "".concat(basePath).concat(_pluginId, ".js");
-        this.loadPluginScript(scriptUrl).then(function () {
-          // The script is expected to call `game.use(pluginInstance)` after loading
-          console.log("Loaded: ".concat(_pluginId));
-          if ((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object') {
-            //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
-            var pluginInstance = new PLUGINS[_pluginId]["default"](options);
-            game.use(pluginInstance);
-            // check to see if pluginInstance is async, if so
-            // we'll assume it will emit a ready event when it's ready
-            if (pluginInstance.async) {
-              // plugin must perform async operation before it's ready
-              // plugin author *must* emit their own ready event game will not start
-            } else {
-              game.loadingPluginsCount--;
-              delete game._plugins[_pluginId];
-              game.emit('plugin::ready::' + _pluginId, pluginInstance);
-              cb();
-            }
-          } else {
-            // decrement loadingPluginsCount even if it fails
-            // this means applications will attempt to load even if plugins fail
-            console.log('Warning: PLUGINS object not found, cannot load plugin', _pluginId);
-            delete game._plugins[_pluginId];
-            game.loadingPluginsCount--;
-            cb(new Error('PLUGINS object not found, cannot load plugin'));
-          }
-        })["catch"](function (err) {
-          console.error("Error loading plugin ".concat(_pluginId, ":"), err);
-          game._plugins[_pluginId] = {
-            status: 'error'
-          };
-          throw err;
-        });
-        return this;
-      }
-
-      // Handling plugin instances
-      if (typeof pluginInstanceOrId.id === 'undefined') {
-        console.log('Error with pluginInstance', pluginInstanceOrId);
-        throw new Error('All plugins must have a static id property');
-      }
-      var pluginId = pluginInstanceOrId.id;
-      this.loadedPlugins.push(pluginId);
-      pluginInstanceOrId.init(this, this.engine, this.scene);
-      this._plugins[pluginId] = pluginInstanceOrId;
-      if (pluginInstanceOrId.type === 'world') {
-        this.worlds.push(pluginInstanceOrId);
-      }
-      this.emit("plugin::loaded::".concat(pluginId), pluginInstanceOrId);
-      this.emit('plugin::loaded', pluginId);
-      if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
-        this.emit("world::loaded::".concat(pluginInstanceOrId.id), pluginInstanceOrId);
-        this.emit('world::loaded', pluginInstanceOrId);
-      }
-      game.data.plugins = game.data.plugins || {};
-      game.data.plugins[pluginId] = options;
-      return this;
+    key: "removeSystem",
+    value: function removeSystem(systemName) {
+      return this.systemsManager.removeSystem(systemName.toLowerCase());
+    }
+  }, {
+    key: "updateGraphic",
+    value: function updateGraphic(entityData) {
+      this.graphics.forEach(function (graphicsInterface) {
+        graphicsInterface.updateGraphic(entityData);
+      });
     }
 
-    // Helper function to load plugin scripts
+    //
+    // Plugin APIs
+    //
   }, {
     key: "loadPluginScript",
     value: function loadPluginScript(scriptUrl) {
@@ -825,88 +445,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
         delete this._plugins[pluginName];
       }
     }
-
-    // TODO: move to componentManager
-  }, {
-    key: "addComponent",
-    value: function addComponent(entityId, componentType, data) {
-      if (!this.components[componentType]) {
-        this.components[componentType] = new _Component["default"](componentType, this);
-      }
-      // Initialize an empty map for the actionRateLimiter component
-      // TODO: remove this hard-coded check for actionRateLimiter
-      if (componentType === 'actionRateLimiter') {
-        data = new Map();
-      }
-      this.components[componentType].set(entityId, data);
-    }
-  }, {
-    key: "getComponent",
-    value: function getComponent(entityId, componentType) {
-      if (this.components.hasOwnProperty(componentType)) {
-        return this.components[componentType].get(entityId);
-      }
-      return null;
-    }
-  }, {
-    key: "addSystem",
-    value: function addSystem(systemName, system) {
-      return this.systemsManager.addSystem(systemName, system);
-    }
-  }, {
-    key: "getSystem",
-    value: function getSystem(systemName) {
-      return this.systemsManager.getSystem(systemName);
-    }
-  }, {
-    key: "removeSystem",
-    value: function removeSystem(systemName) {
-      return this.systemsManager.removeSystem(systemName.toLowerCase());
-    }
-  }, {
-    key: "updateGraphic",
-    value: function updateGraphic(entityData) {
-      this.graphics.forEach(function (graphicsInterface) {
-        graphicsInterface.updateGraphic(entityData);
-      });
-    }
-
-    // TODO: move to playerManager
-    // allows for custom player creation logic, or default player creation logic
-  }, {
-    key: "createPlayer",
-    value: function createPlayer(playerConfig) {
-      var _this = this;
-      return new Promise(function (resolve, reject) {
-        // console.log(this.listenerCount('player::joined'))
-        if (_this.listenerCount('player::joined') === 0) {
-          var result = _this.createDefaultPlayer(playerConfig);
-          resolve(result);
-        } else {
-          // Attach a one-time listener for handling the response
-          _this.once('player::created', function (entity) {
-            resolve(entity);
-          });
-          // Emit the player::joined event
-          _this.emit('player::joined', playerConfig);
-        }
-      });
-    }
-  }, {
-    key: "playNote",
-    value: function playNote(note, duration) {
-      console.log('Tone Plugin not loaded. Cannot play tone note.');
-    }
-  }, {
-    key: "setGravity",
-    value: function setGravity() {
-      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      if (this.physics) {
-        this.physics.setGravity(x, y, z);
-      }
-    }
   }, {
     key: "setControls",
     value: function setControls(controls) {
@@ -918,43 +456,19 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "setActions",
-    value: function setActions(actions) {
-      var game = this;
-      var actionNames = Object.keys(actions);
-      actionNames.forEach(function (actionName) {
-        var action = actions[actionName];
-        game.rules.on(actionName, action);
-      });
-    }
-  }, {
     key: "setSize",
     value: function setSize(width, height) {
       this.width = width;
       this.height = height;
     }
-  }, {
-    key: "zoom",
-    value: function zoom(scale) {
-      if (this.camera && this.camera.zoom) {
-        this.camera.zoom(scale);
-      } else {
-        console.log('warning: no camera.zoom method found');
-      }
-    }
-  }, {
-    key: "shakeCamera",
-    value: function shakeCamera(intensity, duration) {
-      this.graphics.forEach(function (graphicsInterface) {
-        if (graphicsInterface.cameraShake) {
-          graphicsInterface.cameraShake(intensity, duration);
-        }
-      });
-    }
+
+    //
+    // Player specific APIs
+    //
   }, {
     key: "setPlayerId",
     value: function setPlayerId(playerId) {
-      // console.log('setting playerID', playerId)
+      console.log('setting playerID', playerId);
       this.currentPlayerId = playerId;
     }
   }, {
@@ -962,8 +476,63 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function getCurrentPlayer() {
       return this.getEntity(this.currentPlayerId);
     }
+  }, {
+    key: "getPlayerFieldOfView",
+    value: function getPlayerFieldOfView(entId) {
+      var distance = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
+      var mergeData = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+      var ent;
+      if (_typeof(entId) === 'object') {
+        ent = entId;
+      } else {
+        ent = this.getEntity(entId);
+      }
+      if (!ent) {
+        console.log('Warning: no entity found for entId', entId);
+        return [];
+      }
+      var centerPosition = ent.position;
+      var query = {
+        minX: centerPosition.x - distance,
+        minY: centerPosition.y - distance,
+        maxX: centerPosition.x + distance,
+        maxY: centerPosition.y + distance
+      };
+      if (this.systems.rbush) {
+        return this.systems.rbush.search(query, mergeData);
+      } else {
+        console.log('Warning: no rbush system found, cannot perform getPlayerFieldOfView query');
+      }
+    }
 
-    // TODO: should physics plugin mount these instead of direct map to game?
+    //
+    // Audio / Multimedia APIs
+    //
+  }, {
+    key: "playNote",
+    value: function playNote(note, duration) {
+      console.log('Tone Plugin not loaded. Cannot play tone note.');
+    }
+
+    //
+    // Physics Engine APIs
+    //
+  }, {
+    key: "setGravity",
+    value: function setGravity() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      if (this.physics) {
+        this.physics.setGravity(x, y, z);
+      }
+    }
+  }, {
+    key: "setPosition",
+    value: function setPosition(entityId, position) {
+      var body = this.bodyMap[entityId];
+      this.physics.setPosition(body, position);
+    }
   }, {
     key: "applyForce",
     value: function applyForce(entityId, force) {
@@ -973,12 +542,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
         x: body.velocity.x,
         y: body.velocity.y
       };
-    }
-  }, {
-    key: "setPosition",
-    value: function setPosition(entityId, position) {
-      var body = this.bodyMap[entityId];
-      this.physics.setPosition(body, position);
     }
   }, {
     key: "applyPosition",
@@ -999,10 +562,52 @@ var Game = exports.Game = /*#__PURE__*/function () {
       var body = this.bodyMap[entityId];
       this.physics.rotateBody(body, rotationAmount);
     }
+
+    //
+    // Camera APIs
+    //
   }, {
     key: "rotateCamera",
     value: function rotateCamera(angle) {
-      // not implemented directly, Graphics plugin will handle this
+      // not implemented directly, Graphics plugin will hoist this
+    }
+  }, {
+    key: "setZoom",
+    value: function setZoom() {
+      // not implemented directly, Graphics plugin will hoist this
+    }
+  }, {
+    key: "zoom",
+    value: function zoom(scale) {
+      if (this.camera && this.camera.zoom) {
+        this.camera.zoom(scale);
+      } else {
+        console.log('warning: no camera.zoom method found');
+      }
+    }
+  }, {
+    key: "shakeCamera",
+    value: function shakeCamera(intensity, duration) {
+      this.graphics.forEach(function (graphicsInterface) {
+        if (graphicsInterface.cameraShake) {
+          graphicsInterface.cameraShake(intensity, duration);
+        }
+      });
+    }
+
+    //
+    // Asset and Styling APIs
+    //
+  }, {
+    key: "addAsset",
+    value: function addAsset(key, path) {
+      // game.addAsset needs to work immediately, potentially before game.start()
+      // the preloader won't be available until the `Client` system is loaded
+      if (this.preloader) {
+        this.preloader.addAsset(path, 'spritesheet', key);
+      } else {
+        this.queuedAssets[key] = path;
+      }
     }
   }, {
     key: "setBackground",
@@ -1011,12 +616,12 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
   }, {
     key: "createBorder",
-    value: function createBorder(_ref2) {
-      var width = _ref2.width,
-        height = _ref2.height,
-        _ref2$thickness = _ref2.thickness,
-        thickness = _ref2$thickness === void 0 ? 8 : _ref2$thickness,
-        color = _ref2.color;
+    value: function createBorder(_ref) {
+      var width = _ref.width,
+        height = _ref.height,
+        _ref$thickness = _ref.thickness,
+        thickness = _ref$thickness === void 0 ? 8 : _ref$thickness,
+        color = _ref.color;
       var game = this;
       if (game.systems.border) {
         game.systems.border.createBorder({
@@ -1034,17 +639,15 @@ var Game = exports.Game = /*#__PURE__*/function () {
         });
       }
     }
+
+    //
+    // Time APIs / ChronoControl
+    //
   }, {
-    key: "useSutra",
-    value: function useSutra(subSutra, name) {
-      if (this.rules) {
-        this.rules.use(subSutra, name);
-        if (this.systems['gui-sutra']) {
-          this.systems['gui-sutra'].setRules(this.rules);
-        }
-      } else {
-        console.log('Warning: no rules engine found, cannot use sutra', subSutra, name);
-      }
+    key: "stop",
+    value: function stop() {
+      var client = this.getSystem('client');
+      client.stop();
     }
   }, {
     key: "pause",
@@ -1063,27 +666,75 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "reset",
     value: function reset() {
-      // not a full game reset ( yet )
-      // reset default entity input
-      //let movementRules = movement(this);
-      //this.rules.use(movementRules, 'movement');
-
       // reset all Sutra rules
       this.rules = this.createSutra();
-
       // remap the keyboard mappings to Sutra by default
       if (this.systems.sutra) {
-        this.systems.sutra.bindKeyCodesToSutraConditions();
+        this.systems.sutra.bindInputsToSutraConditions();
       }
-
       // reset the default player controls
       this.setControls({});
+
+      // reset any deffered entities
+      this.deferredEntities = {};
+    }
+
+    //
+    // Sutra Behavior Tree APIs
+    //
+  }, {
+    key: "useSutra",
+    value: function useSutra(subSutra, name) {
+      if (this.rules) {
+        this.rules.use(subSutra, name);
+        if (this.systems['gui-sutra']) {
+          this.systems['gui-sutra'].setRules(this.rules);
+        }
+      } else {
+        console.log('Warning: no rules engine found, cannot use sutra', subSutra, name);
+      }
+    }
+  }, {
+    key: "setActions",
+    value: function setActions(actions) {
+      var game = this;
+      var actionNames = Object.keys(actions);
+      actionNames.forEach(function (actionName) {
+        var action = actions[actionName];
+        game.rules.on(actionName, action);
+      });
+    }
+
+    //
+    // Networking APIs
+    //
+  }, {
+    key: "connect",
+    value: function connect(url) {
+      var game = this;
+      // Wait for all systems to be ready before starting the game loop
+      if (game.loadingPluginsCount > 0) {
+        setTimeout(function () {
+          game.connect(url);
+        }, 4);
+        return;
+      } else {
+        console.log('All Plugins are ready! Starting Mantra Game Client...');
+        var client = this.getSystem('client');
+        client.connect(url);
+      }
+    }
+  }, {
+    key: "disconnect",
+    value: function disconnect() {
+      var client = this.getSystem('client');
+      client.disconnect();
     }
   }]);
   return Game;
 }();
 
-},{"./Component/ActionRateLimiter.js":1,"./Component/Component.js":2,"./Component/TimersComponent.js":3,"./System/SystemsManager.js":5,"./lib/createDefaultPlayer.js":7,"./lib/defaultPlayerMovement.js":8,"./lib/eventEmitter.js":9,"./lib/gameTick.js":10,"./lib/loadPluginsFromConfig.js":11,"./lib/localGameLoop.js":12,"./lib/onlineGameLoop.js":13,"./lib/start/defaultGameStart.js":14,"./lib/storage/storage.js":16,"./lib/switchWorlds.js":17,"./lib/util/loadCSS.js":18,"./lib/util/loadScripts.js":19}],5:[function(require,module,exports){
+},{"./Component/Component.js":2,"./lib/Game/construct.js":7,"./lib/Game/start.js":8,"./lib/Game/use.js":9}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1214,7 +865,7 @@ var SystemsManager = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":9}],6:[function(require,module,exports){
+},{"../lib/eventEmitter.js":11}],6:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -1228,11 +879,413 @@ module.exports = MANTRA;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = construct;
+var _Component = _interopRequireDefault(require("../../Component/Component.js"));
+var _SystemsManager = _interopRequireDefault(require("../../System/SystemsManager.js"));
+var _eventEmitter = _interopRequireDefault(require("../eventEmitter.js"));
+var _gameTick = _interopRequireDefault(require("../gameTick.js"));
+var _localGameLoop = _interopRequireDefault(require("../localGameLoop.js"));
+var _onlineGameLoop = _interopRequireDefault(require("../onlineGameLoop.js"));
+var _ActionRateLimiter = _interopRequireDefault(require("../../Component/ActionRateLimiter.js"));
+var _TimersComponent = _interopRequireDefault(require("../../Component/TimersComponent.js"));
+var _storage = _interopRequireDefault(require("../storage/storage.js"));
+var _loadPluginsFromConfig = _interopRequireDefault(require("../loadPluginsFromConfig.js"));
+var _loadScripts = _interopRequireDefault(require("../util/loadScripts.js"));
+var _loadCSS = _interopRequireDefault(require("../util/loadCSS.js"));
+var _switchWorlds = _interopRequireDefault(require("../switchWorlds.js"));
+var _createDefaultPlayer = _interopRequireDefault(require("../createDefaultPlayer.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+// Game instances are event emitters
+
+// Game tick, called once per tick from game loop
+
+// Game loops, TODO: make game loops plugins / configurable
+// Local game loop is for single machine games ( no networking )
+// Online game loop is for multiplayer games ( networking )
+// Action Rate Limiter, suitable for any Systems action that should be rate limited
+// Game local data storage
+// Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
+// Utility function for loading external assets
+function construct(game) {
+  var plugins = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  // fetch the gamegame.config from localStorage
+  var localData = _storage["default"].getAllKeysWithData();
+
+  // Remark: We could merge game data back into the game.config / game.data
+
+  // set the last local start time
+  _storage["default"].set('lastLocalStartTime', Date.now());
+
+  // Keeps a clean copy of current game state
+  // Game.data scope can be used for applying game.configuration settings while game is running
+  // Game.game.config scope is expected to be "immutablish" and should not be modified while game is running
+  game.data = {
+    width: game.config.width,
+    height: game.config.height,
+    FPS: 60,
+    fieldOfView: game.config.fieldOfView,
+    // global for game, not camera specific
+    camera: {
+      follow: game.config.camera.follow,
+      currentZoom: game.config.camera.startingZoom
+    },
+    chunks: {}
+  };
+  game.useFoV = false; // for now
+
+  if (typeof game.data.camera.follow === 'undefined') {
+    game.data.camera.follow = true;
+  }
+  if (typeof game.data.camera.currentZoom === 'undefined') {
+    game.data.camera.currentZoom = 1;
+  }
+  console.log("Mantra starting...");
+
+  // Define the scriptRoot variable for loading external scripts
+  // To support demos and CDN based Serverless Games, we default scriptRoot to yantra.gg
+  game.scriptRoot = 'https://yantra.gg/mantra';
+  game.assetRoot = 'https://yantra.gg/mantra';
+
+  // Could be another CDN or other remote location
+  // For local development, try game.scriptRoot = './';
+  if (game.config.options.scriptRoot) {
+    console.log("Mantra is using the follow path as it's root:", game.config.options.scriptRoot);
+    game.scriptRoot = game.config.options.scriptRoot;
+  }
+  if (game.config.options.assetRoot) {
+    console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot);
+    game.assetRoot = game.config.options.assetRoot;
+  }
+  console.log("new Game(".concat(JSON.stringify(game.config, true, 2), ")"));
+
+  // Bind eventEmitter methods to maintain correct scope
+  game.on = _eventEmitter["default"].on.bind(_eventEmitter["default"]);
+  game.off = _eventEmitter["default"].off.bind(_eventEmitter["default"]);
+  game.once = _eventEmitter["default"].once.bind(_eventEmitter["default"]);
+  game.emit = _eventEmitter["default"].emit.bind(_eventEmitter["default"]);
+  game.onAny = _eventEmitter["default"].onAny.bind(_eventEmitter["default"]);
+  game.offAny = _eventEmitter["default"].offAny.bind(_eventEmitter["default"]);
+  game.listenerCount = _eventEmitter["default"].listenerCount.bind(_eventEmitter["default"]);
+  game.listeners = _eventEmitter["default"].listeners;
+  game.emitters = _eventEmitter["default"].emitters;
+
+  // Bind loadScripts from util
+  game.loadScripts = _loadScripts["default"].bind(game);
+  // Bind loadCSS from util
+  game.loadCSS = _loadCSS["default"].bind(game);
+  game.switchWorlds = _switchWorlds["default"].bind(game);
+  game.bodyMap = {};
+  game.systems = {};
+  game.storage = _storage["default"];
+  game.snapshotQueue = [];
+  game.tick = 0;
+
+  // Keeps track of array of worlds ( Plugins with type="world" )
+  // Each world is a Plugin and will run in left-to-right order
+  // The current default behavior is single world, so worlds[0] is always the current world
+  // Game.use(worldInstance) will add a world to the worlds array, running worlds in left-to-right order
+  // With multiple worlds running at once, worlds[0] will always be the root world in the traversal of the world tree
+  // TODO: move to worldManager
+  game.worlds = [];
+
+  // Game settings
+  game.width = game.config.width;
+  game.height = game.config.height;
+
+  // Remark: Currently, only (1) physics engine is supported at a time
+  // If we want to run multiple physics engines, we'll want to make game array
+  // game.physics = [];
+
+  game.changedEntities = new Set();
+  game.removedEntities = new Set();
+  game.pendingRender = new Set();
+
+  // spatial tree
+  game.deferredEntities = {};
+  game.queuedAssets = {};
+  game.isClient = game.config.isClient;
+  game.isEdgeClient = game.config.isEdgeClient;
+  game.isServer = game.config.isServer;
+  game.localGameLoopRunning = false;
+  game.onlineGameLoopRunning = false;
+  game.currentPlayerId = null;
+
+  // ComponentManager.js? If so, what does it do and is it needed for our ECS?
+  // Remark: I don't think we need to explicitly define components, we can just add them as needed
+  game.components = {
+    type: new _Component["default"]('type', game),
+    // string type, name of Entity
+    destroyed: new _Component["default"]('destroyed', game),
+    // boolean, if true, entity is pending destroy and will be removed from game
+    position: new _Component["default"]('position', game),
+    // object, { x: 0, y: 0, z: 0 }
+    velocity: new _Component["default"]('velocity', game),
+    rotation: new _Component["default"]('rotation', game),
+    mass: new _Component["default"]('mass', game),
+    density: new _Component["default"]('density', game),
+    width: new _Component["default"]('width', game),
+    height: new _Component["default"]('height', game),
+    depth: new _Component["default"]('depth', game),
+    radius: new _Component["default"]('radius', game),
+    isSensor: new _Component["default"]('isSensor', game),
+    owner: new _Component["default"]('owner', game),
+    inputs: new _Component["default"]('inputs', game),
+    items: new _Component["default"]('items', game),
+    sutra: new _Component["default"]('sutra', game)
+  };
+
+  // define additional components for the game
+  game.components.color = new _Component["default"]('color', game);
+  game.components.health = new _Component["default"]('health', game);
+  game.components.target = new _Component["default"]('target', game);
+  game.components.lifetime = new _Component["default"]('lifetime', game);
+  game.components.creationTime = new _Component["default"]('creationTime', game);
+  game.components.BulletComponent = new _Component["default"]('BulletComponent', game);
+  game.components.graphics = new _Component["default"]('graphics', game);
+  game.components.lockedProperties = new _Component["default"]('lockedProperties', game);
+  game.components.actionRateLimiter = new _ActionRateLimiter["default"]('actionRateLimiter', game);
+
+  // TODO: add body component and remove game.bodyMap[] API
+
+  game.components.timers = new _TimersComponent["default"]('timers', game);
+  game.components.yCraft = new _Component["default"]('yCraft', game);
+  game.components.text = new _Component["default"]('text', game);
+  game.components.style = new _Component["default"]('style', game);
+  game.components.collisionActive = new _Component["default"]('collisionActive', game);
+  game.components.collisionStart = new _Component["default"]('collisionStart', game);
+  game.components.collisionEnd = new _Component["default"]('collisionEnd', game);
+
+  // Systems Manager
+  game.systemsManager = new _SystemsManager["default"](game);
+
+  // Graphics rendering pipeline
+  game.graphics = [];
+  game.gameTick = _gameTick["default"].bind(game);
+  game.localGameLoop = _localGameLoop["default"].bind(game);
+  game.onlineGameLoop = _onlineGameLoop["default"].bind(game);
+  game.loadPluginsFromConfig = _loadPluginsFromConfig["default"].bind(game);
+  game.createDefaultPlayer = _createDefaultPlayer["default"].bind(game);
+  game.createPlayer = _createDefaultPlayer["default"].bind(game);
+
+  // keeps track of game.use('PluginStringName') async loading
+  // game.start() will wait for all plugins to be loaded before starting
+  // game means any plugins which are game.use('PluginStringName') will "block" the game from starting
+  game.loadingPluginsCount = 0;
+  // game.plugins represents the initial plugins the Game wil have access to
+  // subsequent plugins will be loaded dynamically with game.use()
+  game.plugins = plugins;
+
+  // game._plugins represents all plugin instances that have been loaded
+  game._plugins = {};
+  game.loadedPlugins = [];
+  // load default plugins
+  if (game.config.loadDefaultPlugins) {
+    console.log('CCCC', game.config);
+    game.loadPluginsFromConfig({
+      physics: game.config.physics,
+      graphics: game.config.graphics,
+      collisions: game.config.collisions,
+      keyboard: game.config.keyboard,
+      mouse: game.config.mouse,
+      gamepad: game.config.gamepad,
+      editor: game.config.editor,
+      sutra: game.config.sutra,
+      lifetime: game.config.lifetime,
+      defaultMovement: game.config.defaultMovement
+    });
+  }
+}
+
+},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../System/SystemsManager.js":5,"../createDefaultPlayer.js":10,"../eventEmitter.js":11,"../gameTick.js":12,"../loadPluginsFromConfig.js":13,"../localGameLoop.js":14,"../onlineGameLoop.js":15,"../storage/storage.js":17,"../switchWorlds.js":18,"../util/loadCSS.js":19,"../util/loadScripts.js":20}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = start;
+function start(cb) {
+  var _this = this;
+  var game = this;
+  return new Promise(function (resolve, reject) {
+    // Define a wrapper for the callback to also resolve the promise
+    var callbackWrapper = function callbackWrapper(err, result) {
+      if (err) {
+        reject(err);
+        if (cb) cb(err);
+        return;
+      }
+      resolve(result);
+      if (cb) cb(null, result);
+    };
+    if (typeof cb !== 'function') {
+      cb = function cb() {// noop 
+      };
+    }
+
+    // Wait for all systems to be ready before starting the game loop
+    if (game.loadingPluginsCount > 0 || game.physicsReady !== true) {
+      // console.log('waiting for plugins to load...', game.physicsReady)
+      setTimeout(function () {
+        game.start(cb).then(resolve)["catch"](reject);
+      }, 4);
+      return;
+    } else {
+      // Remark: If multiple graphics plugins are used, default behavior is to,
+      //         horizontally stack the graphics plugins so they all fit on the screen
+      // TODO: move this to Graphics.js file
+      if (game.config.multiplexGraphicsHorizontally) {
+        // get the graphics count and sub-divide each canvas width to multiplex the graphics plugins
+        var totalCount = game.graphics.length;
+        var newWidth = 100 / totalCount;
+        // find each canvas in the #gameHolder and apply the new width
+        if (totalCount > 1) {
+          if (document && document.querySelectorAll) {
+            var canvasList = document.querySelectorAll('#gameHolder canvas');
+            for (var i = 0; i < canvasList.length; i++) {
+              // console.log('setting new width for', canvasList[i], 'to', newWidth + '%')
+              canvasList[i].style.width = newWidth + '%';
+            }
+          }
+        }
+      }
+      console.log('All Plugins are ready! Starting Mantra Game Client...');
+      game.emit('game::ready');
+      if (_this.config.defaultPlayer) {
+        _this.createPlayer({
+          type: 'PLAYER'
+        }).then(function (ent) {
+          game.setPlayerId(ent.id);
+        });
+      }
+      if (game.systems.client) {
+        var client = _this.getSystem('client');
+        client.start(callbackWrapper);
+      } else {
+        console.log('Warning: No Client System found, will not start game loop.');
+      }
+    }
+  });
+}
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = use;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function use(game) {
+  return function use(pluginInstanceOrId) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var cb = arguments.length > 2 ? arguments[2] : undefined;
+    if (typeof cb === 'undefined') {
+      cb = function noop() {};
+    }
+
+    // TODO: make game configurable
+    var basePath = '/plugins/'; // Base path for loading plugins
+    basePath = game.scriptRoot + basePath;
+    //console.log("FOUND SCRIPT ROOT", game.scriptRoot)
+    //console.log("LOADING FROM BASEPATH", basePath)
+    // Check if the argument is a string (plugin ID)
+    if (typeof pluginInstanceOrId === 'string') {
+      var _pluginId = pluginInstanceOrId;
+      // Check if the plugin is already loaded or loading
+      if (game._plugins[_pluginId]) {
+        // maybe add world here?
+        console.log("Plugin ".concat(_pluginId, " is already loaded or loading."));
+        return game;
+      }
+      if (game.isServer) {
+        // console.log('pluginId', pluginId, game.plugins)
+        if (game.plugins[_pluginId]) {
+          // console.log('loading plugin', pluginId, game.plugins[pluginId])
+          return game.use(new game.plugins[_pluginId](options));
+        }
+        console.log("Attempted to load plugin by string name \"".concat(_pluginId, "\"on server, could not find! skipping"));
+        return;
+      }
+
+      // Mark the plugin as loading
+      game._plugins[_pluginId] = {
+        status: 'loading'
+      };
+      game.loadingPluginsCount++;
+      game.emit('plugin::loading', _pluginId);
+
+      // Dynamically load the plugin script
+      var scriptUrl = "".concat(basePath).concat(_pluginId, ".js");
+      game.loadPluginScript(scriptUrl).then(function () {
+        // The script is expected to call `game.use(pluginInstance)` after loading
+        console.log("Loaded: ".concat(_pluginId));
+        if ((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object') {
+          //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
+          var pluginInstance = new PLUGINS[_pluginId]["default"](options);
+          game.use(pluginInstance);
+          // check to see if pluginInstance is async, if so
+          // we'll assume it will emit a ready event when it's ready
+          if (pluginInstance.async) {
+            // plugin must perform async operation before it's ready
+            // plugin author *must* emit their own ready event game will not start
+          } else {
+            game.loadingPluginsCount--;
+            delete game._plugins[_pluginId];
+            game.emit('plugin::ready::' + _pluginId, pluginInstance);
+            cb();
+          }
+        } else {
+          // decrement loadingPluginsCount even if it fails
+          // game means applications will attempt to load even if plugins fail
+          console.log('Warning: PLUGINS object not found, cannot load plugin', _pluginId);
+          delete game._plugins[_pluginId];
+          game.loadingPluginsCount--;
+          cb(new Error('PLUGINS object not found, cannot load plugin'));
+        }
+      })["catch"](function (err) {
+        console.error("Error loading plugin ".concat(_pluginId, ":"), err);
+        game._plugins[_pluginId] = {
+          status: 'error'
+        };
+        throw err;
+      });
+      return game;
+    }
+
+    // Handling plugin instances
+    if (typeof pluginInstanceOrId.id === 'undefined') {
+      console.log('Error with pluginInstance', pluginInstanceOrId);
+      throw new Error('All plugins must have a static id property');
+    }
+    var pluginId = pluginInstanceOrId.id;
+    game.loadedPlugins.push(pluginId);
+    pluginInstanceOrId.init(game, game.engine, game.scene);
+    game._plugins[pluginId] = pluginInstanceOrId;
+    if (pluginInstanceOrId.type === 'world') {
+      game.worlds.push(pluginInstanceOrId);
+    }
+    game.emit("plugin::loaded::".concat(pluginId), pluginInstanceOrId);
+    game.emit('plugin::loaded', pluginId);
+    if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
+      game.emit("world::loaded::".concat(pluginInstanceOrId.id), pluginInstanceOrId);
+      game.emit('world::loaded', pluginInstanceOrId);
+    }
+    game.data.plugins = game.data.plugins || {};
+    game.data.plugins[pluginId] = options;
+    return game;
+  };
+}
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = createDefaultPlayer;
 function createDefaultPlayer() {
   var playerConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  //console.log('creating default player', playerConfig)
-
+  console.log('creating default player', playerConfig, this.currentPlayerId);
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = {
       x: 0,
@@ -1243,12 +1296,14 @@ function createDefaultPlayer() {
     delete playerConfig.texture;
   }
 
-  // check if game.currentPlayerId is already set,
-  // if so return
+  // check if game.currentPlayerId is already set, if so, return that entity
   if (this.currentPlayerId) {
-    return this.getEntity(this.currentPlayerId);
+    // Remark: Removed 1/22/24 as part of bringing multiplayer back
+    //         Can we remove this entirely?
+    // return this.getEntity(this.currentPlayerId);
   }
   var player = this.createEntity({
+    name: playerConfig.name,
     type: 'PLAYER',
     shape: 'triangle',
     collisionActive: true,
@@ -1274,80 +1329,7 @@ function createDefaultPlayer() {
 }
 ;
 
-},{}],8:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = topdownMovement;
-function topdownMovement(game) {
-  var rules = game.createSutra();
-  rules["if"]('W').then('MOVE_FORWARD');
-  rules["if"]('A').then('MOVE_LEFT');
-  rules["if"]('S').then('MOVE_BACKWARD');
-  rules["if"]('D').then('MOVE_RIGHT');
-  rules["if"]('O').then('ZOOM_IN');
-  rules["if"]('P').then('ZOOM_OUT');
-  rules.on('MOVE_FORWARD', function (entity) {
-    game.applyForce(entity.id, {
-      x: 0,
-      y: -1,
-      z: 0
-    });
-    game.updateEntity({
-      id: entity.id,
-      rotation: 0
-    });
-  });
-  rules.on('MOVE_BACKWARD', function (entity) {
-    game.applyForce(entity.id, {
-      x: 0,
-      y: 1,
-      z: 0
-    });
-    game.updateEntity({
-      id: entity.id,
-      rotation: Math.PI
-    });
-  });
-  rules.on('MOVE_LEFT', function (entity) {
-    game.applyForce(entity.id, {
-      x: -1,
-      y: 0,
-      z: 0
-    });
-    game.updateEntity({
-      id: entity.id,
-      rotation: -Math.PI / 2
-    });
-  });
-  rules.on('MOVE_RIGHT', function (entity) {
-    game.applyForce(entity.id, {
-      x: 1,
-      y: 0,
-      z: 0
-    });
-    game.updateEntity({
-      id: entity.id,
-      rotation: Math.PI / 2
-    });
-  });
-  rules.on('CAMERA_SHAKE', function (entity) {
-    game.shakeCamera(1000);
-  });
-  rules.on('ZOOM_IN', function (entity) {
-    var currentZoom = game.data.camera.currentZoom || 1;
-    game.setZoom(currentZoom + 0.05);
-  });
-  rules.on('ZOOM_OUT', function (entity) {
-    var currentZoom = game.data.camera.currentZoom || 1;
-    game.setZoom(currentZoom - 0.05);
-  });
-  return rules;
-}
-
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1489,21 +1471,17 @@ eventEmitter.listenerCount = function (eventPattern) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 var lastTick = Date.now();
 var hzMS = 16.666; // 60 FPS
 
 function gameTick() {
-  var _this = this;
   this.tick++;
   this.data.tick = this.tick;
   this.data.currentPlayer = this.getEntity(this.currentPlayerId);
@@ -1523,36 +1501,33 @@ function gameTick() {
   }
 
   // Update the physics engine
-  this.physics.updateEngine(this.physics.engine, deltaTimeMS);
+  this.physics.updateEngine(deltaTimeMS);
 
   // run the .update() method of all registered systems
   if (this.systemsManager) {
     this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
   }
 
-  // Loop through entities that have changed
-  var _iterator = _createForOfIteratorHelper(this.changedEntities),
-    _step;
-  try {
-    var _loop = function _loop() {
-      var entityId = _step.value;
-      if (_this.isClient && _this.isOnline === false) {
-        var ent = _this.entities.get(entityId);
-        if (ent) {
-          _this.graphics.forEach(function inflateEntityPerInterface(graphicsInterface) {
-            graphicsInterface.inflateEntity(ent);
-          });
-        }
+  /*
+  Remark: Removed 1/22/24, this is directly handled by the graphics system in offline mode
+  for (let entityId of this.changedEntities) {
+    if (this.isClient && this.isOnline === false) {
+      // only consider entities that are within the field of view of the current player
+      // check to see if entityId is not within ItemsInFov array
+      console.log("itemInFov.indexOf(entityId)", itemInFov.indexOf(entityId))
+      if (itemInFov.indexOf(entityId) === -1) {
+        continue;
       }
-    };
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      _loop();
+      let ent = this.entities.get(entityId);
+      if (ent) {
+        this.graphics.forEach(function inflateEntityPerInterface (graphicsInterface) {
+          // graphicsInterface.inflateEntity(ent);
+        });
+      }
     }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
   }
+  */
+
   this.changedEntities.clear();
 
   // Save the game snapshot
@@ -1561,7 +1536,7 @@ function gameTick() {
 }
 var _default = exports["default"] = gameTick;
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1570,10 +1545,9 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = loadPluginsFromConfig;
 var _LoadingScreen = _interopRequireDefault(require("../plugins/loading-screen/LoadingScreen.js"));
 var _GhostTyper = _interopRequireDefault(require("../plugins/typer-ghost/GhostTyper.js"));
-var _defaultPlayerMovement = _interopRequireDefault(require("./defaultPlayerMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 // default player movement, this could be also be set in defaultGameStart.js
-
+// import movement from './defaultPlayerMovement.js';
 function loadPluginsFromConfig(_ref) {
   var physics = _ref.physics,
     graphics = _ref.graphics,
@@ -1676,7 +1650,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":20,"../plugins/typer-ghost/GhostTyper.js":21,"./defaultPlayerMovement.js":8}],12:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":21,"../plugins/typer-ghost/GhostTyper.js":22}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1757,7 +1731,7 @@ function _requestAnimationFrame(callback) {
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1845,22 +1819,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],14:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = defaultGameStart;
-function defaultGameStart(game) {
-  game.use('Bullet');
-  game.createBorder({
-    height: 2000,
-    width: 2000
-  });
-}
-
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1913,7 +1872,7 @@ var MemoryBackend = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = MemoryBackend;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1993,7 +1952,7 @@ var storage = function () {
 }();
 var _default = exports["default"] = storage;
 
-},{"./MemoryBackend.js":15}],17:[function(require,module,exports){
+},{"./MemoryBackend.js":16}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2019,6 +1978,8 @@ function switchWorlds(selectedWorld) {
   var worldName = 'XState';
   worldName = 'Sutra';
   worldName = selectedWorld;
+
+  // TODO: remove global WORLDS reference for server
   var worldClass = WORLDS.worlds[worldName];
   if (!worldClass) {
     console.error("World ".concat(worldName, " not found"));
@@ -2044,7 +2005,7 @@ function switchWorlds(selectedWorld) {
   game.storage.set('world', selectedWorld);
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2141,7 +2102,7 @@ function _loadCSS() {
   return _loadCSS.apply(this, arguments);
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2233,7 +2194,7 @@ function _loadScripts() {
   return _loadScripts.apply(this, arguments);
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2558,7 +2519,7 @@ var LoadingScreen = /*#__PURE__*/function () {
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

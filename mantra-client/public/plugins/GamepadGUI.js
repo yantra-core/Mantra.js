@@ -258,47 +258,74 @@ var GamepadGUI = /*#__PURE__*/function () {
         _controller.style.bottom = slideOutPosition; // Move the controller outside the viewport
         this.hiding = true;
       }
-
-      // use existing keyboard events
-      // trigger keydown event with keycode of W, A, S, D
-      // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
-
-      /*
-      dpad_up.addEventListener('pointerdown', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyW' }));
-      });
-      dpad_up.addEventListener('pointerup', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyW' }));
-      });
-       dpad_down.addEventListener('pointerdown', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyS' }));
-      });
-      dpad_down.addEventListener('pointerup', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyS' }));
-      });
-       dpad_left.addEventListener('pointerdown', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyA' }));
-      });
-      dpad_left.addEventListener('pointerup', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyA' }));
-      });
-       dpad_right.addEventListener('pointerdown', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyD' }));
-      });
-      dpad_right.addEventListener('pointerup', (ev) => {
-        document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyD' }));
-      });
-      */
     }
+
+    // Remark: Update is called once per game loop
+  }, {
+    key: "update",
+    value: function update() {
+      // TODO, send inputs
+      // this.sendInputs();
+    }
+
+    // TODO: refactor this plugin to use sendInputs()
+  }, {
+    key: "sendInputs",
+    value: function sendInputs() {
+      // Check if all controls are false
+      var allFalse = Object.keys(controls).every(function (key) {
+        return !controls[key];
+      });
+
+      // Send controls if they are not all false or if the last controls were not all false
+      if (!allFalse) {
+        this.lastControlsAllFalse = allFalse;
+        if (this.game.communicationClient) {
+          this.game.communicationClient.sendMessage('player_input', {
+            controls: controls
+          });
+        }
+      }
+    }
+
+    /*
+    let controls2 = {
+      'DPAD_UP': yAxis < -deadzone, // Up
+      'DPAD_DOWN': yAxis > deadzone,  // Down
+      'DPAD_LEFT': xAxis < -deadzone, // Left
+      'DPAD_RIGHT': xAxis > deadzone,  // Right
+      // y button
+      'BUTTON_Y': gamepad.buttons[1].pressed, // "Y" button
+      // x button
+      'BUTTON_X': gamepad.buttons[3].pressed, // "X" button
+      // b button
+      'BUTTON_B': gamepad.buttons[2].pressed, // "B" button
+      // a button
+      'BUTTON_A': gamepad.buttons[0].pressed, // "A" button
+      // start button
+      'BUTTON_START': gamepad.buttons[9].pressed, // "Start" button
+      // select button
+      'BUTTON_SELECT': gamepad.buttons[8].pressed, // "Select" button
+      // left shoulder button
+      'BUTTON_L1': gamepad.buttons[4].pressed, // "L1" button
+      // right shoulder button
+      'BUTTON_R1': gamepad.buttons[5].pressed, // "R1" button
+      // left trigger button
+      'BUTTON_L2': gamepad.buttons[6].pressed, // "L2" button
+      // right trigger button
+      'BUTTON_R2': gamepad.buttons[7].pressed, // "R2" button
+      // left stick button
+      'BUTTON_L3': gamepad.buttons[10].pressed, // "L3" button
+      // right stick button
+      'BUTTON_R3': gamepad.buttons[11].pressed, // "R3" button
+    };
+    */
   }, {
     key: "createSNESGamepad",
     value: function createSNESGamepad(parentElement) {
       var str = "\n  \n  \n<article id=\"snes-gamepad\" aria-label=\"SNES controller\">\n\n  <!-- removed ( for now )\n  <button id=\"l\" class=\"is3d\">Top left<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></button>\n  <button id=\"r\" class=\"is3d\">Top Right<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></button>\n  -->\n  \n  <!-- frame -->\n  <div class=\"face is3d\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>\n  \n  <!-- Letters and Text -->\n  <h1>SUPER MANTRA</h1>\n  <p>CSS ENTERTAINMENT SYSTEM</p>\n  \n  <p class=\"letter letter-x\" aria-hidden=\"true\">X</p>\n  <p class=\"letter letter-y\" aria-hidden=\"true\">Y</p>\n  <p class=\"letter letter-a\" aria-hidden=\"true\">A</p>\n  <p class=\"letter letter-b\" aria-hidden=\"true\">B</p>\n  <p class=\"letter-start\" aria-hidden=\"true\">START</p>\n  <p class=\"letter-select\" aria-hidden=\"true\">SELECT</p>\n  \n  <!-- directional buttons + axis -->\n  <div class=\"axis is3d\"><div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div><div style=\"--z:5\"></div><div style=\"--z:6\"></div></div>\n  \n  <!-- Menu buttons (start/select) -->\n  <button id=\"select\" class=\"is3d\">Select<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n\n  <button id=\"graphics\" class=\"is3d\">Graphics<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n\n  <button id=\"start\" class=\"is3d\">Start<div style=\"--z:1\"></div><div style=\"--z:2\"></div><div style=\"--z:3\"></div><div style=\"--z:4\"></div></button>\n  <!-- Action buttons -->\n  <div class=\"buttons\">\n    <button id=\"x\" class=\"circle is3d\">x<div></div><div></div><div></div><div></div></button>\n    <button id=\"y\" class=\"circle is3d\">y<div></div><div></div><div></div><div></div></button>\n    <button id=\"a\" class=\"circle is3d\">a<div></div><div></div><div></div><div></div></button>\n    <button id=\"b\" class=\"circle is3d\">b<div></div><div></div><div></div><div></div></button>\n  </div>\n    \n</article>\n\n  \n    ";
       parentElement.innerHTML = str;
     }
-  }, {
-    key: "update",
-    value: function update() {}
   }, {
     key: "render",
     value: function render() {}

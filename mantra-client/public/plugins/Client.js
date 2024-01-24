@@ -5,78 +5,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-var lastTick = Date.now();
-var hzMS = 16.666; // 60 FPS
-
-function gameTick() {
-  var _this = this;
-  this.tick++;
-  this.data.tick = this.tick;
-  this.data.currentPlayer = this.getEntity(this.currentPlayerId);
-  // Calculate deltaTime in milliseconds
-  var now = Date.now();
-  var deltaTimeMS = now - lastTick; // Delta time in milliseconds
-  lastTick = now;
-
-  // Clamp deltaTime to avoid time spiral and ensure stability
-  deltaTimeMS = Math.min(deltaTimeMS, hzMS);
-
-  // Clear changed entities
-  this.removedEntities.clear();
-  if (this.isClient) {
-    // TODO: move to localGameLoop?
-    this.systems['entity'].cleanupDestroyedEntities();
-  }
-
-  // Update the physics engine
-  this.physics.updateEngine(this.physics.engine, deltaTimeMS);
-
-  // run the .update() method of all registered systems
-  if (this.systemsManager) {
-    this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
-  }
-
-  // Loop through entities that have changed
-  var _iterator = _createForOfIteratorHelper(this.changedEntities),
-    _step;
-  try {
-    var _loop = function _loop() {
-      var entityId = _step.value;
-      if (_this.isClient && _this.isOnline === false) {
-        var ent = _this.entities.get(entityId);
-        if (ent) {
-          _this.graphics.forEach(function inflateEntityPerInterface(graphicsInterface) {
-            graphicsInterface.inflateEntity(ent);
-          });
-        }
-      }
-    };
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      _loop();
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-  this.changedEntities.clear();
-
-  // Save the game snapshot
-  this.saveSnapshot(this.getEntities(), this.lastProcessedInput);
-  // TODO: THESE should / could all be hooks, after::gameTick
-}
-var _default = exports["default"] = gameTick;
-
-},{}],2:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
 var _LocalClient = _interopRequireDefault(require("./LocalClient.js"));
 var _WebSocketClient = _interopRequireDefault(require("./WebSocketClient.js"));
 var _Preloader = _interopRequireDefault(require("./lib/Preloader.js"));
@@ -110,6 +38,7 @@ var Client = exports["default"] = /*#__PURE__*/function () {
       deltaEncoding: deltaEncoding,
       deltaCompression: deltaCompression
     };
+    this.started = false;
     this.preloading = false;
   }
   _createClass(Client, [{
@@ -133,20 +62,27 @@ var Client = exports["default"] = /*#__PURE__*/function () {
         // hoist preloader to game scope
         game.preloader = preloader;
 
+        // for all game.queuedAssets Set, add to preloader
+        for (var key in game.queuedAssets) {
+          var path = game.queuedAssets[key];
+          preloader.addAsset(path, 'image', key);
+        }
+        game.queuedAssets = {}; // for now
+
         //game.on('progress', progress => console.log(`Loading progress: ${progress * 100}%`));
         //game.on('assetsLoaded', () => console.log('All assets loaded!'));
 
         // load default assets
-        for (var key in _defaultAssets["default"]) {
+        for (var _key in _defaultAssets["default"]) {
           // TODO: configurable assets
 
-          var asset = _defaultAssets["default"][key];
+          var asset = _defaultAssets["default"][_key];
           if (typeof asset === 'string') {
-            preloader.addAsset(asset, 'image', key);
+            preloader.addAsset(asset, 'image', _key);
             continue;
           }
           if (asset.type === 'spritesheet') {
-            preloader.addAsset(asset.url, 'spritesheet', key, asset);
+            preloader.addAsset(asset.url, 'spritesheet', _key, asset);
             continue;
           }
 
@@ -195,15 +131,18 @@ var Client = exports["default"] = /*#__PURE__*/function () {
       }
       var localClient = this.game.getSystem('localClient');
       localClient.start(callback);
+      this.started = true;
     }
   }, {
     key: "stop",
     value: function stop() {
       console.log('Client.js plugin stopping game', this.game);
-      // this.game.localGameLoopRunning = false;
+      this.started = false;
       var localClient = this.game.getSystem('localClient');
       localClient.stop();
     }
+
+    // remote methods here to allow for switching between local / remote modes
   }, {
     key: "connect",
     value: function connect(url) {
@@ -228,7 +167,7 @@ var Client = exports["default"] = /*#__PURE__*/function () {
 _defineProperty(Client, "id", 'client');
 _defineProperty(Client, "removable", false);
 
-},{"./LocalClient.js":3,"./WebSocketClient.js":4,"./defaultAssets.js":5,"./lib/Preloader.js":6}],3:[function(require,module,exports){
+},{"./LocalClient.js":2,"./WebSocketClient.js":3,"./defaultAssets.js":4,"./lib/Preloader.js":5}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -303,7 +242,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
 }();
 _defineProperty(LocalClient, "id", 'client-local');
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -314,7 +253,6 @@ var _msgpack = require("@msgpack/msgpack");
 var _deltaCompression = _interopRequireDefault(require("../snapshot-manager/SnapshotManager/deltaCompression.js"));
 var _interpolateSnapshot = _interopRequireDefault(require("./lib/interpolateSnapshot.js"));
 var _messageSchema = _interopRequireDefault(require("../server/messageSchema.js"));
-var _gameTick = _interopRequireDefault(require("../../lib/gameTick.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
@@ -495,6 +433,13 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
         return;
       }
       if (action === 'player_input') {
+        // Do not send mouse events to server if no mouse buttons or keyboard controls are pressed
+        if (typeof data.controls === 'undefined' && typeof data.mouse !== 'undefined' && data.mouse.LEFT == null && data.mouse.RIGHT == null && data.mouse.MIDDLE == null) {
+          // Remark: This is a special case to ignore Mouse move events when no mouse buttons are pressed
+          //         This is done for performance reasons, as we don't want to send too much data to the server
+          //         ^^^ This line would need to be configurable in order to allow mouse position updates to be sent to the server
+          return;
+        }
         this.inputSequenceNumber++;
         this.inputBuffer[this.inputSequenceNumber] = data;
         var entityInput = this.game.getSystem('entity-input');
@@ -757,7 +702,7 @@ function _decodeBlob() {
   return _decodeBlob.apply(this, arguments);
 }
 
-},{"../../lib/gameTick.js":1,"../server/messageSchema.js":24,"../snapshot-manager/SnapshotManager/deltaCompression.js":25,"./lib/interpolateSnapshot.js":7,"@msgpack/msgpack":17}],5:[function(require,module,exports){
+},{"../server/messageSchema.js":23,"../snapshot-manager/SnapshotManager/deltaCompression.js":24,"./lib/interpolateSnapshot.js":6,"@msgpack/msgpack":16}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -770,7 +715,7 @@ var defaultAssets = {
   'player': '/img/game/link-walk/sprite_0.png',
   'tile-block': '/img/game/tiles/tile-block.png',
   'tile-grass': '/img/game/tiles/tile-grass.png',
-  'fire': '/img/game/env/loz_fire.png',
+  //'fire': '/img/game/env/loz_fire.png',
   'warp-to-platform': '/img/game/env/warp-to-platform.gif',
   'warp-to-music': '/img/game/env/warp-to-music.gif',
   'warp-to-ycraft': '/img/game/env/warp-to-ycraft.gif',
@@ -843,7 +788,7 @@ var defaultAssets = {
       }
     }
   },
-  'mage_sheet': {
+  'blackMage': {
     type: 'spritesheet',
     url: '/img/game/sheets/mage.png',
     frameTags: {
@@ -860,13 +805,25 @@ var defaultAssets = {
           y: 0
         }]
       },
-      mageRight: {
+      playerRight: {
         frames: [{
+          x: 0,
+          y: -64
+        }, {
           x: -32,
+          y: -64
+        }, {
+          x: -64,
+          y: -64
+        }]
+      },
+      playerRightJump: {
+        frames: [{
+          x: 0,
           y: -192
         }]
       },
-      mageWalkLeft: {
+      playerLeftWalk: {
         rate: 16,
         frames: [{
           x: -96,
@@ -876,6 +833,31 @@ var defaultAssets = {
           y: 0
         }, {
           x: -160,
+          y: 0
+        }]
+      },
+      playerRightWalk: {
+        rate: 16,
+        frames: [{
+          x: -96,
+          y: -64
+        }, {
+          x: -128,
+          y: -64
+        }, {
+          x: -160,
+          y: -64
+        }]
+      },
+      playerDownRight: {
+        frames: [{
+          x: -352,
+          y: -64
+        }]
+      },
+      playerDownLeft: {
+        frames: [{
+          x: -352,
           y: 0
         }]
       },
@@ -1147,7 +1129,7 @@ var defaultAssets = {
 };
 var _default = exports["default"] = defaultAssets;
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1292,7 +1274,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
   return Preloader;
 }();
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1350,7 +1332,7 @@ function iterpolateSnapshot(alpha, previousSnapshot, latestSnapshot) {
 }
 var _default = exports["default"] = iterpolateSnapshot;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CachedKeyDecoder = void 0;
@@ -1414,7 +1396,7 @@ class CachedKeyDecoder {
 }
 exports.CachedKeyDecoder = CachedKeyDecoder;
 
-},{"./utils/utf8":23}],9:[function(require,module,exports){
+},{"./utils/utf8":22}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DecodeError = void 0;
@@ -1433,7 +1415,7 @@ class DecodeError extends Error {
 }
 exports.DecodeError = DecodeError;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Decoder = exports.DataViewIndexOutOfBoundsError = void 0;
@@ -2036,7 +2018,7 @@ class Decoder {
 }
 exports.Decoder = Decoder;
 
-},{"./CachedKeyDecoder":8,"./DecodeError":9,"./ExtensionCodec":13,"./utils/int":19,"./utils/prettyByte":20,"./utils/typedArrays":22,"./utils/utf8":23}],11:[function(require,module,exports){
+},{"./CachedKeyDecoder":7,"./DecodeError":8,"./ExtensionCodec":12,"./utils/int":18,"./utils/prettyByte":19,"./utils/typedArrays":21,"./utils/utf8":22}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Encoder = exports.DEFAULT_INITIAL_BUFFER_SIZE = exports.DEFAULT_MAX_DEPTH = void 0;
@@ -2475,7 +2457,7 @@ class Encoder {
 }
 exports.Encoder = Encoder;
 
-},{"./ExtensionCodec":13,"./utils/int":19,"./utils/typedArrays":22,"./utils/utf8":23}],12:[function(require,module,exports){
+},{"./ExtensionCodec":12,"./utils/int":18,"./utils/typedArrays":21,"./utils/utf8":22}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExtData = void 0;
@@ -2490,7 +2472,7 @@ class ExtData {
 }
 exports.ExtData = ExtData;
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 // ExtensionCodec to handle MessagePack extensions
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2563,7 +2545,7 @@ class ExtensionCodec {
 ExtensionCodec.defaultCodec = new ExtensionCodec();
 exports.ExtensionCodec = ExtensionCodec;
 
-},{"./ExtData":12,"./timestamp":18}],14:[function(require,module,exports){
+},{"./ExtData":11,"./timestamp":17}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decodeMulti = exports.decode = exports.defaultDecodeOptions = void 0;
@@ -2599,7 +2581,7 @@ function decodeMulti(buffer, options) {
 }
 exports.decodeMulti = decodeMulti;
 
-},{"./Decoder":10}],15:[function(require,module,exports){
+},{"./Decoder":9}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decodeStream = exports.decodeMultiStream = exports.decodeArrayStream = exports.decodeAsync = void 0;
@@ -2640,7 +2622,7 @@ exports.decodeMultiStream = decodeMultiStream;
  */
 exports.decodeStream = undefined;
 
-},{"./Decoder":10,"./utils/stream":21}],16:[function(require,module,exports){
+},{"./Decoder":9,"./utils/stream":20}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.encode = exports.defaultEncodeOptions = void 0;
@@ -2661,7 +2643,7 @@ function encode(value, options) {
 }
 exports.encode = encode;
 
-},{"./Encoder":11}],17:[function(require,module,exports){
+},{"./Encoder":10}],16:[function(require,module,exports){
 "use strict";
 // Main Functions:
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2696,7 +2678,7 @@ Object.defineProperty(exports, "decodeTimestampToTimeSpec", { enumerable: true, 
 Object.defineProperty(exports, "encodeTimestampExtension", { enumerable: true, get: function () { return timestamp_1.encodeTimestampExtension; } });
 Object.defineProperty(exports, "decodeTimestampExtension", { enumerable: true, get: function () { return timestamp_1.decodeTimestampExtension; } });
 
-},{"./DecodeError":9,"./Decoder":10,"./Encoder":11,"./ExtData":12,"./ExtensionCodec":13,"./decode":14,"./decodeAsync":15,"./encode":16,"./timestamp":18}],18:[function(require,module,exports){
+},{"./DecodeError":8,"./Decoder":9,"./Encoder":10,"./ExtData":11,"./ExtensionCodec":12,"./decode":13,"./decodeAsync":14,"./encode":15,"./timestamp":17}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.timestampExtension = exports.decodeTimestampExtension = exports.decodeTimestampToTimeSpec = exports.encodeTimestampExtension = exports.encodeDateToTimeSpec = exports.encodeTimeSpecToTimestamp = exports.EXT_TIMESTAMP = void 0;
@@ -2801,7 +2783,7 @@ exports.timestampExtension = {
     decode: decodeTimestampExtension,
 };
 
-},{"./DecodeError":9,"./utils/int":19}],19:[function(require,module,exports){
+},{"./DecodeError":8,"./utils/int":18}],18:[function(require,module,exports){
 "use strict";
 // Integer Utility
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2836,7 +2818,7 @@ function getUint64(view, offset) {
 }
 exports.getUint64 = getUint64;
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prettyByte = void 0;
@@ -2845,7 +2827,7 @@ function prettyByte(byte) {
 }
 exports.prettyByte = prettyByte;
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 // utility for whatwg streams
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2886,7 +2868,7 @@ function ensureAsyncIterable(streamLike) {
 }
 exports.ensureAsyncIterable = ensureAsyncIterable;
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createDataView = exports.ensureUint8Array = void 0;
@@ -2915,7 +2897,7 @@ function createDataView(buffer) {
 }
 exports.createDataView = createDataView;
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.utf8Decode = exports.utf8DecodeTD = exports.utf8DecodeJs = exports.utf8Encode = exports.utf8EncodeTE = exports.utf8EncodeJs = exports.utf8Count = void 0;
@@ -3094,7 +3076,7 @@ function utf8Decode(bytes, inputOffset, byteLength) {
 }
 exports.utf8Decode = utf8Decode;
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3211,7 +3193,7 @@ var messageSchema = {
 };
 var _default = exports["default"] = messageSchema;
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3457,7 +3439,7 @@ function initializeDefaultState(id) {
 }
 var _default = exports["default"] = deltaCompression;
 
-},{"./float2Int.js":26}],26:[function(require,module,exports){
+},{"./float2Int.js":25}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3486,5 +3468,5 @@ var float2Int = {
 };
 var _default = exports["default"] = float2Int;
 
-},{}]},{},[2])(2)
+},{}]},{},[1])(1)
 });

@@ -2864,6 +2864,11 @@ function createEntityFromPart(part, contraption) {
       entity = createPartEntity({}, part, contraption);
       break;
   }
+  console.log('eeee', entity);
+  if (!entity) {
+    console.error('No entity created for part', part);
+    return;
+  }
 
   // check to see if entity is array, some parts create multiple entities
   if (Array.isArray(entity)) {

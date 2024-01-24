@@ -49,6 +49,7 @@ var Bomb = /*#__PURE__*/function () {
         console.log('Bomb.dropBomb no entity found for id', entityId);
         return;
       }
+      // TODO: better / more fluent action rate limiter integration
       var actionRateLimiterComponent = this.game.components.actionRateLimiter;
       var lastFired = actionRateLimiterComponent.getLastActionTime(entityId, 'dropBomb');
       var currentTime = Date.now();

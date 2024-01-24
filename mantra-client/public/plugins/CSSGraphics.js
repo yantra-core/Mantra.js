@@ -989,6 +989,15 @@ function createGraphic(entityData) {
     // entityElement.style.backgroundSize = `${entityData.radius}px ${entityData.radius}px`;
   }
 
+  if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+    // entityData.color is int number here we need a hex
+    var hexColor = '#' + entityData.color.toString(16);
+    // update the background color
+    var randomHexColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    // console.log("SETTING BG COLOR", entityData.color, hexColor)
+    // entityElement.style.background = randomHexColor;
+  }
+
   this.renderDiv.appendChild(entityElement);
 
   // Update the position of the entity element
@@ -1060,7 +1069,7 @@ function inflateBox(entityElement, entityData) {
   }
   if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
     // TODO: refactor API
-    tileFlip(entityElement, hexColor, getTexture, entityData);
+    // tileFlip(entityElement, hexColor, getTexture, entityData);
   }
 
   // console.log('entityElement', entityElement)
@@ -1326,6 +1335,7 @@ function updateGraphic(entityData) {
       // entityData.color is int number here we need a hex
       var hexColor = '#' + entityData.color.toString(16);
       // update the background color
+      var randomHexColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
       entityElement.style.background = hexColor;
     }
     if (typeof entityData.position.z === 'number') {
@@ -1524,17 +1534,11 @@ function render(game, alpha) {
   // This is not ideal and will yield low-entity count CSSGraphics performance
   // Best to remove camera follow for CSSGraphics if possible
   // We tried to only iterate changed entities, but this breaks camera follow
-  /*
-  for (let [eId, state] of this.game.changedEntities.entries()) {
-    let ent = this.game.entities.get(eId);
-    // console.log('rendering', ent)
-    // do not re-inflate destroyed entities
-    if (ent.destroyed !== true) {
-      this.inflateEntity(ent, alpha);
-    }
-    // this.game.changedEntities.delete(eId);
-  }
-  */
+
+  var fovEntities = new Map();
+  var currentPlayer = this.game.data.currentPlayer;
+  //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
+  var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
   var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
     _step;
   try {
@@ -1542,13 +1546,13 @@ function render(game, alpha) {
       var _step$value = _slicedToArray(_step.value, 2),
         eId = _step$value[0],
         state = _step$value[1];
-      var ent = this.game.entities.get(eId);
-      // console.log('rendering', ent)
-      // do not re-inflate destroyed entities
-      if (ent.destroyed !== true) {
-        this.inflateEntity(ent, alpha);
+      //console.log('eId',eId, itemsInFov)
+      if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
+        game.removeGraphic(eId);
+        continue;
       }
-      // this.game.changedEntities.delete(eId);
+      var ent = this.game.entities.get(eId);
+      this.inflateEntity(ent, alpha);
     }
   } catch (err) {
     _iterator.e(err);

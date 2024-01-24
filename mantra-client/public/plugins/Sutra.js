@@ -81,7 +81,6 @@ exports["default"] = void 0;
 var _index = require("../../../../sutra/index.js");
 var _defaultPlayerMovement = _interopRequireDefault(require("../../lib/defaultPlayerMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
@@ -89,12 +88,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { createSutra } from '@yantra-core/sutra';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 var Sutra = /*#__PURE__*/function () {
   function Sutra(_ref) {
@@ -106,6 +106,7 @@ var Sutra = /*#__PURE__*/function () {
     this.inputTickCount = {};
     this.inputDuration = {};
     this.defaultMovement = defaultMovement;
+    this.inputsBound = false;
   }
   _createClass(Sutra, [{
     key: "init",
@@ -119,26 +120,38 @@ var Sutra = /*#__PURE__*/function () {
       this.game.on('entityInput::handleInputs', function (entityId, input) {
         self.inputCache = input;
       });
-      var rules = (0, _index.createSutra)(game);
-      this.setSutra(rules);
+      if (_typeof(game.rules) === 'object') {// an instance of Sutra
+        // do nothing, rules are already set, we will extend them
+      } else {
+        // create a new instance of Sutra
+        var rules = (0, _index.createSutra)(game);
+        this.setSutra(rules);
+      }
 
       // Once the game is ready, register the keyboard controls as conditions
       // This allows for game.rules.if('keycode').then('action') style rules
-      game.on('game::ready', function () {
+      if (!this.inputsBound) {
         // for each key in game.controls, add a condition that checks if the key is pressed
         // these are currently explicitly bound to the player entity, we may want to make this more generic
-        self.bindKeyCodesToSutraConditions();
+        self.bindInputsToSutraConditions();
         if (self.defaultMovement) {
           self.game.useSutra((0, _defaultPlayerMovement["default"])(self.game), 'movement');
         }
-      });
+        self.inputsBound = true;
+      }
     }
   }, {
-    key: "bindKeyCodesToSutraConditions",
-    value: function bindKeyCodesToSutraConditions() {
+    key: "bindInputsToSutraConditions",
+    value: function bindInputsToSutraConditions() {
+      this.bindKeyCodesToSutraConditions();
+      this.bindGamepadToSutraConditions();
+    }
+  }, {
+    key: "bindGamepadToSutraConditions",
+    value: function bindGamepadToSutraConditions() {
       var _this = this;
-      if (this.game.systems.keyboard) {
-        var keyControls = this.game.systems.keyboard.controls;
+      if (this.game.systems.gamepad) {
+        var gamepadControls = this.game.systems.gamepad.controls;
         var _loop = function _loop(mantraCode) {
           // Remark: Do we want to imply isPlayer here?
           // Is there a valid case for not defaulting to isPlayer?
@@ -147,8 +160,39 @@ var Sutra = /*#__PURE__*/function () {
             return entity.id === game.currentPlayerId && gameState.input.controls[mantraCode];
           });
         };
-        for (var mantraCode in keyControls) {
+        for (var mantraCode in gamepadControls) {
           _loop(mantraCode);
+        }
+      }
+    }
+  }, {
+    key: "bindKeyCodesToSutraConditions",
+    value: function bindKeyCodesToSutraConditions() {
+      var _this2 = this;
+      if (this.game.systems.keyboard) {
+        var keyControls = this.game.systems.keyboard.controls;
+        var _loop2 = function _loop2(mantraCode) {
+          // Key Down Condition
+          // _DOWN implied as default
+          _this2.game.rules.addCondition(mantraCode, function (entity, gameState) {
+            var _gameState$input$keyS;
+            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS === void 0 ? void 0 : _gameState$input$keyS.down);
+          });
+
+          // Key Up Condition
+          _this2.game.rules.addCondition(mantraCode + '_UP', function (entity, gameState) {
+            var _gameState$input$keyS2;
+            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS2 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS2 === void 0 ? void 0 : _gameState$input$keyS2.up);
+          });
+
+          // Key held Condition
+          _this2.game.rules.addCondition(mantraCode + '_HOLD', function (entity, gameState) {
+            var _gameState$input$keyS3;
+            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS3 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS3 === void 0 ? void 0 : _gameState$input$keyS3.pressed);
+          });
+        };
+        for (var mantraCode in keyControls) {
+          _loop2(mantraCode);
         }
       }
     }
@@ -205,6 +249,9 @@ var Sutra = /*#__PURE__*/function () {
         x: 0,
         y: 0
       };
+      if (game.data && game.data.input) {
+        game.data.input.keyStates = game.systems.keyboard.keyStates;
+      }
 
       // TODO: can we consolidate these into a single rules.tick() call?
       var _iterator = _createForOfIteratorHelper(game.entities.entries()),

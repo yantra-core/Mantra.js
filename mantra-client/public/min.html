@@ -15,71 +15,88 @@
   <script type="module" src="/ycraft.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+
+
+
+    document.addEventListener('DOMContentLoaded', async (event) => {
 
       let game = new MANTRA.Game({
+        graphics: ['css'],
+        defaultMovement: false,
         options: {
           scriptRoot: '.'
         }
       });
 
-      game.start();
+      // will wait for the game to be ready
+      await game.start();
 
+      let currentPlayer = game.getCurrentPlayer();
 
-      // TODO: should merge, not overwrite
-      /*
-      game.setControls({
-        T: function(ev){
-          console.log("T", ev)
-        },
-        SPACE: function(ev){
-          console.log("SPACE", ev)
-        }
-      });
-      */
+      // map inputs to actions using Sutura rules
+      // Flexible, easier to maintain
+      game.rules.if('W').then('MOVEMENT_FORWARD');
+      game.rules.if('A').then('MOVEMENT_LEFT');
+      game.rules.if('S').then('MOVEMENT_BACKWARD');
+      game.rules.if('D').then('MOVEMENT_RIGHT');
 
-
-      /*
-
-      // create entity actions by name
+      // map inputs to actions
+      // Easy to write, not very flexible
+      // Useful for basic mappings and prototyping
       game.setActions({
-        JUMP: function (entityId) {
-          console.log("jump", entityId)
-          game.applyForce(entityId, { x: 0, y: 10, z: 0 });
+        'W': 'MOVEMENT_FORWARD',
+        'A': 'MOVEMENT_LEFT',
+        'S': 'MOVEMENT_BACKWARD',
+        'D': 'MOVEMENT_RIGHT'
+      });
+
+      // map actions to functions
+      game.rules.on('MOVEMENT_FORWARD', function (entity) {
+        console.log("MOVEMENT_FORWARD", entity)
+        game.applyForce(entity.id, { x: 0, y: -10, z: 0 });
+      });
+
+      game.rules.on('MOVEMENT_LEFT', function (entity) {
+        console.log("MOVEMENT_LEFT", entity)
+        game.applyForce(entity.id, { x: -10, y: 0, z: 0 });
+      });
+
+      game.rules.on('MOVEMENT_BACKWARD', function (entity) {
+        console.log("MOVEMENT_BACKWARD", entity)
+        game.applyForce(entity.id, { x: 0, y: 10, z: 0 });
+      });
+
+      game.rules.on('MOVEMENT_RIGHT', function (entity) {
+        console.log("MOVEMENT_RIGHT", entity)
+        game.applyForce(entity.id, { x: 10, y: 0, z: 0 });
+      });
+
+      // Since all rules are Sutras, we can export them to English
+      console.log('rules', game.rules.toEnglish());
+      // console.log('rules', game.rules.toJSON()); // also JSON
+
+
+      // directly map inputs to functions
+      // Easy to do, but not very flexible
+      // Not recommended
+      game.setControls({
+        W: function (ev) {
+          console.log("W", ev)
+          game.applyForce(currentPlayer.id, { x: 0, y: -10, z: 0 });
         },
-        SHOOT: function (entityId) {
-          console.log("shoot", entityId)
-          // for example, fire a bullet via direct access to the bullet system
-          game.systems.bullet.fireBullet(entityId);
+        A: function (ev) {
+          console.log("A", ev)
+          game.applyForce(currentPlayer.id, { x: -10, y: 0, z: 0 });
+        },
+        S: function (ev) {
+          console.log("S", ev)
+          game.applyForce(currentPlayer.id, { x: 0, y: 10, z: 0 });
+        },
+        D: function (ev) {
+          console.log("D", ev)
+          game.applyForce(currentPlayer.id, { x: 10, y: 0, z: 0 });
         }
       });
-
-      game.rules.on('SHOOT', function (entityId) {
-        console.log("SHOOT", entityId)
-      });
-
-      game.rules.if('INPUT_FORWARD').then('MOVEMENT_FORWARD');
-
-      game.rules.if('pressW').then('SHOOT');
-      game.rules.if('JUMP').then('SHOOT');
-
-      game.setControls({
-        SPACE: 'SHOOT',
-        W: 'SHOOT'
-      });
-      */
-
-     /*
-      function handleInputs (entityId, input) {
-        console.log('handleInputs', entityId, input);
-
-      }
-
-      game.on('entityInput::handleInputs', function(){
-        console.log("FFF")
-      });
-      */
-
 
       window.game = game;
 

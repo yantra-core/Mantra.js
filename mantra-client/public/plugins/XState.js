@@ -6180,7 +6180,7 @@ var XState = /*#__PURE__*/function () {
                 game.components[component].data[ent.id] = context[component];
               }
             });
-            console.log('updated entity', ent);
+            // console.log('updated entity', ent);
             game.inflateEntity(ent);
           }
         }

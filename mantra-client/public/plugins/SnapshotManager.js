@@ -178,7 +178,7 @@ var config = {
 };
 
 // TODO: auto-generate this list from the components
-var componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner', 'color'];
+var componentsList = ['type', 'destroyed', 'position', 'velocity', 'mass', 'type', 'health', 'rotation', 'width', 'height', 'depth', 'radius', 'isSensor', 'lifetime', 'owner', 'color', 'texture'];
 var getPlayerSnapshot = function getPlayerSnapshot(playerId) {
   var differentialSnapshotState = [];
   var playerState = [];

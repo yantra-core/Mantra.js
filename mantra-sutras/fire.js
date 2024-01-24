@@ -11,12 +11,12 @@ export default function fire(game) {
     //color: 0xff0000,
     width: 16,
     height: 16,
-    depth: 64,
+    depth: 16,
     isStatic: true,
     position: {
       x: -80,
       y: -60,
-      z: 32
+      z: 16
     }
   });
 
@@ -31,12 +31,12 @@ export default function fire(game) {
     //color: 0xff0000,
     width: 16,
     height: 16,
-    depth: 64,
+    depth: 16,
     isStatic: true,
     position: {
       x: 80,
       y: -60,
-      z: 32
+      z: 16
     }
   });
 

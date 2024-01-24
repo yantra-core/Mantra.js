@@ -17,6 +17,52 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
     _classCallCheck(this, Gamepad);
     this.id = Gamepad.id;
     this.gamepads = {};
+    this.controls = {
+      'DPAD_UP': false,
+      // Up
+      'DPAD_DOWN': false,
+      // Down
+      'DPAD_LEFT': false,
+      // Left
+      'DPAD_RIGHT': false,
+      // Right
+      // y button
+      'BUTTON_Y': false,
+      // "Y" button
+      // x button
+      'BUTTON_X': false,
+      // "X" button
+      // b button
+      'BUTTON_B': false,
+      // "B" button
+      // a button
+      'BUTTON_A': false,
+      // "A" button
+      // start button
+      'BUTTON_START': false,
+      // "Start" button
+      // select button
+      'BUTTON_SELECT': false,
+      // "Select" button
+      // left shoulder button
+      'BUTTON_L1': false,
+      // "L1" button
+      // right shoulder button
+      'BUTTON_R1': false,
+      // "R1" button
+      // left trigger button
+      'BUTTON_L2': false,
+      // "L2" button
+      // right trigger button
+      'BUTTON_R2': false,
+      // "R2" button
+      // left stick button
+      'BUTTON_L3': false,
+      // "L3" button
+      // right stick button
+      'BUTTON_R3': false // "R3" button
+    };
+
     this.lastControlsAllFalse = true;
   }
   _createClass(Gamepad, [{
@@ -25,13 +71,18 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
       var _this = this;
       this.game = game;
       this.id = Gamepad.id;
+      if (this.game.systems.sutra) {
+        this.game.systems.sutra.bindGamepadToSutraConditions();
+      }
       game.systemsManager.addSystem('gamepad', this);
-      window.addEventListener("gamepadconnected", function (event) {
-        return _this.connectHandler(event);
-      });
-      window.addEventListener("gamepaddisconnected", function (event) {
-        return _this.disconnectHandler(event);
-      });
+      if (!this.game.isServer) {
+        window.addEventListener("gamepadconnected", function (event) {
+          return _this.connectHandler(event);
+        });
+        window.addEventListener("gamepaddisconnected", function (event) {
+          return _this.disconnectHandler(event);
+        });
+      }
     }
   }, {
     key: "connectHandler",
@@ -48,8 +99,10 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "update",
     value: function update() {
-      this.pollGamepads();
-      this.sendInputs();
+      if (!this.game.isServer) {
+        this.pollGamepads();
+        this.sendInputs();
+      }
     }
   }, {
     key: "pollGamepads",
@@ -66,9 +119,8 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "sendInputs",
     value: function sendInputs() {
-      var _this2 = this;
-      var _loop = function _loop() {
-        var gamepad = _this2.gamepads[index];
+      for (var index in this.gamepads) {
+        var gamepad = this.gamepads[index];
 
         // Axes for left analog stick
         var xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
@@ -77,58 +129,59 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
         // Deadzone for analog stick to prevent drift
         var deadzone = 0.1;
 
-        // Map left stick to WASD keys
-        var controls = {
-          W: yAxis < -deadzone,
+        // TODO: map controls to current entity input defaults for gamepad
+        this.controls = {
+          'DPAD_UP': yAxis < -deadzone,
           // Up
-          S: yAxis > deadzone,
+          'DPAD_DOWN': yAxis > deadzone,
           // Down
-          A: xAxis < -deadzone,
+          'DPAD_LEFT': xAxis < -deadzone,
           // Left
-          D: xAxis > deadzone,
+          'DPAD_RIGHT': xAxis > deadzone,
           // Right
           // y button
-          P: gamepad.buttons[1].pressed,
-          // "Y" button 
+          'BUTTON_Y': gamepad.buttons[1].pressed,
+          // "Y" button
           // x button
-          K: gamepad.buttons[3].pressed,
+          'BUTTON_X': gamepad.buttons[3].pressed,
           // "X" button
           // b button
-          L: gamepad.buttons[2].pressed,
-          // "B" button 
+          'BUTTON_B': gamepad.buttons[2].pressed,
+          // "B" button
           // a button
-          O: gamepad.buttons[0].pressed,
+          'BUTTON_A': gamepad.buttons[0].pressed,
           // "A" button
           // start button
-          I: gamepad.buttons[9].pressed,
-          // "Start" button for "I" key
+          'BUTTON_START': gamepad.buttons[9].pressed,
+          // "Start" button
           // select button
-          U: gamepad.buttons[8].pressed,
-          // "Select" button for "U" key
-          SPACE: gamepad.buttons[2].pressed // "X" button for Spacebar (fire)
+          'BUTTON_SELECT': gamepad.buttons[8].pressed,
+          // "Select" button
+          // left shoulder button
+          'BUTTON_L1': gamepad.buttons[4].pressed,
+          // "L1" button
+          // right shoulder button
+          'BUTTON_R1': gamepad.buttons[5].pressed,
+          // "R1" button
+          // left trigger button
+          'BUTTON_L2': gamepad.buttons[6].pressed,
+          // "L2" button
+          // right trigger button
+          'BUTTON_R2': gamepad.buttons[7].pressed,
+          // "R2" button
+          // left stick button
+          'BUTTON_L3': gamepad.buttons[10].pressed,
+          // "L3" button
+          // right stick button
+          'BUTTON_R3': gamepad.buttons[11].pressed // "R3" button
         };
 
-        // console.log(gamepad.buttons, 'controls', controls)
-
-        // Send the controls to the game logic or server
-
-        // Check if all controls are false
-        var allFalse = Object.keys(controls).every(function (key) {
-          return !controls[key];
-        });
-
-        // Send controls if they are not all false or if the last controls were not all false
-        if (!allFalse /*|| !this.lastControlsAllFalse*/) {
-          _this2.lastControlsAllFalse = allFalse;
-          if (_this2.game.communicationClient) {
-            _this2.game.communicationClient.sendMessage('player_input', {
-              controls: controls
-            });
-          }
+        var controls = this.controls;
+        if (this.game.communicationClient) {
+          this.game.communicationClient.sendMessage('player_input', {
+            controls: controls
+          });
         }
-      };
-      for (var index in this.gamepads) {
-        _loop();
       }
     }
   }]);

@@ -56,6 +56,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     // this.communicationClient = communicationClient;
     this.inputPool = {}; // Pool to store key inputs since the last game tick
     this.preventDefaults = preventDefaults;
+    this.keyStates = {}; // Object to store the state of each key
 
     // Bind methods and store them as class properties
     this.boundHandleKeyDown = this.handleKeyDown.bind(this);
@@ -65,7 +66,9 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.bindInputControls();
+      if (!this.game.isServer) {
+        this.bindInputControls();
+      }
       this.name = 'keyboard';
 
       // register the Plugin as a system, on each update() we will send the inputPool to the server
@@ -81,11 +84,29 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     key: "update",
     value: function update() {
       this.sendInputs();
+
+      // Reset key down and up states
+      // Remark: is this a race condition here with cross plugin reference from Sutra.js? to this.keyStates?
+      /*
+      for (let key in this.keyStates) {
+        if (this.keyStates[key].down) {
+          this.keyStates[key].down = false;
+        }
+        if (this.keyStates[key].up) {
+          this.keyStates[key].up = false;
+        }
+      }
+      */
     }
   }, {
     key: "handleKeyDown",
     value: function handleKeyDown(event) {
       if (MANTRA_KEY_MAP[event.code]) {
+        this.keyStates[MANTRA_KEY_MAP[event.code]] = {
+          down: true,
+          up: false,
+          pressed: true
+        };
         this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
         if (this.preventDefaults === true) {
           event.preventDefault();
@@ -96,6 +117,11 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     key: "handleKeyUp",
     value: function handleKeyUp(event) {
       if (MANTRA_KEY_MAP[event.code]) {
+        this.keyStates[MANTRA_KEY_MAP[event.code]] = {
+          down: false,
+          up: true,
+          pressed: false
+        };
         this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
       }
     }

@@ -340,6 +340,7 @@ function getTexture(config) {
 
     // sprite name is an object, check for x / y positions with width / height
     if (_typeof(spriteName) === 'object') {
+      // TODO: add check here for literal sprites unbound to a spritesheet
       var _sprite = {};
       _sprite.x = spriteName.x;
       _sprite.y = spriteName.y;
@@ -391,7 +392,8 @@ function switchGraphics(graphicsInterfaceName, cb) {
   var engines = {
     'BabylonGraphics': 'graphics-babylon',
     'PhaserGraphics': 'graphics-phaser',
-    'CSSGraphics': 'graphics-css'
+    'CSSGraphics': 'graphics-css',
+    'ThreeGraphics': 'graphics-three'
   };
   var graphicsInterfaceId = engines[graphicsInterfaceName];
   document.body.style.cursor = 'wait';

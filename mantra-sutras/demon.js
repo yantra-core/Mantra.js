@@ -7,11 +7,11 @@ export default function demon(game) {
     //color: 0xff0000,
     width: 8,
     height: 8,
-    depth: 64,
+    depth: 8,
     position: {
       x: -60,
       y: -60,
-      z: 32
+      z: 8
     }
   });
 
@@ -22,11 +22,11 @@ export default function demon(game) {
     //color: 0xff0000,
     width: 8,
     height: 8,
-    depth: 64,
+    depth: 8,
     position: {
       x: 64,
       y: -60,
-      z: 32
+      z: 8
     }
   });
 

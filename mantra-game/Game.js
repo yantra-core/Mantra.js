@@ -341,6 +341,9 @@ class Game {
     }
     // reset the default player controls
     this.setControls({});
+
+    // reset any deffered entities
+    this.deferredEntities = {};
   }
 
   //
