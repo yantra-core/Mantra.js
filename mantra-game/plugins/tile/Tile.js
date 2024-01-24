@@ -4,6 +4,11 @@ import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 
 // TODO: mantra-tiled-server needs to be a package.json
 import getChunkFiles from './lib/getChunkFiles.js';
+import loadChunk from './lib/loadChunk.js';
+import calculateTilePosition from './lib/calculateTilePosition.js';
+import generateRandomChunk from './lib/generateRandomChunk.js';
+import randomTileFromDistribution from './lib/randomTileFromDistribution.js';
+import createTile from './lib/createTile.js'; 
 
 const tilemap = {
   1: 'grass',
@@ -33,6 +38,9 @@ class Tile {
     // set a default tile map
     this.tileMap = tileMap;
 
+    this.tilemap = tilemap; // rename
+    this.tileTypes = tileTypes; // rename
+
     // TODO: configurable chunk size and tile size
     this.chunkUnitSize = chunkUnitSize;
     this.tileSize = tileSize;
@@ -53,6 +61,13 @@ class Tile {
 
     // list of tile ids for random generation
     this.tileIds = [1, 2, 3, 4];
+
+    this.loadChunk = loadChunk.bind(this);
+    this.calculateTilePosition = calculateTilePosition.bind(this);
+    this.generateRandomChunk = generateRandomChunk.bind(this);
+    this.randomTileFromDistribution = randomTileFromDistribution.bind(this);
+    this.createTile = createTile.bind(this);
+    
 
   }
 
@@ -81,52 +96,6 @@ class Tile {
 
   }
 
-  createTile(tile, x, y, z, tileWidth, tileHeight, color) {
-    let tileId = tile.id;
-
-    // TODO: better tile config by kind
-    // for now
-    z = -16;
-
-    const scale = 1;
-
-    let body = false;
-    let isStatic;
-    let mass;
-
-    /*
-    if (tile.body) {
-      body = true;
-      isStatic = false;
-      mass = 1;
-    }
-    */
-
-    let _color;
-    if (color) {
-      _color = color;
-    }
-    // body = false;
-    let _texture = `tile-${tilemap[tileId]}`;
-    this.game.createEntity({
-      type: 'BLOCK',
-      kind: 'Tile',
-      body,
-      mass,
-      isStatic,
-      style: { cursor: 'pointer' },
-      position: { x: x * scale, y: y * scale, z },
-      friction: 1,
-      frictionAir: 1,
-      frictionStatic: 1,
-      texture: _texture,
-      color: _color,
-      width: tileWidth * scale,
-      height: tileHeight * scale,
-      depth: tileWidth * scale
-    });
-  }
-
   createTileMapFromTiledJSON(tiledJSON) {
     tiledJSON.layers.forEach(layer => {
       if (layer.type === 'tilelayer') {
@@ -149,63 +118,13 @@ class Tile {
     });
   }
 
-  calculateTilePosition(index, layer, tileWidth, tileHeight, tileId) {
-    // Calculate the tile's local position within the layer (relative to the layer's top-left corner)
-    let localX = (index % layer.width) * tileWidth;
-    let localY = Math.floor(index / layer.width) * tileHeight;
 
-    // Calculate the center of the layer in pixel coordinates
-    let layerCenterX = layer.width * tileWidth / 2;
-    let layerCenterY = layer.height * tileHeight / 2;
-
-    // Convert local positions to pixel values and add the layer's offset
-    // Adjusted to start from the center (0,0)
-    let mapX = localX - layerCenterX + (layer.x * tileWidth);
-    let mapY = localY - layerCenterY + (layer.y * tileHeight);
-
-    // Calculate the absolute position of the tile in the game world
-    let x = mapX;
-    let y = mapY;
-    let z = tileId === 1 ? 0 : -1;  // Adjust z based on your game's logic
-
-    return { x, y, z };
-}
 
   getTileImageURL(tileId) {
     return `img/game/tiles/${tileId}.png`;
   }
 
-  loadChunk(chunkPath, chunkKey) {
-    // console.log("load chunk", chunkPath, chunkKey)
-
-    if (!this.loadingStates[chunkPath]) {
-      this.loadingStates[chunkPath] = { attempts: 0, loading: false };
-    }
-
-    let state = this.loadingStates[chunkPath];
-
-    if (!state.loading && state.attempts < this.maxRetries) {
-      state.loading = true;
-      state.attempts++;
-
-      console.log("Attempting to load tile chunk", chunkPath);
-      this.game.loadScripts([chunkPath], (err) => {
-        // console.log("Loaded tile chunk", chunkKey);
-        state.loading = false;
-
-        if (this.game.data.chunks[chunkKey]) {
-          this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
-        } else {
-          console.log("WARNING: chunk not found", chunkKey);
-          this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
-        }
-      });
-    } else if (state.attempts >= this.maxRetries) {
-      // console.log("MAX RETRIES REACHED FOR", chunkPath);
-      this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
-    }
-  }
-
+ 
   handleLoadFailure(chunkPath, chunkKey) {
     //console.log("Fallback for failed load:", chunkPath, chunkKey);
     // Call the procedural generation function
@@ -217,44 +136,14 @@ class Tile {
       this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
     }
   }
-  generateRandomChunk(chunkKey, tileTypes) {
-    let chunkData = [];
-    const totalWeight = tileTypes.reduce((acc, tileType) => acc + tileType.weight, 0);
+ 
 
-    for (let i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
-      let tile = this.randomTileFromDistribution(tileTypes, totalWeight);
-      chunkData.push(tile);
-    }
-
-    let randomIntColor = Math.floor(Math.random() * 16777215);
-    return {
-      data: chunkData,
-      height: this.chunkUnitSize,
-      width: this.chunkUnitSize,
-      color: randomIntColor,
-      x: this.extractChunkCoordinates(chunkKey).x,
-      y: this.extractChunkCoordinates(chunkKey).y
-    };
-  }
-
-  randomTileFromDistribution(tileTypes, totalWeight) {
-    let randomWeight = Math.random() * totalWeight;
-    let weightSum = 0;
-
-    for (let tileType of tileTypes) {
-      weightSum += tileType.weight;
-      if (randomWeight <= weightSum) {
-        return tileType.id;
-      }
-    }
-
-    return tileTypes[tileTypes.length - 1].id; // Fallback in case of rounding errors
-  }
-
+  /*
   randomTileFromDistribution(tileIds) {
     let randomIndex = Math.floor(Math.pow(Math.random(), 2) * tileIds.length);
     return tileIds[randomIndex];
   }
+  */
 
   extractChunkCoordinates(chunkKey) {
     // Extracts x and y coordinates from the chunk key
