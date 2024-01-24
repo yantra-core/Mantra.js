@@ -28,7 +28,8 @@ class Tile {
     tiledServer = false,
     chunkUnitSize = 8,
     tileSize = 16,
-    proceduralGenerateMissingChunks = false
+    proceduralGenerateMissingChunks = false,
+    loadInitialChunk = true,
   } = {}) {
   
     this.id = Tile.id;
@@ -56,6 +57,8 @@ class Tile {
     // if true, will load tiles on demand based on mantra-tiled-server specs
     this.lazyLoadTiles = false;
 
+    this.loadInitialChunk = loadInitialChunk;
+
     // if true, will generate random chunks for missing chunks not found by mantra-tiled-server
     this.proceduralGenerateMissingChunks = proceduralGenerateMissingChunks;
 
@@ -77,7 +80,8 @@ class Tile {
     this.game = game;
     this.game.addSystem('tile', this);
 
-    if (this.tiledServer) {
+    if (this.tiledServer && this.loadInitialChunk) {
+
       this.game.loadScripts([
         '/tiled/chunks/chunk_x0_y0.js'
       ], () => {
@@ -96,12 +100,26 @@ class Tile {
       //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
     }
 
+    // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
+    this.game.on('file::upload', (data) => {
+      console.log('got new tile data', data);
+      this.createTileMapFromTiledJSON(data);
+    });
+
   }
 
   createTileMapFromTiledJSON(tiledJSON) {
     tiledJSON.layers.forEach(layer => {
       if (layer.type === 'tilelayer') {
-        this.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
+
+        if (layer.chunks) {
+          layer.chunks.forEach(chunk => {
+            this.createLayer(chunk, tiledJSON.tilewidth, tiledJSON.tileheight);
+          });
+        } else {
+          this.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
+        }
+
       }
     });
   }
