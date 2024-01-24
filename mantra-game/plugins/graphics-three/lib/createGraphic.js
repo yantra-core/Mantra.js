@@ -7,12 +7,17 @@ export default function createGraphic(entityData) {
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'BULLET':
-      geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
+
       break;
     case 'PLAYER':
-      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
+      //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
+      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
+
       break;
-    case 'TEXT':
+
+    case 'not_implemented_TEXT':
       // Ensure you have the font data loaded
       const font = this.game.font; // Assuming you have a method to get the loaded font
       if (font) {

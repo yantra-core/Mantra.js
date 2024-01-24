@@ -339,6 +339,10 @@ class Game {
     if (this.systems.sutra) {
       this.systems.sutra.bindInputsToSutraConditions();
     }
+
+    // reset the Field of View use to default ( off )
+    this.useFoV = false;
+
     // reset the default player controls
     this.setControls({});
 

@@ -1,4 +1,4 @@
-export default function removeEntity(entityId) {
+export default function removeEntity(entityId, removeFromGameData = true) {
   let ent = this.game.entities.get(entityId);
   if (ent && this.game.systems.graphics && ent.graphics) {
     // Is this best done here? or in the graphics plugin?
@@ -20,9 +20,12 @@ export default function removeEntity(entityId) {
     this.game.entities.set(entityId, updatedEntity);
 
     if (updatedEntity && this.game.systems.rbush) {
-      // TODO: don't remove entity if field of view is active
-      // this way it will reinflate when it comes back into view
-      // this.game.systems.rbush.removeEntity(updatedEntity);
+      // actually remove the entity from the game world
+      // will be set to false for field of view related removals
+      if (removeFromGameData) {
+        this.game.systems.rbush.removeEntity(updatedEntity);
+        delete this.game.deferredEntities[entityId];
+      }
     }
 
   }

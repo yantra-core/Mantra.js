@@ -14,8 +14,8 @@ import createTile from './lib/createTile.js';
 
 const tileKinds = [
   { id: 0, kind: 'grass', weight: 10 },
-  { id: 1, kind: 'bush', weight: 5, body: true, isStatic: true, z: 0 },
-  { id: 2, kind: 'grass', weight: 60 },
+  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 0 },
+  { id: 2, kind: 'grass', weight: 63 },
   { id: 3, kind: 'block', weight: 5, body: true, z: 0  },
   { id: 4, kind: 'path-green', weight: 10 },
   { id: 5, kind: 'path-brown', weight: 10 },
@@ -96,21 +96,26 @@ class Tile {
     this.game = game;
     this.game.addSystem('tile', this);
 
-    if (this.tiledServer && this.loadInitialChunk) {
+    if (this.loadInitialChunk) {
 
-      this.game.loadScripts([
-        '/tiled/chunks/chunk_x0_y0.js'
-      ], () => {
-        // query the default tiled chunk location for chunk chunk_x0_y0
-        // this file will exist in ./tiled/chunks/chunk_x0_y0.js
-        // we can simply inject this remote .js file from the CDN into the client
-        // and the game.data.chunks scope will be populated with the chunk data
-        console.log('this.game.data.chunks.chunk_x0_y0', this.game.data.chunks.chunk_x0_y0.data.length)
-        this.createLayer(this.game.data.chunks.chunk_x0_y0, this.tileSize, this.tileSize);
-      });
+      if (this.tiledServer) {
+        this.game.loadScripts([
+          '/tiled/chunks/chunk_x0_y0.js'
+        ], () => {
+          // query the default tiled chunk location for chunk chunk_x0_y0
+          // this file will exist in ./tiled/chunks/chunk_x0_y0.js
+          // we can simply inject this remote .js file from the CDN into the client
+          // and the game.data.chunks scope will be populated with the chunk data
+          console.log('this.game.data.chunks.chunk_x0_y0', this.game.data.chunks.chunk_x0_y0.data.length)
+          this.createLayer(this.game.data.chunks.chunk_x0_y0, this.tileSize, this.tileSize);
+        });
+  
+      } else if (this.proceduralGenerateMissingChunks) {
+        // TODO: generator
+      }
+      
   
     } else {
-
 
       //setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
       //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
@@ -164,32 +169,21 @@ class Tile {
     });
   }
 
-
-
   getTileImageURL(tileId) {
     return `img/game/tiles/${tileId}.png`;
   }
 
- 
   handleLoadFailure(chunkPath, chunkKey) {
     //console.log("Fallback for failed load:", chunkPath, chunkKey);
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
-      console.log('Generating random chunk', chunkKey)
+      // console.log('Generating random chunk', chunkKey)
       let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
       // console.log('randomChunk', chunkKey, randomChunk.data.length)
       this.game.data.chunks[chunkKey] = randomChunk;
       this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
     }
   }
- 
-
-  /*
-  randomTileFromDistribution(tileIds) {
-    let randomIndex = Math.floor(Math.pow(Math.random(), 2) * tileIds.length);
-    return tileIds[randomIndex];
-  }
-  */
 
   extractChunkCoordinates(chunkKey) {
     // Extracts x and y coordinates from the chunk key
@@ -199,20 +193,25 @@ class Tile {
 
   loadTilesForArea(position) {
 
-    if (!this.tiledServer) return;
+    // if (!this.tiledServer) return;
 
     let outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
     const result = getChunkFiles(position, this.chunkUnitSize, outputDir, 2);
     // console.log("getChunkFiles result", position, result);
   
+    // TODO: place check to see if we allow remote chunk loading
     result.forEach(chunkName => {
       // Extract the chunk key from the chunk file name
       let chunkKey = chunkName.replace('.js', '').replace(outputDir, '');
       // Load the chunk if it's not already loaded
       if (typeof this.game.data.chunks[chunkKey] === 'undefined') {
         // console.log("loadTilesForArea", position, this.chunkUnitSize);
-        let chunkPath = chunkName; // Since the directory is already included in chunkName
-        this.loadChunk(chunkPath, chunkKey);
+        if (this.tiledServer) {
+          let chunkPath = chunkName;
+          this.loadChunk(chunkPath, chunkKey);
+        } else if (this.proceduralGenerateMissingChunks) {
+          this.handleLoadFailure(null, chunkKey); // Changed to handle procedural generation
+        }
       }
     });
   }
