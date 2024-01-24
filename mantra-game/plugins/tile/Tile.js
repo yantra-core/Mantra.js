@@ -7,13 +7,17 @@ import getChunkFiles from './lib/getChunkFiles.js';
 import loadChunk from './lib/loadChunk.js';
 import calculateTilePosition from './lib/calculateTilePosition.js';
 import generateRandomChunk from './lib/generateRandomChunk.js';
+import generateRandomChunkWithPaths from './lib/generateRandomChunkWithPaths.js';
+import generateChunkWithFractal from './lib/generateChunkWithFractal.js';
 import randomTileFromDistribution from './lib/randomTileFromDistribution.js';
 import createTile from './lib/createTile.js'; 
 
 const tileKinds = [
   { id: 1, kind: 'bush', weight: 5, body: true, isStatic: true, z: 0 },
-  { id: 2, kind: 'grass', weight: 90 },
-  { id: 3, kind: 'block', weight: 5, body: true, z: 0  }
+  { id: 2, kind: 'grass', weight: 70 },
+  { id: 3, kind: 'block', weight: 5, body: true, z: 0  },
+  { id: 4, kind: 'path-green', weight: 10 },
+  { id: 5, kind: 'path-brown', weight: 10 },
 ];
 
 class Tile {
@@ -22,12 +26,15 @@ class Tile {
   constructor({ 
     tileMap = defaultOrthogonalMap,
     tiledServer = false,
-    chunkUnitSize = 128,
+    chunkUnitSize = 8,
     tileSize = 16,
     proceduralGenerateMissingChunks = false
   } = {}) {
   
     this.id = Tile.id;
+
+    // in debug mode we will add colors to each chunk
+    this.debug = false;
 
     // set a default tile map
     this.tileMap = tileMap;
@@ -58,6 +65,8 @@ class Tile {
     this.loadChunk = loadChunk.bind(this);
     this.calculateTilePosition = calculateTilePosition.bind(this);
     this.generateRandomChunk = generateRandomChunk.bind(this);
+    this.generateRandomChunkWithPaths = generateRandomChunkWithPaths.bind(this);
+    this.generateChunkWithFractal = generateChunkWithFractal.bind(this);
     this.randomTileFromDistribution = randomTileFromDistribution.bind(this);
     this.createTile = createTile.bind(this);
     
@@ -126,7 +135,7 @@ class Tile {
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
       console.log('Generating random chunk', chunkKey)
-      let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
+      let randomChunk = this.generateChunkWithFractal(chunkKey, tileKinds);
       // console.log('randomChunk', chunkKey, randomChunk.data.length)
       this.game.data.chunks[chunkKey] = randomChunk;
       this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
