@@ -83,11 +83,16 @@ export default function inflateTexture(entityData) {
 
 function applyTextureToMesh(game, entityData, mesh) {
   let texture = game.getTexture(entityData.texture);
-  if (!texture) return;
+  if (!texture) {
+    // console.warn('Warning: Texture not found', entityData.texture);
+    mesh.visible = true;
+    return mesh;
+  };
 
 
   // check to see if the mesh has a texture already
   if (mesh.material.map) {
+    mesh.visible = true;
     return mesh;
   }
 
@@ -120,5 +125,7 @@ function applyTextureToMesh(game, entityData, mesh) {
       mesh.material.color.set(color);
     }
     mesh.material.needsUpdate = true;
+    mesh.visible = true;
+
   });
 }

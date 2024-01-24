@@ -45,6 +45,11 @@ export default function createGraphic(entityData) {
   if (!geometry) return; // If geometry is not set (like missing font), exit early
 
   mesh = new THREE.Mesh(geometry, material);
+  // set to invisible at first
+  if (entityData.type !== "PLAYER") { // for now
+    mesh.visible = false;
+  }
+
   this.scene.add(mesh);
 
   // Setting position

@@ -13,15 +13,15 @@ export default function render(game, alpha) {
   let currentPlayer = this.game.data.currentPlayer;
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
   let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
+  // console.log('itemsInFov', itemsInFov)
 
-  for (let [eId, state] of this.game.entities.entries()) {
-    //console.log('eId',eId, itemsInFov)
-    if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
-      game.removeGraphic(eId);
-      continue;
-    }
+  itemsInFov.forEach(eId => {
     let ent = this.game.entities.get(eId);
-    this.inflateEntity(ent, alpha);
-  }
+    if (ent) {
+      this.inflateEntity(ent, alpha);
+    }
+  });
 
 }
+
+

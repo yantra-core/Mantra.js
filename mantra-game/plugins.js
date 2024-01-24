@@ -95,6 +95,7 @@ import YantraGUI from './plugins/gui-yantra/YantraGUI.js';
 import YCraftGUI from './plugins/gui-ycraft/YCraftGUI.js';
 import PluginExplorer from './plugins/gui-plugin-explorer/PluginExplorer.js';
 import Scoreboard from './plugins/gui-scoreboard/Scoreboard.js';
+import DragAndDropFileUpload from './plugins/gui-drag-and-drop-file-upload/DragAndDropFileUpload.js';
 
 // Utility
 import PingTime from './plugins/ping-time/PingTime.js';
@@ -142,6 +143,7 @@ const plugins = {
   Nes,
   Inspector,
   ControlsGUI,
+  DragAndDropFileUpload,
   PluginExplorer,
   LoadingScreen,
   Editor,

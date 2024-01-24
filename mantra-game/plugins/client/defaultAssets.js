@@ -4,7 +4,11 @@ let defaultAssets = {
   'player': '/img/game/link-walk/sprite_0.png',
   'tile-block': '/img/game/tiles/tile-block.png',
   'tile-grass': '/img/game/tiles/tile-grass.png',
-  'fire': '/img/game/env/loz_fire.png',
+  'tile-bush': '/img/game/tiles/tile-bush.png',
+  'tile-path-green': '/img/game/tiles/tile-path-green.png',
+  'tile-path-brown': '/img/game/tiles/tile-path-brown.png',
+
+  //'fire': '/img/game/env/loz_fire.png',
   'warp-to-platform': '/img/game/env/warp-to-platform.gif',
   'warp-to-music': '/img/game/env/warp-to-music.gif',
   'warp-to-ycraft': '/img/game/env/warp-to-ycraft.gif',
@@ -65,7 +69,7 @@ let defaultAssets = {
       },
     },
   },
-  'mage_sheet': {
+  'blackMage': {
     type: 'spritesheet',
     url: '/img/game/sheets/mage.png',
     frameTags: {
@@ -77,12 +81,19 @@ let defaultAssets = {
           { x: -64, y: 0 },
         ]
       },
-      mageRight: {
+      playerRight: {
         frames: [
-          { x: -32, y: -192 }
+          { x: 0, y: -64 },
+          { x: -32, y: -64 },
+          { x: -64, y: -64 },
         ]
       },
-      mageWalkLeft: {
+      playerRightJump: {
+        frames: [
+          { x: 0, y: -192 },
+        ]
+      },
+      playerLeftWalk: {
         rate: 16,
         frames: [
           { x: -96, y: 0 },
@@ -90,6 +101,27 @@ let defaultAssets = {
           { x: -160, y: 0 },
         ]
       },
+      playerRightWalk: {
+        rate: 16,
+        frames: [
+          { x: -96, y: -64 },
+          { x: -128, y: -64 },
+          { x: -160, y: -64 },
+        ]
+      },
+
+      playerDownRight: {
+        frames: [
+          { x: -352, y: -64 },
+        ]
+      },
+
+      playerDownLeft: {
+        frames: [
+          { x: -352, y: 0 },
+        ]
+      },
+
       mageJump: {
         rate: 100,
         frames: [
