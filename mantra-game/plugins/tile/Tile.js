@@ -135,7 +135,7 @@ class Tile {
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
       console.log('Generating random chunk', chunkKey)
-      let randomChunk = this.generateChunkWithFractal(chunkKey, tileKinds);
+      let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
       // console.log('randomChunk', chunkKey, randomChunk.data.length)
       this.game.data.chunks[chunkKey] = randomChunk;
       this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);

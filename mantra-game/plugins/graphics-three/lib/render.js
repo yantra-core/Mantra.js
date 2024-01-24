@@ -8,16 +8,30 @@ export default function render(game, alpha) {
   let fovEntities = new Map();
   let currentPlayer = this.game.data.currentPlayer;
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
-  let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
 
-  for (let [eId, state] of this.game.entities.entries()) {
-    //console.log('eId',eId, itemsInFov)
-    if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
-      game.removeGraphic(eId);
-      continue;
+
+  if (true || this.game.useFov) {
+
+    let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
+    // console.log('itemsInFov', itemsInFov)
+  
+    itemsInFov.forEach(eId => {
+      let ent = this.game.entities.get(eId);
+      if (ent) {
+        this.inflateGraphic(ent, alpha);
+      }
+    });
+
+  } else {
+
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
+      this.inflateGraphic(ent, alpha);
     }
-    let ent = this.game.entities.get(eId);
-    this.inflateGraphic(ent, alpha);
+
+
   }
+
+
   this.renderer.render(this.scene, this.camera);
 }

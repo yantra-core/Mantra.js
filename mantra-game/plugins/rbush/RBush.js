@@ -75,27 +75,37 @@ class RBush {
       }
     }
 
-    if (tick % 30 !== 0) return;
+    // if (tick % 30 !== 0) return;
 
     // get all items, plus a buffer of 1.5x the field of view
     let nearbyEntities = game.getPlayerFieldOfView(currentPlayer, this.game.data.fieldOfView * 1.5, false);
+
+    // Check to see if any entities exists in the game world which are not in the field of view
+    // If so, remove them from the game world
+    for (let [eId, state] of this.game.entities.entries()) {
+      if (game.useFoV && nearbyEntities.indexOf(eId) === -1) {
+        let ent = this.game.entities.get(eId);
+        if (ent) {
+          game.removeEntity(eId);
+        }
+      }
+    }
+
+    // Check to see if any entities exist in the field of view ( RBush ) which are not in the game world
+    // If so, add them to the game world
     nearbyEntities.forEach(eId => {
       if (eId) {
         let exists = this.game.getEntity(eId);
         if (!exists) {
           let entityData = this.game.deferredEntities[eId.toString()]
-          if (entityData) {
+          if (entityData && entityData.destroyed !== true) {
             this.game.createEntity(entityData, true); // ignore create setup, goes straight to create
           }
-          delete this.game.deferredEntities[eId];
         }
       }
     });
 
   }
-
-
-
 
   render() { }
   destroy() { }
