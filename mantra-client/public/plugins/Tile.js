@@ -7,6 +7,13 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _defaultOrthogonalMap = _interopRequireDefault(require("./maps/defaultOrthogonalMap.js"));
 var _getChunkFiles = _interopRequireDefault(require("./lib/getChunkFiles.js"));
+var _loadChunk = _interopRequireDefault(require("./lib/loadChunk.js"));
+var _calculateTilePosition = _interopRequireDefault(require("./lib/calculateTilePosition.js"));
+var _generateRandomChunk = _interopRequireDefault(require("./lib/generateRandomChunk.js"));
+var _generateRandomChunkWithPaths = _interopRequireDefault(require("./lib/generateRandomChunkWithPaths.js"));
+var _generateChunkWithFractal = _interopRequireDefault(require("./lib/generateChunkWithFractal.js"));
+var _randomTileFromDistribution = _interopRequireDefault(require("./lib/randomTileFromDistribution.js"));
+var _createTile = _interopRequireDefault(require("./lib/createTile.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17,27 +24,32 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 // TODO: mantra-tiled-server needs to be a package.json
-var tilemap = {
-  1: 'grass',
-  2: 'grass',
-  3: 'grass'
-};
-var tileTypes = [{
+var tileKinds = [{
   id: 1,
-  weight: 50
-},
-// 50% chance
-{
+  kind: 'bush',
+  weight: 5,
+  body: true,
+  isStatic: true,
+  z: 0
+}, {
   id: 2,
-  weight: 10,
-  body: true
-},
-// 10% chance
-{
+  kind: 'grass',
+  weight: 70
+}, {
   id: 3,
-  weight: 40
-} // 20% chance
-];
+  kind: 'block',
+  weight: 5,
+  body: true,
+  z: 0
+}, {
+  id: 4,
+  kind: 'path-green',
+  weight: 10
+}, {
+  id: 5,
+  kind: 'path-brown',
+  weight: 10
+}];
 var Tile = /*#__PURE__*/function () {
   function Tile() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -46,7 +58,7 @@ var Tile = /*#__PURE__*/function () {
       _ref$tiledServer = _ref.tiledServer,
       tiledServer = _ref$tiledServer === void 0 ? false : _ref$tiledServer,
       _ref$chunkUnitSize = _ref.chunkUnitSize,
-      chunkUnitSize = _ref$chunkUnitSize === void 0 ? 128 : _ref$chunkUnitSize,
+      chunkUnitSize = _ref$chunkUnitSize === void 0 ? 8 : _ref$chunkUnitSize,
       _ref$tileSize = _ref.tileSize,
       tileSize = _ref$tileSize === void 0 ? 16 : _ref$tileSize,
       _ref$proceduralGenera = _ref.proceduralGenerateMissingChunks,
@@ -54,8 +66,12 @@ var Tile = /*#__PURE__*/function () {
     _classCallCheck(this, Tile);
     this.id = Tile.id;
 
+    // in debug mode we will add colors to each chunk
+    this.debug = false;
+
     // set a default tile map
     this.tileMap = tileMap;
+    this.tileKinds = tileKinds; // rename
 
     // TODO: configurable chunk size and tile size
     this.chunkUnitSize = chunkUnitSize;
@@ -75,7 +91,14 @@ var Tile = /*#__PURE__*/function () {
     this.proceduralGenerateMissingChunks = proceduralGenerateMissingChunks;
 
     // list of tile ids for random generation
-    this.tileIds = [1, 2, 3, 4];
+    this.tileIds = [1, 2, 3];
+    this.loadChunk = _loadChunk["default"].bind(this);
+    this.calculateTilePosition = _calculateTilePosition["default"].bind(this);
+    this.generateRandomChunk = _generateRandomChunk["default"].bind(this);
+    this.generateRandomChunkWithPaths = _generateRandomChunkWithPaths["default"].bind(this);
+    this.generateChunkWithFractal = _generateChunkWithFractal["default"].bind(this);
+    this.randomTileFromDistribution = _randomTileFromDistribution["default"].bind(this);
+    this.createTile = _createTile["default"].bind(this);
   }
   _createClass(Tile, [{
     key: "init",
@@ -100,57 +123,6 @@ var Tile = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "createTile",
-    value: function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
-      var tileId = tile.id;
-
-      // TODO: better tile config by kind
-      // for now
-      z = -16;
-      var scale = 1;
-      var body = false;
-      var isStatic;
-      var mass;
-
-      /*
-      if (tile.body) {
-        body = true;
-        isStatic = false;
-        mass = 1;
-      }
-      */
-
-      var _color;
-      if (color) {
-        _color = color;
-      }
-      // body = false;
-      var _texture = "tile-".concat(tilemap[tileId]);
-      this.game.createEntity({
-        type: 'BLOCK',
-        kind: 'Tile',
-        body: body,
-        mass: mass,
-        isStatic: isStatic,
-        style: {
-          cursor: 'pointer'
-        },
-        position: {
-          x: x * scale,
-          y: y * scale,
-          z: z
-        },
-        friction: 1,
-        frictionAir: 1,
-        frictionStatic: 1,
-        texture: _texture,
-        color: _color,
-        width: tileWidth * scale,
-        height: tileHeight * scale,
-        depth: tileWidth * scale
-      });
-    }
-  }, {
     key: "createTileMapFromTiledJSON",
     value: function createTileMapFromTiledJSON(tiledJSON) {
       var _this2 = this;
@@ -166,9 +138,14 @@ var Tile = /*#__PURE__*/function () {
       var _this3 = this;
       layer.data.forEach(function (tile, index) {
         if (typeof tile === 'number') {
-          tile = {
-            id: tile
-          };
+          // find id = tile in tileKinds
+          var tileId = tile;
+          var tileKind = tileKinds.find(function (tileKind) {
+            return tileKind.id === tileId;
+          });
+          if (tileKind) {
+            tile = tileKind;
+          }
         }
         //if (tileId !== 0 && /* tileId !== 2 && */ tileId !== 4577 && tileId !== 4767) {
         var _this3$calculateTileP = _this3.calculateTilePosition(index, layer, tileWidth, tileHeight, tile.id),
@@ -180,68 +157,9 @@ var Tile = /*#__PURE__*/function () {
       });
     }
   }, {
-    key: "calculateTilePosition",
-    value: function calculateTilePosition(index, layer, tileWidth, tileHeight, tileId) {
-      // Calculate the tile's local position within the layer (relative to the layer's top-left corner)
-      var localX = index % layer.width * tileWidth;
-      var localY = Math.floor(index / layer.width) * tileHeight;
-
-      // Calculate the center of the layer in pixel coordinates
-      var layerCenterX = layer.width * tileWidth / 2;
-      var layerCenterY = layer.height * tileHeight / 2;
-
-      // Convert local positions to pixel values and add the layer's offset
-      // Adjusted to start from the center (0,0)
-      var mapX = localX - layerCenterX + layer.x * tileWidth;
-      var mapY = localY - layerCenterY + layer.y * tileHeight;
-
-      // Calculate the absolute position of the tile in the game world
-      var x = mapX;
-      var y = mapY;
-      var z = tileId === 1 ? 0 : -1; // Adjust z based on your game's logic
-
-      return {
-        x: x,
-        y: y,
-        z: z
-      };
-    }
-  }, {
     key: "getTileImageURL",
     value: function getTileImageURL(tileId) {
       return "img/game/tiles/".concat(tileId, ".png");
-    }
-  }, {
-    key: "loadChunk",
-    value: function loadChunk(chunkPath, chunkKey) {
-      var _this4 = this;
-      // console.log("load chunk", chunkPath, chunkKey)
-
-      if (!this.loadingStates[chunkPath]) {
-        this.loadingStates[chunkPath] = {
-          attempts: 0,
-          loading: false
-        };
-      }
-      var state = this.loadingStates[chunkPath];
-      if (!state.loading && state.attempts < this.maxRetries) {
-        state.loading = true;
-        state.attempts++;
-        console.log("Attempting to load tile chunk", chunkPath);
-        this.game.loadScripts([chunkPath], function (err) {
-          // console.log("Loaded tile chunk", chunkKey);
-          state.loading = false;
-          if (_this4.game.data.chunks[chunkKey]) {
-            _this4.game.systems.tile.createLayer(_this4.game.data.chunks[chunkKey], _this4.tileSize, _this4.tileSize);
-          } else {
-            console.log("WARNING: chunk not found", chunkKey);
-            _this4.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
-          }
-        });
-      } else if (state.attempts >= this.maxRetries) {
-        // console.log("MAX RETRIES REACHED FOR", chunkPath);
-        this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
-      }
     }
   }, {
     key: "handleLoadFailure",
@@ -250,39 +168,19 @@ var Tile = /*#__PURE__*/function () {
       // Call the procedural generation function
       if (this.proceduralGenerateMissingChunks) {
         console.log('Generating random chunk', chunkKey);
-        var randomChunk = this.generateRandomChunk(chunkKey, tileTypes);
+        var randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
         // console.log('randomChunk', chunkKey, randomChunk.data.length)
         this.game.data.chunks[chunkKey] = randomChunk;
         this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
       }
     }
-  }, {
-    key: "generateRandomChunk",
-    value: function generateRandomChunk(chunkKey, tileTypes) {
-      var chunkData = [];
-      var totalWeight = tileTypes.reduce(function (acc, tileType) {
-        return acc + tileType.weight;
-      }, 0);
-      for (var i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
-        var tile = this.randomTileFromDistribution(tileTypes, totalWeight);
-        chunkData.push(tile);
-      }
-      var randomIntColor = Math.floor(Math.random() * 16777215);
-      return {
-        data: chunkData,
-        height: this.chunkUnitSize,
-        width: this.chunkUnitSize,
-        color: randomIntColor,
-        x: this.extractChunkCoordinates(chunkKey).x,
-        y: this.extractChunkCoordinates(chunkKey).y
-      };
-    }
-  }, {
-    key: "randomTileFromDistribution",
-    value: function randomTileFromDistribution(tileIds) {
-      var randomIndex = Math.floor(Math.pow(Math.random(), 2) * tileIds.length);
+
+    /*
+    randomTileFromDistribution(tileIds) {
+      let randomIndex = Math.floor(Math.pow(Math.random(), 2) * tileIds.length);
       return tileIds[randomIndex];
     }
+    */
   }, {
     key: "extractChunkCoordinates",
     value: function extractChunkCoordinates(chunkKey) {
@@ -299,7 +197,7 @@ var Tile = /*#__PURE__*/function () {
   }, {
     key: "loadTilesForArea",
     value: function loadTilesForArea(position) {
-      var _this5 = this;
+      var _this4 = this;
       if (!this.tiledServer) return;
       var outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
       var result = (0, _getChunkFiles["default"])(position, this.chunkUnitSize, outputDir, 2);
@@ -309,10 +207,10 @@ var Tile = /*#__PURE__*/function () {
         // Extract the chunk key from the chunk file name
         var chunkKey = chunkName.replace('.js', '').replace(outputDir, '');
         // Load the chunk if it's not already loaded
-        if (typeof _this5.game.data.chunks[chunkKey] === 'undefined') {
+        if (typeof _this4.game.data.chunks[chunkKey] === 'undefined') {
           // console.log("loadTilesForArea", position, this.chunkUnitSize);
           var chunkPath = chunkName; // Since the directory is already included in chunkName
-          _this5.loadChunk(chunkPath, chunkKey);
+          _this4.loadChunk(chunkPath, chunkKey);
         }
       });
     }
@@ -331,7 +229,246 @@ var Tile = /*#__PURE__*/function () {
 _defineProperty(Tile, "id", 'tile');
 var _default = exports["default"] = Tile;
 
-},{"./lib/getChunkFiles.js":2,"./maps/defaultOrthogonalMap.js":3}],2:[function(require,module,exports){
+},{"./lib/calculateTilePosition.js":2,"./lib/createTile.js":3,"./lib/generateChunkWithFractal.js":4,"./lib/generateRandomChunk.js":5,"./lib/generateRandomChunkWithPaths.js":6,"./lib/getChunkFiles.js":7,"./lib/loadChunk.js":8,"./lib/randomTileFromDistribution.js":9,"./maps/defaultOrthogonalMap.js":10}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = calculateTilePosition;
+function calculateTilePosition(index, layer, tileWidth, tileHeight, tileId) {
+  // Calculate the tile's local position within the layer (relative to the layer's top-left corner)
+  var localX = index % layer.width * tileWidth;
+  var localY = Math.floor(index / layer.width) * tileHeight;
+
+  // Calculate the center of the layer in pixel coordinates
+  var layerCenterX = layer.width * tileWidth / 2;
+  var layerCenterY = layer.height * tileHeight / 2;
+
+  // Convert local positions to pixel values and add the layer's offset
+  // Adjusted to start from the center (0,0)
+  var mapX = localX - layerCenterX + layer.x * tileWidth;
+  var mapY = localY - layerCenterY + layer.y * tileHeight;
+
+  // Calculate the absolute position of the tile in the game world
+  var x = mapX;
+  var y = mapY;
+  var z = tileId === 1 ? 0 : -1; // Adjust z based on your game's logic
+
+  return {
+    x: x,
+    y: y,
+    z: z
+  };
+}
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createTile;
+function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
+  var tileId = tile.id;
+
+  // TODO: better tile config by kind
+  // for now
+
+  if (typeof tile.z === 'number') {
+    z = tile.z;
+  } else {
+    z = -16;
+  }
+  var isStatic;
+  if (typeof tile.isStatic === 'boolean') {
+    isStatic = tile.isStatic;
+  }
+  var scale = 1;
+  var body = tile.body;
+  var mass = tile.mass || 1;
+  var _color;
+  if (color && this.debug) {
+    _color = color;
+  }
+  var _texture = "tile-".concat(tile.kind); // rename
+  this.game.createEntity({
+    type: 'BLOCK',
+    kind: 'Tile',
+    body: body,
+    mass: mass,
+    isStatic: isStatic,
+    style: {
+      cursor: 'pointer'
+    },
+    position: {
+      x: x * scale,
+      y: y * scale,
+      z: z
+    },
+    friction: 1,
+    frictionAir: 1,
+    frictionStatic: 1,
+    texture: _texture,
+    color: _color,
+    width: tileWidth * scale,
+    height: tileHeight * scale,
+    depth: tileWidth * scale
+  });
+}
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = generateChunkWithFractal;
+function generateChunkWithFractal(chunkKey, tileKinds) {
+  var fractalType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'mandelbrot';
+  var chunkData = [];
+  var chunkSize = this.chunkUnitSize;
+  var maxIter = 100; // Max iterations for fractal calculation
+  var fractalBounds = {
+    xMin: -2,
+    xMax: 1,
+    yMin: -1.5,
+    yMax: 1.5
+  }; // Bounds for the fractal
+
+  for (var i = 0; i < chunkSize * chunkSize; i++) {
+    var x = i % chunkSize;
+    var y = Math.floor(i / chunkSize);
+
+    // Map chunk coordinates to fractal coordinates
+    var fractalX = fractalBounds.xMin + x / chunkSize * (fractalBounds.xMax - fractalBounds.xMin);
+    var fractalY = fractalBounds.yMin + y / chunkSize * (fractalBounds.yMax - fractalBounds.yMin);
+    var tile = void 0;
+    var iterations = mandelbrotIterations(fractalX, fractalY, maxIter);
+    if (iterations === maxIter) {
+      // Inside the set, pick a specific tile kind
+      tile = {
+        kind: 'path-brown'
+      };
+    } else {
+      // Outside the set, choose randomly
+      tile = this.randomTileFromDistribution(tileKinds, tileKinds.reduce(function (acc, kind) {
+        return acc + kind.weight;
+      }, 0));
+    }
+    chunkData.push(tile);
+  }
+  var randomIntColor = Math.floor(Math.random() * 16777215);
+  return {
+    data: chunkData,
+    height: chunkSize,
+    width: chunkSize,
+    color: randomIntColor,
+    x: this.extractChunkCoordinates(chunkKey).x,
+    y: this.extractChunkCoordinates(chunkKey).y
+  };
+}
+function mandelbrotIterations(x, y) {
+  var maxIter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
+  var real = x;
+  var imag = y;
+  var n = 0;
+  while (real * real + imag * imag <= 4 && n < maxIter) {
+    var tempReal = real * real - imag * imag + x;
+    imag = 2 * real * imag + y;
+    real = tempReal;
+    n++;
+  }
+  return n;
+}
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = generateRandomChunk;
+function generateRandomChunk(chunkKey, tileKinds) {
+  var chunkData = [];
+  var totalWeight = tileKinds.reduce(function (acc, tileType) {
+    return acc + tileType.weight;
+  }, 0);
+  for (var i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
+    var tile = this.randomTileFromDistribution(tileKinds, totalWeight);
+    chunkData.push(tile);
+  }
+  var randomIntColor = Math.floor(Math.random() * 16777215);
+  return {
+    data: chunkData,
+    height: this.chunkUnitSize,
+    width: this.chunkUnitSize,
+    color: randomIntColor,
+    x: this.extractChunkCoordinates(chunkKey).x,
+    y: this.extractChunkCoordinates(chunkKey).y
+  };
+}
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = generateRandomChunkWithPaths;
+function generateRandomChunkWithPaths(chunkKey, tileKinds) {
+  var chunkData = [];
+  var totalWeight = tileKinds.reduce(function (acc, tileType) {
+    return acc + tileType.weight;
+  }, 0);
+
+  // Determine if this chunk should have a path, and if so, get the pattern
+  var hasPath = Math.random() < 0.5; // 50% chance to have a path
+  var pathPattern = hasPath ? randomPathPattern(this.chunkUnitSize) : null;
+
+  // Variables to control path color consistency
+  var currentPathColor = Math.random() < 0.5 ? 'path-green' : 'path-brown'; // Initial path color
+  var colorSwitchThreshold = 3; // Number of tiles before color switch
+  var colorCounter = 0; // Counter for the current color
+
+  for (var i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
+    var tile = void 0;
+    if (hasPath && pathPattern.has(i)) {
+      tile = {
+        kind: currentPathColor
+      };
+      colorCounter++;
+      // Switch color if the threshold is reached
+      if (colorCounter >= colorSwitchThreshold) {
+        currentPathColor = currentPathColor === 'path-green' ? 'path-brown' : 'path-green';
+        colorCounter = 0; // Reset counter after switching
+      }
+    } else {
+      tile = this.randomTileFromDistribution(tileKinds, totalWeight);
+    }
+    chunkData.push(tile);
+  }
+  var randomIntColor = Math.floor(Math.random() * 16777215);
+  return {
+    data: chunkData,
+    height: this.chunkUnitSize,
+    width: this.chunkUnitSize,
+    color: randomIntColor,
+    x: this.extractChunkCoordinates(chunkKey).x,
+    y: this.extractChunkCoordinates(chunkKey).y
+  };
+}
+function randomPathPattern(size) {
+  // Example implementation: Create a simple straight horizontal path
+  var pathSet = new Set();
+  var row = Math.floor(Math.random() * size); // Random row for the path
+  for (var i = 0; i < size; i++) {
+    pathSet.add(row * size + i);
+  }
+  return pathSet;
+}
+
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -368,7 +505,76 @@ function pathJoin(dir, file) {
   }
 }
 
-},{}],3:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = loadChunk;
+function loadChunk(chunkPath, chunkKey) {
+  var _this = this;
+  // console.log("load chunk", chunkPath, chunkKey)
+
+  if (!this.loadingStates[chunkPath]) {
+    this.loadingStates[chunkPath] = {
+      attempts: 0,
+      loading: false
+    };
+  }
+  var state = this.loadingStates[chunkPath];
+  if (!state.loading && state.attempts < this.maxRetries) {
+    state.loading = true;
+    state.attempts++;
+    console.log("Attempting to load tile chunk", chunkPath);
+    this.game.loadScripts([chunkPath], function (err) {
+      // console.log("Loaded tile chunk", chunkKey);
+      state.loading = false;
+      if (_this.game.data.chunks[chunkKey]) {
+        _this.game.systems.tile.createLayer(_this.game.data.chunks[chunkKey], _this.tileSize, _this.tileSize);
+      } else {
+        console.log("WARNING: chunk not found", chunkKey);
+        _this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
+      }
+    });
+  } else if (state.attempts >= this.maxRetries) {
+    // console.log("MAX RETRIES REACHED FOR", chunkPath);
+    this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
+  }
+}
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = randomTileFromDistribution;
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function randomTileFromDistribution(tileKinds, totalWeight) {
+  var randomWeight = Math.random() * totalWeight;
+  var weightSum = 0;
+  var _iterator = _createForOfIteratorHelper(tileKinds),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var tileType = _step.value;
+      weightSum += tileType.weight;
+      if (randomWeight <= weightSum) {
+        return tileType.id;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  return tileKinds[tileKinds.length - 1].id; // Fallback in case of rounding errors
+}
+
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

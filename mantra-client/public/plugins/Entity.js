@@ -936,7 +936,9 @@ function removeEntity(entityId) {
     var updatedEntity = this.game.getEntity(entityId);
     this.game.entities.set(entityId, updatedEntity);
     if (updatedEntity && this.game.systems.rbush) {
-      this.game.systems.rbush.removeEntity(updatedEntity);
+      // TODO: don't remove entity if field of view is active
+      // this way it will reinflate when it comes back into view
+      // this.game.systems.rbush.removeEntity(updatedEntity);
     }
   }
 }

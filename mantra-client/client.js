@@ -112,6 +112,7 @@ game.use(new plugins.Schema());
 
 game.use(new plugins.Timers());
 game.use('RBush')
+//game.use('Bullet')
 
 
 // game.use(new plugins.LoadingScreen());
@@ -215,7 +216,9 @@ if (mode === 'online') {
   */
 
   game.start(function(){
-    // game.use(home);
+//    game.use(home);
+
+    /*    */
 
     game.createPlayer({
       position: {
@@ -231,7 +234,6 @@ if (mode === 'online') {
       chunkUnitSize: 8,
       proceduralGenerateMissingChunks: true,
     }))
-
     /*
     */
      /*

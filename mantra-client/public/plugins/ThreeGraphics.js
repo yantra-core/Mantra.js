@@ -318,6 +318,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = inflateEntity;
 function inflateEntity(entity, alpha) {
+  if (entity.kind === 'building') {
+    return; // for now
+  }
+
   var graphic;
   if (entity.graphics && entity.graphics['graphics-three']) {
     graphic = entity.graphics['graphics-three'];
@@ -333,6 +337,9 @@ function inflateEntity(entity, alpha) {
     return;
   }
   this.inflateTexture(entity, graphic);
+  if (this.game.tick % 120 === 0) {
+    console.log('length', Object.keys(game.data.ents._).length);
+  }
 }
 
 },{}],5:[function(require,module,exports){
@@ -492,6 +499,7 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 // called as much as the client requires in order to render
 function render(game, alpha) {
+  var _this = this;
   var self = this;
   // Update the controls on each frame
   // this.controls.update();
@@ -500,26 +508,33 @@ function render(game, alpha) {
   var fovEntities = new Map();
   var currentPlayer = this.game.data.currentPlayer;
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
-  var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
-  var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var _step$value = _slicedToArray(_step.value, 2),
-        eId = _step$value[0],
-        state = _step$value[1];
-      //console.log('eId',eId, itemsInFov)
-      if (game.useFoV && itemsInFov.indexOf(eId) === -1) {
-        game.removeGraphic(eId);
-        continue;
+
+  if (true || this.game.useFov) {
+    var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
+    // console.log('itemsInFov', itemsInFov)
+
+    itemsInFov.forEach(function (eId) {
+      var ent = _this.game.entities.get(eId);
+      if (ent) {
+        _this.inflateGraphic(ent, alpha);
       }
-      var ent = this.game.entities.get(eId);
-      this.inflateGraphic(ent, alpha);
+    });
+  } else {
+    var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var _step$value = _slicedToArray(_step.value, 2),
+          eId = _step$value[0],
+          state = _step$value[1];
+        var ent = this.game.entities.get(eId);
+        this.inflateGraphic(ent, alpha);
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
     }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
   }
   this.renderer.render(this.scene, this.camera);
 }
