@@ -147,6 +147,15 @@ class MatterPhysics extends PhysicsInterface {
               this.game.components.position.set(body.myEntityId, position);
               this.game.components.rotation.set(body.myEntityId, body.angle);
 
+              // update the position in RBush
+              if (this.game.systems.rbush) {
+                this.game.systems.rbush.updateEntity({
+                  id: body.myEntityId,
+                  position: position,
+                  width: ent.width,
+                  height: ent.height
+                });
+              }
         
               // update size as well
               //this.game.components.height.set(body.myEntityId, body.bounds.max.y);

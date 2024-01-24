@@ -441,6 +441,16 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                   _this2.game.components.position.set(body.myEntityId, position);
                   _this2.game.components.rotation.set(body.myEntityId, body.angle);
 
+                  // update the position in RBush
+                  if (_this2.game.systems.rbush) {
+                    _this2.game.systems.rbush.updateEntity({
+                      id: body.myEntityId,
+                      position: position,
+                      width: ent.width,
+                      height: ent.height
+                    });
+                  }
+
                   // update size as well
                   //this.game.components.height.set(body.myEntityId, body.bounds.max.y);
                   //this.game.components.width.set(body.myEntityId, body.bounds.max.x);
