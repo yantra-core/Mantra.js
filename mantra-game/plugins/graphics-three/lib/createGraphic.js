@@ -16,7 +16,7 @@ export default function createGraphic(entityData) {
       // Ensure you have the font data loaded
       const font = this.game.font; // Assuming you have a method to get the loaded font
       if (font) {
-        / console.log('font', font);
+        // console.log('font', font);
         // font has isFont, type, and data
         /* TODO: this causes game to crash / not render? no error 
         geometry = new THREE.TextGeometry(entityData.text, {
