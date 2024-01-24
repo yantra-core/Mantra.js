@@ -8,19 +8,30 @@ export default function render(game, alpha) {
   // This is not ideal and will yield low-entity count CSSGraphics performance
   // Best to remove camera follow for CSSGraphics if possible
   // We tried to only iterate changed entities, but this breaks camera follow
- 
-  let fovEntities = new Map();
-  let currentPlayer = this.game.data.currentPlayer;
-  //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
-  let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
-  // console.log('itemsInFov', itemsInFov)
 
-  itemsInFov.forEach(eId => {
-    let ent = this.game.entities.get(eId);
-    if (ent) {
-      this.inflateEntity(ent, alpha);
+  if (this.game.useFov) {
+
+    let fovEntities = new Map();
+    let currentPlayer = this.game.data.currentPlayer;
+    //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
+    let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
+    // console.log('itemsInFov', itemsInFov)
+  
+    itemsInFov.forEach(eId => {
+      let ent = this.game.entities.get(eId);
+      if (ent) {
+        this.inflateGraphic(ent, alpha);
+      }
+    });
+
+  } else {
+
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
+      this.inflateGraphic(ent, alpha);
     }
-  });
+
+  }
 
 }
 
