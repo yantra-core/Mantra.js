@@ -42,7 +42,7 @@ export default function createEntity(config, ignoreSetup = false) {
       // radius: null,
       height: 100,
       width: 100,
-      depth: 10,
+      depth: 16,
       lifetime: -1,
       maxSpeed: 9999,
       isStatic: false,
@@ -75,7 +75,11 @@ export default function createEntity(config, ignoreSetup = false) {
     if (this.game.systems.rbush) {
       this.game.systems.rbush.addEntity(config);
     }
-  
+
+    // Remark: Always add to deferredEntities, this is now being used to store all local
+    //         game data that may not yet be in the game.data scope ( off screen / not loaded )
+    game.deferredEntities[config.id.toString()] = config;
+
     if (this.game.useFoV) {
       // check to see if entity is within game.data.fieldOfView,
       // if not, we will defer creation until it is
@@ -85,7 +89,6 @@ export default function createEntity(config, ignoreSetup = false) {
         let distance = distanceSquared(currentPlayer.position.x, currentPlayer.position.y, incomingPosition.x, incomingPosition.y);
         let fieldOfViewSquared = this.game.data.fieldOfView * this.game.data.fieldOfView;
         if (distance > fieldOfViewSquared) {
-          game.deferredEntities[config.id.toString()] = config;
           return;
         }
       }
