@@ -2525,11 +2525,11 @@ function demon(game) {
     //color: 0xff0000,
     width: 8,
     height: 8,
-    depth: 64,
+    depth: 8,
     position: {
       x: -60,
       y: -60,
-      z: 32
+      z: 8
     }
   });
   game.createEntity({
@@ -2539,11 +2539,11 @@ function demon(game) {
     //color: 0xff0000,
     width: 8,
     height: 8,
-    depth: 64,
+    depth: 8,
     position: {
       x: 64,
       y: -60,
-      z: 32
+      z: 8
     }
   });
   var rules = game.createSutra();
@@ -2593,12 +2593,12 @@ function fire(game) {
     //color: 0xff0000,
     width: 16,
     height: 16,
-    depth: 64,
+    depth: 16,
     isStatic: true,
     position: {
       x: -80,
       y: -60,
-      z: 32
+      z: 16
     }
   });
   game.createEntity({
@@ -2612,12 +2612,12 @@ function fire(game) {
     //color: 0xff0000,
     width: 16,
     height: 16,
-    depth: 64,
+    depth: 16,
     isStatic: true,
     position: {
       x: 80,
       y: -60,
-      z: 32
+      z: 16
     }
   });
   var rules = game.createSutra();
@@ -3167,6 +3167,25 @@ exports["default"] = platformMovement;
 function platformMovement(game) {
   var rules = game.createSutra();
 
+  /*
+     rules.on('MOVE_UP', function (player) {
+      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: 0 });
+    });
+     rules.on('MOVE_DOWN', function (player) {
+      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI });
+    });
+     rules.on('MOVE_LEFT', function (player, node, gameState) {
+      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
+    });
+     rules.on('MOVE_RIGHT', function (player) {
+      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
+      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
+    });
+     */
+
   // TODO: remove this? the Sutra should only be concerned with the control name, not the key
   var defaultControlsMapping = {
     A: 'MOVE_LEFT',
@@ -3228,7 +3247,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = topdownMovement;
 function topdownMovement(game) {
   var rules = game.createSutra();
-  rules.on('MOVE_FORWARD', function (entity) {
+  rules.on('MOVE_UP', function (entity) {
     game.applyForce(entity.id, {
       x: 0,
       y: -1,
@@ -3239,7 +3258,7 @@ function topdownMovement(game) {
       rotation: 0
     });
   });
-  rules.on('MOVE_BACKWARD', function (entity) {
+  rules.on('MOVE_DOWN', function (entity) {
     game.applyForce(entity.id, {
       x: 0,
       y: 1,
@@ -3365,7 +3384,6 @@ var GravityGardens = /*#__PURE__*/function () {
         });
       });
       rules.on('MOVE_LEFT', function (player, node, gameState) {
-        console.log(gameState.tick);
         game.applyForce(player.id, {
           x: -1,
           y: 0,
@@ -3657,25 +3675,46 @@ var Home = /*#__PURE__*/function () {
       game.use('Tone');
       (0, _welcomeMessage["default"])(game);
       var rules = game.rules;
-      rules["if"]('W').then('MOVE_FORWARD').then('updateSprite', {
+      rules.addCondition('PLAYER_UP', {
+        op: 'or',
+        conditions: ['W', 'DPAD_UP']
+      });
+      rules.addCondition('PLAYER_DOWN', {
+        op: 'or',
+        conditions: ['S', 'DPAD_DOWN']
+      });
+      rules.addCondition('PLAYER_LEFT', {
+        op: 'or',
+        conditions: ['A', 'DPAD_LEFT']
+      });
+      rules.addCondition('PLAYER_RIGHT', {
+        op: 'or',
+        conditions: ['D', 'DPAD_RIGHT']
+      });
+      rules.addCondition('USE_ITEM_1', {
+        op: 'or',
+        conditions: ['SPACE', 'H', 'BUTTON_X']
+      });
+
+      // see: ../mantra-sutras/movement/top-down.js events MOVE_UP, MOVE_DOWN, etc.
+      rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
         sprite: 'playerUp'
       });
-      rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+      rules["if"]('PLAYER_LEFT').then('MOVE_LEFT').then('updateSprite', {
         sprite: 'playerLeft'
       });
-      rules["if"]('S').then('MOVE_BACKWARD').then('updateSprite', {
+      rules["if"]('PLAYER_DOWN').then('MOVE_DOWN').then('updateSprite', {
         sprite: 'playerDown'
       });
-      rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
+      rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
         sprite: 'playerRight'
       });
-      rules["if"]('SPACE').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
+      rules["if"]('USE_ITEM_1').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
 
       //rules.if('K').then('SWING_SWORD');
       //rules.if('L').then('SWING_SWORD');
-      rules["if"]('K')["if"]('canDropBomb').then('DROP_BOMB');
       // rules.if('L').then('DROP_BOMB');
-
+      rules["if"]('K')["if"]('canDropBomb').then('DROP_BOMB');
       rules["if"]('O').then('ZOOM_IN');
       rules["if"]('P').then('ZOOM_OUT');
       rules.addMap('determineShootingSprite', function (player, node) {
@@ -3701,50 +3740,26 @@ var Home = /*#__PURE__*/function () {
           }
         });
       });
-      rules.on('MOVE_FORWARD', function (player) {
-        game.applyForce(player.id, {
-          x: 0,
-          y: -1,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: 0
-        });
+
+      /*
+      rules.on('MOVE_UP', function (player) {
+        game.applyForce(player.id, { x: 0, y: -1, z: 0 });
+        game.updateEntity({ id: player.id, rotation: 0 });
       });
-      rules.on('MOVE_BACKWARD', function (player) {
-        game.applyForce(player.id, {
-          x: 0,
-          y: 1,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: Math.PI
-        });
+       rules.on('MOVE_DOWN', function (player) {
+        game.applyForce(player.id, { x: 0, y: 1, z: 0 });
+        game.updateEntity({ id: player.id, rotation: Math.PI });
       });
-      rules.on('MOVE_LEFT', function (player, node, gameState) {
-        game.applyForce(player.id, {
-          x: -1,
-          y: 0,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: -Math.PI / 2
-        });
+       rules.on('MOVE_LEFT', function (player, node, gameState) {
+        game.applyForce(player.id, { x: -1, y: 0, z: 0 });
+        game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
       });
-      rules.on('MOVE_RIGHT', function (player) {
-        game.applyForce(player.id, {
-          x: 1,
-          y: 0,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: Math.PI / 2
-        });
+       rules.on('MOVE_RIGHT', function (player) {
+        game.applyForce(player.id, { x: 1, y: 0, z: 0 });
+        game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
       });
+      */
+
       rules.on('FIRE_BULLET', function (player) {
         game.systems.bullet.fireBullet(player.id);
       });
@@ -3983,11 +3998,11 @@ var Home = /*#__PURE__*/function () {
 
       // switch to 3d text label
       game.createEntity({
-        name: 'BabylonGraphics',
+        name: 'ThreeGraphics',
         collisionActive: true,
         collisionEnd: true,
         collisionStart: true,
-        kind: 'BabylonGraphics',
+        kind: 'ThreeGraphics',
         type: 'TEXT',
         text: '3D',
         width: 60,
@@ -4011,7 +4026,7 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'DOOR',
-        kind: 'BabylonGraphics',
+        kind: 'ThreeGraphics',
         collisionActive: true,
         collisionEnd: true,
         collisionStart: true,
@@ -4326,7 +4341,7 @@ function sutras(game) {
   rules.use((0, _bomb["default"])(game), 'bomb');
 
   // movement
-  //rules.use(movement(game), 'movement');
+  rules.use((0, _topDown["default"])(game), 'movement');
 
   // console.log('created sutra', rules.toEnglish())
   return rules;
@@ -4585,6 +4600,7 @@ exports["default"] = void 0;
 var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 var _createPiano = _interopRequireDefault(require("./instruments/createPiano.js"));
 var _createDrumKit = _interopRequireDefault(require("./instruments/createDrumKit.js"));
+var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 var _sutras = _interopRequireDefault(require("./sutras.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -4694,13 +4710,75 @@ var Music = /*#__PURE__*/function () {
         autoBorder: true
       });
       var rules = game.rules;
-      rules["if"]('W').then('MOVE_FORWARD');
-      rules["if"]('A').then('MOVE_LEFT');
-      rules["if"]('S').then('MOVE_BACKWARD');
-      rules["if"]('D').then('MOVE_RIGHT');
+      rules.addCondition('PLAYER_UP', {
+        op: 'or',
+        conditions: ['W', 'DPAD_UP']
+      });
+      rules.addCondition('PLAYER_DOWN', {
+        op: 'or',
+        conditions: ['S', 'DPAD_DOWN']
+      });
+      rules.addCondition('PLAYER_LEFT', {
+        op: 'or',
+        conditions: ['A', 'DPAD_LEFT']
+      });
+      rules.addCondition('PLAYER_RIGHT', {
+        op: 'or',
+        conditions: ['D', 'DPAD_RIGHT']
+      });
+      rules.addCondition('USE_ITEM_1', {
+        op: 'or',
+        conditions: ['SPACE', 'H', 'BUTTON_X']
+      });
+      rules.use((0, _topDown["default"])(game), 'movement');
+      rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
+        sprite: 'playerUp'
+      });
+      rules["if"]('PLAYER_LEFT').then('MOVE_LEFT').then('updateSprite', {
+        sprite: 'playerLeft'
+      });
+      rules["if"]('PLAYER_DOWN').then('MOVE_DOWN').then('updateSprite', {
+        sprite: 'playerDown'
+      });
+      rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
+        sprite: 'playerRight'
+      });
       rules["if"]('SPACE').then('FIRE_BULLET');
+      rules["if"]('H')["if"]('rateAllowed').then('PLAY_DRUM', {
+        drum: 'kick'
+      });
+      rules["if"]('J')["if"]('rateAllowed').then('PLAY_DRUM', {
+        drum: 'snare'
+      });
+      rules["if"]('K')["if"]('rateAllowed').then('PLAY_DRUM', {
+        drum: 'hat'
+      });
+      rules["if"]('L')["if"]('rateAllowed').then('PLAY_DRUM', {
+        drum: 'hiHatClosed'
+      });
+
+      // TODO: implies once key pressed, then key released
+      //    rules.if('H_DOWN').then('PLAY_DRUM', { drum: 'kick' });
+
+      // TODO: better action rate component api
+      rules.addCondition('rateAllowed', function (entity, gameState) {
+        return true;
+        var actionRateLimiterComponent = game.components.actionRateLimiter;
+        var lastFired = actionRateLimiterComponent.getLastActionTime(entity.id, 'PLAY_DRUM');
+        var currentTime = Date.now();
+        if (currentTime - lastFired < 200) {
+          // console.log('Rate limit hit for entity', entityId, ', cannot fire yet');
+          return false;
+        }
+        actionRateLimiterComponent.recordAction(entity.id, 'PLAY_DRUM');
+        return true;
+      });
       rules["if"]('O').then('ZOOM_IN');
       rules["if"]('P').then('ZOOM_OUT');
+      rules.on('PLAY_DRUM', function (player, node, gameState) {
+        console.log('nnn', node);
+        game.systems.tone.playDrum(node.data.drum || 'kick');
+      });
       rules.on('MOVE_FORWARD', function (player) {
         game.applyForce(player.id, {
           x: 0,
@@ -4708,8 +4786,7 @@ var Music = /*#__PURE__*/function () {
           z: 0
         });
         game.updateEntity({
-          id: player.id,
-          rotation: 0
+          id: player.id
         });
       });
       rules.on('MOVE_BACKWARD', function (player) {
@@ -4730,8 +4807,7 @@ var Music = /*#__PURE__*/function () {
           z: 0
         });
         game.updateEntity({
-          id: player.id,
-          rotation: -Math.PI / 2
+          id: player.id
         });
       });
       rules.on('MOVE_RIGHT', function (player) {
@@ -4741,8 +4817,7 @@ var Music = /*#__PURE__*/function () {
           z: 0
         });
         game.updateEntity({
-          id: player.id,
-          rotation: Math.PI / 2
+          id: player.id
         });
       });
       rules.on('FIRE_BULLET', function (player) {
@@ -4891,7 +4966,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../sutras/warpToWorld.js":58,"./instruments/createDrumKit.js":37,"./instruments/createPiano.js":38,"./sutras.js":39}],37:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"../sutras/warpToWorld.js":58,"./instruments/createDrumKit.js":37,"./instruments/createPiano.js":38,"./sutras.js":39}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5298,11 +5373,11 @@ var Platform = /*#__PURE__*/function () {
       game.setGravity(0, 3.3, 0);
       game.setZoom(4.5);
       game.createPlayer({
-        height: 16,
-        width: 16,
+        height: 32,
+        width: 32,
         texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
+          sheet: 'blackMage',
+          sprite: 'playerRight'
         },
         position: {
           x: 10,
@@ -5381,13 +5456,20 @@ var Platform = /*#__PURE__*/function () {
         return entity.type === 'BLOCK';
       });
       rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
-        sprite: 'playerLeft'
+        sprite: 'playerLeftWalk'
       });
-      rules["if"]('S').then('DUCK').then('updateSprite', {
-        sprite: 'playerDown'
+      rules.addMap('determineDuckingSprite', function (player, node) {
+        var sprite = 'playerDownRight';
+        if (player.texture.sprite === 'playerLeftWalk') {
+          player.texture.sprite = 'playerDownLeft';
+        } else {
+          player.texture.sprite = 'playerDownRight';
+        }
+        return player;
       });
+      rules["if"]('S').then('DUCK').map('determineDuckingSprite').then('updateSprite');
       rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
-        sprite: 'playerRight'
+        sprite: 'playerRightWalk'
       });
 
       /*
@@ -5407,7 +5489,19 @@ var Platform = /*#__PURE__*/function () {
         })
        */
 
-      rules.on('updateSprite', function (player, node) {});
+      rules.on('updateSprite', function (player, node) {
+        var sprite = node.data.sprite || player.texture.sprite;
+        console.log('updateSprite', sprite);
+        game.updateEntity({
+          id: player.id,
+          texture: {
+            frameIndex: 0,
+            sheet: player.texture.sheet,
+            sprite: sprite,
+            animationPlaying: true
+          }
+        });
+      });
 
       /*
       game.createPlayer({
@@ -5433,7 +5527,7 @@ var Platform = /*#__PURE__*/function () {
       });
       rules.addCondition('isRunning', {
         op: 'or',
-        conditions: ['W', 'K'] // defaults UP key, or B button on Gamepad
+        conditions: ['S', 'K'] // defaults DOWN key, or B button on Gamepad
       });
       var maxJumpTicks = 50;
       // Remark: isPlayer is already implied for all Key inputs,
@@ -5446,7 +5540,7 @@ var Platform = /*#__PURE__*/function () {
         rules["if"]('SPACE')
         // .if('doesntExceedDuration')
         .then('JUMP').then('updateSprite', {
-          sprite: 'mageJump'
+          sprite: 'playerRightJump'
         });
       });
 
@@ -5465,7 +5559,8 @@ var Platform = /*#__PURE__*/function () {
         });
         game.updateEntity({
           id: player.id,
-          rotation: 0
+          rotation: 0,
+          sprite: 'playerRightJump'
         });
       });
       var runningForce = 1;
@@ -5489,7 +5584,6 @@ var Platform = /*#__PURE__*/function () {
         });
       });
       rules.on('MOVE_LEFT', function (player, node, gameState) {
-        console.log(gameState.tick);
         game.applyForce(player.id, {
           x: -runningForce,
           y: 0,
@@ -7193,6 +7287,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _contraptionsExample = _interopRequireDefault(require("./contraptions-example.js"));
+var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7267,18 +7362,52 @@ var YCraft = /*#__PURE__*/function () {
         }
       });
       var rules = game.rules;
-      rules["if"]('W').then('MOVE_FORWARD').then('updateSprite', {
+      rules.addCondition('PLAYER_UP', {
+        op: 'or',
+        conditions: ['W', 'DPAD_UP']
+      });
+      rules.addCondition('PLAYER_DOWN', {
+        op: 'or',
+        conditions: ['S', 'DPAD_DOWN']
+      });
+      rules.addCondition('PLAYER_LEFT', {
+        op: 'or',
+        conditions: ['A', 'DPAD_LEFT']
+      });
+      rules.addCondition('PLAYER_RIGHT', {
+        op: 'or',
+        conditions: ['D', 'DPAD_RIGHT']
+      });
+      rules.addCondition('USE_ITEM_1', {
+        op: 'or',
+        conditions: ['SPACE', 'H', 'BUTTON_X']
+      });
+      rules.addCondition('ZOOM_IN', {
+        op: 'or',
+        conditions: ['O', 'BUTTON_L1']
+      });
+      rules.addCondition('ZOOM_OUT', {
+        op: 'or',
+        conditions: ['P', 'BUTTON_R1']
+      });
+      rules.use((0, _topDown["default"])(game), 'movement');
+      rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
         sprite: 'playerUp'
       });
-      rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+      rules["if"]('PLAYER_LEFT').then('MOVE_LEFT').then('updateSprite', {
         sprite: 'playerLeft'
       });
-      rules["if"]('S').then('MOVE_BACKWARD').then('updateSprite', {
+      rules["if"]('PLAYER_DOWN').then('MOVE_DOWN').then('updateSprite', {
         sprite: 'playerDown'
       });
-      rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
+      rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
         sprite: 'playerRight'
       });
+      rules["if"]('USE_ITEM_1').then('FIRE_BULLET');
+
+      // Remark: We could introduce a sutra.do('ZOOM_IN') directive
+      rules["if"]('ZOOM_IN').then('ZOOM_IN');
+      rules["if"]('ZOOM_OUT').then('ZOOM_OUT');
       rules.on('updateSprite', function (player, node) {
         game.updateEntity({
           id: player.id,
@@ -7288,51 +7417,6 @@ var YCraft = /*#__PURE__*/function () {
             sprite: node.data.sprite,
             animationPlaying: true
           }
-        });
-      });
-      rules["if"]('SPACE').then('FIRE_BULLET');
-      rules["if"]('O').then('ZOOM_IN');
-      rules["if"]('P').then('ZOOM_OUT');
-      rules.on('MOVE_FORWARD', function (player) {
-        game.applyForce(player.id, {
-          x: 0,
-          y: -1,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: 0
-        });
-      });
-      rules.on('MOVE_BACKWARD', function (player) {
-        game.applyForce(player.id, {
-          x: 0,
-          y: 1,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: Math.PI
-        });
-      });
-      rules.on('MOVE_LEFT', function (player, node, gameState) {
-        console.log(gameState.tick);
-        game.applyForce(player.id, {
-          x: -1,
-          y: 0,
-          z: 0
-        });
-        //game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-      });
-      rules.on('MOVE_RIGHT', function (player) {
-        game.applyForce(player.id, {
-          x: 1,
-          y: 0,
-          z: 0
-        });
-        game.updateEntity({
-          id: player.id,
-          rotation: Math.PI / 2
         });
       });
       rules.on('FIRE_BULLET', function (player) {
@@ -7445,7 +7529,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"./contraptions-example.js":53}],53:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"./contraptions-example.js":53}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7762,18 +7846,18 @@ function switchGraphics(game) {
   // babylon graphics
   // TODO: clean up the collision handler to use a specific TYPE of entity for switching graphics, don't overlead TEXT
   // perhaps use Door, with KIND property being a Plugin spec
-  rules.addCondition('playerTouchedBabylonGraphics', function (entity, gameState) {
+  rules.addCondition('playerTouchedThreeGraphics', function (entity, gameState) {
     if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE') {
-      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT' && (entity.TEXT.name === 'ThreeGraphics' || entity.TEXT.name === 'CSSGraphics')) {
         return true;
       }
-      if (entity.bodyA.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics') && entity.bodyB.type === 'PLAYER') {
+      if (entity.bodyA.type === 'TEXT' && (entity.TEXT.name === 'ThreeGraphics' || entity.TEXT.name === 'CSSGraphics') && entity.bodyB.type === 'PLAYER') {
         return true;
       }
     }
   });
-  rules.addCondition('playerStoppedTouchedBabylonGraphics', function (entity, gameState) {
-    if (entity.type === 'COLLISION' && entity.kind === 'END' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
+  rules.addCondition('playerStoppedTouchedThreeGraphics', function (entity, gameState) {
+    if (entity.type === 'COLLISION' && entity.kind === 'END' && (entity.TEXT.name === 'ThreeGraphics' || entity.TEXT.name === 'CSSGraphics')) {
       if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
         return true;
       }
@@ -7782,8 +7866,8 @@ function switchGraphics(game) {
       }
     }
   });
-  rules["if"]('playerTouchedBabylonGraphics').then('switchGraphics');
-  rules["if"]('playerStoppedTouchedBabylonGraphics').then('hideLoader');
+  rules["if"]('playerTouchedThreeGraphics').then('switchGraphics');
+  rules["if"]('playerStoppedTouchedThreeGraphics').then('hideLoader');
   rules.on('hideLoader', function (entity, node, gameState) {
     if (loadingCircle) {
       loadingCircle.remove();

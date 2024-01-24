@@ -62,7 +62,9 @@ var Tile = /*#__PURE__*/function () {
       _ref$tileSize = _ref.tileSize,
       tileSize = _ref$tileSize === void 0 ? 16 : _ref$tileSize,
       _ref$proceduralGenera = _ref.proceduralGenerateMissingChunks,
-      proceduralGenerateMissingChunks = _ref$proceduralGenera === void 0 ? false : _ref$proceduralGenera;
+      proceduralGenerateMissingChunks = _ref$proceduralGenera === void 0 ? false : _ref$proceduralGenera,
+      _ref$loadInitialChunk = _ref.loadInitialChunk,
+      loadInitialChunk = _ref$loadInitialChunk === void 0 ? true : _ref$loadInitialChunk;
     _classCallCheck(this, Tile);
     this.id = Tile.id;
 
@@ -86,6 +88,7 @@ var Tile = /*#__PURE__*/function () {
 
     // if true, will load tiles on demand based on mantra-tiled-server specs
     this.lazyLoadTiles = false;
+    this.loadInitialChunk = loadInitialChunk;
 
     // if true, will generate random chunks for missing chunks not found by mantra-tiled-server
     this.proceduralGenerateMissingChunks = proceduralGenerateMissingChunks;
@@ -106,7 +109,7 @@ var Tile = /*#__PURE__*/function () {
       var _this = this;
       this.game = game;
       this.game.addSystem('tile', this);
-      if (this.tiledServer) {
+      if (this.tiledServer && this.loadInitialChunk) {
         this.game.loadScripts(['/tiled/chunks/chunk_x0_y0.js'], function () {
           // query the default tiled chunk location for chunk chunk_x0_y0
           // this file will exist in ./tiled/chunks/chunk_x0_y0.js
@@ -121,6 +124,12 @@ var Tile = /*#__PURE__*/function () {
         //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
         //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
       }
+
+      // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
+      this.game.on('file::upload', function (data) {
+        console.log('got new tile data', data);
+        _this.createTileMapFromTiledJSON(data);
+      });
     }
   }, {
     key: "createTileMapFromTiledJSON",
@@ -128,7 +137,13 @@ var Tile = /*#__PURE__*/function () {
       var _this2 = this;
       tiledJSON.layers.forEach(function (layer) {
         if (layer.type === 'tilelayer') {
-          _this2.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
+          if (layer.chunks) {
+            layer.chunks.forEach(function (chunk) {
+              _this2.createLayer(chunk, tiledJSON.tilewidth, tiledJSON.tileheight);
+            });
+          } else {
+            _this2.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
+          }
         }
       });
     }

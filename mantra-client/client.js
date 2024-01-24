@@ -58,7 +58,7 @@ let game = new Game({
     y: 0
   },
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['three'], // 'three', 'babylon', 'css', 'phaser'
+  graphics: ['css'], // 'three', 'babylon', 'css', 'phaser'
   collisions: true,
   gamepad: {
     useZoomSlider: false
@@ -216,10 +216,11 @@ if (mode === 'online') {
   */
 
   game.start(function(){
-//    game.use(home);
+    game.use(home);
 
     /*    */
-
+    // game.use(new plugins.DragAndDropFileUpload)
+    /*
     game.createPlayer({
       position: {
         x: 0,
@@ -229,12 +230,12 @@ if (mode === 'online') {
       width: 16
     });
     game.use(new plugins.Tile({
+      loadInitialChunk: true,
       tiledServer: true,
       tileSize: 16,
       chunkUnitSize: 8,
       proceduralGenerateMissingChunks: true,
     }))
-    /*
     */
      /*
     game.use(new plugins.Bullet())

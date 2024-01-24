@@ -302,6 +302,11 @@ function createGraphic(entityData) {
   if (!geometry) return; // If geometry is not set (like missing font), exit early
 
   mesh = new THREE.Mesh(geometry, material);
+  // set to invisible at first
+  if (entityData.type !== "PLAYER") {
+    // for now
+    mesh.visible = false;
+  }
   this.scene.add(mesh);
 
   // Setting position
@@ -338,7 +343,7 @@ function inflateEntity(entity, alpha) {
   }
   this.inflateTexture(entity, graphic);
   if (this.game.tick % 120 === 0) {
-    console.log('length', Object.keys(game.data.ents._).length);
+    // console.log('length', Object.keys(game.data.ents._).length)
   }
 }
 
@@ -432,10 +437,16 @@ function inflateTexture(entityData) {
 }
 function applyTextureToMesh(game, entityData, mesh) {
   var texture = game.getTexture(entityData.texture);
-  if (!texture) return;
+  if (!texture) {
+    // console.warn('Warning: Texture not found', entityData.texture);
+    mesh.visible = true;
+    return mesh;
+  }
+  ;
 
   // check to see if the mesh has a texture already
   if (mesh.material.map) {
+    mesh.visible = true;
     return mesh;
   }
   var textureLoader = new THREE.TextureLoader();
@@ -463,6 +474,7 @@ function applyTextureToMesh(game, entityData, mesh) {
       mesh.material.color.set(color);
     }
     mesh.material.needsUpdate = true;
+    mesh.visible = true;
   });
 }
 
