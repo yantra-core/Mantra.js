@@ -46,6 +46,7 @@ import plugins from '../mantra-game/plugins.js';
 let game = new Game({
   width: 800,
   height: 600,
+  fieldOfView: 128,
   plugins: {},
   isClient: true,
   showLoadingScreen: true,
@@ -57,7 +58,7 @@ let game = new Game({
     y: 0
   },
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['css'], // 'babylon', 'css', 'phaser'
+  graphics: ['three'], // 'three', 'babylon', 'css', 'phaser'
   collisions: true,
   gamepad: {
     useZoomSlider: false
@@ -76,6 +77,8 @@ let game = new Game({
     assetRoot: '.', // use local assets instead of default yantra.gg CDN
   }
 });
+
+game.useFoV = true;
 
 // game.gameConfig = TowerWorld;
 
@@ -108,6 +111,8 @@ game.use(new plugins.Schema());
 
 
 game.use(new plugins.Timers());
+game.use('RBush')
+
 
 // game.use(new plugins.LoadingScreen());
 
@@ -185,9 +190,6 @@ if (mode === 'online') {
 
 } else {
 
-
- // game.use(new plugins.Tile());
-
   // Single Player Offline Mode
 
   let home = new worlds.Home();
@@ -200,7 +202,7 @@ if (mode === 'online') {
     home = new worldClass();
   }
   //console.log("wwww", worlds)
-  // home = new worlds.Platform();
+  // home = new worlds.Music();
   // game.use(new plugins.Border());
 
   /*
@@ -213,7 +215,28 @@ if (mode === 'online') {
   */
 
   game.start(function(){
-    game.use(home);
+    // game.use(home);
+
+    game.createPlayer({
+      position: {
+        x: 0,
+        y: 0
+      },
+      height: 16,
+      width: 16
+    });
+    game.use(new plugins.Tile({
+      tiledServer: true,
+      tileSize: 16,
+      chunkUnitSize: 8,
+      proceduralGenerateMissingChunks: true,
+    }))
+
+    /*
+    */
+     /*
+    game.use(new plugins.Bullet())
+    */
 
     /*
     game.setControls({
