@@ -1,6 +1,6 @@
 export default function createGraphic(entityData) {
   let geometry, material, mesh;
-
+  // console.log('createGraphic', entityData)
   // Geometry setup based on entity type
   switch (entityData.type) {
     case 'BORDER':
@@ -12,15 +12,37 @@ export default function createGraphic(entityData) {
     case 'PLAYER':
       geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       break;
+    case 'TEXT':
+      // Ensure you have the font data loaded
+      const font = this.game.font; // Assuming you have a method to get the loaded font
+      if (font) {
+        / console.log('font', font);
+        // font has isFont, type, and data
+        /* TODO: this causes game to crash / not render? no error 
+        geometry = new THREE.TextGeometry(entityData.text, {
+          font: font,
+          size: entityData.size || 1,
+          height: entityData.height || 0.1,
+          curveSegments: 12,
+          bevelEnabled: false
+        });
+         */
+      } else {
+        console.warn("Font not loaded for text geometry");
+        return;
+      }
+      break;
     default:
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
   }
 
-  // Initial material setup with wireframe and color
+  // Material setup - solid if color exists, wireframe otherwise
   material = new THREE.MeshBasicMaterial({
     color: entityData.color || 0xffffff, // Default to white if no color specified
-    wireframe: true,
+    wireframe: !entityData.color,
   });
+
+  if (!geometry) return; // If geometry is not set (like missing font), exit early
 
   mesh = new THREE.Mesh(geometry, material);
   this.scene.add(mesh);
@@ -28,11 +50,7 @@ export default function createGraphic(entityData) {
   // Setting position
   mesh.position.set(-entityData.position.x, entityData.z, -entityData.position.y);
 
-  // Apply texture if available
-  // applyTextureToMesh(entityData, mesh);
-
   this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
 
   return mesh;
 }
-

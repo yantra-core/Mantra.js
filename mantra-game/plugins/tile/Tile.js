@@ -3,7 +3,7 @@ import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 
 // TODO: mantra-tiled-server needs to be a package.json
-import getChunkFiles from '../../../mantra-tiled-server/lib/getChunkFiles.js';
+import getChunkFiles from './lib/getChunkFiles.js';
 
 const tilemap = {
   1: 'grass',

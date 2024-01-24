@@ -8,6 +8,11 @@ import removeGraphic from './lib/removeGraphic.js';
 import inflateGraphic from './lib/inflateGraphic.js';
 import inflateTexture from './lib/inflateTexture.js';
 
+// import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+// import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+// import { FontLoader } from './lib/FontLoader.js'
+
+
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
   static removable = false;
@@ -55,12 +60,20 @@ class ThreeGraphics extends GraphicsInterface {
         '/vendor/three.min.js'
       ], () => {
         this.threeReady(game);
+        /*
+        this.loadFont('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (err, font) => {
+          this.threeReady(game);
+        })
+        */
+
       });
 
     } else {
       this.threeReady(game);
+      /*
+        this.loadFont('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (err, font) => {
+      */
     }
-
   }
 
   threeReady(game) {
@@ -102,6 +115,20 @@ class ThreeGraphics extends GraphicsInterface {
     game.graphics.push(this);
 
     document.body.style.cursor = 'default';
+
+  }
+
+  loadFont(path, cb) {
+    let game = this.game;
+    // console.log("LLLLLLL", THREE)
+    const fontLoader = new FontLoader();
+    fontLoader.load('vendor/fonts/helvetiker_regular.typeface.json', function (font) {
+      // Store the loaded font in your game's state
+      console.log('got back', null, font)
+      game.font = font;
+      cb(null, font)
+      //game.setFont(font);
+    });
 
   }
 

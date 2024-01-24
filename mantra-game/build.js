@@ -30,6 +30,7 @@ const plugins = [
   './plugins/graphics/Graphics.js',
   './plugins/health/Health.js',
   './plugins/timers/Timers.js',
+  './plugins/rbush/RBush.js',
   './plugins/gui-controls/ControlsGUI.js',
   './plugins/loading-screen/LoadingScreen.js',
   './plugins/gui-entities/EntitiesGUI.js',
