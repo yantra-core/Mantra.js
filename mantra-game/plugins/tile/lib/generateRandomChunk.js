@@ -1,9 +1,9 @@
-export default function generateRandomChunk(chunkKey, tileTypes) {
+export default function generateRandomChunk(chunkKey, tileKinds) {
   let chunkData = [];
-  const totalWeight = tileTypes.reduce((acc, tileType) => acc + tileType.weight, 0);
+  const totalWeight = tileKinds.reduce((acc, tileType) => acc + tileType.weight, 0);
 
   for (let i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
-    let tile = this.randomTileFromDistribution(tileTypes, totalWeight);
+    let tile = this.randomTileFromDistribution(tileKinds, totalWeight);
     chunkData.push(tile);
   }
 

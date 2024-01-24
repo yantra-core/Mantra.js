@@ -4,28 +4,29 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
 
   // TODO: better tile config by kind
   // for now
-  z = -16;
+
+  if (typeof tile.z === 'number') {
+    z = tile.z;
+  } else{
+    z = -16;
+  }
+
+  let isStatic;
+
+  if (typeof tile.isStatic === 'boolean') {
+    isStatic = tile.isStatic;
+  }
 
   const scale = 1;
-
-  let body = false;
-  let isStatic;
-  let mass;
-
-  /*
-  if (tile.body) {
-    body = true;
-    isStatic = false;
-    mass = 1;
-  }
-  */
+  let body = tile.body;
+  let mass = tile.mass || 1
 
   let _color;
   if (color) {
     _color = color;
   }
-  // body = false;
-  let _texture = `tile-${this.tilemap[tileId]}`; // rename
+
+  let _texture = `tile-${tile.kind}`; // rename
   this.game.createEntity({
     type: 'BLOCK',
     kind: 'Tile',

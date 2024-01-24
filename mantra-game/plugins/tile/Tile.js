@@ -10,16 +10,10 @@ import generateRandomChunk from './lib/generateRandomChunk.js';
 import randomTileFromDistribution from './lib/randomTileFromDistribution.js';
 import createTile from './lib/createTile.js'; 
 
-const tilemap = {
-  1: 'grass',
-  2: 'grass',
-  3: 'grass'
-};
-
-const tileTypes = [
-  { id: 1, weight: 50 }, // 50% chance
-  { id: 2, weight: 10, body: true }, // 10% chance
-  { id: 3, weight: 40 }  // 20% chance
+const tileKinds = [
+  { id: 1, kind: 'bush', weight: 5, body: true, isStatic: true, z: 0 },
+  { id: 2, kind: 'grass', weight: 90 },
+  { id: 3, kind: 'block', weight: 5, body: true, z: 0  }
 ];
 
 class Tile {
@@ -38,8 +32,7 @@ class Tile {
     // set a default tile map
     this.tileMap = tileMap;
 
-    this.tilemap = tilemap; // rename
-    this.tileTypes = tileTypes; // rename
+    this.tileKinds = tileKinds; // rename
 
     // TODO: configurable chunk size and tile size
     this.chunkUnitSize = chunkUnitSize;
@@ -60,7 +53,7 @@ class Tile {
     this.proceduralGenerateMissingChunks = proceduralGenerateMissingChunks;
 
     // list of tile ids for random generation
-    this.tileIds = [1, 2, 3, 4];
+    this.tileIds = [1, 2, 3];
 
     this.loadChunk = loadChunk.bind(this);
     this.calculateTilePosition = calculateTilePosition.bind(this);
@@ -107,8 +100,11 @@ class Tile {
   createLayer(layer, tileWidth, tileHeight) {
     layer.data.forEach((tile, index) => {
       if (typeof tile === 'number') {
-        tile = {
-          id: tile
+        // find id = tile in tileKinds
+        let tileId = tile;
+        let tileKind = tileKinds.find(tileKind => tileKind.id === tileId);
+        if (tileKind) {
+          tile = tileKind;
         }
       }
       //if (tileId !== 0 && /* tileId !== 2 && */ tileId !== 4577 && tileId !== 4767) {
@@ -130,7 +126,7 @@ class Tile {
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
       console.log('Generating random chunk', chunkKey)
-      let randomChunk = this.generateRandomChunk(chunkKey, tileTypes);
+      let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
       // console.log('randomChunk', chunkKey, randomChunk.data.length)
       this.game.data.chunks[chunkKey] = randomChunk;
       this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
