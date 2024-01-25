@@ -3945,6 +3945,7 @@ var Home = /*#__PURE__*/function () {
         }
       });
 
+      /*
       // switch to CSSGraphics
       game.createEntity({
         name: 'CSSGraphics',
@@ -3952,7 +3953,7 @@ var Home = /*#__PURE__*/function () {
         collisionActive: true,
         collisionEnd: true,
         collisionStart: true,
-        type: 'TEXT',
+         type: 'TEXT',
         text: 'CSS',
         width: 60,
         height: 50,
@@ -3974,8 +3975,7 @@ var Home = /*#__PURE__*/function () {
           z: 10
         }
       });
-
-      // switch to 3d text label
+       // switch to 3d text label
       game.createEntity({
         name: 'BabylonGraphics',
         collisionActive: true,
@@ -4003,6 +4003,8 @@ var Home = /*#__PURE__*/function () {
           z: 64
         }
       });
+      */
+
       game.createEntity({
         type: 'DOOR',
         kind: 'BabylonGraphics',
