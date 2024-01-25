@@ -36,42 +36,27 @@ class Home {
       }
     });
 
-    /* TODO supports in-line cutting of sprites
-    game.createPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: {
-          x: 120,
-          y: 435,
-          height: 16,
-          width: 16
-        }
-      },
-      position: {
-        x: 0,
-        y: 0
-      }
-    });
-    */
-
     game.setBackground('#007fff');
 
     game.use('Block');
     game.use('Border', { autoBorder: true })
     game.use('Bullet');
     // game.use('Sword')
-    game.use('Tile');
+    // game.use('Tile');
     game.use('Tone');
 
     welcomeMessage(game);
 
     let rules = game.rules;
 
-    rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
-    rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
-    rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
+    rules.addCondition('PLAYER_UP', { op: 'or', conditions:    ['W', 'DPAD_UP'] });
+    rules.addCondition('PLAYER_DOWN', { op: 'or', conditions:  ['S', 'DPAD_DOWN'] });
+    rules.addCondition('PLAYER_LEFT', { op: 'or', conditions:  ['A', 'DPAD_LEFT'] });
     rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
-    rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_X'] });
+    rules.addCondition('USE_ITEM_1', { op: 'or', conditions:   ['SPACE', 'H', 'BUTTON_B'] });
+    rules.addCondition('USE_ITEM_2', { op: 'or', conditions:   ['J', 'BUTTON_X'] });
+    rules.addCondition('ZOOM_IN', { op: 'or', conditions:      ['K', 'BUTTON_A'] });
+    rules.addCondition('ZOOM_OUT', { op: 'or', conditions:     ['L', 'BUTTON_Y'] });
 
     // see: ../mantra-sutras/movement/top-down.js events MOVE_UP, MOVE_DOWN, etc.
     rules
@@ -99,14 +84,19 @@ class Home {
         .then('FIRE_BULLET')
           .map('determineShootingSprite')
           .then('updateSprite');
+    
+    rules
+      .if('USE_ITEM_2')
+        .then("DROP_BOMB")
 
     //rules.if('K').then('SWING_SWORD');
     //rules.if('L').then('SWING_SWORD');
     // rules.if('L').then('DROP_BOMB');
-    rules.if('K').if('canDropBomb').then('DROP_BOMB');
+    // rules.if('K').if('canDropBomb').then('DROP_BOMB');
 
-    rules.if('O').then('ZOOM_IN');
-    rules.if('P').then('ZOOM_OUT');
+    // replace with rules.do('ZOOM_IN'), etc
+    rules.if('ZOOM_IN').then('ZOOM_IN');
+    rules.if('ZOOM_OUT').then('ZOOM_OUT');
 
     rules.addMap('determineShootingSprite', (player, node) => {
       // Normalize the rotation within the range of 0 to 2π
@@ -136,34 +126,12 @@ class Home {
       })
     });
 
-    /*
-    rules.on('MOVE_UP', function (player) {
-      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
-    });
-
-    rules.on('MOVE_DOWN', function (player) {
-      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI });
-    });
-
-    rules.on('MOVE_LEFT', function (player, node, gameState) {
-      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-    });
-
-    rules.on('MOVE_RIGHT', function (player) {
-      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
-    });
-    */
-
-
     rules.on('FIRE_BULLET', function (player) {
       game.systems.bullet.fireBullet(player.id);
     });
 
     rules.on('DROP_BOMB', function (player) {
+      // with no rate-limit, will drop 60 per second with default settings
       rules.emit('dropBomb', player)
     });
 

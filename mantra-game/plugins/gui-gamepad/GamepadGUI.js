@@ -220,11 +220,11 @@ class GamepadGUI {
     let buttonA = document.getElementById('a');
 
     buttonB.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyL' }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'Space' }));
     });
 
     buttonB.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyL' }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'Space' }));
     });
 
     buttonA.addEventListener('pointerdown', (ev) => {
@@ -243,41 +243,66 @@ class GamepadGUI {
       this.hiding = true;
     }
 
-    // use existing keyboard events
-    // trigger keydown event with keycode of W, A, S, D
-    // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
+  }
 
-    /*
-    dpad_up.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyW' }));
-    });
-    dpad_up.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyW' }));
-    });
+  // Remark: Update is called once per game loop
+  update() {
+    // TODO, send inputs
+    // this.sendInputs();
+  }
 
-    dpad_down.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyS' }));
-    });
-    dpad_down.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyS' }));
-    });
 
-    dpad_left.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyA' }));
-    });
-    dpad_left.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyA' }));
-    });
+  // TODO: refactor this plugin to use sendInputs()
+  sendInputs() {
 
-    dpad_right.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyD' }));
-    });
-    dpad_right.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyD' }));
-    });
-    */
+    // Check if all controls are false
+    const allFalse = Object.keys(controls).every(key => !controls[key]);
+
+
+    // Send controls if they are not all false or if the last controls were not all false
+    if (!allFalse) {
+      this.lastControlsAllFalse = allFalse;
+      if (this.game.communicationClient) {
+        this.game.communicationClient.sendMessage('player_input', { controls });
+      }
+    }
+
 
   }
+
+  /*
+  let controls2 = {
+    'DPAD_UP': yAxis < -deadzone, // Up
+    'DPAD_DOWN': yAxis > deadzone,  // Down
+    'DPAD_LEFT': xAxis < -deadzone, // Left
+    'DPAD_RIGHT': xAxis > deadzone,  // Right
+    // y button
+    'BUTTON_Y': gamepad.buttons[1].pressed, // "Y" button
+    // x button
+    'BUTTON_X': gamepad.buttons[3].pressed, // "X" button
+    // b button
+    'BUTTON_B': gamepad.buttons[2].pressed, // "B" button
+    // a button
+    'BUTTON_A': gamepad.buttons[0].pressed, // "A" button
+    // start button
+    'BUTTON_START': gamepad.buttons[9].pressed, // "Start" button
+    // select button
+    'BUTTON_SELECT': gamepad.buttons[8].pressed, // "Select" button
+    // left shoulder button
+    'BUTTON_L1': gamepad.buttons[4].pressed, // "L1" button
+    // right shoulder button
+    'BUTTON_R1': gamepad.buttons[5].pressed, // "R1" button
+    // left trigger button
+    'BUTTON_L2': gamepad.buttons[6].pressed, // "L2" button
+    // right trigger button
+    'BUTTON_R2': gamepad.buttons[7].pressed, // "R2" button
+    // left stick button
+    'BUTTON_L3': gamepad.buttons[10].pressed, // "L3" button
+    // right stick button
+    'BUTTON_R3': gamepad.buttons[11].pressed, // "R3" button
+  };
+  */
+
 
   createSNESGamepad(parentElement) {
 
@@ -329,13 +354,6 @@ class GamepadGUI {
 
     parentElement.innerHTML = str;
 
-
-  }
-
-
-
-
-  update() {
   }
 
   render() { }

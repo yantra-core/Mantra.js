@@ -83,6 +83,7 @@ class ThreeGraphics extends GraphicsInterface {
     // Initialize the renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.domElement.id = 'three-render-canvas';
     document.getElementById('gameHolder').appendChild(this.renderer.domElement);
 
     // Create and configure the camera
@@ -153,6 +154,30 @@ class ThreeGraphics extends GraphicsInterface {
         this.camera.lookAt(lookAtPosition);
       }
     }
+  }
+
+  unload () {
+
+    // iterate through all entities and remove existing babylon graphics
+    for (let [eId, entity] of this.game.entities.entries()) {
+      if (entity.graphics && entity.graphics['graphics-three']) {
+        this.removeGraphic(eId);
+        delete entity.graphics['graphics-three'];
+      }
+    }
+
+    this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
+    delete this.game._plugins['ThreeGraphics'];
+
+    // remove canvas
+    let canvas = document.getElementById('three-render-canvas');
+
+    if (canvas) {
+      // hide canvas
+      // canvas.style.display = 'none';
+      canvas.remove();
+    }
+
   }
 
 }
