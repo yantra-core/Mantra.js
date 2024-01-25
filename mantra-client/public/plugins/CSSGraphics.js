@@ -208,7 +208,7 @@ var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInte
 var _CSSCamera = _interopRequireDefault(require("./CSSCamera.js"));
 var _inflateBox = _interopRequireDefault(require("./lib/entity/inflateBox.js"));
 var _inflateText = _interopRequireDefault(require("./lib/entity/inflateText.js"));
-var _inflateEntity = _interopRequireDefault(require("./lib/entity/inflateEntity.js"));
+var _inflateGraphic = _interopRequireDefault(require("./lib/entity/inflateGraphic.js"));
 var _inflateTexture = _interopRequireDefault(require("./lib/entity/inflateTexture.js"));
 var _createGraphic = _interopRequireDefault(require("./lib/entity/createGraphic.js"));
 var _setTransform = _interopRequireDefault(require("./lib/camera/setTransform.js"));
@@ -275,7 +275,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.createGraphic = _createGraphic["default"].bind(_assertThisInitialized(_this));
     _this.inflateBox = _inflateBox["default"].bind(_assertThisInitialized(_this));
     _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
-    _this.inflateEntity = _inflateEntity["default"].bind(_assertThisInitialized(_this));
+    _this.inflateGraphic = _inflateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.inflateTexture = _inflateTexture["default"].bind(_assertThisInitialized(_this));
     _this.setTransform = _setTransform["default"].bind(_assertThisInitialized(_this));
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
@@ -350,7 +350,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/setTransform.js":8,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateEntity.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/setTransform.js":8,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateGraphic.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1335,7 +1335,6 @@ function updateGraphic(entityData) {
       // entityData.color is int number here we need a hex
       var hexColor = '#' + entityData.color.toString(16);
       // update the background color
-      var randomHexColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
       entityElement.style.background = hexColor;
     }
     if (typeof entityData.position.z === 'number') {
@@ -1517,6 +1516,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = render;
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function render(game, alpha) {
   var _this = this;
   // console.log('rendering', this.game.entities.size, 'entities')
@@ -1529,18 +1535,36 @@ function render(game, alpha) {
   // Best to remove camera follow for CSSGraphics if possible
   // We tried to only iterate changed entities, but this breaks camera follow
 
-  var fovEntities = new Map();
-  var currentPlayer = this.game.data.currentPlayer;
-  //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
-  var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
-  // console.log('itemsInFov', itemsInFov)
+  if (this.game.useFov) {
+    var fovEntities = new Map();
+    var currentPlayer = this.game.data.currentPlayer;
+    //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
+    var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
+    // console.log('itemsInFov', itemsInFov)
 
-  itemsInFov.forEach(function (eId) {
-    var ent = _this.game.entities.get(eId);
-    if (ent) {
-      _this.inflateEntity(ent, alpha);
+    itemsInFov.forEach(function (eId) {
+      var ent = _this.game.entities.get(eId);
+      if (ent) {
+        _this.inflateGraphic(ent, alpha);
+      }
+    });
+  } else {
+    var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var _step$value = _slicedToArray(_step.value, 2),
+          eId = _step$value[0],
+          state = _step$value[1];
+        var ent = this.game.entities.get(eId);
+        this.inflateGraphic(ent, alpha);
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
     }
-  });
+  }
 }
 
 },{}],23:[function(require,module,exports){

@@ -14,7 +14,7 @@ function loadTiledMap(filePath) {
 }
 
 let outputDirectory = path.join(__dirname, '../../mantra-client/public/tiled/chunks');
-let tmjFileName = 'infinite2.tmj';
+let tmjFileName = 'small-infinite.tmj';
 let tmjFilePath = path.join(__dirname, '../', tmjFileName);
 // Load your Tiled map
 const tiledMap = loadTiledMap(tmjFilePath);

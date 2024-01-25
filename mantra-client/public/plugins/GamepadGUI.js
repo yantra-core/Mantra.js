@@ -233,12 +233,12 @@ var GamepadGUI = /*#__PURE__*/function () {
       var buttonA = document.getElementById('a');
       buttonB.addEventListener('pointerdown', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keydown', {
-          'code': 'KeyL'
+          'code': 'Space'
         }));
       });
       buttonB.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
-          'code': 'KeyL'
+          'code': 'Space'
         }));
       });
       buttonA.addEventListener('pointerdown', function (ev) {

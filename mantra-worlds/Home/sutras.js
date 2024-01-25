@@ -21,8 +21,8 @@ export default function sutras(game) {
 
   let rules = game.createSutra();
 
-//  rules.addCondition('isGameRunning', (game) => true);  
-//  rules.if('isGameRunning').then('warpToWorld');
+  // movement
+  rules.use(movement(game), 'movement');
 
   // helper for switching graphics
   let switchGraphicsSutra = switchGraphics(game);
@@ -58,9 +58,6 @@ export default function sutras(game) {
 
   // bomb item
   rules.use(bomb(game), 'bomb');
-
-  // movement
-  rules.use(movement(game), 'movement');
 
   // console.log('created sutra', rules.toEnglish())
   return rules;

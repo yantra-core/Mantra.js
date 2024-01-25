@@ -42,7 +42,7 @@ export default function updateEntity(entityData) {
   if (entityData.color) {
     this.game.components.color.set(entityId, entityData.color);
     //if (!this.game.changedEntities.has(entityId)) {}
-    this.game.changedEntities.add(entityId);
+    // this.game.changedEntities.add(entityId);
     // console.log("SETTING COLOR", entityData.color)
   }
 

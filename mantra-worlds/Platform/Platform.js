@@ -261,7 +261,6 @@ class Platform {
     });
 
     rules.on('MOVE_LEFT', function(player, node, gameState){
-      console.log(gameState.tick)
       game.applyForce(player.id, { x: -runningForce, y: 0, z: 0 });
       game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
     });

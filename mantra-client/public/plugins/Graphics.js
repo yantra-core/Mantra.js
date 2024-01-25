@@ -423,7 +423,12 @@ function switchGraphics(graphicsInterfaceName, cb) {
           var ent = _this.game.entities.get(eId);
           // console.log('rendering', ent)
           game.graphics.forEach(function (graphicsInterface) {
-            graphicsInterface.inflateEntity(ent);
+            if (graphicsInterface.inflateEntity) {
+              // legacy api, remove soon
+              graphicsInterface.inflateEntity(ent);
+            } else {
+              graphicsInterface.inflateGraphic(ent);
+            }
           });
           // this.game.changedEntities.delete(eId);
         };

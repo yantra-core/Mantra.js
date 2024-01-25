@@ -9267,7 +9267,6 @@ var Schema = exports["default"] = /*#__PURE__*/function () {
       game.schemaReady = true;
       var root = _protobufjs["default"].Root.fromJSON(_Message["default"]);
       game.Message = root.lookupType("Message");
-      console.log(game.Message);
     }
   }]);
   return Schema;

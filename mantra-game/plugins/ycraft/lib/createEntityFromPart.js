@@ -61,6 +61,11 @@ export default function createEntityFromPart(part, contraption) {
       break;
   }
 
+  if (!entity) {
+    console.error('No entity created for part', part);
+    return;
+  }
+
   // check to see if entity is array, some parts create multiple entities
   if (Array.isArray(entity)) {
     let entityIds = [];

@@ -2864,7 +2864,6 @@ function createEntityFromPart(part, contraption) {
       entity = createPartEntity({}, part, contraption);
       break;
   }
-  console.log('eeee', entity);
   if (!entity) {
     console.error('No entity created for part', part);
     return;

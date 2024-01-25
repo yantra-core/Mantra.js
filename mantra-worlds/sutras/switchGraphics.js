@@ -41,19 +41,19 @@ export default function switchGraphics(game) {
   // babylon graphics
   // TODO: clean up the collision handler to use a specific TYPE of entity for switching graphics, don't overlead TEXT
   // perhaps use Door, with KIND property being a Plugin spec
-  rules.addCondition('playerTouchedBabylonGraphics', (entity, gameState) => {
+  rules.addCondition('playerTouchedThreeGraphics', (entity, gameState) => {
     if (entity.type === 'COLLISION' && entity.kind === 'ACTIVE') {
-      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
+      if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT' && (entity.TEXT.name === 'ThreeGraphics' || entity.TEXT.name === 'CSSGraphics')) {
         return true;
       }
-      if (entity.bodyA.type === 'TEXT' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics') && entity.bodyB.type === 'PLAYER') {
+      if (entity.bodyA.type === 'TEXT' && (entity.TEXT.name === 'ThreeGraphics' || entity.TEXT.name === 'CSSGraphics') && entity.bodyB.type === 'PLAYER') {
         return true;
       }
     }
   });
 
-  rules.addCondition('playerStoppedTouchedBabylonGraphics', (entity, gameState) => {
-    if (entity.type === 'COLLISION' && entity.kind === 'END' && (entity.TEXT.name === 'BabylonGraphics' || entity.TEXT.name === 'CSSGraphics')) {
+  rules.addCondition('playerStoppedTouchedThreeGraphics', (entity, gameState) => {
+    if (entity.type === 'COLLISION' && entity.kind === 'END' && (entity.TEXT.name === 'ThreeGraphics' || entity.TEXT.name === 'CSSGraphics')) {
       if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'TEXT') {
         return true;
       }
@@ -64,10 +64,10 @@ export default function switchGraphics(game) {
   });
 
   rules
-    .if('playerTouchedBabylonGraphics')
+    .if('playerTouchedThreeGraphics')
     .then('switchGraphics')
 
-  rules.if('playerStoppedTouchedBabylonGraphics')
+  rules.if('playerStoppedTouchedThreeGraphics')
     .then('hideLoader')
 
 

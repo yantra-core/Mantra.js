@@ -3676,7 +3676,19 @@ var Home = /*#__PURE__*/function () {
       });
       rules.addCondition('USE_ITEM_1', {
         op: 'or',
-        conditions: ['SPACE', 'H', 'BUTTON_X']
+        conditions: ['SPACE', 'H', 'BUTTON_B']
+      });
+      rules.addCondition('USE_ITEM_2', {
+        op: 'or',
+        conditions: ['J', 'BUTTON_X']
+      });
+      rules.addCondition('ZOOM_IN', {
+        op: 'or',
+        conditions: ['K', 'BUTTON_A']
+      });
+      rules.addCondition('ZOOM_OUT', {
+        op: 'or',
+        conditions: ['L', 'BUTTON_Y']
       });
 
       // see: ../mantra-sutras/movement/top-down.js events MOVE_UP, MOVE_DOWN, etc.
@@ -3693,13 +3705,16 @@ var Home = /*#__PURE__*/function () {
         sprite: 'playerRight'
       });
       rules["if"]('USE_ITEM_1').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
+      rules["if"]('USE_ITEM_2').then("DROP_BOMB");
 
       //rules.if('K').then('SWING_SWORD');
       //rules.if('L').then('SWING_SWORD');
       // rules.if('L').then('DROP_BOMB');
-      rules["if"]('K')["if"]('canDropBomb').then('DROP_BOMB');
-      rules["if"]('O').then('ZOOM_IN');
-      rules["if"]('P').then('ZOOM_OUT');
+      // rules.if('K').if('canDropBomb').then('DROP_BOMB');
+
+      // replace with rules.do('ZOOM_IN'), etc
+      rules["if"]('ZOOM_IN').then('ZOOM_IN');
+      rules["if"]('ZOOM_OUT').then('ZOOM_OUT');
       rules.addMap('determineShootingSprite', function (player, node) {
         // Normalize the rotation within the range of 0 to 2π
         var normalizedRotation = player.rotation % (2 * Math.PI);
@@ -3723,30 +3738,11 @@ var Home = /*#__PURE__*/function () {
           }
         });
       });
-
-      /*
-      rules.on('MOVE_UP', function (player) {
-        game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-        game.updateEntity({ id: player.id, rotation: 0 });
-      });
-       rules.on('MOVE_DOWN', function (player) {
-        game.applyForce(player.id, { x: 0, y: 1, z: 0 });
-        game.updateEntity({ id: player.id, rotation: Math.PI });
-      });
-       rules.on('MOVE_LEFT', function (player, node, gameState) {
-        game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-        game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-      });
-       rules.on('MOVE_RIGHT', function (player) {
-        game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-        game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
-      });
-      */
-
       rules.on('FIRE_BULLET', function (player) {
         game.systems.bullet.fireBullet(player.id);
       });
       rules.on('DROP_BOMB', function (player) {
+        // with no rate-limit, will drop 60 per second with default settings
         rules.emit('dropBomb', player);
       });
 
@@ -6232,9 +6228,13 @@ var Tiled = /*#__PURE__*/function () {
       game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
-
+      game.setBackground('#000000');
+      game.useFoV = true;
+      game.data.fieldOfView = 96;
       // sprite sheet has been defined in defaultAssets.js
       game.createPlayer({
+        height: 16,
+        width: 16,
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'player'
@@ -6263,7 +6263,6 @@ var Tiled = /*#__PURE__*/function () {
       });
       */
 
-      game.setBackground('#007fff');
       game.use('Block');
       game.use('Border', {
         autoBorder: true
@@ -6538,229 +6537,6 @@ var Tiled = /*#__PURE__*/function () {
         }
       });
 
-      // switch to 3d text label
-      game.createEntity({
-        type: 'TEXT',
-        text: 'CSSGraphics Engine',
-        width: 20,
-        color: 0x000000,
-        style: {
-          width: '150px',
-          fontSize: '12px',
-          textAlign: 'center',
-          color: 'black',
-          opacity: 0.22
-        },
-        body: false,
-        position: {
-          x: -63,
-          y: -16,
-          z: -2
-        }
-      });
-
-      // switch to CSSGraphics
-      game.createEntity({
-        name: 'CSSGraphics',
-        kind: 'CSSGraphics',
-        collisionActive: true,
-        collisionEnd: true,
-        collisionStart: true,
-        type: 'TEXT',
-        text: 'CSS',
-        width: 60,
-        height: 50,
-        //color: 0xffffff,
-        style: {
-          width: '60px',
-          height: '30px',
-          fontSize: '12px',
-          color: 'white',
-          textAlign: 'center',
-          // border: '1px solid white',
-          opacity: 0.7
-        },
-        body: true,
-        isSensor: true,
-        position: {
-          x: -55,
-          y: 75,
-          z: 10
-        }
-      });
-
-      // switch to 3d text label
-      game.createEntity({
-        name: 'BabylonGraphics',
-        collisionActive: true,
-        collisionEnd: true,
-        collisionStart: true,
-        kind: 'BabylonGraphics',
-        type: 'TEXT',
-        text: '3D',
-        width: 60,
-        height: 50,
-        color: 0x000000,
-        style: {
-          width: '60px',
-          height: '30px',
-          fontSize: '12px',
-          color: 'white',
-          textAlign: 'center',
-          opacity: 0.7
-        },
-        body: true,
-        isSensor: true,
-        position: {
-          x: 55,
-          y: 75,
-          z: 64
-        }
-      });
-      game.createEntity({
-        type: 'DOOR',
-        kind: 'BabylonGraphics',
-        collisionActive: true,
-        collisionEnd: true,
-        collisionStart: true,
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'ayyoDoor'
-        },
-        width: 16,
-        height: 16,
-        body: false,
-        position: {
-          // position to right
-          x: 55,
-          y: 71,
-          z: 10
-        }
-      });
-      game.createEntity({
-        type: 'DOOR',
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'ayyoDoor'
-        },
-        width: 16,
-        height: 16,
-        body: false,
-        position: {
-          // position to right
-          x: -55,
-          y: 71,
-          z: 10
-        }
-      });
-
-      // if touch warp, switch to Music level
-      game.createEntity({
-        type: 'WARP',
-        kind: 'Music',
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: 'warp-to-music',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: -250,
-          y: 0,
-          z: 32
-        }
-      });
-
-      // text label saying "Warp To Platform World"
-      game.createEntity({
-        type: 'TEXT',
-        width: 100,
-        text: 'Warp To Music World',
-        // width: 200,
-        color: 0x000000,
-        style: {
-          width: '100px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: -250,
-          y: -30,
-          z: 64
-        }
-      });
-
-      // text label saying "Warp To Platform World"
-      game.createEntity({
-        type: 'TEXT',
-        text: 'Warp To Platform World',
-        color: 0x000000,
-        width: 120,
-        height: 200,
-        style: {
-          width: '120px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: 250,
-          y: 20,
-          z: 64
-        }
-      });
-      game.createEntity({
-        type: 'WARP',
-        kind: 'Platform',
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: 'warp-to-platform',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: 250,
-          y: 0,
-          z: 32
-        }
-      });
-      game.createEntity({
-        type: 'WARP',
-        kind: 'GravityGardens',
-        width: 64,
-        height: 64,
-        depth: 64,
-        // texture: 'warp-to-platform',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: 250,
-          y: 250,
-          z: 32
-        }
-      });
-
-      // text label saying "Warp To Platform World"
-      game.createEntity({
-        type: 'TEXT',
-        width: 80,
-        text: 'Gravity Gardens',
-        // width: 200,
-        color: 0x000000,
-        style: {
-          width: '100px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: 240,
-          y: 280,
-          z: 32
-        }
-      });
-
       // if touch note play sound
       game.createEntity({
         type: 'NOTE',
@@ -6921,7 +6697,7 @@ function sutras(game) {
   // rules.use(demon(game), 'demon');
 
   // hexapod entity
-  rules.use((0, _hexapod["default"])(game), 'hexapod');
+  // rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');

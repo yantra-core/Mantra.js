@@ -811,7 +811,7 @@ function createEntity(config) {
     id: entityId
   });
   // console.log("SETTING CHANGED", entityId)
-  this.game.changedEntities.add(entityId);
+  // this.game.changedEntities.add(entityId);
 
   // get updated entity with components
   var updatedEntity = this.game.getEntity(entityId);
@@ -919,6 +919,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = removeEntity;
 function removeEntity(entityId) {
+  var removeFromGameData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
   var ent = this.game.entities.get(entityId);
   if (ent && this.game.systems.graphics && ent.graphics) {
     // Is this best done here? or in the graphics plugin?
@@ -939,9 +940,12 @@ function removeEntity(entityId) {
     var updatedEntity = this.game.getEntity(entityId);
     this.game.entities.set(entityId, updatedEntity);
     if (updatedEntity && this.game.systems.rbush) {
-      // TODO: don't remove entity if field of view is active
-      // this way it will reinflate when it comes back into view
-      // this.game.systems.rbush.removeEntity(updatedEntity);
+      // actually remove the entity from the game world
+      // will be set to false for field of view related removals
+      if (removeFromGameData) {
+        this.game.systems.rbush.removeEntity(updatedEntity);
+        delete this.game.deferredEntities[entityId];
+      }
     }
   }
 }
@@ -1000,7 +1004,7 @@ function updateEntity(entityData) {
   if (entityData.color) {
     this.game.components.color.set(entityId, entityData.color);
     //if (!this.game.changedEntities.has(entityId)) {}
-    this.game.changedEntities.add(entityId);
+    // this.game.changedEntities.add(entityId);
     // console.log("SETTING COLOR", entityData.color)
   }
 

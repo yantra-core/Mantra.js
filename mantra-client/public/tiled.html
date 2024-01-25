@@ -17,12 +17,23 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
 
+      // check to see if query string has tilemap variable
+      // if so, load that tilemap
+      let tiledmap = null;
+      let graphics = 'three';
+
+      if (window.location.search) {
+        const params = new URLSearchParams(window.location.search);
+        tiledmap = params.get('tiledmap');
+        graphics = params.get('graphics');
+      }
+
       let game = new MANTRA.Game({
         defaultPlayer: false,
-        fieldOfView: 128,
+        fieldOfView: 96,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
-        graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        graphics: [graphics], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
           scriptRoot: '.',
@@ -37,24 +48,53 @@
       game.use('GamepadGUI');
       game.useFoV = true;
       game.start(function () {
-        game.use('DragAndDropFileUpload')
+
+        if (graphics === 'three') {
+          //game.setZoom();
+        }
+
+        if (graphics === 'css') {
+          game.setZoom(4.5);
+        }
+
+
+        game.use('DragAndDropFileUpload');
         game.createPlayer({
           position: {
             x: 0,
             y: 0
           },
-          height: 16,
-          width: 16
+          height: 12,
+          width: 12
         });
-        game.use('Tile', {
-          loadInitialChunk: false,
-          tiledServer: false,
-          tileSize: 16,
-          chunkUnitSize: 8,
-          proceduralGenerateMissingChunks: false,
-          lazyLoadTiles: false,
-          loadDefaultTileMap: false
-        })
+
+        if (tiledmap) {
+          console.log("USING CUSTOM DATA", tiledmap)
+          game.use('Tile', {
+            tileMap: JSON.parse(tiledmap),
+            loadInitialChunk: true,
+            tiledServer: false,
+            tileSize: 16,
+            chunkUnitSize: 8,
+            proceduralGenerateMissingChunks: false,
+            lazyLoadTiles: false,
+            loadDefaultTileMap: true
+          });
+
+
+        } else {
+          game.use('Tile', {
+            loadInitialChunk: false,
+            tiledServer: false,
+            tileSize: 16,
+            chunkUnitSize: 8,
+            proceduralGenerateMissingChunks: false,
+            lazyLoadTiles: false,
+            loadDefaultTileMap: false
+          });
+        }
+
+
       });
       window.game = game;
 

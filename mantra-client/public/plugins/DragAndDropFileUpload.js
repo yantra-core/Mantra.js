@@ -37,6 +37,12 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
       this.createDefaultDataButton();
       this.createOptionsSection();
       this.bindEvents();
+
+      // TODO: remove this
+      if (this.game.system.tile && this.game.system.tile.tileMap) {
+        // hide overlay
+        this.overlay.style.visibility = 'hidden';
+      }
     }
   }, {
     key: "createOverlay",
@@ -83,7 +89,9 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: '10px'
+        marginRight: '10px',
+        fontSize: '27px',
+        cursor: 'pointer'
       });
       this.dropArea.innerText = 'Drop Tiled .tmj file here';
       dropAreaContainer.appendChild(this.dropArea);

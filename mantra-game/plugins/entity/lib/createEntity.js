@@ -208,7 +208,7 @@ export default function createEntity(config, ignoreSetup = false) {
     id: entityId
   });
   // console.log("SETTING CHANGED", entityId)
-  this.game.changedEntities.add(entityId);
+  // this.game.changedEntities.add(entityId);
 
   // get updated entity with components
   let updatedEntity = this.game.getEntity(entityId);

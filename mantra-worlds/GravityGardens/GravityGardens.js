@@ -26,7 +26,8 @@ class GravityGardens {
     game.setSize(800, 600);
     game.setZoom(2.5);
 
-    let player = game.createDefaultPlayer({
+    let player = game.createPlayer({
+      color: 0xcccccc,
       position: {
         x: 0,
         y: 0,
@@ -49,7 +50,6 @@ class GravityGardens {
     });
 
     rules.on('MOVE_LEFT', function (player, node, gameState) {
-      console.log(gameState.tick)
       game.applyForce(player.id, { x: -1, y: 0, z: 0 });
       game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
     });
@@ -208,6 +208,7 @@ class GravityGardens {
       texture: 'warp-to-home',
       width: 64,
       height: 64,
+      depth: 64,
       isStatic: true,
       position: {
         x: 600,

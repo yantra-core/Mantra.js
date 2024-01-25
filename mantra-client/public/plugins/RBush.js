@@ -114,13 +114,16 @@ var RBush = /*#__PURE__*/function () {
       //
       if (currentPlayer) {
         if (this.game.systems.tile) {
+          // TODO: && this.game.systems.tile.active
           this.game.systems.tile.loadTilesForArea(currentPlayer.position);
         }
       }
 
       // if (tick % 30 !== 0) return;
 
-      // get all items, plus a buffer of 1.5x the field of view
+      if (this.game.useFoV !== true) return;
+
+      // get all items, plus a buffer of 1.1x the field of view
       var nearbyEntities = game.getPlayerFieldOfView(currentPlayer, this.game.data.fieldOfView * 1.1, false);
 
       // Check to see if any entities exists in the game world which are not in the field of view
@@ -135,7 +138,7 @@ var RBush = /*#__PURE__*/function () {
           if (game.useFoV && nearbyEntities.indexOf(eId) === -1) {
             var ent = this.game.entities.get(eId);
             if (ent) {
-              game.removeEntity(eId);
+              game.removeEntity(eId, false);
             }
           }
         }

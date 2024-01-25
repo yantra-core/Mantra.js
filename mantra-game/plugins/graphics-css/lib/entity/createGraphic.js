@@ -78,6 +78,15 @@ export default function createGraphic(entityData) {
     
   }
 
+  if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+    // entityData.color is int number here we need a hex
+    let hexColor = '#' + entityData.color.toString(16);
+    // update the background color
+    let randomHexColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+    // console.log("SETTING BG COLOR", entityData.color, hexColor)
+    // entityElement.style.background = randomHexColor;
+  }
+
   this.renderDiv.appendChild(entityElement);
 
   // Update the position of the entity element

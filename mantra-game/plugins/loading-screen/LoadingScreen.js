@@ -172,7 +172,6 @@ class LoadingScreen {
       padding: '10px'
     });
 
-
     // Game title
     const gameTitle = document.createElement('div');
     gameTitle.textContent = 'Mantra.js Game Starting';
@@ -192,8 +191,6 @@ class LoadingScreen {
     headerContainer.appendChild(gameTitle);
     headerContainer.appendChild(this.pluginCounter);
     this.crtBackground.appendChild(headerContainer);
-
-
 
     this.createPluginLoaders();
     document.body.appendChild(this.loadingScreen);

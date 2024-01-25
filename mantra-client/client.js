@@ -78,7 +78,7 @@ let game = new Game({
   }
 });
 
-game.useFoV = true;
+game.useFoV = false;
 
 // game.gameConfig = TowerWorld;
 
@@ -203,7 +203,7 @@ if (mode === 'online') {
     home = new worldClass();
   }
   //console.log("wwww", worlds)
-  // home = new worlds.Music();
+  home = new worlds.Tiled();
   // game.use(new plugins.Border());
 
   /*
@@ -216,17 +216,17 @@ if (mode === 'online') {
   */
 
   game.start(function(){
-  //  game.use(home);
+     game.use(home);
 
-    /*    */
-    game.use(new plugins.DragAndDropFileUpload)
+    /*   
+    // game.use(new plugins.DragAndDropFileUpload)
     game.createPlayer({
       position: {
         x: 0,
         y: 0
       },
-      height: 16,
-      width: 16
+      height: 8,
+      width: 8
     });
     game.use(new plugins.Tile({
       loadInitialChunk: false,
@@ -237,6 +237,7 @@ if (mode === 'online') {
       lazyLoadTiles: false,
       loadDefaultTileMap: false
     }))
+     */
      /*
     game.use(new plugins.Bullet())
     */

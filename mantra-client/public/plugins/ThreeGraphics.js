@@ -85,6 +85,13 @@ var _inflateGraphic = _interopRequireDefault(require("./lib/inflateGraphic.js"))
 var _inflateTexture = _interopRequireDefault(require("./lib/inflateTexture.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -174,6 +181,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         antialias: true
       });
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.domElement.id = 'three-render-canvas';
       document.getElementById('gameHolder').appendChild(this.renderer.domElement);
 
       // Create and configure the camera
@@ -240,6 +248,41 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         }
       }
     }
+  }, {
+    key: "unload",
+    value: function unload() {
+      var _this3 = this;
+      // iterate through all entities and remove existing babylon graphics
+      var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+            eId = _step$value[0],
+            entity = _step$value[1];
+          if (entity.graphics && entity.graphics['graphics-three']) {
+            this.removeGraphic(eId);
+            delete entity.graphics['graphics-three'];
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+      this.game.graphics = this.game.graphics.filter(function (g) {
+        return g.id !== _this3.id;
+      });
+      delete this.game._plugins['ThreeGraphics'];
+
+      // remove canvas
+      var canvas = document.getElementById('three-render-canvas');
+      if (canvas) {
+        // hide canvas
+        // canvas.style.display = 'none';
+        canvas.remove();
+      }
+    }
   }]);
   return ThreeGraphics;
 }(_GraphicsInterface2["default"]);
@@ -264,12 +307,14 @@ function createGraphic(entityData) {
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'BULLET':
-      geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'PLAYER':
-      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
+      //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
+      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
-    case 'TEXT':
+    case 'not_implemented_TEXT':
       // Ensure you have the font data loaded
       var font = this.game.font; // Assuming you have a method to get the loaded font
       if (font) {
@@ -342,9 +387,43 @@ function inflateEntity(entity, alpha) {
     return;
   }
   this.inflateTexture(entity, graphic);
+
+  /*
+  // Include the rolling animation logic// Include the rolling animation logic
+  if (graphic.isRolling && !graphic.rollCompleted) {
+    graphic.rotation.x += 0.1; // Adjust the speed of rotation with this value
+    console.log('graphic.rotation.x', graphic.rotation.x)
+    // Check if the rotation has reached 0
+    if (graphic.rotation.x >= 0) {
+      console.log("ROLLING");
+       graphic.rotation.x = 0; // Correct any overshoot
+      graphic.isRolling = false;
+      graphic.rollCompleted = true; // Stop the animation
+    }
+  }
+  */
+
+  // Include the fade-in animation logic with easing
+  if (graphic.isFadingIn && !graphic.fadeCompleted) {
+    graphic.progress += 0.05; // Increment progress. Adjust speed with this value.
+    if (graphic.progress > 1) graphic.progress = 1; // Ensure progress doesn't exceed 1
+
+    // Apply the easing function to the progress and then set the opacity
+    graphic.material.opacity = easeInQuad(graphic.progress);
+
+    // Check if the animation is complete
+    if (graphic.progress === 1) {
+      graphic.isFadingIn = false;
+      graphic.fadeCompleted = true; // Stop the fade-in animation
+    }
+  }
+
   if (this.game.tick % 120 === 0) {
     // console.log('length', Object.keys(game.data.ents._).length)
   }
+}
+function easeInQuad(t) {
+  return t * t;
 }
 
 },{}],5:[function(require,module,exports){
@@ -479,6 +558,14 @@ function applyTextureToMesh(game, entityData, mesh) {
     }
     mesh.material.needsUpdate = true;
     mesh.visible = true;
+    mesh.material.transparent = true;
+    mesh.material.opacity = 0; // Start fully transparent
+
+    // mesh.rotation.x = -Math.PI / 2;
+    mesh.isFadingIn = true; // Start the fade-in
+    mesh.progress = 0;
+
+    //mesh.isRolling = true; // Start the rolling animation
   });
 }
 

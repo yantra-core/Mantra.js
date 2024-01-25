@@ -19,6 +19,14 @@ class DragAndDropFileUpload {
     this.createOptionsSection();
 
     this.bindEvents();
+
+
+    // TODO: remove this
+    if (this.game.system.tile && this.game.system.tile.tileMap) {
+      // hide overlay
+      this.overlay.style.visibility = 'hidden';
+    }
+
   }
 
   createOverlay() {
@@ -48,7 +56,8 @@ class DragAndDropFileUpload {
     this.dropArea = document.createElement('div');
     this.setStyle(this.dropArea, {
       width: '300px', height: '200px', border: '2px dashed #fff', borderRadius: '10px',
-      display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '10px'
+      display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '10px',
+      fontSize: '27px', cursor: 'pointer'
     });
     this.dropArea.innerText = 'Drop Tiled .tmj file here';
 
