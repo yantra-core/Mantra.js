@@ -1,7 +1,21 @@
 // CSSCamera.js - Marak Squires 2023
-import applyThrow from './lib/camera/applyThrow.js';
+
+// Camera Transform
+import setTransform from './lib/camera/setTransform.js';
 import rotateCameraOverTime from './lib/camera/rotateCameraOverTime.js';
 import updateCameraPosition from './lib/camera/updateCameraPosition.js';
+
+// Camera Entity Position ( used for `follow` and `CSSGraphics` )
+import updateEntityPosition from './lib/camera/updateEntityPosition.js';
+
+// Camera Zoom
+import mouseWheelZoom from './lib/camera/mouseWheelZoom.js';
+import zoom from './lib/camera/zoom.js';
+
+// Camera effects
+import cameraShake from './lib/camera/cameraShake.js';
+import applyThrow from './lib/camera/applyThrow.js';
+
 // main update loop for camera
 import update from './lib/camera/update.js';
 
@@ -19,6 +33,12 @@ class CSSCamera {
     this.dragInertia = { x: 0, y: 0 };
     this.isThrowing = false;
     this.rotating = false;
+    this.mouseWheelEnabled = true;
+    this.mouseWheelZoom = mouseWheelZoom.bind(this);
+    this.zoom = zoom.bind(this);
+    this.cameraShake = cameraShake.bind(this);
+    this.setTransform = setTransform.bind(this);
+    this.updateEntityPosition = updateEntityPosition.bind(this);
 
   }
 
@@ -26,9 +46,14 @@ class CSSCamera {
     this.game = game;
     // this.resetCameraState();
 
+    game.setZoom = this.zoom.bind(this);
+
     this.updateCameraPosition = updateCameraPosition.bind(this);
     this.applyThrow = applyThrow.bind(this);
     this.update = update.bind(this);
+
+    this.scene.setTransform = this.setTransform.bind(this);
+    this.scene.updateEntityPosition = this.updateEntityPosition.bind(this);
 
     // hoist rotateCamera to game
     game.rotateCamera = rotateCameraOverTime.bind(this);
@@ -51,7 +76,7 @@ class CSSCamera {
     this.initZoomControls();
 
     game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
-
+      //console.log("CSSCamera.js", entityId, data, sequenceNumber)
       if (data.mouse) {
         // Update camera position based on drag deltas
         if (data.mouse.buttons.RIGHT) {
@@ -64,7 +89,7 @@ class CSSCamera {
         let adjustedDx = data.mouse.dx * zoomFactor;
         let adjustedDy = data.mouse.dy * zoomFactor;
         //console.log('Adjusted Dx', adjustedDx, 'og', data.mouse.dx);
-        //console.log('Adjusted Dy', adjustedDy, 'og', data.mouse.dy);
+        console.log(data.mouse.isDragging);
         this.updateCameraPosition(-adjustedDx, -adjustedDy, data.mouse.isDragging);
       }
 
@@ -79,7 +104,7 @@ class CSSCamera {
   }
 
   initZoomControls() {
-    document.addEventListener('wheel', this.scene.mouseWheelZoom, { passive: false });
+    document.addEventListener('wheel', this.mouseWheelZoom, { passive: false });
     this.scene.mouseWheelEnabled = true;
   }
 

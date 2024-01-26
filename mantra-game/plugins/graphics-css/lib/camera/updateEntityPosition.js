@@ -18,8 +18,8 @@ export default function updateEntityPosition(entityElement, entityData) {
   fovHeight = 600;
 
   const adjustedPosition = {
-    x: position.x - (this.cameraPosition.x -  window.innerWidth / 2),
-    y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
+    x: position.x - (this.scene.cameraPosition.x -  window.innerWidth / 2),
+    y: position.y - (this.scene.cameraPosition.y - window.outerHeight / 2)
   };
 
   // Check if the entity is within the field of view

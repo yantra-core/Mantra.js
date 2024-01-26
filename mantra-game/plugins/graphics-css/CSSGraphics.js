@@ -8,11 +8,7 @@ import inflateGraphic from './lib/entity/inflateGraphic.js';
 import inflateTexture from './lib/entity/inflateTexture.js';
 import createGraphic from './lib/entity/createGraphic.js';
 
-import setTransform from './lib/camera/setTransform.js';
-
 import updateGraphic from './lib/entity/updateGraphic.js';
-import updateEntityPosition from './lib/camera/updateEntityPosition.js';
-import mouseWheelZoom from './lib/camera/mouseWheelZoom.js';
 
 // touch / mouse events on entities
 import bindEntityEvents from './lib/entity/bindEntityEvents.js';
@@ -21,8 +17,6 @@ import bindEntityEvents from './lib/entity/bindEntityEvents.js';
 import bindYCraftEvents from './lib/entity/bindYCraftEvents.js';
 
 import unload from './lib/unload.js';
-import zoom from './lib/camera/zoom.js';
-import cameraShake from './lib/camera/cameraShake.js';
 
 import render from './lib/render.js';
 import removeGraphic from './lib/entity/removeGraphic.js';
@@ -55,17 +49,13 @@ class CSSGraphics extends GraphicsInterface {
     this.inflateText = inflateText.bind(this);
     this.inflateGraphic = inflateGraphic.bind(this);
     this.inflateTexture = inflateTexture.bind(this);
-    this.setTransform = setTransform.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
-    this.updateEntityPosition = updateEntityPosition.bind(this);
+
     this.render = render.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
     this.bindEntityEvents = bindEntityEvents.bind(this);
     this.bindYCraftEvents = bindYCraftEvents.bind(this);
-    this.mouseWheelZoom = mouseWheelZoom.bind(this);
     this.unload = unload.bind(this);
-    this.zoom = zoom.bind(this);
-    this.cameraShake = cameraShake.bind(this);  
 
     // TODO: make this function lookup with defaults ( instead of -1 )
     this.depthChart = [
@@ -77,7 +67,6 @@ class CSSGraphics extends GraphicsInterface {
 
   init(game) {
     this.game = game;
-    game.setZoom = this.zoom.bind(this);
 
     const cssCamera = new CSSCamera(this, this.camera);
     const windowHeight = window.innerHeight;

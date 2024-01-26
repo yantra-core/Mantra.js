@@ -32,8 +32,8 @@ export default function cssMouseWheelZoom(event) {
   const viewportCenterY = window.innerHeight / 2;
 
   // Calculate offsets based on the old scale
-  let offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
-  let offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
+  let offsetX = (viewportCenterX - this.scene.cameraPosition.x) / scale;
+  let offsetY = (viewportCenterY - this.scene.cameraPosition.y) / scale;
 
   // Update scale
   this.zoom(newScale);

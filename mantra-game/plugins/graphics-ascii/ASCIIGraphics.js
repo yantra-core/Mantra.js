@@ -1,5 +1,6 @@
 // ASCIIGraphics.js - Marak Squires 2024
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
+import CSSCamera from '../graphics-css/CSSCamera.js';
 
 class ASCIIGraphics extends GraphicsInterface {
   static id = 'graphics-ascii';
@@ -7,6 +8,7 @@ class ASCIIGraphics extends GraphicsInterface {
 
   constructor({ camera } = {}) {
     super();
+    this.camera = camera;
     this.cameraPosition = { x: 0, y: 0 };
     this.screen = null;
     this.elements = {};
@@ -17,22 +19,22 @@ class ASCIIGraphics extends GraphicsInterface {
   init(game) {
     this.game = game;
     this.game.asciiScreen = this.asciiScreen;
+
+    // Set the ASCII screen size to a portion of the viewport size, for example 50%
+    let screenScaleFactor = 0.5; // Adjust this value to scale the ASCII screen size
     this.screen = {
-      width: Math.min(window.innerWidth, game.width),
-      height: Math.min(window.innerHeight, game.height),
+      width: Math.round(Math.min(window.innerWidth, game.width) * screenScaleFactor),
+      height: Math.round(Math.min(window.innerHeight, game.height) * screenScaleFactor),
     };
 
-    this.screen.width = this.screen.width * 0.1;
-    this.screen.height = this.screen.height * 0.1;
-
-    console.log('ssss', this.screen)
+    // Scaling factors - determine how game coordinates are scaled to ASCII screen coordinates
     this.scaleX = this.screen.width / game.width;
     this.scaleY = this.screen.height / game.height;
-    // set scale to 1 ( for now )
-    //this.scaleX = 10;
-    //this.scaleY = 10;
-    this.createAsciiContainer(); // Initialize the ASCII container in the DOM
 
+    const cssCamera = new CSSCamera(this, this.camera);
+    this.game.use(cssCamera);
+
+    this.createAsciiContainer(); // Initialize the ASCII container in the DOM
     this.createAsciiScreen(); // Initialize ASCII screen
     game.graphics.push(this);
   }
@@ -53,31 +55,45 @@ class ASCIIGraphics extends GraphicsInterface {
 
   createAsciiContainer() {
 
-    // get gameHolder div by id
     let gameHolder = document.getElementById('gameHolder');
+    if (!gameHolder) {
+      gameHolder = document.createElement('div');
+      gameHolder.id = 'gameHolder';
+      document.body.appendChild(gameHolder);
+    }
 
-    this.asciiContainer = document.createElement('div');
-    this.asciiContainer.style.fontFamily = 'monospace';
+    let renderDiv = document.getElementById('ascii-render-div');
+    if (!renderDiv) {
+      renderDiv = document.createElement('div');
+      renderDiv.id = 'ascii-render-div';
+      renderDiv.className = 'render-div';
+      gameHolder.appendChild(renderDiv);
+    }
+
+    this.renderDiv = renderDiv;
+
+    // this.renderDiv = document.createElement('div');
+    this.renderDiv.style.fontFamily = 'monospace';
     // set zIndex to 1 to ensure it is above other elements
-    this.asciiContainer.style.zIndex = 1;
+    this.renderDiv.style.zIndex = 1;
     // larger font
-    this.asciiContainer.style.fontSize = '16px';
+    this.renderDiv.style.fontSize = '16px';
     // font color is black
-    this.asciiContainer.style.color = '#000';
-    this.asciiContainer.style.whiteSpace = 'pre'; // Ensure whitespace is respected
-    gameHolder.appendChild(this.asciiContainer); // Append to body, or another element as needed
+    this.renderDiv.style.color = '#000';
+    this.renderDiv.style.whiteSpace = 'pre'; // Ensure whitespace is respected
+    gameHolder.appendChild(this.renderDiv); // Append to body, or another element as needed
 
     // Initialize the container with blank spaces
     for (let y = 0; y < this.screen.height; y++) {
       let row = document.createElement('div');
       row.textContent = ' '.repeat(this.screen.width); // Initialize with blank spaces
-      this.asciiContainer.appendChild(row);
+      this.renderDiv.appendChild(row);
     }
   }
 
   updateAsciiContainer() {
     for (let y = 0; y < this.screen.height; y++) {
-      let row = this.asciiContainer.childNodes[y];
+      let row = this.renderDiv.childNodes[y];
       let newRowContent = this.asciiScreen[y].join('');
 
       if (row.textContent !== newRowContent) {
@@ -91,9 +107,26 @@ class ASCIIGraphics extends GraphicsInterface {
     for (let y = 0; y < this.screen.height; y++) {
       this.asciiScreen[y] = [];
       for (let x = 0; x < this.screen.width; x++) {
-        this.asciiScreen[y][x] = '0';
+        this.asciiScreen[y][x] = ' ';
       }
     }
+  }
+
+  transformEntityToScreenCoordinates(entity) {
+    let x = Math.round((entity.position.x - this.cameraPosition.x + this.game.width / 2) * this.scaleX);
+    let y = Math.round((entity.position.y - this.cameraPosition.y + this.game.height / 2) * this.scaleY);
+
+    let width = Math.max(1, Math.round(entity.width * this.scaleX));
+    let height = Math.max(1, Math.round(entity.height * this.scaleY));
+
+    x = Math.max(0, Math.min(x, this.screen.width - width));
+    y = Math.max(0, Math.min(y, this.screen.height - height));
+
+    return { x, y, width, height };
+  }
+
+  isWithinScreenBounds(x, y) {
+    return x >= 0 && x < this.screen.width && y >= 0 && y < this.screen.height;
   }
 
   inflateGraphic(entity) {
@@ -120,32 +153,49 @@ class ASCIIGraphics extends GraphicsInterface {
   }
 
   createGraphic(entityData) {
-
-    // console.log('createGraphic', asciiChar)
-    const { x, y } = this.transformCoordinates(entityData);
+    const { x, y, width, height } = this.transformEntityToScreenCoordinates(entityData);
     const asciiChar = this.entityToAscii(entityData);
-    console.log('adding', asciiChar)
-    this.asciiScreen[y][x] = asciiChar;
-    this.elements[entityData.id] = { x, y, char: asciiChar };
 
+    // Fill in the ASCII characters for the entity
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+        if (this.isWithinScreenBounds(x + j, y + i)) {
+          this.asciiScreen[y + i][x + j] = asciiChar;
+        }
+      }
+    }
+
+    this.elements[entityData.id] = { x, y, char: asciiChar, width, height };
     return this.elements[entityData.id];
   }
 
   updateGraphic(entity, alpha = 1) {
-
     if (this.elements[entity.id]) {
-      const { x, y } = this.transformCoordinates(entity);
       const oldPos = this.elements[entity.id];
-      this.asciiScreen[oldPos.y][oldPos.x] = ' '; // Clear old position
+      const { x, y, width, height } = this.transformEntityToScreenCoordinates(entity);
       const asciiChar = this.entityToAscii(entity);
-      // console.log('updateGraphic', asciiChar)
 
-      this.asciiScreen[y][x] = asciiChar;
-      this.elements[entity.id] = { x, y, char: asciiChar };
-      // this.screen.render(); // Render changes
+      // Clear old position
+      for (let i = 0; i < oldPos.height; i++) {
+        for (let j = 0; j < oldPos.width; j++) {
+          if (this.isWithinScreenBounds(oldPos.x + j, oldPos.y + i)) {
+            this.asciiScreen[oldPos.y + i][oldPos.x + j] = ' ';
+          }
+        }
+      }
+
+      // Draw new position
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          if (this.isWithinScreenBounds(x + j, y + i)) {
+            this.asciiScreen[y + i][x + j] = asciiChar;
+          }
+        }
+      }
+
+      this.elements[entity.id] = { x, y, char: asciiChar, width, height };
     }
   }
-
   render(game, alpha = 1) {
     //this.updateAsciiContainer(); // Smart update of ASCII display in the DOM
     for (let [eId, state] of this.game.entities.entries()) {
@@ -154,20 +204,6 @@ class ASCIIGraphics extends GraphicsInterface {
     }
     this.updateAsciiContainer();
 
-  }
-
-  // Transform game world coordinates to screen coordinates
-  // Refactored transformCoordinates method
-  transformCoordinates(entity) {
-    // Adjust game coordinates to screen coordinates based on camera position
-    let x = Math.round((entity.position.x - this.cameraPosition.x) * this.scaleX);
-    let y = Math.round((entity.position.y - this.cameraPosition.y) * this.scaleY);
-
-    // Ensure x and y are within the bounds of the ASCII screen
-    x = Math.max(0, Math.min(x, this.screen.width - 1));
-    y = Math.max(0, Math.min(y, this.screen.height - 1));
-
-    return { x, y };
   }
 
   removeGraphic(entityId) {
