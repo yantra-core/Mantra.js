@@ -25,6 +25,7 @@ import Schema from './plugins/schema/Schema.js';
 
 // Graphics
 import Graphics from './plugins/graphics/Graphics.js';
+
 import BabylonGraphics from './plugins/graphics-babylon/BabylonGraphics.js';
 import Camera from './plugins/graphics-babylon/camera/BabylonCamera.js'; // TODO: rename to BabylonCamera?
 import PhaserGraphics from './plugins/graphics-phaser/PhaserGraphics.js';
@@ -32,6 +33,7 @@ import PhaserCamera from './plugins/graphics-phaser/PhaserCamera.js';
 import CSSGraphics from './plugins/graphics-css/CSSGraphics.js';
 // import CSS3DGraphics from './plugins/graphics-css-3d/CSS3DGraphics.js';
 import ThreeGraphics from './plugins/graphics-three/ThreeGraphics.js';
+import ASCIIGraphics from './plugins/graphics-ascii/ASCIIGraphics.js';
 // import BlessedGraphics from './plugins/graphics-blessed/BlessedGraphics.js';
 
 // Gaming devices
@@ -169,6 +171,7 @@ const plugins = {
   PhaserGraphics,
   PhaserCamera,
   ThreeGraphics,
+  ASCIIGraphics,
   // BlessedGraphics,
   CSSGraphics,
   // CSS3DGraphics,

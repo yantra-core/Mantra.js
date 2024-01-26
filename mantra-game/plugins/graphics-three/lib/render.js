@@ -10,7 +10,7 @@ export default function render(game, alpha) {
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
 
 
-  if (true || this.game.useFov) {
+  if (this.game.useFov) {
 
     let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
     // console.log('itemsInFov', itemsInFov)
@@ -28,7 +28,6 @@ export default function render(game, alpha) {
       let ent = this.game.entities.get(eId);
       this.inflateGraphic(ent, alpha);
     }
-
 
   }
 

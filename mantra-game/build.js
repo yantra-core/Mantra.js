@@ -8,6 +8,7 @@ const plugins = [
   './plugins/sutra/Sutra.js',
   './plugins/ycraft/YCraft.js',
   './plugins/graphics-babylon/camera/BabylonCamera.js',
+  './plugins/graphics-ascii/ASCIIGraphics.js',
   './plugins/graphics-babylon/BabylonGraphics.js',
   './plugins/block/Block.js',
   './plugins/tile/Tile.js',
