@@ -34,7 +34,7 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
     mass,
     isStatic,
     style: { cursor: 'pointer' },
-    position: { x: x * scale, y: y * scale, z },
+    position: { x: x * scale, y: y * scale, z: z * scale },
     friction: 1,
     frictionAir: 1,
     frictionStatic: 1,

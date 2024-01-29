@@ -1,4 +1,6 @@
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
+
+import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 
@@ -10,13 +12,13 @@ import generateRandomChunk from './lib/generateRandomChunk.js';
 import generateRandomChunkWithPaths from './lib/generateRandomChunkWithPaths.js';
 import generateChunkWithFractal from './lib/generateChunkWithFractal.js';
 import randomTileFromDistribution from './lib/randomTileFromDistribution.js';
-import createTile from './lib/createTile.js'; 
+import createTile from './lib/createTile.js';
 
 const tileKinds = [
-  { id: 0, kind: 'grass', weight: 10 },
+  { id: 0, kind: 'empty', weight: 10 },
   { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 0 },
   { id: 2, kind: 'grass', weight: 63 },
-  { id: 3, kind: 'block', weight: 5, body: true, z: 0  },
+  { id: 3, kind: 'block', weight: 5, body: true, z: 0 },
   { id: 4, kind: 'path-green', weight: 10 },
   { id: 5, kind: 'path-brown', weight: 10 },
 ];
@@ -24,7 +26,7 @@ const tileKinds = [
 class Tile {
   static id = 'tile';
 
-  constructor({ 
+  constructor({
     tileMap = defaultOrthogonalMap,
     tiledServer = false,
     chunkUnitSize = 8,
@@ -33,7 +35,7 @@ class Tile {
     loadInitialChunk = true,
     loadDefaultTileMap = true,
   } = {}) {
-  
+
     this.id = Tile.id;
 
     // in debug mode we will add colors to each chunk
@@ -78,7 +80,7 @@ class Tile {
 
   }
 
-  setOptions (TileConfig) {
+  setOptions(TileConfig) {
     // console.log("SET NEW OPTIONS", TileConfig)
     this.tiledServer = TileConfig.tiledServer;
     this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
@@ -109,12 +111,12 @@ class Tile {
           console.log('this.game.data.chunks.chunk_x0_y0', this.game.data.chunks.chunk_x0_y0.data.length)
           this.createLayer(this.game.data.chunks.chunk_x0_y0, this.tileSize, this.tileSize);
         });
-  
+
       } else if (this.proceduralGenerateMissingChunks) {
         // TODO: generator
       }
-      
-  
+
+
     } else {
 
       //setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
@@ -128,13 +130,19 @@ class Tile {
 
     // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
     this.game.on('file::upload', (data) => {
-      console.log('got new tile data', data);
+      // console.log('got new tile data', data);
       this.createTileMapFromTiledJSON(data);
     });
 
   }
 
   createTileMapFromTiledJSON(tiledJSON) {
+    // TODO: remove this line
+    if (typeof window !== 'undefined') {
+      let overlay = document.getElementById('drag-and-drop-file-upload-overlay');
+      // set hidden
+      overlay.style.display = 'none';
+    }
     tiledJSON.layers.forEach(layer => {
       if (layer.type === 'tilelayer') {
 
@@ -151,34 +159,77 @@ class Tile {
   }
 
   createLayer(layer, tileWidth, tileHeight) {
-    layer.data.forEach((tile, index) => {
-      if (typeof tile === 'number') {
-        // find id = tile in tileKinds
-        let tileId = tile;
-        let tileKind = tileKinds.find(tileKind => tileKind.id === tileId);
-        if (tileKind) {
-          tile = tileKind;
-        } else {
-          tile = tileKinds[3];
-        }
-      }
-      //if (tileId !== 0 && /* tileId !== 2 && */ tileId !== 4577 && tileId !== 4767) {
-      let { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, tile.id);
-      this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
-      //}
-    });
+    // Check if the layer.data is a 3D array
+    if (Array.isArray(layer.data[0])) {
+      // 3D data handling
+      layer.data.forEach((layer2D, z) => {
+        layer2D.forEach((tile, index) => {
+          this.processTile(tile, index, layer, tileWidth, tileHeight, z);
+        });
+      });
+    } else {
+      // 2D data handling
+      layer.data.forEach((tile, index) => {
+        this.processTile(tile, index, layer, tileWidth, tileHeight, 0); // Assume z=0 for 2D data
+      });
+    }
   }
+  
+  processTile(tile, index, layer, tileWidth, tileHeight, depth) {
+    if (typeof tile === 'number') {
+      // Find id = tile in tileKinds
+      let tileId = tile;
+      let tileKind = tileKinds.find(tileKind => tileKind.id === tileId);
+      if (tileKind) {
+        tile = tileKind;
+      } else {
+        tile = tileKinds[3]; // Default tile kind if not found
+      }
+    }
+  
+    let { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth);
+    tile.z = z;
+    this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
+  }
+  
 
   getTileImageURL(tileId) {
     return `img/game/tiles/${tileId}.png`;
   }
 
   handleLoadFailure(chunkPath, chunkKey) {
-    //console.log("Fallback for failed load:", chunkPath, chunkKey);
+    console.log("Fallback for failed load:", chunkPath, chunkKey);
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
       // console.log('Generating random chunk', chunkKey)
-      let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
+      // let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
+      let randomChunk;
+      let chunkCoordinates = this.extractChunkCoordinates(chunkKey);
+
+      // console.log('chunkCoordinates', chunkCoordinates)
+      let x = chunkCoordinates.x;
+      let y = chunkCoordinates.y;
+      let map = new labyrinthos.TileMap({
+        x: x,
+        y: y,
+        width: 8,
+        height: 8,
+        tileWidth: 16,
+        tileHeight: 16
+      });
+      map.fill(1);
+      //labyrinthos.mazes.RecursiveBacktrack(map, {});
+      // labyrinthos.mazes.SpiralBacktrack(map, {});
+      // labyrinthos .mazes.RecursiveDivision(map, {});
+      // labyrinthos.terrains.DiamondSquare(map, {});
+      // map.seed(4121);
+      labyrinthos.terrains.FaultLine(map, {});
+      
+      map.scaleToTileRange(6);
+      // console.log('map', map)
+
+      randomChunk = map;
+
       // console.log('randomChunk', chunkKey, randomChunk.data.length)
       this.game.data.chunks[chunkKey] = randomChunk;
       this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
@@ -193,12 +244,15 @@ class Tile {
 
   loadTilesForArea(position) {
 
+    //generateMap(map, {});
+    //console.log('map', map)
+
     // if (!this.tiledServer) return;
 
     let outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
     const result = getChunkFiles(position, this.chunkUnitSize, outputDir, 2);
     // console.log("getChunkFiles result", position, result);
-  
+
     // TODO: place check to see if we allow remote chunk loading
     result.forEach(chunkName => {
       // Extract the chunk key from the chunk file name
@@ -215,7 +269,7 @@ class Tile {
       }
     });
   }
-  
+
   update() { }
 
   render() { }

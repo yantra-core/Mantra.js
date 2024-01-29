@@ -1,4 +1,4 @@
-export default function calculateTilePosition(index, layer, tileWidth, tileHeight, tileId) {
+export default function calculateTilePosition(index, layer, tileWidth = 16, tileHeight = 16, z = 0, depth = 1) {
   // Calculate the tile's local position within the layer (relative to the layer's top-left corner)
   let localX = (index % layer.width) * tileWidth;
   let localY = Math.floor(index / layer.width) * tileHeight;
@@ -15,7 +15,9 @@ export default function calculateTilePosition(index, layer, tileWidth, tileHeigh
   // Calculate the absolute position of the tile in the game world
   let x = mapX;
   let y = mapY;
-  let z = tileId === 1 ? 0 : -1;  // Adjust z based on your game's logic
-
-  return { x, y, z };
+  
+  // Use the z parameter to calculate the depth position
+  // 'depth' is the total depth of the map, used to calculate the offset for each layer
+  let zOffset = z * (tileHeight / depth); // Example calculation for z position, adjust as needed
+  return { x, y, z: zOffset };
 }

@@ -23,13 +23,11 @@ class Tiled {
     game.setZoom(4.5);
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
-    game.setBackground('#000000');
+    // game.setBackground('#000000');
     game.useFoV = true;
     game.data.fieldOfView = 96;
     // sprite sheet has been defined in defaultAssets.js
     game.createPlayer({
-      height: 16,
-      width: 16,
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'player',
@@ -40,23 +38,7 @@ class Tiled {
       }
     });
 
-    /* TODO supports in-line cutting of sprites
-    game.createPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: {
-          x: 120,
-          y: 435,
-          height: 16,
-          width: 16
-        }
-      },
-      position: {
-        x: 0,
-        y: 0
-      }
-    });
-    */
+    game.setBackground('#000000');
 
     game.use('Block');
     game.use('Border', { autoBorder: true })
@@ -64,16 +46,16 @@ class Tiled {
     // game.use('Sword')
     game.use('Tile', {
       loadInitialChunk: true,
-      tiledServer: false,
+      tiledServer: true,
       tileSize: 16,
       chunkUnitSize: 8,
-      proceduralGenerateMissingChunks: true,
+      proceduralGenerateMissingChunks: false,
       lazyLoadTiles: false,
       loadDefaultTileMap: false
     });
     game.use('Tone');
 
-    welcomeMessage(game);
+    // welcomeMessage(game);
 
     let rules = game.rules;
 
@@ -146,48 +128,14 @@ class Tiled {
       })
     });
 
-    /*
-    rules.on('MOVE_UP', function (player) {
-      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
-    });
-
-    rules.on('MOVE_DOWN', function (player) {
-      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI });
-    });
-
-    rules.on('MOVE_LEFT', function (player, node, gameState) {
-      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-    });
-
-    rules.on('MOVE_RIGHT', function (player) {
-      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
-    });
-    */
-
-
     rules.on('FIRE_BULLET', function (player) {
+      console.log("FFFFUREBULLET")
       game.systems.bullet.fireBullet(player.id);
     });
 
     rules.on('DROP_BOMB', function (player) {
       rules.emit('dropBomb', player)
     });
-
-    /*
-    rules.on('SWING_SWORD', function(player){
-      game.systems.sword.swingSword(player.id);
-    })
-    */
-    /*
-    rules.on('CAMERA_SHAKE', function(player){
-      game.shakeCamera(1000);
-    });
-    */
-
     rules.on('ZOOM_IN', function () {
       let currentZoom = game.data.camera.currentZoom || 1;
       game.setZoom(currentZoom + 0.05);
@@ -243,204 +191,6 @@ class Tiled {
       }
     });
 
-    game.createEntity({
-      type: 'BACKGROUND',
-      texture: 'robot-arms-apartment',
-      kind: 'building',
-      depth: 1,
-
-      width: 1340,
-      height: 3668,
-      body: false,
-      position: { // position to right
-        x: 900,
-        y: -1800,
-        z: 1
-      }
-    });
-
-    game.createEntity({
-      type: 'BACKGROUND',
-      texture: 'planet-express-base',
-      kind: 'building',
-
-      width: 2048,
-      height: 2048,
-      depth: 1,
-      body: false,
-      position: { // position to right
-        x: -900,
-        y: -800,
-        z: -1
-      }
-    });
-
-    game.createEntity({
-      type: 'BLOCK',
-      texture: 'tile-block',
-      width: 200,
-      height: 200,
-      mass: 10000,
-      // body: false,
-      position: { // position to right
-        x: 200,
-        y: -800,
-        z: -8
-      }
-    });
-
-    // if touch warp, switch to YCraft level
-    game.createEntity({
-      type: 'WARP',
-      kind: 'YCraft',
-      width: 64,
-      height: 64,
-      depth: 64,
-      texture: 'warp-to-ycraft',
-      isStatic: true,
-      isSensor: true,
-      position: {
-        x: 0,
-        y: -210,
-        z: 32
-      }
-    });
-
-    // if touch warp, switch to Sutra level
-    /*
-    game.createEntity({
-      type: 'WARP',
-      kind: 'Sutra',
-      width: 64,
-      height: 64,
-      depth: 64,
-      texture: 'warp-to-sutra',
-      isStatic: true,
-      isSensor: true,
-      position: {
-        x: 0,
-        y: 210,
-        z: 32
-      }
-    });
-    */
-
-    // text label saying "Warp To YCraft World"
-    game.createEntity({
-      type: 'TEXT',
-      text: 'Warp To YCraft World',
-      width: 164,
-      // kind: 'dynamic',
-      color: 0x000000,
-      style: {
-        fontSize: '16px',
-        textAlign: 'center',
-        paddingLeft: '20px', // for now
-
-      },
-      body: false,
-      position: {
-        x: -20,
-        y: -220,
-        z: 64
-      }
-    });
-
-    // if touch note play sound
-    game.createEntity({
-      type: 'NOTE',
-      color: 0xccff00,
-      width: 32,
-      height: 32,
-      depth: 16,
-      isStatic: true,
-      position: {
-        x: -120,
-        y: -200,
-        z: 32
-      }
-    });
-
-    /*
-    game.createEntity({
-      name: 'noteInfo',
-      type: 'TEXT',
-      text: 'This is a note, touch it to play a sound',
-      fontSize: 16,
-      color: 0x000000,
-      body: false,
-      style: {
-        fontSize: '16px'
-      },
-      position: {
-        x: 0,
-        y: -200,
-        z: 64
-      }
-    });
-    */
-
-    // displays some items from the spritesheet
-    let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-    itemsList = []; // for now
-    itemsList.forEach((item, index) => {
-      game.createEntity({
-        type: item.toUpperCase(),
-        kind: item,
-        width: 16,
-        height: 16,
-        depth: 32,
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: item,
-        },
-        position: {
-          x: -100 + (index * 32),
-          y: 150,
-          z: 32
-        }
-      });
-    });
-
-    /*
-
-    game.createEntity({
-      name: 'raiden-left',
-      type: 'BACKGROUND',
-      width: 64,
-      height: 64,
-      depth: 64,
-      style: {
-        display: 'none'
-      },
-      texture: 'raiden',
-      body: false,
-      position: {
-        x: 0,
-        y: 10,
-        z: 32
-      }
-    });
-
-    game.createEntity({
-      name: 'raiden-right',
-      type: 'BACKGROUND',
-      width: 64,
-      height: 64,
-      depth: 64,
-      style: {
-        display: 'none'
-      },
-      texture: 'raiden',
-      body: false,
-      position: {
-        x: 100,
-        y: 10,
-        z: 32
-      }
-    });
-
-    */
 
   }
 

@@ -26,6 +26,7 @@ app.get('/tiles', (req, res) => {
   width = isNaN(width) ? 32 : width;
   height = isNaN(height) ? 32 : height;
 
+  // TODO, use LABY.TileMap.query() instead
   let tiles = tileQuery(tiledMap, { x, y, width, height})
   res.json(tiles);;
 

@@ -1,3 +1,4 @@
+// TODO: remove this code in favor of LABY.TileMap.query()
 export default function tileQuery (tiledMap, { x, y, width, height }) {
     // Adjust x and y based on the center being at (0,0)
     const minX = x - width / 2;
