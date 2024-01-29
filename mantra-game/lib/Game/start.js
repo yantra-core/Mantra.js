@@ -47,8 +47,8 @@ export default function start(cb) {
 
       console.log('All Plugins are ready! Starting Mantra Game Client...');
       game.emit('game::ready');
-      if (this.config.defaultPlayer) {
-        this.createPlayer({
+      if (game.config.defaultPlayer) {
+        game.createPlayer({
           type: 'PLAYER'
         }).then(function (ent) {
           game.setPlayerId(ent.id);
@@ -56,7 +56,7 @@ export default function start(cb) {
       }
 
       if (game.systems.client) {
-        let client = this.getSystem('client');
+        let client = game.getSystem('client');
         client.start(callbackWrapper);
       } else {
         console.log('Warning: No Client System found, will not start game loop.');
