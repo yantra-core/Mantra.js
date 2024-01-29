@@ -58,12 +58,16 @@ class Game {
     // Assigning the final configuration to this.config
     this.config = config;
 
-    // Plugin handling
+    // Game.use('PluginName') is a helper function for loading plugins
+    // must be defined before construct() is called
     this.use = use(this, config.plugins);
-    this.start = start.bind(this);
 
     // Additional construction logic
     construct(this, config.plugins);
+
+    // Plugin handling
+    this.start = start.bind(this);
+
   }
 
   update(deltaTime) {

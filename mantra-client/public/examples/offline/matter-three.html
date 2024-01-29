@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Three.js Demo</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+      let game = new MANTRA.Game({
+        height: 600 * 10,
+        width: 800 * 10,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: {
+          follow: true,
+          startingZoom: 0.3,
+        },
+        options: {
+          scriptRoot: '../../'
+        }
+      });
+
+      let Plugins = MANTRA.plugins;
+
+      // Use Plugins to extend the game with new functionality
+
+      // Adds projectile Bullets to the game
+      game.use('Bullet')
+
+      // Adds destructible Blocks to the game
+      game.use('Block');
+
+      // Adds a nice StarField background
+      game.use('StarField');
+
+      // game.use('CurrentFPS');
+
+      // game.use('ControlsGUI');
+
+      game.use('Editor', {
+        sourceCode: 'https://github.com/yantra-core/mantra/blob/master/mantra-client/public/examples/offline/matter-phaser.html'
+      });
+
+
+      // start the game loop
+      game.start(function () {
+
+        game.createDefaultPlayer();
+
+        game.createEntity({
+          type: 'BLOCK',
+          width: 64,
+          height: 64,
+          depth: 64,
+          position: {
+            x: 0,
+            y: -50
+          },
+        });
+
+        game.use('Border', { autoBorder: true });
+      });
+
+      // optionally
+      window.game = game;
+
+    });
+
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

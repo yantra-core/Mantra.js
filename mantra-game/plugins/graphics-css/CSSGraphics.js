@@ -88,7 +88,7 @@ class CSSGraphics extends GraphicsInterface {
     document.body.style.cursor = 'default';
 
     game.on('game::ready', () => {
-      this.zoom(1); // game.data.camera.currentZoom
+      game.zoom(1); // game.data.camera.currentZoom
     });
   }
 

@@ -48,11 +48,10 @@ export default function start(cb) {
       console.log('All Plugins are ready! Starting Mantra Game Client...');
       game.emit('game::ready');
       if (game.config.defaultPlayer) {
-        game.createPlayer({
-          type: 'PLAYER'
-        }).then(function (ent) {
-          game.setPlayerId(ent.id);
-        });
+        // Remark: Using this defaultPlayer config will only work in offline mode
+        //         Server mode uses .listen() and .connect() to create a player
+        let defaultPlayer = game.createPlayer();
+        game.setPlayerId(defaultPlayer.id);
       }
 
       if (game.systems.client) {
