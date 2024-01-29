@@ -525,17 +525,29 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "update",
     value: function update() {
       var game = this.game;
+      var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+            eId = _step$value[0],
+            state = _step$value[1];
+          var ent = this.game.entities.get(eId);
+          this.inflateGraphic(ent, 1);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
       if (game.systems['graphics-babylon-camera']) {
         var cameraSystem = this.game.getSystem('graphics-babylon-camera');
         cameraSystem.update(); // is cameraSystem.update() required here?
       }
     }
-
-    // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
-    // TODO: rename to inflateGraphic
   }, {
-    key: "inflateEntity",
-    value: function inflateEntity(entity, alpha) {
+    key: "inflateGraphic",
+    value: function inflateGraphic(entity, alpha) {
       if (entity.graphics && entity.graphics['graphics-babylon']) {
         var graphic = entity.graphics['graphics-babylon'];
         this.updateGraphic(entity, alpha);
@@ -563,13 +575,13 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // TODO: consolidate graphics pipeline unloading into SystemsManager
       // TODO: remove duplicated unload() code in PhaserGraphics
       // iterate through all entities and remove existing babylon graphics
-      var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
-        _step;
+      var _iterator2 = _createForOfIteratorHelper(this.game.entities.entries()),
+        _step2;
       try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var _step$value = _slicedToArray(_step.value, 2),
-            eId = _step$value[0],
-            entity = _step$value[1];
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            eId = _step2$value[0],
+            entity = _step2$value[1];
           if (entity.graphics && entity.graphics['graphics-babylon']) {
             this.removeGraphic(eId);
             delete entity.graphics['graphics-babylon'];
@@ -579,9 +591,9 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // remove BabylonCamera as well
         // Remark: is this required? could we just leave it in memory?
       } catch (err) {
-        _iterator.e(err);
+        _iterator2.e(err);
       } finally {
-        _iterator.f();
+        _iterator2.f();
       }
       this.game.systemsManager.removeSystem('graphics-babylon-camera');
       this.game.graphics = this.game.graphics.filter(function (g) {

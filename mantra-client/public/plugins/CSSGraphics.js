@@ -76,9 +76,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-var _applyThrow = _interopRequireDefault(require("./lib/camera/applyThrow.js"));
+var _setTransform = _interopRequireDefault(require("./lib/camera/setTransform.js"));
 var _rotateCameraOverTime = _interopRequireDefault(require("./lib/camera/rotateCameraOverTime.js"));
 var _updateCameraPosition = _interopRequireDefault(require("./lib/camera/updateCameraPosition.js"));
+var _updateEntityPosition = _interopRequireDefault(require("./lib/camera/updateEntityPosition.js"));
+var _mouseWheelZoom = _interopRequireDefault(require("./lib/camera/mouseWheelZoom.js"));
+var _zoom = _interopRequireDefault(require("./lib/camera/zoom.js"));
+var _cameraShake = _interopRequireDefault(require("./lib/camera/cameraShake.js"));
+var _applyThrow = _interopRequireDefault(require("./lib/camera/applyThrow.js"));
 var _update = _interopRequireDefault(require("./lib/camera/update.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -88,6 +93,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // CSSCamera.js - Marak Squires 2023
+// Camera Transform
+// Camera Entity Position ( used for `follow` and `CSSGraphics` )
+// Camera Zoom
+// Camera effects
 // main update loop for camera
 var CSSCamera = /*#__PURE__*/function () {
   function CSSCamera(scene) {
@@ -104,6 +113,12 @@ var CSSCamera = /*#__PURE__*/function () {
     };
     this.isThrowing = false;
     this.rotating = false;
+    this.mouseWheelEnabled = true;
+    this.mouseWheelZoom = _mouseWheelZoom["default"].bind(this);
+    this.zoom = _zoom["default"].bind(this);
+    this.cameraShake = _cameraShake["default"].bind(this);
+    this.setTransform = _setTransform["default"].bind(this);
+    this.updateEntityPosition = _updateEntityPosition["default"].bind(this);
   }
   _createClass(CSSCamera, [{
     key: "init",
@@ -112,9 +127,18 @@ var CSSCamera = /*#__PURE__*/function () {
       this.game = game;
       // this.resetCameraState();
 
+      game.setZoom = this.zoom.bind(this);
+      game.data.camera = {
+        position: {
+          x: 0,
+          y: 0
+        }
+      };
       this.updateCameraPosition = _updateCameraPosition["default"].bind(this);
       this.applyThrow = _applyThrow["default"].bind(this);
       this.update = _update["default"].bind(this);
+      this.scene.setTransform = this.setTransform.bind(this);
+      this.scene.updateEntityPosition = this.updateEntityPosition.bind(this);
 
       // hoist rotateCamera to game
       game.rotateCamera = _rotateCameraOverTime["default"].bind(this);
@@ -133,6 +157,7 @@ var CSSCamera = /*#__PURE__*/function () {
       this.gameViewport.style.transformOrigin = 'center center';
       this.initZoomControls();
       game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
+        //console.log("CSSCamera.js", entityId, data, sequenceNumber)
         if (data.mouse) {
           // Update camera position based on drag deltas
           if (data.mouse.buttons.RIGHT) {
@@ -145,7 +170,6 @@ var CSSCamera = /*#__PURE__*/function () {
           var adjustedDx = data.mouse.dx * zoomFactor;
           var adjustedDy = data.mouse.dy * zoomFactor;
           //console.log('Adjusted Dx', adjustedDx, 'og', data.mouse.dx);
-          //console.log('Adjusted Dy', adjustedDy, 'og', data.mouse.dy);
           _this.updateCameraPosition(-adjustedDx, -adjustedDy, data.mouse.isDragging);
         }
       });
@@ -160,7 +184,7 @@ var CSSCamera = /*#__PURE__*/function () {
   }, {
     key: "initZoomControls",
     value: function initZoomControls() {
-      document.addEventListener('wheel', this.scene.mouseWheelZoom, {
+      document.addEventListener('wheel', this.mouseWheelZoom, {
         passive: false
       });
       this.scene.mouseWheelEnabled = true;
@@ -197,7 +221,7 @@ var CSSCamera = /*#__PURE__*/function () {
 _defineProperty(CSSCamera, "id", 'css-camera');
 var _default = exports["default"] = CSSCamera;
 
-},{"./lib/camera/applyThrow.js":4,"./lib/camera/rotateCameraOverTime.js":7,"./lib/camera/update.js":9,"./lib/camera/updateCameraPosition.js":10}],3:[function(require,module,exports){
+},{"./lib/camera/applyThrow.js":4,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/rotateCameraOverTime.js":7,"./lib/camera/setTransform.js":8,"./lib/camera/update.js":9,"./lib/camera/updateCameraPosition.js":10,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -211,15 +235,10 @@ var _inflateText = _interopRequireDefault(require("./lib/entity/inflateText.js")
 var _inflateGraphic = _interopRequireDefault(require("./lib/entity/inflateGraphic.js"));
 var _inflateTexture = _interopRequireDefault(require("./lib/entity/inflateTexture.js"));
 var _createGraphic = _interopRequireDefault(require("./lib/entity/createGraphic.js"));
-var _setTransform = _interopRequireDefault(require("./lib/camera/setTransform.js"));
 var _updateGraphic = _interopRequireDefault(require("./lib/entity/updateGraphic.js"));
-var _updateEntityPosition = _interopRequireDefault(require("./lib/camera/updateEntityPosition.js"));
-var _mouseWheelZoom = _interopRequireDefault(require("./lib/camera/mouseWheelZoom.js"));
 var _bindEntityEvents = _interopRequireDefault(require("./lib/entity/bindEntityEvents.js"));
 var _bindYCraftEvents = _interopRequireDefault(require("./lib/entity/bindYCraftEvents.js"));
 var _unload = _interopRequireDefault(require("./lib/unload.js"));
-var _zoom = _interopRequireDefault(require("./lib/camera/zoom.js"));
-var _cameraShake = _interopRequireDefault(require("./lib/camera/cameraShake.js"));
 var _render = _interopRequireDefault(require("./lib/render.js"));
 var _removeGraphic = _interopRequireDefault(require("./lib/entity/removeGraphic.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -277,17 +296,12 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateText = _inflateText["default"].bind(_assertThisInitialized(_this));
     _this.inflateGraphic = _inflateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.inflateTexture = _inflateTexture["default"].bind(_assertThisInitialized(_this));
-    _this.setTransform = _setTransform["default"].bind(_assertThisInitialized(_this));
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
-    _this.updateEntityPosition = _updateEntityPosition["default"].bind(_assertThisInitialized(_this));
     _this.render = _render["default"].bind(_assertThisInitialized(_this));
     _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
     _this.bindEntityEvents = _bindEntityEvents["default"].bind(_assertThisInitialized(_this));
     _this.bindYCraftEvents = _bindYCraftEvents["default"].bind(_assertThisInitialized(_this));
-    _this.mouseWheelZoom = _mouseWheelZoom["default"].bind(_assertThisInitialized(_this));
     _this.unload = _unload["default"].bind(_assertThisInitialized(_this));
-    _this.zoom = _zoom["default"].bind(_assertThisInitialized(_this));
-    _this.cameraShake = _cameraShake["default"].bind(_assertThisInitialized(_this));
 
     // TODO: make this function lookup with defaults ( instead of -1 )
     _this.depthChart = ['background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER', 'BLOCK', 'FIRE', 'WARP', 'NOTE'];
@@ -297,9 +311,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _createClass(CSSGraphics, [{
     key: "init",
     value: function init(game) {
-      var _this2 = this;
       this.game = game;
-      game.setZoom = this.zoom.bind(this);
       var cssCamera = new _CSSCamera["default"](this, this.camera);
       var windowHeight = window.innerHeight;
       this.game.use(cssCamera);
@@ -316,7 +328,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.game.viewportCenterYOffset = 0;
       document.body.style.cursor = 'default';
       game.on('game::ready', function () {
-        _this2.zoom(1); // game.data.camera.currentZoom
+        game.zoom(1); // game.data.camera.currentZoom
       });
     }
   }, {
@@ -350,7 +362,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/camera/cameraShake.js":5,"./lib/camera/mouseWheelZoom.js":6,"./lib/camera/setTransform.js":8,"./lib/camera/updateEntityPosition.js":11,"./lib/camera/zoom.js":12,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateGraphic.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateGraphic.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -493,8 +505,8 @@ function cssMouseWheelZoom(event) {
   var viewportCenterY = window.innerHeight / 2;
 
   // Calculate offsets based on the old scale
-  var offsetX = (viewportCenterX - this.cameraPosition.x) / scale;
-  var offsetY = (viewportCenterY - this.cameraPosition.y) / scale;
+  var offsetX = (viewportCenterX - this.scene.cameraPosition.x) / scale;
+  var offsetY = (viewportCenterY - this.scene.cameraPosition.y) / scale;
 
   // Update scale
   this.zoom(newScale);
@@ -676,9 +688,11 @@ function updateCameraPosition(dx, dy, isDragging) {
     this.isDragging = true;
     // this.follow = false;
     if (typeof dx === 'number') {
+      //game.data.camera.position.x -= dx;
       game.viewportCenterXOffset += dx;
     }
     if (typeof dy === 'number') {
+      //game.data.camera.position.y -= dy;
       game.viewportCenterYOffset += dy;
     }
   }
@@ -723,8 +737,8 @@ function updateEntityPosition(entityElement, entityData) {
   fovWidth = 600;
   fovHeight = 600;
   var adjustedPosition = {
-    x: position.x - (this.cameraPosition.x - window.innerWidth / 2),
-    y: position.y - (this.cameraPosition.y - window.outerHeight / 2)
+    x: position.x - (this.scene.cameraPosition.x - window.innerWidth / 2),
+    y: position.y - (this.scene.cameraPosition.y - window.outerHeight / 2)
   };
 
   // Check if the entity is within the field of view

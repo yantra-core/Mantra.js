@@ -337,12 +337,15 @@ var Game = exports.Game = /*#__PURE__*/function () {
     // Assigning the final configuration to this.config
     this.config = config;
 
-    // Plugin handling
+    // Game.use('PluginName') is a helper function for loading plugins
+    // must be defined before construct() is called
     this.use = (0, _use["default"])(this, config.plugins);
-    this.start = _start["default"].bind(this);
 
     // Additional construction logic
     (0, _construct["default"])(this, config.plugins);
+
+    // Plugin handling
+    this.start = _start["default"].bind(this);
   }
   _createClass(Game, [{
     key: "update",
@@ -1108,7 +1111,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = start;
 function start(cb) {
-  var _this = this;
   var game = this;
   return new Promise(function (resolve, reject) {
     // Define a wrapper for the callback to also resolve the promise
@@ -1154,15 +1156,14 @@ function start(cb) {
       }
       console.log('All Plugins are ready! Starting Mantra Game Client...');
       game.emit('game::ready');
-      if (_this.config.defaultPlayer) {
-        _this.createPlayer({
-          type: 'PLAYER'
-        }).then(function (ent) {
-          game.setPlayerId(ent.id);
-        });
+      if (game.config.defaultPlayer) {
+        // Remark: Using this defaultPlayer config will only work in offline mode
+        //         Server mode uses .listen() and .connect() to create a player
+        var defaultPlayer = game.createPlayer();
+        game.setPlayerId(defaultPlayer.id);
       }
       if (game.systems.client) {
-        var client = _this.getSystem('client');
+        var client = game.getSystem('client');
         client.start(callbackWrapper);
       } else {
         console.log('Warning: No Client System found, will not start game loop.');
@@ -1306,6 +1307,63 @@ function createDefaultPlayer() {
     //         Can we remove this entirely?
     // return this.getEntity(this.currentPlayerId);
   }
+  var rules = game.rules;
+
+  // maps keyboard and usb gamepad inputs
+  rules.addCondition('PLAYER_UP', {
+    op: 'or',
+    conditions: ['W', 'DPAD_UP']
+  });
+  rules.addCondition('PLAYER_DOWN', {
+    op: 'or',
+    conditions: ['S', 'DPAD_DOWN']
+  });
+  rules.addCondition('PLAYER_LEFT', {
+    op: 'or',
+    conditions: ['A', 'DPAD_LEFT']
+  });
+  rules.addCondition('PLAYER_RIGHT', {
+    op: 'or',
+    conditions: ['D', 'DPAD_RIGHT']
+  });
+  rules.addCondition('USE_ITEM_1', {
+    op: 'or',
+    conditions: ['SPACE', 'H', 'BUTTON_B']
+  });
+  rules.addCondition('USE_ITEM_2', {
+    op: 'or',
+    conditions: ['J', 'BUTTON_X']
+  });
+  rules.addCondition('ZOOM_IN', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('ZOOM_OUT', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
+
+  // Uses default player movement actions
+  // see: ../mantra-sutras/movement/top-down.js events MOVE_UP, MOVE_DOWN, etc.
+  rules["if"]('PLAYER_UP').then('MOVE_UP');
+  rules["if"]('PLAYER_LEFT').then('MOVE_LEFT');
+  rules["if"]('PLAYER_DOWN').then('MOVE_DOWN');
+  rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT');
+  rules["if"]('USE_ITEM_1').then('FIRE_BULLET');
+  rules["if"]('USE_ITEM_2').then("DROP_BOMB");
+
+  // replace with rules.do('ZOOM_IN')
+  rules["if"]('ZOOM_IN').then('ZOOM_IN');
+  rules["if"]('ZOOM_OUT').then('ZOOM_OUT');
+  rules.on('FIRE_BULLET', function (player) {
+    if (game.systems.bullet) {
+      game.systems.bullet.fireBullet(player.id);
+    }
+  });
+  rules.on('DROP_BOMB', function (player) {
+    // with no rate-limit, will drop 60 per second with default settings
+    rules.emit('dropBomb', player);
+  });
   var player = this.createEntity({
     name: playerConfig.name,
     type: 'PLAYER',
@@ -1624,6 +1682,11 @@ function loadPluginsFromConfig(_ref) {
       }
       if (typeof graphics === 'string') {
         graphics = [graphics];
+      }
+      if (graphics.includes('ascii')) {
+        this.use('ASCIIGraphics', {
+          camera: this.config.camera
+        });
       }
       if (graphics.includes('babylon')) {
         this.use('BabylonGraphics', {

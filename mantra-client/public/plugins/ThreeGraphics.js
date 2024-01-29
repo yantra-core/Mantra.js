@@ -612,7 +612,7 @@ function render(game, alpha) {
   var currentPlayer = this.game.data.currentPlayer;
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
 
-  if (true || this.game.useFov) {
+  if (this.game.useFov) {
     var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
     // console.log('itemsInFov', itemsInFov)
 
