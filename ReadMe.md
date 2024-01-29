@@ -34,12 +34,12 @@ Mantra is designed to start a full-featured local game instance in seconds using
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     let game = new MANTRA.Game();
-    // optionally use plugins like Bullet
-    game.use('Bullet');
     game.start();
   });
 </script>
 ```
+
+Embedding `mantra.js` and running one-line `game.start()` will be enough to a full-featured game instance with Editor and default settings.
 
 You can just as easily copy the `mantra.js` file to your local system. No need to think about complex physics or netcode.
 
@@ -85,21 +85,6 @@ https://yantra.gg/mantra/ycraft
 
 https://yantra.gg/mantra/platform
 
-#### Simple Configurations
-
-Simple configuration examples are available online and in `./examples`
-
-| Libraries        | Demo Link                                                                      | CodePen Link                                                                |
-|----------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| Matter.js + Babylon.js     | [Yantra](https://yantra.gg/mantra/examples/offline/matter-babylon.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/abXpVQM)                     |
-| Matter.js + Babylon.js + `sutra`     | [Yantra](https://yantra.gg/mantra/tower.html)        | [CodePen](https://codepen.io/Marak-Squires/pen/KKJbeva)                     |
-| Matter.js + Phaser 3       | [Yantra](https://yantra.gg/mantra/examples/offline/matter-phaser.html)       | [CodePen](https://codepen.io/Marak-Squires/pen/GRzrypr)                |
-| Matter.js + CSS Graphics   | [Yantra](https://yantra.gg/mantra/examples/offline/matter-css.html)                                                                                | [CodePen](https://codepen.io/Marak-Squires/pen/abXpEve)                |
-| NVIDIA PhysX 5.3.0 + Babylon.js | [Yantra](https://yantra.gg/mantra/examples/offline/physx-babylon.html)                                                                            | [CodePen](https://codepen.io/Marak-Squires/pen/yLZgpeR)                |
-| RenderPlex - Matter.js + Babylon.js + Phaser 3 | [Yantra](https://yantra.gg/mantra/examples/offline/renderplex.html)                                                          | [CodePen](https://codepen.io/Marak-Squires/pen/eYxgaGz)                |
-
-
-You can view any of these examples in your browser and begin modifying the game code immediately.
 
 ## Start Local Websocket Server
 
