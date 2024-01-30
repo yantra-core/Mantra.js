@@ -1,6 +1,7 @@
-import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
+import labyrinthos from 'labyrinthos';
+// import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 
-import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
+import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 
