@@ -28,8 +28,8 @@
   },
   "dependencies": {
     "@yantra-core/sutra": "^1.8.0",
+    "labyrinthos": "^1.0.0",
     "protobufjs": "^7.2.5",
-    "xstate": "^4.38.3",
     "ycraft": "^1.1.1"
   },
   "browserify": {
