@@ -27,13 +27,15 @@ class Tile {
   static id = 'tile';
 
   constructor({
-    tileMap = defaultOrthogonalMap,
+    tileMap = null,
+    tiledMap = defaultOrthogonalMap,
     tiledServer = false,
     chunkUnitSize = 8,
     tileSize = 16,
     proceduralGenerateMissingChunks = false,
     loadInitialChunk = true,
     loadDefaultTileMap = true,
+    loadTileMap = false
   } = {}) {
 
     this.id = Tile.id;
@@ -41,7 +43,9 @@ class Tile {
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
-    // set a default tile map
+    // set a default tiled map
+    this.tiledMap = tiledMap;
+
     this.tileMap = tileMap;
 
     this.tileKinds = tileKinds; // rename
@@ -58,6 +62,7 @@ class Tile {
     // tile chunks will be loaded on demand based on the mantra-tiled-server specs
     this.tiledServer = tiledServer;
     this.loadDefaultTileMap = loadDefaultTileMap;
+    this.loadTileMap = loadTileMap;
 
     // if true, will load tiles on demand based on mantra-tiled-server specs
     this.lazyLoadTiles = false;
@@ -78,13 +83,14 @@ class Tile {
     this.randomTileFromDistribution = randomTileFromDistribution.bind(this);
     this.createTile = createTile.bind(this);
 
+
   }
 
   setOptions(TileConfig) {
     // console.log("SET NEW OPTIONS", TileConfig)
     this.tiledServer = TileConfig.tiledServer;
     this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
-    //this.tileMap = TileConfig.tileMap;
+    //this.tiledMap = TileConfig.tiledMap;
     //this.loadInitialChunk = TileConfig.loadInitialChunk;
     //this.chunkUnitSize = TileConfig.chunkUnitSize;
     //this.tileSize = TileConfig.tileSize;
@@ -125,7 +131,11 @@ class Tile {
     }
 
     if (this.loadDefaultTileMap) {
-      this.createTileMapFromTiledJSON(this.tileMap);
+      this.createTileMapFromTiledJSON(this.tiledMap);
+    }
+
+    if (this.loadTileMap) {
+      this.createTileMap(this.tileMap);
     }
 
     // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
@@ -133,6 +143,45 @@ class Tile {
       // console.log('got new tile data', data);
       this.createTileMapFromTiledJSON(data);
     });
+
+  }
+
+  createTileMap(tileMap) {
+
+    console.log('createTileMap', tileMap);
+
+    let map = new labyrinthos.TileMap({
+      x: 0,
+      y: 0,
+      width: tileMap.width,
+      height: tileMap.height,
+      tileWidth: 16, // TODO: tileSet.tilewidth
+      tileHeight: 16 // TODO: tileSet.tileheight
+    });
+    map.fill(1);
+
+    map.seed(tileMap.seed);
+
+    let transformFn = labyrinthos.mazes[tileMap.algo];
+    if (typeof transformFn === 'undefined') {
+      transformFn = labyrinthos.terrains[tileMap.algo];
+    }
+
+    if (typeof transformFn === 'undefined') {
+      console.log('no transformFn found for', tileMap.algo);
+      throw new Error('no transformFn found for ' + tileMap.algo);
+    }
+
+    transformFn(map, tileMap.options || {});
+
+    // labyrinthos.mazes.RecursiveBacktrack(map, {});
+    // labyrinthos.mazes.SpiralBacktrack(map, {});
+    // labyrinthos .mazes.RecursiveDivision(map, {});
+    // labyrinthos.terrains.DiamondSquare(map, {});
+    //labyrinthos.terrains.FaultLine(map, {});
+    this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
+
+    this.game.emit('tilemap::created', tileMap);
 
   }
 
@@ -206,9 +255,15 @@ class Tile {
       let randomChunk;
       let chunkCoordinates = this.extractChunkCoordinates(chunkKey);
 
+
+      //console.log('chunkCoordinates', chunkCoordinates)
+      //console.log('current map data', this.tiledMap)
+
       // console.log('chunkCoordinates', chunkCoordinates)
       let x = chunkCoordinates.x;
       let y = chunkCoordinates.y;
+      // TODO: subsection query, continious map
+      //let subsection = this.tiledMap.query({ x: x, y: y, width: this.chunkUnitSize, height: this.chunkUnitSize });
       let map = new labyrinthos.TileMap({
         x: x,
         y: y,
@@ -223,6 +278,7 @@ class Tile {
       // labyrinthos .mazes.RecursiveDivision(map, {});
       // labyrinthos.terrains.DiamondSquare(map, {});
       // map.seed(4121);
+      console.log('using fallback generator')
       labyrinthos.terrains.FaultLine(map, {});
       
       map.scaleToTileRange(6);
