@@ -2,6 +2,10 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
 
   let tileId = tile.id;
 
+  if (tile.kind === 'empty') {
+    return;
+  }
+
   // TODO: better tile config by kind
   // for now
 

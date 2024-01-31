@@ -1,5 +1,5 @@
-import labyrinthos from 'labyrinthos';
-// import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
+// import labyrinthos from 'labyrinthos';
+import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
@@ -17,9 +17,9 @@ import createTile from './lib/createTile.js';
 
 const tileKinds = [
   { id: 0, kind: 'empty', weight: 10 },
-  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 0 },
+  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 16 },
   { id: 2, kind: 'grass', weight: 63 },
-  { id: 3, kind: 'block', weight: 5, body: true, z: 0 },
+  { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
   { id: 4, kind: 'path-green', weight: 10 },
   { id: 5, kind: 'path-brown', weight: 10 },
 ];
@@ -151,20 +151,25 @@ class Tile {
 
     console.log('createTileMap', tileMap);
 
+    let incomingDepth = parseInt(tileMap.depth);
     let map = new labyrinthos.TileMap({
       x: 0,
       y: 0,
-      width: tileMap.width,
-      height: tileMap.height,
+      width: parseInt(tileMap.width),
+      height: parseInt(tileMap.height),
+      //depth: parseInt(tileMap.depth),
       tileWidth: 16, // TODO: tileSet.tilewidth
       tileHeight: 16 // TODO: tileSet.tileheight
     });
     map.fill(1);
 
+    // console.log('confirm', map.data)
     map.seed(tileMap.seed);
 
     let transformFn = labyrinthos.mazes[tileMap.algo];
     let transformType = 'maze';
+    let is3D = false;
+
     if (typeof transformFn === 'undefined') {
       transformFn = labyrinthos.terrains[tileMap.algo];
       transformType = 'terrain';
@@ -173,6 +178,15 @@ class Tile {
       transformFn = labyrinthos.shapes[tileMap.algo];
       transformType = 'shape';
     }
+
+    /*
+    let try3D = tileMap.algo + '3D';
+    if (typeof labyrinthos.mazes[try3D] !== 'undefined') {
+      transformFn = labyrinthos.mazes[try3D];
+      transformType = 'maze';
+      is3D = true;
+    }
+    */
 
     if (typeof transformFn === 'undefined') {
       console.log('no transformFn found for', tileMap.algo);
@@ -185,11 +199,22 @@ class Tile {
       map.scaleToTileRange(6);
     }
 
-    // labyrinthos.mazes.RecursiveBacktrack(map, {});
-    // labyrinthos.mazes.SpiralBacktrack(map, {});
-    // labyrinthos .mazes.RecursiveDivision(map, {});
-    // labyrinthos.terrains.DiamondSquare(map, {});
-    //labyrinthos.terrains.FaultLine(map, {});
+    // default `extrude` mode
+    if (incomingDepth > 1 && typeof map.data[0] !== 'object') { // if not already 3d array
+      // simply clone each layer to fill the depth dimension
+      // this is used to fill algos which can't yet generate 3d maps
+      let layer = map.data;
+
+      map.data = [];
+      for (let i = 0; i < incomingDepth; i++) {
+        map.data[i] = [];
+        for (let j = 0; j < layer.length; j++) {
+          map.data[i][j] = layer[j];
+        }
+        //map.data.push(JSON.parse(JSON.stringify(layer)));
+      }
+    }
+
     this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
 
     this.game.emit('tilemap::created', tileMap);
@@ -219,8 +244,9 @@ class Tile {
   }
 
   createLayer(layer, tileWidth, tileHeight) {
+
     // Check if the layer.data is a 3D array
-    if (Array.isArray(layer.data[0])) {
+    if (typeof layer.data[0] === 'object') {
       // 3D data handling
       layer.data.forEach((layer2D, z) => {
         layer2D.forEach((tile, index) => {
@@ -248,7 +274,15 @@ class Tile {
     }
   
     let { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth);
+    if (tile === null) {
+      //return;
+    }
+    // allow tile.z to override z ( useful for blocks / layers / etc )
+    if (typeof tile.z !== 'number') {
+      tile.z = z;
+    }
     tile.z = z;
+
     this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
   }
   
@@ -336,6 +370,8 @@ class Tile {
       }
     });
   }
+
+  
 
   update() { }
 
