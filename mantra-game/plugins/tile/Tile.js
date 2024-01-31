@@ -142,6 +142,7 @@ class Tile {
     // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
     this.game.on('file::upload', (data) => {
       // console.log('got new tile data', data);
+      this.tiledServer = false;
       this.createTileMapFromTiledJSON(data);
     });
 
