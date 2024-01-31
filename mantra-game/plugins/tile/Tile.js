@@ -164,8 +164,14 @@ class Tile {
     map.seed(tileMap.seed);
 
     let transformFn = labyrinthos.mazes[tileMap.algo];
+    let transformType = 'maze';
     if (typeof transformFn === 'undefined') {
       transformFn = labyrinthos.terrains[tileMap.algo];
+      transformType = 'terrain';
+    }
+    if (typeof transformFn === 'undefined') {
+      transformFn = labyrinthos.shapes[tileMap.algo];
+      transformType = 'shape';
     }
 
     if (typeof transformFn === 'undefined') {
@@ -174,6 +180,10 @@ class Tile {
     }
 
     transformFn(map, tileMap.options || {});
+
+    if (transformType === 'terrain') {
+      map.scaleToTileRange(6);
+    }
 
     // labyrinthos.mazes.RecursiveBacktrack(map, {});
     // labyrinthos.mazes.SpiralBacktrack(map, {});
