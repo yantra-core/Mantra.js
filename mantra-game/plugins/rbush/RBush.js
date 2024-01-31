@@ -97,7 +97,7 @@ class RBush {
     // If so, add them to the game world
     nearbyEntities.forEach(eId => {
       if (eId) {
-        let exists = this.game.getEntity(eId);
+        let exists = this.game.data.ents._[eId.toString()];
         if (!exists) {
           let entityData = this.game.deferredEntities[eId.toString()]
           if (entityData && entityData.destroyed !== true) {

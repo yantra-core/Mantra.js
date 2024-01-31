@@ -28,8 +28,10 @@ class Collisions {
     const entityIdA = bodyA.myEntityId;
     const entityIdB = bodyB.myEntityId;
 
-    const entityA = this.game.getEntity(entityIdA);
-    const entityB = this.game.getEntity(entityIdB);
+    //const entityA = this.game.getEntity(entityIdA);
+    //const entityB = this.game.getEntity(entityIdB);
+    const entityA = bodyA.entity;
+    const entityB = bodyB.entity;
 
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
@@ -100,8 +102,8 @@ class Collisions {
     const entityIdA = bodyA.myEntityId;
     const entityIdB = bodyB.myEntityId;
 
-    const entityA = this.game.getEntity(entityIdA);
-    const entityB = this.game.getEntity(entityIdB);
+    const entityA = bodyA.entity;
+    const entityB = bodyB.entity;
 
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
@@ -152,8 +154,9 @@ class Collisions {
     const entityIdA = bodyA.myEntityId;
     const entityIdB = bodyB.myEntityId;
 
-    const entityA = this.game.getEntity(entityIdA);
-    const entityB = this.game.getEntity(entityIdB);
+    const entityA = bodyA.entity;
+    const entityB = bodyB.entity;
+
     // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
