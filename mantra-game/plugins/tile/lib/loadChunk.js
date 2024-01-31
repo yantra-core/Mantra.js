@@ -19,7 +19,7 @@ export default function loadChunk(chunkPath, chunkKey) {
       if (this.game.data.chunks[chunkKey]) {
         this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
       } else {
-        console.log("WARNING: chunk not found", chunkKey);
+        // console.log("WARNING: chunk not found", chunkKey);
         this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
       }
     });

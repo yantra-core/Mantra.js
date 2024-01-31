@@ -30,9 +30,13 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
     _color = color;
   }
 
+  let _type = 'TILE';
+  if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
+    // _type = 'BLOCK';
+  }
   let _texture = `tile-${tile.kind}`; // rename
   this.game.createEntity({
-    type: 'Tile',
+    type: _type,
     kind: tile.kind,
     body,
     mass,

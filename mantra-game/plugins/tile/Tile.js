@@ -1,5 +1,5 @@
-import labyrinthos from 'labyrinthos';
-// import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
+// import labyrinthos from 'labyrinthos';
+import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
@@ -292,7 +292,7 @@ class Tile {
   }
 
   handleLoadFailure(chunkPath, chunkKey) {
-    console.log("Fallback for failed load:", chunkPath, chunkKey);
+    // console.log("Fallback for failed load:", chunkPath, chunkKey);
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
       // console.log('Generating random chunk', chunkKey)

@@ -75,6 +75,7 @@ class Bullet {
     let bulletStartPosition = {
       x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
       y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation),
+      z: 1
       //z: 10
     };
 
@@ -171,7 +172,21 @@ class Bullet {
         return;
       }
 
-
+      // TODO: collision groups for TileSets
+      if (entityA.type === 'BULLET' && entityB.type === 'TILE') {
+        if (entityB.kind !== 'bush') {
+          return;
+        }
+        this.game.removeEntity(entityB.id);
+        return;
+      }
+      if (entityA.type === 'TILE' && entityB.type === 'BULLET') {
+        if (entityA.kind !== 'bush') {
+          return;
+        }
+        this.game.removeEntity(entityA.id);
+        return;
+      }
 
       //
       // Bullets are destroyed if they hit a BLOCK

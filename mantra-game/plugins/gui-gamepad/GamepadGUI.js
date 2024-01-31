@@ -201,11 +201,11 @@ class GamepadGUI {
     let buttonX = document.getElementById('x');
 
     buttonY.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyK' }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyJ' }));
     });
 
     buttonY.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyK' }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyJ' }));
     });
 
     buttonX.addEventListener('pointerdown', (ev) => {

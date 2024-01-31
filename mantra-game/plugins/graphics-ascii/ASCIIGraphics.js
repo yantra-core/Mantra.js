@@ -113,8 +113,11 @@ class ASCIIGraphics extends GraphicsInterface {
   }
 
   transformEntityToScreenCoordinates(entity) {
-    let x = Math.round((entity.position.x - this.cameraPosition.x + this.game.width / 2) * this.scaleX);
-    let y = Math.round((entity.position.y - this.cameraPosition.y + this.game.height / 2) * this.scaleY);
+
+
+    // console.log(this.game.data.camera.position)
+    let x = Math.round((entity.position.x - this.game.data.camera.position.x + this.game.width / 2) * this.scaleX);
+    let y = Math.round((entity.position.y - this.game.data.camera.position.y + this.game.height / 2) * this.scaleY);
 
     let width = Math.max(1, Math.round(entity.width * this.scaleX));
     let height = Math.max(1, Math.round(entity.height * this.scaleY));
@@ -170,6 +173,11 @@ class ASCIIGraphics extends GraphicsInterface {
   }
 
   updateGraphic(entity, alpha = 1) {
+    const oldPos = this.elements[entity.id];
+    const newPos = this.transformEntityToScreenCoordinates(entity);
+
+    // console.log(`Updating entity ${entity.id}:`, { oldPos, newPos, entity });
+
     if (this.elements[entity.id]) {
       const oldPos = this.elements[entity.id];
       const { x, y, width, height } = this.transformEntityToScreenCoordinates(entity);
@@ -198,11 +206,60 @@ class ASCIIGraphics extends GraphicsInterface {
   }
   render(game, alpha = 1) {
     //this.updateAsciiContainer(); // Smart update of ASCII display in the DOM
+
+    this.game.data.camera.position = this.cameraPosition;
+
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       this.inflateGraphic(ent, alpha);
     }
+    // console.log(this.camera.position, this.game.data.camera.position)
+    //this.cameraPosition.x = this.camera.position.x;
+    //this.cameraPosition.y = this.camera.position.y;
+
+
     this.updateAsciiContainer();
+
+  }
+
+  update () {
+
+    let game = this.game;
+    const currentPlayer = this.game.getEntity(game.currentPlayerId);
+  
+    // Current zoom level
+    let currentZoom = game.data.camera.currentZoom;
+  
+    // Get browser window dimensions
+    let windowHeight = window.innerHeight;
+    let windowWidth = window.innerWidth;
+  
+    let zoomFactor = this.game.data.camera.currentZoom;
+    // console.log('zoomFactor', zoomFactor)
+  
+    if (typeof game.viewportCenterXOffset !== 'number') {
+      game.viewportCenterXOffset = 0;
+    }
+    if (typeof game.viewportCenterYOffset !== 'number') {
+      game.viewportCenterYOffset = 0;
+    }
+
+    if (/*this.follow && */currentPlayer && currentPlayer.position) {
+
+      // If following a player, adjust the camera position based on the player's position and the calculated offset
+      //this.scene.cameraPosition.x = currentPlayer.position.x + game.viewportCenterXOffset;
+      this.game.data.camera.position.x = currentPlayer.position.x + game.viewportCenterXOffset;
+      //this.scene.cameraPosition.x = this.scene.cameraPosition.x / zoomFactor;
+  
+      //let newY = currentPlayer.position.y + game.viewportCenterYOffset;
+      let newY = currentPlayer.position.y + game.viewportCenterYOffset;
+      this.scene.cameraPosition.y = newY;
+  
+    } else {
+      // If not following a player, use the calculated offsets directly
+      this.scene.cameraPosition.x = game.viewportCenterXOffset;
+      this.scene.cameraPosition.y = game.viewportCenterYOffset;
+    }
 
   }
 
@@ -213,6 +270,7 @@ class ASCIIGraphics extends GraphicsInterface {
       delete this.elements[entityId];
     }
   }
+
 
   unload() {
     this.screen.destroy();

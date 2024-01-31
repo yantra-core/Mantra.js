@@ -67,7 +67,6 @@ class BabylonGraphics extends GraphicsInterface {
 
   init(game) {
     this.game = game;
-
     this.game.use('Graphics');
     // check to see if BABYLON scope is available, if not assume we need to inject it sequentially
     if (typeof BABYLON === 'undefined') {
@@ -402,15 +401,21 @@ class BabylonGraphics extends GraphicsInterface {
   // called each time new gametick data arrives
   update() {
     let game = this.game;
+
+    for (let [eId, state] of this.game.entities.entries()) {
+      let ent = this.game.entities.get(eId);
+      this.inflateGraphic(ent, 1);
+    }
+
+
     if (game.systems['graphics-babylon-camera']) {
       let cameraSystem = this.game.getSystem('graphics-babylon-camera');
       cameraSystem.update(); // is cameraSystem.update() required here?
     }
+
   }
 
-  // TODO: move inflateEntity to Graphics interface and use common between all graphics plugins
-  // TODO: rename to inflateGraphic
-  inflateEntity(entity, alpha) {
+  inflateGraphic(entity, alpha) {
     if (entity.graphics && entity.graphics['graphics-babylon']) {
       let graphic = entity.graphics['graphics-babylon'];
       this.updateGraphic(entity, alpha);

@@ -21,11 +21,10 @@ class DragAndDropFileUpload {
     this.bindEvents();
 
 
-    // TODO: remove this
-    if (this.game.system.tile && this.game.system.tile.tileMap) {
-      // hide overlay
+    game.on('tilemap::created', () => {
+      // hide overlay ( for now )
       this.overlay.style.visibility = 'hidden';
-    }
+    })
 
   }
 
