@@ -51,6 +51,11 @@ export default function topdownMovement(game) {
 
   rules.addMap('determineShootingSprite', (player, node) => {
     // Normalize the rotation within the range of 0 to 2π
+
+    if (typeof player.texture === 'undefined') {
+      return player;
+    }
+
     const normalizedRotation = player.rotation % (2 * Math.PI);
     // Define a mapping from radians to sprites
     const rotationToSpriteMap = {
@@ -65,7 +70,14 @@ export default function topdownMovement(game) {
   });
 
   rules.on('updateSprite', function (player, node) {
+
+    if (typeof player.texture === 'undefined') {
+      // for now, just return
+      return;
+    }
+
     let sprite = node.data.sprite || player.texture.sprite;
+
     game.updateEntity({
       id: player.id,
       texture: {
@@ -145,11 +157,15 @@ export default function topdownMovement(game) {
   });
 
   rules.on('FIRE_BULLET', function (entity) {
-    game.systems.bullet.fireBullet(entity.id);
+    if (game.systems.bullet) {
+      game.systems.bullet.fireBullet(entity.id);
+    }
   });
 
   rules.on('SWING_SWORD', function (entity) {
-    game.systems.sword.swingSword(entity.id);
+    if (game.systems.sword) {
+      game.systems.sword.swingSword(entity.id);
+    }
   });
 
   rules.on('DROP_BOMB', function (player) {

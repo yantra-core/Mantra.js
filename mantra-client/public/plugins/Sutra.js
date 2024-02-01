@@ -222,6 +222,10 @@ function topdownMovement(game) {
   rules.addMap('determineShootingSprite', function (player, node) {
     var _rotationToSpriteMap;
     // Normalize the rotation within the range of 0 to 2π
+
+    if (typeof player.texture === 'undefined') {
+      return player;
+    }
     var normalizedRotation = player.rotation % (2 * Math.PI);
     // Define a mapping from radians to sprites
     var rotationToSpriteMap = (_rotationToSpriteMap = {
@@ -232,6 +236,10 @@ function topdownMovement(game) {
     return player;
   });
   rules.on('updateSprite', function (player, node) {
+    if (typeof player.texture === 'undefined') {
+      // for now, just return
+      return;
+    }
     var sprite = node.data.sprite || player.texture.sprite;
     game.updateEntity({
       id: player.id,
@@ -335,10 +343,14 @@ function topdownMovement(game) {
     });
   });
   rules.on('FIRE_BULLET', function (entity) {
-    game.systems.bullet.fireBullet(entity.id);
+    if (game.systems.bullet) {
+      game.systems.bullet.fireBullet(entity.id);
+    }
   });
   rules.on('SWING_SWORD', function (entity) {
-    game.systems.sword.swingSword(entity.id);
+    if (game.systems.sword) {
+      game.systems.sword.swingSword(entity.id);
+    }
   });
   rules.on('DROP_BOMB', function (player) {
     // with no rate-limit, will drop 60 per second with default settings

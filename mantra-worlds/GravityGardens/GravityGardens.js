@@ -39,40 +39,6 @@ class GravityGardens {
 
     let rules = game.rules;
 
-    rules.on('PLAYER_UP', function (player) {
-      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
-    });
-
-    rules.on('PLAYER_DOWN', function (player) {
-      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI });
-    });
-
-    rules.on('MOVE_LEFT', function (player, node, gameState) {
-      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-    });
-
-    rules.on('MOVE_RIGHT', function (player) {
-      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
-    });
-
-    rules.on('ZOOM_IN', function () {
-      let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom + 0.05);
-    });
-
-    rules.on('ZOOM_OUT', function () {
-      let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom - 0.05);
-    });
-
-    rules.on('CAMERA_SHAKE', function (player) {
-      game.shakeCamera(60);
-    });
-
     // game.customMovement = false;
     game.setControls({
       W: 'PLAYER_UP',
