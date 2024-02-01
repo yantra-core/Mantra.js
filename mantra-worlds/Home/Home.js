@@ -95,6 +95,7 @@ class Home {
     });
 
     // convert the Sutra.js rules to English text
+    /*
     let rulesEnglish = game.rules.toEnglish();
     game.createEntity({
       name: 'sutra-tree-text',
@@ -120,6 +121,7 @@ class Home {
         z: 32
       }
     });
+    */
 
     game.createEntity({
       type: 'BACKGROUND',
