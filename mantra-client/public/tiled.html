@@ -11,7 +11,6 @@
 <body>
   <script type="module" src="/mantra.js"></script>
   <script type="module" src="/worlds.mantra.js"></script>
-
   <script type="module" src="/ycraft.js"></script>
 
   <script>
@@ -22,27 +21,44 @@
       let tiledmap = null;
       let graphics = 'three';
       let source = null;
+      let infinite = false;
+      let mode = 'topdown';
 
       if (window.location.search) {
         const params = new URLSearchParams(window.location.search);
         tiledmap = params.get('tiledmap');
         graphics = params.get('graphics');
         source = params.get('s');
+        infinite = params.get('infinite');
+        mode = params.get('mode');
+        // proceduralGenerateMissingChunks = params.get('proceduralGenerateMissingChunks');
         if (source !== null) {
           // grab all map data from source, assume labyrinthos
           tileMap = {};
           tileMap.width = params.get('width') || 32;
           tileMap.height = params.get('height') || 32;
+          tileMap.depth = params.get('depth') || 1;
           tileMap.algo = params.get('algo') || 'AldousBroder';
           tileMap.seed = params.get('seed') || 'labyrinthos';
         }
 
+        if (infinite === 'true') {
+          infinite = true;
+        } else {
+          infinite = false;
+        }
+
       }
 
+      if (mode === 'platform') {
+        mode = 'platform'; // incase of typo
+      }
 
       let game = new MANTRA.Game({
         defaultPlayer: false,
-        fieldOfView: 96,
+        defaultMovement: true,
+        mode: mode,
+        fieldOfView: 256,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: [graphics], // array enum, 'babylon', 'phaser', 'css', 'three'
@@ -53,13 +69,21 @@
         }
       });
 
-      // game.use('Bullet');
+
       game.use('Sutra');
       game.use('RBush');
+      game.use('Bullet');
+      game.use('Bomb');
+      /*
+      game.use('Block', {
+        MIN_BLOCK_SIZE: 100,
+      });
+      */
       game.use('Gamepad');
       game.use('GamepadGUI');
       game.useFoV = true;
       game.start(function () {
+        game.setBackground('#000000');
 
         if (graphics === 'three') {
           //game.setZoom();
@@ -70,19 +94,39 @@
         }
 
         game.use('DragAndDropFileUpload');
-        game.createPlayer({
-          position: {
-            x: 0,
-            y: 0,
-            z: 16
-          },
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'player',
-          },
-          height: 12,
-          width: 12
-        });
+
+        if (mode === 'topdown') {
+          game.createPlayer({
+            position: {
+              x: 0,
+              y: 0,
+              z: 16
+            },
+            texture: {
+              sheet: 'loz_spritesheet',
+              sprite: 'player',
+            }
+          });
+          // game.use('TopDown');
+        } else {
+
+          game.setGravity(0, 3.3, 0);
+
+          game.createPlayer({
+            height: 32,
+            width: 32,
+            texture: {
+              sheet: 'blackMage',
+              sprite: 'playerRight',
+            },
+            position: {
+              x: 10,
+              y: -100,
+              z: 1
+            }
+          });
+
+        }
 
         if (tiledmap) {
           console.log("Using Tiled Format Map Data", tiledmap)
@@ -92,12 +136,13 @@
             tiledServer: false,
             tileSize: 16,
             chunkUnitSize: 8,
-            proceduralGenerateMissingChunks: false,
+            proceduralGenerateMissingChunks: infinite,
             lazyLoadTiles: false,
             loadDefaultTileMap: true
           });
           return;
         }
+
         if (source !== null) {
           console.log("Using TileMap source data from Labyrinthos", tileMap)
           game.use('Tile', {
@@ -107,23 +152,24 @@
             tiledServer: false,
             tileSize: 16,
             chunkUnitSize: 8,
-            proceduralGenerateMissingChunks: false,
+            labyrinthosAlgo: tileMap.algo,
+            proceduralGenerateMissingChunks: infinite,
             lazyLoadTiles: false,
             loadDefaultTileMap: false
           });
           return;
         }
 
+        console.log('Loading default Tile Plugin settings')
         game.use('Tile', {
           loadInitialChunk: false,
           tiledServer: false,
           tileSize: 16,
           chunkUnitSize: 8,
-          proceduralGenerateMissingChunks: false,
+          proceduralGenerateMissingChunks: infinite,
           lazyLoadTiles: false,
           loadDefaultTileMap: false
         });
-
 
       });
       window.game = game;

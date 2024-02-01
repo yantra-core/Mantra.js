@@ -322,6 +322,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       deltaEncoding: true,
       defaultPlayer: true,
       options: {},
+      mode: 'topdown',
+      // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
 
@@ -668,7 +670,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
   }, {
     key: "reset",
-    value: function reset() {
+    value: function reset(mode) {
       // reset all Sutra rules
       this.rules = this.createSutra();
       // remap the keyboard mappings to Sutra by default
@@ -681,6 +683,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
 
       // reset the default player controls
       this.setControls({});
+
+      // set the default movement sutra
+      if (this.systems.sutra) {
+        this.systems.sutra.bindDefaultMovementSutra(mode);
+      }
 
       // reset any deffered entities
       this.deferredEntities = {};
@@ -1087,7 +1094,6 @@ function construct(game) {
   game.loadedPlugins = [];
   // load default plugins
   if (game.config.loadDefaultPlugins) {
-    console.log('CCCC', game.config);
     game.loadPluginsFromConfig({
       physics: game.config.physics,
       graphics: game.config.graphics,
@@ -1290,6 +1296,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = createDefaultPlayer;
 function createDefaultPlayer() {
   var playerConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var game = this;
   console.log('creating default player', playerConfig, this.currentPlayerId);
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = {
@@ -1544,9 +1551,15 @@ var lastTick = Date.now();
 var hzMS = 16.666; // 60 FPS
 
 function gameTick() {
+  var _this = this;
   this.tick++;
   this.data.tick = this.tick;
-  this.data.currentPlayer = this.getEntity(this.currentPlayerId);
+  if (this.currentPlayerId) {
+    this.data.currentPlayer = this.data.ents.PLAYER.find(function (player) {
+      return player.id === _this.currentPlayerId;
+    });
+  }
+
   // Calculate deltaTime in milliseconds
   var now = Date.now();
   var deltaTimeMS = now - lastTick; // Delta time in milliseconds

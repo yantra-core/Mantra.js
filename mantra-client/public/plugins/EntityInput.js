@@ -225,8 +225,8 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       this.game = game;
       this.defaultControlsMapping = {
         // Default 2D Keyboard Controls
-        W: 'MOVE_FORWARD',
-        S: 'MOVE_BACKWARD',
+        W: 'PLAYER_UP',
+        S: 'PLAYER_DOWN',
         A: 'MOVE_LEFT',
         D: 'MOVE_RIGHT',
         SPACE: 'FIRE_BULLET',
@@ -236,8 +236,8 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
         P: 'ZOOM_IN',
         U: 'SELECT_MENU',
         // Default 2D Gamepad Controls
-        DPAD_UP: 'MOVE_FORWARD',
-        DPAD_DOWN: 'MOVE_BACKWARD',
+        DPAD_UP: 'PLAYER_UP',
+        DPAD_DOWN: 'PLAYER_DOWN',
         DPAD_LEFT: 'MOVE_LEFT',
         DPAD_RIGHT: 'MOVE_RIGHT',
         BUTTON_A: 'FIRE_BULLET',
@@ -300,19 +300,19 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
         if (angle >= -22.5 && angle < 22.5) {
           actions.push('MOVE_RIGHT');
         } else if (angle >= 22.5 && angle < 67.5) {
-          actions.push('MOVE_RIGHT', 'MOVE_BACKWARD');
+          actions.push('MOVE_RIGHT', 'PLAYER_DOWN');
         } else if (angle >= 67.5 && angle < 112.5) {
-          actions.push('MOVE_BACKWARD');
+          actions.push('PLAYER_DOWN');
         } else if (angle >= 112.5 && angle < 157.5) {
-          actions.push('MOVE_LEFT', 'MOVE_BACKWARD');
+          actions.push('MOVE_LEFT', 'PLAYER_DOWN');
         } else if (angle >= 157.5 || angle < -157.5) {
           actions.push('MOVE_LEFT');
         } else if (angle >= -157.5 && angle < -112.5) {
-          actions.push('MOVE_LEFT', 'MOVE_FORWARD');
+          actions.push('MOVE_LEFT', 'PLAYER_UP');
         } else if (angle >= -112.5 && angle < -67.5) {
-          actions.push('MOVE_FORWARD');
+          actions.push('PLAYER_UP');
         } else if (angle >= -67.5 && angle < -22.5) {
-          actions.push('MOVE_RIGHT', 'MOVE_FORWARD');
+          actions.push('MOVE_RIGHT', 'PLAYER_UP');
         }
         this.continuousActions = actions;
         this.isPressed = true;
@@ -391,8 +391,8 @@ var DefaultTwoDimensionalInputStrategy = /*#__PURE__*/function () {
       } else {
         // actions is already populated, use those actions as continuous action controls
       }
-      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
-      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
+      if (actions.includes('PLAYER_UP')) entityMovementSystem.update(entityId, 0, moveSpeed);
+      if (actions.includes('PLAYER_DOWN')) entityMovementSystem.update(entityId, 0, -moveSpeed);
       if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, -1);
       if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 1);
       if (actions.includes('ROTATE_LEFT')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);
@@ -471,8 +471,8 @@ var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
         throw new Error('ThreeDimensionalInputStrategy requires an entityInput system to be registered! Please game.use(new EntityInput())');
       }
       this.defaultControlsMapping = {
-        W: 'MOVE_FORWARD',
-        S: 'MOVE_BACKWARD',
+        W: 'PLAYER_UP',
+        S: 'PLAYER_DOWN',
         A: 'MOVE_LEFT',
         D: 'MOVE_RIGHT',
         SPACE: 'FIRE_BULLET',
@@ -537,16 +537,16 @@ var ThreeDimensionalInputStrategy = /*#__PURE__*/function () {
       // "forward facing" movements, forwardDirection needed
       // these movements are relative to the forward facing direction of the entity
       /*
-      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, -forwardDirection.y * moveSpeed, forwardDirection.z * moveSpeed);
-      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, forwardDirection.y * moveSpeed, -forwardDirection.z * moveSpeed);
+      if (actions.includes('PLAYER_UP')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, -forwardDirection.y * moveSpeed, forwardDirection.z * moveSpeed);
+      if (actions.includes('PLAYER_DOWN')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, forwardDirection.y * moveSpeed, -forwardDirection.z * moveSpeed);
       if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, 0);  // Assuming left/right movement is still along the global X axis
       if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 0);  // Assuming left/right movement is still along the global X axis
       if (actions.includes('MOVE_UP')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);  // Assuming up/down movement is still along the global Z axis
       if (actions.includes('MOVE_DOWN')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);  // Assuming up/down movement is still along the global Z axis
       */
       // absolute movements, forwardDirection not needed
-      if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, -1, 0);
-      if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, 1, 0);
+      if (actions.includes('PLAYER_UP')) entityMovementSystem.update(entityId, 0, -1, 0);
+      if (actions.includes('PLAYER_DOWN')) entityMovementSystem.update(entityId, 0, 1, 0);
       if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -1, 0, 0); // Assuming left/right movement is still along the global X axis
       if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, 1, 0, 0); // Assuming left/right movement is still along the global X axis
       if (actions.includes('MOVE_UP')) entityMovementSystem.update(entityId, 0, 0, 1); // Assuming up/down movement is still along the global Z axis

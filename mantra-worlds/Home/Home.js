@@ -245,6 +245,7 @@ class Home {
       }
     });
 
+    /*
     // switch to CSSGraphics
     game.createEntity({
       name: 'CSSGraphics',
@@ -275,7 +276,9 @@ class Home {
         z: 10
       }
     });
+    */
 
+    /*
     // switch to 3d text label
     game.createEntity({
       name: 'BabylonGraphics',
@@ -304,6 +307,7 @@ class Home {
         z: 64
       }
     });
+    */
 
     game.createEntity({
       type: 'DOOR',

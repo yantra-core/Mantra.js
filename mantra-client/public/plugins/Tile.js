@@ -69,15 +69,62 @@ var LSystem = exports["default"] = /*#__PURE__*/function () {
     }
   }, {
     key: "applyRule",
-    value: function applyRule(tileId) {
+    value: function applyRule(tileId, tileMap) {
       var _this$tileset$getTile;
       // Resolve the tile ID to its name
       var tileName = (_this$tileset$getTile = this.tileset.getTile(tileId)) === null || _this$tileset$getTile === void 0 ? void 0 : _this$tileset$getTile.name;
 
       // If there's a rule for this tile, apply it
       if (tileName && this.rules[tileName]) {
-        // The rule might specify a single tile or multiple tiles (e.g., 'bush tree')
-        var resultTiles = this.rules[tileName].split(' ');
+        var resultTiles;
+
+        // Create a context object to pass to the rule function
+        var context = {
+          // Current tile's properties
+          tileId: tileId,
+          tileName: tileName,
+          // Function to get the ID of a tile by name
+          getTileId: this.getTileId.bind(this),
+          // Random function utility
+          random: function random(max) {
+            var min = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+            return tileMap.random(max, min);
+          },
+          // Information about the tile map
+          tileMap: {
+            width: tileMap.width,
+            height: tileMap.height,
+            depth: tileMap.depth || 0 // Assuming depth property exists for 3D maps
+          },
+
+          // Function to get neighboring tiles (example for 2D, extend for 3D if needed)
+          getNeighbors: function getNeighbors(x, y) {
+            return [tileMap.getTileAt(x + 1, y),
+            // Right
+            tileMap.getTileAt(x - 1, y),
+            // Left
+            tileMap.getTileAt(x, y + 1),
+            // Bottom
+            tileMap.getTileAt(x, y - 1) // Top
+            // Add more directions as needed, e.g., diagonal neighbors
+            ];
+          },
+
+          // Current position (assuming you can derive x, y, z from tileId)
+          position: {
+            x: tileId % tileMap.width,
+            y: Math.floor(tileId / tileMap.width),
+            z: tileMap.depth ? Math.floor(tileId / (tileMap.width * tileMap.height)) : 0 // For 3D maps
+          }
+        };
+
+        if (typeof this.rules[tileName] === 'function') {
+          resultTiles = [this.rules[tileName](context)]; // returns string
+        }
+
+        if (typeof this.rules[tileName] === 'string') {
+          resultTiles = this.rules[tileName].split(' ');
+        }
 
         // For simplicity, let's just use the first tile specified in the rule
         // More complex logic could be added here to handle multiple tiles
@@ -94,7 +141,7 @@ var LSystem = exports["default"] = /*#__PURE__*/function () {
       for (var gen = 0; gen < this.generations; gen++) {
         // Apply rules to each tile in the map for each generation
         tileMap.data = tileMap.data.map(function (tileId) {
-          return _this.applyRule(tileId);
+          return _this.applyRule(tileId, tileMap);
         });
       }
     }
@@ -238,6 +285,11 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
       // this.mersenneTwister.seed_array([value]); // also can seed from arrays
     }
   }, {
+    key: "seedRandom",
+    value: function seedRandom() {
+      this.seed(this.random());
+    }
+  }, {
     key: "use",
     value: function use(subMap, offsetX, offsetY) {
       // TODO: add support for if(this.is3D) support
@@ -334,6 +386,15 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "getTileAt",
+    value: function getTileAt(x, y, z) {
+      if (this.is3D) {
+        return this.data[z][y * this.width + x];
+      } else {
+        return this.data[y * this.width + x];
+      }
+    }
+  }, {
     key: "toJSON",
     value: function toJSON() {
       return JSON.stringify({
@@ -341,7 +402,6 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
         height: this.height,
         tileWidth: this.tileWidth,
         tileHeight: this.tileHeight,
-        is3D: this.is3D,
         data: this.data
       }, null, 2);
     }
@@ -495,7 +555,7 @@ function init3DArray(width, height, depth) {
   return arr;
 }
 
-},{"./util/generateTiledJSON.js":23,"./util/mersenne.js":24,"./util/noise.js":25}],5:[function(require,module,exports){
+},{"./util/generateTiledJSON.js":24,"./util/mersenne.js":25,"./util/noise.js":26}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -556,6 +616,7 @@ var _TileMap = _interopRequireDefault(require("./TileMap.js"));
 var _TileSet = _interopRequireDefault(require("./TileSet.js"));
 var _Biome = _interopRequireDefault(require("./Biome.js"));
 var _AldousBroder = _interopRequireDefault(require("./mazes/AldousBroder.js"));
+var _AldousBroder3D = _interopRequireDefault(require("./mazes/AldousBroder3D.js"));
 var _BinaryTree = _interopRequireDefault(require("./mazes/BinaryTree.js"));
 var _CellularAutomata = _interopRequireDefault(require("./mazes/CellularAutomata.js"));
 var _EllersAlgorithm = _interopRequireDefault(require("./mazes/EllersAlgorithm.js"));
@@ -595,6 +656,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var labyrinthos = {};
 labyrinthos.mazes = {};
 labyrinthos.mazes.AldousBroder = _AldousBroder["default"];
+labyrinthos.mazes.AldousBroder3D = _AldousBroder3D["default"];
 labyrinthos.mazes.BinaryTree = _BinaryTree["default"];
 labyrinthos.mazes.CellularAutomata = _CellularAutomata["default"];
 labyrinthos.mazes.EllersAlgorithm = _EllersAlgorithm["default"];
@@ -629,13 +691,50 @@ labyrinthos.TileMap = _TileMap["default"];
 labyrinthos.TileSet = _TileSet["default"];
 var _default = exports["default"] = labyrinthos;
 
-},{"./Biome.js":1,"./LSystem.js":2,"./Tile.js":3,"./TileMap.js":4,"./TileSet.js":5,"./mazes/AldousBroder.js":7,"./mazes/BeattieSchoberth.js":8,"./mazes/BinaryTree.js":9,"./mazes/CellularAutomata.js":10,"./mazes/EllersAlgorithm.js":11,"./mazes/GrowingTree.js":12,"./mazes/PlatformZones.js":13,"./mazes/RecursiveBacktrack.js":14,"./mazes/RecursiveDivision.js":15,"./mazes/ThomasHunter.js":16,"./shapes/Circle.js":17,"./shapes/Square.js":18,"./shapes/Triangle.js":19,"./terrains/FaultLine.js":20,"./terrains/PerlinNoise.js":21,"./util/noise.js":25}],7:[function(require,module,exports){
+},{"./Biome.js":1,"./LSystem.js":2,"./Tile.js":3,"./TileMap.js":4,"./TileSet.js":5,"./mazes/AldousBroder.js":7,"./mazes/AldousBroder3D.js":8,"./mazes/BeattieSchoberth.js":9,"./mazes/BinaryTree.js":10,"./mazes/CellularAutomata.js":11,"./mazes/EllersAlgorithm.js":12,"./mazes/GrowingTree.js":13,"./mazes/PlatformZones.js":14,"./mazes/RecursiveBacktrack.js":15,"./mazes/RecursiveDivision.js":16,"./mazes/ThomasHunter.js":17,"./shapes/Circle.js":18,"./shapes/Square.js":19,"./shapes/Triangle.js":20,"./terrains/FaultLine.js":21,"./terrains/PerlinNoise.js":22,"./util/noise.js":26}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = ALGORITHM_ALDOUS_BRODER;
+// AldousBroder.js - Marak Squires 2024
+// "Aldous-Broder algorithm" - https://en.wikipedia.org/wiki/Maze_generation_algorithm#Aldous-Broder_algorithm
+function ALGORITHM_ALDOUS_BRODER(tileMap, options) {
+  tileMap.fill(1); // Fill with walls
+  var visitedCells = 0;
+  var totalCells = tileMap.width * tileMap.height / 4; // Assumes a grid where every other cell is open
+  var currentX = 2 * Math.floor(tileMap.random() * Math.floor(tileMap.width / 2));
+  var currentY = 2 * Math.floor(tileMap.random() * Math.floor(tileMap.height / 2));
+  tileMap.data[currentY * tileMap.width + currentX] = 0; // Open starting cell
+  visitedCells++;
+  while (visitedCells < totalCells) {
+    var directions = [[2, 0], [-2, 0], [0, 2], [0, -2]];
+    var randomDirection = directions[Math.floor(tileMap.random() * directions.length)];
+    var newX = currentX + randomDirection[0];
+    var newY = currentY + randomDirection[1];
+    if (newX >= 0 && newX < tileMap.width && newY >= 0 && newY < tileMap.height) {
+      if (tileMap.data[newY * tileMap.width + newX] === 1) {
+        // Open path between current cell and new cell
+        tileMap.data[(currentY + randomDirection[1] / 2) * tileMap.width + (currentX + randomDirection[0] / 2)] = 0;
+        tileMap.data[newY * tileMap.width + newX] = 0; // Open new cell
+        visitedCells++;
+      }
+      currentX = newX;
+      currentY = newY;
+    }
+  }
+}
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = ALGORITHM_ALDOUS_BRODER_3D;
+// AldousBroder3D.js - Marak Squires 2024
+// "Aldous-Broder algorithm" - https://en.wikipedia.org/wiki/Maze_generation_algorithm#Aldous-Broder_algorithm
 function ALGORITHM_ALDOUS_BRODER_3D(tileMap, options) {
   tileMap.fill(1); // Fill with walls
   var visitedCells = 0;
@@ -665,7 +764,7 @@ function ALGORITHM_ALDOUS_BRODER_3D(tileMap, options) {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1522,7 +1621,7 @@ function ALGORITHM_BEATTIE_SCHOBERTH(tileMap, options) {
   tileMap.world = built;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1558,7 +1657,7 @@ function ALGORITHM_BINARY_TREE(tileMap, options) {
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1605,7 +1704,7 @@ function generateCellularAutomataMap(tileMap, options) {
   }
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1673,7 +1772,7 @@ function generateEllersAlgorithmMap(tileMap, options) {
   }
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1736,7 +1835,7 @@ function generateGrowingTreeAlgorithmMap(tileMap, options) {
   }
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2147,7 +2246,9 @@ var platformGenerator = function platformGenerator() {
       }
     }
     if (new_door_count < NEW_DOOR_MIN_THRESHOLD) {
-      console.log('UNMET DOOR THRESHOLD: ' + new_door_count + ' OF ' + NEW_DOOR_MIN_THRESHOLD + '. Rebuild...');
+      failCount++;
+      if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
+      //console.log('UNMET DOOR THRESHOLD: ' + new_door_count + ' OF ' + //NEW_DOOR_MIN_THRESHOLD + '. Rebuild...');
       return false;
     }
 
@@ -2344,12 +2445,17 @@ function initialize(width, height) {
   return map;
 }
 function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
-  tileMap.fill(1); // Fill with walls
+  tileMap.fill(0); // Fill with walls
   var maxDimension = Math.max(tileMap.width, tileMap.height);
+  if (maxDimension <= 5) {
+    return;
+  }
   var fractional = Math.sqrt(maxDimension);
   if (fractional % 2 !== 1) fractional++;
-  var roomSizeHeight = Math.floor(tileMap.width / 10);
-  var roomSizeWidth = Math.floor(tileMap.height / 10);
+  var size = maxDimension < 10 ? Math.floor(maxDimension / 2) : 10;
+  var doorDiff = maxDimension < 10 ? 1 : 2;
+  var roomSizeHeight = Math.floor(tileMap.width / size);
+  var roomSizeWidth = Math.floor(tileMap.height / size);
   var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
   var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
   var maxCount = Math.floor(numRoomsWide * numRoomsHigh * 0.8);
@@ -2357,7 +2463,7 @@ function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
   var generator = new PlatformZones({
     roomWidth: roomSizeWidth,
     roomHeight: roomSizeHeight,
-    //maxFails: 200,
+    maxFails: 8000,
     width: numRoomsWide,
     // Max number of zones wide
     height: numRoomsWide,
@@ -2372,9 +2478,9 @@ function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
     // Minimum number of rooms per map
     maxRoomsPerMap: maxCount,
     // Maximum number of rooms per map
-    newDoors: 2,
+    newDoors: doorDiff,
     // # doors to add to prevent tedious linear mazes
-    roomDiff: 2,
+    roomDiff: doorDiff,
     // When adding a new door, room ID distance
     roomDiffOdds: 1 / 2 // Odds of inserting a new door on opportunity
   });
@@ -2382,14 +2488,9 @@ function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
   var built = generator.build(function () {
     return tileMap.random();
   });
-
-  //console.log('FAILS', built.failCount);
-
-  //console.log(built.world.map((line)=>line.join('')).join('\n'));
   var flattened = built.world.reduce(function (agg, line) {
     return agg.concat(line);
   }, []);
-  //console.log('FL', flattened);
   built.world = null;
   tileMap.world = built;
   for (var lcv = 0; lcv < tileMap.data.length; lcv++) {
@@ -2397,7 +2498,7 @@ function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
   }
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2457,7 +2558,7 @@ function generateMap(tileMap, options) {
   visitCell(startX, startY);
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2495,7 +2596,7 @@ function generateRecursiveDivisionMap(tileMap, options) {
   addWalls(0, 0, tileMap.width, tileMap.height);
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2950,7 +3051,8 @@ var Roguelike = /*#__PURE__*/function () {
       this.shuffle(deadends);
       var enter_room_id = deadends.pop();
       if (typeof enter_room_id === 'undefined') {
-        throw new Error('Unable to find a dead end room for Enter!');
+        //throw new Error('Unable to find a dead end room for Enter!');
+        return;
       }
       var enter = this.randomNonEdgeInRoom(enter_room_id);
       this.world[enter.y][enter.x] = TILE.ENTER;
@@ -2964,7 +3066,8 @@ var Roguelike = /*#__PURE__*/function () {
       this.doors[enter_door].enter = true;
       var exit_room_id = deadends.pop();
       if (typeof exit_room_id === 'undefined') {
-        throw new Error('Unable to find a dead end room for Exit!');
+        //throw new Error('Unable to find a dead end room for Exit!');
+        return;
       }
       var exit = this.randomNonEdgeInRoom(exit_room_id);
       this.world[exit.y][exit.x] = TILE.EXIT;
@@ -3057,9 +3160,13 @@ var Roguelike = /*#__PURE__*/function () {
 }();
 function ALGORITHM_THOMAS_HUNTER(tileMap, options) {
   tileMap.fill(1); // Fill with walls
-  var fractional = Math.sqrt(Math.max(tileMap.width, tileMap.height));
+  var maxDimension = Math.max(tileMap.width, tileMap.height);
+  if (maxDimension <= 5) {
+    return;
+  }
+  var fractional = Math.floor(Math.sqrt(Math.max(tileMap.width, tileMap.height)));
   if (fractional % 2 !== 1) fractional++;
-  var roomNumber = tileMap.width / fractional * tileMap.width / fractional / 2;
+  var roomNumber = Math.floor(tileMap.width / fractional * tileMap.width / fractional / 2);
   var rangius = Math.ceil(fractional / 2);
   var generator = new Roguelike({
     width: tileMap.width,
@@ -3094,7 +3201,7 @@ function ALGORITHM_THOMAS_HUNTER(tileMap, options) {
   }
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3115,7 +3222,7 @@ function SHAPE_CIRCLE(tileMap, options) {
   }
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3134,7 +3241,7 @@ function SHAPE_SQUARE(tileMap, options) {
   }
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3152,7 +3259,7 @@ function SHAPE_TRIANGLE(tileMap, options) {
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3200,7 +3307,7 @@ function applyHeightToTileMap(tileMap, heightMap) {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3223,7 +3330,7 @@ function generatePerlinNoiseMap(tileMap, options) {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3493,7 +3600,7 @@ function MersenneTwister19937() {
 //exports.MersenneTwister19937 = MersenneTwister19937;
 var _default = exports["default"] = MersenneTwister19937;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3501,11 +3608,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = generateTiledJSON;
 function generateTiledJSON(tileMap) {
-  var tiledJSON = {
-    "compressionlevel": -1,
-    "height": tileMap.height,
-    "infinite": false,
-    "layers": [{
+  var layers = [];
+  // Check if tileMap.data is a 3D array
+  if (typeof tileMap.data[0][0] !== 'undefined') {
+    var depth = tileMap.data.length; // Assuming the depth is the first dimension of the 3D array
+    for (var z = 0; z < depth; z++) {
+      layers.push({
+        "data": tileMap.data[z].flat(),
+        // Flatten the 2D array to 1D for the layer data
+        "height": tileMap.height,
+        "id": z + 1,
+        // ID should be unique for each layer, hence z + 1
+        "name": "Tile Layer ".concat(z + 1),
+        "opacity": 1,
+        "type": "tilelayer",
+        "visible": true,
+        "width": tileMap.width,
+        "x": 0,
+        "y": 0,
+        "parallaxoriginy": z / depth // Set the parallaxoriginy based on z-index
+      });
+    }
+  } else {
+    // If it's not a 3D array, just use the original layer
+    layers.push({
       "data": tileMap.data,
       "height": tileMap.height,
       "id": 1,
@@ -3516,35 +3642,14 @@ function generateTiledJSON(tileMap) {
       "width": tileMap.width,
       "x": 0,
       "y": 0
-    }],
-    /* infinite style map with chunks 
-      "editorsettings": {
-        "chunksize": {
-          "height": 8,
-          "width": 8
-        }
-      },
-       "layers": [{
-        "chunks": [{
-          "data": tileMap.data,  // Your tileMap data
-          "height": tileMap.height,
-          "width": tileMap.width,
-          "x": 0,
-          "y": 0
-        }],
-        "height": tileMap.height,
-        "name": "Tile Layer 1",
-        "opacity": 1,
-        "startx": 0,
-        "starty": 0,
-        "type": "tilelayer",
-        "visible": true,
-        "width": tileMap.width,
-        "x": 0,
-        "y": 0
-      }],
-      */
-    "nextlayerid": 2,
+    });
+  }
+  var tiledJSON = {
+    "compressionlevel": -1,
+    "height": tileMap.height,
+    "infinite": false,
+    "layers": layers,
+    "nextlayerid": layers.length + 1,
     "nextobjectid": 1,
     "orientation": "orthogonal",
     "renderorder": "right-down",
@@ -3564,46 +3669,76 @@ function generateTiledJSON(tileMap) {
       "tilecount": 2,
       "tileheight": 16,
       "tiles": [
-      // TODO: custom tile set mappings
-      {
-        "id": 0,
-        "image": "tile-bush.png",
-        "imageheight": 16,
-        "imagewidth": 16
-      }, {
-        "id": 1,
-        "image": "tile-grass.png",
-        "imageheight": 16,
-        "imagewidth": 16
-      }, {
-        "id": 2,
-        "image": "tile-block.png",
-        "imageheight": 16,
-        "imagewidth": 16
-      }, {
-        "id": 3,
-        "image": "tile-path-brown.png",
-        "imageheight": 16,
-        "imagewidth": 16
-      }, {
-        "id": 4,
-        "image": "tile-path-green.png",
-        "imageheight": 16,
-        "imagewidth": 16
-      }],
+        // Custom tile set mappings
+      ],
       "tilewidth": 16
     }],
     "tilewidth": 16,
     "type": "map",
     "version": "1.10",
     "width": tileMap.width
-    // Add your tilesets and other necessary properties here
   };
-
+  tiledJSON.tilesets[0].tiles = [
+  // TODO: custom tile set mappings
+  {
+    "id": 0,
+    "image": "tile-bush.png",
+    "imageheight": 16,
+    "imagewidth": 16
+  }, {
+    "id": 1,
+    "image": "tile-grass.png",
+    "imageheight": 16,
+    "imagewidth": 16
+  }, {
+    "id": 2,
+    "image": "tile-block.png",
+    "imageheight": 16,
+    "imagewidth": 16
+  }, {
+    "id": 3,
+    "image": "tile-path-brown.png",
+    "imageheight": 16,
+    "imagewidth": 16
+  }, {
+    "id": 4,
+    "image": "tile-path-green.png",
+    "imageheight": 16,
+    "imagewidth": 16
+  }];
   return tiledJSON;
 }
 
-},{}],24:[function(require,module,exports){
+/* infinite style map with chunks
+  "editorsettings": {
+    "chunksize": {
+      "height": 8,
+      "width": 8
+    }
+  },
+
+  "layers": [{
+    "chunks": [{
+      "data": tileMap.data,  // Your tileMap data
+      "height": tileMap.height,
+      "width": tileMap.width,
+      "x": 0,
+      "y": 0
+    }],
+    "height": tileMap.height,
+    "name": "Tile Layer 1",
+    "opacity": 1,
+    "startx": 0,
+    "starty": 0,
+    "type": "tilelayer",
+    "visible": true,
+    "width": tileMap.width,
+    "x": 0,
+    "y": 0
+  }],
+  */
+
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3629,11 +3764,18 @@ function Mersenne() {
     return Math.floor(gen.genrand_real2() * (max - min) + min);
   };
   this.seed = function (S) {
-    if (typeof S != 'number') {
+    // check incoming value of seed and coherce to number
+    // try to convert seed to number, if not number, consider as string
+    var seed = Number(S);
+    if (isNaN(seed)) {
+      // convert into hash
+      seed = this.stringToSeed(S);
+    }
+    if (typeof seed != 'number') {
       throw new Error("seed(S) must take numeric argument; is " + _typeof(S));
     }
-    this.currentSeed = S;
-    gen.init_genrand(S);
+    this.currentSeed = seed;
+    gen.init_genrand(seed);
   };
   this.seed_array = function (A) {
     if (_typeof(A) != 'object') {
@@ -3642,10 +3784,22 @@ function Mersenne() {
     this.currentSeed = A;
     gen.init_by_array(A, A.length);
   };
+  this.stringToSeed = function (str) {
+    console.log('convert', str);
+    // Simple hash function to convert a string to a number
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      var _char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + _char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+
+    return hash;
+  };
 }
 var _default = exports["default"] = Mersenne;
 
-},{"./MersenneTwister19937.js":22}],25:[function(require,module,exports){
+},{"./MersenneTwister19937.js":23}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4053,15 +4207,15 @@ p5.prototype.noiseSeed = function (seed) {
 };
 var _default = exports["default"] = p5;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-var _defaultOrthogonalMap = _interopRequireDefault(require("./maps/defaultOrthogonalMap.js"));
 var _labyrinthos = _interopRequireDefault(require("../../../../Labyrinthos.js/lib/labyrinthos.js"));
+var _defaultOrthogonalMap = _interopRequireDefault(require("./maps/defaultOrthogonalMap.js"));
 var _getChunkFiles = _interopRequireDefault(require("./lib/getChunkFiles.js"));
 var _loadChunk = _interopRequireDefault(require("./lib/loadChunk.js"));
 var _calculateTilePosition = _interopRequireDefault(require("./lib/calculateTilePosition.js"));
@@ -4077,20 +4231,21 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import labyrinthos from 'labyrinthos';
+//import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 // TODO: mantra-tiled-server needs to be a package.json
 var tileKinds = [{
   id: 0,
-  kind: 'grass',
+  kind: 'empty',
   weight: 10
 }, {
   id: 1,
-  kind: 'bushs',
+  kind: 'bush',
   weight: 2,
   body: true,
   isStatic: true,
-  z: 0
+  z: 16
 }, {
   id: 2,
   kind: 'grass',
@@ -4100,7 +4255,7 @@ var tileKinds = [{
   kind: 'block',
   weight: 5,
   body: true,
-  z: 0
+  z: 16
 }, {
   id: 4,
   kind: 'path-green',
@@ -4114,27 +4269,48 @@ var Tile = /*#__PURE__*/function () {
   function Tile() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       _ref$tileMap = _ref.tileMap,
-      tileMap = _ref$tileMap === void 0 ? _defaultOrthogonalMap["default"] : _ref$tileMap,
+      tileMap = _ref$tileMap === void 0 ? null : _ref$tileMap,
+      _ref$tiledMap = _ref.tiledMap,
+      tiledMap = _ref$tiledMap === void 0 ? _defaultOrthogonalMap["default"] : _ref$tiledMap,
       _ref$tiledServer = _ref.tiledServer,
       tiledServer = _ref$tiledServer === void 0 ? false : _ref$tiledServer,
       _ref$chunkUnitSize = _ref.chunkUnitSize,
       chunkUnitSize = _ref$chunkUnitSize === void 0 ? 8 : _ref$chunkUnitSize,
       _ref$tileSize = _ref.tileSize,
       tileSize = _ref$tileSize === void 0 ? 16 : _ref$tileSize,
+      _ref$labyrinthosAlgo = _ref.labyrinthosAlgo,
+      labyrinthosAlgo = _ref$labyrinthosAlgo === void 0 ? 'FaultLine' : _ref$labyrinthosAlgo,
       _ref$proceduralGenera = _ref.proceduralGenerateMissingChunks,
       proceduralGenerateMissingChunks = _ref$proceduralGenera === void 0 ? false : _ref$proceduralGenera,
       _ref$loadInitialChunk = _ref.loadInitialChunk,
       loadInitialChunk = _ref$loadInitialChunk === void 0 ? true : _ref$loadInitialChunk,
       _ref$loadDefaultTileM = _ref.loadDefaultTileMap,
-      loadDefaultTileMap = _ref$loadDefaultTileM === void 0 ? true : _ref$loadDefaultTileM;
+      loadDefaultTileMap = _ref$loadDefaultTileM === void 0 ? true : _ref$loadDefaultTileM,
+      _ref$loadTileMap = _ref.loadTileMap,
+      loadTileMap = _ref$loadTileMap === void 0 ? false : _ref$loadTileMap;
     _classCallCheck(this, Tile);
     this.id = Tile.id;
 
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
-    // set a default tile map
+    // set a default tiled map
+    this.tiledMap = tiledMap;
     this.tileMap = tileMap;
+    this.labyrinthosAlgoName = labyrinthosAlgo;
+    this.labyType = 'maze';
+    this.labyrinthosAlgo = _labyrinthos["default"].mazes[labyrinthosAlgo];
+    if (typeof this.labyrinthosAlgo === 'undefined') {
+      this.labyrinthosAlgo = _labyrinthos["default"].terrains[labyrinthosAlgo];
+      this.labyType = 'terrain';
+    }
+    if (typeof this.labyrinthosAlgo === 'undefined') {
+      this.labyrinthosAlgo = _labyrinthos["default"].shapes[labyrinthosAlgo];
+      this.labyType = 'shape';
+    }
+    if (typeof this.labyrinthosAlgo === 'undefined') {
+      console.log('Warning: no labyrinthos algo found for', labyrinthosAlgo);
+    }
     this.tileKinds = tileKinds; // rename
 
     // TODO: configurable chunk size and tile size
@@ -4148,6 +4324,7 @@ var Tile = /*#__PURE__*/function () {
     // tile chunks will be loaded on demand based on the mantra-tiled-server specs
     this.tiledServer = tiledServer;
     this.loadDefaultTileMap = loadDefaultTileMap;
+    this.loadTileMap = loadTileMap;
 
     // if true, will load tiles on demand based on mantra-tiled-server specs
     this.lazyLoadTiles = false;
@@ -4172,7 +4349,7 @@ var Tile = /*#__PURE__*/function () {
       // console.log("SET NEW OPTIONS", TileConfig)
       this.tiledServer = TileConfig.tiledServer;
       this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
-      //this.tileMap = TileConfig.tileMap;
+      //this.tiledMap = TileConfig.tiledMap;
       //this.loadInitialChunk = TileConfig.loadInitialChunk;
       //this.chunkUnitSize = TileConfig.chunkUnitSize;
       //this.tileSize = TileConfig.tileSize;
@@ -4207,14 +4384,89 @@ var Tile = /*#__PURE__*/function () {
         //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
       }
       if (this.loadDefaultTileMap) {
-        this.createTileMapFromTiledJSON(this.tileMap);
+        this.createTileMapFromTiledJSON(this.tiledMap);
+      }
+      if (this.loadTileMap) {
+        this.createTileMap(this.tileMap);
       }
 
       // only code path using file::upload 1/24/24 is tile.html Tiled server upload demo
       this.game.on('file::upload', function (data) {
-        console.log('got new tile data', data);
+        // console.log('got new tile data', data);
+        _this.tiledServer = false;
         _this.createTileMapFromTiledJSON(data);
       });
+    }
+  }, {
+    key: "createTileMap",
+    value: function createTileMap(tileMap) {
+      console.log('createTileMap', tileMap);
+      var incomingDepth = parseInt(tileMap.depth);
+      var map = new _labyrinthos["default"].TileMap({
+        x: 0,
+        y: 0,
+        width: parseInt(tileMap.width),
+        height: parseInt(tileMap.height),
+        //depth: parseInt(tileMap.depth),
+        tileWidth: 16,
+        // TODO: tileSet.tilewidth
+        tileHeight: 16 // TODO: tileSet.tileheight
+      });
+
+      map.fill(1);
+
+      // console.log('confirm', map.data)
+      map.seed(tileMap.seed);
+      this.labySeed = tileMap.seed;
+      var transformFn = _labyrinthos["default"].mazes[tileMap.algo];
+      var transformType = 'maze';
+      var is3D = false;
+      if (typeof transformFn === 'undefined') {
+        transformFn = _labyrinthos["default"].terrains[tileMap.algo];
+        transformType = 'terrain';
+      }
+      if (typeof transformFn === 'undefined') {
+        transformFn = _labyrinthos["default"].shapes[tileMap.algo];
+        transformType = 'shape';
+      }
+
+      /*
+      let try3D = tileMap.algo + '3D';
+      if (typeof labyrinthos.mazes[try3D] !== 'undefined') {
+        transformFn = labyrinthos.mazes[try3D];
+        transformType = 'maze';
+        is3D = true;
+      }
+      */
+
+      if (typeof transformFn === 'undefined') {
+        console.log('no transformFn found for', tileMap.algo);
+        throw new Error('no transformFn found for ' + tileMap.algo);
+      }
+      transformFn(map, tileMap.options || {});
+      if (transformType === 'terrain') {
+        map.scaleToTileRange(6);
+      }
+
+      // default `extrude` mode
+      if (incomingDepth > 1 && _typeof(map.data[0]) !== 'object') {
+        // if not already 3d array
+        // simply clone each layer to fill the depth dimension
+        // this is used to fill algos which can't yet generate 3d maps
+        var layer = map.data;
+        map.data = [];
+        for (var i = 0; i < incomingDepth; i++) {
+          map.data[i] = [];
+          for (var j = 0; j < layer.length; j++) {
+            map.data[i][j] = layer[j];
+          }
+          //map.data.push(JSON.parse(JSON.stringify(layer)));
+        }
+      }
+
+      this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
+
+      this.game.emit('tilemap::created', tileMap);
     }
   }, {
     key: "createTileMapFromTiledJSON",
@@ -4226,7 +4478,6 @@ var Tile = /*#__PURE__*/function () {
         // set hidden
         overlay.style.display = 'none';
       }
-      console.log('tiledJSONtiledJSONtiledJSON', tiledJSON.layers);
       tiledJSON.layers.forEach(function (layer) {
         if (layer.type === 'tilelayer') {
           if (layer.chunks) {
@@ -4244,7 +4495,7 @@ var Tile = /*#__PURE__*/function () {
     value: function createLayer(layer, tileWidth, tileHeight) {
       var _this3 = this;
       // Check if the layer.data is a 3D array
-      if (Array.isArray(layer.data[0])) {
+      if (_typeof(layer.data[0]) === 'object') {
         // 3D data handling
         layer.data.forEach(function (layer2D, z) {
           layer2D.forEach(function (tile, index) {
@@ -4264,13 +4515,13 @@ var Tile = /*#__PURE__*/function () {
       if (typeof tile === 'number') {
         // Find id = tile in tileKinds
         var tileId = tile;
-        var tileKind = tileKinds.find(function (tileKind) {
+        var tileKind = this.tileKinds.find(function (tileKind) {
           return tileKind.id === tileId;
         });
         if (tileKind) {
           tile = tileKind;
         } else {
-          tile = tileKinds[3]; // Default tile kind if not found
+          tile = this.tileKinds[3]; // Default tile kind if not found
         }
       }
 
@@ -4278,7 +4529,17 @@ var Tile = /*#__PURE__*/function () {
         x = _this$calculateTilePo.x,
         y = _this$calculateTilePo.y,
         z = _this$calculateTilePo.z;
+      if (tile === null) {
+        //return;
+      }
+      // allow tile.z to override z ( useful for blocks / layers / etc )
+      if (typeof tile.z !== 'number') {
+        tile.z = z;
+      }
       tile.z = z;
+
+      // TODO: check to see if existing tile exsting at this slot?
+
       this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
     }
   }, {
@@ -4289,16 +4550,22 @@ var Tile = /*#__PURE__*/function () {
   }, {
     key: "handleLoadFailure",
     value: function handleLoadFailure(chunkPath, chunkKey) {
-      console.log("Fallback for failed load:", chunkPath, chunkKey);
+      // console.log("Fallback for failed load:", chunkPath, chunkKey);
       // Call the procedural generation function
       if (this.proceduralGenerateMissingChunks) {
         // console.log('Generating random chunk', chunkKey)
         // let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
         var randomChunk;
         var chunkCoordinates = this.extractChunkCoordinates(chunkKey);
-        console.log('chunkCoordinates', chunkCoordinates);
+
+        //console.log('chunkCoordinates', chunkCoordinates)
+        //console.log('current map data', this.tiledMap)
+
+        // console.log('chunkCoordinates', chunkCoordinates)
         var x = chunkCoordinates.x;
         var y = chunkCoordinates.y;
+        // TODO: subsection query, continious map
+        //let subsection = this.tiledMap.query({ x: x, y: y, width: this.chunkUnitSize, height: this.chunkUnitSize });
         var map = new _labyrinthos["default"].TileMap({
           x: x,
           y: y,
@@ -4308,15 +4575,23 @@ var Tile = /*#__PURE__*/function () {
           tileHeight: 16
         });
         map.fill(1);
-        console.log('aaamap', chunkKey, map);
+
+        // map.seed(this.labySeed);
+        map.seed(chunkKey);
+
         //labyrinthos.mazes.RecursiveBacktrack(map, {});
         // labyrinthos.mazes.SpiralBacktrack(map, {});
         // labyrinthos .mazes.RecursiveDivision(map, {});
         // labyrinthos.terrains.DiamondSquare(map, {});
         // map.seed(4121);
-        _labyrinthos["default"].terrains.FaultLine(map, {});
-        map.scaleToTileRange(6);
-        console.log('map', map);
+        console.log('using fallback generator', this.labyrinthosAlgoName);
+        this.labyrinthosAlgo(map, {});
+        if (this.labyType === 'terrain') {
+          // TODO: remove this
+          map.scaleToTileRange(6);
+        }
+        // console.log('map', map)
+
         randomChunk = map;
 
         // console.log('randomChunk', chunkKey, randomChunk.data.length)
@@ -4341,11 +4616,28 @@ var Tile = /*#__PURE__*/function () {
     key: "loadTilesForArea",
     value: function loadTilesForArea(position) {
       var _this4 = this;
-      //generateMap(map, {});
+      // Calculate the actual half-width and half-height by scaling the tileMap dimensions
+      /*
+      let halfWidth = (this.tileMap.width * 16) / 2;
+      let halfHeight = (this.tileMap.height * 16) / 2;
+       // Define a loading buffer distance
+      let loadingBuffer = 0; // This can be adjusted based on how much buffer you want
+       // Adjust halfWidth and halfHeight to include the loading buffer
+      let bufferedHalfWidth = halfWidth - loadingBuffer;
+      let bufferedHalfHeight = halfHeight - loadingBuffer;
+       // Check if the position's absolute values are within the buffered tileMap dimensions
+      if (Math.abs(position.x) <= bufferedHalfWidth && Math.abs(position.y) <= bufferedHalfHeight) {
+        // Position is within the buffered area of the tileMap, so we don't need to do anything yet
+        // Remark: We can continue to generate if seeds are aligned it, it may try to double place entities
+        // at the 0,0 chunk tiles
+        // console.log('Position is within the tileMap area with a buffer');
+        // return;
+      } else {
+        // Position is within the loading buffer or outside the tileMapArea, time to load or generate new tiles
+        // console.log('Position is approaching the tileMap boundary or is outside, loading or generating new tiles');
+      }
+      */
 
-      //console.log('map', map)
-      // if (!this.tiledServer) return;
-      // console.log('aaaaaaa', labyrinthos)
       var outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
       var result = (0, _getChunkFiles["default"])(position, this.chunkUnitSize, outputDir, 2);
       // console.log("getChunkFiles result", position, result);
@@ -4381,7 +4673,7 @@ var Tile = /*#__PURE__*/function () {
 _defineProperty(Tile, "id", 'tile');
 var _default = exports["default"] = Tile;
 
-},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":27,"./lib/createTile.js":28,"./lib/generateChunkWithFractal.js":29,"./lib/generateRandomChunk.js":30,"./lib/generateRandomChunkWithPaths.js":31,"./lib/getChunkFiles.js":32,"./lib/loadChunk.js":33,"./lib/randomTileFromDistribution.js":34,"./maps/defaultOrthogonalMap.js":35}],27:[function(require,module,exports){
+},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":28,"./lib/createTile.js":29,"./lib/generateChunkWithFractal.js":30,"./lib/generateRandomChunk.js":31,"./lib/generateRandomChunkWithPaths.js":32,"./lib/getChunkFiles.js":33,"./lib/loadChunk.js":34,"./lib/randomTileFromDistribution.js":35,"./maps/defaultOrthogonalMap.js":36}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4413,7 +4705,6 @@ function calculateTilePosition(index, layer) {
   // Use the z parameter to calculate the depth position
   // 'depth' is the total depth of the map, used to calculate the offset for each layer
   var zOffset = z * (tileHeight / depth); // Example calculation for z position, adjust as needed
-  console.log('zOffset', zOffset);
   return {
     x: x,
     y: y,
@@ -4421,15 +4712,23 @@ function calculateTilePosition(index, layer) {
   };
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = createTile;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
+  var _this$game$createEnti;
   var tileId = tile.id;
+  if (tile.kind === 'empty') {
+    return;
+  }
 
   // TODO: better tile config by kind
   // for now
@@ -4450,13 +4749,26 @@ function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
   if (color && this.debug) {
     _color = color;
   }
-  console.log("CRETING TILE", z);
+  var _type = 'TILE';
+  if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
+    // _type = 'BLOCK';
+  }
   var _texture = "tile-".concat(tile.kind); // rename
-  this.game.createEntity({
-    type: 'BLOCK',
-    kind: 'Tile',
+  this.game.createEntity((_this$game$createEnti = {
+    type: _type,
+    kind: tile.kind,
     body: body,
     mass: mass,
+    // Remark: By default we will disable all collision events for Tiles
+    //         This is done universally for performance reasons
+    //         Each tile.kind could be configured via `TileSet` class with custom collision config
+    collisionActive: false,
+    collisionStart: false,
+    collisionEnd: false,
+    // set friction high so they dont' glide around on push
+    friction: 100,
+    frictionAir: 100,
+    frictionStatic: 100,
     isStatic: isStatic,
     style: {
       cursor: 'pointer'
@@ -4465,19 +4777,11 @@ function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
       x: x * scale,
       y: y * scale,
       z: z * scale
-    },
-    friction: 1,
-    frictionAir: 1,
-    frictionStatic: 1,
-    texture: _texture,
-    color: _color,
-    width: tileWidth * scale,
-    height: tileHeight * scale,
-    depth: tileWidth * scale
-  });
+    }
+  }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileWidth * scale), _this$game$createEnti));
 }
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4542,7 +4846,7 @@ function mandelbrotIterations(x, y) {
   return n;
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4569,7 +4873,7 @@ function generateRandomChunk(chunkKey, tileKinds) {
   };
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4628,7 +4932,7 @@ function randomPathPattern(size) {
   return pathSet;
 }
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4665,7 +4969,7 @@ function pathJoin(dir, file) {
   }
 }
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4693,7 +4997,7 @@ function loadChunk(chunkPath, chunkKey) {
       if (_this.game.data.chunks[chunkKey]) {
         _this.game.systems.tile.createLayer(_this.game.data.chunks[chunkKey], _this.tileSize, _this.tileSize);
       } else {
-        console.log("WARNING: chunk not found", chunkKey);
+        // console.log("WARNING: chunk not found", chunkKey);
         _this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
       }
     });
@@ -4703,7 +5007,7 @@ function loadChunk(chunkPath, chunkKey) {
   }
 }
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4734,7 +5038,7 @@ function randomTileFromDistribution(tileKinds, totalWeight) {
   return tileKinds[tileKinds.length - 1].id; // Fallback in case of rounding errors
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4775,5 +5079,5 @@ var defaultOrthogonalMap = {
 };
 var _default = exports["default"] = defaultOrthogonalMap;
 
-},{}]},{},[26])(26)
+},{}]},{},[27])(27)
 });

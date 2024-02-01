@@ -647,8 +647,8 @@ function update() {
 
     var newY = currentPlayer.position.y + game.viewportCenterYOffset;
     //newY = newY / zoomFactor;
-    if (game.data.camera.mode === 'platformer') {
-      // locks camera to not exceed bottom of screen for platformer mode
+    if (game.data.camera.mode === 'platform') {
+      // locks camera to not exceed bottom of screen for platform mode
       if (newY < windowHeight * 0.35) {
         this.scene.cameraPosition.y = newY;
       } else {
@@ -688,11 +688,9 @@ function updateCameraPosition(dx, dy, isDragging) {
     this.isDragging = true;
     // this.follow = false;
     if (typeof dx === 'number') {
-      //game.data.camera.position.x -= dx;
       game.viewportCenterXOffset += dx;
     }
     if (typeof dy === 'number') {
-      //game.data.camera.position.y -= dy;
       game.viewportCenterYOffset += dy;
     }
   }

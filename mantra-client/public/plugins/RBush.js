@@ -152,7 +152,7 @@ var RBush = /*#__PURE__*/function () {
       }
       nearbyEntities.forEach(function (eId) {
         if (eId) {
-          var exists = _this2.game.getEntity(eId);
+          var exists = _this2.game.data.ents._[eId.toString()];
           if (!exists) {
             var entityData = _this2.game.deferredEntities[eId.toString()];
             if (entityData && entityData.destroyed !== true) {

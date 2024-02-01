@@ -4,58 +4,345 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = platformMovement;
+function platformMovement(game) {
+  var rules = game.createSutra();
+  rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+    sprite: 'playerLeftWalk'
+  });
+  rules.addMap('determineDuckingSprite', function (player, node) {
+    var sprite = 'playerDownRight';
+    if (player.texture.sprite === 'playerLeftWalk') {
+      player.texture.sprite = 'playerDownLeft';
+    } else {
+      player.texture.sprite = 'playerDownRight';
+    }
+    return player;
+  });
+  rules["if"]('S').then('DUCK').map('determineDuckingSprite').then('updateSprite');
+  rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
+    sprite: 'playerRightWalk'
+  });
+
+  /*
+    Adding textures to Entities
+    game.updateEntity({
+      id: player.id,
+      texture: {
+        frameIndex: 0,
+        sheet: player.texture.sheet,
+        sprite: { // sets directly to sprite, no animations
+          x: -112,
+          y: -16,
+          height: 16,
+          width: 16
+        }
+      }
+    })
+   */
+
+  rules.on('updateSprite', function (player, node) {
+    var sprite = node.data.sprite || player.texture.sprite;
+    console.log('updateSprite', sprite);
+    game.updateEntity({
+      id: player.id,
+      texture: {
+        frameIndex: 0,
+        sheet: player.texture.sheet,
+        sprite: sprite,
+        animationPlaying: true
+      }
+    });
+  });
+
+  // rules.if('SPACE').then('JUMP');
+  rules.addCondition('isPlayer', function (entity) {
+    return entity.type === 'PLAYER';
+  });
+  rules.addCondition('isRunning', {
+    op: 'or',
+    conditions: ['S', 'K'] // defaults DOWN key, or B button on Gamepad
+  });
+
+  var maxJumpTicks = 50;
+  // Remark: isPlayer is already implied for all Key inputs,
+  //         however we add the additional check here for the negative case,
+  //         in order to not let other ents reset player walk speed
+  rules["if"]('isPlayer').then(function (rules) {
+    rules["if"]('isRunning').then('RUN')["else"]('WALK');
+  });
+  rules["if"]('isPlayer').then(function (rules) {
+    rules["if"]('SPACE')
+    // .if('doesntExceedDuration')
+    .then('JUMP').then('updateSprite', {
+      sprite: 'playerRightJump'
+    });
+  });
+
+  //rules.if('L').then('SWING_SWORD');
+  //rules.if('O').then('ZOOM_IN');
+  //rules.if('P').then('ZOOM_OUT');
+
+  rules.on('JUMP', function (player, node, gameState) {
+    // console.log("JUMP", gameState.input, gameState.controls)
+    if (gameState.inputTicks.SPACE >= maxJumpTicks) {
+      return;
+    }
+    game.applyForce(player.id, {
+      x: 0,
+      y: -2.3,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: 0,
+      sprite: 'playerRightJump'
+    });
+  });
+  var runningForce = 1;
+  rules.on('RUN', function (player) {
+    runningForce = 1.6;
+    maxJumpTicks = 70;
+  });
+  rules.on('WALK', function (player) {
+    runningForce = 1;
+    maxJumpTicks = 50;
+  });
+  rules.on('DUCK', function (player) {
+    game.applyForce(player.id, {
+      x: 0,
+      y: 0.5,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: Math.PI
+    });
+  });
+  rules.on('MOVE_LEFT', function (player, node, gameState) {
+    game.applyForce(player.id, {
+      x: -runningForce,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: -Math.PI / 2
+    });
+  });
+  rules.on('MOVE_RIGHT', function (player) {
+    game.applyForce(player.id, {
+      x: runningForce,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: Math.PI / 2
+    });
+  });
+  rules.on('FIRE_BULLET', function (player) {
+    game.systems.bullet.fireBullet(player.id);
+  });
+  rules.on('SWING_SWORD', function (player) {
+    if (game.systems.sword) {
+      game.systems.sword.swingSword(player.id);
+    }
+  });
+  return rules;
+}
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = topdownMovement;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function topdownMovement(game) {
   var rules = game.createSutra();
-  rules["if"]('W').then('MOVE_FORWARD');
-  rules["if"]('A').then('MOVE_LEFT');
-  rules["if"]('S').then('MOVE_BACKWARD');
-  rules["if"]('D').then('MOVE_RIGHT');
-  rules["if"]('O').then('ZOOM_IN');
-  rules["if"]('P').then('ZOOM_OUT');
-  rules.on('MOVE_FORWARD', function (entity) {
-    game.applyForce(entity.id, {
+  rules.addCondition('alwaysTrue', function () {
+    return true;
+  });
+  rules.addCondition('PLAYER_UP', {
+    op: 'or',
+    conditions: ['W', 'DPAD_UP']
+  });
+  rules.addCondition('PLAYER_DOWN', {
+    op: 'or',
+    conditions: ['S', 'DPAD_DOWN']
+  });
+  rules.addCondition('PLAYER_LEFT', {
+    op: 'or',
+    conditions: ['A', 'DPAD_LEFT']
+  });
+  rules.addCondition('PLAYER_RIGHT', {
+    op: 'or',
+    conditions: ['D', 'DPAD_RIGHT']
+  });
+  rules.addCondition('USE_ITEM_1', {
+    op: 'or',
+    conditions: ['SPACE', 'H', 'BUTTON_B']
+  });
+  rules.addCondition('USE_ITEM_2', {
+    op: 'or',
+    conditions: ['J', 'BUTTON_X']
+  });
+  rules.addCondition('ZOOM_IN', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('ZOOM_OUT', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
+  rules["if"]('alwaysTrue').then('resetPlayerState');
+  rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
+    sprite: 'playerUp'
+  });
+  rules["if"]('PLAYER_LEFT').then('MOVE_LEFT').then('updateSprite', {
+    sprite: 'playerLeft'
+  });
+  rules["if"]('PLAYER_DOWN').then('MOVE_DOWN').then('updateSprite', {
+    sprite: 'playerDown'
+  });
+  rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
+    sprite: 'playerRight'
+  });
+  rules["if"]('USE_ITEM_1').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
+  rules["if"]('USE_ITEM_2').then("DROP_BOMB");
+
+  // replace with rules.do('ZOOM_IN'), etc
+  rules["if"]('ZOOM_IN').then('ZOOM_IN');
+  rules["if"]('ZOOM_OUT').then('ZOOM_OUT');
+  rules.addMap('determineShootingSprite', function (player, node) {
+    var _rotationToSpriteMap;
+    // Normalize the rotation within the range of 0 to 2π
+    var normalizedRotation = player.rotation % (2 * Math.PI);
+    // Define a mapping from radians to sprites
+    var rotationToSpriteMap = (_rotationToSpriteMap = {
+      0: 'playerRodUp'
+    }, _defineProperty(_rotationToSpriteMap, Math.PI / 2, 'playerRodRight'), _defineProperty(_rotationToSpriteMap, Math.PI, 'playerRodDown'), _defineProperty(_rotationToSpriteMap, -Math.PI / 2, 'playerRodLeft'), _rotationToSpriteMap);
+    // Set the sprite based on the rotation, default to the current sprite
+    player.texture.sprite = rotationToSpriteMap[normalizedRotation] || player.currentSprite;
+    return player;
+  });
+  rules.on('updateSprite', function (player, node) {
+    var sprite = node.data.sprite || player.texture.sprite;
+    game.updateEntity({
+      id: player.id,
+      texture: {
+        frameIndex: 0,
+        sheet: player.texture.sheet,
+        sprite: sprite,
+        animationPlaying: true
+      }
+    });
+  });
+
+  // TODO:   this playerState should be localized onto the Sutra tree
+  // Remark: this can be achieved by adding hooks into Sutra core .emit() and reset state on tick()
+  //         this way, we always have a reference to all active actions during any tick via `node`
+  var playerState = {
+    MOVE_UP: false,
+    MOVE_DOWN: false,
+    MOVE_LEFT: false,
+    MOVE_RIGHT: false
+  };
+  rules.on('resetPlayerState', function () {
+    playerState.MOVE_UP = false;
+    playerState.MOVE_DOWN = false;
+    playerState.MOVE_LEFT = false;
+    playerState.MOVE_RIGHT = false;
+  });
+  function isDiagonalMovement(state) {
+    var isDiagonal = (state.MOVE_UP || state.MOVE_DOWN) && (state.MOVE_LEFT || state.MOVE_RIGHT);
+    return isDiagonal;
+  }
+
+  // Normalization factor for diagonal movement (1 / sqrt(2))
+  // chebyshev movement
+  var normalizationFactor = 0.7071; // Approximately 1/√2
+
+  rules.on('MOVE_UP', function (entity) {
+    playerState.MOVE_UP = true;
+    var force = {
       x: 0,
       y: -1,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(playerState)) {
+      force.y *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: 0
     });
+    // console.log('MOVE_UP', playerState);
   });
-  rules.on('MOVE_BACKWARD', function (entity) {
-    game.applyForce(entity.id, {
+
+  rules.on('MOVE_DOWN', function (entity) {
+    playerState.MOVE_DOWN = true;
+    var force = {
       x: 0,
       y: 1,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(playerState)) {
+      force.y *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: Math.PI
     });
   });
   rules.on('MOVE_LEFT', function (entity) {
-    game.applyForce(entity.id, {
+    playerState.MOVE_LEFT = true;
+    var force = {
       x: -1,
       y: 0,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(playerState)) {
+      force.x *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: -Math.PI / 2
     });
   });
   rules.on('MOVE_RIGHT', function (entity) {
-    game.applyForce(entity.id, {
+    playerState.MOVE_RIGHT = true;
+    var force = {
       x: 1,
       y: 0,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(playerState)) {
+      force.x *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: Math.PI / 2
     });
+  });
+  rules.on('FIRE_BULLET', function (entity) {
+    game.systems.bullet.fireBullet(entity.id);
+  });
+  rules.on('SWING_SWORD', function (entity) {
+    game.systems.sword.swingSword(entity.id);
+  });
+  rules.on('DROP_BOMB', function (player) {
+    // with no rate-limit, will drop 60 per second with default settings
+    rules.emit('dropBomb', player);
   });
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);
@@ -71,7 +358,7 @@ function topdownMovement(game) {
   return rules;
 }
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -79,7 +366,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _index = require("../../../../sutra/index.js");
-var _defaultPlayerMovement = _interopRequireDefault(require("../../lib/defaultPlayerMovement.js"));
+var _defaultTopdownMovement = _interopRequireDefault(require("../../lib/Game/defaults/defaultTopdownMovement.js"));
+var _defaultPlatformMovement = _interopRequireDefault(require("../../lib/Game/defaults/defaultPlatformMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -94,12 +382,12 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //import { createSutra } from '@yantra-core/sutra';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 var Sutra = /*#__PURE__*/function () {
   function Sutra(_ref) {
     var _ref$defaultMovement = _ref.defaultMovement,
-      defaultMovement = _ref$defaultMovement === void 0 ? false : _ref$defaultMovement;
+      defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement;
     _classCallCheck(this, Sutra);
     this.id = Sutra.id;
     this.inputCache = {};
@@ -135,9 +423,28 @@ var Sutra = /*#__PURE__*/function () {
         // these are currently explicitly bound to the player entity, we may want to make this more generic
         self.bindInputsToSutraConditions();
         if (self.defaultMovement) {
-          self.game.useSutra((0, _defaultPlayerMovement["default"])(self.game), 'movement');
+          if (self.game.config.mode === 'topdown') {
+            self.game.useSutra((0, _defaultTopdownMovement["default"])(self.game), 'mode-topdown');
+          }
+          if (self.game.config.mode === 'platform') {
+            // TODO: better platform control
+            self.game.useSutra((0, _defaultPlatformMovement["default"])(self.game), 'mode-platform');
+            // self.game.useSutra(topdown(self.game), 'mode-topdown');
+          }
         }
+
         self.inputsBound = true;
+      }
+    }
+  }, {
+    key: "bindDefaultMovementSutra",
+    value: function bindDefaultMovementSutra() {
+      var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'topdown';
+      if (mode === 'topdown') {
+        this.game.useSutra((0, _defaultTopdownMovement["default"])(this.game), 'mode-topdown');
+      }
+      if (mode === 'platform') {
+        this.game.useSutra((0, _defaultPlatformMovement["default"])(this.game), 'mode-platform');
       }
     }
   }, {
@@ -319,7 +626,7 @@ var Sutra = /*#__PURE__*/function () {
 _defineProperty(Sutra, "id", 'sutra');
 var _default = exports["default"] = Sutra;
 
-},{"../../../../sutra/index.js":3,"../../lib/defaultPlayerMovement.js":1}],3:[function(require,module,exports){
+},{"../../../../sutra/index.js":4,"../../lib/Game/defaults/defaultPlatformMovement.js":1,"../../lib/Game/defaults/defaultTopdownMovement.js":2}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -338,7 +645,7 @@ function createSutra() {
   return new _sutra["default"]();
 }
 
-},{"./lib/sutra.js":13}],4:[function(require,module,exports){
+},{"./lib/sutra.js":14}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -370,7 +677,7 @@ function evaluateCompositeCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -424,7 +731,7 @@ function evaluateCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -482,7 +789,7 @@ function evaluateDSLCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -535,7 +842,7 @@ function evaluateSingleCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -708,7 +1015,7 @@ function exportToEnglish() {
   //return this.tree.map(node => describeAction(node, indentLevel)).join('\n').concat('') + '\n' + conditionDescriptions;
 }
 
-},{"./i18n.js":9}],9:[function(require,module,exports){
+},{"./i18n.js":10}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -756,7 +1063,7 @@ var languageConfig = {
 };
 var _default = exports["default"] = languageConfig;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -781,7 +1088,7 @@ var _default = exports["default"] = {
   '!': 'not'
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -801,7 +1108,7 @@ function parsePath(path) {
   }, []);
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -850,7 +1157,7 @@ function serializeNode(node) {
   return serializedNode;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1694,5 +2001,5 @@ var _default = exports["default"] = Sutra;
   }
   */
 
-},{"./evaluateCompositeCondition.js":4,"./evaluateCondition.js":5,"./evaluateDSLCondition.js":6,"./evaluateSingleCondition.js":7,"./exportToEnglish.js":8,"./operatorAliases.js":10,"./parsePath.js":11,"./serializeToJson.js":12}]},{},[2])(2)
+},{"./evaluateCompositeCondition.js":5,"./evaluateCondition.js":6,"./evaluateDSLCondition.js":7,"./evaluateSingleCondition.js":8,"./exportToEnglish.js":9,"./operatorAliases.js":11,"./parsePath.js":12,"./serializeToJson.js":13}]},{},[3])(3)
 });

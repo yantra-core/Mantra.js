@@ -484,10 +484,10 @@ function updateSprite(entityId, actions, SheetManager, anims) {
     case 'MOVE_RIGHT':
       direction = 'Right';
       break;
-    case 'MOVE_FORWARD':
+    case 'PLAYER_UP':
       direction = 'Up';
       break;
-    case 'MOVE_BACKWARD':
+    case 'PLAYER_DOWN':
       direction = 'Down';
       break;
     default:

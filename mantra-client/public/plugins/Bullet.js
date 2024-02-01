@@ -90,7 +90,8 @@ var Bullet = /*#__PURE__*/function () {
       // Place the bullet in front of the player
       var bulletStartPosition = {
         x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
-        y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation)
+        y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation),
+        z: 1
         //z: 10
       };
 
@@ -185,6 +186,24 @@ var Bullet = /*#__PURE__*/function () {
         if (entityA.type === 'BORDER' && entityB.type === 'BULLET') {
           // destroy the bullet if it hits a border wall
           this.game.removeEntity(entityIdB);
+          return;
+        }
+
+        // TODO: collision groups for TileSets
+        if (entityA.type === 'BULLET' && entityB.type === 'TILE') {
+          if (entityB.kind !== 'bush') {
+            return;
+          }
+          this.game.removeEntity(entityB.id);
+          this.game.removeEntity(entityA.id);
+          return;
+        }
+        if (entityA.type === 'TILE' && entityB.type === 'BULLET') {
+          if (entityA.kind !== 'bush') {
+            return;
+          }
+          this.game.removeEntity(entityA.id);
+          this.game.removeEntity(entityB.id);
           return;
         }
 

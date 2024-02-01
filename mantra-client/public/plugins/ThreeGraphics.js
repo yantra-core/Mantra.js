@@ -340,10 +340,10 @@ function createGraphic(entityData) {
 
   // Material setup - solid if color exists, wireframe otherwise
   material = new THREE.MeshBasicMaterial({
-    color: entityData.color || 0xffffff,
-    // Default to white if no color specified
-    wireframe: !entityData.color
+    color: entityData.color || 0xffffff // Default to white if no color specified
+    // wireframe: !entityData.color,
   });
+
   if (!geometry) return; // If geometry is not set (like missing font), exit early
 
   mesh = new THREE.Mesh(geometry, material);
@@ -355,7 +355,7 @@ function createGraphic(entityData) {
   this.scene.add(mesh);
 
   // Setting position
-  mesh.position.set(-entityData.position.x, entityData.z, -entityData.position.y);
+  mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
   return mesh;
 }

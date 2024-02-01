@@ -31,18 +31,17 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
   _createClass(DragAndDropFileUpload, [{
     key: "init",
     value: function init(game) {
+      var _this = this;
       this.game = game;
       this.createOverlay();
       this.createDropArea();
       this.createDefaultDataButton();
       this.createOptionsSection();
       this.bindEvents();
-
-      // TODO: remove this
-      if (this.game.system.tile && this.game.system.tile.tileMap) {
-        // hide overlay
-        this.overlay.style.visibility = 'hidden';
-      }
+      game.on('tilemap::created', function () {
+        // hide overlay ( for now )
+        _this.overlay.style.visibility = 'hidden';
+      });
     }
   }, {
     key: "createOverlay",
@@ -100,7 +99,7 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
   }, {
     key: "createDefaultDataButton",
     value: function createDefaultDataButton() {
-      var _this = this;
+      var _this2 = this;
       // Create Load Default Data button
       this.defaultDataButton = document.createElement('button');
       this.setStyle(this.defaultDataButton, {
@@ -115,7 +114,7 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
       });
       this.defaultDataButton.innerText = 'Load Default Tiled Data';
       this.defaultDataButton.onclick = function () {
-        return _this.loadDefaultData();
+        return _this2.loadDefaultData();
       };
 
       // Append to the drop area container
@@ -189,24 +188,24 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
   }, {
     key: "bindEvents",
     value: function bindEvents() {
-      var _this2 = this;
+      var _this3 = this;
       ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (eventName) {
-        _this2.overlay.addEventListener(eventName, function (e) {
-          return _this2.preventDefaults(e);
+        _this3.overlay.addEventListener(eventName, function (e) {
+          return _this3.preventDefaults(e);
         }, false);
       });
       ['dragenter', 'dragover'].forEach(function (eventName) {
-        _this2.dropArea.addEventListener(eventName, function () {
-          return _this2.highlight();
+        _this3.dropArea.addEventListener(eventName, function () {
+          return _this3.highlight();
         }, false);
       });
       ['dragleave', 'drop'].forEach(function (eventName) {
-        _this2.dropArea.addEventListener(eventName, function () {
-          return _this2.unhighlight();
+        _this3.dropArea.addEventListener(eventName, function () {
+          return _this3.unhighlight();
         }, false);
       });
       this.dropArea.addEventListener('drop', function (e) {
-        return _this2.handleDrop(e);
+        return _this3.handleDrop(e);
       }, false);
     }
   }, {
@@ -235,7 +234,7 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
   }, {
     key: "handleFiles",
     value: function handleFiles(files) {
-      var _this3 = this;
+      var _this4 = this;
       var game = this.game;
       var tilePluginOptions = this.getCheckboxValues();
       if (game.systems.tile) {
@@ -256,7 +255,7 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
             console.error('Error parsing JSON:', error);
           }
           // hide overlay
-          _this3.overlay.style.visibility = 'hidden';
+          _this4.overlay.style.visibility = 'hidden';
         };
         reader.onerror = function (error) {
           console.error('Error reading file:', error);

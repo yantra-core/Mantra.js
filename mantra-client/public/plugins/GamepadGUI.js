@@ -211,12 +211,12 @@ var GamepadGUI = /*#__PURE__*/function () {
       var buttonX = document.getElementById('x');
       buttonY.addEventListener('pointerdown', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keydown', {
-          'code': 'KeyK'
+          'code': 'KeyJ'
         }));
       });
       buttonY.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
-          'code': 'KeyK'
+          'code': 'KeyJ'
         }));
       });
       buttonX.addEventListener('pointerdown', function (ev) {

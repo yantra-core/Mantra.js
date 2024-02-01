@@ -45,8 +45,11 @@ var Collisions = /*#__PURE__*/function () {
       // console.log('Collision detected between:', bodyA.myEntityId, 'and', bodyB.myEntityId);
       var entityIdA = bodyA.myEntityId;
       var entityIdB = bodyB.myEntityId;
-      var entityA = this.game.getEntity(entityIdA);
-      var entityB = this.game.getEntity(entityIdB);
+
+      //const entityA = this.game.getEntity(entityIdA);
+      //const entityB = this.game.getEntity(entityIdB);
+      var entityA = bodyA.entity;
+      var entityB = bodyB.entity;
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
@@ -126,8 +129,8 @@ var Collisions = /*#__PURE__*/function () {
 
       var entityIdA = bodyA.myEntityId;
       var entityIdB = bodyB.myEntityId;
-      var entityA = this.game.getEntity(entityIdA);
-      var entityB = this.game.getEntity(entityIdB);
+      var entityA = bodyA.entity;
+      var entityB = bodyB.entity;
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
@@ -179,8 +182,9 @@ var Collisions = /*#__PURE__*/function () {
     value: function collisionActive(pair, bodyA, bodyB) {
       var entityIdA = bodyA.myEntityId;
       var entityIdB = bodyB.myEntityId;
-      var entityA = this.game.getEntity(entityIdA);
-      var entityB = this.game.getEntity(entityIdB);
+      var entityA = bodyA.entity;
+      var entityB = bodyB.entity;
+
       // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
