@@ -1,18 +1,13 @@
 import labyrinthos from 'labyrinthos';
-//import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
+// import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
 
-// TODO: mantra-tiled-server needs to be a package.json
 import getChunkFiles from './lib/getChunkFiles.js';
 import loadChunk from './lib/loadChunk.js';
 import calculateTilePosition from './lib/calculateTilePosition.js';
-import generateRandomChunk from './lib/generateRandomChunk.js';
-import generateRandomChunkWithPaths from './lib/generateRandomChunkWithPaths.js';
-import generateChunkWithFractal from './lib/generateChunkWithFractal.js';
-import randomTileFromDistribution from './lib/randomTileFromDistribution.js';
 import createTile from './lib/createTile.js';
 
 const tileKinds = [
@@ -22,6 +17,7 @@ const tileKinds = [
   { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
   { id: 4, kind: 'path-green', weight: 10 },
   { id: 5, kind: 'path-brown', weight: 10 },
+  { id: 6, kind: 'path-brown', weight: 10 },
 ];
 
 class Tile {
@@ -52,6 +48,8 @@ class Tile {
 
     this.labyrinthosAlgoName = labyrinthosAlgo;
     this.labyType = 'maze';
+
+    // TODO: replace this scaffold wth labyrinthos.transform()
     this.labyrinthosAlgo = labyrinthos.mazes[labyrinthosAlgo];
     if (typeof this.labyrinthosAlgo === 'undefined') {
       this.labyrinthosAlgo = labyrinthos.terrains[labyrinthosAlgo];
@@ -64,7 +62,6 @@ class Tile {
     if (typeof this.labyrinthosAlgo === 'undefined') {
       console.log('Warning: no labyrinthos algo found for', labyrinthosAlgo);
     }
-
 
     this.tileKinds = tileKinds; // rename
 
@@ -93,28 +90,16 @@ class Tile {
     // list of tile ids for random generation
     this.tileIds = [1, 2, 3];
 
+    this.createTile = createTile.bind(this);
     this.loadChunk = loadChunk.bind(this);
     this.calculateTilePosition = calculateTilePosition.bind(this);
-    this.generateRandomChunk = generateRandomChunk.bind(this);
-    this.generateRandomChunkWithPaths = generateRandomChunkWithPaths.bind(this);
-    this.generateChunkWithFractal = generateChunkWithFractal.bind(this);
-    this.randomTileFromDistribution = randomTileFromDistribution.bind(this);
-    this.createTile = createTile.bind(this);
 
   }
 
   setOptions(TileConfig) {
-    // console.log("SET NEW OPTIONS", TileConfig)
+    // console.log("Tile.setOptions", TileConfig)
     this.tiledServer = TileConfig.tiledServer;
     this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
-    //this.tiledMap = TileConfig.tiledMap;
-    //this.loadInitialChunk = TileConfig.loadInitialChunk;
-    //this.chunkUnitSize = TileConfig.chunkUnitSize;
-    //this.tileSize = TileConfig.tileSize;
-    //this.chunkPixelSize = TileConfig.chunkPixelSize;
-    //this.debug = TileConfig.debug;
-    //this.lazyLoadTiles = TileConfig.lazyLoadTiles;
-    //this.tileIds = TileConfig.tileIds;
   }
 
   init(game) {
@@ -122,7 +107,6 @@ class Tile {
     this.game.addSystem('tile', this);
 
     if (this.loadInitialChunk) {
-
       if (this.tiledServer) {
         this.game.loadScripts([
           '/tiled/chunks/chunk_x0_y0.js'
@@ -138,13 +122,6 @@ class Tile {
       } else if (this.proceduralGenerateMissingChunks) {
         // TODO: generator
       }
-
-
-    } else {
-
-      //setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
-      //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
-      //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
     }
 
     if (this.loadDefaultTileMap) {
@@ -302,10 +279,9 @@ class Tile {
     tile.z = z;
 
     // TODO: check to see if existing tile exsting at this slot?
-
     this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
-  }
 
+  }
 
   getTileImageURL(tileId) {
     return `img/game/tiles/${tileId}.png`;
@@ -316,16 +292,16 @@ class Tile {
     // Call the procedural generation function
     if (this.proceduralGenerateMissingChunks) {
       // console.log('Generating random chunk', chunkKey)
-      // let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
+
       let randomChunk;
       let chunkCoordinates = this.extractChunkCoordinates(chunkKey);
 
       //console.log('chunkCoordinates', chunkCoordinates)
       //console.log('current map data', this.tiledMap)
 
-      // console.log('chunkCoordinates', chunkCoordinates)
       let x = chunkCoordinates.x;
       let y = chunkCoordinates.y;
+
       // TODO: subsection query, continious map
       //let subsection = this.tiledMap.query({ x: x, y: y, width: this.chunkUnitSize, height: this.chunkUnitSize });
       let map = new labyrinthos.TileMap({
@@ -338,12 +314,10 @@ class Tile {
       });
       map.fill(1);
 
-
-
       // map.seed(this.labySeed);
       map.seed(chunkKey);
 
-      //labyrinthos.mazes.RecursiveBacktrack(map, {});
+      // labyrinthos.mazes.RecursiveBacktrack(map, {});
       // labyrinthos.mazes.SpiralBacktrack(map, {});
       // labyrinthos .mazes.RecursiveDivision(map, {});
       // labyrinthos.terrains.DiamondSquare(map, {});
