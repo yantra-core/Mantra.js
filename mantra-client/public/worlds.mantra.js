@@ -3650,7 +3650,8 @@ var Home = /*#__PURE__*/function () {
       });
 
       // convert the Sutra.js rules to English text
-      var rulesEnglish = game.rules.toEnglish();
+      /*
+      let rulesEnglish = game.rules.toEnglish();
       game.createEntity({
         name: 'sutra-tree-text',
         type: 'TEXT',
@@ -3675,6 +3676,8 @@ var Home = /*#__PURE__*/function () {
           z: 32
         }
       });
+      */
+
       game.createEntity({
         type: 'BACKGROUND',
         texture: 'robot-arms-apartment',
