@@ -20,11 +20,11 @@ export default function loadChunk(chunkPath, chunkKey) {
         this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
       } else {
         // console.log("WARNING: chunk not found", chunkKey);
-        this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
+        this.handleChunkLoadFailure(chunkPath, chunkKey); // Handle the failure case
       }
     });
   } else if (state.attempts >= this.maxRetries) {
     // console.log("MAX RETRIES REACHED FOR", chunkPath);
-    this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
+    this.handleChunkLoadFailure(chunkPath, chunkKey); // Handle the failure case
   }
 }

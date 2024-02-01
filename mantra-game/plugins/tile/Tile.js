@@ -7,8 +7,11 @@ import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 
 import getChunkFiles from './lib/getChunkFiles.js';
 import loadChunk from './lib/loadChunk.js';
+import loadTilesForArea from './lib/loadTilesForArea.js';
+import handleChunkLoadFailure from './lib/handleChunkLoadFailure.js';
 import calculateTilePosition from './lib/calculateTilePosition.js';
 import createTile from './lib/createTile.js';
+import createTileMap from './lib/createTileMap.js';
 
 const tileKinds = [
   { id: 0, kind: 'empty', weight: 10 },
@@ -37,7 +40,7 @@ class Tile {
   } = {}) {
 
     this.id = Tile.id;
-
+    this.labyrinthos = labyrinthos;
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
@@ -88,11 +91,15 @@ class Tile {
     this.proceduralGenerateMissingChunks = proceduralGenerateMissingChunks;
 
     // list of tile ids for random generation
-    this.tileIds = [1, 2, 3];
+    // this.tileIds = [1, 2, 3];
 
     this.createTile = createTile.bind(this);
+    this.createTileMap = createTileMap.bind(this);
     this.loadChunk = loadChunk.bind(this);
+    this.getChunkFiles = getChunkFiles.bind(this);
+    this.handleChunkLoadFailure = handleChunkLoadFailure.bind(this);
     this.calculateTilePosition = calculateTilePosition.bind(this);
+    this.loadTilesForArea = loadTilesForArea.bind(this);
 
   }
 
@@ -138,81 +145,6 @@ class Tile {
       this.tiledServer = false;
       this.createTileMapFromTiledJSON(data);
     });
-
-  }
-
-  createTileMap(tileMap) {
-
-    console.log('createTileMap', tileMap);
-
-    let incomingDepth = parseInt(tileMap.depth);
-    let map = new labyrinthos.TileMap({
-      x: 0,
-      y: 0,
-      width: parseInt(tileMap.width),
-      height: parseInt(tileMap.height),
-      //depth: parseInt(tileMap.depth),
-      tileWidth: 16, // TODO: tileSet.tilewidth
-      tileHeight: 16 // TODO: tileSet.tileheight
-    });
-    map.fill(1);
-
-    // console.log('confirm', map.data)
-    map.seed(tileMap.seed);
-    this.labySeed = tileMap.seed;
-
-    let transformFn = labyrinthos.mazes[tileMap.algo];
-    let transformType = 'maze';
-    let is3D = false;
-
-    if (typeof transformFn === 'undefined') {
-      transformFn = labyrinthos.terrains[tileMap.algo];
-      transformType = 'terrain';
-    }
-    if (typeof transformFn === 'undefined') {
-      transformFn = labyrinthos.shapes[tileMap.algo];
-      transformType = 'shape';
-    }
-
-    /*
-    let try3D = tileMap.algo + '3D';
-    if (typeof labyrinthos.mazes[try3D] !== 'undefined') {
-      transformFn = labyrinthos.mazes[try3D];
-      transformType = 'maze';
-      is3D = true;
-    }
-    */
-
-    if (typeof transformFn === 'undefined') {
-      console.log('no transformFn found for', tileMap.algo);
-      throw new Error('no transformFn found for ' + tileMap.algo);
-    }
-
-    transformFn(map, tileMap.options || {});
-
-    if (transformType === 'terrain') {
-      map.scaleToTileRange(6);
-    }
-
-    // default `extrude` mode
-    if (incomingDepth > 1 && typeof map.data[0] !== 'object') { // if not already 3d array
-      // simply clone each layer to fill the depth dimension
-      // this is used to fill algos which can't yet generate 3d maps
-      let layer = map.data;
-
-      map.data = [];
-      for (let i = 0; i < incomingDepth; i++) {
-        map.data[i] = [];
-        for (let j = 0; j < layer.length; j++) {
-          map.data[i][j] = layer[j];
-        }
-        //map.data.push(JSON.parse(JSON.stringify(layer)));
-      }
-    }
-
-    this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
-
-    this.game.emit('tilemap::created', tileMap);
 
   }
 
@@ -287,115 +219,11 @@ class Tile {
     return `img/game/tiles/${tileId}.png`;
   }
 
-  handleLoadFailure(chunkPath, chunkKey) {
-    // console.log("Fallback for failed load:", chunkPath, chunkKey);
-    // Call the procedural generation function
-    if (this.proceduralGenerateMissingChunks) {
-      // console.log('Generating random chunk', chunkKey)
-
-      let randomChunk;
-      let chunkCoordinates = this.extractChunkCoordinates(chunkKey);
-
-      //console.log('chunkCoordinates', chunkCoordinates)
-      //console.log('current map data', this.tiledMap)
-
-      let x = chunkCoordinates.x;
-      let y = chunkCoordinates.y;
-
-      // TODO: subsection query, continious map
-      //let subsection = this.tiledMap.query({ x: x, y: y, width: this.chunkUnitSize, height: this.chunkUnitSize });
-      let map = new labyrinthos.TileMap({
-        x: x,
-        y: y,
-        width: 8,
-        height: 8,
-        tileWidth: 16,
-        tileHeight: 16
-      });
-      map.fill(1);
-
-      // map.seed(this.labySeed);
-      map.seed(chunkKey);
-
-      // labyrinthos.mazes.RecursiveBacktrack(map, {});
-      // labyrinthos.mazes.SpiralBacktrack(map, {});
-      // labyrinthos .mazes.RecursiveDivision(map, {});
-      // labyrinthos.terrains.DiamondSquare(map, {});
-      // map.seed(4121);
-      console.log('using fallback generator', this.labyrinthosAlgoName)
-
-      this.labyrinthosAlgo(map, {});
-
-      if (this.labyType === 'terrain') {
-        // TODO: remove this
-        map.scaleToTileRange(6);
-      }
-      // console.log('map', map)
-
-      randomChunk = map;
-
-      // console.log('randomChunk', chunkKey, randomChunk.data.length)
-      this.game.data.chunks[chunkKey] = randomChunk;
-      this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
-    }
-  }
-
   extractChunkCoordinates(chunkKey) {
     // Extracts x and y coordinates from the chunk key
     let match = chunkKey.match(/chunk_x(-?\d+)_y(-?\d+)/);
     return match ? { x: parseInt(match[1]), y: parseInt(match[2]) } : { x: 0, y: 0 };
   }
-
-  loadTilesForArea(position) {
-    // Calculate the actual half-width and half-height by scaling the tileMap dimensions
-    /*
-    let halfWidth = (this.tileMap.width * 16) / 2;
-    let halfHeight = (this.tileMap.height * 16) / 2;
-
-    // Define a loading buffer distance
-    let loadingBuffer = 0; // This can be adjusted based on how much buffer you want
-
-    // Adjust halfWidth and halfHeight to include the loading buffer
-    let bufferedHalfWidth = halfWidth - loadingBuffer;
-    let bufferedHalfHeight = halfHeight - loadingBuffer;
-
-    // Check if the position's absolute values are within the buffered tileMap dimensions
-    if (Math.abs(position.x) <= bufferedHalfWidth && Math.abs(position.y) <= bufferedHalfHeight) {
-      // Position is within the buffered area of the tileMap, so we don't need to do anything yet
-      // Remark: We can continue to generate if seeds are aligned it, it may try to double place entities
-      // at the 0,0 chunk tiles
-      // console.log('Position is within the tileMap area with a buffer');
-      // return;
-    } else {
-      // Position is within the loading buffer or outside the tileMapArea, time to load or generate new tiles
-      // console.log('Position is approaching the tileMap boundary or is outside, loading or generating new tiles');
-    }
-    */
-
-    let outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
-    const result = getChunkFiles(position, this.chunkUnitSize, outputDir, 2);
-    // console.log("getChunkFiles result", position, result);
-
-    // TODO: place check to see if we allow remote chunk loading
-    result.forEach(chunkName => {
-      // Extract the chunk key from the chunk file name
-      let chunkKey = chunkName.replace('.js', '').replace(outputDir, '');
-      // Load the chunk if it's not already loaded
-      if (typeof this.game.data.chunks[chunkKey] === 'undefined') {
-        // console.log("loadTilesForArea", position, this.chunkUnitSize);
-        if (this.tiledServer) {
-          let chunkPath = chunkName;
-          this.loadChunk(chunkPath, chunkKey);
-        } else if (this.proceduralGenerateMissingChunks) {
-          this.handleLoadFailure(null, chunkKey); // Changed to handle procedural generation
-        }
-      }
-    });
-
-
-  }
-
-
 
   update() { }
 
