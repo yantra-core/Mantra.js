@@ -114,10 +114,11 @@ export default function topdownMovement(game) {
   // Normalization factor for diagonal movement (1 / sqrt(2))
   // chebyshev movement
   const normalizationFactor = 0.7071; // Approximately 1/√2
+  const moveSpeed = 2;
 
   rules.on('MOVE_UP', function (entity) {
     playerState.MOVE_UP = true;
-    let force = { x: 0, y: -1, z: 0 };
+    let force = { x: 0, y: -moveSpeed, z: 0 };
     if (isDiagonalMovement(playerState)) {
       force.y *= normalizationFactor;
     }
@@ -128,7 +129,7 @@ export default function topdownMovement(game) {
 
   rules.on('MOVE_DOWN', function (entity) {
     playerState.MOVE_DOWN = true;
-    let force = { x: 0, y: 1, z: 0 };
+    let force = { x: 0, y: moveSpeed, z: 0 };
     if (isDiagonalMovement(playerState)) {
       force.y *= normalizationFactor;
     }
@@ -138,7 +139,7 @@ export default function topdownMovement(game) {
 
   rules.on('MOVE_LEFT', function (entity) {
     playerState.MOVE_LEFT = true;
-    let force = { x: -1, y: 0, z: 0 };
+    let force = { x: -moveSpeed, y: 0, z: 0 };
     if (isDiagonalMovement(playerState)) {
       force.x *= normalizationFactor;
     }
@@ -148,7 +149,7 @@ export default function topdownMovement(game) {
 
   rules.on('MOVE_RIGHT', function (entity) {
     playerState.MOVE_RIGHT = true;
-    let force = { x: 1, y: 0, z: 0 };
+    let force = { x: moveSpeed, y: 0, z: 0 };
     if (isDiagonalMovement(playerState)) {
       force.x *= normalizationFactor;
     }

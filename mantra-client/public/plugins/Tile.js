@@ -280,6 +280,9 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "seed",
     value: function seed(value) {
+      if (typeof value === 'undefined') {
+        value = this.random();
+      }
       this.mersenneTwister.seed(value);
       this.seedNoise(value);
       // this.mersenneTwister.seed_array([value]); // also can seed from arrays
@@ -4262,6 +4265,10 @@ var tileKinds = [{
   weight: 10
 }, {
   id: 5,
+  kind: 'path-brown',
+  weight: 10
+}, {
+  id: 6,
   kind: 'path-brown',
   weight: 10
 }];
