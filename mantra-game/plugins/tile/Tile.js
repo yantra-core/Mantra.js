@@ -1,5 +1,5 @@
 import labyrinthos from 'labyrinthos';
-// import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
+//import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 
 import defaultOrthogonalMap from './maps/defaultOrthogonalMap.js';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
@@ -374,6 +374,7 @@ class Tile {
 
   loadTilesForArea(position) {
     // Calculate the actual half-width and half-height by scaling the tileMap dimensions
+    /*
     let halfWidth = (this.tileMap.width * 16) / 2;
     let halfHeight = (this.tileMap.height * 16) / 2;
 
@@ -395,6 +396,7 @@ class Tile {
       // Position is within the loading buffer or outside the tileMapArea, time to load or generate new tiles
       // console.log('Position is approaching the tileMap boundary or is outside, loading or generating new tiles');
     }
+    */
 
     let outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
     const result = getChunkFiles(position, this.chunkUnitSize, outputDir, 2);
