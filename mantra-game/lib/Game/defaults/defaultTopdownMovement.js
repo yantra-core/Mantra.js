@@ -2,6 +2,8 @@ export default function topdownMovement(game) {
 
   let rules = game.createSutra();
 
+  rules.addCondition('alwaysTrue', () => true);
+
   rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
   rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
   rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
@@ -11,7 +13,8 @@ export default function topdownMovement(game) {
   rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['K', 'BUTTON_A'] });
   rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['L', 'BUTTON_Y'] });
 
-  // see: ../mantra-sutras/movement/top-down.js events MOVE_UP, MOVE_DOWN, etc.
+  rules.if('alwaysTrue').then('resetPlayerState');
+
   rules
     .if('PLAYER_UP')
     .then('MOVE_UP')
@@ -74,23 +77,70 @@ export default function topdownMovement(game) {
     })
   });
 
+  // TODO:   this playerState should be localized onto the Sutra tree
+  // Remark: this can be achieved by adding hooks into Sutra core .emit() and reset state on tick()
+  //         this way, we always have a reference to all active actions during any tick via `node`
+  let playerState = {
+    MOVE_UP: false,
+    MOVE_DOWN: false,
+    MOVE_LEFT: false,
+    MOVE_RIGHT: false
+  };
+
+  rules.on('resetPlayerState', function () {
+    playerState.MOVE_UP = false;
+    playerState.MOVE_DOWN = false;
+    playerState.MOVE_LEFT = false;
+    playerState.MOVE_RIGHT = false;
+  });
+
+  function isDiagonalMovement(state) {
+    let isDiagonal = (state.MOVE_UP || state.MOVE_DOWN) && (state.MOVE_LEFT || state.MOVE_RIGHT);
+    return isDiagonal;
+  }
+
+  // Normalization factor for diagonal movement (1 / sqrt(2))
+  // chebyshev movement
+  const normalizationFactor = 0.7071; // Approximately 1/√2
+
   rules.on('MOVE_UP', function (entity) {
-    game.applyForce(entity.id, { x: 0, y: -1, z: 0 });
+    playerState.MOVE_UP = true;
+    let force = { x: 0, y: -1, z: 0 };
+    if (isDiagonalMovement(playerState)) {
+      force.y *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({ id: entity.id, rotation: 0 });
+    // console.log('MOVE_UP', playerState);
   });
 
   rules.on('MOVE_DOWN', function (entity) {
-    game.applyForce(entity.id, { x: 0, y: 1, z: 0 });
+    playerState.MOVE_DOWN = true;
+    let force = { x: 0, y: 1, z: 0 };
+    if (isDiagonalMovement(playerState)) {
+      force.y *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({ id: entity.id, rotation: Math.PI });
   });
 
   rules.on('MOVE_LEFT', function (entity) {
-    game.applyForce(entity.id, { x: -1, y: 0, z: 0 });
+    playerState.MOVE_LEFT = true;
+    let force = { x: -1, y: 0, z: 0 };
+    if (isDiagonalMovement(playerState)) {
+      force.x *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({ id: entity.id, rotation: -Math.PI / 2 });
   });
 
   rules.on('MOVE_RIGHT', function (entity) {
-    game.applyForce(entity.id, { x: 1, y: 0, z: 0 });
+    playerState.MOVE_RIGHT = true;
+    let force = { x: 1, y: 0, z: 0 };
+    if (isDiagonalMovement(playerState)) {
+      force.x *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({ id: entity.id, rotation: Math.PI / 2 });
   });
 
