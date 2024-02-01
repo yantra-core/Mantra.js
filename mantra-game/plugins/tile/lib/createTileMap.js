@@ -1,20 +1,28 @@
 export default function createTileMap(tileMap) {
   let labyrinthos = this.labyrinthos;
-  console.log('createTileMap', tileMap);
+  // console.log('createTileMap', tileMap);
 
+  if (typeof tileMap.x !== 'number') {
+    tileMap.x = 0;
+  }
+  if (typeof tileMap.y !== 'number') {
+    tileMap.y = 0;
+  }
+  
   let incomingDepth = parseInt(tileMap.depth);
+
   let map = new labyrinthos.TileMap({
-    x: 0,
-    y: 0,
+    x: tileMap.x,
+    y: tileMap.y,
     width: parseInt(tileMap.width),
     height: parseInt(tileMap.height),
     //depth: parseInt(tileMap.depth),
     tileWidth: 16, // TODO: tileSet.tilewidth
     tileHeight: 16 // TODO: tileSet.tileheight
   });
+
   map.fill(1);
 
-  // console.log('confirm', map.data)
   map.seed(tileMap.seed);
   this.labySeed = tileMap.seed;
 
@@ -70,5 +78,6 @@ export default function createTileMap(tileMap) {
   this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
 
   this.game.emit('tilemap::created', tileMap);
+  return map;
 
 }
