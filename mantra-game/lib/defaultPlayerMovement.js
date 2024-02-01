@@ -44,11 +44,6 @@ export default function topdownMovement(game) {
     .if('USE_ITEM_2')
     .then("DROP_BOMB")
 
-  //rules.if('K').then('SWING_SWORD');
-  //rules.if('L').then('SWING_SWORD');
-  // rules.if('L').then('DROP_BOMB');
-  // rules.if('K').if('canDropBomb').then('DROP_BOMB');
-
   // replace with rules.do('ZOOM_IN'), etc
   rules.if('ZOOM_IN').then('ZOOM_IN');
   rules.if('ZOOM_OUT').then('ZOOM_OUT');
@@ -107,7 +102,12 @@ export default function topdownMovement(game) {
 
   rules.on('SWING_SWORD', function (entity) {
     game.systems.sword.swingSword(entity.id);
-  })
+  });
+
+  rules.on('DROP_BOMB', function (player) {
+    // with no rate-limit, will drop 60 per second with default settings
+    rules.emit('dropBomb', player)
+  });
 
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);
@@ -120,30 +120,6 @@ export default function topdownMovement(game) {
     let currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });
-
-  /*
-  
-    rules.on('FIRE_BULLET', function (player) {
-      game.systems.bullet.fireBullet(player.id);
-    });
-  
-    rules.on('DROP_BOMB', function (player) {
-      // with no rate-limit, will drop 60 per second with default settings
-      rules.emit('dropBomb', player)
-    });
-  
-  
-    rules.on('ZOOM_IN', function () {
-      let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom + 0.05);
-    });
-    rules.on('ZOOM_OUT', function () {
-      let currentZoom = game.data.camera.currentZoom || 1;
-      game.setZoom(currentZoom - 0.05);
-    });
-  
-    */
-  // game.useSutra(sutras(game), 'HOME');
 
   return rules;
 }
