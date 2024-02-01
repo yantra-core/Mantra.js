@@ -24,7 +24,12 @@ class DragAndDropFileUpload {
     game.on('tilemap::created', () => {
       // hide overlay ( for now )
       this.overlay.style.visibility = 'hidden';
-    })
+    });
+
+    // check to see if tileMap is already loaded, if so, hide overlay
+    if (game.systems.tile && game.systems.tile.tileMap) {
+      this.overlay.style.visibility = 'hidden';
+    }
 
   }
 
