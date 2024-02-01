@@ -12,6 +12,9 @@ import handleChunkLoadFailure from './lib/handleChunkLoadFailure.js';
 import calculateTilePosition from './lib/calculateTilePosition.js';
 import createTile from './lib/createTile.js';
 import createTileMap from './lib/createTileMap.js';
+import createTileMapFromTiledJSON from './lib/createTileMapFromTiledJSON.js';
+import createLayer from './lib/createLayer.js';
+import processTile from './lib/processTile.js';
 
 const tileKinds = [
   { id: 0, kind: 'empty', weight: 10 },
@@ -95,11 +98,14 @@ class Tile {
 
     this.createTile = createTile.bind(this);
     this.createTileMap = createTileMap.bind(this);
+    this.createTileMapFromTiledJSON = createTileMapFromTiledJSON.bind(this);
     this.loadChunk = loadChunk.bind(this);
     this.getChunkFiles = getChunkFiles.bind(this);
     this.handleChunkLoadFailure = handleChunkLoadFailure.bind(this);
     this.calculateTilePosition = calculateTilePosition.bind(this);
     this.loadTilesForArea = loadTilesForArea.bind(this);
+    this.createLayer = createLayer.bind(this);
+    this.processTile = processTile.bind(this);
 
   }
 
@@ -145,73 +151,6 @@ class Tile {
       this.tiledServer = false;
       this.createTileMapFromTiledJSON(data);
     });
-
-  }
-
-  createTileMapFromTiledJSON(tiledJSON) {
-    // TODO: remove this line
-    if (typeof window !== 'undefined') {
-      let overlay = document.getElementById('drag-and-drop-file-upload-overlay');
-      // set hidden
-      overlay.style.display = 'none';
-    }
-    tiledJSON.layers.forEach(layer => {
-      if (layer.type === 'tilelayer') {
-
-        if (layer.chunks) {
-          layer.chunks.forEach(chunk => {
-            this.createLayer(chunk, tiledJSON.tilewidth, tiledJSON.tileheight);
-          });
-        } else {
-          this.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
-        }
-
-      }
-    });
-  }
-
-  createLayer(layer, tileWidth, tileHeight) {
-
-    // Check if the layer.data is a 3D array
-    if (typeof layer.data[0] === 'object') {
-      // 3D data handling
-      layer.data.forEach((layer2D, z) => {
-        layer2D.forEach((tile, index) => {
-          this.processTile(tile, index, layer, tileWidth, tileHeight, z);
-        });
-      });
-    } else {
-      // 2D data handling
-      layer.data.forEach((tile, index) => {
-        this.processTile(tile, index, layer, tileWidth, tileHeight, 0); // Assume z=0 for 2D data
-      });
-    }
-  }
-
-  processTile(tile, index, layer, tileWidth, tileHeight, depth) {
-    if (typeof tile === 'number') {
-      // Find id = tile in tileKinds
-      let tileId = tile;
-      let tileKind = this.tileKinds.find(tileKind => tileKind.id === tileId);
-      if (tileKind) {
-        tile = tileKind;
-      } else {
-        tile = this.tileKinds[3]; // Default tile kind if not found
-      }
-    }
-
-    let { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth);
-    if (tile === null) {
-      //return;
-    }
-    // allow tile.z to override z ( useful for blocks / layers / etc )
-    if (typeof tile.z !== 'number') {
-      tile.z = z;
-    }
-    tile.z = z;
-
-    // TODO: check to see if existing tile exsting at this slot?
-    this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
 
   }
 
