@@ -337,7 +337,7 @@ class Game {
     }
   }
 
-  reset() {
+  reset(mode) {
     // reset all Sutra rules
     this.rules = this.createSutra();
     // remap the keyboard mappings to Sutra by default
@@ -350,6 +350,11 @@ class Game {
 
     // reset the default player controls
     this.setControls({});
+
+    // set the default movement sutra
+    if (this.systems.sutra) {
+      this.systems.sutra.bindDefaultMovementSutra(mode);
+    }
 
     // reset any deffered entities
     this.deferredEntities = {};

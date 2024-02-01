@@ -34,8 +34,8 @@ export default function update() {
 
     let newY = currentPlayer.position.y + game.viewportCenterYOffset;
     //newY = newY / zoomFactor;
-    if (game.data.camera.mode === 'platformer') {
-      // locks camera to not exceed bottom of screen for platformer mode
+    if (game.data.camera.mode === 'platform') {
+      // locks camera to not exceed bottom of screen for platform mode
       if (newY < windowHeight * 0.35) {
         this.scene.cameraPosition.y = newY;
       } else {

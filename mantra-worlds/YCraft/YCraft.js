@@ -66,64 +66,7 @@ class YCraft {
       }
     });
 
-
     let rules = game.rules;
-
-
-    rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
-    rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
-    rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
-    rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
-    rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_X'] });
-
-    rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['O', 'BUTTON_L1'] });
-    rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['P', 'BUTTON_R1'] });
-
-    rules.use(movement(game), 'movement');
-
-    rules
-      .if('PLAYER_UP')
-      .then('MOVE_UP')
-      .then('updateSprite', { sprite: 'playerUp' });
-
-    rules
-      .if('PLAYER_LEFT')
-      .then('MOVE_LEFT')
-      .then('updateSprite', { sprite: 'playerLeft' });
-
-    rules
-      .if('PLAYER_DOWN')
-      .then('MOVE_DOWN')
-      .then('updateSprite', { sprite: 'playerDown' });
-
-    rules
-      .if('PLAYER_RIGHT')
-      .then('MOVE_RIGHT')
-      .then('updateSprite', { sprite: 'playerRight' })
-
-
-    rules.if('USE_ITEM_1').then('FIRE_BULLET');
-
-    // Remark: We could introduce a sutra.do('ZOOM_IN') directive
-    rules.if('ZOOM_IN').then('ZOOM_IN');
-    rules.if('ZOOM_OUT').then('ZOOM_OUT');
-
-    rules.on('updateSprite', function (player, node) {
-      game.updateEntity({
-        id: player.id,
-        texture: {
-          frameIndex: 0,
-          sheet: player.texture.sheet,
-          sprite: node.data.sprite,
-          animationPlaying: true
-        }
-      })
-    });
-
-
-    rules.on('FIRE_BULLET', function (player) {
-      game.systems.bullet.fireBullet(player.id);
-    });
 
     function yCraftRules() {
       let rules = game.createSutra();

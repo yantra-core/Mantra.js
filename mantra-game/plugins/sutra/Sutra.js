@@ -1,8 +1,8 @@
-//import { createSutra } from '../../../../sutra/index.js';
+// import { createSutra } from '../../../../sutra/index.js';
 import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 import topdown from '../../lib/Game/defaults/defaultTopdownMovement.js';
-import platformer from '../../lib/Game/defaults/defaultPlatformMovement.js';
+import platform from '../../lib/Game/defaults/defaultPlatformMovement.js';
 
 class Sutra {
   static id = 'sutra';
@@ -27,7 +27,6 @@ class Sutra {
       self.inputCache = input;
     });
 
-
     if (typeof game.rules === 'object') { // an instance of Sutra
       // do nothing, rules are already set, we will extend them
     } else {
@@ -46,9 +45,9 @@ class Sutra {
         if (self.game.config.mode === 'topdown') {
           self.game.useSutra(topdown(self.game), 'mode-topdown');
         }
-        if (self.game.config.mode === 'platformer') {
+        if (self.game.config.mode === 'platform') {
           // TODO: better platform control
-          self.game.useSutra(platformer(self.game), 'mode-platformer');
+          self.game.useSutra(platform(self.game), 'mode-platform');
           // self.game.useSutra(topdown(self.game), 'mode-topdown');
         }
       }
@@ -57,6 +56,14 @@ class Sutra {
 
   }
 
+  bindDefaultMovementSutra(mode = 'topdown') {
+    if (mode === 'topdown') {
+      this.game.useSutra(topdown(this.game), 'mode-topdown');
+    }
+    if (mode=== 'platform') {
+      this.game.useSutra(platform(this.game), 'mode-platform');
+    }
+  }
   bindInputsToSutraConditions() {
     this.bindKeyCodesToSutraConditions();
     this.bindGamepadToSutraConditions();

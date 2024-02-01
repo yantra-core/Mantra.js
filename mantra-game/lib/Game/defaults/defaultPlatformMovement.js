@@ -1,4 +1,4 @@
-export default function platformerMovement(game) {
+export default function platformMovement(game) {
 
   let rules = game.createSutra();
 
@@ -95,7 +95,7 @@ export default function platformerMovement(game) {
     if (gameState.inputTicks.SPACE >= maxJumpTicks) {
       return;
     }
-    game.applyForce(player.id, { x: 0, y: -3.2, z: 0 });
+    game.applyForce(player.id, { x: 0, y: -3.3, z: 0 });
     game.updateEntity({ id: player.id, rotation: 0, sprite: 'playerRightJump' });
   });
 
