@@ -5,7 +5,7 @@ import movement from '../../lib/defaultPlayerMovement.js';
 
 class Sutra {
   static id = 'sutra';
-  constructor({ defaultMovement = false }) {
+  constructor({ defaultMovement = true }) {
     this.id = Sutra.id;
     this.inputCache = {};
     this.inputTickCount = {};

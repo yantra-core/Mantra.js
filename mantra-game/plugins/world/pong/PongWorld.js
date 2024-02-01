@@ -12,8 +12,8 @@ class PongWorld extends Plugin {
   init(game) {
 
     game.systems['entity-input'].controlMappings = {
-      W: 'MOVE_FORWARD',
-      S: 'MOVE_BACKWARD'
+      W: 'PLAYER_UP',
+      S: 'PLAYER_DOWN'
     };
 
     let leftSide = game.width / 3 * -1;

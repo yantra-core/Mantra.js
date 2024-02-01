@@ -172,12 +172,12 @@ class Music {
       game.systems.tone.playDrum(node.data.drum || 'kick');
     });
 
-    rules.on('MOVE_FORWARD', function (player) {
+    rules.on('PLAYER_UP', function (player) {
       game.applyForce(player.id, { x: 0, y: -1, z: 0 });
       game.updateEntity({ id: player.id });
     });
 
-    rules.on('MOVE_BACKWARD', function (player) {
+    rules.on('PLAYER_DOWN', function (player) {
       game.applyForce(player.id, { x: 0, y: 1, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI });
     });

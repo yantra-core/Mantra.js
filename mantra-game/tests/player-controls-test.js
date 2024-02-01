@@ -42,7 +42,7 @@ tap.test('player movement and controls', (t) => {
     t.end();
   });
 
-  t.test('Presses MOVE_FORWARD to move player', (t) => {
+  t.test('Presses PLAYER_UP to move player', (t) => {
     let player = game.getEntity(bobby.id);
     let entityInputSystem = game.systemsManager.getSystem('entity-input');
     entityInputSystem.update(player.id, { W: true });

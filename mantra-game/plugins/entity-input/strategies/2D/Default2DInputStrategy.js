@@ -13,8 +13,8 @@ class DefaultTwoDimensionalInputStrategy {
     this.game = game;
     this.defaultControlsMapping = {
       // Default 2D Keyboard Controls
-      W: 'MOVE_FORWARD',
-      S: 'MOVE_BACKWARD',
+      W: 'PLAYER_UP',
+      S: 'PLAYER_DOWN',
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
@@ -25,8 +25,8 @@ class DefaultTwoDimensionalInputStrategy {
       U: 'SELECT_MENU',
 
       // Default 2D Gamepad Controls
-      DPAD_UP: 'MOVE_FORWARD',
-      DPAD_DOWN: 'MOVE_BACKWARD',
+      DPAD_UP: 'PLAYER_UP',
+      DPAD_DOWN: 'PLAYER_DOWN',
       DPAD_LEFT: 'MOVE_LEFT',
       DPAD_RIGHT: 'MOVE_RIGHT',
       BUTTON_A: 'FIRE_BULLET',
@@ -96,19 +96,19 @@ class DefaultTwoDimensionalInputStrategy {
       if (angle >= -22.5 && angle < 22.5) {
         actions.push('MOVE_RIGHT');
       } else if (angle >= 22.5 && angle < 67.5) {
-        actions.push('MOVE_RIGHT', 'MOVE_BACKWARD');
+        actions.push('MOVE_RIGHT', 'PLAYER_DOWN');
       } else if (angle >= 67.5 && angle < 112.5) {
-        actions.push('MOVE_BACKWARD');
+        actions.push('PLAYER_DOWN');
       } else if (angle >= 112.5 && angle < 157.5) {
-        actions.push('MOVE_LEFT', 'MOVE_BACKWARD');
+        actions.push('MOVE_LEFT', 'PLAYER_DOWN');
       } else if (angle >= 157.5 || angle < -157.5) {
         actions.push('MOVE_LEFT');
       } else if (angle >= -157.5 && angle < -112.5) {
-        actions.push('MOVE_LEFT', 'MOVE_FORWARD');
+        actions.push('MOVE_LEFT', 'PLAYER_UP');
       } else if (angle >= -112.5 && angle < -67.5) {
-        actions.push('MOVE_FORWARD');
+        actions.push('PLAYER_UP');
       } else if (angle >= -67.5 && angle < -22.5) {
-        actions.push('MOVE_RIGHT', 'MOVE_FORWARD');
+        actions.push('MOVE_RIGHT', 'PLAYER_UP');
       }
 
       this.continuousActions = actions;
@@ -164,8 +164,8 @@ class DefaultTwoDimensionalInputStrategy {
       // actions is already populated, use those actions as continuous action controls
     }
 
-    if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, moveSpeed);
-    if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, -moveSpeed);
+    if (actions.includes('PLAYER_UP')) entityMovementSystem.update(entityId, 0, moveSpeed);
+    if (actions.includes('PLAYER_DOWN')) entityMovementSystem.update(entityId, 0, -moveSpeed);
     if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, -1);
     if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 1);
 

@@ -1,4 +1,5 @@
 export default function createDefaultPlayer(playerConfig = {}) {
+  let game = this;
   console.log('creating default player', playerConfig, this.currentPlayerId)
 
   if (typeof playerConfig.position === 'undefined') {
@@ -60,7 +61,9 @@ export default function createDefaultPlayer(playerConfig = {}) {
   rules.if('ZOOM_OUT').then('ZOOM_OUT');
 
   rules.on('FIRE_BULLET', function (player) {
-    game.systems.bullet.fireBullet(player.id);
+    if (game.systems.bullet) {
+      game.systems.bullet.fireBullet(player.id);
+    }
   });
 
   rules.on('DROP_BOMB', function (player) {

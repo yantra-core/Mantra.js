@@ -48,6 +48,13 @@ class CSSCamera {
 
     game.setZoom = this.zoom.bind(this);
 
+    game.data.camera = {
+      position: {
+        x: 0,
+        y: 0
+      }
+    }
+
     this.updateCameraPosition = updateCameraPosition.bind(this);
     this.applyThrow = applyThrow.bind(this);
     this.update = update.bind(this);
@@ -89,7 +96,6 @@ class CSSCamera {
         let adjustedDx = data.mouse.dx * zoomFactor;
         let adjustedDy = data.mouse.dy * zoomFactor;
         //console.log('Adjusted Dx', adjustedDx, 'og', data.mouse.dx);
-        console.log(data.mouse.isDragging);
         this.updateCameraPosition(-adjustedDx, -adjustedDy, data.mouse.isDragging);
       }
 

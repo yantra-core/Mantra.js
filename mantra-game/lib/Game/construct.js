@@ -216,7 +216,6 @@ export default function construct(game, plugins = []) {
   game.loadedPlugins = [];
   // load default plugins
   if (game.config.loadDefaultPlugins) {
-    console.log('CCCC', game.config)
     game.loadPluginsFromConfig({
       physics: game.config.physics,
       graphics: game.config.graphics,

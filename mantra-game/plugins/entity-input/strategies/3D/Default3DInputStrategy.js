@@ -16,8 +16,8 @@ class ThreeDimensionalInputStrategy {
     }
 
     this.defaultControlsMapping = {
-      W: 'MOVE_FORWARD',
-      S: 'MOVE_BACKWARD',
+      W: 'PLAYER_UP',
+      S: 'PLAYER_DOWN',
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
       SPACE: 'FIRE_BULLET',
@@ -79,16 +79,16 @@ class ThreeDimensionalInputStrategy {
     // "forward facing" movements, forwardDirection needed
     // these movements are relative to the forward facing direction of the entity
     /*
-    if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, -forwardDirection.y * moveSpeed, forwardDirection.z * moveSpeed);
-    if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, forwardDirection.y * moveSpeed, -forwardDirection.z * moveSpeed);
+    if (actions.includes('PLAYER_UP')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, -forwardDirection.y * moveSpeed, forwardDirection.z * moveSpeed);
+    if (actions.includes('PLAYER_DOWN')) entityMovementSystem.update(entityId, forwardDirection.x * moveSpeed, forwardDirection.y * moveSpeed, -forwardDirection.z * moveSpeed);
     if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -moveSpeed, 0, 0);  // Assuming left/right movement is still along the global X axis
     if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, moveSpeed, 0, 0);  // Assuming left/right movement is still along the global X axis
     if (actions.includes('MOVE_UP')) entityMovementSystem.update(entityId, 0, 0, moveSpeed);  // Assuming up/down movement is still along the global Z axis
     if (actions.includes('MOVE_DOWN')) entityMovementSystem.update(entityId, 0, 0, -moveSpeed);  // Assuming up/down movement is still along the global Z axis
     */
     // absolute movements, forwardDirection not needed
-    if (actions.includes('MOVE_FORWARD')) entityMovementSystem.update(entityId, 0, -1, 0);
-    if (actions.includes('MOVE_BACKWARD')) entityMovementSystem.update(entityId, 0, 1, 0);
+    if (actions.includes('PLAYER_UP')) entityMovementSystem.update(entityId, 0, -1, 0);
+    if (actions.includes('PLAYER_DOWN')) entityMovementSystem.update(entityId, 0, 1, 0);
     if (actions.includes('MOVE_LEFT')) entityMovementSystem.update(entityId, -1, 0, 0);  // Assuming left/right movement is still along the global X axis
     if (actions.includes('MOVE_RIGHT')) entityMovementSystem.update(entityId, 1, 0, 0);  // Assuming left/right movement is still along the global X axis
     if (actions.includes('MOVE_UP')) entityMovementSystem.update(entityId, 0, 0, 1);  // Assuming up/down movement is still along the global Z axis

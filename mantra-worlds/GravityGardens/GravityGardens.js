@@ -39,12 +39,12 @@ class GravityGardens {
 
     let rules = game.rules;
 
-    rules.on('MOVE_FORWARD', function (player) {
+    rules.on('PLAYER_UP', function (player) {
       game.applyForce(player.id, { x: 0, y: -1, z: 0 });
       game.updateEntity({ id: player.id, rotation: 0 });
     });
 
-    rules.on('MOVE_BACKWARD', function (player) {
+    rules.on('PLAYER_DOWN', function (player) {
       game.applyForce(player.id, { x: 0, y: 1, z: 0 });
       game.updateEntity({ id: player.id, rotation: Math.PI });
     });
@@ -75,8 +75,8 @@ class GravityGardens {
 
     // game.customMovement = false;
     game.setControls({
-      W: 'MOVE_FORWARD',
-      S: 'MOVE_BACKWARD',
+      W: 'PLAYER_UP',
+      S: 'PLAYER_DOWN',
       A: 'MOVE_LEFT',
       D: 'MOVE_RIGHT',
       // SPACE: 'FIRE_BULLET',

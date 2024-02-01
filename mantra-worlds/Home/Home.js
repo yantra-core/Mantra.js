@@ -39,6 +39,8 @@ class Home {
     game.setBackground('#007fff');
 
     game.use('Block');
+    game.use('Bomb');
+
     game.use('Border', { autoBorder: true })
     game.use('Bullet');
     // game.use('Sword')
