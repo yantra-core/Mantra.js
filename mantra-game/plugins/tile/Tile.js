@@ -33,6 +33,7 @@ class Tile {
     tiledServer = false,
     chunkUnitSize = 8,
     tileSize = 16,
+    labyrinthosAlgo = 'FaultLine',
     proceduralGenerateMissingChunks = false,
     loadInitialChunk = true,
     loadDefaultTileMap = true,
@@ -48,6 +49,22 @@ class Tile {
     this.tiledMap = tiledMap;
 
     this.tileMap = tileMap;
+
+    this.labyrinthosAlgoName = labyrinthosAlgo;
+    this.labyType = 'maze';
+    this.labyrinthosAlgo = labyrinthos.mazes[labyrinthosAlgo];
+    if (typeof this.labyrinthosAlgo === 'undefined') {
+      this.labyrinthosAlgo = labyrinthos.terrains[labyrinthosAlgo];
+      this.labyType = 'terrain';
+    }
+    if (typeof this.labyrinthosAlgo === 'undefined') {
+      this.labyrinthosAlgo = labyrinthos.shapes[labyrinthosAlgo];
+      this.labyType = 'shape';
+    }
+    if (typeof this.labyrinthosAlgo === 'undefined') {
+      console.log('Warning: no labyrinthos algo found for', labyrinthosAlgo);
+    }
+
 
     this.tileKinds = tileKinds; // rename
 
@@ -83,7 +100,6 @@ class Tile {
     this.generateChunkWithFractal = generateChunkWithFractal.bind(this);
     this.randomTileFromDistribution = randomTileFromDistribution.bind(this);
     this.createTile = createTile.bind(this);
-
 
   }
 
@@ -166,6 +182,7 @@ class Tile {
 
     // console.log('confirm', map.data)
     map.seed(tileMap.seed);
+    this.labySeed = tileMap.seed;
 
     let transformFn = labyrinthos.mazes[tileMap.algo];
     let transformType = 'maze';
@@ -261,19 +278,19 @@ class Tile {
       });
     }
   }
-  
+
   processTile(tile, index, layer, tileWidth, tileHeight, depth) {
     if (typeof tile === 'number') {
       // Find id = tile in tileKinds
       let tileId = tile;
-      let tileKind = tileKinds.find(tileKind => tileKind.id === tileId);
+      let tileKind = this.tileKinds.find(tileKind => tileKind.id === tileId);
       if (tileKind) {
         tile = tileKind;
       } else {
-        tile = tileKinds[3]; // Default tile kind if not found
+        tile = this.tileKinds[3]; // Default tile kind if not found
       }
     }
-  
+
     let { x, y, z } = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth);
     if (tile === null) {
       //return;
@@ -284,9 +301,11 @@ class Tile {
     }
     tile.z = z;
 
+    // TODO: check to see if existing tile exsting at this slot?
+
     this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
   }
-  
+
 
   getTileImageURL(tileId) {
     return `img/game/tiles/${tileId}.png`;
@@ -300,7 +319,6 @@ class Tile {
       // let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
       let randomChunk;
       let chunkCoordinates = this.extractChunkCoordinates(chunkKey);
-
 
       //console.log('chunkCoordinates', chunkCoordinates)
       //console.log('current map data', this.tiledMap)
@@ -319,15 +337,25 @@ class Tile {
         tileHeight: 16
       });
       map.fill(1);
+
+
+
+      // map.seed(this.labySeed);
+      map.seed(chunkKey);
+
       //labyrinthos.mazes.RecursiveBacktrack(map, {});
       // labyrinthos.mazes.SpiralBacktrack(map, {});
       // labyrinthos .mazes.RecursiveDivision(map, {});
       // labyrinthos.terrains.DiamondSquare(map, {});
       // map.seed(4121);
-      console.log('using fallback generator')
-      labyrinthos.terrains.FaultLine(map, {});
-      
-      map.scaleToTileRange(6);
+      console.log('using fallback generator', this.labyrinthosAlgoName)
+
+      this.labyrinthosAlgo(map, {});
+
+      if (this.labyType === 'terrain') {
+        // TODO: remove this
+        map.scaleToTileRange(6);
+      }
       // console.log('map', map)
 
       randomChunk = map;
@@ -345,11 +373,28 @@ class Tile {
   }
 
   loadTilesForArea(position) {
+    // Calculate the actual half-width and half-height by scaling the tileMap dimensions
+    let halfWidth = (this.tileMap.width * 16) / 2;
+    let halfHeight = (this.tileMap.height * 16) / 2;
 
-    //generateMap(map, {});
-    //console.log('map', map)
+    // Define a loading buffer distance
+    let loadingBuffer = 0; // This can be adjusted based on how much buffer you want
 
-    // if (!this.tiledServer) return;
+    // Adjust halfWidth and halfHeight to include the loading buffer
+    let bufferedHalfWidth = halfWidth - loadingBuffer;
+    let bufferedHalfHeight = halfHeight - loadingBuffer;
+
+    // Check if the position's absolute values are within the buffered tileMap dimensions
+    if (Math.abs(position.x) <= bufferedHalfWidth && Math.abs(position.y) <= bufferedHalfHeight) {
+      // Position is within the buffered area of the tileMap, so we don't need to do anything yet
+      // Remark: We can continue to generate if seeds are aligned it, it may try to double place entities
+      // at the 0,0 chunk tiles
+      // console.log('Position is within the tileMap area with a buffer');
+      // return;
+    } else {
+      // Position is within the loading buffer or outside the tileMapArea, time to load or generate new tiles
+      // console.log('Position is approaching the tileMap boundary or is outside, loading or generating new tiles');
+    }
 
     let outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
     const result = getChunkFiles(position, this.chunkUnitSize, outputDir, 2);
@@ -370,9 +415,11 @@ class Tile {
         }
       }
     });
+
+
   }
 
-  
+
 
   update() { }
 

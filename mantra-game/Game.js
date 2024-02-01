@@ -43,6 +43,7 @@ class Game {
       deltaEncoding: true,
       defaultPlayer: true,
       options: {},
+      mode: 'topdown', // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
     };
 

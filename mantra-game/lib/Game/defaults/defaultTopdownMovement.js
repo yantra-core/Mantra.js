@@ -1,5 +1,3 @@
-
-
 export default function topdownMovement(game) {
 
   let rules = game.createSutra();

@@ -178,6 +178,7 @@ class Bullet {
           return;
         }
         this.game.removeEntity(entityB.id);
+        this.game.removeEntity(entityA.id);
         return;
       }
       if (entityA.type === 'TILE' && entityB.type === 'BULLET') {
@@ -185,6 +186,7 @@ class Bullet {
           return;
         }
         this.game.removeEntity(entityA.id);
+        this.game.removeEntity(entityB.id);
         return;
       }
 

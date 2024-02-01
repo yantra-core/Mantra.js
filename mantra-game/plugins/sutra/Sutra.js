@@ -1,7 +1,8 @@
 //import { createSutra } from '../../../../sutra/index.js';
 import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
-import movement from '../../lib/defaultPlayerMovement.js';
+import topdown from '../../lib/Game/defaults/defaultTopdownMovement.js';
+import platformer from '../../lib/Game/defaults/defaultPlatformMovement.js';
 
 class Sutra {
   static id = 'sutra';
@@ -42,7 +43,14 @@ class Sutra {
       // these are currently explicitly bound to the player entity, we may want to make this more generic
       self.bindInputsToSutraConditions();
       if (self.defaultMovement) {
-        self.game.useSutra(movement(self.game), 'movement');
+        if (self.game.config.mode === 'topdown') {
+          self.game.useSutra(topdown(self.game), 'mode-topdown');
+        }
+        if (self.game.config.mode === 'platformer') {
+          // TODO: better platform control
+          self.game.useSutra(platformer(self.game), 'mode-platformer');
+          // self.game.useSutra(topdown(self.game), 'mode-topdown');
+        }
       }
       self.inputsBound = true;
     }
