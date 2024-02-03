@@ -23,7 +23,7 @@ game.use(new SnapshotManager());
 game.use(new Tile());
 
 tap.test('Tile plugin integration tests', (t) => {
-  t.test('create a new tile with properties', (t) => {
+  t.test('create a new tile with coordinates', (t) => {
 
     let tile1;
 
@@ -46,7 +46,7 @@ tap.test('Tile plugin integration tests', (t) => {
     t.end();
   });
 
-  t.test('create a new tile with properties and z position override', (t) => {
+  t.test('create a new tile with coordinates and z position override', (t) => {
 
     let tile1;
 
@@ -66,6 +66,38 @@ tap.test('Tile plugin integration tests', (t) => {
     t.equal(tile1.position.x, 10);
     t.equal(tile1.position.y, 20);
     t.equal(tile1.position.z, 16);
+
+    t.end();
+  });
+
+  t.test('create a new tile with custom size', (t) => {
+
+    let tile1;
+
+    let tileConfig = {
+      kind: 'bush',
+      isStatic: true,
+      size: {
+        width: 32,
+        height: 32,
+        depth: 32
+      }
+    };
+
+    let x = 10;
+    let y = 20;
+    let z = -16;
+
+    tile1 = game.systems.tile.createTile(tileConfig, x, y, z);
+
+    t.equal(tile1.kind, 'bush');
+    t.equal(tile1.position.x, 10);
+    t.equal(tile1.position.y, 20);
+    t.equal(tile1.position.z, -16);
+
+    t.equal(tile1.width, 32);
+    t.equal(tile1.height, 32);
+    t.equal(tile1.depth, 32);
 
     t.end();
   });

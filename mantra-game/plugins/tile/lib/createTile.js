@@ -6,11 +6,17 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, col
     return;
   }
 
-  // overrides for tile depth
+  // overrides for tile z position, used for 2.5D games
   if (typeof tile.z === 'number') {
     z = tile.z;
-  } else {
-    // default tile space is the floor, below player ( 0 )
+  }
+
+  // overrides for tile size
+  if (tile.size && typeof tile.size.width === 'number') {
+    tileWidth = tile.size.width;
+  }
+  if (tile.size && typeof tile.size.height === 'number') {
+    tileHeight = tile.size.height;
   }
 
   let isStatic;
