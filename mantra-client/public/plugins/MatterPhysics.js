@@ -336,7 +336,6 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
   }, {
     key: "init",
     value: function init(game) {
-      var _this2 = this;
       this.engine = _matterJs["default"].Engine.create();
       // game.systemsManager.addSystem('physics', this);
 
@@ -364,7 +363,8 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
 
       // should this be onAfterUpdate? since we are serializing the state of the world?
       // i would assume we want that data *after* the update?
-      this.onAfterUpdate(this.engine, function (event) {
+      var that = this;
+      this.onAfterUpdate(this.engine, function onAfterUpdate(event) {
         // show total number of bodies in the world
         // Remark: should this and bodyMap be replaced with a more generic mapping
         // in order to allow non-physics backed entities to exist in the game?
@@ -373,7 +373,8 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
         try {
           for (_iterator.s(); !(_step = _iterator.n()).done;) {
             var body = _step.value;
-            var entity = _this2.game.getEntity(body.myEntityId);
+            // let entity = that.game.getEntity(body.myEntityId);
+            var entity = that.game.data.ents._[body.myEntityId];
             if (entity && body.isSleeping !== true && body.myEntityId) {
               //
               // Clamp max speed
@@ -387,24 +388,26 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
               //
               // Apply locked properties  ( like entity cannot move x or y position, etc )
               //
-              _this2.lockedProperties(body);
+              if (entity.lockedProperties) {
+                that.lockedProperties(body);
+              }
 
               // If this is the client and we are in online mode,
               // do not update local physics for remote players, only update local physics for the local player
               // This may be changed in the future or through configuration
-              if (_this2.game.isClient && _this2.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
+              if (that.game.isClient && that.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
                 // In online mode, if the entity is a player and that player is not the current player, skip updating physics
                 // continue; // Skip updating physics for remote players
               }
-              if (_this2.game.isClient) {
+              if (that.game.isClient) {
                 // this is the logic for updating *all* entities positions
                 // this should probably be in entity-movement plugin
                 /*            */
                 // console.log(body.myEntityId, body.position)
-                var ent = _this2.game.entities.get(body.myEntityId);
+                var ent = that.game.entities.get(body.myEntityId);
                 // console.log('client ent', ent.id ,body.position)
                 // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
-                if (_this2.game.localGameLoopRunning) {
+                if (that.game.localGameLoopRunning) {
                   // check if body position has changed
 
                   var bodyPosition = {
@@ -419,7 +422,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                   // TODO: add this same kind of logic for server as well?
                   // delta encoding will filter this; however it would be better to do it here as well
                   if (bodyPosition.x !== entPosition.x || bodyPosition.y !== entPosition.y) {
-                    _this2.game.changedEntities.add(body.myEntityId);
+                    that.game.changedEntities.add(body.myEntityId);
                   }
                   // TODO: rotation / velocity as well, use flag isChanged
 
@@ -438,12 +441,12 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                       position.z = ent.position.z;
                     }
                   }
-                  _this2.game.components.velocity.set(body.myEntityId, {
+                  that.game.components.velocity.set(body.myEntityId, {
                     x: body.velocity.x,
                     y: body.velocity.y
                   });
-                  _this2.game.components.position.set(body.myEntityId, position);
-                  _this2.game.components.rotation.set(body.myEntityId, body.angle);
+                  that.game.components.position.set(body.myEntityId, position);
+                  that.game.components.rotation.set(body.myEntityId, body.angle);
 
                   // update size as well
                   //this.game.components.height.set(body.myEntityId, body.bounds.max.y);
@@ -452,13 +455,13 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                 }
 
                 if (body) {
-                  if (_this2.game.systems.rbush) {
-                    var _ent = _this2.game.entities.get(body.myEntityId);
+                  if (that.game.systems.rbush) {
+                    var _ent = that.game.entities.get(body.myEntityId);
                     var _position = {
                       x: body.position.x,
                       y: body.position.y
                     };
-                    _this2.game.systems.rbush.updateEntity({
+                    that.game.systems.rbush.updateEntity({
                       id: body.myEntityId,
                       position: _position,
                       width: _ent.width,
@@ -469,33 +472,33 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
                 }
 
                 if (ent.type === 'BULLET') {
-                  _this2.game.changedEntities.add(body.myEntityId);
-                  _this2.game.components.velocity.set(body.myEntityId, {
+                  that.game.changedEntities.add(body.myEntityId);
+                  that.game.components.velocity.set(body.myEntityId, {
                     x: body.velocity.x,
                     y: body.velocity.y
                   });
-                  _this2.game.components.position.set(body.myEntityId, {
+                  that.game.components.position.set(body.myEntityId, {
                     x: body.position.x,
                     y: body.position.y
                   });
-                  _this2.game.components.rotation.set(body.myEntityId, body.angle);
+                  that.game.components.rotation.set(body.myEntityId, body.angle);
                 }
               } else {
                 // this is the logic for updating *all* entities positions
                 // this should probably be in entity-movement plugin
 
-                var _ent2 = _this2.game.getEntity(body.myEntityId);
+                var _ent2 = that.game.getEntity(body.myEntityId);
                 //console.log('server ent', ent)
-                _this2.game.changedEntities.add(body.myEntityId);
-                _this2.game.components.velocity.set(body.myEntityId, {
+                that.game.changedEntities.add(body.myEntityId);
+                that.game.components.velocity.set(body.myEntityId, {
                   x: body.velocity.x,
                   y: body.velocity.y
                 });
-                _this2.game.components.position.set(body.myEntityId, {
+                that.game.components.position.set(body.myEntityId, {
                   x: body.position.x,
                   y: body.position.y
                 });
-                _this2.game.components.rotation.set(body.myEntityId, body.angle);
+                that.game.components.rotation.set(body.myEntityId, body.angle);
               }
             }
           }
@@ -649,7 +652,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
   }, {
     key: "collisionStart",
     value: function collisionStart(game, callback) {
-      var _this3 = this;
+      var _this2 = this;
       _matterJs["default"].Events.on(this.engine, 'collisionStart', function (event) {
         var _iterator2 = _createForOfIteratorHelper(event.pairs),
           _step2;
@@ -660,8 +663,8 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
             var bodyB = pair.bodyB;
             var entityIdA = bodyA.myEntityId;
             var entityIdB = bodyB.myEntityId;
-            var entityA = _this3.game.getEntity(entityIdA);
-            var entityB = _this3.game.getEntity(entityIdB);
+            var entityA = _this2.game.getEntity(entityIdA);
+            var entityB = _this2.game.getEntity(entityIdB);
             bodyA.entity = entityA;
             bodyB.entity = entityB;
             if (bodyA.entity.collisionStart === true || bodyB.entity.collisionStart === true) {
