@@ -4251,7 +4251,10 @@ var tileKinds = [{
   weight: 2,
   body: true,
   isStatic: true,
-  z: 16
+  z: 0,
+  size: {
+    depth: 32
+  }
 }, {
   id: 2,
   kind: 'grass',
@@ -4512,19 +4515,34 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
+function createTile(tile, x, y) {
   var _this$game$createEnti;
+  var z = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  var tileWidth = arguments.length > 4 ? arguments[4] : undefined;
+  var tileHeight = arguments.length > 5 ? arguments[5] : undefined;
+  var tileDepth = arguments.length > 6 ? arguments[6] : undefined;
+  var color = arguments.length > 7 ? arguments[7] : undefined;
   var tileId = tile.id;
   if (tile.kind === 'empty') {
     return;
   }
 
-  // overrides for tile depth
+  // overrides for tile z position, used for 2.5D games
   if (typeof tile.z === 'number') {
     z = tile.z;
+  }
+
+  // overrides for tile size
+  if (tile.size && typeof tile.size.width === 'number') {
+    tileWidth = tile.size.width;
+  }
+  if (tile.size && typeof tile.size.height === 'number') {
+    tileHeight = tile.size.height;
+  }
+  if (tile.size && typeof tile.size.depth === 'number') {
+    tileDepth = tile.size.depth;
   } else {
-    // default tile space is the floor, below player
-    z = 0;
+    tileDepth = tileHeight;
   }
   var isStatic;
   if (typeof tile.isStatic === 'boolean') {
@@ -4566,7 +4584,7 @@ function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
       y: y * scale,
       z: z * scale
     }
-  }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileWidth * scale), _this$game$createEnti));
+  }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileDepth * scale), _this$game$createEnti));
   return ent;
 }
 
@@ -4863,7 +4881,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = processTile;
 // processTile.js - This function will take a tileValue ( Tile.id ) with index / tileWidth / tileHeight / depth and create a tile
 //                  at the correct position in the game world 
-function processTile(tileValue, index, layer, tileWidth, tileHeight, depth) {
+function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) {
   var tile;
   // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
   // look up the tile kind and use that as the tile
@@ -4887,13 +4905,16 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, depth) {
   //
   // We need to take the relative tile coordinates and convert them world coordinates
   //
-  var _this$calculateTilePo = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth),
+  if (typeof tileDepth !== 'number') {
+    tileDepth = tileHeight;
+  }
+  var _this$calculateTilePo = this.calculateTilePosition(index, layer, tileWidth, tileHeight, tileDepth),
     x = _this$calculateTilePo.x,
     y = _this$calculateTilePo.y,
     z = _this$calculateTilePo.z;
 
   // TODO: check to see if existing tile exsting at this slot?
-  this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
+  this.createTile(tile, x, y, z, tileWidth, tileHeight, tileDepth, layer.color);
 }
 
 },{}],38:[function(require,module,exports){

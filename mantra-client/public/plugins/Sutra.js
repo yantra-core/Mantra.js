@@ -102,22 +102,18 @@ function platformMovement(game) {
       }
     });
   });
-  rules["if"]('PLAYER_RUN').then('RUN');
-  rules["if"]('PLAYER_JUMP').then('JUMP');
-
-  // rules.if('SPACE').then('JUMP');
   rules.addCondition('isPlayer', function (entity) {
     return entity.type === 'PLAYER';
   });
-  var maxJumpTicks = 50;
+  var maxJumpTicks = 40;
   // Remark: isPlayer is already implied for all Key inputs,
   //         however we add the additional check here for the negative case,
   //         in order to not let other ents reset player walk speed
   rules["if"]('isPlayer').then(function (rules) {
-    rules["if"]('isRunning').then('RUN')["else"]('WALK');
+    rules["if"]('PLAYER_RUN').then('RUN')["else"]('WALK');
   });
   rules["if"]('isPlayer').then(function (rules) {
-    rules["if"]('SPACE')
+    rules["if"]('PLAYER_JUMP')
     // .if('doesntExceedDuration')
     .then('JUMP').then('updateSprite', {
       sprite: 'playerRightJump'
@@ -147,11 +143,11 @@ function platformMovement(game) {
   var runningForce = 1;
   rules.on('RUN', function (player) {
     runningForce = 1.6;
-    maxJumpTicks = 70;
+    maxJumpTicks = 35;
   });
   rules.on('WALK', function (player) {
     runningForce = 1;
-    maxJumpTicks = 50;
+    maxJumpTicks = 25;
   });
   rules.on('DUCK', function (player) {
     game.applyForce(player.id, {
@@ -292,29 +288,8 @@ function topdownMovement(game) {
       }
     });
   });
-
-  // TODO:   this playerState should be localized onto the Sutra tree
-  // Remark: this can be achieved by adding hooks into Sutra core .emit() and reset state on tick()
-  //         this way, we always have a reference to all active actions during any tick via `node`
-  /*
-  let playerState = {
-    MOVE_UP: false,
-    MOVE_DOWN: false,
-    MOVE_LEFT: false,
-    MOVE_RIGHT: false
-  };
-   rules.on('resetPlayerState', function () {
-    playerState.MOVE_UP = false;
-    playerState.MOVE_DOWN = false;
-    playerState.MOVE_LEFT = false;
-    playerState.MOVE_RIGHT = false;
-  });
-  */
-
   function isDiagonalMovement(state) {
-    //console.log('isDiagonalMovement', state)
     var isDiagonal = (state.MOVE_UP || state.MOVE_DOWN) && (state.MOVE_LEFT || state.MOVE_RIGHT);
-    //console.log('isDiagonal', isDiagonal, state)
     return isDiagonal;
   }
 
