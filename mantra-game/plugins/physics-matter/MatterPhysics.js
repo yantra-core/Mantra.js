@@ -71,13 +71,15 @@ class MatterPhysics extends PhysicsInterface {
 
     // should this be onAfterUpdate? since we are serializing the state of the world?
     // i would assume we want that data *after* the update?
-    this.onAfterUpdate(this.engine, (event) => {
+    let that = this;
+    this.onAfterUpdate(this.engine, function onAfterUpdate (event) {
       // show total number of bodies in the world
       // Remark: should this and bodyMap be replaced with a more generic mapping
       // in order to allow non-physics backed entities to exist in the game?
       for (const body of event.source.world.bodies) {
 
-        let entity = this.game.getEntity(body.myEntityId);
+        // let entity = that.game.getEntity(body.myEntityId);
+        let entity = that.game.data.ents._[body.myEntityId];
 
         if (entity && body.isSleeping !== true && body.myEntityId) {
 
@@ -93,25 +95,27 @@ class MatterPhysics extends PhysicsInterface {
           //
           // Apply locked properties  ( like entity cannot move x or y position, etc )
           //
-          this.lockedProperties(body);
+          if (entity.lockedProperties) {
+            that.lockedProperties(body);
+          }
 
           // If this is the client and we are in online mode,
           // do not update local physics for remote players, only update local physics for the local player
           // This may be changed in the future or through configuration
-          if (this.game.isClient && this.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
+          if (that.game.isClient && that.game.onlineMode && entity.type === 'PLAYER' && entity.id !== game.currentPlayerId) {
             // In online mode, if the entity is a player and that player is not the current player, skip updating physics
             // continue; // Skip updating physics for remote players
           }
 
-          if (this.game.isClient) {
+          if (that.game.isClient) {
             // this is the logic for updating *all* entities positions
             // this should probably be in entity-movement plugin
             /*            */
             // console.log(body.myEntityId, body.position)
-            let ent = this.game.entities.get(body.myEntityId);
+            let ent = that.game.entities.get(body.myEntityId);
             // console.log('client ent', ent.id ,body.position)
             // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
-            if (this.game.localGameLoopRunning) {
+            if (that.game.localGameLoopRunning) {
               // check if body position has changed
 
               let bodyPosition = {
@@ -126,7 +130,7 @@ class MatterPhysics extends PhysicsInterface {
               // TODO: add this same kind of logic for server as well?
               // delta encoding will filter this; however it would be better to do it here as well
               if (bodyPosition.x !== entPosition.x || bodyPosition.y !== entPosition.y) {
-                this.game.changedEntities.add(body.myEntityId);
+                that.game.changedEntities.add(body.myEntityId);
               }
               // TODO: rotation / velocity as well, use flag isChanged
 
@@ -143,9 +147,9 @@ class MatterPhysics extends PhysicsInterface {
                 }
               }
 
-              this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-              this.game.components.position.set(body.myEntityId, position);
-              this.game.components.rotation.set(body.myEntityId, body.angle);
+              that.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+              that.game.components.position.set(body.myEntityId, position);
+              that.game.components.rotation.set(body.myEntityId, body.angle);
 
               // update size as well
               //this.game.components.height.set(body.myEntityId, body.bounds.max.y);
@@ -155,10 +159,10 @@ class MatterPhysics extends PhysicsInterface {
             }
 
             if (body) {
-              if (this.game.systems.rbush) {
-                let ent = this.game.entities.get(body.myEntityId);
+              if (that.game.systems.rbush) {
+                let ent = that.game.entities.get(body.myEntityId);
                 let position = { x: body.position.x, y: body.position.y };
-                this.game.systems.rbush.updateEntity({
+                that.game.systems.rbush.updateEntity({
                   id: body.myEntityId,
                   position: position,
                   width: ent.width,
@@ -169,22 +173,22 @@ class MatterPhysics extends PhysicsInterface {
             }
 
             if (ent.type === 'BULLET') {
-              this.game.changedEntities.add(body.myEntityId);
-              this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-              this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
-              this.game.components.rotation.set(body.myEntityId, body.angle);
+              that.game.changedEntities.add(body.myEntityId);
+              that.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+              that.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+              that.game.components.rotation.set(body.myEntityId, body.angle);
             }
 
           } else {
             // this is the logic for updating *all* entities positions
             // this should probably be in entity-movement plugin
 
-            let ent = this.game.getEntity(body.myEntityId);
+            let ent = that.game.getEntity(body.myEntityId);
             //console.log('server ent', ent)
-            this.game.changedEntities.add(body.myEntityId);
-            this.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
-            this.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
-            this.game.components.rotation.set(body.myEntityId, body.angle);
+            that.game.changedEntities.add(body.myEntityId);
+            that.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
+            that.game.components.position.set(body.myEntityId, { x: body.position.x, y: body.position.y });
+            that.game.components.rotation.set(body.myEntityId, body.angle);
 
           }
 
