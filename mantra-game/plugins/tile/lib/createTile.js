@@ -6,13 +6,12 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
     return;
   }
 
-  // TODO: better tile config by kind
-  // for now
-
+  // overrides for tile depth
   if (typeof tile.z === 'number') {
     z = tile.z;
-  } else{
-    z = -16;
+  } else {
+    // default tile space is the floor, below player
+    z = 0;
   }
 
   let isStatic;
@@ -35,7 +34,7 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
     // _type = 'BLOCK';
   }
   let _texture = `tile-${tile.kind}`; // rename
-  this.game.createEntity({
+  let ent = this.game.createEntity({
     type: _type,
     kind: tile.kind,
     body,
@@ -62,4 +61,5 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
     height: tileHeight * scale,
     depth: tileWidth * scale
   });
+  return ent;
 }
