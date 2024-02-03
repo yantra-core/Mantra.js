@@ -131,11 +131,11 @@ function applyTextureToMesh(game, entityData, mesh) {
     mesh.material.needsUpdate = true;
     mesh.visible = true;
     mesh.material.transparent = true;
-    mesh.material.opacity = 0; // Start fully transparent
+    mesh.material.opacity = 1; // Start fully visible
 
     // mesh.rotation.x = -Math.PI / 2;
-    mesh.isFadingIn = true; // Start the fade-in
-    mesh.progress = 0;
+    // mesh.isFadingIn = true; // Start the fade-in
+    // mesh.progress = 0;
 
     //mesh.isRolling = true; // Start the rolling animation
 
