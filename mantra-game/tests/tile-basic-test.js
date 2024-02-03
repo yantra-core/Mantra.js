@@ -80,7 +80,7 @@ tap.test('Tile plugin integration tests', (t) => {
       size: {
         width: 32,
         height: 32,
-        depth: 32
+        depth: 64
       }
     };
 
@@ -97,7 +97,7 @@ tap.test('Tile plugin integration tests', (t) => {
 
     t.equal(tile1.width, 32);
     t.equal(tile1.height, 32);
-    t.equal(tile1.depth, 32);
+    t.equal(tile1.depth, 64);
 
     t.end();
   });

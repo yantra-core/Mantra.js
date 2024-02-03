@@ -1,4 +1,4 @@
-export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, color) {
+export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, tileDepth, color) {
 
   let tileId = tile.id;
 
@@ -17,6 +17,9 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, col
   }
   if (tile.size && typeof tile.size.height === 'number') {
     tileHeight = tile.size.height;
+  }
+  if (tile.size && typeof tile.size.depth === 'number') {
+    tileDepth = tile.size.depth;
   }
 
   let isStatic;
@@ -64,7 +67,7 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, col
     color: _color,
     width: tileWidth * scale,
     height: tileHeight * scale,
-    depth: tileWidth * scale
+    depth: tileDepth * scale
   });
   return ent;
 }
