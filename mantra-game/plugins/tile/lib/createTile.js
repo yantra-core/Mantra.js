@@ -1,4 +1,4 @@
-export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
+export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, color) {
 
   let tileId = tile.id;
 
@@ -10,8 +10,7 @@ export default function createTile(tile, x, y, z, tileWidth, tileHeight, color) 
   if (typeof tile.z === 'number') {
     z = tile.z;
   } else {
-    // default tile space is the floor, below player
-    z = 0;
+    // default tile space is the floor, below player ( 0 )
   }
 
   let isStatic;
