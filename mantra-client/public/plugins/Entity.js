@@ -688,6 +688,7 @@ function createEntity(config) {
     position = _config.position,
     rotation = _config.rotation,
     startingPosition = _config.startingPosition,
+    body = _config.body,
     mass = _config.mass,
     density = _config.density,
     velocity = _config.velocity,
@@ -766,8 +767,8 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
-  if (config.body) {
-    var body = this.createBody({
+  if (body) {
+    var _body = this.createBody({
       width: width,
       height: height,
       radius: radius,
@@ -785,18 +786,18 @@ function createEntity(config) {
       frictionAir: config.frictionAir,
       frictionStatic: config.frictionStatic
     });
-    body.myEntityId = entityId;
-    this.game.physics.addToWorld(this.game.engine, body);
-    this.game.bodyMap[entityId] = body;
+    _body.myEntityId = entityId;
+    this.game.physics.addToWorld(this.game.engine, _body);
+    this.game.bodyMap[entityId] = _body;
     if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
-      this.game.physics.setVelocity(body, velocity);
+      this.game.physics.setVelocity(_body, velocity);
     }
     if (position) {
-      this.game.physics.setPosition(body, position);
+      this.game.physics.setPosition(_body, position);
     }
     if (typeof rotation !== 'undefined') {
       if (this.game.physics && this.game.physics.setRotation) {
-        this.game.physics.setRotation(body, rotation);
+        this.game.physics.setRotation(_body, rotation);
       }
     }
   } else {

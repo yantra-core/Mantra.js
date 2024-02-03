@@ -4251,10 +4251,7 @@ var tileKinds = [{
   weight: 2,
   body: true,
   isStatic: true,
-  z: 0,
-  size: {
-    depth: 32
-  }
+  z: 16 /* size: { depth: 32 } */
 }, {
   id: 2,
   kind: 'grass',
@@ -4423,7 +4420,13 @@ var Tile = /*#__PURE__*/function () {
     }
   }, {
     key: "update",
-    value: function update() {}
+    value: function update() {
+      /*
+      if (this.game.tick % 10 === 0) {
+        let allBodies = this.game.physics.Composite.allBodies(this.game.engine.world);
+      }
+      */
+    }
   }, {
     key: "render",
     value: function render() {}
@@ -4493,7 +4496,11 @@ function createLayer(layer, tileWidth, tileHeight) {
     // 3D data handling
     layer.data.forEach(function (layer2D, z) {
       layer2D.forEach(function (tileValue, index) {
-        _this.processTile(tileValue, index, layer, tileWidth, tileHeight, z);
+        var customZ = false;
+        if (z > 0) {
+          customZ = true;
+        }
+        _this.processTile(tileValue, index, layer, tileWidth, tileHeight, z, customZ);
       });
     });
   } else {
@@ -4522,13 +4529,14 @@ function createTile(tile, x, y) {
   var tileHeight = arguments.length > 5 ? arguments[5] : undefined;
   var tileDepth = arguments.length > 6 ? arguments[6] : undefined;
   var color = arguments.length > 7 ? arguments[7] : undefined;
+  var customZ = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : true;
   var tileId = tile.id;
   if (tile.kind === 'empty') {
     return;
   }
 
   // overrides for tile z position, used for 2.5D games
-  if (typeof tile.z === 'number') {
+  if (customZ && typeof tile.z === 'number') {
     z = tile.z;
   }
 
@@ -4558,6 +4566,10 @@ function createTile(tile, x, y) {
   var _type = 'TILE';
   if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
     // _type = 'BLOCK';
+  }
+  if (customZ) {
+    // this is required so don't dont stack 2d bodies inside each other in 2.5D space
+    body = false;
   }
   var _texture = "tile-".concat(tile.kind); // rename
   var ent = this.game.createEntity((_this$game$createEnti = {
@@ -4882,6 +4894,7 @@ exports["default"] = processTile;
 // processTile.js - This function will take a tileValue ( Tile.id ) with index / tileWidth / tileHeight / depth and create a tile
 //                  at the correct position in the game world 
 function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) {
+  var customDepth = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
   var tile;
   // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
   // look up the tile kind and use that as the tile
@@ -4912,9 +4925,9 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) 
     x = _this$calculateTilePo.x,
     y = _this$calculateTilePo.y,
     z = _this$calculateTilePo.z;
-
+  // console.log('processTile.js: x, y, z:', tile, x, y, z);
   // TODO: check to see if existing tile exsting at this slot?
-  this.createTile(tile, x, y, z, tileWidth, tileHeight, tileDepth, layer.color);
+  this.createTile(tile, x, y, z, tileWidth, tileHeight, tileDepth, layer.color, customDepth);
 }
 
 },{}],38:[function(require,module,exports){
