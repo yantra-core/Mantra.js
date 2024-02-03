@@ -1,4 +1,4 @@
-export default function inflateEntity(entity, alpha) {
+export default function inflateGraphic(entity, alpha) {
 
   if (entity.kind === 'building') {
     return; // for now
@@ -38,6 +38,7 @@ export default function inflateEntity(entity, alpha) {
   */
 
   // Include the fade-in animation logic with easing
+  /*
   if (graphic.isFadingIn && !graphic.fadeCompleted) {
     graphic.progress += 0.05; // Increment progress. Adjust speed with this value.
     if (graphic.progress > 1) graphic.progress = 1; // Ensure progress doesn't exceed 1
@@ -51,6 +52,7 @@ export default function inflateEntity(entity, alpha) {
       graphic.fadeCompleted = true; // Stop the fade-in animation
     }
   }
+  */
 
   if (this.game.tick % 120 === 0) {
     // console.log('length', Object.keys(game.data.ents._).length)
