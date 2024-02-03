@@ -13,7 +13,121 @@ export default function inflateTexture(entityData) {
 
   return applyTextureToMesh(this.game, entityData, mesh)
 
-  // TODO: add 2d sprite animation support
+
+}
+
+let texturePool = {};
+
+async function applyTextureToMesh(game, entityData, mesh) {
+  let texture = game.getTexture(entityData.texture);
+
+  // No game texture found for entity, return mesh
+  if (!texture) {
+    mesh.visible = true;
+    return mesh;
+  }
+
+  // If a game texture was found, but has no URL, no updates will be made, return mesh
+  if (!texture.url) {
+    mesh.visible = true;
+    return mesh;
+  }
+
+  let cachedTexture = texturePool[texture.url];
+
+  if (cachedTexture && cachedTexture.image && texture.sprite) {
+    const sprite = texture.sprite;
+    const textureWidth = cachedTexture.image.width;
+    const textureHeight = cachedTexture.image.height;
+    sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
+    sprite.height = sprite.height || 16;
+
+    const uvs = {
+      x: -sprite.x / textureWidth,
+      y: -sprite.y / textureHeight,
+      width: sprite.width / textureWidth,
+      height: sprite.height / textureHeight
+    };
+
+    // create a clone of the cached texture
+    let _cachedTexture = cachedTexture.clone();
+
+
+    _cachedTexture.repeat.set(uvs.width, uvs.height);
+    _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
+
+    mesh.material.map = _cachedTexture;
+    mesh.material.needsUpdate = true;
+    return mesh;
+  }
+
+  // If the texture is not cached yet, or it's a Promise (still loading), handle accordingly
+  if (!cachedTexture || cachedTexture instanceof Promise) {
+    if (!cachedTexture) {
+      // If not cached, start loading and cache the Promise
+      const textureLoader = new THREE.TextureLoader();
+      // console.log("THREELOADER", textureLoader, texture.url)
+      cachedTexture = texturePool[texture.url] = new Promise((resolve, reject) => {
+        textureLoader.load(texture.url, resolve, undefined, reject);
+      }).then(loadedTexture => {
+        // Once loaded, update the cache with the actual texture and return it
+        texturePool[texture.url] = loadedTexture;
+        return loadedTexture;
+      }).catch(error => {
+        console.error('Error loading texture', texture.url, error);
+        return null; // Handle errors appropriately
+      });
+    }
+    // Await the Promise (either already existing or just created)
+    cachedTexture = await cachedTexture;
+
+  }
+
+  // If after awaiting, the cachedTexture is null (due to error or other reasons), return
+  if (!cachedTexture) {
+    mesh.visible = true;
+    return mesh;
+  }
+
+  // console.log("Using cached or freshly loaded texture");
+  if (cachedTexture && cachedTexture.image && texture.sprite) {
+    const sprite = texture.sprite;
+    const textureWidth = cachedTexture.image.width;
+    const textureHeight = cachedTexture.image.height;
+    sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
+    sprite.height = sprite.height || 16;
+
+    const uvs = {
+      x: -sprite.x / textureWidth,
+      y: -sprite.y / textureHeight,
+      width: sprite.width / textureWidth,
+      height: sprite.height / textureHeight
+    };
+
+    // create a clone of the cached texture
+    let _spriteTexture = cachedTexture.clone();
+
+
+    _spriteTexture.repeat.set(uvs.width, uvs.height);
+    _spriteTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
+
+
+    mesh.material.map = _spriteTexture;
+    mesh.material.needsUpdate = true;
+  }
+
+
+
+  // Apply the texture
+  mesh.material.map = cachedTexture;
+  mesh.material.needsUpdate = true;
+  mesh.visible = true;
+
+}
+
+/*
+
+// TODO: Better 2d sprite animation support
   let { url: textureUrl, sprite, frames, playing = true } = texture;
 
  // Function to handle sprite sheet and set appropriate UV mapping
@@ -78,67 +192,5 @@ export default function inflateTexture(entityData) {
     // Handle simple textures without sprite sheets
     applyOrUpdateTexture(textureUrl);
   }
-}
 
-
-function applyTextureToMesh(game, entityData, mesh) {
-  let texture = game.getTexture(entityData.texture);
-  if (!texture) {
-    // console.warn('Warning: Texture not found', entityData.texture);
-    mesh.visible = true;
-    return mesh;
-  };
-
-
-  // check to see if the mesh has a texture already
-  if (mesh.material.map) {
-    mesh.visible = true;
-    return mesh;
-  }
-
-  const textureLoader = new THREE.TextureLoader();
-  if (!texture.url) {
-    mesh.visible = true;
-    return mesh;
-  }
-  textureLoader.load(texture.url, (loadedTexture) => {
-    if (texture.sprite) {
-      const sprite = texture.sprite;
-      const textureWidth = loadedTexture.image.width;
-      const textureHeight = loadedTexture.image.height;
-      sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
-      sprite.height = sprite.height || 16;
-
-      const uvs = {
-        x: -sprite.x / textureWidth,
-        y: -sprite.y / textureHeight,
-        width: sprite.width / textureWidth,
-        height: sprite.height / textureHeight
-      };
-
-      loadedTexture.repeat.set(uvs.width, uvs.height);
-      loadedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
-    }
-
-    mesh.material = new THREE.MeshBasicMaterial({
-      map: loadedTexture
-    });
-
-    if (entityData.color) {
-      const color = new THREE.Color(entityData.color);
-      mesh.material.color.set(color);
-    }
-    mesh.material.needsUpdate = true;
-    mesh.visible = true;
-    mesh.material.transparent = true;
-    mesh.material.opacity = 1; // Start fully visible
-
-    // mesh.rotation.x = -Math.PI / 2;
-    // mesh.isFadingIn = true; // Start the fade-in
-    // mesh.progress = 0;
-
-    //mesh.isRolling = true; // Start the rolling animation
-
-
-  });
-}
+  */

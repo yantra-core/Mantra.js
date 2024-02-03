@@ -16,6 +16,9 @@ export default function createGraphic(entityData) {
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
 
       break;
+    case 'TILE':
+      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
+      break;
 
     case 'not_implemented_TEXT':
       // Ensure you have the font data loaded

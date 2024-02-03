@@ -21,6 +21,10 @@ export default function inflateGraphic(entity, alpha) {
 
   this.inflateTexture(entity, graphic);
 
+}
+
+
+
   /*
   // Include the rolling animation logic// Include the rolling animation logic
   if (graphic.isRolling && !graphic.rollCompleted) {
@@ -54,11 +58,6 @@ export default function inflateGraphic(entity, alpha) {
   }
   */
 
-  if (this.game.tick % 120 === 0) {
-    // console.log('length', Object.keys(game.data.ents._).length)
-  }
-
-}
 
 function easeInQuad(t) {
   return t * t;
