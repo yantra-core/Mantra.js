@@ -7,9 +7,58 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = platformMovement;
 function platformMovement(game) {
   var rules = game.createSutra();
-  rules["if"]('A').then('MOVE_LEFT').then('updateSprite', {
+  rules.addCondition('PLAYER_UP', {
+    op: 'or',
+    conditions: ['W', 'DPAD_UP']
+  });
+  rules.addCondition('PLAYER_DOWN', {
+    op: 'or',
+    conditions: ['S', 'DPAD_DOWN']
+  });
+  rules.addCondition('MOVE_LEFT', {
+    op: 'or',
+    conditions: ['A', 'DPAD_LEFT']
+  });
+  rules.addCondition('MOVE_RIGHT', {
+    op: 'or',
+    conditions: ['D', 'DPAD_RIGHT']
+  });
+  rules.addCondition('PLAYER_JUMP', {
+    op: 'or',
+    conditions: ['SPACE', 'H', 'BUTTON_B']
+  });
+  rules.addCondition('PLAYER_RUN', {
+    op: 'or',
+    conditions: ['J', 'BUTTON_X']
+  });
+  rules.addCondition('ZOOM_IN', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('ZOOM_OUT', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
+  rules.addCondition('isRunning', {
+    op: 'or',
+    conditions: ['S', 'K'] // defaults DOWN key, or B button on Gamepad
+  });
+
+  rules["if"]('MOVE_LEFT').then('MOVE_LEFT').then('updateSprite', {
     sprite: 'playerLeftWalk'
   });
+  rules["if"]('MOVE_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
+    sprite: 'playerRightWalk'
+  });
+
+  /*
+  rules
+    .if('PLAYER_UP')
+      .then('PLAYER_UP')
+      .then('updateSprite', { sprite: 'playerUpRight' });
+  */
+
+  rules["if"]('PLAYER_DOWN').then('DUCK').map('determineDuckingSprite').then('updateSprite');
   rules.addMap('determineDuckingSprite', function (player, node) {
     var sprite = 'playerDownRight';
     if (player.texture.sprite === 'playerLeftWalk') {
@@ -19,10 +68,9 @@ function platformMovement(game) {
     }
     return player;
   });
-  rules["if"]('S').then('DUCK').map('determineDuckingSprite').then('updateSprite');
-  rules["if"]('D').then('MOVE_RIGHT').then('updateSprite', {
-    sprite: 'playerRightWalk'
-  });
+
+  //rules.if('S').then('DUCK').map('determineDuckingSprite').then('updateSprite');
+  //rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRightWalk' });
 
   /*
     Adding textures to Entities
@@ -54,16 +102,13 @@ function platformMovement(game) {
       }
     });
   });
+  rules["if"]('PLAYER_RUN').then('RUN');
+  rules["if"]('PLAYER_JUMP').then('JUMP');
 
   // rules.if('SPACE').then('JUMP');
   rules.addCondition('isPlayer', function (entity) {
     return entity.type === 'PLAYER';
   });
-  rules.addCondition('isRunning', {
-    op: 'or',
-    conditions: ['S', 'K'] // defaults DOWN key, or B button on Gamepad
-  });
-
   var maxJumpTicks = 50;
   // Remark: isPlayer is already implied for all Key inputs,
   //         however we add the additional check here for the negative case,
@@ -165,9 +210,6 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function topdownMovement(game) {
   var rules = game.createSutra();
-  rules.addCondition('alwaysTrue', function () {
-    return true;
-  });
   rules.addCondition('PLAYER_UP', {
     op: 'or',
     conditions: ['W', 'DPAD_UP']
@@ -200,7 +242,6 @@ function topdownMovement(game) {
     op: 'or',
     conditions: ['L', 'BUTTON_Y']
   });
-  rules["if"]('alwaysTrue').then('resetPlayerState');
   rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
     sprite: 'playerUp'
   });
@@ -255,20 +296,25 @@ function topdownMovement(game) {
   // TODO:   this playerState should be localized onto the Sutra tree
   // Remark: this can be achieved by adding hooks into Sutra core .emit() and reset state on tick()
   //         this way, we always have a reference to all active actions during any tick via `node`
-  var playerState = {
+  /*
+  let playerState = {
     MOVE_UP: false,
     MOVE_DOWN: false,
     MOVE_LEFT: false,
     MOVE_RIGHT: false
   };
-  rules.on('resetPlayerState', function () {
+   rules.on('resetPlayerState', function () {
     playerState.MOVE_UP = false;
     playerState.MOVE_DOWN = false;
     playerState.MOVE_LEFT = false;
     playerState.MOVE_RIGHT = false;
   });
+  */
+
   function isDiagonalMovement(state) {
+    //console.log('isDiagonalMovement', state)
     var isDiagonal = (state.MOVE_UP || state.MOVE_DOWN) && (state.MOVE_LEFT || state.MOVE_RIGHT);
+    //console.log('isDiagonal', isDiagonal, state)
     return isDiagonal;
   }
 
@@ -276,14 +322,15 @@ function topdownMovement(game) {
   // chebyshev movement
   var normalizationFactor = 0.7071; // Approximately 1/√2
   var moveSpeed = 2;
-  rules.on('MOVE_UP', function (entity) {
-    playerState.MOVE_UP = true;
+  rules.on('MOVE_UP', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_UP = true;
     var force = {
       x: 0,
       y: -moveSpeed,
       z: 0
     };
-    if (isDiagonalMovement(playerState)) {
+    if (isDiagonalMovement(rules.state)) {
       force.y *= normalizationFactor;
     }
     game.applyForce(entity.id, force);
@@ -294,14 +341,15 @@ function topdownMovement(game) {
     // console.log('MOVE_UP', playerState);
   });
 
-  rules.on('MOVE_DOWN', function (entity) {
-    playerState.MOVE_DOWN = true;
+  rules.on('MOVE_DOWN', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_DOWN = true;
     var force = {
       x: 0,
       y: moveSpeed,
       z: 0
     };
-    if (isDiagonalMovement(playerState)) {
+    if (isDiagonalMovement(rules.state)) {
       force.y *= normalizationFactor;
     }
     game.applyForce(entity.id, force);
@@ -310,14 +358,15 @@ function topdownMovement(game) {
       rotation: Math.PI
     });
   });
-  rules.on('MOVE_LEFT', function (entity) {
-    playerState.MOVE_LEFT = true;
+  rules.on('MOVE_LEFT', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_LEFT = true;
     var force = {
       x: -moveSpeed,
       y: 0,
       z: 0
     };
-    if (isDiagonalMovement(playerState)) {
+    if (isDiagonalMovement(rules.state)) {
       force.x *= normalizationFactor;
     }
     game.applyForce(entity.id, force);
@@ -326,14 +375,15 @@ function topdownMovement(game) {
       rotation: -Math.PI / 2
     });
   });
-  rules.on('MOVE_RIGHT', function (entity) {
-    playerState.MOVE_RIGHT = true;
+  rules.on('MOVE_RIGHT', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_RIGHT = true;
     var force = {
       x: moveSpeed,
       y: 0,
       z: 0
     };
-    if (isDiagonalMovement(playerState)) {
+    if (isDiagonalMovement(rules.state)) {
       force.x *= normalizationFactor;
     }
     game.applyForce(entity.id, force);
@@ -664,7 +714,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = evaluateCompositeCondition;
-function evaluateCompositeCondition(conditionObj, data, gameState) {
+function evaluateCompositeCondition(conditionObj, node, data, gameState) {
   var _this = this;
   var targetData;
   if (typeof data === 'function') {
@@ -675,15 +725,15 @@ function evaluateCompositeCondition(conditionObj, data, gameState) {
   switch (conditionObj.op) {
     case 'and':
       return conditionObj.conditions.every(function (cond) {
-        return _this.evaluateCondition(cond, targetData, gameState);
+        return _this.evaluateCondition(cond, node, targetData, gameState);
       });
     case 'or':
       return conditionObj.conditions.some(function (cond) {
-        return _this.evaluateCondition(cond, targetData, gameState);
+        return _this.evaluateCondition(cond, node, targetData, gameState);
       });
     case 'not':
       // Assuming 'not' operator has a single condition
-      return !this.evaluateCondition(conditionObj.conditions, targetData, gameState);
+      return !this.evaluateCondition(conditionObj.conditions, node, targetData, gameState);
     default:
       return false;
   }
@@ -696,8 +746,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = evaluateCondition;
-function evaluateCondition(condition, data, gameState) {
-  var sutra = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this;
+function evaluateCondition(condition, node, data, gameState) {
+  var sutra = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : this;
   var targetData;
   if (typeof data === 'function') {
     targetData = data(gameState);
@@ -721,23 +771,23 @@ function evaluateCondition(condition, data, gameState) {
     if (conditionEntry) {
       if (Array.isArray(conditionEntry)) {
         return conditionEntry.every(function (cond) {
-          return typeof cond.func === 'function' ? cond.func(targetData, gameState) : sutra.evaluateDSLCondition(cond.original, targetData, gameState);
+          return typeof cond.func === 'function' ? cond.func(targetData, gameState, node) : sutra.evaluateDSLCondition(cond.original, node, targetData, gameState);
         });
       } else if (['and', 'or', 'not'].includes(conditionEntry.op)) {
         // Handling composite conditions
-        return sutra.evaluateCompositeCondition(conditionEntry, targetData, gameState);
+        return sutra.evaluateCompositeCondition(conditionEntry, node, targetData, gameState);
       } else {
-        return sutra.evaluateSingleCondition(conditionEntry, targetData, gameState);
+        return sutra.evaluateSingleCondition(conditionEntry, node, targetData, gameState);
       }
     } else {
       console.log('Warning: Condition not found: ' + condition + '. About to throw an error.\nPlease define the missing condition in your sutra script.');
-      throw new Error("Condition \"".concat(condition, "\" not found"));
+      // throw new Error(`Condition "${condition}" not found`);
     }
   } else if (typeof condition === 'function') {
     return condition(targetData, gameState);
   } else if (Array.isArray(condition)) {
     return condition.every(function (cond) {
-      return sutra.evaluateCondition(cond, targetData, gameState);
+      return sutra.evaluateCondition(cond, node, targetData, gameState);
     });
   }
   return false;
@@ -750,7 +800,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = evaluateDSLCondition;
-function evaluateDSLCondition(conditionObj, data, gameState) {
+function evaluateDSLCondition(conditionObj, node, data, gameState) {
   var _this = this;
   var operator = this.resolveOperator(conditionObj.op);
   var targetData;
@@ -788,14 +838,14 @@ function evaluateDSLCondition(conditionObj, data, gameState) {
       return targetValue >= conditionObj.value;
     case 'and':
       return conditionObj.conditions.every(function (cond) {
-        return _this.evaluateDSLCondition(cond, targetData, gameState);
+        return _this.evaluateDSLCondition(cond, node, targetData, gameState);
       });
     case 'or':
       return conditionObj.conditions.some(function (cond) {
-        return _this.evaluateDSLCondition(cond, targetData, gameState);
+        return _this.evaluateDSLCondition(cond, node, targetData, gameState);
       });
     case 'not':
-      return !this.evaluateDSLCondition(conditionObj.condition, targetData, gameState);
+      return !this.evaluateDSLCondition(conditionObj.condition, node, targetData, gameState);
     default:
       return false;
   }
@@ -809,7 +859,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = evaluateSingleCondition;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function evaluateSingleCondition(condition, data, gameState) {
+function evaluateSingleCondition(condition, node, data, gameState) {
   // logger('Evaluating condition', condition, data);
 
   var targetData;
@@ -823,7 +873,7 @@ function evaluateSingleCondition(condition, data, gameState) {
     if (conditionEntry) {
       // Handle composite conditions
       if (['and', 'or', 'not'].includes(conditionEntry.op)) {
-        return this.evaluateCompositeCondition(conditionEntry, targetData, gameState);
+        return this.evaluateCompositeCondition(conditionEntry, node, targetData, gameState);
       }
 
       // Handle named function conditions
@@ -833,7 +883,7 @@ function evaluateSingleCondition(condition, data, gameState) {
 
       // Handle DSL conditions
       if (_typeof(conditionEntry.original) === 'object') {
-        return this.evaluateDSLCondition(conditionEntry.original, targetData, gameState); // Pass gameState here
+        return this.evaluateDSLCondition(conditionEntry.original, node, targetData, gameState); // Pass gameState here
       }
     }
   }
@@ -1214,6 +1264,13 @@ var Sutra = /*#__PURE__*/function () {
     this.conditions = {};
     this.listeners = {};
     this.maps = {};
+
+    // merged state of actions and conditions stored per tick
+    this.state = {};
+
+    // same this.state data, but with unmerged individual scopes
+    this.satisfiedActions = {};
+    this.satisfiedConditions = {};
     this.operators = ['equals', 'notEquals', 'greaterThan', 'lessThan', 'greaterThanOrEqual', 'lessThanOrEqual', 'and', 'or', 'not'];
     this.operatorAliases = _operatorAliases["default"];
     this.exportToEnglish = _exportToEnglish["default"];
@@ -1361,6 +1418,9 @@ var Sutra = /*#__PURE__*/function () {
         var node = {
           "if": conditions.length > 1 ? conditions : conditions[0]
         };
+        node.state = this.state;
+        node.satisfiedConditions = this.satisfiedConditions;
+        node.satisfiedActions = this.satisfiedActions;
         this.addAction(node);
       }
       return this; // Return this for chaining
@@ -1368,6 +1428,7 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "then",
     value: function then(actionOrFunction) {
+      var _this2 = this;
       var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var lastNode = this.tree[this.tree.length - 1];
       if (!lastNode.then) {
@@ -1381,6 +1442,9 @@ var Sutra = /*#__PURE__*/function () {
               "if": condition,
               then: []
             };
+            node.state = _this2.state;
+            node.satisfiedConditions = _this2.satisfiedConditions;
+            node.satisfiedActions = _this2.satisfiedActions;
             node.sutraPath = "".concat(lastNode.sutraPath, ".then[").concat(lastNode.then.length, "]");
             lastNode.then.push(node);
             return scopedContext; // Allow chaining within the scoped context
@@ -1388,24 +1452,36 @@ var Sutra = /*#__PURE__*/function () {
 
           then: function then(action) {
             var node = lastNode.then[lastNode.then.length - 1];
+            node.state = _this2.state;
+            node.satisfiedConditions = _this2.satisfiedConditions;
+            node.satisfiedActions = _this2.satisfiedActions;
             if (!node.then) {
               node.then = [];
             }
             var actionNode = {
               action: action
             };
+            actionNode.state = _this2.state;
+            actionNode.satisfiedConditions = _this2.satisfiedConditions;
+            actionNode.satisfiedActions = _this2.satisfiedActions;
             actionNode.sutraPath = "".concat(node.sutraPath, ".then[").concat(node.then.length, "]");
             node.then.push(actionNode);
             return scopedContext;
           },
           "else": function _else(action) {
             var node = lastNode.then[lastNode.then.length - 1];
+            node.state = _this2.state;
+            node.satisfiedConditions = _this2.satisfiedConditions;
+            node.satisfiedActions = _this2.satisfiedActions;
             if (!node["else"]) {
               node["else"] = [];
             }
             var actionNode = {
               action: action
             };
+            actionNode.state = _this2.state;
+            actionNode.satisfiedConditions = _this2.satisfiedConditions;
+            actionNode.satisfiedActions = _this2.satisfiedActions;
             actionNode.sutraPath = "".concat(node.sutraPath, ".else[").concat(node["else"].length, "]");
             node["else"].push(actionNode);
             return scopedContext;
@@ -1429,6 +1505,9 @@ var Sutra = /*#__PURE__*/function () {
           subSutra = this.subtrees[actionOrFunction];
         }
         var actionNode = {};
+        actionNode.state = this.state;
+        actionNode.satisfiedConditions = this.satisfiedConditions;
+        actionNode.satisfiedActions = this.satisfiedActions;
         if (data) {
           actionNode.data = data;
         }
@@ -1559,27 +1638,27 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "addCondition",
     value: function addCondition(name, conditionObj) {
-      var _this2 = this;
+      var _this3 = this;
       this.originalConditions = this.originalConditions || {};
       if (Array.isArray(conditionObj)) {
         this.conditions[name] = conditionObj.map(function (cond) {
           if (typeof cond === 'function') {
-            _this2.originalConditions[name] = _this2.originalConditions[name] || [];
-            _this2.originalConditions[name].push({
+            _this3.originalConditions[name] = _this3.originalConditions[name] || [];
+            _this3.originalConditions[name].push({
               type: 'function',
               func: cond
             });
             return {
-              func: function func(data, gameState) {
-                return cond(data, gameState);
+              func: function func(data, gameState, node) {
+                return cond(data, gameState, node);
               },
               original: null
             };
           } else {
-            _this2.originalConditions[name] = _this2.originalConditions[name] || [];
-            _this2.originalConditions[name].push(cond);
-            var conditionFunc = function conditionFunc(data, gameState) {
-              return _this2.evaluateDSLCondition(cond, data, gameState);
+            _this3.originalConditions[name] = _this3.originalConditions[name] || [];
+            _this3.originalConditions[name].push(cond);
+            var conditionFunc = function conditionFunc(data, gameState, node) {
+              return _this3.evaluateDSLCondition(cond, node, data, gameState);
             };
             return {
               func: conditionFunc,
@@ -1606,7 +1685,7 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "updateCondition",
     value: function updateCondition(name, newConditionObj) {
-      var _this3 = this;
+      var _this4 = this;
       if (!this.conditions[name]) {
         return false;
       }
@@ -1620,31 +1699,31 @@ var Sutra = /*#__PURE__*/function () {
           newConditionObj.forEach(function (condition) {
             if (condition.op === 'and' || condition.op === 'or' || condition.op === 'not') {
               // Composite condition for each element in the array
-              var conditionFunc = function conditionFunc(data, gameState) {
-                return _this3.evaluateDSLCondition(condition, data, gameState);
+              var conditionFunc = function conditionFunc(data, gameState, node) {
+                return _this4.evaluateDSLCondition(condition, node, data, gameState);
               };
               conditionFunc.original = condition;
-              _this3.conditions[name] = conditionFunc;
+              _this4.conditions[name] = conditionFunc;
             } else {
               // DSL condition for each element in the array
-              var _conditionFunc = function _conditionFunc(data, gameState) {
-                return _this3.evaluateDSLCondition(condition, data, gameState);
+              var _conditionFunc = function _conditionFunc(data, gameState, node) {
+                return _this4.evaluateDSLCondition(condition, node, data, gameState);
               };
               _conditionFunc.original = condition;
-              _this3.conditions[name] = _conditionFunc;
+              _this4.conditions[name] = _conditionFunc;
             }
           });
         } else if (newConditionObj.op === 'and' || newConditionObj.op === 'or' || newConditionObj.op === 'not') {
           // Composite condition
-          var conditionFunc = function conditionFunc(data, gameState) {
-            return _this3.evaluateDSLCondition(newConditionObj, data, gameState);
+          var conditionFunc = function conditionFunc(data, gameState, node) {
+            return _this4.evaluateDSLCondition(newConditionObj, node, data, gameState);
           };
           conditionFunc.original = newConditionObj;
           this.conditions[name] = conditionFunc;
         } else {
           // DSL condition
-          var _conditionFunc2 = function _conditionFunc2(data, gameState) {
-            return _this3.evaluateDSLCondition(newConditionObj, data, gameState);
+          var _conditionFunc2 = function _conditionFunc2(data, gameState, node) {
+            return _this4.evaluateDSLCondition(newConditionObj, node, data, gameState);
           };
           _conditionFunc2.original = newConditionObj;
           this.conditions[name] = _conditionFunc2;
@@ -1659,7 +1738,7 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "storeSingleCondition",
     value: function storeSingleCondition(name, conditionObj) {
-      var _this4 = this;
+      var _this5 = this;
       // Store the original condition object separately for GUI use
       if (!(typeof conditionObj === 'function' && conditionObj.original)) {
         this.originalConditions = this.originalConditions || {};
@@ -1682,8 +1761,8 @@ var Sutra = /*#__PURE__*/function () {
         };
       } else {
         // For DSL conditions, pass gameState to the evaluateDSLCondition function
-        var conditionFunc = function conditionFunc(data, gameState) {
-          return _this4.evaluateDSLCondition(conditionObj, data, gameState);
+        var conditionFunc = function conditionFunc(data, gameState, node) {
+          return _this5.evaluateDSLCondition(conditionObj, node, data, gameState);
         };
         conditionFunc.original = conditionObj;
         this.conditions[name] = conditionFunc;
@@ -1723,8 +1802,10 @@ var Sutra = /*#__PURE__*/function () {
       if (node.subtree) {
         var subSutra = this.subtrees[node.subtree];
         if (subSutra) {
-          var _conditionMet = node["if"] ? this.evaluateCondition(node["if"], data, gameState, subSutra) : true;
+          var _conditionMet = node["if"] ? this.evaluateCondition(node["if"], node, data, gameState, subSutra) : true;
           if (_conditionMet) {
+            node.state[node["if"]] = true;
+            node.satisfiedConditions[node["if"]] = true;
             subSutra.tick(data, gameState);
           }
         } else {
@@ -1753,8 +1834,10 @@ var Sutra = /*#__PURE__*/function () {
         this.executeAction(node.action, mappedData || currentData, node, gameState);
         return;
       }
-      var conditionMet = node["if"] ? this.evaluateCondition(node["if"], mappedData || currentData, gameState) : true;
+      var conditionMet = node["if"] ? this.evaluateCondition(node["if"], node, mappedData || currentData, gameState) : true;
       if (conditionMet) {
+        this.state[node["if"]] = true;
+        this.satisfiedConditions[node["if"]] = true;
         this.processBranch(node.then, mappedData || currentData, gameState, mappedData);
       } else {
         this.processBranch(node["else"], mappedData || currentData, gameState, mappedData);
@@ -1763,11 +1846,11 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "processBranch",
     value: function processBranch(branch, data, gameState) {
-      var _this5 = this;
+      var _this6 = this;
       var mappedData = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
       if (Array.isArray(branch)) {
         branch.forEach(function (childNode) {
-          return _this5.traverseNode(childNode, data, gameState, mappedData);
+          return _this6.traverseNode(childNode, data, gameState, mappedData);
         });
       }
     }
@@ -1803,6 +1886,9 @@ var Sutra = /*#__PURE__*/function () {
         }
       });
       var mergedData = object;
+      // Update node state to reflect executed action
+      this.state[action] = true;
+      this.satisfiedActions[action] = true;
       this.emit(action, mergedData, node, gameState);
     }
   }, {
@@ -1822,19 +1908,19 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "generateSutraPath",
     value: function generateSutraPath(node, parentPath, index, parent) {
-      var _this6 = this;
+      var _this7 = this;
       var path = index === -1 ? parentPath : "".concat(parentPath, "[").concat(index, "]");
       node.sutraPath = path;
       node.parent = parent; // Set the parent reference
 
       if (node.then && Array.isArray(node.then)) {
         node.then.forEach(function (child, idx) {
-          return _this6.generateSutraPath(child, "".concat(path, ".then"), idx, node);
+          return _this7.generateSutraPath(child, "".concat(path, ".then"), idx, node);
         });
       }
       if (node["else"] && Array.isArray(node["else"])) {
         node["else"].forEach(function (child, idx) {
-          return _this6.generateSutraPath(child, "".concat(path, ".else"), idx, node);
+          return _this7.generateSutraPath(child, "".concat(path, ".else"), idx, node);
         });
       }
     }
@@ -1928,16 +2014,25 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "tick",
     value: function tick(data) {
-      var _this7 = this;
+      var _this8 = this;
       var gameState = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      // Reset state for all nodes
+      this.tree.forEach(function (node) {
+        node.state = {};
+        node.satisfiedConditions = {};
+        node.satisfiedActions = {};
+      });
+      this.state = {};
+      this.satisfiedActions = {};
+      this.satisfiedConditions = {};
       var subtreeEvaluated = false;
       // Iterate over the main tree's nodes
       this.tree.forEach(function (node) {
         if (node.subtree) {
           subtreeEvaluated = true;
-          _this7.traverseNode(node, data, gameState);
+          _this8.traverseNode(node, data, gameState);
         } else {
-          _this7.traverseNode(node, data, gameState);
+          _this8.traverseNode(node, data, gameState);
         }
       });
 
@@ -1974,44 +2069,6 @@ var Sutra = /*#__PURE__*/function () {
   return Sutra;
 }();
 var _default = exports["default"] = Sutra;
-/*
-  use(subSutra, name = null, insertAt = this.tree.length, shareListeners = true, prefixSubSutra = true) {
-    // Store a reference to the subSutra for subtree-specific logic
-    this.subtrees = this.subtrees || {};
-    subSutra.isSubtree = true;
-    subSutra.parent = this;
-    this.subtrees[name] = subSutra;
-  
-    // Function to prefix keys of an object with the subtree name
-    const prefixKeys = (obj, prefix) => {
-      return Object.keys(obj).reduce((prefixedObj, key) => {
-        prefixedObj[`${prefix}::${key}`] = obj[key];
-        return prefixedObj;
-      }, {});
-    };
-  
-    if (shareListeners) {
-      this.sharedListeners = true;
-  
-      // Prefix and merge subtree's listeners and conditions if required
-      let prefixedListeners = prefixSubSutra && name ? prefixKeys(subSutra.listeners, name) : subSutra.listeners;
-      let prefixedConditions = prefixSubSutra && name ? prefixKeys(subSutra.conditions, name) : subSutra.conditions;
-  
-      this.listeners = { ...this.listeners, ...prefixedListeners };
-      this.conditions = { ...this.conditions, ...prefixedConditions };
-  
-      this.anyListeners = [...(this.anyListeners || []), ...(subSutra.anyListeners || [])];
-  
-      // Optionally, update the subtree's listeners and conditions to reflect this change
-      subSutra.listeners = this.listeners;
-      subSutra.conditions = this.conditions;
-      subSutra.anyListeners = this.anyListeners;
-    }
-  
-    // Insert the subtree at the specified position
-    this.tree.splice(insertAt, 0, ...subSutra.tree);
-  }
-  */
 
 },{"./evaluateCompositeCondition.js":5,"./evaluateCondition.js":6,"./evaluateDSLCondition.js":7,"./evaluateSingleCondition.js":8,"./exportToEnglish.js":9,"./operatorAliases.js":11,"./parsePath.js":12,"./serializeToJson.js":13}]},{},[3])(3)
 });

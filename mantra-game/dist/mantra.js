@@ -671,8 +671,12 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "reset",
     value: function reset(mode) {
+      var clearSutra = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       // reset all Sutra rules
-      this.rules = this.createSutra();
+      if (clearSutra) {
+        this.rules = this.createSutra();
+      }
+
       // remap the keyboard mappings to Sutra by default
       if (this.systems.sutra) {
         this.systems.sutra.bindInputsToSutraConditions();

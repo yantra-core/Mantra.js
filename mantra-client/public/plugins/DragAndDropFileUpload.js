@@ -42,6 +42,11 @@ var DragAndDropFileUpload = /*#__PURE__*/function () {
         // hide overlay ( for now )
         _this.overlay.style.visibility = 'hidden';
       });
+
+      // check to see if tileMap is already loaded, if so, hide overlay
+      if (game.systems.tile && game.systems.tile.tileMap) {
+        this.overlay.style.visibility = 'hidden';
+      }
     }
   }, {
     key: "createOverlay",

@@ -15,6 +15,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
       let game = new MANTRA.Game({
+        defaultPlayer: false,
         height: 600 * 10,
         width: 800 * 10,
         physics: 'matter', // enum, 'physx', 'matter
@@ -44,13 +45,9 @@
 
       // start the game loop
       game.start(function () {
-
         game.use(new WORLDS.worlds['TowerDefense']());
-
         game.data.roundEnded = false;
         game.data.roundStarted = true;
-
-
       });
     });
   </script>

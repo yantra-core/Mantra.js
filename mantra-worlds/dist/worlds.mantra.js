@@ -3247,6 +3247,43 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = topdownMovement;
 function topdownMovement(game) {
   var rules = game.createSutra();
+  rules.addCondition('PLAYER_UP', {
+    op: 'or',
+    conditions: ['W', 'DPAD_UP']
+  });
+  rules.addCondition('PLAYER_DOWN', {
+    op: 'or',
+    conditions: ['S', 'DPAD_DOWN']
+  });
+  rules.addCondition('PLAYER_LEFT', {
+    op: 'or',
+    conditions: ['A', 'DPAD_LEFT']
+  });
+  rules.addCondition('PLAYER_RIGHT', {
+    op: 'or',
+    conditions: ['D', 'DPAD_RIGHT']
+  });
+  rules.addCondition('USE_ITEM_1', {
+    op: 'or',
+    conditions: ['SPACE', 'H', 'BUTTON_B']
+  });
+  rules.addCondition('USE_ITEM_2', {
+    op: 'or',
+    conditions: ['J', 'BUTTON_X']
+  });
+  rules.addCondition('ZOOM_IN', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('ZOOM_OUT', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
+  rules["if"]('PLAYER_UP').then('MOVE_UP');
+  rules["if"]('PLAYER_LEFT').then('MOVE_LEFT');
+  rules["if"]('PLAYER_DOWN').then('MOVE_DOWN');
+  rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT');
+  rules["if"]('USE_ITEM_1').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
   rules.on('MOVE_UP', function (entity) {
     game.applyForce(entity.id, {
       x: 0,
@@ -3544,7 +3581,7 @@ function createFounts(game) {
 }
 var _default = exports["default"] = GravityGardens;
 
-},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":24,"../sutras/warpToWorld.js":61}],31:[function(require,module,exports){
+},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":24,"../sutras/warpToWorld.js":60}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4183,7 +4220,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":53,"../sutras/routing.js":59,"../sutras/switchGraphics.js":60,"../sutras/warpToWorld.js":61,"./sutras/block.js":33}],33:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":52,"../sutras/routing.js":58,"../sutras/switchGraphics.js":59,"../sutras/warpToWorld.js":60,"./sutras/block.js":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4689,7 +4726,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../../mantra-sutras/player-movement/top-down.js":29,"../sutras/warpToWorld.js":61,"./instruments/createDrumKit.js":37,"./instruments/createPiano.js":38,"./sutras.js":39}],37:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"../sutras/warpToWorld.js":60,"./instruments/createDrumKit.js":37,"./instruments/createPiano.js":38,"./sutras.js":39}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5046,7 +5083,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":60,"../sutras/warpToWorld.js":61}],40:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":59,"../sutras/warpToWorld.js":60}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5312,7 +5349,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../../mantra-sutras/player-movement/platform.js":28,"../sutras/warpToWorld.js":61}],41:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/platform.js":28,"../sutras/warpToWorld.js":60}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5625,7 +5662,13 @@ var Sutra = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      game.customMovement = true;
       // alert('hi')
+      game.reset('topdown');
+      game.setGravity(0, 0, 0);
+
+      // TODO: set default zoom to 0.3 ( zoomed out )
+      game.setZoom(3.5);
       this.createWorld();
     }
   }, {
@@ -5633,10 +5676,6 @@ var Sutra = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       var that = this;
-      game.setGravity(0, 0, 0);
-
-      // TODO: set default zoom to 0.3 ( zoomed out )
-      game.zoom(0.3);
       game.use('Bullet');
       //    game.use('Timers');
       game.use('Tone');
@@ -5656,10 +5695,10 @@ var Sutra = /*#__PURE__*/function () {
         MIN_BLOCK_SIZE: 1000
       });
       // game.use('Border', { autoBorder: true, thickness: 200 });
-      game.setSutra((0, _hexapod["default"])(game));
+      game.useSutra((0, _hexapod["default"])(game), 'HEXAPOD');
       game.data.roundEnded = false;
       game.data.roundStarted = true;
-      game.createDefaultPlayer();
+      game.createPlayer();
       //createPlayPauseButton();
 
       /*
@@ -5752,7 +5791,7 @@ var Sutra = /*#__PURE__*/function () {
           agamaIndex = (agamaIndex + 1) % agamaKeys.length;
         }, 3300);
       }
-      demoSutras();
+      //demoSutras();
     }
   }, {
     key: "update",
@@ -6054,7 +6093,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":53,"../sutras/routing.js":59,"../sutras/switchGraphics.js":60,"../sutras/warpToWorld.js":61}],46:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":52,"../sutras/routing.js":58,"../sutras/switchGraphics.js":59,"../sutras/warpToWorld.js":60}],46:[function(require,module,exports){
 arguments[4][34][0].apply(exports,arguments)
 },{"dup":34}],47:[function(require,module,exports){
 "use strict";
@@ -6067,7 +6106,6 @@ var _round = _interopRequireDefault(require("./sutras/round.js"));
 var _player = _interopRequireDefault(require("./sutras/player.js"));
 var _colorChanges = _interopRequireDefault(require("./sutras/colorChanges.js"));
 var _enemy = _interopRequireDefault(require("./sutras/enemy.js"));
-var _input = _interopRequireDefault(require("./sutras/input.js"));
 var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -6076,7 +6114,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // import input from './sutras/input.js';
 var TowerWorld = /*#__PURE__*/function () {
   function TowerWorld() {
     _classCallCheck(this, TowerWorld);
@@ -6121,13 +6159,10 @@ var TowerWorld = /*#__PURE__*/function () {
           this.sutras[key] = this[key]();
         }
       }
-
-      // bypass default input movement
-      game.customMovement = true;
-
+      game.reset('topdown', true);
       // game.data.camera.currentZoom = 2;
       game.setGravity(0, 0, 0);
-      game.createDefaultPlayer({
+      game.createPlayer({
         position: {
           x: 0,
           y: 0
@@ -6153,20 +6188,15 @@ var TowerWorld = /*#__PURE__*/function () {
       var roundSutra = _round["default"].call(this);
       var spawnerSutra = _enemy["default"].call(this);
       var playerSutra = _player["default"].call(this);
-      var inputSutra = _input["default"].call(this);
+      // let inputSutra = input.call(this);
       var colorChangesSutra = _colorChanges["default"].call(this);
 
       // Main rules Sutra
-      // TODO: ensure entire Sutra definition is exports on TowerWorld such that any
-      // node can be re-used in other Sutras
-      var rules = game.createSutra();
+      var rules = game.rules;
 
       // movement
-      rules.use((0, _topDown["default"])(game), 'movement');
-      this.handleInputs = function (entityId, inputs) {
-        rules.emit('entityInput::handleInputs', entityId, inputs);
-      };
-      game.on('entityInput::handleInputs', this.handleInputs);
+      // rules.use(movement(game), 'movement');
+
       rules.addCondition('isBorder', function (entity) {
         return entity.type === 'BORDER';
       });
@@ -6191,10 +6221,11 @@ var TowerWorld = /*#__PURE__*/function () {
         return allWallsFallen;
       });
       rules.use(roundSutra, 'round');
-      rules.use(spawnerSutra, 'spawner');
-      rules.use(playerSutra, 'player');
-      rules.use(colorChangesSutra, 'colorChanges');
-      rules.use(inputSutra, 'input');
+      //rules.use(spawnerSutra, 'spawner');
+      //rules.use(playerSutra, 'player');
+      //rules.use(colorChangesSutra, 'colorChanges');
+      // rules.use(inputSutra, 'input');
+
       rules["if"]('roundRunning')["if"]('gameTickMod60').then('spawner');
 
       // rules.if('changesColorWithDamage').then('colorChanges');
@@ -6203,16 +6234,25 @@ var TowerWorld = /*#__PURE__*/function () {
         subtree: 'colorChanges'
       });
 
+      /*
       // rules.if('isPlayer').then('input');
       rules.addAction({
-        "if": 'isPlayer',
+        if: 'isPlayer',
         subtree: 'input'
       });
+      */
 
       // Additional rules
       this.createAdditionalRules(rules);
-      console.log('rrr', rules);
-      game.setSutra(rules);
+      console.log('FMLML', rules);
+      // game.useSutra(rules);
+
+      // game.useSutra(rules, 'TowerDefense');
+      //game.setSutra(rules);
+      //game.systems.sutra.bindInputsToSutraConditions();
+      //game.systems.sutra.bindDefaultMovementSutra('topdown');
+
+      console.log("FFFF", rules);
       game.data.roundStarted = true;
       game.data.roundRunning = false;
       return rules;
@@ -6427,7 +6467,7 @@ var _default = exports["default"] = TowerWorld;
 
 */
 
-},{"../../mantra-sutras/player-movement/top-down.js":29,"./sutras/colorChanges.js":48,"./sutras/enemy.js":49,"./sutras/input.js":50,"./sutras/player.js":51,"./sutras/round.js":52}],48:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"./sutras/colorChanges.js":48,"./sutras/enemy.js":49,"./sutras/player.js":50,"./sutras/round.js":51}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6603,80 +6643,6 @@ function spawner() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = input;
-var moveSpeed = 5;
-function input() {
-  var game = this.game;
-  var inputSutra = this.game.createSutra();
-  var inputMap = ['W', 'A', 'S', 'D'];
-  inputMap.forEach(function (key) {
-    inputSutra.addCondition("press".concat(key), function (data, gameState) {
-      if (gameState.input && gameState.input.controls[key]) {
-        //console.log(`press${key}`, gameState.input)
-        return true;
-      }
-      return false;
-    });
-  });
-
-  // Add actions corresponding to the conditions
-  inputSutra["if"]('pressW').then('moveForward');
-  inputSutra["if"]('pressA').then('moveLeft');
-  inputSutra["if"]('pressS').then('moveBackward');
-  inputSutra["if"]('pressD').then('moveRight');
-
-  // Sutra event listeners for executing actions
-  inputSutra.on('moveForward', function (entity) {
-    var dx = 0;
-    var dy = moveSpeed;
-    var forceFactor = 0.05;
-    var force = {
-      x: dx * forceFactor,
-      y: -dy * forceFactor
-    };
-    game.applyForce(entity.id, force);
-  });
-  inputSutra.on('moveLeft', function (entity) {
-    var dx = moveSpeed;
-    var dy = 0;
-    var forceFactor = 0.05;
-    var force = {
-      x: -dx * forceFactor,
-      y: dy * forceFactor
-    };
-    game.applyForce(entity.id, force);
-  });
-  inputSutra.on('moveRight', function (entity) {
-    var dx = moveSpeed;
-    var dy = 0;
-    var forceFactor = 0.05;
-    var force = {
-      x: dx * forceFactor,
-      y: dy * forceFactor
-    };
-    game.applyForce(entity.id, force);
-  });
-  inputSutra.on('moveBackward', function (entity) {
-    var dx = 0;
-    var dy = moveSpeed;
-    var forceFactor = 0.05;
-    var force = {
-      x: dx * forceFactor,
-      y: dy * forceFactor
-    };
-    game.applyForce(entity.id, force);
-  });
-  console.log('creating input sutra', inputSutra);
-  return inputSutra;
-}
-;
-
-},{}],51:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports["default"] = player;
 function player() {
   var game = this.game;
@@ -6692,7 +6658,6 @@ function player() {
     }
   });
   player.on('resetPlayerPosition', function (data, node) {
-    // console.log('resetPlayerPosition', data, node)
     game.updateEntity({
       id: data.id,
       position: {
@@ -6731,7 +6696,7 @@ function player() {
   return player;
 }
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6786,7 +6751,7 @@ function round() {
   return round;
 }
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6924,7 +6889,7 @@ function createWalker(game, config) {
   return walker;
 }
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7122,7 +7087,7 @@ _defineProperty(XState, "id", 'world-xstate');
 _defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7312,7 +7277,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"../../mantra-sutras/player-movement/top-down.js":29,"./contraptions-example.js":56}],56:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"./contraptions-example.js":55}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7505,7 +7470,7 @@ function roverLight(x, y, z) {
   return contraption;
 }
 
-},{"../../../YCraft.js/index.js":1}],57:[function(require,module,exports){
+},{"../../../YCraft.js/index.js":1}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7520,7 +7485,7 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":58}],58:[function(require,module,exports){
+},{"./index.js":57}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7555,7 +7520,7 @@ worlds.TowerDefense = _TowerDefense["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./GravityGardens/GravityGardens.js":30,"./Home/Home.js":31,"./Maze/Maze.js":35,"./Music/Music.js":36,"./Platform/Platform.js":40,"./Pong/Pong.js":41,"./Space/Space.js":42,"./Sutra/Sutra.js":43,"./Tiled/Tiled.js":44,"./TowerDefense/TowerDefense.js":47,"./XState/XState.js":54,"./YCraft/YCraft.js":55}],59:[function(require,module,exports){
+},{"./GravityGardens/GravityGardens.js":30,"./Home/Home.js":31,"./Maze/Maze.js":35,"./Music/Music.js":36,"./Platform/Platform.js":40,"./Pong/Pong.js":41,"./Space/Space.js":42,"./Sutra/Sutra.js":43,"./Tiled/Tiled.js":44,"./TowerDefense/TowerDefense.js":47,"./XState/XState.js":53,"./YCraft/YCraft.js":54}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7592,7 +7557,7 @@ const circleRoute = createCircleRoute(100, 100, 50, 20);
 */
 var _default = exports["default"] = routing;
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7689,7 +7654,7 @@ function switchGraphics(game) {
   return rules;
 }
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7723,5 +7688,5 @@ function warpToWorld(game) {
   return rules;
 }
 
-},{}]},{},[57])(57)
+},{}]},{},[56])(56)
 });

@@ -30,7 +30,7 @@
         graphics = params.get('graphics');
         source = params.get('s');
         infinite = params.get('infinite');
-        mode = params.get('mode');
+        // mode = params.get('mode');
         // proceduralGenerateMissingChunks = params.get('proceduralGenerateMissingChunks');
         if (source !== null) {
           // grab all map data from source, assume labyrinthos
@@ -54,11 +54,17 @@
         mode = 'platform'; // incase of typo
       }
 
+      let fieldOfView = 96;
+
+      if (graphics === 'three' || graphics === 'babylon') {
+        fieldOfView = 256;
+      }
+
       let game = new MANTRA.Game({
         defaultPlayer: false,
         defaultMovement: true,
         mode: mode,
-        fieldOfView: 96,
+        fieldOfView: fieldOfView,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
         graphics: [graphics], // array enum, 'babylon', 'phaser', 'css', 'three'
@@ -73,11 +79,10 @@
       game.use('RBush');
       game.use('Bullet');
       game.use('Bomb');
-      /*
       game.use('Block', {
         MIN_BLOCK_SIZE: 100,
       });
-      */
+
       game.use('Gamepad');
       game.use('GamepadGUI');
       game.useFoV = true;

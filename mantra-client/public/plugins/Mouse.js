@@ -23,7 +23,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
-    this.disableContextMenu = true;
+    this.disableContextMenu = false;
     this.isDragging = false;
     this.dragStartPosition = {
       x: 0,

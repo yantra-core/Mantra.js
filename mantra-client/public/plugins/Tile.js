@@ -234,6 +234,7 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
     // ASCII representations for tiles 0-10
     // TODO: Is there a better default set of ASCII characters we can use?
     this.defaultRogueLike = ['-', '#', '+', '0', '<', '>', '$', '#', '@', '&', '?'];
+    this.seedRandom();
   }
   _createClass(TileMap, [{
     key: "initializeDataArray",
@@ -281,7 +282,7 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
     key: "seed",
     value: function seed(value) {
       if (typeof value === 'undefined') {
-        value = this.random();
+        value = this.random(6400000000);
       }
       this.mersenneTwister.seed(value);
       this.seedNoise(value);
@@ -290,7 +291,7 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "seedRandom",
     value: function seedRandom() {
-      this.seed(this.random());
+      this.seed(this.random(6400000000));
     }
   }, {
     key: "use",
@@ -628,7 +629,7 @@ var _RecursiveBacktrack = _interopRequireDefault(require("./mazes/RecursiveBackt
 var _RecursiveDivision = _interopRequireDefault(require("./mazes/RecursiveDivision.js"));
 var _ThomasHunter = _interopRequireDefault(require("./mazes/ThomasHunter.js"));
 var _BeattieSchoberth = _interopRequireDefault(require("./mazes/BeattieSchoberth.js"));
-var _PlatformZones = _interopRequireDefault(require("./mazes/PlatformZones.js"));
+var _Metroidvania = _interopRequireDefault(require("./mazes/Metroidvania.js"));
 var _Circle = _interopRequireDefault(require("./shapes/Circle.js"));
 var _Square = _interopRequireDefault(require("./shapes/Square.js"));
 var _Triangle = _interopRequireDefault(require("./shapes/Triangle.js"));
@@ -670,7 +671,8 @@ labyrinthos.mazes.RecursiveDivision = _RecursiveDivision["default"];
 // labyrinthos.mazes.SpiralBacktrack = SpiralBacktrack;
 labyrinthos.mazes.BeattieSchoberth = _BeattieSchoberth["default"];
 labyrinthos.mazes.ThomasHunter = _ThomasHunter["default"];
-labyrinthos.mazes.PlatformZones = _PlatformZones["default"];
+labyrinthos.mazes.Metroidvania = _Metroidvania["default"];
+labyrinthos.mazes.PlatformZones = _Metroidvania["default"]; // legacy API support
 // labyrinthos.mazes.TremauxsAlgorithm = TremauxsAlgorithm;
 // labyrinthos.mazes.VoronoiDiagram = VoronoiDiagram;
 
@@ -694,7 +696,7 @@ labyrinthos.TileMap = _TileMap["default"];
 labyrinthos.TileSet = _TileSet["default"];
 var _default = exports["default"] = labyrinthos;
 
-},{"./Biome.js":1,"./LSystem.js":2,"./Tile.js":3,"./TileMap.js":4,"./TileSet.js":5,"./mazes/AldousBroder.js":7,"./mazes/AldousBroder3D.js":8,"./mazes/BeattieSchoberth.js":9,"./mazes/BinaryTree.js":10,"./mazes/CellularAutomata.js":11,"./mazes/EllersAlgorithm.js":12,"./mazes/GrowingTree.js":13,"./mazes/PlatformZones.js":14,"./mazes/RecursiveBacktrack.js":15,"./mazes/RecursiveDivision.js":16,"./mazes/ThomasHunter.js":17,"./shapes/Circle.js":18,"./shapes/Square.js":19,"./shapes/Triangle.js":20,"./terrains/FaultLine.js":21,"./terrains/PerlinNoise.js":22,"./util/noise.js":26}],7:[function(require,module,exports){
+},{"./Biome.js":1,"./LSystem.js":2,"./Tile.js":3,"./TileMap.js":4,"./TileSet.js":5,"./mazes/AldousBroder.js":7,"./mazes/AldousBroder3D.js":8,"./mazes/BeattieSchoberth.js":9,"./mazes/BinaryTree.js":10,"./mazes/CellularAutomata.js":11,"./mazes/EllersAlgorithm.js":12,"./mazes/GrowingTree.js":13,"./mazes/Metroidvania.js":14,"./mazes/RecursiveBacktrack.js":15,"./mazes/RecursiveDivision.js":16,"./mazes/ThomasHunter.js":17,"./shapes/Circle.js":18,"./shapes/Square.js":19,"./shapes/Triangle.js":20,"./terrains/FaultLine.js":21,"./terrains/PerlinNoise.js":22,"./util/noise.js":26}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1844,7 +1846,7 @@ function generateGrowingTreeAlgorithmMap(tileMap, options) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = ALGORITHM_PLATFORM_ZONES;
+exports["default"] = ALGORITHM_METROIDVANIA;
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
@@ -1855,6 +1857,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 /**
+ * Metroidvania.js - Abbey Hawk Sparrow 2024
  * Originally written by Thomas Hunter II
  *
  * Originally written on June 12, 2013
@@ -1918,13 +1921,13 @@ var Grid = /*#__PURE__*/function () {
   }]);
   return Grid;
 }();
-var PlatformZones = /*#__PURE__*/function () {
-  function PlatformZones() {
+var Metroidvania = /*#__PURE__*/function () {
+  function Metroidvania() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    _classCallCheck(this, PlatformZones);
+    _classCallCheck(this, Metroidvania);
     this.options = config;
   }
-  _createClass(PlatformZones, [{
+  _createClass(Metroidvania, [{
     key: "render",
     value: function render() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1971,7 +1974,7 @@ var PlatformZones = /*#__PURE__*/function () {
       return data;
     }
   }]);
-  return PlatformZones;
+  return Metroidvania;
 }();
 var inDoorRange = function inDoorRange(n, max, range) {
   var half = Math.floor(max / 2);
@@ -2447,7 +2450,7 @@ function initialize(width, height) {
   }
   return map;
 }
-function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
+function ALGORITHM_METROIDVANIA(tileMap, options) {
   tileMap.fill(0); // Fill with walls
   var maxDimension = Math.max(tileMap.width, tileMap.height);
   if (maxDimension <= 5) {
@@ -2463,7 +2466,7 @@ function ALGORITHM_PLATFORM_ZONES(tileMap, options) {
   var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
   var maxCount = Math.floor(numRoomsWide * numRoomsHigh * 0.8);
   var minCount = Math.floor(maxCount / 4);
-  var generator = new PlatformZones({
+  var generator = new Metroidvania({
     roomWidth: roomSizeWidth,
     roomHeight: roomSizeHeight,
     maxFails: 8000,
@@ -3769,16 +3772,16 @@ function Mersenne() {
   this.seed = function (S) {
     // check incoming value of seed and coherce to number
     // try to convert seed to number, if not number, consider as string
-    var seed = Number(S);
-    if (isNaN(seed)) {
+    var _seed = Number(S);
+    if (isNaN(_seed)) {
       // convert into hash
-      seed = this.stringToSeed(S);
+      _seed = this.stringToSeed(S);
     }
-    if (typeof seed != 'number') {
+    if (typeof _seed != 'number') {
       throw new Error("seed(S) must take numeric argument; is " + _typeof(S));
     }
-    this.currentSeed = seed;
-    gen.init_genrand(seed);
+    this.currentSeed = _seed;
+    gen.init_genrand(_seed);
   };
   this.seed_array = function (A) {
     if (_typeof(A) != 'object') {
@@ -3788,7 +3791,6 @@ function Mersenne() {
     gen.init_by_array(A, A.length);
   };
   this.stringToSeed = function (str) {
-    console.log('convert', str);
     // Simple hash function to convert a string to a number
     var hash = 0;
     for (var i = 0; i < str.length; i++) {
@@ -4221,12 +4223,14 @@ var _labyrinthos = _interopRequireDefault(require("../../../../Labyrinthos.js/li
 var _defaultOrthogonalMap = _interopRequireDefault(require("./maps/defaultOrthogonalMap.js"));
 var _getChunkFiles = _interopRequireDefault(require("./lib/getChunkFiles.js"));
 var _loadChunk = _interopRequireDefault(require("./lib/loadChunk.js"));
+var _loadTilesForArea = _interopRequireDefault(require("./lib/loadTilesForArea.js"));
+var _handleChunkLoadFailure = _interopRequireDefault(require("./lib/handleChunkLoadFailure.js"));
 var _calculateTilePosition = _interopRequireDefault(require("./lib/calculateTilePosition.js"));
-var _generateRandomChunk = _interopRequireDefault(require("./lib/generateRandomChunk.js"));
-var _generateRandomChunkWithPaths = _interopRequireDefault(require("./lib/generateRandomChunkWithPaths.js"));
-var _generateChunkWithFractal = _interopRequireDefault(require("./lib/generateChunkWithFractal.js"));
-var _randomTileFromDistribution = _interopRequireDefault(require("./lib/randomTileFromDistribution.js"));
 var _createTile = _interopRequireDefault(require("./lib/createTile.js"));
+var _createTileMap = _interopRequireDefault(require("./lib/createTileMap.js"));
+var _createTileMapFromTiledJSON = _interopRequireDefault(require("./lib/createTileMapFromTiledJSON.js"));
+var _createLayer = _interopRequireDefault(require("./lib/createLayer.js"));
+var _processTile = _interopRequireDefault(require("./lib/processTile.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4237,7 +4241,6 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import labyrinthos from 'labyrinthos';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
-// TODO: mantra-tiled-server needs to be a package.json
 var tileKinds = [{
   id: 0,
   kind: 'empty',
@@ -4297,7 +4300,7 @@ var Tile = /*#__PURE__*/function () {
       loadTileMap = _ref$loadTileMap === void 0 ? false : _ref$loadTileMap;
     _classCallCheck(this, Tile);
     this.id = Tile.id;
-
+    this.labyrinthos = _labyrinthos["default"];
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
@@ -4306,6 +4309,8 @@ var Tile = /*#__PURE__*/function () {
     this.tileMap = tileMap;
     this.labyrinthosAlgoName = labyrinthosAlgo;
     this.labyType = 'maze';
+
+    // TODO: replace this scaffold wth labyrinthos.transform()
     this.labyrinthosAlgo = _labyrinthos["default"].mazes[labyrinthosAlgo];
     if (typeof this.labyrinthosAlgo === 'undefined') {
       this.labyrinthosAlgo = _labyrinthos["default"].terrains[labyrinthosAlgo];
@@ -4341,29 +4346,25 @@ var Tile = /*#__PURE__*/function () {
     this.proceduralGenerateMissingChunks = proceduralGenerateMissingChunks;
 
     // list of tile ids for random generation
-    this.tileIds = [1, 2, 3];
-    this.loadChunk = _loadChunk["default"].bind(this);
-    this.calculateTilePosition = _calculateTilePosition["default"].bind(this);
-    this.generateRandomChunk = _generateRandomChunk["default"].bind(this);
-    this.generateRandomChunkWithPaths = _generateRandomChunkWithPaths["default"].bind(this);
-    this.generateChunkWithFractal = _generateChunkWithFractal["default"].bind(this);
-    this.randomTileFromDistribution = _randomTileFromDistribution["default"].bind(this);
+    // this.tileIds = [1, 2, 3];
+
     this.createTile = _createTile["default"].bind(this);
+    this.createTileMap = _createTileMap["default"].bind(this);
+    this.createTileMapFromTiledJSON = _createTileMapFromTiledJSON["default"].bind(this);
+    this.loadChunk = _loadChunk["default"].bind(this);
+    this.getChunkFiles = _getChunkFiles["default"].bind(this);
+    this.handleChunkLoadFailure = _handleChunkLoadFailure["default"].bind(this);
+    this.calculateTilePosition = _calculateTilePosition["default"].bind(this);
+    this.loadTilesForArea = _loadTilesForArea["default"].bind(this);
+    this.createLayer = _createLayer["default"].bind(this);
+    this.processTile = _processTile["default"].bind(this);
   }
   _createClass(Tile, [{
     key: "setOptions",
     value: function setOptions(TileConfig) {
-      // console.log("SET NEW OPTIONS", TileConfig)
+      // console.log("Tile.setOptions", TileConfig)
       this.tiledServer = TileConfig.tiledServer;
       this.proceduralGenerateMissingChunks = TileConfig.proceduralGenerateMissingChunks;
-      //this.tiledMap = TileConfig.tiledMap;
-      //this.loadInitialChunk = TileConfig.loadInitialChunk;
-      //this.chunkUnitSize = TileConfig.chunkUnitSize;
-      //this.tileSize = TileConfig.tileSize;
-      //this.chunkPixelSize = TileConfig.chunkPixelSize;
-      //this.debug = TileConfig.debug;
-      //this.lazyLoadTiles = TileConfig.lazyLoadTiles;
-      //this.tileIds = TileConfig.tileIds;
     }
   }, {
     key: "init",
@@ -4384,11 +4385,6 @@ var Tile = /*#__PURE__*/function () {
         } else if (this.proceduralGenerateMissingChunks) {
           // TODO: generator
         }
-      } else {
-
-        //setTimeout(() => this.createTileMapFromTiledJSON(defaultOrthogonalMap), 222);
-        //setTimeout(() => this.createTileMapFromTiledJSON(mediumOrthogonalMap), 222);
-        //setTimeout(() => this.createTileMapFromTiledJSON(largeOrthogonalMap), 222);
       }
       if (this.loadDefaultTileMap) {
         this.createTileMapFromTiledJSON(this.tiledMap);
@@ -4405,206 +4401,9 @@ var Tile = /*#__PURE__*/function () {
       });
     }
   }, {
-    key: "createTileMap",
-    value: function createTileMap(tileMap) {
-      console.log('createTileMap', tileMap);
-      var incomingDepth = parseInt(tileMap.depth);
-      var map = new _labyrinthos["default"].TileMap({
-        x: 0,
-        y: 0,
-        width: parseInt(tileMap.width),
-        height: parseInt(tileMap.height),
-        //depth: parseInt(tileMap.depth),
-        tileWidth: 16,
-        // TODO: tileSet.tilewidth
-        tileHeight: 16 // TODO: tileSet.tileheight
-      });
-
-      map.fill(1);
-
-      // console.log('confirm', map.data)
-      map.seed(tileMap.seed);
-      this.labySeed = tileMap.seed;
-      var transformFn = _labyrinthos["default"].mazes[tileMap.algo];
-      var transformType = 'maze';
-      var is3D = false;
-      if (typeof transformFn === 'undefined') {
-        transformFn = _labyrinthos["default"].terrains[tileMap.algo];
-        transformType = 'terrain';
-      }
-      if (typeof transformFn === 'undefined') {
-        transformFn = _labyrinthos["default"].shapes[tileMap.algo];
-        transformType = 'shape';
-      }
-
-      /*
-      let try3D = tileMap.algo + '3D';
-      if (typeof labyrinthos.mazes[try3D] !== 'undefined') {
-        transformFn = labyrinthos.mazes[try3D];
-        transformType = 'maze';
-        is3D = true;
-      }
-      */
-
-      if (typeof transformFn === 'undefined') {
-        console.log('no transformFn found for', tileMap.algo);
-        throw new Error('no transformFn found for ' + tileMap.algo);
-      }
-      transformFn(map, tileMap.options || {});
-      if (transformType === 'terrain') {
-        map.scaleToTileRange(6);
-      }
-
-      // default `extrude` mode
-      if (incomingDepth > 1 && _typeof(map.data[0]) !== 'object') {
-        // if not already 3d array
-        // simply clone each layer to fill the depth dimension
-        // this is used to fill algos which can't yet generate 3d maps
-        var layer = map.data;
-        map.data = [];
-        for (var i = 0; i < incomingDepth; i++) {
-          map.data[i] = [];
-          for (var j = 0; j < layer.length; j++) {
-            map.data[i][j] = layer[j];
-          }
-          //map.data.push(JSON.parse(JSON.stringify(layer)));
-        }
-      }
-
-      this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
-
-      this.game.emit('tilemap::created', tileMap);
-    }
-  }, {
-    key: "createTileMapFromTiledJSON",
-    value: function createTileMapFromTiledJSON(tiledJSON) {
-      var _this2 = this;
-      // TODO: remove this line
-      if (typeof window !== 'undefined') {
-        var overlay = document.getElementById('drag-and-drop-file-upload-overlay');
-        // set hidden
-        overlay.style.display = 'none';
-      }
-      tiledJSON.layers.forEach(function (layer) {
-        if (layer.type === 'tilelayer') {
-          if (layer.chunks) {
-            layer.chunks.forEach(function (chunk) {
-              _this2.createLayer(chunk, tiledJSON.tilewidth, tiledJSON.tileheight);
-            });
-          } else {
-            _this2.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
-          }
-        }
-      });
-    }
-  }, {
-    key: "createLayer",
-    value: function createLayer(layer, tileWidth, tileHeight) {
-      var _this3 = this;
-      // Check if the layer.data is a 3D array
-      if (_typeof(layer.data[0]) === 'object') {
-        // 3D data handling
-        layer.data.forEach(function (layer2D, z) {
-          layer2D.forEach(function (tile, index) {
-            _this3.processTile(tile, index, layer, tileWidth, tileHeight, z);
-          });
-        });
-      } else {
-        // 2D data handling
-        layer.data.forEach(function (tile, index) {
-          _this3.processTile(tile, index, layer, tileWidth, tileHeight, 0); // Assume z=0 for 2D data
-        });
-      }
-    }
-  }, {
-    key: "processTile",
-    value: function processTile(tile, index, layer, tileWidth, tileHeight, depth) {
-      if (typeof tile === 'number') {
-        // Find id = tile in tileKinds
-        var tileId = tile;
-        var tileKind = this.tileKinds.find(function (tileKind) {
-          return tileKind.id === tileId;
-        });
-        if (tileKind) {
-          tile = tileKind;
-        } else {
-          tile = this.tileKinds[3]; // Default tile kind if not found
-        }
-      }
-
-      var _this$calculateTilePo = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth),
-        x = _this$calculateTilePo.x,
-        y = _this$calculateTilePo.y,
-        z = _this$calculateTilePo.z;
-      if (tile === null) {
-        //return;
-      }
-      // allow tile.z to override z ( useful for blocks / layers / etc )
-      if (typeof tile.z !== 'number') {
-        tile.z = z;
-      }
-      tile.z = z;
-
-      // TODO: check to see if existing tile exsting at this slot?
-
-      this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
-    }
-  }, {
     key: "getTileImageURL",
     value: function getTileImageURL(tileId) {
       return "img/game/tiles/".concat(tileId, ".png");
-    }
-  }, {
-    key: "handleLoadFailure",
-    value: function handleLoadFailure(chunkPath, chunkKey) {
-      // console.log("Fallback for failed load:", chunkPath, chunkKey);
-      // Call the procedural generation function
-      if (this.proceduralGenerateMissingChunks) {
-        // console.log('Generating random chunk', chunkKey)
-        // let randomChunk = this.generateRandomChunk(chunkKey, tileKinds);
-        var randomChunk;
-        var chunkCoordinates = this.extractChunkCoordinates(chunkKey);
-
-        //console.log('chunkCoordinates', chunkCoordinates)
-        //console.log('current map data', this.tiledMap)
-
-        // console.log('chunkCoordinates', chunkCoordinates)
-        var x = chunkCoordinates.x;
-        var y = chunkCoordinates.y;
-        // TODO: subsection query, continious map
-        //let subsection = this.tiledMap.query({ x: x, y: y, width: this.chunkUnitSize, height: this.chunkUnitSize });
-        var map = new _labyrinthos["default"].TileMap({
-          x: x,
-          y: y,
-          width: 8,
-          height: 8,
-          tileWidth: 16,
-          tileHeight: 16
-        });
-        map.fill(1);
-
-        // map.seed(this.labySeed);
-        map.seed(chunkKey);
-
-        //labyrinthos.mazes.RecursiveBacktrack(map, {});
-        // labyrinthos.mazes.SpiralBacktrack(map, {});
-        // labyrinthos .mazes.RecursiveDivision(map, {});
-        // labyrinthos.terrains.DiamondSquare(map, {});
-        // map.seed(4121);
-        console.log('using fallback generator', this.labyrinthosAlgoName);
-        this.labyrinthosAlgo(map, {});
-        if (this.labyType === 'terrain') {
-          // TODO: remove this
-          map.scaleToTileRange(6);
-        }
-        // console.log('map', map)
-
-        randomChunk = map;
-
-        // console.log('randomChunk', chunkKey, randomChunk.data.length)
-        this.game.data.chunks[chunkKey] = randomChunk;
-        this.game.systems.tile.createLayer(this.game.data.chunks[chunkKey], this.tileSize, this.tileSize);
-      }
     }
   }, {
     key: "extractChunkCoordinates",
@@ -4618,52 +4417,6 @@ var Tile = /*#__PURE__*/function () {
         x: 0,
         y: 0
       };
-    }
-  }, {
-    key: "loadTilesForArea",
-    value: function loadTilesForArea(position) {
-      var _this4 = this;
-      // Calculate the actual half-width and half-height by scaling the tileMap dimensions
-      /*
-      let halfWidth = (this.tileMap.width * 16) / 2;
-      let halfHeight = (this.tileMap.height * 16) / 2;
-       // Define a loading buffer distance
-      let loadingBuffer = 0; // This can be adjusted based on how much buffer you want
-       // Adjust halfWidth and halfHeight to include the loading buffer
-      let bufferedHalfWidth = halfWidth - loadingBuffer;
-      let bufferedHalfHeight = halfHeight - loadingBuffer;
-       // Check if the position's absolute values are within the buffered tileMap dimensions
-      if (Math.abs(position.x) <= bufferedHalfWidth && Math.abs(position.y) <= bufferedHalfHeight) {
-        // Position is within the buffered area of the tileMap, so we don't need to do anything yet
-        // Remark: We can continue to generate if seeds are aligned it, it may try to double place entities
-        // at the 0,0 chunk tiles
-        // console.log('Position is within the tileMap area with a buffer');
-        // return;
-      } else {
-        // Position is within the loading buffer or outside the tileMapArea, time to load or generate new tiles
-        // console.log('Position is approaching the tileMap boundary or is outside, loading or generating new tiles');
-      }
-      */
-
-      var outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
-      var result = (0, _getChunkFiles["default"])(position, this.chunkUnitSize, outputDir, 2);
-      // console.log("getChunkFiles result", position, result);
-
-      // TODO: place check to see if we allow remote chunk loading
-      result.forEach(function (chunkName) {
-        // Extract the chunk key from the chunk file name
-        var chunkKey = chunkName.replace('.js', '').replace(outputDir, '');
-        // Load the chunk if it's not already loaded
-        if (typeof _this4.game.data.chunks[chunkKey] === 'undefined') {
-          // console.log("loadTilesForArea", position, this.chunkUnitSize);
-          if (_this4.tiledServer) {
-            var chunkPath = chunkName;
-            _this4.loadChunk(chunkPath, chunkKey);
-          } else if (_this4.proceduralGenerateMissingChunks) {
-            _this4.handleLoadFailure(null, chunkKey); // Changed to handle procedural generation
-          }
-        }
-      });
     }
   }, {
     key: "update",
@@ -4680,7 +4433,7 @@ var Tile = /*#__PURE__*/function () {
 _defineProperty(Tile, "id", 'tile');
 var _default = exports["default"] = Tile;
 
-},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":28,"./lib/createTile.js":29,"./lib/generateChunkWithFractal.js":30,"./lib/generateRandomChunk.js":31,"./lib/generateRandomChunkWithPaths.js":32,"./lib/getChunkFiles.js":33,"./lib/loadChunk.js":34,"./lib/randomTileFromDistribution.js":35,"./maps/defaultOrthogonalMap.js":36}],28:[function(require,module,exports){
+},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":28,"./lib/createLayer.js":29,"./lib/createTile.js":30,"./lib/createTileMap.js":31,"./lib/createTileMapFromTiledJSON.js":32,"./lib/getChunkFiles.js":33,"./lib/handleChunkLoadFailure.js":34,"./lib/loadChunk.js":35,"./lib/loadTilesForArea.js":36,"./lib/processTile.js":37,"./maps/defaultOrthogonalMap.js":38}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4725,6 +4478,35 @@ function calculateTilePosition(index, layer) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = createLayer;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+//
+// createLayer.js - Will process the entire TileMap.data array and create the tiles for the layer
+//
+function createLayer(layer, tileWidth, tileHeight) {
+  var _this = this;
+  // Check if the layer.data is a 3D array
+  if (_typeof(layer.data[0]) === 'object') {
+    // 3D data handling
+    layer.data.forEach(function (layer2D, z) {
+      layer2D.forEach(function (tileValue, index) {
+        _this.processTile(tileValue, index, layer, tileWidth, tileHeight, z);
+      });
+    });
+  } else {
+    // 2D data handling
+    layer.data.forEach(function (tileValue, index) {
+      _this.processTile(tileValue, index, layer, tileWidth, tileHeight, 0); // Assume z=0 for 2D data
+    });
+  }
+}
+
+},{}],30:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = createTile;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -4737,13 +4519,12 @@ function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
     return;
   }
 
-  // TODO: better tile config by kind
-  // for now
-
+  // overrides for tile depth
   if (typeof tile.z === 'number') {
     z = tile.z;
   } else {
-    z = -16;
+    // default tile space is the floor, below player
+    z = 0;
   }
   var isStatic;
   if (typeof tile.isStatic === 'boolean') {
@@ -4761,7 +4542,7 @@ function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
     // _type = 'BLOCK';
   }
   var _texture = "tile-".concat(tile.kind); // rename
-  this.game.createEntity((_this$game$createEnti = {
+  var ent = this.game.createEntity((_this$game$createEnti = {
     type: _type,
     kind: tile.kind,
     body: body,
@@ -4786,71 +4567,7 @@ function createTile(tile, x, y, z, tileWidth, tileHeight, color) {
       z: z * scale
     }
   }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileWidth * scale), _this$game$createEnti));
-}
-
-},{}],30:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = generateChunkWithFractal;
-function generateChunkWithFractal(chunkKey, tileKinds) {
-  var fractalType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'mandelbrot';
-  var chunkData = [];
-  var chunkSize = this.chunkUnitSize;
-  var maxIter = 100; // Max iterations for fractal calculation
-  var fractalBounds = {
-    xMin: -2,
-    xMax: 1,
-    yMin: -1.5,
-    yMax: 1.5
-  }; // Bounds for the fractal
-
-  for (var i = 0; i < chunkSize * chunkSize; i++) {
-    var x = i % chunkSize;
-    var y = Math.floor(i / chunkSize);
-
-    // Map chunk coordinates to fractal coordinates
-    var fractalX = fractalBounds.xMin + x / chunkSize * (fractalBounds.xMax - fractalBounds.xMin);
-    var fractalY = fractalBounds.yMin + y / chunkSize * (fractalBounds.yMax - fractalBounds.yMin);
-    var tile = void 0;
-    var iterations = mandelbrotIterations(fractalX, fractalY, maxIter);
-    if (iterations === maxIter) {
-      // Inside the set, pick a specific tile kind
-      tile = {
-        kind: 'path-brown'
-      };
-    } else {
-      // Outside the set, choose randomly
-      tile = this.randomTileFromDistribution(tileKinds, tileKinds.reduce(function (acc, kind) {
-        return acc + kind.weight;
-      }, 0));
-    }
-    chunkData.push(tile);
-  }
-  var randomIntColor = Math.floor(Math.random() * 16777215);
-  return {
-    data: chunkData,
-    height: chunkSize,
-    width: chunkSize,
-    color: randomIntColor,
-    x: this.extractChunkCoordinates(chunkKey).x,
-    y: this.extractChunkCoordinates(chunkKey).y
-  };
-}
-function mandelbrotIterations(x, y) {
-  var maxIter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
-  var real = x;
-  var imag = y;
-  var n = 0;
-  while (real * real + imag * imag <= 4 && n < maxIter) {
-    var tempReal = real * real - imag * imag + x;
-    imag = 2 * real * imag + y;
-    real = tempReal;
-    n++;
-  }
-  return n;
+  return ent;
 }
 
 },{}],31:[function(require,module,exports){
@@ -4859,25 +4576,83 @@ function mandelbrotIterations(x, y) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = generateRandomChunk;
-function generateRandomChunk(chunkKey, tileKinds) {
-  var chunkData = [];
-  var totalWeight = tileKinds.reduce(function (acc, tileType) {
-    return acc + tileType.weight;
-  }, 0);
-  for (var i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
-    var tile = this.randomTileFromDistribution(tileKinds, totalWeight);
-    chunkData.push(tile);
+exports["default"] = createTileMap;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function createTileMap(tileMap) {
+  var labyrinthos = this.labyrinthos;
+  // console.log('createTileMap', tileMap);
+
+  if (typeof tileMap.x !== 'number') {
+    tileMap.x = 0;
   }
-  var randomIntColor = Math.floor(Math.random() * 16777215);
-  return {
-    data: chunkData,
-    height: this.chunkUnitSize,
-    width: this.chunkUnitSize,
-    color: randomIntColor,
-    x: this.extractChunkCoordinates(chunkKey).x,
-    y: this.extractChunkCoordinates(chunkKey).y
-  };
+  if (typeof tileMap.y !== 'number') {
+    tileMap.y = 0;
+  }
+  var incomingDepth = parseInt(tileMap.depth);
+  var map = new labyrinthos.TileMap({
+    x: tileMap.x,
+    y: tileMap.y,
+    width: parseInt(tileMap.width),
+    height: parseInt(tileMap.height),
+    //depth: parseInt(tileMap.depth),
+    tileWidth: 16,
+    // TODO: tileSet.tilewidth
+    tileHeight: 16 // TODO: tileSet.tileheight
+  });
+
+  map.fill(1);
+  map.seed(tileMap.seed);
+  this.labySeed = tileMap.seed;
+  var transformFn = labyrinthos.mazes[tileMap.algo];
+  var transformType = 'maze';
+  var is3D = false;
+  if (typeof transformFn === 'undefined') {
+    transformFn = labyrinthos.terrains[tileMap.algo];
+    transformType = 'terrain';
+  }
+  if (typeof transformFn === 'undefined') {
+    transformFn = labyrinthos.shapes[tileMap.algo];
+    transformType = 'shape';
+  }
+
+  /*
+  let try3D = tileMap.algo + '3D';
+  if (typeof labyrinthos.mazes[try3D] !== 'undefined') {
+    transformFn = labyrinthos.mazes[try3D];
+    transformType = 'maze';
+    is3D = true;
+  }
+  */
+
+  if (typeof transformFn === 'undefined') {
+    console.log('no transformFn found for', tileMap.algo);
+    throw new Error('no transformFn found for ' + tileMap.algo);
+  }
+  transformFn(map, tileMap.options || {});
+  if (transformType === 'terrain') {
+    map.scaleToTileRange(6);
+  }
+
+  // default `extrude` mode
+  if (incomingDepth > 1 && _typeof(map.data[0]) !== 'object') {
+    // if not already 3d array
+    // simply clone each layer to fill the depth dimension
+    // this is used to fill algos which can't yet generate 3d maps
+    var layer = map.data;
+    map.data = [];
+    for (var i = 0; i < incomingDepth; i++) {
+      map.data[i] = [];
+      for (var j = 0; j < layer.length; j++) {
+        map.data[i][j] = layer[j];
+      }
+      //map.data.push(JSON.parse(JSON.stringify(layer)));
+    }
+  }
+
+  this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
+
+  this.game.emit('tilemap::created', tileMap);
+  return map;
 }
 
 },{}],32:[function(require,module,exports){
@@ -4886,57 +4661,26 @@ function generateRandomChunk(chunkKey, tileKinds) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = generateRandomChunkWithPaths;
-function generateRandomChunkWithPaths(chunkKey, tileKinds) {
-  var chunkData = [];
-  var totalWeight = tileKinds.reduce(function (acc, tileType) {
-    return acc + tileType.weight;
-  }, 0);
-
-  // Determine if this chunk should have a path, and if so, get the pattern
-  var hasPath = Math.random() < 0.5; // 50% chance to have a path
-  var pathPattern = hasPath ? randomPathPattern(this.chunkUnitSize) : null;
-
-  // Variables to control path color consistency
-  var currentPathColor = Math.random() < 0.5 ? 'path-green' : 'path-brown'; // Initial path color
-  var colorSwitchThreshold = 3; // Number of tiles before color switch
-  var colorCounter = 0; // Counter for the current color
-
-  for (var i = 0; i < this.chunkUnitSize * this.chunkUnitSize; i++) {
-    var tile = void 0;
-    if (hasPath && pathPattern.has(i)) {
-      tile = {
-        kind: currentPathColor
-      };
-      colorCounter++;
-      // Switch color if the threshold is reached
-      if (colorCounter >= colorSwitchThreshold) {
-        currentPathColor = currentPathColor === 'path-green' ? 'path-brown' : 'path-green';
-        colorCounter = 0; // Reset counter after switching
+exports["default"] = createTileMapFromTiledJSON;
+function createTileMapFromTiledJSON(tiledJSON) {
+  var _this = this;
+  // TODO: remove this line
+  if (typeof window !== 'undefined') {
+    var overlay = document.getElementById('drag-and-drop-file-upload-overlay');
+    // set hidden
+    overlay.style.display = 'none';
+  }
+  tiledJSON.layers.forEach(function (layer) {
+    if (layer.type === 'tilelayer') {
+      if (layer.chunks) {
+        layer.chunks.forEach(function (chunk) {
+          _this.createLayer(chunk, tiledJSON.tilewidth, tiledJSON.tileheight);
+        });
+      } else {
+        _this.createLayer(layer, tiledJSON.tilewidth, tiledJSON.tileheight);
       }
-    } else {
-      tile = this.randomTileFromDistribution(tileKinds, totalWeight);
     }
-    chunkData.push(tile);
-  }
-  var randomIntColor = Math.floor(Math.random() * 16777215);
-  return {
-    data: chunkData,
-    height: this.chunkUnitSize,
-    width: this.chunkUnitSize,
-    color: randomIntColor,
-    x: this.extractChunkCoordinates(chunkKey).x,
-    y: this.extractChunkCoordinates(chunkKey).y
-  };
-}
-function randomPathPattern(size) {
-  // Example implementation: Create a simple straight horizontal path
-  var pathSet = new Set();
-  var row = Math.floor(Math.random() * size); // Random row for the path
-  for (var i = 0; i < size; i++) {
-    pathSet.add(row * size + i);
-  }
-  return pathSet;
+  });
 }
 
 },{}],33:[function(require,module,exports){
@@ -4982,6 +4726,50 @@ function pathJoin(dir, file) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = handleChunkLoadFailure;
+function handleChunkLoadFailure(chunkPath, chunkKey) {
+  var labyrinthos = this.labyrinthos;
+  // console.log("Fallback for failed load:", chunkPath, chunkKey);
+
+  // Call the procedural generation function
+  if (this.proceduralGenerateMissingChunks) {
+    // console.log('Generating random chunk', chunkKey)
+
+    var randomChunk;
+    var chunkCoordinates = this.extractChunkCoordinates(chunkKey);
+
+    //console.log('chunkCoordinates', chunkCoordinates)
+    //console.log('current map data', this.tiledMap)
+
+    var x = chunkCoordinates.x;
+    var y = chunkCoordinates.y;
+
+    // this will eventually call Tile.createLayer()
+    // certain incoming tileMap options will require custom logic to re-inflate the map
+    // with correct seed and algo configurations
+    var map = this.createTileMap({
+      x: x,
+      y: y,
+      width: 8,
+      height: 8,
+      tileWidth: 16,
+      tileHeight: 16,
+      algo: this.labyrinthosAlgoName,
+      seed: chunkKey
+    });
+    randomChunk = map;
+
+    // console.log('randomChunk', chunkKey, randomChunk.data.length)
+    this.game.data.chunks[chunkKey] = randomChunk;
+  }
+}
+
+},{}],35:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = loadChunk;
 function loadChunk(chunkPath, chunkKey) {
   var _this = this;
@@ -5005,47 +4793,110 @@ function loadChunk(chunkPath, chunkKey) {
         _this.game.systems.tile.createLayer(_this.game.data.chunks[chunkKey], _this.tileSize, _this.tileSize);
       } else {
         // console.log("WARNING: chunk not found", chunkKey);
-        _this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
+        _this.handleChunkLoadFailure(chunkPath, chunkKey); // Handle the failure case
       }
     });
   } else if (state.attempts >= this.maxRetries) {
     // console.log("MAX RETRIES REACHED FOR", chunkPath);
-    this.handleLoadFailure(chunkPath, chunkKey); // Handle the failure case
+    this.handleChunkLoadFailure(chunkPath, chunkKey); // Handle the failure case
   }
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = randomTileFromDistribution;
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function randomTileFromDistribution(tileKinds, totalWeight) {
-  var randomWeight = Math.random() * totalWeight;
-  var weightSum = 0;
-  var _iterator = _createForOfIteratorHelper(tileKinds),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var tileType = _step.value;
-      weightSum += tileType.weight;
-      if (randomWeight <= weightSum) {
-        return tileType.id;
+exports["default"] = loadTilesForArea;
+function loadTilesForArea(position) {
+  var _this = this;
+  // Calculate the actual half-width and half-height by scaling the tileMap dimensions
+  /*
+  let halfWidth = (this.tileMap.width * 16) / 2;
+  let halfHeight = (this.tileMap.height * 16) / 2;
+   // Define a loading buffer distance
+  let loadingBuffer = 0; // This can be adjusted based on how much buffer you want
+   // Adjust halfWidth and halfHeight to include the loading buffer
+  let bufferedHalfWidth = halfWidth - loadingBuffer;
+  let bufferedHalfHeight = halfHeight - loadingBuffer;
+   // Check if the position's absolute values are within the buffered tileMap dimensions
+  if (Math.abs(position.x) <= bufferedHalfWidth && Math.abs(position.y) <= bufferedHalfHeight) {
+    // Position is within the buffered area of the tileMap, so we don't need to do anything yet
+    // Remark: We can continue to generate if seeds are aligned it, it may try to double place entities
+    // at the 0,0 chunk tiles
+    // console.log('Position is within the tileMap area with a buffer');
+    // return;
+  } else {
+    // Position is within the loading buffer or outside the tileMapArea, time to load or generate new tiles
+    // console.log('Position is approaching the tileMap boundary or is outside, loading or generating new tiles');
+  }
+  */
+
+  var outputDir = '/tiled/chunks/'; // Set the base directory for the chunks
+  var result = this.getChunkFiles(position, this.chunkUnitSize, outputDir, 2);
+  // console.log("getChunkFiles result", position, result);
+
+  // TODO: place check to see if we allow remote chunk loading
+  result.forEach(function (chunkName) {
+    // Extract the chunk key from the chunk file name
+    var chunkKey = chunkName.replace('.js', '').replace(outputDir, '');
+    // Load the chunk if it's not already loaded
+    if (typeof _this.game.data.chunks[chunkKey] === 'undefined') {
+      // console.log("loadTilesForArea", position, this.chunkUnitSize);
+      if (_this.tiledServer) {
+        var chunkPath = chunkName;
+        _this.loadChunk(chunkPath, chunkKey);
+      } else if (_this.proceduralGenerateMissingChunks) {
+        _this.handleChunkLoadFailure(null, chunkKey); // Changed to handle procedural generation
       }
     }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-  return tileKinds[tileKinds.length - 1].id; // Fallback in case of rounding errors
+  });
 }
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = processTile;
+// processTile.js - This function will take a tileValue ( Tile.id ) with index / tileWidth / tileHeight / depth and create a tile
+//                  at the correct position in the game world 
+function processTile(tileValue, index, layer, tileWidth, tileHeight, depth) {
+  var tile;
+  // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
+  // look up the tile kind and use that as the tile
+  if (typeof tileValue === 'number') {
+    // Find id = tile in tileKinds
+    var tileId = tileValue;
+    var tileKind = this.tileKinds.find(function (tileKind) {
+      return tileKind.id === tileId;
+    });
+    if (tileKind) {
+      tile = tileKind;
+    } else {
+      // Default tile kind if not found
+      tile = this.tileKinds[3];
+    }
+  } else {
+    console.log('Warning: tileValue was not a number. This should not happen:', tileValue);
+    return;
+  }
+
+  //
+  // We need to take the relative tile coordinates and convert them world coordinates
+  //
+  var _this$calculateTilePo = this.calculateTilePosition(index, layer, tileWidth, tileHeight, depth),
+    x = _this$calculateTilePo.x,
+    y = _this$calculateTilePo.y,
+    z = _this$calculateTilePo.z;
+
+  // TODO: check to see if existing tile exsting at this slot?
+  this.createTile(tile, x, y, z, tileWidth, tileHeight, layer.color);
+}
+
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
