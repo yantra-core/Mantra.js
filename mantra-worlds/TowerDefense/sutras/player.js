@@ -13,7 +13,6 @@ export default function player() {
   });
 
   player.on('resetPlayerPosition', function (data, node) {
-    // console.log('resetPlayerPosition', data, node)
     game.updateEntity({
       id: data.id,
       position: {

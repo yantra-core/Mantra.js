@@ -337,9 +337,13 @@ class Game {
     }
   }
 
-  reset(mode) {
+  reset(mode, clearSutra = true) {
+
     // reset all Sutra rules
-    this.rules = this.createSutra();
+    if (clearSutra) {
+      this.rules = this.createSutra();
+    }
+
     // remap the keyboard mappings to Sutra by default
     if (this.systems.sutra) {
       this.systems.sutra.bindInputsToSutraConditions();

@@ -3,7 +3,7 @@ import player from './sutras/player.js';
 import colorChanges from './sutras/colorChanges.js';
 import enemy from './sutras/enemy.js';
 import input from './sutras/input.js';
-import movement from "../../mantra-sutras/player-movement/top-down.js";
+// import movement from "../../mantra-sutras/player-movement/top-down.js";
 
 class TowerWorld {
   static id = 'world-towerdefense';
@@ -52,14 +52,12 @@ class TowerWorld {
         this.sutras[key] = this[key]();
       }
     }
-
-    // bypass default input movement
     game.customMovement = true;
-
+    game.reset();
     // game.data.camera.currentZoom = 2;
     game.setGravity(0, 0, 0);
 
-    game.createDefaultPlayer({
+    game.createPlayer({
       position: {
         x: 0,
         y: 0
@@ -88,32 +86,26 @@ class TowerWorld {
     let colorChangesSutra = colorChanges.call(this);
 
     // Main rules Sutra
-    // TODO: ensure entire Sutra definition is exports on TowerWorld such that any
-    // node can be re-used in other Sutras
     let rules = game.createSutra();
 
-
     // movement
-    rules.use(movement(game), 'movement');
-
-    this.handleInputs = function (entityId, inputs) {
-      rules.emit('entityInput::handleInputs', entityId, inputs)
-    }
-    game.on('entityInput::handleInputs', this.handleInputs);
+    // rules.use(movement(game), 'movement');
 
     rules.addCondition('isBorder', (entity) => entity.type === 'BORDER');
 
     rules
       .if('roundNotPaused')
       .if('roundNotRunning')
-      .then('createBorders')
-      .then('spawnEnemyUnits')
-      .then('startRound')
+        .then('createBorders')
+        .then('spawnEnemyUnits')
+        .then('startRound')
 
+        /*
     rules
       .if('spawnUnitTouchedHomebase')
       .then('removeSpawnUnit')
       .then('resetSpawnerUnit');
+      */
 
     rules
       .if('blockHitWall')
@@ -139,8 +131,6 @@ class TowerWorld {
       .if('allWallsFallen')
       .then('roundLost');
 
-   
-
     rules.addCondition('allWallsFallen', function (entity, gameState) {
       // check see if any of UnitSpawners have been made it past the world height + 1000
       let height = gameState.height;
@@ -161,32 +151,35 @@ class TowerWorld {
     rules.use(colorChangesSutra, 'colorChanges');
     rules.use(inputSutra, 'input');
 
-    rules
-      .if('roundRunning')
-      .if('gameTickMod60')
-      .then('spawner');
 
+      /*
     // rules.if('changesColorWithDamage').then('colorChanges');
     rules.addAction({
       if: 'changesColorWithDamage',
       subtree: 'colorChanges'
     });
+    */
 
+    /*
+      Remark: I don't think we need to use a subtree here since the input sutra is bound to user inputs
+              The input sutra should just work as intended without need to be subtree
+      rules.addAction({
+        if: 'isPlayer',
+        subtree: 'input'
+      });
+    */
+
+    /*
     // rules.if('isPlayer').then('input');
-    rules.addAction({
-      if: 'isPlayer',
-      subtree: 'input'
-    });
+    */
 
     // Additional rules
     this.createAdditionalRules(rules);
-
-    console.log('rrr', rules)
-    game.setSutra(rules);
-
+    console.log(rules)
+    // let test = game.createSutra();
+    game.useSutra(rules, 'TowerDefense');
     game.data.roundStarted = true;
     game.data.roundRunning = false;
-
 
     return rules;
 
@@ -218,17 +211,6 @@ class TowerWorld {
   createAdditionalRules(rules) {
     let game = this.game;
     let self = this;
-
-    rules
-      .on('removeSpawnUnit', function (event, data, node) {
-        if (event.bodyA.type === 'BORDER') {
-          game.removeEntity(event.bodyB.id);
-          // set the color of bodyB to red
-        }
-        if (event.bodyB.type === 'BORDER') {
-          game.removeEntity(event.bodyA.id);
-        }
-      });
 
     rules.addCondition('blockHitWall', function (entity, data) {
       if (entity.type === 'COLLISION') {
@@ -300,52 +282,7 @@ class TowerWorld {
       self.createBorders(2);
     })
 
-    rules.on('spawnEnemyUnits', function (data, node) {
-      console.log('data', data, node)
-      try {
-        // create 8 unit spawners at the top of the map border, left to right, evenly spaced
-        let spawners = [];
 
-        for (let i = 0; i < 8; i++) {
-          // create fresh clone of unitSpawner
-          let spawner = JSON.parse(JSON.stringify({
-            type: 'UnitSpawner',
-            health: 100,
-            position: {
-              x: 0,
-              y: 0
-            },
-            health: 100,
-            mass: 100,
-            width: 64,
-            height: 64,
-            color: 0x00ff00,
-            style: {
-              backgroundColor: '#000000'
-            },
-
-          }));
-          console.log('spawner', spawner)
-          let smallerWidth = game.width * 0.8;
-          spawner.position.x = -smallerWidth / 2 + (smallerWidth / 8) * i;
-          spawner.position.y = (-game.height / 2) + 100;
-          spawner.startingPosition = {
-            x: spawner.position.x,
-            y: spawner.position.y
-          }
-          spawners.push(spawner);
-        }
-        spawners.forEach(spawner => {
-          let ent = game.createEntity(spawner);
-        });
-      } catch (err) {
-        console.log('err', err)
-      }
-
-
-    });
-
-    /*
     rules.on('roundLost', function (data, node, gameState) {
       //console.log('roundLost!!!');
       // stop the game
@@ -358,7 +295,6 @@ class TowerWorld {
       // set roundRunning to true
       game.data.roundRunning = true;
     });
-    */
 
   }
 

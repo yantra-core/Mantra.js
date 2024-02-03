@@ -27,7 +27,6 @@ class Platform {
   createWorld() {
 
     let game = this.game;
-    game.customMovement = true;
 
     game.reset('platform');
     game.setGravity(0, 3.3, 0);

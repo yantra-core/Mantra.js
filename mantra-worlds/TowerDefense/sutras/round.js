@@ -18,7 +18,6 @@ export default function round() {
   });
 
   round.addCondition('roundNotRunning', (entity, gameState) => {
-    // console.log('roundNotRunning', gameState.roundRunning)
     return gameState.roundRunning === false;
   });
 
@@ -42,7 +41,7 @@ export default function round() {
 
   round.on('startRound', function (data, node, gameState) {
     // set roundRunning to true
-    console.log('startRound')
+    console.log('startRound', node)
     gameState.roundRunning = true;
     gameState.roundEnded = false;
   });

@@ -2,27 +2,62 @@ const moveSpeed = 5;
 
 export default function input() {
   let game = this.game;
-  let inputSutra = this.game.createSutra();
+  let rules = this.game.createSutra();
 
-  let inputMap = ['W', 'A', 'S', 'D'];
-  inputMap.forEach((key) => {
-    inputSutra.addCondition(`press${key}`, function(data, gameState){
-      if (gameState.input && gameState.input.controls[key]) {
-        //console.log(`press${key}`, gameState.input)
-        return true;
-      }
-      return false;
-    });
+  rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
+  rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
+  rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
+  rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
+  rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_B'] });
+  rules.addCondition('USE_ITEM_2', { op: 'or', conditions: ['J', 'BUTTON_X'] });
+  rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['K', 'BUTTON_A'] });
+  rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['L', 'BUTTON_Y'] });
+
+  rules
+    .if('PLAYER_UP')
+    .then('MOVE_UP')
+
+  rules
+    .if('PLAYER_LEFT')
+    .then('MOVE_LEFT')
+
+  rules
+    .if('PLAYER_DOWN')
+    .then('MOVE_DOWN')
+
+  rules
+    .if('PLAYER_RIGHT')
+    .then('MOVE_RIGHT')
+
+  rules
+    .if('USE_ITEM_1')
+    .then('FIRE_BULLET')
+    .map('determineShootingSprite')
+    .then('updateSprite');
+
+
+  rules.on('FIRE_BULLET', function (entity) {
+    game.systems.bullet.fireBullet(entity.id);
   });
- 
-  // Add actions corresponding to the conditions
-  inputSutra.if('pressW').then('moveForward');
-  inputSutra.if('pressA').then('moveLeft');
-  inputSutra.if('pressS').then('moveBackward');
-  inputSutra.if('pressD').then('moveRight');
+
+  rules.on('SWING_SWORD', function (entity) {
+    game.systems.sword.swingSword(entity.id);
+  })
+
+  rules.on('CAMERA_SHAKE', function (entity) {
+    game.shakeCamera(1000);
+  });
+  rules.on('ZOOM_IN', function (entity) {
+    let currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom + 0.05);
+  });
+  rules.on('ZOOM_OUT', function (entity) {
+    let currentZoom = game.data.camera.currentZoom || 1;
+    game.setZoom(currentZoom - 0.05);
+  });
 
   // Sutra event listeners for executing actions
-  inputSutra.on('moveForward', (entity) => {
+  rules.on('PLAYER_UP', (entity) => {
     let dx = 0;
     let dy = moveSpeed;
     const forceFactor = 0.05;
@@ -30,7 +65,7 @@ export default function input() {
     game.applyForce(entity.id, force);
   });
 
-  inputSutra.on('moveLeft', (entity) => {
+  rules.on('PLAYER_LEFT', (entity) => {
     let dx = moveSpeed;
     let dy = 0;
     const forceFactor = 0.05;
@@ -38,7 +73,7 @@ export default function input() {
     game.applyForce(entity.id, force);
   });
 
-  inputSutra.on('moveRight', (entity) => {
+  rules.on('PLAYER_RIGHT', (entity) => {
     let dx = moveSpeed;
     let dy = 0;
     const forceFactor = 0.05;
@@ -46,7 +81,7 @@ export default function input() {
     game.applyForce(entity.id, force);
   });
 
-  inputSutra.on('moveBackward', (entity) => {
+  rules.on('PLAYER_DOWN', (entity) => {
     let dx = 0;
     let dy = moveSpeed;
     const forceFactor = 0.05;
@@ -54,6 +89,6 @@ export default function input() {
     game.applyForce(entity.id, force);
   });
 
-  console.log('creating input sutra', inputSutra)
-  return inputSutra;
+  console.log('creating input sutra', rules)
+  return rules;
 };
