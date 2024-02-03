@@ -18,7 +18,7 @@ import processTile from './lib/processTile.js';
 
 const tileKinds = [
   { id: 0, kind: 'empty', weight: 10 },
-  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 16 },
+  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 0, size: { depth: 96 } },
   { id: 2, kind: 'grass', weight: 63 },
   { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
   { id: 4, kind: 'path-green', weight: 10 },

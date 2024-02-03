@@ -20,6 +20,8 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   }
   if (tile.size && typeof tile.size.depth === 'number') {
     tileDepth = tile.size.depth;
+  } else {
+    tileDepth = tileHeight;
   }
 
   let isStatic;
