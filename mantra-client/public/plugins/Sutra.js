@@ -756,7 +756,7 @@ function evaluateCondition(condition, node, data, gameState) {
       }
     } else {
       console.log('Warning: Condition not found: ' + condition + '. About to throw an error.\nPlease define the missing condition in your sutra script.');
-      // throw new Error(`Condition "${condition}" not found`);
+      throw new Error("Condition \"".concat(condition, "\" not found"));
     }
   } else if (typeof condition === 'function') {
     return condition(targetData, gameState);
