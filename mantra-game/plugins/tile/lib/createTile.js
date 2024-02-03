@@ -1,4 +1,4 @@
-export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, tileDepth, color) {
+export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, tileDepth, color, customZ = true) {
 
   let tileId = tile.id;
 
@@ -7,7 +7,7 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   }
 
   // overrides for tile z position, used for 2.5D games
-  if (typeof tile.z === 'number') {
+  if (customZ && typeof tile.z === 'number') {
     z = tile.z;
   }
 
@@ -18,6 +18,7 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   if (tile.size && typeof tile.size.height === 'number') {
     tileHeight = tile.size.height;
   }
+
   if (tile.size && typeof tile.size.depth === 'number') {
     tileDepth = tile.size.depth;
   } else {
@@ -42,6 +43,11 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   let _type = 'TILE';
   if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
     // _type = 'BLOCK';
+  }
+
+  if (customZ) {
+    // this is required so don't dont stack 2d bodies inside each other in 2.5D space
+    body = false;
   }
   let _texture = `tile-${tile.kind}`; // rename
   let ent = this.game.createEntity({

@@ -7,7 +7,11 @@ export default function  createLayer(layer, tileWidth, tileHeight) {
     // 3D data handling
     layer.data.forEach((layer2D, z) => {
       layer2D.forEach((tileValue, index) => {
-        this.processTile(tileValue, index, layer, tileWidth, tileHeight, z);
+        let customZ = false;
+        if (z > 0) {
+          customZ = true;
+        }
+        this.processTile(tileValue, index, layer, tileWidth, tileHeight, z, customZ);
       });
     });
   } else {
