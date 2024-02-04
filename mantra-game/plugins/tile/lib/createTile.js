@@ -49,7 +49,15 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
     // this is required so don't dont stack 2d bodies inside each other in 2.5D space
     body = false;
   }
-  let _texture = `tile-${tile.kind}`; // rename
+
+  let _texture;
+  // check to see if a custom texture is set
+  if (typeof tile.texture !== 'undefined') {
+    _texture = tile.texture;
+  } else{
+    _texture = `tile-${tile.kind}`; // rename
+  }
+
   let ent = this.game.createEntity({
     type: _type,
     kind: tile.kind,

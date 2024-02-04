@@ -18,7 +18,7 @@ import processTile from './lib/processTile.js';
 
 const defaultTileSet = [
   { id: 0, kind: 'empty', weight: 10 },
-  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true,  z: 16 /* size: { depth: 32 } */ },
+  { id: 1, kind: 'bush', texture: 'tile-bush', weight: 2, body: true, isStatic: true,  z: 16 /* size: { depth: 32 } */ },
   { id: 2, kind: 'grass', weight: 63 },
   { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
   { id: 4, kind: 'path-green', weight: 10 },
