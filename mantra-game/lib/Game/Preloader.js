@@ -18,14 +18,16 @@ export default class Preloader {
   async loadAll() {
     let game = this.game;
     const loadPromises = this.assets.map(asset => this.loadAsset(asset));
+    console.log('loading all assets', loadPromises.length)
     await Promise.all(loadPromises);
-    game.emit('assetsLoaded');
+    game.emit('preloader::loaded');
   }
 
   async loadAsset(asset) {
     switch (asset.type) {
       case 'image':
         await this.loadImage(asset);
+        asset.loaded = true;
         break;
       // Other cases for different asset types
     }

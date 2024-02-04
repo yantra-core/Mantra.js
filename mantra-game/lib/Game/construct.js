@@ -23,6 +23,8 @@ import storage from '../storage/storage.js';
 // Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
 import loadPluginsFromConfig from '../loadPluginsFromConfig.js';
 
+import Preloader from "./Preloader.js";
+
 // Utility function for loading external assets
 import loadScripts from '../util/loadScripts.js';
 import loadCSS from '../util/loadCSS.js';
@@ -134,6 +136,11 @@ export default function construct(game, plugins = []) {
 
   // spatial tree
   game.deferredEntities = {};
+
+  // Preloader, for loading assets in client
+  const preloader = new Preloader(game);
+  game.preloader = preloader;
+
 
   game.queuedAssets = {};
 

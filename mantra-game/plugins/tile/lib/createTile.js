@@ -53,11 +53,12 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   let ent = this.game.createEntity({
     type: _type,
     kind: tile.kind,
-    body,
+    body: body,
     mass,
     // Remark: By default we will disable all collision events for Tiles
     //         This is done universally for performance reasons
     //         Each tile.kind could be configured via `TileSet` class with custom collision config
+    // Note:   Entities will still collide if they have `body`, but no collision events will be emitted
     collisionActive: false,
     collisionStart: false,
     collisionEnd: false,

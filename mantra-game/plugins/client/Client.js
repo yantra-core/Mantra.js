@@ -2,7 +2,6 @@
 // Mantra Client, connects to either local instance or remote websocket server
 import LocalClient from "./LocalClient.js";
 import WebSocketClient from "./WebSocketClient.js";
-import Preloader from "./lib/Preloader.js";
 import defaultAssets from './defaultAssets.js';
 
 export default class Client {
@@ -39,10 +38,9 @@ export default class Client {
       deltaEncoding: this.config.deltaEncoding
     }));
 
+    let preloader = game.preloader;
+
     if (!game.isServer) {
-      const preloader = new Preloader(game);
-      // hoist preloader to game scope
-      game.preloader = preloader;
 
       // for all game.queuedAssets Set, add to preloader
       for (let key in game.queuedAssets) {
