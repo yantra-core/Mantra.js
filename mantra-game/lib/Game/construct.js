@@ -57,8 +57,6 @@ export default function construct(game, plugins = []) {
     chunks: {}
   };
 
-  game.useFoV = false; // for now
-
   if (typeof game.data.camera.follow === 'undefined') {
     game.data.camera.follow = true;
   }

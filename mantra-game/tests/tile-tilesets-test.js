@@ -73,7 +73,7 @@ tap.test('Tile plugin custom tile set', (t) => {
     let tileSet = [
       { id: 0, kind: 'test-empty', weight: 10 },
       { id: 1, kind: 'test-bush', weight: 2, body: true, isStatic: true,  z: 16 },
-      { id: 2, kind: 'test-grass', weight: 63 },
+      { id: 2, kind: 'test-grass', texture: 'custom-texture', weight: 63 },
     ];
 
     // check for default tileSet values

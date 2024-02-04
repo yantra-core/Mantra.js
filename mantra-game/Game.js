@@ -23,6 +23,7 @@ class Game {
       width: 800,
       height: 600,
       fieldOfView: 1600,
+      useFoV: true,
       // game systems / auto-load based on pluginsConfig
       physics: 'matter',
       graphics: ['css'],
@@ -350,7 +351,7 @@ class Game {
     }
 
     // reset the Field of View use to default ( off )
-    this.useFoV = false;
+    this.config.useFoV = false;
 
     // reset the default player controls
     this.setControls({});

@@ -77,7 +77,7 @@ class RBush {
 
     // if (tick % 30 !== 0) return;
 
-    if (this.game.useFoV !== true) return;
+    if (this.game.config.useFoV !== true) return;
 
     // get all items, plus a buffer of 1.1x the field of view
     let nearbyEntities = game.getPlayerFieldOfView(currentPlayer, this.game.data.fieldOfView * 1.1, false);
@@ -85,7 +85,7 @@ class RBush {
     // Check to see if any entities exists in the game world which are not in the field of view
     // If so, remove them from the game world
     for (let [eId, state] of this.game.entities.entries()) {
-      if (game.useFoV && nearbyEntities.indexOf(eId) === -1) {
+      if (game.config.useFoV && nearbyEntities.indexOf(eId) === -1) {
         let ent = this.game.entities.get(eId);
         if (ent) {
           game.removeEntity(eId, false);

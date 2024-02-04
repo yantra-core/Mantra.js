@@ -24,7 +24,7 @@ class Tiled {
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
     // game.setBackground('#000000');
-    game.useFoV = true;
+    game.config.useFoV = true;
     game.data.fieldOfView = 96;
     // sprite sheet has been defined in defaultAssets.js
     game.createPlayer({
