@@ -1,15 +1,64 @@
+const axesAssociation = {
+  'DPAD_HORIZONTAL' : ['DPAD_LEFT', 'DPAD_RIGHT'],
+  'DPAD_VERTICAL' : ['DPAD_UP', 'DPAD_DOWN'],
+  'LEFT_STICK_HORIZONTAL' : ['LEFT_STICK_LEFT', 'LEFT_STICK_RIGHT'],
+  'LEFT_STICK_VERTICAL' : ['LEFT_STICK_UP', 'LEFT_STICK_DOWN'],
+  'RIGHT_STICK_HORIZONTAL' : ['RIGHT_STICK_LEFT', 'RIGHT_STICK_RIGHT'],
+  'RIGHT_STICK_VERTICAL' : ['RIGHT_STICK_UP', 'RIGHT_STICK_DOWN']
+};
+
+const modules = import.meta.glob("./gamepads/*.js");
+
 export default class Gamepad {
 
   static id = 'gamepad';
+  static defaultControllerConfig = {
+    buttons : {
+        'BUTTON_A' : 0,
+        'BUTTON_B' : 2,
+        'BUTTON_X' : 3,
+        'BUTTON_Y' : 1,
+        'BUTTON_L1': 4,
+        'BUTTON_R1': 5,
+        'BUTTON_L2': 6,
+        'BUTTON_R2': 7,
+        // L3 & R3 aren't fixed 
+        // (sticks, touch pads, and other)
+        //'BUTTON_L3':8 : 'l2',
+        //'BUTTON_R3':9 : 'r2',
+        'BUTTON_SELECT':8,
+        'BUTTON_START':9,
+        'BUTTON_STICK_L' : 10,
+        'BUTTON_STICK_R' :11,
+    },
+    axes : {
+        'LEFT_STICK_HORIZONTAL' : 0,
+        'LEFT_STICK_VERTICAL' : 1,
+        'RIGHT_STICK_HORIZONTAL' : 2,
+        'RIGHT_STICK_VERTICAL' : 3,
+        'DPAD_HORIZONTAL' : 4,
+        'DPAD_VERTICAL' : 5,
+    }
+  };
 
   constructor() {
     this.id = Gamepad.id;
     this.gamepads = {};
+    this.configs = {};
+    this.hashes = {};
     this.controls = {
       'DPAD_UP': false, // Up
       'DPAD_DOWN': false,  // Down
       'DPAD_LEFT': false, // Left
       'DPAD_RIGHT': false,  // Right
+      'LEFT_STICK_UP': false, // Up
+      'LEFT_STICK_DOWN': false,  // Down
+      'LEFT_STICK_LEFT': false, // Left
+      'LEFT_STICK_RIGHT': false,  // Right
+      'RIGHT_STICK_UP': false, // Up
+      'RIGHT_STICK_DOWN': false,  // Down
+      'RIGHT_STICK_LEFT': false, // Left
+      'RIGHT_STICK_RIGHT': false,  // Right
       // y button
       'BUTTON_Y': false, // "Y" button
       // x button
@@ -34,9 +83,12 @@ export default class Gamepad {
       'BUTTON_L3': false, // "L3" button
       // right stick button
       'BUTTON_R3': false, // "R3" button
+      'BUTTON_STICK_L': false, // "L3" button
+      // right stick button
+      'BUTTON_STICK_R': false, // "R3" button
     };
     this.lastControlsAllFalse = true;
-
+    
   }
 
   init(game) {
@@ -49,7 +101,9 @@ export default class Gamepad {
 
     game.systemsManager.addSystem('gamepad', this);
     if (!this.game.isServer) {
-      window.addEventListener("gamepadconnected", (event) => this.connectHandler(event));
+      window.addEventListener("gamepadconnected", (event) => {
+        this.connectHandler(event)
+      });
       window.addEventListener("gamepaddisconnected", (event) => this.disconnectHandler(event));
     }
   }
@@ -81,49 +135,55 @@ export default class Gamepad {
       }
     }
   }
+  
+  controllerConfig(hash) {
+    const config = typeof this.configs[hash] === 'object'?
+      this.configs[hash]:
+      Gamepad.defaultControllerConfig;
+    if(!this.configs[hash]){
+      this.configs[hash] = true; //don't double load
+      (async ()=>{
+        let loadedConfig = null;
+        try{
+          loadedConfig = (await import(`./gamepads/${hash.slice(0)}.js`)).default;
+        }catch(ex){
+          //if the hash file failed to load, stuff the config with defaults
+          loadedConfig = Gamepad.defaultControllerConfig;
+          //console.log(ex, loadedConfig);
+        }
+        this.configs[hash] = loadedConfig;
+      })();
+    }
+    return config;
+  }
 
   sendInputs() {
     for (let index in this.gamepads) {
+      // Cheezy hack to ignore VirtualHID driver
+      // (a side effect of older controllers in OS X)
+      if(this.gamepads[index].id.indexOf('Virtual') !== -1) continue;
+      if(!this.hashes[this.gamepads[index].id]){
+        this.hashes[this.gamepads[index].id] = btoa(
+          this.gamepads[index].id).replace(/\=+$/, 
+          ''
+        );
+      }
+      const hash = this.hashes[this.gamepads[index].id];
+      const config = this.controllerConfig(hash);
       const gamepad = this.gamepads[index];
-
-      // Axes for left analog stick
-      const xAxis = gamepad.axes[0]; // Left (-1) to Right (1)
-      const yAxis = gamepad.axes[1]; // Up (-1) to Down (1)
 
       // Deadzone for analog stick to prevent drift
       const deadzone = 0.1;
 
-      // TODO: map controls to current entity input defaults for gamepad
-      this.controls = {
-        'DPAD_UP': yAxis < -deadzone, // Up
-        'DPAD_DOWN': yAxis > deadzone,  // Down
-        'DPAD_LEFT': xAxis < -deadzone, // Left
-        'DPAD_RIGHT': xAxis > deadzone,  // Right
-        // y button
-        'BUTTON_Y': gamepad.buttons[1].pressed, // "Y" button
-        // x button
-        'BUTTON_X': gamepad.buttons[3].pressed, // "X" button
-        // b button
-        'BUTTON_B': gamepad.buttons[2].pressed, // "B" button
-        // a button
-        'BUTTON_A': gamepad.buttons[0].pressed, // "A" button
-        // start button
-        'BUTTON_START': gamepad.buttons[9].pressed, // "Start" button
-        // select button
-        'BUTTON_SELECT': gamepad.buttons[8].pressed, // "Select" button
-        // left shoulder button
-        'BUTTON_L1': gamepad.buttons[4].pressed, // "L1" button
-        // right shoulder button
-        'BUTTON_R1': gamepad.buttons[5].pressed, // "R1" button
-        // left trigger button
-        'BUTTON_L2': gamepad.buttons[6].pressed, // "L2" button
-        // right trigger button
-        'BUTTON_R2': gamepad.buttons[7].pressed, // "R2" button
-        // left stick button
-        'BUTTON_L3': gamepad.buttons[10].pressed, // "L3" button
-        // right stick button
-        'BUTTON_R3': gamepad.buttons[11].pressed, // "R3" button
-      };
+      Object.keys(config.buttons).forEach((key)=>{
+        this.controls[key] = gamepad.buttons[config.buttons[key]].pressed;
+      });
+      Object.keys(config.axes).forEach((key)=>{
+        const booleanStates = axesAssociation[key];
+        const value = gamepad.axes[config.axes[key]];
+        this.controls[booleanStates[0]] = value < -deadzone;
+        this.controls[booleanStates[1]] = value > deadzone;
+      });
 
       let controls = this.controls;
       if (this.game.communicationClient) {
