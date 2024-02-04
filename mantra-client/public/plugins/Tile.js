@@ -4241,13 +4241,14 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import labyrinthos from 'labyrinthos';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
-var tileKinds = [{
+var defaultTileSet = [{
   id: 0,
   kind: 'empty',
   weight: 10
 }, {
   id: 1,
   kind: 'bush',
+  texture: 'tile-bush',
   weight: 2,
   body: true,
   isStatic: true,
@@ -4284,6 +4285,8 @@ var Tile = /*#__PURE__*/function () {
       tiledMap = _ref$tiledMap === void 0 ? _defaultOrthogonalMap["default"] : _ref$tiledMap,
       _ref$tiledServer = _ref.tiledServer,
       tiledServer = _ref$tiledServer === void 0 ? false : _ref$tiledServer,
+      _ref$tileSet = _ref.tileSet,
+      tileSet = _ref$tileSet === void 0 ? defaultTileSet : _ref$tileSet,
       _ref$chunkUnitSize = _ref.chunkUnitSize,
       chunkUnitSize = _ref$chunkUnitSize === void 0 ? 8 : _ref$chunkUnitSize,
       _ref$tileSize = _ref.tileSize,
@@ -4323,7 +4326,10 @@ var Tile = /*#__PURE__*/function () {
     if (typeof this.labyrinthosAlgo === 'undefined') {
       console.log('Warning: no labyrinthos algo found for', labyrinthosAlgo);
     }
-    this.tileKinds = tileKinds; // rename
+    this.tileSet = tileSet;
+    this.tileSets = {
+      "default": tileSet
+    };
 
     // TODO: configurable chunk size and tile size
     this.chunkUnitSize = chunkUnitSize;
@@ -4400,10 +4406,20 @@ var Tile = /*#__PURE__*/function () {
         _this.createTileMapFromTiledJSON(data);
       });
     }
+
+    // takes an incoming TileSet and sets it as active for immediate use
   }, {
-    key: "getTileImageURL",
-    value: function getTileImageURL(tileId) {
-      return "img/game/tiles/".concat(tileId, ".png");
+    key: "useTileSet",
+    value: function useTileSet(key, tileSet) {
+      this.tileSet = tileSet;
+      this.tileSets[key] = tileSet;
+    }
+
+    // adds / registers a new TileSet into Tile.tileSets[key] ( for later access )
+  }, {
+    key: "addTileSet",
+    value: function addTileSet(key, tileSet) {
+      this.tileSets(key, tileSet);
     }
   }, {
     key: "extractChunkCoordinates",
@@ -4571,7 +4587,14 @@ function createTile(tile, x, y) {
     // this is required so don't dont stack 2d bodies inside each other in 2.5D space
     body = false;
   }
-  var _texture = "tile-".concat(tile.kind); // rename
+  var _texture;
+  // check to see if a custom texture is set
+  if (typeof tile.texture !== 'undefined') {
+    _texture = tile.texture;
+  } else {
+    _texture = "tile-".concat(tile.kind); // rename
+  }
+
   var ent = this.game.createEntity((_this$game$createEnti = {
     type: _type,
     kind: tile.kind,
@@ -4580,6 +4603,7 @@ function createTile(tile, x, y) {
     // Remark: By default we will disable all collision events for Tiles
     //         This is done universally for performance reasons
     //         Each tile.kind could be configured via `TileSet` class with custom collision config
+    // Note:   Entities will still collide if they have `body`, but no collision events will be emitted
     collisionActive: false,
     collisionStart: false,
     collisionEnd: false,
@@ -4895,20 +4919,22 @@ exports["default"] = processTile;
 //                  at the correct position in the game world 
 function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) {
   var customDepth = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+  // TODO: we currently always pull from `Tile.tileSet`, which is active default
+  //       we can add logic for checking `Tile.tileSets[key]` if we have multiple tileSets 
   var tile;
   // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
   // look up the tile kind and use that as the tile
   if (typeof tileValue === 'number') {
-    // Find id = tile in tileKinds
+    // Find id = tile in tileSet
     var tileId = tileValue;
-    var tileKind = this.tileKinds.find(function (tileKind) {
+    var tileKind = this.tileSet.find(function (tileKind) {
       return tileKind.id === tileId;
     });
     if (tileKind) {
       tile = tileKind;
     } else {
       // Default tile kind if not found
-      tile = this.tileKinds[3];
+      tile = this.tileSet[3];
     }
   } else {
     console.log('Warning: tileValue was not a number. This should not happen:', tileValue);
