@@ -101,9 +101,7 @@ export default class Gamepad {
 
     game.systemsManager.addSystem('gamepad', this);
     if (!this.game.isServer) {
-      window.addEventListener("gamepadconnected", (event) => {
-        this.connectHandler(event)
-      });
+      window.addEventListener("gamepadconnected", (event) => this.connectHandler(event));
       window.addEventListener("gamepaddisconnected", (event) => this.disconnectHandler(event));
     }
   }
