@@ -22,7 +22,7 @@ game.use(new EntityInput());
 game.use(new SnapshotManager());
 game.use(new Tile());
 
-tap.test('Tile plugin integration tests', (t) => {
+tap.test('Tile plugin Tile.createTile tests', (t) => {
   t.test('create a new tile with coordinates', (t) => {
 
     let tile1;

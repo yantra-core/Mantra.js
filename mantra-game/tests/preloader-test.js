@@ -82,10 +82,20 @@ tap.test('Preloader unit tests', (t) => {
     t.end();
   });
 
+  t.test('preloader will emit preloader::loaded event when all assets are loaded', async (t) => {
+    const loadedSpy = sinon.spy();
+    game.on('preloader::loaded', loadedSpy);
+    game.preloader.addAsset('mock-url-3', 'image', 'asset3');
+
+    await game.preloader.loadAll();
+
+    t.ok(loadedSpy.called, 'preloader::loaded event was emitted');
+    t.end();
+  })
+
 });
 
-
-/* TODO: better behavior for preload fails, currently with not throw error
+/* TODO: better behavior for preload fails, current behavior is to not throw error
 
 t.test('preloader handles asset loading failure', async (t) => {
     // Override the Image mock to simulate an error

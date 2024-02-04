@@ -16,9 +16,9 @@ import createTileMapFromTiledJSON from './lib/createTileMapFromTiledJSON.js';
 import createLayer from './lib/createLayer.js';
 import processTile from './lib/processTile.js';
 
-const tileKinds = [
+const defaultTileSet = [
   { id: 0, kind: 'empty', weight: 10 },
-  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true, z: 0, size: { depth: 32 } },
+  { id: 1, kind: 'bush', weight: 2, body: true, isStatic: true,  z: 16 /* size: { depth: 32 } */ },
   { id: 2, kind: 'grass', weight: 63 },
   { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
   { id: 4, kind: 'path-green', weight: 10 },
@@ -33,6 +33,7 @@ class Tile {
     tileMap = null,
     tiledMap = defaultOrthogonalMap,
     tiledServer = false,
+    tileSet = defaultTileSet,
     chunkUnitSize = 8,
     tileSize = 16,
     labyrinthosAlgo = 'FaultLine',
@@ -69,7 +70,10 @@ class Tile {
       console.log('Warning: no labyrinthos algo found for', labyrinthosAlgo);
     }
 
-    this.tileKinds = tileKinds; // rename
+    this.tileSet = tileSet;
+    this.tileSets = {
+      default: tileSet
+    };
 
     // TODO: configurable chunk size and tile size
     this.chunkUnitSize = chunkUnitSize;
@@ -154,8 +158,15 @@ class Tile {
 
   }
 
-  getTileImageURL(tileId) {
-    return `img/game/tiles/${tileId}.png`;
+  // takes an incoming TileSet and sets it as active for immediate use
+  useTileSet(key, tileSet) {
+    this.tileSet = tileSet;
+    this.tileSets[key] = tileSet;
+  }
+
+  // adds / registers a new TileSet into Tile.tileSets[key] ( for later access )
+  addTileSet(key, tileSet) {
+    this.tileSets(key, tileSet);
   }
 
   extractChunkCoordinates(chunkKey) {
@@ -164,7 +175,14 @@ class Tile {
     return match ? { x: parseInt(match[1]), y: parseInt(match[2]) } : { x: 0, y: 0 };
   }
 
-  update() { }
+  update() { 
+    /*
+    if (this.game.tick % 10 === 0) {
+      let allBodies = this.game.physics.Composite.allBodies(this.game.engine.world);
+    }
+    */
+
+  }
 
   render() { }
 

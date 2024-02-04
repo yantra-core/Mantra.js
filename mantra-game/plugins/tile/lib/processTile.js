@@ -2,18 +2,20 @@
 //                  at the correct position in the game world 
 export default function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth, customDepth = false) {
 
+  // TODO: we currently always pull from `Tile.tileSet`, which is active default
+  //       we can add logic for checking `Tile.tileSets[key]` if we have multiple tileSets 
   let tile;
   // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
   // look up the tile kind and use that as the tile
   if (typeof tileValue === 'number') {
-    // Find id = tile in tileKinds
+    // Find id = tile in tileSet
     let tileId = tileValue;
-    let tileKind = this.tileKinds.find(tileKind => tileKind.id === tileId);
+    let tileKind = this.tileSet.find(tileKind => tileKind.id === tileId);
     if (tileKind) {
       tile = tileKind;
     } else {
       // Default tile kind if not found
-      tile = this.tileKinds[3];
+      tile = this.tileSet[3];
     }
   } else {
     console.log('Warning: tileValue was not a number. This should not happen:', tileValue);
