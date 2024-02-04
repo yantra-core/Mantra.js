@@ -1,4 +1,5 @@
 // Sony PLAYSTATION(R)3 Controller
+// U29ueSBQTEFZU1RBVElPTihSKTMgQ29udHJvbGxlcg
 export const controllerConfig = {
     buttons : {
         'BUTTON_A' : 1,
@@ -17,6 +18,7 @@ export const controllerConfig = {
         'DPAD_DOWN' :13,
         'DPAD_LEFT' :14,
         'DPAD_RIGHT' :15,
+        'HOME' :16,
     },
     axes : {
         'LEFT_STICK_HORIZONTAL' : 0,
