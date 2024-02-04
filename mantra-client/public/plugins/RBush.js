@@ -121,7 +121,7 @@ var RBush = /*#__PURE__*/function () {
 
       // if (tick % 30 !== 0) return;
 
-      if (this.game.useFoV !== true) return;
+      if (this.game.config.useFoV !== true) return;
 
       // get all items, plus a buffer of 1.1x the field of view
       var nearbyEntities = game.getPlayerFieldOfView(currentPlayer, this.game.data.fieldOfView * 1.1, false);
@@ -135,7 +135,7 @@ var RBush = /*#__PURE__*/function () {
           var _step$value = _slicedToArray(_step.value, 2),
             eId = _step$value[0],
             state = _step$value[1];
-          if (game.useFoV && nearbyEntities.indexOf(eId) === -1) {
+          if (game.config.useFoV && nearbyEntities.indexOf(eId) === -1) {
             var ent = this.game.entities.get(eId);
             if (ent) {
               game.removeEntity(eId, false);

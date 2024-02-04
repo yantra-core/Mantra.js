@@ -302,6 +302,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       width: 800,
       height: 600,
       fieldOfView: 1600,
+      useFoV: true,
       // game systems / auto-load based on pluginsConfig
       physics: 'matter',
       graphics: ['css'],
@@ -683,7 +684,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
 
       // reset the Field of View use to default ( off )
-      this.useFoV = false;
+      this.config.useFoV = false;
 
       // reset the default player controls
       this.setControls({});
@@ -1097,8 +1098,6 @@ function construct(game) {
     },
     chunks: {}
   };
-  game.useFoV = false; // for now
-
   if (typeof game.data.camera.follow === 'undefined') {
     game.data.camera.follow = true;
   }

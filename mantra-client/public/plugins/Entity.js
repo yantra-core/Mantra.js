@@ -651,7 +651,7 @@ function createEntity(config) {
     // Remark: Always add to deferredEntities, this is now being used to store all local
     //         game data that may not yet be in the game.data scope ( off screen / not loaded )
     this.game.deferredEntities[config.id.toString()] = config;
-    if (this.game.useFoV) {
+    if (this.game.config.useFoV) {
       // check to see if entity is within game.data.fieldOfView,
       // if not, we will defer creation until it is
       var currentPlayer = this.game.getCurrentPlayer();

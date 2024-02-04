@@ -689,7 +689,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = evaluateCompositeCondition;
-function evaluateCompositeCondition(conditionObj, node, data, gameState) {
+function evaluateCompositeCondition(conditionObj, data, gameState) {
   var _this = this;
   var targetData;
   if (typeof data === 'function') {
@@ -700,15 +700,15 @@ function evaluateCompositeCondition(conditionObj, node, data, gameState) {
   switch (conditionObj.op) {
     case 'and':
       return conditionObj.conditions.every(function (cond) {
-        return _this.evaluateCondition(cond, node, targetData, gameState);
+        return _this.evaluateCondition(cond, targetData, gameState);
       });
     case 'or':
       return conditionObj.conditions.some(function (cond) {
-        return _this.evaluateCondition(cond, node, targetData, gameState);
+        return _this.evaluateCondition(cond, targetData, gameState);
       });
     case 'not':
       // Assuming 'not' operator has a single condition
-      return !this.evaluateCondition(conditionObj.conditions, node, targetData, gameState);
+      return !this.evaluateCondition(conditionObj.conditions, targetData, gameState);
     default:
       return false;
   }
@@ -721,8 +721,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = evaluateCondition;
-function evaluateCondition(condition, node, data, gameState) {
-  var sutra = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : this;
+function evaluateCondition(condition, data, gameState) {
+  var sutra = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this;
   var targetData;
   if (typeof data === 'function') {
     targetData = data(gameState);
@@ -746,13 +746,13 @@ function evaluateCondition(condition, node, data, gameState) {
     if (conditionEntry) {
       if (Array.isArray(conditionEntry)) {
         return conditionEntry.every(function (cond) {
-          return typeof cond.func === 'function' ? cond.func(targetData, gameState, node) : sutra.evaluateDSLCondition(cond.original, node, targetData, gameState);
+          return typeof cond.func === 'function' ? cond.func(targetData, gameState) : sutra.evaluateDSLCondition(cond.original, targetData, gameState);
         });
       } else if (['and', 'or', 'not'].includes(conditionEntry.op)) {
         // Handling composite conditions
-        return sutra.evaluateCompositeCondition(conditionEntry, node, targetData, gameState);
+        return sutra.evaluateCompositeCondition(conditionEntry, targetData, gameState);
       } else {
-        return sutra.evaluateSingleCondition(conditionEntry, node, targetData, gameState);
+        return sutra.evaluateSingleCondition(conditionEntry, targetData, gameState);
       }
     } else {
       // silently fail ( for now )
@@ -763,7 +763,7 @@ function evaluateCondition(condition, node, data, gameState) {
     return condition(targetData, gameState);
   } else if (Array.isArray(condition)) {
     return condition.every(function (cond) {
-      return sutra.evaluateCondition(cond, node, targetData, gameState);
+      return sutra.evaluateCondition(cond, targetData, gameState);
     });
   }
   return false;
@@ -776,7 +776,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = evaluateDSLCondition;
-function evaluateDSLCondition(conditionObj, node, data, gameState) {
+function evaluateDSLCondition(conditionObj, data, gameState) {
   var _this = this;
   var operator = this.resolveOperator(conditionObj.op);
   var targetData;
@@ -814,14 +814,14 @@ function evaluateDSLCondition(conditionObj, node, data, gameState) {
       return targetValue >= conditionObj.value;
     case 'and':
       return conditionObj.conditions.every(function (cond) {
-        return _this.evaluateDSLCondition(cond, node, targetData, gameState);
+        return _this.evaluateDSLCondition(cond, targetData, gameState);
       });
     case 'or':
       return conditionObj.conditions.some(function (cond) {
-        return _this.evaluateDSLCondition(cond, node, targetData, gameState);
+        return _this.evaluateDSLCondition(cond, targetData, gameState);
       });
     case 'not':
-      return !this.evaluateDSLCondition(conditionObj.condition, node, targetData, gameState);
+      return !this.evaluateDSLCondition(conditionObj.condition, targetData, gameState);
     default:
       return false;
   }
@@ -835,7 +835,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = evaluateSingleCondition;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function evaluateSingleCondition(condition, node, data, gameState) {
+function evaluateSingleCondition(condition, data, gameState) {
   // logger('Evaluating condition', condition, data);
 
   var targetData;
@@ -849,7 +849,7 @@ function evaluateSingleCondition(condition, node, data, gameState) {
     if (conditionEntry) {
       // Handle composite conditions
       if (['and', 'or', 'not'].includes(conditionEntry.op)) {
-        return this.evaluateCompositeCondition(conditionEntry, node, targetData, gameState);
+        return this.evaluateCompositeCondition(conditionEntry, targetData, gameState);
       }
 
       // Handle named function conditions
@@ -859,7 +859,7 @@ function evaluateSingleCondition(condition, node, data, gameState) {
 
       // Handle DSL conditions
       if (_typeof(conditionEntry.original) === 'object') {
-        return this.evaluateDSLCondition(conditionEntry.original, node, targetData, gameState); // Pass gameState here
+        return this.evaluateDSLCondition(conditionEntry.original, targetData, gameState); // Pass gameState here
       }
     }
   }
@@ -1625,16 +1625,16 @@ var Sutra = /*#__PURE__*/function () {
               func: cond
             });
             return {
-              func: function func(data, gameState, node) {
-                return cond(data, gameState, node);
+              func: function func(data, gameState) {
+                return cond(data, gameState);
               },
               original: null
             };
           } else {
             _this3.originalConditions[name] = _this3.originalConditions[name] || [];
             _this3.originalConditions[name].push(cond);
-            var conditionFunc = function conditionFunc(data, gameState, node) {
-              return _this3.evaluateDSLCondition(cond, node, data, gameState);
+            var conditionFunc = function conditionFunc(data, gameState) {
+              return _this3.evaluateDSLCondition(cond, data, gameState);
             };
             return {
               func: conditionFunc,
@@ -1675,15 +1675,15 @@ var Sutra = /*#__PURE__*/function () {
           newConditionObj.forEach(function (condition) {
             if (condition.op === 'and' || condition.op === 'or' || condition.op === 'not') {
               // Composite condition for each element in the array
-              var conditionFunc = function conditionFunc(data, gameState, node) {
-                return _this4.evaluateDSLCondition(condition, node, data, gameState);
+              var conditionFunc = function conditionFunc(data, gameState) {
+                return _this4.evaluateDSLCondition(condition, data, gameState);
               };
               conditionFunc.original = condition;
               _this4.conditions[name] = conditionFunc;
             } else {
               // DSL condition for each element in the array
-              var _conditionFunc = function _conditionFunc(data, gameState, node) {
-                return _this4.evaluateDSLCondition(condition, node, data, gameState);
+              var _conditionFunc = function _conditionFunc(data, gameState) {
+                return _this4.evaluateDSLCondition(condition, data, gameState);
               };
               _conditionFunc.original = condition;
               _this4.conditions[name] = _conditionFunc;
@@ -1691,15 +1691,15 @@ var Sutra = /*#__PURE__*/function () {
           });
         } else if (newConditionObj.op === 'and' || newConditionObj.op === 'or' || newConditionObj.op === 'not') {
           // Composite condition
-          var conditionFunc = function conditionFunc(data, gameState, node) {
-            return _this4.evaluateDSLCondition(newConditionObj, node, data, gameState);
+          var conditionFunc = function conditionFunc(data, gameState) {
+            return _this4.evaluateDSLCondition(newConditionObj, data, gameState);
           };
           conditionFunc.original = newConditionObj;
           this.conditions[name] = conditionFunc;
         } else {
           // DSL condition
-          var _conditionFunc2 = function _conditionFunc2(data, gameState, node) {
-            return _this4.evaluateDSLCondition(newConditionObj, node, data, gameState);
+          var _conditionFunc2 = function _conditionFunc2(data, gameState) {
+            return _this4.evaluateDSLCondition(newConditionObj, data, gameState);
           };
           _conditionFunc2.original = newConditionObj;
           this.conditions[name] = _conditionFunc2;
@@ -1737,8 +1737,8 @@ var Sutra = /*#__PURE__*/function () {
         };
       } else {
         // For DSL conditions, pass gameState to the evaluateDSLCondition function
-        var conditionFunc = function conditionFunc(data, gameState, node) {
-          return _this5.evaluateDSLCondition(conditionObj, node, data, gameState);
+        var conditionFunc = function conditionFunc(data, gameState) {
+          return _this5.evaluateDSLCondition(conditionObj, data, gameState);
         };
         conditionFunc.original = conditionObj;
         this.conditions[name] = conditionFunc;
@@ -1778,7 +1778,7 @@ var Sutra = /*#__PURE__*/function () {
       if (node.subtree) {
         var subSutra = this.subtrees[node.subtree];
         if (subSutra) {
-          var _conditionMet = node["if"] ? this.evaluateCondition(node["if"], node, data, gameState, subSutra) : true;
+          var _conditionMet = node["if"] ? this.evaluateCondition(node["if"], data, gameState, subSutra) : true;
           if (_conditionMet) {
             node.state[node["if"]] = true;
             node.satisfiedConditions[node["if"]] = true;
@@ -1810,7 +1810,7 @@ var Sutra = /*#__PURE__*/function () {
         this.executeAction(node.action, mappedData || currentData, node, gameState);
         return;
       }
-      var conditionMet = node["if"] ? this.evaluateCondition(node["if"], node, mappedData || currentData, gameState) : true;
+      var conditionMet = node["if"] ? this.evaluateCondition(node["if"], mappedData || currentData, gameState) : true;
       if (conditionMet) {
         this.state[node["if"]] = true;
         this.satisfiedConditions[node["if"]] = true;
@@ -1867,6 +1867,8 @@ var Sutra = /*#__PURE__*/function () {
       this.satisfiedActions[action] = true;
       this.emit(action, mergedData, node, gameState);
     }
+
+    // Remark: Is this being used?
   }, {
     key: "updateEntity",
     value: function updateEntity(entity, updateData, gameState) {

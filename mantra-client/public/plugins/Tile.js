@@ -4313,6 +4313,8 @@ var Tile = /*#__PURE__*/function () {
     this.labyrinthosAlgoName = labyrinthosAlgo;
     this.labyType = 'maze';
 
+    // console.log('loading tileMap', tileMap)
+
     // TODO: replace this scaffold wth labyrinthos.transform()
     this.labyrinthosAlgo = _labyrinthos["default"].mazes[labyrinthosAlgo];
     if (typeof this.labyrinthosAlgo === 'undefined') {
