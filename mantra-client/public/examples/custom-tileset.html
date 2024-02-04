@@ -14,16 +14,12 @@
   <script type="module" src="/ycraft.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+    document.addEventListener('DOMContentLoaded', async (event) => {
 
       // check to see if query string has tilemap variable
       // if so, load that tilemap
-      let tiledmap = null;
       let graphics = 'three';
-      let source = null;
-      let infinite = false;
       let mode = 'topdown';
-
 
       let tileMap = {
         width: 32,
@@ -41,7 +37,7 @@
 
       //fieldOfView = 1024;
       let game = new MANTRA.Game({
-        defaultPlayer: false,
+        defaultPlayer: true,
         defaultMovement: true,
         mode: mode,
         fieldOfView: fieldOfView,
@@ -66,9 +62,13 @@
 
       game.use('Gamepad');
       game.use('GamepadGUI');
+
+      game.preloader.addAsset('./img/game/tiles/tile-block-b.png', 'image', 'customTile');
+      // should not need to preload here, since game.start() will preload all assets
+      // await game.preloader.loadAll();
       game.start(function () {
         game.setBackground('#000000');
-
+        console.log('rrrrr', game.preloader)
         if (graphics === 'three') {
           //game.setZoom();
         }
@@ -76,9 +76,7 @@
         if (graphics === 'css') {
           game.setZoom(4.5);
         }
-
-        game.use('DragAndDropFileUpload');
-
+        
         if (mode === 'topdown') {
           game.createPlayer({
             position: {
@@ -96,7 +94,7 @@
 
         const customTileSet = [
           { id: 0, kind: 'empty', weight: 10 },
-          { id: 1, kind: 'grass', texture: 'tile-block', weight: 2, body: true, isStatic: true, z: 16 /* size: { depth: 32 } */ },
+          { id: 1, kind: 'grass', texture: 'customTile', weight: 2, body: true, isStatic: true, z: 16 /* size: { depth: 32 } */ },
           { id: 2, kind: 'bush', texture: 'tile-block', weight: 63 },
           { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
           { id: 4, kind: 'path-green', weight: 10 },
