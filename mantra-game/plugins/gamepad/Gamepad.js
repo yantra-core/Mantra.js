@@ -1,3 +1,6 @@
+import bitdoNesPro from './gamepads/8BitdoNES30Pro.js';
+import ps3 from './gamepads/Playstation3.js';
+import logitechDualAction from './gamepads/LogitechDualAction.js';
 const axesAssociation = {
   'DPAD_HORIZONTAL' : ['DPAD_LEFT', 'DPAD_RIGHT'],
   'DPAD_VERTICAL' : ['DPAD_UP', 'DPAD_DOWN'],
@@ -8,6 +11,7 @@ const axesAssociation = {
 };
 
 const modules = import.meta.glob("./gamepads/*.js");
+
 
 export default class Gamepad {
 
@@ -44,7 +48,12 @@ export default class Gamepad {
   constructor() {
     this.id = Gamepad.id;
     this.gamepads = {};
-    this.configs = {};
+    this.configs = {
+      // prestuff the cache so no lookups happen to known controllers
+      'OEJpdGRvIE5FUzMwIFBybyAoVmVuZG9yOiAyZGM4IFByb2R1Y3Q6IDM4MjAp': bitdoNesPro,
+      'TG9naXRlY2ggTG9naXRlY2ggRHVhbCBBY3Rpb24': logitechDualAction,
+      'U29ueSBQTEFZU1RBVElPTihSKTMgQ29udHJvbGxlcg': ps3
+    };
     this.hashes = {};
     this.controls = {
       'DPAD_UP': false, // Up

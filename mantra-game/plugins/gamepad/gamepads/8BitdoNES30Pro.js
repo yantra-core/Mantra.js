@@ -1,4 +1,5 @@
-// Sony PLAYSTATION(R)3 Controller
+// 8Bitdo NES30 Pro (Vendor: 2dc8 Product: 3820)
+// OEJpdGRvIE5FUzMwIFBybyAoVmVuZG9yOiAyZGM4IFByb2R1Y3Q6IDM4MjAp
 export const controllerConfig = {
     buttons : {
         'BUTTON_A' : 0,
