@@ -314,6 +314,13 @@ function createGraphic(entityData) {
       //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
+    case 'BULLET':
+      console.log("BULLET", entityData);
+      geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      break;
+    case 'BLOCK':
+      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
+      break;
     case 'TILE':
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
@@ -349,12 +356,8 @@ function createGraphic(entityData) {
 
   if (!geometry) return; // If geometry is not set (like missing font), exit early
 
+  // console.log('creating a new mesh', entityData, geometry, material)
   mesh = new THREE.Mesh(geometry, material);
-  // set to invisible at first
-  if (entityData.type !== "PLAYER") {
-    // for now
-    mesh.visible = false;
-  }
   this.scene.add(mesh);
 
   // Setting position
@@ -375,6 +378,9 @@ function inflateGraphic(entity, alpha) {
     return; // for now
   }
 
+  if (entity.destroyed === true) {
+    return;
+  }
   var graphic;
   if (entity.graphics && entity.graphics['graphics-three']) {
     graphic = entity.graphics['graphics-three'];
@@ -447,7 +453,6 @@ function inflateTexture(entityData) {
   }
   var mesh = entityData.graphics['graphics-three'];
   if (!mesh) return; // Ensure the mesh exists
-
   return applyTextureToMesh(this.game, entityData, mesh);
 }
 var texturePool = {};
@@ -637,16 +642,21 @@ function _applyTextureToMesh() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = removeGraphic;
+exports["default"] = void 0;
 function removeGraphic(entityId) {
-  // Fetch the mesh from the 'graphics' component
   var mesh = this.game.components.graphics.get([entityId, 'graphics-three']);
   if (mesh) {
+    if (mesh.parent) {
+      mesh.parent.remove(mesh);
+    }
     this.scene.remove(mesh);
-    // Remove the mesh from the 'graphics' component
+    mesh.geometry.dispose();
+    mesh.material.dispose();
+    // mesh = undefined;
     this.game.components.graphics.remove([entityId, 'graphics-three']);
   }
 }
+var _default = exports["default"] = removeGraphic;
 
 },{}],7:[function(require,module,exports){
 "use strict";

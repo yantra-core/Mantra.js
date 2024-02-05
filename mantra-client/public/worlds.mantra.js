@@ -3632,6 +3632,21 @@ var Home = /*#__PURE__*/function () {
           y: 0
         }
       });
+      game.createEntity({
+        type: 'BLOCK',
+        width: 50,
+        height: 50,
+        isSensor: true,
+        isStatic: true,
+        body: true,
+        mass: 10000,
+        color: 0xff0000,
+        position: {
+          x: -50,
+          y: -50,
+          z: 100
+        }
+      });
       game.setBackground('#007fff');
       game.use('Block');
       game.use('Bomb');
@@ -3657,18 +3672,7 @@ var Home = /*#__PURE__*/function () {
       */
 
       // now create some background and text entities for navigation
-      game.createEntity({
-        type: 'BACKGROUND',
-        texture: 'garden',
-        width: 300,
-        height: 300,
-        body: false,
-        position: {
-          x: 0,
-          y: 0,
-          z: -10
-        }
-      });
+
       game.createEntity({
         name: 'sutra-tree',
         type: 'BACKGROUND',
@@ -3762,14 +3766,23 @@ var Home = /*#__PURE__*/function () {
 
       // if touch warp, switch to YCraft level
       game.createEntity({
-        type: 'WARP',
-        kind: 'YCraft',
+        type: 'DOOR',
+        // kind: 'YCraft',
         width: 64,
         height: 64,
         depth: 64,
         texture: 'warp-to-ycraft',
         isStatic: true,
         isSensor: true,
+        exit: {
+          world: 'YCraft',
+          // optional, if not specified will use the current world
+          position: {
+            // optional, if not specified will use 0,0,0
+            x: 0,
+            y: 0
+          }
+        },
         position: {
           x: 0,
           y: -210,
@@ -3902,9 +3915,15 @@ var Home = /*#__PURE__*/function () {
 
       game.createEntity({
         type: 'DOOR',
+        exit: {
+          position: {
+            x: -1000,
+            y: -500,
+            z: 0
+          }
+        },
         kind: 'BabylonGraphics',
-        collisionActive: true,
-        collisionEnd: true,
+        isStatic: true,
         collisionStart: true,
         texture: {
           sheet: 'loz_spritesheet',
@@ -3912,7 +3931,7 @@ var Home = /*#__PURE__*/function () {
         },
         width: 16,
         height: 16,
-        body: false,
+        body: true,
         position: {
           // position to right
           x: 55,
@@ -3940,7 +3959,9 @@ var Home = /*#__PURE__*/function () {
       // if touch warp, switch to Music level
       game.createEntity({
         type: 'WARP',
-        kind: 'Music',
+        exit: {
+          world: 'Music'
+        },
         width: 64,
         height: 64,
         depth: 64,
@@ -3995,7 +4016,9 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'WARP',
-        kind: 'Platform',
+        exit: {
+          world: 'Platform'
+        },
         width: 64,
         height: 64,
         depth: 64,
@@ -4010,7 +4033,9 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'WARP',
-        kind: 'GravityGardens',
+        exit: {
+          world: 'GravityGardens'
+        },
         width: 64,
         height: 64,
         depth: 64,
@@ -4185,8 +4210,8 @@ function sutras(game) {
   rules.use(switchGraphicsSutra, 'switchGraphics');
 
   // when touching WARP entity, warp to world
-  var warp = (0, _warpToWorld["default"])(game);
-  rules.use(warp, 'warpToWorld');
+  //let warp = warpToWorld(game);
+  //rules.use(warp, 'warpToWorld');
 
   // walker is npc that walks around route
   rules.use((0, _walker["default"])(game, {
@@ -5856,7 +5881,7 @@ var Tiled = /*#__PURE__*/function () {
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
       // game.setBackground('#000000');
-      game.useFoV = true;
+      game.config.useFoV = true;
       game.data.fieldOfView = 96;
       // sprite sheet has been defined in defaultAssets.js
       game.createPlayer({
@@ -7351,6 +7376,7 @@ var YCraft = /*#__PURE__*/function () {
           mass: 10000,
           height: 16,
           width: 16,
+          startCollision: true,
           position: {
             x: 180,
             y: 0 + i * 64,

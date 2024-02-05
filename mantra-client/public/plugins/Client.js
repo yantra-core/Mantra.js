@@ -714,6 +714,7 @@ var defaultAssets = {
   'tile-bush': '/img/game/tiles/tile-bush.png',
   'tile-path-green': '/img/game/tiles/tile-path-green.png',
   'tile-path-brown': '/img/game/tiles/tile-path-brown.png',
+  'tile-exit': '/img/game/tiles/tile-exit.png',
   //'fire': '/img/game/env/loz_fire.png',
   'warp-to-platform': '/img/game/env/warp-to-platform.gif',
   'warp-to-music': '/img/game/env/warp-to-music.gif',

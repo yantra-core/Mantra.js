@@ -639,7 +639,8 @@ function createEntity(config) {
       texture: null,
       collisionActive: false,
       collisionStart: true,
-      collisionEnd: false
+      collisionEnd: false,
+      exit: null
     };
 
     // merge config with defaultConfig
@@ -715,7 +716,8 @@ function createEntity(config) {
     texture = _config.texture,
     collisionActive = _config.collisionActive,
     collisionStart = _config.collisionStart,
-    collisionEnd = _config.collisionEnd;
+    collisionEnd = _config.collisionEnd,
+    exit = _config.exit;
   var x = position.x,
     y = position.y;
 
@@ -767,6 +769,7 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
+  this.game.addComponent(entityId, 'exit', exit);
   if (body) {
     var _body = this.createBody({
       width: width,

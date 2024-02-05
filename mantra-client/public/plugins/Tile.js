@@ -559,6 +559,24 @@ function init3DArray(width, height, depth) {
   return arr;
 }
 
+/*
+
+{
+  "void": 0,
+  "floor": 1,
+  "wall": 2,
+  "door": 3,
+  "special_door": 4,
+  "enter": 5,
+  "exit": 6,
+  "entity": 7,
+  "block": 8,
+  "bush": 9,
+  "grass": 10
+}
+
+*/
+
 },{"./util/generateTiledJSON.js":24,"./util/mersenne.js":25,"./util/noise.js":26}],5:[function(require,module,exports){
 "use strict";
 
@@ -4241,41 +4259,82 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import labyrinthos from 'labyrinthos';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
+var exitConfig = {
+  position: {
+    x: 0,
+    y: 0,
+    z: 0
+  },
+  exitHandler: function exitHandler(enterEnt, exitEnt) {
+    var game = this;
+    console.log('exitHandler', game, enterEnt, exitEnt);
+
+    // default behavior is to clear all tiles
+    // clear all current tiles
+    game.data.ents.TILE.forEach(function (tile) {
+      game.removeEntity(tile.id);
+    });
+
+    // clear any tiles that are deferred
+    for (var eId in game.deferredEntities) {
+      var ent = game.deferredEntities[eId.toString()];
+      if (ent.type === 'TILE') {
+        // game.removeEntity(ent.id);
+        delete game.deferredEntities[eId.toString()];
+      }
+    }
+
+    // update the player position to the exit position ( can customimze this )
+    game.setPosition(enterEnt.id, {
+      x: exitEnt.exit.position.x,
+      y: exitEnt.exit.position.y
+    });
+
+    // generate a new seed and regenerate the maze with the new seed and existing settings
+    var seed = Math.floor(Math.random() * 100000);
+
+    // set the new seed
+    game.systems.tile.tileMap.seed = seed;
+
+    // regenerate the tile map
+    game.systems.tile.createTileMap(game.systems.tile.tileMap);
+  }
+};
 var defaultTileSet = [{
   id: 0,
-  kind: 'empty',
-  weight: 10
+  kind: 'empty'
 }, {
   id: 1,
   kind: 'bush',
   texture: 'tile-bush',
-  weight: 2,
   body: true,
   isStatic: true,
+  customZ: true,
   z: 16 /* size: { depth: 32 } */
 }, {
   id: 2,
-  kind: 'grass',
-  weight: 63
+  kind: 'grass'
 }, {
   id: 3,
   kind: 'block',
-  weight: 5,
   body: true,
   z: 16
 }, {
   id: 4,
-  kind: 'path-green',
-  weight: 10
+  kind: 'path-green'
 }, {
   id: 5,
-  kind: 'path-brown',
-  weight: 10
+  kind: 'path-brown'
 }, {
   id: 6,
-  kind: 'path-brown',
-  weight: 10
-}];
+  kind: 'exit',
+  texture: 'tile-exit',
+  body: true,
+  isStatic: true,
+  isSensor: true,
+  exit: exitConfig
+} // exit
+];
 var Tile = /*#__PURE__*/function () {
   function Tile() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -4312,8 +4371,6 @@ var Tile = /*#__PURE__*/function () {
     this.tileMap = tileMap;
     this.labyrinthosAlgoName = labyrinthosAlgo;
     this.labyType = 'maze';
-
-    // console.log('loading tileMap', tileMap)
 
     // TODO: replace this scaffold wth labyrinthos.transform()
     this.labyrinthosAlgo = _labyrinthos["default"].mazes[labyrinthosAlgo];
@@ -4524,7 +4581,7 @@ function createLayer(layer, tileWidth, tileHeight) {
   } else {
     // 2D data handling
     layer.data.forEach(function (tileValue, index) {
-      _this.processTile(tileValue, index, layer, tileWidth, tileHeight, 0); // Assume z=0 for 2D data
+      _this.processTile(tileValue, index, layer, tileWidth, tileHeight, 0, true); // Assume z=0 for 2D data
     });
   }
 }
@@ -4585,10 +4642,15 @@ function createTile(tile, x, y) {
   if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
     // _type = 'BLOCK';
   }
-  if (customZ) {
+
+  /*
+  Remark: Removed for now, optimization for 2.5D games representing 3d tilemap data
+  if (customZ && z !== 0) {
     // this is required so don't dont stack 2d bodies inside each other in 2.5D space
-    body = false;
+    // body = false;
   }
+  */
+
   var _texture;
   // check to see if a custom texture is set
   if (typeof tile.texture !== 'undefined') {
@@ -4597,8 +4659,10 @@ function createTile(tile, x, y) {
     _texture = "tile-".concat(tile.kind); // rename
   }
 
+  console.log('creating tile with exit', tile.exit);
   var ent = this.game.createEntity((_this$game$createEnti = {
     type: _type,
+    name: tile.name || tile.kind,
     kind: tile.kind,
     body: body,
     mass: mass,
@@ -4622,7 +4686,7 @@ function createTile(tile, x, y) {
       y: y * scale,
       z: z * scale
     }
-  }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileDepth * scale), _this$game$createEnti));
+  }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileDepth * scale), _defineProperty(_this$game$createEnti, "exit", tile.exit), _this$game$createEnti));
   return ent;
 }
 
