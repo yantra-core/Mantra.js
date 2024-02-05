@@ -16,14 +16,21 @@ import createTileMapFromTiledJSON from './lib/createTileMapFromTiledJSON.js';
 import createLayer from './lib/createLayer.js';
 import processTile from './lib/processTile.js';
 
+
+let exitConfig = {
+  exitHandler: function (enterEnt, exitEnt) {
+    console.log('exitHandler', enterEnt, exitEnt);
+  }
+};
+
 const defaultTileSet = [
-  { id: 0, kind: 'empty', weight: 10 },
-  { id: 1, kind: 'bush', texture: 'tile-bush', weight: 2, body: true, isStatic: true,  z: 16 /* size: { depth: 32 } */ },
-  { id: 2, kind: 'grass', weight: 63 },
-  { id: 3, kind: 'block', weight: 5, body: true, z: 16 },
-  { id: 4, kind: 'path-green', weight: 10 },
-  { id: 5, kind: 'path-brown', weight: 10 },
-  { id: 6, kind: 'path-brown', weight: 10 },
+  { id: 0, kind: 'empty' },
+  { id: 1, kind: 'bush', texture: 'tile-bush', body: true, isStatic: true,  customZ: true, z: 16 /* size: { depth: 32 } */ },
+  { id: 2, kind: 'grass' },
+  { id: 3, kind: 'block', body: true, z: 16 },
+  { id: 4, kind: 'path-green' },
+  { id: 5, kind: 'path-brown' },
+  { id: 6, kind: 'exit', texture: 'tile-exit', body: true, isStatic: true, isSensor: true, exit: exitConfig }, // exit
 ];
 
 class Tile {
@@ -55,6 +62,7 @@ class Tile {
 
     this.labyrinthosAlgoName = labyrinthosAlgo;
     this.labyType = 'maze';
+
 
     // TODO: replace this scaffold wth labyrinthos.transform()
     this.labyrinthosAlgo = labyrinthos.mazes[labyrinthosAlgo];
