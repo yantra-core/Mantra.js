@@ -8,7 +8,7 @@ export default function createTileMap(tileMap) {
   if (typeof tileMap.y !== 'number') {
     tileMap.y = 0;
   }
-  
+
   let incomingDepth = parseInt(tileMap.depth);
 
   let map = new labyrinthos.TileMap({
@@ -97,36 +97,42 @@ export default function createTileMap(tileMap) {
     }
   }
 
-  if (exits.length === 0) {
-    // pick a random item in the array that is 0 and make it an exit
-    let exit;
-    
-    if (is3DTileMap) {
-      exit = map.random(map.data.length - 1); // TODO: better random 3D exit
-    } else {
+  if (this.tiledServer === false && this.proceduralGenerateMissingChunks === false) {
 
-      // find all spaces that are 0
-      let spaces = [];
-      for (let i = 0; i < map.data.length; i++) {
-        if (map.data[i] === 0) {
-          spaces.push(i);
+    if (exits.length === 0) {
+      // pick a random item in the array that is 0 and make it an exit
+      let exit;
+
+      if (is3DTileMap) {
+        exit = map.random(map.data.length - 1); // TODO: better random 3D exit
+      } else {
+
+        // find all spaces that are 0
+        let spaces = [];
+        for (let i = 0; i < map.data.length; i++) {
+          if (map.data[i] === 0) {
+            spaces.push(i);
+          }
         }
+
+        exit = map.random(spaces.length - 1);
       }
+      map.data[exit] = 6;
 
-      exit = map.random(spaces.length - 1);
+      exits.push(exit);
     }
-    map.data[exit] = 6;
 
-    exits.push(exit);
+
+    if (entrances.length === 0) {
+      // pick a random item in the array that is 0 and make it an entrance
+      let entrance = map.random(map.data.length - 1);
+      map.data[entrance] = 5;
+      entrances.push(entrance);
+    }
+
   }
 
-  if (entrances.length === 0) {
-    // pick a random item in the array that is 0 and make it an entrance
-    let entrance = map.random(map.data.length - 1);
-    map.data[entrance] = 5;
-    entrances.push(entrance);
-  }
-  
+
   this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
 
   this.game.emit('tilemap::created', tileMap);
