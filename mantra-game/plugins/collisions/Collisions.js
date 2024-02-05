@@ -45,7 +45,7 @@ class Collisions {
         game.switchWorlds(exitEnt.exit.world);
       }
       if (typeof exitEnt.exit.position !== 'undefined') {
-        this.game.setPosition(enterEnt.id, { x: exitEnt.position.x, y: exitEnt.position.y });
+        this.game.setPosition(enterEnt.id, { x: exitEnt.exit.position.x, y: exitEnt.exit.position.y });
       }
     }
 
