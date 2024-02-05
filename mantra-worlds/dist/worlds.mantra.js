@@ -3632,6 +3632,18 @@ var Home = /*#__PURE__*/function () {
           y: 0
         }
       });
+      game.createEntity({
+        type: "BACKGROUND",
+        texture: 'garden',
+        width: 300,
+        height: 300,
+        body: false,
+        position: {
+          x: 0,
+          y: 0,
+          z: -10
+        }
+      });
       game.setBackground('#007fff');
       game.use('Block');
       game.use('Bomb');
@@ -3657,18 +3669,7 @@ var Home = /*#__PURE__*/function () {
       */
 
       // now create some background and text entities for navigation
-      game.createEntity({
-        type: 'BACKGROUND',
-        texture: 'garden',
-        width: 300,
-        height: 300,
-        body: false,
-        position: {
-          x: 0,
-          y: 0,
-          z: -10
-        }
-      });
+
       game.createEntity({
         name: 'sutra-tree',
         type: 'BACKGROUND',
@@ -3727,7 +3728,7 @@ var Home = /*#__PURE__*/function () {
           // position to right
           x: 900,
           y: -1800,
-          z: 1
+          z: -1
         }
       });
       game.createEntity({
@@ -3763,13 +3764,22 @@ var Home = /*#__PURE__*/function () {
       // if touch warp, switch to YCraft level
       game.createEntity({
         type: 'WARP',
-        kind: 'YCraft',
+        // kind: 'YCraft',
         width: 64,
         height: 64,
         depth: 64,
         texture: 'warp-to-ycraft',
         isStatic: true,
         isSensor: true,
+        exit: {
+          world: 'YCraft',
+          // optional, if not specified will use the current world
+          position: {
+            // optional, if not specified will use 0,0,0
+            x: 0,
+            y: 0
+          }
+        },
         position: {
           x: 0,
           y: -210,
@@ -3902,9 +3912,14 @@ var Home = /*#__PURE__*/function () {
 
       game.createEntity({
         type: 'DOOR',
-        kind: 'BabylonGraphics',
-        collisionActive: true,
-        collisionEnd: true,
+        exit: {
+          position: {
+            x: -1000,
+            y: -500
+          }
+        },
+        body: true,
+        isStatic: true,
         collisionStart: true,
         texture: {
           sheet: 'loz_spritesheet',
@@ -3912,7 +3927,6 @@ var Home = /*#__PURE__*/function () {
         },
         width: 16,
         height: 16,
-        body: false,
         position: {
           // position to right
           x: 55,
@@ -3922,15 +3936,23 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'DOOR',
+        exit: {
+          position: {
+            x: 1100,
+            y: -500
+          }
+        },
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'ayyoDoor'
         },
         width: 16,
         height: 16,
-        body: false,
+        body: true,
+        isStatic: true,
+        collisionStart: true,
         position: {
-          // position to right
+          // position to left
           x: -55,
           y: 71,
           z: 10
@@ -3940,7 +3962,9 @@ var Home = /*#__PURE__*/function () {
       // if touch warp, switch to Music level
       game.createEntity({
         type: 'WARP',
-        kind: 'Music',
+        exit: {
+          world: 'Music'
+        },
         width: 64,
         height: 64,
         depth: 64,
@@ -3995,7 +4019,9 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'WARP',
-        kind: 'Platform',
+        exit: {
+          world: 'Platform'
+        },
         width: 64,
         height: 64,
         depth: 64,
@@ -4010,7 +4036,9 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'WARP',
-        kind: 'GravityGardens',
+        exit: {
+          world: 'GravityGardens'
+        },
         width: 64,
         height: 64,
         depth: 64,
@@ -4157,7 +4185,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = sutras;
-var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 var _switchGraphics = _interopRequireDefault(require("../sutras/switchGraphics.js"));
 var _walker = _interopRequireDefault(require("../TowerDefense/sutras/walker.js"));
 var _routing = _interopRequireDefault(require("../sutras/routing.js"));
@@ -4184,10 +4211,6 @@ function sutras(game) {
   var switchGraphicsSutra = (0, _switchGraphics["default"])(game);
   rules.use(switchGraphicsSutra, 'switchGraphics');
 
-  // when touching WARP entity, warp to world
-  var warp = (0, _warpToWorld["default"])(game);
-  rules.use(warp, 'warpToWorld');
-
   // walker is npc that walks around route
   rules.use((0, _walker["default"])(game, {
     route: _routing["default"].createRectangleRoute(-50, -150, 200, -150),
@@ -4211,7 +4234,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  rules.use((0, _hexapod["default"])(game), 'hexapod');
+  //rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');
@@ -4220,7 +4243,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":53,"../sutras/routing.js":59,"../sutras/switchGraphics.js":60,"../sutras/warpToWorld.js":61,"./sutras/block.js":33}],33:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":53,"../sutras/routing.js":59,"../sutras/switchGraphics.js":60,"./sutras/block.js":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4470,7 +4493,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
-var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 var _createPiano = _interopRequireDefault(require("./instruments/createPiano.js"));
 var _createDrumKit = _interopRequireDefault(require("./instruments/createDrumKit.js"));
 var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
@@ -4590,7 +4612,9 @@ var Music = /*#__PURE__*/function () {
       // warp to Platform level
       game.createEntity({
         type: 'WARP',
-        kind: 'Home',
+        exit: {
+          world: 'Home'
+        },
         texture: 'warp-to-home',
         width: 64,
         height: 64,
@@ -4726,7 +4750,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../../mantra-sutras/player-movement/top-down.js":29,"../sutras/warpToWorld.js":61,"./instruments/createDrumKit.js":37,"./instruments/createPiano.js":38,"./sutras.js":39}],37:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"./instruments/createDrumKit.js":37,"./instruments/createPiano.js":38,"./sutras.js":39}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4964,10 +4988,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = sutras;
-var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 var _switchGraphics = _interopRequireDefault(require("../sutras/switchGraphics.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-// helper sutra for switching worlds
+// helper sutra for switching graphics
 
 var isPressed = false;
 var timerCache = {};
@@ -4976,10 +4999,6 @@ function sutras(game) {
   rules.addCondition('isTile', function (entity) {
     return entity.type === 'BLOCK';
   });
-
-  // when touching WARP entity, warp to world
-  var warp = (0, _warpToWorld["default"])(game);
-  rules.use(warp, 'warpToWorld');
   rules.addCondition('entityTouchedNote', function (entity, gameState) {
     if (entity.type === 'COLLISION' && entity.kind === 'START') {
       // console.log('spawnUnitTouchedHomebase', entity)
@@ -5083,7 +5102,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":60,"../sutras/warpToWorld.js":61}],40:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":60}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5856,7 +5875,7 @@ var Tiled = /*#__PURE__*/function () {
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
       // game.setBackground('#000000');
-      game.useFoV = true;
+      game.config.useFoV = true;
       game.data.fieldOfView = 96;
       // sprite sheet has been defined in defaultAssets.js
       game.createPlayer({
@@ -7256,11 +7275,18 @@ var YCraft = /*#__PURE__*/function () {
       // create warp by back home entity
       game.createEntity({
         type: 'WARP',
-        kind: 'Home',
+        exit: {
+          world: 'Home',
+          position: {
+            x: 0,
+            y: 0
+          }
+        },
         // color: 0x00ff00,
         width: 64,
         texture: 'warp-to-home',
         isStatic: true,
+        collisionStart: true,
         // isSensor: false,
         height: 64,
         position: {
@@ -7291,28 +7317,7 @@ var YCraft = /*#__PURE__*/function () {
       var rules = game.rules;
       function yCraftRules() {
         var rules = game.createSutra();
-
-        // TODO: use common warp sutra
-        rules.addCondition('playerTouchedWarpZone', function (entity, gameState) {
-          if (entity.type === 'COLLISION') {
-            // console.log('entity', entity)
-
-            if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-              return true;
-            }
-            if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
-              return true;
-            }
-          }
-        });
-        rules["if"]('playerTouchedWarpZone').then('switchWorld');
-
-        // TODO: make this common Sutra
-        rules.on('switchWorld', function (entity) {
-          console.log('entityentity', entity);
-          var worldName = entity.WARP.kind || 'Home';
-          game.switchWorlds(worldName);
-        });
+        // no custom rules yet, see YCraft.js plugin
         game.useSutra(rules, 'YCRAFT');
       }
       yCraftRules();
@@ -7351,6 +7356,7 @@ var YCraft = /*#__PURE__*/function () {
           mass: 10000,
           height: 16,
           width: 16,
+          startCollision: true,
           position: {
             x: 180,
             y: 0 + i * 64,

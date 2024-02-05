@@ -12,6 +12,18 @@
   <script type="module" src="/mantra.js"></script>
   <script type="module" src="/worlds.mantra.js"></script>
   <script type="module" src="/ycraft.js"></script>
+  <style>
+    .score {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: white;
+      font-size: 24px;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9001;
+    }
+  </style>
 
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -176,10 +188,19 @@
         });
 
       });
+
+      let score = 0;
+      game.on('player::tilemap::entrance', function (data) {
+        console.log('player::tilemap::entrance', data);
+        score++;
+        // update curernt score using document.querySelector('.currentScore').innerText = score;
+        document.querySelector('.currentScore').innerText = score
+      });
       window.game = game;
 
     });
   </script>
+  <div class="score">Score: <span class="currentScore">0</span></div>
   <div id="gameHolder"></div>
 </body>
 

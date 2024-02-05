@@ -559,12 +559,11 @@ function init3DArray(width, height, depth) {
   return arr;
 }
 
-/*
-
+/* default roguelike `TileSet` mappings
 {
   "void": 0,
-  "floor": 1,
-  "wall": 2,
+  "wall": 1,
+  "floor": 2,
   "door": 3,
   "special_door": 4,
   "enter": 5,
@@ -574,7 +573,6 @@ function init3DArray(width, height, depth) {
   "bush": 9,
   "grass": 10
 }
-
 */
 
 },{"./util/generateTiledJSON.js":24,"./util/mersenne.js":25,"./util/noise.js":26}],5:[function(require,module,exports){
@@ -1420,8 +1418,8 @@ var BeattieSchoberth = exports.BeattieSchoberth = /*#__PURE__*/function () {
 }();
 var TILE = {
   VOID: 0,
-  FLOOR: 1,
-  WALL: 2,
+  WALL: 1,
+  FLOOR: 2,
   DOOR: 3,
   SPECIAL_DOOR: 4,
   ENTER: 5,
@@ -1889,8 +1887,8 @@ var EXIT = 'exit';
 var DIRECTIONS = ['n', 'e', 's', 'w'];
 var TILE = {
   VOID: 0,
-  FLOOR: 1,
-  WALL: 2,
+  WALL: 1,
+  FLOOR: 2,
   DOOR: 3,
   SPECIAL_DOOR: 4,
   ENTER: 5,
@@ -2037,7 +2035,7 @@ var buildRoom = function buildRoom() {
               if (options.edges.w === 'door') {
                 row.push(TILE.DOOR);
               } else {
-                row.push(TILE.ENTER);
+                row.push(TILE.EXIT);
               }
             } else {
               row.push(TILE.WALL);
@@ -2051,7 +2049,7 @@ var buildRoom = function buildRoom() {
               if (options.edges.e === 'door') {
                 row.push(TILE.DOOR);
               } else {
-                row.push(TILE.ENTER);
+                row.push(TILE.EXIT);
               }
             } else {
               row.push(TILE.WALL);
@@ -2487,7 +2485,7 @@ function ALGORITHM_METROIDVANIA(tileMap, options) {
   var generator = new Metroidvania({
     roomWidth: roomSizeWidth,
     roomHeight: roomSizeHeight,
-    maxFails: 8000,
+    maxFails: 25000,
     width: numRoomsWide,
     // Max number of zones wide
     height: numRoomsWide,
@@ -4300,10 +4298,24 @@ var exitConfig = {
     game.systems.tile.createTileMap(game.systems.tile.tileMap);
   }
 };
-var defaultTileSet = [{
+var defaultTileSet = [
+/*
+VOID: 0,
+FLOOR: 1,
+WALL: 2,
+DOOR: 3,
+SPECIAL_DOOR: 4,
+ENTER: 5,
+EXIT: 6
+*/
+
+// void
+{
   id: 0,
   kind: 'empty'
-}, {
+},
+// wall
+{
   id: 1,
   kind: 'bush',
   texture: 'tile-bush',
@@ -4325,7 +4337,7 @@ var defaultTileSet = [{
 }, {
   id: 5,
   kind: 'entrance',
-  texture: 'pixel-black'
+  texture: 'pixel'
 }, {
   id: 6,
   kind: 'exit',
@@ -4793,30 +4805,20 @@ function createTileMap(tileMap) {
 
   if (this.tiledServer === false && this.proceduralGenerateMissingChunks === false) {
     if (exits.length === 0) {
-      // pick a random item in the array that is 0 and make it an exit
-      var exit;
-      if (is3DTileMap) {
-        exit = map.random(map.data.length - 1); // TODO: better random 3D exit
-      } else {
-        // find all spaces that are 0
-        var spaces = [];
-        for (var _i = 0; _i < map.data.length; _i++) {
-          if (map.data[_i] === 0) {
-            spaces.push(_i);
-          }
-        }
-        exit = map.random(spaces.length - 1);
-      }
-      map.data[exit] = 6;
-      exits.push(exit);
+      // TODO: move this code into LABY
+      // if no 6s ( EXIT ) exist, pick a random 2 ( FLOOR ) instead and make it an exit
+      // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an exit
+      exits = generateExits(map, 1); // create a single exit, TOOD: configurable
     }
+
     if (entrances.length === 0) {
-      // pick a random item in the array that is 0 and make it an entrance
-      var entrance = map.random(map.data.length - 1);
-      map.data[entrance] = 5;
-      entrances.push(entrance);
+      // TODO: move this code into LABY
+      // if no 5s ( ENTRANCE ) exist, pick a random 2 ( FLOOR ) instead and make it an entrance
+      // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an entrance
+      entrances = generateEntrances(map, 1); // create a single entrance, TOOD: configurable
     }
   }
+
   this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
 
   this.game.emit('tilemap::created', tileMap);
@@ -4824,19 +4826,94 @@ function createTileMap(tileMap) {
     // pick random entrance using seed
     // let entrance = entrances[map.random(entrances.length - 1)];
     // picks random each time using Math.random
-    var _entrance = entrances[Math.floor(Math.random() * entrances.length)];
-    var pos = this.calculateTilePosition(_entrance, map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
+    var entrance = entrances[Math.floor(Math.random() * entrances.length)];
+    var pos = this.calculateTilePosition(entrance, map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
     if (typeof pos.x === 'number' && typeof pos.y === 'number') {
       // TODO: 3d space
       var currentPlayer = this.game.getCurrentPlayer();
-      console.log('currentPlayer', currentPlayer);
       game.setPosition(currentPlayer.id, {
         x: pos.x,
         y: pos.y
       });
+      // emit an event we can listen to in app space
+      this.game.emit('player::tilemap::entrance', currentPlayer);
     }
   }
   return map;
+}
+function generateExits(map, exitCount) {
+  var exits = [];
+  // Find all spaces that are '2' FLOOR for potential exits
+  var potentialExits = map.data.reduce(function (acc, val, idx) {
+    if (val === 2) acc.push(idx);
+    return acc;
+  }, []);
+  var exit;
+  if (potentialExits.length > 0) {
+    // If there are '0's, pick a random one to be an exit
+    // exit = potentialExits[Math.floor(Math.random() * potentialExits.length)];
+    // use map.random()
+    exit = potentialExits[map.random(potentialExits.length - 1)];
+  } else {
+    // If there are no '0's, consider a fallback strategy
+    // For example, find all '3's (if '3' is a secondary choice for exits)
+    var secondaryChoices = map.data.reduce(function (acc, val, idx) {
+      if (val === 0) acc.push(idx); // Assuming '0' VOID as secondary choice for an exit
+      return acc;
+    }, []);
+    if (secondaryChoices.length > 0) {
+      // If there are secondary choices, pick a random one
+      // exit = secondaryChoices[Math.floor(Math.random() * secondaryChoices.length)];
+      // use map.random()
+      exit = secondaryChoices[map.random(secondaryChoices.length - 1)];
+    } else {
+      // If there are no '0's or secondary choices, fallback to picking a random index
+      // This case might indicate an issue with the map generation or logic
+      console.warn("No valid exit points (0 or 3) found in map.data.");
+      exit = Math.floor(Math.random() * map.data.length);
+    }
+  }
+
+  // Set the selected index as an exit (6) and add it to the exits array
+  map.data[exit] = 6;
+  exits.push(exit);
+  return exits;
+}
+function generateEntrances(map, entranceCount) {
+  var entrances = [];
+  // Find indexes of all '2's in the array
+  var potentialEntrances = map.data.reduce(function (acc, val, idx) {
+    if (val === 2) acc.push(idx);
+    return acc;
+  }, []);
+  var entrance;
+  if (potentialEntrances.length > 0) {
+    // If there are '2's, pick a random one to be an entrance
+    // entrance = potentialEntrances[Math.floor(Math.random() * potentialEntrances.length)];
+    // use map.random()
+    entrance = potentialEntrances[map.random(potentialEntrances.length - 1)];
+  } else {
+    // If there are no '2's, find indexes of all '0's to pick a random one
+    var zeros = map.data.reduce(function (acc, val, idx) {
+      if (val === 0) acc.push(idx);
+      return acc;
+    }, []);
+    if (zeros.length > 0) {
+      entrance = zeros[Math.floor(Math.random() * zeros.length)];
+    } else {
+      // If there are no '0's either, fallback to picking a random index
+      // This case might indicate an issue with the map generation or logic
+      console.warn("No valid entrance points (0 or 2) found in map.data.");
+      // entrance = Math.floor(Math.random() * map.data.length);
+      // use map.random()
+      entrance = map.random(map.data.length - 1);
+    }
+  }
+
+  // Set the selected index as an entrance (5) and add it to the entrances array
+  map.data[entrance] = 5;
+  entrances.push(entrance);
+  return entrances;
 }
 
 },{}],32:[function(require,module,exports){

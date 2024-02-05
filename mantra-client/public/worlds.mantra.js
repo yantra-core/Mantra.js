@@ -3763,7 +3763,7 @@ var Home = /*#__PURE__*/function () {
 
       // if touch warp, switch to YCraft level
       game.createEntity({
-        type: 'DOOR',
+        type: 'WARP',
         // kind: 'YCraft',
         width: 64,
         height: 64,
@@ -4196,7 +4196,6 @@ var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-moveme
 var _bomb = _interopRequireDefault(require("../../mantra-sutras/bomb.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 // helper sutra for switching worlds
-// import warpToWorld from '../sutras/warpToWorld.js';
 
 // walker is npc that walks around route
 
@@ -4211,10 +4210,6 @@ function sutras(game) {
   // helper for switching graphics
   var switchGraphicsSutra = (0, _switchGraphics["default"])(game);
   rules.use(switchGraphicsSutra, 'switchGraphics');
-
-  // when touching WARP entity, warp to world
-  //let warp = warpToWorld(game);
-  //rules.use(warp, 'warpToWorld');
 
   // walker is npc that walks around route
   rules.use((0, _walker["default"])(game, {
@@ -4239,7 +4234,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  rules.use((0, _hexapod["default"])(game), 'hexapod');
+  //rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');
@@ -4509,7 +4504,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // import warpToWorld from "../sutras/warpToWorld.js";
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var Music = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Music() {
@@ -4995,7 +4990,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = sutras;
 var _switchGraphics = _interopRequireDefault(require("../sutras/switchGraphics.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-// helper sutra for switching worlds
+// helper sutra for switching graphics
 
 var isPressed = false;
 var timerCache = {};
