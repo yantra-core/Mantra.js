@@ -4844,7 +4844,9 @@ function createTileMap(tileMap) {
     // pick random entrance using seed
     // let entrance = entrances[map.random(entrances.length - 1)];
     // picks random each time using Math.random
-    var entrance = entrances[Math.floor(Math.random() * entrances.length)];
+    // let entrance = entrances[Math.floor(Math.random() * entrances.length)];
+    // use seeded random
+    var entrance = entrances[map.random(entrances.length - 1)];
     var pos = this.calculateTilePosition(entrance, map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
     if (typeof pos.x === 'number' && typeof pos.y === 'number') {
       // TODO: 3d space
@@ -4888,7 +4890,9 @@ function generateExits(map, exitCount) {
       // If there are no '0's or secondary choices, fallback to picking a random index
       // This case might indicate an issue with the map generation or logic
       console.warn("No valid exit points (0 or 3) found in map.data.");
-      exit = Math.floor(Math.random() * map.data.length);
+      // exit = Math.floor(Math.random() * map.data.length);
+      // use map.random()
+      exit = map.random(map.data.length - 1);
     }
   }
 
@@ -4917,7 +4921,9 @@ function generateEntrances(map, entranceCount) {
       return acc;
     }, []);
     if (zeros.length > 0) {
-      entrance = zeros[Math.floor(Math.random() * zeros.length)];
+      // entrance = zeros[Math.floor(Math.random() * zeros.length)];
+      // use map.random()
+      entrance = zeros[map.random(zeros.length - 1)];
     } else {
       // If there are no '0's either, fallback to picking a random index
       // This case might indicate an issue with the map generation or logic
