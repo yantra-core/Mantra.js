@@ -62,7 +62,7 @@ const defaultTileSet = [
   { id: 2, kind: 'grass' },
   { id: 3, kind: 'block', body: true, z: 16 },
   { id: 4, kind: 'path-green' },
-  { id: 5, kind: 'path-brown' },
+  { id: 5, kind: 'entrance', texture: 'pixel' },
   { id: 6, kind: 'exit', texture: 'tile-exit', body: true, isStatic: true, isSensor: true, exit: exitConfig }, // exit
 ];
 
