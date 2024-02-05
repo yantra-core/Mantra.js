@@ -44,11 +44,14 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
     // _type = 'BLOCK';
   }
-
-  if (customZ) {
+  
+  /*
+  Remark: Removed for now, optimization for 2.5D games representing 3d tilemap data
+  if (customZ && z !== 0) {
     // this is required so don't dont stack 2d bodies inside each other in 2.5D space
-    body = false;
+    // body = false;
   }
+  */
 
   let _texture;
   // check to see if a custom texture is set
