@@ -63,6 +63,7 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
 
   let ent = this.game.createEntity({
     type: _type,
+    name: tile.name || tile.kind,
     kind: tile.kind,
     body: body,
     mass,
@@ -87,7 +88,8 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
     color: _color,
     width: tileWidth * scale,
     height: tileHeight * scale,
-    depth: tileDepth * scale
+    depth: tileDepth * scale,
+    exit: tile.exit
   });
   return ent;
 }

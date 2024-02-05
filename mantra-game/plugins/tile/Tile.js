@@ -16,7 +16,6 @@ import createTileMapFromTiledJSON from './lib/createTileMapFromTiledJSON.js';
 import createLayer from './lib/createLayer.js';
 import processTile from './lib/processTile.js';
 
-
 let exitConfig = {
   position: {
     x: 0,
@@ -46,7 +45,7 @@ let exitConfig = {
     game.setPosition(enterEnt.id, { x: exitEnt.exit.position.x, y: exitEnt.exit.position.y });
 
     // generate a new seed and regenerate the maze with the new seed and existing settings
-    let seed = Math.floor(Math.random() * 100000);
+    let seed = Math.floor(Math.random() * 100000000000);
 
     // set the new seed
     game.systems.tile.tileMap.seed = seed;

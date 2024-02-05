@@ -41,12 +41,20 @@ class Collisions {
     if (entityA.exit || entityB.exit) {
       let exitEnt = entityA.exit ? entityA : entityB;
       let enterEnt = entityA.exit ? entityB : entityA;
-      if (typeof exitEnt.exit.world !== 'undefined') {
-        game.switchWorlds(exitEnt.exit.world);
+
+      if (typeof exitEnt.exit.exitHandler === 'function') {
+        // call with this.game scope
+        //exitEnt.exit.exitHandler(enterEnt, exitEnt);
+        exitEnt.exit.exitHandler.call(this.game, enterEnt, exitEnt);
+      } else {
+        if (typeof exitEnt.exit.world !== 'undefined') {
+          game.switchWorlds(exitEnt.exit.world);
+        }
+        if (typeof exitEnt.exit.position !== 'undefined') {
+          this.game.setPosition(enterEnt.id, { x: exitEnt.exit.position.x, y: exitEnt.exit.position.y });
+        }
       }
-      if (typeof exitEnt.exit.position !== 'undefined') {
-        this.game.setPosition(enterEnt.id, { x: exitEnt.exit.position.x, y: exitEnt.exit.position.y });
-      }
+
     }
 
     // Check for specific collision cases and send events to the state machine
