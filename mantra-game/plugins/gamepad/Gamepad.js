@@ -10,9 +10,6 @@ const axesAssociation = {
   'RIGHT_STICK_VERTICAL' : ['RIGHT_STICK_UP', 'RIGHT_STICK_DOWN']
 };
 
-const modules = import.meta.glob("./gamepads/*.js");
-
-
 export default class Gamepad {
 
   static id = 'gamepad';
