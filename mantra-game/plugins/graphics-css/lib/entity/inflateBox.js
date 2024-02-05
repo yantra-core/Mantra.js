@@ -20,7 +20,6 @@ export default function inflateBox(entityElement, entityData) {
     entityElement.style.width = entityData.width + 'px';
     entityElement.style.height = entityData.height + 'px';
   }
-
   
   // entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 

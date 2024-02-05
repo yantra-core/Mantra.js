@@ -26,6 +26,9 @@ export default function updateGraphic(entityData) {
   // compare the current mesh position with the entityData position
   // only update the mesh position if the entityData position has changed
   if (-currentMeshPosition.x !== entityData.position.x || currentMeshPosition.y !== entityData.position.z) {
+    if (typeof entityData.position.z !== 'number') {
+      entityData.position.z = 0;
+    }
     mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   }
 

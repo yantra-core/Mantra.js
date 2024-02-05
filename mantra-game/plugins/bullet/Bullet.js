@@ -99,6 +99,8 @@ class Bullet {
         x: directionX * this.speed,
         y: directionY * this.speed
       },
+      width: 8,
+      height: 16,
       radius: 8, // TODO: make this a config
       damage: 10, // TODO: make this a config
     };

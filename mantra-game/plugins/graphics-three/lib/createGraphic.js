@@ -6,19 +6,17 @@ export default function createGraphic(entityData) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
-    case 'BULLET':
-      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
-      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
-
-      break;
+   
     case 'PLAYER':
       //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
 
       break;
     case 'BULLET':
-      console.log("BULLET", entityData)
-      geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      // console.log('entityData.width', entityData.radius, entityData.radius, entityData.radius)
+      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
+
       break;
 
       case 'BLOCK':

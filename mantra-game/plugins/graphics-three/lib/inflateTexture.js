@@ -10,9 +10,7 @@ export default function inflateTexture(entityData) {
 
   let mesh = entityData.graphics['graphics-three'];
   if (!mesh) return; // Ensure the mesh exists
-
   return applyTextureToMesh(this.game, entityData, mesh)
-
 
 }
 
@@ -116,14 +114,35 @@ async function applyTextureToMesh(game, entityData, mesh) {
     mesh.material.needsUpdate = true;
   }
 
-
-
   // Apply the texture
   mesh.material.map = cachedTexture;
   mesh.material.needsUpdate = true;
   mesh.visible = true;
 
 }
+
+/*
+function customizeUVsForBox(faces) {
+  // Customize UV mapping here based on your needs
+  // This example divides the texture into quarters and applies each quarter to two faces of the box
+  const uvCoordinates = [
+      [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5], // First quarter
+      [1, 1], [0.5, 1], [0.5, 0.5], [1, 0.5], // Second quarter
+      // Add more for other faces, adjusting the texture coordinates accordingly
+  ];
+
+  faces.forEach((face, index) => {
+      const uvIndex = Math.floor(index / 2); // Assuming two triangles per face
+      const uvQuad = uvCoordinates[uvIndex];
+
+      face.forEach((vertex, vertexIndex) => {
+          const uv = uvQuad[vertexIndex];
+          vertex.x = uv[0];
+          vertex.y = uv[1];
+      });
+  });
+}
+*/
 
 /*
 
