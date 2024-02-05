@@ -36,12 +36,12 @@ export default class Gamepad {
         'BUTTON_STICK_R' :11,
     },
     axes : {
-        'LEFT_STICK_HORIZONTAL' : 0,
-        'LEFT_STICK_VERTICAL' : 1,
-        'RIGHT_STICK_HORIZONTAL' : 2,
-        'RIGHT_STICK_VERTICAL' : 3,
-        'DPAD_HORIZONTAL' : 4,
-        'DPAD_VERTICAL' : 5,
+        'DPAD_HORIZONTAL' : 0,
+        'DPAD_VERTICAL' : 1,
+        'LEFT_STICK_HORIZONTAL' : 2,
+        'LEFT_STICK_VERTICAL' : 3,
+        'RIGHT_STICK_HORIZONTAL' : 4,
+        'RIGHT_STICK_VERTICAL' : 5,
     }
   };
 
