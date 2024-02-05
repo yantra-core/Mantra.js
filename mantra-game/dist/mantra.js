@@ -512,36 +512,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
 
     //
-    // Doors
-    //
-  }, {
-    key: "createDoor",
-    value: function createDoor(config) {}
-
-    /*
-    game.createDoor({
-    position: {
-      x: 0,
-      y: -210,
-      z: 32
-    },
-    size: {
-      width: 64,
-      height: 64,
-      depth: 64,
-    },
-    texture: 'warp-to-ycraft',
-    exit: {
-      world: 'YCraft', // optional, if not specified will use the current world
-      position: {      // optional, if not specified will use 0,0,0
-        x: 0,
-        y: 0
-      }
-    }
-    });
-    */
-
-    //
     // Audio / Multimedia APIs
     //
   }, {
@@ -2174,7 +2144,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = switchWorlds;
 function switchWorlds(selectedWorld) {
   var game = this;
-  console.log("SselectedWorld", selectedWorld);
   // check to see if game.worlds has any entries
   // if so, unload them if they have an unload method
   if (game.worlds.length > 0) {

@@ -33,32 +33,7 @@ async function applyTextureToMesh(game, entityData, mesh) {
 
   let cachedTexture = texturePool[texture.url];
 
-  if (cachedTexture && cachedTexture.image && texture.sprite) {
-    const sprite = texture.sprite;
-    const textureWidth = cachedTexture.image.width;
-    const textureHeight = cachedTexture.image.height;
-    sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
-    sprite.height = sprite.height || 16;
-
-    const uvs = {
-      x: -sprite.x / textureWidth,
-      y: -sprite.y / textureHeight,
-      width: sprite.width / textureWidth,
-      height: sprite.height / textureHeight
-    };
-
-    // create a clone of the cached texture
-    let _cachedTexture = cachedTexture.clone();
-
-
-    _cachedTexture.repeat.set(uvs.width, uvs.height);
-    _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
-
-    mesh.material.map = _cachedTexture;
-    mesh.material.needsUpdate = true;
-    return mesh;
-  }
-
+  
   // If the texture is not cached yet, or it's a Promise (still loading), handle accordingly
   if (!cachedTexture || cachedTexture instanceof Promise) {
     if (!cachedTexture) {
@@ -80,14 +55,16 @@ async function applyTextureToMesh(game, entityData, mesh) {
     cachedTexture = await cachedTexture;
 
   }
-
   // If after awaiting, the cachedTexture is null (due to error or other reasons), return
   if (!cachedTexture) {
     mesh.visible = true;
     return mesh;
   }
+  if (entityData.type === 'PLAYER') {
+    console.log('loadined', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
+  }
 
-  // console.log("Using cached or freshly loaded texture");
+
   if (cachedTexture && cachedTexture.image && texture.sprite) {
     const sprite = texture.sprite;
     const textureWidth = cachedTexture.image.width;
@@ -103,17 +80,16 @@ async function applyTextureToMesh(game, entityData, mesh) {
     };
 
     // create a clone of the cached texture
-    let _spriteTexture = cachedTexture.clone();
+    let _cachedTexture = cachedTexture.clone();
 
-    // TODO: Customize UVs for each face of the box
-    // let geometry = mesh.geometry;
-    // customizeBoxUVs(geometry, _spriteTexture);
-    _spriteTexture.repeat.set(uvs.width, uvs.height);
-    _spriteTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
+    _cachedTexture.repeat.set(uvs.width, uvs.height);
+    _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
 
-    mesh.material.map = _spriteTexture;
+    mesh.material.map = _cachedTexture;
     mesh.material.needsUpdate = true;
+    return mesh;
   }
+
 
   // Apply the texture
   mesh.material.map = cachedTexture;

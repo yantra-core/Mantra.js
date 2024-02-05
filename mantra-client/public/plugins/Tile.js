@@ -233,7 +233,7 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
     this.data = this.initializeDataArray();
     // ASCII representations for tiles 0-10
     // TODO: Is there a better default set of ASCII characters we can use?
-    this.defaultRogueLike = ['-', '#', '+', '0', '<', '>', '$', '#', '@', '&', '?'];
+    this.defaultRogueLike = ['-', '#', '+', '0', '<', '>', '$', '⌂', '@', '&', '?'];
     this.seedRandom();
   }
   _createClass(TileMap, [{
@@ -2037,7 +2037,7 @@ var buildRoom = function buildRoom() {
               if (options.edges.w === 'door') {
                 row.push(TILE.DOOR);
               } else {
-                row.push(TILE.EXIT);
+                row.push(TILE.ENTER);
               }
             } else {
               row.push(TILE.WALL);
@@ -2051,7 +2051,7 @@ var buildRoom = function buildRoom() {
               if (options.edges.e === 'door') {
                 row.push(TILE.DOOR);
               } else {
-                row.push(TILE.EXIT);
+                row.push(TILE.ENTER);
               }
             } else {
               row.push(TILE.WALL);
@@ -4324,7 +4324,8 @@ var defaultTileSet = [{
   kind: 'path-green'
 }, {
   id: 5,
-  kind: 'path-brown'
+  kind: 'entrance',
+  texture: 'pixel-black'
 }, {
   id: 6,
   kind: 'exit',
@@ -4751,26 +4752,90 @@ function createTileMap(tileMap) {
   if (transformType === 'terrain') {
     map.scaleToTileRange(6);
   }
-
+  var entrances = [];
+  var exits = [];
+  var is3DTileMap = false;
   // default `extrude` mode
   if (incomingDepth > 1 && _typeof(map.data[0]) !== 'object') {
     // if not already 3d array
     // simply clone each layer to fill the depth dimension
     // this is used to fill algos which can't yet generate 3d maps
     var layer = map.data;
+    is3DTileMap = true;
     map.data = [];
     for (var i = 0; i < incomingDepth; i++) {
       map.data[i] = [];
       for (var j = 0; j < layer.length; j++) {
         map.data[i][j] = layer[j];
+        if (layer[j] === 5) {
+          entrances.push(j); // find an entrance since we are O(n) here already
+        }
+
+        if (layer[j] === 6) {
+          exits.push(j); // find an exit since we are O(n) here already
+        }
       }
       //map.data.push(JSON.parse(JSON.stringify(layer)));
     }
+  } else {
+    // needs to find the entrance in 2d map
+    var _layer = map.data;
+    for (var _j = 0; _j < _layer.length; _j++) {
+      if (_layer[_j] === 5) {
+        entrances.push(_j); // 5 is the entrance, 6 is exit
+      }
+
+      if (_layer[_j] === 6) {
+        exits.push(_j); // 5 is the entrance, 6 is exit
+      }
+    }
   }
 
+  if (this.tiledServer === false && this.proceduralGenerateMissingChunks === false) {
+    if (exits.length === 0) {
+      // pick a random item in the array that is 0 and make it an exit
+      var exit;
+      if (is3DTileMap) {
+        exit = map.random(map.data.length - 1); // TODO: better random 3D exit
+      } else {
+        // find all spaces that are 0
+        var spaces = [];
+        for (var _i = 0; _i < map.data.length; _i++) {
+          if (map.data[_i] === 0) {
+            spaces.push(_i);
+          }
+        }
+        exit = map.random(spaces.length - 1);
+      }
+      map.data[exit] = 6;
+      exits.push(exit);
+    }
+    if (entrances.length === 0) {
+      // pick a random item in the array that is 0 and make it an entrance
+      var entrance = map.random(map.data.length - 1);
+      map.data[entrance] = 5;
+      entrances.push(entrance);
+    }
+  }
   this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
 
   this.game.emit('tilemap::created', tileMap);
+  if (entrances.length > 0) {
+    // pick random entrance using seed
+    // let entrance = entrances[map.random(entrances.length - 1)];
+    // picks random each time using Math.random
+    var _entrance = entrances[Math.floor(Math.random() * entrances.length)];
+    var pos = this.calculateTilePosition(_entrance, map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
+    if (typeof pos.x === 'number' && typeof pos.y === 'number') {
+      // TODO: 3d space
+      var currentPlayer = this.game.getCurrentPlayer();
+      console.log('currentPlayer', currentPlayer);
+      game.setPosition(currentPlayer.id, {
+        x: pos.x,
+        y: pos.y
+      });
+    }
+  }
   return map;
 }
 

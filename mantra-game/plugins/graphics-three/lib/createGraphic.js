@@ -2,6 +2,12 @@ export default function createGraphic(entityData) {
   let geometry, material, mesh;
   // console.log('createGraphic', entityData)
   // Geometry setup based on entity type
+
+  if (entityData.destroyed === true) {
+    // ignore, shouldn't have made it here, check upstream as well
+    return;
+  }
+
   switch (entityData.type) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);

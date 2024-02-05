@@ -2144,7 +2144,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = switchWorlds;
 function switchWorlds(selectedWorld) {
   var game = this;
-  console.log("SselectedWorld", selectedWorld);
   // check to see if game.worlds has any entries
   // if so, unload them if they have an unload method
   if (game.worlds.length > 0) {

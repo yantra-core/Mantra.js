@@ -212,7 +212,6 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "loadFont",
     value: function loadFont(path, cb) {
       var game = this.game;
-      // console.log("LLLLLLL", THREE)
       var fontLoader = new FontLoader();
       fontLoader.load('vendor/fonts/helvetiker_regular.typeface.json', function (font) {
         // Store the loaded font in your game's state
@@ -302,6 +301,11 @@ function createGraphic(entityData) {
   var geometry, material, mesh;
   // console.log('createGraphic', entityData)
   // Geometry setup based on entity type
+
+  if (entityData.destroyed === true) {
+    // ignore, shouldn't have made it here, check upstream as well
+    return;
+  }
   switch (entityData.type) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
@@ -355,6 +359,10 @@ function createGraphic(entityData) {
 
   // console.log('creating a new mesh', entityData, geometry, material)
   mesh = new THREE.Mesh(geometry, material);
+  if (entityData.type === 'TEXT') {
+    mesh.visible = false; // for now
+  }
+
   this.scene.add(mesh);
 
   // Setting position
@@ -456,28 +464,244 @@ var texturePool = {};
 function applyTextureToMesh(_x, _x2, _x3) {
   return _applyTextureToMesh.apply(this, arguments);
 }
-/*
+function _applyTextureToMesh() {
+  _applyTextureToMesh = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(game, entityData, mesh) {
+    var texture, cachedTexture, textureLoader, sprite, textureWidth, textureHeight, uvs, _cachedTexture;
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          texture = game.getTexture(entityData.texture); // No game texture found for entity, return mesh
+          if (texture) {
+            _context.next = 4;
+            break;
+          }
+          mesh.visible = true;
+          return _context.abrupt("return", mesh);
+        case 4:
+          if (texture.url) {
+            _context.next = 7;
+            break;
+          }
+          mesh.visible = true;
+          return _context.abrupt("return", mesh);
+        case 7:
+          cachedTexture = texturePool[texture.url]; // If the texture is not cached yet, or it's a Promise (still loading), handle accordingly
+          if (!(!cachedTexture || cachedTexture instanceof Promise)) {
+            _context.next = 13;
+            break;
+          }
+          if (!cachedTexture) {
+            // If not cached, start loading and cache the Promise
+            textureLoader = new THREE.TextureLoader(); // console.log("THREELOADER", textureLoader, texture.url)
+            cachedTexture = texturePool[texture.url] = new Promise(function (resolve, reject) {
+              textureLoader.load(texture.url, resolve, undefined, reject);
+            }).then(function (loadedTexture) {
+              // Once loaded, update the cache with the actual texture and return it
+              texturePool[texture.url] = loadedTexture;
+              return loadedTexture;
+            })["catch"](function (error) {
+              console.error('Error loading texture', texture.url, error);
+              return null; // Handle errors appropriately
+            });
+          }
+          // Await the Promise (either already existing or just created)
+          _context.next = 12;
+          return cachedTexture;
+        case 12:
+          cachedTexture = _context.sent;
+        case 13:
+          if (cachedTexture) {
+            _context.next = 16;
+            break;
+          }
+          mesh.visible = true;
+          return _context.abrupt("return", mesh);
+        case 16:
+          if (entityData.type === 'PLAYER') {
+            console.log('loadined', entityData.type, texture.sprite, cachedTexture, texture.url, texturePool[texture.url]);
+          }
+          if (!(cachedTexture && cachedTexture.image && texture.sprite)) {
+            _context.next = 30;
+            break;
+          }
+          sprite = texture.sprite;
+          textureWidth = cachedTexture.image.width;
+          textureHeight = cachedTexture.image.height;
+          sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
+          sprite.height = sprite.height || 16;
+          uvs = {
+            x: -sprite.x / textureWidth,
+            y: -sprite.y / textureHeight,
+            width: sprite.width / textureWidth,
+            height: sprite.height / textureHeight
+          }; // create a clone of the cached texture
+          _cachedTexture = cachedTexture.clone();
+          _cachedTexture.repeat.set(uvs.width, uvs.height);
+          _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
+          mesh.material.map = _cachedTexture;
+          mesh.material.needsUpdate = true;
+          return _context.abrupt("return", mesh);
+        case 30:
+          // Apply the texture
+          mesh.material.map = cachedTexture;
+          mesh.material.needsUpdate = true;
+          mesh.visible = true;
+        case 33:
+        case "end":
+          return _context.stop();
+      }
+    }, _callee);
+  }));
+  return _applyTextureToMesh.apply(this, arguments);
+}
+function loadTexture(_x4) {
+  return _loadTexture.apply(this, arguments);
+}
+function _loadTexture() {
+  _loadTexture = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(url) {
+    var textureLoader;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          textureLoader = new THREE.TextureLoader();
+          _context2.prev = 1;
+          _context2.next = 4;
+          return new Promise(function (resolve, reject) {
+            textureLoader.load(url, resolve, undefined, reject);
+          });
+        case 4:
+          return _context2.abrupt("return", _context2.sent);
+        case 7:
+          _context2.prev = 7;
+          _context2.t0 = _context2["catch"](1);
+          console.error('Error loading texture', url, _context2.t0);
+          return _context2.abrupt("return", null);
+        case 11:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2, null, [[1, 7]]);
+  }));
+  return _loadTexture.apply(this, arguments);
+}
+function customizeBoxUVs(geometry) {
+  var uvAttribute = geometry.attributes.uv;
+  var uvArray = uvAttribute.array;
+
+  // Common UVs for all faces to cover the entire texture
+  var commonUVs = [[0, 0],
+  // Bottom left
+  [1, 0],
+  // Bottom right
+  [1, 1],
+  // Top right
+  [0, 1] // Top left
+  ];
+  var _loop = function _loop(faceIndex) {
+    // Each face is two triangles, so 6 vertices in total
+    var vertexIndices = [0, 1, 2, 2, 3, 0].map(function (v) {
+      return v + faceIndex * 4;
+    });
+    vertexIndices.forEach(function (vertexIndex, uvIndex) {
+      uvArray[vertexIndex * 2] = commonUVs[uvIndex % 4][0]; // U coordinate
+      uvArray[vertexIndex * 2 + 1] = commonUVs[uvIndex % 4][1]; // V coordinate
+    });
+  };
+  for (var faceIndex = 0; faceIndex < 6; faceIndex++) {
+    _loop(faceIndex);
+  }
+
+  // Inform Three.js that the UVs have been updated
+  uvAttribute.needsUpdate = true;
+}
+function getFaceUVs(texture, faceIndex) {
+  // Calculate UVs based on the texture and which part of the texture you want to use for the face
+  // This is a placeholder function, you need to implement the logic based on your texture layout and requirements
+  // For example, you might divide the texture into sections and return UV coordinates for the section corresponding to the faceIndex
+  var sectionWidth = 1 / 3; // Assuming 3x2 sections in the texture
+  var sectionHeight = 1 / 2;
+  var x = faceIndex % 3 * sectionWidth;
+  var y = Math.floor(faceIndex / 3) * sectionHeight;
+  return [[x, y + sectionHeight],
+  // Bottom left
+  [x + sectionWidth, y + sectionHeight],
+  // Bottom right
+  [x + sectionWidth, y],
+  // Top right
+  [x, y] // Top left
+  ];
+}
+
 function customizeUVsForBox(faces) {
   // Customize UV mapping here based on your needs
   // This example divides the texture into quarters and applies each quarter to two faces of the box
-  const uvCoordinates = [
-      [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5], // First quarter
-      [1, 1], [0.5, 1], [0.5, 0.5], [1, 0.5], // Second quarter
-      // Add more for other faces, adjusting the texture coordinates accordingly
+  var uvCoordinates = [[0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5],
+  // First quarter
+  [1, 1], [0.5, 1], [0.5, 0.5], [1, 0.5] // Second quarter
+  // Add more for other faces, adjusting the texture coordinates accordingly
   ];
 
-  faces.forEach((face, index) => {
-      const uvIndex = Math.floor(index / 2); // Assuming two triangles per face
-      const uvQuad = uvCoordinates[uvIndex];
-
-      face.forEach((vertex, vertexIndex) => {
-          const uv = uvQuad[vertexIndex];
-          vertex.x = uv[0];
-          vertex.y = uv[1];
-      });
+  faces.forEach(function (face, index) {
+    var uvIndex = Math.floor(index / 2); // Assuming two triangles per face
+    var uvQuad = uvCoordinates[uvIndex];
+    face.forEach(function (vertex, vertexIndex) {
+      var uv = uvQuad[vertexIndex];
+      vertex.x = uv[0];
+      vertex.y = uv[1];
+    });
   });
 }
+
+/*
+function customizeBoxUVs(geometry, textureWidth, textureHeight) {
+  // Calculate the aspect ratio of the texture
+  const textureAspectRatio = textureWidth / textureHeight;
+
+  const uvAttribute = geometry.attributes.uv;
+  const uvArray = uvAttribute.array;
+
+  // Iterate over each face of the box
+  for (let faceIndex = 0; faceIndex < 6; faceIndex++) {
+      // Assuming each box face is a square, so aspect ratio is 1:1
+      // If your box faces are not square, you would need to calculate the aspect ratio for each face
+
+      // Calculate UV coordinates based on the aspect ratios
+      let uMin, uMax, vMin, vMax;
+
+      if (textureAspectRatio >= 1) {
+          // Texture is wider than tall
+          uMin = 0;
+          uMax = 1;
+          const scaleFactor = 1 / textureAspectRatio;
+          vMin = (1 - scaleFactor) / 2; // Center vertically
+          vMax = 1 - vMin;
+      } else {
+          // Texture is taller than wide
+          vMin = 0;
+          vMax = 1;
+          const scaleFactor = textureAspectRatio;
+          uMin = (1 - scaleFactor) / 2; // Center horizontally
+          uMax = 1 - uMin;
+      }
+
+      // Apply calculated UVs to the current face
+      // Each face is two triangles, so 6 vertices in total
+      const vertexIndices = [0, 1, 2, 2, 3, 0].map(v => v + faceIndex * 4);
+      const faceUVs = [
+          [uMin, vMin], // Bottom left
+          [uMax, vMin], // Bottom right
+          [uMax, vMax], // Top right
+          [uMin, vMax]  // Top left
+      ];
+
+      vertexIndices.forEach((vertexIndex, uvIndex) => {
+          uvArray[vertexIndex * 2] = faceUVs[uvIndex % 4][0]; // U coordinate
+          uvArray[vertexIndex * 2 + 1] = faceUVs[uvIndex % 4][1]; // V coordinate
+      });
+  }
+
 */
+
 /*
 
 // TODO: Better 2d sprite animation support
@@ -547,113 +771,6 @@ function customizeUVsForBox(faces) {
   }
 
   */
-function _applyTextureToMesh() {
-  _applyTextureToMesh = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(game, entityData, mesh) {
-    var texture, cachedTexture, sprite, textureWidth, textureHeight, uvs, _cachedTexture, textureLoader, _sprite, _textureWidth, _textureHeight, _uvs, _spriteTexture;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
-        case 0:
-          texture = game.getTexture(entityData.texture); // No game texture found for entity, return mesh
-          if (texture) {
-            _context.next = 4;
-            break;
-          }
-          mesh.visible = true;
-          return _context.abrupt("return", mesh);
-        case 4:
-          if (texture.url) {
-            _context.next = 7;
-            break;
-          }
-          mesh.visible = true;
-          return _context.abrupt("return", mesh);
-        case 7:
-          cachedTexture = texturePool[texture.url];
-          if (!(cachedTexture && cachedTexture.image && texture.sprite)) {
-            _context.next = 21;
-            break;
-          }
-          sprite = texture.sprite;
-          textureWidth = cachedTexture.image.width;
-          textureHeight = cachedTexture.image.height;
-          sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
-          sprite.height = sprite.height || 16;
-          uvs = {
-            x: -sprite.x / textureWidth,
-            y: -sprite.y / textureHeight,
-            width: sprite.width / textureWidth,
-            height: sprite.height / textureHeight
-          }; // create a clone of the cached texture
-          _cachedTexture = cachedTexture.clone();
-          _cachedTexture.repeat.set(uvs.width, uvs.height);
-          _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
-          mesh.material.map = _cachedTexture;
-          mesh.material.needsUpdate = true;
-          return _context.abrupt("return", mesh);
-        case 21:
-          if (!(!cachedTexture || cachedTexture instanceof Promise)) {
-            _context.next = 26;
-            break;
-          }
-          if (!cachedTexture) {
-            // If not cached, start loading and cache the Promise
-            textureLoader = new THREE.TextureLoader(); // console.log("THREELOADER", textureLoader, texture.url)
-            cachedTexture = texturePool[texture.url] = new Promise(function (resolve, reject) {
-              textureLoader.load(texture.url, resolve, undefined, reject);
-            }).then(function (loadedTexture) {
-              // Once loaded, update the cache with the actual texture and return it
-              texturePool[texture.url] = loadedTexture;
-              return loadedTexture;
-            })["catch"](function (error) {
-              console.error('Error loading texture', texture.url, error);
-              return null; // Handle errors appropriately
-            });
-          }
-          // Await the Promise (either already existing or just created)
-          _context.next = 25;
-          return cachedTexture;
-        case 25:
-          cachedTexture = _context.sent;
-        case 26:
-          if (cachedTexture) {
-            _context.next = 29;
-            break;
-          }
-          mesh.visible = true;
-          return _context.abrupt("return", mesh);
-        case 29:
-          // console.log("Using cached or freshly loaded texture");
-          if (cachedTexture && cachedTexture.image && texture.sprite) {
-            _sprite = texture.sprite;
-            _textureWidth = cachedTexture.image.width;
-            _textureHeight = cachedTexture.image.height;
-            _sprite.width = _sprite.width || 16; // Default sprite dimensions if not specified
-            _sprite.height = _sprite.height || 16;
-            _uvs = {
-              x: -_sprite.x / _textureWidth,
-              y: -_sprite.y / _textureHeight,
-              width: _sprite.width / _textureWidth,
-              height: _sprite.height / _textureHeight
-            }; // create a clone of the cached texture
-            _spriteTexture = cachedTexture.clone();
-            _spriteTexture.repeat.set(_uvs.width, _uvs.height);
-            _spriteTexture.offset.set(_uvs.x, 1 - _uvs.y - _uvs.height);
-            mesh.material.map = _spriteTexture;
-            mesh.material.needsUpdate = true;
-          }
-
-          // Apply the texture
-          mesh.material.map = cachedTexture;
-          mesh.material.needsUpdate = true;
-          mesh.visible = true;
-        case 33:
-        case "end":
-          return _context.stop();
-      }
-    }, _callee);
-  }));
-  return _applyTextureToMesh.apply(this, arguments);
-}
 
 },{}],6:[function(require,module,exports){
 "use strict";
