@@ -44,9 +44,12 @@ import plugins from '../mantra-game/plugins.js';
 
 
 let game = new Game({
-  width: 800,
-  height: 600,
-  fieldOfView: 128,
+  //  width: 800,
+  //  height: 600,
+  height: 600 * 10,
+  width: 800 * 10,
+
+  fieldOfView: 512,
   plugins: {},
   isClient: true,
   showLoadingScreen: true,
@@ -58,7 +61,7 @@ let game = new Game({
     y: 0
   },
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['css'], // 'ascii', 'three', 'babylon', 'css', 'phaser', 'ascii'
+  graphics: ['three'], // 'ascii', 'three', 'babylon', 'css', 'phaser', 'ascii'
   collisions: true,
   gamepad: {
     useZoomSlider: false
@@ -89,7 +92,8 @@ window.game = game;
 
 // Plugins can also be loaded async by string name
 //game.use('Bullet');
-// game.use(new plugins.Bullet())
+game.use(new plugins.Block())
+game.use(new plugins.Bullet())
 game.use(new plugins.Entity())
 game.use(new plugins.Platform());
 game.use(new plugins.MatterPhysics());
@@ -143,7 +147,7 @@ game.use(new plugins.Editor({
   sutraEditor: true
 }));
 
-game.use(new plugins.Sutra({ }));
+game.use(new plugins.Sutra({}));
 
 // import Pong from '../mantra-game/tests/fixtures/PongWorld.js';
 // import BossFight from '../mantra-game/tests/fixtures/BossFight.js';
@@ -203,8 +207,9 @@ if (mode === 'online') {
     home = new worldClass();
   }
   //console.log("wwww", worlds)
-  home = new worlds.Tiled();
-  // game.use(new plugins.Border());
+  game.use(new plugins.Border());
+
+  // home = new worlds.YCraft();
 
   /*
   --purple-light: #bbe;
@@ -215,19 +220,37 @@ if (mode === 'online') {
   --button-b: #e9dd34;
   */
 
-  game.start(function(){
-     game.use(home);
+  game.start(function () {
+    game.use(home);
 
-    /*   
+    /*
+    game.createEntity({
+     type: 'BLOCK',
+     width: 50,
+     height: 50,
+     isStatic: false,
+     // isSensor: true,
+     body: true,
+     color: 0xff0000,
+     position: {
+       x: -50,
+       y: -50,
+       z: 0
+     },
+   });
+   game.createPlayer({
+     position: {
+       x: 0,
+       y: 0
+     },
+     height: 8,
+     width: 8
+   });
+   */
+
+   /*   
     // game.use(new plugins.DragAndDropFileUpload)
-    game.createPlayer({
-      position: {
-        x: 0,
-        y: 0
-      },
-      height: 8,
-      width: 8
-    });
+
     game.use(new plugins.Tile({
       loadInitialChunk: false,
       tiledServer: true,
@@ -238,9 +261,9 @@ if (mode === 'online') {
       loadDefaultTileMap: false
     }))
      */
-     /*
-    game.use(new plugins.Bullet())
-    */
+    /*
+   game.use(new plugins.Bullet())
+   */
 
     /*
     game.setControls({
@@ -258,7 +281,7 @@ if (mode === 'online') {
       }
     });
     */
-  
+
     // create names Actions
     /*
     game.setActions({
@@ -273,7 +296,7 @@ if (mode === 'online') {
       }
     });
     */
-  
+
     // call actions from key press
     // game.rules.if('W').then('JUMP');
 
@@ -300,12 +323,12 @@ if (mode === 'online') {
     game.rules.if('W').then('W');
     */
 
+    game.data.roundEnded = false;
+    game.data.roundStarted = true;
 
   });
 
 
-  game.data.roundEnded = false;
-  game.data.roundStarted = true;
 }
 
 

@@ -3912,12 +3912,14 @@ var Home = /*#__PURE__*/function () {
 
       game.createEntity({
         type: 'DOOR',
+        /*
         exit: {
           position: {
             x: -1000,
             y: -500
-          }
+          },
         },
+        */
         body: true,
         isStatic: true,
         collisionStart: true,
@@ -3936,12 +3938,14 @@ var Home = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'DOOR',
+        /*
         exit: {
           position: {
             x: 1100,
             y: -500
-          }
+          },
         },
+        */
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'ayyoDoor'
@@ -4034,6 +4038,27 @@ var Home = /*#__PURE__*/function () {
           z: 32
         }
       });
+
+      /*
+      game.createEntity({
+        type: 'WARP',
+        exit: {
+          world: 'Labyrinthos'
+        },
+        width: 64,
+        height: 64,
+        depth: 64,
+        // texture: 'warp-to-platform',
+        isStatic: true,
+        isSensor: true,
+        position: {
+          x: 250,
+          y: 250,
+          z: 32
+        }
+      });
+      */
+
       game.createEntity({
         type: 'WARP',
         exit: {
@@ -4234,7 +4259,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  //rules.use(hexapod(game), 'hexapod');
+  rules.use((0, _hexapod["default"])(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');
@@ -5110,7 +5135,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _platform = _interopRequireDefault(require("../../mantra-sutras/player-movement/platform.js"));
-var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5225,11 +5249,6 @@ var Platform = /*#__PURE__*/function () {
       */
 
       var rules = game.rules;
-
-      // TODO: moves to sutras.js
-      var warp = (0, _warpToWorld["default"])(game);
-      rules.use(warp, 'warpToWorld');
-      // rules.use(movement(game), 'movement');
       rules.addCondition('isTile', function (entity) {
         return entity.type === 'BLOCK';
       });
@@ -5249,7 +5268,9 @@ var Platform = /*#__PURE__*/function () {
       });
       game.createEntity({
         type: 'WARP',
-        kind: 'Home',
+        exit: {
+          world: 'Home'
+        },
         texture: 'warp-to-home',
         width: 64,
         height: 64,
@@ -5367,7 +5388,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../../mantra-sutras/player-movement/platform.js":28,"../sutras/warpToWorld.js":61}],41:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/platform.js":28}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5976,7 +5997,6 @@ var Tiled = /*#__PURE__*/function () {
         });
       });
       rules.on('FIRE_BULLET', function (player) {
-        console.log("FFFFUREBULLET");
         game.systems.bullet.fireBullet(player.id);
       });
       rules.on('DROP_BOMB', function (player) {

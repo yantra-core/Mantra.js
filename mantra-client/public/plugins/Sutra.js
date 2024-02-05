@@ -91,7 +91,6 @@ function platformMovement(game) {
 
   rules.on('updateSprite', function (player, node) {
     var sprite = node.data.sprite || player.texture.sprite;
-    console.log('updateSprite', sprite);
     game.updateEntity({
       id: player.id,
       texture: {

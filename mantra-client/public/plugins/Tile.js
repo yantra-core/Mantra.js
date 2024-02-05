@@ -4272,6 +4272,13 @@ var exitConfig = {
     game.data.ents.TILE.forEach(function (tile) {
       game.removeEntity(tile.id);
     });
+    // Tile.createTile() can delegate ent types with override in TileSet config
+    // currently only BLOCK, we'll need to figure out to clear entire level or perhaps scene / container
+    if (game.data.ents.BLOCK) {
+      game.data.ents.BLOCK.forEach(function (block) {
+        game.removeEntity(block.id);
+      });
+    }
 
     // clear any tiles that are deferred
     for (var eId in game.deferredEntities) {
@@ -4329,6 +4336,7 @@ EXIT: 6
 }, {
   id: 3,
   kind: 'block',
+  type: 'BLOCK',
   body: true,
   z: 16
 }, {
@@ -4652,8 +4660,8 @@ function createTile(tile, x, y) {
     _color = color;
   }
   var _type = 'TILE';
-  if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
-    // _type = 'BLOCK';
+  if (typeof tile.type !== 'undefined') {
+    _type = tile.type;
   }
 
   /*
@@ -4760,7 +4768,16 @@ function createTileMap(tileMap) {
     console.log('no transformFn found for', tileMap.algo);
     throw new Error('no transformFn found for ' + tileMap.algo);
   }
-  transformFn(map, tileMap.options || {});
+  function tryUntilSuccess() {
+    try {
+      transformFn(map, tileMap.options || {});
+    } catch (err) {
+      console.log('Random seed cannot generate map with current map size and configuration', err.message);
+      map.seedRandom(); // new seed
+      tryUntilSuccess();
+    }
+  }
+  tryUntilSuccess();
   if (transformType === 'terrain') {
     map.scaleToTileRange(6);
   }
@@ -4804,14 +4821,15 @@ function createTileMap(tileMap) {
   }
 
   if (this.tiledServer === false && this.proceduralGenerateMissingChunks === false) {
-    if (exits.length === 0) {
+    if (exits.length === 0 && !is3DTileMap) {
+      // TODO: add support for 3d doors and exits, easy
       // TODO: move this code into LABY
       // if no 6s ( EXIT ) exist, pick a random 2 ( FLOOR ) instead and make it an exit
       // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an exit
       exits = generateExits(map, 1); // create a single exit, TOOD: configurable
     }
 
-    if (entrances.length === 0) {
+    if (entrances.length === 0 && !is3DTileMap) {
       // TODO: move this code into LABY
       // if no 5s ( ENTRANCE ) exist, pick a random 2 ( FLOOR ) instead and make it an entrance
       // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an entrance
