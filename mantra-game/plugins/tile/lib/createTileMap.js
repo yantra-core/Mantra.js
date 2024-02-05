@@ -100,38 +100,20 @@ export default function createTileMap(tileMap) {
   if (this.tiledServer === false && this.proceduralGenerateMissingChunks === false) {
 
     if (exits.length === 0) {
-      // pick a random item in the array that is 0 and make it an exit
-      let exit;
-
-      if (is3DTileMap) {
-        exit = map.random(map.data.length - 1); // TODO: better random 3D exit
-      } else {
-
-        // find all spaces that are 0
-        let spaces = [];
-        for (let i = 0; i < map.data.length; i++) {
-          if (map.data[i] === 0) {
-            spaces.push(i);
-          }
-        }
-
-        exit = map.random(spaces.length - 1);
-      }
-      map.data[exit] = 6;
-
-      exits.push(exit);
+     // TODO: move this code into LABY
+     // if no 6s ( EXIT ) exist, pick a random 2 ( FLOOR ) instead and make it an exit
+     // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an exit
+     exits = generateExits(map, 1); // create a single exit, TOOD: configurable
     }
 
-
     if (entrances.length === 0) {
-      // pick a random item in the array that is 0 and make it an entrance
-      let entrance = map.random(map.data.length - 1);
-      map.data[entrance] = 5;
-      entrances.push(entrance);
+      // TODO: move this code into LABY
+      // if no 5s ( ENTRANCE ) exist, pick a random 2 ( FLOOR ) instead and make it an entrance
+      // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an entrance
+      entrances = generateEntrances(map, 1); // create a single entrance, TOOD: configurable
     }
 
   }
-
 
   this.createLayer(map, 16, 16); // TODO: tileSet.tilewidth, tileSet.tileheight
 
@@ -146,14 +128,96 @@ export default function createTileMap(tileMap) {
     if (typeof pos.x === 'number' && typeof pos.y === 'number') {
       // TODO: 3d space
       let currentPlayer = this.game.getCurrentPlayer();
-      console.log('currentPlayer', currentPlayer)
       game.setPosition(currentPlayer.id, {
         x: pos.x,
         y: pos.y
       });
+      // emit an event we can listen to in app space
+      this.game.emit('player::tilemap::entrance', currentPlayer);
     }
   }
 
   return map;
 
+}
+
+function generateExits(map, exitCount) {
+  let exits = [];
+  // Find all spaces that are '2' FLOOR for potential exits
+  let potentialExits = map.data.reduce((acc, val, idx) => {
+    if (val === 2) acc.push(idx);
+    return acc;
+  }, []);
+
+  let exit;
+  if (potentialExits.length > 0) {
+    // If there are '0's, pick a random one to be an exit
+    // exit = potentialExits[Math.floor(Math.random() * potentialExits.length)];
+    // use map.random()
+    exit = potentialExits[map.random(potentialExits.length - 1)];
+  } else {
+    // If there are no '0's, consider a fallback strategy
+    // For example, find all '3's (if '3' is a secondary choice for exits)
+    let secondaryChoices = map.data.reduce((acc, val, idx) => {
+      if (val === 0) acc.push(idx); // Assuming '0' VOID as secondary choice for an exit
+      return acc;
+    }, []);
+
+    if (secondaryChoices.length > 0) {
+      // If there are secondary choices, pick a random one
+      // exit = secondaryChoices[Math.floor(Math.random() * secondaryChoices.length)];
+      // use map.random()
+      exit = secondaryChoices[map.random(secondaryChoices.length - 1)];
+    } else {
+      // If there are no '0's or secondary choices, fallback to picking a random index
+      // This case might indicate an issue with the map generation or logic
+      console.warn("No valid exit points (0 or 3) found in map.data.");
+      exit = Math.floor(Math.random() * map.data.length);
+    }
+  }
+
+  // Set the selected index as an exit (6) and add it to the exits array
+  map.data[exit] = 6;
+  exits.push(exit);
+  return exits;
+
+}
+
+function generateEntrances(map, entranceCount) {
+  let entrances = [];
+  // Find indexes of all '2's in the array
+  let potentialEntrances = map.data.reduce((acc, val, idx) => {
+    if (val === 2) acc.push(idx);
+    return acc;
+  }, []);
+
+  let entrance;
+  if (potentialEntrances.length > 0) {
+    // If there are '2's, pick a random one to be an entrance
+    // entrance = potentialEntrances[Math.floor(Math.random() * potentialEntrances.length)];
+    // use map.random()
+    entrance = potentialEntrances[map.random(potentialEntrances.length - 1)];
+  } else {
+    // If there are no '2's, find indexes of all '0's to pick a random one
+    let zeros = map.data.reduce((acc, val, idx) => {
+      if (val === 0) acc.push(idx);
+      return acc;
+    }, []);
+
+    if (zeros.length > 0) {
+      entrance = zeros[Math.floor(Math.random() * zeros.length)];
+    } else {
+      // If there are no '0's either, fallback to picking a random index
+      // This case might indicate an issue with the map generation or logic
+      console.warn("No valid entrance points (0 or 2) found in map.data.");
+      // entrance = Math.floor(Math.random() * map.data.length);
+      // use map.random()
+      entrance = map.random(map.data.length - 1);
+    }
+  }
+
+  // Set the selected index as an entrance (5) and add it to the entrances array
+  map.data[entrance] = 5;
+  entrances.push(entrance);
+  return entrances;
 }
