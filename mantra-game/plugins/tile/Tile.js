@@ -18,8 +18,42 @@ import processTile from './lib/processTile.js';
 
 
 let exitConfig = {
+  position: {
+    x: 0,
+    y: 0,
+    z: 0
+  },
   exitHandler: function (enterEnt, exitEnt) {
-    console.log('exitHandler', enterEnt, exitEnt);
+    let game = this;
+    console.log('exitHandler', game, enterEnt, exitEnt);
+
+    // default behavior is to clear all tiles
+    // clear all current tiles
+    game.data.ents.TILE.forEach((tile) => {
+      game.removeEntity(tile.id);
+    });
+
+    // clear any tiles that are deferred
+    for (let eId in game.deferredEntities) {
+      let ent = game.deferredEntities[eId.toString()];
+      if (ent.type === 'TILE') {
+        // game.removeEntity(ent.id);
+        delete game.deferredEntities[eId.toString()];
+      }
+    }
+
+    // update the player position to the exit position ( can customimze this )
+    game.setPosition(enterEnt.id, { x: exitEnt.exit.position.x, y: exitEnt.exit.position.y });
+
+    // generate a new seed and regenerate the maze with the new seed and existing settings
+    let seed = Math.floor(Math.random() * 100000);
+
+    // set the new seed
+    game.systems.tile.tileMap.seed = seed;
+
+    // regenerate the tile map
+    game.systems.tile.createTileMap(game.systems.tile.tileMap)
+
   }
 };
 
@@ -57,12 +91,10 @@ class Tile {
 
     // set a default tiled map
     this.tiledMap = tiledMap;
-
     this.tileMap = tileMap;
 
     this.labyrinthosAlgoName = labyrinthosAlgo;
     this.labyType = 'maze';
-
 
     // TODO: replace this scaffold wth labyrinthos.transform()
     this.labyrinthosAlgo = labyrinthos.mazes[labyrinthosAlgo];
