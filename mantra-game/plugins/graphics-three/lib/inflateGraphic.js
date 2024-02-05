@@ -4,6 +4,10 @@ export default function inflateGraphic(entity, alpha) {
     return; // for now
   }
 
+  if (entity.destroyed === true) {
+    return;
+  }
+
   let graphic;
   if (entity.graphics && entity.graphics['graphics-three']) {
     graphic = entity.graphics['graphics-three'];
@@ -22,7 +26,6 @@ export default function inflateGraphic(entity, alpha) {
   this.inflateTexture(entity, graphic);
 
 }
-
 
 
   /*

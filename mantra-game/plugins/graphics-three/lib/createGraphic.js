@@ -16,6 +16,15 @@ export default function createGraphic(entityData) {
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
 
       break;
+    case 'BULLET':
+      console.log("BULLET", entityData)
+      geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      break;
+
+      case 'BLOCK':
+        geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
+        break;
+  
     case 'TILE':
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
@@ -52,11 +61,8 @@ export default function createGraphic(entityData) {
 
   if (!geometry) return; // If geometry is not set (like missing font), exit early
 
+  // console.log('creating a new mesh', entityData, geometry, material)
   mesh = new THREE.Mesh(geometry, material);
-  // set to invisible at first
-  if (entityData.type !== "PLAYER") { // for now
-    mesh.visible = false;
-  }
 
   this.scene.add(mesh);
 

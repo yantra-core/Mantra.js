@@ -1,9 +1,20 @@
-export default function removeGraphic(entityId) {
-  // Fetch the mesh from the 'graphics' component
+function removeGraphic(entityId) {
+
   const mesh = this.game.components.graphics.get([entityId, 'graphics-three']);
+
   if (mesh) {
+
+    if (mesh.parent) {
+      mesh.parent.remove(mesh);
+    }
+
     this.scene.remove(mesh);
-    // Remove the mesh from the 'graphics' component
+    mesh.geometry.dispose();
+    mesh.material.dispose();
+    // mesh = undefined;
     this.game.components.graphics.remove([entityId, 'graphics-three']);
+
   }
 }
+
+export default removeGraphic;
