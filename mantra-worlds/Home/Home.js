@@ -36,6 +36,19 @@ class Home {
       }
     });
 
+    game.createEntity({
+      type: "BACKGROUND",
+      texture: 'garden',
+      width: 300,
+      height: 300,
+      body: false,
+      position: {
+        x: 0,
+        y: 0,
+        z: -10
+      }
+    })
+
     game.setBackground('#007fff');
 
     game.use('Block');
@@ -64,18 +77,7 @@ class Home {
 
 
     // now create some background and text entities for navigation
-    game.createEntity({
-      type: 'BACKGROUND',
-      texture: 'garden',
-      width: 300,
-      height: 300,
-      body: false,
-      position: {
-        x: 0,
-        y: 0,
-        z: -10
-      }
-    });
+
 
     game.createEntity({
       name: 'sutra-tree',
@@ -135,7 +137,7 @@ class Home {
       position: { // position to right
         x: 900,
         y: -1800,
-        z: 1
+        z: -1
       }
     });
 
@@ -169,16 +171,26 @@ class Home {
       }
     });
 
+
+
+
     // if touch warp, switch to YCraft level
     game.createEntity({
       type: 'WARP',
-      kind: 'YCraft',
+      // kind: 'YCraft',
       width: 64,
       height: 64,
       depth: 64,
       texture: 'warp-to-ycraft',
       isStatic: true,
       isSensor: true,
+      exit: {
+        world: 'YCraft', // optional, if not specified will use the current world
+        position: {      // optional, if not specified will use 0,0,0
+          x: 0,
+          y: 0
+        }
+      },
       position: {
         x: 0,
         y: -210,
@@ -313,9 +325,14 @@ class Home {
 
     game.createEntity({
       type: 'DOOR',
-      kind: 'BabylonGraphics',
-      collisionActive: true,
-      collisionEnd: true,
+      exit: {
+        position: {
+          x: -1000,
+          y: -500
+        },
+      },
+      body: true,
+      isStatic: true,
       collisionStart: true,
       texture: {
         sheet: 'loz_spritesheet',
@@ -323,7 +340,6 @@ class Home {
       },
       width: 16,
       height: 16,
-      body: false,
       position: { // position to right
         x: 55,
         y: 71,
@@ -333,14 +349,22 @@ class Home {
 
     game.createEntity({
       type: 'DOOR',
+      exit: {
+        position: {
+          x: 1100,
+          y: -500
+        },
+      },
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'ayyoDoor',
       },
       width: 16,
       height: 16,
-      body: false,
-      position: { // position to right
+      body: true,
+      isStatic: true,
+      collisionStart: true,
+      position: { // position to left
         x: -55,
         y: 71,
         z: 10
@@ -350,7 +374,9 @@ class Home {
     // if touch warp, switch to Music level
     game.createEntity({
       type: 'WARP',
-      kind: 'Music',
+      exit: {
+        world: 'Music'
+      },
       width: 64,
       height: 64,
       depth: 64,
@@ -406,7 +432,9 @@ class Home {
 
     game.createEntity({
       type: 'WARP',
-      kind: 'Platform',
+      exit: {
+        world: 'Platform'
+      },
       width: 64,
       height: 64,
       depth: 64,
@@ -422,7 +450,9 @@ class Home {
 
     game.createEntity({
       type: 'WARP',
-      kind: 'GravityGardens',
+      exit: {
+        world: 'GravityGardens'
+      },
       width: 64,
       height: 64,
       depth: 64,

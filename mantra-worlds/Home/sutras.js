@@ -1,5 +1,4 @@
 // helper sutra for switching worlds
-import warpToWorld from '../sutras/warpToWorld.js';
 import switchGraphics from '../sutras/switchGraphics.js';
 
 // walker is npc that walks around route
@@ -27,11 +26,6 @@ export default function sutras(game) {
   // helper for switching graphics
   let switchGraphicsSutra = switchGraphics(game);
   rules.use(switchGraphicsSutra, 'switchGraphics');
-
-
-  // when touching WARP entity, warp to world
-  let warp = warpToWorld(game);
-  rules.use(warp, 'warpToWorld');
 
   // walker is npc that walks around route
   rules.use(walker(game, {

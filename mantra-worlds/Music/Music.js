@@ -1,4 +1,3 @@
-import warpToWorld from "../sutras/warpToWorld.js";
 import createPiano from "./instruments/createPiano.js";
 import createDrumKit from "./instruments/createDrumKit.js";
 import movement from '../../mantra-sutras/player-movement/top-down.js';
@@ -116,7 +115,9 @@ class Music {
     // warp to Platform level
     game.createEntity({
       type: 'WARP',
-      kind: 'Home',
+      exit: {
+        world: 'Home'
+      },
       texture: 'warp-to-home',
       width: 64,
       height: 64,

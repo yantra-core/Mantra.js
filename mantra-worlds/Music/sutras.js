@@ -1,5 +1,4 @@
-// helper sutra for switching worlds
-import warpToWorld from '../sutras/warpToWorld.js';
+// helper sutra for switching graphics
 import switchGraphics from '../sutras/switchGraphics.js';
 
 let isPressed = false;
@@ -12,9 +11,6 @@ export default function sutras(game) {
 
   rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-  // when touching WARP entity, warp to world
-  let warp = warpToWorld(game);
-  rules.use(warp, 'warpToWorld');
 
   rules.addCondition('entityTouchedNote', (entity, gameState) => {
     if (entity.type === 'COLLISION' && entity.kind === 'START') {

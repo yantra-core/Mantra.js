@@ -27,6 +27,7 @@ export default function createGraphic(entityData) {
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
 
+
     case 'not_implemented_TEXT':
       // Ensure you have the font data loaded
       const font = this.game.font; // Assuming you have a method to get the loaded font
@@ -61,6 +62,10 @@ export default function createGraphic(entityData) {
 
   // console.log('creating a new mesh', entityData, geometry, material)
   mesh = new THREE.Mesh(geometry, material);
+
+  if (entityData.type === 'TEXT') {
+    mesh.visible = false; // for now
+  }
 
   this.scene.add(mesh);
 

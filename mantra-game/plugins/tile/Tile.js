@@ -76,7 +76,7 @@ class Tile {
     tileSet = defaultTileSet,
     chunkUnitSize = 8,
     tileSize = 16,
-    labyrinthosAlgo = 'FaultLine',
+    labyrinthosAlgo = 'AldousBroder',
     proceduralGenerateMissingChunks = false,
     loadInitialChunk = true,
     loadDefaultTileMap = true,

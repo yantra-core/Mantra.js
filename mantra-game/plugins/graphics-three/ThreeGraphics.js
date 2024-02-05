@@ -121,7 +121,6 @@ class ThreeGraphics extends GraphicsInterface {
 
   loadFont(path, cb) {
     let game = this.game;
-    // console.log("LLLLLLL", THREE)
     const fontLoader = new FontLoader();
     fontLoader.load('vendor/fonts/helvetiker_regular.typeface.json', function (font) {
       // Store the loaded font in your game's state

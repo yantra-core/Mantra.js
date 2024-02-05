@@ -33,11 +33,18 @@ class YCraft {
     // create warp by back home entity
     game.createEntity({
       type: 'WARP',
-      kind: 'Home',
+      exit: {
+        world: 'Home',
+        position: {
+          x: 0,
+          y: 0
+        }
+      },
       // color: 0x00ff00,
       width: 64,
       texture: 'warp-to-home',
       isStatic: true,
+      collisionStart: true,
       // isSensor: false,
       height: 64,
       position: {
@@ -70,32 +77,7 @@ class YCraft {
 
     function yCraftRules() {
       let rules = game.createSutra();
-
-      // TODO: use common warp sutra
-      rules.addCondition('playerTouchedWarpZone', (entity, gameState) => {
-        if (entity.type === 'COLLISION') {
-          // console.log('entity', entity)
-
-          if (entity.bodyA.type === 'PLAYER' && entity.bodyB.type === 'WARP') {
-            return true;
-          }
-          if (entity.bodyA.type === 'WARP' && entity.bodyB.type === 'PLAYER') {
-            return true;
-          }
-        }
-      });
-
-      rules
-        .if('playerTouchedWarpZone')
-        .then('switchWorld')
-
-      // TODO: make this common Sutra
-      rules.on('switchWorld', (entity) => {
-        console.log('entityentity', entity)
-        let worldName = entity.WARP.kind || 'Home';
-        game.switchWorlds(worldName);
-      });
-
+      // no custom rules yet, see YCraft.js plugin
       game.useSutra(rules, 'YCRAFT');
 
     }
@@ -138,6 +120,7 @@ class YCraft {
         mass: 10000,
         height: 16,
         width: 16,
+        startCollision: true,
         position: {
           x: 180,
           y: 0 + i * 64,
