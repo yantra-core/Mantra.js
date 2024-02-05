@@ -50,9 +50,9 @@ export default class Gamepad {
     this.gamepads = {};
     this.configs = {
       // prestuff the cache so no lookups happen to known controllers
-      'OEJpdGRvIE5FUzMwIFBybyAoVmVuZG9yOiAyZGM4IFByb2R1Y3Q6IDM4MjAp': bitdoNesPro,
-      'TG9naXRlY2ggTG9naXRlY2ggRHVhbCBBY3Rpb24': logitechDualAction,
-      'U29ueSBQTEFZU1RBVElPTihSKTMgQ29udHJvbGxlcg': ps3
+      '8Bitdo NES30 Pro (Vendor: 2dc8 Product: 3820)': bitdoNesPro,
+      'Logitech Logitech Dual Action': logitechDualAction,
+      'Sony PLAYSTATION(R)3 Controller': ps3
     };
     this.hashes = {};
     this.controls = {
@@ -147,20 +147,6 @@ export default class Gamepad {
     const config = typeof this.configs[hash] === 'object'?
       this.configs[hash]:
       Gamepad.defaultControllerConfig;
-    if(!this.configs[hash]){
-      this.configs[hash] = true; //don't double load
-      (async ()=>{
-        let loadedConfig = null;
-        try{
-          loadedConfig = (await import(`./gamepads/${hash.slice(0)}.js`)).default;
-        }catch(ex){
-          //if the hash file failed to load, stuff the config with defaults
-          loadedConfig = Gamepad.defaultControllerConfig;
-          //console.log(ex, loadedConfig);
-        }
-        this.configs[hash] = loadedConfig;
-      })();
-    }
     return config;
   }
 
@@ -169,14 +155,7 @@ export default class Gamepad {
       // Cheezy hack to ignore VirtualHID driver
       // (a side effect of older controllers in OS X)
       if(this.gamepads[index].id.indexOf('Virtual') !== -1) continue;
-      if(!this.hashes[this.gamepads[index].id]){
-        this.hashes[this.gamepads[index].id] = btoa(
-          this.gamepads[index].id).replace(/\=+$/, 
-          ''
-        );
-      }
-      const hash = this.hashes[this.gamepads[index].id];
-      const config = this.controllerConfig(hash);
+      const config = this.controllerConfig(this.gamepads[index].id);
       const gamepad = this.gamepads[index];
 
       // Deadzone for analog stick to prevent drift
