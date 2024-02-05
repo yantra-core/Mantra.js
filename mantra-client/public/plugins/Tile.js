@@ -4291,7 +4291,7 @@ var exitConfig = {
     });
 
     // generate a new seed and regenerate the maze with the new seed and existing settings
-    var seed = Math.floor(Math.random() * 100000);
+    var seed = Math.floor(Math.random() * 100000000000);
 
     // set the new seed
     game.systems.tile.tileMap.seed = seed;
@@ -4659,7 +4659,6 @@ function createTile(tile, x, y) {
     _texture = "tile-".concat(tile.kind); // rename
   }
 
-  console.log('creating tile with exit', tile.exit);
   var ent = this.game.createEntity((_this$game$createEnti = {
     type: _type,
     name: tile.name || tile.kind,
