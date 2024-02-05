@@ -17,7 +17,7 @@ export default function  createLayer(layer, tileWidth, tileHeight) {
   } else {
     // 2D data handling
     layer.data.forEach((tileValue, index) => {
-      this.processTile(tileValue, index, layer, tileWidth, tileHeight, 0); // Assume z=0 for 2D data
+      this.processTile(tileValue, index, layer, tileWidth, tileHeight, 0, true); // Assume z=0 for 2D data
     });
   }
 }
