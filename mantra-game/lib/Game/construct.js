@@ -194,6 +194,10 @@ export default function construct(game, plugins = []) {
   game.components.collisionStart = new Component('collisionStart', game);
   game.components.collisionEnd = new Component('collisionEnd', game);
 
+  // stores a location to teleport to when the entity is touched
+  game.components.exit = new Component('exit', game);
+
+
   // Systems Manager
   game.systemsManager = new SystemsManager(game);
 

@@ -37,6 +37,18 @@ class Collisions {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
       return;
     }
+
+    if (entityA.exit || entityB.exit) {
+      let exitEnt = entityA.exit ? entityA : entityB;
+      let enterEnt = entityA.exit ? entityB : entityA;
+      if (typeof exitEnt.exit.world !== 'undefined') {
+        game.switchWorlds(exitEnt.exit.world);
+      }
+      if (typeof exitEnt.exit.position !== 'undefined') {
+        this.game.setPosition(enterEnt.id, { x: exitEnt.position.x, y: exitEnt.position.y });
+      }
+    }
+
     // Check for specific collision cases and send events to the state machine
     if (this.shouldSendCollisionEvent(bodyA, bodyB, 'START')) {
       if (this.game.machine && this.game.machine.sendEvent) {
