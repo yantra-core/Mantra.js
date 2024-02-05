@@ -1,5 +1,4 @@
 import movement from '../../mantra-sutras/player-movement/platform.js';
-import warpToWorld from '../sutras/warpToWorld.js';
 
 class Platform {
   static id = 'world-platform';
@@ -113,10 +112,6 @@ class Platform {
 
     let rules = game.rules;
 
-    // TODO: moves to sutras.js
-    let warp = warpToWorld(game);
-    rules.use(warp, 'warpToWorld');
-    // rules.use(movement(game), 'movement');
     rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
     /*
@@ -135,7 +130,9 @@ class Platform {
 
     game.createEntity({
       type: 'WARP',
-      kind: 'Home',
+      exit: {
+        world: 'Home'
+      },
       texture: 'warp-to-home',
       width: 64,
       height: 64,

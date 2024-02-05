@@ -41,8 +41,8 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
   }
 
   let _type = 'TILE';
-  if (tile.kind === 'bush' || tile.kind === 'tree' || tile.kind === 'block') {
-    // _type = 'BLOCK';
+  if (typeof tile.type !== 'undefined') {
+    _type = tile.type;
   }
   
   /*

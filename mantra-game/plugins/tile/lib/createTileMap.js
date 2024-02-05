@@ -53,7 +53,22 @@ export default function createTileMap(tileMap) {
     throw new Error('no transformFn found for ' + tileMap.algo);
   }
 
-  transformFn(map, tileMap.options || {});
+
+  function tryUntilSuccess() {
+    try {
+      transformFn(map, tileMap.options || {});
+    } catch (err) {
+      console.log('Random seed cannot generate map with current map size and configuration', err.message);
+      map.seedRandom(); // new seed
+      tryUntilSuccess();
+    }
+  }
+
+  tryUntilSuccess();
+
+
+
+
 
   if (transformType === 'terrain') {
     map.scaleToTileRange(6);
@@ -99,14 +114,14 @@ export default function createTileMap(tileMap) {
 
   if (this.tiledServer === false && this.proceduralGenerateMissingChunks === false) {
 
-    if (exits.length === 0) {
+    if (exits.length === 0 && !is3DTileMap) { // TODO: add support for 3d doors and exits, easy
      // TODO: move this code into LABY
      // if no 6s ( EXIT ) exist, pick a random 2 ( FLOOR ) instead and make it an exit
      // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an exit
      exits = generateExits(map, 1); // create a single exit, TOOD: configurable
     }
 
-    if (entrances.length === 0) {
+    if (entrances.length === 0 && !is3DTileMap) {
       // TODO: move this code into LABY
       // if no 5s ( ENTRANCE ) exist, pick a random 2 ( FLOOR ) instead and make it an entrance
       // if no 2s ( FLOOR ) exist, pick a random 0 ( VOID ) instead and make it an entrance

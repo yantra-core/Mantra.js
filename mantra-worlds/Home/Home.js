@@ -325,12 +325,14 @@ class Home {
 
     game.createEntity({
       type: 'DOOR',
+      /*
       exit: {
         position: {
           x: -1000,
           y: -500
         },
       },
+      */
       body: true,
       isStatic: true,
       collisionStart: true,
@@ -349,12 +351,14 @@ class Home {
 
     game.createEntity({
       type: 'DOOR',
+      /*
       exit: {
         position: {
           x: 1100,
           y: -500
         },
       },
+      */
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'ayyoDoor',
@@ -447,6 +451,28 @@ class Home {
         z: 32
       }
     });
+
+
+    /*
+    game.createEntity({
+      type: 'WARP',
+      exit: {
+        world: 'Labyrinthos'
+      },
+      width: 64,
+      height: 64,
+      depth: 64,
+      // texture: 'warp-to-platform',
+      isStatic: true,
+      isSensor: true,
+      position: {
+        x: 250,
+        y: 250,
+        z: 32
+      }
+    });
+    */
+
 
     game.createEntity({
       type: 'WARP',

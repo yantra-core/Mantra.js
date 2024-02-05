@@ -31,6 +31,13 @@ let exitConfig = {
     game.data.ents.TILE.forEach((tile) => {
       game.removeEntity(tile.id);
     });
+    // Tile.createTile() can delegate ent types with override in TileSet config
+    // currently only BLOCK, we'll need to figure out to clear entire level or perhaps scene / container
+    if (game.data.ents.BLOCK) {
+      game.data.ents.BLOCK.forEach((block) => {
+        game.removeEntity(block.id);
+      });
+    }
 
     // clear any tiles that are deferred
     for (let eId in game.deferredEntities) {
@@ -57,10 +64,26 @@ let exitConfig = {
 };
 
 const defaultTileSet = [
+
+  /*
+  VOID: 0,
+  FLOOR: 1,
+  WALL: 2,
+  DOOR: 3,
+  SPECIAL_DOOR: 4,
+  ENTER: 5,
+  EXIT: 6
+  */
+
+
+
+  // void
   { id: 0, kind: 'empty' },
+  // wall
   { id: 1, kind: 'bush', texture: 'tile-bush', body: true, isStatic: true,  customZ: true, z: 16 /* size: { depth: 32 } */ },
+
   { id: 2, kind: 'grass' },
-  { id: 3, kind: 'block', body: true, z: 16 },
+  { id: 3, kind: 'block', type: 'BLOCK', body: true, z: 16 },
   { id: 4, kind: 'path-green' },
   { id: 5, kind: 'entrance', texture: 'pixel' },
   { id: 6, kind: 'exit', texture: 'tile-exit', body: true, isStatic: true, isSensor: true, exit: exitConfig }, // exit

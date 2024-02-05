@@ -130,7 +130,6 @@ class Tiled {
     });
 
     rules.on('FIRE_BULLET', function (player) {
-      console.log("FFFFUREBULLET")
       game.systems.bullet.fireBullet(player.id);
     });
 
