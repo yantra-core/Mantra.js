@@ -306,17 +306,14 @@ function createGraphic(entityData) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
-    case 'BULLET':
-      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
-      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
-      break;
     case 'PLAYER':
       //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'BULLET':
-      console.log("BULLET", entityData);
-      geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
+      // console.log('entityData.width', entityData.radius, entityData.radius, entityData.radius)
+      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
     case 'BLOCK':
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
@@ -459,6 +456,28 @@ var texturePool = {};
 function applyTextureToMesh(_x, _x2, _x3) {
   return _applyTextureToMesh.apply(this, arguments);
 }
+/*
+function customizeUVsForBox(faces) {
+  // Customize UV mapping here based on your needs
+  // This example divides the texture into quarters and applies each quarter to two faces of the box
+  const uvCoordinates = [
+      [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5], // First quarter
+      [1, 1], [0.5, 1], [0.5, 0.5], [1, 0.5], // Second quarter
+      // Add more for other faces, adjusting the texture coordinates accordingly
+  ];
+
+  faces.forEach((face, index) => {
+      const uvIndex = Math.floor(index / 2); // Assuming two triangles per face
+      const uvQuad = uvCoordinates[uvIndex];
+
+      face.forEach((vertex, vertexIndex) => {
+          const uv = uvQuad[vertexIndex];
+          vertex.x = uv[0];
+          vertex.y = uv[1];
+      });
+  });
+}
+*/
 /*
 
 // TODO: Better 2d sprite animation support
@@ -750,6 +769,9 @@ function updateGraphic(entityData) {
   // compare the current mesh position with the entityData position
   // only update the mesh position if the entityData position has changed
   if (-currentMeshPosition.x !== entityData.position.x || currentMeshPosition.y !== entityData.position.z) {
+    if (typeof entityData.position.z !== 'number') {
+      entityData.position.z = 0;
+    }
     mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   }
 }

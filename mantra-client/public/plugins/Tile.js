@@ -4351,7 +4351,7 @@ var Tile = /*#__PURE__*/function () {
       _ref$tileSize = _ref.tileSize,
       tileSize = _ref$tileSize === void 0 ? 16 : _ref$tileSize,
       _ref$labyrinthosAlgo = _ref.labyrinthosAlgo,
-      labyrinthosAlgo = _ref$labyrinthosAlgo === void 0 ? 'FaultLine' : _ref$labyrinthosAlgo,
+      labyrinthosAlgo = _ref$labyrinthosAlgo === void 0 ? 'AldousBroder' : _ref$labyrinthosAlgo,
       _ref$proceduralGenera = _ref.proceduralGenerateMissingChunks,
       proceduralGenerateMissingChunks = _ref$proceduralGenera === void 0 ? false : _ref$proceduralGenera,
       _ref$loadInitialChunk = _ref.loadInitialChunk,
