@@ -3387,7 +3387,11 @@ var GravityGardens = /*#__PURE__*/function () {
       game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
-      game.setZoom(2.5);
+      if (game.isTouchDevice) {
+        game.zoom(1);
+      } else {
+        game.setZoom(2.5);
+      }
       var player = game.createPlayer({
         color: 0xcccccc,
         position: {
@@ -3664,7 +3668,11 @@ var Home = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.reset();
-      game.zoom(4.5);
+      if (game.isTouchDevice) {
+        game.zoom(2.5);
+      } else {
+        game.zoom(4.5);
+      }
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
 
@@ -4688,6 +4696,7 @@ var Music = /*#__PURE__*/function () {
       game.use('Block');
       // game.use('Tile');
       game.use('Tone');
+      game.use('Boomerang');
       game.use('Bullet');
       // game.use('Sword')
 
@@ -5238,7 +5247,11 @@ var Platform = /*#__PURE__*/function () {
       var game = this.game;
       game.reset('platform');
       game.setGravity(0, 3.3, 0);
-      game.setZoom(4.5);
+      if (game.isTouchDevice) {
+        game.setZoom(3);
+      } else {
+        game.setZoom(4.5);
+      }
       game.createPlayer({
         height: 32,
         width: 32,
@@ -7349,7 +7362,12 @@ var YCraft = /*#__PURE__*/function () {
       game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(1600, 900);
-      game.setZoom(3.5);
+      if (game.isTouchDevice) {
+        game.zoom(1.5);
+      } else {
+        game.setZoom(3.5);
+      }
+      game.use('Boomerang');
       game.use('Bullet');
       game.use('Block');
       game.use('YCraft', {

@@ -1245,7 +1245,7 @@ function inflateTexture(entityData, entityElement) {
   var game = this.game;
   var texture = game.getTexture(entityData.texture);
   if (!texture) {
-    console.warn('Warning: Texture not found', entityData.texture);
+    // console.warn('Warning: Texture not found', entityData.texture);
     return;
   }
   var textureUrl = texture.url,

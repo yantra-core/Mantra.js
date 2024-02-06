@@ -77,7 +77,7 @@ var Client = exports["default"] = /*#__PURE__*/function () {
             preloader.addAsset(asset, 'image', _key);
             continue;
           }
-          if (asset.type === 'spritesheet') {
+          if (asset.type === 'spritesheet' || asset.type === 'sheet') {
             preloader.addAsset(asset.url, 'spritesheet', _key, asset);
             continue;
           }

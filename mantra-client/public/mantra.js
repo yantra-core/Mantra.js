@@ -600,6 +600,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
         }
       });
     }
+  }, {
+    key: "isTouchDevice",
+    value: function isTouchDevice() {
+      return 'ontouchstart' in window || navigator.maxTouchPoints;
+    }
 
     //
     // Asset and Styling APIs
@@ -978,15 +983,21 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               _context2.t0 = asset.type;
-              _context2.next = _context2.t0 === 'image' ? 3 : 7;
+              _context2.next = _context2.t0 === 'image' ? 3 : _context2.t0 === 'spritesheet' ? 7 : 11;
               break;
             case 3:
               _context2.next = 5;
               return this.loadImage(asset);
             case 5:
               asset.loaded = true;
-              return _context2.abrupt("break", 7);
+              return _context2.abrupt("break", 11);
             case 7:
+              _context2.next = 9;
+              return this.loadImage(asset);
+            case 9:
+              asset.loaded = true;
+              return _context2.abrupt("break", 11);
+            case 11:
             case "end":
               return _context2.stop();
           }

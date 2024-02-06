@@ -48,17 +48,18 @@ var Graphics = /*#__PURE__*/function () {
         minZoom: 0.1,
         maxZoom: 10
       };
+      if (this.game.isClient) {
+        // Ensure the gameHolder div exists
+        var gameHolder = document.getElementById('gameHolder');
+        if (!gameHolder) {
+          gameHolder = document.createElement('div');
+          gameHolder.id = 'gameHolder';
+          document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+        }
 
-      // Ensure the gameHolder div exists
-      var gameHolder = document.getElementById('gameHolder');
-      if (!gameHolder) {
-        gameHolder = document.createElement('div');
-        gameHolder.id = 'gameHolder';
-        document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
       }
-
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
     }
   }, {
     key: "preload",
@@ -308,7 +309,16 @@ function getTexture(config) {
     // could be sprite sheet
     assetName = config.sheet;
   }
+
+  // console.log('getting texture', config, assetName)
+
   t = game.preloader.getItem(assetName);
+  if (typeof t === 'undefined') {
+    return null;
+  }
+
+  // TODO: perform switch here based on type of entity
+
   if (config && typeof config.sprite !== 'undefined') {
     var spriteName = config.sprite;
     var frameIndex = 0;
