@@ -1,8 +1,6 @@
 // GravityGardens.js - Marak Squires 2024
 import blackhole from '../../mantra-sutras/blackhole.js'
 import fount from '../../mantra-sutras/fount.js'
-import warpToWorld from '../sutras/warpToWorld.js';
-
 
 class GravityGardens {
   static id = 'world-gravity-gardens';
@@ -16,6 +14,7 @@ class GravityGardens {
     this.game = game;
     this.createWorld();
     game.use('CurrentFPS');
+
   }
 
   createWorld() {
@@ -39,6 +38,38 @@ class GravityGardens {
 
     let rules = game.rules;
 
+    function switchGravity(entity, game) {
+      if (typeof game.data.lastGravitySwitch === 'undefined') {
+        game.data.lastGravitySwitch = 0;
+      }
+      if (Date.now() - game.data.lastGravitySwitch >= 1000) {
+        game.data.repulsion = !game.data.repulsion;
+
+        // get screen center coordinates, take the window size and divide by 2
+        // use the document window here not the game data
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 2 + 24;
+
+        if (game.data.repulsion) {
+          game.pingPosition(x, y, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+          game.updateEntity({
+            id: entity.id,
+            color: 0xff0000
+          });
+        } else {
+          game.pingPosition(x, y, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+          // update the player color
+          game.updateEntity({
+            id: entity.id,
+            color: 0xffffff
+          });
+        }
+
+        game.data.lastGravitySwitch = Date.now();
+      }
+
+    }
+    // game.customControls = true;
     // game.customMovement = false;
     game.setControls({
       W: 'PLAYER_UP',
@@ -50,22 +81,14 @@ class GravityGardens {
       O: 'ZOOM_IN',
       P: 'ZOOM_OUT',
       L: function (entity, game) {
-        if (typeof game.data.lastGravitySwitch === 'undefined') {
-          game.data.lastGravitySwitch = 0;
-        }
-        if (Date.now() - game.data.lastGravitySwitch >= 1000) {
-          game.data.repulsion = !game.data.repulsion;
-          game.data.lastGravitySwitch = Date.now();
-        }
+        switchGravity(entity, game);
+      },
+      SPACE: function (entity, game) {
+        switchGravity(entity, game);
       },
       K: 'CAMERA_SHAKE',
       U: 'SELECT_MENU'
     });
-
-
-    // when touching WARP entity, warp to world
-    let warp = warpToWorld(game);
-    rules.use(warp, 'warpToWorld');
 
     game.use('StarField');
 
@@ -95,23 +118,18 @@ class GravityGardens {
     });
 
     game.useSutra(wallCollision, 'wallCollision');
-    // game.setSutra(blackhole(game));
-    // game.setSutra(fount(game));
-
-    // Create stand-alone black hole Sutra with entity
-    // game.rules.emit('blackhole::create');
-
     // Apply the blackhole behavior to existing entities
     game.updateEntity({
       id: player.id,
       sutra: blackhole(game, player)
     });
 
-
     // warp to Platform level
     game.createEntity({
       type: 'WARP',
-      kind: 'Home',
+      exit: {
+        world: 'Home'
+      },
       texture: 'warp-to-home',
       width: 64,
       height: 64,
@@ -123,7 +141,6 @@ class GravityGardens {
         z: 0
       }
     });
-
 
     // text "Warp to Mantra"
     game.createEntity({
