@@ -73,6 +73,15 @@ export default function createEntity(config, ignoreSetup = false) {
     // merge config with defaultConfig
     config = { ...defaultConfig, ...config };
   
+    // before mutating any game state based on the incoming entity, we *must* check that certain properties validate
+    // check that position is well formed, contains, x,y,z, and is all valid numbers
+    if (config.position &&
+      (typeof config.position.x !== 'number' || isNaN(config.position.x) ||
+       typeof config.position.y !== 'number' || isNaN(config.position.y))) {
+      console.log('Entity.createEntity could not create with data', config);
+      throw new Error('Invalid position for entity');
+    }
+
     if (this.game.systems.rbush) {
       this.game.systems.rbush.addEntity(config);
     }
