@@ -4623,6 +4623,11 @@ var Music = /*#__PURE__*/function () {
       game.setSize(2200, 600);
       //game.setGravity(0, 4.3, 0);
       game.setGravity(0, 0, 0);
+      if (game.isTouchDevice()) {
+        game.zoom(1.5);
+      } else {
+        game.zoom(2.5);
+      }
       game.customMovement = false;
       game.setBackground('black');
       var pianoConfig = {
@@ -4815,14 +4820,14 @@ var Music = /*#__PURE__*/function () {
       });
       */
 
-      game.createDefaultPlayer({
+      game.createPlayer({
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'player'
         },
         position: {
           x: 352,
-          y: 0
+          y: 80
         }
       });
     }
