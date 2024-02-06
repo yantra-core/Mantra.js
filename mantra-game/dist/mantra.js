@@ -579,7 +579,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
   }, {
     key: "setZoom",
-    value: function setZoom() {
+    value: function setZoom() {// TODO: remove setZoom, use delegation to camera.zoom() instead of hoisting
       // not implemented directly, Graphics plugin will hoist this
     }
   }, {
@@ -1226,6 +1226,9 @@ function construct(game) {
 
   // stores a location to teleport to when the entity is touched
   game.components.exit = new _Component["default"]('exit', game);
+
+  // stores the creation tick time of the entity ( which game tick the entity was created )
+  game.components.ctick = new _Component["default"]('ctick', game);
 
   // Systems Manager
   game.systemsManager = new _SystemsManager["default"](game);
