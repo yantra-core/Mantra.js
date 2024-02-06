@@ -27,7 +27,10 @@ export default function switchGraphics(graphicsInterfaceName, cb) {
         }
       });
 
-      // redraw all graphics
+      // redraw all graphics, not needed?
+      // this was removed 2/6/2024 because the graphics pipeline should already understand to redraw
+      // the ent graphics since entity.graphics will not have the required graphics object
+      /*
       for (let [eId, state] of this.game.entities.entries()) {
         let ent = this.game.entities.get(eId);
         // console.log('rendering', ent)
@@ -41,6 +44,7 @@ export default function switchGraphics(graphicsInterfaceName, cb) {
         });
         // this.game.changedEntities.delete(eId);
       }
+      */
       console.log("BABYLON READY")
       // Remark: cursor was immediately defaulting instead of wait, so moved it into BabylonGraphics.js itself
       // document.body.style.cursor = 'default';

@@ -8,7 +8,7 @@ export default function inflateTexture(entityData, entityElement) {
     return;
   }
 
-  let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames, playing = true} = texture;
+  let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames, rate, playing = true} = texture;
   // Extract the current texture URL from the element's style
   let currentTextureUrl = entityElement.style.backgroundImage.slice(5, -2);
 
@@ -36,9 +36,12 @@ export default function inflateTexture(entityData, entityElement) {
   if (Array.isArray(frames) && playing) {
     let frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
 
-    // TODO: use config setting for tick rate per animation
-    if (game.tick % 30 === 0) {
-      let frame = frames[frameIndex];
+    let frame = frames[frameIndex];
+
+    if (typeof rate !== 'number') {
+      rate = 30;
+    }
+    if (game.tick % rate === 0) { // uses configurable rate from texture.rate, see defaulAssets.js file
       if (frame) {
         spritePosition = frame;
         frameIndex = frameIndex >= frames.length - 1 ? 0 : frameIndex + 1;

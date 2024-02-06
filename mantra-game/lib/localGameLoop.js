@@ -56,6 +56,7 @@ function localGameLoop(game, playerId) {
 
   // Render the local snapshot with interpolation
   game.graphics.forEach(function localGameLoopGraphicsRender (graphicsInterface) {
+    // this looks like it may not deal with snapshots properly
     graphicsInterface.render(game, alpha); // Pass the alpha to the render method
   });
 

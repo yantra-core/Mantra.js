@@ -46,7 +46,7 @@ class CSSCamera {
     this.game = game;
     // this.resetCameraState();
     this.game.shakeCamera = cameraShake.bind(this); // for now
-    game.setZoom = this.zoom.bind(this);
+    game.zoom = this.zoom.bind(this);
 
     game.data.camera = {
       position: {

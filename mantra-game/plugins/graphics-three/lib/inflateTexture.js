@@ -61,7 +61,7 @@ async function applyTextureToMesh(game, entityData, mesh) {
     return mesh;
   }
   if (entityData.type === 'PLAYER') {
-    console.log('loadined', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
+    // console.log('loaded player', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
   }
 
 

@@ -1,5 +1,8 @@
 export default function unload () {
 
+  // set zoom back to 1, or else document may be fuzzy
+  this.game.zoom(1);
+
   // TODO: consolidate graphics pipeline unloading into SystemsManager
   // TODO: remove duplicated unload() code in BabylonGraphics
 

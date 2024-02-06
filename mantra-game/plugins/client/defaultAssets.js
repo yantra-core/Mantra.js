@@ -280,6 +280,7 @@ let defaultAssets = {
         ]
       },
       boomerang: {
+        rate: 4,
         frames: [
           { x: -304, y: -496 },
           { x: -320, y: -496 },

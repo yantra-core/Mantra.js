@@ -263,9 +263,11 @@ class Game {
   rotateCamera(angle) {
     // not implemented directly, Graphics plugin will hoist this
   }
-  setZoom() {
+
+  setZoom() { // TODO: remove setZoom, use delegation to camera.zoom() instead of hoisting
     // not implemented directly, Graphics plugin will hoist this
   }
+
   zoom(scale) {
     if (this.camera && this.camera.zoom) {
       this.camera.zoom(scale);

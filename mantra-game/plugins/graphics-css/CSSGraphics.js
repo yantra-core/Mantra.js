@@ -71,6 +71,7 @@ class CSSGraphics extends GraphicsInterface {
     const cssCamera = new CSSCamera(this, this.camera);
     const windowHeight = window.innerHeight;
     this.game.use(cssCamera);
+    game.camera = cssCamera;
 
     // Initialize the CSS render div
     this.initCSSRenderDiv();
@@ -87,9 +88,6 @@ class CSSGraphics extends GraphicsInterface {
 
     document.body.style.cursor = 'default';
 
-    game.on('game::ready', () => {
-      game.zoom(1); // game.data.camera.currentZoom
-    });
   }
 
   initCSSRenderDiv() {
