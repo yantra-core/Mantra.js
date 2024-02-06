@@ -115,7 +115,7 @@ class ThreeGraphics extends GraphicsInterface {
     game.emit('plugin::ready::graphics-three', this);
     // TODO: remove this line from plugin implementations
     game.loadingPluginsCount--;
-        
+
     game.graphics.push(this);
 
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
@@ -124,10 +124,10 @@ class ThreeGraphics extends GraphicsInterface {
 
   }
 
-
   setCameraDefaults() {
     // this.camera.position.set(0, 0, 100); // Set a default position
-    this.setZoom(0.5); // Set a default zoom level
+    this.setZoom(1); // Set a default zoom level
+    this.game.data.camera.mode = 'follow';
   }
 
   setZoom(zoomLevel) {
@@ -166,20 +166,32 @@ class ThreeGraphics extends GraphicsInterface {
     // Follow the player entity with the camera
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     if (currentPlayer) {
-      const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
-      if (playerGraphic) {
-        // Calculate the new camera position with a slight offset above and behind the player
-        const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
-        const lookAtPosition = playerGraphic.position.clone();
-  
-        // Use a smaller lerp factor for smoother camera movement
-        this.camera.position.lerp(newPosition, 0.05);
-        this.camera.lookAt(lookAtPosition);
+
+      if (game.data.camera.mode === 'fpv') {
+        this.setFirstPersonView();
       }
+
+
+      if (game.data.camera.mode === 'follow') {
+
+        const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
+        if (playerGraphic) {
+          // Calculate the new camera position with a slight offset above and behind the player
+          const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
+          const lookAtPosition = playerGraphic.position.clone();
+
+          // Use a smaller lerp factor for smoother camera movement
+          this.camera.position.lerp(newPosition, 0.05);
+          this.camera.lookAt(lookAtPosition);
+        }
+
+      }
+
+
     }
   }
 
-  unload () {
+  unload() {
 
     // iterate through all entities and remove existing babylon graphics
     for (let [eId, entity] of this.game.entities.entries()) {
@@ -201,6 +213,39 @@ class ThreeGraphics extends GraphicsInterface {
       canvas.remove();
     }
 
+  }
+
+  // New function to switch to first-person perspective
+  setFirstPersonView() {
+    const currentPlayer = this.game.getEntity(this.game.currentPlayerId);
+    if (!currentPlayer) {
+      console.warn('Current player entity not found');
+      return;
+    }
+
+    const playerGraphic = this.game.components.graphics.get([this.game.currentPlayerId, 'graphics-three']);
+    if (!playerGraphic) {
+      console.warn('Player graphic component not found');
+      return;
+    }
+
+    playerGraphic.visible = false;
+
+    // Assume the player's "eyes" are located at some offset
+    const eyePositionOffset = new THREE.Vector3(0, 1.6, 0); // Adjust Y offset to represent the player's eye level
+    const playerPosition = playerGraphic.position.clone();
+
+    // Position the camera at the player's eye level
+    this.camera.position.copy(playerPosition.add(eyePositionOffset));
+
+    // Assuming the player's forward direction is along the negative Z-axis of the player's local space
+    // We need to find the forward direction in world space
+    const forwardDirection = new THREE.Vector3(0, 0, 0);
+    forwardDirection.applyQuaternion(playerGraphic.quaternion); // Convert local forward direction to world space
+
+    // Look in the forward direction from the current camera position
+    const lookAtPosition = this.camera.position.clone().add(forwardDirection);
+    this.camera.lookAt(lookAtPosition);
   }
 
 }
