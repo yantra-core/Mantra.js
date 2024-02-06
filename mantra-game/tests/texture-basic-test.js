@@ -81,7 +81,41 @@ tap.test('Basic Texture Tests', (t) => {
 
   t.test('Can get image sprite texture from spritesheet based on entityData.texture', async (t) => {
 
-    game.preloader.addAsset('mock-url-3', 'spritesheet', 'game-sheet');
+    let gameSheet =  {
+      type: 'spritesheet',
+      url: '/img/game/sheets/loz_spritesheet.png',
+      frameTags: {
+        ayyoKey: {
+          frames: [
+            { x: -640, y: -656 },
+          ]
+        },
+  
+        ayyoDoor: {
+          frames: [
+            { x: -656, y: -656 },
+          ]
+        },
+  
+        player: {
+          rate: 100,
+          frames: [
+            { x: -592, y: -16 },
+            { x: -640, y: -16 },
+            { x: -592, y: -16 },
+            { x: -640, y: -16 },
+            { x: -656, y: -16 },
+            { x: -640, y: -16 },
+            { x: -640, y: -16 },
+            { x: -608, y: -16 },
+  
+          ]
+        }
+
+      }
+    };
+
+    game.preloader.addAsset('mock-url-3', 'spritesheet', 'game-sheet', gameSheet);
 
     await game.preloader.loadAll();
 
@@ -90,13 +124,20 @@ tap.test('Basic Texture Tests', (t) => {
     t.ok(allLoaded, 'all assets are loaded');
 
     let entityData = {
-      texture: 'asset1'
+      texture: {
+        sheet: 'game-sheet',
+        sprite: 'player'
+      }
     };
     let texture = game.getTexture(entityData.texture);
-    t.ok(texture.url === mockRoot + 'mock-url-1', 'Texture url should match');
-    t.ok(texture.key === 'asset1', 'Texture key should match');
+    t.ok(texture.url === mockRoot + 'mock-url-3', 'Texture url should match');
+
+    // sprite name should match with position
+    t.ok(texture.sprite.x === -592, 'Texture frame x should match');
+    t.ok(texture.sprite.y === -16, 'Texture frame y should match');
+    t.ok(texture.sprite.name === 'player', 'Texture frame name should match');
+
     t.end();
   });
-
 
 });
