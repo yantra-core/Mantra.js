@@ -67,7 +67,8 @@ export default function createEntity(config, ignoreSetup = false) {
       collisionActive: false,
       collisionStart: true,
       collisionEnd: false,
-      exit: null
+      exit: null,
+      ctick: this.game.tick
     };
   
     // merge config with defaultConfig
@@ -120,7 +121,7 @@ export default function createEntity(config, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, sutra, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, sutra, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
   let { x, y } = position;
 
   /*
@@ -173,6 +174,7 @@ export default function createEntity(config, ignoreSetup = false) {
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
   this.game.addComponent(entityId, 'exit', exit);
+  this.game.addComponent(entityId, 'ctick', ctick);
 
   if (body) {
     let body = this.createBody({

@@ -197,6 +197,8 @@ export default function construct(game, plugins = []) {
   // stores a location to teleport to when the entity is touched
   game.components.exit = new Component('exit', game);
 
+  // stores the creation tick time of the entity ( which game tick the entity was created )
+  game.components.ctick = new Component('ctick', game);
 
   // Systems Manager
   game.systemsManager = new SystemsManager(game);
