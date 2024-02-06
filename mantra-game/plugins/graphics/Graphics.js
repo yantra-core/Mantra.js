@@ -3,6 +3,7 @@ import updateSprite from "./lib/updateSprite.js";
 import getTexture from "./lib/getTexture.js";
 import LoadingCircle from "./lib/LoadingCircle.js";
 import switchGraphics from "./lib/switchGraphics.js";
+import pingPosition from "./lib/pingPosition.js";
 
 class Graphics {
   static id = 'graphics';
@@ -26,6 +27,7 @@ class Graphics {
     this.game.updateSprite = this.updateSprite.bind(this);
     this.game.switchGraphics = this.switchGraphics.bind(this);
     this.game.setBackground = this.setBackground.bind(this);
+    this.game.pingPosition = pingPosition.bind(this);
 
     this.game.data.camera = this.game.data.camera || {
       position: {
@@ -49,7 +51,7 @@ class Graphics {
 
   }
 
-  preload () {
+  preload() {
 
   }
 
@@ -88,17 +90,10 @@ class Graphics {
     });
   }
 
-  setBackground (style) {
+  setBackground(style, effect) {
     let game = this.game;
-
     // assume style is CSS color, set body background
     document.body.style.background = style;
-    /*
-    // TODO
-    game.graphics.forEach(function (graphicsInterface) {
-      graphicsInterface.setBackground(style);
-    })
-    */
   }
 
 }

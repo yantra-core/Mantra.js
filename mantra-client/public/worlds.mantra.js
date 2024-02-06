@@ -3360,7 +3360,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _blackhole = _interopRequireDefault(require("../../mantra-sutras/blackhole.js"));
 var _fount = _interopRequireDefault(require("../../mantra-sutras/fount.js"));
-var _warpToWorld = _interopRequireDefault(require("../sutras/warpToWorld.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3399,7 +3398,48 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       game.setBackground('#007fff');
       var rules = game.rules;
+      function switchGravity(entity, game) {
+        if (typeof game.data.lastGravitySwitch === 'undefined') {
+          game.data.lastGravitySwitch = 0;
+        }
+        if (Date.now() - game.data.lastGravitySwitch >= 1000) {
+          game.data.repulsion = !game.data.repulsion;
 
+          // get screen center coordinates, take the window size and divide by 2
+          // use the document window here not the game data
+          var x = window.innerWidth / 2;
+          var y = window.innerHeight / 2 + 24;
+          if (game.data.repulsion) {
+            game.pingPosition(x, y, {
+              color: 'red',
+              duration: 1500,
+              size: 50,
+              finalSize: 200,
+              borderWidth: 3
+            });
+            game.updateEntity({
+              id: entity.id,
+              color: 0xff0000
+            });
+          } else {
+            game.pingPosition(x, y, {
+              reverse: true,
+              color: 'white',
+              duration: 1500,
+              size: 50,
+              finalSize: 200,
+              borderWidth: 3
+            });
+            // update the player color
+            game.updateEntity({
+              id: entity.id,
+              color: 0xffffff
+            });
+          }
+          game.data.lastGravitySwitch = Date.now();
+        }
+      }
+      // game.customControls = true;
       // game.customMovement = false;
       game.setControls({
         W: 'PLAYER_UP',
@@ -3411,21 +3451,14 @@ var GravityGardens = /*#__PURE__*/function () {
         O: 'ZOOM_IN',
         P: 'ZOOM_OUT',
         L: function L(entity, game) {
-          if (typeof game.data.lastGravitySwitch === 'undefined') {
-            game.data.lastGravitySwitch = 0;
-          }
-          if (Date.now() - game.data.lastGravitySwitch >= 1000) {
-            game.data.repulsion = !game.data.repulsion;
-            game.data.lastGravitySwitch = Date.now();
-          }
+          switchGravity(entity, game);
+        },
+        SPACE: function SPACE(entity, game) {
+          switchGravity(entity, game);
         },
         K: 'CAMERA_SHAKE',
         U: 'SELECT_MENU'
       });
-
-      // when touching WARP entity, warp to world
-      var warp = (0, _warpToWorld["default"])(game);
-      rules.use(warp, 'warpToWorld');
       game.use('StarField');
       if (game.systems.border) {
         game.systems.border.createAutoBorder();
@@ -3450,12 +3483,6 @@ var GravityGardens = /*#__PURE__*/function () {
         }
       });
       game.useSutra(wallCollision, 'wallCollision');
-      // game.setSutra(blackhole(game));
-      // game.setSutra(fount(game));
-
-      // Create stand-alone black hole Sutra with entity
-      // game.rules.emit('blackhole::create');
-
       // Apply the blackhole behavior to existing entities
       game.updateEntity({
         id: player.id,
@@ -3465,7 +3492,9 @@ var GravityGardens = /*#__PURE__*/function () {
       // warp to Platform level
       game.createEntity({
         type: 'WARP',
-        kind: 'Home',
+        exit: {
+          world: 'Home'
+        },
         texture: 'warp-to-home',
         width: 64,
         height: 64,
@@ -3581,7 +3610,7 @@ function createFounts(game) {
 }
 var _default = exports["default"] = GravityGardens;
 
-},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":24,"../sutras/warpToWorld.js":61}],31:[function(require,module,exports){
+},{"../../mantra-sutras/blackhole.js":20,"../../mantra-sutras/fount.js":24}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3620,6 +3649,23 @@ var Home = /*#__PURE__*/function () {
       game.setZoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
+
+      // ping position handler
+      /*
+      game.on('pointerDown', (entity, pointerEvent, c) => {
+        // get the mouse position from pointerEvent
+        let x = pointerEvent.clientX;
+        let y = pointerEvent.clientY;
+         let reverse = true;
+        let color = 'white';
+         // if right click then reverse is false
+        if (pointerEvent.button === 2) {
+          reverse = false;
+          color = 'red';
+        }
+        game.pingPosition(x, y, { reverse: reverse, color: color, duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+      });
+      */
 
       // sprite sheet has been defined in defaultAssets.js
       game.createPlayer({

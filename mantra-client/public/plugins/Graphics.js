@@ -9,6 +9,7 @@ var _updateSprite = _interopRequireDefault(require("./lib/updateSprite.js"));
 var _getTexture = _interopRequireDefault(require("./lib/getTexture.js"));
 var _LoadingCircle = _interopRequireDefault(require("./lib/LoadingCircle.js"));
 var _switchGraphics = _interopRequireDefault(require("./lib/switchGraphics.js"));
+var _pingPosition = _interopRequireDefault(require("./lib/pingPosition.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -38,6 +39,7 @@ var Graphics = /*#__PURE__*/function () {
       this.game.updateSprite = this.updateSprite.bind(this);
       this.game.switchGraphics = this.switchGraphics.bind(this);
       this.game.setBackground = this.setBackground.bind(this);
+      this.game.pingPosition = _pingPosition["default"].bind(this);
       this.game.data.camera = this.game.data.camera || {
         position: {
           x: 0,
@@ -101,17 +103,10 @@ var Graphics = /*#__PURE__*/function () {
     }
   }, {
     key: "setBackground",
-    value: function setBackground(style) {
+    value: function setBackground(style, effect) {
       var game = this.game;
-
       // assume style is CSS color, set body background
       document.body.style.background = style;
-      /*
-      // TODO
-      game.graphics.forEach(function (graphicsInterface) {
-        graphicsInterface.setBackground(style);
-      })
-      */
     }
   }]);
   return Graphics;
@@ -143,7 +138,7 @@ function downloadCanvasAsImage(canvasElement, filename) {
 
 */
 
-},{"./lib/LoadingCircle.js":2,"./lib/getTexture.js":3,"./lib/switchGraphics.js":4,"./lib/updateSprite.js":5}],2:[function(require,module,exports){
+},{"./lib/LoadingCircle.js":2,"./lib/getTexture.js":3,"./lib/pingPosition.js":4,"./lib/switchGraphics.js":5,"./lib/updateSprite.js":6}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -377,6 +372,77 @@ function getTexture(config) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = pingPosition;
+function pingPosition(x, y) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  // Default configuration for the ripple, with added reverse option
+  var config = {
+    color: options.color || 'rgba(0, 150, 255, 0.7)',
+    // Ripple color
+    duration: options.duration || 1000,
+    // Ripple effect duration in milliseconds
+    size: options.size || 100,
+    // Size of the ripple in pixels
+    finalSize: options.finalSize || 300,
+    // Final size of the ripple in pixels
+    borderWidth: options.borderWidth || 2,
+    // Border width of the ripple
+    reverse: options.reverse || false // Reverse (implosion) effect
+  };
+
+  // Create the ripple element
+  var ripple = document.createElement('div');
+  ripple.style.position = 'fixed';
+  ripple.style.border = "".concat(config.borderWidth, "px solid ").concat(config.color);
+  ripple.style.borderRadius = '50%';
+  ripple.style.pointerEvents = 'none'; // Ignore mouse events
+  ripple.style.opacity = 1;
+  ripple.style.transition = "all ".concat(config.duration, "ms ease-out");
+  if (config.reverse) {
+    // For reverse ripple, start from finalSize and shrink to size
+    ripple.style.width = "".concat(config.finalSize, "px");
+    ripple.style.height = "".concat(config.finalSize, "px");
+    ripple.style.left = "".concat(x - config.finalSize / 2, "px");
+    ripple.style.top = "".concat(y - config.finalSize / 2, "px");
+  } else {
+    // For normal ripple, start from size and expand to finalSize
+    ripple.style.width = "".concat(config.size, "px");
+    ripple.style.height = "".concat(config.size, "px");
+    ripple.style.left = "".concat(x - config.size / 2, "px");
+    ripple.style.top = "".concat(y - config.size / 2, "px");
+  }
+  document.body.appendChild(ripple);
+
+  // Trigger the animation
+  setTimeout(function () {
+    if (config.reverse) {
+      // For reverse ripple, shrink to size
+      ripple.style.width = "".concat(config.size, "px");
+      ripple.style.height = "".concat(config.size, "px");
+      ripple.style.left = "".concat(x - config.size / 2, "px");
+      ripple.style.top = "".concat(y - config.size / 2, "px");
+    } else {
+      // For normal ripple, expand to finalSize
+      ripple.style.width = "".concat(config.finalSize, "px");
+      ripple.style.height = "".concat(config.finalSize, "px");
+      ripple.style.left = "".concat(x - config.finalSize / 2, "px");
+      ripple.style.top = "".concat(y - config.finalSize / 2, "px");
+    }
+    ripple.style.opacity = 0;
+  }, 0);
+
+  // Remove the ripple after the animation
+  setTimeout(function () {
+    ripple.remove();
+  }, config.duration);
+}
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = switchGraphics;
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -451,7 +517,7 @@ function switchGraphics(graphicsInterfaceName, cb) {
   }
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
