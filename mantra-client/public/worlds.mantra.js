@@ -3699,6 +3699,7 @@ var Home = /*#__PURE__*/function () {
         autoBorder: true
       });
       game.use('Bullet');
+      game.use('Boomerang');
       // game.use('Sword')
       // game.use('Tile');
       game.use('Tone');
@@ -4307,7 +4308,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  rules.use((0, _hexapod["default"])(game), 'hexapod');
+  // rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');
