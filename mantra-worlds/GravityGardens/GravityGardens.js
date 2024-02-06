@@ -82,10 +82,19 @@ class GravityGardens {
     rules.removeNodes({
       if: 'USE_ITEM_2'
     });
-    
+
+    rules.removeNodes({
+      if: 'ZOOM_IN'
+    });
+
+    rules.removeNodes({
+      if: 'ZOOM_OUT'
+    });
 
     rules.if('USE_ITEM_1').then('switchGravity');
     rules.if('USE_ITEM_2').then('shakeCamera');
+    rules.if('USE_ITEM_3').then('ZOOM_IN');
+    rules.if('USE_ITEM_4').then('ZOOM_OUT');
 
     rules.on('switchGravity', (entity, node, gameState) => {
       switchGravity(entity, gameState);
@@ -95,6 +104,16 @@ class GravityGardens {
       game.shakeCamera({ duration: 777, intensity: 1000 });
     });
     
+    rules.on('ZOOM_IN', function (entity) {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom + 0.01);
+    });
+
+    rules.on('ZOOM_OUT', function (entity) {
+      let currentZoom = game.data.camera.currentZoom || 1;
+      game.setZoom(currentZoom - 0.01);
+    });
+
     game.use('StarField');
 
     if (game.systems.border) {

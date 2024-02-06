@@ -209,30 +209,30 @@ class GamepadGUI {
     });
 
     buttonX.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyO' }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyL' }));
     });
 
     buttonX.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyO' }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyL' }));
     });
 
     let buttonB = document.getElementById('b');
     let buttonA = document.getElementById('a');
 
     buttonB.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'Space' }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyH' }));
     });
 
     buttonB.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'Space' }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyH' }));
     });
 
     buttonA.addEventListener('pointerdown', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyP' }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyK' }));
     });
 
     buttonA.addEventListener('pointerup', (ev) => {
-      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyP' }));
+      document.dispatchEvent(new KeyboardEvent('keyup', { 'code': 'KeyK' }));
     });
 
     if (false && !is_touch_enabled()) {

@@ -6,11 +6,14 @@ export default function topdownMovement(game) {
   rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
   rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
   rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
+
   rules.addCondition('USE_ITEM_1', { op: 'or', conditions: ['SPACE', 'H', 'BUTTON_B'] });
   rules.addCondition('USE_ITEM_2', { op: 'or', conditions: ['J', 'BUTTON_X'] });
+  rules.addCondition('USE_ITEM_3', { op: 'or', conditions: ['K', 'BUTTON_A'] });
+  rules.addCondition('USE_ITEM_4', { op: 'or', conditions: ['L', 'BUTTON_Y'] });
+
   rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['K', 'BUTTON_A'] });
   rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['L', 'BUTTON_Y'] });
-
 
   rules
     .if('PLAYER_UP')

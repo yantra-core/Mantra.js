@@ -221,34 +221,34 @@ var GamepadGUI = /*#__PURE__*/function () {
       });
       buttonX.addEventListener('pointerdown', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keydown', {
-          'code': 'KeyO'
+          'code': 'KeyL'
         }));
       });
       buttonX.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
-          'code': 'KeyO'
+          'code': 'KeyL'
         }));
       });
       var buttonB = document.getElementById('b');
       var buttonA = document.getElementById('a');
       buttonB.addEventListener('pointerdown', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keydown', {
-          'code': 'Space'
+          'code': 'KeyH'
         }));
       });
       buttonB.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
-          'code': 'Space'
+          'code': 'KeyH'
         }));
       });
       buttonA.addEventListener('pointerdown', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keydown', {
-          'code': 'KeyP'
+          'code': 'KeyK'
         }));
       });
       buttonA.addEventListener('pointerup', function (ev) {
         document.dispatchEvent(new KeyboardEvent('keyup', {
-          'code': 'KeyP'
+          'code': 'KeyK'
         }));
       });
       if (false && !is_touch_enabled()) {

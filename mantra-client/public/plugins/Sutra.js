@@ -229,6 +229,14 @@ function topdownMovement(game) {
     op: 'or',
     conditions: ['J', 'BUTTON_X']
   });
+  rules.addCondition('USE_ITEM_3', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('USE_ITEM_4', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
   rules.addCondition('ZOOM_IN', {
     op: 'or',
     conditions: ['K', 'BUTTON_A']
