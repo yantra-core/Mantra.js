@@ -18,6 +18,13 @@ export default function getTexture(config) {
 
   t = game.preloader.getItem(assetName);
 
+  if (typeof t === 'undefined') {
+    return null;
+  }
+
+  // TODO: perform switch here based on type of entity
+
+
   if (config && typeof config.sprite !== 'undefined') {
     let spriteName = config.sprite;
     let frameIndex = 0;
