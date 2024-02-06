@@ -13,8 +13,10 @@ export default function getTexture(config) {
 
   if (typeof assetName === 'object') {
     // could be sprite sheet
-    assetName = config.sheet;
+    assetName = config.sheet || config.model;
   }
+
+  // console.log('getting texture', config, assetName)
 
   t = game.preloader.getItem(assetName);
 
@@ -22,8 +24,14 @@ export default function getTexture(config) {
     return null;
   }
 
-  // TODO: perform switch here based on type of entity
+  if (t.loadedModel) {
+    return {
+      key: t.key,
+      model: t.loadedModel
+    };
+  }
 
+  // TODO: perform switch here based on type of entity
 
   if (config && typeof config.sprite !== 'undefined') {
     let spriteName = config.sprite;

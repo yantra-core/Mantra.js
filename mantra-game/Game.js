@@ -45,7 +45,7 @@ class Game {
       defaultPlayer: true,
       options: {},
       mode: 'topdown', // default entity input and movement mode defined as Sutras
-      multiplexGraphicsHorizontally: true // default behavior is multiple graphics plugins will be horizontally stacked
+      multiplexGraphicsHorizontally: false // default behavior is multiple graphics plugins will be horizontally stacked
     };
 
     // Merge custom configuration with defaults

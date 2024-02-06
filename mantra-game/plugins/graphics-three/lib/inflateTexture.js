@@ -3,8 +3,9 @@ export default function inflateTexture(entityData) {
 
   let game = this.game;
   let texture = game.getTexture(entityData.texture);
+
   if (!texture) {
-    console.warn('Warning: Texture not found', entityData.texture);
+    // console.warn('Warning: Texture not found', entityData.texture);
     return;
   }
 
@@ -24,6 +25,22 @@ async function applyTextureToMesh(game, entityData, mesh) {
     mesh.visible = true;
     return mesh;
   }
+
+  /*
+ // Assuming texture.model is a THREE.Material instance
+ if (texture.model) {
+  console.log('texture.model', texture.model);
+
+  // Iterate over all child objects within the group
+  mesh.traverse((child) => {
+    // Check if the child is a mesh
+    if (child.isMesh) {
+      // Apply the material to the mesh
+      child.material = texture.model;
+    }
+  });
+}
+*/
 
   // If a game texture was found, but has no URL, no updates will be made, return mesh
   if (!texture.url) {
@@ -84,6 +101,8 @@ async function applyTextureToMesh(game, entityData, mesh) {
 
     _cachedTexture.repeat.set(uvs.width, uvs.height);
     _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
+
+    
 
     mesh.material.map = _cachedTexture;
     mesh.material.needsUpdate = true;

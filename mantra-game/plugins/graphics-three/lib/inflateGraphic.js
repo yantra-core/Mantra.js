@@ -23,9 +23,11 @@ export default function inflateGraphic(entity, alpha) {
     return;
   }
 
-  this.inflateTexture(entity, graphic);
+  // this.inflateTexture(entity, graphic);
 
 }
+
+
 
 
   /*

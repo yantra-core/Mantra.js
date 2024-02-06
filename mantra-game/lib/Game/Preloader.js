@@ -1,3 +1,5 @@
+import FBXLoader from "./Preloader/FBXLoader.js";
+
 export default class Preloader {
   constructor(game, { assets = [] } = {}) {
     this.assets = assets;
@@ -38,7 +40,12 @@ export default class Preloader {
         await this.loadImage(asset);
         asset.loaded = true;
         break;
-
+      case 'model':
+        let model = await this.loadModel(asset);
+        asset.loaded = true;
+        asset.loadedModel = model;
+        break;
+  
       // Other cases for different asset types
       default: 
         if(this.loaders[asset.type]){
@@ -46,6 +53,13 @@ export default class Preloader {
           asset.loaded = true;
         } //else default to nothing
     }
+  }
+
+  async loadModel (asset) {
+    // assume three fbx ( for now )
+    let model = FBXLoader(asset);
+    return model;
+
   }
 
   async loadImage(asset) {

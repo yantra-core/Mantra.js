@@ -8,14 +8,36 @@ export default function createGraphic(entityData) {
     return;
   }
 
+
+  // check to see if there is texture data or a model to use
+  let texture = game.getTexture(entityData.texture);
+
+  console.log("creating ent with text", texture)
+
+  // Create a group to hold the entity's components
+  let entityGroup;
+  
+  if (texture && texture.model) {
+    entityGroup = texture.model;
+    console.log("assigning text", texture)
+    // set size of entityGroup
+    // entityGroup.scale.set(entityData.width, entityData.depth, entityData.height);
+    entityGroup.scale.set(1, 1, 1);
+
+  } else {
+    entityGroup = new THREE.Group();
+  }
+  
+
   switch (entityData.type) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
-   
+
     case 'PLAYER':
       //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
+
 
       break;
     case 'BULLET':
@@ -25,35 +47,15 @@ export default function createGraphic(entityData) {
 
       break;
 
-      case 'BLOCK':
-        geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
-        break;
-  
+    case 'BLOCK':
+      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
+      break;
+
     case 'TILE':
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
 
 
-    case 'not_implemented_TEXT':
-      // Ensure you have the font data loaded
-      const font = this.game.font; // Assuming you have a method to get the loaded font
-      if (font) {
-        // console.log('font', font);
-        // font has isFont, type, and data
-        /* TODO: this causes game to crash / not render? no error 
-        geometry = new THREE.TextGeometry(entityData.text, {
-          font: font,
-          size: entityData.size || 1,
-          height: entityData.height || 0.1,
-          curveSegments: 12,
-          bevelEnabled: false
-        });
-         */
-      } else {
-        console.warn("Font not loaded for text geometry");
-        return;
-      }
-      break;
     default:
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
   }
@@ -73,12 +75,29 @@ export default function createGraphic(entityData) {
     mesh.visible = false; // for now
   }
 
-  this.scene.add(mesh);
+  console.log(entityGroup.position);
+  console.log(entityGroup.scale);
+  
+  // TODO doesnt this only get set if we don't have a default model mesh?
+  // Before adding the mesh, check if the entityGroup was just created (and doesn't contain a model from texture)
+  if (!texture || !texture.model) {
+    entityGroup.add(mesh);
+  }
+  
+  entityGroup.traverse((child) => {
+    child.visible = true;
+  });
+
+  this.scene.add(entityGroup);
 
   // Setting position
-  mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+   entityGroup.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+  //entityGroup.position.set(0, 0, 0);
 
-  this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
+  this.game.components.graphics.set([entityData.id, 'graphics-three'], entityGroup);
+  entityGroup.visible = true;
+  entityGroup.needsUpdate = true;
+  //this.inflateTexture(entityData, entityGroup);
 
-  return mesh;
+  return entityGroup;
 }

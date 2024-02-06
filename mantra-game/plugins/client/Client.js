@@ -66,6 +66,11 @@ export default class Client {
           continue;
         }
 
+        if (asset.type === 'model') {
+          preloader.addAsset(asset.url, 'model', key, asset);
+          continue;
+        }
+
         // preloader.addAsset(defaultAssets[key], 'image', key);
       }
 
