@@ -70,7 +70,6 @@ tap.test('Basic Texture Tests', (t) => {
     const allLoaded = game.preloader.assets.every(asset => asset.loaded);
     t.ok(allLoaded, 'all assets are loaded');
 
-    console.log('game.preloader.assets',  game.preloader.assets)
     let entityData = {
       texture: 'asset1'
     };
@@ -79,5 +78,25 @@ tap.test('Basic Texture Tests', (t) => {
     t.ok(texture.key === 'asset1', 'Texture key should match');
     t.end();
   });
+
+  t.test('Can get image sprite texture from spritesheet based on entityData.texture', async (t) => {
+
+    game.preloader.addAsset('mock-url-3', 'spritesheet', 'game-sheet');
+
+    await game.preloader.loadAll();
+
+    // Verify all assets are marked as loaded
+    const allLoaded = game.preloader.assets.every(asset => asset.loaded);
+    t.ok(allLoaded, 'all assets are loaded');
+
+    let entityData = {
+      texture: 'asset1'
+    };
+    let texture = game.getTexture(entityData.texture);
+    t.ok(texture.url === mockRoot + 'mock-url-1', 'Texture url should match');
+    t.ok(texture.key === 'asset1', 'Texture key should match');
+    t.end();
+  });
+
 
 });

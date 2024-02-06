@@ -61,7 +61,7 @@ export default class Client {
           continue;
         }
 
-        if (asset.type === 'spritesheet') {
+        if (asset.type === 'spritesheet' || asset.type === 'sheet') {
           preloader.addAsset(asset.url, 'spritesheet', key, asset);
           continue;
         }

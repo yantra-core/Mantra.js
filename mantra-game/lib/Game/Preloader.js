@@ -1,5 +1,5 @@
 export default class Preloader {
-  constructor(game, { assets = []} = {}) {
+  constructor(game, { assets = [] } = {}) {
     this.assets = assets;
     this.totalAssetsSize = 0;
     this.loadedAssetsSize = 0;
@@ -29,6 +29,11 @@ export default class Preloader {
         await this.loadImage(asset);
         asset.loaded = true;
         break;
+      case 'spritesheet':
+        await this.loadImage(asset);
+        asset.loaded = true;
+        break;
+
       // Other cases for different asset types
     }
   }
