@@ -94,8 +94,11 @@ class ThreeGraphics extends GraphicsInterface {
       this.cameraConfig.far
     );
 
+    // Set up the camera defaults
     this.setCameraDefaults();
-
+  
+    // Set up the mouse wheel event listener for zooming
+    this.setupZoomControls();
 
     // Add a light source
     const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
@@ -191,6 +194,22 @@ class ThreeGraphics extends GraphicsInterface {
     }
   }
 
+  setupZoomControls() {
+    const zoomSensitivity = -0.05; // Adjust this value based on desired zoom speed
+    const minFov = 20; // Minimum FOV
+    const maxFov = 150; // Maximum FOV, you can adjust this value
+
+    this.renderer.domElement.addEventListener('wheel', (event) => {
+      // Adjust the camera's FOV
+      this.camera.fov -= event.deltaY * zoomSensitivity;
+      // Clamp the FOV to the min/max limits
+      this.camera.fov = Math.max(Math.min(this.camera.fov, maxFov), minFov);
+      // Update the camera's projection matrix
+      this.camera.updateProjectionMatrix();
+    });
+  }
+
+
   unload() {
 
     // iterate through all entities and remove existing babylon graphics
@@ -214,6 +233,8 @@ class ThreeGraphics extends GraphicsInterface {
     }
 
   }
+
+
 
   // New function to switch to first-person perspective
   setFirstPersonView() {
