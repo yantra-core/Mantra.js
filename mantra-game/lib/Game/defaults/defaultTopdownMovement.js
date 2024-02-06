@@ -40,7 +40,7 @@ export default function topdownMovement(game) {
 
   rules
     .if('USE_ITEM_2')
-    .then("DROP_BOMB")
+    .then("THROW_BOOMERANG")
 
   // replace with rules.do('ZOOM_IN'), etc
   rules.if('ZOOM_IN').then('ZOOM_IN');
@@ -156,10 +156,18 @@ export default function topdownMovement(game) {
     }
   });
 
+  rules.on('THROW_BOOMERANG', function (player) {
+    if (game.systems.boomerang) {
+      game.systems.boomerang.throwBoomerang(player.id);
+    }
+  });
+
+  /*
   rules.on('DROP_BOMB', function (player) {
     // with no rate-limit, will drop 60 per second with default settings
     rules.emit('dropBomb', player)
   });
+  */
 
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);

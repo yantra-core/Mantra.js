@@ -60,6 +60,7 @@ import Lifetime from './plugins/lifetime/Lifetime.js';
 // Game Objects
 import Border from './plugins/border/Border.js';
 import Bomb from './plugins/bomb/Bomb.js';
+import Boomerang from './plugins/boomerang/Boomerang.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 import Platform from './plugins/platform/Platform.js';
@@ -120,6 +121,7 @@ const plugins = {
   Tile,
   Border,
   Bomb,
+  Boomerang,
   Bullet,
   Sword,
   Collision,

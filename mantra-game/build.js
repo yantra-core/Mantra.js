@@ -15,6 +15,7 @@ const plugins = [
   './plugins/platform/Platform.js',
   './plugins/border/Border.js',
   './plugins/bomb/Bomb.js',
+  './plugins/boomerang/Boomerang.js',
   './plugins/bullet/Bullet.js',
   './plugins/sword/Sword.js',
   './plugins/graphics-css/CSSGraphics.js',

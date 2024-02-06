@@ -24,6 +24,25 @@ class Home {
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
+    // ping position handler
+    /*
+    game.on('pointerDown', (entity, pointerEvent, c) => {
+      // get the mouse position from pointerEvent
+      let x = pointerEvent.clientX;
+      let y = pointerEvent.clientY;
+
+      let reverse = true;
+      let color = 'white';
+
+      // if right click then reverse is false
+      if (pointerEvent.button === 2) {
+        reverse = false;
+        color = 'red';
+      }
+      game.pingPosition(x, y, { reverse: reverse, color: color, duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+    });
+    */
+
     // sprite sheet has been defined in defaultAssets.js
     game.createPlayer({
       texture: {
@@ -56,6 +75,7 @@ class Home {
 
     game.use('Border', { autoBorder: true })
     game.use('Bullet');
+    game.use('Boomerang');
     // game.use('Sword')
     // game.use('Tile');
     game.use('Tone');
