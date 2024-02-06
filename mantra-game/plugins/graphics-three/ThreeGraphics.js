@@ -94,6 +94,9 @@ class ThreeGraphics extends GraphicsInterface {
       this.cameraConfig.far
     );
 
+    this.setCameraDefaults();
+
+
     // Add a light source
     const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
     this.scene.add(light);
@@ -115,8 +118,29 @@ class ThreeGraphics extends GraphicsInterface {
         
     game.graphics.push(this);
 
+    window.addEventListener('resize', this.onWindowResize.bind(this), false);
+
     document.body.style.cursor = 'default';
 
+  }
+
+
+  setCameraDefaults() {
+    // this.camera.position.set(0, 0, 100); // Set a default position
+    this.setZoom(0.5); // Set a default zoom level
+  }
+
+  setZoom(zoomLevel) {
+    // Here we are using fov to control the zoom. You can adjust this formula as needed.
+    const newFov = 75 / zoomLevel;
+    this.camera.fov = newFov;
+    this.camera.updateProjectionMatrix();
+  }
+
+  onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
   loadFont(path, cb) {
