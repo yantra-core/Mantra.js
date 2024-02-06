@@ -87,7 +87,7 @@ class RBush {
     for (let [eId, state] of this.game.entities.entries()) {
       if (game.config.useFoV && nearbyEntities.indexOf(eId) === -1) {
         let ent = this.game.entities.get(eId);
-        if (ent) {
+        if (ent && ent.type !== 'BOOMERANG') { // TODO: remove this reference, use a flag
           game.removeEntity(eId, false);
         }
       }

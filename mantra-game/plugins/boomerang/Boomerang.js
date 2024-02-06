@@ -8,6 +8,7 @@ class Boomerang {
     this.direction = config.direction || { x: 1, y: 0 }; // Initial direction
     this.damage = config.damage || 20; // Damage dealt by the boomerang
     this.range = config.range || 30; // Maximum distance the boomerang can travel before returning
+    this.catchBoomerangTickDelay = 33; // minimum number of ticks before the boomerang can be caught
     this.isReturning = false; // State to track if the boomerang is returning
     this.ownerId = null; // The entity ID of the boomerang's owner
   }
@@ -45,6 +46,31 @@ class Boomerang {
     return distance >= this.range;
   }
 
+  handleCollision (pair, bodyA, bodyB) {
+    if (bodyA.myEntityId && bodyB.myEntityId) {
+      const entityIdA = bodyA.myEntityId;
+      const entityIdB = bodyB.myEntityId;
+
+      //const entityA = this.game.getEntity(entityIdA);
+      //const entityB = this.game.getEntity(entityIdB);
+      const entityA = bodyA.entity;
+      const entityB = bodyB.entity;
+
+      // do not process collisions for entities that player owners ( for now )
+      // Check if entityA owns entityB or if entityB owns entityA
+      if (entityA.owner === entityB.id || entityB.owner === entityA.id) {
+        let boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
+        pair.isActive = false; // Deactivate collision processing for this pair
+        let diff = game.tick - boomerang.ctick;
+        if (diff > this.catchBoomerangTickDelay) {
+          this.completeReturn(boomerang);
+        }
+        return;
+      }
+
+    }
+  }
+
   returnToOwner(boomerang) {
     // Find the owner entity using the owner ID stored in the boomerang
     let ownerEntity = this.game.getEntity(boomerang.owner);
@@ -60,10 +86,6 @@ class Boomerang {
         y: normalizedDirection.y * this.returnSpeed
       });
 
-      // Check for collision with the owner to complete the return
-      if (this.checkCollision(boomerang, ownerEntity)) {
-        this.completeReturn(boomerang);
-      }
     }
   }
 
@@ -128,7 +150,7 @@ class Boomerang {
     // adjust force for entity.rotation
     boomerangVelocity.x = Math.sin(playerRotation) * this.speed;
     boomerangVelocity.y = -Math.cos(playerRotation) * this.speed;
-
+    boomerangstartingPosition.z = 4;
     const boomerangConfig = {
       type: 'BOOMERANG',
       height: 16,
@@ -136,9 +158,12 @@ class Boomerang {
       position: boomerangstartingPosition,
       rotation: entity.rotation, // TODO: get the player's rotation
       speed: this.speed,
-      isSensor: true,
+      // isSensor: true,
       owner: ownerId,
       velocity: boomerangVelocity,
+      style: {
+        zIndex: 99 // TODO: should not be need, should use position.z
+      },
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'boomerang',
