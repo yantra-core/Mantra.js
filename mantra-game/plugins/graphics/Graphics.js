@@ -38,16 +38,19 @@ class Graphics {
       maxZoom: 10,
     };
 
-    // Ensure the gameHolder div exists
-    let gameHolder = document.getElementById('gameHolder');
-    if (!gameHolder) {
-      gameHolder = document.createElement('div');
-      gameHolder.id = 'gameHolder';
-      document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
-    }
+    if (this.game.isClient) {
+      // Ensure the gameHolder div exists
+      let gameHolder = document.getElementById('gameHolder');
+      if (!gameHolder) {
+        gameHolder = document.createElement('div');
+        gameHolder.id = 'gameHolder';
+        document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+      }
 
-    document.body.scrollTop = 0; // For Safari
-    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+
+    }
 
   }
 
