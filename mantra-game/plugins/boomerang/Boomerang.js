@@ -81,9 +81,18 @@ class Boomerang {
       let directionToOwner = { x: ownerPosition.x - currentPosition.x, y: ownerPosition.y - currentPosition.y };
       let normalizedDirection = this.normalize(directionToOwner);
 
+      // Increase the return speed gradually, up to a maximum value
+      const maxReturnSpeed = 0.1; // Maximum return speed, adjust as needed
+      const speedIncreaseFactor = 0.001; // Rate of speed increase per update, adjust as needed
+
+      if (typeof boomerang.returnSpeed !== 'number') {
+        boomerang.returnSpeed = this.returnSpeed;
+      }
+      // Increase the return speed, but don't exceed the maximum
+      boomerang.returnSpeed = Math.min(boomerang.returnSpeed + speedIncreaseFactor, maxReturnSpeed);
       this.game.applyForce(boomerang.id, {
-        x: normalizedDirection.x * this.returnSpeed,
-        y: normalizedDirection.y * this.returnSpeed
+        x: normalizedDirection.x * boomerang.returnSpeed,
+        y: normalizedDirection.y * boomerang.returnSpeed
       });
 
     }
