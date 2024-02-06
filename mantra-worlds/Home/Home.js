@@ -20,7 +20,13 @@ class Home {
     let game = this.game;
 
     game.reset();
-    game.zoom(4.5);
+
+    if (game.isTouchDevice) {
+      game.zoom(2.5);
+    } else {
+      game.zoom(4.5);
+    }
+
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 

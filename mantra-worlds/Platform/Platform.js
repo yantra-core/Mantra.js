@@ -29,7 +29,13 @@ class Platform {
 
     game.reset('platform');
     game.setGravity(0, 3.3, 0);
-    game.setZoom(4.5);
+
+    if (game.isTouchDevice) {
+      game.setZoom(3);
+    } else {
+      game.setZoom(4.5);
+    }
+
 
     game.createPlayer({
       height: 32,

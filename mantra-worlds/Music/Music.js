@@ -29,8 +29,6 @@ class Music {
     //game.setGravity(0, 4.3, 0);
     game.setGravity(0, 0, 0);
 
-
-
     game.customMovement = false;
     game.setBackground('black');
 
@@ -101,7 +99,7 @@ class Music {
     game.use('Block')
     // game.use('Tile');
     game.use('Tone');
-
+    game.use('Boomerang');
     game.use('Bullet')
     // game.use('Sword')
 

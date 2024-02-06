@@ -284,6 +284,10 @@ class Game {
     });
   }
 
+  isTouchDevice () {
+    return 'ontouchstart' in window || navigator.maxTouchPoints;
+  }
+
   //
   // Asset and Styling APIs
   //
