@@ -5,6 +5,7 @@ export default class Preloader {
     this.loadedAssetsSize = 0;
     this.root = game.assetRoot;
     this.game = game;
+    this.loaders = {};
   }
 
   getItem(key) {
@@ -22,6 +23,10 @@ export default class Preloader {
     await Promise.all(loadPromises);
     game.emit('preloader::loaded');
   }
+  
+  createLoader(name, handler){
+    this.loaders[name] = handler;
+  }
 
   async loadAsset(asset) {
     switch (asset.type) {
@@ -35,6 +40,11 @@ export default class Preloader {
         break;
 
       // Other cases for different asset types
+      default: 
+        if(this.loaders[asset.type]){
+          await this.loaders[asset.type](asset);
+          asset.loaded = true;
+        } //else default to nothing
     }
   }
 
