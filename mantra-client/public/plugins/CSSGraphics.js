@@ -127,7 +127,7 @@ var CSSCamera = /*#__PURE__*/function () {
       this.game = game;
       // this.resetCameraState();
       this.game.shakeCamera = _cameraShake["default"].bind(this); // for now
-      game.setZoom = this.zoom.bind(this);
+      game.zoom = this.zoom.bind(this);
       game.data.camera = {
         position: {
           x: 0,
@@ -320,6 +320,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       var cssCamera = new _CSSCamera["default"](this, this.camera);
       var windowHeight = window.innerHeight;
       this.game.use(cssCamera);
+      game.camera = cssCamera;
 
       // Initialize the CSS render div
       this.initCSSRenderDiv();
@@ -332,9 +333,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.game.viewportCenterXOffset = 0;
       this.game.viewportCenterYOffset = 0;
       document.body.style.cursor = 'default';
-      game.on('game::ready', function () {
-        game.zoom(1); // game.data.camera.currentZoom
-      });
     }
   }, {
     key: "initCSSRenderDiv",
@@ -1605,6 +1603,9 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function unload() {
   var _this = this;
+  // set zoom back to 1, or else document may be fuzzy
+  this.game.zoom(1);
+
   // TODO: consolidate graphics pipeline unloading into SystemsManager
   // TODO: remove duplicated unload() code in BabylonGraphics
 

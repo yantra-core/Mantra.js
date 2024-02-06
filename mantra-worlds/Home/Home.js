@@ -20,7 +20,7 @@ class Home {
     let game = this.game;
 
     game.reset();
-    game.setZoom(4.5);
+    game.zoom(4.5);
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 

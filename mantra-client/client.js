@@ -61,7 +61,7 @@ let game = new Game({
     y: 0
   },
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['three'], // 'ascii', 'three', 'babylon', 'css', 'phaser', 'ascii'
+  graphics: ['css'], // 'ascii', 'three', 'babylon', 'css', 'phaser', 'ascii'
   collisions: true,
   gamepad: {
     useZoomSlider: false
@@ -209,7 +209,7 @@ if (mode === 'online') {
   //console.log("wwww", worlds)
   game.use(new plugins.Border());
 
-  // home = new worlds.YCraft();
+  // home = new worlds.GravityGardens();
 
   /*
   --purple-light: #bbe;

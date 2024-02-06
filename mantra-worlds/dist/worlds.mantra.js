@@ -4308,7 +4308,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  // rules.use(hexapod(game), 'hexapod');
+  rules.use((0, _hexapod["default"])(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');

@@ -602,7 +602,7 @@ function _applyTextureToMesh() {
           return _context.abrupt("return", mesh);
         case 16:
           if (entityData.type === 'PLAYER') {
-            // console.log('loadined', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
+            // console.log('loaded player', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
           }
           if (!(cachedTexture && cachedTexture.image && texture.sprite)) {
             _context.next = 30;

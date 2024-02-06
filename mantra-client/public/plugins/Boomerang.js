@@ -26,6 +26,7 @@ var Boomerang = /*#__PURE__*/function () {
     }; // Initial direction
     this.damage = config.damage || 20; // Damage dealt by the boomerang
     this.range = config.range || 30; // Maximum distance the boomerang can travel before returning
+    this.catchBoomerangTickDelay = 33; // minimum number of ticks before the boomerang can be caught
     this.isReturning = false; // State to track if the boomerang is returning
     this.ownerId = null; // The entity ID of the boomerang's owner
   }
@@ -65,6 +66,31 @@ var Boomerang = /*#__PURE__*/function () {
       return distance >= this.range;
     }
   }, {
+    key: "handleCollision",
+    value: function handleCollision(pair, bodyA, bodyB) {
+      if (bodyA.myEntityId && bodyB.myEntityId) {
+        var entityIdA = bodyA.myEntityId;
+        var entityIdB = bodyB.myEntityId;
+
+        //const entityA = this.game.getEntity(entityIdA);
+        //const entityB = this.game.getEntity(entityIdB);
+        var entityA = bodyA.entity;
+        var entityB = bodyB.entity;
+
+        // do not process collisions for entities that player owners ( for now )
+        // Check if entityA owns entityB or if entityB owns entityA
+        if (entityA.owner === entityB.id || entityB.owner === entityA.id) {
+          var boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
+          pair.isActive = false; // Deactivate collision processing for this pair
+          var diff = game.tick - boomerang.ctick;
+          if (diff > this.catchBoomerangTickDelay) {
+            this.completeReturn(boomerang);
+          }
+          return;
+        }
+      }
+    }
+  }, {
     key: "returnToOwner",
     value: function returnToOwner(boomerang) {
       // Find the owner entity using the owner ID stored in the boomerang
@@ -77,15 +103,20 @@ var Boomerang = /*#__PURE__*/function () {
           y: ownerPosition.y - currentPosition.y
         };
         var normalizedDirection = this.normalize(directionToOwner);
-        this.game.applyForce(boomerang.id, {
-          x: normalizedDirection.x * this.returnSpeed,
-          y: normalizedDirection.y * this.returnSpeed
-        });
 
-        // Check for collision with the owner to complete the return
-        if (this.checkCollision(boomerang, ownerEntity)) {
-          this.completeReturn(boomerang);
+        // Increase the return speed gradually, up to a maximum value
+        var maxReturnSpeed = 0.1; // Maximum return speed, adjust as needed
+        var speedIncreaseFactor = 0.001; // Rate of speed increase per update, adjust as needed
+
+        if (typeof boomerang.returnSpeed !== 'number') {
+          boomerang.returnSpeed = this.returnSpeed;
         }
+        // Increase the return speed, but don't exceed the maximum
+        boomerang.returnSpeed = Math.min(boomerang.returnSpeed + speedIncreaseFactor, maxReturnSpeed);
+        this.game.applyForce(boomerang.id, {
+          x: normalizedDirection.x * boomerang.returnSpeed,
+          y: normalizedDirection.y * boomerang.returnSpeed
+        });
       }
     }
   }, {
@@ -156,6 +187,7 @@ var Boomerang = /*#__PURE__*/function () {
       // adjust force for entity.rotation
       boomerangVelocity.x = Math.sin(playerRotation) * this.speed;
       boomerangVelocity.y = -Math.cos(playerRotation) * this.speed;
+      boomerangstartingPosition.z = 4;
       var boomerangConfig = {
         type: 'BOOMERANG',
         height: 16,
@@ -164,9 +196,13 @@ var Boomerang = /*#__PURE__*/function () {
         rotation: entity.rotation,
         // TODO: get the player's rotation
         speed: this.speed,
-        isSensor: true,
+        // isSensor: true,
         owner: ownerId,
         velocity: boomerangVelocity,
+        style: {
+          zIndex: 99 // TODO: should not be need, should use position.z
+        },
+
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'boomerang',

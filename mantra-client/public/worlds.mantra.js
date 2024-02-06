@@ -3648,7 +3648,7 @@ var Home = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.reset();
-      game.setZoom(4.5);
+      game.zoom(4.5);
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
 
@@ -4308,7 +4308,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  // rules.use(hexapod(game), 'hexapod');
+  rules.use((0, _hexapod["default"])(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');

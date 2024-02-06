@@ -640,11 +640,19 @@ function createEntity(config) {
       collisionActive: false,
       collisionStart: true,
       collisionEnd: false,
-      exit: null
+      exit: null,
+      ctick: this.game.tick
     };
 
     // merge config with defaultConfig
     config = _objectSpread(_objectSpread({}, defaultConfig), config);
+
+    // before mutating any game state based on the incoming entity, we *must* check that certain properties validate
+    // check that position is well formed, contains, x,y,z, and is all valid numbers
+    if (config.position && (typeof config.position.x !== 'number' || isNaN(config.position.x) || typeof config.position.y !== 'number' || isNaN(config.position.y))) {
+      console.log('Entity.createEntity could not create with data', config);
+      throw new Error('Invalid position for entity');
+    }
     if (this.game.systems.rbush) {
       this.game.systems.rbush.addEntity(config);
     }
@@ -717,7 +725,8 @@ function createEntity(config) {
     collisionActive = _config.collisionActive,
     collisionStart = _config.collisionStart,
     collisionEnd = _config.collisionEnd,
-    exit = _config.exit;
+    exit = _config.exit,
+    ctick = _config.ctick;
   var x = position.x,
     y = position.y;
 
@@ -770,6 +779,7 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
   this.game.addComponent(entityId, 'exit', exit);
+  this.game.addComponent(entityId, 'ctick', ctick);
   if (body) {
     var _body = this.createBody({
       width: width,

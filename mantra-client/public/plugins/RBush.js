@@ -137,7 +137,8 @@ var RBush = /*#__PURE__*/function () {
             state = _step$value[1];
           if (game.config.useFoV && nearbyEntities.indexOf(eId) === -1) {
             var ent = this.game.entities.get(eId);
-            if (ent) {
+            if (ent && ent.type !== 'BOOMERANG') {
+              // TODO: remove this reference, use a flag
               game.removeEntity(eId, false);
             }
           }

@@ -472,6 +472,8 @@ function switchGraphics(graphicsInterfaceName, cb) {
       });
 
       // redraw all graphics, not needed?
+      // this was removed 2/6/2024 because the graphics pipeline should already understand to redraw
+      // the ent graphics since entity.graphics will not have the required graphics object
       /*
       for (let [eId, state] of this.game.entities.entries()) {
         let ent = this.game.entities.get(eId);
