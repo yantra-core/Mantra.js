@@ -444,13 +444,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = switchGraphics;
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function switchGraphics(graphicsInterfaceName, cb) {
   var _this = this;
   cb = cb || function noop() {};
@@ -478,34 +471,22 @@ function switchGraphics(graphicsInterfaceName, cb) {
         }
       });
 
-      // redraw all graphics
-      var _iterator = _createForOfIteratorHelper(_this.game.entities.entries()),
-        _step;
-      try {
-        var _loop = function _loop() {
-          var _step$value = _slicedToArray(_step.value, 2),
-            eId = _step$value[0],
-            state = _step$value[1];
-          var ent = _this.game.entities.get(eId);
-          // console.log('rendering', ent)
-          game.graphics.forEach(function (graphicsInterface) {
-            if (graphicsInterface.inflateEntity) {
-              // legacy api, remove soon
-              graphicsInterface.inflateEntity(ent);
-            } else {
-              graphicsInterface.inflateGraphic(ent);
-            }
-          });
-          // this.game.changedEntities.delete(eId);
-        };
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          _loop();
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
+      // redraw all graphics, not needed?
+      /*
+      for (let [eId, state] of this.game.entities.entries()) {
+        let ent = this.game.entities.get(eId);
+        // console.log('rendering', ent)
+        game.graphics.forEach(function (graphicsInterface) {
+          if (graphicsInterface.inflateEntity) {
+            // legacy api, remove soon
+            graphicsInterface.inflateEntity(ent);
+          } else {
+            graphicsInterface.inflateGraphic(ent);
+          }
+        });
+        // this.game.changedEntities.delete(eId);
       }
+      */
       console.log("BABYLON READY");
       // Remark: cursor was immediately defaulting instead of wait, so moved it into BabylonGraphics.js itself
       // document.body.style.cursor = 'default';

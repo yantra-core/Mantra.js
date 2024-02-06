@@ -187,6 +187,12 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Create and configure the camera
       this.camera = new THREE.PerspectiveCamera(this.cameraConfig.fov, this.cameraConfig.aspect, this.cameraConfig.near, this.cameraConfig.far);
 
+      // Set up the camera defaults
+      this.setCameraDefaults();
+
+      // Set up the mouse wheel event listener for zooming
+      this.setupZoomControls();
+
       // Add a light source
       var light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
       this.scene.add(light);
@@ -206,7 +212,30 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // TODO: remove this line from plugin implementations
       game.loadingPluginsCount--;
       game.graphics.push(this);
+      window.addEventListener('resize', this.onWindowResize.bind(this), false);
       document.body.style.cursor = 'default';
+    }
+  }, {
+    key: "setCameraDefaults",
+    value: function setCameraDefaults() {
+      // this.camera.position.set(0, 0, 100); // Set a default position
+      this.setZoom(1); // Set a default zoom level
+      this.game.data.camera.mode = 'follow';
+    }
+  }, {
+    key: "setZoom",
+    value: function setZoom(zoomLevel) {
+      // Here we are using fov to control the zoom. You can adjust this formula as needed.
+      var newFov = 75 / zoomLevel;
+      this.camera.fov = newFov;
+      this.camera.updateProjectionMatrix();
+    }
+  }, {
+    key: "onWindowResize",
+    value: function onWindowResize() {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
   }, {
     key: "loadFont",
@@ -235,22 +264,44 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Follow the player entity with the camera
       var currentPlayer = this.game.getEntity(game.currentPlayerId);
       if (currentPlayer) {
-        var playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
-        if (playerGraphic) {
-          // Calculate the new camera position with a slight offset above and behind the player
-          var newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
-          var lookAtPosition = playerGraphic.position.clone();
+        if (game.data.camera.mode === 'fpv') {
+          this.setFirstPersonView();
+        }
+        if (game.data.camera.mode === 'follow') {
+          var playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
+          if (playerGraphic) {
+            // Calculate the new camera position with a slight offset above and behind the player
+            var newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
+            var lookAtPosition = playerGraphic.position.clone();
 
-          // Use a smaller lerp factor for smoother camera movement
-          this.camera.position.lerp(newPosition, 0.05);
-          this.camera.lookAt(lookAtPosition);
+            // Use a smaller lerp factor for smoother camera movement
+            this.camera.position.lerp(newPosition, 0.05);
+            this.camera.lookAt(lookAtPosition);
+          }
         }
       }
     }
   }, {
+    key: "setupZoomControls",
+    value: function setupZoomControls() {
+      var _this3 = this;
+      var zoomSensitivity = -0.05; // Adjust this value based on desired zoom speed
+      var minFov = 20; // Minimum FOV
+      var maxFov = 150; // Maximum FOV, you can adjust this value
+
+      this.renderer.domElement.addEventListener('wheel', function (event) {
+        // Adjust the camera's FOV
+        _this3.camera.fov -= event.deltaY * zoomSensitivity;
+        // Clamp the FOV to the min/max limits
+        _this3.camera.fov = Math.max(Math.min(_this3.camera.fov, maxFov), minFov);
+        // Update the camera's projection matrix
+        _this3.camera.updateProjectionMatrix();
+      });
+    }
+  }, {
     key: "unload",
     value: function unload() {
-      var _this3 = this;
+      var _this4 = this;
       // iterate through all entities and remove existing babylon graphics
       var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
         _step;
@@ -270,7 +321,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         _iterator.f();
       }
       this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this3.id;
+        return g.id !== _this4.id;
       });
       delete this.game._plugins['ThreeGraphics'];
 
@@ -281,6 +332,39 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // canvas.style.display = 'none';
         canvas.remove();
       }
+    }
+
+    // New function to switch to first-person perspective
+  }, {
+    key: "setFirstPersonView",
+    value: function setFirstPersonView() {
+      var currentPlayer = this.game.getEntity(this.game.currentPlayerId);
+      if (!currentPlayer) {
+        console.warn('Current player entity not found');
+        return;
+      }
+      var playerGraphic = this.game.components.graphics.get([this.game.currentPlayerId, 'graphics-three']);
+      if (!playerGraphic) {
+        console.warn('Player graphic component not found');
+        return;
+      }
+      playerGraphic.visible = false;
+
+      // Assume the player's "eyes" are located at some offset
+      var eyePositionOffset = new THREE.Vector3(0, 1.6, 0); // Adjust Y offset to represent the player's eye level
+      var playerPosition = playerGraphic.position.clone();
+
+      // Position the camera at the player's eye level
+      this.camera.position.copy(playerPosition.add(eyePositionOffset));
+
+      // Assuming the player's forward direction is along the negative Z-axis of the player's local space
+      // We need to find the forward direction in world space
+      var forwardDirection = new THREE.Vector3(0, 0, 0);
+      forwardDirection.applyQuaternion(playerGraphic.quaternion); // Convert local forward direction to world space
+
+      // Look in the forward direction from the current camera position
+      var lookAtPosition = this.camera.position.clone().add(forwardDirection);
+      this.camera.lookAt(lookAtPosition);
     }
   }]);
   return ThreeGraphics;
@@ -518,7 +602,7 @@ function _applyTextureToMesh() {
           return _context.abrupt("return", mesh);
         case 16:
           if (entityData.type === 'PLAYER') {
-            console.log('loadined', entityData.type, texture.sprite, cachedTexture, texture.url, texturePool[texture.url]);
+            // console.log('loadined', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
           }
           if (!(cachedTexture && cachedTexture.image && texture.sprite)) {
             _context.next = 30;

@@ -596,7 +596,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function shakeCamera(intensity, duration) {
       this.graphics.forEach(function (graphicsInterface) {
         if (graphicsInterface.cameraShake) {
-          graphicsInterface.cameraShake(intensity, duration);
+          graphicsInterface.shakeCamera(intensity, duration);
         }
       });
     }

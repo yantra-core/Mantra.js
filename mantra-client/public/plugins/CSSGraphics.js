@@ -116,9 +116,9 @@ var CSSCamera = /*#__PURE__*/function () {
     this.mouseWheelEnabled = true;
     this.mouseWheelZoom = _mouseWheelZoom["default"].bind(this);
     this.zoom = _zoom["default"].bind(this);
-    this.cameraShake = _cameraShake["default"].bind(this);
     this.setTransform = _setTransform["default"].bind(this);
     this.updateEntityPosition = _updateEntityPosition["default"].bind(this);
+    this.cameraShake = _cameraShake["default"].bind(this);
   }
   _createClass(CSSCamera, [{
     key: "init",
@@ -126,7 +126,7 @@ var CSSCamera = /*#__PURE__*/function () {
       var _this = this;
       this.game = game;
       // this.resetCameraState();
-
+      this.game.shakeCamera = _cameraShake["default"].bind(this); // for now
       game.setZoom = this.zoom.bind(this);
       game.data.camera = {
         position: {
@@ -200,7 +200,6 @@ var CSSCamera = /*#__PURE__*/function () {
         console.error('Invalid angle for rotateCamera. Must be a number.');
         return;
       }
-
       // Update the CSS transform property to rotate the viewport
       this.gameViewport.style.transform = "rotate(".concat(angle, "deg)");
     }
@@ -214,6 +213,12 @@ var CSSCamera = /*#__PURE__*/function () {
       };
       // Reset cursor style back to default
       this.gameViewport.style.cursor = 'grab';
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      // remove event listeners
+      document.removeEventListener('wheel', this.mouseWheelZoom);
     }
   }]);
   return CSSCamera;
@@ -405,10 +410,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = cameraShake;
 // cameraShake.js - Marak Squires 2023
-function cameraShake() {
+function cameraShake(_ref) {
   var _this = this;
-  var initialIntensity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-  var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 777;
+  var _ref$initialIntensity = _ref.initialIntensity,
+    initialIntensity = _ref$initialIntensity === void 0 ? 100 : _ref$initialIntensity,
+    _ref$duration = _ref.duration,
+    duration = _ref$duration === void 0 ? 777 : _ref$duration;
   var gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');
@@ -1248,6 +1255,7 @@ function inflateTexture(entityData, entityElement) {
       y: 0
     } : _texture$sprite,
     frames = texture.frames,
+    rate = texture.rate,
     _texture$playing = texture.playing,
     playing = _texture$playing === void 0 ? true : _texture$playing;
   // Extract the current texture URL from the element's style
@@ -1276,10 +1284,12 @@ function inflateTexture(entityData, entityElement) {
   // Update frame index and position for animated sprites
   if (Array.isArray(frames) && playing) {
     var frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
-
-    // TODO: use config setting for tick rate per animation
-    if (game.tick % 30 === 0) {
-      var frame = frames[frameIndex];
+    var frame = frames[frameIndex];
+    if (typeof rate !== 'number') {
+      rate = 30;
+    }
+    if (game.tick % rate === 0) {
+      // uses configurable rate from texture.rate, see defaulAssets.js file
       if (frame) {
         spritePosition = frame;
         frameIndex = frameIndex >= frames.length - 1 ? 0 : frameIndex + 1;
@@ -1595,11 +1605,9 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function unload() {
   var _this = this;
-  // Reset Zoom
-  this.zoom(1);
-
   // TODO: consolidate graphics pipeline unloading into SystemsManager
   // TODO: remove duplicated unload() code in BabylonGraphics
+
   this.game.graphics = this.game.graphics.filter(function (g) {
     return g.id !== _this.id;
   });

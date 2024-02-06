@@ -1063,6 +1063,7 @@ var defaultAssets = {
         }]
       },
       boomerang: {
+        rate: 4,
         frames: [{
           x: -304,
           y: -496

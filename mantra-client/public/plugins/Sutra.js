@@ -250,7 +250,7 @@ function topdownMovement(game) {
     sprite: 'playerRight'
   });
   rules["if"]('USE_ITEM_1').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
-  rules["if"]('USE_ITEM_2').then("DROP_BOMB");
+  rules["if"]('USE_ITEM_2').then("THROW_BOOMERANG");
 
   // replace with rules.do('ZOOM_IN'), etc
   rules["if"]('ZOOM_IN').then('ZOOM_IN');
@@ -376,10 +376,19 @@ function topdownMovement(game) {
       game.systems.sword.swingSword(entity.id);
     }
   });
+  rules.on('THROW_BOOMERANG', function (player) {
+    if (game.systems.boomerang) {
+      game.systems.boomerang.throwBoomerang(player.id);
+    }
+  });
+
+  /*
   rules.on('DROP_BOMB', function (player) {
     // with no rate-limit, will drop 60 per second with default settings
-    rules.emit('dropBomb', player);
+    rules.emit('dropBomb', player)
   });
+  */
+
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);
   });
@@ -2051,6 +2060,41 @@ var Sutra = /*#__PURE__*/function () {
       }, obj);
     }
   }, {
+    key: "removeNodes",
+    value: function removeNodes(query) {
+      var _this8 = this;
+      var results = this.searchNode(query);
+      results.forEach(function (node) {
+        _this8.removeNode(node.sutraPath);
+      });
+      // search all subtrees recursively
+      if (this.subtrees) {
+        Object.values(this.subtrees).forEach(function (subSutra) {
+          subSutra.removeNodes(query);
+        });
+      }
+    }
+  }, {
+    key: "searchNode",
+    value: function searchNode(query) {
+      var results = [];
+      if (typeof query["if"] === 'string') {
+        // search all nodes that have this condition
+        this.tree.forEach(function (node) {
+          if (node["if"] === query["if"]) {
+            results.push(node);
+          }
+        });
+        // search all subtrees recursively
+        if (_typeof(this.subtrees) === 'object') {
+          Object.values(this.subtrees).forEach(function (subSutra) {
+            results = results.concat(subSutra.searchNode(query));
+          });
+        }
+      }
+      return results;
+    }
+  }, {
     key: "findNode",
     value: function findNode(path) {
       // Remark: findNode is intentionally not recursive / doesn't use visitor pattern
@@ -2132,7 +2176,7 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "tick",
     value: function tick(data) {
-      var _this8 = this;
+      var _this9 = this;
       var gameState = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       // Reset state for all nodes
       this.tree.forEach(function (node) {
@@ -2148,9 +2192,9 @@ var Sutra = /*#__PURE__*/function () {
       this.tree.forEach(function (node) {
         if (node.subtree) {
           subtreeEvaluated = true;
-          _this8.traverseNode(node, data, gameState);
+          _this9.traverseNode(node, data, gameState);
         } else {
-          _this8.traverseNode(node, data, gameState);
+          _this9.traverseNode(node, data, gameState);
         }
       });
 
