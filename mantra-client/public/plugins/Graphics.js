@@ -489,7 +489,7 @@ function switchGraphics(graphicsInterfaceName, cb) {
         // this.game.changedEntities.delete(eId);
       }
       */
-      console.log("BABYLON READY");
+
       // Remark: cursor was immediately defaulting instead of wait, so moved it into BabylonGraphics.js itself
       // document.body.style.cursor = 'default';
       cb(null);

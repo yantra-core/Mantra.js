@@ -25,7 +25,7 @@ class GraphicsSelector {
     // Example: this.addOption(selectBox, 'Option 1', 'value1');
     //this.addOption(selectBox, 'CSSGraphics v1.1.0', 'CSSGraphics');
     //this.addOption(selectBox, 'Babylon.js v6.25.0', 'BabylonGraphics');
-    this.addOption(selectBox, '2D CSSGrahics', 'CSSGraphics');
+    this.addOption(selectBox, '2D CSS', 'CSSGraphics');
     this.addOption(selectBox, '3D Babylon.js', 'BabylonGraphics');
     this.addOption(selectBox, '3D Three.js', 'ThreeGraphics');
 

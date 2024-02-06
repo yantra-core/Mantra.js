@@ -209,8 +209,10 @@ class ThreeGraphics extends GraphicsInterface {
     });
   }
 
-
   unload() {
+
+    // remove events mouse wheel camera
+    this.renderer.domElement.removeEventListener('wheel', () => { });
 
     // iterate through all entities and remove existing babylon graphics
     for (let [eId, entity] of this.game.entities.entries()) {

@@ -302,6 +302,9 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "unload",
     value: function unload() {
       var _this4 = this;
+      // remove events mouse wheel camera
+      this.renderer.domElement.removeEventListener('wheel', function () {});
+
       // iterate through all entities and remove existing babylon graphics
       var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
         _step;
