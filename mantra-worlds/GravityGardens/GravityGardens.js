@@ -38,19 +38,20 @@ class GravityGardens {
 
     let rules = game.rules;
 
-    function switchGravity(entity, game) {
-      if (typeof game.data.lastGravitySwitch === 'undefined') {
-        game.data.lastGravitySwitch = 0;
+    function switchGravity(entity, gameState) {
+
+      if (typeof gameState.lastGravitySwitch === 'undefined') {
+        gameState.lastGravitySwitch = 0;
       }
-      if (Date.now() - game.data.lastGravitySwitch >= 1000) {
-        game.data.repulsion = !game.data.repulsion;
+      if (Date.now() - gameState.lastGravitySwitch >= 1000) {
+        gameState.repulsion = !gameState.repulsion;
 
         // get screen center coordinates, take the window size and divide by 2
         // use the document window here not the game data
         let x = window.innerWidth / 2;
         let y = window.innerHeight / 2 + 24;
 
-        if (game.data.repulsion) {
+        if (gameState.repulsion) {
           game.pingPosition(x, y, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
           game.updateEntity({
             id: entity.id,
@@ -65,31 +66,35 @@ class GravityGardens {
           });
         }
 
-        game.data.lastGravitySwitch = Date.now();
+        gameState.lastGravitySwitch = Date.now();
       }
 
     }
-    // game.customControls = true;
-    // game.customMovement = false;
-    game.setControls({
-      W: 'PLAYER_UP',
-      S: 'PLAYER_DOWN',
-      A: 'MOVE_LEFT',
-      D: 'MOVE_RIGHT',
-      // SPACE: 'FIRE_BULLET',
-      // K: 'FIRE_BULLET',
-      O: 'ZOOM_IN',
-      P: 'ZOOM_OUT',
-      L: function (entity, game) {
-        switchGravity(entity, game);
-      },
-      SPACE: function (entity, game) {
-        switchGravity(entity, game);
-      },
-      K: 'CAMERA_SHAKE',
-      U: 'SELECT_MENU'
+
+    // Remark: You can also use Sutra rules to define custom controls instead of direct mappings
+    // TODO: just bind to sutra rules or events here?
+
+    // remove default behaviors
+    rules.removeNodes({
+      if: 'USE_ITEM_1'
     });
 
+    rules.removeNodes({
+      if: 'USE_ITEM_2'
+    });
+    
+
+    rules.if('USE_ITEM_1').then('switchGravity');
+    rules.if('USE_ITEM_2').then('shakeCamera');
+
+    rules.on('switchGravity', (entity, node, gameState) => {
+      switchGravity(entity, gameState);
+    });
+
+    rules.on('shakeCamera', (entity, node, gameState) => {
+      game.shakeCamera({ duration: 777, intensity: 1000 });
+    });
+    
     game.use('StarField');
 
     if (game.systems.border) {

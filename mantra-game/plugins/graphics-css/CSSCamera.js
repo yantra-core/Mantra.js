@@ -36,16 +36,16 @@ class CSSCamera {
     this.mouseWheelEnabled = true;
     this.mouseWheelZoom = mouseWheelZoom.bind(this);
     this.zoom = zoom.bind(this);
-    this.cameraShake = cameraShake.bind(this);
     this.setTransform = setTransform.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
+    this.cameraShake = cameraShake.bind(this);
 
   }
 
   init(game) {
     this.game = game;
     // this.resetCameraState();
-
+    this.game.shakeCamera = cameraShake.bind(this); // for now
     game.setZoom = this.zoom.bind(this);
 
     game.data.camera = {
