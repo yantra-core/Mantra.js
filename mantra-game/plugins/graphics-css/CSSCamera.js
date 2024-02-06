@@ -122,7 +122,6 @@ class CSSCamera {
       console.error('Invalid angle for rotateCamera. Must be a number.');
       return;
     }
-
     // Update the CSS transform property to rotate the viewport
     this.gameViewport.style.transform = `rotate(${angle}deg)`;
   }
@@ -132,6 +131,11 @@ class CSSCamera {
     this.dragInertia = { x: 0, y: 0 };
     // Reset cursor style back to default
     this.gameViewport.style.cursor = 'grab';
+  }
+
+  unload () {
+    // remove event listeners
+    document.removeEventListener('wheel', this.mouseWheelZoom);
   }
 
 }

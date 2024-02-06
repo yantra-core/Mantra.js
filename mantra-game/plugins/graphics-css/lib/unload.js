@@ -1,10 +1,8 @@
 export default function unload () {
 
-  // Reset Zoom
-  this.zoom(1);
-
   // TODO: consolidate graphics pipeline unloading into SystemsManager
   // TODO: remove duplicated unload() code in BabylonGraphics
+
   this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
   delete this.game._plugins['CSSGraphics'];
 
