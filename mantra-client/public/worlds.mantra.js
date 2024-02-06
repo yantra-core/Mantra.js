@@ -3387,7 +3387,7 @@ var GravityGardens = /*#__PURE__*/function () {
       game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
-      if (game.isTouchDevice) {
+      if (game.isTouchDevice()) {
         game.zoom(1);
       } else {
         game.setZoom(2.5);
@@ -3668,7 +3668,7 @@ var Home = /*#__PURE__*/function () {
     value: function createWorld() {
       var game = this.game;
       game.reset();
-      if (game.isTouchDevice) {
+      if (game.isTouchDevice()) {
         game.zoom(2.5);
       } else {
         game.zoom(4.5);
@@ -5247,7 +5247,7 @@ var Platform = /*#__PURE__*/function () {
       var game = this.game;
       game.reset('platform');
       game.setGravity(0, 3.3, 0);
-      if (game.isTouchDevice) {
+      if (game.isTouchDevice()) {
         game.setZoom(3);
       } else {
         game.setZoom(4.5);
@@ -7362,7 +7362,7 @@ var YCraft = /*#__PURE__*/function () {
       game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(1600, 900);
-      if (game.isTouchDevice) {
+      if (game.isTouchDevice()) {
         game.zoom(1.5);
       } else {
         game.setZoom(3.5);

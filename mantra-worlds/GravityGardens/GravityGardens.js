@@ -24,7 +24,7 @@ class GravityGardens {
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
 
-    if (game.isTouchDevice) {
+    if (game.isTouchDevice()) {
       game.zoom(1);
     } else {
       game.setZoom(2.5);

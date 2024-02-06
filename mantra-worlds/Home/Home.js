@@ -21,7 +21,7 @@ class Home {
 
     game.reset();
 
-    if (game.isTouchDevice) {
+    if (game.isTouchDevice()) {
       game.zoom(2.5);
     } else {
       game.zoom(4.5);

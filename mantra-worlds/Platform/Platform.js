@@ -30,7 +30,7 @@ class Platform {
     game.reset('platform');
     game.setGravity(0, 3.3, 0);
 
-    if (game.isTouchDevice) {
+    if (game.isTouchDevice()) {
       game.setZoom(3);
     } else {
       game.setZoom(4.5);
