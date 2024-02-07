@@ -1,6 +1,5 @@
-// TODO: decouple game objects from physics updates
-// might be to move this outside of worker entire and only have worker report body updates each tick
-
+// TODO: Finish refactor of decoupling game objects from physics updates
+//       Remove usage of bodyMap from game space in favor of using entity.id reference to matter world
 export default function onAfterUpdate(worldState) {
   let Matter = this.Matter;
   let that = this;
@@ -11,16 +10,14 @@ export default function onAfterUpdate(worldState) {
   if (!worldState || !worldState.length) {
     return;
   }
-  worldState.forEach(function processWorldState (body) {
-
-    // for (const body of event.world.bodies) {
+  worldState.forEach(function processWorldState(body) {
 
     // let entity = that.game.getEntity(body.myEntityId);
     let entity = that.game.data.ents._[body.myEntityId];
 
     if (entity && body.isSleeping !== true && body.myEntityId) {
 
-      /* TODO: move these to worker
+      /* TODO: move limitSpeed and lockedProperties logic to separate scope so worker can access them */
       //
       // Clamp max speed
       //
@@ -36,7 +33,6 @@ export default function onAfterUpdate(worldState) {
       if (entity.lockedProperties) {
         that.lockedProperties(body);
       }
-      */
 
       // If this is the client and we are in online mode,
       // do not update local physics for remote players, only update local physics for the local player
@@ -133,7 +129,6 @@ export default function onAfterUpdate(worldState) {
       }
 
     }
-
 
   });
 

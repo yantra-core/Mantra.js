@@ -66,8 +66,8 @@ const actions = {
   addToWorld: (body) => {
     Matter.World.add(physics.engine.world, body);
   },
-  updateEngine: ({ delta }) => {
-    Matter.Engine.update(physics.engine, delta);
+  updateEngine: (args) => {
+    Matter.Engine.update(physics.engine, args[0]);
     postMessage({ action: 'engineUpdated' });
   },
   createBody: ({ options }) => {
@@ -98,6 +98,8 @@ const actions = {
     physics.Matter.Body.setPosition(args[0], args[1]);
   },
   setVelocity(args) {
+    // Remark: This is currently not working as expected since the parent process is sending actual body
+    //         We need to send a JSON representation of body using entity.id instead
     physics.Matter.Body.setVelocity(args[0], args[1]);
   },
   applyForce(args) {

@@ -29,29 +29,31 @@ class MatterPhysics extends PhysicsInterface {
     this.Bodies = Matter.Bodies;
     this.Composite = Matter.Composite;
     this.Events = Matter.Events;
-    this.useWorker = false;
+    this.useWorker = false; // not yet available through config
 
     this.dimension = 2;
 
     this.Matter = Matter;
+
+    this.initEngine = initEngine.bind(this);
 
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
     //
     // collisionActive is used for continuous collision detection ( like touching a planet )
     //
-    // collisionEnd is currently not being used
+    // collisionEnd is used for when a collision ends ( after an active and started collision is no longer happening )
     //
     // Remark: These namespaces collisionStart, collisionActive, etc, are considered from ECS perspective
     // If we register this plugin as a system these methods will be called on the system update, which is not what we want
     // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
-
-    this.initEngine = initEngine.bind(this);
     this.collisionStart = collisionStart.bind(this);
     this.collisionActive = collisionActive.bind(this);
     this.collisionEnd = collisionEnd.bind(this);
+
     this.onAfterUpdate = onAfterUpdate.bind(this);
     this.setBodySize = setBodySize.bind(this);
+    
     this.lockedProperties = lockedProperties.bind(this);
     this.limitSpeed = limitSpeed.bind(this);
     this.setGravity = setGravity.bind(this);
@@ -152,10 +154,12 @@ class MatterPhysics extends PhysicsInterface {
     game.physics = this;
 
     if (this.useWorker) {
+      // Experimental support for running matter as web worker, close to working, see code comments
       this.initWorkerMode();
     } else {
       this.initDirectMode();
     }
+
   }
 
   initDirectMode() {
@@ -167,7 +171,9 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Events.on(this.engine, 'afterUpdate', function (event) {
 
       let worldState = [];
-      // TODO: remove this O(n) by allowing afterUpdate to accept single body instead of array
+      //
+      // REMARK: TODO: remove this O(n) by allowing afterUpdate to accept single body instead of array
+      //
       for (const body of event.source.world.bodies) {
 
         if (body.isSleeping !== true && body.myEntityId) {
@@ -180,7 +186,9 @@ class MatterPhysics extends PhysicsInterface {
             angularVelocity: body.angularVelocity,
             isSleeping: body.isSleeping,
             isStatic: body.isStatic,
-            isSensor: body.isSensor
+            isSensor: body.isSensor,
+            positionPrev: body.positionPrev,
+            parts: body.parts
           };
           worldState.push(bodyState);
         }
