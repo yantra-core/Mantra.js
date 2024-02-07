@@ -48,19 +48,21 @@ function applyTextureToMesh(mesh, cachedTexture, sprite) {
     // Adjust UV mapping for sprites
     const textureWidth = cachedTexture.image.width;
     const textureHeight = cachedTexture.image.height;
-    //console.log('tttt', textureWidth, textureHeight)
     const uvs = calculateSpriteUVs(sprite, textureWidth, textureHeight);
-    //console.log('eeee', uvs)
 
     // Clone the cached texture to avoid altering the original cached texture
     let clonedTexture = cachedTexture.clone();
-    clonedTexture.repeat.set(uvs.width, uvs.height);
-    clonedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
+    clonedTexture.repeat.set(-uvs.width, uvs.height); // Flip texture on the X-axis by setting width to -uvs.width
+    clonedTexture.offset.set(uvs.x + uvs.width, 1 - uvs.y - uvs.height); // Adjust offset for the flipped texture
 
     mesh.material.map = clonedTexture;
   } else {
-    // Apply the entire texture
-    mesh.material.map = cachedTexture;
+    // For non-sprite textures that need to be flipped on the X-axis
+    let clonedTexture = cachedTexture.clone();
+    clonedTexture.repeat.set(-1, 1); // Flip texture on the X-axis
+    clonedTexture.offset.set(1, 0); // Adjust offset for the flipped texture
+
+    mesh.material.map = clonedTexture;
   }
   mesh.material.needsUpdate = true;
   mesh.visible = true;

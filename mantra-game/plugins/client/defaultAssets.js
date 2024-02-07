@@ -1,8 +1,10 @@
 let defaultAssets = {
+  /*
   'characterMedium': {
     type: 'model',
     url: '/game/models/characterMedium.fbx'
   },
+  */
   'pixel': '/img/game/pixel.png',
   'pixel-black': '/img/game/pixel-black.png',
   'player': '/img/game/link-walk/sprite_0.png',

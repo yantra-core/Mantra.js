@@ -6,20 +6,20 @@ export default function createGraphic(entityData) {
   }
 
   // Attempt to retrieve texture and model data
-  console.log("fetching texture", entityData, entityData.texture)
+  // console.log("fetching texture", entityData, entityData.texture)
   let texture = game.getTexture(entityData.texture);
-  console.log("Creating entity with texture:", texture);
+  // console.log("Creating entity with texture:", texture);
 
   // Define a variable to hold the main object for the entity (model or group)
   let entityObject;
 
   // Check if there is a model associated with the texture
   if (texture && texture.model) {
-    console.log("Using existing model for entity.");
+    //console.log("Using existing model for entity.");
     entityObject = processModel(texture.model);
-    console.log('entityObject after processModel()', entityObject);
+    //console.log('entityObject after processModel()', entityObject);
   } else {
-    console.log("Creating new geometry for entity.");
+    // console.log("Creating new geometry for entity.");
     entityObject = createGeometryForEntity(entityData);
   }
 
@@ -28,7 +28,7 @@ export default function createGraphic(entityData) {
     entityData.position.z = 0;
   }
 
-  console.log('setting position of entityObject', entityObject, entityData.position);
+  // console.log('setting position of entityObject', entityObject, entityData.position);
   entityObject.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   entityObject.visible = true; // Ensure the entity is visible
   this.scene.add(entityObject);

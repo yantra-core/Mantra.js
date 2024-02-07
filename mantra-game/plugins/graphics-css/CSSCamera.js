@@ -50,6 +50,7 @@ class CSSCamera {
     game.setZoom = this.zoom.bind(this); // TODO: legacy remove
 
     game.data.camera = {
+      mode: 'follow',
       position: {
         x: 0,
         y: 0
