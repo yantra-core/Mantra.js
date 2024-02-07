@@ -1,4 +1,6 @@
 // ThreeGraphics.js - Marak Squires 2023
+import { Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Vector3 } from 'three';
+
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
 import render from './lib/render.js';
@@ -12,11 +14,10 @@ import inflateTexture from './lib/inflateTexture.js';
 // import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 // import { FontLoader } from './lib/FontLoader.js'
 
-
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
   static removable = false;
-  static async = true; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
+  static async = false; // indicates that this plugin has async initialization and should not auto-emit a ready event on return
 
   constructor({ camera, cameraConfig } = {}) {
     super();
@@ -60,36 +61,16 @@ class ThreeGraphics extends GraphicsInterface {
       }
     }
 
-    // check to see if THREE scope is available, if not assume we need to inject it sequentially
-    if (typeof THREE === 'undefined') {
-      console.log('THREE is not defined, attempting to load it from vendor');
+    this.threeReady(game);
 
-      game.loadScripts([
-        '/vendor/three.min.js'
-      ], () => {
-        this.threeReady(game);
-        /*
-        this.loadFont('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (err, font) => {
-          this.threeReady(game);
-        })
-        */
-
-      });
-
-    } else {
-      this.threeReady(game);
-      /*
-        this.loadFont('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (err, font) => {
-      */
-    }
   }
 
   threeReady(game) {
 
-    this.scene = new THREE.Scene();
+    this.scene = new Scene();
 
     // Initialize the renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new WebGLRenderer({ antialias: true });
     // set to transparent
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -97,7 +78,7 @@ class ThreeGraphics extends GraphicsInterface {
     document.getElementById('gameHolder').appendChild(this.renderer.domElement);
 
     // Create and configure the camera
-    this.camera = new THREE.PerspectiveCamera(
+    this.camera = new PerspectiveCamera(
       this.cameraConfig.fov,
       this.cameraConfig.aspect,
       this.cameraConfig.near,
@@ -111,7 +92,7 @@ class ThreeGraphics extends GraphicsInterface {
     this.setupZoomControls();
 
     // Add a light source
-    const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+    const light = new HemisphereLight(0xffffbb, 0x080820, 1);
     this.scene.add(light);
 
 
@@ -120,15 +101,13 @@ class ThreeGraphics extends GraphicsInterface {
 
     // Position the camera for a bird's eye view
     this.camera.position.set(0, 0, 0);
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+    this.camera.lookAt(new Vector3(0, 0, 0));
     // TODO: Initialize controls for camera interaction
-    // this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     // this.controls.enableZoom = true; // Enable zooming
 
     // async:true plugins *must* self report when they are ready
-    game.emit('plugin::ready::graphics-three', this);
-    // TODO: remove this line from plugin implementations
-    game.loadingPluginsCount--;
+    // game.emit('plugin::ready::graphics-three', this);
 
     game.graphics.push(this);
 
@@ -190,7 +169,7 @@ class ThreeGraphics extends GraphicsInterface {
         const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
         if (playerGraphic) {
           // Calculate the new camera position with a slight offset above and behind the player
-          const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
+          const newPosition = playerGraphic.position.clone().add(new Vector3(0, 150, -100));
           const lookAtPosition = playerGraphic.position.clone();
 
           // Use a smaller lerp factor for smoother camera movement
@@ -200,13 +179,12 @@ class ThreeGraphics extends GraphicsInterface {
 
       }
 
-      // TODO: Better platform camera, see CSSGraphics.js for example
       if (game.data.camera.mode === 'platform') {
 
         const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
         if (playerGraphic) {
           // Calculate the new camera position with a slight offset above and behind the player
-          const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
+          const newPosition = playerGraphic.position.clone().add(new Vector3(0, 150, -100));
           const lookAtPosition = playerGraphic.position.clone();
 
           // Use a smaller lerp factor for smoother camera movement
@@ -280,7 +258,7 @@ class ThreeGraphics extends GraphicsInterface {
     playerGraphic.visible = false;
 
     // Assume the player's "eyes" are located at some offset
-    const eyePositionOffset = new THREE.Vector3(0, 1.6, 0); // Adjust Y offset to represent the player's eye level
+    const eyePositionOffset = new Vector3(0, 1.6, 0); // Adjust Y offset to represent the player's eye level
     const playerPosition = playerGraphic.position.clone();
 
     // Position the camera at the player's eye level
@@ -288,7 +266,7 @@ class ThreeGraphics extends GraphicsInterface {
 
     // Assuming the player's forward direction is along the negative Z-axis of the player's local space
     // We need to find the forward direction in world space
-    const forwardDirection = new THREE.Vector3(0, 0, 0);
+    const forwardDirection = new Vector3(0, 0, 0);
     forwardDirection.applyQuaternion(playerGraphic.quaternion); // Convert local forward direction to world space
 
     // Look in the forward direction from the current camera position

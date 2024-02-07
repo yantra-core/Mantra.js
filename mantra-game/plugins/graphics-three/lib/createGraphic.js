@@ -1,3 +1,5 @@
+import { MeshBasicMaterial, BoxGeometry, Mesh, Group } from 'three';
+
 export default function createGraphic(entityData) {
   // Early exit if entity is marked as destroyed
   if (entityData.destroyed === true) {
@@ -45,7 +47,7 @@ function processModel(model) {
   const clonedModel = model.clone();
   clonedModel.traverse((child) => {
     if (child.isMesh) {
-      child.material = new THREE.MeshBasicMaterial({
+      child.material = new MeshBasicMaterial({
         color: 0xff0000, // Applying a red color for visibility
       });
     }
@@ -57,32 +59,32 @@ function processModel(model) {
 
 function createGeometryForEntity(entityData) {
   let geometry, material, mesh;
-  const entityGroup = new THREE.Group();
+  const entityGroup = new Group();
 
   // Define geometry based on entity type
   switch (entityData.type) {
     case 'BORDER':
-      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
+      geometry = new BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'PLAYER':
-      geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
+      geometry = new BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'BULLET':
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
+      geometry = new BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
     case 'BLOCK':
     case 'TILE':
     default:
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
+      geometry = new BoxGeometry(entityData.width, entityData.depth, entityData.height);
   }
 
   // Create material (color or texture)
-  material = new THREE.MeshBasicMaterial({
+  material = new MeshBasicMaterial({
     color: entityData.color || 0xffffff, // Default to white if no color specified
   });
 
   // Create mesh and add it to the group
-  mesh = new THREE.Mesh(geometry, material);
+  mesh = new Mesh(geometry, material);
   if (entityData.type === 'TEXT') {
     mesh.visible = false; // Hide text meshes for now
   }

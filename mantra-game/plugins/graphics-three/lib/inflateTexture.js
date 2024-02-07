@@ -1,3 +1,5 @@
+import { TextureLoader } from 'three';
+
 export default async function inflateTexture(entityData) {
   if (!entityData.texture) return;
 
@@ -89,7 +91,7 @@ async function getCachedTexture(url) {
 }
 
 async function loadTexture(url) {
-  const textureLoader = new THREE.TextureLoader();
+  const textureLoader = new TextureLoader();
   try {
     return await new Promise((resolve, reject) => {
       textureLoader.load(url, resolve, undefined, reject);
@@ -245,7 +247,7 @@ function customizeBoxUVs(geometry, textureWidth, textureHeight) {
 
   // Function to apply or update texture
   const applyOrUpdateTexture = (texUrl, spriteData) => {
-    const textureLoader = new THREE.TextureLoader();
+    const textureLoader = new TextureLoader();
     textureLoader.load(texUrl, (loadedTexture) => {
       if (mesh.material.map && mesh.material.map.image.src === texUrl) {
         // Texture already exists, just update the sprite sheet
@@ -258,7 +260,7 @@ function customizeBoxUVs(geometry, textureWidth, textureHeight) {
         mesh.material.needsUpdate = true;
 
         if (entityData.color) {
-          const color = new THREE.Color(entityData.color);
+          const color = new Color(entityData.color);
           mesh.material.color.set(color);
         }
 
