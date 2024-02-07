@@ -1,7 +1,7 @@
 // Remark: Won't build with current tools
 // import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
-export default async function (asset) {
+export default async function FBXLoader (asset) {
   console.log("incoming asset", asset);
   // Ensure asset.url or a similar property holds the path to your FBX file
   const modelUrl = asset.url; // Assuming 'url' is the property holding the path to the FBX file

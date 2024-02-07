@@ -40,7 +40,7 @@ export default class Preloader {
         await this.loadImage(asset);
         asset.loaded = true;
         break;
-      case 'model':
+      case 'model-fbx':
         let model = await this.loadModel(asset);
         asset.loaded = true;
         asset.loadedModel = model;
@@ -48,10 +48,8 @@ export default class Preloader {
   
       // Other cases for different asset types
       default: 
-        if(this.loaders[asset.type]){
-          await this.loaders[asset.type](asset);
-          asset.loaded = true;
-        } //else default to nothing
+        throw new Error('Unknown asset type: ' + asset.type);
+      break;
     }
   }
 
