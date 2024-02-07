@@ -3,7 +3,10 @@ import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 import Collisions from '../collisions/Collisions.js';
 
+import collisionStart from './lib/collisionStart.js';
 import collisionActive from './lib/collisionActive.js';
+import collisionEnd from './lib/collisionEnd.js';
+
 import onAfterUpdate from './lib/onAfterUpdate.js';
 import setBodySize from './lib/setBodySize.js';
 import lockedProperties from './lib/lockedProperties.js';
@@ -36,7 +39,9 @@ class MatterPhysics extends PhysicsInterface {
     //
     // collisionEnd is currently not being used
     //
+    this.collisionStart = collisionStart.bind(this);
     this.collisionActive = collisionActive.bind(this);
+    this.collisionEnd = collisionEnd.bind(this);
     this.onAfterUpdate = onAfterUpdate.bind(this);
     this.setBodySize = setBodySize.bind(this);
     this.lockedProperties = lockedProperties.bind(this);
@@ -91,7 +96,6 @@ class MatterPhysics extends PhysicsInterface {
 
   }
 
-
   initDirectMode() {
     let game = this.game;
     this.engine = Matter.Engine.create()
@@ -125,7 +129,12 @@ class MatterPhysics extends PhysicsInterface {
     // should this be onAfterUpdate? since we are serializing the state of the world?
     // i would assume we want that data *after* the update?
     let that = this;
-    this.onAfterUpdate(this.engine, this.onAfterUpdate);
+
+    Matter.Events.on(this.engine, 'afterUpdate', function(event){
+      that.onAfterUpdate(that.engine, that.game);
+    });
+  
+    //this.onAfterUpdate(this.engine, this.onAfterUpdate);
 
     // TODO: configurable collision plugins
     game.use(new Collisions());
@@ -196,7 +205,7 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   onAfterUpdate(engine, callback) {
-    Matter.Events.on(engine, 'afterUpdate', callback);
+    // Matter.Events.on(engine, 'afterUpdate', callback);
   }
 
   setRotation(body, rotation) {
@@ -214,41 +223,7 @@ class MatterPhysics extends PhysicsInterface {
   // Remark: These namespaces collisionStart, collisionActive, etc, are considerd from ECS perspective
   // If we register this plugin as a system these methods will be called on the system update, which is not what we want
   // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
-  collisionStart(game, callback) {
-    Matter.Events.on(this.engine, 'collisionStart', (event) => {
-      for (let pair of event.pairs) {
-        const bodyA = pair.bodyA;
-        const bodyB = pair.bodyB;
 
-        const entityIdA = bodyA.myEntityId;
-        const entityIdB = bodyB.myEntityId;
-
-        const entityA = this.game.getEntity(entityIdA);
-        const entityB = this.game.getEntity(entityIdB);
-
-        bodyA.entity = entityA;
-        bodyB.entity = entityB;
-
-        if (bodyA.entity.collisionStart === true || bodyB.entity.collisionStart === true) {
-          game.emit('collisionStart', { pair, bodyA, bodyB })
-          callback(pair, bodyA, bodyB);
-        }
-      }
-    });
-  }
-
-  collisionEnd(game, callback) {
-    Matter.Events.on(this.engine, 'collisionEnd', (event) => {
-      for (let pair of event.pairs) {
-        const bodyA = pair.bodyA;
-        const bodyB = pair.bodyB;
-        if (bodyA.entity.collisionEnd === true || bodyB.entity.collisionEnd === true) {
-          game.emit('collision::end', { pair, bodyA, bodyB })
-          callback(pair, bodyA, bodyB);
-        }
-      }
-    });
-  }
 
   // Remark: This may not work as expected, since the callback is not the same function reference
   // TODO: remove anonymous functions for collision handlers and have them be returned named functions
@@ -264,18 +239,19 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Events.off(this.engine, 'collisionEnd', callback);
   }
 
+  limitSpeed(body, maxSpeed) {
+    let speed = Matter.Vector.magnitude(body.velocity);
+    if (speed > maxSpeed) {
+      let newVelocity = Matter.Vector.mult(Matter.Vector.normalise(body.velocity), maxSpeed);
+      Matter.Body.setVelocity(body, newVelocity);
+    }
+  }
+
+  truncateToStringWithPrecision = (value, precision = 3) => {
+    return value.toFixed(precision);
+  };
+  
+
 }
 
 export default MatterPhysics;
-
-function limitSpeed(body, maxSpeed) {
-  let speed = Matter.Vector.magnitude(body.velocity);
-  if (speed > maxSpeed) {
-    let newVelocity = Matter.Vector.mult(Matter.Vector.normalise(body.velocity), maxSpeed);
-    Matter.Body.setVelocity(body, newVelocity);
-  }
-}
-
-const truncateToStringWithPrecision = (value, precision = 3) => {
-  return value.toFixed(precision);
-};

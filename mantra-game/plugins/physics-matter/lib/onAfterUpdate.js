@@ -1,5 +1,6 @@
 export default function onAfterUpdate(event) {
   let Matter = this.Matter;
+  let that = this;
 
   // show total number of bodies in the world
   // Remark: should this and bodyMap be replaced with a more generic mapping
@@ -18,7 +19,7 @@ export default function onAfterUpdate(event) {
       if (entity.maxSpeed) {
         maxSpeed = entity.maxSpeed;
       }
-      limitSpeed(body, maxSpeed);
+      that.limitSpeed(body, maxSpeed);
 
       //
       // Apply locked properties  ( like entity cannot move x or y position, etc )
@@ -47,12 +48,12 @@ export default function onAfterUpdate(event) {
           // check if body position has changed
 
           let bodyPosition = {
-            x: truncateToStringWithPrecision(body.position.x, 3),
-            y: truncateToStringWithPrecision(body.position.y, 3)
+            x: that.truncateToStringWithPrecision(body.position.x, 3),
+            y: that.truncateToStringWithPrecision(body.position.y, 3)
           };
           let entPosition = {
-            x: truncateToStringWithPrecision(ent.position.x, 3),
-            y: truncateToStringWithPrecision(ent.position.y, 3)
+            x: that.truncateToStringWithPrecision(ent.position.x, 3),
+            y: that.truncateToStringWithPrecision(ent.position.y, 3)
           }
 
           // TODO: add this same kind of logic for server as well?
