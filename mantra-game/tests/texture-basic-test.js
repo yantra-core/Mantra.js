@@ -142,10 +142,7 @@ tap.test('Basic Texture Tests', (t) => {
 
   t.test('Can get fbx model based on entityData.texture', async (t) => {
 
-    let gameSheet =  {
-      type: 'model',
-      url: '/game/models/characterMedium.fbx'
-    };
+    let modelOptions =  {}; // TODO: similar to spritesheet, add model options
 
     game.preloader.loadModel = function stub () {
       return {
@@ -153,7 +150,7 @@ tap.test('Basic Texture Tests', (t) => {
       };
     }
 
-    game.preloader.addAsset('mock-url-3', 'model-fbx', 'customModel', gameSheet);
+    game.preloader.addAsset('mock-url-3', 'model-fbx', 'customModel', modelOptions);
 
     await game.preloader.loadAll();
 
