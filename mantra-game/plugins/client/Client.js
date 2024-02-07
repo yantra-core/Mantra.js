@@ -66,6 +66,11 @@ export default class Client {
           continue;
         }
 
+        if (asset.type === 'model' || 'model-fbx') {
+          preloader.addAsset(asset.url, 'model-fbx', key, asset);
+          continue;
+        }
+
         // preloader.addAsset(defaultAssets[key], 'image', key);
       }
 

@@ -52,6 +52,14 @@ class ThreeGraphics extends GraphicsInterface {
     this.game = game;
     this.game.systemsManager.addSystem('graphics-three', this);
 
+    game.data.camera = {
+      mode: 'follow',
+      position: {
+        x: 0,
+        y: 0
+      }
+    }
+
     // check to see if THREE scope is available, if not assume we need to inject it sequentially
     if (typeof THREE === 'undefined') {
       console.log('THREE is not defined, attempting to load it from vendor');
@@ -82,6 +90,8 @@ class ThreeGraphics extends GraphicsInterface {
 
     // Initialize the renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    // set to transparent
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.domElement.id = 'three-render-canvas';
     document.getElementById('gameHolder').appendChild(this.renderer.domElement);
@@ -103,6 +113,7 @@ class ThreeGraphics extends GraphicsInterface {
     // Add a light source
     const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
     this.scene.add(light);
+
 
     // Notify the system that graphics are ready
     // game.graphicsReady.push(this.name);
@@ -174,7 +185,6 @@ class ThreeGraphics extends GraphicsInterface {
         this.setFirstPersonView();
       }
 
-
       if (game.data.camera.mode === 'follow') {
 
         const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
@@ -190,6 +200,21 @@ class ThreeGraphics extends GraphicsInterface {
 
       }
 
+      // TODO: Better platform camera, see CSSGraphics.js for example
+      if (game.data.camera.mode === 'platform') {
+
+        const playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
+        if (playerGraphic) {
+          // Calculate the new camera position with a slight offset above and behind the player
+          const newPosition = playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
+          const lookAtPosition = playerGraphic.position.clone();
+
+          // Use a smaller lerp factor for smoother camera movement
+          this.camera.position.lerp(newPosition, 0.05);
+          this.camera.lookAt(lookAtPosition);
+        }
+
+      }
 
     }
   }

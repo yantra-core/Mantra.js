@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra Home World</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+  <script type="module" src="/ycraft.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async (event) => {
+
+      // check to see if query string has tilemap variable
+      // if so, load that tilemap
+      let graphics = 'three';
+      let mode = 'topdown';
+
+
+
+      let fieldOfView = 96;
+
+      if (graphics === 'three' || graphics === 'babylon') {
+        fieldOfView = 256;
+      }
+
+      //fieldOfView = 1024;
+      let game = new MANTRA.Game({
+        defaultPlayer: true,
+        defaultMovement: true,
+        mode: mode,
+        fieldOfView: fieldOfView,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: [graphics], // array enum, 'babylon', 'phaser', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '../',
+          assetRoot: '../'
+        }
+      });
+
+      game.use('Sutra');
+      game.use('RBush');
+      game.use('Bullet');
+      game.use('Bomb');
+      game.use('Block', {
+        MIN_BLOCK_SIZE: 100,
+      });
+      game.use('CurrentFPS');
+
+      game.use('Gamepad');
+      game.use('GamepadGUI');
+
+
+      game.preloader.addAsset('./game/models/characterMedium.fbx', 'model-fbx', 'customModel');
+      // should not need to preload here, since game.start() will preload all assets
+      // await game.preloader.loadAll();
+      game.start(function () {
+        game.setBackground('#ff0000');
+      
+
+      });
+      window.game = game;
+
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

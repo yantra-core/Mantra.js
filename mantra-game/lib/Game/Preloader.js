@@ -1,3 +1,5 @@
+// import FBXLoader from "./Preloader/FBXLoader.js";
+
 export default class Preloader {
   constructor(game, { assets = [] } = {}) {
     this.assets = assets;
@@ -19,7 +21,6 @@ export default class Preloader {
   async loadAll() {
     let game = this.game;
     const loadPromises = this.assets.map(asset => this.loadAsset(asset));
-    console.log('loading all assets', loadPromises.length)
     await Promise.all(loadPromises);
     game.emit('preloader::loaded');
   }
@@ -38,14 +39,23 @@ export default class Preloader {
         await this.loadImage(asset);
         asset.loaded = true;
         break;
-
+      case 'model-fbx':
+        let model = await this.loadModel(asset);
+        asset.loaded = true;
+        asset.loadedModel = model;
+        break;
+  
       // Other cases for different asset types
       default: 
-        if(this.loaders[asset.type]){
-          await this.loaders[asset.type](asset);
-          asset.loaded = true;
-        } //else default to nothing
+        throw new Error('Unknown asset type: ' + asset.type);
+      break;
     }
+  }
+
+  async loadModel (asset) {
+    // assume three fbx ( for now )
+    let model = FBXLoader(asset, this.root);
+    return model;
   }
 
   async loadImage(asset) {

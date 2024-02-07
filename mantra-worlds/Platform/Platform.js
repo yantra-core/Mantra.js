@@ -15,13 +15,7 @@ class Platform {
     this.createWorld();
   }
 
-  unload () {
-    let game = this.game;
-    // reset camera mode
-    game.data.camera.mode = null;
-    // remove event listeners
-    // game.off('entityInput::handleInputs', this.handleInputs);
-  }
+  unload () {}
 
   createWorld() {
 

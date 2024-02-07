@@ -152,6 +152,13 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.inflateTexture = _inflateTexture["default"].bind(this);
       this.game = game;
       this.game.systemsManager.addSystem('graphics-three', this);
+      game.data.camera = {
+        mode: 'follow',
+        position: {
+          x: 0,
+          y: 0
+        }
+      };
 
       // check to see if THREE scope is available, if not assume we need to inject it sequentially
       if (typeof THREE === 'undefined') {
@@ -180,6 +187,8 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.renderer = new THREE.WebGLRenderer({
         antialias: true
       });
+      // set to transparent
+      this.renderer.setClearColor(0x000000, 0);
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.domElement.id = 'three-render-canvas';
       document.getElementById('gameHolder').appendChild(this.renderer.domElement);
@@ -277,6 +286,20 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             // Use a smaller lerp factor for smoother camera movement
             this.camera.position.lerp(newPosition, 0.05);
             this.camera.lookAt(lookAtPosition);
+          }
+        }
+
+        // TODO: Better platform camera, see CSSGraphics.js for example
+        if (game.data.camera.mode === 'platform') {
+          var _playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
+          if (_playerGraphic) {
+            // Calculate the new camera position with a slight offset above and behind the player
+            var _newPosition = _playerGraphic.position.clone().add(new THREE.Vector3(0, 150, -100));
+            var _lookAtPosition = _playerGraphic.position.clone();
+
+            // Use a smaller lerp factor for smoother camera movement
+            this.camera.position.lerp(_newPosition, 0.05);
+            this.camera.lookAt(_lookAtPosition);
           }
         }
       }
@@ -385,77 +408,97 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createGraphic;
 function createGraphic(entityData) {
-  var geometry, material, mesh;
-  // console.log('createGraphic', entityData)
-  // Geometry setup based on entity type
-
+  // Early exit if entity is marked as destroyed
   if (entityData.destroyed === true) {
-    // ignore, shouldn't have made it here, check upstream as well
+    console.log("Entity is destroyed, skipping creation.");
     return;
   }
+
+  // Attempt to retrieve texture and model data
+  // console.log("fetching texture", entityData, entityData.texture)
+  var texture = game.getTexture(entityData.texture);
+  // console.log("Creating entity with texture:", texture);
+
+  // Define a variable to hold the main object for the entity (model or group)
+  var entityObject;
+
+  // Check if there is a model associated with the texture
+  if (texture && texture.model) {
+    //console.log("Using existing model for entity.");
+    entityObject = processModel(texture.model);
+    //entityObject = createGeometryForEntity(entityData);
+
+    //console.log('entityObject after processModel()', entityObject);
+  } else {
+    // console.log("Creating new geometry for entity.");
+    entityObject = createGeometryForEntity(entityData);
+  }
+
+  // Set entity position and add to the scene
+  if (typeof entityData.position.z !== 'number') {
+    entityData.position.z = 0;
+  }
+
+  // console.log('setting position of entityObject', entityObject, entityData.position);
+  entityObject.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+  entityObject.visible = true; // Ensure the entity is visible
+  this.scene.add(entityObject);
+
+  // Save the entity object in the game's component system
+  this.game.components.graphics.set([entityData.id, 'graphics-three'], entityObject);
+  return entityObject;
+}
+function processModel(model) {
+  var clonedModel = model.clone();
+  clonedModel.traverse(function (child) {
+    if (child.isMesh) {
+      child.material = new THREE.MeshBasicMaterial({
+        color: 0xff0000 // Applying a red color for visibility
+      });
+    }
+  });
+  // Set model scale or other transformations if needed
+  clonedModel.scale.set(1, 1, 1);
+  return clonedModel;
+}
+function createGeometryForEntity(entityData) {
+  var geometry, material, mesh;
+  var entityGroup = new THREE.Group();
+
+  // Define geometry based on entity type
   switch (entityData.type) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'PLAYER':
-      //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
     case 'BULLET':
-      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
-      // console.log('entityData.width', entityData.radius, entityData.radius, entityData.radius)
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
       break;
     case 'BLOCK':
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
-      break;
     case 'TILE':
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
-      break;
-    case 'not_implemented_TEXT':
-      // Ensure you have the font data loaded
-      var font = this.game.font; // Assuming you have a method to get the loaded font
-      if (font) {
-        // console.log('font', font);
-        // font has isFont, type, and data
-        /* TODO: this causes game to crash / not render? no error 
-        geometry = new THREE.TextGeometry(entityData.text, {
-          font: font,
-          size: entityData.size || 1,
-          height: entityData.height || 0.1,
-          curveSegments: 12,
-          bevelEnabled: false
-        });
-         */
-      } else {
-        console.warn("Font not loaded for text geometry");
-        return;
-      }
-      break;
     default:
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
   }
 
-  // Material setup - solid if color exists, wireframe otherwise
+  // Create material (color or texture)
   material = new THREE.MeshBasicMaterial({
     color: entityData.color || 0xffffff // Default to white if no color specified
-    // wireframe: !entityData.color,
   });
 
-  if (!geometry) return; // If geometry is not set (like missing font), exit early
-
-  // console.log('creating a new mesh', entityData, geometry, material)
+  // Create mesh and add it to the group
   mesh = new THREE.Mesh(geometry, material);
   if (entityData.type === 'TEXT') {
-    mesh.visible = false; // for now
+    mesh.visible = false; // Hide text meshes for now
   }
 
-  this.scene.add(mesh);
+  if (entityData.texture) {
+    mesh.visible = false; // Hide mesh until texture is loaded
+  }
 
-  // Setting position
-  mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
-  this.game.components.graphics.set([entityData.id, 'graphics-three'], mesh);
-  return mesh;
+  entityGroup.add(mesh);
+  return entityGroup;
 }
 
 },{}],4:[function(require,module,exports){
@@ -498,7 +541,8 @@ if (graphic.isRolling && !graphic.rollCompleted) {
   // Check if the rotation has reached 0
   if (graphic.rotation.x >= 0) {
     console.log("ROLLING");
-     graphic.rotation.x = 0; // Correct any overshoot
+
+    graphic.rotation.x = 0; // Correct any overshoot
     graphic.isRolling = false;
     graphic.rollCompleted = true; // Stop the animation
   }
@@ -510,9 +554,11 @@ if (graphic.isRolling && !graphic.rollCompleted) {
 if (graphic.isFadingIn && !graphic.fadeCompleted) {
   graphic.progress += 0.05; // Increment progress. Adjust speed with this value.
   if (graphic.progress > 1) graphic.progress = 1; // Ensure progress doesn't exceed 1
-   // Apply the easing function to the progress and then set the opacity
+
+  // Apply the easing function to the progress and then set the opacity
   graphic.material.opacity = easeInQuad(graphic.progress);
-   // Check if the animation is complete
+
+  // Check if the animation is complete
   if (graphic.progress === 1) {
     graphic.isFadingIn = false;
     graphic.fadeCompleted = true; // Stop the fade-in animation
@@ -535,210 +581,253 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-function inflateTexture(entityData) {
-  if (!entityData.texture) return;
-  var game = this.game;
-  var texture = game.getTexture(entityData.texture);
-  if (!texture) {
-    console.warn('Warning: Texture not found', entityData.texture);
-    return;
-  }
-  var mesh = entityData.graphics['graphics-three'];
-  if (!mesh) return; // Ensure the mesh exists
-  return applyTextureToMesh(this.game, entityData, mesh);
+function inflateTexture(_x) {
+  return _inflateTexture.apply(this, arguments);
 }
-var texturePool = {};
-function applyTextureToMesh(_x, _x2, _x3) {
-  return _applyTextureToMesh.apply(this, arguments);
-}
-function _applyTextureToMesh() {
-  _applyTextureToMesh = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(game, entityData, mesh) {
-    var texture, cachedTexture, textureLoader, sprite, textureWidth, textureHeight, uvs, _cachedTexture;
+function _inflateTexture() {
+  _inflateTexture = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(entityData) {
+    var texture, entityGraphic;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
-          texture = game.getTexture(entityData.texture); // No game texture found for entity, return mesh
+          if (entityData.texture) {
+            _context.next = 2;
+            break;
+          }
+          return _context.abrupt("return");
+        case 2:
+          texture = this.game.getTexture(entityData.texture);
           if (texture) {
-            _context.next = 4;
+            _context.next = 6;
             break;
           }
-          mesh.visible = true;
-          return _context.abrupt("return", mesh);
-        case 4:
-          if (texture.url) {
-            _context.next = 7;
+          console.warn('Warning: Texture not found', entityData.texture);
+          return _context.abrupt("return");
+        case 6:
+          // Retrieve the entity's graphic component, which could be a Mesh or a Group
+          entityGraphic = entityData.graphics['graphics-three'];
+          if (entityGraphic) {
+            _context.next = 9;
             break;
           }
-          mesh.visible = true;
-          return _context.abrupt("return", mesh);
-        case 7:
-          cachedTexture = texturePool[texture.url]; // If the texture is not cached yet, or it's a Promise (still loading), handle accordingly
-          if (!(!cachedTexture || cachedTexture instanceof Promise)) {
-            _context.next = 13;
-            break;
-          }
-          if (!cachedTexture) {
-            // If not cached, start loading and cache the Promise
-            textureLoader = new THREE.TextureLoader(); // console.log("THREELOADER", textureLoader, texture.url)
-            cachedTexture = texturePool[texture.url] = new Promise(function (resolve, reject) {
-              textureLoader.load(texture.url, resolve, undefined, reject);
-            }).then(function (loadedTexture) {
-              // Once loaded, update the cache with the actual texture and return it
-              texturePool[texture.url] = loadedTexture;
-              return loadedTexture;
-            })["catch"](function (error) {
-              console.error('Error loading texture', texture.url, error);
-              return null; // Handle errors appropriately
-            });
-          }
-          // Await the Promise (either already existing or just created)
-          _context.next = 12;
-          return cachedTexture;
-        case 12:
-          cachedTexture = _context.sent;
-        case 13:
-          if (cachedTexture) {
-            _context.next = 16;
-            break;
-          }
-          mesh.visible = true;
-          return _context.abrupt("return", mesh);
-        case 16:
-          if (entityData.type === 'PLAYER') {
-            // console.log('loaded player', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
-          }
-          if (!(cachedTexture && cachedTexture.image && texture.sprite)) {
-            _context.next = 30;
-            break;
-          }
-          sprite = texture.sprite;
-          textureWidth = cachedTexture.image.width;
-          textureHeight = cachedTexture.image.height;
-          sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
-          sprite.height = sprite.height || 16;
-          uvs = {
-            x: -sprite.x / textureWidth,
-            y: -sprite.y / textureHeight,
-            width: sprite.width / textureWidth,
-            height: sprite.height / textureHeight
-          }; // create a clone of the cached texture
-          _cachedTexture = cachedTexture.clone();
-          _cachedTexture.repeat.set(uvs.width, uvs.height);
-          _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
-          mesh.material.map = _cachedTexture;
-          mesh.material.needsUpdate = true;
-          return _context.abrupt("return", mesh);
-        case 30:
-          // Apply the texture
-          mesh.material.map = cachedTexture;
-          mesh.material.needsUpdate = true;
-          mesh.visible = true;
-        case 33:
+          return _context.abrupt("return");
+        case 9:
+          _context.next = 11;
+          return applyTextureToEntityGraphic(this.game, entityData, entityGraphic);
+        case 11:
         case "end":
           return _context.stop();
       }
-    }, _callee);
+    }, _callee, this);
   }));
-  return _applyTextureToMesh.apply(this, arguments);
+  return _inflateTexture.apply(this, arguments);
 }
-function loadTexture(_x4) {
-  return _loadTexture.apply(this, arguments);
+function applyTextureToEntityGraphic(_x2, _x3, _x4) {
+  return _applyTextureToEntityGraphic.apply(this, arguments);
 }
-function _loadTexture() {
-  _loadTexture = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(url) {
-    var textureLoader;
+function _applyTextureToEntityGraphic() {
+  _applyTextureToEntityGraphic = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(game, entityData, entityGraphic) {
+    var texture, cachedTexture;
     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
       while (1) switch (_context2.prev = _context2.next) {
         case 0:
+          texture = game.getTexture(entityData.texture);
+          if (texture) {
+            _context2.next = 4;
+            break;
+          }
+          entityGraphic.visible = true; // No game texture found, ensure visibility and return
+          return _context2.abrupt("return");
+        case 4:
+          if (texture.url) {
+            _context2.next = 7;
+            break;
+          }
+          entityGraphic.visible = true; // Texture has no URL, ensure visibility and return
+          return _context2.abrupt("return");
+        case 7:
+          _context2.next = 9;
+          return getCachedTexture(texture.url);
+        case 9:
+          cachedTexture = _context2.sent;
+          if (cachedTexture) {
+            _context2.next = 13;
+            break;
+          }
+          entityGraphic.visible = true; // Texture failed to load, ensure visibility and return
+          return _context2.abrupt("return");
+        case 13:
+          // Traverse the entity graphic component and apply texture to all child meshes
+          entityGraphic.traverse(function (child) {
+            if (child.isMesh) {
+              applyTextureToMesh(child, cachedTexture, texture.sprite);
+            }
+          });
+        case 14:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2);
+  }));
+  return _applyTextureToEntityGraphic.apply(this, arguments);
+}
+function applyTextureToMesh(mesh, cachedTexture, sprite) {
+  // console.log("applyTextureToMesh", mesh, cachedTexture, sprite)
+  if (sprite) {
+    // Adjust UV mapping for sprites
+    var textureWidth = cachedTexture.image.width;
+    var textureHeight = cachedTexture.image.height;
+    var uvs = calculateSpriteUVs(sprite, textureWidth, textureHeight);
+
+    // Clone the cached texture to avoid altering the original cached texture
+    var clonedTexture = cachedTexture.clone();
+    clonedTexture.repeat.set(-uvs.width, uvs.height); // Flip texture on the X-axis by setting width to -uvs.width
+    clonedTexture.offset.set(uvs.x + uvs.width, 1 - uvs.y - uvs.height); // Adjust offset for the flipped texture
+
+    mesh.material.map = clonedTexture;
+  } else {
+    // For non-sprite textures that need to be flipped on the X-axis
+    var _clonedTexture = cachedTexture.clone();
+    _clonedTexture.repeat.set(-1, 1); // Flip texture on the X-axis
+    _clonedTexture.offset.set(1, 0); // Adjust offset for the flipped texture
+
+    mesh.material.map = _clonedTexture;
+  }
+  mesh.material.needsUpdate = true;
+  mesh.visible = true;
+}
+function calculateSpriteUVs(sprite, textureWidth, textureHeight) {
+  sprite.width = sprite.width || 16; // Default sprite width
+  sprite.height = sprite.height || 16; // Default sprite height
+
+  return {
+    x: Math.abs(sprite.x) / textureWidth,
+    y: Math.abs(sprite.y) / textureHeight,
+    width: sprite.width / textureWidth,
+    height: sprite.height / textureHeight
+  };
+}
+function getCachedTexture(_x5) {
+  return _getCachedTexture.apply(this, arguments);
+}
+function _getCachedTexture() {
+  _getCachedTexture = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(url) {
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          if (!texturePool[url]) {
+            // If the texture is not in the pool, load and cache it
+            texturePool[url] = loadTexture(url);
+          }
+          return _context3.abrupt("return", texturePool[url]);
+        case 2:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3);
+  }));
+  return _getCachedTexture.apply(this, arguments);
+}
+function loadTexture(_x6) {
+  return _loadTexture.apply(this, arguments);
+}
+function _loadTexture() {
+  _loadTexture = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(url) {
+    var textureLoader;
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
+        case 0:
           textureLoader = new THREE.TextureLoader();
-          _context2.prev = 1;
-          _context2.next = 4;
+          _context4.prev = 1;
+          _context4.next = 4;
           return new Promise(function (resolve, reject) {
             textureLoader.load(url, resolve, undefined, reject);
           });
         case 4:
-          return _context2.abrupt("return", _context2.sent);
+          return _context4.abrupt("return", _context4.sent);
         case 7:
-          _context2.prev = 7;
-          _context2.t0 = _context2["catch"](1);
-          console.error('Error loading texture', url, _context2.t0);
-          return _context2.abrupt("return", null);
-        case 11:
+          _context4.prev = 7;
+          _context4.t0 = _context4["catch"](1);
+          console.error('Error loading texture', url, _context4.t0);
+          delete texturePool[url]; // Remove failed load from cache
+          return _context4.abrupt("return", null);
+        case 12:
         case "end":
-          return _context2.stop();
+          return _context4.stop();
       }
-    }, _callee2, null, [[1, 7]]);
+    }, _callee4, null, [[1, 7]]);
   }));
   return _loadTexture.apply(this, arguments);
 }
+var texturePool = {}; // Texture cache
+
+/*
+
 function customizeBoxUVs(geometry) {
-  var uvAttribute = geometry.attributes.uv;
-  var uvArray = uvAttribute.array;
+  const uvAttribute = geometry.attributes.uv;
+  const uvArray = uvAttribute.array;
 
   // Common UVs for all faces to cover the entire texture
-  var commonUVs = [[0, 0],
-  // Bottom left
-  [1, 0],
-  // Bottom right
-  [1, 1],
-  // Top right
-  [0, 1] // Top left
+  const commonUVs = [
+    [0, 0], // Bottom left
+    [1, 0], // Bottom right
+    [1, 1], // Top right
+    [0, 1]  // Top left
   ];
-  var _loop = function _loop(faceIndex) {
+
+  for (let faceIndex = 0; faceIndex < 6; faceIndex++) {
     // Each face is two triangles, so 6 vertices in total
-    var vertexIndices = [0, 1, 2, 2, 3, 0].map(function (v) {
-      return v + faceIndex * 4;
-    });
-    vertexIndices.forEach(function (vertexIndex, uvIndex) {
+    const vertexIndices = [0, 1, 2, 2, 3, 0].map(v => v + faceIndex * 4);
+    vertexIndices.forEach((vertexIndex, uvIndex) => {
       uvArray[vertexIndex * 2] = commonUVs[uvIndex % 4][0]; // U coordinate
       uvArray[vertexIndex * 2 + 1] = commonUVs[uvIndex % 4][1]; // V coordinate
     });
-  };
-  for (var faceIndex = 0; faceIndex < 6; faceIndex++) {
-    _loop(faceIndex);
   }
 
   // Inform Three.js that the UVs have been updated
   uvAttribute.needsUpdate = true;
 }
+
 function getFaceUVs(texture, faceIndex) {
   // Calculate UVs based on the texture and which part of the texture you want to use for the face
   // This is a placeholder function, you need to implement the logic based on your texture layout and requirements
   // For example, you might divide the texture into sections and return UV coordinates for the section corresponding to the faceIndex
-  var sectionWidth = 1 / 3; // Assuming 3x2 sections in the texture
-  var sectionHeight = 1 / 2;
-  var x = faceIndex % 3 * sectionWidth;
-  var y = Math.floor(faceIndex / 3) * sectionHeight;
-  return [[x, y + sectionHeight],
-  // Bottom left
-  [x + sectionWidth, y + sectionHeight],
-  // Bottom right
-  [x + sectionWidth, y],
-  // Top right
-  [x, y] // Top left
+  const sectionWidth = 1 / 3; // Assuming 3x2 sections in the texture
+  const sectionHeight = 1 / 2;
+  const x = faceIndex % 3 * sectionWidth;
+  const y = Math.floor(faceIndex / 3) * sectionHeight;
+
+  return [
+    [x, y + sectionHeight], // Bottom left
+    [x + sectionWidth, y + sectionHeight], // Bottom right
+    [x + sectionWidth, y], // Top right
+    [x, y] // Top left
   ];
 }
+
 
 function customizeUVsForBox(faces) {
   // Customize UV mapping here based on your needs
   // This example divides the texture into quarters and applies each quarter to two faces of the box
-  var uvCoordinates = [[0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5],
-  // First quarter
-  [1, 1], [0.5, 1], [0.5, 0.5], [1, 0.5] // Second quarter
-  // Add more for other faces, adjusting the texture coordinates accordingly
+  const uvCoordinates = [
+    [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5], // First quarter
+    [1, 1], [0.5, 1], [0.5, 0.5], [1, 0.5], // Second quarter
+    // Add more for other faces, adjusting the texture coordinates accordingly
   ];
 
-  faces.forEach(function (face, index) {
-    var uvIndex = Math.floor(index / 2); // Assuming two triangles per face
-    var uvQuad = uvCoordinates[uvIndex];
-    face.forEach(function (vertex, vertexIndex) {
-      var uv = uvQuad[vertexIndex];
+  faces.forEach((face, index) => {
+    const uvIndex = Math.floor(index / 2); // Assuming two triangles per face
+    const uvQuad = uvCoordinates[uvIndex];
+
+    face.forEach((vertex, vertexIndex) => {
+      const uv = uvQuad[vertexIndex];
       vertex.x = uv[0];
       vertex.y = uv[1];
     });
   });
 }
 
+*/
 /*
 function customizeBoxUVs(geometry, textureWidth, textureHeight) {
   // Calculate the aspect ratio of the texture
@@ -867,15 +956,36 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 function removeGraphic(entityId) {
-  var mesh = this.game.components.graphics.get([entityId, 'graphics-three']);
-  if (mesh) {
-    if (mesh.parent) {
-      mesh.parent.remove(mesh);
+  var group = this.game.components.graphics.get([entityId, 'graphics-three']);
+  if (group) {
+    // Recursively dispose of group children
+    group.traverse(function (child) {
+      if (child.isMesh) {
+        if (child.geometry) {
+          child.geometry.dispose();
+        }
+        if (child.material) {
+          // If the material is an array of materials, dispose of each one
+          if (Array.isArray(child.material)) {
+            child.material.forEach(function (material) {
+              return material.dispose();
+            });
+          } else {
+            child.material.dispose();
+          }
+        }
+      }
+    });
+
+    // Remove the group from its parent
+    if (group.parent) {
+      group.parent.remove(group);
     }
-    this.scene.remove(mesh);
-    mesh.geometry.dispose();
-    mesh.material.dispose();
-    // mesh = undefined;
+
+    // Alternatively, you can remove the group directly from the scene if it's directly added to it
+    // this.scene.remove(group);
+
+    // Remove the reference from your game components
     this.game.components.graphics.remove([entityId, 'graphics-three']);
   }
 }

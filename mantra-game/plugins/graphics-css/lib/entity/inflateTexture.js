@@ -4,7 +4,7 @@ export default function inflateTexture(entityData, entityElement) {
 
   let texture = game.getTexture(entityData.texture);
   if (!texture) {
-    console.warn('Warning: Texture not found', entityData.texture);
+    // console.warn('Warning: Texture not found', entityData.texture);
     return;
   }
 

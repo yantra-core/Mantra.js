@@ -81,6 +81,10 @@ var Client = exports["default"] = /*#__PURE__*/function () {
             preloader.addAsset(asset.url, 'spritesheet', _key, asset);
             continue;
           }
+          if (asset.type === 'model' || 'model-fbx') {
+            preloader.addAsset(asset.url, 'model-fbx', _key, asset);
+            continue;
+          }
 
           // preloader.addAsset(defaultAssets[key], 'image', key);
         }
@@ -706,6 +710,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var defaultAssets = {
+  /*
+  'characterMedium': {
+    type: 'model',
+    url: '/game/models/characterMedium.fbx'
+  },
+  */
   'pixel': '/img/game/pixel.png',
   'pixel-black': '/img/game/pixel-black.png',
   'player': '/img/game/link-walk/sprite_0.png',
