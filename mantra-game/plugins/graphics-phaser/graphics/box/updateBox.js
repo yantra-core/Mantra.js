@@ -8,6 +8,10 @@ export default function updateBox(entityData, graphic, game) {
   if (typeof entityData.texture !== 'undefined') {
 
     let texture = game.getTexture(entityData.texture);
+    if (!texture) {
+      return graphic;
+    }
+
     let textureUrl = texture.url;
     let spritePosition = texture.sprite || { x: 0, y: 0 };
     if (typeof entityData.texture.frame === 'number') {
