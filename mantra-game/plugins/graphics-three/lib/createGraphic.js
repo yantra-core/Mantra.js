@@ -1,103 +1,88 @@
 export default function createGraphic(entityData) {
-  let geometry, material, mesh;
-  // console.log('createGraphic', entityData)
-  // Geometry setup based on entity type
-
+  // Early exit if entity is marked as destroyed
   if (entityData.destroyed === true) {
-    // ignore, shouldn't have made it here, check upstream as well
+    console.log("Entity is destroyed, skipping creation.");
     return;
   }
 
-
-  // check to see if there is texture data or a model to use
+  // Attempt to retrieve texture and model data
+  console.log("fetching texture", entityData, entityData.texture)
   let texture = game.getTexture(entityData.texture);
+  console.log("Creating entity with texture:", texture);
 
-  console.log("creating ent with text", texture)
+  // Define a variable to hold the main object for the entity (model or group)
+  let entityObject;
 
-  // Create a group to hold the entity's components
-  let entityGroup;
-  
+  // Check if there is a model associated with the texture
   if (texture && texture.model) {
-    entityGroup = texture.model;
-    console.log("assigning text", texture)
-    // set size of entityGroup
-    // entityGroup.scale.set(entityData.width, entityData.depth, entityData.height);
-    entityGroup.scale.set(1, 1, 1);
-
+    console.log("Using existing model for entity.");
+    entityObject = processModel(texture.model);
   } else {
-    entityGroup = new THREE.Group();
+    console.log("Creating new geometry for entity.");
+    entityObject = createGeometryForEntity(entityData);
   }
-  
 
+  // Set entity position and add to the scene
+  if (typeof entityData.position.z !== 'number') {
+    entityData.position.z = 0;
+  }
+  entityObject.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+  entityObject.visible = true; // Ensure the entity is visible
+  this.scene.add(entityObject);
+
+  // Save the entity object in the game's component system
+  this.game.components.graphics.set([entityData.id, 'graphics-three'], entityObject);
+
+  return entityObject;
+}
+
+function processModel(model) {
+  const clonedModel = model.clone();
+  clonedModel.traverse((child) => {
+    if (child.isMesh) {
+      child.material = new THREE.MeshBasicMaterial({
+        color: 0xff0000, // Applying a red color for visibility
+      });
+    }
+  });
+  // Set model scale or other transformations if needed
+  clonedModel.scale.set(1, 1, 1);
+  return clonedModel;
+}
+
+function createGeometryForEntity(entityData) {
+  let geometry, material, mesh;
+  const entityGroup = new THREE.Group();
+
+  // Define geometry based on entity type
   switch (entityData.type) {
     case 'BORDER':
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
       break;
-
     case 'PLAYER':
-      //      geometry = new THREE.CylinderGeometry(0, entityData.width, entityData.height, 3);
       geometry = new THREE.BoxGeometry(entityData.width, 1, entityData.height);
-
-
       break;
     case 'BULLET':
-      // geometry = new THREE.SphereGeometry(entityData.radius, 32, 32);
-      // console.log('entityData.width', entityData.radius, entityData.radius, entityData.radius)
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
-
       break;
-
     case 'BLOCK':
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
-      break;
-
     case 'TILE':
-      geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
-      break;
-
-
     default:
       geometry = new THREE.BoxGeometry(entityData.width, entityData.depth, entityData.height);
   }
 
-  // Material setup - solid if color exists, wireframe otherwise
+  // Create material (color or texture)
   material = new THREE.MeshBasicMaterial({
     color: entityData.color || 0xffffff, // Default to white if no color specified
-    // wireframe: !entityData.color,
   });
 
-  if (!geometry) return; // If geometry is not set (like missing font), exit early
-
-  // console.log('creating a new mesh', entityData, geometry, material)
+  // Create mesh and add it to the group
   mesh = new THREE.Mesh(geometry, material);
-
   if (entityData.type === 'TEXT') {
-    mesh.visible = false; // for now
+    mesh.visible = false; // Hide text meshes for now
   }
-
-  console.log(entityGroup.position);
-  console.log(entityGroup.scale);
-  
-  // TODO doesnt this only get set if we don't have a default model mesh?
-  // Before adding the mesh, check if the entityGroup was just created (and doesn't contain a model from texture)
-  if (!texture || !texture.model) {
-    entityGroup.add(mesh);
-  }
-  
-  entityGroup.traverse((child) => {
-    child.visible = true;
-  });
-
-  this.scene.add(entityGroup);
-
-  // Setting position
-   entityGroup.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
-  //entityGroup.position.set(0, 0, 0);
-
-  this.game.components.graphics.set([entityData.id, 'graphics-three'], entityGroup);
-  entityGroup.visible = true;
-  entityGroup.needsUpdate = true;
-  //this.inflateTexture(entityData, entityGroup);
+  entityGroup.add(mesh);
 
   return entityGroup;
 }
+

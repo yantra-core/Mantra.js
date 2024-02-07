@@ -1,120 +1,92 @@
-export default function inflateTexture(entityData) {
+export default async function inflateTexture(entityData) {
   if (!entityData.texture) return;
 
-  let game = this.game;
-  let texture = game.getTexture(entityData.texture);
-
+  let texture = this.game.getTexture(entityData.texture);
   if (!texture) {
-    // console.warn('Warning: Texture not found', entityData.texture);
+    console.warn('Warning: Texture not found', entityData.texture);
     return;
   }
 
-  let mesh = entityData.graphics['graphics-three'];
-  if (!mesh) return; // Ensure the mesh exists
-  return applyTextureToMesh(this.game, entityData, mesh)
+  // Retrieve the entity's graphic component, which could be a Mesh or a Group
+  let entityGraphic = entityData.graphics['graphics-three'];
+  if (!entityGraphic) return; // Ensure the entity graphic component exists
 
+  // Apply texture to all meshes within the entity graphic component
+  await applyTextureToEntityGraphic(this.game, entityData, entityGraphic);
 }
 
-let texturePool = {};
-
-async function applyTextureToMesh(game, entityData, mesh) {
+async function applyTextureToEntityGraphic(game, entityData, entityGraphic) {
   let texture = game.getTexture(entityData.texture);
 
-  // No game texture found for entity, return mesh
+  console.log("applyTextureToEntityGraphic", texture, entityGraphic)
   if (!texture) {
-    mesh.visible = true;
-    return mesh;
+    entityGraphic.visible = true; // No game texture found, ensure visibility and return
+    return;
   }
 
-  /*
- // Assuming texture.model is a THREE.Material instance
- if (texture.model) {
-  console.log('texture.model', texture.model);
+  if (!texture.url) {
+    entityGraphic.visible = true; // Texture has no URL, ensure visibility and return
+    return;
+  }
 
-  // Iterate over all child objects within the group
-  mesh.traverse((child) => {
-    // Check if the child is a mesh
+  let cachedTexture = await getCachedTexture(texture.url); // Load or get cached texture
+  if (!cachedTexture) {
+    entityGraphic.visible = true; // Texture failed to load, ensure visibility and return
+    return;
+  }
+
+  // console.log("HERE WE ARE", entityGraphic)
+
+  // Traverse the entity graphic component and apply texture to all child meshes
+  entityGraphic.traverse((child) => {
     if (child.isMesh) {
-      // Apply the material to the mesh
-      child.material = texture.model;
+      applyTextureToMesh(child, cachedTexture, texture.sprite);
     }
   });
 }
-*/
 
-  // If a game texture was found, but has no URL, no updates will be made, return mesh
-  if (!texture.url) {
-    mesh.visible = true;
-    return mesh;
-  }
-
-  let cachedTexture = texturePool[texture.url];
-
-  
-  // If the texture is not cached yet, or it's a Promise (still loading), handle accordingly
-  if (!cachedTexture || cachedTexture instanceof Promise) {
-    if (!cachedTexture) {
-      // If not cached, start loading and cache the Promise
-      const textureLoader = new THREE.TextureLoader();
-      // console.log("THREELOADER", textureLoader, texture.url)
-      cachedTexture = texturePool[texture.url] = new Promise((resolve, reject) => {
-        textureLoader.load(texture.url, resolve, undefined, reject);
-      }).then(loadedTexture => {
-        // Once loaded, update the cache with the actual texture and return it
-        texturePool[texture.url] = loadedTexture;
-        return loadedTexture;
-      }).catch(error => {
-        console.error('Error loading texture', texture.url, error);
-        return null; // Handle errors appropriately
-      });
-    }
-    // Await the Promise (either already existing or just created)
-    cachedTexture = await cachedTexture;
-
-  }
-  // If after awaiting, the cachedTexture is null (due to error or other reasons), return
-  if (!cachedTexture) {
-    mesh.visible = true;
-    return mesh;
-  }
-  if (entityData.type === 'PLAYER') {
-    // console.log('loaded player', entityData.type, texture.sprite, cachedTexture,  texture.url, texturePool[texture.url])
-  }
-
-
-  if (cachedTexture && cachedTexture.image && texture.sprite) {
-    const sprite = texture.sprite;
+function applyTextureToMesh(mesh, cachedTexture, sprite) {
+  // console.log("applyTextureToMesh", mesh, cachedTexture, sprite)
+  if (sprite) {
+    // Adjust UV mapping for sprites
     const textureWidth = cachedTexture.image.width;
     const textureHeight = cachedTexture.image.height;
-    sprite.width = sprite.width || 16; // Default sprite dimensions if not specified
-    sprite.height = sprite.height || 16;
+    //console.log('tttt', textureWidth, textureHeight)
+    const uvs = calculateSpriteUVs(sprite, textureWidth, textureHeight);
+    //console.log('eeee', uvs)
 
-    const uvs = {
-      x: -sprite.x / textureWidth,
-      y: -sprite.y / textureHeight,
-      width: sprite.width / textureWidth,
-      height: sprite.height / textureHeight
-    };
+    // Clone the cached texture to avoid altering the original cached texture
+    let clonedTexture = cachedTexture.clone();
+    clonedTexture.repeat.set(uvs.width, uvs.height);
+    clonedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
 
-    // create a clone of the cached texture
-    let _cachedTexture = cachedTexture.clone();
-
-    _cachedTexture.repeat.set(uvs.width, uvs.height);
-    _cachedTexture.offset.set(uvs.x, 1 - uvs.y - uvs.height);
-
-    
-
-    mesh.material.map = _cachedTexture;
-    mesh.material.needsUpdate = true;
-    return mesh;
+    mesh.material.map = clonedTexture;
+  } else {
+    // Apply the entire texture
+    mesh.material.map = cachedTexture;
   }
-
-
-  // Apply the texture
-  mesh.material.map = cachedTexture;
   mesh.material.needsUpdate = true;
   mesh.visible = true;
+}
 
+function calculateSpriteUVs(sprite, textureWidth, textureHeight) {
+  sprite.width = sprite.width || 16; // Default sprite width
+  sprite.height = sprite.height || 16; // Default sprite height
+
+  return {
+    x: Math.abs(sprite.x) / textureWidth,
+    y: Math.abs(sprite.y) / textureHeight,
+    width: sprite.width / textureWidth,
+    height: sprite.height / textureHeight
+  };
+}
+
+async function getCachedTexture(url) {
+  if (!texturePool[url]) {
+    // If the texture is not in the pool, load and cache it
+    texturePool[url] = loadTexture(url);
+  }
+  return texturePool[url];
 }
 
 async function loadTexture(url) {
@@ -125,9 +97,14 @@ async function loadTexture(url) {
     });
   } catch (error) {
     console.error('Error loading texture', url, error);
+    delete texturePool[url]; // Remove failed load from cache
     return null;
   }
 }
+
+let texturePool = {}; // Texture cache
+
+/*
 
 function customizeBoxUVs(geometry) {
   const uvAttribute = geometry.attributes.uv;
@@ -193,6 +170,7 @@ function customizeUVsForBox(faces) {
   });
 }
 
+*/
 /*
 function customizeBoxUVs(geometry, textureWidth, textureHeight) {
   // Calculate the aspect ratio of the texture
