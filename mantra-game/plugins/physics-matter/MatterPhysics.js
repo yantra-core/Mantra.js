@@ -10,6 +10,7 @@ import collisionEnd from './lib/collisionEnd.js';
 import onAfterUpdate from './lib/onAfterUpdate.js';
 import setBodySize from './lib/setBodySize.js';
 import lockedProperties from './lib/lockedProperties.js';
+import limitSpeed from './lib/limitSpeed.js';
 
 class MatterPhysics extends PhysicsInterface {
 
@@ -39,12 +40,17 @@ class MatterPhysics extends PhysicsInterface {
     //
     // collisionEnd is currently not being used
     //
+    // Remark: These namespaces collisionStart, collisionActive, etc, are considered from ECS perspective
+    // If we register this plugin as a system these methods will be called on the system update, which is not what we want
+    // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
+
     this.collisionStart = collisionStart.bind(this);
     this.collisionActive = collisionActive.bind(this);
     this.collisionEnd = collisionEnd.bind(this);
     this.onAfterUpdate = onAfterUpdate.bind(this);
     this.setBodySize = setBodySize.bind(this);
     this.lockedProperties = lockedProperties.bind(this);
+    this.limitSpeed = limitSpeed.bind(this);
 
   }
 
@@ -83,9 +89,6 @@ class MatterPhysics extends PhysicsInterface {
     }
   }
 
-
-    
-
   init(game) {
     this.game = game;
     if (this.useWorker) {
@@ -93,7 +96,6 @@ class MatterPhysics extends PhysicsInterface {
     } else {
       this.initDirectMode();
     }
-
   }
 
   initDirectMode() {
@@ -220,11 +222,6 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Body.setVelocity(body, velocity);
   }
 
-  // Remark: These namespaces collisionStart, collisionActive, etc, are considerd from ECS perspective
-  // If we register this plugin as a system these methods will be called on the system update, which is not what we want
-  // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
-
-
   // Remark: This may not work as expected, since the callback is not the same function reference
   // TODO: remove anonymous functions for collision handlers and have them be returned named functions
   removeCollisionStart(game, callback) {
@@ -239,18 +236,9 @@ class MatterPhysics extends PhysicsInterface {
     Matter.Events.off(this.engine, 'collisionEnd', callback);
   }
 
-  limitSpeed(body, maxSpeed) {
-    let speed = Matter.Vector.magnitude(body.velocity);
-    if (speed > maxSpeed) {
-      let newVelocity = Matter.Vector.mult(Matter.Vector.normalise(body.velocity), maxSpeed);
-      Matter.Body.setVelocity(body, newVelocity);
-    }
-  }
-
   truncateToStringWithPrecision = (value, precision = 3) => {
     return value.toFixed(precision);
   };
-  
 
 }
 
