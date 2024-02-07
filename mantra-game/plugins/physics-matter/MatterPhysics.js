@@ -3,6 +3,8 @@ import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 import Collisions from '../collisions/Collisions.js';
 
+
+import initEngine from './lib/initEngine.js';
 import collisionStart from './lib/collisionStart.js';
 import collisionActive from './lib/collisionActive.js';
 import collisionEnd from './lib/collisionEnd.js';
@@ -33,6 +35,7 @@ class MatterPhysics extends PhysicsInterface {
 
     this.Matter = Matter;
 
+
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
     //
@@ -44,6 +47,7 @@ class MatterPhysics extends PhysicsInterface {
     // If we register this plugin as a system these methods will be called on the system update, which is not what we want
     // In order to allow this plugin to be registered as a system, we would change these to _collisionStart, _collisionActive, etc
 
+    this.initEngine = initEngine.bind(this);
     this.collisionStart = collisionStart.bind(this);
     this.collisionActive = collisionActive.bind(this);
     this.collisionEnd = collisionEnd.bind(this);
@@ -53,6 +57,34 @@ class MatterPhysics extends PhysicsInterface {
     this.limitSpeed = limitSpeed.bind(this);
 
   }
+
+
+  wrapMethods() {
+    const methodNames = [
+      'collisionStart',
+      'collisionActive',
+      'collisionEnd',
+      'onAfterUpdate',
+      'setBodySize',
+      'lockedProperties',
+      'limitSpeed',
+      // Add other method names here...
+    ];
+
+    methodNames.forEach(methodName => {
+      const originalMethod = this[methodName];
+      this[methodName] = (...args) => {
+        if (this.useWorker) {
+          // Delegate to worker
+          this.postMessageToWorker(methodName, args);
+        } else {
+          // Call the original method
+          return originalMethod(...args);
+        }
+      };
+    });
+  }
+
 
   setGravity(x = 0, y = 0) {
     // console.log('setting gravity', x, y)
@@ -99,47 +131,7 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   initDirectMode() {
-    let game = this.game;
-    this.engine = Matter.Engine.create()
-    // game.systemsManager.addSystem('physics', this);
-
-    // TODO: register system
-    if (typeof game.config.gravity === 'undefined') {
-      game.config.gravity = { x: 0, y: 0 };
-    }
-
-    if (typeof game.config.gravity.x === 'undefined') {
-      game.config.gravity.x = 0;
-    }
-
-    if (typeof game.config.gravity.y === 'undefined') {
-      game.config.gravity.y = 0;
-    }
-
-    this.engine.gravity.x = game.config.gravity.x;
-    this.engine.gravity.y = game.config.gravity.y;
-    this.world = this.engine.world;
-
-    game.physics = this;
-    game.engine = this.engine;
-    game.world = this.world;
-
-    this.game = game;
-
-    game.physicsReady = true;
-
-    // should this be onAfterUpdate? since we are serializing the state of the world?
-    // i would assume we want that data *after* the update?
-    let that = this;
-
-    Matter.Events.on(this.engine, 'afterUpdate', function(event){
-      that.onAfterUpdate(that.engine, that.game);
-    });
-  
-    //this.onAfterUpdate(this.engine, this.onAfterUpdate);
-
-    // TODO: configurable collision plugins
-    game.use(new Collisions());
+    this.initEngine();
   }
 
   createBody(options) {
