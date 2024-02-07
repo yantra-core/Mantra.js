@@ -140,4 +140,39 @@ tap.test('Basic Texture Tests', (t) => {
     t.end();
   });
 
+  t.test('Can get fbx model based on entityData.texture', async (t) => {
+
+    let gameSheet =  {
+      type: 'model',
+      url: '/game/models/characterMedium.fbx'
+    };
+
+    game.preloader.loadModel = function stub () {
+      return {
+        // empty model, put meta here
+      };
+    }
+
+    game.preloader.addAsset('mock-url-3', 'model-fbx', 'customModel', gameSheet);
+
+    await game.preloader.loadAll();
+
+    // Verify all assets are marked as loaded
+    const allLoaded = game.preloader.assets.every(asset => asset.loaded);
+    t.ok(allLoaded, 'all assets are loaded');
+
+    let entityData = {
+      texture: {
+        model: 'customModel'
+      }
+    };
+    let texture = game.getTexture(entityData.texture);
+    t.ok(texture.url === mockRoot + 'mock-url-3', 'Texture url should match');
+    // key should be the same as the model name
+    t.ok(texture.key === 'customModel', 'Texture key should match');
+
+    t.end();
+  });
+
+
 });

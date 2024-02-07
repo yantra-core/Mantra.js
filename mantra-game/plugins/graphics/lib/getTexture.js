@@ -24,15 +24,15 @@ export default function getTexture(config) {
     return null;
   }
 
+  let url = game.assetRoot + t.url;
+
   if (t.loadedModel) {
     return {
-      url: t.url,
+      url: url,
       key: t.key,
       model: t.loadedModel
     };
   }
-
-  // TODO: perform switch here based on type of entity
 
   if (config && typeof config.sprite !== 'undefined') {
     let spriteName = config.sprite;
@@ -47,7 +47,6 @@ export default function getTexture(config) {
       let sprite = t.frameTags[spriteName].frames[frameIndex];
       let rate =  t.frameTags[spriteName].rate || 30;
       sprite.name = spriteName;
-      let url = game.assetRoot + t.url;
       return {
         key: t.key,
         url: url,
