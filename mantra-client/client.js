@@ -61,7 +61,7 @@ let game = new Game({
     y: 0
   },
   physics: 'matter', // 'matter', 'physx'
-  graphics: ['css'], // 'ascii', 'three', 'babylon', 'css', 'phaser', 'ascii'
+  graphics: ['three'], // 'ascii', 'three', 'babylon', 'css', 'phaser', 'ascii'
   collisions: true,
   gamepad: {
     useZoomSlider: false
@@ -115,6 +115,8 @@ game.use(new plugins.Schema());
 
 
 game.use(new plugins.Timers());
+// game.use(new plugins.ThreeGraphics());
+
 game.use('RBush')
 //game.use('Bullet')
 
@@ -219,9 +221,27 @@ if (mode === 'online') {
   --button-a: #f03025;
   --button-b: #e9dd34;
   */
+  game.setBackground('#ffffff');
+
+
+  // game.preloader.addAsset('./game/models/characterMedium.fbx', 'model-fbx', 'customModel');
 
   game.start(function () {
-    game.use(home);
+     game.use(home);
+
+
+    /*
+     game.createPlayer({
+      texture: {
+        model: 'customModel',
+      },
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+    */
+
 
     /*
     game.createEntity({

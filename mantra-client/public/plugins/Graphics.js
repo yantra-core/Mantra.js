@@ -307,7 +307,7 @@ function getTexture(config) {
 
   if (_typeof(assetName) === 'object') {
     // could be sprite sheet
-    assetName = config.sheet;
+    assetName = config.sheet || config.model;
   }
 
   // console.log('getting texture', config, assetName)
@@ -315,6 +315,13 @@ function getTexture(config) {
   t = game.preloader.getItem(assetName);
   if (typeof t === 'undefined') {
     return null;
+  }
+  if (t.loadedModel) {
+    return {
+      url: t.url,
+      key: t.key,
+      model: t.loadedModel
+    };
   }
 
   // TODO: perform switch here based on type of entity

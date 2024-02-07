@@ -17,6 +17,8 @@ export default function createGraphic(entityData) {
   if (texture && texture.model) {
     //console.log("Using existing model for entity.");
     entityObject = processModel(texture.model);
+    //entityObject = createGeometryForEntity(entityData);
+
     //console.log('entityObject after processModel()', entityObject);
   } else {
     // console.log("Creating new geometry for entity.");

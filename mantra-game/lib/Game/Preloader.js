@@ -1,4 +1,4 @@
-import FBXLoader from "./Preloader/FBXLoader.js";
+// import FBXLoader from "./Preloader/FBXLoader.js";
 
 export default class Preloader {
   constructor(game, { assets = [] } = {}) {
@@ -21,7 +21,6 @@ export default class Preloader {
   async loadAll() {
     let game = this.game;
     const loadPromises = this.assets.map(asset => this.loadAsset(asset));
-    console.log('loading all assets', loadPromises.length)
     await Promise.all(loadPromises);
     game.emit('preloader::loaded');
   }
@@ -55,9 +54,8 @@ export default class Preloader {
 
   async loadModel (asset) {
     // assume three fbx ( for now )
-    let model = FBXLoader(asset);
+    let model = FBXLoader(asset, this.root);
     return model;
-
   }
 
   async loadImage(asset) {

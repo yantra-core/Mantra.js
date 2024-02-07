@@ -5239,13 +5239,7 @@ var Platform = /*#__PURE__*/function () {
     }
   }, {
     key: "unload",
-    value: function unload() {
-      var game = this.game;
-      // reset camera mode
-      game.data.camera.mode = null;
-      // remove event listeners
-      // game.off('entityInput::handleInputs', this.handleInputs);
-    }
+    value: function unload() {}
   }, {
     key: "createWorld",
     value: function createWorld() {

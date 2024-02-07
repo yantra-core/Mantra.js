@@ -28,8 +28,6 @@ export default function inflateGraphic(entity, alpha) {
 }
 
 
-
-
 /*
 // Include the rolling animation logic// Include the rolling animation logic
 if (graphic.isRolling && !graphic.rollCompleted) {

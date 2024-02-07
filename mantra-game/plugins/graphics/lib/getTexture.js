@@ -38,7 +38,6 @@ export default function getTexture(config) {
     let spriteName = config.sprite;
     let frameIndex = 0;
 
-
     if (typeof config.frame === 'number') {
       frameIndex = config.frame;
     }

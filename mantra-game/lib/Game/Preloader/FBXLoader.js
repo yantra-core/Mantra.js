@@ -1,14 +1,15 @@
 // Remark: Won't build with current tools
-// import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
-export default async function FBXLoader (asset) {
-  console.log("incoming asset", asset);
+export default async function loader (asset, root) {
+  console.log("incoming asset", root, asset);
   // Ensure asset.url or a similar property holds the path to your FBX file
-  const modelUrl = asset.url; // Assuming 'url' is the property holding the path to the FBX file
+  const modelUrl = root + asset.url; // Assuming 'url' is the property holding the path to the FBX file
 
+  console.log("modelUrl", modelUrl);
   const fbxLoader = new FBXLoader();
   // TODO: handle animation and texture load
-  console.log("Loading model...");
+  console.log("Loading model...", modelUrl);
 
   const loadedModel = await new Promise((resolve, reject) => {
 
