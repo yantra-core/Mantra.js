@@ -1,5 +1,5 @@
 // Remark: Won't build with current tools
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export default async function loader (asset, root) {
   console.log("incoming asset", root, asset);
@@ -11,23 +11,31 @@ export default async function loader (asset, root) {
   // TODO: handle animation and texture load
   console.log("Loading model...", modelUrl);
 
-  const loadedModel = await new Promise((resolve, reject) => {
+  let loadedModel;
+  
+  try {
+    loadedModel = await new Promise((resolve, reject) => {
 
-    console.log('loading resource', modelUrl)
-    fbxLoader.load(
-      modelUrl, // Use the URL or path from the asset object
-      (object) => { // OnLoad callback
-        resolve(object);
-      },
-      (xhr) => { // OnProgress callback
-        console.log(`Model load progress: ${(xhr.loaded / xhr.total) * 100}%`);
-      },
-      (error) => { // OnError callback
-        console.error('An error happened during the loading of the model');
-        reject(error);
-      }
-    );
-  });
+      console.log('loading resource', modelUrl)
+      fbxLoader.load(
+        modelUrl, // Use the URL or path from the asset object
+        (object) => { // OnLoad callback
+          resolve(object);
+        },
+        (xhr) => { // OnProgress callback
+          console.log(`Model load progress: ${(xhr.loaded / xhr.total) * 100}%`);
+        },
+        (error) => { // OnError callback
+          console.error('An error happened during the loading of the model');
+          reject(error);
+        }
+      );
+    });
+  } catch (err) {
+    console.log('Error loading model', err);
+    throw err;
+  }
+  
 
   return loadedModel;
 }
