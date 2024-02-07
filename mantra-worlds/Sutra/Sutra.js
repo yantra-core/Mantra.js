@@ -25,7 +25,14 @@ class Sutra {
 
   init(game) {
     this.game = game;
+    game.customMovement = true;
     // alert('hi')
+    game.reset('topdown');
+    game.setGravity(0, 0, 0);
+
+    // TODO: set default zoom to 0.3 ( zoomed out )
+    game.setZoom(3.5);
+
     this.createWorld();
   }
 
@@ -34,10 +41,6 @@ class Sutra {
     let game = this.game;
     let that = this;
 
-    game.setGravity(0, 0, 0);
-
-    // TODO: set default zoom to 0.3 ( zoomed out )
-    game.zoom(0.3);
     game.use('Bullet')
     //    game.use('Timers');
     game.use('Tone');
@@ -56,10 +59,10 @@ class Sutra {
 
     game.use('Block', { MIN_BLOCK_SIZE: 1000 });
     // game.use('Border', { autoBorder: true, thickness: 200 });
-    game.setSutra(hexapod(game));
+    game.useSutra(hexapod(game), 'HEXAPOD');
     game.data.roundEnded = false;
     game.data.roundStarted = true;
-    game.createDefaultPlayer();
+    game.createPlayer();
     //createPlayPauseButton();
 
 
@@ -159,7 +162,7 @@ class Sutra {
       }, 3300);
     
     }
-    demoSutras();
+    //demoSutras();
 
   }
 

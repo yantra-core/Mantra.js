@@ -22,9 +22,9 @@ class Home {
     game.reset();
 
     if (game.isTouchDevice()) {
-      game.zoom(2.5);
+      game.zoom(1.44);
     } else {
-      game.zoom(4.5);
+      game.zoom(2);
     }
 
     game.setSize(16000, 9000);
@@ -50,6 +50,17 @@ class Home {
     */
 
     // sprite sheet has been defined in defaultAssets.js
+    /*
+    game.createPlayer({
+      texture: {
+        model: 'customModel',
+      },
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+    */
     game.createPlayer({
       texture: {
         sheet: 'loz_spritesheet',

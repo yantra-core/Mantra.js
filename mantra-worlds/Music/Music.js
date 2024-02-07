@@ -30,11 +30,21 @@ class Music {
     game.setGravity(0, 0, 0);
 
     if (game.isTouchDevice()) {
-      game.zoom(1.5);
+      game.zoom(1.44);
     } else {
       game.zoom(2.5);
     }
 
+    game.createPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
+      position: {
+        x: 352,
+        y: 80
+      }
+    });
 
     game.customMovement = false;
     game.setBackground('black');
@@ -229,18 +239,6 @@ class Music {
       game.createDefaultPlayer();
     });
     */
-
-
-    game.createPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'player'
-      },
-      position: {
-        x: 352,
-        y: 80
-      }
-    });
 
   }
 

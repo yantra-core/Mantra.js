@@ -27,7 +27,7 @@ class GravityGardens {
     if (game.isTouchDevice()) {
       game.zoom(1);
     } else {
-      game.setZoom(2.5);
+      game.zoom(1);
     }
 
     let player = game.createPlayer({
@@ -142,7 +142,10 @@ class GravityGardens {
       let particle = collision.PARTICLE || collision.STAR;
       if (particle) {
         // remove the entity
-        game.removeEntity(particle.id);
+        // only remove if ctick is very old to game.tick
+        if (particle.ctick < game.tick - 1000) {
+          game.removeEntity(particle.id);
+        }
       }
     });
 
