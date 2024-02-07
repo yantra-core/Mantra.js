@@ -1,5 +1,3 @@
-import Collisions from '../../collisions/Collisions.js';
-
 export default function initEngine() {
   let Matter = this.Matter;
   let game = this.game;

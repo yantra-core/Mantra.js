@@ -881,8 +881,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = initEngine;
-var _Collisions = _interopRequireDefault(require("../../collisions/Collisions.js"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function initEngine() {
   var Matter = this.Matter;
   var game = this.game;
@@ -894,7 +892,7 @@ function initEngine() {
   game.physicsReady = true;
 }
 
-},{"../../collisions/Collisions.js":1}],8:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1152,7 +1150,6 @@ function setGravity() {
   var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   // console.log('setting gravity', x, y)
-  console.log("CHEESBURGER", this);
   this.engine.gravity.x = x;
   this.engine.gravity.y = y;
 }

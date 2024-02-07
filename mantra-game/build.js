@@ -100,6 +100,18 @@ function logStep(plugin, message) {
   console.log(`[${getFileName(plugin)}] ${message}`);
 }
 
+
+/*
+// Matter-js worker
+const workerFile = './plugins/physics-matter/worker-matter.js'; // Adjust the path to your worker file
+
+browserify(workerFile, { standalone: 'MatterWorker' }) // 'MatterWorker' can be any name, it's not used in workers but required by Browserify
+  .transform('babelify', { presets: ['@babel/preset-env'] }) // Assuming you need Babel transformation for your worker
+  .bundle()
+  .on('error', function (err) { console.error(err); })
+  .pipe(fs.createWriteStream(`../mantra-client/public/worker-matter.js`)); // Adjust the output directory as needed
+*/
+
 // include additions files and dirs aside from the Plugin class file
 const includeDirs = ['vendor'];
 
@@ -107,10 +119,11 @@ plugins.forEach(plugin => {
   logStep(plugin, 'Starting bundling');
 
   const b = browserify(plugin, { standalone: `PLUGINS.${getFileName(plugin)}` })
-    .transform('babelify')
+    .transform('babelify', { presets: ['@babel/preset-env'] }) // Ensure babelify uses the preset-env
     .bundle()
+    .on('error', function (err) { console.error(err); }) // Add error handling to catch and log bundling errors
     .pipe(fs.createWriteStream(`../mantra-client/public/plugins/${getFileName(plugin)}.js`));
-
+ 
   // After bundling the plugin, copy its subdirectories
   const pluginDir = path.dirname(plugin);
   const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;
