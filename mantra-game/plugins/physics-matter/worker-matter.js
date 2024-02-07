@@ -1,5 +1,4 @@
 
-let engine;
 import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 import Collisions from '../collisions/Collisions.js';
@@ -15,19 +14,41 @@ import lockedProperties from './lib/lockedProperties.js';
 import limitSpeed from './lib/limitSpeed.js';
 
 
+let physics = {};
+
+physics.engine = null;
+
+physics.Matter = Matter;
+
+physics.onAfterUpdate = onAfterUpdate.bind(physics);
+
 // Handlers for various physics operations, structured similarly to methods in the MatterPhysics class
 const actions = {
-  initEngine: ({ config }) => {
-    engine = initEngine();
+  initEngine: ({config}) => {
+
+    physics.engine = Matter.Engine.create()
+
+    physics.engine.gravity.x = config.gravity.x;
+    physics.engine.gravity.y = config.gravity.y;
+  
+    Matter.Events.on(physics.engine, 'afterUpdate', function(event){
+      physics.onAfterUpdate(physics.engine);
+    });
+  
     postMessage({ action: 'engineInitialized' });
   },
+  addToWorld: ({ body }) => {
+    console.log('addToWorld worker', body)
+    Matter.World.add(physics.engine.world, body);
+  },
   updateEngine: ({ delta }) => {
-    Matter.Engine.update(engine, delta);
+    Matter.Engine.update(physics.engine, delta);
     postMessage({ action: 'engineUpdated' });
   },
   createBody: ({ options }) => {
+    console.log('createBody', options)
     const body = Matter.Body.create(options);
-    Matter.World.add(engine.world, body);
+    Matter.World.add(physics.engine.world, body);
     postMessage({ action: 'bodyCreated', bodyId: body.id });
   },
   // Implement additional handlers corresponding to the methods in your MatterPhysics class

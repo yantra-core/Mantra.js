@@ -196,7 +196,7 @@ export default function createEntity(config, ignoreSetup = false) {
       frictionStatic: config.frictionStatic
     });
     body.myEntityId = entityId;
-    this.game.physics.addToWorld(this.game.engine, body);
+    this.game.physics.addToWorld(body);
     this.game.bodyMap[entityId] = body;
     if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
       this.game.physics.setVelocity(body, velocity);

@@ -1,3 +1,6 @@
+// TODO: decouple game objects from physics updates
+// might be to move this outside of worker entire and only have worker report body updates each tick
+
 export default function onAfterUpdate(event) {
   let Matter = this.Matter;
   let that = this;

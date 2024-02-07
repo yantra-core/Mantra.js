@@ -3,7 +3,6 @@ import Matter from 'matter-js';
 import PhysicsInterface from './PhysicsInterface.js';
 import Collisions from '../collisions/Collisions.js';
 
-
 import initEngine from './lib/initEngine.js';
 import collisionStart from './lib/collisionStart.js';
 import collisionActive from './lib/collisionActive.js';
@@ -35,7 +34,6 @@ class MatterPhysics extends PhysicsInterface {
 
     this.Matter = Matter;
 
-
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
     //
@@ -56,8 +54,9 @@ class MatterPhysics extends PhysicsInterface {
     this.lockedProperties = lockedProperties.bind(this);
     this.limitSpeed = limitSpeed.bind(this);
 
-  }
+    this.wrapMethods();
 
+  }
 
   wrapMethods() {
     const methodNames = [
@@ -68,18 +67,23 @@ class MatterPhysics extends PhysicsInterface {
       'setBodySize',
       'lockedProperties',
       'limitSpeed',
+      'addToWorld',
+      'updateEngine',
+      'setGravity'
       // Add other method names here...
     ];
-
+    let that = this;
     methodNames.forEach(methodName => {
       const originalMethod = this[methodName];
       this[methodName] = (...args) => {
         if (this.useWorker) {
           // Delegate to worker
+          // console.log('calling worker method', methodName, args)
           this.postMessageToWorker(methodName, args);
         } else {
           // Call the original method
-          return originalMethod(...args);
+          // console.log('calling original method', methodName, args)
+          return originalMethod.call(that, ...args);
         }
       };
     });
@@ -97,7 +101,7 @@ class MatterPhysics extends PhysicsInterface {
     this.worker.onmessage = this.handleWorkerMessage.bind(this);
 
     // Send a message to the worker to initialize the engine
-    this.postMessageToWorker('initEngine', { config: this.config });
+    this.postMessageToWorker('initEngine', { config: this.game.config });
   }
 
   postMessageToWorker(action, data) {
@@ -109,6 +113,8 @@ class MatterPhysics extends PhysicsInterface {
     switch (action) {
       case 'engineInitialized':
         console.log('Engine initialized in worker');
+        game.physicsReady = true;
+
         break;
       case 'engineUpdated':
         // Handle engine updated message, such as syncing state back to the main thread entities
@@ -123,6 +129,27 @@ class MatterPhysics extends PhysicsInterface {
 
   init(game) {
     this.game = game;
+
+    // TODO: register as system, takes some consideration to make collision event namespaces "internal" as to not collide
+    // game.systemsManager.addSystem('physics', this);
+
+    //
+    // Set gravity defaults if missing from game config
+    //
+    if (typeof game.config.gravity === 'undefined') {
+      game.config.gravity = { x: 0, y: 0 };
+    }
+
+    if (typeof game.config.gravity.x === 'undefined') {
+      game.config.gravity.x = 0;
+    }
+
+    if (typeof game.config.gravity.y === 'undefined') {
+      game.config.gravity.y = 0;
+    }
+
+    game.physics = this;
+
     if (this.useWorker) {
       this.initWorkerMode();
     } else {
@@ -131,7 +158,18 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   initDirectMode() {
-    this.initEngine();
+    let game = this.game;
+    this.initEngine(game.config);
+
+    let that = this;
+
+    Matter.Events.on(this.engine, 'afterUpdate', function (event) {
+      that.onAfterUpdate(that.engine, that.game);
+    });
+
+    // TODO: configurable collision plugins
+    game.use(new Collisions());
+
   }
 
   createBody(options) {
@@ -144,8 +182,8 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   // Equivalent to World.add()
-  addToWorld(engine, body) {
-    Matter.World.add(engine.world, body);
+  addToWorld(body) {
+    Matter.World.add(this.engine.world, body);
   }
 
   removeBody(body) {
