@@ -12,6 +12,7 @@ import onAfterUpdate from './lib/onAfterUpdate.js';
 import setBodySize from './lib/setBodySize.js';
 import lockedProperties from './lib/lockedProperties.js';
 import limitSpeed from './lib/limitSpeed.js';
+import setGravity from './lib/setGravity.js';
 
 class MatterPhysics extends PhysicsInterface {
 
@@ -53,6 +54,7 @@ class MatterPhysics extends PhysicsInterface {
     this.setBodySize = setBodySize.bind(this);
     this.lockedProperties = lockedProperties.bind(this);
     this.limitSpeed = limitSpeed.bind(this);
+    this.setGravity = setGravity.bind(this);
 
     this.wrapMethods();
 
@@ -63,13 +65,17 @@ class MatterPhysics extends PhysicsInterface {
       'collisionStart',
       'collisionActive',
       'collisionEnd',
-      'onAfterUpdate',
+      // 'onAfterUpdate',
       'setBodySize',
       'lockedProperties',
       'limitSpeed',
       'addToWorld',
       'updateEngine',
-      'setGravity'
+      'setGravity',
+      'setVelocity',
+      'setPosition',
+      'setRotation',
+      'applyForce'
       // Add other method names here...
     ];
     let that = this;
@@ -87,13 +93,6 @@ class MatterPhysics extends PhysicsInterface {
         }
       };
     });
-  }
-
-
-  setGravity(x = 0, y = 0) {
-    // console.log('setting gravity', x, y)
-    this.engine.gravity.x = x;
-    this.engine.gravity.y = y;
   }
 
   initWorkerMode() {
@@ -118,6 +117,8 @@ class MatterPhysics extends PhysicsInterface {
         break;
       case 'engineUpdated':
         // Handle engine updated message, such as syncing state back to the main thread entities
+        //console.log('Engine updated in worker', event.data.worldState);
+        this.onAfterUpdate(event.data.worldState);
         break;
       case 'bodyCreated':
         console.log('Body created with ID:', messageData.bodyId);
@@ -164,7 +165,28 @@ class MatterPhysics extends PhysicsInterface {
     let that = this;
 
     Matter.Events.on(this.engine, 'afterUpdate', function (event) {
-      that.onAfterUpdate(that.engine, that.game);
+
+      let worldState = [];
+      // TODO: remove this O(n) by allowing afterUpdate to accept single body instead of array
+      for (const body of event.source.world.bodies) {
+
+        if (body.isSleeping !== true && body.myEntityId) {
+          let bodyState = {
+            id: body.id,
+            myEntityId: body.myEntityId,
+            position: body.position,
+            angle: body.angle,
+            velocity: body.velocity,
+            angularVelocity: body.angularVelocity,
+            isSleeping: body.isSleeping,
+            isStatic: body.isStatic,
+            isSensor: body.isSensor
+          };
+          worldState.push(bodyState);
+        }
+      }
+
+      that.onAfterUpdate(worldState);
     });
 
     // TODO: configurable collision plugins

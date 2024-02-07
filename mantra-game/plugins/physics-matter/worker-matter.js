@@ -12,33 +12,58 @@ import onAfterUpdate from './lib/onAfterUpdate.js';
 import setBodySize from './lib/setBodySize.js';
 import lockedProperties from './lib/lockedProperties.js';
 import limitSpeed from './lib/limitSpeed.js';
-
+import _setGravity from './lib/setGravity.js';
 
 let physics = {};
 
 physics.engine = null;
 
 physics.Matter = Matter;
+physics.engine = Matter.Engine.create()
 
 physics.onAfterUpdate = onAfterUpdate.bind(physics);
+physics.setGravity = _setGravity.bind(physics);
+
 
 // Handlers for various physics operations, structured similarly to methods in the MatterPhysics class
 const actions = {
-  initEngine: ({config}) => {
+  initEngine: ({ config }) => {
 
-    physics.engine = Matter.Engine.create()
 
     physics.engine.gravity.x = config.gravity.x;
     physics.engine.gravity.y = config.gravity.y;
-  
-    Matter.Events.on(physics.engine, 'afterUpdate', function(event){
-      physics.onAfterUpdate(physics.engine);
+
+    Matter.Events.on(physics.engine, 'afterUpdate', function (event) {
+      // physics.onAfterUpdate(physics.engine);
+      let worldState = [];
+      for (const body of event.source.world.bodies) {
+
+        // let entity = that.game.getEntity(body.myEntityId);
+        // let entity = that.game.data.ents._[body.myEntityId];
+
+        if (body.isSleeping !== true && body.myEntityId) {
+          let bodyState = {
+            id: body.id,
+            myEntityId: body.myEntityId,
+            position: body.position,
+            angle: body.angle,
+            velocity: body.velocity,
+            angularVelocity: body.angularVelocity,
+            isSleeping: body.isSleeping,
+            isStatic: body.isStatic,
+            isSensor: body.isSensor
+          };
+          worldState.push(bodyState);
+        }
+
+      }
+      postMessage({ action: 'engineUpdated', worldState: worldState });
+
     });
-  
     postMessage({ action: 'engineInitialized' });
+
   },
-  addToWorld: ({ body }) => {
-    console.log('addToWorld worker', body)
+  addToWorld: (body) => {
     Matter.World.add(physics.engine.world, body);
   },
   updateEngine: ({ delta }) => {
@@ -63,13 +88,28 @@ const actions = {
   collisionEnd: ({ data }) => {
     // Implement collision end logic here
   },
+  setGravity({ data }) {
+    _setGravity.call(physics, data);
+  },
+  setRotation(args) {
+    physics.Matter.Body.setAngle(args[0], args[1]);
+  },
+  setPosition(args) {
+    physics.Matter.Body.setPosition(args[0], args[1]);
+  },
+  setVelocity(args) {
+    physics.Matter.Body.setVelocity(args[0], args[1]);
+  },
+  applyForce(args) {
+    Matter.Body.applyForce(args[0], args[1], args[2]);
+  }
   // Add more handlers as needed for methods like setBodySize, lockedProperties, etc.
 };
 
-onmessage = function(event) {
+onmessage = function (event) {
   const { action, data } = event.data;
   const handler = actions[action];
-  console.log('Worker received action:', action, data);
+  // console.log('Worker received action:', action, data);
   if (handler) {
     handler(data);
   } else {

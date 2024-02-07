@@ -1,20 +1,26 @@
 // TODO: decouple game objects from physics updates
 // might be to move this outside of worker entire and only have worker report body updates each tick
 
-export default function onAfterUpdate(event) {
+export default function onAfterUpdate(worldState) {
   let Matter = this.Matter;
   let that = this;
-
+  // console.log('onafterupdate', worldState)
   // show total number of bodies in the world
   // Remark: should this and bodyMap be replaced with a more generic mapping
   // in order to allow non-physics backed entities to exist in the game?
-  for (const body of event.world.bodies) {
+  if (!worldState || !worldState.length) {
+    return;
+  }
+  worldState.forEach(function processWorldState (body) {
+
+    // for (const body of event.world.bodies) {
 
     // let entity = that.game.getEntity(body.myEntityId);
     let entity = that.game.data.ents._[body.myEntityId];
 
     if (entity && body.isSleeping !== true && body.myEntityId) {
 
+      /* TODO: move these to worker
       //
       // Clamp max speed
       //
@@ -30,6 +36,7 @@ export default function onAfterUpdate(event) {
       if (entity.lockedProperties) {
         that.lockedProperties(body);
       }
+      */
 
       // If this is the client and we are in online mode,
       // do not update local physics for remote players, only update local physics for the local player
@@ -45,6 +52,7 @@ export default function onAfterUpdate(event) {
         /*            */
         // console.log(body.myEntityId, body.position)
         let ent = that.game.entities.get(body.myEntityId);
+        // console.log('got ent?', ent)
         // console.log('client ent', ent.id ,body.position)
         // console.log('this.game.localGameLoopRunning', this.game.localGameLoopRunning)
         if (that.game.localGameLoopRunning) {
@@ -78,7 +86,7 @@ export default function onAfterUpdate(event) {
               position.z = ent.position.z;
             }
           }
-
+          // console.log('setting new component position', body.myEntityId, position)
           that.game.components.velocity.set(body.myEntityId, { x: body.velocity.x, y: body.velocity.y });
           that.game.components.position.set(body.myEntityId, position);
           that.game.components.rotation.set(body.myEntityId, body.angle);
@@ -126,5 +134,7 @@ export default function onAfterUpdate(event) {
 
     }
 
-  }
+
+  });
+
 }
