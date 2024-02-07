@@ -143,9 +143,10 @@ class GravityGardens {
       if (particle) {
         // remove the entity
         // only remove if ctick is very old to game.tick
-        if (particle.ctick < game.tick - 1000) {
-          game.removeEntity(particle.id);
-        }
+        game.removeEntity(particle.id);
+        /*
+        if (particle.ctick < game.tick - 1000) {}
+        */
       }
     });
 

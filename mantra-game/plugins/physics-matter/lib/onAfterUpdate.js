@@ -1,16 +1,21 @@
 // TODO: Finish refactor of decoupling game objects from physics updates
 //       Remove usage of bodyMap from game space in favor of using entity.id reference to matter world
-export default function onAfterUpdate(worldState) {
+export default function onAfterUpdate(event) {
   let Matter = this.Matter;
   let that = this;
   // console.log('onafterupdate', worldState)
   // show total number of bodies in the world
   // Remark: should this and bodyMap be replaced with a more generic mapping
   // in order to allow non-physics backed entities to exist in the game?
+  /*
   if (!worldState || !worldState.length) {
     return;
   }
-  worldState.forEach(function processWorldState(body) {
+  */
+
+  for (const body of event.source.world.bodies) {
+
+  // worldState.forEach(function processWorldState(body) {
 
     // let entity = that.game.getEntity(body.myEntityId);
     let entity = that.game.data.ents._[body.myEntityId];
@@ -130,6 +135,7 @@ export default function onAfterUpdate(worldState) {
 
     }
 
-  });
+  // });
+  }
 
 }

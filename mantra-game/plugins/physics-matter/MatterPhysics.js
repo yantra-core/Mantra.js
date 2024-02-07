@@ -174,6 +174,7 @@ class MatterPhysics extends PhysicsInterface {
       //
       // REMARK: TODO: remove this O(n) by allowing afterUpdate to accept single body instead of array
       //
+      /*
       for (const body of event.source.world.bodies) {
 
         if (body.isSleeping !== true && body.myEntityId) {
@@ -193,8 +194,9 @@ class MatterPhysics extends PhysicsInterface {
           worldState.push(bodyState);
         }
       }
+      */
 
-      that.onAfterUpdate(worldState);
+      that.onAfterUpdate(event);
     });
 
     // TODO: configurable collision plugins

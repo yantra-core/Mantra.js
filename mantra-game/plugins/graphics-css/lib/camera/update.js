@@ -20,11 +20,6 @@ export default function update() {
     game.viewportCenterYOffset = 0;
   }
 
-  // game.viewportCenterYOffset = 500;
-  // console.log('game.viewportCenterYOffset ', game.viewportCenterYOffset )
-
-  // console.log(zoomFactor, game.viewportCenterXOffset, game.viewportCenterYOffset)
-
   // Update the camera position
   if (this.follow && currentPlayer && currentPlayer.position) {
 
@@ -45,27 +40,21 @@ export default function update() {
       this.scene.cameraPosition.y = newY;
     }
 
-    let playerPos = currentPlayer.position;
-
-    // Calculate the center of the viewport without adjusting for the current zoom level
-    let centerX = window.innerWidth / 2;
-    let centerY = window.innerHeight / 2;
-
-    // Calculate offsets by subtracting the player's position from the center of the viewport
-    let offsetX = centerX - this.game.data.camera.position.x;
-    let offsetY = centerY - this.game.data.camera.position.y;
-
-    offsetX *= this.game.data.camera.currentZoom;
-    offsetY *= this.game.data.camera.currentZoom;
-
-    offsetX -= game.viewportCenterXOffset;
-    offsetY -= game.viewportCenterYOffset;
-
-    if (this.scene.renderDiv) {
-      // console.log(playerPos, 'offsetX', offsetX, 'offsetY', offsetY, 'currentZoom', this.game.data.camera.currentZoom);
-      setTransform(this.scene.renderDiv, offsetX, offsetY, this.game.data.camera.currentZoom, 0);
+    let adjustedPosition = {
+      x: this.game.data.camera.position.x - (windowWidth / 2),
+      y: this.game.data.camera.position.y - (windowHeight / 2),
     }
 
+    adjustedPosition.x *= this.game.data.camera.currentZoom;
+    adjustedPosition.y *= this.game.data.camera.currentZoom;
+    // domY += game.viewportCenterYOffset / this.game.data.camera.currentZoom;
+
+    adjustedPosition.y += game.viewportCenterYOffset / 2;
+
+    //console.log('domX', domX, 'domY', domY)
+    if (this.scene.renderDiv) {
+      setTransform(this.scene.renderDiv, -adjustedPosition.x, -adjustedPosition.y, this.game.data.camera.currentZoom, 0);
+    }
 
 
   } else {
@@ -88,9 +77,7 @@ function setTransform(container, offsetX, offsetY, zoom, rotation) {
   // Check if the new values differ from the last applied values
   if (offsetX !== lastOffsetX || offsetY !== lastOffsetY || zoom !== lastZoom || rotation !== lastRotation) {
     // Apply the new transform only if there's a change
-    console.log('applying transform')
     container.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom}) rotate(${rotation}deg)`;
-
     // Update the container's dataset with the new values
     container.dataset.lastOffsetX = offsetX;
     container.dataset.lastOffsetY = offsetY;
