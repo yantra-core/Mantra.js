@@ -26,6 +26,7 @@ export default function getTexture(config) {
 
   if (t.loadedModel) {
     return {
+      url: t.url,
       key: t.key,
       model: t.loadedModel
     };

@@ -18,7 +18,6 @@ export default async function inflateTexture(entityData) {
 async function applyTextureToEntityGraphic(game, entityData, entityGraphic) {
   let texture = game.getTexture(entityData.texture);
 
-  console.log("applyTextureToEntityGraphic", texture, entityGraphic)
   if (!texture) {
     entityGraphic.visible = true; // No game texture found, ensure visibility and return
     return;
@@ -34,8 +33,6 @@ async function applyTextureToEntityGraphic(game, entityData, entityGraphic) {
     entityGraphic.visible = true; // Texture failed to load, ensure visibility and return
     return;
   }
-
-  // console.log("HERE WE ARE", entityGraphic)
 
   // Traverse the entity graphic component and apply texture to all child meshes
   entityGraphic.traverse((child) => {

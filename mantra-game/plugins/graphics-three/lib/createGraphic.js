@@ -17,6 +17,7 @@ export default function createGraphic(entityData) {
   if (texture && texture.model) {
     console.log("Using existing model for entity.");
     entityObject = processModel(texture.model);
+    console.log('entityObject after processModel()', entityObject);
   } else {
     console.log("Creating new geometry for entity.");
     entityObject = createGeometryForEntity(entityData);
@@ -26,6 +27,8 @@ export default function createGraphic(entityData) {
   if (typeof entityData.position.z !== 'number') {
     entityData.position.z = 0;
   }
+
+  console.log('setting position of entityObject', entityObject, entityData.position);
   entityObject.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   entityObject.visible = true; // Ensure the entity is visible
   this.scene.add(entityObject);
