@@ -84,6 +84,11 @@ function createGeometryForEntity(entityData) {
   if (entityData.type === 'TEXT') {
     mesh.visible = false; // Hide text meshes for now
   }
+
+  if (entityData.texture) {
+    mesh.visible = false; // Hide mesh until texture is loaded
+  }
+
   entityGroup.add(mesh);
 
   return entityGroup;
