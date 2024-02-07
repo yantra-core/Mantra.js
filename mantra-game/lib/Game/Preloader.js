@@ -1,4 +1,4 @@
-// import FBXLoader from "./Preloader/FBXLoader.js";
+import FBXLoader from "./Preloader/FBXLoader.js";
 
 export default class Preloader {
   constructor(game, { assets = [] } = {}) {
