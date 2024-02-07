@@ -44,16 +44,18 @@ export default function createGraphic(entityData) {
 }
 
 function processModel(model) {
-  const clonedModel = model.clone();
+  // const clonedModel = model.clone();
+  const clonedModel = model;
+
   clonedModel.traverse((child) => {
     if (child.isMesh) {
       child.material = new MeshBasicMaterial({
-        color: 0xff0000, // Applying a red color for visibility
+        color: 0xff00ff, // Applying a red color for visibility
       });
     }
   });
   // Set model scale or other transformations if needed
-  clonedModel.scale.set(1, 1, 1);
+  clonedModel.scale.set(0.2, 0.2, 0.2);
   return clonedModel;
 }
 

@@ -30,6 +30,10 @@ async function applyTextureToEntityGraphic(game, entityData, entityGraphic) {
     return;
   }
 
+  if (texture.model) { // for now
+    return entityGraphic;
+  }
+
   let cachedTexture = await getCachedTexture(texture.url); // Load or get cached texture
   if (!cachedTexture) {
     entityGraphic.visible = true; // Texture failed to load, ensure visibility and return

@@ -1,35 +1,39 @@
 export default function updateGraphic(entityData) {
-  const mesh = this.game.components.graphics.get([entityData.id, 'graphics-three']);
-  if (!mesh) {
-    console.error('No mesh found for entity', entityData.id);
+  // Assuming 'graphics-three' now refers to a Group rather than a Mesh
+  const group = this.game.components.graphics.get([entityData.id, 'graphics-three']);
+  if (!group) {
+    console.error('No group found for entity', entityData.id);
     return;
   }
 
-  // Check and update mesh rotation if needed
+  // Check and update group rotation if needed
   let hasRotationChanged = false;
   if (typeof entityData.rotation === 'object' && entityData.rotation !== null) {
     // 3D rotation
-    hasRotationChanged = mesh.rotation.x !== entityData.rotation.x || mesh.rotation.y !== entityData.rotation.y || mesh.rotation.z !== entityData.rotation.z;
+    hasRotationChanged = group.rotation.x !== entityData.rotation.x || group.rotation.y !== entityData.rotation.y || group.rotation.z !== entityData.rotation.z;
     if (hasRotationChanged) {
-      mesh.rotation.set(entityData.rotation.x, entityData.rotation.y, entityData.rotation.z);
+      group.rotation.set(entityData.rotation.x, entityData.rotation.y, entityData.rotation.z);
     }
   } else {
     // 2D / 2.5D rotation (assuming around Y axis)
-    hasRotationChanged = mesh.rotation.y !== entityData.rotation;
+    hasRotationChanged = group.rotation.y !== entityData.rotation;
     if (hasRotationChanged) {
-      mesh.rotation.set(0, entityData.rotation, 0);
+      group.rotation.set(0, entityData.rotation, 0);
     }
   }
 
-  // get the current mesh position
-  let currentMeshPosition = mesh.position.clone();
-  // compare the current mesh position with the entityData position
-  // only update the mesh position if the entityData position has changed
-  if (-currentMeshPosition.x !== entityData.position.x || currentMeshPosition.y !== entityData.position.z) {
+  // Get the current group position
+  let currentGroupPosition = group.position.clone();
+  // Compare the current group position with the entityData position
+  // Only update the group position if the entityData position has changed
+  //console.log("CHECKING POS UPDATE POSITON OF GROUP", currentGroupPosition)
+
+  if (-currentGroupPosition.x !== entityData.position.x || currentGroupPosition.y !== entityData.position.z) {
     if (typeof entityData.position.z !== 'number') {
       entityData.position.z = 0;
     }
-    mesh.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+    // console.log("UPDATING POSITON OF GROUP", entityData.position, group)
+    group.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   }
 
 }
