@@ -93,13 +93,23 @@ tap.test('Entity Texture Tests', (t) => {
   });
 
 
-  /*
-  t.test('createEntity() function - texture as sprite and sprite sheet', (t) => {
+
+  t.test('createEntity() function - texture as model', async (t) => {
+
+    let modelOptions =  {}; // TODO: similar to spritesheet, add model options
+    game.preloader.loadModel = function stub () {
+      return {}; // empty model, put meta here
+    }
+    game.preloader.addAsset('mock-url-3', 'model-fbx', 'customModel', modelOptions);
+
+    await game.preloader.loadAll();
+    const allLoaded = game.preloader.assets.every(asset => asset.loaded);
+    t.ok(allLoaded, 'all assets are loaded');
+
     const entity = game.createEntity({
-      id: entityId,
       type: 'TEST',
       texture: {
-
+        model: 'customModel'
       },
       width: 33,
       height: 44,
@@ -107,9 +117,10 @@ tap.test('Entity Texture Tests', (t) => {
       position: { x: 10, y: 20 }
     });
 
-
+    let componentValue = game.getComponent(entity.id, 'texture');
+    t.equal(componentValue.model, 'customModel', 'Texture should be set to customModel');
     t.end();
+
   });
-  */
 
 });
