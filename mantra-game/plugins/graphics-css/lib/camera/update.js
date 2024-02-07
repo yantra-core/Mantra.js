@@ -44,7 +44,29 @@ export default function update() {
     } else {
       this.scene.cameraPosition.y = newY;
     }
-    // this.scene.cameraPosition.y = newY;
+
+    let playerPos = currentPlayer.position;
+
+    // Calculate the center of the viewport without adjusting for the current zoom level
+    let centerX = window.innerWidth / 2;
+    let centerY = window.innerHeight / 2;
+
+    // Calculate offsets by subtracting the player's position from the center of the viewport
+    let offsetX = centerX - this.game.data.camera.position.x;
+    let offsetY = centerY - this.game.data.camera.position.y;
+
+    offsetX *= this.game.data.camera.currentZoom;
+    offsetY *= this.game.data.camera.currentZoom;
+
+    offsetX -= game.viewportCenterXOffset;
+    offsetY -= game.viewportCenterYOffset;
+
+    if (this.scene.renderDiv) {
+      // console.log(playerPos, 'offsetX', offsetX, 'offsetY', offsetY, 'currentZoom', this.game.data.camera.currentZoom);
+      setTransform(this.scene.renderDiv, offsetX, offsetY, this.game.data.camera.currentZoom, 0);
+    }
+
+
 
   } else {
     // If not following a player, use the calculated offsets directly
@@ -54,4 +76,25 @@ export default function update() {
 
   // Update the camera's position in the game data
   this.game.data.camera.position = this.scene.cameraPosition;
+}
+
+function setTransform(container, offsetX, offsetY, zoom, rotation) {
+  // Retrieve the last applied values from the container's dataset
+  const lastOffsetX = parseFloat(container.dataset.lastOffsetX) || 0;
+  const lastOffsetY = parseFloat(container.dataset.lastOffsetY) || 0;
+  const lastZoom = parseFloat(container.dataset.lastZoom) || 1;
+  const lastRotation = parseFloat(container.dataset.lastRotation) || 0;
+
+  // Check if the new values differ from the last applied values
+  if (offsetX !== lastOffsetX || offsetY !== lastOffsetY || zoom !== lastZoom || rotation !== lastRotation) {
+    // Apply the new transform only if there's a change
+    console.log('applying transform')
+    container.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom}) rotate(${rotation}deg)`;
+
+    // Update the container's dataset with the new values
+    container.dataset.lastOffsetX = offsetX;
+    container.dataset.lastOffsetY = offsetY;
+    container.dataset.lastZoom = zoom;
+    container.dataset.lastRotation = rotation;
+  }
 }
