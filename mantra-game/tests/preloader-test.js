@@ -39,7 +39,6 @@ tap.test('Preloader unit tests', (t) => {
   t.test('preloader can load an image', async (t) => {
     const mockUrl = 'mock-image-url';
     game.preloader.addAsset(mockUrl, 'image', 'placeholder');
-    console.log(game.preloader.assets)
 
     t.ok(game.preloader.assets.length > 0, 'asset was added to preloader');
     t.ok(!game.preloader.assets[0].loaded, 'asset has not yet been loaded');
@@ -94,26 +93,28 @@ tap.test('Preloader unit tests', (t) => {
   })
   
   t.test('preloader can load a custom format', async (t) => {
-    /*
-    game.preloader.createLoader('model-fbx', async (url)=>{
-      
-    }); //*/
     
-    const loaderSpy = sinon.spy();
+    game.preloader.assets = [];
+    const loadedSpy = sinon.spy();
+    game.on('preloader::loaded', loadedSpy);
 
-    game.preloader.createLoader('model-fbx', loaderSpy);
+    game.preloader.loadModel = function stub () {
+      return {
+        // empty model, put meta here
+      };
+    }
     // Add multiple assets
     game.preloader.addAsset('mock-url-1', 'model-fbx', 'asset1');
     game.preloader.addAsset('mock-url-2', 'model-fbx', 'asset2');
   
     await game.preloader.loadAll();
-  
+
     // Verify all assets are marked as loaded
     const allLoaded = game.preloader.assets.every(asset => asset.loaded);
     t.ok(allLoaded, 'all assets are loaded');
-    t.same(loaderSpy.callCount, 2, 'the loader was called once for each asset');
-    // Remark: decouple tests with new Preloader per test when required
-    //t.ok(game.preloader.assets.length === 4, 'multiple assets were added to the preloader');
+    t.ok(loadedSpy.called, 'preloader::loaded event was emitted');
+
+    t.ok(game.preloader.assets.length === 2, 'multiple assets were added to the preloader');
     t.end();
   });
 
