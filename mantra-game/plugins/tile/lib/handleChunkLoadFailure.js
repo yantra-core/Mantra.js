@@ -10,7 +10,7 @@ export default function handleChunkLoadFailure(chunkPath, chunkKey) {
     let randomChunk;
     let chunkCoordinates = this.extractChunkCoordinates(chunkKey);
 
-    //console.log('chunkCoordinates', chunkCoordinates)
+    // console.log('chunkCoordinates', chunkCoordinates)
     //console.log('current map data', this.tiledMap)
 
     let x = chunkCoordinates.x;
@@ -22,8 +22,8 @@ export default function handleChunkLoadFailure(chunkPath, chunkKey) {
     let map = this.createTileMap({
       x: x,
       y: y,
-      width: 8,
-      height: 8,
+      width: this.chunkUnitSize,
+      height: this.chunkUnitSize,
       tileWidth: 16,
       tileHeight: 16,
       algo: this.labyrinthosAlgoName,

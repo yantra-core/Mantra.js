@@ -1,5 +1,5 @@
 // Remark: Won't build with current tools
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+// import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 export default async function loader (asset, root) {
   console.log("incoming asset", root, asset);

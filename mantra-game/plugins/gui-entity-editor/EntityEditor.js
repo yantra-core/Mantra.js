@@ -167,9 +167,6 @@ class EntityEditor {
     // TODO: Load the entity properties into the form for editing
   }
 
-  saveEntity() {
-    // TODO: Save the changes made to the entity
-  }
 
   deleteEntity(entityId) {
     // TODO: Implement deletion of an entity

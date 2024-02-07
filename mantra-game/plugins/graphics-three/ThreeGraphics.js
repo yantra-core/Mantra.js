@@ -1,5 +1,6 @@
 // ThreeGraphics.js - Marak Squires 2023
 import { Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Vector3 } from 'three';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
@@ -103,9 +104,8 @@ class ThreeGraphics extends GraphicsInterface {
     this.camera.position.set(0, 0, 0);
     this.camera.lookAt(new Vector3(0, 0, 0));
     // TODO: Initialize controls for camera interaction
-    // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     // this.controls.enableZoom = true; // Enable zooming
-
     // async:true plugins *must* self report when they are ready
     // game.emit('plugin::ready::graphics-three', this);
 
@@ -171,7 +171,6 @@ class ThreeGraphics extends GraphicsInterface {
           // Calculate the new camera position with a slight offset above and behind the player
           const newPosition = playerGraphic.position.clone().add(new Vector3(0, 150, -100));
           const lookAtPosition = playerGraphic.position.clone();
-
           // Use a smaller lerp factor for smoother camera movement
           this.camera.position.lerp(newPosition, 0.05);
           this.camera.lookAt(lookAtPosition);
@@ -238,7 +237,6 @@ class ThreeGraphics extends GraphicsInterface {
     }
 
   }
-
 
 
   // New function to switch to first-person perspective
