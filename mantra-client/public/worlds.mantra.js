@@ -3390,7 +3390,7 @@ var GravityGardens = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.zoom(1);
       } else {
-        game.setZoom(2.5);
+        game.zoom(1);
       }
       var player = game.createPlayer({
         color: 0xcccccc,
@@ -3501,7 +3501,11 @@ var GravityGardens = /*#__PURE__*/function () {
         var particle = collision.PARTICLE || collision.STAR;
         if (particle) {
           // remove the entity
+          // only remove if ctick is very old to game.tick
           game.removeEntity(particle.id);
+          /*
+          if (particle.ctick < game.tick - 1000) {}
+          */
         }
       });
       game.useSutra(wallCollision, 'wallCollision');
@@ -3669,9 +3673,9 @@ var Home = /*#__PURE__*/function () {
       var game = this.game;
       game.reset();
       if (game.isTouchDevice()) {
-        game.zoom(2.5);
+        game.zoom(1.44);
       } else {
-        game.zoom(4.5);
+        game.zoom(1);
       }
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
@@ -3694,6 +3698,17 @@ var Home = /*#__PURE__*/function () {
       */
 
       // sprite sheet has been defined in defaultAssets.js
+      /*
+      game.createPlayer({
+        texture: {
+          model: 'customModel',
+        },
+        position: {
+          x: 0,
+          y: 0
+        }
+      });
+      */
       game.createPlayer({
         texture: {
           sheet: 'loz_spritesheet',
@@ -4332,7 +4347,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  rules.use((0, _hexapod["default"])(game), 'hexapod');
+  // rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');
@@ -4624,10 +4639,20 @@ var Music = /*#__PURE__*/function () {
       //game.setGravity(0, 4.3, 0);
       game.setGravity(0, 0, 0);
       if (game.isTouchDevice()) {
-        game.zoom(1.5);
+        game.zoom(1.44);
       } else {
         game.zoom(2.5);
       }
+      game.createPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
+        position: {
+          x: 352,
+          y: 80
+        }
+      });
       game.customMovement = false;
       game.setBackground('black');
       var pianoConfig = {
@@ -4819,17 +4844,6 @@ var Music = /*#__PURE__*/function () {
         game.createDefaultPlayer();
       });
       */
-
-      game.createPlayer({
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
-        },
-        position: {
-          x: 352,
-          y: 80
-        }
-      });
     }
   }, {
     key: "update",
@@ -5249,7 +5263,7 @@ var Platform = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.setZoom(3);
       } else {
-        game.setZoom(4.5);
+        game.setZoom(2.5);
       }
       game.createPlayer({
         height: 32,
@@ -7364,7 +7378,7 @@ var YCraft = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.zoom(1.5);
       } else {
-        game.setZoom(3.5);
+        game.setZoom(2);
       }
       game.use('Boomerang');
       game.use('Bullet');
@@ -7373,6 +7387,16 @@ var YCraft = /*#__PURE__*/function () {
         contraption: _contraptionsExample["default"]
       });
       game.use('YCraftGUI');
+      game.createPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
+        position: {
+          x: 100,
+          y: 100
+        }
+      });
 
       // create warp by back home entity
       game.createEntity({
@@ -7469,19 +7493,6 @@ var YCraft = /*#__PURE__*/function () {
           frictionStatic: 1
         });
       }
-
-      // Remark: Players removed for initial demo, is working
-
-      game.createDefaultPlayer({
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
-        },
-        position: {
-          x: 0,
-          y: 0
-        }
-      });
     }
   }, {
     key: "update",

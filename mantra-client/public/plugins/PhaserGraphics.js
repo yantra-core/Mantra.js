@@ -797,6 +797,9 @@ function updateBox(entityData, graphic, game) {
   }
   if (typeof entityData.texture !== 'undefined') {
     var texture = game.getTexture(entityData.texture);
+    if (!texture) {
+      return graphic;
+    }
     var textureUrl = texture.url;
     var spritePosition = texture.sprite || {
       x: 0,

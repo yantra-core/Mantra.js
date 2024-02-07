@@ -800,7 +800,10 @@ function createEntity(config) {
       frictionStatic: config.frictionStatic
     });
     _body.myEntityId = entityId;
-    this.game.physics.addToWorld(this.game.engine, _body);
+    this.game.physics.addToWorld(_body);
+    // TODO: bodyMap needs to be removed
+    //       in order to decouple physics from game, we'll need to use body references in app space
+    //       and allow the physics interface to use entity.id as the key between worker and app space
     this.game.bodyMap[entityId] = _body;
     if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
       this.game.physics.setVelocity(_body, velocity);

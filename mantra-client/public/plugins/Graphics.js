@@ -316,16 +316,14 @@ function getTexture(config) {
   if (typeof t === 'undefined') {
     return null;
   }
+  var url = game.assetRoot + t.url;
   if (t.loadedModel) {
     return {
-      url: t.url,
+      url: url,
       key: t.key,
       model: t.loadedModel
     };
   }
-
-  // TODO: perform switch here based on type of entity
-
   if (config && typeof config.sprite !== 'undefined') {
     var spriteName = config.sprite;
     var frameIndex = 0;
@@ -338,7 +336,6 @@ function getTexture(config) {
       var sprite = t.frameTags[spriteName].frames[frameIndex];
       var rate = t.frameTags[spriteName].rate || 30;
       sprite.name = spriteName;
-      var url = game.assetRoot + t.url;
       return {
         key: t.key,
         url: url,

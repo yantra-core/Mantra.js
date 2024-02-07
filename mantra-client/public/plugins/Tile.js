@@ -4614,12 +4614,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = createTile;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function createTile(tile, x, y) {
-  var _this$game$createEnti;
   var z = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
   var tileWidth = arguments.length > 4 ? arguments[4] : undefined;
   var tileHeight = arguments.length > 5 ? arguments[5] : undefined;
@@ -4680,7 +4675,7 @@ function createTile(tile, x, y) {
     _texture = "tile-".concat(tile.kind); // rename
   }
 
-  var ent = this.game.createEntity((_this$game$createEnti = {
+  var ent = this.game.createEntity({
     type: _type,
     name: tile.name || tile.kind,
     kind: tile.kind,
@@ -4705,8 +4700,14 @@ function createTile(tile, x, y) {
       x: x * scale,
       y: y * scale,
       z: z * scale
-    }
-  }, _defineProperty(_this$game$createEnti, "friction", 1), _defineProperty(_this$game$createEnti, "frictionAir", 1), _defineProperty(_this$game$createEnti, "frictionStatic", 1), _defineProperty(_this$game$createEnti, "texture", _texture), _defineProperty(_this$game$createEnti, "color", _color), _defineProperty(_this$game$createEnti, "width", tileWidth * scale), _defineProperty(_this$game$createEnti, "height", tileHeight * scale), _defineProperty(_this$game$createEnti, "depth", tileDepth * scale), _defineProperty(_this$game$createEnti, "exit", tile.exit), _this$game$createEnti));
+    },
+    texture: _texture,
+    color: _color,
+    width: tileWidth * scale,
+    height: tileHeight * scale,
+    depth: tileDepth * scale,
+    exit: tile.exit
+  });
   return ent;
 }
 
@@ -5023,7 +5024,7 @@ function handleChunkLoadFailure(chunkPath, chunkKey) {
     var randomChunk;
     var chunkCoordinates = this.extractChunkCoordinates(chunkKey);
 
-    //console.log('chunkCoordinates', chunkCoordinates)
+    // console.log('chunkCoordinates', chunkCoordinates)
     //console.log('current map data', this.tiledMap)
 
     var x = chunkCoordinates.x;
@@ -5035,8 +5036,8 @@ function handleChunkLoadFailure(chunkPath, chunkKey) {
     var map = this.createTileMap({
       x: x,
       y: y,
-      width: 8,
-      height: 8,
+      width: this.chunkUnitSize,
+      height: this.chunkUnitSize,
       tileWidth: 16,
       tileHeight: 16,
       algo: this.labyrinthosAlgoName,

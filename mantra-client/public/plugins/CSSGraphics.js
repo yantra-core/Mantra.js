@@ -351,6 +351,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         renderDiv = document.createElement('div');
         renderDiv.id = 'css-render-div';
         renderDiv.className = 'render-div';
+        renderDiv.style.transformOrigin = 'center center';
         gameHolder.appendChild(renderDiv);
       }
       this.renderDiv = renderDiv;
@@ -642,11 +643,6 @@ function update() {
     game.viewportCenterYOffset = 0;
   }
 
-  // game.viewportCenterYOffset = 500;
-  // console.log('game.viewportCenterYOffset ', game.viewportCenterYOffset )
-
-  // console.log(zoomFactor, game.viewportCenterXOffset, game.viewportCenterYOffset)
-
   // Update the camera position
   if (this.follow && currentPlayer && currentPlayer.position) {
     // If following a player, adjust the camera position based on the player's position and the calculated offset
@@ -665,7 +661,20 @@ function update() {
     } else {
       this.scene.cameraPosition.y = newY;
     }
-    // this.scene.cameraPosition.y = newY;
+    var adjustedPosition = {
+      x: this.game.data.camera.position.x - windowWidth / 2,
+      y: this.game.data.camera.position.y - windowHeight / 2
+    };
+    adjustedPosition.x *= this.game.data.camera.currentZoom;
+    adjustedPosition.y *= this.game.data.camera.currentZoom;
+    // domY += game.viewportCenterYOffset / this.game.data.camera.currentZoom;
+
+    adjustedPosition.y += game.viewportCenterYOffset / 2;
+
+    //console.log('domX', domX, 'domY', domY)
+    if (this.scene.renderDiv) {
+      setTransform(this.scene.renderDiv, -adjustedPosition.x, -adjustedPosition.y, this.game.data.camera.currentZoom, 0);
+    }
   } else {
     // If not following a player, use the calculated offsets directly
     this.scene.cameraPosition.x = game.viewportCenterXOffset;
@@ -674,6 +683,24 @@ function update() {
 
   // Update the camera's position in the game data
   this.game.data.camera.position = this.scene.cameraPosition;
+}
+function setTransform(container, offsetX, offsetY, zoom, rotation) {
+  // Retrieve the last applied values from the container's dataset
+  var lastOffsetX = parseFloat(container.dataset.lastOffsetX) || 0;
+  var lastOffsetY = parseFloat(container.dataset.lastOffsetY) || 0;
+  var lastZoom = parseFloat(container.dataset.lastZoom) || 1;
+  var lastRotation = parseFloat(container.dataset.lastRotation) || 0;
+
+  // Check if the new values differ from the last applied values
+  if (offsetX !== lastOffsetX || offsetY !== lastOffsetY || zoom !== lastZoom || rotation !== lastRotation) {
+    // Apply the new transform only if there's a change
+    container.style.transform = "translate(".concat(offsetX, "px, ").concat(offsetY, "px) scale(").concat(zoom, ") rotate(").concat(rotation, "deg)");
+    // Update the container's dataset with the new values
+    container.dataset.lastOffsetX = offsetX;
+    container.dataset.lastOffsetY = offsetY;
+    container.dataset.lastZoom = zoom;
+    container.dataset.lastRotation = rotation;
+  }
 }
 
 },{}],10:[function(require,module,exports){
@@ -742,11 +769,22 @@ function updateEntityPosition(entityElement, entityData) {
   var fovHeight = window.outerHeight;
   fovWidth = 600;
   fovHeight = 600;
-  var adjustedPosition = {
-    x: position.x - (this.scene.cameraPosition.x - window.innerWidth / 2),
-    y: position.y - (this.scene.cameraPosition.y - window.outerHeight / 2)
-  };
 
+  /* Remark: Removed 2/7/2024
+            Entities are no longer transformed per camera
+            Instead entities are transformed per game holder
+            Camera will apply transforms to the game holder
+     Reason: Performance, we don't need to transform every entity per camera
+     let adjustedPosition = {
+      x: position.x - (this.scene.cameraPosition.x -  window.innerWidth / 2),
+      y: position.y - (this.scene.cameraPosition.y - window.outerHeight / 2)
+    };
+  */
+
+  var adjustedPosition = {
+    x: position.x,
+    y: position.y
+  };
   // Check if the entity is within the field of view
   // Remark: Field of View is disabled ( for now ), it *should* be working as expected,
   //         the current implementation will hide the entity, we should removeEntity() instead
