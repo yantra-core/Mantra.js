@@ -14,6 +14,7 @@ let defaultAssets = {
   'tile-path-green': '/img/game/tiles/tile-path-green.png',
   'tile-path-brown': '/img/game/tiles/tile-path-brown.png',
   'tile-exit': '/img/game/tiles/tile-exit.png',
+  'tile-entrance': '/img/game/tiles/tile-entrance.png',
   //'fire': '/img/game/env/loz_fire.png',
   // 'flare': '/img/game/particle/flare.png',
     //'planet-express-base': '/img/game/env/planet-express-base.png',
