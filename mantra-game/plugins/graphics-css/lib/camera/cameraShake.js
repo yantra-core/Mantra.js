@@ -1,6 +1,5 @@
 // cameraShake.js - Marak Squires 2023
-export default function cameraShake({initialIntensity = 100, duration = 777}) {
-
+export default function cameraShake({ initialIntensity = 100, duration = 777 }) {
   let gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');
@@ -14,13 +13,16 @@ export default function cameraShake({initialIntensity = 100, duration = 777}) {
   }
   gameViewport.dataset.isShaking = 'true';
 
+  // Capture the initial transform state before starting the shake effect
+  let initialTransform = gameViewport.style.transform;
+
   let startTime = Date.now();
   let shake = () => {
     let elapsedTime = Date.now() - startTime;
     let remainingTime = duration - elapsedTime;
     if (remainingTime <= 0) {
-      // Reset transform after shaking completes
-      gameViewport.style.transform = `scale(${this.game.data.camera.currentZoom})`;
+      // Reset transform to the initial state after shaking completes
+      gameViewport.style.transform = initialTransform;
       gameViewport.dataset.isShaking = 'false'; // Reset the debounce flag
       return;
     }
@@ -32,8 +34,8 @@ export default function cameraShake({initialIntensity = 100, duration = 777}) {
     let x = intensity * Math.sin(elapsedTime / 100) * (Math.random() > 0.5 ? 1 : -1);
     let y = intensity * Math.cos(elapsedTime / 100) * (Math.random() > 0.5 ? 1 : -1);
 
-    // Apply the shake with the current zoom
-    gameViewport.style.transform = `scale(${this.game.data.camera.currentZoom}) translate(${x}px, ${y}px)`;
+    // Apply the shake effect on top of the initial transform
+    gameViewport.style.transform = `${initialTransform} translate(${x}px, ${y}px)`;
 
     // Apply a random force to each entity
     Object.keys(this.game.data.ents._).forEach(eId => {
