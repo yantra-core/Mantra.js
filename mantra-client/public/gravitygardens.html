@@ -10,8 +10,7 @@
 <body>
   <script type="module" src="/mantra.js"></script>
   <script type="module" src="/worlds.mantra.js"></script>
-  <script type="module" src="/ycraft.js"></script>
-
+  
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
 
@@ -22,7 +21,8 @@
         graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
-          scriptRoot: '.'
+          scriptRoot: '.',
+          assetRoot: '.'
         }
       });
 

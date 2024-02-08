@@ -20,7 +20,7 @@ let defaultAssets = {
   // 'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   // '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
-  'warp-to-home': '/img/game/env/warp-to-mantra-home.png',
+  'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
   /*
   'raiden': {
     type: 'spritesheet',
