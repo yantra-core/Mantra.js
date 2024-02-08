@@ -81,7 +81,7 @@ var Client = exports["default"] = /*#__PURE__*/function () {
             preloader.addAsset(asset.url, 'spritesheet', _key, asset);
             continue;
           }
-          if (asset.type === 'model' || 'model-fbx') {
+          if (asset.type === 'model' || asset.type === 'model-fbx') {
             preloader.addAsset(asset.url, 'model-fbx', _key, asset);
             continue;
           }
