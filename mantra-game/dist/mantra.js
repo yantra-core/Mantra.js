@@ -536,37 +536,33 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "setPosition",
     value: function setPosition(entityId, position) {
-      var body = this.bodyMap[entityId];
-      this.physics.setPosition(body, position);
+      this.physics.setPosition(entityId, position);
     }
   }, {
     key: "applyForce",
     value: function applyForce(entityId, force) {
-      var body = this.bodyMap[entityId];
-      this.physics.applyForce(body, body.position, force);
-      this.components.velocity[entityId] = {
-        x: body.velocity.x,
-        y: body.velocity.y
-      };
+      // const body = this.bodyMap[entityId];
+      this.physics.applyForce(entityId, force);
+      // this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
     }
   }, {
     key: "applyPosition",
     value: function applyPosition(entityId, position) {
-      var body = this.bodyMap[entityId];
+      // const body = this.bodyMap[entityId];
       // takes the current position and adds the new position
       var newPosition = {
         x: body.position.x + position.x,
         y: body.position.y + position.y
       };
-      this.physics.setPosition(body, newPosition);
+      this.physics.setPosition(entityId, newPosition);
     }
   }, {
     key: "rotate",
     value: function rotate(entityId, rotation) {
       var rotationSpeed = 0.022; // TODO: config
       var rotationAmount = rotation * rotationSpeed;
-      var body = this.bodyMap[entityId];
-      this.physics.rotateBody(body, rotationAmount);
+      // const body = this.bodyMap[entityId];
+      this.physics.rotateBody(entityId, rotationAmount);
     }
 
     //
@@ -1256,7 +1252,8 @@ function construct(game) {
   // Bind loadCSS from util
   game.loadCSS = _loadCSS["default"].bind(game);
   game.switchWorlds = _switchWorlds["default"].bind(game);
-  game.bodyMap = {};
+
+  // game.bodyMap = {};
   game.systems = {};
   game.storage = _storage["default"];
   game.snapshotQueue = [];

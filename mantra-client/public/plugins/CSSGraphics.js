@@ -430,13 +430,16 @@ function cameraShake(_ref) {
     return;
   }
   gameViewport.dataset.isShaking = 'true';
+
+  // Capture the initial transform state before starting the shake effect
+  var initialTransform = gameViewport.style.transform;
   var startTime = Date.now();
   var shake = function shake() {
     var elapsedTime = Date.now() - startTime;
     var remainingTime = duration - elapsedTime;
     if (remainingTime <= 0) {
-      // Reset transform after shaking completes
-      gameViewport.style.transform = "scale(".concat(_this.game.data.camera.currentZoom, ")");
+      // Reset transform to the initial state after shaking completes
+      gameViewport.style.transform = initialTransform;
       gameViewport.dataset.isShaking = 'false'; // Reset the debounce flag
       return;
     }
@@ -448,8 +451,8 @@ function cameraShake(_ref) {
     var x = intensity * Math.sin(elapsedTime / 100) * (Math.random() > 0.5 ? 1 : -1);
     var y = intensity * Math.cos(elapsedTime / 100) * (Math.random() > 0.5 ? 1 : -1);
 
-    // Apply the shake with the current zoom
-    gameViewport.style.transform = "scale(".concat(_this.game.data.camera.currentZoom, ") translate(").concat(x, "px, ").concat(y, "px)");
+    // Apply the shake effect on top of the initial transform
+    gameViewport.style.transform = "".concat(initialTransform, " translate(").concat(x, "px, ").concat(y, "px)");
 
     // Apply a random force to each entity
     Object.keys(_this.game.data.ents._).forEach(function (eId) {
@@ -486,9 +489,6 @@ function cssMouseWheelZoom(event) {
   var game = this.game;
   var scale = game.data.camera.currentZoom;
 
-  // Game viewport
-  var gameViewport = document.getElementById('gameHolder');
-
   // Zoom settings
   var zoomSettings = {
     intensity: 0.1,
@@ -508,14 +508,6 @@ function cssMouseWheelZoom(event) {
   // Applying logarithmic scale for smooth zoom
   var logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
   var newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
-
-  // Center of the viewport
-  var viewportCenterX = window.innerWidth / 2;
-  var viewportCenterY = window.innerHeight / 2;
-
-  // Calculate offsets based on the old scale
-  var offsetX = (viewportCenterX - this.scene.cameraPosition.x) / scale;
-  var offsetY = (viewportCenterY - this.scene.cameraPosition.y) / scale;
 
   // Update scale
   this.zoom(newScale);
@@ -623,6 +615,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = update;
+var _zoom = _interopRequireDefault(require("./zoom.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function update() {
   var game = this.game;
   var currentPlayer = this.game.getEntity(game.currentPlayerId);
@@ -645,11 +639,9 @@ function update() {
 
   // Update the camera position
   if (this.follow && currentPlayer && currentPlayer.position) {
-    // If following a player, adjust the camera position based on the player's position and the calculated offset
-    this.scene.cameraPosition.x = currentPlayer.position.x + game.viewportCenterXOffset;
     //this.scene.cameraPosition.x = this.scene.cameraPosition.x / zoomFactor;
-
-    var newY = currentPlayer.position.y + game.viewportCenterYOffset;
+    /*
+    let newY = currentPlayer.position.y + game.viewportCenterYOffset;
     //newY = newY / zoomFactor;
     if (game.data.camera.mode === 'platform') {
       // locks camera to not exceed bottom of screen for platform mode
@@ -661,17 +653,56 @@ function update() {
     } else {
       this.scene.cameraPosition.y = newY;
     }
+    */
+
+    //
+    // If following the player is enabled, the camera position is always the player position
+    //
+    var follow = true;
+    if (follow) {
+      this.scene.cameraPosition.x = currentPlayer.position.x;
+      this.scene.cameraPosition.y = currentPlayer.position.y;
+    }
+
+    //
+    // If there are any view port offsets from dragging or scrolling
+    // Adjust the camera position by these offsets
+    //
+    this.scene.cameraPosition.x += game.viewportCenterXOffset;
+    this.scene.cameraPosition.y += game.viewportCenterYOffset;
+
+    //
+    // Find the center of the screen
+    //
+    var centerX = window.innerWidth / 2;
+    var centerY = window.innerHeight / 2;
+
+    //
+    // Create a new position to move the renderDiv in order to keep the camera centered
+    // Based on current zoom settings
+    //
     var adjustedPosition = {
-      x: this.game.data.camera.position.x - windowWidth / 2,
-      y: this.game.data.camera.position.y - windowHeight / 2
+      x: this.scene.cameraPosition.x - centerX,
+      y: this.scene.cameraPosition.y - centerY
     };
+
+    //
+    // Apply the current zoom level to adjust the position
+    //
     adjustedPosition.x *= this.game.data.camera.currentZoom;
     adjustedPosition.y *= this.game.data.camera.currentZoom;
-    // domY += game.viewportCenterYOffset / this.game.data.camera.currentZoom;
 
-    adjustedPosition.y += game.viewportCenterYOffset / 2;
+    // TODO: now we need to recenter the adjusted position based on zoom
+    // Calculate the size of the visible area in the game's world space at the current zoom level
+    var visibleWidth = window.innerWidth / this.game.data.camera.currentZoom;
+    var visibleHeight = window.innerHeight / this.game.data.camera.currentZoom;
 
-    //console.log('domX', domX, 'domY', domY)
+    // Determine the offsets needed to center the viewport on the player in the game's world space
+    var offsetX = (window.innerWidth - visibleWidth) / 2;
+    var offsetY = (window.innerHeight - visibleHeight) / 2;
+    offsetX = offsetX * this.game.data.camera.currentZoom;
+    offsetY = offsetY * this.game.data.camera.currentZoom;
+    adjustedPosition.y += offsetY;
     if (this.scene.renderDiv) {
       setTransform(this.scene.renderDiv, -adjustedPosition.x, -adjustedPosition.y, this.game.data.camera.currentZoom, 0);
     }
@@ -703,7 +734,7 @@ function setTransform(container, offsetX, offsetY, zoom, rotation) {
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{"./zoom.js":12}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -848,36 +879,6 @@ function zoom(scale) {
     scale = maxZoom;
   }
   this.game.data.camera.currentZoom = scale;
-  var gameViewport = document.getElementById('gameHolder');
-  if (gameViewport) {
-    // Set the transform origin to the center
-    gameViewport.style.transformOrigin = 'center center';
-
-    // Set transition time
-    gameViewport.style.transition = "transform ".concat(transitionTime);
-
-    // Calculate the translation needed to keep the screen's center constant
-    var centerX = window.innerWidth / 2;
-    var centerY = window.outerHeight / 2;
-    var playerHeightOffset = 16;
-    if (window === top) {} else {
-      // if embed in iframe, adjust for iframe offset
-      playerHeightOffset = 32;
-    }
-
-    // The logic here ensures that the screen center remains constant during zoom
-    // X adjustment not needed for default zoom behavior
-    // let newCameraX = (centerX - (centerX / scale));
-    var newCameraY = centerY - centerY / scale;
-    //game.viewportCenterXOffset = newCameraX;
-    // alert()
-    this.game.viewportCenterYOffset = newCameraY + playerHeightOffset;
-
-    // Apply scale and translate transform
-    gameViewport.style.transform = "scale(".concat(scale, ")");
-  } else {
-    console.log('Warning: could not find gameHolder div, cannot zoom');
-  }
 }
 
 },{}],13:[function(require,module,exports){

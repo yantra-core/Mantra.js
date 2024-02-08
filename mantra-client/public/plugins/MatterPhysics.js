@@ -310,6 +310,7 @@ var _setBodySize = _interopRequireDefault(require("./lib/setBodySize.js"));
 var _lockedProperties = _interopRequireDefault(require("./lib/lockedProperties.js"));
 var _limitSpeed = _interopRequireDefault(require("./lib/limitSpeed.js"));
 var _setGravity = _interopRequireDefault(require("./lib/setGravity.js"));
+var _createBody = _interopRequireDefault(require("./lib/createBody.js"));
 var _excluded = ["action"];
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -352,6 +353,9 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     _this.Matter = _matterJs["default"];
     _this.initEngine = _initEngine["default"].bind(_assertThisInitialized(_this));
 
+    // keeps reference to all bodies in the game, required for communicating with the worker
+    _this.bodyMap = {};
+
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
     //
@@ -367,6 +371,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     _this.collisionEnd = _collisionEnd["default"].bind(_assertThisInitialized(_this));
     _this.onAfterUpdate = _onAfterUpdate["default"].bind(_assertThisInitialized(_this));
     _this.setBodySize = _setBodySize["default"].bind(_assertThisInitialized(_this));
+    _this.createBody = _createBody["default"].bind(_assertThisInitialized(_this));
     _this.lockedProperties = _lockedProperties["default"].bind(_assertThisInitialized(_this));
     _this.limitSpeed = _limitSpeed["default"].bind(_assertThisInitialized(_this));
     _this.setGravity = _setGravity["default"].bind(_assertThisInitialized(_this));
@@ -513,11 +518,6 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
       // TODO: configurable collision plugins
       game.use(new _Collisions["default"]());
     }
-  }, {
-    key: "createBody",
-    value: function createBody(options) {
-      return _matterJs["default"].Body.create(options);
-    }
 
     // Equivalent to Engine.create()
   }, {
@@ -529,13 +529,20 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     // Equivalent to World.add()
   }, {
     key: "addToWorld",
-    value: function addToWorld(body) {
+    value: function addToWorld(bodyConfig) {
+      // body is body config as json
+      var body = this.createBody(bodyConfig);
+      this.bodyMap[bodyConfig.myEntityId] = body;
       _matterJs["default"].World.add(this.engine.world, body);
     }
   }, {
     key: "removeBody",
-    value: function removeBody(body) {
-      _matterJs["default"].World.remove(this.engine.world, body);
+    value: function removeBody(entityId) {
+      var body = this.bodyMap[entityId];
+      if (body) {
+        _matterJs["default"].World.remove(this.engine.world, body);
+        delete this.bodyMap[body.myEntityId];
+      }
     }
   }, {
     key: "setMass",
@@ -567,8 +574,14 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     // Equivalent to Body.applyForce()
   }, {
     key: "applyForce",
-    value: function applyForce(body, position, force) {
-      _matterJs["default"].Body.applyForce(body, position, force);
+    value: function applyForce(entityId, force) {
+      var body = this.bodyMap[entityId];
+      if (body) {
+        var position = body.position;
+        _matterJs["default"].Body.applyForce(body, position, force);
+      } else {
+        // console.error('No body found for entityId', entityId);
+      }
     }
 
     // Custom method to get a body's position
@@ -606,18 +619,30 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
     }
   }, {
     key: "setRotation",
-    value: function setRotation(body, rotation) {
-      _matterJs["default"].Body.setAngle(body, rotation);
+    value: function setRotation(entityId, rotation) {
+      var body = this.bodyMap[entityId];
+      if (body) {
+        _matterJs["default"].Body.setAngle(body, rotation);
+      }
     }
   }, {
     key: "setPosition",
-    value: function setPosition(body, position) {
-      _matterJs["default"].Body.setPosition(body, position);
+    value: function setPosition(entityId, position) {
+      var body = this.bodyMap[entityId];
+      if (body) {
+        _matterJs["default"].Body.setPosition(body, {
+          x: position.x,
+          y: position.y
+        });
+      }
     }
   }, {
     key: "setVelocity",
-    value: function setVelocity(body, velocity) {
-      _matterJs["default"].Body.setVelocity(body, velocity);
+    value: function setVelocity(entityId, velocity) {
+      var body = this.bodyMap[entityId];
+      if (body) {
+        _matterJs["default"].Body.setVelocity(body, velocity);
+      }
     }
 
     // Remark: This may not work as expected, since the callback is not the same function reference
@@ -644,7 +669,7 @@ _defineProperty(MatterPhysics, "id", 'physics-matter');
 _defineProperty(MatterPhysics, "removable", false);
 var _default = exports["default"] = MatterPhysics;
 
-},{"../collisions/Collisions.js":1,"./PhysicsInterface.js":3,"./lib/collisionActive.js":4,"./lib/collisionEnd.js":5,"./lib/collisionStart.js":6,"./lib/initEngine.js":7,"./lib/limitSpeed.js":8,"./lib/lockedProperties.js":9,"./lib/onAfterUpdate.js":10,"./lib/setBodySize.js":11,"./lib/setGravity.js":12,"matter-js":13}],3:[function(require,module,exports){
+},{"../collisions/Collisions.js":1,"./PhysicsInterface.js":3,"./lib/collisionActive.js":4,"./lib/collisionEnd.js":5,"./lib/collisionStart.js":6,"./lib/createBody.js":7,"./lib/initEngine.js":8,"./lib/limitSpeed.js":9,"./lib/lockedProperties.js":10,"./lib/onAfterUpdate.js":11,"./lib/setBodySize.js":12,"./lib/setGravity.js":13,"matter-js":14}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -880,6 +905,75 @@ function collisionStart(game, callback) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = createBody;
+// TODO: move this to PhysicsPlugin
+function createBody(config) {
+  var Matter = this.Matter;
+  var game = this.game;
+  var commonBodyConfig = {
+    mass: config.mass,
+    isSensor: config.isSensor,
+    isStatic: config.isStatic,
+    inertia: Infinity,
+    density: config.density,
+    restitution: config.restitution,
+    friction: config.friction,
+    frictionAir: config.frictionAir,
+    frictionStatic: config.frictionStatic
+  };
+  if (config.type === "BULLET") {
+    config.shape = 'circle';
+  }
+  var body;
+  switch (config.shape) {
+    case 'rectangle':
+      body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
+      break;
+    case 'circle':
+      body = this.game.physics.Bodies.circle(config.position.x, config.position.y, config.radius, commonBodyConfig);
+      break;
+    case 'triangle':
+    default:
+      var triangleVertices = [{
+        x: config.position.x,
+        y: config.position.y - 32
+      }, {
+        x: config.position.x - 32,
+        y: config.position.y + 32
+      }, {
+        x: config.position.x + 32,
+        y: config.position.y + 32
+      }];
+      // TODO: add this support to PhysxPlugin
+      //body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
+      body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
+      break;
+  }
+  if (typeof config.mass !== 'undefined') {
+    if (this.game.physics && this.game.physics.setMass) {
+      this.game.physics.setMass(body, config.mass);
+    }
+  }
+
+  // TODO: move to BulletPlugin ?
+  if (config.type === 'BULLET') {
+    // set friction to 0 for bullets
+    // this.game.physics.setFriction(body, 0);
+    // TODO: make this config with defaults
+    body.friction = 0;
+    body.frictionAir = 0;
+    body.frictionStatic = 0;
+  }
+  body.myEntityId = config.myEntityId;
+  return body;
+}
+
+},{}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = initEngine;
 function initEngine() {
   var Matter = this.Matter;
@@ -892,7 +986,7 @@ function initEngine() {
   game.physicsReady = true;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -908,7 +1002,7 @@ function limitSpeed(body, maxSpeed) {
   }
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -933,7 +1027,7 @@ function lockedProperties(body) {
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -962,6 +1056,10 @@ function onAfterUpdate(event) {
   try {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
       var body = _step.value;
+      if (typeof this.bodyMap[body.myEntityId] === 'undefined') {
+        // add the reference to the bodyMap
+        this.bodyMap[body.myEntityId] = body;
+      }
       // worldState.forEach(function processWorldState(body) {
 
       // let entity = that.game.getEntity(body.myEntityId);
@@ -1105,7 +1203,7 @@ function onAfterUpdate(event) {
   }
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1139,7 +1237,7 @@ function setBodySize(body, size) {
   }
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1154,7 +1252,7 @@ function setGravity() {
   this.engine.gravity.y = y;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){(function (){
 /*!
  * matter-js 0.19.0 by @liabru

@@ -105,7 +105,8 @@ var Block = /*#__PURE__*/function () {
             type: entityA.type,
             position: {
               x: entityA.position.x + xOffset,
-              y: entityA.position.y + yOffset
+              y: entityA.position.y + yOffset,
+              z: entityA.position.z
             },
             velocity: {
               x: (Math.random() * 2 - 1) * 10,

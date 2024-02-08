@@ -91,10 +91,23 @@ var Boomerang = /*#__PURE__*/function () {
           var boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
           pair.isActive = false; // Deactivate collision processing for this pair
           var diff = game.tick - boomerang.ctick;
-          if (diff > this.catchBoomerangTickDelay) {
+          if (boomerang.isReturning || diff > this.catchBoomerangTickDelay) {
             this.completeReturn(boomerang);
           }
           return;
+        }
+
+        // if the boomerang hits anything else, it should return
+        if (entityA.type === 'BOOMERANG' || entityB.type === 'BOOMERANG') {
+          var _boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
+          // pair.isActive = false; // Deactivate collision processing for this pair
+          // invert the velocity
+          _boomerang.isReturning = true;
+          this.game.applyForce(_boomerang.id, {
+            x: -_boomerang.velocity.x,
+            y: -_boomerang.velocity.y
+          });
+          // this.completeReturn(boomerang);
         }
       }
     }
@@ -217,11 +230,13 @@ var Boomerang = /*#__PURE__*/function () {
         x: Math.sin(playerRotation) * this.speed + playerVelocity.x,
         y: -Math.cos(playerRotation) * this.speed + playerVelocity.y
       };
+      boomerangVelocity.x = Math.min(boomerangVelocity.x, 10);
+      boomerangVelocity.y = Math.min(boomerangVelocity.y, 10);
       boomerangstartingPosition.z = 4;
       var boomerangConfig = {
         type: 'BOOMERANG',
-        height: 16,
-        width: 16,
+        height: 12,
+        width: 12,
         position: boomerangstartingPosition,
         rotation: entity.rotation,
         // TODO: get the player's rotation

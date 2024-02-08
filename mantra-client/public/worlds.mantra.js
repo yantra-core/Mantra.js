@@ -2304,11 +2304,6 @@ function blackHoleSutra(game, context) {
 
   // Function to apply gravitational force
   function applyGravity(ent1, ent2, gravity, gameState) {
-    // TODO: refactor to use Entity.body component, removes game.bodyMap
-    var body = game.bodyMap[ent2.id];
-    if (!body) {
-      return;
-    }
     var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
@@ -3409,10 +3404,11 @@ var GravityGardens = /*#__PURE__*/function () {
         if (Date.now() - gameState.lastGravitySwitch >= 1000) {
           gameState.repulsion = !gameState.repulsion;
 
-          // get screen center coordinates, take the window size and divide by 2
-          // use the document window here not the game data
+          // pings the screen center, assuming player is there
           var x = window.innerWidth / 2;
-          var y = window.innerHeight / 2 + 24;
+          var y = window.innerHeight / 2;
+          x = x - game.viewportCenterXOffset;
+          y = y - game.viewportCenterYOffset;
           if (gameState.repulsion) {
             game.pingPosition(x, y, {
               color: 'red',
@@ -3675,7 +3671,7 @@ var Home = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.zoom(1.44);
       } else {
-        game.zoom(1);
+        game.zoom(4.5);
       }
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
@@ -4347,7 +4343,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  // rules.use(hexapod(game), 'hexapod');
+  rules.use((0, _hexapod["default"])(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');

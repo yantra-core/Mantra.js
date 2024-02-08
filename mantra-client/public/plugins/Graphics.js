@@ -404,6 +404,15 @@ function pingPosition(x, y) {
     reverse: options.reverse || false // Reverse (implosion) effect
   };
 
+  // scale size based on current this.game.data.camera.currentZoom
+  var scale = this.game.data.camera.currentZoom;
+  config.size *= scale;
+  config.finalSize *= scale;
+
+  // adjust based on the current this.game.data.camera.position
+  //x += this.game.viewportCenterXOffset;
+  //y += this.game.viewportCenterYOffset;
+
   // Create the ripple element
   var ripple = document.createElement('div');
   ripple.style.position = 'fixed';
