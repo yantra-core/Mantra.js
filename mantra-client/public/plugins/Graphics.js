@@ -62,9 +62,6 @@ var Graphics = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "preload",
-    value: function preload() {}
-  }, {
     key: "update",
     value: function update() {}
 
