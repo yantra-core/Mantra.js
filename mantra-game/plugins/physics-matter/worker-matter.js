@@ -12,6 +12,7 @@ import onAfterUpdate from './lib/onAfterUpdate.js';
 import setBodySize from './lib/setBodySize.js';
 import lockedProperties from './lib/lockedProperties.js';
 import limitSpeed from './lib/limitSpeed.js';
+import createBody from './lib/createBody.js';
 import _setGravity from './lib/setGravity.js';
 
 let physics = {};
@@ -23,6 +24,8 @@ physics.engine = Matter.Engine.create()
 
 physics.onAfterUpdate = onAfterUpdate.bind(physics);
 physics.setGravity = _setGravity.bind(physics);
+physics.createBody = createBody.bind(physics);
+physics.bodyMap = {};
 
 
 // Handlers for various physics operations, structured similarly to methods in the MatterPhysics class
@@ -63,19 +66,24 @@ const actions = {
     postMessage({ action: 'engineInitialized' });
 
   },
-  addToWorld: (body) => {
+  addToWorld: (bodyConfig) => {
+    // body is body config as json
+    let body = physics.createBody(bodyConfig);
+    physics.bodyMap[bodyConfig.myEntityId] = body;
     Matter.World.add(physics.engine.world, body);
   },
   updateEngine: (args) => {
     Matter.Engine.update(physics.engine, args[0]);
     postMessage({ action: 'engineUpdated' });
   },
+  /*
   createBody: ({ options }) => {
     console.log('createBody', options)
     const body = Matter.Body.create(options);
     Matter.World.add(physics.engine.world, body);
     postMessage({ action: 'bodyCreated', bodyId: body.id });
   },
+  */
   // Implement additional handlers corresponding to the methods in your MatterPhysics class
   // For instance, for collisionStart, collisionActive, and collisionEnd
   collisionStart: ({ data }) => {
