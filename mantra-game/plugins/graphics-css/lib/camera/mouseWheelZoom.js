@@ -6,9 +6,6 @@ export default function cssMouseWheelZoom(event) {
   let game = this.game;
   let scale = game.data.camera.currentZoom;
 
-  // Game viewport
-  let gameViewport = document.getElementById('gameHolder');
-
   // Zoom settings
   const zoomSettings = {
     intensity: 0.1, // Base zoom intensity
@@ -26,14 +23,6 @@ export default function cssMouseWheelZoom(event) {
   // Applying logarithmic scale for smooth zoom
   let logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
   const newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
-
-  // Center of the viewport
-  const viewportCenterX = window.innerWidth / 2;
-  const viewportCenterY = window.innerHeight / 2;
-
-  // Calculate offsets based on the old scale
-  let offsetX = (viewportCenterX - this.scene.cameraPosition.x) / scale;
-  let offsetY = (viewportCenterY - this.scene.cameraPosition.y) / scale;
 
   // Update scale
   this.zoom(newScale);
