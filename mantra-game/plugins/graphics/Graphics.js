@@ -54,10 +54,6 @@ class Graphics {
 
   }
 
-  preload() {
-
-  }
-
   update() { }
 
 

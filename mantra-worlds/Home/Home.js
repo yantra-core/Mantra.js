@@ -10,6 +10,20 @@ class Home {
     this.type = Home.type;
   }
 
+  async preload (game){
+
+    /* // for dev testing
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    await sleep(2000);
+    */
+
+    game.addAsset('/img/game/env/planet-express-base.png', 'image', 'planet-express-base');
+    game.addAsset('/img/game/env/robot-arms-apartment.png', 'image', 'robot-arms-apartment');
+
+  }
+
   init(game) {
     this.game = game;
     this.createWorld();

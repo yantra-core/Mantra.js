@@ -1,5 +1,5 @@
 export default function use(game) {
-  return function use(pluginInstanceOrId, options = {}, cb) {
+  return async function use(pluginInstanceOrId, options = {}, cb) {
 
     if (typeof cb === 'undefined') {
       cb = function noop() { };
@@ -38,16 +38,25 @@ export default function use(game) {
 
       // Dynamically load the plugin script
       const scriptUrl = `${basePath}${pluginId}.js`;
-      game.loadPluginScript(scriptUrl).then(function () {
+      game.loadPluginScript(scriptUrl).then(async function () {
         // The script is expected to call `game.use(pluginInstance)` after loading
         console.log(`Loaded: ${pluginId}`);
+
         if (typeof PLUGINS === 'object') {
           //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
           let pluginInstance = new PLUGINS[pluginId].default(options);
+
+          if (pluginInstance.preload) {
+            // alert('pluginInstance.preload')
+            // console.log("pluginInstance.preload", pluginInstance.preload)
+            // await pluginInstance.preload(game);
+            // we could preload here as well, i don't think we need to since it will happen below
+          }
+
           game.use(pluginInstance);
           // check to see if pluginInstance is async, if so
           // we'll assume it will emit a ready event when it's ready
-          if (pluginInstance.async) {
+          if (pluginInstance.async) { // TODO: remove this and have better async init semantics
             // plugin must perform async operation before it's ready
             // plugin author *must* emit their own ready event game will not start
           } else {
@@ -81,6 +90,13 @@ export default function use(game) {
 
     const pluginId = pluginInstanceOrId.id;
     game.loadedPlugins.push(pluginId);
+
+    //
+    // If the Plugin has a .preload() method, call it
+    //
+    if (pluginInstanceOrId.preload) {
+      await pluginInstanceOrId.preload(game);
+    }
 
     pluginInstanceOrId.init(game, game.engine, game.scene);
     game._plugins[pluginId] = pluginInstanceOrId;

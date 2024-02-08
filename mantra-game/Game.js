@@ -290,11 +290,10 @@ class Game {
   //
   // Asset and Styling APIs
   //
-  addAsset(key, path) {
-    // game.addAsset needs to work immediately, potentially before game.start()
-    // the preloader won't be available until the `Client` system is loaded
+  addAsset(url, type, key, options) {
+    // game::ready event / game.start(cb) will wait for all assets to be loaded
     if (this.preloader) {
-      this.preloader.addAsset(path, 'spritesheet', key);
+      this.preloader.addAsset(url, type, key, options);
     } else {
       this.queuedAssets[key] = path;
     }
