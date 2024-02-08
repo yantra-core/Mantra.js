@@ -374,6 +374,10 @@ class Game {
 
     // reset any deffered entities
     this.deferredEntities = {};
+
+    // reset the camera offsets ( in case user has dragged or scrolled camera )
+    game.viewPortOffsetX = 0; // TODO: scope these onto game.data.camera.viewPortOffset
+    game.viewPortOffsetY = 0;
   }
 
   //
