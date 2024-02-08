@@ -1,3 +1,4 @@
+import assets from './assets.js';
 import sutras from './sutras.js';
 import welcomeMessage from './welcomeMessage.js';
 
@@ -19,8 +20,17 @@ class Home {
     await sleep(2000);
     */
 
+    // add groups of assets
+    game.addAssets(assets);
+
+    // add single assets
     game.addAsset('/img/game/env/planet-express-base.png', 'image', 'planet-express-base');
     game.addAsset('/img/game/env/robot-arms-apartment.png', 'image', 'robot-arms-apartment');
+    game.addAsset('/img/game/logos/sutra-tree.png', 'image', 'sutra-tree');
+    game.addAsset('/img/game/env/warp-to-platform.gif', 'image', 'warp-to-platform');
+    game.addAsset('/img/game/env/warp-to-music.gif', 'image', 'warp-to-music');
+    game.addAsset('/img/game/env/warp-to-ycraft.gif', 'image', 'warp-to-ycraft');
+    game.addAsset('/img/game/env/garden.png', 'image', 'garden');
 
   }
 

@@ -9,6 +9,10 @@ class Platform {
     this.type = Platform.type;
   }
 
+  async preload(game) {
+    game.addAsset('/img/game/levels/smb3-1-1.png', 'image', 'smb3-1-1');  
+  }
+
   init(game) {
     this.game = game;
     game.data.camera.mode = 'platform';

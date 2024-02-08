@@ -299,6 +299,13 @@ class Game {
     }
   }
 
+  addAssets(assets) {
+    for (let a in assets) {
+      let asset = assets[a];
+      this.addAsset(asset.url, asset.type, a, asset);
+    }
+  }
+
   setBackground(color) {
     // not implemented directly, Graphics plugin will handle this
   }

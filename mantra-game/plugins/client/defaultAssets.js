@@ -15,17 +15,11 @@ let defaultAssets = {
   'tile-path-brown': '/img/game/tiles/tile-path-brown.png',
   'tile-exit': '/img/game/tiles/tile-exit.png',
   //'fire': '/img/game/env/loz_fire.png',
-  'warp-to-platform': '/img/game/env/warp-to-platform.gif',
-  'warp-to-music': '/img/game/env/warp-to-music.gif',
-  'warp-to-ycraft': '/img/game/env/warp-to-ycraft.gif',
-  'smb3-1-1': '/img/game/levels/smb3-1-1.png',
   // 'flare': '/img/game/particle/flare.png',
     //'planet-express-base': '/img/game/env/planet-express-base.png',
   // 'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   // '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
-  'garden': '/img/game/env/garden.png',
-  'sutra-tree': '/img/game/logos/sutra-tree.png',
   'warp-to-home': '/img/game/env/warp-to-mantra-home.png',
   /*
   'raiden': {
@@ -43,39 +37,7 @@ let defaultAssets = {
     },
   },
   */
-  'jogurt': {
-    type: 'spritesheet',
-    url: '/img/game/sheets/jogurt.png',
-    frameWidth: 20,
-    frameHeight: 24,
-    frameTags: {
-      walkDown: {
-        frames: [
-          { x: 0, y: 0 },
-          { x: 0, y: -28 },
-        ]
-      },
-      walkUp: {
-        frames: [
-          { x: -22, y: 0 },
-          { x: -22, y: -28 },
-        ]
-      },
-      walkLeft: {
-        frames: [
-          { x: -44, y: 0 },
-          { x: -44, y: -28 },
-        ]
-      },
-      walkRight: {
-        frames: [
-          { x: -70, y: -1 },
-          { x: -70, y: -28 },
-        ]
-      },
-    },
-  },
-  'blackMage': {
+   'blackMage': {
     type: 'spritesheet',
     url: '/img/game/sheets/mage.png',
     frameTags: {
