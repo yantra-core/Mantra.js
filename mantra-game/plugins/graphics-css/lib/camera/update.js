@@ -1,4 +1,4 @@
-import zoom from "./zoom";
+import zoom from "./zoom.js";
 
 export default function update() {
 

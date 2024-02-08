@@ -86,14 +86,7 @@ class Entity {
       if (destroyedComponentData[entityId]) {
         // Removes the body from the physics engine
         if (typeof this.game.physics.removeBody === 'function') {
-          if (this.game.physics.bodyMap[entityId]) {
-            // removes body from physics engine
-            this.game.physics.removeBody(this.game.physics.bodyMap[entityId]);
-            // deletes reference to body
-            delete this.game.physics.bodyMap[entityId];
-          } else {
-            // console.log('No body found for entityId', entityId);
-          }
+          this.game.physics.removeBody(entityId);
         }
         // Delete associated components for the entity using Component's remove method
         for (let componentType in this.game.components) {
