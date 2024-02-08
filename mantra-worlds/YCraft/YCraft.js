@@ -26,7 +26,7 @@ class YCraft {
     if (game.isTouchDevice()) {
       game.zoom(1.5);
     } else {
-      game.setZoom(3.5);
+      game.setZoom(2);
     }
 
     game.use('Boomerang');
@@ -36,6 +36,17 @@ class YCraft {
       contraption: contraptionsExample
     });
     game.use('YCraftGUI');
+
+    game.createPlayer({
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
+      },
+      position: {
+        x: 100,
+        y: 100
+      }
+    });
 
     // create warp by back home entity
     game.createEntity({
@@ -139,18 +150,6 @@ class YCraft {
       });
     }
 
-    // Remark: Players removed for initial demo, is working
-
-    game.createDefaultPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'player'
-      },
-      position: {
-        x: 0,
-        y: 0
-      }
-    });
 
   }
 

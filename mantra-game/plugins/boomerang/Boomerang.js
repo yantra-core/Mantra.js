@@ -48,7 +48,7 @@ class Boomerang {
     return distance >= this.range;
   }
 
-  handleCollision (pair, bodyA, bodyB) {
+  handleCollision(pair, bodyA, bodyB) {
     if (bodyA.myEntityId && bodyB.myEntityId) {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;
@@ -70,10 +70,23 @@ class Boomerang {
         let boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
         pair.isActive = false; // Deactivate collision processing for this pair
         let diff = game.tick - boomerang.ctick;
-        if (diff > this.catchBoomerangTickDelay) {
+        if (boomerang.isReturning || diff > this.catchBoomerangTickDelay) {
           this.completeReturn(boomerang);
         }
         return;
+      }
+
+      // if the boomerang hits anything else, it should return
+      if (entityA.type === 'BOOMERANG' || entityB.type === 'BOOMERANG') {
+        let boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
+        // pair.isActive = false; // Deactivate collision processing for this pair
+        // invert the velocity
+        boomerang.isReturning = true;
+        this.game.applyForce(boomerang.id, {
+          x: -boomerang.velocity.x,
+          y: -boomerang.velocity.y
+        })
+        // this.completeReturn(boomerang);
       }
 
     }
@@ -137,7 +150,7 @@ class Boomerang {
       console.log('Boomerang.throwBoomerang no entity found for id', entityId);
       return;
     }
-    
+
 
     // Ensure only a limited number of boomerangs can be thrown by one player
     let boomerangCount = 0;
@@ -181,17 +194,21 @@ class Boomerang {
     //boomerangVelocity.x = Math.sin(playerRotation) * this.speed;
     //boomerangVelocity.y = -Math.cos(playerRotation) * this.speed;
 
-   // Set initial boomerang velocity to include player's current velocity
-   let boomerangVelocity = {
-    x: Math.sin(playerRotation) * this.speed + playerVelocity.x,
-    y: -Math.cos(playerRotation) * this.speed + playerVelocity.y
-  };
+    // Set initial boomerang velocity to include player's current velocity
+    let boomerangVelocity = {
+      x: Math.sin(playerRotation) * this.speed + playerVelocity.x,
+      y: -Math.cos(playerRotation) * this.speed + playerVelocity.y
+    };
+
+    boomerangVelocity.x = Math.min(boomerangVelocity.x, 10);
+    boomerangVelocity.y = Math.min(boomerangVelocity.y, 10);
+
 
     boomerangstartingPosition.z = 4;
     const boomerangConfig = {
       type: 'BOOMERANG',
-      height: 16,
-      width: 16,
+      height: 12,
+      width: 12,
       position: boomerangstartingPosition,
       rotation: entity.rotation, // TODO: get the player's rotation
       speed: this.speed,

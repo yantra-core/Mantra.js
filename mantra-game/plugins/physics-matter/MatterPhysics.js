@@ -295,7 +295,6 @@ class MatterPhysics extends PhysicsInterface {
 
   setPosition(entityId, position) {
     let body = this.bodyMap[entityId];
-    console.log("setPosition", entityId, position, body)
     if (body) {
       Matter.Body.setPosition(body, {
         x: position.x,
