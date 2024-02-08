@@ -118,13 +118,14 @@
             position: {
               x: 0,
               y: 0,
-              z: 16
+              z: 17
             },
             texture: {
               sheet: 'loz_spritesheet',
               sprite: 'player',
             }
           });
+          // TODO: we need to clear any tiles a 0,0 here in case has been set, player stuck
         } else {
 
           game.setGravity(0, 3.3, 0);

@@ -349,6 +349,11 @@ var Entity = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "_generateId",
+    value: function _generateId() {
+      return this.nextEntityId++;
+    }
+  }, {
     key: "cleanupDestroyedEntities",
     value: function cleanupDestroyedEntities() {
       var _this = this;
@@ -362,14 +367,7 @@ var Entity = /*#__PURE__*/function () {
         if (destroyedComponentData[entityId]) {
           // Removes the body from the physics engine
           if (typeof _this.game.physics.removeBody === 'function') {
-            if (_this.game.bodyMap[entityId]) {
-              // removes body from physics engine
-              _this.game.physics.removeBody(_this.game.bodyMap[entityId]);
-              // deletes reference to body
-              delete _this.game.bodyMap[entityId];
-            } else {
-              // console.log('No body found for entityId', entityId);
-            }
+            _this.game.physics.removeBody(entityId);
           }
           // Delete associated components for the entity using Component's remove method
           for (var componentType in _this.game.components) {
@@ -465,72 +463,6 @@ var Entity = /*#__PURE__*/function () {
       if (clearCurrentPlayer) {
         this.game.currentPlayerId = null;
       }
-    }
-
-    // TODO: move this to PhysicsPlugin
-  }, {
-    key: "createBody",
-    value: function createBody(config) {
-      var commonBodyConfig = {
-        mass: config.mass,
-        isSensor: config.isSensor,
-        isStatic: config.isStatic,
-        inertia: Infinity,
-        density: config.density,
-        restitution: config.restitution,
-        friction: config.friction,
-        frictionAir: config.frictionAir,
-        frictionStatic: config.frictionStatic
-      };
-      if (config.type === "BULLET") {
-        config.shape = 'circle';
-      }
-      var body;
-      switch (config.shape) {
-        case 'rectangle':
-          body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
-          break;
-        case 'circle':
-          body = this.game.physics.Bodies.circle(config.position.x, config.position.y, config.radius, commonBodyConfig);
-          break;
-        case 'triangle':
-        default:
-          var triangleVertices = [{
-            x: config.position.x,
-            y: config.position.y - 32
-          }, {
-            x: config.position.x - 32,
-            y: config.position.y + 32
-          }, {
-            x: config.position.x + 32,
-            y: config.position.y + 32
-          }];
-          // TODO: add this support to PhysxPlugin
-          //body = this.game.physics.Bodies.fromVertices(config.position.x, config.position.y, triangleVertices, commonBodyConfig);
-          body = this.game.physics.Bodies.rectangle(config.position.x, config.position.y, config.width, config.height, commonBodyConfig);
-          break;
-      }
-      if (typeof config.mass !== 'undefined') {
-        if (this.game.physics && this.game.physics.setMass) {
-          this.game.physics.setMass(body, config.mass);
-        }
-      }
-
-      // TODO: move to BulletPlugin ?
-      if (config.type === 'BULLET') {
-        // set friction to 0 for bullets
-        // this.game.physics.setFriction(body, 0);
-        // TODO: make this config with defaults
-        body.friction = 0;
-        body.frictionAir = 0;
-        body.frictionStatic = 0;
-      }
-      return body;
-    }
-  }, {
-    key: "_generateId",
-    value: function _generateId() {
-      return this.nextEntityId++;
     }
   }]);
   return Entity;
@@ -781,7 +713,9 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
   if (body) {
-    var _body = this.createBody({
+    // remove this step, have everything work in addToWorld
+    var _body = {
+      entityId: entityId,
       width: width,
       height: height,
       radius: radius,
@@ -798,19 +732,24 @@ function createEntity(config) {
       friction: config.friction,
       frictionAir: config.frictionAir,
       frictionStatic: config.frictionStatic
-    });
-    _body.myEntityId = entityId;
-    this.game.physics.addToWorld(this.game.engine, _body);
-    this.game.bodyMap[entityId] = _body;
+    };
+    _body.myEntityId = entityId; // TODO myEntityId is legacy, remove
+
+    this.game.physics.addToWorld(_body);
+    // TODO: bodyMap needs to be removed
+    //       in order to decouple physics from game, we'll need to use body references in app space
+    //       and allow the physics interface to use entity.id as the key between worker and app space
+    // this.game.bodyMap[entityId] = body;
+
     if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
-      this.game.physics.setVelocity(_body, velocity);
+      this.game.physics.setVelocity(entityId, velocity);
     }
     if (position) {
-      this.game.physics.setPosition(_body, position);
+      this.game.physics.setPosition(entityId, position);
     }
     if (typeof rotation !== 'undefined') {
       if (this.game.physics && this.game.physics.setRotation) {
-        this.game.physics.setRotation(_body, rotation);
+        this.game.physics.setRotation(entityId, rotation);
       }
     }
   } else {
@@ -1037,22 +976,17 @@ function updateEntity(entityData) {
   }
 
   if (updateSize) {
-    var body = this.game.bodyMap[entityId];
-    if (body) {
-      // console.log('eeee', entityData.radius)
-      this.game.physics.setBodySize(body, entityData);
-    }
+    // let body = this.game.bodyMap[entityId];
+    this.game.physics.setBodySize(entityId, entityData);
   }
   if (entityData.position) {
     // Remark: Tests require we update component, perhaps changed test?
     this.game.components.position.set(entityId, entityData.position);
-    var _body = this.game.bodyMap[entityId];
-    if (_body) {
-      this.game.physics.setPosition(_body, entityData.position);
-    }
+    // let body = this.game.bodyMap[entityId];
+    this.game.physics.setPosition(entityId, entityData.position);
   }
   if (entityData.velocity) {
-    this.game.physics.setVelocity(this.game.bodyMap[entityId], entityData.velocity);
+    this.game.physics.setVelocity(entityId, entityData.velocity);
   }
   if (entityData.health) {
     this.game.components.health.set(entityId, entityData.health);
@@ -1065,10 +999,8 @@ function updateEntity(entityData) {
   }
   if (typeof entityData.rotation !== 'undefined') {
     if (this.game.physics && this.game.physics.setRotation) {
-      var _body2 = this.game.bodyMap[entityId];
-      if (_body2) {
-        this.game.physics.setRotation(_body2, entityData.rotation);
-      }
+      // let body = this.game.bodyMap[entityId];
+      this.game.physics.setRotation(entityId, entityData.rotation);
     } else {
       console.log('WARNING: physics.setRotation is not defined');
       // Remark: we could support direct rotation updates here if mantra was being run without physics engine

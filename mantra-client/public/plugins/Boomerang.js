@@ -29,6 +29,8 @@ var Boomerang = /*#__PURE__*/function () {
     this.catchBoomerangTickDelay = 33; // minimum number of ticks before the boomerang can be caught
     this.isReturning = false; // State to track if the boomerang is returning
     this.ownerId = null; // The entity ID of the boomerang's owner
+    this.maxBoomarangCount = 10;
+    this.throwBoomerangTickDelay = 10; // in game ticks
   }
   _createClass(Boomerang, [{
     key: "init",
@@ -77,16 +79,35 @@ var Boomerang = /*#__PURE__*/function () {
         var entityA = bodyA.entity;
         var entityB = bodyB.entity;
 
+        // do not process collisions for other boomarangs
+        if (entityA.type === 'BOOMERANG' && entityB.type === 'BOOMERANG') {
+          pair.isActive = false; // Deactivate collision processing for this pair
+          return;
+        }
+
         // do not process collisions for entities that player owners ( for now )
         // Check if entityA owns entityB or if entityB owns entityA
         if (entityA.owner === entityB.id || entityB.owner === entityA.id) {
           var boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
           pair.isActive = false; // Deactivate collision processing for this pair
           var diff = game.tick - boomerang.ctick;
-          if (diff > this.catchBoomerangTickDelay) {
+          if (boomerang.isReturning || diff > this.catchBoomerangTickDelay) {
             this.completeReturn(boomerang);
           }
           return;
+        }
+
+        // if the boomerang hits anything else, it should return
+        if (entityA.type === 'BOOMERANG' || entityB.type === 'BOOMERANG') {
+          var _boomerang = entityA.type === 'BOOMERANG' ? entityA : entityB;
+          // pair.isActive = false; // Deactivate collision processing for this pair
+          // invert the velocity
+          _boomerang.isReturning = true;
+          this.game.applyForce(_boomerang.id, {
+            x: -_boomerang.velocity.x,
+            y: -_boomerang.velocity.y
+          });
+          // this.completeReturn(boomerang);
         }
       }
     }
@@ -159,12 +180,21 @@ var Boomerang = /*#__PURE__*/function () {
         return;
       }
 
-      // check to see if any other boomerangs already exists with this owner
+      // Ensure only a limited number of boomerangs can be thrown by one player
+      var boomerangCount = 0;
       if (this.game.data.ents.BOOMERANG) {
         for (var eId in this.game.data.ents.BOOMERANG) {
           var b = this.game.data.ents.BOOMERANG[eId];
           if (b.owner === entityId) {
-            return;
+            boomerangCount++;
+
+            // if any of these are been thrown within N ctick then we should not throw another one
+            if (game.tick - b.ctick < this.throwBoomerangTickDelay) {
+              return;
+            }
+            if (boomerangCount >= this.maxBoomarangCount) {
+              return;
+            }
           }
         }
       }
@@ -172,6 +202,10 @@ var Boomerang = /*#__PURE__*/function () {
 
       var playerPos = entity.position;
       var playerRotation = entity.rotation; // in radians, if applicable
+      var playerVelocity = entity.velocity || {
+        x: 0,
+        y: 0
+      }; // Get the player's current velocity, assuming it's stored in entity.velocity
 
       // Initial boomerang position should be close to the player
       var boomerangstartingPosition = {
@@ -179,19 +213,30 @@ var Boomerang = /*#__PURE__*/function () {
         // Offset by 10 units in the direction of player's facing
         y: playerPos.y - Math.cos(playerRotation) * 10
       };
-      var boomerangVelocity = {
-        x: this.direction.x * this.speed,
-        y: this.direction.y * this.speed
-      };
 
+      // Initial boomerang position should be close to the player
+      var boomerangStartingPosition = {
+        x: playerPos.x + Math.sin(playerRotation) * 10,
+        // Offset by 10 units in the direction of player's facing
+        y: playerPos.y - Math.cos(playerRotation) * 10
+        // z: 4 // Assuming boomerangs are thrown at a certain height
+      };
       // adjust force for entity.rotation
-      boomerangVelocity.x = Math.sin(playerRotation) * this.speed;
-      boomerangVelocity.y = -Math.cos(playerRotation) * this.speed;
+      //boomerangVelocity.x = Math.sin(playerRotation) * this.speed;
+      //boomerangVelocity.y = -Math.cos(playerRotation) * this.speed;
+
+      // Set initial boomerang velocity to include player's current velocity
+      var boomerangVelocity = {
+        x: Math.sin(playerRotation) * this.speed + playerVelocity.x,
+        y: -Math.cos(playerRotation) * this.speed + playerVelocity.y
+      };
+      boomerangVelocity.x = Math.min(boomerangVelocity.x, 10);
+      boomerangVelocity.y = Math.min(boomerangVelocity.y, 10);
       boomerangstartingPosition.z = 4;
       var boomerangConfig = {
         type: 'BOOMERANG',
-        height: 16,
-        width: 16,
+        height: 12,
+        width: 12,
         position: boomerangstartingPosition,
         rotation: entity.rotation,
         // TODO: get the player's rotation

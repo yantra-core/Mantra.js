@@ -27,7 +27,7 @@ class GravityGardens {
     if (game.isTouchDevice()) {
       game.zoom(1);
     } else {
-      game.setZoom(2.5);
+      game.zoom(1);
     }
 
     let player = game.createPlayer({
@@ -51,10 +51,11 @@ class GravityGardens {
       if (Date.now() - gameState.lastGravitySwitch >= 1000) {
         gameState.repulsion = !gameState.repulsion;
 
-        // get screen center coordinates, take the window size and divide by 2
-        // use the document window here not the game data
+        // pings the screen center, assuming player is there
         let x = window.innerWidth / 2;
-        let y = window.innerHeight / 2 + 24;
+        let y = window.innerHeight / 2;
+        x = x - game.viewportCenterXOffset;
+        y = y - game.viewportCenterYOffset;
 
         if (gameState.repulsion) {
           game.pingPosition(x, y, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
@@ -142,7 +143,11 @@ class GravityGardens {
       let particle = collision.PARTICLE || collision.STAR;
       if (particle) {
         // remove the entity
+        // only remove if ctick is very old to game.tick
         game.removeEntity(particle.id);
+        /*
+        if (particle.ctick < game.tick - 1000) {}
+        */
       }
     });
 

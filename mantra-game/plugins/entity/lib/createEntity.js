@@ -177,7 +177,9 @@ export default function createEntity(config, ignoreSetup = false) {
   this.game.addComponent(entityId, 'ctick', ctick);
 
   if (body) {
-    let body = this.createBody({
+    // remove this step, have everything work in addToWorld
+    let body = {
+      entityId: entityId,
       width: width,
       height: height,
       radius: radius,
@@ -194,19 +196,25 @@ export default function createEntity(config, ignoreSetup = false) {
       friction: config.friction,
       frictionAir: config.frictionAir,
       frictionStatic: config.frictionStatic
-    });
-    body.myEntityId = entityId;
-    this.game.physics.addToWorld(this.game.engine, body);
-    this.game.bodyMap[entityId] = body;
-    if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
-      this.game.physics.setVelocity(body, velocity);
     }
+    body.myEntityId = entityId; // TODO myEntityId is legacy, remove
+    
+    this.game.physics.addToWorld(body);
+    // TODO: bodyMap needs to be removed
+    //       in order to decouple physics from game, we'll need to use body references in app space
+    //       and allow the physics interface to use entity.id as the key between worker and app space
+    // this.game.bodyMap[entityId] = body;
+
+    if (velocity && (velocity.x !== 0 || velocity.y !== 0)) {
+      this.game.physics.setVelocity(entityId, velocity);
+    }
+
     if (position) {
-      this.game.physics.setPosition(body, position);
+      this.game.physics.setPosition(entityId, position);
     }
     if (typeof rotation !== 'undefined') {
       if (this.game.physics && this.game.physics.setRotation) {
-        this.game.physics.setRotation(body, rotation);
+        this.game.physics.setRotation(entityId, rotation);
       }
     }
   } else {

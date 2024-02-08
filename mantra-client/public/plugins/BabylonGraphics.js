@@ -831,6 +831,9 @@ function apply2DTexture(graphic, entityData) {
   var game = this.game;
   var material = new BABYLON.StandardMaterial("material", this.scene);
   var texture = game.getTexture(entityData.texture);
+  if (!texture) {
+    return material;
+  }
   var spritePosition = texture.sprite;
   material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
   if (typeof spritePosition !== 'undefined') {

@@ -6,6 +6,24 @@ import commonjs from '@rollup/plugin-commonjs';
 import fs from 'fs';
 import path from 'path';
 
+/*
+import plugins from '../mantra-game/plugins.js';
+
+console.log('plugins', plugins)
+
+const registerPluginsGlobalNamespace = {
+  name: 'register-plugins-global-namespace',
+  generateBundle(options, bundle) {
+    for (const [fileName, fileInfo] of Object.entries(bundle)) {
+      if (fileInfo.type === 'chunk') {
+        const pluginName = path.basename(fileName, '.js');
+        fileInfo.code = `window.PLUGINS = window.PLUGINS || {}; window.PLUGINS['${pluginName}'] = (function(){ ${fileInfo.code} })();`;
+      }
+    }
+  }
+};
+*/
+
 const HtmlFallbackPlugin = {
   name: 'html-fallback',
   configureServer(server) {

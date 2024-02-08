@@ -17,11 +17,23 @@ export default function updateEntityPosition(entityElement, entityData) {
   fovWidth = 600;
   fovHeight = 600;
 
-  const adjustedPosition = {
-    x: position.x - (this.scene.cameraPosition.x -  window.innerWidth / 2),
-    y: position.y - (this.scene.cameraPosition.y - window.outerHeight / 2)
-  };
+  /* Remark: Removed 2/7/2024
+            Entities are no longer transformed per camera
+            Instead entities are transformed per game holder
+            Camera will apply transforms to the game holder
 
+    Reason: Performance, we don't need to transform every entity per camera
+
+    let adjustedPosition = {
+      x: position.x - (this.scene.cameraPosition.x -  window.innerWidth / 2),
+      y: position.y - (this.scene.cameraPosition.y - window.outerHeight / 2)
+    };
+  */
+
+  let adjustedPosition = {
+    x: position.x,
+    y: position.y
+  };
   // Check if the entity is within the field of view
   // Remark: Field of View is disabled ( for now ), it *should* be working as expected,
   //         the current implementation will hide the entity, we should removeEntity() instead

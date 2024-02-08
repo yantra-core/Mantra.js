@@ -27,7 +27,7 @@ class Platform {
     if (game.isTouchDevice()) {
       game.setZoom(3);
     } else {
-      game.setZoom(4.5);
+      game.setZoom(2.5);
     }
 
 

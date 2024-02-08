@@ -2304,11 +2304,6 @@ function blackHoleSutra(game, context) {
 
   // Function to apply gravitational force
   function applyGravity(ent1, ent2, gravity, gameState) {
-    // TODO: refactor to use Entity.body component, removes game.bodyMap
-    var body = game.bodyMap[ent2.id];
-    if (!body) {
-      return;
-    }
     var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {
@@ -3390,7 +3385,7 @@ var GravityGardens = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.zoom(1);
       } else {
-        game.setZoom(2.5);
+        game.zoom(1);
       }
       var player = game.createPlayer({
         color: 0xcccccc,
@@ -3409,10 +3404,11 @@ var GravityGardens = /*#__PURE__*/function () {
         if (Date.now() - gameState.lastGravitySwitch >= 1000) {
           gameState.repulsion = !gameState.repulsion;
 
-          // get screen center coordinates, take the window size and divide by 2
-          // use the document window here not the game data
+          // pings the screen center, assuming player is there
           var x = window.innerWidth / 2;
-          var y = window.innerHeight / 2 + 24;
+          var y = window.innerHeight / 2;
+          x = x - game.viewportCenterXOffset;
+          y = y - game.viewportCenterYOffset;
           if (gameState.repulsion) {
             game.pingPosition(x, y, {
               color: 'red',
@@ -3501,7 +3497,11 @@ var GravityGardens = /*#__PURE__*/function () {
         var particle = collision.PARTICLE || collision.STAR;
         if (particle) {
           // remove the entity
+          // only remove if ctick is very old to game.tick
           game.removeEntity(particle.id);
+          /*
+          if (particle.ctick < game.tick - 1000) {}
+          */
         }
       });
       game.useSutra(wallCollision, 'wallCollision');
@@ -3669,7 +3669,7 @@ var Home = /*#__PURE__*/function () {
       var game = this.game;
       game.reset();
       if (game.isTouchDevice()) {
-        game.zoom(2.5);
+        game.zoom(1.44);
       } else {
         game.zoom(4.5);
       }
@@ -3694,6 +3694,17 @@ var Home = /*#__PURE__*/function () {
       */
 
       // sprite sheet has been defined in defaultAssets.js
+      /*
+      game.createPlayer({
+        texture: {
+          model: 'customModel',
+        },
+        position: {
+          x: 0,
+          y: 0
+        }
+      });
+      */
       game.createPlayer({
         texture: {
           sheet: 'loz_spritesheet',
@@ -4624,10 +4635,20 @@ var Music = /*#__PURE__*/function () {
       //game.setGravity(0, 4.3, 0);
       game.setGravity(0, 0, 0);
       if (game.isTouchDevice()) {
-        game.zoom(1.5);
+        game.zoom(1.44);
       } else {
         game.zoom(2.5);
       }
+      game.createPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
+        position: {
+          x: 352,
+          y: 80
+        }
+      });
       game.customMovement = false;
       game.setBackground('black');
       var pianoConfig = {
@@ -4819,17 +4840,6 @@ var Music = /*#__PURE__*/function () {
         game.createDefaultPlayer();
       });
       */
-
-      game.createPlayer({
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
-        },
-        position: {
-          x: 352,
-          y: 80
-        }
-      });
     }
   }, {
     key: "update",
@@ -5249,7 +5259,7 @@ var Platform = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.setZoom(3);
       } else {
-        game.setZoom(4.5);
+        game.setZoom(2.5);
       }
       game.createPlayer({
         height: 32,
@@ -7364,7 +7374,7 @@ var YCraft = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.zoom(1.5);
       } else {
-        game.setZoom(3.5);
+        game.setZoom(2);
       }
       game.use('Boomerang');
       game.use('Bullet');
@@ -7373,6 +7383,16 @@ var YCraft = /*#__PURE__*/function () {
         contraption: _contraptionsExample["default"]
       });
       game.use('YCraftGUI');
+      game.createPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
+        position: {
+          x: 100,
+          y: 100
+        }
+      });
 
       // create warp by back home entity
       game.createEntity({
@@ -7469,19 +7489,6 @@ var YCraft = /*#__PURE__*/function () {
           frictionStatic: 1
         });
       }
-
-      // Remark: Players removed for initial demo, is working
-
-      game.createDefaultPlayer({
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
-        },
-        position: {
-          x: 0,
-          y: 0
-        }
-      });
     }
   }, {
     key: "update",

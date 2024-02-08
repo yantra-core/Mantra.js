@@ -109,12 +109,6 @@ export default function blackHoleSutra(game, context) {
   // Function to apply gravitational force
   function applyGravity(ent1, ent2, gravity, gameState) {
 
-    // TODO: refactor to use Entity.body component, removes game.bodyMap
-    let body = game.bodyMap[ent2.id];
-    if (!body) {
-      return;
-    }
-
     var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
 

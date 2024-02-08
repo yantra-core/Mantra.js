@@ -2,6 +2,11 @@ export default function apply2DTexture(graphic, entityData) {
   let game = this.game;
   let material = new BABYLON.StandardMaterial("material", this.scene);
   let texture = game.getTexture(entityData.texture);
+
+  if (!texture) {
+    return material;
+  }
+
   let spritePosition = texture.sprite;
 
   material.diffuseTexture = new BABYLON.Texture(texture.url, this.scene);
