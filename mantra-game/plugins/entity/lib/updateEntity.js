@@ -63,24 +63,21 @@ export default function updateEntity(entityData) {
   }
 
   if (updateSize) {
-    let body = this.game.bodyMap[entityId];
-    if (body) {
-      // console.log('eeee', entityData.radius)
-      this.game.physics.setBodySize(body, entityData);
-    }
+    // let body = this.game.bodyMap[entityId];
+    this.game.physics.setBodySize(entityId, entityData);
+
   }
 
   if (entityData.position) {
     // Remark: Tests require we update component, perhaps changed test?
     this.game.components.position.set(entityId, entityData.position);
-    let body = this.game.bodyMap[entityId];
-    if (body) {
-      this.game.physics.setPosition(body, entityData.position);
-    }
+    // let body = this.game.bodyMap[entityId];
+    this.game.physics.setPosition(entityId, entityData.position);
+
   }
 
   if (entityData.velocity) {
-    this.game.physics.setVelocity(this.game.bodyMap[entityId], entityData.velocity);
+    this.game.physics.setVelocity(entityId, entityData.velocity);
   }
 
   if (entityData.health) {
@@ -97,10 +94,9 @@ export default function updateEntity(entityData) {
 
   if (typeof entityData.rotation !== 'undefined') {
     if (this.game.physics && this.game.physics.setRotation) {
-      let body = this.game.bodyMap[entityId];
-      if (body) {
-        this.game.physics.setRotation(body, entityData.rotation);
-      }
+      // let body = this.game.bodyMap[entityId];
+      this.game.physics.setRotation(entityId, entityData.rotation);
+
     } else {
       console.log('WARNING: physics.setRotation is not defined');
       // Remark: we could support direct rotation updates here if mantra was being run without physics engine

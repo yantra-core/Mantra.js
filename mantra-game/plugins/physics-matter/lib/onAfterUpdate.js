@@ -15,6 +15,10 @@ export default function onAfterUpdate(event) {
 
   for (const body of event.source.world.bodies) {
 
+    if (typeof this.bodyMap[body.myEntityId] === 'undefined') {
+      // add the reference to the bodyMap
+      this.bodyMap[body.myEntityId] = body;
+    }
   // worldState.forEach(function processWorldState(body) {
 
     // let entity = that.game.getEntity(body.myEntityId);

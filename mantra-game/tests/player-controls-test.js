@@ -73,8 +73,8 @@ tap.test('player movement and controls', (t) => {
     let bulletCount = 0;
     let bullet = null;
     // check the bodyMap for a bullet
-    for (let b in game.bodyMap) {
-      let body = game.bodyMap[b];
+    for (let b in game.physics.bodyMap) {
+      let body = game.physics.bodyMap[b];
       let myEntityId = body.myEntityId;
       let type = game.components.type.get(myEntityId);
       if (type === 'BULLET') {

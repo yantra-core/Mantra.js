@@ -13,6 +13,7 @@ import setBodySize from './lib/setBodySize.js';
 import lockedProperties from './lib/lockedProperties.js';
 import limitSpeed from './lib/limitSpeed.js';
 import setGravity from './lib/setGravity.js';
+import createBody from './lib/createBody.js';
 
 class MatterPhysics extends PhysicsInterface {
 
@@ -37,6 +38,9 @@ class MatterPhysics extends PhysicsInterface {
 
     this.initEngine = initEngine.bind(this);
 
+    // keeps reference to all bodies in the game, required for communicating with the worker
+    this.bodyMap = {};
+
     //
     // collisionStart is used for initial collision detection ( like bullets or mines or player ship contact )
     //
@@ -53,6 +57,7 @@ class MatterPhysics extends PhysicsInterface {
 
     this.onAfterUpdate = onAfterUpdate.bind(this);
     this.setBodySize = setBodySize.bind(this);
+    this.createBody = createBody.bind(this);
     
     this.lockedProperties = lockedProperties.bind(this);
     this.limitSpeed = limitSpeed.bind(this);
@@ -204,22 +209,23 @@ class MatterPhysics extends PhysicsInterface {
 
   }
 
-  createBody(options) {
-    return Matter.Body.create(options);
-  }
-
   // Equivalent to Engine.create()
   createEngine(options) {
     return Matter.Engine.create(options);
   }
 
   // Equivalent to World.add()
-  addToWorld(body) {
+  addToWorld(bodyConfig) {
+    // body is body config as json
+    let body = this.createBody(bodyConfig);
+    this.bodyMap[bodyConfig.myEntityId] = body;
     Matter.World.add(this.engine.world, body);
   }
 
   removeBody(body) {
+    // remove from body map
     Matter.World.remove(this.engine.world, body);
+    delete this.bodyMap[body.myEntityId];
   }
 
   setMass(body, mass) {
@@ -242,8 +248,14 @@ class MatterPhysics extends PhysicsInterface {
   }
 
   // Equivalent to Body.applyForce()
-  applyForce(body, position, force) {
-    Matter.Body.applyForce(body, position, force);
+  applyForce(entityId, force) {
+    let body = this.bodyMap[entityId];
+    if (body) {
+      let position = body.position;
+      Matter.Body.applyForce(body, position, force);
+    } else {
+      // console.error('No body found for entityId', entityId);
+    }
   }
 
   // Custom method to get a body's position
@@ -272,16 +284,29 @@ class MatterPhysics extends PhysicsInterface {
     // Matter.Events.on(engine, 'afterUpdate', callback);
   }
 
-  setRotation(body, rotation) {
-    Matter.Body.setAngle(body, rotation);
+  setRotation(entityId, rotation) {
+    let body = this.bodyMap[entityId];
+    if (body) {
+      Matter.Body.setAngle(body, rotation);
+    }
   }
 
-  setPosition(body, position) {
-    Matter.Body.setPosition(body, position);
+  setPosition(entityId, position) {
+    let body = this.bodyMap[entityId];
+    console.log("setPosition", entityId, position, body)
+    if (body) {
+      Matter.Body.setPosition(body, {
+        x: position.x,
+        y: position.y
+      });
+    }
   }
 
-  setVelocity(body, velocity) {
-    Matter.Body.setVelocity(body, velocity);
+  setVelocity(entityId, velocity) {
+    let body = this.bodyMap[entityId];
+    if (body) {
+      Matter.Body.setVelocity(body, velocity);
+    }
   }
 
   // Remark: This may not work as expected, since the callback is not the same function reference

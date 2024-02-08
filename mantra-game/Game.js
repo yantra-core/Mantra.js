@@ -230,31 +230,30 @@ class Game {
   }
 
   setPosition(entityId, position) {
-    const body = this.bodyMap[entityId];
-    this.physics.setPosition(body, position);
+    this.physics.setPosition(entityId, position);
   }
 
   applyForce(entityId, force) {
-    const body = this.bodyMap[entityId];
-    this.physics.applyForce(body, body.position, force);
-    this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
+    // const body = this.bodyMap[entityId];
+    this.physics.applyForce(entityId, force);
+    // this.components.velocity[entityId] = { x: body.velocity.x, y: body.velocity.y };
   }
 
   applyPosition(entityId, position) {
-    const body = this.bodyMap[entityId];
+    // const body = this.bodyMap[entityId];
     // takes the current position and adds the new position
     let newPosition = {
       x: body.position.x + position.x,
       y: body.position.y + position.y
     };
-    this.physics.setPosition(body, newPosition);
+    this.physics.setPosition(entityId, newPosition);
   }
 
   rotate(entityId, rotation) {
     const rotationSpeed = 0.022; // TODO: config
     let rotationAmount = rotation * rotationSpeed;
-    const body = this.bodyMap[entityId];
-    this.physics.rotateBody(body, rotationAmount);
+    // const body = this.bodyMap[entityId];
+    this.physics.rotateBody(entityId, rotationAmount);
   }
 
   //

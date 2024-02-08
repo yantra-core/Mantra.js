@@ -104,7 +104,7 @@ export default function construct(game, plugins = []) {
 
   game.switchWorlds = switchWorlds.bind(game);
 
-  game.bodyMap = {};
+  // game.bodyMap = {};
   game.systems = {};
   game.storage = storage;
 
