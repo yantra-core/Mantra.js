@@ -171,6 +171,7 @@ export default function construct(game, plugins = []) {
     owner: new Component('owner', game),
     inputs: new Component('inputs', game),
     items: new Component('items', game),
+    hasInventory: new Component('hasInventory', game),
     sutra: new Component('sutra', game),
     // meta property allows for arbitrary data to be attached to an entity
     // you should *not* use meta for any high-frequency data updates as it is not optimized for that

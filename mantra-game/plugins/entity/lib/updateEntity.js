@@ -62,6 +62,13 @@ export default function updateEntity(entityData) {
     // this.game.components.radius.set(entityId, entityData.radius);
   }
 
+  /*
+  if (entityData.body === false) {
+    // alert("remove body");
+    this.game.physics.removeBody(entityId);
+  }
+  */
+
   if (updateSize) {
     // let body = this.game.bodyMap[entityId];
     this.game.physics.setBodySize(entityId, entityData);

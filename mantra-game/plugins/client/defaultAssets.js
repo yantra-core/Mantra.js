@@ -22,6 +22,7 @@ let defaultAssets = {
   // '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
   'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
+  'ayyo-key': '/img/game/env/ayyo-key-medium.png',
   /*
   'raiden': {
     type: 'spritesheet',

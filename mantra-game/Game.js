@@ -393,8 +393,8 @@ class Game {
     this.deferredEntities = {};
 
     // reset the camera offsets ( in case user has dragged or scrolled camera )
-    game.viewPortOffsetX = 0; // TODO: scope these onto game.data.camera.viewPortOffset
-    game.viewPortOffsetY = 0;
+    game.viewportCenterOffsetX = 0; // TODO: scope these onto game.data.camera.viewPortOffset
+    game.viewportCenterOffsetY = 0;
 
     // defaults camera back to 1x zoom
     game.zoom(1);

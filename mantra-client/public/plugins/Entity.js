@@ -558,6 +558,7 @@ function createEntity(config) {
       sutra: null,
       meta: null,
       collectable: false,
+      hasInventory: true,
       owner: 0,
       // 0 = server
       inputs: null,
@@ -676,6 +677,7 @@ function createEntity(config) {
     sutra = _config.sutra,
     meta = _config.meta,
     collectable = _config.collectable,
+    hasInventory = _config.hasInventory,
     owner = _config.owner,
     inputs = _config.inputs,
     lifetime = _config.lifetime,
@@ -725,6 +727,9 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'sutra', sutra);
   this.game.addComponent(entityId, 'meta', meta);
   this.game.addComponent(entityId, 'collectable', collectable);
+
+  // if entity is allowed to pickup items, add an inventory component
+  this.game.addComponent(entityId, 'hasInventory', hasInventory);
   this.game.addComponent(entityId, 'inputs', inputs);
   this.game.addComponent(entityId, 'lifetime', lifetime);
   this.game.addComponent(entityId, 'destroyed', false);
@@ -878,10 +883,12 @@ function createEntity(config) {
           console.log('warning: item not found in container', index, item);
           return;
         }
+        var paddingTop = containerEnt.style.paddingTop || 20;
+        var paddingLeft = containerEnt.style.paddingLeft || -10;
 
         // Set the starting position to the top-left corner of the container's bounding box
-        var positionX = containerPosition.x - containerSize.width / 2;
-        var positionY = containerPosition.y - containerSize.height / 2;
+        var positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
+        var positionY = containerPosition.y - containerSize.height / 2 + paddingTop;
         var positionZ = containerPosition.z;
 
         // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell
@@ -1110,6 +1117,13 @@ function updateEntity(entityData) {
     updateSize = true;
     // this.game.components.radius.set(entityId, entityData.radius);
   }
+
+  /*
+  if (entityData.body === false) {
+    // alert("remove body");
+    this.game.physics.removeBody(entityId);
+  }
+  */
 
   if (updateSize) {
     // let body = this.game.bodyMap[entityId];

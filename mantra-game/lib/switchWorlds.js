@@ -1,5 +1,5 @@
 
-export default function switchWorlds (selectedWorld) {
+export default async function switchWorlds (selectedWorld) {
   let game = this;
   // check to see if game.worlds has any entries
   // if so, unload them if they have an unload method
@@ -42,6 +42,18 @@ export default function switchWorlds (selectedWorld) {
   //       See: Timers.js file for example
   setTimeout(() => {
   }, 400);
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  if (worldInstance.preload) {
+    // remark: is this not already handled????
+    // not needed?
+    //await worldInstance.preload(game);
+    // required ( for now should be automated? )
+    //await game.preloader.loadAll();
+  }
   game.use(worldInstance);
 
   // USER INTENT: Change world

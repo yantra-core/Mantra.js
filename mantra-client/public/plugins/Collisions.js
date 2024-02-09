@@ -96,12 +96,24 @@ var Collisions = /*#__PURE__*/function () {
       // this is done by adding to Entity.items() array
       // further checks in Collectibles system can update the position of the collectable
       function addItemIfCollectible(sourceEntity, targetEntity) {
+        if (!targetEntity.hasInventory) {
+          return;
+        }
         // console.log('Processing collectable', sourceEntity.collectable, sourceEntity, targetEntity);
         // Initialize the target entity's items array if it doesn't exist
         targetEntity.items = targetEntity.items || [];
         // Check if the source entity's ID is already in the target entity's items array
         // If not, add it to the array and update the entity
         if (!targetEntity.items.includes(sourceEntity.id)) {
+          /* TODO: add this back, we'll need a config flag + og body reference if item is dropped
+          // that means recreate the item, better from ref incase item was mutated by game code
+          // if the source entity has a body, remove it ( in some cases we want to keep it )
+          game.updateEntity({
+            id: sourceEntity.id,
+            body: false
+          })
+          */
+
           // console.log("ADDING ITEM", sourceEntity.id, targetEntity.id, targetEntity.items)
           targetEntity.items.push(sourceEntity.id);
           this.game.updateEntity({

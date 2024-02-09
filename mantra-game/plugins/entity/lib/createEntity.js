@@ -57,6 +57,7 @@ export default function createEntity(config, ignoreSetup = false) {
       sutra: null,
       meta: null,
       collectable: false,
+      hasInventory: true,
       owner: 0, // 0 = server
       inputs: null,
       destroyed: false,
@@ -138,7 +139,7 @@ export default function createEntity(config, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, meta, collectable, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -176,6 +177,9 @@ export default function createEntity(config, ignoreSetup = false) {
   this.game.addComponent(entityId, 'sutra', sutra);
   this.game.addComponent(entityId, 'meta', meta);
   this.game.addComponent(entityId, 'collectable', collectable);
+  
+  // if entity is allowed to pickup items, add an inventory component
+  this.game.addComponent(entityId, 'hasInventory', hasInventory);
 
   this.game.addComponent(entityId, 'inputs', inputs);
   this.game.addComponent(entityId, 'lifetime', lifetime);
@@ -344,9 +348,12 @@ export default function createEntity(config, ignoreSetup = false) {
           return;
         }
 
+        let paddingTop = containerEnt.style.paddingTop || 20;
+        let paddingLeft = containerEnt.style.paddingLeft || -10;
+
         // Set the starting position to the top-left corner of the container's bounding box
-        let positionX = containerPosition.x - containerSize.width / 2;
-        let positionY = containerPosition.y - containerSize.height / 2;
+        let positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
+        let positionY = containerPosition.y - containerSize.height / 2 + paddingTop;
         let positionZ = containerPosition.z;
 
         // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell

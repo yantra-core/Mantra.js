@@ -54,6 +54,7 @@ class Platform {
     function createPlatform(platformData) {
       game.createEntity({
         type: 'PLATFORM',
+        hasInventory: false,
         isStatic: true,
         width: platformData.width,
         height: platformData.height,
@@ -226,6 +227,8 @@ class Platform {
       game.createEntity({
         type: item.toUpperCase(),
         kind: item,
+        collectable: false, // TODO: change this
+        hasInventory: false,
         width: 16,
         height: 16,
         depth: 32,

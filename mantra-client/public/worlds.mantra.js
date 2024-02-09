@@ -4707,7 +4707,7 @@ var Maze = /*#__PURE__*/function () {
         body: false,
         size: {
           width: 300,
-          height: 200
+          height: 180
         },
         grid: {
           columns: 4,
@@ -4749,10 +4749,8 @@ var Maze = /*#__PURE__*/function () {
           },
           */
           collisionStart: function collisionStart(a, b) {
-            console.log('ent custom collisionStart', i, a, b);
             // get the a b that isnt the door
             var enterEnt = a.name === 'maze-door-' + i ? a : b;
-            console.log('ent', enterEnt, enterEnt.meta);
             var player = a.type === 'PLAYER' ? a : b;
             // only allow player collisions to trigger door events
             if (player.type !== 'PLAYER') {
@@ -4896,7 +4894,7 @@ var Maze = /*#__PURE__*/function () {
           type: 'KEY',
           size: {
             width: 16,
-            height: 16
+            height: 8
           },
           // equippable: true,
           isSensor: true,
@@ -4904,16 +4902,13 @@ var Maze = /*#__PURE__*/function () {
           //onCollect: true
 
           name: 'maze-door-0',
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'ayyoKey'
-          },
+          texture: "ayyo-key",
           color: 0x00ff00,
-          container: 'laby-container',
+          // container: 'laby-container',
           position: {
             // relative to the container
-            x: 350,
-            y: -50,
+            x: -100,
+            y: -30,
             z: 0
           }
         });
@@ -4974,54 +4969,6 @@ var Maze = /*#__PURE__*/function () {
         }
       });
       */
-
-      // Create walls for a simple hallway
-      //this.createHallwayWalls(game);
-    }
-  }, {
-    key: "createHallwayWalls",
-    value: function createHallwayWalls(game) {
-      // Define the dimensions of the hallway
-      var hallwayLength = 64; // Length of the hallway
-      var wallWidth = 32; // Width of the walls
-      var wallHeight = 100; // Height of the walls
-      var hallwayWidth = 100; // Width of the hallway
-
-      // Create left wall
-      for (var x = 0; x < hallwayLength; x += wallWidth) {
-        game.createEntity({
-          type: 'WALL',
-          isStatic: true,
-          width: wallWidth,
-          height: wallHeight,
-          rotation: Math.PI / 2,
-          // Rotate 90 degrees
-          position: {
-            x: x,
-            y: -hallwayWidth / 2,
-            // Positioning to the left of the center
-            z: 0
-          }
-        });
-      }
-
-      // Create right wall
-      for (var _x = 0; _x < hallwayLength; _x += wallWidth) {
-        game.createEntity({
-          type: 'WALL',
-          isStatic: true,
-          width: wallWidth,
-          height: wallHeight,
-          rotation: -Math.PI / 2,
-          // Rotate -90 degrees
-          position: {
-            x: _x,
-            y: hallwayWidth / 2,
-            // Positioning to the right of the center
-            z: 0
-          }
-        });
-      }
     }
   }]);
   return Maze;
@@ -5737,6 +5684,7 @@ var Platform = /*#__PURE__*/function () {
       function createPlatform(platformData) {
         game.createEntity({
           type: 'PLATFORM',
+          hasInventory: false,
           isStatic: true,
           width: platformData.width,
           height: platformData.height,
@@ -5903,6 +5851,9 @@ var Platform = /*#__PURE__*/function () {
         game.createEntity({
           type: item.toUpperCase(),
           kind: item,
+          collectable: false,
+          // TODO: change this
+          hasInventory: false,
           width: 16,
           height: 16,
           depth: 32,

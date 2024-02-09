@@ -60,7 +60,7 @@ class Maze {
       body: false,
       size: {
         width: 300,
-        height: 200
+        height: 180
       },
       grid: {
         columns: 4,
@@ -246,7 +246,7 @@ class Maze {
         type: 'KEY',
         size: {
           width: 16,
-          height: 16
+          height: 8
         },
         // equippable: true,
         isSensor: true,
@@ -254,15 +254,12 @@ class Maze {
         //onCollect: true
   
         name: 'maze-door-0',
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'ayyoKey',
-        },
+        texture: "ayyo-key",
         color: 0x00ff00,
-        container: 'laby-container',
+        // container: 'laby-container',
         position: { // relative to the container
-          x: 350,
-          y: -50,
+          x: -100,
+          y: -30,
           z: 0
         }
       });

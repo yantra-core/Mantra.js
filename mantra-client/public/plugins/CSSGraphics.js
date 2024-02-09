@@ -1053,9 +1053,10 @@ function createGraphic(entityData) {
     var hexColor = '#' + entityData.color.toString(16);
     // update the background color
     var randomHexColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    console.log("SETTING BG COLOR", entityData.color, hexColor);
-    entityElement.style.background = randomHexColor;
+    // console.log("SETTING BG COLOR", entityData.color, hexColor)
+    // entityElement.style.background = randomHexColor;
   }
+
   this.renderDiv.appendChild(entityElement);
 
   // Update the position of the entity element
