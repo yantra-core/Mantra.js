@@ -82,11 +82,11 @@ class Game {
     this.systemsManager.render();
   }
 
-
   //
   // Component APIs
   //
   addComponent(entityId, componentType, data) {
+
     if (!this.components[componentType]) {
       this.components[componentType] = new Component(componentType, this);
     }
@@ -95,6 +95,11 @@ class Game {
     if (componentType === 'actionRateLimiter') {
       data = new Map();
     }
+
+    if (data == null) {
+      return;
+    }
+
     this.components[componentType].set(entityId, data);
   }
 
@@ -211,6 +216,18 @@ class Game {
       console.log('Warning: no rbush system found, cannot perform getPlayerFieldOfView query');
     }
 
+  }
+
+  //
+  // Containers
+  //
+  createContainer(entityData) { // helper method for containers
+    entityData.type = 'CONTAINER'
+    entityData.style = entityData.style || {};
+    entityData.style.layout = entityData.layout || 'none';
+    entityData.style.grid = entityData.grid || {};
+    entityData.items = entityData.items || [];
+    return game.createEntity(entityData); 
   }
 
   //
@@ -378,6 +395,10 @@ class Game {
     // reset the camera offsets ( in case user has dragged or scrolled camera )
     game.viewPortOffsetX = 0; // TODO: scope these onto game.data.camera.viewPortOffset
     game.viewPortOffsetY = 0;
+
+    // defaults camera back to 1x zoom
+    game.zoom(1);
+
   }
 
   //
@@ -426,6 +447,7 @@ class Game {
     let client = this.getSystem('client');
     client.disconnect();
   }
+
 
 }
 

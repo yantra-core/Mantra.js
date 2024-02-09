@@ -1,3 +1,5 @@
+// TODO: add support for Entity.items
+
 import EntityClass from '../../../Entity/Entity.js';
 // TODO: remove TimersComponent import, use game reference instead ( reduce imported code )
 import TimersComponent from '../../../Component/TimersComponent.js';
@@ -43,17 +45,22 @@ export default function createEntity(config, ignoreSetup = false) {
       height: 100,
       width: 100,
       depth: 16,
+      // Remark: height, width, and depth are being replaced by size
+      size: { width: 100, height: 100, depth: 16 },
       lifetime: -1,
       maxSpeed: 9999,
       isStatic: false,
       isSensor: false,
       restitution: 0,
+      container: null,
       items: null,
       sutra: null,
+      meta: null,
+      collectable: false,
       owner: 0, // 0 = server
       inputs: null,
       destroyed: false,
-      type: 'PLAYER',
+      type: 'NONE',
       friction: 0.1,  // Default friction
       frictionAir: 0.01, // Default air friction
       frictionStatic: 0.5, // Default static friction
@@ -70,15 +77,25 @@ export default function createEntity(config, ignoreSetup = false) {
       exit: null,
       ctick: this.game.tick
     };
-  
+
+    // Remark: Adding support for new Entity.size prop, removing Entity.height and Entity.width
+    if (typeof config.size === 'object') {
+      config.width = config.size.width;
+      config.height = config.size.height;
+      config.depth = config.size.depth;
+    } else {
+      // Remark: Added 2/8/2024 Backwards support for legacy API, removed soon
+      config.size = { width: config.width, height: config.height, depth: config.depth };
+    }
+
     // merge config with defaultConfig
     config = { ...defaultConfig, ...config };
-  
+
     // before mutating any game state based on the incoming entity, we *must* check that certain properties validate
     // check that position is well formed, contains, x,y,z, and is all valid numbers
     if (config.position &&
       (typeof config.position.x !== 'number' || isNaN(config.position.x) ||
-       typeof config.position.y !== 'number' || isNaN(config.position.y))) {
+        typeof config.position.y !== 'number' || isNaN(config.position.y))) {
       console.log('Entity.createEntity could not create with data', config);
       throw new Error('Invalid position for entity');
     }
@@ -96,16 +113,16 @@ export default function createEntity(config, ignoreSetup = false) {
       // if not, we will defer creation until it is
       let currentPlayer = this.game.getCurrentPlayer();
       if (currentPlayer) {
-        let incomingPosition = config.position || { x: 0, y: 0, z: 0};
+        let incomingPosition = config.position || { x: 0, y: 0, z: 0 };
         let distance = distanceSquared(currentPlayer.position.x, currentPlayer.position.y, incomingPosition.x, incomingPosition.y);
         let fieldOfViewSquared = this.game.data.fieldOfView * this.game.data.fieldOfView;
         if (distance > fieldOfViewSquared) {
           return;
         }
       }
-  
+
     }
-  
+
   }
 
   entityId = config.id;
@@ -121,7 +138,8 @@ export default function createEntity(config, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, radius, shape, color, maxSpeed, health, score, items, sutra, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, meta, collectable, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
+
   let { x, y } = position;
 
   /*
@@ -131,10 +149,8 @@ export default function createEntity(config, ignoreSetup = false) {
   }
   */
 
-
   // console.log('position', position, 'width', width, 'height', height)
   // Using game's API to add components
-  // alert(type)
   this.game.addComponent(entityId, 'type', type || 'PLAYER');
   this.game.addComponent(entityId, 'name', name || null);
   this.game.addComponent(entityId, 'kind', kind);
@@ -149,6 +165,8 @@ export default function createEntity(config, ignoreSetup = false) {
   this.game.addComponent(entityId, 'width', width);
   this.game.addComponent(entityId, 'height', height);
   this.game.addComponent(entityId, 'depth', depth);
+  // Remark: height, width, and depth are being replaced by size
+  this.game.addComponent(entityId, 'size', size);
   this.game.addComponent(entityId, 'radius', radius);
   this.game.addComponent(entityId, 'shape', shape);
   this.game.addComponent(entityId, 'color', color);
@@ -156,6 +174,9 @@ export default function createEntity(config, ignoreSetup = false) {
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
   this.game.addComponent(entityId, 'sutra', sutra);
+  this.game.addComponent(entityId, 'meta', meta);
+  this.game.addComponent(entityId, 'collectable', collectable);
+
   this.game.addComponent(entityId, 'inputs', inputs);
   this.game.addComponent(entityId, 'lifetime', lifetime);
   this.game.addComponent(entityId, 'destroyed', false);
@@ -198,7 +219,7 @@ export default function createEntity(config, ignoreSetup = false) {
       frictionStatic: config.frictionStatic
     }
     body.myEntityId = entityId; // TODO myEntityId is legacy, remove
-    
+
     this.game.physics.addToWorld(body);
     // TODO: bodyMap needs to be removed
     //       in order to decouple physics from game, we'll need to use body references in app space
@@ -222,6 +243,10 @@ export default function createEntity(config, ignoreSetup = false) {
     // this.game.changedEntities.add(entityId);
   }
 
+
+  
+
+
   // Add the entity to the game entities scope
   // TODO: new Entity() should do this
   // console.log('setting id', entityId, 'to entity')
@@ -243,6 +268,112 @@ export default function createEntity(config, ignoreSetup = false) {
 
   // updates entity in the ECS entity Map scope
   this.game.entities.set(entityId, updatedEntity);
+
+
+  // TODO: move this to separate file
+  if (container) {
+    console.log('attemping to add to container');
+
+    let containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
+
+    if (!containerEnt) {
+      throw new Error('Container not found: ' + container);
+    }
+    let containerPosition = containerEnt.position;
+    console.log('found container ent to work with', containerEnt);
+
+    let layoutType = 'none';
+
+    if (containerEnt.style && containerEnt.style.layout) {
+      layoutType = containerEnt.style.layout;
+    }
+
+    //
+    // Add the current new entity id to the container items
+    //
+    containerEnt.items.push(entityId);
+
+    //
+    // Default / no layout indicates relative position from top left origin ( -1, -1 )
+    // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
+    //
+    if (layoutType === 'none') {
+      // console.log('adding item to container using relative position with no layout algorithm');
+      // adjust the absolute position about to be set to the container relative position
+      position.x = position.x + containerPosition.x;
+      position.y = position.y + containerPosition.y;
+    }
+
+    //
+    // Layout container items using grid layout algorithm
+    //
+    if (layoutType === 'grid') {
+      let cols = containerEnt.style.grid.columns;
+      let rows = containerEnt.style.grid.rows;
+
+      if (typeof cols !== 'number' || typeof rows !== 'number') {
+        console.log('containerEnt.layout', containerEnt.layout);
+        throw new Error('Grid layout requires cols and rows to be numbers');
+      }
+
+      // get all the other items in the container
+      let containerItems = containerEnt.items || [];
+
+      // call game.getEntity() for each item to get its size and position
+      // TODO: use components api to only fetch the necessary components ( instead of entire ent )
+      containerItems = containerItems.map((itemId) => {
+        return this.game.getEntity(itemId);
+      });
+
+      let containerSize = containerEnt.size;
+
+      // Calculate the width and height for each grid cell
+      let cellWidth = containerSize.width / cols;
+      let cellHeight = containerSize.height / rows;
+
+      // Loop through each item in the container
+      containerItems.forEach((item, index) => {
+        // Calculate the row and column for the current item based on its index
+        let row = Math.floor(index / cols);
+        let col = index % cols;
+
+        // skip if item is not found
+        if (!item) {
+          // Remark: This should *not* happen, investigate why index is null value
+          console.log('warning: item not found in container', index, item)
+          return;
+        }
+
+        // Set the starting position to the top-left corner of the container's bounding box
+        let positionX = containerPosition.x - containerSize.width / 2;
+        let positionY = containerPosition.y - containerSize.height / 2;
+        let positionZ = containerPosition.z;
+
+        // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell
+        let itemPosition = {
+          x: positionX + (col * cellWidth) + (cellWidth / 2), // Center of the grid cell
+          y: positionY + (row * cellHeight) + (cellHeight / 2), // Center of the grid cell
+          z: item.position.z // Assuming z-index remains constant or is managed elsewhere
+        };
+
+        // Update the entity's position using the game framework's method
+        this.game.updateEntity({ id: item.id, position: itemPosition });
+
+        console.log(`Item ${item.id} positioned at row ${row}, column ${col}`);
+      });
+
+      console.log('adding item to container using grid layout algorithm');
+    }
+
+    //
+    // Layout container items using custom function
+    //
+    if (typeof layoutType === 'function') {
+      console.log('adding item to container using custom layout algorithm');
+      throw new Error('Custom layout algorithm functions are yet implemented!')
+    }
+
+  }
 
   // updates entity in the flat game.data scope
   this.game.data.ents = this.game.data.ents || {};

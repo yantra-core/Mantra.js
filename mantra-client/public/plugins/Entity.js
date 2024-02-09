@@ -487,12 +487,13 @@ exports["default"] = createEntity;
 var _Entity = _interopRequireDefault(require("../../../Entity/Entity.js"));
 var _TimersComponent = _interopRequireDefault(require("../../../Component/TimersComponent.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // TODO: remove TimersComponent import, use game reference instead ( reduce imported code )
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); } // TODO: add support for Entity.items
+// TODO: remove TimersComponent import, use game reference instead ( reduce imported code )
 function distanceSquared(x1, y1, x2, y2) {
   var dx = x2 - x1;
   var dy = y2 - y1;
@@ -507,6 +508,7 @@ function deferEntityCreation(entityData) {
 // the setup phase assigns default values to the entity and auto-id
 // this is currently being used from `rbush` plugin when creating deferred entities
 function createEntity(config) {
+  var _this = this;
   var ignoreSetup = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   // console.log('createEntity', config)
 
@@ -540,18 +542,27 @@ function createEntity(config) {
       height: 100,
       width: 100,
       depth: 16,
+      // Remark: height, width, and depth are being replaced by size
+      size: {
+        width: 100,
+        height: 100,
+        depth: 16
+      },
       lifetime: -1,
       maxSpeed: 9999,
       isStatic: false,
       isSensor: false,
       restitution: 0,
+      container: null,
       items: null,
       sutra: null,
+      meta: null,
+      collectable: false,
       owner: 0,
       // 0 = server
       inputs: null,
       destroyed: false,
-      type: 'PLAYER',
+      type: 'NONE',
       friction: 0.1,
       // Default friction
       frictionAir: 0.01,
@@ -575,6 +586,20 @@ function createEntity(config) {
       exit: null,
       ctick: this.game.tick
     };
+
+    // Remark: Adding support for new Entity.size prop, removing Entity.height and Entity.width
+    if (_typeof(config.size) === 'object') {
+      config.width = config.size.width;
+      config.height = config.size.height;
+      config.depth = config.size.depth;
+    } else {
+      // Remark: Added 2/8/2024 Backwards support for legacy API, removed soon
+      config.size = {
+        width: config.width,
+        height: config.height,
+        depth: config.depth
+      };
+    }
 
     // merge config with defaultConfig
     config = _objectSpread(_objectSpread({}, defaultConfig), config);
@@ -639,6 +664,7 @@ function createEntity(config) {
     width = _config.width,
     height = _config.height,
     depth = _config.depth,
+    size = _config.size,
     radius = _config.radius,
     shape = _config.shape,
     color = _config.color,
@@ -646,7 +672,10 @@ function createEntity(config) {
     health = _config.health,
     score = _config.score,
     items = _config.items,
+    container = _config.container,
     sutra = _config.sutra,
+    meta = _config.meta,
+    collectable = _config.collectable,
     owner = _config.owner,
     inputs = _config.inputs,
     lifetime = _config.lifetime,
@@ -671,7 +700,6 @@ function createEntity(config) {
 
   // console.log('position', position, 'width', width, 'height', height)
   // Using game's API to add components
-  // alert(type)
   this.game.addComponent(entityId, 'type', type || 'PLAYER');
   this.game.addComponent(entityId, 'name', name || null);
   this.game.addComponent(entityId, 'kind', kind);
@@ -686,6 +714,8 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'width', width);
   this.game.addComponent(entityId, 'height', height);
   this.game.addComponent(entityId, 'depth', depth);
+  // Remark: height, width, and depth are being replaced by size
+  this.game.addComponent(entityId, 'size', size);
   this.game.addComponent(entityId, 'radius', radius);
   this.game.addComponent(entityId, 'shape', shape);
   this.game.addComponent(entityId, 'color', color);
@@ -693,6 +723,8 @@ function createEntity(config) {
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
   this.game.addComponent(entityId, 'sutra', sutra);
+  this.game.addComponent(entityId, 'meta', meta);
+  this.game.addComponent(entityId, 'collectable', collectable);
   this.game.addComponent(entityId, 'inputs', inputs);
   this.game.addComponent(entityId, 'lifetime', lifetime);
   this.game.addComponent(entityId, 'destroyed', false);
@@ -777,6 +809,108 @@ function createEntity(config) {
 
   // updates entity in the ECS entity Map scope
   this.game.entities.set(entityId, updatedEntity);
+
+  // TODO: move this to separate file
+  if (container) {
+    console.log('attemping to add to container');
+    var containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
+
+    if (!containerEnt) {
+      throw new Error('Container not found: ' + container);
+    }
+    var containerPosition = containerEnt.position;
+    console.log('found container ent to work with', containerEnt);
+    var layoutType = 'none';
+    if (containerEnt.style && containerEnt.style.layout) {
+      layoutType = containerEnt.style.layout;
+    }
+
+    //
+    // Add the current new entity id to the container items
+    //
+    containerEnt.items.push(entityId);
+
+    //
+    // Default / no layout indicates relative position from top left origin ( -1, -1 )
+    // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
+    //
+    if (layoutType === 'none') {
+      // console.log('adding item to container using relative position with no layout algorithm');
+      // adjust the absolute position about to be set to the container relative position
+      position.x = position.x + containerPosition.x;
+      position.y = position.y + containerPosition.y;
+    }
+
+    //
+    // Layout container items using grid layout algorithm
+    //
+    if (layoutType === 'grid') {
+      var cols = containerEnt.style.grid.columns;
+      var rows = containerEnt.style.grid.rows;
+      if (typeof cols !== 'number' || typeof rows !== 'number') {
+        console.log('containerEnt.layout', containerEnt.layout);
+        throw new Error('Grid layout requires cols and rows to be numbers');
+      }
+
+      // get all the other items in the container
+      var containerItems = containerEnt.items || [];
+
+      // call game.getEntity() for each item to get its size and position
+      // TODO: use components api to only fetch the necessary components ( instead of entire ent )
+      containerItems = containerItems.map(function (itemId) {
+        return _this.game.getEntity(itemId);
+      });
+      var containerSize = containerEnt.size;
+
+      // Calculate the width and height for each grid cell
+      var cellWidth = containerSize.width / cols;
+      var cellHeight = containerSize.height / rows;
+
+      // Loop through each item in the container
+      containerItems.forEach(function (item, index) {
+        // Calculate the row and column for the current item based on its index
+        var row = Math.floor(index / cols);
+        var col = index % cols;
+
+        // skip if item is not found
+        if (!item) {
+          // Remark: This should *not* happen, investigate why index is null value
+          console.log('warning: item not found in container', index, item);
+          return;
+        }
+
+        // Set the starting position to the top-left corner of the container's bounding box
+        var positionX = containerPosition.x - containerSize.width / 2;
+        var positionY = containerPosition.y - containerSize.height / 2;
+        var positionZ = containerPosition.z;
+
+        // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell
+        var itemPosition = {
+          x: positionX + col * cellWidth + cellWidth / 2,
+          // Center of the grid cell
+          y: positionY + row * cellHeight + cellHeight / 2,
+          // Center of the grid cell
+          z: item.position.z // Assuming z-index remains constant or is managed elsewhere
+        };
+
+        // Update the entity's position using the game framework's method
+        _this.game.updateEntity({
+          id: item.id,
+          position: itemPosition
+        });
+        console.log("Item ".concat(item.id, " positioned at row ").concat(row, ", column ").concat(col));
+      });
+      console.log('adding item to container using grid layout algorithm');
+    }
+
+    //
+    // Layout container items using custom function
+    //
+    if (typeof layoutType === 'function') {
+      console.log('adding item to container using custom layout algorithm');
+      throw new Error('Custom layout algorithm functions are yet implemented!');
+    }
+  }
 
   // updates entity in the flat game.data scope
   this.game.data.ents = this.game.data.ents || {};
@@ -871,6 +1005,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = removeEntity;
+// TODO: double check that all components values are being cleared on removal of ent
 function removeEntity(entityId) {
   var removeFromGameData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
   var ent = this.game.entities.get(entityId);
@@ -917,6 +1052,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function updateEntity(entityData) {
+  // console.log('updateEntity', entityData)
   var entityId = entityData.id;
   if (typeof entityId === 'undefined') {
     // check to see if we have a name, if so, find the entity by name
@@ -1023,6 +1159,13 @@ function updateEntity(entityData) {
   if (typeof entityData.sutra !== 'undefined') {
     // overwrite sutra ( for now )
     this.game.components.sutra.set(entityId, entityData.sutra);
+  }
+
+  // Items
+  if (typeof entityData.items !== 'undefined') {
+    // overwrite all items ( for now )
+    // Remark: in the future we could merge instead of overwrite
+    this.game.components.items.set(entityId, entityData.items);
   }
   if (typeof entityData.style !== 'undefined') {
     // overwrite all items ( for now )

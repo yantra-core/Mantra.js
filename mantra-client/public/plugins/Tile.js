@@ -4298,6 +4298,15 @@ var exitConfig = {
     // generate a new seed and regenerate the maze with the new seed and existing settings
     var seed = Math.floor(Math.random() * 100000000000);
 
+    /* TODO: new instance instead of re-use?
+    let tileMap = {
+      width:  game.systems.tile.tileMap.width,
+      height: game.systems.tile.tileMap.height,
+      seed: seed,
+      algo:  game.systems.tile.tileMap.algo,
+    };
+    */
+
     // set the new seed
     game.systems.tile.tileMap.seed = seed;
 
@@ -4345,7 +4354,7 @@ EXIT: 6
 }, {
   id: 5,
   kind: 'entrance',
-  texture: 'pixel'
+  texture: 'tile-entrance'
 }, {
   id: 6,
   kind: 'exit',
@@ -4378,7 +4387,7 @@ var Tile = /*#__PURE__*/function () {
       _ref$loadInitialChunk = _ref.loadInitialChunk,
       loadInitialChunk = _ref$loadInitialChunk === void 0 ? true : _ref$loadInitialChunk,
       _ref$loadDefaultTileM = _ref.loadDefaultTileMap,
-      loadDefaultTileMap = _ref$loadDefaultTileM === void 0 ? true : _ref$loadDefaultTileM,
+      loadDefaultTileMap = _ref$loadDefaultTileM === void 0 ? false : _ref$loadDefaultTileM,
       _ref$loadTileMap = _ref.loadTileMap,
       loadTileMap = _ref$loadTileMap === void 0 ? false : _ref$loadTileMap;
     _classCallCheck(this, Tile);

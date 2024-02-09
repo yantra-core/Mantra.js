@@ -45,6 +45,7 @@ var Graphics = /*#__PURE__*/function () {
           x: 0,
           y: 0
         },
+        currentZoom: 1,
         minZoom: 0.1,
         maxZoom: 10
       };
@@ -60,6 +61,9 @@ var Graphics = /*#__PURE__*/function () {
         document.body.scrollTop = 0; // For Safari
         document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
       }
+
+      game.flash = triggerItemPickupEffect;
+      game.anime = triggerAnimeTextEffect;
     }
   }, {
     key: "update",
@@ -134,6 +138,145 @@ function downloadCanvasAsImage(canvasElement, filename) {
 }
 
 
+*/
+function triggerItemPickupEffect() {
+  return;
+  var effect = document.getElementById('itemPickupEffect');
+
+  // Create the effect element if it doesn't exist
+  if (!effect) {
+    effect = document.createElement('div');
+    effect.id = 'itemPickupEffect';
+    document.body.appendChild(effect);
+
+    // Apply initial styles
+    Object.assign(effect.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      pointerEvents: 'none',
+      display: 'none',
+      zIndex: '9999' // Ensure it's above other elements
+    });
+  }
+
+  // Apply animation
+  effect.style.display = 'block';
+  effect.style.animation = 'glow 1s ease-out forwards';
+
+  // Calculate shadow size relative to screen size
+  var initialShadowSize = window.innerHeight * 0.25; // 45% from top and bottom for initial state
+  var maxShadowSize = window.innerHeight * 0.5; // 90% from top and bottom for mid-animation state
+
+  // Set up CSS animation keyframes if not already defined
+  var styleSheet = document.getElementById('glowAnimation');
+  if (!styleSheet) {
+    styleSheet = document.createElement('style');
+    styleSheet.id = 'glowAnimation';
+    document.head.appendChild(styleSheet);
+  }
+
+  // TODO: config color
+  var color = '#ccc';
+  styleSheet.innerHTML = "\n    @keyframes glow {\n      0% {\n        box-shadow: 0 0 30px ".concat(initialShadowSize, "px ").concat(color, " inset;\n        opacity: 1;\n      }\n      50% {\n        box-shadow: 0 0 60px ").concat(maxShadowSize, "px ").concat(color, "  inset;\n        opacity: 1;\n      }\n      100% {\n        box-shadow: 0 0 30px ").concat(initialShadowSize, "px ").concat(color, "  inset;\n        opacity: 0;\n      }\n    }\n  ");
+
+  // Reset the effect after it finishes
+  setTimeout(function () {
+    effect.style.display = 'none';
+    effect.style.animation = 'none'; // Reset animation
+  }, 2000); // Hide effect after 2 seconds
+}
+
+function triggerAnimeTextEffect(textMessage) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    styles: {
+      color: '#FF0',
+      // Custom style overrides
+      fontSize: '12rem'
+    },
+    animations: [{
+      name: 'panIn',
+      duration: '3s',
+      timingFunction: 'ease-out'
+    }
+
+    // { name: 'rotate', duration: '5s', timingFunction: 'linear', delay: 3, iterationCount: 'infinite' },
+    // Add more animations as needed
+    ],
+
+    totalDuration: 4000 // Total duration to keep the effect visible
+  };
+
+  return;
+  var textEffect = document.getElementById('animeTextEffect');
+
+  // Create the text effect element if it doesn't exist
+  if (!textEffect) {
+    textEffect = document.createElement('div');
+    textEffect.id = 'animeTextEffect';
+    document.body.appendChild(textEffect);
+
+    // Set default styles
+    textEffect.style = "\n      position: fixed;\n      top: 50%;\n      left: 50%;\n      transform: translate(-50%, -50%);\n      font-size: 12rem;\n      font-weight: bold;\n      color: #FF0;\n      text-shadow: 0 0 20px #FFF;\n      opacity: 0;\n      pointer-events: none;\n      z-index: 9999; // Ensure it's above other elements\n    ";
+  }
+
+  // Apply custom styles from options
+  if (options && options.styles) {
+    Object.assign(textEffect.style, options.styles);
+  }
+
+  // Set the text
+  textEffect.textContent = textMessage;
+
+  // Construct animation sequence based on options
+  var animationSequence = '';
+  if (options && options.animations) {
+    options.animations.forEach(function (anim, index) {
+      animationSequence += "".concat(anim.name, " ").concat(anim.duration, " ").concat(anim.timingFunction, " ").concat(anim.delay || 0, "s ").concat(anim.iterationCount || 'forwards');
+      if (index < options.animations.length - 1) {
+        animationSequence += ', ';
+      }
+    });
+  }
+  textEffect.style.display = 'block';
+  textEffect.style.animation = animationSequence;
+
+  // Set up CSS animation keyframes if not already defined
+  var styleSheet = document.getElementById('textAnimation');
+  if (!styleSheet) {
+    styleSheet = document.createElement('style');
+    styleSheet.id = 'textAnimation';
+    document.head.appendChild(styleSheet);
+  }
+  var keyframes = "\n    @keyframes panIn {\n      0% { transform: translate(-50%, -150%) scale(0.5); opacity: 0; }\n      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }\n    }\n    @keyframes panOut {\n      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }\n      100% { transform: translate(-50%, 150%) scale(0.5); opacity: 0; }\n    }\n    @keyframes swipeRight {\n      0% { transform: translate(-50%, -50%) rotate(0deg); }\n      100% { transform: translate(50%, -50%) rotate(360deg); }\n    }\n    @keyframes rotate {\n      0% { transform: translate(-50%, -50%) rotate(0deg); }\n      100% { transform: translate(-50%, -50%) rotate(360deg); }\n    }\n  ";
+  styleSheet.innerHTML = keyframes;
+
+  // Reset the effect after some time
+  setTimeout(function () {
+    // perform fadeout opacity instead of hiding immediately
+    // TODO: fadeout, better animation text management
+    textEffect.style.display = 'none';
+    textEffect.style.animation = 'none'; // Reset animation
+  }, options.totalDuration || 8000); // Use totalDuration from options or default to 8 seconds
+}
+
+//triggerAnimeTextEffect('test text yo')
+// Example usage:
+/*
+triggerAnimeTextEffect('Level Cleared!', {
+  styles: {
+    color: '#FFF', // Custom style overrides
+    fontSize: '10rem',
+  },
+  animations: [
+    { name: 'panIn', duration: '3s', timingFunction: 'ease-out' },
+    // { name: 'rotate', duration: '5s', timingFunction: 'linear', delay: 3, iterationCount: 'infinite' },
+    // Add more animations as needed
+  ],
+  totalDuration: 8000 // Total duration to keep the effect visible
+});
 */
 
 },{"./lib/LoadingCircle.js":2,"./lib/getTexture.js":3,"./lib/pingPosition.js":4,"./lib/switchGraphics.js":5,"./lib/updateSprite.js":6}],2:[function(require,module,exports){

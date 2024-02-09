@@ -127,7 +127,9 @@ class Music {
     // set the Sutra rules for Home world
     game.useSutra(sutras(game), 'MUSIC');
 
-    // warp to Platform level
+    //
+    // warp to Mantra Home World
+    //
     game.createEntity({
       type: 'WARP',
       exit: {

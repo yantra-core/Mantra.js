@@ -535,6 +535,51 @@ class Home {
     */
 
 
+    //
+    // Warp to Maze World
+    //
+    game.createEntity({
+      type: 'WARP',
+      exit: {
+        world: 'Maze'
+      },
+      width: 64,
+      height: 64,
+      depth: 64,
+      // texture: 'warp-to-platform',
+      isStatic: true,
+      isSensor: true,
+      position: {
+        x: -250,
+        y: 250,
+        z: 32
+      }
+    });
+
+    // text label
+    game.createEntity({
+      type: 'TEXT',
+      width: 80,
+      text: 'Maze World',
+      // width: 200,
+      color: 0x000000,
+      style: {
+        width: '50px',
+        fontSize: '16px',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: -235,
+        y: 280,
+        z: 32
+      }
+    });
+
+
+    //
+    // Warp to Gravity Gardens
+    //
     game.createEntity({
       type: 'WARP',
       exit: {
@@ -553,7 +598,7 @@ class Home {
       }
     });
 
-    // text label saying "Warp To Platform World"
+    // text label
     game.createEntity({
       type: 'TEXT',
       width: 80,

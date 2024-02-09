@@ -34,6 +34,7 @@ class Graphics {
         x: 0,
         y: 0
       },
+      currentZoom: 1,
       minZoom: 0.1,
       maxZoom: 10,
     };
@@ -51,6 +52,9 @@ class Graphics {
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
 
     }
+
+    game.flash = triggerItemPickupEffect;
+    game.anime = triggerAnimeTextEffect;
 
   }
 
@@ -121,4 +125,187 @@ function downloadCanvasAsImage(canvasElement, filename) {
 }
 
 
+*/
+
+function triggerItemPickupEffect() {
+  return;
+  let effect = document.getElementById('itemPickupEffect');
+
+  // Create the effect element if it doesn't exist
+  if (!effect) {
+    effect = document.createElement('div');
+    effect.id = 'itemPickupEffect';
+    document.body.appendChild(effect);
+
+    // Apply initial styles
+    Object.assign(effect.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      pointerEvents: 'none',
+      display: 'none',
+      zIndex: '9999', // Ensure it's above other elements
+    });
+  }
+
+  // Apply animation
+  effect.style.display = 'block';
+  effect.style.animation = 'glow 1s ease-out forwards';
+
+  // Calculate shadow size relative to screen size
+  const initialShadowSize = window.innerHeight * 0.25; // 45% from top and bottom for initial state
+  const maxShadowSize = window.innerHeight * 0.5; // 90% from top and bottom for mid-animation state
+
+  // Set up CSS animation keyframes if not already defined
+  let styleSheet = document.getElementById('glowAnimation');
+  if (!styleSheet) {
+    styleSheet = document.createElement('style');
+    styleSheet.id = 'glowAnimation';
+    document.head.appendChild(styleSheet);
+  }
+
+  // TODO: config color
+  let color = '#ccc';
+
+  styleSheet.innerHTML = `
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 30px ${initialShadowSize}px ${color} inset;
+        opacity: 1;
+      }
+      50% {
+        box-shadow: 0 0 60px ${maxShadowSize}px ${color}  inset;
+        opacity: 1;
+      }
+      100% {
+        box-shadow: 0 0 30px ${initialShadowSize}px ${color}  inset;
+        opacity: 0;
+      }
+    }
+  `;
+
+  // Reset the effect after it finishes
+  setTimeout(() => {
+    effect.style.display = 'none';
+    effect.style.animation = 'none'; // Reset animation
+  }, 2000); // Hide effect after 2 seconds
+}
+
+
+
+function triggerAnimeTextEffect(textMessage, options = {
+  styles: {
+    color: '#FF0', // Custom style overrides
+    fontSize: '12rem',
+  },
+  animations: [
+    { name: 'panIn', duration: '3s', timingFunction: 'ease-out' },
+
+    // { name: 'rotate', duration: '5s', timingFunction: 'linear', delay: 3, iterationCount: 'infinite' },
+    // Add more animations as needed
+  ],
+  totalDuration: 4000 // Total duration to keep the effect visible
+}) {
+  return;
+  let textEffect = document.getElementById('animeTextEffect');
+
+  // Create the text effect element if it doesn't exist
+  if (!textEffect) {
+    textEffect = document.createElement('div');
+    textEffect.id = 'animeTextEffect';
+    document.body.appendChild(textEffect);
+
+    // Set default styles
+    textEffect.style = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12rem;
+      font-weight: bold;
+      color: #FF0;
+      text-shadow: 0 0 20px #FFF;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999; // Ensure it's above other elements
+    `;
+  }
+
+  // Apply custom styles from options
+  if (options && options.styles) {
+    Object.assign(textEffect.style, options.styles);
+  }
+
+  // Set the text
+  textEffect.textContent = textMessage;
+
+  // Construct animation sequence based on options
+  let animationSequence = '';
+  if (options && options.animations) {
+    options.animations.forEach((anim, index) => {
+      animationSequence += `${anim.name} ${anim.duration} ${anim.timingFunction} ${anim.delay || 0}s ${anim.iterationCount || 'forwards'}`;
+      if (index < options.animations.length - 1) {
+        animationSequence += ', ';
+      }
+    });
+  }
+
+  textEffect.style.display = 'block';
+  textEffect.style.animation = animationSequence;
+
+  // Set up CSS animation keyframes if not already defined
+  let styleSheet = document.getElementById('textAnimation');
+  if (!styleSheet) {
+    styleSheet = document.createElement('style');
+    styleSheet.id = 'textAnimation';
+    document.head.appendChild(styleSheet);
+  }
+
+  let keyframes = `
+    @keyframes panIn {
+      0% { transform: translate(-50%, -150%) scale(0.5); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    @keyframes panOut {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, 150%) scale(0.5); opacity: 0; }
+    }
+    @keyframes swipeRight {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(50%, -50%) rotate(360deg); }
+    }
+    @keyframes rotate {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+  `;
+
+  styleSheet.innerHTML = keyframes;
+
+  // Reset the effect after some time
+  setTimeout(() => {
+    // perform fadeout opacity instead of hiding immediately
+    // TODO: fadeout, better animation text management
+    textEffect.style.display = 'none';
+    textEffect.style.animation = 'none'; // Reset animation
+  }, options.totalDuration || 8000); // Use totalDuration from options or default to 8 seconds
+}
+
+//triggerAnimeTextEffect('test text yo')
+// Example usage:
+/*
+triggerAnimeTextEffect('Level Cleared!', {
+  styles: {
+    color: '#FFF', // Custom style overrides
+    fontSize: '10rem',
+  },
+  animations: [
+    { name: 'panIn', duration: '3s', timingFunction: 'ease-out' },
+    // { name: 'rotate', duration: '5s', timingFunction: 'linear', delay: 3, iterationCount: 'infinite' },
+    // Add more animations as needed
+  ],
+  totalDuration: 8000 // Total duration to keep the effect visible
+});
 */
