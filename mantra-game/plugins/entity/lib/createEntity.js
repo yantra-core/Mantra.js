@@ -149,10 +149,8 @@ export default function createEntity(config, ignoreSetup = false) {
   }
   */
 
-
   // console.log('position', position, 'width', width, 'height', height)
   // Using game's API to add components
-  // alert(type)
   this.game.addComponent(entityId, 'type', type || 'PLAYER');
   this.game.addComponent(entityId, 'name', name || null);
   this.game.addComponent(entityId, 'kind', kind);
@@ -339,9 +337,17 @@ export default function createEntity(config, ignoreSetup = false) {
         let row = Math.floor(index / cols);
         let col = index % cols;
 
+        // skip if item is not found
+        if (!item) {
+          // Remark: This should *not* happen, investigate why index is null value
+          console.log('warning: item not found in container', index, item)
+          return;
+        }
+
         // Set the starting position to the top-left corner of the container's bounding box
         let positionX = containerPosition.x - containerSize.width / 2;
         let positionY = containerPosition.y - containerSize.height / 2;
+        let positionZ = containerPosition.z;
 
         // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell
         let itemPosition = {

@@ -23,7 +23,8 @@ class Maze {
       },
       position: {
         x: -100,
-        y: 10
+        y: 10,
+        z: 1
       }
     });
 
@@ -104,10 +105,8 @@ class Maze {
         */
         collisionStart: function (a, b) {
 
-          console.log('ent custom collisionStart', i, a, b);
           // get the a b that isnt the door
           let enterEnt = a.name === 'maze-door-' + i ? a : b;
-          console.log('ent', enterEnt, enterEnt.meta);
           let player = a.type === 'PLAYER' ? a : b;
           // only allow player collisions to trigger door events
           if (player.type !== 'PLAYER') {
@@ -123,7 +122,6 @@ class Maze {
             return;
           }
 
-
           // TODO: make this a CONTAINER and then just remove all items in container
           // default behavior is to clear all tiles
 
@@ -135,6 +133,9 @@ class Maze {
             // create a new key at where it started
             createHomeKey();
           }
+
+          game.flash();
+          game.anime(algos[i]);
 
           // clear all current tiles
           if (game.data.ents.TILE) {
@@ -218,8 +219,6 @@ class Maze {
         container: 'laby-container',
       });
 
-
-
       // create a text label for each door
       game.createEntity({
         type: 'TEXT',
@@ -239,10 +238,7 @@ class Maze {
         },
         container: 'laby-container',
       });
-
-
     }
-
 
     function createHomeKey () {
 
@@ -274,6 +270,43 @@ class Maze {
     createHomeKey();
 
 
+        //
+    // warp to Mantra Home World
+    //
+    game.createEntity({
+      type: 'WARP',
+      exit: {
+        world: 'Home'
+      },
+      texture: 'warp-to-home',
+      width: 64,
+      height: 64,
+      isStatic: true,
+      position: {
+        x: -400,
+        y: -100,
+        z: 0
+      }
+    });
+
+    // text "Warp to Mantra"
+    game.createEntity({
+      type: 'TEXT',
+      text: 'Warp To Mantra',
+      // kind: 'dynamic',
+      style: {
+        padding: '2px',
+        fontSize: '16px',
+        color: '#ffffff',
+        textAlign: 'center'
+      },
+      body: false,
+      position: {
+        x: -400,
+        y: -120
+      }
+    });
+
     /*
     game.createEntity({
       size: {
@@ -293,54 +326,6 @@ class Maze {
     */
 
 
-
-    // Create walls for a simple hallway
-    //this.createHallwayWalls(game);
-
-
-
-
-
-  }
-
-  createHallwayWalls(game) {
-    // Define the dimensions of the hallway
-    const hallwayLength = 64; // Length of the hallway
-    const wallWidth = 32;      // Width of the walls
-    const wallHeight = 100;    // Height of the walls
-    const hallwayWidth = 100;  // Width of the hallway
-
-    // Create left wall
-    for (let x = 0; x < hallwayLength; x += wallWidth) {
-      game.createEntity({
-        type: 'WALL',
-        isStatic: true,
-        width: wallWidth,
-        height: wallHeight,
-        rotation: Math.PI / 2, // Rotate 90 degrees
-        position: {
-          x: x,
-          y: -hallwayWidth / 2, // Positioning to the left of the center
-          z: 0
-        }
-      });
-    }
-
-    // Create right wall
-    for (let x = 0; x < hallwayLength; x += wallWidth) {
-      game.createEntity({
-        type: 'WALL',
-        isStatic: true,
-        width: wallWidth,
-        height: wallHeight,
-        rotation: -Math.PI / 2, // Rotate -90 degrees
-        position: {
-          x: x,
-          y: hallwayWidth / 2, // Positioning to the right of the center
-          z: 0
-        }
-      });
-    }
   }
 
 }
