@@ -245,6 +245,7 @@ var _getEntity = _interopRequireDefault(require("./lib/getEntity.js"));
 var _inflateEntity = _interopRequireDefault(require("./lib/inflateEntity.js"));
 var _removeEntity = _interopRequireDefault(require("./lib/removeEntity.js"));
 var _updateEntity = _interopRequireDefault(require("./lib/updateEntity.js"));
+var _layoutEntity = _interopRequireDefault(require("./lib/layoutEntity.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -289,6 +290,7 @@ var Entity = /*#__PURE__*/function () {
       this.game.hasEntity = this.hasEntity.bind(this);
       this.game.findEntity = this.findEntity.bind(this);
       this.game.removeAllEntities = this.removeAllEntities.bind(this);
+      this.layoutEntity = _layoutEntity["default"].bind(this);
     }
   }, {
     key: "hasEntity",
@@ -477,7 +479,7 @@ const entity = new Entity(entityId);
 
 */
 
-},{"./lib/createEntity.js":5,"./lib/getEntity.js":6,"./lib/inflateEntity.js":7,"./lib/removeEntity.js":8,"./lib/updateEntity.js":9}],5:[function(require,module,exports){
+},{"./lib/createEntity.js":5,"./lib/getEntity.js":6,"./lib/inflateEntity.js":7,"./lib/layoutEntity.js":8,"./lib/removeEntity.js":9,"./lib/updateEntity.js":10}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -486,6 +488,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = createEntity;
 var _Entity = _interopRequireDefault(require("../../../Entity/Entity.js"));
 var _TimersComponent = _interopRequireDefault(require("../../../Component/TimersComponent.js"));
+var _layoutEntity = _interopRequireDefault(require("./layoutEntity.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -508,7 +511,6 @@ function deferEntityCreation(entityData) {
 // the setup phase assigns default values to the entity and auto-id
 // this is currently being used from `rbush` plugin when creating deferred entities
 function createEntity(config) {
-  var _this = this;
   var ignoreSetup = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   // console.log('createEntity', config)
 
@@ -817,106 +819,7 @@ function createEntity(config) {
 
   // TODO: move this to separate file
   if (container) {
-    console.log('attemping to add to container');
-    var containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
-
-    if (!containerEnt) {
-      throw new Error('Container not found: ' + container);
-    }
-    var containerPosition = containerEnt.position;
-    console.log('found container ent to work with', containerEnt);
-    var layoutType = 'none';
-    if (containerEnt.style && containerEnt.style.layout) {
-      layoutType = containerEnt.style.layout;
-    }
-
-    //
-    // Add the current new entity id to the container items
-    //
-    containerEnt.items.push(entityId);
-
-    //
-    // Default / no layout indicates relative position from top left origin ( -1, -1 )
-    // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
-    //
-    if (layoutType === 'none') {
-      // console.log('adding item to container using relative position with no layout algorithm');
-      // adjust the absolute position about to be set to the container relative position
-      position.x = position.x + containerPosition.x;
-      position.y = position.y + containerPosition.y;
-    }
-
-    //
-    // Layout container items using grid layout algorithm
-    //
-    if (layoutType === 'grid') {
-      var cols = containerEnt.style.grid.columns;
-      var rows = containerEnt.style.grid.rows;
-      if (typeof cols !== 'number' || typeof rows !== 'number') {
-        console.log('containerEnt.layout', containerEnt.layout);
-        throw new Error('Grid layout requires cols and rows to be numbers');
-      }
-
-      // get all the other items in the container
-      var containerItems = containerEnt.items || [];
-
-      // call game.getEntity() for each item to get its size and position
-      // TODO: use components api to only fetch the necessary components ( instead of entire ent )
-      containerItems = containerItems.map(function (itemId) {
-        return _this.game.getEntity(itemId);
-      });
-      var containerSize = containerEnt.size;
-
-      // Calculate the width and height for each grid cell
-      var cellWidth = containerSize.width / cols;
-      var cellHeight = containerSize.height / rows;
-
-      // Loop through each item in the container
-      containerItems.forEach(function (item, index) {
-        // Calculate the row and column for the current item based on its index
-        var row = Math.floor(index / cols);
-        var col = index % cols;
-
-        // skip if item is not found
-        if (!item) {
-          // Remark: This should *not* happen, investigate why index is null value
-          console.log('warning: item not found in container', index, item);
-          return;
-        }
-        var paddingTop = containerEnt.style.paddingTop || 20;
-        var paddingLeft = containerEnt.style.paddingLeft || -10;
-
-        // Set the starting position to the top-left corner of the container's bounding box
-        var positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
-        var positionY = containerPosition.y - containerSize.height / 2 + paddingTop;
-        var positionZ = containerPosition.z;
-
-        // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell
-        var itemPosition = {
-          x: positionX + col * cellWidth + cellWidth / 2,
-          // Center of the grid cell
-          y: positionY + row * cellHeight + cellHeight / 2,
-          // Center of the grid cell
-          z: item.position.z // Assuming z-index remains constant or is managed elsewhere
-        };
-
-        // Update the entity's position using the game framework's method
-        _this.game.updateEntity({
-          id: item.id,
-          position: itemPosition
-        });
-        console.log("Item ".concat(item.id, " positioned at row ").concat(row, ", column ").concat(col));
-      });
-      console.log('adding item to container using grid layout algorithm');
-    }
-
-    //
-    // Layout container items using custom function
-    //
-    if (typeof layoutType === 'function') {
-      console.log('adding item to container using custom layout algorithm');
-      throw new Error('Custom layout algorithm functions are yet implemented!');
-    }
+    this.layoutEntity(container, entityId);
   }
 
   // updates entity in the flat game.data scope
@@ -928,7 +831,7 @@ function createEntity(config) {
   return updatedEntity;
 }
 
-},{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3}],6:[function(require,module,exports){
+},{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3,"./layoutEntity.js":8}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1011,6 +914,117 @@ function inflateEntity(entityData) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = layoutEntity;
+function layoutEntity(container, entityId) {
+  var _this = this;
+  console.log('attemping to add to container');
+  var containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
+
+  if (!containerEnt) {
+    throw new Error('Container not found: ' + container);
+  }
+  var containerPosition = containerEnt.position;
+  console.log('found container ent to work with', containerEnt);
+  var layoutType = 'none';
+  if (containerEnt.style && containerEnt.style.layout) {
+    layoutType = containerEnt.style.layout;
+  }
+
+  //
+  // Add the current new entity id to the container items
+  //
+  containerEnt.items.push(entityId);
+
+  //
+  // Default / no layout indicates relative position from top left origin ( -1, -1 )
+  // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
+  //
+  if (layoutType === 'none') {
+    // console.log('adding item to container using relative position with no layout algorithm');
+    // adjust the absolute position about to be set to the container relative position
+    position.x = position.x + containerPosition.x;
+    position.y = position.y + containerPosition.y;
+  }
+
+  //
+  // Layout container items using grid layout algorithm
+  //
+  if (layoutType === 'grid') {
+    var cols = containerEnt.style.grid.columns;
+    var rows = containerEnt.style.grid.rows;
+    if (typeof cols !== 'number' || typeof rows !== 'number') {
+      console.log('containerEnt.layout', containerEnt.layout);
+      throw new Error('Grid layout requires cols and rows to be numbers');
+    }
+
+    // get all the other items in the container
+    var containerItems = containerEnt.items || [];
+
+    // call game.getEntity() for each item to get its size and position
+    // TODO: use components api to only fetch the necessary components ( instead of entire ent )
+    containerItems = containerItems.map(function (itemId) {
+      return _this.game.getEntity(itemId);
+    });
+    var containerSize = containerEnt.size;
+
+    // Calculate the width and height for each grid cell
+    var cellWidth = containerSize.width / cols;
+    var cellHeight = containerSize.height / rows;
+
+    // Loop through each item in the container
+    containerItems.forEach(function (item, index) {
+      // Calculate the row and column for the current item based on its index
+      var row = Math.floor(index / cols);
+      var col = index % cols;
+
+      // skip if item is not found
+      if (!item) {
+        // Remark: This should *not* happen, investigate why index is null value
+        console.log('warning: item not found in container', index, item);
+        return;
+      }
+      var paddingTop = containerEnt.style.paddingTop || 20;
+      var paddingLeft = containerEnt.style.paddingLeft || -10;
+
+      // Set the starting position to the top-left corner of the container's bounding box
+      var positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
+      var positionY = containerPosition.y - containerSize.height / 2 + paddingTop;
+      var positionZ = containerPosition.z;
+
+      // Calculate the position for the current item, aligning the center of the entity with the center of the grid cell
+      var itemPosition = {
+        x: positionX + col * cellWidth + cellWidth / 2,
+        // Center of the grid cell
+        y: positionY + row * cellHeight + cellHeight / 2,
+        // Center of the grid cell
+        z: item.position.z // Assuming z-index remains constant or is managed elsewhere
+      };
+
+      // Update the entity's position using the game framework's method
+      _this.game.updateEntity({
+        id: item.id,
+        position: itemPosition
+      });
+      console.log("Item ".concat(item.id, " positioned at row ").concat(row, ", column ").concat(col));
+    });
+    console.log('adding item to container using grid layout algorithm');
+  }
+
+  //
+  // Layout container items using custom function
+  //
+  if (typeof layoutType === 'function') {
+    console.log('adding item to container using custom layout algorithm');
+    throw new Error('Custom layout algorithm functions are yet implemented!');
+  }
+}
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = removeEntity;
 // TODO: double check that all components values are being cleared on removal of ent
 function removeEntity(entityId) {
@@ -1045,7 +1059,7 @@ function removeEntity(entityId) {
   }
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

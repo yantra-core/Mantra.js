@@ -5,6 +5,7 @@ import getEntity from './lib/getEntity.js';
 import inflateEntity from './lib/inflateEntity.js';
 import removeEntity from './lib/removeEntity.js';
 import updateEntity from './lib/updateEntity.js';
+import layoutEntity from './lib/layoutEntity.js';
 
 class Entity {
 
@@ -39,6 +40,7 @@ class Entity {
     this.game.hasEntity = this.hasEntity.bind(this);
     this.game.findEntity = this.findEntity.bind(this);
     this.game.removeAllEntities = this.removeAllEntities.bind(this);
+    this.layoutEntity = layoutEntity.bind(this);
   }
 
   hasEntity (entityId) {
