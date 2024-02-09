@@ -164,12 +164,22 @@ export default function construct(game, plugins = []) {
     width: new Component('width', game),
     height: new Component('height', game),
     depth: new Component('depth', game),
+    // Remark: height, width, depth are being removed in favor of size
+    size: new Component('size', game),
     radius: new Component('radius', game),
     isSensor: new Component('isSensor', game),
     owner: new Component('owner', game),
     inputs: new Component('inputs', game),
     items: new Component('items', game),
-    sutra: new Component('sutra', game)
+    sutra: new Component('sutra', game),
+    // meta property allows for arbitrary data to be attached to an entity
+    // you should *not* use meta for any high-frequency data updates as it is not optimized for that
+    // if you find yourself needing to put a larger amount of data in meta, consider creating a new component
+    meta: new Component('meta', game),
+
+    // boolean flag for if the entity is a collectable
+    // collectable entities go into items[] of the entity when they collide
+    collectable: new Component('collectable', game),
 
   };
 

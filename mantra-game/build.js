@@ -52,6 +52,7 @@ const plugins = [
   './plugins/schema/Schema.js',
   './plugins/current-fps/CurrentFPS.js',
   './plugins/keyboard/Keyboard.js',
+  './plugins/collectable/Collectable.js',
   './plugins/lifetime/Lifetime.js',
   './plugins/client/LocalClient.js',
   './plugins/physics-matter/MatterPhysics.js',

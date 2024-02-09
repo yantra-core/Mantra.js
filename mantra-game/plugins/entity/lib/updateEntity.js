@@ -1,5 +1,5 @@
 export default function updateEntity(entityData) {
-
+  // console.log('updateEntity', entityData)
   let entityId = entityData.id;
   if (typeof entityId === 'undefined') {
     // check to see if we have a name, if so, find the entity by name
@@ -119,6 +119,13 @@ export default function updateEntity(entityData) {
   if (typeof entityData.sutra !== 'undefined') {
     // overwrite sutra ( for now )
     this.game.components.sutra.set(entityId, entityData.sutra);
+  }
+
+  // Items
+  if (typeof entityData.items !== 'undefined') {
+    // overwrite all items ( for now )
+    // Remark: in the future we could merge instead of overwrite
+    this.game.components.items.set(entityId, entityData.items);
   }
 
   if (typeof entityData.style !== 'undefined') {

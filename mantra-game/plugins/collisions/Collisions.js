@@ -38,6 +38,8 @@ class Collisions {
       return;
     }
 
+    // TODO: remove this in favor of collisionStart() handler?
+    // Remark: May have many of these? Only allow on per entity? may need array?
     if (entityA.exit || entityB.exit) {
       let exitEnt = entityA.exit ? entityA : entityB;
       let enterEnt = entityA.exit ? entityB : entityA;
@@ -57,6 +59,47 @@ class Collisions {
         }
       }
 
+    }
+    if (entityA.collisionStart) {
+      if (typeof entityA.collisionStart === 'function') {
+        // console.log('calling entityA.collisionStart', entityA.collisionStart, entityA, entityB)
+        entityA.collisionStart.call(this.game, entityB, entityA);
+      }
+    }
+
+    if (entityB.collisionStart) {
+      if (typeof entityB.collisionStart === 'function') {
+        // console.log('calling entityB.collisionStart', entityB.collisionStart, entityB, entityA)
+        entityB.collisionStart.call(this.game, entityA, entityB);
+      }
+    }
+
+    //
+    // Collectable entities will get attached to the entity they collide with
+    // this is done by adding to Entity.items() array
+    // further checks in Collectibles system can update the position of the collectable
+    function addItemIfCollectible(sourceEntity, targetEntity) {
+      // console.log('Processing collectable', sourceEntity.collectable, sourceEntity, targetEntity);
+      // Initialize the target entity's items array if it doesn't exist
+      targetEntity.items = targetEntity.items || [];
+      // Check if the source entity's ID is already in the target entity's items array
+      // If not, add it to the array and update the entity
+      if (!targetEntity.items.includes(sourceEntity.id)) {
+        // console.log("ADDING ITEM", sourceEntity.id, targetEntity.id, targetEntity.items)
+        targetEntity.items.push(sourceEntity.id);
+        this.game.updateEntity({
+          id: targetEntity.id,
+          items: targetEntity.items
+        });
+      }
+    }
+
+    if (entityA.collectable) {
+      addItemIfCollectible.call(this, entityA, entityB);
+    }
+
+    if (entityB.collectable) {
+      addItemIfCollectible.call(this, entityB, entityA);
     }
 
     // Check for specific collision cases and send events to the state machine
@@ -240,7 +283,7 @@ class Collisions {
     if (kind === 'ACTIVE' && (bodyA.entity.collisionActive === true || bodyB.entity.collisionActive === true)) {
       return true;
     }
-    if (kind === 'START' && (bodyA.entity.collisionStart === true || bodyB.entity.collisionStart === true)) {
+    if (kind === 'START' && (bodyA.entity.collisionStart || bodyB.entity.collisionStart)) {
       return true;
     }
     if (kind === 'END' && (bodyA.entity.collisionEnd === true || bodyB.entity.collisionEnd === true)) {

@@ -34,6 +34,7 @@ class Graphics {
         x: 0,
         y: 0
       },
+      currentZoom: 1,
       minZoom: 0.1,
       maxZoom: 10,
     };

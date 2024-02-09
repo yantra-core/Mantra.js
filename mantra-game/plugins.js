@@ -54,6 +54,7 @@ import GhostTyper from './plugins/typer-ghost/GhostTyper.js';
 import Tone from './plugins/tone/Tone.js';
 
 // Entity Component Systems
+import Collectable from './plugins/collectable/Collectable.js';
 import Health from './plugins/health/Health.js';
 import Lifetime from './plugins/lifetime/Lifetime.js';
 
@@ -136,6 +137,7 @@ const plugins = {
   Graphics,
   Health,
   Keyboard,
+  Collectable,
   Lifetime,
   Timers,
   RBush,
