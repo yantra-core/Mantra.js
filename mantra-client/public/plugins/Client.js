@@ -725,13 +725,14 @@ var defaultAssets = {
   'tile-path-green': '/img/game/tiles/tile-path-green.png',
   'tile-path-brown': '/img/game/tiles/tile-path-brown.png',
   'tile-exit': '/img/game/tiles/tile-exit.png',
+  'tile-entrance': '/img/game/tiles/tile-entrance.png',
   //'fire': '/img/game/env/loz_fire.png',
   // 'flare': '/img/game/particle/flare.png',
   //'planet-express-base': '/img/game/env/planet-express-base.png',
   // 'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   // '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
-  'warp-to-home': '/img/game/env/warp-to-mantra-home.png',
+  'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
   /*
   'raiden': {
     type: 'spritesheet',

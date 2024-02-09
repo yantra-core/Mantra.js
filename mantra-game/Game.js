@@ -448,18 +448,6 @@ class Game {
     client.disconnect();
   }
 
-  triggerItemPickupEffect() {
-    const effect = document.getElementById('itemPickupEffect');
-    effect.style.display = 'block';
-    effect.style.animation = 'glow 2s ease-out forwards';
-  
-    setTimeout(() => {
-      effect.style.display = 'none';
-      effect.style.animation = 'none'; // Reset animation
-    }, 2000); // Hide effect after 2 seconds
-  }
-  
-
 
 }
 

@@ -377,6 +377,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       if (componentType === 'actionRateLimiter') {
         data = new Map();
       }
+      if (data == null) {
+        return;
+      }
       this.components[componentType].set(entityId, data);
     }
   }, {
@@ -509,6 +512,21 @@ var Game = exports.Game = /*#__PURE__*/function () {
       } else {
         console.log('Warning: no rbush system found, cannot perform getPlayerFieldOfView query');
       }
+    }
+
+    //
+    // Containers
+    //
+  }, {
+    key: "createContainer",
+    value: function createContainer(entityData) {
+      // helper method for containers
+      entityData.type = 'CONTAINER';
+      entityData.style = entityData.style || {};
+      entityData.style.layout = entityData.layout || 'none';
+      entityData.style.grid = entityData.grid || {};
+      entityData.items = entityData.items || [];
+      return game.createEntity(entityData);
     }
 
     //
@@ -708,6 +726,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // reset the camera offsets ( in case user has dragged or scrolled camera )
       game.viewPortOffsetX = 0; // TODO: scope these onto game.data.camera.viewPortOffset
       game.viewPortOffsetY = 0;
+
+      // defaults camera back to 1x zoom
+      game.zoom(1);
     }
 
     //
@@ -1320,12 +1341,21 @@ function construct(game) {
     width: new _Component["default"]('width', game),
     height: new _Component["default"]('height', game),
     depth: new _Component["default"]('depth', game),
+    // Remark: height, width, depth are being removed in favor of size
+    size: new _Component["default"]('size', game),
     radius: new _Component["default"]('radius', game),
     isSensor: new _Component["default"]('isSensor', game),
     owner: new _Component["default"]('owner', game),
     inputs: new _Component["default"]('inputs', game),
     items: new _Component["default"]('items', game),
-    sutra: new _Component["default"]('sutra', game)
+    sutra: new _Component["default"]('sutra', game),
+    // meta property allows for arbitrary data to be attached to an entity
+    // you should *not* use meta for any high-frequency data updates as it is not optimized for that
+    // if you find yourself needing to put a larger amount of data in meta, consider creating a new component
+    meta: new _Component["default"]('meta', game),
+    // boolean flag for if the entity is a collectable
+    // collectable entities go into items[] of the entity when they collide
+    collectable: new _Component["default"]('collectable', game)
   };
 
   // define additional components for the game
