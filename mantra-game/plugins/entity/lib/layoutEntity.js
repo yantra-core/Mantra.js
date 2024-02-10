@@ -1,5 +1,4 @@
 export default function layoutEntity (container, entityId) {
-  console.log('attemping to add to container');
 
   let containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
 
@@ -7,7 +6,7 @@ export default function layoutEntity (container, entityId) {
     throw new Error('Container not found: ' + container);
   }
   let containerPosition = containerEnt.position;
-  console.log('found container ent to work with', containerEnt);
+  // console.log('found container ent to work with', containerEnt);
 
   let layoutType = 'none';
 
@@ -89,10 +88,10 @@ export default function layoutEntity (container, entityId) {
       // Update the entity's position using the game framework's method
       this.game.updateEntity({ id: item.id, position: itemPosition });
 
-      console.log(`Item ${item.id} positioned at row ${row}, column ${col}`);
+      // console.log(`Item ${item.id} positioned at row ${row}, column ${col}`);
     });
 
-    console.log('adding item to container using grid layout algorithm');
+    // console.log('adding item to container using grid layout algorithm');
   }
 
   //

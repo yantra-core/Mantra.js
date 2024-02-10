@@ -1,7 +1,7 @@
 // TODO: double check that all components values are being cleared on removal of ent
 export default function removeEntity(entityId, removeFromGameData = true) {
 
-  this.game.lifecycle.triggerHook('before.remove.entity', entityId);
+  this.game.lifecycle.triggerHook('before.removeEntity', entityId);
 
   let ent = this.game.entities.get(entityId);
   if (ent && this.game.systems.graphics && ent.graphics) {
@@ -34,6 +34,6 @@ export default function removeEntity(entityId, removeFromGameData = true) {
 
   }
 
-  this.game.lifecycle.triggerHook('after.remove.entity', entityId);
+  this.game.lifecycle.triggerHook('after.removeEntity', entityId);
 
 }

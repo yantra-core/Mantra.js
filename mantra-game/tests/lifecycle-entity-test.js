@@ -32,7 +32,7 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   let testData = null;
 
   // Define a test hook
-  lifecycle.addHook('before.create.entity', (entityData) => {
+  lifecycle.addHook('before.createEntity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -54,7 +54,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   lifecycle.clearAllHooks();
 
   // First hook to modify data
-  lifecycle.addHook('before.create.entity', (data) => {
+  lifecycle.addHook('before.createEntity', (data) => {
     data.meta = data.meta || {};
     data.meta.modifications = data.meta.modifications || [];
     data.meta.modifications.push('first');
@@ -62,13 +62,13 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   });
 
   // Second hook to further modify data
-  lifecycle.addHook('before.create.entity', (data) => {
+  lifecycle.addHook('before.createEntity', (data) => {
     data.meta.modifications.push('second');
     return data;
   });
 
   // Third hook to add final modifications
-  lifecycle.addHook('before.create.entity', (data) => {
+  lifecycle.addHook('before.createEntity', (data) => {
     data.meta.modifications.push('third');
     return data;
   });
@@ -76,7 +76,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   // Initial entity data
   let entityData = { name: 'Original Entity', meta: { modifications: [] } };
 
-  // Assuming game.createEntity() internally calls lifecycle.triggerHook() for 'before.create.entity' event
+  // Assuming game.createEntity() internally calls lifecycle.triggerHook() for 'before.createEntity' event
   let ent = game.createEntity(entityData);
 
   // Expected modifications after all hooks have run
@@ -95,7 +95,7 @@ tap.test('Lifecycle hooks - after.create.entity', (t) => {
   lifecycle.clearAllHooks();
 
   // Define a test hook
-  lifecycle.addHook('after.create.entity', (entityData) => {
+  lifecycle.addHook('after.createEntity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -120,7 +120,7 @@ tap.test('Lifecycle hooks - before.update.entity', (t) => {
   lifecycle.clearAllHooks();
 
   // Define a test hook
-  lifecycle.addHook('before.update.entity', (entityData) => {
+  lifecycle.addHook('before.updateEntity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -148,7 +148,7 @@ tap.test('Lifecycle hooks - after.update.entity', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
   // Define a test hook
-  lifecycle.addHook('after.update.entity', (entityData) => {
+  lifecycle.addHook('after.updateEntity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -170,23 +170,23 @@ tap.test('Lifecycle hooks - after.update.entity', (t) => {
 });
 
 //
-// before.remove.entity
+// before.removeEntity
 //
-tap.test('Lifecycle hooks - before.remove.entity', (t) => {
+tap.test('Lifecycle hooks - before.removeEntity', (t) => {
   const lifecycle = game.lifecycle;
 
   // Create a Sinon spy
   const hookSpy = sinon.spy();
 
   // Define a test hook using the Sinon spy
-  lifecycle.addHook('before.remove.entity', hookSpy);
+  lifecycle.addHook('before.removeEntity', hookSpy);
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });
   game.removeEntity(ent);
 
   // Assertions
-  t.ok(hookSpy.called, 'before.remove.entity hook should be called');
+  t.ok(hookSpy.called, 'before.removeEntity hook should be called');
   t.end();
 });
 
@@ -200,7 +200,7 @@ tap.test('Lifecycle hooks - after.remove.entity', (t) => {
   const hookSpy = sinon.spy();
 
   // Define a test hook using the Sinon spy
-  lifecycle.addHook('after.remove.entity', hookSpy);
+  lifecycle.addHook('after.removeEntity', hookSpy);
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });

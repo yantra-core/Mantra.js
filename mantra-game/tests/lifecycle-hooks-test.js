@@ -30,7 +30,7 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   let testData = null;
 
   // Define a test hook
-  lifecycle.addHook('before.create.entity', (entityData) => {
+  lifecycle.addHook('before.createEntity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -39,7 +39,7 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   const mutatedEntityData = { name: 'Mutated Entity' };
 
   // unit test use lifecycle.triggerHook
-  let ent = lifecycle.triggerHook('before.create.entity', mutatedEntityData);
+  let ent = lifecycle.triggerHook('before.createEntity', mutatedEntityData);
 
   // Assertions
   t.same(ent.name, mutatedEntityData.name, 'before.create.entity hook should modify testData');
@@ -50,7 +50,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   const lifecycle = game.lifecycle; // Assuming game.lifecycle is an instance of LifecycleHooks
 
   // First hook to modify data
-  lifecycle.addHook('before.create.entity', (data) => {
+  lifecycle.addHook('before.createEntity', (data) => {
     data.meta = data.meta || {};
     data.meta.modifications = data.meta.modifications || [];
     data.meta.modifications.push('first');
@@ -58,13 +58,13 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   });
 
   // Second hook to further modify data
-  lifecycle.addHook('before.create.entity', (data) => {
+  lifecycle.addHook('before.createEntity', (data) => {
     data.meta.modifications.push('second');
     return data;
   });
 
   // Third hook to add final modifications
-  lifecycle.addHook('before.create.entity', (data) => {
+  lifecycle.addHook('before.createEntity', (data) => {
     data.meta.modifications.push('third');
     return data;
   });
@@ -72,7 +72,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   // Initial entity data
   let entityData = { name: 'Original Entity', meta: { modifications: [] } };
 
-  let ent = lifecycle.triggerHook('before.create.entity', entityData);
+  let ent = lifecycle.triggerHook('before.createEntity', entityData);
 
   // Expected modifications after all hooks have run
   const expectedModifications = ['first', 'second', 'third'];
@@ -118,13 +118,13 @@ tap.test('LifecycleHooks - before and after', (t) => {
       afterTrigger = false;
 
   // Add a before hook
-  lifecycle.before('create.entity', function(entityData){
+  lifecycle.before('createEntity', function(entityData){
     beforeTrigger = true;
     return entityData;
   });
 
   // Add an after hook
-  lifecycle.after('create.entity', function(entity){
+  lifecycle.after('createEntity', function(entity){
     afterTrigger = true;
     return entity;
   });
@@ -146,13 +146,13 @@ tap.test('Game.before and Game.after integration', (t) => {
       afterTrigger = false;
 
   // Add a before hook
-  game.before('create.entity', function(entityData){
+  game.before('createEntity', function(entityData){
     beforeTrigger = true;
     return entityData;
   });
 
   // Add an after hook
-  game.after('create.entity', function(entity){
+  game.after('createEntity', function(entity){
     afterTrigger = true;
     return entity;
   });
