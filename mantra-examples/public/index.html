@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Dev ECS Framework - Categories</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #000000;
+    }
+
+    .search-container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .search-container input {
+      width: 50%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 20px;
+    }
+
+    .category {
+      flex: 0 1 calc(33.333% - 40px);
+      margin: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      background: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .category img {
+      width: 100%;
+      height: auto;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .category h3 {
+      margin: 0;
+      padding: 15px;
+      background: #333;
+      color: #fff;
+      border-bottom: 1px solid #444;
+    }
+
+    .category p {
+      padding: 10px;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    .category a {
+      display: block;
+      padding: 10px;
+      background: #5cb85c;
+      color: #fff;
+      text-decoration: none;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .category {
+        flex: 0 1 calc(50% - 40px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .category {
+        flex: 0 1 calc(100% - 40px);
+      }
+
+      .search-container input {
+        width: 80%;
+      }
+    }
+  </style>
+
+  <script src="examples.js"></script>
+</head>
+
+<body>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search Examples (i.e. Movement, Bullet, Config)">
+  </div>
+
+  <div class="categories">
+    <!-- these initial values will always remain for SEO, keep as default static HTML -->
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Items</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Entity</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Physics</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Graphics</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Assets</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Plugins</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+    <div class="category">
+      <img src="placeholder-image.jpg" alt="Physics">
+      <h3>Game Config</h3>
+      <p>Explore examples featuring the physics engine.</p>
+      <a href="example.html">View Category</a>
+    </div>
+
+  </div>
+
+</body>
+
+</html>
