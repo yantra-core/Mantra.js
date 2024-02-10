@@ -188,6 +188,8 @@ class Game {
     return this.getEntity(this.currentPlayerId);
   }
 
+  // TODO: doesn't need to be player, can be ent
+  // rename: getEntityFieldOfView
   getPlayerFieldOfView(entId, distance = 1000, mergeData = true) {
     let ent;
 

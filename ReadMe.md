@@ -185,6 +185,7 @@ game.listen(8888); // starts a listening WebSocket server on port 8888
 ```
   
 ## Game API
+
 ### Entity API
 
 ```js
@@ -231,6 +232,75 @@ game.use(pluginInstance)
 game.use(pluginIdAsString)
 
 ```
+
+# Mantra Lifecycle Hooks
+
+## Game Loop Lifecycle Hooks
+
+### `game.beforeUpdate(function(delta){})`
+Called before the game loop.
+
+### `game.afterUpdate(function(delta){})`
+Called after the game loop.
+
+## Entity Lifecycle Hooks
+
+### Create Entity
+
+#### `game.beforeCreateEntity(function(entityData){})`
+Called before an entity is created.
+
+#### `game.afterCreateEntity(function(entityData){})`
+Called after an entity is created.
+
+### Update Entity
+
+#### `game.beforeUpdateEntity(function(entityData){})`
+Called before an entity is updated.
+
+#### `game.afterUpdateEntity(function(entityData){})`
+Called after an entity is updated.
+
+### Remove Entity
+
+#### `game.beforeRemoveEntity(function(entityData){})`
+Called before an entity is destroyed.
+
+#### `game.afterRemoveEntity(function(entityData){})`
+Called after an entity is destroyed.
+
+### Cleanup Removed Entities
+
+This is the final removal step one game tick after an entity is removed. We keep entities in the game state with `entity.destroyed` set to true for one tick. This approach aids in scenarios where a collision or other event may need to reference the entity. It also helps with the render loop to avoid flickering.
+
+####  `game.beforeCleanupRemovedEntities(function(){})`
+####  `game.afterCleanupRemovedEntities(function(){})`
+
+## Collisions Lifecycle Hooks
+
+## Collision Start
+
+### `game.beforeCollisionStart(function(a, b, pair){})`
+### `game.afterCollisionStart(function(a, b, pair){})`
+
+## Collision Active
+
+### `game.beforeCollisionActive(function(a, b, pair){})`
+### `game.afterCollisionActive(function(a, b, pair){})`
+
+## Collision End
+### `game.beforeCollisionEnd(function(a, b, pair){})`
+### `game.afterCollisionEnd(function(a, b, pair){})`
+
+## Input Lifecycle
+
+### `game.beforeHandleInput(function(entityId, input, sequence){})`
+Called before an input event occurs.
+
+### `game.afterHandleInput(function(entityId, input, sequence){})`
+Called after an input event occurs.
+
+
 
 <a name="plugins"></a>
 ## Plugin Directory
