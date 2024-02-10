@@ -7,7 +7,6 @@ import EntityInput from '../plugins/entity-input/EntityInput.js';
 import SnapshotManager from '../plugins/snapshot-manager/SnapshotManager.js';
 import sinon from 'sinon';
 
-
 const game = new Game({
   loadDefaultPlugins: false,
   msgpack: false,
@@ -28,24 +27,62 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
 
   // Define a test hook
   lifecycle.addHook('beforeCreateEntity', (entityData) => {
-    testData = entityData;
+    entityData.name = 'Mutated Entity';
+    return entityData;
   });
 
   // Define test entity data
-  const testEntityData = { id: 1, name: 'Test Entity' };
+  const mutatedEntityData = { name: 'Mutated Entity' };
 
-  // Trigger the hook
-  lifecycle.triggerHook('beforeCreateEntity', testEntityData);
+  let ent = game.createEntity({
+    name: 'Test Entity'
+  });
 
   // Assertions
-  t.same(testData, testEntityData, 'beforeCreateEntity hook should modify testData');
+  t.same(ent.name, mutatedEntityData.name, 'beforeCreateEntity hook should modify testData');
+  t.end();
+});
+
+tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
+  const lifecycle = game.lifecycle; // Assuming game.lifecycle is an instance of LifecycleHooks
+
+  // First hook to modify data
+  lifecycle.addHook('beforeCreateEntity', (data) => {
+    data.meta = data.meta || {};
+    data.meta.modifications = data.meta.modifications || [];
+    data.meta.modifications.push('first');
+    return data;
+  });
+
+  // Second hook to further modify data
+  lifecycle.addHook('beforeCreateEntity', (data) => {
+    data.meta.modifications.push('second');
+    return data;
+  });
+
+  // Third hook to add final modifications
+  lifecycle.addHook('beforeCreateEntity', (data) => {
+    data.meta.modifications.push('third');
+    return data;
+  });
+
+  // Initial entity data
+  let entityData = { name: 'Original Entity', meta: { modifications: [] } };
+
+  // Assuming game.createEntity() internally calls lifecycle.triggerHook() for 'beforeCreateEntity' event
+  let ent = game.createEntity(entityData);
+
+  // Expected modifications after all hooks have run
+  const expectedModifications = ['first', 'second', 'third'];
+
+  // Assertions
+  t.same(ent.meta.modifications, expectedModifications, 'Hooks should modify data in sequence');
   t.end();
 });
 
 // Test triggering a hook that has no callbacks
 tap.test('Lifecycle hooks - Trigger hook without callbacks', (t) => {
   const lifecycle = game.lifecycle;
-  // TODO: replace with sinon
   const consoleWarnSpy = sinon.spy(console, 'warn');
 
   // Trigger a hook that hasn't had any callbacks added
@@ -57,15 +94,14 @@ tap.test('Lifecycle hooks - Trigger hook without callbacks', (t) => {
   t.end();
 });
 
+
 // Test adding a hook to a non-existent lifecycle event
 tap.test('LifecycleHooks - Add hook to non-existent lifecycle event', (t) => {
   const lifecycle = game.lifecycle;
-    // TODO: replace with sinon
-
   const consoleWarnSpy = sinon.spy(console, 'warn');
 
   // Attempt to add a hook to a non-existent lifecycle event
-  lifecycle.addHook('nonExistentEvent', () => {});
+  lifecycle.addHook('nonExistentEvent', () => { });
 
   // Assertions
   t.ok(consoleWarnSpy.called, 'Adding a hook to a non-existent lifecycle event should call console.warn');

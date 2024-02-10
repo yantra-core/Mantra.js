@@ -24,6 +24,9 @@ export default function createEntity(config, ignoreSetup = false) {
 
   let entityId;
 
+  // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
+  config = this.game.lifecycle.triggerHook('beforeCreateEntity', config);
+
   if (!ignoreSetup) {
     entityId = this._generateId();
 
@@ -247,10 +250,6 @@ export default function createEntity(config, ignoreSetup = false) {
     // immediately add to changedEntities
     // this.game.changedEntities.add(entityId);
   }
-
-
-  
-
 
   // Add the entity to the game entities scope
   // TODO: new Entity() should do this
