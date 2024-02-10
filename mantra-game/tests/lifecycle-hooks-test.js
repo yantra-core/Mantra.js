@@ -96,7 +96,6 @@ tap.test('Lifecycle hooks - Trigger hook without callbacks', (t) => {
   t.end();
 });
 
-
 // Test adding a hook to a non-existent lifecycle event
 tap.test('LifecycleHooks - Add hook to non-existent lifecycle event', (t) => {
   const lifecycle = game.lifecycle;
@@ -110,3 +109,59 @@ tap.test('LifecycleHooks - Add hook to non-existent lifecycle event', (t) => {
   consoleWarnSpy.restore(); // Clean up the spy
   t.end();
 });
+
+tap.test('LifecycleHooks - before and after', (t) => {
+  const lifecycle = game.lifecycle;
+  lifecycle.clearAllHooks();
+
+  let beforeTrigger = false,
+      afterTrigger = false;
+
+  // Add a before hook
+  lifecycle.before('create.entity', function(entityData){
+    beforeTrigger = true;
+    return entityData;
+  });
+
+  // Add an after hook
+  lifecycle.after('create.entity', function(entity){
+    afterTrigger = true;
+    return entity;
+  });
+
+  let ent = game.createEntity();
+
+  t.ok(beforeTrigger, 'before.create.entity hook should have been triggered');
+  t.ok(afterTrigger, 'after.create.entity hook should have been triggered');
+  t.end();
+
+});
+
+
+tap.test('Game.before and Game.after integration', (t) => {
+  const lifecycle = game.lifecycle;
+  lifecycle.clearAllHooks();
+
+  let beforeTrigger = false,
+      afterTrigger = false;
+
+  // Add a before hook
+  game.before('create.entity', function(entityData){
+    beforeTrigger = true;
+    return entityData;
+  });
+
+  // Add an after hook
+  game.after('create.entity', function(entity){
+    afterTrigger = true;
+    return entity;
+  });
+
+  let ent = game.createEntity();
+
+  t.ok(beforeTrigger, 'before.create.entity hook should have been triggered');
+  t.ok(afterTrigger, 'after.create.entity hook should have been triggered');
+  t.end();
+
+});
+

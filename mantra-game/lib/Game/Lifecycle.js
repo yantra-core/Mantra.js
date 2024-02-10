@@ -45,6 +45,14 @@ export default class Lifecycle {
     }
   }
 
+  before(hookName, callback) {
+    this.addHook(`before.${hookName}`, callback);
+  }
+
+  after(hookName, callback) {
+    this.addHook(`after.${hookName}`, callback);
+  }
+
   // Remark: `triggerHook` has been optimized for performance, please avoid refactoring without benchmarking
   // Method to trigger all callbacks associated with a hook
   triggerHook(hookName, data, arg2, arg3) {

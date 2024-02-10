@@ -113,6 +113,8 @@ export default function construct(game, plugins = []) {
   game.snapshotQueue = [];
 
   game.lifecycle = new Lifecycle(game);
+  game.before = game.lifecycle.before.bind(game.lifecycle);
+  game.after = game.lifecycle.after.bind(game.lifecycle);
 
   game.tick = 0;
 
