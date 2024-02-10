@@ -107,13 +107,13 @@ class SystemsManager {
         if (this.game.paused) {
           continue;
         }
-
-
         system.update(deltaTime);
       }
     }
   }
 
+  // Remark: Render control is being handled by graphics and each adapter
+  // TODO: Add test coverage and formalize rendering through this method, it is required for helpers developers customizerendering
   render() {
     /*
     const renderSystem = this.systems.get('render');
@@ -122,20 +122,6 @@ class SystemsManager {
     }
     */
   }
-
-  /*
-  // something like this
-  before(eventPattern, callback) {
-
-    // game.systemManager.before('entityMovement.update', (entityId, x, y) => {})
-    game.systemManager.after('game.getPlayerSnapshot', (snapshot, next) => {
-      // perform compression logic here
-      next(snapshot); // is error not first arg? probably not?
-    })
-
-    // eventEmitter.before(eventPattern, callback)
-  }
-  */
 
 }
 
