@@ -27,6 +27,8 @@ game.use(new SnapshotManager());
 //
 tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   const lifecycle = game.lifecycle;
+  lifecycle.clearAllHooks();
+
   let testData = null;
 
   // Define a test hook
@@ -49,6 +51,7 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
 
 tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   const lifecycle = game.lifecycle; // Assuming game.lifecycle is an instance of LifecycleHooks
+  lifecycle.clearAllHooks();
 
   // First hook to modify data
   lifecycle.addHook('beforeCreateEntity', (data) => {
@@ -89,6 +92,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
 //
 tap.test('Lifecycle hooks - afterCreateEntity', (t) => {
   const lifecycle = game.lifecycle;
+  lifecycle.clearAllHooks();
 
   // Define a test hook
   lifecycle.addHook('afterCreateEntity', (entityData) => {
@@ -105,6 +109,63 @@ tap.test('Lifecycle hooks - afterCreateEntity', (t) => {
 
   // Assertions
   t.same(ent.name, mutatedEntityData.name, 'afterCreateEntity hook should modify testData');
+  t.end();
+});
+
+//
+// beforeUpdateEntity
+//
+tap.test('Lifecycle hooks - beforeUpdateEntity', (t) => {
+  const lifecycle = game.lifecycle;
+  lifecycle.clearAllHooks();
+
+  // Define a test hook
+  lifecycle.addHook('beforeUpdateEntity', (entityData) => {
+    entityData.name = 'Mutated Entity';
+    return entityData;
+  });
+
+  // Define test entity data
+  const mutatedEntityData = { name: 'Mutated Entity' };
+
+  let ent = game.createEntity({
+    name: 'Test Entity'
+  });
+
+  // Update the entity
+  ent.name = 'Updated Entity';
+  game.updateEntity(ent);
+
+  // Assertions
+  t.same(ent.name, mutatedEntityData.name, 'beforeUpdateEntity hook should modify testData');
+  t.end();
+});
+
+//
+// afterUpdateEntity
+//
+tap.test('Lifecycle hooks - afterUpdateEntity', (t) => {
+  const lifecycle = game.lifecycle;
+  lifecycle.clearAllHooks();
+  // Define a test hook
+  lifecycle.addHook('afterUpdateEntity', (entityData) => {
+    entityData.name = 'Mutated Entity';
+    return entityData;
+  });
+
+  // Define test entity data
+  const mutatedEntityData = { name: 'Mutated Entity' };
+
+  let ent = game.createEntity({
+    name: 'Test Entity'
+  });
+
+  // Update the entity
+  ent.name = 'Updated Entity';
+  let finalUpdate = game.updateEntity(ent);
+
+  // Assertions
+  t.same(finalUpdate.name, mutatedEntityData.name, 'afterUpdateEntity hook should modify testData');
   t.end();
 });
 
@@ -173,7 +234,6 @@ tap.test('Lifecycle hooks - beforeCleanupRemovedEntities', (t) => {
   t.ok(hookSpy.called, 'beforeCleanupRemovedEntities hook should be called');
   t.end();
 });
-
 
 //
 // afterCleanupRemovedEntities

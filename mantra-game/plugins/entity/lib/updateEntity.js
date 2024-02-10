@@ -1,4 +1,8 @@
 export default function updateEntity(entityData) {
+
+  // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
+  entityData = this.game.lifecycle.triggerHook('beforeUpdateEntity', entityData);
+
   // console.log('updateEntity', entityData)
   let entityId = entityData.id;
   if (typeof entityId === 'undefined') {
@@ -155,6 +159,8 @@ export default function updateEntity(entityData) {
   if (this.game.systems.rbush) {
     // this.game.systems.rbush.updateEntity(ent);
   }
+
+  ent = this.game.lifecycle.triggerHook('afterUpdateEntity', ent);
 
   return ent;
 

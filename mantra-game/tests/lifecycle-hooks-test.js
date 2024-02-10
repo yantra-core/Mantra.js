@@ -82,17 +82,17 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   t.end();
 });
 
-// Test triggering a hook that has no callbacks
 tap.test('Lifecycle hooks - Trigger hook without callbacks', (t) => {
   const lifecycle = game.lifecycle;
-  const consoleWarnSpy = sinon.spy(console, 'warn');
 
-  // Trigger a hook that hasn't had any callbacks added
-  lifecycle.triggerHook('nonExistentHook');
+  // Original data to pass to the hook
+  const originalData = { key: 'value' };
+
+  // Trigger a hook that hasn't had any callbacks added, and capture the result
+  const result = lifecycle.triggerHook('nonExistentHook', originalData);
 
   // Assertions
-  t.ok(consoleWarnSpy.called, 'Triggering a non-existent hook should call console.warn');
-  consoleWarnSpy.restore(); // Clean up the spy
+  t.equal(result, originalData, 'Triggering a non-existent hook should return original data');
   t.end();
 });
 

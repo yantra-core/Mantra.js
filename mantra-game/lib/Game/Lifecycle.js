@@ -23,6 +23,13 @@ export default class Lifecycle {
     };
   }
 
+  clearAllHooks() {
+    // go through all hooks and clear them
+    for (let hookName in this.hooks) {
+      this.hooks[hookName] = [];
+    }
+  }
+
   // Method to add a custom hook
   addHook(hookName, callback) {
     if (this.hooks[hookName]) {
@@ -37,8 +44,8 @@ export default class Lifecycle {
   triggerHook(hookName, data) {
     const hooks = this.hooks[hookName];
 
-    if (!hooks) { // `hooks` references Array.length, 0 returns false
-      console.warn(`Hook '${hookName}' does not exist.`);
+    if (!hooks) { // `hooks` references object exists or Array.length, 0 returns false
+      // console.warn(`Hook '${hookName}' does not exist.`);
       return data; // Return the initial data if no hooks exist
     }
 
