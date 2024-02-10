@@ -13,6 +13,8 @@ import localGameLoop from '../localGameLoop.js';
 // Online game loop is for multiplayer games ( networking )
 import onlineGameLoop from '../onlineGameLoop.js';
 
+import Lifecycle from './Lifecycle.js';
+
 // Action Rate Limiter, suitable for any Systems action that should be rate limited
 import ActionRateLimiter from '../../Component/ActionRateLimiter.js';
 import TimersComponent from '../../Component/TimersComponent.js';
@@ -109,6 +111,8 @@ export default function construct(game, plugins = []) {
   game.storage = storage;
 
   game.snapshotQueue = [];
+
+  game.lifecycle = new Lifecycle(game);
 
   game.tick = 0;
 

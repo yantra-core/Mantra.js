@@ -227,7 +227,7 @@ class Game {
     entityData.style.layout = entityData.layout || 'none';
     entityData.style.grid = entityData.grid || {};
     entityData.items = entityData.items || [];
-    return game.createEntity(entityData); 
+    return this.createEntity(entityData);
   }
 
   //
