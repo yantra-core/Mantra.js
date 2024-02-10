@@ -9,14 +9,16 @@ export default class Lifecycle {
       afterRender: [],
       beforeCreateEntity: [],
       afterCreateEntity: [],
-      beforeDestroyEntity: [],
-      afterDestroyEntity: [],
+      beforeRemoveEntity: [],
+      afterRemoveEntity: [],
       beforeUpdateEntity: [],
       afterUpdateEntity: [],
       beforeRenderEntity: [],
       afterRenderEntity: [],
       beforeHandleCollision: [],
       afterHandleCollision: [],
+      beforeCleanupRemovedEntities: [],
+      afterCleanupRemovedEntities: [],
       // Add more lifecycle events as needed
     };
   }
@@ -31,28 +33,30 @@ export default class Lifecycle {
   }
 
   // Remark: `triggerHook` has been optimized for performance, please avoid refactoring without benchmarking
-  // Remark: Manual spread is done here intentionally to avoid performance overhead ... spread or arguments scope
-  //         In all internal cases we only use 1 or 2 arguments
   // Method to trigger all callbacks associated with a hook
-  triggerHook(hookName, arg1, arg2, arg3, arg4) {
-
+  triggerHook(hookName, data) {
     const hooks = this.hooks[hookName];
 
     if (!hooks) { // `hooks` references Array.length, 0 returns false
       console.warn(`Hook '${hookName}' does not exist.`);
-      return;
+      return data; // Return the initial data if no hooks exist
     }
+
+    let result = data; // Initialize result with the data being processed
 
     // Optimized for single element array
     if (hooks.length === 1) {
-      hooks[0](arg1, arg2, arg3, arg4); // Directly pass arguments
-      return;
+      // Returns a single result from single array, allowing the hook to modify and return the data
+      return hooks[0](result);
     }
 
     // Arrays with more than 1 element
     for (let i = 0; i < hooks.length; i++) {
-      hooks[i](arg1, arg2, arg3, arg4); // Directly pass arguments
+      // Pass the result of the previous hook (or the initial data for the first hook) to the next hook
+      result = hooks[i](result);
     }
+
+    return result; // Return the final result after all hooks have been processed
   }
 
 }

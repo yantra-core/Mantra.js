@@ -285,5 +285,7 @@ export default function createEntity(config, ignoreSetup = false) {
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
 
+  updatedEntity = this.game.lifecycle.triggerHook('afterCreateEntity', config);
+
   return updatedEntity;
 }

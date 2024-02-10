@@ -1,5 +1,8 @@
 // TODO: double check that all components values are being cleared on removal of ent
 export default function removeEntity(entityId, removeFromGameData = true) {
+
+  this.game.lifecycle.triggerHook('beforeRemoveEntity', entityId);
+
   let ent = this.game.entities.get(entityId);
   if (ent && this.game.systems.graphics && ent.graphics) {
     // Is this best done here? or in the graphics plugin?
@@ -30,5 +33,7 @@ export default function removeEntity(entityId, removeFromGameData = true) {
     }
 
   }
+
+  this.game.lifecycle.triggerHook('afterRemoveEntity', entityId);
 
 }

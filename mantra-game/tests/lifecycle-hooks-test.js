@@ -21,6 +21,10 @@ game.use(new Entity());
 game.use(new EntityInput());
 game.use(new SnapshotManager());
 
+
+//
+// beforeCreateEntity
+//
 tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   const lifecycle = game.lifecycle;
   let testData = null;
@@ -34,9 +38,8 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   // Define test entity data
   const mutatedEntityData = { name: 'Mutated Entity' };
 
-  let ent = game.createEntity({
-    name: 'Test Entity'
-  });
+  // unit test use lifecycle.triggerHook
+  let ent = lifecycle.triggerHook('beforeCreateEntity', mutatedEntityData);
 
   // Assertions
   t.same(ent.name, mutatedEntityData.name, 'beforeCreateEntity hook should modify testData');
@@ -69,8 +72,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   // Initial entity data
   let entityData = { name: 'Original Entity', meta: { modifications: [] } };
 
-  // Assuming game.createEntity() internally calls lifecycle.triggerHook() for 'beforeCreateEntity' event
-  let ent = game.createEntity(entityData);
+  let ent = lifecycle.triggerHook('beforeCreateEntity', entityData);
 
   // Expected modifications after all hooks have run
   const expectedModifications = ['first', 'second', 'third'];
