@@ -24,7 +24,7 @@ game.use(new SnapshotManager());
 //
 // beforeCollisionStart, beforeCollisionActive, beforeCollisionEnd
 // afterCollisionStart, afterCollisionActive, afterCollisionEnd
-tap.test('Lifecycle hooks - beforeHandleInput', (t) => {
+tap.test('Lifecycle hooks - before.handleInput', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
 
@@ -40,19 +40,19 @@ tap.test('Lifecycle hooks - beforeHandleInput', (t) => {
   //
 
   // start
-  lifecycle.addHook('beforeCollisionStart', (entityA, entityB, pair) => {
+  lifecycle.addHook('before.collisionStart', (entityA, entityB, pair) => {
     _beforeCollisionStart = true;
     // console.log('beforeCollisionStart hook triggered', entityA, entityB, pair);
   });
 
   // active
-  lifecycle.addHook('beforeCollisionActive', (entityA, entityB, pair) => {
+  lifecycle.addHook('before.collisionActive', (entityA, entityB, pair) => {
     _beforeCollisionActive = true;
     // console.log('beforeCollisionActive hook triggered', entityA, entityB, pair);
   });
 
   // end
-  lifecycle.addHook('beforeCollisionEnd', (entityA, entityB, pair) => {
+  lifecycle.addHook('before.collisionEnd', (entityA, entityB, pair) => {
     _beforeCollisionEnd = true;
     // console.log('beforeCollisionEnd hook triggered', entityA, entityB, pair);
   });
@@ -61,19 +61,19 @@ tap.test('Lifecycle hooks - beforeHandleInput', (t) => {
   // After
   //
   // start
-  lifecycle.addHook('afterCollisionStart', (entityA, entityB, pair) => {
+  lifecycle.addHook('after.collisionStart', (entityA, entityB, pair) => {
     _afterCollisionStart = true;
     // console.log('afterCollisionStart hook triggered', entityA, entityB, pair);
   });
 
   // active
-  lifecycle.addHook('afterCollisionActive', (entityA, entityB, pair) => {
+  lifecycle.addHook('after.collisionActive', (entityA, entityB, pair) => {
     _afterCollisionActive = true;
     // console.log('afterCollisionActive hook triggered', entityA, entityB, pair);
   });
 
   // end
-  lifecycle.addHook('afterCollisionEnd', (entityA, entityB, pair) => {
+  lifecycle.addHook('after.collisionEnd', (entityA, entityB, pair) => {
     _afterCollisionEnd = true;
     // console.log('afterCollisionEnd hook triggered', entityA, entityB, pair);
   });

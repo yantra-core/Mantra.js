@@ -33,7 +33,7 @@ class Collisions {
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
 
-    this.game.lifecycle.triggerHook('beforeCollisionStart', entityA, entityB, pair);
+    this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
 
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
@@ -156,7 +156,7 @@ class Collisions {
 
       this.game.data.collisions.push(collisionContext);
 
-      this.game.lifecycle.triggerHook('afterCollisionStart', entityA, entityB, pair);
+      this.game.lifecycle.triggerHook('after.collisionStart', entityA, entityB, pair);
 
     }
 
@@ -188,7 +188,7 @@ class Collisions {
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
 
-    this.game.lifecycle.triggerHook('beforeCollisionEnd', entityA, entityB, pair);
+    this.game.lifecycle.triggerHook('before.collisionEnd', entityA, entityB, pair);
 
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
@@ -231,7 +231,7 @@ class Collisions {
       }
     }
 
-    this.game.lifecycle.triggerHook('afterCollisionEnd', entityA, entityB, pair);
+    this.game.lifecycle.triggerHook('after.collisionEnd', entityA, entityB, pair);
 
   }
 
@@ -243,7 +243,7 @@ class Collisions {
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
 
-    this.game.lifecycle.triggerHook('beforeCollisionActive', entityA, entityB, pair);
+    this.game.lifecycle.triggerHook('before.collisionActive', entityA, entityB, pair);
 
     // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
     if (!entityA || !entityB) {
@@ -295,7 +295,7 @@ class Collisions {
       }
     }
 
-    this.game.lifecycle.triggerHook('afterCollisionActive', entityA, entityB, pair);
+    this.game.lifecycle.triggerHook('after.collisionActive', entityA, entityB, pair);
 
   }
 

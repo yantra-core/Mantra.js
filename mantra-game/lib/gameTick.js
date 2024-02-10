@@ -30,7 +30,7 @@ function gameTick() {
 
   // Run game lifecycle hooks
   if (this.lifecycle) {
-    this.lifecycle.triggerHook('beforeUpdate', hzMS);
+    this.lifecycle.triggerHook('before.update', hzMS);
   }
 
   // run the .update() method of all registered systems
@@ -40,7 +40,7 @@ function gameTick() {
 
   // Run game lifecycle hooks
   if (this.lifecycle) {
-    this.lifecycle.triggerHook('afterUpdate', hzMS);
+    this.lifecycle.triggerHook('after.update', hzMS);
   }
   
   /*

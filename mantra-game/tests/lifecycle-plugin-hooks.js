@@ -40,14 +40,17 @@ tap.test('Lifecycle hooks - custom plugin methods', (t) => {
     afterEntId = null;
 
   // plugin names are hooked with underscore to separate the namespace from internal hooks
-  lifecycle.addHook('before_bullet_fireBullet', (entityId, bulletConfig) => {
+  lifecycle.addHook('before.bullet.fireBullet', (entityId, bulletConfig) => {
     _before_Bullet_fireBullet = true;
     beforeEntId = entityId;
     // set the bulletConfig to something else
     bulletConfig.width = 111;
   });
 
-  lifecycle.addHook('after_bullet_fireBullet', (entityId) => {
+  // lifecycle.before('bullet.fireBullet', (entityId, bulletConfig) => {});
+  // lifecycle.after('bullet.fireBullet', (entityId, bulletConfig) => {});
+
+  lifecycle.addHook('after.bullet.fireBullet', (entityId) => {
     _after_Bullet_fireBullet = true;
     afterEntId = entityId;
   });

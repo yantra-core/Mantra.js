@@ -210,7 +210,7 @@ if (mode === 'online') {
   //console.log("wwww", worlds)
   game.use(new plugins.Border());
 
-  // home = new worlds.GravityGardens();
+  home = new worlds.Maze();
 
   /*
   --purple-light: #bbe;
@@ -222,10 +222,21 @@ if (mode === 'online') {
   */
   game.setBackground('#ffffff');
 
+  // custom plugin hooks require you mutate the argument scope
+  // if you wish to not mutate you can manually create addHook() inside your plugin code
+  game.lifecycle.addHook('before.bullet.fireBullet', (entityId, bulletConfig) => {
+    console.log("before.bullet.fireBullet", entityId, bulletConfig)
+    bulletConfig.texture = 'tile-block';
+  });
+
+  game.lifecycle.addHook('after.bullet.fireBullet', (entityId, bullet) => {
+    console.log("after.bullet.fireBullet", entityId, bullet)
+  });
 
   // game.preloader.addAsset('./game/models/characterMedium.fbx', 'model-fbx', 'customModel');
 
   game.start(function () {
+
      game.use(home);
      //game.use(new plugins.ThreeGraphics());
 

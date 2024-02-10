@@ -22,18 +22,18 @@ game.use(new EntityInput());
 game.use(new SnapshotManager());
 
 //
-// beforeHandleInput
+// before.handleInput
 //
-tap.test('Lifecycle hooks - beforeHandleInput', (t) => {
+tap.test('Lifecycle hooks - before.handleInput', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
 
   let trigger = false;
 
   // Define a test hook
-  lifecycle.addHook('beforeHandleInput', (entityId, input, sequence) => {
+  lifecycle.addHook('before.handleInput', (entityId, input, sequence) => {
     trigger = true;
-    console.log('beforeHandleInput hook triggered', entityId, input, sequence);
+    console.log('before.handleInput hook triggered', entityId, input, sequence);
   });
   
   let player = game.createEntity();
@@ -44,24 +44,24 @@ tap.test('Lifecycle hooks - beforeHandleInput', (t) => {
   }, 1);
 
 
-  t.ok(trigger, 'beforeHandleInput hook should have been triggered');
+  t.ok(trigger, 'before.handleInput hook should have been triggered');
   
   t.end();
 });
 
 //
-// afterHandleInput
+// after.handleInput
 //
-tap.test('Lifecycle hooks - afterHandleInput', (t) => {
+tap.test('Lifecycle hooks - after.handleInput', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
 
   let trigger = false;
 
   // Define a test hook
-  lifecycle.addHook('afterHandleInput', (entityId, input, sequence) => {
+  lifecycle.addHook('after.handleInput', (entityId, input, sequence) => {
     trigger = true;
-    console.log('afterHandleInput hook triggered', entityId, input, sequence);
+    console.log('after.handleInput hook triggered', entityId, input, sequence);
   });
   
   let player = game.createEntity();
@@ -71,7 +71,7 @@ tap.test('Lifecycle hooks - afterHandleInput', (t) => {
     controls: { SPACE: true }
   }, 1);
 
-  t.ok(trigger, 'beforeHandleInput hook should have been triggered');
+  t.ok(trigger, 'before.handleInput hook should have been triggered');
   
   t.end();
 

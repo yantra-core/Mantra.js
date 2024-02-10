@@ -40,19 +40,19 @@ class SystemsManager {
           // console.log(`Method ${propName} found.`);
       
           // Initialize hooks if they don't already exist
-          this.game.lifecycle.hooks[`before_${systemId}_${propName}`] = this.game.lifecycle.hooks[`before_${systemId}_${propName}`] || [];
-          this.game.lifecycle.hooks[`after_${systemId}_${propName}`] = this.game.lifecycle.hooks[`after_${systemId}_${propName}`] || [];
+          this.game.lifecycle.hooks[`before.${systemId}.${propName}`] = this.game.lifecycle.hooks[`before.${systemId}.${propName}`] || [];
+          this.game.lifecycle.hooks[`after.${systemId}.${propName}`] = this.game.lifecycle.hooks[`after.${systemId}.${propName}`] || [];
       
           // Wrap the original method in a function that includes the lifecycle hooks
           system[propName] = function(arg1 = {}, arg2 = {}, arg3 = {}) {
             // Trigger the 'before' hook with up to three arguments
-            this.game.lifecycle.triggerHook(`before_${systemId}_${propName}`, arg1, arg2, arg3);
+            this.game.lifecycle.triggerHook(`before.${systemId}.${propName}`, arg1, arg2, arg3);
       
             // Call the original method with up to three arguments
             const result = originalMethod.call(this, arg1, arg2, arg3);
       
             // Trigger the 'after' hook with up to three arguments
-            this.game.lifecycle.triggerHook(`after_${systemId}_${propName}`, arg1, arg2, arg3);
+            this.game.lifecycle.triggerHook(`after.${systemId}.${propName}`, arg1, arg2, arg3);
       
             // Return the original method's result
             return result;

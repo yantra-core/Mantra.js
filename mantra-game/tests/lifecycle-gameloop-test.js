@@ -22,23 +22,23 @@ game.use(new EntityInput());
 game.use(new SnapshotManager());
 
 //
-// beforeUpdate
+// before.update
 //
-tap.test('Lifecycle hooks - beforeUpdate', (t) => {
+tap.test('Lifecycle hooks - before.update', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
 
   let ticks = 0;
 
   // Define a test hook
-  lifecycle.addHook('beforeUpdate', (delta) => {
+  lifecycle.addHook('before.update', (delta) => {
     ticks++;
   });
 
   game.gameTick();
 
   // 1 game tick
-  t.ok(ticks === 1, 'beforeUpdate hook should not have been triggered yet');
+  t.ok(ticks === 1, 'before.update hook should not have been triggered yet');
   
   t.end();
 });
@@ -53,14 +53,14 @@ tap.test('Lifecycle hooks - afterUpdate', (t) => {
   let ticks = 0;
 
   // Define a test hook
-  lifecycle.addHook('afterUpdate', (delta) => {
+  lifecycle.addHook('after.update', (delta) => {
     ticks++;
   });
 
   game.gameTick();
 
   // 1 game tick
-  t.ok(ticks === 1, 'afterUpdate hook should have been triggered');
+  t.ok(ticks === 1, 'after.update hook should have been triggered');
 
   t.end();
 });

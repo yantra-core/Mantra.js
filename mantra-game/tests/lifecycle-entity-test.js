@@ -23,7 +23,7 @@ game.use(new SnapshotManager());
 
 
 //
-// beforeCreateEntity
+// before.create.entity
 //
 tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   const lifecycle = game.lifecycle;
@@ -32,7 +32,7 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   let testData = null;
 
   // Define a test hook
-  lifecycle.addHook('beforeCreateEntity', (entityData) => {
+  lifecycle.addHook('before.create.entity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -45,7 +45,7 @@ tap.test('Lifecycle hooks - Add and trigger hook', (t) => {
   });
 
   // Assertions
-  t.same(ent.name, mutatedEntityData.name, 'beforeCreateEntity hook should modify testData');
+  t.same(ent.name, mutatedEntityData.name, 'before.create.entity hook should modify testData');
   t.end();
 });
 
@@ -54,7 +54,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   lifecycle.clearAllHooks();
 
   // First hook to modify data
-  lifecycle.addHook('beforeCreateEntity', (data) => {
+  lifecycle.addHook('before.create.entity', (data) => {
     data.meta = data.meta || {};
     data.meta.modifications = data.meta.modifications || [];
     data.meta.modifications.push('first');
@@ -62,13 +62,13 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   });
 
   // Second hook to further modify data
-  lifecycle.addHook('beforeCreateEntity', (data) => {
+  lifecycle.addHook('before.create.entity', (data) => {
     data.meta.modifications.push('second');
     return data;
   });
 
   // Third hook to add final modifications
-  lifecycle.addHook('beforeCreateEntity', (data) => {
+  lifecycle.addHook('before.create.entity', (data) => {
     data.meta.modifications.push('third');
     return data;
   });
@@ -76,7 +76,7 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
   // Initial entity data
   let entityData = { name: 'Original Entity', meta: { modifications: [] } };
 
-  // Assuming game.createEntity() internally calls lifecycle.triggerHook() for 'beforeCreateEntity' event
+  // Assuming game.createEntity() internally calls lifecycle.triggerHook() for 'before.create.entity' event
   let ent = game.createEntity(entityData);
 
   // Expected modifications after all hooks have run
@@ -88,14 +88,14 @@ tap.test('Lifecycle hooks - Sequence of multiple hooks', (t) => {
 });
 
 //
-// afterCreateEntity
+// after.create.entity
 //
-tap.test('Lifecycle hooks - afterCreateEntity', (t) => {
+tap.test('Lifecycle hooks - after.create.entity', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
 
   // Define a test hook
-  lifecycle.addHook('afterCreateEntity', (entityData) => {
+  lifecycle.addHook('after.create.entity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -108,19 +108,19 @@ tap.test('Lifecycle hooks - afterCreateEntity', (t) => {
   });
 
   // Assertions
-  t.same(ent.name, mutatedEntityData.name, 'afterCreateEntity hook should modify testData');
+  t.same(ent.name, mutatedEntityData.name, 'after.create.entity hook should modify testData');
   t.end();
 });
 
 //
-// beforeUpdateEntity
+// before.update.entity
 //
-tap.test('Lifecycle hooks - beforeUpdateEntity', (t) => {
+tap.test('Lifecycle hooks - before.update.entity', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
 
   // Define a test hook
-  lifecycle.addHook('beforeUpdateEntity', (entityData) => {
+  lifecycle.addHook('before.update.entity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -137,18 +137,18 @@ tap.test('Lifecycle hooks - beforeUpdateEntity', (t) => {
   game.updateEntity(ent);
 
   // Assertions
-  t.same(ent.name, mutatedEntityData.name, 'beforeUpdateEntity hook should modify testData');
+  t.same(ent.name, mutatedEntityData.name, 'before.update.entity hook should modify testData');
   t.end();
 });
 
 //
-// afterUpdateEntity
+// after.update.entity
 //
-tap.test('Lifecycle hooks - afterUpdateEntity', (t) => {
+tap.test('Lifecycle hooks - after.update.entity', (t) => {
   const lifecycle = game.lifecycle;
   lifecycle.clearAllHooks();
   // Define a test hook
-  lifecycle.addHook('afterUpdateEntity', (entityData) => {
+  lifecycle.addHook('after.update.entity', (entityData) => {
     entityData.name = 'Mutated Entity';
     return entityData;
   });
@@ -165,87 +165,63 @@ tap.test('Lifecycle hooks - afterUpdateEntity', (t) => {
   let finalUpdate = game.updateEntity(ent);
 
   // Assertions
-  t.same(finalUpdate.name, mutatedEntityData.name, 'afterUpdateEntity hook should modify testData');
+  t.same(finalUpdate.name, mutatedEntityData.name, 'after.update.entity hook should modify testData');
   t.end();
 });
 
 //
-// beforeRemoveEntity
+// before.remove.entity
 //
-tap.test('Lifecycle hooks - beforeRemoveEntity', (t) => {
+tap.test('Lifecycle hooks - before.remove.entity', (t) => {
   const lifecycle = game.lifecycle;
 
   // Create a Sinon spy
   const hookSpy = sinon.spy();
 
   // Define a test hook using the Sinon spy
-  lifecycle.addHook('beforeRemoveEntity', hookSpy);
+  lifecycle.addHook('before.remove.entity', hookSpy);
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });
   game.removeEntity(ent);
 
   // Assertions
-  t.ok(hookSpy.called, 'beforeRemoveEntity hook should be called');
+  t.ok(hookSpy.called, 'before.remove.entity hook should be called');
   t.end();
 });
 
 //
-// afterRemoveEntity
+// after.remove.entity
 //
-tap.test('Lifecycle hooks - afterRemoveEntity', (t) => {
+tap.test('Lifecycle hooks - after.remove.entity', (t) => {
   const lifecycle = game.lifecycle;
 
   // Create a Sinon spy
   const hookSpy = sinon.spy();
 
   // Define a test hook using the Sinon spy
-  lifecycle.addHook('afterRemoveEntity', hookSpy);
+  lifecycle.addHook('after.remove.entity', hookSpy);
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });
   game.removeEntity(ent);
 
   // Assertions
-  t.ok(hookSpy.called, 'afterRemoveEntity hook should be called');
+  t.ok(hookSpy.called, 'after.remove.entity hook should be called');
   t.end();
 });
 
 //
-// beforeCleanupRemovedEntities
+// before.cleanupRemovedEntities
 //
-tap.test('Lifecycle hooks - beforeCleanupRemovedEntities', (t) => {
+tap.test('Lifecycle hooks - before.cleanupRemovedEntities', (t) => {
   const lifecycle = game.lifecycle;
 
   // Create a Sinon spy
   const hookSpy = sinon.spy();
 
   // Define a test hook using the Sinon spy
-  lifecycle.addHook('beforeCleanupRemovedEntities', hookSpy);
-
-  // Simulate creating and then removing an entity
-  let ent = game.createEntity({ name: 'Test Entity' });
-  game.removeEntity(ent);
-
-  // move game forward in time to trigger cleanup
-  game.gameTick();
-
-  // Assertions
-  t.ok(hookSpy.called, 'beforeCleanupRemovedEntities hook should be called');
-  t.end();
-});
-
-//
-// afterCleanupRemovedEntities
-//
-tap.test('Lifecycle hooks - afterCleanupRemovedEntities', (t) => {
-  const lifecycle = game.lifecycle;
-
-  // Create a Sinon spy
-  const hookSpy = sinon.spy();
-
-  // Define a test hook using the Sinon spy
-  lifecycle.addHook('afterCleanupRemovedEntities', hookSpy);
+  lifecycle.addHook('before.cleanupRemovedEntities', hookSpy);
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });
@@ -255,6 +231,30 @@ tap.test('Lifecycle hooks - afterCleanupRemovedEntities', (t) => {
   game.gameTick();
 
   // Assertions
-  t.ok(hookSpy.called, 'afterCleanupRemovedEntities hook should be called');
+  t.ok(hookSpy.called, 'before.cleanupRemovedEntities hook should be called');
+  t.end();
+});
+
+//
+// after.cleanupRemovedEntities
+//
+tap.test('Lifecycle hooks - after.cleanupRemovedEntities', (t) => {
+  const lifecycle = game.lifecycle;
+
+  // Create a Sinon spy
+  const hookSpy = sinon.spy();
+
+  // Define a test hook using the Sinon spy
+  lifecycle.addHook('after.cleanupRemovedEntities', hookSpy);
+
+  // Simulate creating and then removing an entity
+  let ent = game.createEntity({ name: 'Test Entity' });
+  game.removeEntity(ent);
+
+  // move game forward in time to trigger cleanup
+  game.gameTick();
+
+  // Assertions
+  t.ok(hookSpy.called, 'after.cleanupRemovedEntities hook should be called');
   t.end();
 });

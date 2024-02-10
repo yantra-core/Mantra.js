@@ -25,7 +25,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   let entityId;
 
   // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
-  config = this.game.lifecycle.triggerHook('beforeCreateEntity', config);
+  config = this.game.lifecycle.triggerHook('before.create.entity', config);
 
   if (!ignoreSetup) {
     entityId = this._generateId();
@@ -285,7 +285,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
 
-  updatedEntity = this.game.lifecycle.triggerHook('afterCreateEntity', config);
+  updatedEntity = this.game.lifecycle.triggerHook('after.create.entity', config);
 
   return updatedEntity;
 }

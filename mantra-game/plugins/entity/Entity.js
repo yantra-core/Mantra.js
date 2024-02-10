@@ -80,7 +80,7 @@ class Entity {
 
   cleanupDestroyedEntities() {
 
-    this.game.lifecycle.triggerHook('beforeCleanupRemovedEntities');
+    this.game.lifecycle.triggerHook('before.cleanupRemovedEntities');
 
     const destroyedComponentData = this.game.components.destroyed.data;
     for (let entityId in destroyedComponentData) {
@@ -110,7 +110,7 @@ class Entity {
       }
     }
 
-    this.game.lifecycle.triggerHook('afterCleanupRemovedEntities');
+    this.game.lifecycle.triggerHook('after.cleanupRemovedEntities');
 
   }
 
