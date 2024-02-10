@@ -40,6 +40,7 @@ export default class LocalClient {
     
   }
   stop () {
+    console.log("Local Client is stopping...")
     this.game.localGameLoopRunning = false;
   }
 

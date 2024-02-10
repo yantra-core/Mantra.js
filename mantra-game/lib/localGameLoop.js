@@ -62,6 +62,7 @@ function localGameLoop(game, playerId) {
 
   // Call the next iteration of the loop using requestAnimationFrame
   if (game.localGameLoopRunning) {
+    // why isn't game loop stopping for tests?
     _requestAnimationFrame(function rafLocalGameLoop () {
       localGameLoop(game, playerId);
     });

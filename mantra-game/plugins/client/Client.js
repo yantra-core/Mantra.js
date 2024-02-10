@@ -120,7 +120,7 @@ export default class Client {
   }
 
   stop() {
-    console.log('Client.js plugin stopping game', this.game)
+    console.log('Client.js plugin stopping game');
     this.started = false;
     let localClient = this.game.getSystem('localClient');
     localClient.stop();

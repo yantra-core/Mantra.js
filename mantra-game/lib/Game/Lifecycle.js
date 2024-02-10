@@ -17,8 +17,6 @@ export default class Lifecycle {
       afterRenderEntity: [],
       beforeHandleInput: [],
       afterHandleInput: [],
-      beforeHandleCollision: [],
-      afterHandleCollision: [],
       beforeCleanupRemovedEntities: [],
       afterCleanupRemovedEntities: [],
       beforeCollisionStart: [],

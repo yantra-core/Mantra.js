@@ -14,17 +14,52 @@ class SystemsManager {
       return;
     }
 
-    // Remark: Defaulting all Plugins to event emitters is disabled for now by default
-    // This is disabled for performance reasons, some of these methods are high frequency
-    // and there is wildcard search logic enabled by default? It's a bit much on performance for all enabled
-    // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
-    // This will enable all plugin methods as emitted events
+    /*
+        All Plugins are event emitters feature ( DISABLED )
+        // Remark: Defaulting all Plugins to event emitters is disabled for now by default
+        // This is disabled for performance reasons, some of these methods are high frequency
+        // and there is wildcard search logic enabled by default? It's a bit much on performance for all enabled
+        // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
+        // This will enable all plugin methods as emitted events
 
-    // eventEmitter.bindClass(system, systemId)
+        // eventEmitter.bindClass(system, systemId)
 
+    */
+
+    // All Plugins have Lifecycle Hooks feature ( ENABLED DEFAULT )
+    // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
     // register the system methods as Lifecycle hooks
-    // we will want a beforePluginNameMethodName and afterPluginNameMethodName
-    // be sure to iterate through all methods, ignore init? maybe no
+    if (this.game.config.addLifecycleHooksToAllPlugins) {
+
+      const allProps = Object.getOwnPropertyNames(Object.getPrototypeOf(system));
+
+      for (const propName of allProps) {
+        const originalMethod = system[propName];
+        if (typeof originalMethod === 'function' && propName === 'fireBullet') {
+          // Found the method
+          // console.log(`Method ${propName} found.`);
+      
+          // Initialize hooks if they don't already exist
+          this.game.lifecycle.hooks[`before_${systemId}_${propName}`] = this.game.lifecycle.hooks[`before_${systemId}_${propName}`] || [];
+          this.game.lifecycle.hooks[`after_${systemId}_${propName}`] = this.game.lifecycle.hooks[`after_${systemId}_${propName}`] || [];
+      
+          // Wrap the original method in a function that includes the lifecycle hooks
+          system[propName] = function(arg1 = {}, arg2 = {}, arg3 = {}) {
+            // Trigger the 'before' hook with up to three arguments
+            this.game.lifecycle.triggerHook(`before_${systemId}_${propName}`, arg1, arg2, arg3);
+      
+            // Call the original method with up to three arguments
+            const result = originalMethod.call(this, arg1, arg2, arg3);
+      
+            // Trigger the 'after' hook with up to three arguments
+            this.game.lifecycle.triggerHook(`after_${systemId}_${propName}`, arg1, arg2, arg3);
+      
+            // Return the original method's result
+            return result;
+          }.bind(system); // Ensure 'this' within the wrapped function refers to the system object
+        }
+      }
+    }
 
     // binds system to local instance Map
     this.systems.set(systemId, system);
