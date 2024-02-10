@@ -19,7 +19,7 @@ function deferEntityCreation(entityData) {
 // ignoreSetup set to true will ignore the setup phase of createEntity
 // the setup phase assigns default values to the entity and auto-id
 // this is currently being used from `rbush` plugin when creating deferred entities
-export default function createEntity(config, ignoreSetup = false) {
+export default function createEntity(config = {}, ignoreSetup = false) {
   // console.log('createEntity', config)
 
   let entityId;

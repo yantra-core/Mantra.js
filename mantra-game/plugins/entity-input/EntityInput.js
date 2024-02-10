@@ -70,6 +70,8 @@ class EntityInput extends Plugin {
 
     let controls = input.controls;
 
+    this.game.lifecycle.triggerHook('beforeHandleInput', entityId, input, sequenceNumber);
+
     if (this.game.customInput !== false) {
 
       this.strategies.forEach(function (strategy) {
@@ -101,6 +103,9 @@ class EntityInput extends Plugin {
 
     // always emit the entityInput::handleInputs event
     this.game.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
+
+    this.game.lifecycle.triggerHook('afterHandleInput', entityId, input, sequenceNumber);
+
 
   }
 

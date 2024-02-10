@@ -33,6 +33,8 @@ class Collisions {
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
 
+    this.game.lifecycle.triggerHook('beforeCollisionStart', entityA, entityB, pair);
+
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
       return;
@@ -153,6 +155,9 @@ class Collisions {
       collisionContext[entityB.type] = entityB;
 
       this.game.data.collisions.push(collisionContext);
+
+      this.game.lifecycle.triggerHook('afterCollisionStart', entityA, entityB, pair);
+
     }
 
     // do not process player collisions locally ( for now )
@@ -183,13 +188,14 @@ class Collisions {
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
 
+    this.game.lifecycle.triggerHook('beforeCollisionEnd', entityA, entityB, pair);
+
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
       return;
     }
 
     if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
-
 
       this.game.data.collisions = this.game.data.collisions || [];
       // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
@@ -225,6 +231,8 @@ class Collisions {
       }
     }
 
+    this.game.lifecycle.triggerHook('afterCollisionEnd', entityA, entityB, pair);
+
   }
 
   collisionActive(pair, bodyA, bodyB) {
@@ -234,6 +242,8 @@ class Collisions {
 
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
+
+    this.game.lifecycle.triggerHook('beforeCollisionActive', entityA, entityB, pair);
 
     // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
     if (!entityA || !entityB) {
@@ -284,6 +294,8 @@ class Collisions {
         system.collisionActive(pair, bodyA, bodyB);
       }
     }
+
+    this.game.lifecycle.triggerHook('afterCollisionActive', entityA, entityB, pair);
 
   }
 

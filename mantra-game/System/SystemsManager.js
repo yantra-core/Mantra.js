@@ -14,10 +14,17 @@ class SystemsManager {
       return;
     }
 
-    // Remark: Defaulting all Plugins to event emitters has is currently enabled
-    // This means all plugin methods will be emitted as events
+    // Remark: Defaulting all Plugins to event emitters is disabled for now by default
+    // This is disabled for performance reasons, some of these methods are high frequency
+    // and there is wildcard search logic enabled by default? It's a bit much on performance for all enabled
     // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
+    // This will enable all plugin methods as emitted events
+
     // eventEmitter.bindClass(system, systemId)
+
+    // register the system methods as Lifecycle hooks
+    // we will want a beforePluginNameMethodName and afterPluginNameMethodName
+    // be sure to iterate through all methods, ignore init? maybe no
 
     // binds system to local instance Map
     this.systems.set(systemId, system);

@@ -15,10 +15,18 @@ export default class Lifecycle {
       afterUpdateEntity: [],
       beforeRenderEntity: [],
       afterRenderEntity: [],
+      beforeHandleInput: [],
+      afterHandleInput: [],
       beforeHandleCollision: [],
       afterHandleCollision: [],
       beforeCleanupRemovedEntities: [],
       afterCleanupRemovedEntities: [],
+      beforeCollisionStart: [],
+      beforeCollisionActive: [],
+      beforeCollisionEnd: [],
+      afterCollisionStart: [],
+      afterCollisionActive: [],
+      afterCollisionEnd: [],
       // Add more lifecycle events as needed
     };
   }
@@ -41,7 +49,7 @@ export default class Lifecycle {
 
   // Remark: `triggerHook` has been optimized for performance, please avoid refactoring without benchmarking
   // Method to trigger all callbacks associated with a hook
-  triggerHook(hookName, data) {
+  triggerHook(hookName, data, arg2, arg3) {
     const hooks = this.hooks[hookName];
 
     if (!hooks) { // `hooks` references object exists or Array.length, 0 returns false
@@ -54,13 +62,13 @@ export default class Lifecycle {
     // Optimized for single element array
     if (hooks.length === 1) {
       // Returns a single result from single array, allowing the hook to modify and return the data
-      return hooks[0](result);
+      return hooks[0](result, arg2, arg3);
     }
 
     // Arrays with more than 1 element
     for (let i = 0; i < hooks.length; i++) {
       // Pass the result of the previous hook (or the initial data for the first hook) to the next hook
-      result = hooks[i](result);
+      result = hooks[i](result, arg2, arg3);
     }
 
     return result; // Return the final result after all hooks have been processed

@@ -28,12 +28,20 @@ function gameTick() {
   // Update the physics engine
   this.physics.updateEngine(deltaTimeMS);
 
+  // Run game lifecycle hooks
+  if (this.lifecycle) {
+    this.lifecycle.triggerHook('beforeUpdate', hzMS);
+  }
+
   // run the .update() method of all registered systems
   if (this.systemsManager) {
     this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
   }
 
-  
+  // Run game lifecycle hooks
+  if (this.lifecycle) {
+    this.lifecycle.triggerHook('afterUpdate', hzMS);
+  }
   
   /*
   Remark: Removed 1/22/24, this is directly handled by the graphics system in offline mode
