@@ -33,6 +33,7 @@ class Game {
       keyboard: true,
       mouse: true,
       gamepad: true,
+      virtualGamepad: true,
       editor: true,
       sutra: true,
       lifetime: true,

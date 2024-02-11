@@ -251,6 +251,7 @@ export default function construct(game, plugins = []) {
       keyboard: game.config.keyboard,
       mouse: game.config.mouse,
       gamepad: game.config.gamepad,
+      virtualGamepad: game.config.virtualGamepad,
       editor: game.config.editor,
       sutra: game.config.sutra,
       lifetime: game.config.lifetime,
