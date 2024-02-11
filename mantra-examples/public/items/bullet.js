@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   let game = new MANTRA.Game({
     physics: 'matter', // enum, 'physx', 'matter
     collisions: true,
-    graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
+    graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
     // camera: 'follow',
     // TODO: gameRoot, have this be default for scriptRoot and assetRoot
     options: {

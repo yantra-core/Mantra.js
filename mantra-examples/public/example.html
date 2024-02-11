@@ -16,6 +16,7 @@
 
     .game-instance {
       width: 100%;
+      height: 100%;
       text-align: center;
       padding: 20px;
     }
@@ -39,10 +40,14 @@
       /* Cursor indicates resizing */
     }
 
+    #game-embed {
+      height: 70vh;
+    }
+
     .code-editor {
       position: relative;
       width: 100%;
-      height: 400px;
+      height: 30vh;
       /* Initial height */
       background: #333;
       color: #fff;
@@ -59,7 +64,9 @@
   </style>
 
   <script>
+
     document.addEventListener('DOMContentLoaded', (event) => {
+
       const codeEditor = document.querySelector('.code-editor');
       const resizeHandle = document.querySelector('.resize-handle');
 
@@ -84,7 +91,6 @@
     });
   </script>
 
-
 </head>
 
 <body>
@@ -94,27 +100,40 @@
     <div class="resize-handle"></div> <!-- Resize handle -->
   </div>
 
+  <div id="monaco-editor"></div>
+  <div id="game-embed">
+    <iframe src="./items/bullet.html" class="game-instance" frameborder="0"></iframe>
+  </div>
   <script src="mantra.js"></script>
   <script>
+    let editor;
     let loaded = false;
     document.addEventListener('DOMContentLoaded', (event) => {
       if (loaded) return;
       loaded = true;
+      let exampleName = 'items/bullet';
+      exampleName = 'items/boomerang';
+
+      fetchAndDisplayCode();
       function fetchAndDisplayCode() {
-        fetch('./items/bullet.js')
+        fetch('./' + exampleName + '.js')
           .then(response => response.text())
           .then(code => {
 
             // inject the code into the script tag
+            /*
             const script = document.createElement('script');
             script.textContent = code;
             document.body.appendChild(script);
+            */
 
             // trigger DOMContentLoaded event to run the code
             // Warning: This may cause infinite loops if mutex is not used on demos page all events subscribed to DOMContentLoaded
-            document.dispatchEvent(new Event('DOMContentLoaded'));
+            //document.dispatchEvent(new Event('DOMContentLoaded'));
             // Append the mantra.js script to the start of the string.
-            code = '<script src="mantra.js"><\/script>\n' + code;
+            //code = '<script src="mantra.js"><\/script>\n' + code;
+
+            // TODO: instead switch iframe src
 
             // Remove the very last line of the code example.
             code = code.trim().split('\n').slice(0, -1).join('\n');
@@ -122,9 +141,13 @@
 
             // Set the code example to the pre element
             document.querySelector('.code-editor pre').textContent = code;
-
             // hide the code example
             // document.querySelector('.code-editor').style.display = 'none';
+            // editor.setValue(code);
+
+            // set the iframe src to bullet.html, sibling to this file
+            document.querySelector('#game-embed iframe').src = './' + exampleName + '.html';
+
 
           })
           .catch(error => {
@@ -132,7 +155,6 @@
           });
       }
 
-      fetchAndDisplayCode();
     });
   </script>
 

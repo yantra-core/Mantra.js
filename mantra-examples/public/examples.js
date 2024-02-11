@@ -133,11 +133,7 @@ let examples = [
   }
 ];
 
-// TODO: add logic here so when key is pressed, the search is performed based on the input value
-// we should search on "categories" and "examples" arrays and display the results
-// we should search on title, category, and the "tags" array
-
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
   const categoriesContainer = document.querySelector('.categories');
 
@@ -145,48 +141,75 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   function handleSearch() {
     const keyword = searchInput.value.toLowerCase();
-    const filteredCategories = categories.filter(category =>
+    const filteredCategories = filterCategories(keyword);
+    const filteredExamples = filterExamples(keyword);
+
+    updateCategoriesDisplay(filteredCategories);
+    updateExamplesDisplay(filteredExamples);
+  }
+
+  function filterCategories(keyword) {
+    return categories.filter(category =>
       category.title.toLowerCase().includes(keyword) ||
       category.description.toLowerCase().includes(keyword) ||
       category.tags.some(tag => tag.toLowerCase().includes(keyword))
     );
-
-    const filteredExamples = examples.filter(example =>
-      example.title.toLowerCase().includes(keyword) ||
-      example.category.toLowerCase().includes(keyword) ||
-      example.description.toLowerCase().includes(keyword) ||
-      example.tags.some(tag => tag.toLowerCase().includes(keyword))
-    );
-
-    updateDisplay(filteredCategories, filteredExamples);
   }
 
-  function updateDisplay(categories, examples) {
+  function filterExamples(keyword, categoryFilter = null) {
+    return examples.filter(example =>
+      (!categoryFilter || example.category.toLowerCase() === categoryFilter.toLowerCase()) &&
+      (keyword === '' || example.title.toLowerCase().includes(keyword) ||
+      example.description.toLowerCase().includes(keyword) ||
+      example.tags.some(tag => tag.toLowerCase().includes(keyword)))
+    );
+  }
+  
+
+  function updateCategoriesDisplay(filteredCategories) {
     categoriesContainer.innerHTML = ''; // Clear the current content
 
-    // Add filtered categories to the display
-    categories.forEach(category => {
-      categoriesContainer.innerHTML += `
-    <div class="category">
-      <img src="${category.image}" alt="${category.title}">
-      <h3>${category.title}</h3>
-      <p>${category.description}</p>
-      <a href="${category.url}">View Category</a>
-    </div>
-  `;
-    });
+    filteredCategories.forEach(category => {
+      const categoryElement = document.createElement('div');
+      categoryElement.className = 'category';
+      categoryElement.innerHTML = `
+        <img src="${category.image}" alt="${category.title}">
+        <h3>${category.title}</h3>
+        <p>${category.description}</p>
+        <button class="view-category">View Category</button>
+      `;
 
-    // Optionally, add filtered examples to the display if needed
-    // This part can be adjusted or expanded based on how you want to display examples
-    examples.forEach(example => {
-      categoriesContainer.innerHTML += `
-    <div class="category">
-      <img src="${example.image}" alt="${example.title}">
-      <h3>${example.title}</h3>
-      <p>${example.description}</p>
-      <a href="${example.url}">View Example</a>
-    </div>
-  `;
+      categoryElement.querySelector('.view-category').addEventListener('click', () => {
+        const categoryTitle = category.title; // Get the title of the clicked category
+        const categoryExamples = filterExamples('', categoryTitle); // Filter examples for this category
+      
+        categoriesContainer.innerHTML = ''; // Clear the current content to display only the relevant examples
+        updateExamplesDisplay(categoryExamples); // Update the display with the filtered examples
+      });
+      
+
+      categoriesContainer.appendChild(categoryElement);
     });
   }
+
+  function updateExamplesDisplay(filteredExamples) {
+    // Optionally clear the categories display or do something else as per requirement
+    // categoriesContainer.innerHTML = '';
+
+    filteredExamples.forEach(example => {
+      const exampleElement = document.createElement('div');
+      exampleElement.className = 'category'; // Consider renaming the class for semantic clarity
+      exampleElement.innerHTML = `
+        <img src="${example.image}" alt="${example.title}">
+        <h3>${example.title}</h3>
+        <p>${example.description}</p>
+        <a href="${example.url}">View Example</a>
+      `;
+
+      categoriesContainer.appendChild(exampleElement);
+    });
+  }
+
+  updateCategoriesDisplay(categories);
+
 });
