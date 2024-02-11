@@ -205,6 +205,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   searchInput.addEventListener('input', handleSearch);
 
+  // set the default push state to the root
+  window.history.pushState({}, 'Mantra Examples', '/');
+
+  window.addEventListener('popstate', function (event) {
+
+    // Always clear the iframe and hide it
+    exampleIframe.src = '';
+    exampleEmbedsContainer.style.display = 'none';
+  
+    // Hide the code editor and clear it
+    codeEditor.style.display = 'none';
+    document.querySelector('.code-editor pre').textContent = '';
+  
+    // Always show the search container
+    document.querySelector('.search-container').style.display = 'block';
+  
+    if (event.state) {
+      const { type, title } = event.state;
+      if (type === 'category') {
+        // Display examples for this category
+        const categoryExamples = filterExamples('', title);
+        categoriesContainer.innerHTML = ''; // Clear the current content
+        updateExamplesDisplay(categoryExamples);
+      } else if (type === 'example') {
+        // Load the example embed
+        loadExampleEmbed({ title, url: event.state.url });
+      }
+    } else {
+      // No state or root state, revert to initial categories display
+      categoriesContainer.innerHTML = ''; // It's important to clear the content to reset the view
+      updateCategoriesDisplay(categories);
+    }
+  
+    // Always show categories container, but conditionally based on whether it's already populated
+    if (!categoriesContainer.innerHTML.trim()) {
+      updateCategoriesDisplay(categories);
+    }
+    categoriesContainer.style.display = 'flex'; // Show categories container
+    exampleEmbedsContainer.style.display = 'none'; // Ensure example iframe container is hidden
+  });
+  
+
   function handleSearch() {
     const keyword = searchInput.value.toLowerCase();
     const filteredCategories = filterCategories(keyword);
@@ -227,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Remark: might not be needed, check pushState
     document.querySelector('#example-embed').style.display = 'none';
     // TODO: set src to empty?
-
 
   }
 
@@ -271,7 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("categoryTitle", categoryTitle)
 
         // update url push state
-        window.history.pushState({}, categoryTitle, `/${categoryTitle}`);
+        let categoryPath = category.url.replace('.html', '');
+        window.history.pushState({ type: 'category', title: category.title }, categoryPath, `/${categoryPath}`);
 
         const categoryExamples = filterExamples('', categoryTitle); // Filter examples for this category
         console.log("categoryExamples", categoryExamples)
@@ -286,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateExamplesDisplay(filteredExamples) {
     // Optionally clear the categories display or do something else as per requirement
-    // categoriesContainer.innerHTML = '';
+    categoriesContainer.innerHTML = '';
     console.log('filteredExamples', filteredExamples)
     filteredExamples.forEach(example => {
       const exampleElement = document.createElement('div');
@@ -306,8 +348,10 @@ document.addEventListener('DOMContentLoaded', () => {
       categoriesContainer.appendChild(exampleElement);
 
       exampleElement.addEventListener('click', () => {
-
-
+        
+        // Use the category's title to prepend to the example's title in the URL
+        const stateUrl = `${example.url.replace('.html', '')}`;
+        window.history.pushState({ type: 'example', title: example.title, url: example.url }, example.title, stateUrl);
 
         loadExampleEmbed(example); // Load the example iframe
       });
@@ -316,21 +360,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }
 
-
   function loadExampleEmbed (example) {
-    const exampleUrl = './' + example.url; // Get the URL of the clicked example
-    exampleIframe.src = exampleUrl
+    console.log("loadExampleEmbed", example)
+    const exampleUrl = '/' + example.url; // Get the URL of the clicked example
+    exampleIframe.src = exampleUrl;
+    // alert(exampleUrl);
     // update url push state
-    window.history.pushState({}, example.title, `/${example.title}`);
+    // window.history.pushState({}, example.title, `/${example.title}`);
+    // show exampleIframe
+    exampleIframe.style.display = 'block';
     categoriesContainer.style.display = 'none'; // Hide the categories container
     exampleEmbedsContainer.style.display = 'block'; // Show the example iframe container
     loadEditor(example);
   }
   
-
   updateCategoriesDisplay(categories);
-
-
 
 });
 
@@ -344,17 +388,17 @@ function loadEditor(example) {
   let exampleUrl = example.url;
   let exampleName = 'items/bullet';
   exampleName = exampleUrl.replace('.html', '');
-
   // set push state to the example name
   // window.history.pushState({}, exampleName, `/${exampleName}`);
   
-  let jsSource = './' + exampleName + '.js';
+  let jsSource = '/' + exampleName + '.js';
+  console.log('loading remote source', jsSource)
   fetchAndDisplayCode();
   function fetchAndDisplayCode() {
     fetch(jsSource)
       .then(response => response.text())
       .then(code => {
-
+        console.log(code)
         // inject the code into the script tag
         /*
         const script = document.createElement('script');
@@ -387,7 +431,6 @@ function loadEditor(example) {
 
         // show code-editor
         document.querySelector('.code-editor').style.display = 'block';
-
 
       })
       .catch(error => {
