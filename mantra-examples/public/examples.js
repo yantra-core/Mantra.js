@@ -7,6 +7,7 @@ let categories = [
     url: 'physics.html',
     tags: ['physics', 'engine', 'motion', 'movement', 'gravity', 'force', 'velocity', 'mass', 'acceleration', 'inertia', 'friction']
   },
+  /*
   {
     title: 'Graphics', // blue
     color: '#2196f3',
@@ -15,6 +16,8 @@ let categories = [
     url: 'graphics.html',
     tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
   },
+  */
+ /*
   {
     title: 'Assets', // green
     color: '#4caf50',
@@ -23,6 +26,8 @@ let categories = [
     url: 'assets.html',
     tags: ['assets', 'management', 'loading', 'resources', 'files', 'images', 'audio', 'video', 'fonts', 'scripts', 'data']
   },
+  */
+ /*
   {
     title: 'Plugins', // orange
     color: '#ff9800',
@@ -31,6 +36,8 @@ let categories = [
     url: 'plugins.html',
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
   },
+  */
+ /*
   {
     title: 'Game Config', // red
     color: '#f44336',
@@ -39,6 +46,23 @@ let categories = [
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  */
+
+  /*
+  {
+    title: 'Input', // yellow
+  },
+  */
+
+  {
+    title: 'Lifecycle', // blue
+    color: '#2196f3',
+    description: 'Explore examples featuring the game lifecycle.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle.html',
+    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
+  },
+
   {
     title: 'Items', // teal
     color: '#009688',
@@ -57,7 +81,9 @@ let categories = [
   }
 ];
 
-let examples = [
+let examples = [];
+
+let item_examples = [
   {
     title: 'Block',
     category: 'items',
@@ -91,30 +117,6 @@ let examples = [
     tags: ['boomerang', 'item', 'inventory', 'throwing', 'damage', 'return', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
   },
   {
-    title: 'Create Entity',
-    category: 'entity',
-    description: 'Create a new entity and add it to the scene.',
-    image: 'placeholder-image.jpg',
-    url: 'entity/create-entity.html',
-    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
-  },
-  {
-    title: 'Remove Entity',
-    category: 'entity',
-    description: 'Remove an entity from the scene.',
-    image: 'placeholder-image.jpg',
-    url: 'entity/remove-entity.html',
-    tags: ['remove', 'entity', 'scene', 'delete', 'destroy', 'dispose', 'clear', 'purge', 'eliminate', 'exterminate']
-  },
-  {
-    title: 'Update Entity',
-    category: 'entity',
-    description: 'Update an entity in the scene.',
-    image: 'placeholder-image.jpg',
-    url: 'entity/update-entity.html',
-    tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
-  },
-  {
     title: 'Apply Force',
     category: 'physics',
     description: 'Apply a force to an entity.',
@@ -140,6 +142,59 @@ let examples = [
   }
 ];
 
+let entity_examples = [
+
+  {
+    title: 'Create Entity',
+    category: 'entity',
+    description: 'Create a new entity and add it to the scene.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/create-entity.html',
+    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
+  },
+  {
+    title: 'Remove Entity',
+    category: 'entity',
+    description: 'Remove an entity from the scene.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/remove-entity.html',
+    tags: ['remove', 'entity', 'scene', 'delete', 'destroy', 'dispose', 'clear', 'purge', 'eliminate', 'exterminate']
+  },
+  {
+    title: 'Update Entity',
+    category: 'entity',
+    description: 'Update an entity in the scene.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/update-entity.html',
+    tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
+  }
+
+];
+
+let lifecycle_examples = [
+  {
+    title: 'before.update',
+    category: 'lifecycle',
+    description: 'Run code before the update loop.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-update.html',
+    tags: ['before', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'event', 'event', 'event']
+  },
+  {
+    title: 'after.update',
+    category: 'lifecycle',
+    description: 'Run code after the update loop.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-update.html',
+    tags: ['after', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'event', 'event', 'event']
+  },
+];
+
+
+// concat all arr to examples
+examples = examples.concat(item_examples);
+examples = examples.concat(entity_examples);
+examples = examples.concat(lifecycle_examples);
 
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
@@ -167,6 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCategoriesDisplay(filteredCategories);
     updateExamplesDisplay(filteredExamples);
+
+    // hide the example-embed
+    // Remark: might not be needed, check pushState
+    document.querySelector('#example-embed').style.display = 'none';
+    // TODO: set src to empty?
+
+
   }
 
   function filterCategories(keyword) {
@@ -244,39 +306,52 @@ document.addEventListener('DOMContentLoaded', () => {
       categoriesContainer.appendChild(exampleElement);
 
       exampleElement.addEventListener('click', () => {
-        const exampleUrl = example.url; // Get the URL of the clicked example
-        exampleIframe.src = example
-        // update url push state
-        window.history.pushState({}, example.title, `/${example.title}`);
-        categoriesContainer.style.display = 'none'; // Hide the categories container
-        exampleEmbedsContainer.style.display = 'block'; // Show the example iframe container
-        loadEditor(exampleUrl);
+
+
+
+        loadExampleEmbed(example); // Load the example iframe
       });
 
     });
 
   }
 
+
+  function loadExampleEmbed (example) {
+    const exampleUrl = './' + example.url; // Get the URL of the clicked example
+    exampleIframe.src = exampleUrl
+    // update url push state
+    window.history.pushState({}, example.title, `/${example.title}`);
+    categoriesContainer.style.display = 'none'; // Hide the categories container
+    exampleEmbedsContainer.style.display = 'block'; // Show the example iframe container
+    loadEditor(example);
+  }
+  
+
   updateCategoriesDisplay(categories);
 
+
+
 });
-
-
 
 let editor;
 let loaded = false;
 
-function loadEditor(exampleUrl) {
-
+function loadEditor(example) {
   if (loaded) return;
 
   loaded = true;
+  let exampleUrl = example.url;
   let exampleName = 'items/bullet';
   exampleName = exampleUrl.replace('.html', '');
 
+  // set push state to the example name
+  // window.history.pushState({}, exampleName, `/${exampleName}`);
+  
+  let jsSource = './' + exampleName + '.js';
   fetchAndDisplayCode();
   function fetchAndDisplayCode() {
-    fetch('./' + exampleName + '.js')
+    fetch(jsSource)
       .then(response => response.text())
       .then(code => {
 
@@ -305,10 +380,7 @@ function loadEditor(exampleUrl) {
         // editor.setValue(code);
 
         // set the iframe src to bullet.html, sibling to this file
-        document.querySelector('#example-embed').src = './' + exampleName + '.html';
-
-        // hide the example-embed
-        document.querySelector('#example-embed').style.display = 'none';
+        // document.querySelector('#example-embed').src = './' + exampleName + '.html';
 
         // hide the search-container class
         document.querySelector('.search-container').style.display = 'none';
