@@ -133,9 +133,24 @@ let examples = [
   }
 ];
 
+// TODO: we need to add an event handler for all lazy loaded exampleLink
+// such that when the link is clicked we load the iframe based on the url and return false to prevent the default action
+// the iframe is already in the document and looks like this:
+/*
+  <div class="exampleEmbeds">
+    <iframe id="example-embed" src="./items/bullet.html" frameborder="0" width="100%" height="100%"></iframe>
+  </div>
+
+  When the example iframe loads we'll need to hide .categories and show .exampleEmbeds
+
+*/
+
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
   const categoriesContainer = document.querySelector('.categories');
+  const exampleEmbedsContainer = document.querySelector('.exampleEmbeds');
+  const exampleIframe = document.getElementById('example-embed');
+  const codeEditor = document.querySelector('.code-editor'); // Assuming there's a code editor element with class 'code-editor'
 
   searchInput.addEventListener('input', handleSearch);
 
@@ -143,6 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyword = searchInput.value.toLowerCase();
     const filteredCategories = filterCategories(keyword);
     const filteredExamples = filterExamples(keyword);
+
+    // Set embed src to empty string and hide
+    exampleIframe.src = '';
+    exampleEmbedsContainer.style.display = 'none';
+
+    // Hide the code editor
+    codeEditor.style.display = 'none';
+
+    // show categories again
+    categoriesContainer.style.display = 'flex';
 
     updateCategoriesDisplay(filteredCategories);
     updateExamplesDisplay(filteredExamples);
@@ -160,11 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return examples.filter(example =>
       (!categoryFilter || example.category.toLowerCase() === categoryFilter.toLowerCase()) &&
       (keyword === '' || example.title.toLowerCase().includes(keyword) ||
-      example.description.toLowerCase().includes(keyword) ||
-      example.tags.some(tag => tag.toLowerCase().includes(keyword)))
+        example.description.toLowerCase().includes(keyword) ||
+        example.tags.some(tag => tag.toLowerCase().includes(keyword)))
     );
   }
-  
+
 
   function updateCategoriesDisplay(filteredCategories) {
     categoriesContainer.innerHTML = ''; // Clear the current content
@@ -179,14 +204,20 @@ document.addEventListener('DOMContentLoaded', () => {
         <button class="view-category">View Category</button>
       `;
 
-      categoryElement.querySelector('.view-category').addEventListener('click', () => {
+      // get all .category elements
+      categoryElement.addEventListener('click', () => {
         const categoryTitle = category.title; // Get the title of the clicked category
+        console.log("categoryTitle", categoryTitle)
+
+        // update url push state
+        window.history.pushState({}, categoryTitle, `/${categoryTitle}`);
+
         const categoryExamples = filterExamples('', categoryTitle); // Filter examples for this category
-      
+        console.log("categoryExamples", categoryExamples)
         categoriesContainer.innerHTML = ''; // Clear the current content to display only the relevant examples
         updateExamplesDisplay(categoryExamples); // Update the display with the filtered examples
       });
-      
+
 
       categoriesContainer.appendChild(categoryElement);
     });
@@ -195,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateExamplesDisplay(filteredExamples) {
     // Optionally clear the categories display or do something else as per requirement
     // categoriesContainer.innerHTML = '';
-
+    console.log('filteredExamples', filteredExamples)
     filteredExamples.forEach(example => {
       const exampleElement = document.createElement('div');
       exampleElement.className = 'category'; // Consider renaming the class for semantic clarity
@@ -203,13 +234,91 @@ document.addEventListener('DOMContentLoaded', () => {
         <img src="${example.image}" alt="${example.title}">
         <h3>${example.title}</h3>
         <p>${example.description}</p>
-        <a href="${example.url}">View Example</a>
+        <a class="exampleLink" href="${example.url}">View Example</a>
       `;
 
       categoriesContainer.appendChild(exampleElement);
     });
+
+
+    // Add event listeners to example links for lazy loading in iframe
+    const exampleLinks = document.querySelectorAll('.exampleLink');
+    exampleLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent the default link behavior
+        const exampleUrl = link.getAttribute('href'); // Get the URL from the link
+        exampleIframe.src = exampleUrl; // Set the iframe src to load the example
+
+        categoriesContainer.style.display = 'none'; // Hide the categories container
+        exampleEmbedsContainer.style.display = 'block'; // Show the example iframe container
+
+        loadEditor(exampleUrl);
+
+      });
+    });
+
   }
 
   updateCategoriesDisplay(categories);
 
 });
+
+
+
+let editor;
+let loaded = false;
+
+function loadEditor(exampleUrl) {
+
+  if (loaded) return;
+
+  loaded = true;
+  let exampleName = 'items/bullet';
+  exampleName = exampleUrl.replace('.html', '');
+
+  fetchAndDisplayCode();
+  function fetchAndDisplayCode() {
+    fetch('./' + exampleName + '.js')
+      .then(response => response.text())
+      .then(code => {
+
+        // inject the code into the script tag
+        /*
+        const script = document.createElement('script');
+        script.textContent = code;
+        document.body.appendChild(script);
+        */
+
+        // trigger DOMContentLoaded event to run the code
+        // Warning: This may cause infinite loops if mutex is not used on demos page all events subscribed to DOMContentLoaded
+        //document.dispatchEvent(new Event('DOMContentLoaded'));
+        // Append the mantra.js script to the start of the string.
+        //code = '<script src="mantra.js"><\/script>\n' + code;
+
+
+        // Remove the very last line of the code example.
+        code = code.trim().split('\n').slice(0, -1).join('\n');
+        code = code.trim().split('\n').slice(0, -1).join('\n');
+
+        // Set the code example to the pre element
+        document.querySelector('.code-editor pre').textContent = code;
+        // hide the code example
+        // document.querySelector('.code-editor').style.display = 'none';
+        // editor.setValue(code);
+
+        // set the iframe src to bullet.html, sibling to this file
+        document.querySelector('#example-embed').src = './' + exampleName + '.html';
+
+        // show code-editor
+        // this no good?
+        document.querySelector('.code-editor').style.display = 'block';
+
+
+      })
+      .catch(error => {
+        throw error;
+        console.error('Error fetching the code example:', error);
+      });
+  }
+
+}

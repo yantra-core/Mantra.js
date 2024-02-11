@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
   game.use('Bullet');
 
   // TODO: demos should have simple control mappings with Sutra, no default mappings
-  // alert('yo')
-  console.log('fudge')
   game.start(function () {
     game.zoom(1);
     game.setBackground('#000000');
