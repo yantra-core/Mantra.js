@@ -1,48 +1,55 @@
 let categories = [
   {
-    title: 'Physics',
+    title: 'Physics', // purple
+    color: '#9c27b0',
     description: 'Explore examples featuring the physics engine.',
     image: 'placeholder-image.jpg',
     url: 'physics.html',
     tags: ['physics', 'engine', 'motion', 'movement', 'gravity', 'force', 'velocity', 'mass', 'acceleration', 'inertia', 'friction']
   },
   {
-    title: 'Graphics',
+    title: 'Graphics', // blue
+    color: '#2196f3',
     description: 'Explore examples featuring the graphics engine.',
     image: 'placeholder-image.jpg',
     url: 'graphics.html',
     tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
   },
   {
-    title: 'Assets',
+    title: 'Assets', // green
+    color: '#4caf50',
     description: 'Explore examples featuring the asset management system.',
     image: 'placeholder-image.jpg',
     url: 'assets.html',
     tags: ['assets', 'management', 'loading', 'resources', 'files', 'images', 'audio', 'video', 'fonts', 'scripts', 'data']
   },
   {
-    title: 'Plugins',
+    title: 'Plugins', // orange
+    color: '#ff9800',
     description: 'Explore examples featuring the plugin system.',
     image: 'placeholder-image.jpg',
     url: 'plugins.html',
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
   },
   {
-    title: 'Game Config',
+    title: 'Game Config', // red
+    color: '#f44336',
     description: 'Explore examples featuring the game configuration.',
     image: 'placeholder-image.jpg',
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
   {
-    title: 'Items',
+    title: 'Items', // teal
+    color: '#009688',
     description: 'Explore examples featuring the item system.',
     image: 'placeholder-image.jpg',
     url: 'items.html',
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
   {
-    title: 'Entity',
+    title: 'Entity', // pink
+    color: '#e91e63',
     description: 'Explore examples featuring the entity system.',
     image: 'placeholder-image.jpg',
     url: 'entity.html',
@@ -133,17 +140,6 @@ let examples = [
   }
 ];
 
-// TODO: we need to add an event handler for all lazy loaded exampleLink
-// such that when the link is clicked we load the iframe based on the url and return false to prevent the default action
-// the iframe is already in the document and looks like this:
-/*
-  <div class="exampleEmbeds">
-    <iframe id="example-embed" src="./items/bullet.html" frameborder="0" width="100%" height="100%"></iframe>
-  </div>
-
-  When the example iframe loads we'll need to hide .categories and show .exampleEmbeds
-
-*/
 
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
@@ -190,19 +186,22 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   }
 
-
   function updateCategoriesDisplay(filteredCategories) {
     categoriesContainer.innerHTML = ''; // Clear the current content
 
     filteredCategories.forEach(category => {
       const categoryElement = document.createElement('div');
       categoryElement.className = 'category';
+      //         <img class="categoryImage" src="${category.image}" alt="${category.title}">
       categoryElement.innerHTML = `
-        <img src="${category.image}" alt="${category.title}">
-        <h3>${category.title}</h3>
+        <span class="categoryImage">${category.title}</span>
         <p>${category.description}</p>
-        <button class="view-category">View Category</button>
+        <h3>${category.title}</h3>
       `;
+      //         <button class="view-category">View Category</button>
+
+      // set the categoryElement background color to the category color
+      categoryElement.style.backgroundColor = category.color;
 
       // get all .category elements
       categoryElement.addEventListener('click', () => {
@@ -230,31 +229,30 @@ document.addEventListener('DOMContentLoaded', () => {
     filteredExamples.forEach(example => {
       const exampleElement = document.createElement('div');
       exampleElement.className = 'category'; // Consider renaming the class for semantic clarity
+      //         <img src="${example.image}" alt="${example.title}">
       exampleElement.innerHTML = `
-        <img src="${example.image}" alt="${example.title}">
-        <h3>${example.title}</h3>
+        <span class="categoryExample">${example.category}</span>
         <p>${example.description}</p>
-        <a class="exampleLink" href="${example.url}">View Example</a>
+        <h3>${example.title}</h3>
       `;
 
+      //         <a class="exampleLink" href="${example.url}">View Example</a>
+
+      // assign the categoryExample background color to the category color
+      const category = categories.find(category => category.title.toLowerCase() === example.category.toLowerCase());
+      exampleElement.style.backgroundColor = category.color;
       categoriesContainer.appendChild(exampleElement);
-    });
 
-
-    // Add event listeners to example links for lazy loading in iframe
-    const exampleLinks = document.querySelectorAll('.exampleLink');
-    exampleLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent the default link behavior
-        const exampleUrl = link.getAttribute('href'); // Get the URL from the link
-        exampleIframe.src = exampleUrl; // Set the iframe src to load the example
-
+      exampleElement.addEventListener('click', () => {
+        const exampleUrl = example.url; // Get the URL of the clicked example
+        exampleIframe.src = example
+        // update url push state
+        window.history.pushState({}, example.title, `/${example.title}`);
         categoriesContainer.style.display = 'none'; // Hide the categories container
         exampleEmbedsContainer.style.display = 'block'; // Show the example iframe container
-
         loadEditor(exampleUrl);
-
       });
+
     });
 
   }
@@ -309,8 +307,13 @@ function loadEditor(exampleUrl) {
         // set the iframe src to bullet.html, sibling to this file
         document.querySelector('#example-embed').src = './' + exampleName + '.html';
 
+        // hide the example-embed
+        document.querySelector('#example-embed').style.display = 'none';
+
+        // hide the search-container class
+        document.querySelector('.search-container').style.display = 'none';
+
         // show code-editor
-        // this no good?
         document.querySelector('.code-editor').style.display = 'block';
 
 
