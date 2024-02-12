@@ -74,11 +74,18 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
     collisionActive: false,
     collisionStart: false,
     collisionEnd: false,
+    hasInventory: false,
+    collectable: false,
+    /*
+    restitution: 0,
     // set friction high so they dont' glide around on push
-    friction: 100,
-    frictionAir: 100,
-    frictionStatic: 100,
+    */
+    friction: tile.friction || 0.01,
+    frictionAir: tile.friction || 0.01,
+    frictionStatic: tile.friction || 0.01,
+
     isStatic,
+
     style: { cursor: 'pointer' },
     position: { x: x * scale, y: y * scale, z: z * scale },
     texture: _texture,
