@@ -15,7 +15,6 @@ import movement from "../../mantra-sutras/player-movement/top-down.js";
 
 import bomb from '../../mantra-sutras/bomb.js';
 
-
 export default function sutras(game) {
 
   let rules = game.createSutra();

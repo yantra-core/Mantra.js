@@ -2242,10 +2242,12 @@ function blackHoleSutra(game, context) {
   rules.on('applyGravity', function (entityData, node, gameState) {
     // check if this running locally on a context or globally on all BLACK_HOLE entities
     if (typeof context !== 'undefined') {
+      // must get updated position of context
+      var updatedContext = gameState.ents._[context.id];
       Object.keys(gameState.ents._).forEach(function (eId) {
         var entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
+          applyGravity(updatedContext, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;
@@ -4653,22 +4655,21 @@ var Maze = /*#__PURE__*/function () {
       });
 
       // text "Warp to Mantra"
-      game.createEntity({
+      game.createEntity(_defineProperty(_defineProperty({
         type: 'TEXT',
         text: 'Warp To Mantra',
+        body: false,
         // kind: 'dynamic',
         style: {
           padding: '2px',
           fontSize: '16px',
           color: '#ffffff',
           textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: -400,
-          y: -120
         }
-      });
+      }, "body", false), "position", {
+        x: -400,
+        y: -120
+      }));
 
       /*
       game.createEntity({
