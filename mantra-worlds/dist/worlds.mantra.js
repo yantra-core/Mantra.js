@@ -4900,6 +4900,7 @@ function createDoors(game) {
   // create text label instruction for picking up keys
   game.createEntity({
     type: 'TEXT',
+    body: false,
     text: 'Collect keys to open doors',
     size: {
       width: 400,
