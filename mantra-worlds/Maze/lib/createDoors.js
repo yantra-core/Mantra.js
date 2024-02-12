@@ -192,6 +192,26 @@ export default function createDoors(game) {
 
   createHomeKey();
 
+  // create text label instruction for picking up keys
+  game.createEntity({
+    type: 'TEXT',
+    body: false,
+    text: 'Collect keys to open doors',
+    size: {
+      width: 400,
+      height: 20
+    },
+    style: {
+      fontSize: '16px',
+      color: '#ffffff',
+      textAlign: 'center'
+    },
+    position: {
+      x: -100,
+      y: 20
+    }
+  });
+
 }
 
 function createHomeKey () {

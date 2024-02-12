@@ -358,6 +358,7 @@ export default function createBackground(game) {
     }
   });
 
+  /*
   // if touch note play sound
   game.createEntity({
     type: 'NOTE',
@@ -372,6 +373,7 @@ export default function createBackground(game) {
       z: 32
     }
   });
+  */
 
 }
 

@@ -10,7 +10,7 @@ export default function render(game, alpha) {
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
 
 
-  if (this.game.useFov) {
+  if (this.game.config.useFoV) {
 
     let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
     // console.log('itemsInFov', itemsInFov)

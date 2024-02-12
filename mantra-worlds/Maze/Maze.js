@@ -74,6 +74,7 @@ class Maze {
     game.createEntity({
       type: 'TEXT',
       text: 'Warp To Mantra',
+      body: false,
       // kind: 'dynamic',
       style: {
         padding: '2px',

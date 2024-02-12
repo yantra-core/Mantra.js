@@ -39,10 +39,12 @@ export default function blackHoleSutra(game, context) {
 
     // check if this running locally on a context or globally on all BLACK_HOLE entities
     if (typeof context !== 'undefined') {
+      // must get updated position of context
+      let updatedContext = gameState.ents._[context.id];
       Object.keys(gameState.ents._).forEach(eId => {
         let entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
+          applyGravity(updatedContext, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;

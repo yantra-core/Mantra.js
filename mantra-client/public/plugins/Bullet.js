@@ -41,6 +41,7 @@ var Bullet = /*#__PURE__*/function () {
   }, {
     key: "fireBullet",
     value: function fireBullet(entityId) {
+      var bulletConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var entity = this.game.getEntity(entityId);
       if (!entity) {
         console.log('Bullet.fireBullet no entity found for id', entityId);
@@ -55,33 +56,10 @@ var Bullet = /*#__PURE__*/function () {
       }
       actionRateLimiterComponent.recordAction(entityId, 'fireBullet');
       var playerPos = entity.position;
-      var playerRotation = entity.rotation; // in radians
+      var playerRotation = entity.rotation || 0; // Ensure there's a default value for rotation
 
-      if (!playerPos) {
-        // client might not have the position or rotation component, don't client-side predict
-        console.log('no player data available');
-        return;
-      }
-      // Distance in front of the player where the bullet should start
-      var distanceInFront = 16; // TODO: make this a config
-
-      if (typeof entity.radius !== 'undefined') {
-        entity.width = entity.radius * 2;
-        entity.height = entity.radius * 2;
-      }
-      var playerOffsetX = entity.width / 2; // Adjust this value to align the bullet properly
-      var playerOffsetY = entity.height / 2; // Adjust this value to align the bullet properly
-
-      playerOffsetX = 0;
-      playerOffsetY = 0;
-      if (typeof playerRotation === 'undefined') {
-        playerRotation = 0; // this should have a default
-      }
-
-      // convert to 3d if rotation object
-      if (_typeof(playerRotation) === 'object') {
-        playerRotation = playerRotation.z;
-      }
+      // Convert to 3D rotation if necessary
+      playerRotation = _typeof(playerRotation) === 'object' ? playerRotation.z : playerRotation;
 
       // Compute the bullet's direction based on player's rotation
       var directionX = Math.sin(playerRotation);
@@ -89,20 +67,19 @@ var Bullet = /*#__PURE__*/function () {
 
       // Place the bullet in front of the player
       var bulletStartPosition = {
-        x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
-        y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation),
-        z: 1
-        //z: 10
+        x: playerPos.x + directionX * 16,
+        // Assuming distanceInFront is 16
+        y: playerPos.y + directionY * 16,
+        z: 1 // Assuming a default Z position
       };
 
       this.bulletCount++;
-      var bulletDirectionConfig = {
+      var defaultBulletConfig = {
         type: 'BULLET',
         mass: 1,
         collisionStart: true,
         position: bulletStartPosition,
         lifetime: this.lifetime,
-        //texture: 'tile-block',
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'arrow'
@@ -110,7 +87,6 @@ var Bullet = /*#__PURE__*/function () {
         owner: entityId,
         rotation: playerRotation,
         isSensor: true,
-        //color: entity.bulletColor || 0x000000,
         velocity: {
           x: directionX * this.speed,
           y: directionY * this.speed
@@ -118,42 +94,15 @@ var Bullet = /*#__PURE__*/function () {
         width: 8,
         height: 16,
         radius: 8,
-        // TODO: make this a config
-        damage: 10 // TODO: make this a config
+        // Assuming a default radius
+        damage: 10 // Assuming default damage
       };
-      // console.log('using bulletDirectionConfig', bulletDirectionConfig)
-      this.game.createEntity(bulletDirectionConfig);
-    }
-  }, {
-    key: "applyTemporaryGlowEffect",
-    value: function applyTemporaryGlowEffect(entity) {
-      if (this.isPlayerAlreadyGlowing(entity)) {
-        return; // Skip if the player is already glowing
-      }
 
-      var originalMaterial = entity.mesh.material;
-      var redGlowMaterial = this.getRedGlowMaterial();
-      entity.mesh.material = redGlowMaterial;
-      setTimeout(function () {
-        if (entity.mesh.material === redGlowMaterial) {
-          entity.mesh.material = originalMaterial;
-        }
-      }, 500);
-    }
-  }, {
-    key: "getRedGlowMaterial",
-    value: function getRedGlowMaterial() {
-      if (!this.redGlowMaterial) {
-        // TODO: should not have direct calls to babylon here!
-        this.redGlowMaterial = new BABYLON.StandardMaterial("redGlow", this.scene);
-        this.redGlowMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0);
-      }
-      return this.redGlowMaterial;
-    }
-  }, {
-    key: "isPlayerAlreadyGlowing",
-    value: function isPlayerAlreadyGlowing(entity) {
-      return entity.graphics['graphics-babylon'].material && entity.graphics['graphics-babylon'].material.name === "redGlow";
+      // Merge the bulletConfig into the defaultBulletConfig
+      var mergedBulletConfig = Object.assign({}, defaultBulletConfig, bulletConfig);
+
+      // Create the bullet entity with the merged configuration
+      return this.game.createEntity(mergedBulletConfig);
     }
   }, {
     key: "handleCollision",

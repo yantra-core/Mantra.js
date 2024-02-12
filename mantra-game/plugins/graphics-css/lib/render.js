@@ -9,7 +9,7 @@ export default function render(game, alpha) {
   // Best to remove camera follow for CSSGraphics if possible
   // We tried to only iterate changed entities, but this breaks camera follow
 
-  if (this.game.useFov) {
+  if (this.game.config.useFoV) {
 
     let fovEntities = new Map();
     let currentPlayer = this.game.data.currentPlayer;

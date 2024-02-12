@@ -46,10 +46,12 @@ function blackHoleSutra(game, context) {
   rules.on('applyGravity', function (entityData, node, gameState) {
     // check if this running locally on a context or globally on all BLACK_HOLE entities
     if (typeof context !== 'undefined') {
+      // must get updated position of context
+      var updatedContext = gameState.ents._[context.id];
       Object.keys(gameState.ents._).forEach(function (eId) {
         var entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
+          applyGravity(updatedContext, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;
@@ -108,11 +110,6 @@ function blackHoleSutra(game, context) {
 
   // Function to apply gravitational force
   function applyGravity(ent1, ent2, gravity, gameState) {
-    // TODO: refactor to use Entity.body component, removes game.bodyMap
-    var body = game.bodyMap[ent2.id];
-    if (!body) {
-      return;
-    }
     var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
     if (magnitude < 0.5) {

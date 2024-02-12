@@ -2242,10 +2242,12 @@ function blackHoleSutra(game, context) {
   rules.on('applyGravity', function (entityData, node, gameState) {
     // check if this running locally on a context or globally on all BLACK_HOLE entities
     if (typeof context !== 'undefined') {
+      // must get updated position of context
+      var updatedContext = gameState.ents._[context.id];
       Object.keys(gameState.ents._).forEach(function (eId) {
         var entity = gameState.ents._[eId];
         if (entity.type !== 'BLACK_HOLE') {
-          applyGravity(context, entity, GRAVITATIONAL_CONSTANT, gameState);
+          applyGravity(updatedContext, entity, GRAVITATIONAL_CONSTANT, gameState);
         }
       });
       return;
@@ -3642,6 +3644,7 @@ exports["default"] = void 0;
 var _assets = _interopRequireDefault(require("./assets.js"));
 var _sutras = _interopRequireDefault(require("./sutras.js"));
 var _welcomeMessage = _interopRequireDefault(require("./welcomeMessage.js"));
+var _createBackground = _interopRequireDefault(require("./lib/createBackground.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
@@ -3652,7 +3655,34 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } //
+// Mantra Home World
+//
+/*
+
+  # Loading custom assets:
+
+  Asset data can be loaded from a simple JSON config file
+
+    game.addAssets(assets);
+
+  Assets can be individually loaded in the `preload` method
+
+    game.addAsset('/img/game/env/planet-express-base.png', 'image', 'planet-express-base');
+
+*/ /*
+  
+   # Custom Game Logic
+
+   Use Sutra to add or modify your game's behavior tree
+
+    game.useSutra(sutras(game), 'HOME');
+
+
+*/ // TODO: remove this and use game.flashMessage() instead
+// TODO: make this a JSON object? it could be a list of entities
+// TODO: make this a JSON object? it could be a list of entities
+// game.load(backGroundEntities)
 var Home = /*#__PURE__*/function () {
   // type is optional for Plugins
 
@@ -3668,12 +3698,10 @@ var Home = /*#__PURE__*/function () {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              /* // for dev testing
-              function sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-              }
-              await sleep(2000);
-              */
+              //
+              // game.addAssets() and game.addAsset() will accumulate assets into the preload queue
+              //
+              // game.start() and `game::ready` will wait for all assets to be loaded
 
               // add groups of assets
               game.addAssets(_assets["default"]);
@@ -3686,6 +3714,14 @@ var Home = /*#__PURE__*/function () {
               game.addAsset('/img/game/env/warp-to-music.gif', 'image', 'warp-to-music');
               game.addAsset('/img/game/env/warp-to-ycraft.gif', 'image', 'warp-to-ycraft');
               game.addAsset('/img/game/env/garden.png', 'image', 'garden');
+
+              //
+              // Game.start will call await.preloader.loadAll() for you
+              //
+              //   You may optionally invoke preloader to immediately load assets and wait
+              //
+              //     await game.preloader.loadAll();
+              //
             case 8:
             case "end":
               return _context.stop();
@@ -3715,36 +3751,6 @@ var Home = /*#__PURE__*/function () {
       }
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
-
-      // ping position handler
-      /*
-      game.on('pointerDown', (entity, pointerEvent, c) => {
-        // get the mouse position from pointerEvent
-        let x = pointerEvent.clientX;
-        let y = pointerEvent.clientY;
-         let reverse = true;
-        let color = 'white';
-         // if right click then reverse is false
-        if (pointerEvent.button === 2) {
-          reverse = false;
-          color = 'red';
-        }
-        game.pingPosition(x, y, { reverse: reverse, color: color, duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
-      });
-      */
-
-      // sprite sheet has been defined in defaultAssets.js
-      /*
-      game.createPlayer({
-        texture: {
-          model: 'customModel',
-        },
-        position: {
-          x: 0,
-          y: 0
-        }
-      });
-      */
       game.createPlayer({
         texture: {
           sheet: 'loz_spritesheet',
@@ -3755,18 +3761,6 @@ var Home = /*#__PURE__*/function () {
           y: 0
         }
       });
-      game.createEntity({
-        type: "BACKGROUND",
-        texture: 'garden',
-        width: 300,
-        height: 300,
-        body: false,
-        position: {
-          x: 0,
-          y: 0,
-          z: -10
-        }
-      });
       game.setBackground('#007fff');
       game.use('Block');
       game.use('Bomb');
@@ -3775,594 +3769,16 @@ var Home = /*#__PURE__*/function () {
       });
       game.use('Bullet');
       game.use('Boomerang');
-      // game.use('Sword')
-      // game.use('Tile');
       game.use('Tone');
       (0, _welcomeMessage["default"])(game);
       game.useSutra((0, _sutras["default"])(game), 'HOME');
-
-      /*
-      rules.on('SWING_SWORD', function(player){
-        game.systems.sword.swingSword(player.id);
-      })
-      */
-      /*
-      rules.on('CAMERA_SHAKE', function(player){
-        game.shakeCamera(1000);
-      });
-      */
-
-      // now create some background and text entities for navigation
-
-      game.createEntity({
-        name: 'sutra-tree',
-        type: 'BACKGROUND',
-        // kind: 'building',
-        width: 1024 / 4,
-        height: 1024 / 4,
-        //depth: 256,
-        depth: 1,
-        texture: 'sutra-tree',
-        body: false,
-        position: {
-          x: 0,
-          y: 300,
-          z: 32
-        }
-      });
-
-      // convert the Sutra.js rules to English text
-      /*
-      let rulesEnglish = game.rules.toEnglish();
-      game.createEntity({
-        name: 'sutra-tree-text',
-        type: 'TEXT',
-        text: 'Sutra Rules \n\n' + rulesEnglish,
-        width: 256,
-        height: 256,
-        depth: 1,
-        // texture: 'sutra-tree',
-        body: false,
-        style: {
-          // this is code and we need to preserve the spaces and \n
-          whiteSpace: 'pre',
-          // width: '150px',
-          // fontSize: '12px',
-          textAlign: 'left',
-          color: 'black',
-          opacity: 0.55
-        },
-        position: {
-          x: 40,
-          y: 550,
-          z: 32
-        }
-      });
-      */
-
-      game.createEntity({
-        type: 'BACKGROUND',
-        texture: 'robot-arms-apartment',
-        kind: 'building',
-        depth: 1,
-        width: 1340,
-        height: 3668,
-        body: false,
-        position: {
-          // position to right
-          x: 900,
-          y: -1800,
-          z: -1
-        }
-      });
-      game.createEntity({
-        type: 'BACKGROUND',
-        texture: 'planet-express-base',
-        kind: 'building',
-        width: 2048,
-        height: 2048,
-        depth: 1,
-        body: false,
-        position: {
-          // position to right
-          x: -900,
-          y: -800,
-          z: -1
-        }
-      });
-      game.createEntity({
-        type: 'BLOCK',
-        texture: 'tile-block',
-        width: 200,
-        height: 200,
-        mass: 10000,
-        // body: false,
-        position: {
-          // position to right
-          x: 200,
-          y: -800,
-          z: -8
-        }
-      });
-
-      // if touch warp, switch to YCraft level
-      game.createEntity({
-        type: 'WARP',
-        // kind: 'YCraft',
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: 'warp-to-ycraft',
-        isStatic: true,
-        isSensor: true,
-        exit: {
-          world: 'YCraft',
-          // optional, if not specified will use the current world
-          position: {
-            // optional, if not specified will use 0,0,0
-            x: 0,
-            y: 0
-          }
-        },
-        position: {
-          x: 0,
-          y: -210,
-          z: 32
-        }
-      });
-
-      // if touch warp, switch to Sutra level
-      /*
-      game.createEntity({
-        type: 'WARP',
-        kind: 'Sutra',
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: 'warp-to-sutra',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: 0,
-          y: 210,
-          z: 32
-        }
-      });
-      */
-
-      // text label saying "Warp To YCraft World"
-      game.createEntity({
-        type: 'TEXT',
-        text: 'Warp To YCraft World',
-        width: 164,
-        // kind: 'dynamic',
-        color: 0x000000,
-        style: {
-          fontSize: '16px',
-          textAlign: 'center',
-          paddingLeft: '20px' // for now
-        },
-        body: false,
-        position: {
-          x: -20,
-          y: -220,
-          z: 64
-        }
-      });
-
-      // switch to 3d text label
-      game.createEntity({
-        type: 'TEXT',
-        text: 'CSSGraphics Engine',
-        width: 20,
-        color: 0x000000,
-        style: {
-          width: '150px',
-          fontSize: '12px',
-          textAlign: 'center',
-          color: 'black',
-          opacity: 0.22
-        },
-        body: false,
-        position: {
-          x: -63,
-          y: -16,
-          z: -2
-        }
-      });
-
-      /*
-      // switch to CSSGraphics
-      game.createEntity({
-        name: 'CSSGraphics',
-        kind: 'CSSGraphics',
-        collisionActive: true,
-        collisionEnd: true,
-        collisionStart: true,
-         type: 'TEXT',
-        text: 'CSS',
-        width: 60,
-        height: 50,
-        //color: 0xffffff,
-        style: {
-          width: '60px',
-          height: '30px',
-          fontSize: '12px',
-          color: 'white',
-          textAlign: 'center',
-          // border: '1px solid white',
-          opacity: 0.7
-        },
-        body: true,
-        isSensor: true,
-        position: {
-          x: -55,
-          y: 75,
-          z: 10
-        }
-      });
-      */
-
-      /*
-      // switch to 3d text label
-      game.createEntity({
-        name: 'BabylonGraphics',
-        collisionActive: true,
-        collisionEnd: true,
-        collisionStart: true,
-        kind: 'BabylonGraphics',
-        type: 'TEXT',
-        text: '3D',
-        width: 60,
-        height: 50,
-        color: 0x000000,
-        style: {
-          width: '60px',
-          height: '30px',
-          fontSize: '12px',
-          color: 'white',
-          textAlign: 'center',
-          opacity: 0.7
-        },
-        body: true,
-        isSensor: true,
-        position: {
-          x: 55,
-          y: 75,
-          z: 64
-        }
-      });
-      */
-
-      game.createEntity({
-        type: 'DOOR',
-        /*
-        exit: {
-          position: {
-            x: -1000,
-            y: -500
-          },
-        },
-        */
-        body: true,
-        isStatic: true,
-        collisionStart: true,
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'ayyoDoor'
-        },
-        width: 16,
-        height: 16,
-        position: {
-          // position to right
-          x: 55,
-          y: 71,
-          z: 10
-        }
-      });
-      game.createEntity({
-        type: 'DOOR',
-        /*
-        exit: {
-          position: {
-            x: 1100,
-            y: -500
-          },
-        },
-        */
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: 'ayyoDoor'
-        },
-        width: 16,
-        height: 16,
-        body: true,
-        isStatic: true,
-        collisionStart: true,
-        position: {
-          // position to left
-          x: -55,
-          y: 71,
-          z: 10
-        }
-      });
-
-      // if touch warp, switch to Music level
-      game.createEntity({
-        type: 'WARP',
-        exit: {
-          world: 'Music'
-        },
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: 'warp-to-music',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: -250,
-          y: 0,
-          z: 32
-        }
-      });
-
-      // text label saying "Warp To Platform World"
-      game.createEntity({
-        type: 'TEXT',
-        width: 100,
-        text: 'Warp To Music World',
-        // width: 200,
-        color: 0x000000,
-        style: {
-          width: '100px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: -250,
-          y: -30,
-          z: 64
-        }
-      });
-
-      // text label saying "Warp To Platform World"
-      game.createEntity({
-        type: 'TEXT',
-        text: 'Warp To Platform World',
-        color: 0x000000,
-        width: 120,
-        height: 200,
-        style: {
-          width: '120px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: 250,
-          y: 20,
-          z: 64
-        }
-      });
-      game.createEntity({
-        type: 'WARP',
-        exit: {
-          world: 'Platform'
-        },
-        width: 64,
-        height: 64,
-        depth: 64,
-        texture: 'warp-to-platform',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: 250,
-          y: 0,
-          z: 32
-        }
-      });
-
-      /*
-      game.createEntity({
-        type: 'WARP',
-        exit: {
-          world: 'Labyrinthos'
-        },
-        width: 64,
-        height: 64,
-        depth: 64,
-        // texture: 'warp-to-platform',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: 250,
-          y: 250,
-          z: 32
-        }
-      });
-      */
-
-      //
-      // Warp to Maze World
-      //
-      game.createEntity({
-        type: 'WARP',
-        exit: {
-          world: 'Maze'
-        },
-        width: 64,
-        height: 64,
-        depth: 64,
-        // texture: 'warp-to-platform',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: -250,
-          y: 250,
-          z: 32
-        }
-      });
-
-      // text label
-      game.createEntity({
-        type: 'TEXT',
-        width: 80,
-        text: 'Maze World',
-        // width: 200,
-        color: 0x000000,
-        style: {
-          width: '50px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: -235,
-          y: 280,
-          z: 32
-        }
-      });
-
-      //
-      // Warp to Gravity Gardens
-      //
-      game.createEntity({
-        type: 'WARP',
-        exit: {
-          world: 'GravityGardens'
-        },
-        width: 64,
-        height: 64,
-        depth: 64,
-        // texture: 'warp-to-platform',
-        isStatic: true,
-        isSensor: true,
-        position: {
-          x: 250,
-          y: 250,
-          z: 32
-        }
-      });
-
-      // text label
-      game.createEntity({
-        type: 'TEXT',
-        width: 80,
-        text: 'Gravity Gardens',
-        // width: 200,
-        color: 0x000000,
-        style: {
-          width: '100px',
-          fontSize: '16px',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: 240,
-          y: 280,
-          z: 32
-        }
-      });
-
-      // if touch note play sound
-      game.createEntity({
-        type: 'NOTE',
-        color: 0xccff00,
-        width: 32,
-        height: 32,
-        depth: 16,
-        isStatic: true,
-        position: {
-          x: -120,
-          y: -200,
-          z: 32
-        }
-      });
-
-      /*
-      game.createEntity({
-        name: 'noteInfo',
-        type: 'TEXT',
-        text: 'This is a note, touch it to play a sound',
-        fontSize: 16,
-        color: 0x000000,
-        body: false,
-        style: {
-          fontSize: '16px'
-        },
-        position: {
-          x: 0,
-          y: -200,
-          z: 64
-        }
-      });
-      */
-
-      // displays some items from the spritesheet
-      var itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-      itemsList = []; // for now
-      itemsList.forEach(function (item, index) {
-        game.createEntity({
-          type: item.toUpperCase(),
-          kind: item,
-          width: 16,
-          height: 16,
-          depth: 32,
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: item
-          },
-          position: {
-            x: -100 + index * 32,
-            y: 150,
-            z: 32
-          }
-        });
-      });
-
-      /*
-       game.createEntity({
-        name: 'raiden-left',
-        type: 'BACKGROUND',
-        width: 64,
-        height: 64,
-        depth: 64,
-        style: {
-          display: 'none'
-        },
-        texture: 'raiden',
-        body: false,
-        position: {
-          x: 0,
-          y: 10,
-          z: 32
-        }
-      });
-       game.createEntity({
-        name: 'raiden-right',
-        type: 'BACKGROUND',
-        width: 64,
-        height: 64,
-        depth: 64,
-        style: {
-          display: 'none'
-        },
-        texture: 'raiden',
-        body: false,
-        position: {
-          x: 100,
-          y: 10,
-          z: 32
-        }
-      });
-       */
+      (0, _createBackground["default"])(game);
     }
   }, {
     key: "unload",
     value: function unload() {
-      // optionally unload assets
-      // in most cases calling game.reset() is sufficient
+      // optionally unload assets / remove events / etc
+      // in most cases calling `game.reset()` at the start of the next world is sufficient
     }
   }]);
   return Home;
@@ -4371,7 +3787,7 @@ _defineProperty(Home, "id", 'world-home');
 _defineProperty(Home, "type", 'world');
 var _default = exports["default"] = Home;
 
-},{"./assets.js":32,"./sutras.js":33,"./welcomeMessage.js":35}],32:[function(require,module,exports){
+},{"./assets.js":32,"./lib/createBackground.js":33,"./sutras.js":34,"./welcomeMessage.js":36}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4426,6 +3842,528 @@ var _default = exports["default"] = {
 };
 
 },{}],33:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createBackground;
+function createBackground(game) {
+  game.createEntity({
+    type: "BACKGROUND",
+    texture: 'garden',
+    width: 300,
+    height: 300,
+    body: false,
+    position: {
+      x: 0,
+      y: 0,
+      z: -10
+    }
+  });
+
+  // create some background and text entities for navigation
+  game.createEntity({
+    name: 'sutra-tree',
+    type: 'BACKGROUND',
+    // kind: 'building',
+    width: 1024 / 4,
+    height: 1024 / 4,
+    //depth: 256,
+    depth: 1,
+    texture: 'sutra-tree',
+    body: false,
+    position: {
+      x: 0,
+      y: 300,
+      z: 32
+    }
+  });
+
+  // convert the Sutra.js rules to English text
+  //     let rulesEnglish = game.rules.toEnglish();
+  game.createEntity({
+    type: 'BACKGROUND',
+    texture: 'robot-arms-apartment',
+    kind: 'building',
+    depth: 1,
+    width: 1340,
+    height: 3668,
+    body: false,
+    position: {
+      // position to right
+      x: 900,
+      y: -1800,
+      z: -1
+    }
+  });
+  game.createEntity({
+    type: 'BACKGROUND',
+    texture: 'planet-express-base',
+    kind: 'building',
+    width: 2048,
+    height: 2048,
+    depth: 1,
+    body: false,
+    position: {
+      // position to right
+      x: -900,
+      y: -800,
+      z: -1
+    }
+  });
+  game.createEntity({
+    type: 'BLOCK',
+    texture: 'tile-block',
+    width: 200,
+    height: 200,
+    mass: 10000,
+    // body: false,
+    position: {
+      // position to right
+      x: 200,
+      y: -800,
+      z: -8
+    }
+  });
+
+  // if touch warp, switch to YCraft level
+  game.createEntity({
+    type: 'WARP',
+    // kind: 'YCraft',
+    width: 64,
+    height: 64,
+    depth: 64,
+    texture: 'warp-to-ycraft',
+    isStatic: true,
+    isSensor: true,
+    exit: {
+      world: 'YCraft',
+      // optional, if not specified will use the current world
+      position: {
+        // optional, if not specified will use 0,0,0
+        x: 0,
+        y: 0
+      }
+    },
+    position: {
+      x: 0,
+      y: -210,
+      z: 32
+    }
+  });
+
+  // text label saying "Warp To YCraft World"
+  game.createEntity({
+    type: 'TEXT',
+    text: 'Warp To YCraft World',
+    width: 164,
+    // kind: 'dynamic',
+    color: 0x000000,
+    style: {
+      fontSize: '16px',
+      textAlign: 'center',
+      paddingLeft: '20px' // for now
+    },
+    body: false,
+    position: {
+      x: -20,
+      y: -220,
+      z: 64
+    }
+  });
+  game.createEntity({
+    type: 'TEXT',
+    text: 'CSSGraphics Engine',
+    width: 20,
+    color: 0x000000,
+    style: {
+      width: '150px',
+      fontSize: '12px',
+      textAlign: 'center',
+      color: 'black',
+      opacity: 0.22
+    },
+    body: false,
+    position: {
+      x: -63,
+      y: -16,
+      z: -2
+    }
+  });
+  game.createEntity({
+    type: 'DOOR',
+    /*
+    exit: {
+      position: {
+        x: -1000,
+        y: -500
+      },
+    },
+    */
+    body: true,
+    isStatic: true,
+    collisionStart: true,
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'ayyoDoor'
+    },
+    width: 16,
+    height: 16,
+    position: {
+      // position to right
+      x: 55,
+      y: 71,
+      z: 10
+    }
+  });
+  game.createEntity({
+    type: 'DOOR',
+    /*
+    exit: {
+      position: {
+        x: 1100,
+        y: -500
+      },
+    },
+    */
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: 'ayyoDoor'
+    },
+    width: 16,
+    height: 16,
+    body: true,
+    isStatic: true,
+    collisionStart: true,
+    position: {
+      // position to left
+      x: -55,
+      y: 71,
+      z: 10
+    }
+  });
+
+  // if touch warp, switch to Music level
+  game.createEntity({
+    type: 'WARP',
+    exit: {
+      world: 'Music'
+    },
+    width: 64,
+    height: 64,
+    depth: 64,
+    texture: 'warp-to-music',
+    isStatic: true,
+    isSensor: true,
+    position: {
+      x: -250,
+      y: 0,
+      z: 32
+    }
+  });
+
+  // text label saying "Warp To Platform World"
+  game.createEntity({
+    type: 'TEXT',
+    width: 100,
+    text: 'Warp To Music World',
+    // width: 200,
+    color: 0x000000,
+    style: {
+      width: '100px',
+      fontSize: '16px',
+      textAlign: 'center'
+    },
+    body: false,
+    position: {
+      x: -250,
+      y: -30,
+      z: 64
+    }
+  });
+
+  // text label saying "Warp To Platform World"
+  game.createEntity({
+    type: 'TEXT',
+    text: 'Warp To Platform World',
+    color: 0x000000,
+    width: 120,
+    height: 200,
+    style: {
+      width: '120px',
+      fontSize: '16px',
+      textAlign: 'center'
+    },
+    body: false,
+    position: {
+      x: 250,
+      y: 20,
+      z: 64
+    }
+  });
+  game.createEntity({
+    type: 'WARP',
+    exit: {
+      world: 'Platform'
+    },
+    width: 64,
+    height: 64,
+    depth: 64,
+    texture: 'warp-to-platform',
+    isStatic: true,
+    isSensor: true,
+    position: {
+      x: 250,
+      y: 0,
+      z: 32
+    }
+  });
+
+  //
+  // Warp to Maze World
+  //
+  game.createEntity({
+    type: 'WARP',
+    exit: {
+      world: 'Maze'
+    },
+    width: 64,
+    height: 64,
+    depth: 64,
+    // texture: 'warp-to-platform',
+    isStatic: true,
+    isSensor: true,
+    position: {
+      x: -250,
+      y: 250,
+      z: 32
+    }
+  });
+
+  // text label
+  game.createEntity({
+    type: 'TEXT',
+    width: 80,
+    text: 'Maze World',
+    // width: 200,
+    color: 0x000000,
+    style: {
+      width: '50px',
+      fontSize: '16px',
+      textAlign: 'center'
+    },
+    body: false,
+    position: {
+      x: -235,
+      y: 280,
+      z: 32
+    }
+  });
+
+  //
+  // Warp to Gravity Gardens
+  //
+  game.createEntity({
+    type: 'WARP',
+    exit: {
+      world: 'GravityGardens'
+    },
+    width: 64,
+    height: 64,
+    depth: 64,
+    // texture: 'warp-to-platform',
+    isStatic: true,
+    isSensor: true,
+    position: {
+      x: 250,
+      y: 250,
+      z: 32
+    }
+  });
+
+  // text label
+  game.createEntity({
+    type: 'TEXT',
+    width: 80,
+    text: 'Gravity Gardens',
+    // width: 200,
+    color: 0x000000,
+    style: {
+      width: '100px',
+      fontSize: '16px',
+      textAlign: 'center'
+    },
+    body: false,
+    position: {
+      x: 240,
+      y: 280,
+      z: 32
+    }
+  });
+
+  /*
+  // if touch note play sound
+  game.createEntity({
+    type: 'NOTE',
+    color: 0xccff00,
+    width: 32,
+    height: 32,
+    depth: 16,
+    isStatic: true,
+    position: {
+      x: -120,
+      y: -200,
+      z: 32
+    }
+  });
+  */
+}
+
+/*
+// switch to CSSGraphics
+game.createEntity({
+  name: 'CSSGraphics',
+  kind: 'CSSGraphics',
+  collisionActive: true,
+  collisionEnd: true,
+  collisionStart: true,
+   type: 'TEXT',
+  text: 'CSS',
+  width: 60,
+  height: 50,
+  //color: 0xffffff,
+  style: {
+    width: '60px',
+    height: '30px',
+    fontSize: '12px',
+    color: 'white',
+    textAlign: 'center',
+    // border: '1px solid white',
+    opacity: 0.7
+  },
+  body: true,
+  isSensor: true,
+  position: {
+    x: -55,
+    y: 75,
+    z: 10
+  }
+});
+*/
+
+/*
+// switch to 3d text label
+game.createEntity({
+  name: 'BabylonGraphics',
+  collisionActive: true,
+  collisionEnd: true,
+  collisionStart: true,
+  kind: 'BabylonGraphics',
+  type: 'TEXT',
+  text: '3D',
+  width: 60,
+  height: 50,
+  color: 0x000000,
+  style: {
+    width: '60px',
+    height: '30px',
+    fontSize: '12px',
+    color: 'white',
+    textAlign: 'center',
+    opacity: 0.7
+  },
+  body: true,
+  isSensor: true,
+  position: {
+    x: 55,
+    y: 75,
+    z: 64
+  }
+});
+*/
+
+/*
+game.createEntity({
+  name: 'noteInfo',
+  type: 'TEXT',
+  text: 'This is a note, touch it to play a sound',
+  fontSize: 16,
+  color: 0x000000,
+  body: false,
+  style: {
+    fontSize: '16px'
+  },
+  position: {
+    x: 0,
+    y: -200,
+    z: 64
+  }
+});
+*/
+
+/*
+game.createEntity({
+name: 'raiden-left',
+type: 'BACKGROUND',
+width: 64,
+height: 64,
+depth: 64,
+style: {
+display: 'none'
+},
+texture: 'raiden',
+body: false,
+position: {
+x: 0,
+y: 10,
+z: 32
+}
+});
+game.createEntity({
+name: 'raiden-right',
+type: 'BACKGROUND',
+width: 64,
+height: 64,
+depth: 64,
+style: {
+display: 'none'
+},
+texture: 'raiden',
+body: false,
+position: {
+x: 100,
+y: 10,
+z: 32
+}
+});
+*/
+
+/*
+// displays some items from the spritesheet
+let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
+itemsList = []; // for now
+itemsList.forEach((item, index) => {
+  game.createEntity({
+    type: item.toUpperCase(),
+    kind: item,
+    width: 16,
+    height: 16,
+    depth: 32,
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: item,
+    },
+    position: {
+      x: -100 + (index * 32),
+      y: 150,
+      z: 32
+    }
+  });
+});
+*/
+
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4490,7 +4428,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":54,"../sutras/routing.js":60,"../sutras/switchGraphics.js":61,"./sutras/block.js":34}],34:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":56,"../sutras/routing.js":62,"../sutras/switchGraphics.js":63,"./sutras/block.js":35}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4566,7 +4504,7 @@ function fire(game) {
 }
 ;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4633,13 +4571,15 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _createDoors = _interopRequireDefault(require("./lib/createDoors"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -4693,227 +4633,7 @@ var Maze = /*#__PURE__*/function () {
       // a container will not be sent over the wire?
       // game.createPlayer();
 
-      // shortcuts to game.createContainer();
-      var container = game.createContainer({
-        name: 'laby-container',
-        layout: 'grid',
-        // optional. can also be "flex" or "none"
-        color: 0xff00ff,
-        position: {
-          x: -100,
-          y: -100,
-          z: -1
-        },
-        body: false,
-        size: {
-          width: 300,
-          height: 180
-        },
-        grid: {
-          columns: 4,
-          rows: 8
-        },
-        style: {
-          // supports CSS property names
-          padding: 0,
-          margin: 0,
-          // background: '#ff0000', // can also use Entity.color
-          border: {
-            color: '#000000',
-            width: 0
-          }
-        }
-      });
-
-      // adds the entity to the container
-      // ent.position becomes relative to the container
-      //let ent = game.createEntity({}); // etc, create new ent
-      //container.add(ent);
-      var algos = [];
-      algos.push('AldousBroder');
-      algos.push('BinaryTree');
-      algos.push('CellularAutomata');
-      algos.push('EllersAlgorithm');
-      algos.push('GrowingTree');
-      algos.push('RecursiveBacktrack');
-      algos.push('RecursiveDivision');
-      algos.push('BeattieSchoberth');
-      algos.push('ThomasHunter');
-      algos.push('Metroidvania');
-      var _loop = function _loop(i) {
-        // create entity directly inside container with relative position
-        game.createEntity({
-          /*
-          exit: {
-            world: 'Home'
-          },
-          */
-          collisionStart: function collisionStart(a, b) {
-            // get the a b that isnt the door
-            var enterEnt = a.name === 'maze-door-' + i ? a : b;
-            var player = a.type === 'PLAYER' ? a : b;
-            // only allow player collisions to trigger door events
-            if (player.type !== 'PLAYER') {
-              return;
-            }
-
-            // check to see if entity that collides has items which contains any type === 'KEY'
-            // if so, remove the key and open the door
-
-            // does the player have any items
-            if (!player.items || player.items.length === 0) {
-              game.shakeCamera({
-                initialIntensity: 22,
-                duration: 666
-              });
-              return;
-            }
-
-            // TODO: make this a CONTAINER and then just remove all items in container
-            // default behavior is to clear all tiles
-
-            // clear all keys
-            if (game.data.ents.KEY) {
-              game.data.ents.KEY.forEach(function (key) {
-                game.removeEntity(key.id);
-              });
-              // create a new key at where it started
-              createHomeKey();
-            }
-            game.flash();
-            game.anime(algos[i]);
-
-            // clear all current tiles
-            if (game.data.ents.TILE) {
-              game.data.ents.TILE.forEach(function (tile) {
-                game.removeEntity(tile.id);
-              });
-            }
-
-            // Tile.createTile() can delegate ent types with override in TileSet config
-            // currently only BLOCK, we'll need to figure out to clear entire level or perhaps scene / container
-            if (game.data.ents.BLOCK) {
-              game.data.ents.BLOCK.forEach(function (block) {
-                game.removeEntity(block.id);
-              });
-            }
-
-            // clear any tiles that are deferred
-            for (var eId in game.deferredEntities) {
-              var ent = game.deferredEntities[eId.toString()];
-              if (ent.type === 'TILE') {
-                // game.removeEntity(ent.id);
-                delete game.deferredEntities[eId.toString()];
-              }
-            }
-
-            // clear the players items
-            game.updateEntity({
-              id: player.id,
-              items: []
-            });
-
-            // update the player position to the exit position ( can customimze this )
-            // game.setPosition(enterEnt.id, { x: 0, y: 0, z: 0 }); // for now, can use .meta.position as well
-
-            // generate a new seed and regenerate the maze with the new seed and existing settings
-            var seed = Math.floor(Math.random() * 100000000000);
-            var tileMap = {
-              x: 20,
-              // Remark: This will place tile map in TileMap units, not pixed
-              y: -6,
-              // Actual values will be x * 16, y * 16
-              width: 32,
-              height: 32,
-              seed: seed,
-              algo: algos[i],
-              meta: {
-                source: 'labryninthos',
-                algo: 'recursive-backtracking',
-                height: 16,
-                width: 16
-              }
-            };
-
-            // TODO: remove this if we can
-            game.systems.tile.tileMap = tileMap;
-            // set the new seed
-            // ileMap.seed = seed;
-
-            // regenerate the tile map
-            game.systems.tile.createTileMap(tileMap);
-          },
-          body: true,
-          meta: {
-            source: 'labryninthos',
-            algo: 'recursive-backtracking',
-            height: 16,
-            width: 16
-          },
-          isStatic: true,
-          type: 'DOOR',
-          size: {
-            width: 16,
-            height: 16
-          },
-          name: 'maze-door-' + i,
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'ayyoDoor'
-          },
-          color: 0x00ff00,
-          container: 'laby-container'
-        });
-
-        // create a text label for each door
-        game.createEntity({
-          type: 'TEXT',
-          text: algos[i],
-          size: {
-            width: 80,
-            height: 10
-          },
-          style: {
-            fontSize: '8px'
-          },
-          body: false,
-          position: {
-            // relative to the container
-            x: 0,
-            y: 0,
-            z: 0
-          },
-          container: 'laby-container'
-        });
-      };
-      for (var i = 0; i < 10; i++) {
-        _loop(i);
-      }
-      function createHomeKey() {
-        game.createEntity({
-          type: 'KEY',
-          size: {
-            width: 16,
-            height: 8
-          },
-          // equippable: true,
-          isSensor: true,
-          collectable: true,
-          //onCollect: true
-
-          name: 'maze-door-0',
-          texture: "ayyo-key",
-          color: 0x00ff00,
-          // container: 'laby-container',
-          position: {
-            // relative to the container
-            x: -100,
-            y: -30,
-            z: 0
-          }
-        });
-      }
-      createHomeKey();
+      (0, _createDoors["default"])(game);
 
       //
       // warp to Mantra Home World
@@ -4935,22 +4655,21 @@ var Maze = /*#__PURE__*/function () {
       });
 
       // text "Warp to Mantra"
-      game.createEntity({
+      game.createEntity(_defineProperty(_defineProperty({
         type: 'TEXT',
         text: 'Warp To Mantra',
+        body: false,
         // kind: 'dynamic',
         style: {
           padding: '2px',
           fontSize: '16px',
           color: '#ffffff',
           textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: -400,
-          y: -120
         }
-      });
+      }, "body", false), "position", {
+        x: -400,
+        y: -120
+      }));
 
       /*
       game.createEntity({
@@ -4977,7 +4696,253 @@ _defineProperty(Maze, "id", 'world-maze');
 _defineProperty(Maze, "type", 'maze');
 var _default = exports["default"] = Maze;
 
-},{}],37:[function(require,module,exports){
+},{"./lib/createDoors":38}],38:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = createDoors;
+function createDoors(game) {
+  //
+  // Creates a CONTAINER to hold the doors
+  // 
+  // Containers are a way to group entities together
+  // With no layout given, entities will be placed relative to the container
+  // With a layout given, entities will be placed according to the layout algorithm
+  var container = game.createContainer({
+    name: 'laby-container',
+    layout: 'grid',
+    // optional. can also be "flex" or "none"
+    color: 0xff00ff,
+    position: {
+      x: -100,
+      y: -100,
+      z: -1
+    },
+    body: false,
+    size: {
+      width: 300,
+      height: 180
+    },
+    grid: {
+      columns: 4,
+      rows: 8
+    },
+    style: {
+      // supports CSS property names
+      padding: 0,
+      margin: 0,
+      // background: '#ff0000', // can also use Entity.color
+      border: {
+        color: '#000000',
+        width: 0
+      }
+    }
+  });
+  var algos = [];
+  algos.push('AldousBroder');
+  algos.push('BinaryTree');
+  algos.push('CellularAutomata');
+  algos.push('EllersAlgorithm');
+  algos.push('GrowingTree');
+  algos.push('RecursiveBacktrack');
+  algos.push('RecursiveDivision');
+  algos.push('BeattieSchoberth');
+  algos.push('ThomasHunter');
+  algos.push('Metroidvania');
+  var _loop = function _loop(i) {
+    // create entity directly inside container with relative position
+    game.createEntity({
+      name: 'maze-door-' + i,
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'ayyoDoor'
+      },
+      color: 0x00ff00,
+      container: 'laby-container',
+      body: true,
+      meta: {
+        source: 'labryninthos',
+        algo: 'recursive-backtracking',
+        height: 16,
+        width: 16
+      },
+      isStatic: true,
+      type: 'DOOR',
+      size: {
+        width: 16,
+        height: 16
+      },
+      collisionStart: function collisionStart(a, b) {
+        // get the a b that isnt the door
+        var enterEnt = a.name === 'maze-door-' + i ? a : b;
+        var player = a.type === 'PLAYER' ? a : b;
+        // only allow player collisions to trigger door events
+        if (player.type !== 'PLAYER') {
+          return;
+        }
+
+        // check to see if entity that collides has items which contains any type === 'KEY'
+        // if so, remove the key and open the door
+
+        // does the player have any items
+        if (!player.items || player.items.length === 0) {
+          game.shakeCamera({
+            initialIntensity: 22,
+            duration: 666
+          });
+          return;
+        }
+
+        // TODO: make this a CONTAINER and then just remove all items in container
+        // default behavior is to clear all tiles
+
+        // clear all keys
+        if (game.data.ents.KEY) {
+          game.data.ents.KEY.forEach(function (key) {
+            game.removeEntity(key.id);
+          });
+          // create a new key at where it started
+          createHomeKey();
+        }
+        game.flash();
+        game.anime(algos[i]);
+
+        // clear all current tiles
+        if (game.data.ents.TILE) {
+          game.data.ents.TILE.forEach(function (tile) {
+            game.removeEntity(tile.id);
+          });
+        }
+
+        // Tile.createTile() can delegate ent types with override in TileSet config
+        // currently only BLOCK, we'll need to figure out to clear entire level or perhaps scene / container
+        if (game.data.ents.BLOCK) {
+          game.data.ents.BLOCK.forEach(function (block) {
+            game.removeEntity(block.id);
+          });
+        }
+
+        // clear any tiles that are deferred
+        for (var eId in game.deferredEntities) {
+          var ent = game.deferredEntities[eId.toString()];
+          if (ent.type === 'TILE') {
+            // game.removeEntity(ent.id);
+            delete game.deferredEntities[eId.toString()];
+          }
+        }
+
+        // clear the players items
+        game.updateEntity({
+          id: player.id,
+          items: []
+        });
+
+        // update the player position to the exit position ( can customimze this )
+        // game.setPosition(enterEnt.id, { x: 0, y: 0, z: 0 }); // for now, can use .meta.position as well
+
+        // generate a new seed and regenerate the maze with the new seed and existing settings
+        var seed = Math.floor(Math.random() * 100000000000);
+        var tileMap = {
+          x: 20,
+          // Remark: This will place tile map in TileMap units, not pixed
+          y: -6,
+          // Actual values will be x * 16, y * 16
+          width: 32,
+          height: 32,
+          seed: seed,
+          algo: algos[i],
+          meta: {
+            source: 'labryninthos',
+            algo: 'recursive-backtracking',
+            height: 16,
+            width: 16
+          }
+        };
+
+        // TODO: remove this if we can
+        game.systems.tile.tileMap = tileMap;
+        // set the new seed
+        // ileMap.seed = seed;
+
+        // regenerate the tile map
+        game.systems.tile.createTileMap(tileMap);
+      }
+    });
+
+    // create a text label for each door
+    game.createEntity({
+      type: 'TEXT',
+      text: algos[i],
+      size: {
+        width: 80,
+        height: 10
+      },
+      style: {
+        fontSize: '8px'
+      },
+      body: false,
+      position: {
+        // relative to the container
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      container: 'laby-container'
+    });
+  };
+  for (var i = 0; i < 10; i++) {
+    _loop(i);
+  }
+  createHomeKey();
+
+  // create text label instruction for picking up keys
+  game.createEntity({
+    type: 'TEXT',
+    body: false,
+    text: 'Collect keys to open doors',
+    size: {
+      width: 400,
+      height: 20
+    },
+    style: {
+      fontSize: '16px',
+      color: '#ffffff',
+      textAlign: 'center'
+    },
+    position: {
+      x: -100,
+      y: 20
+    }
+  });
+}
+function createHomeKey() {
+  game.createEntity({
+    type: 'KEY',
+    size: {
+      width: 16,
+      height: 8
+    },
+    // equippable: true,
+    isSensor: true,
+    collectable: true,
+    //onCollect: true
+
+    name: 'maze-door-0',
+    texture: "ayyo-key",
+    color: 0x00ff00,
+    // container: 'laby-container',
+    position: {
+      // relative to the container
+      x: -100,
+      y: -30,
+      z: 0
+    }
+  });
+}
+
+},{}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5248,7 +5213,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../../mantra-sutras/player-movement/top-down.js":29,"./instruments/createDrumKit.js":38,"./instruments/createPiano.js":39,"./sutras.js":40}],38:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"./instruments/createDrumKit.js":40,"./instruments/createPiano.js":41,"./sutras.js":42}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5354,7 +5319,7 @@ function createDrumKit(game, config) {
   });
 }
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5479,7 +5444,7 @@ function createPiano(game, config) {
   */
 }
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5600,7 +5565,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":61}],41:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":63}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5885,7 +5850,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../../mantra-sutras/player-movement/platform.js":28}],42:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/platform.js":28}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6070,7 +6035,7 @@ var Pong = /*#__PURE__*/function () {
 _defineProperty(Pong, "id", 'world-pong');
 var _default = exports["default"] = Pong;
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6158,7 +6123,7 @@ _defineProperty(Space, "id", 'world-space');
 _defineProperty(Space, "type", 'world');
 var _default = exports["default"] = Space;
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6353,7 +6318,7 @@ _defineProperty(Sutra, "id", 'world-sutra');
 _defineProperty(Sutra, "type", 'world');
 var _default = exports["default"] = Sutra;
 
-},{"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/game-of-life.js":25,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/note.js":27}],45:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/game-of-life.js":25,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/note.js":27}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6565,7 +6530,7 @@ _defineProperty(Tiled, "id", 'world-home');
 _defineProperty(Tiled, "type", 'world');
 var _default = exports["default"] = Tiled;
 
-},{"./sutras.js":46,"./welcomeMessage.js":47}],46:[function(require,module,exports){
+},{"./sutras.js":48,"./welcomeMessage.js":49}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6628,9 +6593,9 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":54,"../sutras/routing.js":60,"../sutras/switchGraphics.js":61,"../sutras/warpToWorld.js":62}],47:[function(require,module,exports){
-arguments[4][35][0].apply(exports,arguments)
-},{"dup":35}],48:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":21,"../../mantra-sutras/demon.js":22,"../../mantra-sutras/fire.js":23,"../../mantra-sutras/hexapod.js":26,"../../mantra-sutras/player-movement/top-down.js":29,"../TowerDefense/sutras/walker.js":56,"../sutras/routing.js":62,"../sutras/switchGraphics.js":63,"../sutras/warpToWorld.js":64}],49:[function(require,module,exports){
+arguments[4][36][0].apply(exports,arguments)
+},{"dup":36}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6964,7 +6929,7 @@ var _default = exports["default"] = TowerWorld;
 
 */
 
-},{"./sutras/colorChanges.js":49,"./sutras/enemy.js":50,"./sutras/input.js":51,"./sutras/player.js":52,"./sutras/round.js":53}],49:[function(require,module,exports){
+},{"./sutras/colorChanges.js":51,"./sutras/enemy.js":52,"./sutras/input.js":53,"./sutras/player.js":54,"./sutras/round.js":55}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7014,7 +6979,7 @@ function colorChanges() {
   return colorChanges;
 }
 
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7181,7 +7146,7 @@ function spawner() {
   return spawner;
 }
 
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7293,7 +7258,7 @@ function input() {
 }
 ;
 
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7352,7 +7317,7 @@ function player() {
   return player;
 }
 
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7406,7 +7371,7 @@ function round() {
   return round;
 }
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7544,7 +7509,7 @@ function createWalker(game, config) {
   return walker;
 }
 
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7742,7 +7707,7 @@ _defineProperty(XState, "id", 'world-xstate');
 _defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7921,7 +7886,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"../../mantra-sutras/player-movement/top-down.js":29,"./contraptions-example.js":57}],57:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":29,"./contraptions-example.js":59}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8114,7 +8079,7 @@ function roverLight(x, y, z) {
   return contraption;
 }
 
-},{"../../../YCraft.js/index.js":1}],58:[function(require,module,exports){
+},{"../../../YCraft.js/index.js":1}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8129,7 +8094,7 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":59}],59:[function(require,module,exports){
+},{"./index.js":61}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8164,7 +8129,7 @@ worlds.TowerDefense = _TowerDefense["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./GravityGardens/GravityGardens.js":30,"./Home/Home.js":31,"./Maze/Maze.js":36,"./Music/Music.js":37,"./Platform/Platform.js":41,"./Pong/Pong.js":42,"./Space/Space.js":43,"./Sutra/Sutra.js":44,"./Tiled/Tiled.js":45,"./TowerDefense/TowerDefense.js":48,"./XState/XState.js":55,"./YCraft/YCraft.js":56}],60:[function(require,module,exports){
+},{"./GravityGardens/GravityGardens.js":30,"./Home/Home.js":31,"./Maze/Maze.js":37,"./Music/Music.js":39,"./Platform/Platform.js":43,"./Pong/Pong.js":44,"./Space/Space.js":45,"./Sutra/Sutra.js":46,"./Tiled/Tiled.js":47,"./TowerDefense/TowerDefense.js":50,"./XState/XState.js":57,"./YCraft/YCraft.js":58}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8201,7 +8166,7 @@ const circleRoute = createCircleRoute(100, 100, 50, 20);
 */
 var _default = exports["default"] = routing;
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8298,7 +8263,7 @@ function switchGraphics(game) {
   return rules;
 }
 
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8332,5 +8297,5 @@ function warpToWorld(game) {
   return rules;
 }
 
-},{}]},{},[58])(58)
+},{}]},{},[60])(60)
 });

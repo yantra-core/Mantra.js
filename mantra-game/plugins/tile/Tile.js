@@ -54,6 +54,17 @@ let exitConfig = {
     // generate a new seed and regenerate the maze with the new seed and existing settings
     let seed = Math.floor(Math.random() * 100000000000);
 
+
+    /* TODO: new instance instead of re-use?
+    let tileMap = {
+      width:  game.systems.tile.tileMap.width,
+      height: game.systems.tile.tileMap.height,
+      seed: seed,
+      algo:  game.systems.tile.tileMap.algo,
+    };
+    */
+
+
     // set the new seed
     game.systems.tile.tileMap.seed = seed;
 
@@ -80,7 +91,7 @@ const defaultTileSet = [
   // void
   { id: 0, kind: 'empty' },
   // wall
-  { id: 1, kind: 'bush', texture: 'tile-bush', body: true, isStatic: true,  customZ: true, z: 16 /* size: { depth: 32 } */ },
+  { id: 1, kind: 'bush', texture: 'tile-bush', body: true, isStatic: true, customZ: true, z: 16 /* size: { depth: 32 } */ },
 
   { id: 2, kind: 'grass' },
   { id: 3, kind: 'block', type: 'BLOCK', body: true, z: 16 },
@@ -102,7 +113,7 @@ class Tile {
     labyrinthosAlgo = 'AldousBroder',
     proceduralGenerateMissingChunks = false,
     loadInitialChunk = true,
-    loadDefaultTileMap = true,
+    loadDefaultTileMap = false,
     loadTileMap = false
   } = {}) {
 

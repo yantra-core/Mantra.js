@@ -38,23 +38,6 @@ import createBackground from './lib/createBackground.js';
 // TODO: make this a JSON object? it could be a list of entities
 // game.load(backGroundEntities)
 
-//
-// All Worlds are Plugins
-//
-/*
-
-    A Plugin is a class that has the following methods:
-
-      - constructor() - required, must set an id
-      - init(game) - required, must map `game` instance to `this`, is called automatically by game.start()
-      - preload(game) - optional
-      - unload() - optional ( called automatically during plugin::unload )
-      - update(delta) - optional, called once per game loop
-      - render(delta) - optional, called as many times as possible per render loop
-      - handleCollision(a, b) - optional, called when a collision occurs
-
-
-*/
 class Home {
   static id = 'world-home';
   static type = 'world'; // type is optional for Plugins
@@ -131,7 +114,7 @@ class Home {
     game.use('Bullet');
     game.use('Boomerang');
     game.use('Tone');
-
+    
     welcomeMessage(game);
     game.useSutra(sutras(game), 'HOME');
 

@@ -4,7 +4,7 @@ import GhostTyper from "../plugins/typer-ghost/GhostTyper.js";
 // default player movement, this could be also be set in defaultGameStart.js
 // import movement from './defaultPlayerMovement.js';
 
-export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, editor, sutra, ghostTyper, lifetime, defaultMovement = true }) {
+export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, virtualGamepad, editor, sutra, ghostTyper, lifetime, defaultMovement = true }) {
 
   let plugins = this.plugins;
   let gameConfig = this.config
@@ -56,6 +56,9 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     if (gamepad) {
       this.use('Gamepad');
+    }
+
+    if (virtualGamepad) {
       this.use('GamepadGUI', gamepad);
     }
 

@@ -136,7 +136,7 @@ var Client = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "stop",
     value: function stop() {
-      console.log('Client.js plugin stopping game', this.game);
+      console.log('Client.js plugin stopping game');
       this.started = false;
       var localClient = this.game.getSystem('localClient');
       localClient.stop();
@@ -219,6 +219,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "stop",
     value: function stop() {
+      console.log("Local Client is stopping...");
       this.game.localGameLoopRunning = false;
     }
   }, {

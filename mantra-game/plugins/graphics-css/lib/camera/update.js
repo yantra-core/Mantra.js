@@ -25,7 +25,6 @@ export default function update() {
   // Update the camera position
   if (this.follow && currentPlayer && currentPlayer.position) {
 
-
     //this.scene.cameraPosition.x = this.scene.cameraPosition.x / zoomFactor;
     /*
     let newY = currentPlayer.position.y + game.viewportCenterYOffset;
@@ -42,12 +41,10 @@ export default function update() {
     }
     */
 
-
     //
     // If following the player is enabled, the camera position is always the player position
     //
-    let follow = true;
-    if (follow) {
+    if (this.follow) {
       this.scene.cameraPosition.x = currentPlayer.position.x;
       this.scene.cameraPosition.y = currentPlayer.position.y;
     }
@@ -56,6 +53,13 @@ export default function update() {
     // If there are any view port offsets from dragging or scrolling
     // Adjust the camera position by these offsets
     //
+    if (typeof game.viewportCenterXOffset !== 'number') {
+      game.viewportCenterXOffset = 0;
+    }
+    if (typeof game.viewportCenterYOffset !== 'number') {
+      game.viewportCenterYOffset = 0;
+    }
+
     this.scene.cameraPosition.x += game.viewportCenterXOffset;
     this.scene.cameraPosition.y += game.viewportCenterYOffset;
 
@@ -80,8 +84,6 @@ export default function update() {
     adjustedPosition.x *= this.game.data.camera.currentZoom;
     adjustedPosition.y *= this.game.data.camera.currentZoom;
 
-
-    // TODO: now we need to recenter the adjusted position based on zoom
     // Calculate the size of the visible area in the game's world space at the current zoom level
     let visibleWidth = window.innerWidth / this.game.data.camera.currentZoom;
     let visibleHeight = window.innerHeight / this.game.data.camera.currentZoom;
@@ -96,7 +98,6 @@ export default function update() {
     if (this.scene.renderDiv) {
       setTransform(this.scene.renderDiv, -adjustedPosition.x, -adjustedPosition.y, this.game.data.camera.currentZoom, 0);
     }
-
 
   } else {
     // If not following a player, use the calculated offsets directly
@@ -115,14 +116,22 @@ function setTransform(container, offsetX, offsetY, zoom, rotation) {
   const lastZoom = parseFloat(container.dataset.lastZoom) || 1;
   const lastRotation = parseFloat(container.dataset.lastRotation) || 0;
 
+  // Improved checks for NaN and finite numbers
+  // We shouldn't get NaN at this stage; however it's better to not apply an invalid transform than to break the layout,
+  // as subsequent calls may provide valid values. This issue came up in embed scenarios
+  offsetX = Number.isFinite(offsetX) ? offsetX : lastOffsetX;
+  offsetY = Number.isFinite(offsetY) ? offsetY : lastOffsetY;
+  zoom = Number.isFinite(zoom) && zoom > 0 ? zoom : lastZoom; // Zoom should not be negative
+  rotation = Number.isFinite(rotation) ? rotation : lastRotation;
+
   // Check if the new values differ from the last applied values
   if (offsetX !== lastOffsetX || offsetY !== lastOffsetY || zoom !== lastZoom || rotation !== lastRotation) {
     // Apply the new transform only if there's a change
     container.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom}) rotate(${rotation}deg)`;
     // Update the container's dataset with the new values
-    container.dataset.lastOffsetX = offsetX;
-    container.dataset.lastOffsetY = offsetY;
-    container.dataset.lastZoom = zoom;
-    container.dataset.lastRotation = rotation;
+    container.dataset.lastOffsetX = offsetX.toString();
+    container.dataset.lastOffsetY = offsetY.toString();
+    container.dataset.lastZoom = zoom.toString();
+    container.dataset.lastRotation = rotation.toString();
   }
 }

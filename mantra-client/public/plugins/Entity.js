@@ -359,6 +359,7 @@ var Entity = /*#__PURE__*/function () {
     key: "cleanupDestroyedEntities",
     value: function cleanupDestroyedEntities() {
       var _this = this;
+      this.game.lifecycle.triggerHook('before.cleanupRemovedEntities');
       var destroyedComponentData = this.game.components.destroyed.data;
       var _loop = function _loop(entityId) {
         if (typeof entityId === 'string') {
@@ -390,6 +391,7 @@ var Entity = /*#__PURE__*/function () {
       for (var entityId in destroyedComponentData) {
         _loop(entityId);
       }
+      this.game.lifecycle.triggerHook('after.cleanupRemovedEntities');
     }
 
     // Update the getEntities method to return the game.entities
@@ -510,11 +512,15 @@ function deferEntityCreation(entityData) {
 // ignoreSetup set to true will ignore the setup phase of createEntity
 // the setup phase assigns default values to the entity and auto-id
 // this is currently being used from `rbush` plugin when creating deferred entities
-function createEntity(config) {
+function createEntity() {
+  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var ignoreSetup = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   // console.log('createEntity', config)
 
   var entityId;
+
+  // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
+  config = this.game.lifecycle.triggerHook('before.createEntity', config);
   if (!ignoreSetup) {
     entityId = this._generateId();
     var defaultConfig = {
@@ -828,6 +834,7 @@ function createEntity(config) {
   this.game.data.ents._[entityId] = updatedEntity;
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
+  updatedEntity = this.game.lifecycle.triggerHook('after.createEntity', config);
   return updatedEntity;
 }
 
@@ -917,14 +924,14 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = layoutEntity;
 function layoutEntity(container, entityId) {
   var _this = this;
-  console.log('attemping to add to container');
   var containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
 
   if (!containerEnt) {
     throw new Error('Container not found: ' + container);
   }
   var containerPosition = containerEnt.position;
-  console.log('found container ent to work with', containerEnt);
+  // console.log('found container ent to work with', containerEnt);
+
   var layoutType = 'none';
   if (containerEnt.style && containerEnt.style.layout) {
     layoutType = containerEnt.style.layout;
@@ -1005,9 +1012,11 @@ function layoutEntity(container, entityId) {
         id: item.id,
         position: itemPosition
       });
-      console.log("Item ".concat(item.id, " positioned at row ").concat(row, ", column ").concat(col));
+
+      // console.log(`Item ${item.id} positioned at row ${row}, column ${col}`);
     });
-    console.log('adding item to container using grid layout algorithm');
+
+    // console.log('adding item to container using grid layout algorithm');
   }
 
   //
@@ -1029,6 +1038,7 @@ exports["default"] = removeEntity;
 // TODO: double check that all components values are being cleared on removal of ent
 function removeEntity(entityId) {
   var removeFromGameData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  this.game.lifecycle.triggerHook('before.removeEntity', entityId);
   var ent = this.game.entities.get(entityId);
   if (ent && this.game.systems.graphics && ent.graphics) {
     // Is this best done here? or in the graphics plugin?
@@ -1057,6 +1067,7 @@ function removeEntity(entityId) {
       }
     }
   }
+  this.game.lifecycle.triggerHook('after.removeEntity', entityId);
 }
 
 },{}],10:[function(require,module,exports){
@@ -1072,7 +1083,18 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function updateEntity(entityData) {
+function updateEntity(entityDataOrId, entityData) {
+  if (typeof entityDataOrId === 'string' || typeof entityDataOrId === 'number') {
+    entityData = _objectSpread({
+      id: entityDataOrId
+    }, entityData);
+  } else {
+    entityData = entityDataOrId;
+  }
+
+  // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
+  entityData = this.game.lifecycle.triggerHook('before.updateEntity', entityData);
+
   // console.log('updateEntity', entityData)
   var entityId = entityData.id;
   if (typeof entityId === 'undefined') {
@@ -1214,6 +1236,7 @@ function updateEntity(entityData) {
   if (this.game.systems.rbush) {
     // this.game.systems.rbush.updateEntity(ent);
   }
+  ent = this.game.lifecycle.triggerHook('after.updateEntity', ent);
   return ent;
 }
 

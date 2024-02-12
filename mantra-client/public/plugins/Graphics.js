@@ -55,7 +55,11 @@ var Graphics = /*#__PURE__*/function () {
         if (!gameHolder) {
           gameHolder = document.createElement('div');
           gameHolder.id = 'gameHolder';
-          document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
+
+          // always append as first element
+          document.body.insertBefore(gameHolder, document.body.firstChild);
+
+          // document.body.appendChild(gameHolder); // Append to the body or to a specific element as needed
         }
 
         document.body.scrollTop = 0; // For Safari
