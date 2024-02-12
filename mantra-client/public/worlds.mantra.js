@@ -3681,237 +3681,6 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 // TODO: make this a JSON object? it could be a list of entities
 // TODO: make this a JSON object? it could be a list of entities
 // game.load(backGroundEntities)
-//
-// All Worlds are Plugins
-//
-/*
-
-    A Plugin is a class that has the following methods:
-
-      - constructor() - required, must set an id
-      - init(game) - required, must map `game` instance to `this`, is called automatically by game.start()
-      - preload(game) - optional
-      - unload() - optional ( called automatically during plugin::unload )
-      - update(delta) - optional, called once per game loop
-      - render(delta) - optional, called as many times as possible per render loop
-      - handleCollision(a, b) - optional, called when a collision occurs
-
-
-
-    Game Lifecycle:
-
-      - game.start() - starts the game
-      - game.reset() - resets the game
-      - game.stop() - stops the game
-      - game.pause() - pauses the game
-      - game.resume() - resumes the game
-      - game.load(world) - loads a new world
-      - game.unload(world) - unloads a world
-
-    Hooking into the game loop and entity lifecycle including entity graphics pipeline:
-
-      - game.update(delta) - called once per game loop
-      - game.render(delta) - called as many times as possible per render loop
-      - game.createEntity(entity) - creates a new entity
-      - game.destroyEntity(entity) - destroys an entity
-      - game.updateEntity(entity) - updates an entity
-      - game.renderEntity(entity) - renders an entity
-      - game.handleCollision(a, b) - called when a collision occurs
-      - game.handleInput(event) - called when an input event occurs
-      - game.handleAction(action) - called when an action occurs
-      - game.handleMessage(message) - called when a message is received
-    
-
-    Building Plugins to extend the game:
-
-    In most cases you will want to create a custom Plugin in order to hook into the game's `update()` and `handleCollision()` methods.
-
-    Creating a plugin and adding it to the game:
-
-      class MyPlugin {
-        constructor() {
-          this.id = 'my-plugin';
-        }
-        init(game) {
-          this.game = game;
-        }
-        update(delta) {
-          // called once per game loop
-        }
-        handleCollision(a, b) {
-          // called when a collision occurs
-        }
-      }
-
-      game.use(new MyPlugin());
-
-
-    If you wish to further extend the game or specifically hook into mantra APIs you can bind to the game's custom lifecycle hooks:
-
-    Please take performance considerations in mind when adding custom logic to the game loop.
-    You should avoid CPU heavy operations or O(n) operations on entities in your custom code.
-
-    Look at `game.data.ents` for multiple ways to access ents in memory for optimal reads
-    
-    Use game.getEntityFieldOfView() for spatial queries on entities
-    
-    Use before.collisionStart for easy collision detection
-
-    Instead of using a custom hook, you may be better suited using Mantra built-in collision detection, physics, or RBush spatial tree search
-
-    Mantra Lifecycle Hooks:
-
-      Game Loop Lifecycle Hooks
-
-        - game.beforeUpdate(function(delta){}) - called before the game loop
-        - game.afterUpdate(function(delta){}) - called after the game loop
-
-      Entity Lifecycle Hooks
-
-        Create Entity
-          - game.before.create.entity(function(entityData){}) - called before an entity is created
-          - game.after.create.entity(function(entityData){}) - called after an entity is created
-
-        Update Entity
-          - game.before.update.entity(function(entityData){}) - called before an entity is updated
-          - game.after.update.entity(function(entityData){}) - called after an entity is updated
-
-        Remove Entity
-          - game.before.removeEntity(function(entityData){}) - called before an entity is destroyed
-          - game.after.remove.entity(function(entityData){}) - called after an entity is destroyed
-
-        Cleanup Removed Entities
-          ( this is final remove step one game tick after entity is removed )
-          we keep entities in the game state state with `entity.destroyed` set to true for one tick
-          this helps in the case of a collision or other event that may need to reference the entity
-          it also helps with the render loop to avoid flickering
-
-          before.cleanupRemovedEntities: [],
-            after.cleanupRemovedEntities: [],
-
-
-      Collisions Lifecycle Hooks
-        - game.beforeHandleCollision(function(a, b){}) - called before a collision occurs
-        - game.afterHandleCollision(function(a ,b){}) - called after a collision occurs
-        before.collisionStart: [],
-        before.collisionActive: [],
-        before.collisionEnd: [],
-        after.collisionStart: [],
-        after.collisionActive: [],
-        after.collisionEnd: [],
-
-
-      Input Lifecycle
-
-        - game.before.handleInput(function(entityId, input, sequence){}) - called before an input event occurs
-        - game.after.handleInput(function(entityId, input, sequence){}) - called after an input event occurs
-
-
-
-# Mantra Lifecycle Hooks
-
-## Game Loop Lifecycle Hooks
-
-### `game.beforeUpdate(function(delta){})`
-Called before the game loop.
-
-### `game.afterUpdate(function(delta){})`
-Called after the game loop.
-
-## Entity Lifecycle Hooks
-
-### Create Entity
-
-#### `game.before.create.entity(function(entityData){})`
-Called before an entity is created.
-
-#### `game.after.create.entity(function(entityData){})`
-Called after an entity is created.
-
-### Update Entity
-
-#### `game.before.update.entity(function(entityData){})`
-Called before an entity is updated.
-
-#### `game.after.update.entity(function(entityData){})`
-Called after an entity is updated.
-
-### Remove Entity
-
-#### `game.before.removeEntity(function(entityData){})`
-Called before an entity is destroyed.
-
-#### `game.after.remove.entity(function(entityData){})`
-Called after an entity is destroyed.
-
-### Cleanup Removed Entities
-
-This is the final removal step one game tick after an entity is removed. We keep entities in the game state with `entity.destroyed` set to true for one tick. This approach aids in scenarios where a collision or other event may need to reference the entity. It also helps with the render loop to avoid flickering.
-
-####  `game.before.removeEntity(function(){})`
-####  `game.before.removeEntity(function(){})`
-
-## Collisions Lifecycle Hooks
-
-## Collision Start
-
-### `game.before.collisionStart(function(a, b, pair){})`
-### `game.after.collisionStart(function(a, b, pair){})`
-
-## Collision Active
-
-### `game.before.collisionActive(function(a, b, pair){})`
-### `game.after.collisionActive(function(a, b, pair){})`
-
-## Collision End
-### `game.before.collisionEnd(function(a, b, pair){})`
-### `game.after.collisionEnd(function(a, b, pair){})`
-
-## Input Lifecycle
-
-### `game.before.handleInput(function(entityId, input, sequence){})`
-Called before an input event occurs.
-
-### `game.after.handleInput(function(entityId, input, sequence){})`
-Called after an input event occurs.
-
-        
-      WIP
-
-      Sutra Actions LifeCycle
-        // TODO: Sutra handles thies
-        - game.beforeHandleAction(action) - called before an action occurs
-        - game.afterHandleAction(action) - called after an action occurs
-
-      Graphics Lifecycle Hooks TBD
-
-        - game.beforeRenderEntity(function(entityData){}) - called before an entity is rendered
-        - game.afterRenderEntity(function(entityData){}) - called after an entity is rendered
-        - create / remove / update graphics api hooks
-
-      Render Loop
-      - game.beforeRender(function(delta){}) - called before the render loop
-      - game.afterRender(function(delta){}) - called after the render loop
-
-
-    Adding your own game logic:
-
-      - game.use('PluginName', options) - adds a plugin to the game
-      - game.useSutra(sutra, 'HOME') - adds a Sutra to the game
-      - game.setActions(actions) - sets the game actions
-      - game.setRules(rules) - sets the game rules
-
-
-    Game State, TODO
-
-      - game.data - a place to store game state
-      - game.data.entities - a list of all entities
-      - game.data.world - the current world
-      - game.data.camera - the camera object
-      - game.renderer - the renderer object ????
-
-
-*/
 var Home = /*#__PURE__*/function () {
   // type is optional for Plugins
 
@@ -4431,6 +4200,7 @@ function createBackground(game) {
     }
   });
 
+  /*
   // if touch note play sound
   game.createEntity({
     type: 'NOTE',
@@ -4445,6 +4215,7 @@ function createBackground(game) {
       z: 32
     }
   });
+  */
 }
 
 /*
@@ -5124,6 +4895,25 @@ function createDoors(game) {
     _loop(i);
   }
   createHomeKey();
+
+  // create text label instruction for picking up keys
+  game.createEntity({
+    type: 'TEXT',
+    text: 'Collect keys to open doors',
+    size: {
+      width: 400,
+      height: 20
+    },
+    style: {
+      fontSize: '16px',
+      color: '#ffffff',
+      textAlign: 'center'
+    },
+    position: {
+      x: -100,
+      y: 20
+    }
+  });
 }
 function createHomeKey() {
   game.createEntity({
