@@ -50,6 +50,7 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "stop",
     value: function stop() {
+      console.log("Local Client is stopping...");
       this.game.localGameLoopRunning = false;
     }
   }, {

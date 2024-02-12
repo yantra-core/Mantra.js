@@ -4689,7 +4689,7 @@ function createTile(tile, x, y) {
     name: tile.name || tile.kind,
     kind: tile.kind,
     body: body,
-    mass: mass,
+    mass: 10000,
     // Remark: By default we will disable all collision events for Tiles
     //         This is done universally for performance reasons
     //         Each tile.kind could be configured via `TileSet` class with custom collision config

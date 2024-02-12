@@ -312,6 +312,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       keyboard: true,
       mouse: true,
       gamepad: true,
+      virtualGamepad: true,
       editor: true,
       sutra: true,
       lifetime: true,
@@ -321,11 +322,15 @@ var Game = exports.Game = /*#__PURE__*/function () {
       msgpack: false,
       deltaCompression: false,
       deltaEncoding: true,
+      // createDefaultPlayer: false,
       defaultPlayer: true,
+      gameRoot: 'https://yantra.gg',
       options: {},
       mode: 'topdown',
       // default entity input and movement mode defined as Sutras
-      multiplexGraphicsHorizontally: false // default behavior is multiple graphics plugins will be horizontally stacked
+      multiplexGraphicsHorizontally: false,
+      // default behavior is multiple graphics plugins will be horizontally stacked
+      addLifecycleHooksToAllPlugins: true // default behavior is to add lifecycle hooks to all plugin methods
     };
 
     // Merge custom configuration with defaults
@@ -485,6 +490,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function getCurrentPlayer() {
       return this.getEntity(this.currentPlayerId);
     }
+
+    // TODO: doesn't need to be player, can be ent
+    // rename: getEntityFieldOfView
   }, {
     key: "getPlayerFieldOfView",
     value: function getPlayerFieldOfView(entId) {
@@ -526,7 +534,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       entityData.style.layout = entityData.layout || 'none';
       entityData.style.grid = entityData.grid || {};
       entityData.items = entityData.items || [];
-      return game.createEntity(entityData);
+      return this.createEntity(entityData);
     }
 
     //
@@ -647,10 +655,55 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // not implemented directly, Graphics plugin will handle this
     }
   }, {
+    key: "randomColor",
+    value: function randomColor() {
+      var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'int';
+      var color;
+
+      // first generate color as int
+      color = Math.floor(Math.random() * 16777215);
+      if (format === 'int') {
+        return color;
+      }
+
+      // if not int, probably hex
+      color = '#' + color.toString(16);
+      return color;
+    }
+  }, {
+    key: "randomPositionSquare",
+    value: function randomPositionSquare(centerX, centerY, distance) {
+      var x = centerX + Math.random() * 2 * distance - distance; // Random x within distance from centerX
+      var y = centerY + Math.random() * 2 * distance - distance; // Random y within distance from centerY
+      return {
+        x: x,
+        y: y
+      };
+    }
+  }, {
+    key: "randomPositionsRadial",
+    value: function randomPositionsRadial(centerX, centerY, distance, count) {
+      var positions = [];
+      for (var i = 0; i < count; i++) {
+        var angle = Math.random() * 2 * Math.PI; // Random angle
+        var radius = Math.random() * distance; // Random radius within distance
+        var x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
+        var y = centerY + radius * Math.sin(angle);
+        positions.push({
+          x: x,
+          y: y
+        });
+      }
+      return positions;
+    }
+  }, {
     key: "createBorder",
-    value: function createBorder(_ref) {
-      var width = _ref.width,
-        height = _ref.height,
+    value: function createBorder() {
+      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$width = _ref.width,
+        width = _ref$width === void 0 ? this.width : _ref$width,
+        _ref$height = _ref.height,
+        height = _ref$height === void 0 ? this.height : _ref$height,
         _ref$thickness = _ref.thickness,
         thickness = _ref$thickness === void 0 ? 8 : _ref$thickness,
         color = _ref.color;
@@ -786,7 +839,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   return Game;
 }();
 
-},{"./Component/Component.js":2,"./lib/Game/construct.js":9,"./lib/Game/start.js":10,"./lib/Game/use.js":11}],5:[function(require,module,exports){
+},{"./Component/Component.js":2,"./lib/Game/construct.js":10,"./lib/Game/start.js":11,"./lib/Game/use.js":12}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -817,16 +870,70 @@ var SystemsManager = /*#__PURE__*/function () {
   _createClass(SystemsManager, [{
     key: "addSystem",
     value: function addSystem(systemId, system) {
+      var _this = this;
       if (this.systems.has(systemId)) {
         // throw new Error(`System with name ${systemId} already exists!`);
         console.log("Warning: System with name ".concat(systemId, " already exists!"));
         return;
       }
 
-      // Remark: Defaulting all Plugins to event emitters has is currently enabled
-      // This means all plugin methods will be emitted as events
-      // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
-      // eventEmitter.bindClass(system, systemId)
+      /*
+          All Plugins are event emitters feature ( DISABLED )
+          // Remark: Defaulting all Plugins to event emitters is disabled for now by default
+          // This is disabled for performance reasons, some of these methods are high frequency
+          // and there is wildcard search logic enabled by default? It's a bit much on performance for all enabled
+          // In the future we can add a config option per Plugin and per Plugin method to enable/disable this
+          // This will enable all plugin methods as emitted events
+           // eventEmitter.bindClass(system, systemId)
+       */
+
+      // All Plugins have Lifecycle Hooks feature ( ENABLED DEFAULT )
+      // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
+      // register the system methods as Lifecycle hooks
+      if (this.game.config.addLifecycleHooksToAllPlugins) {
+        var allProps = Object.getOwnPropertyNames(Object.getPrototypeOf(system));
+        var _iterator = _createForOfIteratorHelper(allProps),
+          _step;
+        try {
+          var _loop = function _loop() {
+            var propName = _step.value;
+            var originalMethod = system[propName];
+            if (typeof originalMethod === 'function' && propName === 'fireBullet') {
+              // Found the method
+              // console.log(`Method ${propName} found.`);
+
+              // Initialize hooks if they don't already exist
+              _this.game.lifecycle.hooks["before.".concat(systemId, ".").concat(propName)] = _this.game.lifecycle.hooks["before.".concat(systemId, ".").concat(propName)] || [];
+              _this.game.lifecycle.hooks["after.".concat(systemId, ".").concat(propName)] = _this.game.lifecycle.hooks["after.".concat(systemId, ".").concat(propName)] || [];
+
+              // Wrap the original method in a function that includes the lifecycle hooks
+              system[propName] = function () {
+                var arg1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+                var arg2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+                var arg3 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+                // Trigger the 'before' hook with up to three arguments
+                this.game.lifecycle.triggerHook("before.".concat(systemId, ".").concat(propName), arg1, arg2, arg3);
+
+                // Call the original method with up to three arguments
+                var result = originalMethod.call(this, arg1, arg2, arg3);
+
+                // Trigger the 'after' hook with up to three arguments
+                this.game.lifecycle.triggerHook("after.".concat(systemId, ".").concat(propName), arg1, arg2, arg3);
+
+                // Return the original method's result
+                return result;
+              }.bind(system); // Ensure 'this' within the wrapped function refers to the system object
+            }
+          };
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            _loop();
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      }
 
       // binds system to local instance Map
       this.systems.set(systemId, system);
@@ -869,13 +976,13 @@ var SystemsManager = /*#__PURE__*/function () {
   }, {
     key: "update",
     value: function update(deltaTime) {
-      var _iterator = _createForOfIteratorHelper(this.systems),
-        _step;
+      var _iterator2 = _createForOfIteratorHelper(this.systems),
+        _step2;
       try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var _step$value = _slicedToArray(_step.value, 2),
-            _ = _step$value[0],
-            system = _step$value[1];
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+            _ = _step2$value[0],
+            system = _step2$value[1];
           if (typeof system.update === "function") {
             // check to see if the game is paused, if not, skip updates for systems without flag
             if (this.game.paused) {
@@ -885,11 +992,14 @@ var SystemsManager = /*#__PURE__*/function () {
           }
         }
       } catch (err) {
-        _iterator.e(err);
+        _iterator2.e(err);
       } finally {
-        _iterator.f();
+        _iterator2.f();
       }
     }
+
+    // Remark: Render control is being handled by graphics and each adapter
+    // TODO: Add test coverage and formalize rendering through this method, it is required for helpers developers customizerendering
   }, {
     key: "render",
     value: function render() {
@@ -900,24 +1010,12 @@ var SystemsManager = /*#__PURE__*/function () {
       }
       */
     }
-
-    /*
-    // something like this
-    before(eventPattern, callback) {
-       // game.systemManager.before('entityMovement.update', (entityId, x, y) => {})
-      game.systemManager.after('game.getPlayerSnapshot', (snapshot, next) => {
-        // perform compression logic here
-        next(snapshot); // is error not first arg? probably not?
-      })
-       // eventEmitter.before(eventPattern, callback)
-    }
-    */
   }]);
   return SystemsManager;
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":13}],6:[function(require,module,exports){
+},{"../lib/eventEmitter.js":14}],6:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -926,6 +1024,111 @@ MANTRA.plugins = {}; // empty plugin scope, may be populated by using plugins
 module.exports = MANTRA;
 
 },{"./Game.js":4}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// Lifecycle.js - Marak Squires 2024
+var Lifecycle = exports["default"] = /*#__PURE__*/function () {
+  function Lifecycle() {
+    _classCallCheck(this, Lifecycle);
+    this.hooks = {
+      // TODO: all all lifecycle events
+      'before.update': [],
+      'after.update': [],
+      //beforeRender: [],
+      //afterRender: [],
+      //beforeRenderEntity: [],
+      //afterRenderEntity: [],
+      'before.createEntity': [],
+      'after.createEntity': [],
+      'before.removeEntity': [],
+      'after.removeEntity': [],
+      'before.updateEntity': [],
+      'after.updateEntity': [],
+      'before.handleInput': [],
+      'after.handleInput': [],
+      'before.cleanupRemovedEntities': [],
+      'after.cleanupRemovedEntities': [],
+      'before.collisionStart': [],
+      'before.collisionActive': [],
+      'before.collisionEnd': [],
+      'after.collisionStart': [],
+      'after.collisionActive': [],
+      'after.collisionEnd': []
+      // Add more lifecycle events as needed
+    };
+  }
+  _createClass(Lifecycle, [{
+    key: "clearAllHooks",
+    value: function clearAllHooks() {
+      // go through all hooks and clear them
+      for (var hookName in this.hooks) {
+        this.hooks[hookName] = [];
+      }
+    }
+
+    // Method to add a custom hook
+  }, {
+    key: "addHook",
+    value: function addHook(hookName, callback) {
+      if (this.hooks[hookName]) {
+        this.hooks[hookName].push(callback);
+      } else {
+        console.warn("Hook '".concat(hookName, "' does not exist."));
+      }
+    }
+  }, {
+    key: "before",
+    value: function before(hookName, callback) {
+      this.addHook("before.".concat(hookName), callback);
+    }
+  }, {
+    key: "after",
+    value: function after(hookName, callback) {
+      this.addHook("after.".concat(hookName), callback);
+    }
+
+    // Remark: `triggerHook` has been optimized for performance, please avoid refactoring without benchmarking
+    // Method to trigger all callbacks associated with a hook
+  }, {
+    key: "triggerHook",
+    value: function triggerHook(hookName, data, arg2, arg3) {
+      var hooks = this.hooks[hookName];
+      if (!hooks) {
+        // `hooks` references object exists or Array.length, 0 returns false
+        // console.warn(`Hook '${hookName}' does not exist.`);
+        return data; // Return the initial data if no hooks exist
+      }
+
+      var result = data; // Initialize result with the data being processed
+
+      // Optimized for single element array
+      if (hooks.length === 1) {
+        // Returns a single result from single array, allowing the hook to modify and return the data
+        return hooks[0](result, arg2, arg3);
+      }
+
+      // Arrays with more than 1 element
+      for (var i = 0; i < hooks.length; i++) {
+        // Pass the result of the previous hook (or the initial data for the first hook) to the next hook
+        result = hooks[i](result, arg2, arg3);
+      }
+      return result; // Return the final result after all hooks have been processed
+    }
+  }]);
+  return Lifecycle;
+}();
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1118,7 +1321,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
   return Preloader;
 }();
 
-},{"./Preloader/FBXLoader.js":8}],8:[function(require,module,exports){
+},{"./Preloader/FBXLoader.js":9}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1184,7 +1387,7 @@ function _loader() {
   return _loader.apply(this, arguments);
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1197,6 +1400,7 @@ var _eventEmitter = _interopRequireDefault(require("../eventEmitter.js"));
 var _gameTick = _interopRequireDefault(require("../gameTick.js"));
 var _localGameLoop = _interopRequireDefault(require("../localGameLoop.js"));
 var _onlineGameLoop = _interopRequireDefault(require("../onlineGameLoop.js"));
+var _Lifecycle = _interopRequireDefault(require("./Lifecycle.js"));
 var _ActionRateLimiter = _interopRequireDefault(require("../../Component/ActionRateLimiter.js"));
 var _TimersComponent = _interopRequireDefault(require("../../Component/TimersComponent.js"));
 var _storage = _interopRequireDefault(require("../storage/storage.js"));
@@ -1258,8 +1462,16 @@ function construct(game) {
 
   // Could be another CDN or other remote location
   // For local development, try game.scriptRoot = './';
+  if (game.config.gameRoot) {
+    console.log("Mantra is using the follow path as it's root for both scripts and assets:", game.config.gameRoot);
+    game.gameRoot = game.config.gameRoot;
+    game.scriptRoot = game.config.gameRoot;
+    game.assetRoot = game.config.gameRoot;
+  }
+
+  // Remark: options scope being removed, everything should be mounted on GameConfig
   if (game.config.options.scriptRoot) {
-    console.log("Mantra is using the follow path as it's root:", game.config.options.scriptRoot);
+    console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot);
     game.scriptRoot = game.config.options.scriptRoot;
   }
   if (game.config.options.assetRoot) {
@@ -1289,6 +1501,9 @@ function construct(game) {
   game.systems = {};
   game.storage = _storage["default"];
   game.snapshotQueue = [];
+  game.lifecycle = new _Lifecycle["default"](game);
+  game.before = game.lifecycle.before.bind(game.lifecycle);
+  game.after = game.lifecycle.after.bind(game.lifecycle);
   game.tick = 0;
 
   // Keeps track of array of worlds ( Plugins with type="world" )
@@ -1418,6 +1633,7 @@ function construct(game) {
       keyboard: game.config.keyboard,
       mouse: game.config.mouse,
       gamepad: game.config.gamepad,
+      virtualGamepad: game.config.virtualGamepad,
       editor: game.config.editor,
       sutra: game.config.sutra,
       lifetime: game.config.lifetime,
@@ -1426,7 +1642,7 @@ function construct(game) {
   }
 }
 
-},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../System/SystemsManager.js":5,"../createDefaultPlayer.js":12,"../eventEmitter.js":13,"../gameTick.js":14,"../loadPluginsFromConfig.js":15,"../localGameLoop.js":16,"../onlineGameLoop.js":17,"../storage/storage.js":19,"../switchWorlds.js":20,"../util/loadCSS.js":21,"../util/loadScripts.js":22,"./Preloader.js":7}],10:[function(require,module,exports){
+},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../System/SystemsManager.js":5,"../createDefaultPlayer.js":13,"../eventEmitter.js":14,"../gameTick.js":15,"../loadPluginsFromConfig.js":16,"../localGameLoop.js":17,"../onlineGameLoop.js":18,"../storage/storage.js":20,"../switchWorlds.js":21,"../util/loadCSS.js":22,"../util/loadScripts.js":23,"./Lifecycle.js":7,"./Preloader.js":8}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1495,7 +1711,7 @@ function start(cb) {
   });
 }
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1663,7 +1879,7 @@ function use(game) {
   }();
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1718,7 +1934,7 @@ function createDefaultPlayer() {
 }
 ;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1860,7 +2076,7 @@ eventEmitter.listenerCount = function (eventPattern) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1898,9 +2114,19 @@ function gameTick() {
   // Update the physics engine
   this.physics.updateEngine(deltaTimeMS);
 
+  // Run game lifecycle hooks
+  if (this.lifecycle) {
+    this.lifecycle.triggerHook('before.update', hzMS);
+  }
+
   // run the .update() method of all registered systems
   if (this.systemsManager) {
     this.systemsManager.update(hzMS); // TODO: use deltaTime in systemsManager
+  }
+
+  // Run game lifecycle hooks
+  if (this.lifecycle) {
+    this.lifecycle.triggerHook('after.update', hzMS);
   }
 
   /*
@@ -1931,7 +2157,7 @@ function gameTick() {
 }
 var _default = exports["default"] = gameTick;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1950,6 +2176,7 @@ function loadPluginsFromConfig(_ref) {
     keyboard = _ref.keyboard,
     mouse = _ref.mouse,
     gamepad = _ref.gamepad,
+    virtualGamepad = _ref.virtualGamepad,
     editor = _ref.editor,
     sutra = _ref.sutra,
     ghostTyper = _ref.ghostTyper,
@@ -1994,6 +2221,8 @@ function loadPluginsFromConfig(_ref) {
     }
     if (gamepad) {
       this.use('Gamepad');
+    }
+    if (virtualGamepad) {
       this.use('GamepadGUI', gamepad);
     }
     if (sutra) {
@@ -2050,7 +2279,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":23,"../plugins/typer-ghost/GhostTyper.js":24}],16:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":24,"../plugins/typer-ghost/GhostTyper.js":25}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2118,6 +2347,7 @@ function localGameLoop(game, playerId) {
 
   // Call the next iteration of the loop using requestAnimationFrame
   if (game.localGameLoopRunning) {
+    // why isn't game loop stopping for tests?
     _requestAnimationFrame(function rafLocalGameLoop() {
       localGameLoop(game, playerId);
     });
@@ -2132,7 +2362,7 @@ function _requestAnimationFrame(callback) {
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2220,7 +2450,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2273,7 +2503,7 @@ var MemoryBackend = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = MemoryBackend;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2353,7 +2583,7 @@ var storage = function () {
 }();
 var _default = exports["default"] = storage;
 
-},{"./MemoryBackend.js":18}],20:[function(require,module,exports){
+},{"./MemoryBackend.js":19}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2439,7 +2669,7 @@ function _switchWorlds() {
   return _switchWorlds.apply(this, arguments);
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2536,7 +2766,7 @@ function _loadCSS() {
   return _loadCSS.apply(this, arguments);
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2628,7 +2858,7 @@ function _loadScripts() {
   return _loadScripts.apply(this, arguments);
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2953,7 +3183,7 @@ var LoadingScreen = /*#__PURE__*/function () {
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

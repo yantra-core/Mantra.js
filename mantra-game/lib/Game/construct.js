@@ -76,8 +76,16 @@ export default function construct(game, plugins = []) {
 
   // Could be another CDN or other remote location
   // For local development, try game.scriptRoot = './';
+  if (game.config.gameRoot) {
+    console.log("Mantra is using the follow path as it's root for both scripts and assets:", game.config.gameRoot);
+    game.gameRoot = game.config.gameRoot;
+    game.scriptRoot = game.config.gameRoot;
+    game.assetRoot = game.config.gameRoot;
+  }
+
+  // Remark: options scope being removed, everything should be mounted on GameConfig
   if (game.config.options.scriptRoot) {
-    console.log("Mantra is using the follow path as it's root:", game.config.options.scriptRoot)
+    console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot)
     game.scriptRoot = game.config.options.scriptRoot;
   }
 

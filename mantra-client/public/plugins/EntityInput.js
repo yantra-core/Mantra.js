@@ -142,6 +142,7 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
         return;
       }
       var controls = input.controls;
+      this.game.lifecycle.triggerHook('before.handleInput', entityId, input, sequenceNumber);
       if (this.game.customInput !== false) {
         this.strategies.forEach(function (strategy) {
           strategy.handleInputs(entityId, input, sequenceNumber);
@@ -173,6 +174,7 @@ var EntityInput = /*#__PURE__*/function (_Plugin) {
 
       // always emit the entityInput::handleInputs event
       this.game.emit('entityInput::handleInputs', entityId, input, sequenceNumber);
+      this.game.lifecycle.triggerHook('after.handleInput', entityId, input, sequenceNumber);
     }
   }, {
     key: "update",

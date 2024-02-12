@@ -1,4 +1,10 @@
-export default function updateEntity(entityData) {
+export default function updateEntity(entityDataOrId, entityData) {
+
+  if (typeof entityDataOrId === 'string' || typeof entityDataOrId === 'number') {
+    entityData = { id: entityDataOrId, ...entityData };
+  } else {
+    entityData = entityDataOrId;
+  }
 
   // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
   entityData = this.game.lifecycle.triggerHook('before.updateEntity', entityData);

@@ -43,7 +43,9 @@ class Game {
       msgpack: false,
       deltaCompression: false,
       deltaEncoding: true,
+      // createDefaultPlayer: false,
       defaultPlayer: true,
+      gameRoot: 'https://yantra.gg',
       options: {},
       mode: 'topdown', // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: false, // default behavior is multiple graphics plugins will be horizontally stacked
@@ -331,7 +333,45 @@ class Game {
     // not implemented directly, Graphics plugin will handle this
   }
 
-  createBorder({ width, height, thickness = 8, color }) {
+  randomColor(format = 'int') {
+
+    let color;
+
+    // first generate color as int
+    color = Math.floor(Math.random() * 16777215);
+
+    if (format === 'int') {
+      return color;
+    }
+
+    // if not int, probably hex
+    color = '#' + color.toString(16);
+    return color;
+
+  }
+
+  randomPositionSquare(centerX, centerY, distance) {
+    let x = centerX + Math.random() * 2 * distance - distance; // Random x within distance from centerX
+    let y = centerY + Math.random() * 2 * distance - distance; // Random y within distance from centerY
+    return { x, y };
+  }
+
+  randomPositionsRadial(centerX, centerY, distance, count) {
+    let positions = [];
+    for (let i = 0; i < count; i++) {
+        let angle = Math.random() * 2 * Math.PI; // Random angle
+        let radius = Math.random() * distance; // Random radius within distance
+        let x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
+        let y = centerY + radius * Math.sin(angle);
+        positions.push({ x, y });
+    }
+    return positions;
+}
+
+
+
+
+  createBorder({ width = this.width, height = this.height, thickness = 8, color } = {}) {
     let game = this;
     if (game.systems.border) {
       game.systems.border.createBorder({

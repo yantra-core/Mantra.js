@@ -1,12 +1,10 @@
 <html>
-  <script src="/mantra.js"></script>
-  <script src="/examples.js"></script>
-  <script src="./apply-force.js"></script>
-  <!--
+  <script src="/code-editor.js"></script>
   <script>
-    loadEditor({
-      url: './physics/apply-force.html',
-    })
+    document.addEventListener('DOMContentLoaded', () => {
+      loadEditor('/physics/apply-force.js');
+    });
   </script>
-  -->
+  <script src="/mantra.js"></script>
+  <script src="./apply-force.js"></script>
 </html>

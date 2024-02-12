@@ -50,6 +50,7 @@ var Collisions = /*#__PURE__*/function () {
       //const entityB = this.game.getEntity(entityIdB);
       var entityA = bodyA.entity;
       var entityB = bodyB.entity;
+      this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
@@ -165,6 +166,7 @@ var Collisions = /*#__PURE__*/function () {
         collisionContext[entityA.type] = entityA;
         collisionContext[entityB.type] = entityB;
         this.game.data.collisions.push(collisionContext);
+        this.game.lifecycle.triggerHook('after.collisionStart', entityA, entityB, pair);
       }
 
       // do not process player collisions locally ( for now )
@@ -206,6 +208,7 @@ var Collisions = /*#__PURE__*/function () {
       var entityIdB = bodyB.myEntityId;
       var entityA = bodyA.entity;
       var entityB = bodyB.entity;
+      this.game.lifecycle.triggerHook('before.collisionEnd', entityA, entityB, pair);
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
@@ -251,6 +254,7 @@ var Collisions = /*#__PURE__*/function () {
       } finally {
         _iterator2.f();
       }
+      this.game.lifecycle.triggerHook('after.collisionEnd', entityA, entityB, pair);
     }
   }, {
     key: "collisionActive",
@@ -259,6 +263,7 @@ var Collisions = /*#__PURE__*/function () {
       var entityIdB = bodyB.myEntityId;
       var entityA = bodyA.entity;
       var entityB = bodyB.entity;
+      this.game.lifecycle.triggerHook('before.collisionActive', entityA, entityB, pair);
 
       // console.log('collisionActive', pair, bodyA, bodyB, entityA, entityB)
       if (!entityA || !entityB) {
@@ -315,6 +320,7 @@ var Collisions = /*#__PURE__*/function () {
       } finally {
         _iterator3.f();
       }
+      this.game.lifecycle.triggerHook('after.collisionActive', entityA, entityB, pair);
     }
 
     // Remark: In most cases this code path will not be reached since the Physics interface,

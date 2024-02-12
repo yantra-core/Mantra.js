@@ -274,8 +274,11 @@ class MatterPhysics extends PhysicsInterface {
     return body.angle;
   }
 
-  rotateBody(body, rotation) {
-    Matter.Body.rotate(body, rotation);
+  rotateBody(entityId, rotation) {
+    let body = this.bodyMap[entityId];
+    if (body) {
+      Matter.Body.rotate(body, rotation);
+    }
   }
 
   onBeforeUpdate(engine, callback) {

@@ -1,5 +1,4 @@
 // TODO: decouple main fn from DOMContentLoaded event
-
 document.addEventListener('DOMContentLoaded', () => {
 
   // only render if root page
@@ -181,119 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
     exampleIframe.style.display = 'block';
     categoriesContainer.style.display = 'none'; // Hide the categories container
     exampleEmbedsContainer.style.display = 'block'; // Show the example iframe container
-    loadEditor(example);
+    // loadEditor(example);
   }
   
   updateCategoriesDisplay(categories);
 
 });
-
-let editor;
-let loaded = false;
-
-function loadEditor(example) {
-  if (loaded) return;
-
-  loaded = true;
-  let exampleUrl = example.url;
-  let exampleName = 'items/bullet';
-  exampleName = exampleUrl.replace('.html', '');
-  // set push state to the example name
-  // window.history.pushState({}, exampleName, `/${exampleName}`);
-  let jsSource = '/' + exampleName + '.js';
-  console.log('loading remote source', jsSource)
-  fetchAndDisplayCode();
-  function fetchAndDisplayCode() {
-    fetch(jsSource)
-      .then(response => response.text())
-      .then(code => {
-        console.log(code)
-        // inject the code into the script tag
-        /*
-        const script = document.createElement('script');
-        script.textContent = code;
-        document.body.appendChild(script);
-        */
-
-        // trigger DOMContentLoaded event to run the code
-        // Warning: This may cause infinite loops if mutex is not used on demos page all events subscribed to DOMContentLoaded
-        //document.dispatchEvent(new Event('DOMContentLoaded'));
-        // Append the mantra.js script to the start of the string.
-        //code = '<script src="mantra.js"><\/script>\n' + code;
-
-
-        // Remove the very last line of the code example.
-        code = code.trim().split('\n').slice(0, -1).join('\n');
-        code = code.trim().split('\n').slice(0, -1).join('\n');
-
-
-        // check to see if code-editor exists in DOM, if not create it
-        if (!document.querySelector('.code-editor')) {
-          const codeEditor = document.createElement('div');
-          codeEditor.className = 'code-editor';
-          codeEditor.innerHTML = `
-            <pre>Loading code from document...</pre>
-            <div class="resize-handle"></div> <!-- Resize handle -->
-          `;
-
-
-          /*
-           .code-editor {
-            position: relative;
-            width: 100%;
-            height: 30vh;
-            background: #333;
-            color: #fff;
-            overflow: auto;
-            padding: 20px;
-            box-sizing: border-box;
-            font-family: monospace;
-            resize: vertical;
-            border: 1px solid #888;
-            display: none;
-          }
-          */
-          // set the styles
-          codeEditor.style.position = 'relative';
-          codeEditor.style.width = '100%';
-
-          codeEditor.style.height = '30vh';
-          codeEditor.style.background = '#333';
-          codeEditor.style.color = '#fff';
-          codeEditor.style.overflow = 'auto';
-          codeEditor.style.padding = '20px';
-          codeEditor.style.boxSizing = 'border-box';
-          codeEditor.style.fontFamily = 'monospace';
-          codeEditor.style.resize = 'vertical';
-          codeEditor.style.border = '1px solid #888';
-          
-
-          document.body.appendChild(codeEditor);
-        }
-
-        // Set the code example to the pre element
-        document.querySelector('.code-editor pre').textContent = code;
-        // hide the code example
-        // document.querySelector('.code-editor').style.display = 'none';
-        // editor.setValue(code);
-
-        // set the iframe src to bullet.html, sibling to this file
-        // document.querySelector('#example-embed').src = './' + exampleName + '.html';
-
-        // hide the search-container class
-        // check that the search-container exists
-        if (document.querySelector('.search-container')) {
-          document.querySelector('.search-container').style.display = 'none';
-        }
-
-        // show code-editor
-        document.querySelector('.code-editor').style.display = 'block';
-
-      })
-      .catch(error => {
-        throw error;
-        console.error('Error fetching the code example:', error);
-      });
-  }
-
-}

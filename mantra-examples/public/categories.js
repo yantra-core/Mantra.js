@@ -167,6 +167,14 @@ let entity_examples = [
     image: 'placeholder-image.jpg',
     url: 'entity/update-entity.html',
     tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Get Entity',
+    category: 'entity',
+    description: 'Get an entity from the scene.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/get-entity.html',
+    tags: ['get', 'entity', 'scene', 'find', 'search', 'locate', 'retrieve', 'fetch', 'obtain', 'acquire', 'detect']
   }
 
 ];

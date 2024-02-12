@@ -322,7 +322,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       msgpack: false,
       deltaCompression: false,
       deltaEncoding: true,
+      // createDefaultPlayer: false,
       defaultPlayer: true,
+      gameRoot: 'https://yantra.gg',
       options: {},
       mode: 'topdown',
       // default entity input and movement mode defined as Sutras
@@ -651,6 +653,48 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "setBackground",
     value: function setBackground(color) {
       // not implemented directly, Graphics plugin will handle this
+    }
+  }, {
+    key: "randomColor",
+    value: function randomColor() {
+      var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'int';
+      var color;
+
+      // first generate color as int
+      color = Math.floor(Math.random() * 16777215);
+      if (format === 'int') {
+        return color;
+      }
+
+      // if not int, probably hex
+      color = '#' + color.toString(16);
+      return color;
+    }
+  }, {
+    key: "randomPositionSquare",
+    value: function randomPositionSquare(centerX, centerY, distance) {
+      var x = centerX + Math.random() * 2 * distance - distance; // Random x within distance from centerX
+      var y = centerY + Math.random() * 2 * distance - distance; // Random y within distance from centerY
+      return {
+        x: x,
+        y: y
+      };
+    }
+  }, {
+    key: "randomPositionsRadial",
+    value: function randomPositionsRadial(centerX, centerY, distance, count) {
+      var positions = [];
+      for (var i = 0; i < count; i++) {
+        var angle = Math.random() * 2 * Math.PI; // Random angle
+        var radius = Math.random() * distance; // Random radius within distance
+        var x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
+        var y = centerY + radius * Math.sin(angle);
+        positions.push({
+          x: x,
+          y: y
+        });
+      }
+      return positions;
     }
   }, {
     key: "createBorder",
@@ -1418,8 +1462,16 @@ function construct(game) {
 
   // Could be another CDN or other remote location
   // For local development, try game.scriptRoot = './';
+  if (game.config.gameRoot) {
+    console.log("Mantra is using the follow path as it's root for both scripts and assets:", game.config.gameRoot);
+    game.gameRoot = game.config.gameRoot;
+    game.scriptRoot = game.config.gameRoot;
+    game.assetRoot = game.config.gameRoot;
+  }
+
+  // Remark: options scope being removed, everything should be mounted on GameConfig
   if (game.config.options.scriptRoot) {
-    console.log("Mantra is using the follow path as it's root:", game.config.options.scriptRoot);
+    console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot);
     game.scriptRoot = game.config.options.scriptRoot;
   }
   if (game.config.options.assetRoot) {

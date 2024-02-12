@@ -1,58 +1,42 @@
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', async (event) => {
+  let game = new MANTRA.Game({ gameRoot: 'http://192.168.1.80:7777' });
+  game.use('Border');
+  await game.start();
 
-  let game = new MANTRA.Game({
-    physics: 'matter', // enum, 'physx', 'matter
-    collisions: true,
-    graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-    // camera: 'follow',
-    // TODO: gameRoot, have this be default for scriptRoot and assetRoot
-    options: {
-      scriptRoot: 'http://192.168.1.80:7777',
-      assetRoot: 'http://192.168.1.80:7777'
-    }
-  });
+  game.zoom(1);
+  game.setBackground('#000000');
+  game.createBorder();
 
-  game.use('Block');
+  let entities = [];
 
-  game.use('Bullet');
-
-  // TODO: demos should have simple control mappings with Sutra, no default mappings
-
-  game.start(function () {
-    game.zoom(1);
-    game.setBackground('#000000');
-
-
-    // create a few entities to shoot
-    let entities = [];
-    for (let i = 0; i < 10; i++) {
-      let entity = game.createEntity({
-        type: 'BLOCK',
-        size: {
-          width: 50,
-          height: 50
-        },
-        isSensor: true,
-        hasCollisionStart: true,
-        position: {
-          x: Math.random() * -500,
-          y: Math.random() * -1000
-        }
-      });
-      entities.push(entity);
-    }
-
-    game.before('update', function () {
-      if (game.tick % 10 === 0) {
-        entities.forEach((entity) => {
-          let randomX = Math.random() * -500;
-          let randomY = Math.random() * -500;
-          game.setPosition(entity.id, { x: randomX, y: randomY });
-        });
+  // random position from center, could be + or -
+  for (let i = 0; i < 22; i++) {
+    let randomColor = game.randomColor();
+    let entity = game.createEntity({
+      color: randomColor,
+      size: {
+        width: 16,
+        height: 16
+      },
+      isSensor: true,
+      hasCollisionStart: true,
+      position: {
+        x: 0,
+        y: 0
       }
     });
+    entities.push(entity.id);
+  }
 
+  game.before('update', function () {
+    if (game.tick % 10 === 0) {
+      entities.forEach((entityId) => {
+        // generate a random position within an area around 0,0 with distance of 284
+        let randomPosition = game.randomPositionSquare(0, 0, 284);
+        game.setPosition(entityId, { x: randomPosition.x, y: randomPosition.y });
+      });
+    }
   });
-  window.game = game;
 
 });
+window.game = game;
