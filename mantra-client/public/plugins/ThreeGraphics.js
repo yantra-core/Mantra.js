@@ -54739,7 +54739,7 @@ function render(game, alpha) {
   var currentPlayer = this.game.data.currentPlayer;
   //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
 
-  if (this.game.useFov) {
+  if (this.game.config.useFoV) {
     var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
     // console.log('itemsInFov', itemsInFov)
 

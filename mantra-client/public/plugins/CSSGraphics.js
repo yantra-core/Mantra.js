@@ -486,6 +486,13 @@ function cssMouseWheelZoom(event) {
   if (!this.mouseWheelEnabled) {
     return;
   }
+
+  // check that target is gameHolder, if not cancel
+  // Remark: This should suffice for CSSGraphics, this is required for embedding or other page interactions
+  //         outside of the Mantra Game
+  if (event.target !== document.body) {
+    return false;
+  }
   var game = this.game;
   var scale = game.data.camera.currentZoom;
 
@@ -639,7 +646,6 @@ function update() {
 
   // Update the camera position
   if (this.follow && currentPlayer && currentPlayer.position) {
-    // console.log("currentPlayer.position", currentPlayer.position);
     //this.scene.cameraPosition.x = this.scene.cameraPosition.x / zoomFactor;
     /*
     let newY = currentPlayer.position.y + game.viewportCenterYOffset;
@@ -659,7 +665,6 @@ function update() {
     //
     // If following the player is enabled, the camera position is always the player position
     //
-    //let follow = true;
     if (this.follow) {
       this.scene.cameraPosition.x = currentPlayer.position.x;
       this.scene.cameraPosition.y = currentPlayer.position.y;
@@ -669,7 +674,6 @@ function update() {
     // If there are any view port offsets from dragging or scrolling
     // Adjust the camera position by these offsets
     //
-    // console.log('game.viewportCenterXOffset', game.viewportCenterXOffset)
     if (typeof game.viewportCenterXOffset !== 'number') {
       game.viewportCenterXOffset = 0;
     }
@@ -700,7 +704,6 @@ function update() {
     adjustedPosition.x *= this.game.data.camera.currentZoom;
     adjustedPosition.y *= this.game.data.camera.currentZoom;
 
-    // TODO: now we need to recenter the adjusted position based on zoom
     // Calculate the size of the visible area in the game's world space at the current zoom level
     var visibleWidth = window.innerWidth / this.game.data.camera.currentZoom;
     var visibleHeight = window.innerHeight / this.game.data.camera.currentZoom;
@@ -731,6 +734,8 @@ function setTransform(container, offsetX, offsetY, zoom, rotation) {
   var lastRotation = parseFloat(container.dataset.lastRotation) || 0;
 
   // Improved checks for NaN and finite numbers
+  // We shouldn't get NaN at this stage; however it's better to not apply an invalid transform than to break the layout,
+  // as subsequent calls may provide valid values. This issue came up in embed scenarios
   offsetX = Number.isFinite(offsetX) ? offsetX : lastOffsetX;
   offsetY = Number.isFinite(offsetY) ? offsetY : lastOffsetY;
   zoom = Number.isFinite(zoom) && zoom > 0 ? zoom : lastZoom; // Zoom should not be negative
@@ -1611,7 +1616,7 @@ function render(game, alpha) {
   // Best to remove camera follow for CSSGraphics if possible
   // We tried to only iterate changed entities, but this breaks camera follow
 
-  if (this.game.useFov) {
+  if (this.game.config.useFoV) {
     var fovEntities = new Map();
     var currentPlayer = this.game.data.currentPlayer;
     //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);

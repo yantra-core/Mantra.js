@@ -420,7 +420,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _index = require("../../../../sutra/index.js");
 var _defaultTopdownMovement = _interopRequireDefault(require("../../lib/Game/defaults/defaultTopdownMovement.js"));
-var _bomb = _interopRequireDefault(require("../../../mantra-sutras/bomb.js"));
 var _defaultPlatformMovement = _interopRequireDefault(require("../../lib/Game/defaults/defaultPlatformMovement.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -479,7 +478,6 @@ var Sutra = /*#__PURE__*/function () {
         if (self.defaultMovement) {
           if (self.game.config.mode === 'topdown') {
             self.game.useSutra((0, _defaultTopdownMovement["default"])(self.game), 'mode-topdown');
-            self.game.useSutra((0, _bomb["default"])(self.game), 'bomb');
           }
           if (self.game.config.mode === 'platform') {
             // TODO: better platform control
@@ -497,7 +495,6 @@ var Sutra = /*#__PURE__*/function () {
       var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'topdown';
       if (mode === 'topdown') {
         this.game.useSutra((0, _defaultTopdownMovement["default"])(this.game), 'mode-topdown');
-        this.game.useSutra((0, _bomb["default"])(self.game), 'bomb');
       }
       if (mode === 'platform') {
         this.game.useSutra((0, _defaultPlatformMovement["default"])(this.game), 'mode-platform');
@@ -682,145 +679,7 @@ var Sutra = /*#__PURE__*/function () {
 _defineProperty(Sutra, "id", 'sutra');
 var _default = exports["default"] = Sutra;
 
-},{"../../../../sutra/index.js":5,"../../../mantra-sutras/bomb.js":4,"../../lib/Game/defaults/defaultPlatformMovement.js":1,"../../lib/Game/defaults/defaultTopdownMovement.js":2}],4:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = bomb;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-// bomb.js - Marak Squires 2024
-function bomb(game) {
-  var rules = game.createSutra();
-
-  // Rate at which the player can drop bombs
-  var fireRate = 1000;
-  // Distance in front of the player where the bomb should start
-  var distanceInFront = 16;
-  // Speed at which the bomb is thrown
-  var speed = 0.05;
-  // TODO: ^^^ make these config
-
-  rules.addCondition('canDropBomb', function (entity, gameState) {
-    // TODO: better fluent integration of Action Rate Limiter into Sutra
-    var actionRateLimiterComponent = game.components.actionRateLimiter;
-    var lastFired = actionRateLimiterComponent.getLastActionTime(entity.id, 'dropBomb');
-    var currentTime = Date.now();
-    return currentTime - lastFired >= fireRate;
-  });
-
-  // Define actions
-  rules.addAction({
-    "if": 'canDropBomb',
-    then: 'dropBomb'
-  });
-
-  // Event listeners for actions
-  rules.on('dropBomb', function (entity, node, gameState) {
-    var playerPos = entity.position;
-    var playerRotation = entity.rotation; // in radians
-
-    if (!playerPos) {
-      // client might not have the position or rotation component, don't client-side predict
-      console.log('no player data available');
-      return;
-    }
-
-    // TODO: better fluent integration of Action Rate Limiter into Sutra
-    var actionRateLimiterComponent = game.components.actionRateLimiter;
-    actionRateLimiterComponent.recordAction(entity.id, 'dropBomb');
-    if (typeof entity.radius !== 'undefined') {
-      entity.width = entity.radius * 2;
-      entity.height = entity.radius * 2;
-    }
-    var playerOffsetX = entity.width / 2; // Adjust this value to align the bomb properly
-    var playerOffsetY = entity.height / 2; // Adjust this value to align the bomb properly
-
-    playerOffsetX = 0;
-    playerOffsetY = 0;
-    if (typeof playerRotation === 'undefined') {
-      playerRotation = 0; // this should have a default
-    }
-
-    // convert to 3d if rotation object
-    if (_typeof(playerRotation) === 'object') {
-      playerRotation = playerRotation.z;
-    }
-
-    // Compute the bomb's direction based on player's rotation
-    var directionX = Math.sin(playerRotation);
-    var directionY = -Math.cos(playerRotation);
-
-    // Place the bomb in front of the player
-    var bombStartPosition = {
-      x: playerPos.x + playerOffsetX + distanceInFront * Math.sin(playerRotation),
-      y: playerPos.y + playerOffsetY + distanceInFront * -Math.cos(playerRotation)
-      //z: 10
-    };
-
-    var bombDirectionConfig = {
-      type: 'BOMB',
-      mass: 10000,
-      collisionStart: true,
-      position: bombStartPosition,
-      lifetime: 2000,
-      friction: 0.5,
-      frictionStatic: 0.5,
-      frictionAir: 0.01,
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'bomb',
-        playing: false
-      },
-      owner: entity.id,
-      rotation: 0,
-      velocity: {
-        x: directionX * speed,
-        y: directionY * speed
-      },
-      height: 16,
-      width: 16,
-      damage: 10 // TODO: make this a config
-    };
-    // console.log('using bombDirectionConfig', bombDirectionConfig)
-    game.createEntity(bombDirectionConfig);
-  });
-
-  // Handling collisions
-  rules["if"]('entTouchedBomb').then('bombCollision');
-  rules.addCondition('entTouchedBomb', function (entity, gameState) {
-    if (entity.type === 'COLLISION' && entity.kind === 'START') {
-      if (entity.bodyA.type === 'BOMB') {
-        return true;
-      }
-      if (entity.bodyB.type === 'BOMB') {
-        return true;
-      }
-    }
-  });
-  rules.on('bombCollision', function (collision, node, gameState) {
-    var bombEntity = collision.bodyA.type === 'BOMB' ? collision.bodyA : collision.bodyB;
-    var otherEntity = collision.bodyA.type === 'BOMB' ? collision.bodyB : collision.bodyA;
-
-    // TODO: check the ctime of bomb to now, do not explode if too new
-    // TODO: Apply damage or other effects to otherEntity
-    // TODO: configurable collision groups
-    if (['DEMON', 'HEXAPOD', 'FIRE', 'NPC', 'BLOCK', 'DOOR'].indexOf(otherEntity.type) !== -1) {
-      // TODO: remove this to work with generic collision handler for Block types
-      //       no need for explict call here, is simple refactor
-      if (otherEntity.type === 'BLOCK' || otherEntity.type === 'HEXAPOD') {
-        game.systems.block.blockBulletCollision(otherEntity.id, bombEntity.id, otherEntity, bombEntity);
-      } else {
-        game.removeEntity(otherEntity.id);
-        game.removeEntity(bombEntity.id);
-      }
-    }
-  });
-  return rules;
-}
-
-},{}],5:[function(require,module,exports){
+},{"../../../../sutra/index.js":4,"../../lib/Game/defaults/defaultPlatformMovement.js":1,"../../lib/Game/defaults/defaultTopdownMovement.js":2}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -839,7 +698,7 @@ function createSutra() {
   return new _sutra["default"]();
 }
 
-},{"./lib/sutra.js":15}],6:[function(require,module,exports){
+},{"./lib/sutra.js":14}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -871,7 +730,7 @@ function evaluateCompositeCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -926,7 +785,7 @@ function evaluateCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -984,7 +843,7 @@ function evaluateDSLCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1037,7 +896,7 @@ function evaluateSingleCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1210,7 +1069,7 @@ function exportToEnglish() {
   //return this.tree.map(node => describeAction(node, indentLevel)).join('\n').concat('') + '\n' + conditionDescriptions;
 }
 
-},{"./i18n.js":11}],11:[function(require,module,exports){
+},{"./i18n.js":10}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1258,7 +1117,7 @@ var languageConfig = {
 };
 var _default = exports["default"] = languageConfig;
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1283,7 +1142,7 @@ var _default = exports["default"] = {
   '!': 'not'
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1303,7 +1162,7 @@ function parsePath(path) {
   }, []);
 }
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1352,7 +1211,7 @@ function serializeNode(node) {
   return serializedNode;
 }
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2240,5 +2099,5 @@ var Sutra = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Sutra;
 
-},{"./evaluateCompositeCondition.js":6,"./evaluateCondition.js":7,"./evaluateDSLCondition.js":8,"./evaluateSingleCondition.js":9,"./exportToEnglish.js":10,"./operatorAliases.js":12,"./parsePath.js":13,"./serializeToJson.js":14}]},{},[3])(3)
+},{"./evaluateCompositeCondition.js":5,"./evaluateCondition.js":6,"./evaluateDSLCondition.js":7,"./evaluateSingleCondition.js":8,"./exportToEnglish.js":9,"./operatorAliases.js":11,"./parsePath.js":12,"./serializeToJson.js":13}]},{},[3])(3)
 });

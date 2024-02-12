@@ -1,3 +1,4 @@
+let ogPath = window.location.pathname;
 // TODO: decouple main fn from DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -16,7 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // set the default push state to the root
-  window.history.pushState({}, 'Mantra Examples', '/');
+// Preserve the original state and remove 'index.html' from the path if it exists
+  let initialPath = window.location.pathname;
+  window.history.replaceState({}, 'Mantra Examples', initialPath);
+  // window.history.pushState({}, 'Mantra Examples', '/');
 
   window.addEventListener('popstate', function (event) {
     // Always clear the iframe and hide it
@@ -129,8 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("categoryTitle", categoryTitle)
 
         // update url push state
-        let categoryPath = category.url.replace('.html', '');
-        window.history.pushState({ type: 'category', title: category.title }, categoryPath, `/${categoryPath}`);
+        let newPath = `${window.location.pathname}${category.url.replace('.html', '')}`;
+        window.history.pushState({ type: 'category', title: category.title }, categoryTitle, newPath);
+      
+
+        //let categoryPath = category.url.replace('.html', '');
+        //window.history.pushState({ type: 'category', title: category.title }, categoryPath, `/${categoryPath}`);
         const categoryExamples = filterExamples('', categoryTitle); // Filter examples for this category
         console.log("categoryExamples", categoryExamples)
         categoriesContainer.innerHTML = ''; // Clear the current content to display only the relevant examples
@@ -164,8 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
       exampleElement.addEventListener('click', () => {
         
         // Use the category's title to prepend to the example's title in the URL
-        const stateUrl = `${example.url.replace('.html', '')}`;
+        const stateUrl = `${ogPath}${example.url.replace('.html', '')}`;
+        // alert(ogPath + example.url)
+        example.url = ogPath + example.url;
         window.history.pushState({ type: 'example', title: example.title, url: example.url }, example.title, stateUrl);
+      
+        //const stateUrl = `${example.url.replace('.html', '')}`;
+        //window.history.pushState({ type: 'example', title: example.title, url: example.url }, example.title, stateUrl);
         loadExampleEmbed(example); // Load the example iframe
       });
 

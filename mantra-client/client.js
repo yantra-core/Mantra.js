@@ -210,7 +210,7 @@ if (mode === 'online') {
   //console.log("wwww", worlds)
   game.use(new plugins.Border());
 
-  home = new worlds.Maze();
+  // home = new worlds.Maze();
 
   /*
   --purple-light: #bbe;
@@ -224,10 +224,31 @@ if (mode === 'online') {
 
   // custom plugin hooks require you mutate the argument scope
   // if you wish to not mutate you can manually create addHook() inside your plugin code
+
+  //
+  console.log('game', game.lifecycle)
+
+  /*
+  // core methods usually require you return data
+  game.before('createEntity', (entityData) => {
+    if (entityData.type === 'BULLET') {
+      entityData.size = { width: 16, height: 16 };
+    }
+    return entityData;
+  });
+
+  // custom plugin hooks require you mutate the argument scope ( no return )
+  game.before('bullet.fireBullet', (entityId, bulletConfig) => {
+    bulletConfig.texture = 'tile-block';
+  });
+  */
+
+  /*
   game.lifecycle.addHook('before.bullet.fireBullet', (entityId, bulletConfig) => {
     console.log("before.bullet.fireBullet", entityId, bulletConfig)
     bulletConfig.texture = 'tile-block';
   });
+  */
 
   game.lifecycle.addHook('after.bullet.fireBullet', (entityId, bullet) => {
     console.log("after.bullet.fireBullet", entityId, bullet)
