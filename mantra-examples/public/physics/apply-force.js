@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
 
   game.use('Block');
+  game.use('Border');
 
   game.use('Bullet');
 
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   game.start(function () {
     game.zoom(1);
+    game.createBorder();
     game.setBackground('#000000');
 
 

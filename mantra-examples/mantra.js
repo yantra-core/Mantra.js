@@ -654,12 +654,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
   }, {
     key: "createBorder",
-    value: function createBorder() {
-      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref$width = _ref.width,
-        width = _ref$width === void 0 ? this.width : _ref$width,
-        _ref$height = _ref.height,
-        height = _ref$height === void 0 ? this.height : _ref$height,
+    value: function createBorder(_ref) {
+      var width = _ref.width,
+        height = _ref.height,
         _ref$thickness = _ref.thickness,
         thickness = _ref$thickness === void 0 ? 8 : _ref$thickness,
         color = _ref.color;
@@ -1574,6 +1571,7 @@ function construct(game) {
   game.loadedPlugins = [];
   // load default plugins
   if (game.config.loadDefaultPlugins) {
+    alert(game.config.virtualGamepad);
     game.loadPluginsFromConfig({
       physics: game.config.physics,
       graphics: game.config.graphics,
