@@ -5,11 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     collisions: true,
     graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
     // camera: 'follow',
-    // TODO: gameRoot, have this be default for scriptRoot and assetRoot
-    options: {
-      scriptRoot: 'http://192.168.1.80:7777',
-      assetRoot: 'http://192.168.1.80:7777'
-    }
+    gameRoot: 'https://yantra.gg/mantra'
   });
 
   game.use('Block');

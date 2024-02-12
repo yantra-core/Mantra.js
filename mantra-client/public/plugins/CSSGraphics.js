@@ -1623,12 +1623,14 @@ function render(game, alpha) {
     var itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
     // console.log('itemsInFov', itemsInFov)
 
-    itemsInFov.forEach(function (eId) {
-      var ent = _this.game.entities.get(eId);
-      if (ent) {
-        _this.inflateGraphic(ent, alpha);
-      }
-    });
+    if (itemsInFov && itemsInFov.length) {
+      itemsInFov.forEach(function (eId) {
+        var ent = _this.game.entities.get(eId);
+        if (ent) {
+          _this.inflateGraphic(ent, alpha);
+        }
+      });
+    }
   } else {
     var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
       _step;

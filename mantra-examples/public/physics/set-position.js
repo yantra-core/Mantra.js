@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', async (event) => {
-  let game = new MANTRA.Game({ gameRoot: 'http://192.168.1.80:7777' });
+  let game = new MANTRA.Game({
+    gameRoot: 'https://yantra.gg/mantra'
+  });
   game.use('Border');
   await game.start();
 
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
   }
 
   game.before('update', function () {
-    if (game.tick % 10 === 0) {
+    if (game.tick % 16 === 0) {
       entities.forEach((entityId) => {
         // generate a random position within an area around 0,0 with distance of 284
         let randomPosition = game.randomPositionSquare(0, 0, 284);
@@ -37,6 +39,5 @@ document.addEventListener('DOMContentLoaded', async (event) => {
       });
     }
   });
-
+  window.game = game;
 });
-window.game = game;

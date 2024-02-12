@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     createDefaultPlayer: false,
     physics: 'matter', // enum, 'physx', 'matter
     graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-    gameRoot: 'http://192.168.1.80:7777'
+    gameRoot: 'https://yantra.gg/mantra'
   });
 
   game.use('Block');

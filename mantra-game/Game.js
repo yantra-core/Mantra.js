@@ -23,7 +23,7 @@ class Game {
       width: 800,
       height: 600,
       fieldOfView: 1600,
-      useFoV: true,
+      useFoV: false,
       // game systems / auto-load based on pluginsConfig
       physics: 'matter',
       graphics: ['css'],
@@ -45,7 +45,7 @@ class Game {
       deltaEncoding: true,
       // createDefaultPlayer: false,
       defaultPlayer: true,
-      gameRoot: 'https://yantra.gg',
+      gameRoot: 'https://yantra.gg/mantra',
       options: {},
       mode: 'topdown', // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: false, // default behavior is multiple graphics plugins will be horizontally stacked

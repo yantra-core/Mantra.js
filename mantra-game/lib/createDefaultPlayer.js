@@ -37,6 +37,7 @@ export default function createDefaultPlayer(playerConfig = {}) {
     frictionStatic: 1, // Default static friction
     // color: 0x00ff00,
     position: playerConfig.position,
+    // sutra: playerConfig.sutra,
   });
 
   this.setPlayerId(player.id);
