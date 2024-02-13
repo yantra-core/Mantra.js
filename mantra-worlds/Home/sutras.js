@@ -20,7 +20,14 @@ export default function sutras(game) {
   let rules = game.createSutra();
 
   // movement
-  rules.use(movement(game), 'movement');
+  // not work, inputs to sutra tick not making it to subtree?
+  // double check sutra tick in mantra plugin and sutra core
+  // this *should* work
+  // rules.use(movement(game), 'movement');
+
+  // for now, ensure that player input movement sutras are top level rules
+  // we should be able to use the movement sutra as a sub-sutra, see above comment
+  game.useSutra(movement(game), 'mode-topdown');
 
   // helper for switching graphics
   let switchGraphicsSutra = switchGraphics(game);
