@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+  <script src="../mantra.js"></script> <!-- Keep this as it is -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      const source = params.get('source');
+      const script = document.createElement('script');
+      script.src = source + '.js';
+      // alert(script.src);
+      document.body.appendChild(script);
+      // Add similar blocks here for other scripts you might want to load dynamically based on the 'source' parameter
+    });
+  </script>
+</html>
