@@ -1,5 +1,4 @@
 let started = false;
-let hzMS = 16.666;
 let accumulator = 0;
 let lastGameTick = Date.now();
 
@@ -14,6 +13,9 @@ function localGameLoop(game, playerId) {
     started = true;
     lastGameTick = Date.now(); // Ensure we start with the current time
   }
+
+  let hzMS = game.config.hzMS || 16.666; // 60 FPS
+
   // game.localGameLoopRunning = true;
   game.mode = 'local';
   // Calculate deltaTime in seconds

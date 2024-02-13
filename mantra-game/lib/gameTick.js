@@ -1,10 +1,10 @@
 let lastTick = Date.now();
-let hzMS = 16.666; // 60 FPS
 
 function gameTick() {
   this.tick++;
   this.data.tick = this.tick;
 
+  let hzMS = this.config.hzMS || 16.666; // 60 FPS
   if (this.currentPlayerId) {
     this.data.currentPlayer = this.data.ents.PLAYER.find(player => player.id === this.currentPlayerId);
   }

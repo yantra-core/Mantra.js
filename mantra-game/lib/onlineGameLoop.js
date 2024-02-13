@@ -1,7 +1,7 @@
 // onlineGameLoop.js - Marak Squires 2023
 let started = false;
 let lastRenderedSnapshotId = null;
-let hzMS = 16.666;
+let hzMS = 16.666; // TODO: variable frame rates via game.config.hzMS
 let accumulator = 0;
 let lastGameTick = Date.now();
 

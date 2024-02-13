@@ -4,7 +4,6 @@ import deltaCompression from "../snapshot-manager/SnapshotManager/deltaCompressi
 import interpolateSnapshot from './lib/interpolateSnapshot.js';
 import messageSchema from "../server/messageSchema.js";
 let encoder = new TextEncoder();
-let hzMS = 16.666; // TODO: config with Game.fps
 let config = {};
 // default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
 // cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
@@ -41,6 +40,8 @@ export default class WebSocketClient {
 
   init(game) {
     this.game = game;
+    this.hzMS = game.config.hzMS || 16.666; // 60 FPS
+
     //this.game.connect = this.connect.bind(this);
     //this.game.disconnect = this.disconnect.bind(this);
     this.game.systemsManager.addSystem('websocketClient', this);
@@ -131,7 +132,7 @@ export default class WebSocketClient {
 
   startTicking() {
     // Calculate the interval to send ticks slightly faster than hzMS, accounting for RTT
-    const tickInterval = Math.max(hzMS - (this.rtt || 100) / 2, 1); // Ensure the interval is never less than 1ms
+    const tickInterval = Math.max(this.hzMS - (this.rtt || 100) / 2, 1); // Ensure the interval is never less than 1ms
 
     setInterval(() => {
       // Include the clientTickTime based on the current time and RTT

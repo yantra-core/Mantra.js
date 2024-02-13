@@ -53,7 +53,7 @@ tap.test('game class', (t) => {
     // gameState should contain important metadata about the game world
     t.equal(gameState.width, 800);
     t.equal(gameState.height, 600);
-    t.equal(gameState.FPS, 60);
+    t.equal(gameState.fps, 60);
 
     t.end();
   });

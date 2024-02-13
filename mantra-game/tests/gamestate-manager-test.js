@@ -52,7 +52,7 @@ tap.test('toJSON should return correct string', (t) => {
   t.equal(stateObj.height, 600);
 
   // Assert FPS and camera settings
-  t.equal(stateObj.FPS, 60);
+  t.equal(stateObj.fps, 60);
   t.ok(stateObj.camera.follow);
   t.equal(stateObj.camera.currentZoom, 1);
 

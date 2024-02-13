@@ -23,6 +23,7 @@ class Game {
       width: 800,
       height: 600,
       fieldOfView: 1600,
+      fps: 60,
       useFoV: false,
       // game systems / auto-load based on pluginsConfig
       physics: 'matter',

@@ -104,7 +104,7 @@ export default function switchGraphics(game) {
         });
       } else {
         // update circle
-        loadingCircle.tick(1 / gameState.FPS * 1000);
+        loadingCircle.tick(1 / gameState.fps * 1000);
       }
     }
   });

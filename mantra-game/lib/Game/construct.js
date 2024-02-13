@@ -50,7 +50,7 @@ export default function construct(game, plugins = []) {
   game.data = {
     width: game.config.width,
     height: game.config.height,
-    FPS: 60,
+    fps: game.config.fps,
     fieldOfView: game.config.fieldOfView, // global for game, not camera specific
     camera: {
       follow: game.config.camera.follow,
@@ -65,6 +65,14 @@ export default function construct(game, plugins = []) {
 
   if (typeof game.data.camera.currentZoom === 'undefined') {
     game.data.camera.currentZoom = 1;
+  }
+
+  if (typeof game.config.fps === 'number') {
+    // if fps is provide, set game.config.hzMS to 1000 / fps
+    game.config.hzMS = 1000 / game.config.fps;
+    // set precision to 3 decimal places, preserve the last repeating digit
+    game.config.hzMS = game.config.hzMS.toFixed(3);
+    console.log('Setting custom FPS:', game.config.fps);
   }
 
   console.log("Mantra starting...");

@@ -146,7 +146,7 @@ class Sutra {
 
         if (this.inputCache.controls[c] === true) {
           this.inputDuration[c] = this.inputDuration[c] || 0;
-          this.inputDuration[c] += 1000 / game.data.FPS;
+          this.inputDuration[c] += 1000 / game.data.fps;
         }
         if (this.inputCache.controls[c] === false) {
           this.inputDuration[c] = this.inputDuration[c] || 0;
@@ -205,7 +205,6 @@ class Sutra {
     game.data.input = {};
     game.data.inputTicks = {};
     game.data.inputDuration = {};
-
     this.inputCache = {};
 
   }

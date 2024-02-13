@@ -9,6 +9,7 @@ import plugins from '../../plugins.js';
 import deltaCompression from '../snapshot-manager/SnapshotManager/deltaCompression.js';
 import deltaEncoding from '../snapshot-manager/SnapshotManager/deltaEncoding.js';
 
+// TODO: adjust for variable frame rates via game.config.hzMS
 const FIXED_DT = 16.666; // 60 FPS
 let accumulatedTime = 0;
 let lastTimestamp;
