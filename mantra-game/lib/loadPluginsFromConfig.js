@@ -9,6 +9,37 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   let plugins = this.plugins;
   let gameConfig = this.config
 
+
+  //
+  // Iterate through `GameConfig.plugins` array and load plugins
+  // Three separate formats are supported to load plugins:
+  //   1. string name of plugin (e.g. 'Bullet')
+  //   2. instance of plugin (e.g. new Bullet())
+  //   3. object with `name` and `config` properties (e.g. { name: 'Bullet', config: { cool: true } })
+  if (plugins.length) {
+    console.log('The following plugins will be loaded from `GameConfig`', plugins)
+    plugins.forEach(pluginy => {
+      if (typeof pluginy === 'string') {
+        // console.log('using plugin as string name', pluginy)
+        this.use(pluginy);
+        return;
+      }
+
+      if (typeof pluginy === 'object' && pluginy.id && typeof pluginy.init === 'function') {
+        //console.log('found compatible plugin class instance as object', pluginy)
+        this.use(pluginy);
+        return;
+      }
+
+      if (typeof pluginy === 'object' && pluginy.name && typeof pluginy.config === 'object') {
+        // console.log('found plugin as config object', pluginy)
+        this.use(pluginy.name, pluginy.object);
+        return;
+      }
+
+    });
+  }
+
   if (gameConfig.showLoadingScreen && !this.isServer) {
     this.use(new LoadingScreen({
       minLoadTime: gameConfig.minLoadTime
@@ -25,8 +56,10 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
     this.use('PhysXPhysics');
   }
 
-  this.use('EntityInput');
-  this.use('EntityMovement');
+  // Remark: Removed 2/13/2024, no longer loading movement by default
+  // this.use('EntityInput');
+  // this.use('EntityMovement');
+
   this.use('SnapshotManager');
 
   if (lifetime) {

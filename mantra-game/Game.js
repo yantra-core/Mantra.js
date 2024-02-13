@@ -15,7 +15,7 @@ class Game {
       isEdgeClient: false,
       isServer: false,
       isOfflineMode: undefined,
-      plugins: {}, // Plugin Classes that will be bound to the game instance
+      plugins: [], // array of plugins as string, instance, or string with config object
       // game options
       showLoadingScreen: true,
       minLoadTime: 330, // minimum time to show loading screen
@@ -33,19 +33,19 @@ class Game {
       gravity: {},
       keyboard: true,
       mouse: true,
-      gamepad: true,
-      virtualGamepad: true,
+      gamepad: false,
+      virtualGamepad: false,
       editor: true,
       sutra: true,
       lifetime: true,
-      defaultMovement: true,
+      defaultMovement: false,
       // data compression
       protobuf: false,
       msgpack: false,
       deltaCompression: false,
       deltaEncoding: true,
       // createDefaultPlayer: false,
-      defaultPlayer: true,
+      defaultPlayer: false,
       gameRoot: 'https://yantra.gg/mantra',
       options: {},
       mode: 'topdown', // default entity input and movement mode defined as Sutras

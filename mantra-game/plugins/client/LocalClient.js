@@ -46,12 +46,14 @@ export default class LocalClient {
 
   sendMessage(action, data) {
     if (action === 'player_input') {
+      /* Remark: Removed 2/13/2024 - No need for entity-input system ( use Plugins + Sutra), especially in offline mode
       if (!this.game.systems['entity-input']) {
         console.log('entity-input system not found, skipping player_input action to sendMessage');
         return;
       }
       let entityInput = this.game.getSystem('entity-input');
       entityInput.handleInputs(this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse, actions: data.actions });
+      */
     }
   }
 }
