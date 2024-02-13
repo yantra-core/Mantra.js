@@ -83,6 +83,10 @@ class CSSCamera {
     this.gameViewport.style.transformOrigin = 'center center';
 
     this.initZoomControls();
+    // set initial zoom based on config
+    if (this.config.initialZoom) {
+      this.zoom(this.config.initialZoom);
+    }
 
     game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
       //console.log("CSSCamera.js", entityId, data, sequenceNumber)

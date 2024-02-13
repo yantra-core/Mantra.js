@@ -279,7 +279,7 @@ class Collisions {
 
       if (existingCollision) {
         // Increment duration if collision is already active
-        existingCollision.duration += 1 / this.game.data.FPS; // Adds approximately 0.01667 seconds per tick at 60 FPS
+        existingCollision.duration += 1 / this.game.data.fps; // Adds approximately 0.01667 seconds per tick at 60 FPS
         existingCollision.ticks++;
       } else {
         // Add new collision if not found
