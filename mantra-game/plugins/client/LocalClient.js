@@ -54,6 +54,10 @@ export default class LocalClient {
       let entityInput = this.game.getSystem('entity-input');
       entityInput.handleInputs(this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse, actions: data.actions });
       */
+      // some GUI components are still listening for this event, we can make them plugins,
+      // that check for game.data.inputs or leave the event ( for now )
+      this.game.emit('entityInput::handleInputs', this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse, actions: data.actions }, null);
+
     }
   }
 }
