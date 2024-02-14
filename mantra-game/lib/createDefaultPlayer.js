@@ -13,6 +13,10 @@ export default function createDefaultPlayer(playerConfig = {}) {
     delete playerConfig.texture;
   }
 
+  if (typeof playerConfig.rotation !== 'number') {
+    playerConfig.rotation = 0;
+  }
+
   // check if game.currentPlayerId is already set, if so, return that entity
   if (this.currentPlayerId) {
     // Remark: Removed 1/22/24 as part of bringing multiplayer back
@@ -33,6 +37,7 @@ export default function createDefaultPlayer(playerConfig = {}) {
     name: playerConfig.name,
     type: 'PLAYER',
     shape: 'triangle',
+    rotation: playerConfig.rotation,
     collisionActive: true,
     collisionStart: true,
     collisionEnd: true,

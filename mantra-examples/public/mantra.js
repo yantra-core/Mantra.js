@@ -1909,6 +1909,9 @@ function createDefaultPlayer() {
   if (playerConfig.texture === 'none') {
     delete playerConfig.texture;
   }
+  if (typeof playerConfig.rotation !== 'number') {
+    playerConfig.rotation = 0;
+  }
 
   // check if game.currentPlayerId is already set, if so, return that entity
   if (this.currentPlayerId) {
@@ -1927,6 +1930,7 @@ function createDefaultPlayer() {
     name: playerConfig.name,
     type: 'PLAYER',
     shape: 'triangle',
+    rotation: playerConfig.rotation,
     collisionActive: true,
     collisionStart: true,
     collisionEnd: true,
