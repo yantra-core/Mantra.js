@@ -1,6 +1,12 @@
 async function start() {
-  let game = new MANTRA.Game({});
+  let game = new MANTRA.Game({
+    defaultPlayer: false,
+    graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three',
+    gameRoot: 'http://192.168.1.80:7777'
+  });
   await game.start();
+  
+  // game.setZoom(2);
 
   game.setBackground('#000000');
   game.createBorder();

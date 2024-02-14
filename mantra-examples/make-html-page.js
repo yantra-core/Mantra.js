@@ -43,6 +43,15 @@ let categories = [
     url: 'textures.html',
     tags: ['textures', 'images', 'graphics', 'assets', 'resources', 'files', 'loading', 'unloading', 'applying', 'updating', 'changing', 'modifying', 'replacing']
   },
+  {
+    title: 'Render', // blue
+    color: '#2196f3',
+    description: 'Render entities using RenderPlex pipeline.',
+    image: 'placeholder-image.jpg',
+    url: 'render.html',
+    tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
+  },
+
   /*
   {
     title: 'Game Config', // red
@@ -218,15 +227,41 @@ let texture_examples = [
     tags: ['sprite', 'sheet', 'texture', 'graphic', 'sprite', 'image', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load']
   },
 
- 
 ];
+
+let render_examples = [
+  {
+    title: 'CSS3 Graphics',
+    category: 'render',
+    description: 'Render entities using CSS3.',
+    image: 'placeholder-image.jpg',
+    url: 'render/css3.html',
+    tags: ['css3', 'graphics', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
+  },
+  {
+    title: 'Babylon.js WebGPU',
+    category: 'render',
+    description: 'Render entities using Babylon.js WebGPU.',
+    image: 'placeholder-image.jpg',
+    url: 'render/babylon.html',
+    tags: ['babylon.js', 'webgpu', 'graphics', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
+  },
+  {
+    title: "Three.js WebGL",
+    category: 'render',
+    description: 'Render entities using Three.js WebGL.',
+    image: 'placeholder-image.jpg',
+    url: 'render/three.html',
+    tags: ['three.js', 'webgl', 'graphics', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
+  }
+]
 
 // concat all arr to examples
 examples = examples.concat(item_examples);
 examples = examples.concat(entity_examples);
 examples = examples.concat(lifecycle_examples);
 examples = examples.concat(texture_examples);
-
+examples = examples.concat(render_examples);
 
 import fs from 'fs';
 import path from 'path';

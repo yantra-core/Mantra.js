@@ -1,5 +1,7 @@
 async function start() {
-  let game = new MANTRA.Game({});
+  let game = new MANTRA.Game({
+    graphics: ['babylon'], // array enum, 'babylon', 'phaser', 'css', 'three'
+  });
   await game.start();
 
   game.setBackground('#000000');

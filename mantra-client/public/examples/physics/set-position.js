@@ -1,7 +1,5 @@
 async function start() {
-  let game = new MANTRA.Game({
-    gameRoot: 'http://192.168.1.80:7777'
-  });
+  let game = new MANTRA.Game({});
   await game.start();
 
   game.setBackground('#000000');
