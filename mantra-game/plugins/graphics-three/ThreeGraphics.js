@@ -159,7 +159,6 @@ class ThreeGraphics extends GraphicsInterface {
     // Follow the player entity with the camera
     const currentPlayer = this.game.getEntity(game.currentPlayerId);
     if (currentPlayer) {
-
       if (game.data.camera.mode === 'fpv') {
         this.setFirstPersonView();
       }
@@ -193,6 +192,13 @@ class ThreeGraphics extends GraphicsInterface {
 
       }
 
+    } else {
+      // no current player
+      // sets a default camera position and perspective
+      // TODO: add multiple camera views here / camera controls to orbital view
+      this.camera.position.set(0, 400, 100); // Set a default position
+      this.camera.lookAt(new Vector3(0, 0, 0));
+      console.log('fffcouldnt find follow player looking at 0');
     }
   }
 
