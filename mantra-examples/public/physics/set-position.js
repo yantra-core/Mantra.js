@@ -1,8 +1,9 @@
 async function start() {
-  let game = new MANTRA.Game({});
-  game.use('Border');
+  let game = new MANTRA.Game({
+    gameRoot: 'http://192.168.1.80:7777'
+  });
   await game.start();
-  game.zoom(1);
+
   game.setBackground('#000000');
   game.createBorder();
 

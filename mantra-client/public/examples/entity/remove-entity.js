@@ -1,8 +1,5 @@
 let game = new MANTRA.Game({
-  createDefaultPlayer: true,
-  physics: 'matter', // enum, 'physx', 'matter
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  gameRoot: 'https://yantra.gg/mantra'
 });
 
 game.use('Block');

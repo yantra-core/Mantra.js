@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="keywords" content="physics, engine, motion, movement, gravity, force, velocity, mass, acceleration, inertia, friction, javascript game development, html5 game development, webgl game development, css game development, css3 game development, canvas game development, web game development, browser game development, browser based game development, browser games">
-<meta name="description" content="Explore examples featuring the physics engine.">
-  <title>Physics</title>
+<meta name="description" content="Interact with bodies, forces, gravity.">
+  <title>Mantra - Examples - Physics</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,6 +48,8 @@
       cursor: pointer;
       transition: box-shadow 0.3s;
       font-size: 1.3em;
+      min-width: 300px;
+      max-width: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -99,6 +101,7 @@
       padding: 10px;
       margin: 0;
       flex-grow: 1;
+
     }
 
     .category a {
@@ -195,7 +198,7 @@
       color: #000 !important;
       text-decoration: none !important;
       flex: 0 1 calc(33.333% - 40px);
-          /* flex: 0 1 calc(33.333% - 40px) !important; */
+      /* flex: 0 1 calc(33.333% - 40px) !important; */
     }
 
 
@@ -204,6 +207,10 @@
       .category {
         flex: 0 1 calc(50% - 40px);
       }
+      .staticExampleLink {
+        flex: 0 1 calc(50% - 40px);
+      }
+
     }
 
     @media (max-width: 480px) {
@@ -230,11 +237,6 @@
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Search Examples (i.e. Movement, Bullet, Config)">
     </div>
-  </div>
-
-
-  <div class="exampleEmbeds">
-    <iframe id="example-embed" src="./items/bullet.html" frameborder="0" width="100%" height="100%"></iframe>
   </div>
 
   <div class="code-editor">

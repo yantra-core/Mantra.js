@@ -1,19 +1,12 @@
 let game = new MANTRA.Game({
-  createDefaultPlayer: false,
-  physics: 'matter', // enum, 'physx', 'matter
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  gameRoot: 'https://yantra.gg/mantra'
+  gameRoot: 'http://192.168.1.80:7777',
 });
 
-game.use('Block');
-game.use('Border');
-game.use('Bullet');
-
 game.start(function () {
-  game.zoom(1);
   game.createBorder();
   game.setBackground('#000000');
-  // create a few entities to shoot
+
   let entities = [];
   for (let i = 0; i < 22; i++) {
     let randomColor = game.randomColor();

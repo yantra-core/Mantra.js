@@ -16,9 +16,6 @@
     document.addEventListener('DOMContentLoaded', (event) => {
 
       let game = new MANTRA.Game({
-        defaultPlayer: false,
-        physics: 'matter', // enum, 'physx', 'matter
-        collisions: true,
         graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
         options: {
@@ -28,11 +25,7 @@
       });
 
       // game.use('Bullet');
-      game.use('Sutra');
-      game.use('Gamepad');
-      game.use('GamepadGUI');
       game.start(function () {
-        game.use('Editor');
         game.use(new WORLDS.worlds['Platform']());
       });
       window.game = game;

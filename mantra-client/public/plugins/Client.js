@@ -226,16 +226,21 @@ var LocalClient = exports["default"] = /*#__PURE__*/function () {
     key: "sendMessage",
     value: function sendMessage(action, data) {
       if (action === 'player_input') {
+        /* Remark: Removed 2/13/2024 - No need for entity-input system ( use Plugins + Sutra), especially in offline mode
         if (!this.game.systems['entity-input']) {
           console.log('entity-input system not found, skipping player_input action to sendMessage');
           return;
         }
-        var entityInput = this.game.getSystem('entity-input');
-        entityInput.handleInputs(this.game.currentPlayerId, {
+        let entityInput = this.game.getSystem('entity-input');
+        entityInput.handleInputs(this.game.currentPlayerId, { controls:  data.controls, mouse: data.mouse, actions: data.actions });
+        */
+        // some GUI components are still listening for this event, we can make them plugins,
+        // that check for game.data.inputs or leave the event ( for now )
+        this.game.emit('entityInput::handleInputs', this.game.currentPlayerId, {
           controls: data.controls,
           mouse: data.mouse,
           actions: data.actions
-        });
+        }, null);
       }
     }
   }]);
@@ -266,7 +271,6 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // WebSocketClient.js - Marak Squires 2023
 var encoder = new TextEncoder();
-var hzMS = 16.666; // TODO: config with Game.fps
 var config = {};
 // default encoding is protobuf, turn this on to connect websocket server ( not cloudflare )
 // cloudflare edge server requires msgpack due to: https://github.com/protobufjs/protobuf.js/pull/1941
@@ -303,6 +307,8 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      this.hzMS = game.config.hzMS || 16.666; // 60 FPS
+
       //this.game.connect = this.connect.bind(this);
       //this.game.disconnect = this.disconnect.bind(this);
       this.game.systemsManager.addSystem('websocketClient', this);
@@ -403,7 +409,7 @@ var WebSocketClient = exports["default"] = /*#__PURE__*/function () {
     value: function startTicking() {
       var _this2 = this;
       // Calculate the interval to send ticks slightly faster than hzMS, accounting for RTT
-      var tickInterval = Math.max(hzMS - (this.rtt || 100) / 2, 1); // Ensure the interval is never less than 1ms
+      var tickInterval = Math.max(this.hzMS - (this.rtt || 100) / 2, 1); // Ensure the interval is never less than 1ms
 
       setInterval(function () {
         // Include the clientTickTime based on the current time and RTT

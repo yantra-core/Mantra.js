@@ -159,11 +159,10 @@ export default function updateEntity(entityDataOrId, entityData) {
     let newTexture;
     // check to see if incoming entityData.texture is a string, if so, it's a texture id
     if (typeof entityData.texture === 'string') {
-//      newTexture = entityData.texture;
+      newTexture = entityData.texture;
     } else {
-
+      newTexture = { ...prev, ...entityData.texture };
     }
-    newTexture = { ...prev, ...entityData.texture };
 
     this.game.components.texture.set(entityId, newTexture);
   }

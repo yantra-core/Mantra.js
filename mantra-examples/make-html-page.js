@@ -1,13 +1,57 @@
+
+
 let categories = [
   {
     title: 'Physics', // purple
     color: '#9c27b0',
-    description: 'Explore examples featuring the physics engine.',
+    description: 'Interact with bodies, forces, gravity.',
     image: 'placeholder-image.jpg',
     url: 'physics.html',
     tags: ['physics', 'engine', 'motion', 'movement', 'gravity', 'force', 'velocity', 'mass', 'acceleration', 'inertia', 'friction']
   },
+
+  {
+    title: 'Lifecycle', // blue
+    color: '#2196f3',
+    description: 'Hook into game events.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle.html',
+    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
+  },
+
+  {
+    title: 'Items', // teal
+    color: '#009688',
+    description: 'Items can be collected and used.',
+    image: 'placeholder-image.jpg',
+    url: 'items.html',
+    tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
+  },
+  {
+    title: 'Entity', // pink
+    color: '#e91e63',
+    description: 'Entities are the main game objects.',
+    image: 'placeholder-image.jpg',
+    url: 'entity.html',
+    tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
+  },
+  {
+    title: 'Textures', // green
+    color: '#4caf50',
+    description: 'Change the appearance of entities.',
+    image: 'placeholder-image.jpg',
+    url: 'textures.html',
+    tags: ['textures', 'images', 'graphics', 'assets', 'resources', 'files', 'loading', 'unloading', 'applying', 'updating', 'changing', 'modifying', 'replacing']
+  },
   /*
+  {
+    title: 'Game Config', // red
+    color: '#f44336',
+    description: 'Explore examples featuring the game configuration.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config.html',
+    tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
   {
     title: 'Graphics', // blue
     color: '#2196f3',
@@ -16,18 +60,6 @@ let categories = [
     url: 'graphics.html',
     tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
   },
-  */
- /*
-  {
-    title: 'Assets', // green
-    color: '#4caf50',
-    description: 'Explore examples featuring the asset management system.',
-    image: 'placeholder-image.jpg',
-    url: 'assets.html',
-    tags: ['assets', 'management', 'loading', 'resources', 'files', 'images', 'audio', 'video', 'fonts', 'scripts', 'data']
-  },
-  */
- /*
   {
     title: 'Plugins', // orange
     color: '#ff9800',
@@ -37,49 +69,10 @@ let categories = [
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
   },
   */
- /*
-  {
-    title: 'Game Config', // red
-    color: '#f44336',
-    description: 'Explore examples featuring the game configuration.',
-    image: 'placeholder-image.jpg',
-    url: 'game-config.html',
-    tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
-  },
-  */
 
-  /*
-  {
-    title: 'Input', // yellow
-  },
-  */
-
-  {
-    title: 'Lifecycle', // blue
-    color: '#2196f3',
-    description: 'Explore examples featuring the game lifecycle.',
-    image: 'placeholder-image.jpg',
-    url: 'lifecycle.html',
-    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
-  },
-
-  {
-    title: 'Items', // teal
-    color: '#009688',
-    description: 'Explore examples featuring the item system.',
-    image: 'placeholder-image.jpg',
-    url: 'items.html',
-    tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
-  },
-  {
-    title: 'Entity', // pink
-    color: '#e91e63',
-    description: 'Explore examples featuring the entity system.',
-    image: 'placeholder-image.jpg',
-    url: 'entity.html',
-    tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
-  }
 ];
+
+//  assets   tags: ['assets', 'management', 'loading', 'resources', 'files', 'images', 'audio', 'video', 'fonts', 'scripts', 'data']
 
 let examples = [];
 
@@ -87,7 +80,7 @@ let item_examples = [
   {
     title: 'Block',
     category: 'items',
-    description: 'Create a block item and add it to the inventory.',
+    description: 'Blocks are can be split into smaller blocks.',
     image: 'placeholder-image.jpg',
     url: 'items/block.html',
     tags: ['block', 'item', 'inventory', 'building', 'construction', 'material', 'structure', 'obstacle', 'barrier', 'wall', 'floor']
@@ -95,7 +88,7 @@ let item_examples = [
   {
     title: 'Bomb',
     category: 'items',
-    description: 'Create a bomb item and add it to the inventory.',
+    description: 'Bombs can be thrown and explode after a set time.',
     image: 'placeholder-image.jpg',
     url: 'items/bomb.html',
     tags: ['bomb', 'item', 'inventory', 'explosive', 'damage', 'area', 'effect', 'blast', 'radius', 'timer', 'fuse']
@@ -103,7 +96,7 @@ let item_examples = [
   {
     title: 'Bullet',
     category: 'items',
-    description: 'Create a bullet item and add it to the inventory.',
+    description: 'Bullets shoot in a straight line and deal damage to entities they hit.',
     image: 'placeholder-image.jpg',
     url: 'items/bullet.html',
     tags: ['bullet', 'item', 'inventory', 'projectile', 'damage', 'range', 'speed', 'accuracy', 'penetration', 'piercing', 'shooting']
@@ -111,7 +104,7 @@ let item_examples = [
   {
     title: 'Boomerang',
     category: 'items',
-    description: 'Create a boomerang item and add it to the inventory.',
+    description: 'Boomerangs can be thrown and return.',
     image: 'placeholder-image.jpg',
     url: 'items/boomerang.html',
     tags: ['boomerang', 'item', 'inventory', 'throwing', 'damage', 'return', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
@@ -147,7 +140,7 @@ let entity_examples = [
   {
     title: 'Create Entity',
     category: 'entity',
-    description: 'Create a new entity and add it to the scene.',
+    description: 'Create a new entity.',
     image: 'placeholder-image.jpg',
     url: 'entity/create-entity.html',
     tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
@@ -155,7 +148,7 @@ let entity_examples = [
   {
     title: 'Remove Entity',
     category: 'entity',
-    description: 'Remove an entity from the scene.',
+    description: 'Remove an entity',
     image: 'placeholder-image.jpg',
     url: 'entity/remove-entity.html',
     tags: ['remove', 'entity', 'scene', 'delete', 'destroy', 'dispose', 'clear', 'purge', 'eliminate', 'exterminate']
@@ -163,7 +156,7 @@ let entity_examples = [
   {
     title: 'Update Entity',
     category: 'entity',
-    description: 'Update an entity in the scene.',
+    description: 'Update an entity.',
     image: 'placeholder-image.jpg',
     url: 'entity/update-entity.html',
     tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
@@ -171,13 +164,14 @@ let entity_examples = [
   {
     title: 'Get Entity',
     category: 'entity',
-    description: 'Get an entity from the scene.',
+    description: 'Get an entity',
     image: 'placeholder-image.jpg',
     url: 'entity/get-entity.html',
     tags: ['get', 'entity', 'scene', 'find', 'search', 'locate', 'retrieve', 'fetch', 'obtain', 'acquire', 'detect']
   }
 
 ];
+
 
 let lifecycle_examples = [
   {
@@ -198,11 +192,41 @@ let lifecycle_examples = [
   },
 ];
 
+let texture_examples = [
+  {
+    title: 'Set Texture',
+    category: 'textures',
+    description: 'Set a texture on Entity.',
+    image: 'placeholder-image.jpg',
+    url: 'textures/set-texture.html',
+    tags: ['load', 'texture', 'graphic', 'sprite', 'image', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load']
+  },
+  {
+    title: 'Update Texture',
+    category: 'textures',
+    description: 'Update a texture on Entity.',
+    image: 'placeholder-image.jpg',
+    url: 'textures/update-texture.html',
+    tags: ['unload', 'texture', 'graphic', 'sprite', 'image', 'asset', 'resource', 'file', 'unload', 'unload', 'unload', 'unload', 'unload', 'unload']
+  },
+  {
+    title: 'Sprite Sheets',
+    category: 'textures',
+    description: 'Sprite textures from a sprite sheet',
+    image: 'placeholder-image.jpg',
+    url: 'textures/sprite-sheets.html',
+    tags: ['sprite', 'sheet', 'texture', 'graphic', 'sprite', 'image', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load']
+  },
+
+ 
+];
 
 // concat all arr to examples
 examples = examples.concat(item_examples);
 examples = examples.concat(entity_examples);
 examples = examples.concat(lifecycle_examples);
+examples = examples.concat(texture_examples);
+
 
 import fs from 'fs';
 import path from 'path';
@@ -259,7 +283,7 @@ categories.forEach(category => {
   ];
 
   str = str.replace('$$$categories$$$', categoryHTML);
-  str = str.replace('$$$title$$$', category.title);
+  str = str.replace('$$$title$$$', 'Mantra - Examples - ' + category.title);
 
   // Combine category-specific tags with general game development tags and create a single keywords meta tag
   const combinedTags = [...category.tags, ...mantraGameDevFrameworksTags].join(', ');
@@ -309,7 +333,7 @@ console.log("mainCategoriesHTML", mainCategoriesHTML)
 
 // Create index.html content by replacing the placeholder with main categories HTML
 let indexHTML = indexTemplate.replace('$$$categories$$$', mainCategoriesHTML);
-indexHTML = indexHTML.replace('$$$title$$$', 'Main Categories');
+indexHTML = indexHTML.replace('$$$title$$$', 'Mantra - Examples - Main Categories');
 
 // Ensure the output directory exists
 if (!fs.existsSync(outputDir)){

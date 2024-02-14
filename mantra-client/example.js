@@ -11,9 +11,10 @@ let Boomerang = new plugins.Boomerang();
 let game = new Game({
   width: 800,
   height: 600,
+  defaultPlayer: true,
+  defaultMovement: true,
   virtualGamepad: true,
   gameRoot: '.',
-  defaultMovement: true,
   plugins: [
     'Bullet',    // plugin as string
     Boomerang,   // plugin as Plugin instance
@@ -56,56 +57,39 @@ let game = new Game({
 
 window.game = game;
 
+
 game.start(function () {
-
-  //game.use('Bullet');
-  //game.use('Boomerang');
-
-  // TODO: should not have default movements...
-  game.createPlayer({
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'player',
-    },
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
-
-  game.rules.if('W').then('MOVE_UP');
-
-  game.rules.on('MOVE_UP', function (entity) {
-    game.applyForce(entity.id, {
-      x: 0,
-      y: -1
+  game.zoom(1);
+  game.createBorder();
+  game.setBackground('#000000');
+  // create a few entities to shoot
+  let entities = [];
+  for (let i = 0; i < 22; i++) {
+    let randomColor = game.randomColor();
+    let entity = game.createEntity({
+      color: randomColor,
+      size: {
+        width: 16,
+        height: 16
+      },
+      hasCollisionStart: true,
+      position: {
+        // random positions start from top left corner
+        x: Math.random() * -game.width / 2,
+        y: Math.random() * -game.height / 2
+      }
     });
-  });
+    entities.push(entity);
+  }
 
-  game.createEntity({
-    position: {
-      x: -50,
-      y: 0
-    }
-  });
-  game.createEntity({
-    position: {
-      x: 50,
-      y: 0
+  game.before('update', function () {
+    if (game.tick % 100) {
+      entities.forEach((entity) => {
+        game.applyForce(entity.id, { x: 0.01, y: 0.01 });
+      });
     }
   });
 
-  /*
-  game.createPlayer({
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'player',
-    },
-    position: {
-      x: 0,
-      y: 0
-    }
-  });
-
-  */
 });
+window.game = game;
+

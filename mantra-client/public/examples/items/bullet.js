@@ -1,30 +1,37 @@
 let game = new MANTRA.Game({
-  physics: 'matter', // enum, 'physx', 'matter
-  collisions: true,
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  // camera: 'follow',
-  gameRoot: 'https://yantra.gg/mantra'
+  defaultPlayer: true,   // creates a player
+  defaultMovement: true, // adds movement to player
+  virtualGamepad: false, // adds virtual gamepad to player
+  gameRoot: 'http://192.168.1.80:7777',
 });
 
 game.use('Block');
-
 game.use('Bullet');
 
 // TODO: demos should have simple control mappings with Sutra, no default mappings
 game.start(function () {
-  game.zoom(1);
   game.setBackground('#000000');
 
+  game.on('pointerDown', function (event) {
+    game.systems.bullet.fireBullet(game.data.ents.PLAYER[0].id);
+  });
 
-  // create a few entities to shoot
+  // create a few entities to shoot, aligned horizontally in front of the gun
   let entities = [];
+  let startPosition = { x: 100, y: 100 };
+  let blockSpacing = 60; // Adjust as needed for spacing between blocks
   for (let i = 0; i < 10; i++) {
     let entity = game.createEntity({
       type: 'BLOCK',
+      size: {
+        width: 50,
+        height: 50
+      },
       hasCollisionStart: true,
       position: {
-        x: Math.random() * 1000,
-        y: Math.random() * 1000
+        x: startPosition.x + (i * blockSpacing), // Position blocks in a line to the right of the gun
+        y: startPosition.y // Align blocks vertically with the gun
       }
     });
     entities.push(entity);

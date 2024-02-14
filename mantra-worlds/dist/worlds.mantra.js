@@ -3163,75 +3163,187 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = platformMovement;
 function platformMovement(game) {
   var rules = game.createSutra();
+  rules.addCondition('PLAYER_UP', {
+    op: 'or',
+    conditions: ['W', 'DPAD_UP']
+  });
+  rules.addCondition('PLAYER_DOWN', {
+    op: 'or',
+    conditions: ['S', 'DPAD_DOWN']
+  });
+  rules.addCondition('MOVE_LEFT', {
+    op: 'or',
+    conditions: ['A', 'DPAD_LEFT']
+  });
+  rules.addCondition('MOVE_RIGHT', {
+    op: 'or',
+    conditions: ['D', 'DPAD_RIGHT']
+  });
+  rules.addCondition('PLAYER_JUMP', {
+    op: 'or',
+    conditions: ['SPACE', 'H', 'BUTTON_B']
+  });
+  rules.addCondition('PLAYER_RUN', {
+    op: 'or',
+    conditions: ['J', 'BUTTON_X']
+  });
+  rules.addCondition('ZOOM_IN', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('ZOOM_OUT', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
+  rules.addCondition('isRunning', {
+    op: 'or',
+    conditions: ['S', 'K'] // defaults DOWN key, or B button on Gamepad
+  });
+  rules["if"]('MOVE_LEFT').then('MOVE_LEFT').then('updateSprite', {
+    sprite: 'playerLeftWalk'
+  });
+  rules["if"]('MOVE_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
+    sprite: 'playerRightWalk'
+  });
 
   /*
-     rules.on('MOVE_UP', function (player) {
-      game.applyForce(player.id, { x: 0, y: -1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: 0 });
-    });
-     rules.on('MOVE_DOWN', function (player) {
-      game.applyForce(player.id, { x: 0, y: 1, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI });
-    });
-     rules.on('MOVE_LEFT', function (player, node, gameState) {
-      game.applyForce(player.id, { x: -1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: -Math.PI / 2 });
-    });
-     rules.on('MOVE_RIGHT', function (player) {
-      game.applyForce(player.id, { x: 1, y: 0, z: 0 });
-      game.updateEntity({ id: player.id, rotation: Math.PI / 2 });
-    });
-     */
+  rules
+    .if('PLAYER_UP')
+      .then('PLAYER_UP')
+      .then('updateSprite', { sprite: 'playerUpRight' });
+  */
 
-  // TODO: remove this? the Sutra should only be concerned with the control name, not the key
-  var defaultControlsMapping = {
-    A: 'MOVE_LEFT',
-    D: 'MOVE_RIGHT',
-    SPACE: 'JUMP',
-    O: 'JUMP' // virtual gamepad Y button
-    // Other controls can be mapped as needed
-  };
-  function handleInputs(entityId, input) {
-    var moveSpeed = 1.5;
-    var jumpForce = 1.5; // Adjust as needed
-    var actions = [];
-
-    // Map the input to actions
-    // use game.setControls() instead?
-    if (input.controls) {
-      Object.keys(input.controls).forEach(function (key) {
-        if (input.controls[key] && defaultControlsMapping[key]) {
-          actions.push(defaultControlsMapping[key]);
-        }
-      });
+  rules["if"]('PLAYER_DOWN').then('DUCK').map('determineDuckingSprite').then('updateSprite');
+  rules.addMap('determineDuckingSprite', function (player, node) {
+    var sprite = 'playerDownRight';
+    if (player.texture.sprite === 'playerLeftWalk') {
+      player.texture.sprite = 'playerDownLeft';
+    } else {
+      player.texture.sprite = 'playerDownRight';
     }
+    return player;
+  });
 
-    // Apply movement
-    actions.forEach(function (action) {
-      var force = {
-        x: 0,
-        y: 0
-      };
-      switch (action) {
-        case 'MOVE_LEFT':
-          force.x = -moveSpeed;
-          break;
-        case 'MOVE_RIGHT':
-          force.x = moveSpeed;
-          break;
-        case 'JUMP':
-          if (true /*|| game.isTouchingGround(entityId)*/) {
-            // Replace with actual condition check
-            force.y = -jumpForce;
-          }
-          break;
+  //rules.if('S').then('DUCK').map('determineDuckingSprite').then('updateSprite');
+  //rules.if('D').then('MOVE_RIGHT').then('updateSprite', { sprite: 'playerRightWalk' });
+
+  /*
+    Adding textures to Entities
+    game.updateEntity({
+      id: player.id,
+      texture: {
+        frameIndex: 0,
+        sheet: player.texture.sheet,
+        sprite: { // sets directly to sprite, no animations
+          x: -112,
+          y: -16,
+          height: 16,
+          width: 16
+        }
       }
-      if (force.x !== 0 || force.y !== 0) {
-        game.applyForce(entityId, force);
+    })
+   */
+
+  rules.on('updateSprite', function (player, node) {
+    var sprite = node.data.sprite || player.texture.sprite;
+    game.updateEntity({
+      id: player.id,
+      texture: {
+        frameIndex: 0,
+        sheet: player.texture.sheet,
+        sprite: sprite,
+        animationPlaying: true
       }
     });
-  }
-  rules.on('entityInput::handleInputs', handleInputs);
+  });
+  rules.addCondition('isPlayer', function (entity) {
+    return entity.type === 'PLAYER';
+  });
+  var maxJumpTicks = 40;
+  // Remark: isPlayer is already implied for all Key inputs,
+  //         however we add the additional check here for the negative case,
+  //         in order to not let other ents reset player walk speed
+  rules["if"]('isPlayer').then(function (rules) {
+    rules["if"]('PLAYER_RUN').then('RUN')["else"]('WALK');
+  });
+  rules["if"]('isPlayer').then(function (rules) {
+    rules["if"]('PLAYER_JUMP')
+    // .if('doesntExceedDuration')
+    .then('JUMP').then('updateSprite', {
+      sprite: 'playerRightJump'
+    });
+  });
+
+  //rules.if('L').then('SWING_SWORD');
+  //rules.if('O').then('ZOOM_IN');
+  //rules.if('P').then('ZOOM_OUT');
+
+  rules.on('JUMP', function (player, node, gameState) {
+    // console.log("JUMP", gameState.input, gameState.controls)
+    if (gameState.inputTicks.SPACE >= maxJumpTicks) {
+      return;
+    }
+    game.applyForce(player.id, {
+      x: 0,
+      y: -2.3,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: 0,
+      sprite: 'playerRightJump'
+    });
+  });
+  var runningForce = 1;
+  rules.on('RUN', function (player) {
+    runningForce = 1.6;
+    maxJumpTicks = 35;
+  });
+  rules.on('WALK', function (player) {
+    runningForce = 1;
+    maxJumpTicks = 25;
+  });
+  rules.on('DUCK', function (player) {
+    game.applyForce(player.id, {
+      x: 0,
+      y: 0.5,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: Math.PI
+    });
+  });
+  rules.on('MOVE_LEFT', function (player, node, gameState) {
+    game.applyForce(player.id, {
+      x: -runningForce,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: -Math.PI / 2
+    });
+  });
+  rules.on('MOVE_RIGHT', function (player) {
+    game.applyForce(player.id, {
+      x: runningForce,
+      y: 0,
+      z: 0
+    });
+    game.updateEntity({
+      id: player.id,
+      rotation: Math.PI / 2
+    });
+  });
+  rules.on('FIRE_BULLET', function (player) {
+    game.systems.bullet.fireBullet(player.id);
+  });
+  rules.on('SWING_SWORD', function (player) {
+    if (game.systems.sword) {
+      game.systems.sword.swingSword(player.id);
+    }
+  });
   return rules;
 }
 
@@ -3242,6 +3354,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = topdownMovement;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+// TODO: separate sprite actions from movement actions, separate sutras
 function topdownMovement(game) {
   var rules = game.createSutra();
   rules.addCondition('PLAYER_UP', {
@@ -3268,6 +3385,14 @@ function topdownMovement(game) {
     op: 'or',
     conditions: ['J', 'BUTTON_X']
   });
+  rules.addCondition('USE_ITEM_3', {
+    op: 'or',
+    conditions: ['K', 'BUTTON_A']
+  });
+  rules.addCondition('USE_ITEM_4', {
+    op: 'or',
+    conditions: ['L', 'BUTTON_Y']
+  });
   rules.addCondition('ZOOM_IN', {
     op: 'or',
     conditions: ['K', 'BUTTON_A']
@@ -3276,61 +3401,156 @@ function topdownMovement(game) {
     op: 'or',
     conditions: ['L', 'BUTTON_Y']
   });
-  rules["if"]('PLAYER_UP').then('MOVE_UP');
-  rules["if"]('PLAYER_LEFT').then('MOVE_LEFT');
-  rules["if"]('PLAYER_DOWN').then('MOVE_DOWN');
-  rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT');
+  rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
+    sprite: 'playerUp'
+  });
+  rules["if"]('PLAYER_LEFT').then('MOVE_LEFT').then('updateSprite', {
+    sprite: 'playerLeft'
+  });
+  rules["if"]('PLAYER_DOWN').then('MOVE_DOWN').then('updateSprite', {
+    sprite: 'playerDown'
+  });
+  rules["if"]('PLAYER_RIGHT').then('MOVE_RIGHT').then('updateSprite', {
+    sprite: 'playerRight'
+  });
   rules["if"]('USE_ITEM_1').then('FIRE_BULLET').map('determineShootingSprite').then('updateSprite');
-  rules.on('MOVE_UP', function (entity) {
-    game.applyForce(entity.id, {
-      x: 0,
-      y: -1,
-      z: 0
+  rules["if"]('USE_ITEM_2').then("THROW_BOOMERANG");
+
+  // replace with rules.do('ZOOM_IN'), etc
+  rules["if"]('ZOOM_IN').then('ZOOM_IN');
+  rules["if"]('ZOOM_OUT').then('ZOOM_OUT');
+  rules.addMap('determineShootingSprite', function (player, node) {
+    // Normalize the rotation within the range of 0 to 2π
+
+    if (typeof player.texture === 'undefined') {
+      return player;
+    }
+    var normalizedRotation = player.rotation % (2 * Math.PI);
+    // Define a mapping from radians to sprites
+    var rotationToSpriteMap = _defineProperty(_defineProperty(_defineProperty({
+      0: 'playerRodUp'
+    }, Math.PI / 2, 'playerRodRight'), Math.PI, 'playerRodDown'), -Math.PI / 2, 'playerRodLeft');
+    // Set the sprite based on the rotation, default to the current sprite
+    player.texture.sprite = rotationToSpriteMap[normalizedRotation] || player.currentSprite;
+    return player;
+  });
+  rules.on('updateSprite', function (player, node) {
+    if (typeof player.texture === 'undefined') {
+      // for now, just return
+      return;
+    }
+    var sprite = node.data.sprite || player.texture.sprite;
+    game.updateEntity({
+      id: player.id,
+      texture: {
+        frameIndex: 0,
+        sheet: player.texture.sheet,
+        sprite: sprite,
+        animationPlaying: true
+      }
     });
+  });
+  function isDiagonalMovement(state) {
+    var isDiagonal = (state.MOVE_UP || state.MOVE_DOWN) && (state.MOVE_LEFT || state.MOVE_RIGHT);
+    return isDiagonal;
+  }
+
+  // Normalization factor for diagonal movement (1 / sqrt(2))
+  // chebyshev movement
+  var normalizationFactor = 0.7071; // Approximately 1/√2
+  var moveSpeed = 2;
+  rules.on('MOVE_UP', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_UP = true;
+    var force = {
+      x: 0,
+      y: -moveSpeed,
+      z: 0
+    };
+    if (isDiagonalMovement(rules.state)) {
+      force.y *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: 0
     });
+    // console.log('MOVE_UP', playerState);
   });
-  rules.on('MOVE_DOWN', function (entity) {
-    game.applyForce(entity.id, {
+  rules.on('MOVE_DOWN', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_DOWN = true;
+    var force = {
       x: 0,
-      y: 1,
+      y: moveSpeed,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(rules.state)) {
+      force.y *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: Math.PI
     });
   });
-  rules.on('MOVE_LEFT', function (entity) {
-    game.applyForce(entity.id, {
-      x: -1,
+  rules.on('MOVE_LEFT', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_LEFT = true;
+    var force = {
+      x: -moveSpeed,
       y: 0,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(rules.state)) {
+      force.x *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: -Math.PI / 2
     });
   });
-  rules.on('MOVE_RIGHT', function (entity) {
-    game.applyForce(entity.id, {
-      x: 1,
+  rules.on('MOVE_RIGHT', function (entity, node) {
+    node.state = node.state || {};
+    node.state.MOVE_RIGHT = true;
+    var force = {
+      x: moveSpeed,
       y: 0,
       z: 0
-    });
+    };
+    if (isDiagonalMovement(rules.state)) {
+      force.x *= normalizationFactor;
+    }
+    game.applyForce(entity.id, force);
     game.updateEntity({
       id: entity.id,
       rotation: Math.PI / 2
     });
   });
   rules.on('FIRE_BULLET', function (entity) {
-    game.systems.bullet.fireBullet(entity.id);
+    if (game.systems.bullet) {
+      game.systems.bullet.fireBullet(entity.id);
+    }
   });
   rules.on('SWING_SWORD', function (entity) {
-    game.systems.sword.swingSword(entity.id);
+    if (game.systems.sword) {
+      game.systems.sword.swingSword(entity.id);
+    }
   });
+  rules.on('THROW_BOOMERANG', function (player) {
+    if (game.systems.boomerang) {
+      game.systems.boomerang.throwBoomerang(player.id);
+    }
+  });
+
+  /*
+  rules.on('DROP_BOMB', function (player) {
+    // with no rate-limit, will drop 60 per second with default settings
+    rules.emit('dropBomb', player)
+  });
+  */
+
   rules.on('CAMERA_SHAKE', function (entity) {
     game.shakeCamera(1000);
   });
@@ -3342,9 +3562,6 @@ function topdownMovement(game) {
     var currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });
-
-  // game.emit('entityInput::handleActions', entityId, actions);
-
   return rules;
 }
 
@@ -3391,6 +3608,7 @@ var GravityGardens = /*#__PURE__*/function () {
       }
       var player = game.createPlayer({
         color: 0xcccccc,
+        texture: null,
         position: {
           x: 0,
           y: 0,
@@ -4390,7 +4608,14 @@ function sutras(game) {
   var rules = game.createSutra();
 
   // movement
-  rules.use((0, _topDown["default"])(game), 'movement');
+  // not work, inputs to sutra tick not making it to subtree?
+  // double check sutra tick in mantra plugin and sutra core
+  // this *should* work
+  // rules.use(movement(game), 'movement');
+
+  // for now, ensure that player input movement sutras are top level rules
+  // we should be able to use the movement sutra as a sub-sutra, see above comment
+  game.useSutra((0, _topDown["default"])(game), 'mode-topdown');
 
   // helper for switching graphics
   var switchGraphicsSutra = (0, _switchGraphics["default"])(game);
@@ -5632,6 +5857,9 @@ var Platform = /*#__PURE__*/function () {
       } else {
         game.setZoom(2.5);
       }
+
+      // we should be able to use the movement sutra as a sub-sutra, see above comment
+      game.useSutra((0, _platform["default"])(game), 'mode-platform');
       game.createPlayer({
         height: 32,
         width: 32,
@@ -8256,7 +8484,7 @@ function switchGraphics(game) {
         });
       } else {
         // update circle
-        loadingCircle.tick(1 / gameState.FPS * 1000);
+        loadingCircle.tick(1 / gameState.fps * 1000);
       }
     }
   });

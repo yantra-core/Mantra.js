@@ -435,7 +435,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //import { createSutra } from '@yantra-core/sutra';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 var Sutra = /*#__PURE__*/function () {
   function Sutra(_ref) {
@@ -482,10 +482,8 @@ var Sutra = /*#__PURE__*/function () {
           if (self.game.config.mode === 'platform') {
             // TODO: better platform control
             self.game.useSutra((0, _defaultPlatformMovement["default"])(self.game), 'mode-platform');
-            // self.game.useSutra(topdown(self.game), 'mode-topdown');
           }
         }
-
         self.inputsBound = true;
       }
     }
@@ -518,13 +516,20 @@ var Sutra = /*#__PURE__*/function () {
           // It may be required for complex play movements?
           _this.game.rules.addCondition(mantraCode, function (entity, gameState) {
             return entity.id === game.currentPlayerId && gameState.input.controls[mantraCode];
-          });
+          }
+          // gameState.input.controls[mantraCode]
+          );
         };
         for (var mantraCode in gamepadControls) {
           _loop(mantraCode);
         }
       }
     }
+
+    // TODO: send mouse control events to Sutra tree for tick evaluation
+  }, {
+    key: "bindMouseCodesToSutraConditions",
+    value: function bindMouseCodesToSutraConditions() {}
   }, {
     key: "bindKeyCodesToSutraConditions",
     value: function bindKeyCodesToSutraConditions() {
@@ -533,23 +538,30 @@ var Sutra = /*#__PURE__*/function () {
         var keyControls = this.game.systems.keyboard.controls;
         var _loop2 = function _loop2(mantraCode) {
           // Key Down Condition
+          // Remark: These should not be bound to current player, instead to the entity that is being controlled
           // _DOWN implied as default
           _this2.game.rules.addCondition(mantraCode, function (entity, gameState) {
             var _gameState$input$keyS;
             return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS === void 0 ? void 0 : _gameState$input$keyS.down);
-          });
+          }
+          // gameState.input.keyStates[mantraCode]?.down
+          );
 
           // Key Up Condition
           _this2.game.rules.addCondition(mantraCode + '_UP', function (entity, gameState) {
             var _gameState$input$keyS2;
             return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS2 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS2 === void 0 ? void 0 : _gameState$input$keyS2.up);
-          });
+          }
+          // gameState.input.keyStates[mantraCode]?.up
+          );
 
           // Key held Condition
           _this2.game.rules.addCondition(mantraCode + '_HOLD', function (entity, gameState) {
             var _gameState$input$keyS3;
             return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS3 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS3 === void 0 ? void 0 : _gameState$input$keyS3.pressed);
-          });
+          }
+          // gameState.input.keyStates[mantraCode]?.pressed
+          );
         };
         for (var mantraCode in keyControls) {
           _loop2(mantraCode);
@@ -591,7 +603,7 @@ var Sutra = /*#__PURE__*/function () {
           }
           if (this.inputCache.controls[c] === true) {
             this.inputDuration[c] = this.inputDuration[c] || 0;
-            this.inputDuration[c] += 1000 / game.data.FPS;
+            this.inputDuration[c] += 1000 / game.data.fps;
           }
           if (this.inputCache.controls[c] === false) {
             this.inputDuration[c] = this.inputDuration[c] || 0;

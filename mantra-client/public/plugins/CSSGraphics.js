@@ -159,6 +159,10 @@ var CSSCamera = /*#__PURE__*/function () {
       this.gameViewport = document.getElementById('gameHolder');
       this.gameViewport.style.transformOrigin = 'center center';
       this.initZoomControls();
+      // set initial zoom based on config
+      if (this.config.initialZoom) {
+        this.zoom(this.config.initialZoom);
+      }
       game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
         //console.log("CSSCamera.js", entityId, data, sequenceNumber)
         if (data.mouse) {
@@ -320,7 +324,9 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "init",
     value: function init(game) {
       this.game = game;
-      var cssCamera = new _CSSCamera["default"](this, this.camera);
+      var cssCamera = new _CSSCamera["default"](this, {
+        initialZoom: 1
+      });
       var windowHeight = window.innerHeight;
       this.game.use(cssCamera);
       game.camera = cssCamera;
@@ -644,83 +650,60 @@ function update() {
     game.viewportCenterYOffset = 0;
   }
 
-  // Update the camera position
+  // Initialize offsets if they are not numbers
+  if (typeof game.viewportCenterXOffset !== 'number') {
+    game.viewportCenterXOffset = 0;
+  }
+  if (typeof game.viewportCenterYOffset !== 'number') {
+    game.viewportCenterYOffset = 0;
+  }
+
+  // Determine the base position of the camera
+  var baseX = 0,
+    baseY = 0;
+
+  // If following the player, set the base position to the player's position
   if (this.follow && currentPlayer && currentPlayer.position) {
-    //this.scene.cameraPosition.x = this.scene.cameraPosition.x / zoomFactor;
-    /*
-    let newY = currentPlayer.position.y + game.viewportCenterYOffset;
-    //newY = newY / zoomFactor;
-    if (game.data.camera.mode === 'platform') {
-      // locks camera to not exceed bottom of screen for platform mode
-      if (newY < windowHeight * 0.35) {
-        this.scene.cameraPosition.y = newY;
-      } else {
-        this.scene.cameraPosition.y = windowHeight * 0.35;
-      }
-    } else {
-      this.scene.cameraPosition.y = newY;
-    }
-    */
+    baseX = currentPlayer.position.x;
+    baseY = currentPlayer.position.y;
+  }
 
-    //
-    // If following the player is enabled, the camera position is always the player position
-    //
-    if (this.follow) {
-      this.scene.cameraPosition.x = currentPlayer.position.x;
-      this.scene.cameraPosition.y = currentPlayer.position.y;
-    }
+  // Apply viewport offsets to the base position
+  this.scene.cameraPosition.x = baseX + game.viewportCenterXOffset;
+  this.scene.cameraPosition.y = baseY + game.viewportCenterYOffset;
 
-    //
-    // If there are any view port offsets from dragging or scrolling
-    // Adjust the camera position by these offsets
-    //
-    if (typeof game.viewportCenterXOffset !== 'number') {
-      game.viewportCenterXOffset = 0;
-    }
-    if (typeof game.viewportCenterYOffset !== 'number') {
-      game.viewportCenterYOffset = 0;
-    }
-    this.scene.cameraPosition.x += game.viewportCenterXOffset;
-    this.scene.cameraPosition.y += game.viewportCenterYOffset;
+  // Find the center of the screen
+  var centerX = window.innerWidth / 2;
+  var centerY = window.innerHeight / 2;
 
-    //
-    // Find the center of the screen
-    //
-    var centerX = window.innerWidth / 2;
-    var centerY = window.innerHeight / 2;
+  // Calculate the adjusted position for camera centering and zoom
+  var adjustedPosition = {
+    x: this.scene.cameraPosition.x - centerX,
+    y: this.scene.cameraPosition.y - centerY
+  };
 
-    //
-    // Create a new position to move the renderDiv in order to keep the camera centered
-    // Based on current zoom settings
-    //
-    var adjustedPosition = {
-      x: this.scene.cameraPosition.x - centerX,
-      y: this.scene.cameraPosition.y - centerY
-    };
+  // Apply the current zoom level to adjust the position
+  adjustedPosition.x *= this.game.data.camera.currentZoom;
+  adjustedPosition.y *= this.game.data.camera.currentZoom;
 
-    //
-    // Apply the current zoom level to adjust the position
-    //
-    adjustedPosition.x *= this.game.data.camera.currentZoom;
-    adjustedPosition.y *= this.game.data.camera.currentZoom;
+  // Calculate the size of the visible area in the game's world space at the current zoom level
+  var visibleWidth = window.innerWidth / this.game.data.camera.currentZoom;
+  var visibleHeight = window.innerHeight / this.game.data.camera.currentZoom;
 
-    // Calculate the size of the visible area in the game's world space at the current zoom level
-    var visibleWidth = window.innerWidth / this.game.data.camera.currentZoom;
-    var visibleHeight = window.innerHeight / this.game.data.camera.currentZoom;
+  // Determine the offsets needed to center the viewport in the game's world space
+  var offsetX = (window.innerWidth - visibleWidth) / 2;
+  var offsetY = (window.innerHeight - visibleHeight) / 2;
 
-    // Determine the offsets needed to center the viewport on the player in the game's world space
-    var offsetX = (window.innerWidth - visibleWidth) / 2;
-    var offsetY = (window.innerHeight - visibleHeight) / 2;
-    offsetX = offsetX * this.game.data.camera.currentZoom;
-    offsetY = offsetY * this.game.data.camera.currentZoom;
-    adjustedPosition.y += offsetY;
-    if (this.scene.renderDiv) {
-      setTransform(this.scene.renderDiv, -adjustedPosition.x, -adjustedPosition.y, this.game.data.camera.currentZoom, 0);
-    }
-  } else {
-    // If not following a player, use the calculated offsets directly
-    this.scene.cameraPosition.x = game.viewportCenterXOffset;
-    this.scene.cameraPosition.y = game.viewportCenterYOffset;
+  // Apply zoom to offsets
+  offsetX *= this.game.data.camera.currentZoom;
+  offsetY *= this.game.data.camera.currentZoom;
+
+  // Adjust the y position further by the offsetY to center vertically
+  adjustedPosition.y += offsetY;
+
+  // Update the transform of the renderDiv to adjust the camera view
+  if (this.scene.renderDiv) {
+    setTransform(this.scene.renderDiv, -adjustedPosition.x, -adjustedPosition.y, this.game.data.camera.currentZoom, 0);
   }
 
   // Update the camera's position in the game data

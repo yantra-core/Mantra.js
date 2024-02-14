@@ -1,19 +1,12 @@
 let game = new MANTRA.Game({
-  createDefaultPlayer: false,
-  physics: 'matter', // enum, 'physx', 'matter
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  gameRoot: 'https://yantra.gg/mantra'
+  gameRoot: 'http://192.168.1.80:7777',
 });
 
-game.use('Block');
-game.use('Border');
-game.use('Bullet');
-
-game.start(function () {
-  game.zoom(1);
+async function start () {
+  await game.start();
   game.createBorder();
   game.setBackground('#000000');
-  // create a few entities to shoot
   let entities = [];
   for (let i = 0; i < 22; i++) {
     let randomColor = game.randomColor();
@@ -33,6 +26,7 @@ game.start(function () {
     entities.push(entity);
   }
 
+  // simple logic to apply force to entities on each 100 ticks
   game.before('update', function () {
     if (game.tick % 100) {
       entities.forEach((entity) => {
@@ -41,6 +35,6 @@ game.start(function () {
     }
   });
 
-});
-window.game = game;
-
+  window.game = game;
+}
+start();

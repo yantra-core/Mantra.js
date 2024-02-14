@@ -1227,7 +1227,13 @@ function updateEntity(entityDataOrId, entityData) {
     // Remark: in the future we could merge instead of overwrite
     // create new textures object by merging in the new texture
     var prev = this.game.components.texture.get(entityId);
-    var newTexture = _objectSpread(_objectSpread({}, prev), entityData.texture);
+    var newTexture;
+    // check to see if incoming entityData.texture is a string, if so, it's a texture id
+    if (typeof entityData.texture === 'string') {
+      newTexture = entityData.texture;
+    } else {
+      newTexture = _objectSpread(_objectSpread({}, prev), entityData.texture);
+    }
     this.game.components.texture.set(entityId, newTexture);
   }
 

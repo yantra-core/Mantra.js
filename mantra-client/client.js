@@ -48,7 +48,7 @@ let game = new Game({
   //  height: 600,
   height: 600 * 10,
   width: 800 * 10,
-
+  fps: 60,
   fieldOfView: 512,
   plugins: {},
   isClient: true,
@@ -258,19 +258,17 @@ if (mode === 'online') {
 
   game.start(function () {
 
-     game.use(home);
+     // game.use(home);
      //game.use(new plugins.ThreeGraphics());
 
     // game.reset();
-    // game.zoom(3)
+    game.zoom(3)
  
     //   game.setSize(16000, 9000);
     //     game.setGravity(0, 0, 0);
  
  
-
-     /*
-     game.createPlayer({
+    game.createPlayer({
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'player',
@@ -280,6 +278,22 @@ if (mode === 'online') {
         y: 0
       }
     });
+
+    game.createEntity({
+      position: {
+        x: -50,
+        y: 0
+      }
+    });
+    game.createEntity({
+      position: {
+        x: 50,
+        y: 0
+      }
+    });
+
+     /*
+ 
     */
 
     /*

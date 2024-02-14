@@ -291,8 +291,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       isEdgeClient: false,
       isServer: false,
       isOfflineMode: undefined,
-      plugins: {},
-      // Plugin Classes that will be bound to the game instance
+      plugins: [],
+      // array of plugins as string, instance, or string with config object
       // game options
       showLoadingScreen: true,
       minLoadTime: 330,
@@ -302,6 +302,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       width: 800,
       height: 600,
       fieldOfView: 1600,
+      fps: 60,
       useFoV: false,
       // game systems / auto-load based on pluginsConfig
       physics: 'matter',
@@ -311,19 +312,19 @@ var Game = exports.Game = /*#__PURE__*/function () {
       gravity: {},
       keyboard: true,
       mouse: true,
-      gamepad: true,
-      virtualGamepad: true,
+      gamepad: false,
+      virtualGamepad: false,
       editor: true,
       sutra: true,
       lifetime: true,
-      defaultMovement: true,
+      defaultMovement: false,
       // data compression
       protobuf: false,
       msgpack: false,
       deltaCompression: false,
       deltaEncoding: true,
       // createDefaultPlayer: false,
-      defaultPlayer: true,
+      defaultPlayer: false,
       gameRoot: 'https://yantra.gg/mantra',
       options: {},
       mode: 'topdown',
@@ -335,7 +336,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
 
     // Merge custom configuration with defaults
     var config = _objectSpread(_objectSpread({}, defaultConfig), customConfig);
-
     // Override for server-specific defaults
     if (config.isServer) {
       config.showLoadingScreen = false;
@@ -1438,7 +1438,7 @@ function construct(game) {
   game.data = {
     width: game.config.width,
     height: game.config.height,
-    FPS: 60,
+    fps: game.config.fps,
     fieldOfView: game.config.fieldOfView,
     // global for game, not camera specific
     camera: {
@@ -1452,6 +1452,13 @@ function construct(game) {
   }
   if (typeof game.data.camera.currentZoom === 'undefined') {
     game.data.camera.currentZoom = 1;
+  }
+  if (typeof game.config.fps === 'number') {
+    // if fps is provide, set game.config.hzMS to 1000 / fps
+    game.config.hzMS = 1000 / game.config.fps;
+    // set precision to 3 decimal places, preserve the last repeating digit
+    game.config.hzMS = game.config.hzMS.toFixed(3);
+    console.log('Setting custom FPS:', game.config.fps);
   }
   console.log("Mantra starting...");
 
@@ -1886,6 +1893,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = createDefaultPlayer;
+// TODO: use Entity.sutra to bind movement directly to the player
+// import topdown from './Game/defaults/defaultTopdownMovement.js';
+
 function createDefaultPlayer() {
   var playerConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var game = this;
@@ -1907,6 +1917,12 @@ function createDefaultPlayer() {
     // return this.getEntity(this.currentPlayerId);
   }
   var rules = game.rules;
+  if (typeof playerConfig.texture === 'undefined') {
+    playerConfig.texture = {
+      sheet: 'loz_spritesheet',
+      sprite: 'player'
+    };
+  }
   var player = this.createEntity({
     name: playerConfig.name,
     type: 'PLAYER',
@@ -1920,6 +1936,7 @@ function createDefaultPlayer() {
     radius: playerConfig.radius,
     texture: playerConfig.texture,
     mass: 222,
+    // sutra: topdown(game), // TODO: replace with more comprehensive player sutra with sprites and item actions
     friction: 0.5,
     // Default friction
     frictionAir: 0.5,
@@ -2086,12 +2103,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var lastTick = Date.now();
-var hzMS = 16.666; // 60 FPS
-
 function gameTick() {
   var _this = this;
   this.tick++;
   this.data.tick = this.tick;
+  var hzMS = this.config.hzMS || 16.666; // 60 FPS
   if (this.currentPlayerId) {
     this.data.currentPlayer = this.data.ents.PLAYER.find(function (player) {
       return player.id === _this.currentPlayerId;
@@ -2169,9 +2185,11 @@ exports["default"] = loadPluginsFromConfig;
 var _LoadingScreen = _interopRequireDefault(require("../plugins/loading-screen/LoadingScreen.js"));
 var _GhostTyper = _interopRequireDefault(require("../plugins/typer-ghost/GhostTyper.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 // default player movement, this could be also be set in defaultGameStart.js
 // import movement from './defaultPlayerMovement.js';
 function loadPluginsFromConfig(_ref) {
+  var _this = this;
   var physics = _ref.physics,
     graphics = _ref.graphics,
     collisions = _ref.collisions,
@@ -2187,6 +2205,33 @@ function loadPluginsFromConfig(_ref) {
     defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement;
   var plugins = this.plugins;
   var gameConfig = this.config;
+
+  //
+  // Iterate through `GameConfig.plugins` array and load plugins
+  // Three separate formats are supported to load plugins:
+  //   1. string name of plugin (e.g. 'Bullet')
+  //   2. instance of plugin (e.g. new Bullet())
+  //   3. object with `name` and `config` properties (e.g. { name: 'Bullet', config: { cool: true } })
+  if (plugins.length) {
+    console.log('The following plugins will be loaded from `GameConfig`', plugins);
+    plugins.forEach(function (pluginy) {
+      if (typeof pluginy === 'string') {
+        // console.log('using plugin as string name', pluginy)
+        _this.use(pluginy);
+        return;
+      }
+      if (_typeof(pluginy) === 'object' && pluginy.id && typeof pluginy.init === 'function') {
+        //console.log('found compatible plugin class instance as object', pluginy)
+        _this.use(pluginy);
+        return;
+      }
+      if (_typeof(pluginy) === 'object' && pluginy.name && _typeof(pluginy.config) === 'object') {
+        // console.log('found plugin as config object', pluginy)
+        _this.use(pluginy.name, pluginy.object);
+        return;
+      }
+    });
+  }
   if (gameConfig.showLoadingScreen && !this.isServer) {
     this.use(new _LoadingScreen["default"]({
       minLoadTime: gameConfig.minLoadTime
@@ -2199,8 +2244,11 @@ function loadPluginsFromConfig(_ref) {
   if (physics === 'physx') {
     this.use('PhysXPhysics');
   }
-  this.use('EntityInput');
-  this.use('EntityMovement');
+
+  // Remark: Removed 2/13/2024, no longer loading movement by default
+  // this.use('EntityInput');
+  // this.use('EntityMovement');
+
   this.use('SnapshotManager');
   if (lifetime) {
     this.use('Lifetime');
@@ -2229,8 +2277,14 @@ function loadPluginsFromConfig(_ref) {
     }
     if (sutra) {
       this.use('Sutra', {
-        defaultMovement: defaultMovement
+        defaultMovement: defaultMovement // TODO: remove, no mutation from using plugins!
       });
+    }
+
+    if (defaultMovement) {
+      if (this.systems.sutra) {
+        this.systems.sutra.bindDefaultMovementSutra(mode);
+      }
     }
     this.use('GhostTyper');
 
@@ -2289,7 +2343,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var started = false;
-var hzMS = 16.666;
 var accumulator = 0;
 var lastGameTick = Date.now();
 var fpsMeasurements = []; // Array to store FPS measurements
@@ -2301,6 +2354,9 @@ function localGameLoop(game, playerId) {
     started = true;
     lastGameTick = Date.now(); // Ensure we start with the current time
   }
+
+  var hzMS = game.config.hzMS || 16.666; // 60 FPS
+
   // game.localGameLoopRunning = true;
   game.mode = 'local';
   // Calculate deltaTime in seconds
@@ -2374,7 +2430,7 @@ exports["default"] = void 0;
 // onlineGameLoop.js - Marak Squires 2023
 var started = false;
 var lastRenderedSnapshotId = null;
-var hzMS = 16.666;
+var hzMS = 16.666; // TODO: variable frame rates via game.config.hzMS
 var accumulator = 0;
 var lastGameTick = Date.now();
 var fpsMeasurements = []; // Array to store FPS measurements

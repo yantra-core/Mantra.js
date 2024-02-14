@@ -76,8 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const filteredExamples = filterExamples(keyword);
 
     // Set embed src to empty string and hide
-    exampleIframe.src = '';
-    exampleEmbedsContainer.style.display = 'none';
+    // exampleIframe.src = '';
+    // exampleEmbedsContainer.style.display = 'none';
 
     // Hide the code editor
     codeEditor.style.display = 'none';
