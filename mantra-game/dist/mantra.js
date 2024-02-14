@@ -1283,7 +1283,6 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
     key: "loadImage",
     value: function () {
       var _loadImage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(asset) {
-        var _this2 = this;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -1297,7 +1296,14 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
                 img.onerror = function () {
                   reject("Failed to load image: ".concat(asset.url));
                 };
-                img.src = _this2.root + asset.url;
+                // only append root if asset.url is not an absolute url
+                /* TODO: better handling of absolute urls
+                if (!asset.url.includes('http')) {
+                  img.src = this.root + asset.url;
+                } else {
+                  img.src = asset.url;
+                }*/
+                img.src = asset.url;
               }));
             case 1:
             case "end":

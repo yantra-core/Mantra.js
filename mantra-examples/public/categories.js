@@ -1,5 +1,15 @@
 let categories = [
   {
+    title: 'Entity', // pink
+    name: 'entity',
+    color: '#e91e63',
+    description: 'Entities are the main game objects.',
+    image: 'placeholder-image.jpg',
+    url: 'entity.html',
+    tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
+  },
+
+  {
     title: 'Physics', // purple
     name: 'physics',
     color: '#9c27b0',
@@ -29,15 +39,6 @@ let categories = [
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
   {
-    title: 'Entity', // pink
-    name: 'entity',
-    color: '#e91e63',
-    description: 'Entities are the main game objects.',
-    image: 'placeholder-image.jpg',
-    url: 'entity.html',
-    tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
-  },
-  {
     title: 'Textures', // green
     name: 'textures',
     color: '#4caf50',
@@ -65,15 +66,6 @@ let categories = [
     "tags": ["assets", "management", "loading", "unloading", "resources", "optimization", "storage", "caching", "streaming"]
   },
   {
-    "title": "Game Logic",
-    name: "logic",
-    "color": "#673ab7", // deep purple
-    "description": "Write custom logic for your games.",
-    "image": "placeholder-image.jpg",
-    "url": "game-logic-systems.html",
-    "tags": ["logic", "systems", "scoring", "AI", "rules", "gameplay", "state management", "decision making", "behavior", "strategy"]
-  },
-  {
     "title": "Audio & Sound",
     name: "audio",
     "color": "#00bcd4", // cyan
@@ -91,8 +83,19 @@ let categories = [
     "url": "inputs.html",
     "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
   },
+  /*
+  {
+    "title": "Game Logic",
+    name: "logic",
+    "color": "#673ab7", // deep purple
+    "description": "Write custom logic for your games.",
+    "image": "placeholder-image.jpg",
+    "url": "game-logic-systems.html",
+    "tags": ["logic", "systems", "scoring", "AI", "rules", "gameplay", "state management", "decision making", "behavior", "strategy"]
+  },
   {
     title: 'Game Config', // red
+    name: 'config',
     color: '#f44336',
     description: 'Explore examples featuring the game configuration.',
     image: 'placeholder-image.jpg',
@@ -101,12 +104,14 @@ let categories = [
   },
   {
     title: 'Plugins', // orange
+    name: 'plugins',
     color: '#ff9800',
     description: 'Explore examples featuring the plugin system.',
     image: 'placeholder-image.jpg',
     url: 'plugins.html',
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
   }
+  */
 
 ];
 
@@ -357,6 +362,7 @@ let input_examples = [
 ];
 
 let audio_examples = [
+  /*
   {
     title: 'Play Sound',
     category: 'audio',
@@ -365,6 +371,7 @@ let audio_examples = [
     url: 'audio/play-sound.html',
     tags: ['play', 'sound', 'audio', 'music', 'effects', 'background music', 'soundtrack', 'volume', 'playback', 'midi', 'tone']
   },
+  */
   {
     title: 'Play Tone',
     category: 'audio',
@@ -392,3 +399,4 @@ examples = examples.concat(render_examples);
 examples = examples.concat(asset_examples);
 examples = examples.concat(input_examples);
 examples = examples.concat(audio_examples);
+

@@ -108,10 +108,12 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
           pressed: true
         };
         this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
+        console.log("keydownllkasdlkasd");
         if (this.preventDefaults === true) {
           event.preventDefault();
         }
       }
+      this.game.emit('keydown', event, MANTRA_KEY_MAP[event.code]);
     }
   }, {
     key: "handleKeyUp",
@@ -124,6 +126,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
         };
         this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
       }
+      this.game.emit('keyup', event, MANTRA_KEY_MAP[event.code]);
     }
   }, {
     key: "sendInputs",

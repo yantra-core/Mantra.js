@@ -2,6 +2,7 @@ let ogPath = window.location.pathname;
 // TODO: decouple main fn from DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
 
+
   // only render if root page
   //if (window.location.pathname !== '/') return;
 
@@ -88,11 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCategoriesDisplay(filteredCategories);
     updateExamplesDisplay(filteredExamples);
 
-    // hide the example-embed
-    // Remark: might not be needed, check pushState
-    document.querySelector('#example-embed').style.display = 'none';
-    // TODO: set src to empty?
-
   }
 
   function filterCategories(keyword) {
@@ -126,22 +122,23 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       //         <button class="view-category">View Category</button>
 
+      console.log('category' ,category)
       // set the categoryElement background color to the category color
       categoryElement.style.backgroundColor = category.color;
 
       // get all .category elements
       categoryElement.addEventListener('click', () => {
         const categoryTitle = category.title; // Get the title of the clicked category
+        let categoryName = category.name;
         // console.log("categoryTitle", categoryTitle)
 
         // update url push state
         let newPath = `${window.location.pathname}${category.url.replace('.html', '')}`;
         window.history.pushState({ type: 'category', title: category.title }, categoryTitle, newPath);
-      
-
         //let categoryPath = category.url.replace('.html', '');
         //window.history.pushState({ type: 'category', title: category.title }, categoryPath, `/${categoryPath}`);
-        const categoryExamples = filterExamples('', categoryTitle); // Filter examples for this category
+
+        const categoryExamples = filterExamples('', categoryName); // Filter examples for this category
         // console.log("categoryExamples", categoryExamples)
         categoriesContainer.innerHTML = ''; // Clear the current content to display only the relevant examples
         updateExamplesDisplay(categoryExamples); // Update the display with the filtered examples
@@ -167,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
       //         <a class="exampleLink" href="${example.url}">View Example</a>
 
       // assign the categoryExample background color to the category color
-      const category = categories.find(category => category.title.toLowerCase() === example.category.toLowerCase());
+      const category = categories.find(category => category.name.toLowerCase() === example.category.toLowerCase());
+      console.log('category', category, example)
       exampleElement.style.backgroundColor = category.color;
       categoriesContainer.appendChild(exampleElement);
 
@@ -205,5 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCategoriesDisplay(categories);
   }
   // updateCategoriesDisplay(categories);
+
+  // add popstate event listener
+  window.addEventListener('popstate', function (event) {
+    // on pop state, reload categories
+    // this is intended to capture the back button to prevent empty categories list
+    updateCategoriesDisplay(categories);
+  });
 
 });

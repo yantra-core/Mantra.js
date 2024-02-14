@@ -98,13 +98,17 @@ export default class Keyboard {
         event.preventDefault();
       }
     }
+    this.game.emit('keydown', event, MANTRA_KEY_MAP[event.code]);
   }
 
   handleKeyUp(event) {
     if (MANTRA_KEY_MAP[event.code]) {
       this.keyStates[MANTRA_KEY_MAP[event.code]] = { down: false, up: true, pressed: false };
       this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
+
     }
+    this.game.emit('keyup', event, MANTRA_KEY_MAP[event.code]);
+
   }
 
   sendInputs() {

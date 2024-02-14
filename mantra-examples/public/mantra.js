@@ -1297,6 +1297,13 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
                 img.onerror = function () {
                   reject("Failed to load image: ".concat(asset.url));
                 };
+                // only append root if asset.url is not an absolute url
+                /* TODO: better handling of absolute urls
+                if (!asset.url.includes('http')) {
+                  img.src = this.root + asset.url;
+                } else {
+                  img.src = asset.url;
+                }*/
                 img.src = _this2.root + asset.url;
               }));
             case 1:
