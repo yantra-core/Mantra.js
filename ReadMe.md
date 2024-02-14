@@ -3,6 +3,7 @@
 ![mantra-logo-smol](https://github.com/yantra-core/Mantra.js/assets/70011/3a10c09f-3d19-458a-b0c2-a8910420aee1)
 
   <a href="https://yantra.gg/mantra">Live Demos</a> •
+  <a href="https://yantra.gg/mantra/examples">Examples Gallery</a> •
   <a href="#alpha-notice">v1 Alpha</a> •
   <a href="#contributing">Contributing</a>
   
@@ -24,6 +25,32 @@ You can start building a simple offline game in seconds using your favorite libr
 The [Mantra.js](https://yantra.gg/mantra.js) file is currently under `111kb` and will most likely get smaller. It's best to think of Mantra as the orchestrator for your game. You can import Mantra once and immediately begin adding new functionality dynamically. 
 
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
+
+# Get Started Now
+
+## Examples Gallery
+
+[https://yantra.gg/mantra/examples](https://yantra.gg/mantra/examples)
+
+
+## Try Mantra Worlds ( ALPHA )
+
+The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
+
+[https://yantra.gg/mantra](https://yantra.gg/mantra)
+
+#### Home World
+
+https://yantra.gg/mantra/home
+
+#### YCraft World
+
+https://yantra.gg/mantra/ycraft
+
+#### Platform World
+
+https://yantra.gg/mantra/platform
+
 
 ## Super Simple Offline First
 
@@ -64,27 +91,6 @@ if isBoss
       color: 0xff0000
       speed: 5
 ```
-
-## Demos
-
-[View All Demos on Yantra.gg](https://yantra.gg/mantra)
-
-### Mantra World ( ALPHA )
-
-The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
-
-#### Home World
-
-https://yantra.gg/mantra/home
-
-#### YCraft World
-
-https://yantra.gg/mantra/ycraft
-
-#### Platform World
-
-https://yantra.gg/mantra/platform
-
 
 ## Start Local Websocket Server
 
