@@ -2,7 +2,6 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   plugins: ['Block', 'Border', 'Bullet'], // plugins at construction
-  gameRoot: 'http://192.168.1.80:7777/'
 });
 
 game.use('Lifetime'); // plugins at runtime

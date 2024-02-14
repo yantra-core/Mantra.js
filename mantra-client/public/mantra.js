@@ -1708,7 +1708,7 @@ function start(cb) {
         }
       }
 
-      // remap the keyboard mappings to Sutra by default
+      // Bind all controller input events to Sutra conditions by default
       if (game.systems.sutra) {
         console.log("Binding all input events to Sutra conditions...");
         game.systems.sutra.bindInputsToSutraConditions();

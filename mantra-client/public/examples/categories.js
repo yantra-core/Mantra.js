@@ -359,6 +359,7 @@ let input_examples = [
     url: 'inputs/gamepad.html',
     tags: ['gamepad', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   },
+  /*
   {
     title: 'Touch',
     category: 'inputs',
@@ -367,6 +368,7 @@ let input_examples = [
     url: 'inputs/touch.html',
     tags: ['touch', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   }
+  */
 ];
 
 let audio_examples = [
