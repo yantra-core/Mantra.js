@@ -1,8 +1,17 @@
-
-
 let categories = [
   {
+    title: 'Entity', // pink
+    name: 'entity',
+    color: '#e91e63',
+    description: 'Entities are the main game objects.',
+    image: 'placeholder-image.jpg',
+    url: 'entity.html',
+    tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
+  },
+
+  {
     title: 'Physics', // purple
+    name: 'physics',
     color: '#9c27b0',
     description: 'Interact with bodies, forces, gravity.',
     image: 'placeholder-image.jpg',
@@ -12,6 +21,7 @@ let categories = [
 
   {
     title: 'Lifecycle', // blue
+    name: 'lifecycle',
     color: '#2196f3',
     description: 'Hook into game events.',
     image: 'placeholder-image.jpg',
@@ -21,6 +31,7 @@ let categories = [
 
   {
     title: 'Items', // teal
+    name: 'items',
     color: '#009688',
     description: 'Items can be collected and used.',
     image: 'placeholder-image.jpg',
@@ -28,15 +39,8 @@ let categories = [
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
   {
-    title: 'Entity', // pink
-    color: '#e91e63',
-    description: 'Entities are the main game objects.',
-    image: 'placeholder-image.jpg',
-    url: 'entity.html',
-    tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
-  },
-  {
     title: 'Textures', // green
+    name: 'textures',
     color: '#4caf50',
     description: 'Change the appearance of entities.',
     image: 'placeholder-image.jpg',
@@ -45,14 +49,49 @@ let categories = [
   },
   {
     title: 'Render', // blue
+    name: 'render',
     color: '#2196f3',
     description: 'Render entities using RenderPlex pipeline.',
     image: 'placeholder-image.jpg',
     url: 'render.html',
     tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
   },
-
-  /*
+  {
+    "title": "Assets",
+    name: "assets",
+    "color": "#795548", // brown
+    "description": "Load and use custom game assets.",
+    "image": "placeholder-image.jpg",
+    "url": "assets.html",
+    "tags": ["assets", "management", "loading", "unloading", "resources", "optimization", "storage", "caching", "streaming"]
+  },
+  {
+    "title": "Game Logic",
+    name: "logic",
+    "color": "#673ab7", // deep purple
+    "description": "Write custom logic for your games.",
+    "image": "placeholder-image.jpg",
+    "url": "game-logic-systems.html",
+    "tags": ["logic", "systems", "scoring", "AI", "rules", "gameplay", "state management", "decision making", "behavior", "strategy"]
+  },
+  {
+    "title": "Audio & Sound",
+    name: "audio",
+    "color": "#00bcd4", // cyan
+    "description": "Integrate and control audio elements for immersive game experiences.",
+    "image": "placeholder-image.jpg",
+    "url": "sound.html",
+    "tags": ["audio", "sound", "music", "effects", "background music", "soundtrack", "volume", "playback", "midi", "tone"]
+  },
+  {
+    "title": "Input Controls",
+    "name": "inputs",
+    "color": "#ff5722", // deep orange
+    "description": "Mouse, Keyboard, Gamepad, Touch, and other input methods.",
+    "image": "placeholder-image.jpg",
+    "url": "inputs.html",
+    "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
+  },
   {
     title: 'Game Config', // red
     color: '#f44336',
@@ -62,22 +101,13 @@ let categories = [
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
   {
-    title: 'Graphics', // blue
-    color: '#2196f3',
-    description: 'Explore examples featuring the graphics engine.',
-    image: 'placeholder-image.jpg',
-    url: 'graphics.html',
-    tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
-  },
-  {
     title: 'Plugins', // orange
     color: '#ff9800',
     description: 'Explore examples featuring the plugin system.',
     image: 'placeholder-image.jpg',
     url: 'plugins.html',
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
-  },
-  */
+  }
 
 ];
 
@@ -256,15 +286,138 @@ let render_examples = [
   }
 ]
 
+let asset_examples = [
+  {
+    title: 'Load Image',
+    category: 'assets',
+    description: 'Load an image asset.',
+    image: 'placeholder-image.jpg',
+    url: 'assets/load-image.html',
+    tags: ['load', 'image', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load']
+  },
+  {
+    title: 'Load Sprite Sheet',
+    category: 'assets',
+    description: 'Load a sprite sheet asset.',
+    image: 'placeholder-image.jpg',
+    url: 'assets/load-sprite-sheet.html',
+    tags: ['load', 'sprite', 'sheet', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load']
+  }
+  /*
+  {
+    title: 'Load FBX Model',
+    category: 'assets',
+    description: 'Load an FBX model asset.',
+    image: 'placeholder-image.jpg',
+    url: 'assets/load-fbx-model.html',
+    tags: ['load', 'fbx', 'model', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load']
+  },
+  {
+    title: 'Load Audio',
+    category: 'assets',
+    description: 'Load an audio asset.',
+    image: 'placeholder-image.jpg',
+    url: 'assets/load-audio.html',
+    tags: ['load', 'audio', 'asset', 'resource', 'file', 'load', 'load', 'load', 'load', 'load', 'load'
+  }*/
+]
+
+let input_examples = [
+  {
+    title: 'Keyboard',
+    category: 'inputs',
+    description: 'Handle keyboard input.',
+    image: 'placeholder-image.jpg',
+    url: 'inputs/keyboard.html',
+    tags: ['keyboard', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Mouse',
+    category: 'inputs',
+    description: 'Handle mouse input.',
+    image: 'placeholder-image.jpg',
+    url: 'inputs/mouse.html',
+    tags: ['mouse', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Gamepad',
+    category: 'inputs',
+    description: 'Handle gamepad input.',
+    image: 'placeholder-image.jpg',
+    url: 'inputs/gamepad.html',
+    tags: ['gamepad', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Touch',
+    category: 'inputs',
+    description: 'Handle touch input.',
+    image: 'placeholder-image.jpg',
+    url: 'inputs/touch.html',
+    tags: ['touch', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  }
+];
+
+let audio_examples = [
+  {
+    title: 'Play Sound',
+    category: 'audio',
+    description: 'Play a sound.',
+    image: 'placeholder-image.jpg',
+    url: 'audio/play-sound.html',
+    tags: ['play', 'sound', 'audio', 'music', 'effects', 'background music', 'soundtrack', 'volume', 'playback', 'midi', 'tone']
+  },
+  {
+    title: 'Play Tone',
+    category: 'audio',
+    description: 'Play a tone.',
+    image: 'placeholder-image.jpg',
+    url: 'audio/play-tone.html',
+    tags: ['play', 'tone', 'audio', 'music', 'effects', 'background music', 'soundtrack', 'volume', 'playback', 'midi', 'tone']
+  },
+  {
+    title: 'Virtual Piano',
+    category: 'audio',
+    description: 'Play a virtual piano.',
+    image: 'placeholder-image.jpg',
+    url: 'audio/virtual-piano.html',
+    tags: ['virtual', 'piano', 'audio', 'music', 'effects', 'background music', 'soundtrack', 'volume', 'playback', 'midi', 'tone']
+  }
+];
+
 // concat all arr to examples
 examples = examples.concat(item_examples);
 examples = examples.concat(entity_examples);
 examples = examples.concat(lifecycle_examples);
 examples = examples.concat(texture_examples);
 examples = examples.concat(render_examples);
+examples = examples.concat(asset_examples);
+examples = examples.concat(input_examples);
+examples = examples.concat(audio_examples);
+
 
 import fs from 'fs';
 import path from 'path';
+
+function exampleTemplateHolder (example) {
+
+  let html = ```
+  <html>
+    <link href="../prism.css" rel="stylesheet" />
+    <script src="../code-editor.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        loadEditor('./${example.name}js');
+      });
+    </script>
+    <iframe src="../demo.html?source=${example.path}" width="100%" height="50%"></iframe>
+    <script src="../prism.min.js"></script>
+  </html>
+  ```;
+
+  return html;
+
+}
+
 // Directory where the HTML files will be saved
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -273,7 +426,8 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // Function to generate HTML content for each category
 function generateCategoryHTML(category) {
-  const categoryExamples = examples.filter(example => example.category === category.title.toLowerCase());
+  const categoryExamples = examples.filter(example => example.category === category.name);
+
   let categoryHTML = `<div class="categories">`;
 
   categoryExamples.forEach(example => {
@@ -302,7 +456,11 @@ if (!fs.existsSync(outputDir)){
 categories.forEach(category => {
   let str = new String(indexTemplate); // Assuming indexTemplate is your base HTML template string
   const categoryHTML = generateCategoryHTML(category);
-  const filePath = path.join(outputDir, `${category.title.toLowerCase().replace(/\s+/g, '-')}.html`);
+
+  // filePath should dervive from category.url, just remove the .html and replace with .html
+  const filePath = path.join(outputDir, `${category.url}`);
+
+  //const filePath = path.join(outputDir, `${category.title.toLowerCase().replace(/\s+/g, '-')}.html`);
   
   let mantraGameDevFrameworksTags = [
     'javascript game development',
