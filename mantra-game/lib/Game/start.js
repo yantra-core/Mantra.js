@@ -45,6 +45,12 @@ export default function start(cb) {
         }
       }
 
+      // Bind all controller input events to Sutra conditions by default
+      if (game.systems.sutra) {
+        console.log("Binding all input events to Sutra conditions...")
+        game.systems.sutra.bindInputsToSutraConditions();
+      }
+
       console.log('All Plugins are ready! Starting Mantra Game Client...');
       game.emit('game::ready');
       if (game.config.defaultPlayer) {

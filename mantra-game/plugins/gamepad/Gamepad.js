@@ -101,10 +101,6 @@ export default class Gamepad {
     this.game = game;
     this.id = Gamepad.id;
 
-    if (this.game.systems.sutra) {
-      this.game.systems.sutra.bindGamepadToSutraConditions();
-    }
-
     game.systemsManager.addSystem('gamepad', this);
     if (!this.game.isServer) {
       window.addEventListener("gamepadconnected", (event) => this.connectHandler(event));

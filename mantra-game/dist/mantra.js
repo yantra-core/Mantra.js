@@ -316,7 +316,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       virtualGamepad: false,
       editor: true,
       sutra: true,
-      lifetime: true,
+      lifetime: false,
       defaultMovement: false,
       // data compression
       protobuf: false,
@@ -1283,6 +1283,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
     key: "loadImage",
     value: function () {
       var _loadImage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(asset) {
+        var _this2 = this;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -1303,7 +1304,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
                 } else {
                   img.src = asset.url;
                 }*/
-                img.src = asset.url;
+                img.src = _this2.root + asset.url;
               }));
             case 1:
             case "end":
@@ -1705,6 +1706,12 @@ function start(cb) {
             }
           }
         }
+      }
+
+      // remap the keyboard mappings to Sutra by default
+      if (game.systems.sutra) {
+        console.log("Binding all input events to Sutra conditions...");
+        game.systems.sutra.bindInputsToSutraConditions();
       }
       console.log('All Plugins are ready! Starting Mantra Game Client...');
       game.emit('game::ready');

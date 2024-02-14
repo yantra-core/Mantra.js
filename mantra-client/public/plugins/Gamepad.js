@@ -111,9 +111,6 @@ var Gamepad = exports["default"] = /*#__PURE__*/function () {
       var _this = this;
       this.game = game;
       this.id = Gamepad.id;
-      if (this.game.systems.sutra) {
-        this.game.systems.sutra.bindGamepadToSutraConditions();
-      }
       game.systemsManager.addSystem('gamepad', this);
       if (!this.game.isServer) {
         window.addEventListener("gamepadconnected", function (event) {

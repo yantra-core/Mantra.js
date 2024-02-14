@@ -1,8 +1,8 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  defaultPlayer: true,
-  defaultMovement: true, // adds movement to player
-  plugins: ['Block', 'Border'], // plugins at construction
+  //defaultPlayer: true,
+  //defaultMovement: true, // adds movement to player
+  plugins: ['Block', 'Border', 'Lifetime'], // plugins at construction
 });
 
 game.use('Bullet'); // plugins at runtime
@@ -11,66 +11,79 @@ game.use('Bullet'); // plugins at runtime
 game.start(function () {
   game.setBackground('#000000');
   game.setZoom(1)
-  game.on('pointerDown', function (entity, event) {
-    game.systems.bullet.fireBullet(game.data.ents.PLAYER[0].id);
-    console.log(event)
-    game.updateEntity(game.data.ents.PLAYER[0].id, {
+  game.createBorder();
+  game.setGravity(0, 2);
+  game.on('pointerDown', function (position, event) {
+    let worldX = position.x, worldY = position.y;
+    // Create entity at this location in the world
+    game.createEntity({
+      color: 0xffffff,
+      size: {
+        width: 100,
+        height: 100
+      },
+      lifetime: 1000,
       position: {
-        x: event.x,
-        y: event.y
-      }
+        x: worldX,
+        y: worldY,
+        z: 1
+      },
     });
-
-
   });
 
-  game.on('pointerMove', function (entity, event) {
-    // game.systems.bullet.fireBullet(game.data.ents.PLAYER[0].id, event);
-    console.log('pointerMove', entity, event);
+  game.on('pointerMove', function (position, event) {
+    let text = `
+      x: ${position.x}
+      y: ${position.y}
+    `;
     game.updateEntity(mouseInfo.id, {
-      text: `entity: ${entity.id} x: ${event.x}, y: ${event.y}`
+      text: text
     });
-    // update player to mouse position
-    console.log('eeee', event.x, event.y)
-    console.log(game.data.camera.position)
-    /*
-    game.updateEntity(game.data.ents.PLAYER[0].id, {
-      position: {
-        x: game.data.camera.position.x + event.x,
-        y: game.data.camera.position.y + event.y
-      }
-    });
-    */
   });
 
   let mouseInfo = game.createEntity({
     type: 'TEXT',
-    width: 500,
-    height: 50,
+    body: false,
+    size: {
+      width: 500,
+      height: 500,
+    },
+    hasCollisionStart: true,
+
+    position: {
+      x: 100,
+      y: 100,
+      z: 1
+    },
     color: 0xffffff,
-    text: 'Click and drag to shoot'
+    text: '',
+    style: {
+      backgroundColor: 'black',
+      fontSize: '44px',
+    }
   })
 
-  // create a few entities to shoot, aligned horizontally in front of the gun
-  let entities = [];
-  let startPosition = { x: 100, y: 0 };
-  let blockSpacing = 60; // Adjust as needed for spacing between blocks
-  for (let i = 0; i < 10; i++) {
-    let entity = game.createEntity({
-      type: 'BLOCK',
-      size: {
-        width: 50,
-        height: 50
-      },
-      hasCollisionStart: true,
-      position: {
-        x: startPosition.x + (i * blockSpacing), // Position blocks in a line to the right of the gun
-        y: startPosition.y // Align blocks vertically with the gun
-      }
-    });
-    entities.push(entity);
-  }
+  game.createEntity({
+    type: 'TEXT',
+    body: false,
+    size: {
+      width: 500,
+      height: 100,
+    },
+    hasCollisionStart: true,
 
+    position: {
+      x: 50,
+      y: -200,
+      z: 1
+    },
+    color: 0xffffff,
+    text: 'Click to create entities',
+    style: {
+      backgroundColor: 'black',
+      fontSize: '44px',
+    }
+  })
 
 });
 window.game = game;

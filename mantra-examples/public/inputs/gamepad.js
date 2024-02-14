@@ -2,26 +2,41 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultPlayer: true,
   defaultMovement: true, // adds movement to player
-  virtualGamepad: true, // adds virtual gamepad to player
-  plugins: ['Block', 'Border'], // plugins at construction
+  plugins: ['Block', 'Border', 'Bullet', 'Boomerang', 'Gamepad'], // plugins at construction
 });
 
-game.use('Bullet'); // plugins at runtime
+// optional virtual gamepad GUI
+game.use('GamepadGUI'); // plugins at runtime
 
-
-// TODO: demos should have simple control mappings with Sutra, no default mappings
 game.start(function () {
   game.setBackground('#000000');
+  game.createBorder();
 
-  game.on('pointerDown', function (event) {
-    game.systems.bullet.fireBullet(game.data.ents.PLAYER[0].id);
+  // create text, "Connect USB Gamepad to play"
+  game.createEntity({
+    type: 'TEXT',
+    body: false,
+    width: 700,
+    height: 50,
+    color: 0xffffff,
+    text: `Connect USB Gamepad to play`,
+    position: {
+      x: 50,
+      y: -100
+    },
+    style: {
+      backgroundColor: 'black',
+      fontSize: '44px',
+    },
   });
 
+  // TODO: add status icon with gamepad image and game.on('gamepadconnected', function() { ... }
+  
   // create a few entities to shoot, aligned horizontally in front of the gun
   let entities = [];
   let startPosition = { x: 100, y: 0 };
   let blockSpacing = 60; // Adjust as needed for spacing between blocks
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 5; i++) {
     let entity = game.createEntity({
       type: 'BLOCK',
       size: {
@@ -36,7 +51,6 @@ game.start(function () {
     });
     entities.push(entity);
   }
-
 
 });
 window.game = game;

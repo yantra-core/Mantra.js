@@ -508,7 +508,9 @@ var Sutra = /*#__PURE__*/function () {
     key: "bindGamepadToSutraConditions",
     value: function bindGamepadToSutraConditions() {
       var _this = this;
+      console.log("CHECKING FOR GAMEPADS", this.game.systems.gamepad);
       if (this.game.systems.gamepad) {
+        console.log("Binding all gamepad events to Sutra conditions...");
         var gamepadControls = this.game.systems.gamepad.controls;
         var _loop = function _loop(mantraCode) {
           // Remark: Do we want to imply isPlayer here?
@@ -535,6 +537,7 @@ var Sutra = /*#__PURE__*/function () {
     value: function bindKeyCodesToSutraConditions() {
       var _this2 = this;
       if (this.game.systems.keyboard) {
+        console.log("Binding all keyboard events to Sutra conditions...");
         var keyControls = this.game.systems.keyboard.controls;
         var _loop2 = function _loop2(mantraCode) {
           // Key Down Condition

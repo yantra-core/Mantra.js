@@ -97,6 +97,18 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         };
       }
       this.sendMouseData();
+
+      // Get mouse position
+      var mouseX = event.clientX;
+      var mouseY = event.clientY;
+
+      // Convert screen coordinates to world coordinates
+      var worldX = (mouseX - window.innerWidth / 2 + game.viewportCenterXOffset) / game.data.camera.currentZoom + game.data.camera.position.x;
+      var worldY = (mouseY - window.innerHeight / 2 + game.viewportCenterYOffset) / game.data.camera.currentZoom + game.data.camera.position.y;
+      this.game.emit('pointerMove', {
+        x: worldX,
+        y: worldY
+      }, event);
     }
   }, {
     key: "handleMouseDown",
@@ -150,10 +162,26 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // event.preventDefault();
       }
 
+      // Get mouse position
+      var mouseX = event.clientX;
+      var mouseY = event.clientY;
+
+      // Convert screen coordinates to world coordinates
+      var worldX = (mouseX - window.innerWidth / 2 + game.viewportCenterXOffset) / game.data.camera.currentZoom + game.data.camera.position.x;
+      var worldY = (mouseY - window.innerHeight / 2 + game.viewportCenterYOffset) / game.data.camera.currentZoom + game.data.camera.position.y;
+      var position = {
+        x: worldX,
+        y: worldY
+      };
+
+      // truncate to 3 decimal places
+      position.x = Math.round(position.x * 1000) / 1000;
+      position.y = Math.round(position.y * 1000) / 1000;
+      position.entityId = this.game.selectedEntityId || null;
       // Remark: We may need better logic here to determine intent of the user pointerDown
       // TODO: add conditional check here to see if we should be processing mouse events
       //       should support configurable options for mouse events
-      this.game.emit('pointerDown', this.game.selectedEntityId || {}, event);
+      this.game.emit('pointerDown', position, event);
       this.sendMouseData(event);
     }
   }, {
@@ -188,7 +216,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     key: "handleMouseOver",
     value: function handleMouseOver(event) {
       var target = event.target;
-      this.game.emit('pointerMove', this.game.selectedEntityId || {}, event);
+      this.game.emit('pointerOver', this.game.selectedEntityId || {}, event);
       this.sendMouseData(event);
     }
   }, {
