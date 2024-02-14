@@ -3,7 +3,7 @@ let game = new MANTRA.Game({
   defaultPlayer: true,   // creates a player
   defaultMovement: true, // adds movement to player
   virtualGamepad: false, // adds virtual gamepad to player
-  gameRoot: 'http://192.168.1.80:7777',
+  
 });
 
 game.use('Block');
