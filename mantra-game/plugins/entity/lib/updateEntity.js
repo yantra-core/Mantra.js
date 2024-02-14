@@ -156,7 +156,15 @@ export default function updateEntity(entityDataOrId, entityData) {
     // Remark: in the future we could merge instead of overwrite
     // create new textures object by merging in the new texture
     let prev = this.game.components.texture.get(entityId);
-    let newTexture = { ...prev, ...entityData.texture };
+    let newTexture;
+    // check to see if incoming entityData.texture is a string, if so, it's a texture id
+    if (typeof entityData.texture === 'string') {
+//      newTexture = entityData.texture;
+    } else {
+
+    }
+    newTexture = { ...prev, ...entityData.texture };
+
     this.game.components.texture.set(entityId, newTexture);
   }
 

@@ -32,6 +32,7 @@ class GravityGardens {
 
     let player = game.createPlayer({
       color: 0xcccccc,
+      texture: null,
       position: {
         x: 0,
         y: 0,

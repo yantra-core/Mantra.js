@@ -55,7 +55,6 @@ class Game {
 
     // Merge custom configuration with defaults
     const config = { ...defaultConfig, ...customConfig };
-
     // Override for server-specific defaults
     if (config.isServer) {
       config.showLoadingScreen = false;

@@ -48,7 +48,6 @@ class Sutra {
         if (self.game.config.mode === 'platform') {
           // TODO: better platform control
           self.game.useSutra(platform(self.game), 'mode-platform');
-          // self.game.useSutra(topdown(self.game), 'mode-topdown');
         }
       }
       self.inputsBound = true;
@@ -78,10 +77,14 @@ class Sutra {
         // It may be required for complex play movements?
         this.game.rules.addCondition(mantraCode, (entity, gameState) =>
           entity.id === game.currentPlayerId && gameState.input.controls[mantraCode]
+          // gameState.input.controls[mantraCode]
         );
       }
     }
   }
+
+  // TODO: send mouse control events to Sutra tree for tick evaluation
+  bindMouseCodesToSutraConditions() {}
 
   bindKeyCodesToSutraConditions() {
     if (this.game.systems.keyboard) {
@@ -89,24 +92,27 @@ class Sutra {
 
       for (let mantraCode in keyControls) {
         // Key Down Condition
+        // Remark: These should not be bound to current player, instead to the entity that is being controlled
         // _DOWN implied as default
         this.game.rules.addCondition(mantraCode, (entity, gameState) =>
           entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.down
+          // gameState.input.keyStates[mantraCode]?.down
         );
 
         // Key Up Condition
         this.game.rules.addCondition(mantraCode + '_UP', (entity, gameState) =>
           entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.up
+          // gameState.input.keyStates[mantraCode]?.up
         );
 
         // Key held Condition
         this.game.rules.addCondition(mantraCode + '_HOLD', (entity, gameState) =>
           entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.pressed
+          // gameState.input.keyStates[mantraCode]?.pressed
         );
       }
     }
   }
-
 
   update() {
     let game = this.game;

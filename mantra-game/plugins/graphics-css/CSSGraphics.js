@@ -69,7 +69,7 @@ class CSSGraphics extends GraphicsInterface {
     this.game = game;
 
     const cssCamera = new CSSCamera(this, {
-      initialZoom: 4.5
+      initialZoom: 1
     });
 
     const windowHeight = window.innerHeight;

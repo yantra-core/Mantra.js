@@ -45,10 +45,9 @@ let game = new Game({
 // game.gameConfig = TowerWorld;
 
 window.game = game;
-let home = new worlds.Home();
+let home = new worlds.Platform();
+home = new worlds.GravityGardens();
 
 game.start(function () {
   game.use(home);
-
-  
 });

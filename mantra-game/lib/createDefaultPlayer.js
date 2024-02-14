@@ -1,3 +1,6 @@
+// TODO: use Entity.sutra to bind movement directly to the player
+// import topdown from './Game/defaults/defaultTopdownMovement.js';
+
 export default function createDefaultPlayer(playerConfig = {}) {
   let game = this;
   console.log('creating default player', playerConfig, this.currentPlayerId)
@@ -19,6 +22,13 @@ export default function createDefaultPlayer(playerConfig = {}) {
 
   let rules = game.rules;
 
+  if (typeof playerConfig.texture === 'undefined') {
+    playerConfig.texture = {
+      sheet: 'loz_spritesheet',
+      sprite: 'player',
+    };
+  }
+
   let player = this.createEntity({
     name: playerConfig.name,
     type: 'PLAYER',
@@ -32,6 +42,7 @@ export default function createDefaultPlayer(playerConfig = {}) {
     radius: playerConfig.radius,
     texture: playerConfig.texture,
     mass: 222,
+    // sutra: topdown(game), // TODO: replace with more comprehensive player sutra with sprites and item actions
     friction: 0.5,  // Default friction
     frictionAir: 0.5, // Default air friction
     frictionStatic: 1, // Default static friction

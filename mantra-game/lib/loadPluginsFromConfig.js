@@ -9,7 +9,6 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   let plugins = this.plugins;
   let gameConfig = this.config
 
-
   //
   // Iterate through `GameConfig.plugins` array and load plugins
   // Three separate formats are supported to load plugins:
@@ -97,8 +96,14 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     if (sutra) {
       this.use('Sutra', {
-        defaultMovement: defaultMovement
+        defaultMovement: defaultMovement // TODO: remove, no mutation from using plugins!
       });
+    }
+
+    if (defaultMovement) {
+      if (this.systems.sutra) {
+        this.systems.sutra.bindDefaultMovementSutra(mode);
+      }
     }
 
     this.use('GhostTyper');

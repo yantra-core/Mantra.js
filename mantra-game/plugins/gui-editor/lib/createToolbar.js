@@ -13,6 +13,7 @@ export default function createToolbar(game) {
   let keyPressed = false;
 
   // TODO: this won't work if editor isn't already loaded
+  // TODO: remove usage of entityInput event, use game.data.input instead?
   game.on('entityInput::handleInputs', (entityId, input) => {
     if (input.controls && input.controls.U !== undefined) {
       if (input.controls.U === true && !keyPressed) {
