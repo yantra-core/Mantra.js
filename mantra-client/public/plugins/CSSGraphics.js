@@ -1253,7 +1253,11 @@ function inflateText(entityElement, entityData) {
     entityElement.style.width = entityData.width + 'px';
   }
   if (entityData.color) {
-    entityElement.style.color = entityData.color;
+    // convert int color to hex
+    if (typeof entityData.color === 'number') {
+      var hexColor = '#' + entityData.color.toString(16);
+      entityElement.style.color = hexColor;
+    }
   }
 
   /* Remark: No need to bind each entity to a pointerdown event for CSSGraphics, we can delegate

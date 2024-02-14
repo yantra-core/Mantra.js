@@ -556,7 +556,7 @@ function createEntity() {
         height: 100,
         depth: 16
       },
-      lifetime: -1,
+      lifetime: null,
       maxSpeed: 9999,
       isStatic: false,
       isSensor: false,

@@ -108,7 +108,6 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
           pressed: true
         };
         this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
-        console.log("keydownllkasdlkasd");
         if (this.preventDefaults === true) {
           event.preventDefault();
         }

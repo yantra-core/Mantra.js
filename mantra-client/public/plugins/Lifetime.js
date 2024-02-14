@@ -27,20 +27,16 @@ var Lifetime = /*#__PURE__*/function () {
     key: "update",
     value: function update() {
       var now = Date.now();
-      // TODO: iterate through lifetime instead of creationTime
-      // TODO: ensure that lifetime is only added if non Infinity
-      // TODO: check performance of lifetime again after these changes
-      /*
-      for (let entityId in this.game.components.creationTime.data) {
-        let ent = this.game.getEntity(entityId);
-        if (ent && this.game.components.lifetime[entityId] > 0 && this.game.components.lifetime[entityId] !== Infinity) { // Remark: protobuf didn't like Infinity, -1 is probably better choice
-          const elapsedTime = now - ent.creationTime; 
-          if (elapsedTime > ent.lifetime) {
+      for (var entityId in this.game.components.lifetime.data) {
+        var entLifetime = this.game.components.lifetime.get(entityId);
+        if (entLifetime > 0) {
+          var creationTime = this.game.components.creationTime.get(entityId);
+          var elapsedTime = now - creationTime;
+          if (elapsedTime > entLifetime) {
             this.game.removeEntity(Number(entityId)); // TODO: remove Number(), refactor Components to use Map
           }
         }
       }
-      */
     }
   }, {
     key: "render",

@@ -316,7 +316,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       virtualGamepad: false,
       editor: true,
       sutra: true,
-      lifetime: true,
+      lifetime: false,
       defaultMovement: false,
       // data compression
       protobuf: false,

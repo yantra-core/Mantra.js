@@ -211,6 +211,14 @@ let entity_examples = [
     image: 'placeholder-image.jpg',
     url: 'entity/get-entity.html',
     tags: ['get', 'entity', 'scene', 'find', 'search', 'locate', 'retrieve', 'fetch', 'obtain', 'acquire', 'detect']
+  },
+  {
+    title: 'Entity Lifetime',
+    category: 'entity',
+    description: 'Set the time duration an entity will exist.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/entity-lifetime.html',
+    tags: ['entity', 'lifetime', 'duration', 'time', 'exist', 'live', 'survive', 'persist', 'endure', 'continue', 'remain']
   }
 
 ];

@@ -37,7 +37,7 @@ class Game {
       virtualGamepad: false,
       editor: true,
       sutra: true,
-      lifetime: true,
+      lifetime: false,
       defaultMovement: false,
       // data compression
       protobuf: false,

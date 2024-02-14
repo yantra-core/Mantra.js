@@ -17,7 +17,11 @@ export default function inflateText(entityElement, entityData) {
   }
 
   if (entityData.color) {
-    entityElement.style.color = entityData.color;
+    // convert int color to hex
+    if (typeof entityData.color === 'number') {
+      let hexColor = '#' + entityData.color.toString(16);
+      entityElement.style.color =  hexColor;
+    }
   }
 
   /* Remark: No need to bind each entity to a pointerdown event for CSSGraphics, we can delegate
