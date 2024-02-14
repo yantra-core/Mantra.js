@@ -54015,6 +54015,12 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
             this.camera.lookAt(_lookAtPosition);
           }
         }
+      } else {
+        // no current player
+        // sets a default camera position and perspective
+        // TODO: add multiple camera views here / camera controls to orbital view
+        this.camera.position.set(0, 400, 100); // Set a default position
+        this.camera.lookAt(new _three.Vector3(0, 0, 0));
       }
     }
   }, {
@@ -54127,7 +54133,7 @@ function createGraphic(entityData) {
     console.log("Entity is destroyed, skipping creation.");
     return;
   }
-
+  var game = this.game;
   // Attempt to retrieve texture and model data
   // console.log("fetching texture", entityData, entityData.texture)
   var texture = game.getTexture(entityData.texture);

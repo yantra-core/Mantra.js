@@ -198,7 +198,6 @@ class ThreeGraphics extends GraphicsInterface {
       // TODO: add multiple camera views here / camera controls to orbital view
       this.camera.position.set(0, 400, 100); // Set a default position
       this.camera.lookAt(new Vector3(0, 0, 0));
-      console.log('fffcouldnt find follow player looking at 0');
     }
   }
 

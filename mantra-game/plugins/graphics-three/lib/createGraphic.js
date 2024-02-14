@@ -7,6 +7,7 @@ export default function createGraphic(entityData) {
     return;
   }
 
+  let game = this.game;
   // Attempt to retrieve texture and model data
   // console.log("fetching texture", entityData, entityData.texture)
   let texture = game.getTexture(entityData.texture);
