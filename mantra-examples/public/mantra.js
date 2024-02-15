@@ -700,6 +700,17 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
       return positions;
     }
+
+    //
+    // Text
+    //
+  }, {
+    key: "createText",
+    value: function createText(entityData) {
+      entityData.type = 'TEXT';
+      entityData.body = false;
+      return this.createEntity(entityData);
+    }
   }, {
     key: "createBorder",
     value: function createBorder() {

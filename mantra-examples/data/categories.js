@@ -1,3 +1,5 @@
+
+// TODO: camera
 let categories = [
   {
     title: 'Entity', // pink
@@ -516,6 +518,7 @@ let behaviors_examples = [
     url: 'behaviors/conditional-on-game-tick-time.html',
     tags: ['conditional', 'game', 'tick', 'time', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
+  /* Remark: Not really needed, we have lifetime, could be better suited as new core api for timers on ticks, etc
   {
     title: 'Conditional on Entity Tick Time',
     category: ['behaviors', 'entity'],
@@ -524,9 +527,10 @@ let behaviors_examples = [
     url: 'behaviors/conditional-on-entity-tick-time.html',
     tags: ['conditional', 'entity', 'tick', 'time', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
+  */
   {
     title: 'Conditional on Entity Collision',
-    category: ['behaviors', 'entity', 'collisions'],
+    category: ['behaviors', 'entity', 'collisions', 'physics'],
     description: 'Run a behavior based on entity collision.',
     image: 'placeholder-image.jpg',
     url: 'behaviors/conditional-on-entity-collision.html',
