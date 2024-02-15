@@ -292,7 +292,13 @@ let entity_examples = [
 
 ];
 
-
+// before.collisionStart, after.collisionStart
+// before.collisionEnd,  after.collisionEnd
+// before.collisionActive, after.collisionActive
+// before.createEntity, after.createEntity
+// before.removeEntity, after.removeEntity
+// before.updateEntity, after.updateEntity
+// before.createEntity, after.createEntity
 let lifecycle_examples = [
   {
     title: 'before.update',
@@ -300,7 +306,7 @@ let lifecycle_examples = [
     description: 'Run code before the update loop.',
     image: 'placeholder-image.jpg',
     url: 'lifecycle/before-update.html',
-    tags: ['before', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'event', 'event', 'event']
+    tags: ['before', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'lifecycle', 'event', 'emitter']
   },
   {
     title: 'after.update',
@@ -308,8 +314,104 @@ let lifecycle_examples = [
     description: 'Run code after the update loop.',
     image: 'placeholder-image.jpg',
     url: 'lifecycle/after-update.html',
-    tags: ['after', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'event', 'event', 'event']
+    tags: ['after', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
+  {
+    title: 'before.createEntity',
+    category: ['lifecycle', 'entity'],
+    description: 'Run code before an entity is created.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-create-entity.html',
+    tags: ['before', 'create', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'after.createEntity',
+    category: ['lifecycle', 'entity'],
+    description: 'Run code after an entity is created.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-create-entity.html',
+    tags: ['after', 'create', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'before.removeEntity',
+    category: ['lifecycle', 'entity'],
+    description: 'Run code before an entity is removed.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-remove-entity.html',
+    tags: ['before', 'remove', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'after.removeEntity',
+    category: ['lifecycle', 'entity'],
+    description: 'Run code after an entity is removed.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-remove-entity.html',
+    tags: ['after', 'remove', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'before.updateEntity',
+    category: ['lifecycle', 'entity'],
+    description: 'Run code before an entity is updated.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-update-entity.html',
+    tags: ['before', 'update', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'after.updateEntity',
+    category: ['lifecycle', 'entity'],
+    description: 'Run code after an entity is updated.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-update-entity.html',
+    tags: ['after', 'update', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'before.collisionStart',
+    category: ['lifecycle', 'collisions', 'entity'],
+    description: 'Run code before a collision starts.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-collision-start.html',
+    tags: ['before', 'collision', 'start', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'after.collisionStart',
+    category: ['lifecycle', 'collisions', 'entity'],
+    description: 'Run code after a collision starts.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-collision-start.html',
+    tags: ['after', 'collision', 'start', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'before.collisionEnd',
+    category: ['lifecycle', 'collisions', 'entity'],
+    description: 'Run code before a collision ends.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-collision-end.html',
+    tags: ['before', 'collision', 'end', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'after.collisionEnd',
+    category: ['lifecycle', 'collisions', 'entity'],
+    description: 'Run code after a collision ends.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-collision-end.html',
+    tags: ['after', 'collision', 'end', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'before.collisionActive',
+    category: ['lifecycle', 'collisions', 'entity'],
+    description: 'Run code before a collision is active.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/before-collision-active.html',
+    tags: ['before', 'collision', 'active', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  },
+  {
+    title: 'after.collisionActive',
+    category: ['lifecycle', 'collisions', 'entity'],
+    description: 'Run code after a collision is active.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle/after-collision-active.html',
+    tags: ['after', 'collision', 'active', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
+  }
 ];
 
 let texture_examples = [
