@@ -3720,6 +3720,10 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       game.on('pointerDown', function (position, event) {
         mousePosition = position;
+
+        // adjust position for game camera offset
+        mousePosition.x = mousePosition.x - game.viewportCenterXOffset;
+        mousePosition.y = mousePosition.y - game.viewportCenterYOffset;
         mousePosition.clientX = event.clientX;
         mousePosition.clientY = event.clientY;
         // if right click
@@ -3749,8 +3753,8 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       game.on('pointerMove', function (position, event) {
         mousePosition = position;
-        mousePosition.clientX = event.clientX;
-        mousePosition.clientY = event.clientY;
+        mousePosition.x = mousePosition.x - game.viewportCenterXOffset;
+        mousePosition.y = mousePosition.y - game.viewportCenterYOffset;
       });
 
       // mouse drops particles logic
@@ -3775,13 +3779,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
         // show repeating ping
         if (dropping && game.tick % 10 === 0) {
-          game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, {
-            color: 'white',
-            duration: 1500,
-            size: 25,
-            finalSize: 100,
-            borderWidth: 3
-          });
+          // game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
         }
       });
 
@@ -3797,6 +3795,11 @@ var GravityGardens = /*#__PURE__*/function () {
               }, entity, 3.33);
             }
           });
+        }
+
+        // show repeating ping
+        if (slurping && game.tick % 10 === 0) {
+          // game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'red', reverse: true, duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
         }
       });
       createFounts(game);
