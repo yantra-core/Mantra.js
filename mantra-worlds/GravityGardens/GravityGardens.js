@@ -129,6 +129,66 @@ class GravityGardens {
       game.use('Border', { autoBorder: true })
     }
 
+    let dropping = false;
+    let slurping = false;
+    let mousePosition = { x: 0, y: 0 };
+    game.on('pointerUp', function (position, event) {
+      dropping = false;
+      slurping = false;
+    });
+
+    game.on('pointerDown', function (position, event) {
+      mousePosition = position;
+      // if right click
+      if (event.button === 2) {
+        slurping = true;
+        game.pingPosition(event.clientX, event.clientY, {  reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+      }
+
+      // if left click
+      if (event.button === 0) {
+        dropping = true;
+        game.pingPosition(event.clientX, event.clientY, {  color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+      }
+    });
+
+    game.on('pointerMove', function (position, event) {
+      mousePosition = position;
+    });
+
+    // mouse drops particles logic
+    game.before('update', function () {
+      if (dropping && game.tick % 3 === 0) {
+        // console.log('dropping', mousePosition.x, mousePosition.y);
+        let randomRadialPosition = game.randomPositionRadial(mousePosition.x, mousePosition.y, 15);
+        let randomColor = game.randomColor();
+        // create burst of particles at this position
+        game.createEntity({
+          type: 'PARTICLE',
+          kind: 'START',
+          color: randomColor,
+          isSensor: true,
+          size: {
+            width: 8,
+            height: 8
+          },
+          position: randomRadialPosition
+        });
+      }
+    });
+
+    // mouse slurps up particles logic
+    game.before('update', function () {
+      if (slurping && game.tick % 3 === 0) {
+        Object.keys(game.data.ents._).forEach(eId => {
+          let entity = game.data.ents._[eId];
+          if (entity.type !== 'BLACK_HOLE' && entity.type !== 'PLAYER') {
+            game.applyGravity({ position: mousePosition, mass: 1000 }, entity, 3.33);
+          }
+        });
+      }
+    });
+
     createFounts(game);
 
     // Particles will be removed when they collide with the wall

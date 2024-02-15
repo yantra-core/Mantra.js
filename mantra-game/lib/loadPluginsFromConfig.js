@@ -1,5 +1,6 @@
 import LoadingScreen from "../plugins/loading-screen/LoadingScreen.js";
 import GhostTyper from "../plugins/typer-ghost/GhostTyper.js";
+import Physics from "../plugins/physics/Physics.js";
 
 // default player movement, this could be also be set in defaultGameStart.js
 // import movement from './defaultPlayerMovement.js';
@@ -107,6 +108,9 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
     }
 
     this.use('GhostTyper');
+
+    // Physics is imported directly in Main mantra package ( for now )
+    this.use(new Physics());
 
     // TODO: move to Graphics.loadFromConfig() ?
     if (graphics) {

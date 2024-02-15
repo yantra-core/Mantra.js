@@ -254,6 +254,10 @@ class Game {
     }
   }
 
+  applyGravity(entA, entB, gravity) {
+    this.systems.physics.applyGravity(entA, entB, gravity);
+  }
+
   setPosition(entityId, position) {
     this.physics.setPosition(entityId, position);
   }
@@ -358,16 +362,12 @@ class Game {
     return { x, y };
   }
 
-  randomPositionsRadial(centerX, centerY, distance, count) {
-    let positions = [];
-    for (let i = 0; i < count; i++) {
-      let angle = Math.random() * 2 * Math.PI; // Random angle
-      let radius = Math.random() * distance; // Random radius within distance
-      let x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
-      let y = centerY + radius * Math.sin(angle);
-      positions.push({ x, y });
-    }
-    return positions;
+  randomPositionRadial(centerX, centerY, distance, count) {
+    let angle = Math.random() * 2 * Math.PI; // Random angle
+    let radius = Math.random() * distance; // Random radius within distance
+    let x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
+    let y = centerY + radius * Math.sin(angle);
+    return { x, y };
   }
 
   //
