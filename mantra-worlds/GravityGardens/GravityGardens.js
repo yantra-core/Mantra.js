@@ -59,13 +59,13 @@ class GravityGardens {
         y = y - game.viewportCenterYOffset;
 
         if (gameState.repulsion) {
-          game.pingPosition(x, y, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+          game.pingPosition(x, y, 1, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
           game.updateEntity({
             id: entity.id,
             color: 0xff0000
           });
         } else {
-          game.pingPosition(x, y, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+          game.pingPosition(x, y, 1, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
           // update the player color
           game.updateEntity({
             id: entity.id,
@@ -139,21 +139,25 @@ class GravityGardens {
 
     game.on('pointerDown', function (position, event) {
       mousePosition = position;
+      mousePosition.clientX = event.clientX;
+      mousePosition.clientY = event.clientY;
       // if right click
       if (event.button === 2) {
         slurping = true;
-        game.pingPosition(event.clientX, event.clientY, {  reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+        game.pingPosition(event.clientX, event.clientY, 1, {  reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
 
       // if left click
       if (event.button === 0) {
         dropping = true;
-        game.pingPosition(event.clientX, event.clientY, {  color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+        game.pingPosition(event.clientX, event.clientY, 1, {  color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
     });
 
     game.on('pointerMove', function (position, event) {
       mousePosition = position;
+      mousePosition.clientX = event.clientX;
+      mousePosition.clientY = event.clientY;
     });
 
     // mouse drops particles logic
@@ -175,6 +179,12 @@ class GravityGardens {
           position: randomRadialPosition
         });
       }
+
+      // show repeating ping
+      if (dropping && game.tick % 10 === 0 ) {
+        game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+      }
+
     });
 
     // mouse slurps up particles logic

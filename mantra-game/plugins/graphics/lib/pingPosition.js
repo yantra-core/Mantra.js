@@ -1,4 +1,4 @@
-export default function pingPosition(x, y, options = {}) {
+export default function pingPosition(x, y, z, options = {}) {
   // Default configuration for the ripple, with added reverse option
   const config = {
     color: options.color || 'rgba(0, 150, 255, 0.7)', // Ripple color
@@ -26,6 +26,7 @@ export default function pingPosition(x, y, options = {}) {
   ripple.style.pointerEvents = 'none'; // Ignore mouse events
   ripple.style.opacity = 1;
   ripple.style.transition = `all ${config.duration}ms ease-out`;
+  ripple.style.zIndex = z;
 
   if (config.reverse) {
     // For reverse ripple, start from finalSize and shrink to size
