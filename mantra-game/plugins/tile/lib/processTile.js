@@ -10,6 +10,7 @@ export default function processTile(tileValue, index, layer, tileWidth, tileHeig
   if (typeof tileValue === 'number') {
     // Find id = tile in tileSet
     let tileId = tileValue;
+    // TODO: remove this.tileSet
     let tileKind = this.tileSet.find(tileKind => tileKind.id === tileId);
     if (tileKind) {
       tile = tileKind;

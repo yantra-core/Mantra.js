@@ -55,6 +55,7 @@ export default function construct(game, plugins = []) {
     camera: {
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
+      position: { x: 0, y: 0 },
     },
     chunks: {}
   };

@@ -1861,7 +1861,7 @@ function use(game) {
                       } else {
                         game.loadingPluginsCount--;
                         delete game._plugins[_pluginId];
-                        console.log("emitting ready", _pluginId, pluginInstance);
+                        // console.log("emitting ready" , pluginId, pluginInstance)
                         game.emit('plugin::ready::' + _pluginId, pluginInstance);
                         cb();
                       }

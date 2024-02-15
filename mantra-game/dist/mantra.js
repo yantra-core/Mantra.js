@@ -700,6 +700,17 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
       return positions;
     }
+
+    //
+    // Text
+    //
+  }, {
+    key: "createText",
+    value: function createText(entityData) {
+      entityData.type = 'TEXT';
+      entityData.body = false;
+      return this.createEntity(entityData);
+    }
   }, {
     key: "createBorder",
     value: function createBorder() {
@@ -1454,7 +1465,11 @@ function construct(game) {
     // global for game, not camera specific
     camera: {
       follow: game.config.camera.follow,
-      currentZoom: game.config.camera.startingZoom
+      currentZoom: game.config.camera.startingZoom,
+      position: {
+        x: 0,
+        y: 0
+      }
     },
     chunks: {}
   };
@@ -1846,6 +1861,7 @@ function use(game) {
                       } else {
                         game.loadingPluginsCount--;
                         delete game._plugins[_pluginId];
+                        // console.log("emitting ready" , pluginId, pluginInstance)
                         game.emit('plugin::ready::' + _pluginId, pluginInstance);
                         cb();
                       }

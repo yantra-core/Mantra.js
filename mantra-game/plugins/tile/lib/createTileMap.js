@@ -26,6 +26,11 @@ export default function createTileMap(tileMap) {
   map.seed(tileMap.seed);
   this.labySeed = tileMap.seed;
 
+  // TODO: clean up this code path, createTileMap() should allow LABY or non-LABY instances
+  // Maybe just config for Laby tilemap and non-Laby tilemap
+  if (tileMap.algo) {
+
+  }
   let transformFn = labyrinthos.mazes[tileMap.algo];
   let transformType = 'maze';
   let is3D = false;

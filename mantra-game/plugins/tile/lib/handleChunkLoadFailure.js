@@ -16,6 +16,11 @@ export default function handleChunkLoadFailure(chunkPath, chunkKey) {
     let x = chunkCoordinates.x;
     let y = chunkCoordinates.y;
 
+    // do not regen 0,0 ( for now )
+    if (x === 0 && y === 0) {
+      return;
+    }
+
     // this will eventually call Tile.createLayer()
     // certain incoming tileMap options will require custom logic to re-inflate the map
     // with correct seed and algo configurations

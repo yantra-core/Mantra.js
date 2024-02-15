@@ -27,6 +27,12 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
 
   let isStatic;
 
+  let collisionStart = false;
+
+  if (typeof tile.collisionStart === 'function') {
+    collisionStart = tile.collisionStart;
+  }
+
   if (typeof tile.isStatic === 'boolean') {
     isStatic = tile.isStatic;
   }
@@ -72,7 +78,7 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
     //         Each tile.kind could be configured via `TileSet` class with custom collision config
     // Note:   Entities will still collide if they have `body`, but no collision events will be emitted
     collisionActive: false,
-    collisionStart: false,
+    collisionStart: collisionStart,
     collisionEnd: false,
     hasInventory: false,
     collectable: false,

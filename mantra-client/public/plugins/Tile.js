@@ -5200,11 +5200,9 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) 
     // Find id = tile in tileSet
     var tileId = tileValue;
     // TODO: remove this.tileSet
-    console.log('this.tileSet', this.tileSet);
     var tileKind = this.tileSet.find(function (tileKind) {
       return tileKind.id === tileId;
     });
-    console.log('found', tileKind);
     if (tileKind) {
       tile = tileKind;
     } else {
