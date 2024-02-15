@@ -1,5 +1,4 @@
 // Entity.js - Marak Squires 2023
-
 import createEntity from './lib/createEntity.js';
 import getEntity from './lib/getEntity.js';
 import inflateEntity from './lib/inflateEntity.js';

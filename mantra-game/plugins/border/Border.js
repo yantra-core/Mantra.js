@@ -84,8 +84,7 @@ class Border {
       }
     };
 
-
-
+    // TODO: put these in a container
     for (let b in borders) {
       let border = borders[b];
       if (typeof entityData.id === 'undefined') {
@@ -108,6 +107,7 @@ class Border {
       });
     }
 
+    return 
   }
 
   unload () {

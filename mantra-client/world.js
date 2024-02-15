@@ -46,7 +46,7 @@ let game = new Game({
 
 window.game = game;
 let home = new worlds.Platform();
-home = new worlds.GravityGardens();
+home = new worlds.YCraft();
 
 game.start(function () {
   game.use(home);

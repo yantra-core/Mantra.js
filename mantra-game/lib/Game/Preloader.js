@@ -59,6 +59,8 @@ export default class Preloader {
   }
 
   async loadImage(asset) {
+    // clonse asset
+    // let asset = Object.assign({}, _asset);
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.style.display = 'none'; // Hide the image
@@ -69,6 +71,13 @@ export default class Preloader {
       img.onerror = () => {
         reject(`Failed to load image: ${asset.url}`);
       };
+      // only append root if asset.url is not an absolute url
+      /* TODO: better handling of absolute urls
+      if (!asset.url.includes('http')) {
+        img.src = this.root + asset.url;
+      } else {
+        img.src = asset.url;
+      }*/
       img.src = this.root + asset.url;
     });
   }
