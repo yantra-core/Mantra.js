@@ -47,6 +47,8 @@ class Game {
       // createDefaultPlayer: false,
       defaultPlayer: false,
       gameRoot: 'https://yantra.gg/mantra',
+      scriptRoot: null, // scripts, plugins, .js files, will inherit from gameRoot if not set
+      assetRoot: null,  // images, models, sounds, sprites, will inherit from gameRoot if not set
       options: {},
       mode: 'topdown', // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: false, // default behavior is multiple graphics plugins will be horizontally stacked

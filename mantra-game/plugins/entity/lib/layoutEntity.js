@@ -1,33 +1,70 @@
-export default function layoutEntity (container, entityId) {
+export default function layoutEntity(container, entityId) {
 
   let containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
 
   if (!containerEnt) {
     throw new Error('Container not found: ' + container);
   }
-  let containerPosition = containerEnt.position;
+  let containerPosition = containerEnt.position || { x: 0, y: 0, z: 0 };
   // console.log('found container ent to work with', containerEnt);
 
-  let layoutType = 'none';
+  let layoutType = 'none'; // 'none', 'grid', 'flex', 'stack', 'custom-function'
+  let origin = 'center'; // 'center', 'bottom-right', 'top-right', 'bottom-left', 'center-left', 'center-right', 'top-center', 'bottom-center', 'top-left'
 
   if (containerEnt.style && containerEnt.style.layout) {
     layoutType = containerEnt.style.layout;
   }
 
+  if (containerEnt.style && containerEnt.style.origin) {
+    origin = containerEnt.style.origin;
+  }
+
   //
   // Add the current new entity id to the container items
   //
-  containerEnt.items.push(entityId);
+  if (!containerEnt.items) {
+    containerEnt.items = [];
+  }
+  containerEnt.items.push(entityId); // Remark: We are not saving the associations here?
 
   //
   // Default / no layout indicates relative position from top left origin ( -1, -1 )
   // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
   //
   if (layoutType === 'none') {
-    // console.log('adding item to container using relative position with no layout algorithm');
-    // adjust the absolute position about to be set to the container relative position
-    position.x = position.x + containerPosition.x;
-    position.y = position.y + containerPosition.y;
+    // Retrieve the entity to be positioned
+    let entity = this.game.getEntity(entityId);
+
+    // Check if entity exists
+    if (!entity) {
+      console.error('Entity not found: ' + entityId);
+      return;
+    }
+
+    // Optional: Define offsets from the container's top-left corner
+    let offsetX = 0; // Adjust as needed
+    let offsetY = 0; // Adjust as needed
+
+
+    if (origin === 'top-left') {
+      // offset to be calculated by size of container and size of entity
+      offsetX = -containerEnt.size.width / 2;
+      offsetY = -containerEnt.size.height / 2;
+    }
+
+
+    // Calculate the entity's new position relative to the container's position
+    let newPosition = {
+      x: containerPosition.x + offsetX,
+      y: containerPosition.y + offsetY,
+      z: containerPosition.z // Assuming z-index remains constant or is managed elsewhere
+    };
+
+    // Update the entity's position
+    this.game.updateEntity({ id: entityId, position: newPosition });
+
+    // Log for debugging purposes
+    console.log(`Entity ${entityId} positioned at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) relative to container`);
   }
 
   //
@@ -46,7 +83,7 @@ export default function layoutEntity (container, entityId) {
     let containerItems = containerEnt.items || [];
 
     // call game.getEntity() for each item to get its size and position
-    // TODO: use components api to only fetch the necessary components ( instead of entire ent )
+    // Remark: use components api to only fetch the necessary components ( instead of entire ent )
     containerItems = containerItems.map((itemId) => {
       return this.game.getEntity(itemId);
     });
@@ -92,6 +129,46 @@ export default function layoutEntity (container, entityId) {
     });
 
     // console.log('adding item to container using grid layout algorithm');
+  }
+
+  //
+  // Layout container items using stack layout algorithm
+  //
+  if (layoutType === 'stack') {
+    // Define stack offset values
+    let stackOffsetX = 0; // Horizontal offset for each stacked item
+    let stackOffsetY = 5; // Vertical offset for each stacked item
+
+
+    // Retrieve the entity to be positioned
+    let entity = this.game.getEntity(entityId);
+
+    // Check if entity exists
+    if (!entity) {
+      console.error('Entity not found: ' + entityId);
+      return;
+    }
+
+    // TODO: we could add multiple ways to stack here by cardinal direction or custom function
+    // default stack top to bottom using entity size
+    stackOffsetY = entity.size.height + 5;
+
+
+    // Determine the stack position based on the number of items already in the container
+    let stackIndex = containerEnt.items.length - 1; // -1 because we've already added the new entityId to containerEnt.items
+
+    // Calculate the entity's new position based on stack index and offsets
+    let newPosition = {
+      x: containerPosition.x + stackIndex * stackOffsetX,
+      y: containerPosition.y + stackIndex * stackOffsetY,
+      z: containerPosition.z // Assuming z-index remains constant or is managed elsewhere
+    };
+
+    // Update the entity's position
+    this.game.updateEntity({ id: entityId, position: newPosition });
+
+    // Log for debugging purposes
+    console.log(`Entity ${entityId} stacked at index ${stackIndex} with position (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) relative to container`);
   }
 
   //

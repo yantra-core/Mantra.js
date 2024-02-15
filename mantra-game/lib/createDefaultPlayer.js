@@ -6,7 +6,7 @@ export default function createDefaultPlayer(playerConfig = {}) {
   console.log('creating default player', playerConfig, this.currentPlayerId)
 
   if (typeof playerConfig.position === 'undefined') {
-    playerConfig.position = { x: 0, y: 0 };
+    playerConfig.position = { x: 0, y: 0, z: 1 };
   }
 
   if (playerConfig.texture === 'none') {

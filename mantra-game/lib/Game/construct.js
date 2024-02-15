@@ -91,15 +91,29 @@ export default function construct(game, plugins = []) {
     game.assetRoot = game.config.gameRoot;
   }
 
+  //
   // Remark: options scope being removed, everything should be mounted on GameConfig
+  //
   if (game.config.options.scriptRoot) {
     console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot)
     game.scriptRoot = game.config.options.scriptRoot;
   }
-
   if (game.config.options.assetRoot) {
     console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot)
     game.assetRoot = game.config.options.assetRoot;
+  }
+  //
+  // ^^ legacy API, remove soon
+  //
+
+  // scriptRoot and assetRoot take precedence over gameRoot if provided
+  if (game.config.scriptRoot) {
+    console.log("Mantra is using the follow path as it's script root:", game.config.scriptRoot)
+    game.scriptRoot = game.config.scriptRoot;
+  }
+  if (game.config.assetRoot) {
+    console.log("Mantra is using the follow path as it's asset root:", game.config.assetRoot)
+    game.assetRoot = game.config.assetRoot;
   }
 
   console.log(`new Game(${JSON.stringify(game.config, true, 2)})`);
