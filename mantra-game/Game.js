@@ -308,7 +308,7 @@ class Game {
     });
   }
 
-  isTouchDevice () {
+  isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints;
   }
 
@@ -361,17 +361,23 @@ class Game {
   randomPositionsRadial(centerX, centerY, distance, count) {
     let positions = [];
     for (let i = 0; i < count; i++) {
-        let angle = Math.random() * 2 * Math.PI; // Random angle
-        let radius = Math.random() * distance; // Random radius within distance
-        let x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
-        let y = centerY + radius * Math.sin(angle);
-        positions.push({ x, y });
+      let angle = Math.random() * 2 * Math.PI; // Random angle
+      let radius = Math.random() * distance; // Random radius within distance
+      let x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
+      let y = centerY + radius * Math.sin(angle);
+      positions.push({ x, y });
     }
     return positions;
-}
+  }
 
-
-
+  //
+  // Text
+  //
+  createText(entityData) {
+    entityData.type = 'TEXT';
+    entityData.body = false;
+    return this.createEntity(entityData);
+  }
 
   createBorder({ width = this.width, height = this.height, thickness = 8, color } = {}) {
     let game = this;

@@ -195,6 +195,18 @@ class Collisions {
       return;
     }
 
+    if (entityA.collisionEnd) {
+      if (typeof entityA.collisionEnd === 'function') {
+        entityA.collisionEnd.call(this.game, entityB, entityA);
+      }
+    }
+
+    if (entityB.collisionEnd) {
+      if (typeof entityB.collisionEnd === 'function') {
+        entityB.collisionEnd.call(this.game, entityA, entityB);
+      }
+    }
+
     if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
 
       this.game.data.collisions = this.game.data.collisions || [];
@@ -249,6 +261,19 @@ class Collisions {
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
       return;
+    }
+
+
+    if (entityA.collisionActive) {
+      if (typeof entityA.collisionActive === 'function') {
+        entityA.collisionActive.call(this.game, entityB, entityA);
+      }
+    }
+
+    if (entityB.collisionActive) {
+      if (typeof entityB.collisionActive === 'function') {
+        entityB.collisionActive.call(this.game, entityA, entityB);
+      }
     }
 
     if (this.shouldSendCollisionEvent(bodyA, bodyB, 'ACTIVE')) {
