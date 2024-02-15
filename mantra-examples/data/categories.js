@@ -564,13 +564,24 @@ let behaviors_examples = [
 
 let tiles_examples = [
   {
-    title: 'Tilemap from Array of Integers',
+    title: 'TileMap Object',
+    category: 'tiles',
+    description: 'Create a tilemap from an array of integers.',
+    image: 'placeholder-image.jpg',
+    url: 'tilemaps/tilemap-object.html',
+    tags: ['create', 'tilemap', 'array', 'integers', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+
+
+  {
+    title: 'TileMap Array',
     category: 'tiles',
     description: 'Create a tilemap from an array of integers.',
     image: 'placeholder-image.jpg',
     url: 'tilemaps/create-tilemap-from-array-of-integers.html',
     tags: ['create', 'tilemap', 'array', 'integers', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
+  /*
   {
     title: 'Tilemap from Tiled Editor JSON',
     category: 'tiles',
@@ -579,8 +590,9 @@ let tiles_examples = [
     url: 'tilemaps/create-tilemap-from-tiled-editor-json.html',
     tags: ['create', 'tilemap', 'tiled', 'editor', 'json', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
+  */
   {
-    title: 'Custom TileSets',
+    title: 'TileSets',
     category: 'tiles',
     description: 'Create custom tilesets.',
     image: 'placeholder-image.jpg',
@@ -588,7 +600,7 @@ let tiles_examples = [
     tags: ['custom', 'tilesets', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
   {
-    title: 'TileMap from Labyrinthos',
+    title: 'Labyrinthos.js TileMaps',
     category: 'tiles',
     description: 'Create a tilemap from Labyrinthos.',
     image: 'placeholder-image.jpg',
@@ -629,6 +641,14 @@ let terrains_examples = [
     image: 'placeholder-image.jpg',
     url: 'terrain/infinite-maze.html',
     tags: ['infinite', 'maze', 'labyrinth', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
+  },
+  {
+    title: 'L-Systems',
+    category: 'terrain',
+    description: 'Generate terrain using L-Systems.',
+    image: 'placeholder-image.jpg',
+    url: 'terrain/l-systems.html',
+    tags: ['l-systems', 'terrain', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
   }
 ];
 

@@ -12,20 +12,18 @@ game.start(function () {
   //
   // Creating a TileMap can be done at the lowest-level using arrays of integers
   //
+
+  // TODO: have this be new game.TileMap({ ... })
   let tileMap = {
-    x: 2, // Remark: This will place tile map in TileMap units, not pixel
-    y: 2, // Actual values will be x * 16, y * 16
-    width: 4,
-    height: 4,
-    tileSize: 16,
-    data: [
-      1,1,1,1,
-      1,1,1,1,
-      1,1,1,1,
-      1,1,1,1,
-    ]
+    x: 20, // Remark: This will place tile map in TileMap units, not pixed
+    y: -6, // Actual values will be x * 16, y * 16
+    width: 16,
+    height: 16,
+    seed: 1234,
+    algo: 'AldousBroder'
   };
 
-  game.systems.tile.createLayer(tileMap, tileMap.tileSize, tileMap.tileSize)
+  game.systems.tile.tileMap = tileMap
+  game.systems.tile.createTileMap(tileMap);
 
 });
