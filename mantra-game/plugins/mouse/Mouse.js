@@ -129,8 +129,8 @@ export default class Mouse {
         break;
     }
 
-
-    if (event.button === 2) { // Right mouse button
+    // middle mouse button
+    if (event.button === 1) { // Middle mouse button
       this.isDragging = true;
       this.dragStartPosition = { x: event.clientX, y: event.clientY };
       // prevent default right click menu
@@ -173,7 +173,7 @@ export default class Mouse {
         break;
     }
 
-    if (event.button === 2) { // Right mouse button
+    if (event.button === 1) { // Middle mouse button
       this.isDragging = false;
       // prevent default right click menu
       event.preventDefault();
