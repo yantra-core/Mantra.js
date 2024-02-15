@@ -4692,7 +4692,7 @@ function createTile(tile, x, y) {
     // body = false;
   }
   */
-  console.log('collisionStart', collisionStart);
+
   var _texture;
   // check to see if a custom texture is set
   if (typeof tile.texture !== 'undefined') {

@@ -531,8 +531,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = pingPosition;
-function pingPosition(x, y) {
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+function pingPosition(x, y, z) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
   // Default configuration for the ripple, with added reverse option
   var config = {
     color: options.color || 'rgba(0, 150, 255, 0.7)',
@@ -565,6 +565,7 @@ function pingPosition(x, y) {
   ripple.style.pointerEvents = 'none'; // Ignore mouse events
   ripple.style.opacity = 1;
   ripple.style.transition = "all ".concat(config.duration, "ms ease-out");
+  ripple.style.zIndex = z;
   if (config.reverse) {
     // For reverse ripple, start from finalSize and shrink to size
     ripple.style.width = "".concat(config.finalSize, "px");

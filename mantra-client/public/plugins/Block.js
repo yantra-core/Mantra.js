@@ -99,7 +99,6 @@ var Block = /*#__PURE__*/function () {
         // inherit important properties from parent
         var lifetime = entityA.lifetime;
         var color = entityA.color;
-        console.log('setting', entityIdA, 'to color', color, 'lifetime', lifetime, 'newWidth', newWidth, 'newHeight', newHeight, 'newSplits', newSplits);
         for (var i = 0; i < 4; i++) {
           // TODO: make option for new random color to be config flag
           var newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];

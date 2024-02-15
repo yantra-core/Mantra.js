@@ -4,6 +4,34 @@
 <head>
   <title>Mantra Worlds</title>
   <link rel="stylesheet" type="text/css" href="admin.css">
+  <script>
+    function resizeIframeToFitContent(iframe) {
+      iframe.onload = function() {
+        try {
+          // Adjust the height of the iframe to match its body's scrollHeight
+          const body = iframe.contentWindow.document.body;
+          const html = iframe.contentWindow.document.documentElement;
+          const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+          iframe.style.height = height + 'px';
+  
+          const currentPath = iframe.contentWindow.location.pathname; // Get the current path of the iframe's content
+          const breadcrumbDiv = document.getElementById('breadcrumb');
+  
+          // Create a clickable link for the breadcrumb
+          // Note: Ensure the base URL matches the domain of your iframe content if it's not relative
+          const baseUrl = './'; // Adjust this base URL as needed
+          const fullPath = baseUrl + currentPath;
+  
+          // Update the breadcrumb with the link
+          breadcrumbDiv.innerHTML = 'Mantra > <a href="' + fullPath + '" target="_blank">' + currentPath + '</a>';
+        } catch (e) {
+          console.error("Error resizing iframe: " + e);
+          // Handle errors here, if the content is cross-origin, you might not be able to access the content of the iframe
+        }
+      };
+    }
+  </script>
+  
 </head>
 
 <body>
@@ -19,98 +47,19 @@
     <br />
     <br />
     <br />
-    <!--
-    <section class="demo-category">
-      <h2>Additional Offline Configurations</h2>
-      <p>For Development, several Default Configuration examples Are provided.</p>
-
-      <div class="demo-flex-container">
-        <div class="demo-section">
-          <h2>Home World</h2>
-          <h3>Enter Mantra and Explore</h3>
-          <a class="demo-link" href="./examples/offline/matter-babylon.html">Enter Demo</a>
-          <h4><a href="https://github.com/yantra-core/Mantra.js/blob/master/mantra-worlds/Home/Home.js">Source Code</a>
-          </h4>
-        </div>
-
-        <div class="demo-section">
-          <h2>Music World</h2>
-          <h3>Play virtual instruments, connect MIDI devices</h3>
-          <a class="demo-link" href="./examples/offline/matter-babylon.html">Enter Demo</a>
-        </div>
-
-
-        <div class="demo-section">
-          <h2>Maze World</h2>
-          <h3>Explore algorithmic mazes. Powered by <a
-              href="https://github.com/yantra-core/labyrinthos.js">Labyrinthos</a></h3>
-          <a class="demo-link" href="./examples/offline/matter-css.html">Enter Demo</a>
-        </div>
-
-
-        <div class="demo-section">
-          <h2>3D Flight ( Experimental )</h2>
-          <h3> NVIDIA PhysX 5.3.0 + Babylon.js</h3>
-          <a class="demo-link" href="./examples/offline/physx-babylon.html">Enter Demo</a>
-        </div>
-
-        <div class="demo-section">
-          <h2>Sutra Behavioral Tree Gallery</h2>
-          <h3><a href="https://github.com/yantra-core/sutra" target="_blank">Sutra.js</a> behavior tree +
-            Matter.js + Babylon.js</h3>
-          <a class="demo-link" href="./sutra.html">Enter Demo</a>
-        </div>
-
-        <div class="demo-section">
-          <h2>YCraft.js Crafting</h2>
-          <h3><a href="https://github.com/yantra-core/YCraft.js">YCraft.js</a> Contraption Crafting</h3>
-          <a class="demo-link" href="./ycraft.html">Enter Demo</a>
-        </div>
-
-
-        <div class="demo-section">
-          <h2>XState Boss Fight</h2>
-          <h3><a href="https://github.com/statelyai/xstate" target="_blank">xstate</a> Game Logic + Matter.js
-            + Babylon.js</h3>
-          <a class="demo-link" href="./examples/offline/xstate-matter-babylon.html">Enter Demo</a>
-        </div>
-
-        <div class="demo-section">
-          <h2>RenderPlex</h2>
-          <h3>Matter.js + Babylon.js + Phaser 3</h3>
-          <a class="demo-link" href="./examples/offline/renderplex.html">Enter Demo</a>
-        </div>
-        
-      </div>
-    </section>
--->
-
-    <br />
-
-    <!-- Online Section 
-    <section class="demo-category">
-      <h2>Yantra Online Multplayer Demos</h2>
-      <div class="demo-flex-container">
-        <div class="demo-section">
-          <h2>Regional Auto-Scale</h2>
-          <h3>Matter.js + Babylon.js</h3>
-          <a class="demo-link" href="./examples/yantra/matter-babylon.html">Enter Demo</a>
-        </div>
-        <div class="demo-section">
-          <h2>Regional Auto-Scale</h2>
-          <h3>Matter.js + Phaser 3</h3>
-          <a class="demo-link" href="./examples/yantra/matter-phaser.html">Enter Demo</a>
-        </div>
-
-      </div>
-      <h3>Powered by <a class="link" href="https://yantra.gg">Yantra.gg</a> and <a href="https://hathora.dev"><img
-            class="hathora-logo" src="/img/hathora.png" /></a></h3>
-
-    </section>
-    -->
-    <!-- Solo Section -->
-
   </div>
+  <div id="breadcrumb">Mantra</div> <!-- Breadcrumb placeholder -->
+
+  <iframe id="mantraIframe" src="./examples" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
+
+  <script>
+    // Initialize the resizing function for the iframe when the document is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const iframe = document.getElementById('mantraIframe');
+      resizeIframeToFitContent(iframe);
+    });
+  </script>
+
 </body>
 
 </html>

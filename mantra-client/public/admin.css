@@ -125,3 +125,12 @@ a:visited {
   /*color: #9a9cff;*/
 }
 /* view source modals */
+
+#breadcrumb {
+  background-color: #2a2a2a;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 10px 0;
+  font-size: 22px;
+}

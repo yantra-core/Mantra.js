@@ -151,8 +151,10 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           this.mouseButtons.RIGHT = true;
           break;
       }
-      if (event.button === 2) {
-        // Right mouse button
+
+      // middle mouse button
+      if (event.button === 1) {
+        // Middle mouse button
         this.isDragging = true;
         this.dragStartPosition = {
           x: event.clientX,
@@ -198,8 +200,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           this.mouseButtons.RIGHT = false;
           break;
       }
-      if (event.button === 2) {
-        // Right mouse button
+      if (event.button === 1) {
+        // Middle mouse button
         this.isDragging = false;
         // prevent default right click menu
         event.preventDefault();

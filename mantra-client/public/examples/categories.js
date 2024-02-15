@@ -131,6 +131,7 @@ let categories = [
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  /*
   {
     title: 'Movement', // blue
     name: 'movement',
@@ -140,6 +141,7 @@ let categories = [
     url: 'movement.html',
     tags: ['movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
   },
+
   {
     title: 'Scenes', // blue
     name: 'scenes',
@@ -149,6 +151,7 @@ let categories = [
     url: 'scenes.html',
     tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
+  */
   {
     title: 'Containers', // blue
     name: 'containers',
@@ -546,6 +549,7 @@ let behaviors_examples = [
     url: 'behaviors/keyboard-input.html',
     tags: ['conditional', 'keyboard', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
+  /*
   {
     title: 'Mouse Input',
     category: ['behaviors', 'inputs'],
@@ -554,6 +558,7 @@ let behaviors_examples = [
     url: 'behaviors/mouse-input.html',
     tags: ['conditional', 'mouse', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
+  */
   {
     title: 'Gamepad Input',
     category: ['behaviors', 'inputs'],
@@ -644,6 +649,7 @@ let terrains_examples = [
     url: 'terrain/infinite-maze.html',
     tags: ['infinite', 'maze', 'labyrinth', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
   },
+  /*
   {
     title: 'L-Systems',
     category: 'terrain',
@@ -652,6 +658,7 @@ let terrains_examples = [
     url: 'terrain/l-systems.html',
     tags: ['l-systems', 'terrain', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
   }
+  */
 ];
 
 let config_examples = [

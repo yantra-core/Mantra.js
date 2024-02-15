@@ -564,6 +564,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "applyGravity",
+    value: function applyGravity(entA, entB, gravity) {
+      this.systems.physics.applyGravity(entA, entB, gravity);
+    }
+  }, {
     key: "setPosition",
     value: function setPosition(entityId, position) {
       this.physics.setPosition(entityId, position);
@@ -685,20 +690,16 @@ var Game = exports.Game = /*#__PURE__*/function () {
       };
     }
   }, {
-    key: "randomPositionsRadial",
-    value: function randomPositionsRadial(centerX, centerY, distance, count) {
-      var positions = [];
-      for (var i = 0; i < count; i++) {
-        var angle = Math.random() * 2 * Math.PI; // Random angle
-        var radius = Math.random() * distance; // Random radius within distance
-        var x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
-        var y = centerY + radius * Math.sin(angle);
-        positions.push({
-          x: x,
-          y: y
-        });
-      }
-      return positions;
+    key: "randomPositionRadial",
+    value: function randomPositionRadial(centerX, centerY, distance, count) {
+      var angle = Math.random() * 2 * Math.PI; // Random angle
+      var radius = Math.random() * distance; // Random radius within distance
+      var x = centerX + radius * Math.cos(angle); // Convert polar to Cartesian coordinates
+      var y = centerY + radius * Math.sin(angle);
+      return {
+        x: x,
+        y: y
+      };
     }
 
     //
@@ -1861,7 +1862,6 @@ function use(game) {
                       } else {
                         game.loadingPluginsCount--;
                         delete game._plugins[_pluginId];
-                        // console.log("emitting ready" , pluginId, pluginInstance)
                         game.emit('plugin::ready::' + _pluginId, pluginInstance);
                         cb();
                       }
@@ -2237,6 +2237,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = loadPluginsFromConfig;
 var _LoadingScreen = _interopRequireDefault(require("../plugins/loading-screen/LoadingScreen.js"));
 var _GhostTyper = _interopRequireDefault(require("../plugins/typer-ghost/GhostTyper.js"));
+var _Physics = _interopRequireDefault(require("../plugins/physics/Physics.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 // default player movement, this could be also be set in defaultGameStart.js
@@ -2341,6 +2342,9 @@ function loadPluginsFromConfig(_ref) {
     }
     this.use('GhostTyper');
 
+    // Physics is imported directly in Main mantra package ( for now )
+    this.use(new _Physics["default"]());
+
     // TODO: move to Graphics.loadFromConfig() ?
     if (graphics) {
       this.use('Graphics');
@@ -2388,7 +2392,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":24,"../plugins/typer-ghost/GhostTyper.js":25}],17:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":24,"../plugins/physics/Physics.js":25,"../plugins/typer-ghost/GhostTyper.js":26}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3295,6 +3299,103 @@ _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
 },{}],25:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// Physics.js - Marak Squires 2024
+// Generic Math-Only Physics, designed to be used in-code without Physics engine
+var Physics = exports["default"] = /*#__PURE__*/function () {
+  function Physics(config) {
+    _classCallCheck(this, Physics);
+    this.id = Physics.id;
+  }
+  _createClass(Physics, [{
+    key: "init",
+    value: function init(game) {
+      var _this = this;
+      this.game = game;
+      game.systemsManager.addSystem(Physics.id, this);
+
+      // simplified vector math for physics
+      this.Vector = {
+        add: function add(v1, v2) {
+          return {
+            x: v1.x + v2.x,
+            y: v1.y + v2.y
+          };
+        },
+        sub: function sub(v1, v2) {
+          return {
+            x: v1.x - v2.x,
+            y: v1.y - v2.y
+          };
+        },
+        mult: function mult(v, factor) {
+          return {
+            x: v.x * factor,
+            y: v.y * factor
+          };
+        },
+        div: function div(v, factor) {
+          return {
+            x: v.x / factor,
+            y: v.y / factor
+          };
+        },
+        magnitude: function magnitude(v) {
+          return Math.sqrt(v.x * v.x + v.y * v.y);
+        },
+        normalize: function normalize(v) {
+          var mag = _this.Vector.magnitude(v);
+          return mag > 0 ? _this.Vector.div(v, mag) : {
+            x: 0,
+            y: 0
+          };
+        }
+      };
+    }
+  }, {
+    key: "applyGravity",
+    value: function applyGravity(ent1, ent2, gravity) {
+      var repulsion = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      if (!ent1 || !ent2) {
+        return;
+      }
+      var Vector = this.Vector;
+      console.log('e1e2', ent1, ent2);
+      var distance = Vector.sub(ent2.position, ent1.position);
+      var magnitude = Vector.magnitude(distance);
+      if (magnitude < 0.5) {
+        // This prevents extreme forces at very close distances
+        return;
+      }
+      distance = Vector.normalize(distance);
+      var force = gravity * ent1.mass * ent2.mass / (magnitude * magnitude);
+      var maxForce = 1; // Prevents excessively large forces
+      force = Math.min(force, maxForce);
+      var sign = repulsion ? 1 : -1;
+      game.applyForce(ent2.id, {
+        x: sign * distance.x * force,
+        y: sign * distance.y * force
+      });
+    }
+  }]);
+  return Physics;
+}();
+_defineProperty(Physics, "id", 'physics');
+_defineProperty(Physics, "removable", false);
+
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
