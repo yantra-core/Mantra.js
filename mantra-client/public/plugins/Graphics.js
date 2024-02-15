@@ -617,20 +617,28 @@ function switchGraphics(graphicsInterfaceName, cb) {
   var game = this.game;
   var engines = {
     'BabylonGraphics': 'graphics-babylon',
-    'PhaserGraphics': 'graphics-phaser',
+    // 'PhaserGraphics': 'graphics-phaser',
     'CSSGraphics': 'graphics-css',
     'ThreeGraphics': 'graphics-three'
   };
+  var mappings = {
+    'babylon': 'BabylonGraphics',
+    'css': 'CSSGraphics',
+    'three': 'ThreeGraphics'
+  };
+  graphicsInterfaceName = mappings[graphicsInterfaceName] || graphicsInterfaceName;
   var graphicsInterfaceId = engines[graphicsInterfaceName];
   document.body.style.cursor = 'wait';
+  console.log('this.game.systems[graphicsInterfaceId]', this.game.systems[graphicsInterfaceId]);
   // Check if the selected graphics mode is already registered
   if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
     this.game.use(graphicsInterfaceName, {
       camera: this.game.data.camera
     });
-
+    console.log("WAS USED WAITING NOW");
     // Add event listeners for plugin ready events
     this.game.once("plugin::ready::".concat(graphicsInterfaceId), function () {
+      alert('plugin::ready::' + graphicsInterfaceId);
       // iterate through all existing graphics ( except this one ) and remove them
       _this.game.graphics.forEach(function (graphics) {
         if (graphics.id !== graphicsInterfaceId) {

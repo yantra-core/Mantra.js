@@ -4393,6 +4393,10 @@ var Tile = /*#__PURE__*/function () {
     _classCallCheck(this, Tile);
     this.id = Tile.id;
     this.labyrinthos = _labyrinthos["default"];
+    this.TileMap = _labyrinthos["default"].TileMap;
+    this.TileSet = _labyrinthos["default"].TileSet;
+    this.Biome = _labyrinthos["default"].Biome;
+    this.terrains = _labyrinthos["default"].terrains;
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
@@ -4467,6 +4471,10 @@ var Tile = /*#__PURE__*/function () {
       var _this = this;
       this.game = game;
       this.game.addSystem('tile', this);
+      this.game.TileMap = this.TileMap;
+      this.game.TileSet = this.TileSet;
+      this.game.Biome = this.Biome;
+      this.game.terrains = this.terrains;
       if (this.loadInitialChunk) {
         if (this.tiledServer) {
           this.game.loadScripts(['/tiled/chunks/chunk_x0_y0.js'], function () {

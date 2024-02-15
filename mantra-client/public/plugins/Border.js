@@ -136,6 +136,8 @@ var Border = /*#__PURE__*/function () {
           }
         }
       };
+
+      // TODO: put these in a container
       for (var b in borders) {
         var border = borders[b];
         if (typeof entityData.id === 'undefined') {
@@ -157,6 +159,7 @@ var Border = /*#__PURE__*/function () {
           health: entityData.health || 100
         });
       }
+      return;
     }
   }, {
     key: "unload",

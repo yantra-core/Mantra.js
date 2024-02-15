@@ -39,13 +39,35 @@ if (!fs.existsSync(outputDir)) {
 }
 
 function generateCategoryHTML(category) {
-    const categoryExamples = examples.filter(example => example.category === category.name);
+    const categoryExamples = examples.filter(example => {
+        return Array.isArray(example.category) ? example.category.includes(category.name) : example.category === category.name;
+    });
+
     let categoryHTML = `<div class="categories">`;
 
     categoryExamples.forEach(example => {
+        let exampleCategoryColor = category.color; // Default to current category color
+
+        if (Array.isArray(example.category) && example.category.length > 1) {
+            // Determine the category to use based on the current category's position in the list
+            const currentCategoryIndex = example.category.indexOf(category.name);
+            let nextCategoryName;
+
+            if (currentCategoryIndex === 0) {
+                // Current category is the first in the list, use the second category's color
+                nextCategoryName = category.color;
+            } else {
+                // Current category is not the first, use the first category's color
+                nextCategoryName = example.category[0];
+            }
+
+            const nextCategory = categories.find(cat => cat.name === nextCategoryName);
+            exampleCategoryColor = nextCategory ? nextCategory.color : category.color;
+        }
+
         categoryHTML += `
     <a class="staticExampleLink" href="${example.url}">
-      <div class="category" style="background-color: ${category.color};">
+      <div class="category" style="background-color: ${exampleCategoryColor};">
         <span class="categoryExample">${category.title}</span>
         <p>${example.description}</p>
         <h3>${example.title}</h3>
@@ -56,6 +78,7 @@ function generateCategoryHTML(category) {
     categoryHTML += `</div>`;
     return categoryHTML;
 }
+
 
 function generateMainCategoriesHTML(categories) {
     let categoriesHTML = `<div class="categories">`;
@@ -166,30 +189,30 @@ game.start();
 }
 
 function generateExampleFiles() {
-  examples.forEach(example => {
-      // example.url looks like: 'inputs/mouse.html', for example
-      // Extract the base name without the extension to use for both .html and .js files
-      const baseName = path.basename(example.url, '.html'); // Removes the '.html' extension
+    examples.forEach(example => {
+        // example.url looks like: 'inputs/mouse.html', for example
+        // Extract the base name without the extension to use for both .html and .js files
+        const baseName = path.basename(example.url, '.html'); // Removes the '.html' extension
 
-      // Construct the directory path based on the URL, subtracting the file name
-      const dirPath = path.join(outputDir, path.dirname(example.url));
+        // Construct the directory path based on the URL, subtracting the file name
+        const dirPath = path.join(outputDir, path.dirname(example.url));
 
-      // Ensure the directory exists
-      if (!fs.existsSync(dirPath)) {
-          fs.mkdirSync(dirPath, { recursive: true });
-      }
+        // Ensure the directory exists
+        if (!fs.existsSync(dirPath)) {
+            fs.mkdirSync(dirPath, { recursive: true });
+        }
 
-      const exampleHTMLPath = path.join(dirPath, `${baseName}.html`);
-      const exampleJSPath = path.join(dirPath, `${baseName}.js`);
+        const exampleHTMLPath = path.join(dirPath, `${baseName}.html`);
+        const exampleJSPath = path.join(dirPath, `${baseName}.js`);
 
-      if (!fs.existsSync(exampleHTMLPath)) {
-          fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
-      }
+        if (!fs.existsSync(exampleHTMLPath)) {
+            fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
+        }
 
-      if (!fs.existsSync(exampleJSPath)) {
-          fs.writeFileSync(exampleJSPath, exampleTemplateJS(example), 'utf8');
-      }
-  });
+        if (!fs.existsSync(exampleJSPath)) {
+            fs.writeFileSync(exampleJSPath, exampleTemplateJS(example), 'utf8');
+        }
+    });
 }
 
 // Main script execution

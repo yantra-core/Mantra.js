@@ -326,6 +326,10 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // createDefaultPlayer: false,
       defaultPlayer: false,
       gameRoot: 'https://yantra.gg/mantra',
+      scriptRoot: null,
+      // scripts, plugins, .js files, will inherit from gameRoot if not set
+      assetRoot: null,
+      // images, models, sounds, sprites, will inherit from gameRoot if not set
       options: {},
       mode: 'topdown',
       // default entity input and movement mode defined as Sutras
@@ -1483,7 +1487,9 @@ function construct(game) {
     game.assetRoot = game.config.gameRoot;
   }
 
+  //
   // Remark: options scope being removed, everything should be mounted on GameConfig
+  //
   if (game.config.options.scriptRoot) {
     console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot);
     game.scriptRoot = game.config.options.scriptRoot;
@@ -1491,6 +1497,19 @@ function construct(game) {
   if (game.config.options.assetRoot) {
     console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot);
     game.assetRoot = game.config.options.assetRoot;
+  }
+  //
+  // ^^ legacy API, remove soon
+  //
+
+  // scriptRoot and assetRoot take precedence over gameRoot if provided
+  if (game.config.scriptRoot) {
+    console.log("Mantra is using the follow path as it's script root:", game.config.scriptRoot);
+    game.scriptRoot = game.config.scriptRoot;
+  }
+  if (game.config.assetRoot) {
+    console.log("Mantra is using the follow path as it's asset root:", game.config.assetRoot);
+    game.assetRoot = game.config.assetRoot;
   }
   console.log("new Game(".concat(JSON.stringify(game.config, true, 2), ")"));
 
@@ -1916,7 +1935,8 @@ function createDefaultPlayer() {
   if (typeof playerConfig.position === 'undefined') {
     playerConfig.position = {
       x: 0,
-      y: 0
+      y: 0,
+      z: 1
     };
   }
   if (playerConfig.texture === 'none') {

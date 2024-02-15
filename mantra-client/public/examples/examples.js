@@ -1,3 +1,31 @@
+/*
+
+our example data looks like this:
+
+ {
+    title: 'Create Entity',
+    category: 'entity',
+    description: 'Create a new entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/create-entity.html',
+    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
+  },
+
+  We wish to support this syntax ( in addition to the existing syntax ):
+
+
+   {
+    title: 'Create Entity',
+    category: ['entity', 'physics'],
+    description: 'Create a new entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/create-entity.html',
+    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
+  },
+
+*/
+
+
 let ogPath = window.location.pathname;
 // TODO: decouple main fn from DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,56 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // set the default push state to the root
   // Preserve the original state and remove 'index.html' from the path if it exists
   let initialPath = window.location.pathname;
-  // window.history.replaceState({}, 'Mantra Examples', initialPath);
-  // window.history.pushState({}, 'Mantra Examples', '/');
 
-  /*
-  window.addEventListener('popstate', function (event) {
-    // Always clear the iframe and hide it
-    exampleIframe.src = '';
-    exampleEmbedsContainer.style.display = 'none';
-  
-    // Hide the code editor and clear it
-    codeEditor.style.display = 'none';
-    document.querySelector('.code-editor pre').textContent = '';
-  
-    // Always show the search container
-    document.querySelector('.search-container').style.display = 'block';
-
-    let path = window.location.pathname;
-
-    if (path === '/') {
-      categoriesContainer.innerHTML = ''; // It's important to clear the content to reset the view
-      updateCategoriesDisplay(categories);
-      return;
-    }
-
-    if (event.state) {
-      const { type, title } = event.state;
-      if (type === 'category') {
-        // Display examples for this category
-        const categoryExamples = filterExamples('', title);
-        categoriesContainer.innerHTML = ''; // Clear the current content
-        updateExamplesDisplay(categoryExamples);
-      } else if (type === 'example') {
-        // Load the example embed
-        loadExampleEmbed({ title, url: event.state.url });
-      }
-    } else {
-      // No state or root state, revert to initial categories display
-      categoriesContainer.innerHTML = ''; // It's important to clear the content to reset the view
-      updateCategoriesDisplay(categories);
-    }
-  
-    // Always show categories container, but conditionally based on whether it's already populated
-    if (!categoriesContainer.innerHTML.trim()) {
-      updateCategoriesDisplay(categories);
-    }
-    categoriesContainer.style.display = 'flex'; // Show categories container
-    exampleEmbedsContainer.style.display = 'none'; // Ensure example iframe container is hidden
-  });
-  
-  */
 
   function handleSearch() {
     const keyword = searchInput.value.toLowerCase();
@@ -100,13 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function filterExamples(keyword, categoryFilter = null) {
-    return examples.filter(example =>
-      (!categoryFilter || example.category.toLowerCase() === categoryFilter.toLowerCase()) &&
-      (keyword === '' || example.title.toLowerCase().includes(keyword) ||
-        example.description.toLowerCase().includes(keyword) ||
-        example.tags.some(tag => tag.toLowerCase().includes(keyword)))
-    );
+    return examples.filter(example => {
+      const exampleCategories = Array.isArray(example.category) ? example.category : [example.category];
+      return (!categoryFilter || exampleCategories.map(cat => cat.toLowerCase()).includes(categoryFilter.toLowerCase())) &&
+        (keyword === '' || example.title.toLowerCase().includes(keyword) ||
+          example.description.toLowerCase().includes(keyword) ||
+          example.tags.some(tag => tag.toLowerCase().includes(keyword)));
+    });
   }
+
 
   function updateCategoriesDisplay(filteredCategories) {
     categoriesContainer.innerHTML = ''; // Clear the current content
@@ -122,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       //         <button class="view-category">View Category</button>
 
-      console.log('category' ,category)
+      console.log('category', category)
       // set the categoryElement background color to the category color
       categoryElement.style.backgroundColor = category.color;
 
@@ -148,45 +129,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateExamplesDisplay(filteredExamples) {
-    // Optionally clear the categories display or do something else as per requirement
-    categoriesContainer.innerHTML = '';
-    // console.log('filteredExamples', filteredExamples)
+    categoriesContainer.innerHTML = ''; // Clear the categories display
     filteredExamples.forEach(example => {
       const exampleElement = document.createElement('div');
-      exampleElement.className = 'category'; // Consider renaming the class for semantic clarity
-      //         <img src="${example.image}" alt="${example.title}">
+      exampleElement.className = 'category'; // Consider renaming for clarity
+
+      // Handle example categories for display
+      const exampleCategoryNames = Array.isArray(example.category) ? example.category.join(', ') : example.category;
       exampleElement.innerHTML = `
-        <span class="categoryExample">${example.category}</span>
-        <p>${example.description}</p>
-        <h3>${example.title}</h3>
-      `;
+                  <span class="categoryExample">${exampleCategoryNames}</span>
+                  <p>${example.description}</p>
+                  <h3>${example.title}</h3>
+              `;
 
-      //         <a class="exampleLink" href="${example.url}">View Example</a>
+      // Determine the category to use for the background color
+      let categoryName = Array.isArray(example.category) ? example.category[0] : example.category;
+      let category = categories.find(cat => cat.name === categoryName);
 
-      // assign the categoryExample background color to the category color
-      const category = categories.find(category => category.name.toLowerCase() === example.category.toLowerCase());
-      console.log('category', category, example)
-      exampleElement.style.backgroundColor = category.color;
+      console.log("category", category);
+      console.log('example', example);
+      exampleElement.style.backgroundColor = category ? category.color : 'defaultColor'; // Use a default color if category is not found
+
       categoriesContainer.appendChild(exampleElement);
 
       exampleElement.addEventListener('click', () => {
-        
-        // Use the category's title to prepend to the example's title in the URL
-        // const stateUrl = `${ogPath}${example.url.replace('.html', '')}`;
-        // alert(ogPath + example.url)
         example.url = example.url;
-        // window.history.pushState({ type: 'example', title: example.title, url: example.url }, example.title, stateUrl);
-      
-        //const stateUrl = `${example.url.replace('.html', '')}`;
-        //window.history.pushState({ type: 'example', title: example.title, url: example.url }, example.title, stateUrl);
         loadExampleEmbed(example); // Load the example iframe
       });
-
     });
-
   }
 
-  function loadExampleEmbed (example) {
+
+
+  function loadExampleEmbed(example) {
     // console.log("loadExampleEmbed", example)
     let exampleUrl = '' + example.url; // Get the URL of the clicked example
 
@@ -196,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.location = exampleUrl;
   }
-  
+
   // if root, load default ats
   // TODO manually copy static html for root index.html with top level categories
   if (window.location.pathname === '/') {

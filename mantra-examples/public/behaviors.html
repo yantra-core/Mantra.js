@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="behavior, tree, sutra, AI, decision, making, strategy, state, management, rules, gameplay, javascript game development, html5 game development, webgl game development, css game development, css3 game development, canvas game development, web game development, browser game development, browser based game development, browser games">
+<meta name="description" content="Sutra Behavioral Trees for game logic.">
+  <title>Mantra - Examples - Behavior Trees</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #000000;
+    }
+
+    .search-container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .search-container input {
+      width: 50%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 20px;
+    }
+
+    .category {
+      flex: 0 1 calc(33.333% - 40px);
+      margin: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      background: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: box-shadow 0.3s;
+      font-size: 1.3em;
+      min-width: 300px;
+      max-width: 400px;
+    }
+
+    /* glowing white / grey box shadow */
+    .category:hover {
+      box-shadow: 0 0 70px rgba(255, 255, 255, 0.5);
+    }
+
+    .category img {
+      width: 100%;
+      height: auto;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .categoryImage {
+      min-height: 200px;
+      text-align: left;
+      padding-left: 5px;
+      padding-top: 5px;
+    }
+
+    .categoryExample {
+      min-height: 200px;
+      text-align: left;
+      padding-left: 5px;
+      padding-top: 5px;
+    }
+
+    .category h3 {
+      margin: 0;
+      padding: 15px;
+      background: #333;
+      color: #fff;
+      border-bottom: 1px solid #444;
+      min-height: 20px;
+      /* Set the minimum height */
+      display: flex;
+      /* Enable flexbox */
+      align-items: center;
+      /* Vertically center the content */
+      justify-content: center;
+      /* Horizontally center the content (if needed) */
+      text-align: center;
+      /* Ensure the text is centered */
+      font-size: 2em;
+    }
+
+    .category p {
+      padding: 10px;
+      margin: 0;
+      flex-grow: 1;
+
+    }
+
+    .category a {
+      display: block;
+      padding: 10px;
+      background: #5cb85c;
+      color: #fff;
+      text-decoration: none;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    .exampleEmbeds {
+      display: none;
+    }
+
+    .exampleEmbeds {
+      height: 70vh;
+    }
+
+    .code-editor {
+      position: relative;
+      width: 100%;
+      height: 30vh;
+      /* Initial height */
+      background: #333;
+      color: #fff;
+      overflow: auto;
+      /* Scrollable content */
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: monospace;
+      resize: vertical;
+      /* Make it only resizable vertically */
+      border: 1px solid #888;
+      /* Optional: adds a border for better visibility */
+      display: none;
+    }
+
+    .resize-handle {
+      position: absolute;
+      top: 70vh;
+      /* Adjust based on initial iframe height */
+      left: 0;
+      width: 100%;
+      height: 5px;
+      /* Height of the resize handle */
+      background: #666;
+      /* Visible handle color */
+      cursor: ns-resize;
+      /* Cursor indicates resizing */
+      z-index: 10;
+      /* Ensure it's above other elements */
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      /* Vertically center the items */
+      justify-content: space-between;
+      /* Space between home button and search input */
+      padding: 20px;
+      /* Add some padding around */
+    }
+
+    .docsHomeButon {
+      /* Remove position absolute and other positioning styles */
+      font-size: 36px;
+      color: #fff;
+      margin-right: 20px;
+      /* Add some space between the button and the search input */
+    }
+
+    .docsHomeButon a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .docsHomeButon a:hover {
+      color: #fff;
+      text-decoration: solid;
+    }
+
+    .search-container {
+      /* Remove text-align: center to align it with flex start */
+      flex-grow: 1;
+      /* Allow search container to take up remaining space */
+    }
+
+
+
+    /* needs to remove any styles that a tag might have */
+    .staticExampleLink {
+      color: #000 !important;
+      text-decoration: none !important;
+      flex: 0 1 calc(33.333% - 40px);
+      /* flex: 0 1 calc(33.333% - 40px) !important; */
+    }
+
+
+
+    @media (max-width: 768px) {
+      .category {
+        flex: 0 1 calc(50% - 40px);
+      }
+      .staticExampleLink {
+        flex: 0 1 calc(50% - 40px);
+      }
+
+    }
+
+    @media (max-width: 480px) {
+      .category {
+        flex: 0 1 calc(100% - 40px);
+      }
+
+      .search-container input {
+        width: 80%;
+      }
+    }
+  </style>
+  <script src="categories.js"></script>
+  <script src="examples.js"></script>
+
+</head>
+
+<body>
+  <div class="top-bar">
+    <div class="docsHomeButon">
+      <a href="https://yantra.gg/mantra/examples">Mantra Examples</a>
+      <!-- mantra/examples -->
+    </div>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search Examples (i.e. Movement, Bullet, Config)">
+    </div>
+  </div>
+
+  <div class="code-editor">
+    <pre>Loading code from document...</pre>
+  </div>
+  <!-- <div class="resize-handle"></div> Resize handle -->
+  <div class="categories">
+    <a class="staticExampleLink" href="behaviors/conditional-on-game-state.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on game state.</p>
+        <h3>Conditional on Game State</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-entity-state.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on entity state.</p>
+        <h3>Conditional on Entity State</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-game-tick-time.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on game tick time.</p>
+        <h3>Conditional on Game Tick Time</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-entity-tick-time.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on entity tick time.</p>
+        <h3>Conditional on Entity Tick Time</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-entity-collision.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on entity collision.</p>
+        <h3>Conditional on Entity Collision</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-keyboard-input.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on keyboard input.</p>
+        <h3>Conditional on Keyboard Input</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-mouse-input.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on mouse input.</p>
+        <h3>Conditional on Mouse Input</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/conditional-on-gamepad-input.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on gamepad input.</p>
+        <h3>Conditional on Gamepad Input</h3>
+      </div>
+    </a></div>
+  <div class="tags">
+    $<span class="tag">behavior</span>
+<span class="tag">tree</span>
+<span class="tag">sutra</span>
+<span class="tag">AI</span>
+<span class="tag">decision</span>
+<span class="tag">making</span>
+<span class="tag">strategy</span>
+<span class="tag">state</span>
+<span class="tag">management</span>
+<span class="tag">rules</span>
+<span class="tag">gameplay</span>
+  </div>
+</body>
+
+
+</html>

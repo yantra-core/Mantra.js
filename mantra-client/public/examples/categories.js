@@ -20,7 +20,17 @@ let categories = [
   },
 
   {
-    title: 'Lifecycle', // blue
+    title: 'Behavior Trees', // deep purple
+    name: 'behaviors',
+    color: '#673ab7',
+    description: 'Sutra Behavioral Trees for game logic.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors.html',
+    tags: ['behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+
+  {
+    title: 'Game Lifecycle', // blue
     name: 'lifecycle',
     color: '#2196f3',
     description: 'Hook into game events.',
@@ -83,15 +93,32 @@ let categories = [
     "url": "inputs.html",
     "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
   },
-  /*
   {
-    "title": "Game Logic",
-    name: "logic",
-    "color": "#673ab7", // deep purple
-    "description": "Write custom logic for your games.",
+    "title": "Collisions",
+    "name": "collisions",
+    "color": "#ff9800", // orange
+    "description": "Detect and respond to collisions between entities.",
     "image": "placeholder-image.jpg",
-    "url": "game-logic-systems.html",
-    "tags": ["logic", "systems", "scoring", "AI", "rules", "gameplay", "state management", "decision making", "behavior", "strategy"]
+    "url": "collisions.html",
+    "tags": ["collisions", "detection", "response", "hit", "impact", "contact", "interaction", "overlap", "intersection", "touch", "crash"]
+  },
+  {
+    "title": "Tiles",
+    name: "tiles",
+    "color": "#4caf50", // green
+    "description": "Create and manage tile-based maps.",
+    "image": "placeholder-image.jpg",
+    "url": "tilemaps.html",
+    "tags": ["tilemaps", "maps", "levels", "worlds", "environments", "terrain", "landscapes", "scenery", "backgrounds", "landmarks", "geography"]
+  },
+  {
+    "title": "Terrains",
+    name: "terrain",
+    "color": "#4caf50", // green
+    "description": "Procedurally generate Mazes, Biomes, Terrains.",
+    "image": "placeholder-image.jpg",
+    "url": "terrain.html",
+    "tags": ["terrain", "biomes", "mazes", "labyrinths", "environments", "worlds", "landscapes", "scenery", "backgrounds", "landmarks", "geography"]
   },
   {
     title: 'Game Config', // red
@@ -101,6 +128,43 @@ let categories = [
     image: 'placeholder-image.jpg',
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Movement', // blue
+    name: 'movement',
+    color: '#2196f3',
+    description: 'Movement systems for players and entities.',
+    image: 'placeholder-image.jpg',
+    url: 'movement.html',
+    tags: ['movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  },
+  {
+    title: 'Scenes', // blue
+    name: 'scenes',
+    color: '#2196f3',
+    description: 'Manage scenes and transitions.',
+    image: 'placeholder-image.jpg',
+    url: 'scenes.html',
+    tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Containers', // blue
+    name: 'containers',
+    color: '#2196f3',
+    description: 'Group entites into containers.',
+    image: 'placeholder-image.jpg',
+    url: 'containers.html',
+    tags: ['containers', 'groups', 'layouts', 'arrangements', 'compositions', 'assemblies', 'collections', 'assemblages', 'aggregations']
+  },
+  /*
+  {
+    "title": "Game Logic",
+    name: "logic",
+    "color": "#673ab7", // deep purple
+    "description": "Write custom logic for your games.",
+    "image": "placeholder-image.jpg",
+    "url": "game-logic-systems.html",
+    "tags": ["logic", "systems", "scoring", "AI", "rules", "gameplay", "state management", "decision making", "behavior", "strategy"]
   },
   {
     title: 'Plugins', // orange
@@ -246,7 +310,7 @@ let lifecycle_examples = [
 let texture_examples = [
   {
     title: 'Set Texture',
-    category: 'textures',
+    category: ['textures', 'entity'],
     description: 'Set a texture on Entity.',
     image: 'placeholder-image.jpg',
     url: 'textures/set-texture.html',
@@ -254,7 +318,7 @@ let texture_examples = [
   },
   {
     title: 'Update Texture',
-    category: 'textures',
+    category: ['textures', 'entity'],
     description: 'Update a texture on Entity.',
     image: 'placeholder-image.jpg',
     url: 'textures/update-texture.html',
@@ -262,7 +326,7 @@ let texture_examples = [
   },
   {
     title: 'Sprite Sheets',
-    category: 'textures',
+    category: ['textures', 'entity'],
     description: 'Sprite textures from a sprite sheet',
     image: 'placeholder-image.jpg',
     url: 'textures/sprite-sheets.html',
@@ -400,6 +464,320 @@ let audio_examples = [
   }
 ];
 
+let collision_examples = [
+  {
+    title: 'Collision Start',
+    category: ['collisions', 'physics', 'entity'],
+    description: 'Detect when a collision starts.',
+    image: 'placeholder-image.jpg',
+    url: 'collisions/collision-start.html',
+    tags: ['collision', 'start', 'detect', 'event', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
+  },
+  {
+    title: 'Collision Active',
+    category: ['collisions', 'physics', 'entity'],
+    description: 'Detect when a collision is active.',
+    image: 'placeholder-image.jpg',
+    url: 'collisions/collision-active.html',
+    tags: ['collision', 'active', 'detect', 'event', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
+  },
+  {
+    title: 'Collision End',
+    category: ['collisions', 'physics', 'entity'],
+    description: 'Detect when a collision ends.',
+    image: 'placeholder-image.jpg',
+    url: 'collisions/collision-end.html',
+    tags: ['collision', 'end', 'detect', 'event', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
+  }
+];
+
+let behaviors_examples = [
+  {
+    title: 'Conditional on Game State',
+    category: 'behaviors',
+    description: 'Run a behavior based on game state.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-game-state.html',
+    tags: ['conditional', 'game', 'state', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Entity State',
+    category: ['behaviors', 'entity'],
+    description: 'Run a behavior based on entity state.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-entity-state.html',
+    tags: ['conditional', 'entity', 'state', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Game Tick Time',
+    category: 'behaviors',
+    description: 'Run a behavior based on game tick time.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-game-tick-time.html',
+    tags: ['conditional', 'game', 'tick', 'time', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Entity Tick Time',
+    category: ['behaviors', 'entity'],
+    description: 'Run a behavior based on entity tick time.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-entity-tick-time.html',
+    tags: ['conditional', 'entity', 'tick', 'time', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Entity Collision',
+    category: ['behaviors', 'entity', 'collisions'],
+    description: 'Run a behavior based on entity collision.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-entity-collision.html',
+    tags: ['conditional', 'entity', 'collision', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Keyboard Input',
+    category: ['behaviors', 'inputs'],
+    description: 'Run a behavior based on keyboard input.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-keyboard-input.html',
+    tags: ['conditional', 'keyboard', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Mouse Input',
+    category: ['behaviors', 'inputs'],
+    description: 'Run a behavior based on mouse input.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-mouse-input.html',
+    tags: ['conditional', 'mouse', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  },
+  {
+    title: 'Conditional on Gamepad Input',
+    category: ['behaviors', 'inputs'],
+    description: 'Run a behavior based on gamepad input.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors/conditional-on-gamepad-input.html',
+    tags: ['conditional', 'gamepad', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
+  }
+];
+
+let tiles_examples = [
+  {
+    title: 'Tilemap from Array of Integers',
+    category: 'tiles',
+    description: 'Create a tilemap from an array of integers.',
+    image: 'placeholder-image.jpg',
+    url: 'tilemaps/create-tilemap-from-array-of-integers.html',
+    tags: ['create', 'tilemap', 'array', 'integers', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Tilemap from Tiled Editor JSON',
+    category: 'tiles',
+    description: 'Create a tilemap from Tiled Editor JSON.',
+    image: 'placeholder-image.jpg',
+    url: 'tilemaps/create-tilemap-from-tiled-editor-json.html',
+    tags: ['create', 'tilemap', 'tiled', 'editor', 'json', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Custom TileSets',
+    category: 'tiles',
+    description: 'Create custom tilesets.',
+    image: 'placeholder-image.jpg',
+    url: 'tilemaps/custom-tilesets.html',
+    tags: ['custom', 'tilesets', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'TileMap from Labyrinthos',
+    category: 'tiles',
+    description: 'Create a tilemap from Labyrinthos.',
+    image: 'placeholder-image.jpg',
+    url: 'tilemaps/tilemap-from-labyrinthos.html',
+    tags: ['tilemap', 'labyrinthos', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Tile Collisions',
+    category: ['tiles', 'collisions'],
+    description: 'Detect and respond to tile collisions.',
+    image: 'placeholder-image.jpg',
+    url: 'tilemaps/tile-collisions.html',
+    tags: ['tile', 'collisions', 'detection', 'response', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
+  }
+];
+
+let terrains_examples = [
+  {
+    title: 'Procedural Maze',
+    category: 'terrain',
+    description: 'Generate a procedural maze.',
+    image: 'placeholder-image.jpg',
+    url: 'terrain/procedural-maze.html',
+    tags: ['procedural', 'maze', 'labyrinth', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
+  },
+  {
+    title: 'Procedural Biome',
+    category: 'terrain',
+    description: 'Generate a procedural biome.',
+    image: 'placeholder-image.jpg',
+    url: 'terrain/procedural-biome.html',
+    tags: ['procedural', 'biome', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
+  },
+  {
+    title: 'Infinite Maze',
+    category: 'terrain',
+    description: 'Generate an infinite maze.',
+    image: 'placeholder-image.jpg',
+    url: 'terrain/infinite-maze.html',
+    tags: ['infinite', 'maze', 'labyrinth', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
+  }
+];
+
+let config_examples = [
+  {
+    title: 'GameConfig Object',
+    category: 'config',
+    description: 'Explore the GameConfig object.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/game-config-object.html',
+    tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Game Root',
+    category: 'config',
+    description: 'Change the default game root for assets and scripts',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/game-root.html',
+    tags: ['game', 'root', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Game Size',
+    category: 'config',
+    description: 'Change the default game size.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/game-size.html',
+    tags: ['game', 'size', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Game Graphics',
+    category: 'config',
+    description: 'Change the default game graphic and rendering settings.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/game-graphics.html',
+    tags: ['game', 'graphics', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Game Plugins',
+    category: 'config',
+    description: 'Use Plugins to extend game functionality.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/game-plugins.html',
+    tags: ['game', 'plugins', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Field of View',
+    category: 'config',
+    description: 'Change the default game field of view.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/field-of-view.html',
+    tags: ['field', 'of', 'view', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  {
+    title: 'Frames Per Second (FPS)',
+    category: 'config',
+    description: 'Change the default game frames per second.',
+    image: 'placeholder-image.jpg',
+    url: 'game-config/frames-per-second.html',
+    tags: ['frames', 'per', 'second', 'fps', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+];
+
+let movement_examples = [
+  {
+    title: 'Top Down Movement',
+    category: 'movement',
+    description: 'Top down movement system for players and entities.',
+    image: 'placeholder-image.jpg',
+    url: 'movement/top-down-movement.html',
+    tags: ['top', 'down', 'movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  },
+  /*
+  {
+    title: 'Platform Movement',
+    category: 'movement',
+    description: 'Platform movement system for players and entities.',
+    image: 'placeholder-image.jpg',
+    url: 'movement/platform-movement.html',
+    tags: ['platform', 'movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  },
+  */
+  {
+    title: 'Side Scroller Movement',
+    category: 'movement',
+    description: 'Side scroller movement system for players and entities.',
+    image: 'placeholder-image.jpg',
+    url: 'movement/side-scroller-movement.html',
+    tags: ['side', 'scroller', 'movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  },
+  {
+    title: 'Jumping',
+    category: 'movement',
+    description: 'Jumping system for players and entities.',
+    image: 'placeholder-image.jpg',
+    url: 'movement/jumping.html',
+    tags: ['jumping', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  }
+];
+
+let container_examples = [
+  {
+    title: 'Group Entities',
+    category: ['containers', 'entity'],
+    description: 'Group entities together.',
+    image: 'placeholder-image.jpg',
+    url: 'containers/group-entities.html',
+    tags: ['group', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'assemblage', 'aggregation']
+  },
+  {
+    title: 'Grid Layout',
+    category: 'containers',
+    description: 'Arrange entities in a grid layout.',
+    image: 'placeholder-image.jpg',
+    url: 'containers/grid-layout.html',
+    tags: ['grid', 'layout', 'arrange', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'assemblage', 'aggregation']
+  },
+  {
+    title: 'Stack Layout',
+    category: 'containers',
+    description: 'Arrange entities in a stack layout.',
+    image: 'placeholder-image.jpg',
+    url: 'containers/stack-layout.html',
+    tags: ['stack', 'layout', 'arrange', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'assemblage', 'aggregation']
+  }
+];
+
+let scenes_examples = [
+  {
+    title: 'Scene Transition',
+    category: 'scenes',
+    description: 'Transition between scenes.',
+    image: 'placeholder-image.jpg',
+    url: 'scenes/scene-transition.html',
+    tags: ['scene', 'transition', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Scene Loading',
+    category: 'scenes',
+    description: 'Load a scene.',
+    image: 'placeholder-image.jpg',
+    url: 'scenes/scene-loading.html',
+    tags: ['scene', 'loading', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Scene Unloading',
+    category: 'scenes',
+    description: 'Unload a scene.',
+    image: 'placeholder-image.jpg',
+    url: 'scenes/scene-unloading.html',
+    tags: ['scene', 'unloading', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+];
+
 // concat all arr to examples
 examples = examples.concat(item_examples);
 examples = examples.concat(entity_examples);
@@ -409,4 +787,15 @@ examples = examples.concat(render_examples);
 examples = examples.concat(asset_examples);
 examples = examples.concat(input_examples);
 examples = examples.concat(audio_examples);
+examples = examples.concat(collision_examples);
+examples = examples.concat(behaviors_examples);
+examples = examples.concat(tiles_examples);
+examples = examples.concat(terrains_examples);
+examples = examples.concat(config_examples);
+examples = examples.concat(movement_examples);
+examples = examples.concat(container_examples);
+examples = examples.concat(scenes_examples);
+
+// examples count
+console.log('examples count:', examples.length)
 
