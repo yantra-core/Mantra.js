@@ -131,6 +131,7 @@ let categories = [
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  /*
   {
     title: 'Movement', // blue
     name: 'movement',
@@ -140,6 +141,7 @@ let categories = [
     url: 'movement.html',
     tags: ['movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
   },
+
   {
     title: 'Scenes', // blue
     name: 'scenes',
@@ -149,6 +151,7 @@ let categories = [
     url: 'scenes.html',
     tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
+  */
   {
     title: 'Containers', // blue
     name: 'containers',
