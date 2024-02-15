@@ -3633,7 +3633,7 @@ var GravityGardens = /*#__PURE__*/function () {
           x = x - game.viewportCenterXOffset;
           y = y - game.viewportCenterYOffset;
           if (gameState.repulsion) {
-            game.pingPosition(x, y, {
+            game.pingPosition(x, y, 1, {
               color: 'red',
               duration: 1500,
               size: 50,
@@ -3645,7 +3645,7 @@ var GravityGardens = /*#__PURE__*/function () {
               color: 0xff0000
             });
           } else {
-            game.pingPosition(x, y, {
+            game.pingPosition(x, y, 1, {
               reverse: true,
               color: 'white',
               duration: 1500,
@@ -3708,6 +3708,97 @@ var GravityGardens = /*#__PURE__*/function () {
           autoBorder: true
         });
       }
+      var dropping = false;
+      var slurping = false;
+      var mousePosition = {
+        x: 0,
+        y: 0
+      };
+      game.on('pointerUp', function (position, event) {
+        dropping = false;
+        slurping = false;
+      });
+      game.on('pointerDown', function (position, event) {
+        mousePosition = position;
+        mousePosition.clientX = event.clientX;
+        mousePosition.clientY = event.clientY;
+        // if right click
+        if (event.button === 2) {
+          slurping = true;
+          game.pingPosition(event.clientX, event.clientY, 1, {
+            reverse: true,
+            color: 'red',
+            duration: 1500,
+            size: 25,
+            finalSize: 100,
+            borderWidth: 3
+          });
+        }
+
+        // if left click
+        if (event.button === 0) {
+          dropping = true;
+          game.pingPosition(event.clientX, event.clientY, 1, {
+            color: 'white',
+            duration: 1500,
+            size: 25,
+            finalSize: 100,
+            borderWidth: 3
+          });
+        }
+      });
+      game.on('pointerMove', function (position, event) {
+        mousePosition = position;
+        mousePosition.clientX = event.clientX;
+        mousePosition.clientY = event.clientY;
+      });
+
+      // mouse drops particles logic
+      game.before('update', function () {
+        if (dropping && game.tick % 3 === 0) {
+          // console.log('dropping', mousePosition.x, mousePosition.y);
+          var randomRadialPosition = game.randomPositionRadial(mousePosition.x, mousePosition.y, 15);
+          var randomColor = game.randomColor();
+          // create burst of particles at this position
+          game.createEntity({
+            type: 'PARTICLE',
+            kind: 'START',
+            color: randomColor,
+            isSensor: true,
+            size: {
+              width: 8,
+              height: 8
+            },
+            position: randomRadialPosition
+          });
+        }
+
+        // show repeating ping
+        if (dropping && game.tick % 10 === 0) {
+          game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, {
+            color: 'white',
+            duration: 1500,
+            size: 25,
+            finalSize: 100,
+            borderWidth: 3
+          });
+        }
+      });
+
+      // mouse slurps up particles logic
+      game.before('update', function () {
+        if (slurping && game.tick % 3 === 0) {
+          Object.keys(game.data.ents._).forEach(function (eId) {
+            var entity = game.data.ents._[eId];
+            if (entity.type !== 'BLACK_HOLE' && entity.type !== 'PLAYER') {
+              game.applyGravity({
+                position: mousePosition,
+                mass: 1000
+              }, entity, 3.33);
+            }
+          });
+        }
+      });
       createFounts(game);
 
       // Particles will be removed when they collide with the wall
