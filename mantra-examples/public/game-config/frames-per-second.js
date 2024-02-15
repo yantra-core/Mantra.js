@@ -7,7 +7,6 @@ let game = new MANTRA.Game({
   fps: 20,
   defaultMovement: true,
   plugins: ['Bullet', 'Boomerang'],
-  gameRoot: 'http://192.168.1.80:7777/'
 });
 
 game.start(function () {

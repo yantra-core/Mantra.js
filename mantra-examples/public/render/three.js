@@ -1,7 +1,7 @@
 async function start() {
   let game = new MANTRA.Game({
     defaultPlayer: false,
-    graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three',
+    graphics: ['three'], // array enum, 'babylon', 'css', 'three',
   });
   await game.start();
   

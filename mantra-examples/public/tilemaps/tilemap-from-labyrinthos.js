@@ -4,8 +4,8 @@ let game = new MANTRA.Game({
   defaultMovement: true,
   plugins: ['RBush', 'Tile'], // RBush is required for Field of View
   useFoV: true,
-  gameRoot: 'http://192.168.1.80:7777/'
 });
+
 game.start(function () {
   game.zoom(2.5);
   game.createPlayer();
@@ -34,6 +34,7 @@ game.start(function () {
       { id: 5, name: 'path-brown' }
     ]
   });
+
 
   // Create a new biome with the tileset and distribution
   let forest = new game.Biome({

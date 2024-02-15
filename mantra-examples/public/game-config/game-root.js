@@ -1,6 +1,6 @@
 
 let game = new MANTRA.Game({
-  graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
+  graphics: ['css'], // array enum, 'babylon', 'css', 'three'
   /*
     Mantra's gameRoot is the root URL for all game assets and scripts.
     This is useful for when you want to host your game on a different server

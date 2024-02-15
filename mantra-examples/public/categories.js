@@ -494,6 +494,7 @@ let collision_examples = [
 ];
 
 let behaviors_examples = [
+  /*
   {
     title: 'Conditional on Game State',
     category: 'behaviors',
@@ -502,20 +503,21 @@ let behaviors_examples = [
     url: 'behaviors/conditional-on-game-state.html',
     tags: ['conditional', 'game', 'state', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
+  */
   {
-    title: 'Conditional on Entity State',
+    title: 'Entity State',
     category: ['behaviors', 'entity'],
     description: 'Run a behavior based on entity state.',
     image: 'placeholder-image.jpg',
-    url: 'behaviors/conditional-on-entity-state.html',
+    url: 'behaviors/entity-state.html',
     tags: ['conditional', 'entity', 'state', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   {
-    title: 'Conditional on Game Tick Time',
+    title: 'Game Tick',
     category: 'behaviors',
-    description: 'Run a behavior based on game tick time.',
+    description: 'Run a behavior based on game tick.',
     image: 'placeholder-image.jpg',
-    url: 'behaviors/conditional-on-game-tick-time.html',
+    url: 'behaviors/game-tick.html',
     tags: ['conditional', 'game', 'tick', 'time', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   /* Remark: Not really needed, we have lifetime, could be better suited as new core api for timers on ticks, etc
@@ -529,35 +531,35 @@ let behaviors_examples = [
   },
   */
   {
-    title: 'Conditional on Entity Collision',
+    title: 'Entity Collisions',
     category: ['behaviors', 'entity', 'collisions', 'physics'],
     description: 'Run a behavior based on entity collision.',
     image: 'placeholder-image.jpg',
-    url: 'behaviors/conditional-on-entity-collision.html',
+    url: 'behaviors/entity-collision.html',
     tags: ['conditional', 'entity', 'collision', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   {
-    title: 'Conditional on Keyboard Input',
+    title: 'Keyboard Input',
     category: ['behaviors', 'inputs'],
     description: 'Run a behavior based on keyboard input.',
     image: 'placeholder-image.jpg',
-    url: 'behaviors/conditional-on-keyboard-input.html',
+    url: 'behaviors/keyboard-input.html',
     tags: ['conditional', 'keyboard', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   {
-    title: 'Conditional on Mouse Input',
+    title: 'Mouse Input',
     category: ['behaviors', 'inputs'],
     description: 'Run a behavior based on mouse input.',
     image: 'placeholder-image.jpg',
-    url: 'behaviors/conditional-on-mouse-input.html',
+    url: 'behaviors/mouse-input.html',
     tags: ['conditional', 'mouse', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   {
-    title: 'Conditional on Gamepad Input',
+    title: 'Gamepad Input',
     category: ['behaviors', 'inputs'],
     description: 'Run a behavior based on gamepad input.',
     image: 'placeholder-image.jpg',
-    url: 'behaviors/conditional-on-gamepad-input.html',
+    url: 'behaviors/gamepad-input.html',
     tags: ['conditional', 'gamepad', 'input', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   }
 ];
@@ -641,6 +643,14 @@ let terrains_examples = [
     image: 'placeholder-image.jpg',
     url: 'terrain/infinite-maze.html',
     tags: ['infinite', 'maze', 'labyrinth', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
+  },
+  {
+    title: 'L-Systems',
+    category: 'terrain',
+    description: 'Generate terrain using L-Systems.',
+    image: 'placeholder-image.jpg',
+    url: 'terrain/l-systems.html',
+    tags: ['l-systems', 'terrain', 'generate', 'create', 'make', 'build', 'construct', 'design', 'develop']
   }
 ];
 

@@ -1,12 +1,12 @@
-
 let game = new MANTRA.Game({
-  graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  gameRoot: 'http://192.168.1.80:7777/'
+  graphics: ['css'], // array enum, 'babylon', 'css', 'three'
 });
+
 game.start(function(){
+
   game.setBackground('#000000');
   game.setZoom(1.5);
-  
+
   let containerA = game.createContainer({
     name: 'group-a',
     // layout: 'grid', // optional. can also be "flex" or "none"
@@ -65,7 +65,6 @@ game.start(function(){
       }
     },
   });
-
 
   for (let i = 0; i < 12; i++) {
 

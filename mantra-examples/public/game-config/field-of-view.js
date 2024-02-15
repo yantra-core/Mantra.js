@@ -11,7 +11,6 @@ let game = new MANTRA.Game({
     useFoV- Field of View can be turned on or off in the constructor or after construction
   */
   useFoV: true,
-  gameRoot: 'http://192.168.1.80:7777/'
 });
 game.start(function () {
   game.zoom(2.5);

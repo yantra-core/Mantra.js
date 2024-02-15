@@ -3,7 +3,6 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
   plugins: ['Tile'], // RBush is required for Field of View
-  gameRoot: 'http://192.168.1.80:7777/'
 });
 game.start(function () {
   game.zoom(2.5);
