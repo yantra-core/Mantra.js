@@ -1,5 +1,5 @@
 let game = new MANTRA.Game({
-  graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
+  graphics: ['css'], // array enum, 'babylon', 'css', 'three'
   defaultPlayer: true,
   defaultMovement: true, // adds movement to player
   plugins: ['Block', 'Border', 'Bullet', 'Boomerang', 'Gamepad'], // plugins at construction

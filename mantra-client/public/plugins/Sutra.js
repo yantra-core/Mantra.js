@@ -668,6 +668,7 @@ var Sutra = /*#__PURE__*/function () {
           return collisionEvent.kind === 'ACTIVE';
         });
       }
+      game.rules.emit('tick', game.data);
       game.data.input = {};
       game.data.inputTicks = {};
       game.data.inputDuration = {};

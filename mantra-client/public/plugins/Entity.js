@@ -708,6 +708,13 @@ function createEntity() {
   }
   */
 
+  // asset that color is integer value
+  if (typeof color === 'string') {
+    // check to see if # is present, if so, convert hex to int
+    // needs to map common colors to integer values, red, green, black , etc
+  }
+  var ensuredColor = ensureColorInt(color);
+
   // console.log('position', position, 'width', width, 'height', height)
   // Using game's API to add components
   this.game.addComponent(entityId, 'type', type || 'PLAYER');
@@ -728,7 +735,7 @@ function createEntity() {
   this.game.addComponent(entityId, 'size', size);
   this.game.addComponent(entityId, 'radius', radius);
   this.game.addComponent(entityId, 'shape', shape);
-  this.game.addComponent(entityId, 'color', color);
+  this.game.addComponent(entityId, 'color', ensuredColor);
   this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
@@ -836,6 +843,44 @@ function createEntity() {
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
   updatedEntity = this.game.lifecycle.triggerHook('after.createEntity', config);
   return updatedEntity;
+}
+function ensureColorInt(color) {
+  if (!color) {
+    return color;
+  }
+
+  // Mapping of common color names to hex values
+  var colorNameToHex = {
+    red: '#FF0000',
+    green: '#00FF00',
+    blue: '#0000FF',
+    black: '#000000',
+    white: '#FFFFFF',
+    yellow: '#FFFF00',
+    purple: '#800080',
+    orange: '#FFA500',
+    pink: '#FFC0CB'
+    // Add more common colors as needed
+  };
+
+  // If color is already a number, return it as is
+  if (typeof color === 'number') {
+    return color;
+  }
+
+  // If color is a hex string (with #), convert it to an integer
+  if (typeof color === 'string' && color.startsWith('#')) {
+    return parseInt(color.replace('#', ''), 16);
+  }
+
+  // If color is a common color name, convert it using the mapping
+  if (typeof color === 'string' && colorNameToHex[color.toLowerCase()]) {
+    return parseInt(colorNameToHex[color.toLowerCase()].replace('#', ''), 16);
+  }
+
+  // If color format is unrecognized, throw an error or return a default color
+  console.error('Unrecognized color format:', color);
+  return parseInt('000000', 16); // Default to black
 }
 
 },{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3,"./layoutEntity.js":8}],6:[function(require,module,exports){

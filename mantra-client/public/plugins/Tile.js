@@ -4397,6 +4397,8 @@ var Tile = /*#__PURE__*/function () {
     this.TileSet = _labyrinthos["default"].TileSet;
     this.Biome = _labyrinthos["default"].Biome;
     this.terrains = _labyrinthos["default"].terrains;
+    this.mazes = _labyrinthos["default"].mazes;
+    this.shapes = _labyrinthos["default"].shapes;
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
@@ -4475,6 +4477,9 @@ var Tile = /*#__PURE__*/function () {
       this.game.TileSet = this.TileSet;
       this.game.Biome = this.Biome;
       this.game.terrains = this.terrains;
+      this.game.mazes = this.mazes;
+      // this.game.shapes = this.shapes;
+
       if (this.loadInitialChunk) {
         if (this.tiledServer) {
           this.game.loadScripts(['/tiled/chunks/chunk_x0_y0.js'], function () {
@@ -4661,6 +4666,10 @@ function createTile(tile, x, y) {
     tileDepth = tileHeight;
   }
   var isStatic;
+  var collisionStart = false;
+  if (typeof tile.collisionStart === 'function') {
+    collisionStart = tile.collisionStart;
+  }
   if (typeof tile.isStatic === 'boolean') {
     isStatic = tile.isStatic;
   }
@@ -4683,7 +4692,7 @@ function createTile(tile, x, y) {
     // body = false;
   }
   */
-
+  console.log('collisionStart', collisionStart);
   var _texture;
   // check to see if a custom texture is set
   if (typeof tile.texture !== 'undefined') {
@@ -4703,7 +4712,7 @@ function createTile(tile, x, y) {
     //         Each tile.kind could be configured via `TileSet` class with custom collision config
     // Note:   Entities will still collide if they have `body`, but no collision events will be emitted
     collisionActive: false,
-    collisionStart: false,
+    collisionStart: collisionStart,
     collisionEnd: false,
     hasInventory: false,
     collectable: false,
@@ -4766,6 +4775,10 @@ function createTileMap(tileMap) {
   map.fill(1);
   map.seed(tileMap.seed);
   this.labySeed = tileMap.seed;
+
+  // TODO: clean up this code path, createTileMap() should allow LABY or non-LABY instances
+  // Maybe just config for Laby tilemap and non-Laby tilemap
+  if (tileMap.algo) {}
   var transformFn = labyrinthos.mazes[tileMap.algo];
   var transformType = 'maze';
   var is3D = false;
@@ -5052,6 +5065,11 @@ function handleChunkLoadFailure(chunkPath, chunkKey) {
     var x = chunkCoordinates.x;
     var y = chunkCoordinates.y;
 
+    // do not regen 0,0 ( for now )
+    if (x === 0 && y === 0) {
+      return;
+    }
+
     // this will eventually call Tile.createLayer()
     // certain incoming tileMap options will require custom logic to re-inflate the map
     // with correct seed and algo configurations
@@ -5181,9 +5199,12 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) 
   if (typeof tileValue === 'number') {
     // Find id = tile in tileSet
     var tileId = tileValue;
+    // TODO: remove this.tileSet
+    console.log('this.tileSet', this.tileSet);
     var tileKind = this.tileSet.find(function (tileKind) {
       return tileKind.id === tileId;
     });
+    console.log('found', tileKind);
     if (tileKind) {
       tile = tileKind;
     } else {

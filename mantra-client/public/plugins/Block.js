@@ -96,8 +96,12 @@ var Block = /*#__PURE__*/function () {
         var newHeight = entityA.height / 2;
         var newSplits = entityA.splits + 1;
 
-        // TODO: could we move this into a sutra rule instead?
+        // inherit important properties from parent
+        var lifetime = entityA.lifetime;
+        var color = entityA.color;
+        console.log('setting', entityIdA, 'to color', color, 'lifetime', lifetime, 'newWidth', newWidth, 'newHeight', newHeight, 'newSplits', newSplits);
         for (var i = 0; i < 4; i++) {
+          // TODO: make option for new random color to be config flag
           var newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];
           var xOffset = i % 2 * newWidth;
           var yOffset = Math.floor(i / 2) * newHeight;
@@ -121,7 +125,9 @@ var Block = /*#__PURE__*/function () {
             height: newHeight,
             splits: newSplits,
             //friction: 0.5,
-            frictionAir: 0.2
+            frictionAir: 0.2,
+            color: color,
+            lifetime: lifetime
             //frictionStatic: 0.5,
             // TODO: needs to inherit other properties from parent such as frictoin
           });

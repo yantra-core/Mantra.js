@@ -213,6 +213,16 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
+      if (entityA.collisionEnd) {
+        if (typeof entityA.collisionEnd === 'function') {
+          entityA.collisionEnd.call(this.game, entityB, entityA);
+        }
+      }
+      if (entityB.collisionEnd) {
+        if (typeof entityB.collisionEnd === 'function') {
+          entityB.collisionEnd.call(this.game, entityA, entityB);
+        }
+      }
       if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
@@ -269,6 +279,16 @@ var Collisions = /*#__PURE__*/function () {
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
+      }
+      if (entityA.collisionActive) {
+        if (typeof entityA.collisionActive === 'function') {
+          entityA.collisionActive.call(this.game, entityB, entityA);
+        }
+      }
+      if (entityB.collisionActive) {
+        if (typeof entityB.collisionActive === 'function') {
+          entityB.collisionActive.call(this.game, entityA, entityB);
+        }
       }
       if (this.shouldSendCollisionEvent(bodyA, bodyB, 'ACTIVE')) {
         this.game.data.collisions = this.game.data.collisions || [];
