@@ -430,6 +430,16 @@ class Game {
       this.systems.sutra.bindInputsToSutraConditions();
     }
 
+    // clear any events that were bound to the game from World
+    for (let listener in game.listeners) {
+      // remmove any event that doesn't contain '::'
+      // TODO: we may want to make this more specific, bound to scenes or systems
+      if (listener.indexOf('::') === -1) {
+        // game.off(listener, game.listeners[listener]);
+        delete  game.listeners[listener];
+      }
+    }
+
     // reset the Field of View use to default ( off )
     this.config.useFoV = false;
 
