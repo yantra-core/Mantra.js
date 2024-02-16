@@ -29,9 +29,9 @@ let categories = [
     tags: ['behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   {
-    title: 'Items', // teal
+    title: 'Items', // light blue
     name: 'items',
-    color: '#009688',
+    color: '#03a9f4',
     description: 'Items can be collected and used.',
     image: 'placeholder-image.jpg',
     url: 'items.html',
@@ -46,30 +46,28 @@ let categories = [
     "url": "collisions.html",
     "tags": ["collisions", "detection", "response", "hit", "impact", "contact", "interaction", "overlap", "intersection", "touch", "crash"]
   },
-  /*
   {
-    title: 'Camera', // blue
+    title: 'Camera', // light green
     name: 'camera',
-    color: '#2196f3',
+    color: '#8bc34a',
     description: 'Control the camera and view.',
     image: 'placeholder-image.jpg',
     url: 'camera.html',
     tags: ['camera', 'view', 'perspective', 'angle', 'zoom', 'pan', 'tilt', 'rotate', 'follow', 'look', 'focus', 'position']
   },
-  */
   {
-    title: 'Textures', // green
+    title: 'Textures', // amber
     name: 'textures',
-    color: '#4caf50',
+    color: '#ffc107',
     description: 'Change the appearance of entities.',
     image: 'placeholder-image.jpg',
     url: 'textures.html',
     tags: ['textures', 'images', 'graphics', 'assets', 'resources', 'files', 'loading', 'unloading', 'applying', 'updating', 'changing', 'modifying', 'replacing']
   },
   {
-    title: 'Render', // blue
+    title: 'Render', // Deep Brown
     name: 'render',
-    color: '#2196f3',
+    color: '#9e91a3',
     description: 'Render entities using RenderPlex pipeline.',
     image: 'placeholder-image.jpg',
     url: 'render.html',
@@ -105,7 +103,7 @@ let categories = [
   {
     "title": "Tiles",
     name: "tiles",
-    "color": "#4caf50", // green
+    "color": "#9e9e9e", // grey
     "description": "Create and manage tile-based maps.",
     "image": "placeholder-image.jpg",
     "url": "tilemaps.html",
@@ -121,7 +119,7 @@ let categories = [
     "tags": ["terrain", "biomes", "mazes", "labyrinths", "environments", "worlds", "landscapes", "scenery", "backgrounds", "landmarks", "geography"]
   },
   {
-    title: 'Game Config', // red
+    title: 'Game Config', // blue grey
     name: 'config',
     color: '#f44336',
     description: 'Explore examples featuring the game configuration.',
@@ -129,37 +127,46 @@ let categories = [
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
-  /*
   {
-    title: 'Movement', // blue
+    title: 'Movement', // Yellow
     name: 'movement',
-    color: '#2196f3',
+    color: '#ffeb3b',
     description: 'Movement systems for players and entities.',
     image: 'placeholder-image.jpg',
     url: 'movement.html',
     tags: ['movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
   },
-
-  */
   {
-    title: 'Scenes', // blue
+    title: 'Scenes', // Lime
     name: 'scenes',
-    color: '#2196f3',
+    color: '#3f51b5',
     description: 'Manage scenes and transitions.',
     image: 'placeholder-image.jpg',
     url: 'scenes.html',
     tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
-
   {
-    title: 'Containers', // blue
+    title: 'Containers', // Lime
     name: 'containers',
-    color: '#2196f3',
+    color: '#cddc39',
     description: 'Group entites into containers.',
     image: 'placeholder-image.jpg',
     url: 'containers.html',
     tags: ['containers', 'groups', 'layouts', 'arrangements', 'compositions', 'assemblies', 'collections', 'assemblages', 'aggregations']
   },
+  {
+    title: 'Game Lifecycle', // Pink A200
+    name: 'lifecycle',
+    color: '#ff4081',
+    description: 'Hook into game events.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle.html',
+    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
+  },
+
+];
+
+
   /*
   {
     "title": "Game Logic",
@@ -180,19 +187,6 @@ let categories = [
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
   }
   */
-  {
-    title: 'Game Lifecycle', // blue
-    name: 'lifecycle',
-    color: '#2196f3',
-    description: 'Hook into game events.',
-    image: 'placeholder-image.jpg',
-    url: 'lifecycle.html',
-    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
-  },
-
-
-];
-
 //  assets   tags: ['assets', 'management', 'loading', 'resources', 'files', 'images', 'audio', 'video', 'fonts', 'scripts', 'data']
 
 let examples = [];
@@ -825,9 +819,9 @@ let config_examples = [
     tags: ['field', 'of', 'view', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
   {
-    title: 'Frames Per Second (FPS)',
+    title: 'FPS',
     category: 'config',
-    description: 'Change the default game frames per second.',
+    description: 'Change the default game Frames Per Second.',
     image: 'placeholder-image.jpg',
     url: 'game-config/frames-per-second.html',
     tags: ['frames', 'per', 'second', 'fps', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']

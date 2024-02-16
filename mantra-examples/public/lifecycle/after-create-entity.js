@@ -1,13 +1,12 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Border'],
+  plugins: ['Border']
 });
-
 
 //
 // Registers an event listener after the 'createEntity' event
 //
-// Applies a random force each time entity is create
+// Applies a random force each time entity is created
 game.after('createEntity', function (entityData) {
   console.log('after create entity', entityData);
   let randomForce = game.randomForce(2);
@@ -17,7 +16,6 @@ game.after('createEntity', function (entityData) {
   });
   return entityData;
 });
-
 
 game.start(function () {
   game.zoom(1);
