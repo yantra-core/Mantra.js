@@ -3,8 +3,8 @@ import blackhole from '../../mantra-sutras/blackhole.js'
 import fount from '../../mantra-sutras/fount.js'
 
 class GravityGardens {
-  static id = 'world-gravity-gardens';
-  static type = 'gravity-gardens';
+  static id = 'gravity-gardens';
+  static type = 'world';
 
   constructor() {
     this.id = GravityGardens.id;
@@ -85,7 +85,7 @@ class GravityGardens {
 
     game.on('pointerDown', function (position, event) {
       mousePosition = position;
-      console.log('pppp', position, event)
+
       // adjust position for game camera offset
       mousePosition.x = mousePosition.x - game.data.camera.offsetX;
       mousePosition.y = mousePosition.y - game.data.camera.offsetY;
@@ -93,13 +93,13 @@ class GravityGardens {
       mousePosition.clientX = event.clientX;
       mousePosition.clientY = event.clientY;
       // if right click
-      if (event.button === 2) {
+      if (event.button === 0) {
         slurping = true;
         game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
 
       // if left click
-      if (event.button === 0) {
+      if (event.button === 2) {
         dropping = true;
         game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
