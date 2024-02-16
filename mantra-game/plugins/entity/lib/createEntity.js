@@ -60,7 +60,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       container: null,
       items: null,
       sutra: null,
-      scene: null,
+      scene: [],
       meta: null,
       collectable: false,
       hasInventory: true,
@@ -188,7 +188,6 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
-  this.game.addComponent(entityId, 'sutra', sutra);
   this.game.addComponent(entityId, 'scene', scene);
 
   this.game.addComponent(entityId, 'meta', meta);
@@ -216,6 +215,26 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
+
+  let _sutra;
+  // if the incoming sutra is an object, it is config object which needs to be scoped to the new entity
+  if (typeof sutra === 'object' && sutra !== null) {
+    if (typeof sutra.rules === 'function') {
+      if (typeof sutra.config !== 'object') {
+        sutra.config = {};
+      }
+      // if there is a valid rules function, we will create the Sutra instance
+      // it is assumed the signature of the rules function is (game, entityId, config)
+      // this may change in the future
+      _sutra = sutra.rules(this.game, entityId, sutra.config);
+    }
+  } else {
+    // the incoming sutra was not a non-null object
+    // it could be null or a function, assign component value without modification
+    _sutra = sutra;
+  }
+
+  this.game.addComponent(entityId, 'sutra', _sutra);
 
   if (body) {
     // remove this step, have everything work in addToWorld

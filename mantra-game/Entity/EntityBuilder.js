@@ -147,6 +147,11 @@ export default class EntityBuilder {
     return this;
   }
 
+  sutra(rules, config) {
+    this.config.sutra = { rules, config };
+    return this;
+  }
+
   // TODO: better name for "exit" semantics
   exit(handler) {
     this.config.exit = handler;

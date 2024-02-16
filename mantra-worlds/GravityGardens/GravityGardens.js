@@ -239,69 +239,47 @@ class GravityGardens {
 
 }
 
-
-
 function createFounts(game) {
-  let fountA = game.createEntity({
-    name: 'fountA',
-    type: 'FOUNT',
-    color: 0xf03025,
-    isStatic: true,
-    width: 8,
-    height: 8,
-    position: { x: 200, y: 0 },
-  });
 
-  game.updateEntity({
-    id: fountA.id,
-    sutra: fount(game, fountA, { sprayAngle: 0, color: 0xf03025 })
-  });
+  let fountA = game.build()
+    .type('FOUNT')
+    .name('fountA')
+    .color(0xf03025)
+    .isStatic(true)
+    .size(8, 8)
+    .position(200, 0)
+    .sutra(fount, { sprayAngle: 0, color: 0xf03025 })
+    .createEntity(); // Finalizes and creates the entity
 
-  let fountB = game.createEntity({
-    name: 'fountB',
-    type: 'FOUNT',
-    color: 0x14b161,
-    isStatic: true,
-    width: 8,
-    height: 8,
-    position: { x: -200, y: 0 }
-  });
+  let fountB = game.build()
+    .type('FOUNT')
+    .name('fountB')
+    .color(0x14b161)
+    .isStatic(true)
+    .size(8, 8)
+    .position(-200, 0)
+    .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161 })
+    .createEntity(); // Finalizes and creates the entity
 
-  game.updateEntity({
-    id: fountB.id,
-    sutra: fount(game, fountB, { sprayAngle: Math.PI, color: 0x14b161 })
-  });
+  let fountC = game.build()
+    .type('FOUNT')
+    .name('fountC')
+    .color(0x3c62f8)
+    .isStatic(true)
+    .size(8, 8)
+    .position(0, -200)
+    .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
+    .createEntity(); // Finalizes and creates the entity
 
-  let fountC = game.createEntity({
-    name: 'fountC',
-    type: 'FOUNT',
-    color: 0x3c62f8,
-    isStatic: true,
-    width: 8,
-    height: 8,
-    position: { x: 0, y: -200 },
-  });
-
-  game.updateEntity({
-    id: fountC.id,
-    sutra: fount(game, fountC, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
-  });
-
-  let fountD = game.createEntity({
-    name: 'fountD',
-    type: 'FOUNT',
-    color: 0xe9dd34,
-    isStatic: true,
-    width: 8,
-    height: 8,
-    position: { x: 0, y: 200 }
-  });
-
-  game.updateEntity({
-    id: fountD.id,
-    sutra: fount(game, fountD, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
-  });
-
+  let fountD = game.build()
+    .type('FOUNT')
+    .name('fountD')
+    .color(0xe9dd34)
+    .isStatic(true)
+    .size(8, 8)
+    .position(0, 200)
+    .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
+    .createEntity(); // Finalizes and creates the entity
 
 }
 
