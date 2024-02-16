@@ -17,7 +17,6 @@ async function start() {
         height: 16
       },
       isSensor: true,
-      hasCollisionStart: true,
       position: {
         x: 0,
         y: 0

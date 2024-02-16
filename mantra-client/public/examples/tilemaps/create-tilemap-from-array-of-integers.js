@@ -2,6 +2,7 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
+  camera: 'follow',
   plugins: ['Tile'], // RBush is required for Field of View
 });
 game.start(function () {

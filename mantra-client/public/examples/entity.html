@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,69 +252,6 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="entity/create-entity.html">
-      <div class="category" style="background-color: #e91e63;">
-        <span class="categoryExample">Entity</span>
-        <p>Create a new entity.</p>
-        <h3>Create Entity</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="entity/remove-entity.html">
-      <div class="category" style="background-color: #e91e63;">
-        <span class="categoryExample">Entity</span>
-        <p>Remove an entity</p>
-        <h3>Remove Entity</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="entity/update-entity.html">
-      <div class="category" style="background-color: #e91e63;">
-        <span class="categoryExample">Entity</span>
-        <p>Update an entity.</p>
-        <h3>Update Entity</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="entity/get-entity.html">
-      <div class="category" style="background-color: #e91e63;">
-        <span class="categoryExample">Entity</span>
-        <p>Get an entity</p>
-        <h3>Get Entity</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="entity/entity-lifetime.html">
-      <div class="category" style="background-color: #e91e63;">
-        <span class="categoryExample">Entity</span>
-        <p>Set the time duration an entity will exist.</p>
-        <h3>Entity Lifetime</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="textures/set-texture.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Entity</span>
-        <p>Set a texture on Entity.</p>
-        <h3>Set Texture</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="textures/update-texture.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Entity</span>
-        <p>Update a texture on Entity.</p>
-        <h3>Update Texture</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="textures/sprite-sheets.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Entity</span>
-        <p>Sprite textures from a sprite sheet</p>
-        <h3>Sprite Sheets</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="collisions/collision-start.html">
-      <div class="category" style="background-color: #ff9800;">
-        <span class="categoryExample">Entity</span>
-        <p>Detect when a collision starts.</p>
-        <h3>Collision Start</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="collisions/collision-active.html">
       <div class="category" style="background-color: #ff9800;">
         <span class="categoryExample">Entity</span>
@@ -321,11 +266,18 @@
         <h3>Collision End</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="behaviors/entity-state.html">
-      <div class="category" style="background-color: #673ab7;">
+    <a class="staticExampleLink" href="collisions/collision-start.html">
+      <div class="category" style="background-color: #ff9800;">
         <span class="categoryExample">Entity</span>
-        <p>Run a behavior based on entity state.</p>
-        <h3>Entity State</h3>
+        <p>Detect when a collision starts.</p>
+        <h3>Collision Start</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="entity/create-entity.html">
+      <div class="category" style="background-color: #e91e63;">
+        <span class="categoryExample">Entity</span>
+        <p>Create a new entity.</p>
+        <h3>Create Entity</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="behaviors/entity-collision.html">
@@ -335,11 +287,158 @@
         <h3>Entity Collisions</h3>
       </div>
     </a>
+    <a class="staticExampleLink" href="entity/entity-lifetime.html">
+      <div class="category" style="background-color: #e91e63;">
+        <span class="categoryExample">Entity</span>
+        <p>Set the time duration an entity will exist.</p>
+        <h3>Entity Lifetime</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/entity-state.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Entity</span>
+        <p>Run a behavior based on entity state.</p>
+        <h3>Entity State</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="game-config/field-of-view.html">
+      <div class="category" style="background-color: #f44336;">
+        <span class="categoryExample">Entity</span>
+        <p>Change the default game field of view.</p>
+        <h3>Field of View</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="entity/get-entity.html">
+      <div class="category" style="background-color: #e91e63;">
+        <span class="categoryExample">Entity</span>
+        <p>Get an entity</p>
+        <h3>Get Entity</h3>
+      </div>
+    </a>
     <a class="staticExampleLink" href="containers/group-entities.html">
       <div class="category" style="background-color: #2196f3;">
         <span class="categoryExample">Entity</span>
         <p>Group entities together.</p>
         <h3>Group Entities</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="entity/remove-entity.html">
+      <div class="category" style="background-color: #e91e63;">
+        <span class="categoryExample">Entity</span>
+        <p>Remove an entity</p>
+        <h3>Remove Entity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="textures/set-texture.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Entity</span>
+        <p>Set a texture on Entity.</p>
+        <h3>Set Texture</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="textures/sprite-sheets.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Entity</span>
+        <p>Sprite textures from a sprite sheet</p>
+        <h3>Sprite Sheets</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="entity/update-entity.html">
+      <div class="category" style="background-color: #e91e63;">
+        <span class="categoryExample">Entity</span>
+        <p>Update an entity.</p>
+        <h3>Update Entity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="textures/update-texture.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Entity</span>
+        <p>Update a texture on Entity.</p>
+        <h3>Update Texture</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-collision-active.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code after a collision is active.</p>
+        <h3>after.collisionActive</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-collision-end.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code after a collision ends.</p>
+        <h3>after.collisionEnd</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-collision-start.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code after a collision starts.</p>
+        <h3>after.collisionStart</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-create-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code after an entity is created.</p>
+        <h3>after.createEntity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-remove-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code after an entity is removed.</p>
+        <h3>after.removeEntity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-update-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code after an entity is updated.</p>
+        <h3>after.updateEntity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-collision-active.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code before a collision is active.</p>
+        <h3>before.collisionActive</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-collision-end.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code before a collision ends.</p>
+        <h3>before.collisionEnd</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-collision-start.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code before a collision starts.</p>
+        <h3>before.collisionStart</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-create-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code before an entity is created.</p>
+        <h3>before.createEntity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-remove-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code before an entity is removed.</p>
+        <h3>before.removeEntity</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-update-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Entity</span>
+        <p>Run code before an entity is updated.</p>
+        <h3>before.updateEntity</h3>
       </div>
     </a></div>
   <div class="tags">

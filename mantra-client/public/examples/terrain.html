@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,11 +252,11 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="terrain/procedural-maze.html">
+    <a class="staticExampleLink" href="terrain/infinite-maze.html">
       <div class="category" style="background-color: #4caf50;">
         <span class="categoryExample">Terrains</span>
-        <p>Generate a procedural maze.</p>
-        <h3>Procedural Maze</h3>
+        <p>Generate an infinite maze.</p>
+        <h3>Infinite Maze</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="terrain/procedural-biome.html">
@@ -258,11 +266,11 @@
         <h3>Procedural Biome</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="terrain/infinite-maze.html">
+    <a class="staticExampleLink" href="terrain/procedural-maze.html">
       <div class="category" style="background-color: #4caf50;">
         <span class="categoryExample">Terrains</span>
-        <p>Generate an infinite maze.</p>
-        <h3>Infinite Maze</h3>
+        <p>Generate a procedural maze.</p>
+        <h3>Procedural Maze</h3>
       </div>
     </a></div>
   <div class="tags">

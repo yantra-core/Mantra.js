@@ -2,6 +2,20 @@
 <html>
     <link href="../prism.css" rel="stylesheet" />
     <script src="../code-editor.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 50%;
+            min-height: 600px;
+            min-width: 300px;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             loadEditor('./collision-end.js');

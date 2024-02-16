@@ -2,8 +2,11 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
-  plugins: ['RBush', 'Tile'], // RBush is required for Field of View
+  camera: 'follow',
+  // RBush is required plugin for Field of View
+  plugins: ['RBush', 'Tile', 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang'],
   useFoV: true,
+  gameRoot: 'http://192.168.1.80:7777'
 });
 
 game.start(function () {
@@ -13,9 +16,8 @@ game.start(function () {
   let tileMap = new game.TileMap({
     x: 0,
     y: 0,
-    width: 32,
-    height: 32,
-    seed: 1234,
+    width: 16,
+    height: 16,
     //depth: parseInt(tileMap.depth),
     tileWidth: 16, // TODO: tileSet.tilewidth
     tileHeight: 16 // TODO: tileSet.tileheight
@@ -23,6 +25,8 @@ game.start(function () {
 
   // file entire tilemap with grass
   tileMap.fill(2);
+
+  tileMap.seed(12345);
 
   let tileset = new game.TileSet({
     tiles: [

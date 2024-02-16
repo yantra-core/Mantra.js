@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,18 +252,18 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="scenes/scene-transition.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Scenes</span>
-        <p>Transition between scenes.</p>
-        <h3>Scene Transition</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="scenes/scene-loading.html">
       <div class="category" style="background-color: #2196f3;">
         <span class="categoryExample">Scenes</span>
         <p>Load a scene.</p>
         <h3>Scene Loading</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="scenes/scene-transition.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Scenes</span>
+        <p>Transition between scenes.</p>
+        <h3>Scene Transition</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="scenes/scene-unloading.html">

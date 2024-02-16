@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -251,18 +259,18 @@
         <h3>Set Texture</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="textures/update-texture.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Textures</span>
-        <p>Update a texture on Entity.</p>
-        <h3>Update Texture</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="textures/sprite-sheets.html">
       <div class="category" style="background-color: #4caf50;">
         <span class="categoryExample">Textures</span>
         <p>Sprite textures from a sprite sheet</p>
         <h3>Sprite Sheets</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="textures/update-texture.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Textures</span>
+        <p>Update a texture on Entity.</p>
+        <h3>Update Texture</h3>
       </div>
     </a></div>
   <div class="tags">

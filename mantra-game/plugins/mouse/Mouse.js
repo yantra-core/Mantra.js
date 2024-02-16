@@ -133,8 +133,8 @@ export default class Mouse {
     if (event.button === 1) { // Middle mouse button
       this.isDragging = true;
       this.dragStartPosition = { x: event.clientX, y: event.clientY };
-      // prevent default right click menu
-      // event.preventDefault();
+      // prevents default browser scrolling
+      event.preventDefault();
     }
 
     // Get mouse position

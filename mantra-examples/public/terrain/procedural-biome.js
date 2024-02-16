@@ -3,6 +3,7 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
   plugins: ['RBush', 'Tile'], // RBush is required for Field of View
+  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function () {
   game.zoom(2.5);
@@ -13,14 +14,14 @@ game.start(function () {
     y: 0,
     width: 32,
     height: 32,
-    seed: 1234,
-    //depth: parseInt(tileMap.depth),
     tileWidth: 16, // TODO: tileSet.tilewidth
     tileHeight: 16 // TODO: tileSet.tileheight
   });
 
   // file entire tilemap with grass
   tileMap.fill(2);
+
+  tileMap.seed(12345);
 
   let tileset = new game.TileSet({
     tiles: [

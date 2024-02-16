@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,55 +252,6 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="lifecycle/before-collision-start.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Collisions</span>
-        <p>Run code before a collision starts.</p>
-        <h3>before.collisionStart</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="lifecycle/after-collision-start.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Collisions</span>
-        <p>Run code after a collision starts.</p>
-        <h3>after.collisionStart</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="lifecycle/before-collision-end.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Collisions</span>
-        <p>Run code before a collision ends.</p>
-        <h3>before.collisionEnd</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="lifecycle/after-collision-end.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Collisions</span>
-        <p>Run code after a collision ends.</p>
-        <h3>after.collisionEnd</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="lifecycle/before-collision-active.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Collisions</span>
-        <p>Run code before a collision is active.</p>
-        <h3>before.collisionActive</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="lifecycle/after-collision-active.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Collisions</span>
-        <p>Run code after a collision is active.</p>
-        <h3>after.collisionActive</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="collisions/collision-start.html">
-      <div class="category" style="background-color: #ff9800;">
-        <span class="categoryExample">Collisions</span>
-        <p>Detect when a collision starts.</p>
-        <h3>Collision Start</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="collisions/collision-active.html">
       <div class="category" style="background-color: #ff9800;">
         <span class="categoryExample">Collisions</span>
@@ -307,6 +266,13 @@
         <h3>Collision End</h3>
       </div>
     </a>
+    <a class="staticExampleLink" href="collisions/collision-start.html">
+      <div class="category" style="background-color: #ff9800;">
+        <span class="categoryExample">Collisions</span>
+        <p>Detect when a collision starts.</p>
+        <h3>Collision Start</h3>
+      </div>
+    </a>
     <a class="staticExampleLink" href="behaviors/entity-collision.html">
       <div class="category" style="background-color: #673ab7;">
         <span class="categoryExample">Collisions</span>
@@ -319,6 +285,48 @@
         <span class="categoryExample">Collisions</span>
         <p>Detect and respond to tile collisions.</p>
         <h3>Tile Collisions</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-collision-active.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Collisions</span>
+        <p>Run code after a collision is active.</p>
+        <h3>after.collisionActive</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-collision-end.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Collisions</span>
+        <p>Run code after a collision ends.</p>
+        <h3>after.collisionEnd</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/after-collision-start.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Collisions</span>
+        <p>Run code after a collision starts.</p>
+        <h3>after.collisionStart</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-collision-active.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Collisions</span>
+        <p>Run code before a collision is active.</p>
+        <h3>before.collisionActive</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-collision-end.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Collisions</span>
+        <p>Run code before a collision ends.</p>
+        <h3>before.collisionEnd</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle/before-collision-start.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Collisions</span>
+        <p>Run code before a collision starts.</p>
+        <h3>before.collisionStart</h3>
       </div>
     </a></div>
   <div class="tags">

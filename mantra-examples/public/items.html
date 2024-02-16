@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -258,18 +266,18 @@
         <h3>Bomb</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="items/bullet.html">
-      <div class="category" style="background-color: #009688;">
-        <span class="categoryExample">Items</span>
-        <p>Bullets shoot in a straight line and deal damage to entities they hit.</p>
-        <h3>Bullet</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="items/boomerang.html">
       <div class="category" style="background-color: #009688;">
         <span class="categoryExample">Items</span>
         <p>Boomerangs can be thrown and return.</p>
         <h3>Boomerang</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="items/bullet.html">
+      <div class="category" style="background-color: #009688;">
+        <span class="categoryExample">Items</span>
+        <p>Bullets shoot in a straight line and deal damage to entities they hit.</p>
+        <h3>Bullet</h3>
       </div>
     </a></div>
   <div class="tags">

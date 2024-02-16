@@ -103,8 +103,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       var mouseY = event.clientY;
 
       // Convert screen coordinates to world coordinates
-      var worldX = (mouseX - window.innerWidth / 2 + game.viewportCenterXOffset) / game.data.camera.currentZoom + game.data.camera.position.x;
-      var worldY = (mouseY - window.innerHeight / 2 + game.viewportCenterYOffset) / game.data.camera.currentZoom + game.data.camera.position.y;
+      var worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
+      var worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
       this.game.emit('pointerMove', {
         x: worldX,
         y: worldY
@@ -160,8 +160,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           x: event.clientX,
           y: event.clientY
         };
-        // prevent default right click menu
-        // event.preventDefault();
+        // prevents default browser scrolling
+        event.preventDefault();
       }
 
       // Get mouse position
@@ -169,8 +169,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       var mouseY = event.clientY;
 
       // Convert screen coordinates to world coordinates
-      var worldX = (mouseX - window.innerWidth / 2 + game.viewportCenterXOffset) / game.data.camera.currentZoom + game.data.camera.position.x;
-      var worldY = (mouseY - window.innerHeight / 2 + game.viewportCenterYOffset) / game.data.camera.currentZoom + game.data.camera.position.y;
+      var worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
+      var worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
       var position = {
         x: worldX,
         y: worldY

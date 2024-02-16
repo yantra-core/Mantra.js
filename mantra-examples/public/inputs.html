@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,25 +252,25 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="inputs/keyboard.html">
-      <div class="category" style="background-color: #ff5722;">
-        <span class="categoryExample">Input Controls</span>
-        <p>Handle keyboard input.</p>
-        <h3>Keyboard</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="inputs/mouse.html">
-      <div class="category" style="background-color: #ff5722;">
-        <span class="categoryExample">Input Controls</span>
-        <p>Handle mouse input.</p>
-        <h3>Mouse</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="inputs/gamepad.html">
       <div class="category" style="background-color: #ff5722;">
         <span class="categoryExample">Input Controls</span>
         <p>Handle gamepad input.</p>
         <h3>Gamepad</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="behaviors/gamepad-input.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Input Controls</span>
+        <p>Run a behavior based on gamepad input.</p>
+        <h3>Gamepad Input</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="inputs/keyboard.html">
+      <div class="category" style="background-color: #ff5722;">
+        <span class="categoryExample">Input Controls</span>
+        <p>Handle keyboard input.</p>
+        <h3>Keyboard</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="behaviors/keyboard-input.html">
@@ -272,11 +280,11 @@
         <h3>Keyboard Input</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="behaviors/gamepad-input.html">
-      <div class="category" style="background-color: #673ab7;">
+    <a class="staticExampleLink" href="inputs/mouse.html">
+      <div class="category" style="background-color: #ff5722;">
         <span class="categoryExample">Input Controls</span>
-        <p>Run a behavior based on gamepad input.</p>
-        <h3>Gamepad Input</h3>
+        <p>Handle mouse input.</p>
+        <h3>Mouse</h3>
       </div>
     </a></div>
   <div class="tags">

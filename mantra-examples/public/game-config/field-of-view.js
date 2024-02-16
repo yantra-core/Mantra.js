@@ -2,7 +2,8 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
-  plugins: ['RBush', 'Tile'], // RBush is required for Field of View
+  camera: 'follow',
+  plugins: ['RBush', 'Tile', 'Bullet', 'Boomerang'], // RBush is required for Field of View
   /*
     fieldOfView- Field of View distance can be set in the constructor or after construction
   */
@@ -11,6 +12,7 @@ let game = new MANTRA.Game({
     useFoV- Field of View can be turned on or off in the constructor or after construction
   */
   useFoV: true,
+  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function () {
   game.zoom(2.5);
@@ -21,7 +23,6 @@ game.start(function () {
     y: 0,
     width: 128,
     height: 128,
-    seed: 1234,
     //depth: parseInt(tileMap.depth),
     tileWidth: 16, // TODO: tileSet.tilewidth
     tileHeight: 16 // TODO: tileSet.tileheight
@@ -29,6 +30,8 @@ game.start(function () {
 
   // file entire tilemap with grass
   tileMap.fill(2);
+
+  tileMap.seed(1234);
 
   let tileset = new game.TileSet({
     tiles: [

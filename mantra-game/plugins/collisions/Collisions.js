@@ -33,7 +33,12 @@ class Collisions {
     const entityA = bodyA.entity;
     const entityB = bodyB.entity;
 
-    this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
+    let canCollide = this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
+
+    if (canCollide === false) {
+      // console.log('before.collisionStart returned false, skipping collision', entityIdA, entityIdB);
+      return;
+    }
 
     if (!entityA || !entityB) {
       // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);

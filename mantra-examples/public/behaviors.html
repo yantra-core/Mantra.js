@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,6 +252,13 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
+    <a class="staticExampleLink" href="behaviors/entity-collision.html">
+      <div class="category" style="background-color: #673ab7;">
+        <span class="categoryExample">Behavior Trees</span>
+        <p>Run a behavior based on entity collision.</p>
+        <h3>Entity Collisions</h3>
+      </div>
+    </a>
     <a class="staticExampleLink" href="behaviors/entity-state.html">
       <div class="category" style="background-color: #673ab7;">
         <span class="categoryExample">Behavior Trees</span>
@@ -258,11 +273,11 @@
         <h3>Game Tick</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="behaviors/entity-collision.html">
+    <a class="staticExampleLink" href="behaviors/gamepad-input.html">
       <div class="category" style="background-color: #673ab7;">
         <span class="categoryExample">Behavior Trees</span>
-        <p>Run a behavior based on entity collision.</p>
-        <h3>Entity Collisions</h3>
+        <p>Run a behavior based on gamepad input.</p>
+        <h3>Gamepad Input</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="behaviors/keyboard-input.html">
@@ -270,13 +285,6 @@
         <span class="categoryExample">Behavior Trees</span>
         <p>Run a behavior based on keyboard input.</p>
         <h3>Keyboard Input</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="behaviors/gamepad-input.html">
-      <div class="category" style="background-color: #673ab7;">
-        <span class="categoryExample">Behavior Trees</span>
-        <p>Run a behavior based on gamepad input.</p>
-        <h3>Gamepad Input</h3>
       </div>
     </a></div>
   <div class="tags">

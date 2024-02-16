@@ -105,7 +105,6 @@ var CSSCamera = /*#__PURE__*/function () {
     this.id = CSSCamera.id;
     this.scene = scene;
     this.config = config;
-    this.follow = true;
     this.isDragging = false;
     this.dragInertia = {
       x: 0,
@@ -130,13 +129,16 @@ var CSSCamera = /*#__PURE__*/function () {
       game.zoom = this.zoom.bind(this);
       game.setZoom = this.zoom.bind(this); // TODO: legacy remove
 
-      game.data.camera = {
-        mode: 'follow',
-        position: {
-          x: 0,
-          y: 0
-        }
-      };
+      // Remark: We can remove this soon, camera should be initialized in the game
+      if (typeof game.data.camera === 'undefined') {
+        game.data.camera = {
+          mode: 'follow',
+          position: {
+            x: 0,
+            y: 0
+          }
+        };
+      }
       this.updateCameraPosition = _updateCameraPosition["default"].bind(this);
       this.applyThrow = _applyThrow["default"].bind(this);
       this.update = _update["default"].bind(this);
@@ -145,9 +147,6 @@ var CSSCamera = /*#__PURE__*/function () {
 
       // hoist rotateCamera to game
       game.rotateCamera = _rotateCameraOverTime["default"].bind(this);
-
-      // sets auto-follow player when starting CSSGraphics ( for now )
-      this.follow = true;
       this.game.systemsManager.addSystem('graphics-css-camera', this);
       var gameHolder = document.getElementById('gameHolder');
       if (!gameHolder) {
@@ -185,8 +184,8 @@ var CSSCamera = /*#__PURE__*/function () {
     key: "resetCameraState",
     value: function resetCameraState() {
       // Reset other camera properties as needed
-      this.game.viewportCenterXOffset = 0;
-      this.game.viewportCenterYOffset = 0;
+      this.game.data.camera.offsetX = 0;
+      this.game.data.camera.offsetY = 0;
     }
   }, {
     key: "initZoomControls",
@@ -281,18 +280,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       camera = _ref.camera;
     _classCallCheck(this, CSSGraphics);
     _this = _super.call(this);
-
-    // legacy API, remove in future
-    if (typeof camera === 'string') {
-      camera = {
-        follow: true
-      };
-    }
-
-    // Config scope for convenience
-    _this.config = {
-      camera: camera
-    };
     _this.id = CSSGraphics.id;
     _this.async = CSSGraphics.async;
     _this.cameraPosition = {
@@ -339,8 +326,8 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // is sync load; however we still need to let the graphics pipeline know we are ready
       game.emit('plugin::ready::graphics-css', this);
       game.loadingPluginsCount--;
-      this.game.viewportCenterXOffset = 0;
-      this.game.viewportCenterYOffset = 0;
+      this.game.data.camera.offsetX = 0;
+      this.game.data.camera.offsetY = 0;
       document.body.style.cursor = 'default';
     }
   }, {
@@ -388,8 +375,8 @@ function applyThrow() {
   var game = this.game;
   var decayFactor = 0.985; // Increase closer to 1 for longer throws
 
-  game.viewportCenterXOffset += this.dragInertia.x;
-  game.viewportCenterYOffset += this.dragInertia.y;
+  game.data.camera.offsetX += this.dragInertia.x;
+  game.data.camera.offsetY += this.dragInertia.y;
 
   // Decrease the inertia
   this.dragInertia.x *= decayFactor;
@@ -432,7 +419,7 @@ function cameraShake(_ref) {
 
   // Debounce mechanism
   if (gameViewport.dataset.isShaking === 'true') {
-    console.log('Camera is already shaking. Ignoring additional shake requests.');
+    // console.log('Camera is already shaking. Ignoring additional shake requests.');
     return;
   }
   gameViewport.dataset.isShaking = 'true';
@@ -489,6 +476,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = cssMouseWheelZoom;
 function cssMouseWheelZoom(event) {
+  // Prevent default scrolling behavior
+  event.preventDefault();
   if (!this.mouseWheelEnabled) {
     return;
   }
@@ -511,9 +500,6 @@ function cssMouseWheelZoom(event) {
     logBase: 2 // Logarithmic base
   };
 
-  // Prevent default scrolling behavior
-  event.preventDefault();
-
   // Determine zoom direction
   var delta = event.wheelDelta ? event.wheelDelta : -event.detail;
   var direction = delta > 0 ? 1 : -1;
@@ -524,6 +510,7 @@ function cssMouseWheelZoom(event) {
 
   // Update scale
   this.zoom(newScale);
+  return false;
 }
 
 },{}],7:[function(require,module,exports){
@@ -560,7 +547,7 @@ function rotateCameraOverTime() {
   // no need for X?
   // centerX = centerX / currentZoom;
   // centerY = centerY / currentZoom;
-  // centerY = centerY + this.game.viewportCenterYOffset;
+  // centerY = centerY + this.game.data.camera.offsetY;
   // centerY = centerY +  this.game.data.camera.position.y / currentZoom;
   // Set the transition property on the gameViewport
   this.gameViewport.style.transition = "transform ".concat(duration, "ms");
@@ -643,19 +630,19 @@ function update() {
   var zoomFactor = this.game.data.camera.currentZoom;
   // console.log('zoomFactor', zoomFactor)
 
-  if (typeof game.viewportCenterXOffset !== 'number') {
-    game.viewportCenterXOffset = 0;
+  if (typeof game.data.camera.offsetX !== 'number') {
+    game.data.camera.offsetX = 0;
   }
-  if (typeof game.viewportCenterYOffset !== 'number') {
-    game.viewportCenterYOffset = 0;
+  if (typeof game.data.camera.offsetY !== 'number') {
+    game.data.camera.offsetY = 0;
   }
 
   // Initialize offsets if they are not numbers
-  if (typeof game.viewportCenterXOffset !== 'number') {
-    game.viewportCenterXOffset = 0;
+  if (typeof game.data.camera.offsetX !== 'number') {
+    game.data.camera.offsetX = 0;
   }
-  if (typeof game.viewportCenterYOffset !== 'number') {
-    game.viewportCenterYOffset = 0;
+  if (typeof game.data.camera.offsetY !== 'number') {
+    game.data.camera.offsetY = 0;
   }
 
   // Determine the base position of the camera
@@ -663,14 +650,14 @@ function update() {
     baseY = 0;
 
   // If following the player, set the base position to the player's position
-  if (this.follow && currentPlayer && currentPlayer.position) {
+  if (this.game.data.camera.mode === 'follow' && currentPlayer && currentPlayer.position) {
     baseX = currentPlayer.position.x;
     baseY = currentPlayer.position.y;
   }
 
   // Apply viewport offsets to the base position
-  this.scene.cameraPosition.x = baseX + game.viewportCenterXOffset;
-  this.scene.cameraPosition.y = baseY + game.viewportCenterYOffset;
+  this.scene.cameraPosition.x = baseX + game.data.camera.offsetX;
+  this.scene.cameraPosition.y = baseY + game.data.camera.offsetY;
 
   // Find the center of the screen
   var centerX = window.innerWidth / 2;
@@ -756,10 +743,10 @@ function updateCameraPosition(dx, dy, isDragging) {
     this.isDragging = true;
     // this.follow = false;
     if (typeof dx === 'number') {
-      game.viewportCenterXOffset += dx;
+      game.data.camera.offsetX += dx;
     }
     if (typeof dy === 'number') {
-      game.viewportCenterYOffset += dy;
+      game.data.camera.offsetY += dy;
     }
   }
   if (this.isDragging && !isDragging && (dx !== 0 || dy !== 0)) {

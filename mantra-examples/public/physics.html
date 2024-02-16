@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -251,27 +259,6 @@
         <h3>Apply Force</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="physics/set-position.html">
-      <div class="category" style="background-color: #9c27b0;">
-        <span class="categoryExample">Physics</span>
-        <p>Set the position of an entity.</p>
-        <h3>Set Position</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="physics/rotate.html">
-      <div class="category" style="background-color: #9c27b0;">
-        <span class="categoryExample">Physics</span>
-        <p>Rotate an entity.</p>
-        <h3>Rotate</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="collisions/collision-start.html">
-      <div class="category" style="background-color: #ff9800;">
-        <span class="categoryExample">Physics</span>
-        <p>Detect when a collision starts.</p>
-        <h3>Collision Start</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="collisions/collision-active.html">
       <div class="category" style="background-color: #ff9800;">
         <span class="categoryExample">Physics</span>
@@ -286,11 +273,32 @@
         <h3>Collision End</h3>
       </div>
     </a>
+    <a class="staticExampleLink" href="collisions/collision-start.html">
+      <div class="category" style="background-color: #ff9800;">
+        <span class="categoryExample">Physics</span>
+        <p>Detect when a collision starts.</p>
+        <h3>Collision Start</h3>
+      </div>
+    </a>
     <a class="staticExampleLink" href="behaviors/entity-collision.html">
       <div class="category" style="background-color: #673ab7;">
         <span class="categoryExample">Physics</span>
         <p>Run a behavior based on entity collision.</p>
         <h3>Entity Collisions</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="physics/rotate.html">
+      <div class="category" style="background-color: #9c27b0;">
+        <span class="categoryExample">Physics</span>
+        <p>Rotate an entity.</p>
+        <h3>Rotate</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="physics/set-position.html">
+      <div class="category" style="background-color: #9c27b0;">
+        <span class="categoryExample">Physics</span>
+        <p>Set the position of an entity.</p>
+        <h3>Set Position</h3>
       </div>
     </a></div>
   <div class="tags">

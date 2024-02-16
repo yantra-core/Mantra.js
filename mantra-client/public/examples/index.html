@@ -49,6 +49,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -94,6 +95,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -264,18 +272,18 @@
         <h3>Behavior Trees</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="lifecycle.html">
-      <div class="category" style="background-color: #2196f3;">
-        <span class="categoryExample">Game Lifecycle</span>
-        <p>Hook into game events.</p>
-        <h3>Game Lifecycle</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="items.html">
       <div class="category" style="background-color: #009688;">
         <span class="categoryExample">Items</span>
         <p>Items can be collected and used.</p>
         <h3>Items</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="collisions.html">
+      <div class="category" style="background-color: #ff9800;">
+        <span class="categoryExample">Collisions</span>
+        <p>Detect and respond to collisions between entities.</p>
+        <h3>Collisions</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="textures.html">
@@ -313,13 +321,6 @@
         <h3>Input Controls</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="collisions.html">
-      <div class="category" style="background-color: #ff9800;">
-        <span class="categoryExample">Collisions</span>
-        <p>Detect and respond to collisions between entities.</p>
-        <h3>Collisions</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="tilemaps.html">
       <div class="category" style="background-color: #4caf50;">
         <span class="categoryExample">Tiles</span>
@@ -341,11 +342,25 @@
         <h3>Game Config</h3>
       </div>
     </a>
+    <a class="staticExampleLink" href="scenes.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Scenes</span>
+        <p>Manage scenes and transitions.</p>
+        <h3>Scenes</h3>
+      </div>
+    </a>
     <a class="staticExampleLink" href="containers.html">
       <div class="category" style="background-color: #2196f3;">
         <span class="categoryExample">Containers</span>
         <p>Group entites into containers.</p>
         <h3>Containers</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="lifecycle.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Game Lifecycle</span>
+        <p>Hook into game events.</p>
+        <h3>Game Lifecycle</h3>
       </div>
     </a></div>
   <div class="tags">

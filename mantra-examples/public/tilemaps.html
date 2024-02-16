@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,27 +252,6 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="tilemaps/tilemap-object.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Tiles</span>
-        <p>Create a tilemap from an array of integers.</p>
-        <h3>TileMap Object</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="tilemaps/create-tilemap-from-array-of-integers.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Tiles</span>
-        <p>Create a tilemap from an array of integers.</p>
-        <h3>TileMap Array</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="tilemaps/custom-tilesets.html">
-      <div class="category" style="background-color: #4caf50;">
-        <span class="categoryExample">Tiles</span>
-        <p>Create custom tilesets.</p>
-        <h3>TileSets</h3>
-      </div>
-    </a>
     <a class="staticExampleLink" href="tilemaps/tilemap-from-labyrinthos.html">
       <div class="category" style="background-color: #4caf50;">
         <span class="categoryExample">Tiles</span>
@@ -277,6 +264,27 @@
         <span class="categoryExample">Tiles</span>
         <p>Detect and respond to tile collisions.</p>
         <h3>Tile Collisions</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="tilemaps/create-tilemap-from-array-of-integers.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Tiles</span>
+        <p>Create a tilemap from an array of integers.</p>
+        <h3>TileMap Array</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="tilemaps/tilemap-object.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Tiles</span>
+        <p>Create a tilemap from an array of integers.</p>
+        <h3>TileMap Object</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="tilemaps/custom-tilesets.html">
+      <div class="category" style="background-color: #4caf50;">
+        <span class="categoryExample">Tiles</span>
+        <p>Create custom tilesets.</p>
+        <h3>TileSets</h3>
       </div>
     </a></div>
   <div class="tags">

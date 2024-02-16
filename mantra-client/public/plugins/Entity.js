@@ -490,6 +490,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = createEntity;
 var _Entity = _interopRequireDefault(require("../../../Entity/Entity.js"));
 var _TimersComponent = _interopRequireDefault(require("../../../Component/TimersComponent.js"));
+var _ensureColorInt = _interopRequireDefault(require("./util/ensureColorInt.js"));
 var _layoutEntity = _interopRequireDefault(require("./layoutEntity.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -564,6 +565,7 @@ function createEntity() {
       container: null,
       items: null,
       sutra: null,
+      scene: null,
       meta: null,
       collectable: false,
       hasInventory: true,
@@ -683,6 +685,7 @@ function createEntity() {
     items = _config.items,
     container = _config.container,
     sutra = _config.sutra,
+    scene = _config.scene,
     meta = _config.meta,
     collectable = _config.collectable,
     hasInventory = _config.hasInventory,
@@ -713,7 +716,7 @@ function createEntity() {
     // check to see if # is present, if so, convert hex to int
     // needs to map common colors to integer values, red, green, black , etc
   }
-  var ensuredColor = ensureColorInt(color);
+  var ensuredColor = (0, _ensureColorInt["default"])(color);
 
   // console.log('position', position, 'width', width, 'height', height)
   // Using game's API to add components
@@ -740,6 +743,7 @@ function createEntity() {
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
   this.game.addComponent(entityId, 'sutra', sutra);
+  this.game.addComponent(entityId, 'scene', scene);
   this.game.addComponent(entityId, 'meta', meta);
   this.game.addComponent(entityId, 'collectable', collectable);
 
@@ -844,46 +848,8 @@ function createEntity() {
   updatedEntity = this.game.lifecycle.triggerHook('after.createEntity', config);
   return updatedEntity;
 }
-function ensureColorInt(color) {
-  if (!color) {
-    return color;
-  }
 
-  // Mapping of common color names to hex values
-  var colorNameToHex = {
-    red: '#FF0000',
-    green: '#00FF00',
-    blue: '#0000FF',
-    black: '#000000',
-    white: '#FFFFFF',
-    yellow: '#FFFF00',
-    purple: '#800080',
-    orange: '#FFA500',
-    pink: '#FFC0CB'
-    // Add more common colors as needed
-  };
-
-  // If color is already a number, return it as is
-  if (typeof color === 'number') {
-    return color;
-  }
-
-  // If color is a hex string (with #), convert it to an integer
-  if (typeof color === 'string' && color.startsWith('#')) {
-    return parseInt(color.replace('#', ''), 16);
-  }
-
-  // If color is a common color name, convert it using the mapping
-  if (typeof color === 'string' && colorNameToHex[color.toLowerCase()]) {
-    return parseInt(colorNameToHex[color.toLowerCase()].replace('#', ''), 16);
-  }
-
-  // If color format is unrecognized, throw an error or return a default color
-  console.error('Unrecognized color format:', color);
-  return parseInt('000000', 16); // Default to black
-}
-
-},{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3,"./layoutEntity.js":8}],6:[function(require,module,exports){
+},{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3,"./layoutEntity.js":8,"./util/ensureColorInt.js":11}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1166,8 +1132,14 @@ exports["default"] = removeEntity;
 // TODO: double check that all components values are being cleared on removal of ent
 function removeEntity(entityId) {
   var removeFromGameData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-  this.game.lifecycle.triggerHook('before.removeEntity', entityId);
   var ent = this.game.entities.get(entityId);
+  if (!ent) {
+    return;
+  }
+  var canBeRemoved = this.game.lifecycle.triggerHook('before.removeEntity', ent);
+  if (canBeRemoved === false) {
+    return;
+  }
   if (ent && this.game.systems.graphics && ent.graphics) {
     // Is this best done here? or in the graphics plugin?
     this.game.systems.graphics.removeGraphic(entityId);
@@ -1195,7 +1167,7 @@ function removeEntity(entityId) {
       }
     }
   }
-  this.game.lifecycle.triggerHook('after.removeEntity', entityId);
+  this.game.lifecycle.triggerHook('after.removeEntity', ent);
 }
 
 },{}],10:[function(require,module,exports){
@@ -1205,6 +1177,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = updateEntity;
+var _ensureColorInt = _interopRequireDefault(require("./util/ensureColorInt.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -1259,15 +1233,14 @@ function updateEntity(entityDataOrId, entityData) {
   this.game.graphics.forEach(function (graphicsInterface) {
     ent.pendingRender[graphicsInterface.id] = true;
   });
-
-  // TODO: add additional component types that can be updated ( should be most of them )
   if (entityData.color) {
-    this.game.components.color.set(entityId, entityData.color);
-    //if (!this.game.changedEntities.has(entityId)) {}
-    // this.game.changedEntities.add(entityId);
-    // console.log("SETTING COLOR", entityData.color)
+    // entityData.color may be color name as string, hex code, or integer value
+    // ensureColorInt will convert incoming color to safe integer value
+    //console.log('entityData.color', entityData.color)
+    var ensuredColor = (0, _ensureColorInt["default"])(entityData.color);
+    // console.log('ensuredColor', ensuredColor)
+    this.game.components.color.set(entityId, ensuredColor);
   }
-
   var updateSize = false;
   if (entityData.height) {
     updateSize = true;
@@ -1372,6 +1345,52 @@ function updateEntity(entityDataOrId, entityData) {
   }
   ent = this.game.lifecycle.triggerHook('after.updateEntity', ent);
   return ent;
+}
+
+},{"./util/ensureColorInt.js":11}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = ensureColorInt;
+function ensureColorInt(color) {
+  if (!color) {
+    return color;
+  }
+
+  // Mapping of common color names to hex values
+  var colorNameToHex = {
+    red: '#FF0000',
+    green: '#00FF00',
+    blue: '#0000FF',
+    black: '#000000',
+    white: '#FFFFFF',
+    yellow: '#FFFF00',
+    purple: '#800080',
+    orange: '#FFA500',
+    pink: '#FFC0CB'
+    // Add more common colors as needed
+  };
+
+  // If color is already a number, return it as is
+  if (typeof color === 'number') {
+    return color;
+  }
+
+  // If color is a hex string (with #), convert it to an integer
+  if (typeof color === 'string' && color.startsWith('#')) {
+    return parseInt(color.replace('#', ''), 16);
+  }
+
+  // If color is a common color name, convert it using the mapping
+  if (typeof color === 'string' && colorNameToHex[color.toLowerCase()]) {
+    return parseInt(colorNameToHex[color.toLowerCase()].replace('#', ''), 16);
+  }
+
+  // If color format is unrecognized, throw an error or return a default color
+  console.error('Unrecognized color format:', color);
+  return parseInt('000000', 16); // Default to black
 }
 
 },{}]},{},[4])(4)

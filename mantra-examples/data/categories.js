@@ -1,5 +1,3 @@
-
-// TODO: camera
 let categories = [
   {
     title: 'Entity', // pink
@@ -30,17 +28,6 @@ let categories = [
     url: 'behaviors.html',
     tags: ['behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
-
-  {
-    title: 'Game Lifecycle', // blue
-    name: 'lifecycle',
-    color: '#2196f3',
-    description: 'Hook into game events.',
-    image: 'placeholder-image.jpg',
-    url: 'lifecycle.html',
-    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
-  },
-
   {
     title: 'Items', // teal
     name: 'items',
@@ -50,6 +37,26 @@ let categories = [
     url: 'items.html',
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
+  {
+    "title": "Collisions",
+    "name": "collisions",
+    "color": "#ff9800", // orange
+    "description": "Detect and respond to collisions between entities.",
+    "image": "placeholder-image.jpg",
+    "url": "collisions.html",
+    "tags": ["collisions", "detection", "response", "hit", "impact", "contact", "interaction", "overlap", "intersection", "touch", "crash"]
+  },
+  /*
+  {
+    title: 'Camera', // blue
+    name: 'camera',
+    color: '#2196f3',
+    description: 'Control the camera and view.',
+    image: 'placeholder-image.jpg',
+    url: 'camera.html',
+    tags: ['camera', 'view', 'perspective', 'angle', 'zoom', 'pan', 'tilt', 'rotate', 'follow', 'look', 'focus', 'position']
+  },
+  */
   {
     title: 'Textures', // green
     name: 'textures',
@@ -96,15 +103,6 @@ let categories = [
     "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
   },
   {
-    "title": "Collisions",
-    "name": "collisions",
-    "color": "#ff9800", // orange
-    "description": "Detect and respond to collisions between entities.",
-    "image": "placeholder-image.jpg",
-    "url": "collisions.html",
-    "tags": ["collisions", "detection", "response", "hit", "impact", "contact", "interaction", "overlap", "intersection", "touch", "crash"]
-  },
-  {
     "title": "Tiles",
     name: "tiles",
     "color": "#4caf50", // green
@@ -142,6 +140,7 @@ let categories = [
     tags: ['movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
   },
 
+  */
   {
     title: 'Scenes', // blue
     name: 'scenes',
@@ -151,7 +150,7 @@ let categories = [
     url: 'scenes.html',
     tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
-  */
+
   {
     title: 'Containers', // blue
     name: 'containers',
@@ -181,12 +180,49 @@ let categories = [
     tags: ['plugins', 'system', 'modules', 'extensions', 'addons', 'features', 'components', 'interfaces', 'libraries', 'tools']
   }
   */
+  {
+    title: 'Game Lifecycle', // blue
+    name: 'lifecycle',
+    color: '#2196f3',
+    description: 'Hook into game events.',
+    image: 'placeholder-image.jpg',
+    url: 'lifecycle.html',
+    tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
+  },
+
 
 ];
 
 //  assets   tags: ['assets', 'management', 'loading', 'resources', 'files', 'images', 'audio', 'video', 'fonts', 'scripts', 'data']
 
 let examples = [];
+
+let physics_examples = [
+  {
+    title: 'Apply Force',
+    category: 'physics',
+    description: 'Apply a force to an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'physics/apply-force.html',
+    tags: ['apply', 'force', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  },
+  {
+    title: 'Set Position',
+    category: 'physics',
+    description: 'Set the position of an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'physics/set-position.html',
+    tags: ['set', 'position', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  },
+  {
+    title: 'Rotate',
+    category: 'physics',
+    description: 'Rotate an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'physics/rotate.html',
+    tags: ['rotate', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  }
+];
 
 let item_examples = [
   {
@@ -220,30 +256,6 @@ let item_examples = [
     image: 'placeholder-image.jpg',
     url: 'items/boomerang.html',
     tags: ['boomerang', 'item', 'inventory', 'throwing', 'damage', 'return', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
-  },
-  {
-    title: 'Apply Force',
-    category: 'physics',
-    description: 'Apply a force to an entity.',
-    image: 'placeholder-image.jpg',
-    url: 'physics/apply-force.html',
-    tags: ['apply', 'force', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
-  },
-  {
-    title: 'Set Position',
-    category: 'physics',
-    description: 'Set the position of an entity.',
-    image: 'placeholder-image.jpg',
-    url: 'physics/set-position.html',
-    tags: ['set', 'position', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
-  },
-  {
-    title: 'Rotate',
-    category: 'physics',
-    description: 'Rotate an entity.',
-    image: 'placeholder-image.jpg',
-    url: 'physics/rotate.html',
-    tags: ['rotate', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
   }
 ];
 
@@ -806,7 +818,7 @@ let config_examples = [
   },
   {
     title: 'Field of View',
-    category: 'config',
+    category: ['config', 'entity'],
     description: 'Change the default game field of view.',
     image: 'placeholder-image.jpg',
     url: 'game-config/field-of-view.html',
@@ -913,16 +925,68 @@ let scenes_examples = [
   },
 ];
 
+let camera_examples = [
+  {
+    title: 'Follow Player',
+    category: 'camera',
+    description: 'Follow the player with the camera.',
+    image: 'placeholder-image.jpg',
+    url: 'camera/follow-player.html',
+    tags: ['follow', 'player', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Camera Zoom',
+    category: 'camera',
+    description: 'Zoom the camera in and out.',
+    image: 'placeholder-image.jpg',
+    url: 'camera/camera-zoom.html',
+    tags: ['zoom', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Camera Shake',
+    category: 'camera',
+    description: 'Shake the camera.',
+    image: 'placeholder-image.jpg',
+    url: 'camera/camera-shake.html',
+    tags: ['shake', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Camera Move',
+    category: 'camera',
+    description: 'Move the camera.',
+    image: 'placeholder-image.jpg',
+    url: 'camera/camera-move.html',
+    tags: ['move', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Camera Position',
+    category: 'camera',
+    description: 'Set the camera position.',
+    image: 'placeholder-image.jpg',
+    url: 'camera/set-position.html',
+    tags: ['set', 'position', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Rotate Camera',
+    category: 'camera',
+    description: 'Rotate the camera.',
+    image: 'placeholder-image.jpg',
+    url: 'camera/rotate-camera.html',
+    tags: ['rotate', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
+  }
+];
+
 // concat all arr to examples
 examples = examples.concat(item_examples);
 examples = examples.concat(entity_examples);
-examples = examples.concat(lifecycle_examples);
+examples = examples.concat(physics_examples);
 examples = examples.concat(texture_examples);
 examples = examples.concat(render_examples);
 examples = examples.concat(asset_examples);
 examples = examples.concat(input_examples);
 examples = examples.concat(audio_examples);
 examples = examples.concat(collision_examples);
+examples = examples.concat(camera_examples);
 examples = examples.concat(behaviors_examples);
 examples = examples.concat(tiles_examples);
 examples = examples.concat(terrains_examples);
@@ -930,6 +994,10 @@ examples = examples.concat(config_examples);
 examples = examples.concat(movement_examples);
 examples = examples.concat(container_examples);
 examples = examples.concat(scenes_examples);
+examples = examples.concat(lifecycle_examples);
+
+// sort all the examples by title
+examples.sort((a, b) => (a.title > b.title) ? 1 : -1);
 
 // examples count
 console.log('examples count:', examples.length)

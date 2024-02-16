@@ -18,45 +18,45 @@ function loadEditor(sourceUrl) {
         code = code.trim().split('\n').slice(0, -1).join('\n');
 
 
-       // check to see if code-editor exists in DOM, if not create it
-       if (!document.querySelector('.code-editor')) {
-        const codeEditor = document.createElement('div');
-        codeEditor.className = 'code-editor';
-        codeEditor.innerHTML = `<pre><code>${code}</code></pre><div class="resize-handle"></div>`;
+        // check to see if code-editor exists in DOM, if not create it
+        if (!document.querySelector('.code-editor')) {
+          const codeEditor = document.createElement('div');
+          codeEditor.className = 'code-editor';
+          codeEditor.innerHTML = `<pre><code>${code}</code></pre><div class="resize-handle"></div>`;
 
-        // set the styles
-        codeEditor.style.width = '100%';
-        // codeEditor.style.height = '30vh'; // Set initial height
-        codeEditor.style.background = '#333';
-        codeEditor.style.color = '#fff';
-        codeEditor.style.overflow = 'auto';
-        codeEditor.style.padding = '20px';
-        codeEditor.style.boxSizing = 'border-box';
-        codeEditor.style.fontFamily = 'monospace';
-        codeEditor.style.border = '1px solid #888';
+          // set the styles
+          codeEditor.style.width = '100%';
+          // codeEditor.style.height = '30vh'; // Set initial height
+          codeEditor.style.background = '#333';
+          codeEditor.style.color = '#fff';
+          codeEditor.style.overflow = 'auto';
+          codeEditor.style.padding = '20px';
+          codeEditor.style.boxSizing = 'border-box';
+          codeEditor.style.fontFamily = 'monospace';
+          codeEditor.style.border = '1px solid #888';
 
-        // set position to bottom of page
-        codeEditor.style.position = 'relative';
-        //codeEditor.style.top = '0';
-        //codeEditor.style.left = '0';
-        codeEditor.style.resize = 'vertical';
+          // set position to bottom of page
+          codeEditor.style.position = 'relative';
+          //codeEditor.style.top = '0';
+          //codeEditor.style.left = '0';
+          codeEditor.style.resize = 'vertical';
 
-        // add class="language-javascript" to code element
-        codeEditor.querySelector('code').classList.add('language-javascript');
+          // add class="language-javascript" to code element
+          codeEditor.querySelector('code').classList.add('language-javascript');
 
-        // add class language-javascript
-        // codeEditor.classList.add('language-javascript');
+          // add class language-javascript
+          // codeEditor.classList.add('language-javascript');
 
-        // set background opacity
-        codeEditor.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+          // set background opacity
+          codeEditor.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
 
-        // append at end of document
-        document.body.appendChild(codeEditor);
-      } else {
-        // If code-editor exists, just update its content
-        document.querySelector('.code-editor pre code').textContent = code;
-      }
-      Prism.highlightAll()
+          // append at end of document
+          document.body.appendChild(codeEditor);
+        } else {
+          // If code-editor exists, just update its content
+          document.querySelector('.code-editor pre code').textContent = code;
+        }
+        Prism.highlightAll()
 
 
         // Set the code example to the pre element

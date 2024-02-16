@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -95,6 +96,13 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
@@ -244,25 +252,18 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="game-config/game-config-object.html">
+    <a class="staticExampleLink" href="game-config/field-of-view.html">
       <div class="category" style="background-color: #f44336;">
         <span class="categoryExample">Game Config</span>
-        <p>Explore the GameConfig object.</p>
-        <h3>GameConfig Object</h3>
+        <p>Change the default game field of view.</p>
+        <h3>Field of View</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="game-config/game-root.html">
+    <a class="staticExampleLink" href="game-config/frames-per-second.html">
       <div class="category" style="background-color: #f44336;">
         <span class="categoryExample">Game Config</span>
-        <p>Change the default game root for assets and scripts</p>
-        <h3>Game Root</h3>
-      </div>
-    </a>
-    <a class="staticExampleLink" href="game-config/game-size.html">
-      <div class="category" style="background-color: #f44336;">
-        <span class="categoryExample">Game Config</span>
-        <p>Change the default game size.</p>
-        <h3>Game Size</h3>
+        <p>Change the default game frames per second.</p>
+        <h3>Frames Per Second (FPS)</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="game-config/game-graphics.html">
@@ -279,18 +280,25 @@
         <h3>Game Plugins</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="game-config/field-of-view.html">
+    <a class="staticExampleLink" href="game-config/game-root.html">
       <div class="category" style="background-color: #f44336;">
         <span class="categoryExample">Game Config</span>
-        <p>Change the default game field of view.</p>
-        <h3>Field of View</h3>
+        <p>Change the default game root for assets and scripts</p>
+        <h3>Game Root</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="game-config/frames-per-second.html">
+    <a class="staticExampleLink" href="game-config/game-size.html">
       <div class="category" style="background-color: #f44336;">
         <span class="categoryExample">Game Config</span>
-        <p>Change the default game frames per second.</p>
-        <h3>Frames Per Second (FPS)</h3>
+        <p>Change the default game size.</p>
+        <h3>Game Size</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="game-config/game-config-object.html">
+      <div class="category" style="background-color: #f44336;">
+        <span class="categoryExample">Game Config</span>
+        <p>Explore the GameConfig object.</p>
+        <h3>GameConfig Object</h3>
       </div>
     </a></div>
   <div class="tags">

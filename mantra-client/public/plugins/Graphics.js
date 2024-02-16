@@ -554,8 +554,8 @@ function pingPosition(x, y, z) {
   config.finalSize *= scale;
 
   // adjust based on the current this.game.data.camera.position
-  //x += this.game.viewportCenterXOffset;
-  //y += this.game.viewportCenterYOffset;
+  //x += this.game.data.camera.offsetX;
+  //y += this.game.data.camera.offsetY;
 
   // Create the ripple element
   var ripple = document.createElement('div');

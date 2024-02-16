@@ -50,7 +50,11 @@ var Collisions = /*#__PURE__*/function () {
       //const entityB = this.game.getEntity(entityIdB);
       var entityA = bodyA.entity;
       var entityB = bodyB.entity;
-      this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
+      var canCollide = this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
+      if (canCollide === false) {
+        // console.log('before.collisionStart returned false, skipping collision', entityIdA, entityIdB);
+        return;
+      }
       if (!entityA || !entityB) {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
