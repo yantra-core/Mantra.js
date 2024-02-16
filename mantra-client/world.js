@@ -11,7 +11,7 @@ import worlds from '../mantra-worlds/index.js';
 let game = new Game({
   width: 800,
   height: 600,
-  virtualGamepad: true,
+  plugins: ['Gamepad', 'GamepadGUI'],
   gameRoot: '.',
   defaultMovement: true,
 
@@ -46,7 +46,7 @@ let game = new Game({
 
 window.game = game;
 let home = new worlds.Platform();
-home = new worlds.GravityGardens();
+home = new worlds.Home();
 
 game.start(function () {
   game.use(home);
