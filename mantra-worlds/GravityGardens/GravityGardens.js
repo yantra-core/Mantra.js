@@ -16,26 +16,36 @@ class GravityGardens {
   init(game) {
     this.game = game;
     this.createWorld();
+    this.createFounts(game);
     this.bindEvents();
+    this.bindSutraRules();
     game.use('CurrentFPS');
+    game.use('StarField');
   }
 
   createWorld() {
     let game = this.game;
 
+    // we reset the game to clear any previous state
     game.reset();
+
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
+    game.createBorder({
+      thickness: 20,
+    });
 
+    // set the zoom level based on device type
     if (game.isTouchDevice()) {
       game.zoom(1);
     } else {
       game.zoom(2.5);
     }
 
+    // create a player
     let player = game.createPlayer({
       color: 0xcccccc,
-      texture: null,
+      texture: null, // default texture is a player sprite
       position: {
         x: 0,
         y: 0,
@@ -43,7 +53,31 @@ class GravityGardens {
       }
     });
 
-    game.setBackground('#007fff');
+    // Apply the blackhole behavior to existing entities
+    game.updateEntity({
+      id: player.id,
+      sutra: blackhole(game, player)
+    });
+
+    game.build()
+      .type('WARP')
+      .exit({ world: 'Home' })
+      .texture('warp-to-home')
+      .size(64, 64, 64)
+      .isStatic(true)
+      .position(600, -30, 0)
+      .createEntity();
+
+    game.build()
+      .type('TEXT')
+      .text('Warp To Mantra')
+      .style({ padding: '2px', fontSize: '16px', color: '#ffffff', textAlign: 'center' })
+      .position(595, -60, 0)
+      .createEntity();
+
+  }
+
+  bindSutraRules() {
 
     let rules = game.rules;
 
@@ -70,15 +104,6 @@ class GravityGardens {
       game.setZoom(currentZoom - 0.01);
     });
 
-    game.use('StarField');
-
-    if (game.systems.border) {
-      game.systems.border.createAutoBorder();
-    } else {
-      game.use('Border', { autoBorder: true })
-    }
-
-    this.createFounts(game);
 
     // Particles will be removed when they collide with the wall
     let wallCollision = game.createSutra();
@@ -98,27 +123,6 @@ class GravityGardens {
     });
 
     game.useSutra(wallCollision, 'wallCollision');
-    // Apply the blackhole behavior to existing entities
-    game.updateEntity({
-      id: player.id,
-      sutra: blackhole(game, player)
-    });
-
-    game.build()
-      .type('WARP')
-      .exit({ world: 'Home' })
-      .texture('warp-to-home')
-      .size(64, 64, 64)
-      .isStatic(true)
-      .position(600, -30, 0)
-      .createEntity();
-
-    game.build()
-      .type('TEXT')
-      .text('Warp To Mantra')
-      .style({ padding: '2px', fontSize: '16px', color: '#ffffff', textAlign: 'center' })
-      .position(595, -60, 0)
-      .createEntity();
 
   }
 
@@ -144,13 +148,6 @@ class GravityGardens {
       });
     }
 
-    // show repeating ping ( commented out for being too visually busy )
-    /*
-    if (this.dropping && game.tick % 10 === 0) {
-      game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
-    }
-    */
-
     // mouse slurps up particles logic
     if (this.slurping && game.tick % 3 === 0) {
       Object.keys(game.data.ents._).forEach(eId => {
@@ -160,13 +157,6 @@ class GravityGardens {
         }
       });
     }
-
-    // show repeating ping ( commented out for being too visually busy )
-    /* 
-    if (this.slurping && game.tick % 10 === 0) {
-      game.pingPosition(mousePosition.clientX, that.mousePosition.clientY, -1, { color: 'red', reverse: true, duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
-    }
-    */
 
   }
 
