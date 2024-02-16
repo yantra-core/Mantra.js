@@ -86,6 +86,8 @@ class Home {
 
     game.reset();
 
+    game.data.camera.follow = true;
+
     if (game.isTouchDevice()) {
       game.zoom(1.44);
     } else {

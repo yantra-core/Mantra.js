@@ -3607,7 +3607,7 @@ var GravityGardens = /*#__PURE__*/function () {
       if (game.isTouchDevice()) {
         game.zoom(1);
       } else {
-        game.zoom(1);
+        game.zoom(2.5);
       }
       var player = game.createPlayer({
         color: 0xcccccc,
@@ -3620,65 +3620,6 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       game.setBackground('#007fff');
       var rules = game.rules;
-      function switchGravity(entity, gameState) {
-        if (typeof gameState.lastGravitySwitch === 'undefined') {
-          gameState.lastGravitySwitch = 0;
-        }
-        if (Date.now() - gameState.lastGravitySwitch >= 1000) {
-          gameState.repulsion = !gameState.repulsion;
-
-          // pings the screen center, assuming player is there
-          var x = window.innerWidth / 2;
-          var y = window.innerHeight / 2;
-          x = x - game.data.camera.offsetX;
-          y = y - game.data.camera.offsetY;
-          if (gameState.repulsion) {
-            game.pingPosition(x, y, 1, {
-              color: 'red',
-              duration: 1500,
-              size: 50,
-              finalSize: 200,
-              borderWidth: 3
-            });
-            game.updateEntity({
-              id: entity.id,
-              color: 0xff0000
-            });
-          } else {
-            game.pingPosition(x, y, 1, {
-              reverse: true,
-              color: 'white',
-              duration: 1500,
-              size: 50,
-              finalSize: 200,
-              borderWidth: 3
-            });
-            // update the player color
-            game.updateEntity({
-              id: entity.id,
-              color: 0xffffff
-            });
-          }
-          gameState.lastGravitySwitch = Date.now();
-        }
-      }
-
-      // Remark: You can also use Sutra rules to define custom controls instead of direct mappings
-      // TODO: just bind to sutra rules or events here?
-
-      // remove default behaviors
-      rules.removeNodes({
-        "if": 'USE_ITEM_1'
-      });
-      rules.removeNodes({
-        "if": 'USE_ITEM_2'
-      });
-      rules.removeNodes({
-        "if": 'ZOOM_IN'
-      });
-      rules.removeNodes({
-        "if": 'ZOOM_OUT'
-      });
       rules["if"]('USE_ITEM_1').then('switchGravity');
       rules["if"]('USE_ITEM_2').then('shakeCamera');
       rules["if"]('USE_ITEM_3').then('ZOOM_IN');
@@ -3720,7 +3661,7 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       game.on('pointerDown', function (position, event) {
         mousePosition = position;
-
+        console.log('pppp', position, event);
         // adjust position for game camera offset
         mousePosition.x = mousePosition.x - game.data.camera.offsetX;
         mousePosition.y = mousePosition.y - game.data.camera.offsetY;
@@ -3792,7 +3733,7 @@ var GravityGardens = /*#__PURE__*/function () {
               game.applyGravity({
                 position: mousePosition,
                 mass: 1000
-              }, entity, 3.33);
+              }, entity, 0.01);
             }
           });
         }
@@ -3863,6 +3804,48 @@ var GravityGardens = /*#__PURE__*/function () {
           y: -60
         }
       });
+      function switchGravity(entity, gameState) {
+        if (typeof gameState.lastGravitySwitch === 'undefined') {
+          gameState.lastGravitySwitch = 0;
+        }
+        if (Date.now() - gameState.lastGravitySwitch >= 1000) {
+          gameState.repulsion = !gameState.repulsion;
+
+          // pings the screen center, assuming player is there
+          var x = window.innerWidth / 2;
+          var y = window.innerHeight / 2;
+          x = x - game.data.camera.offsetX;
+          y = y - game.data.camera.offsetY;
+          if (gameState.repulsion) {
+            game.pingPosition(x, y, 1, {
+              color: 'red',
+              duration: 1500,
+              size: 50,
+              finalSize: 200,
+              borderWidth: 3
+            });
+            game.updateEntity({
+              id: entity.id,
+              color: 0xff0000
+            });
+          } else {
+            game.pingPosition(x, y, 1, {
+              reverse: true,
+              color: 'white',
+              duration: 1500,
+              size: 50,
+              finalSize: 200,
+              borderWidth: 3
+            });
+            // update the player color
+            game.updateEntity({
+              id: entity.id,
+              color: 0xffffff
+            });
+          }
+          gameState.lastGravitySwitch = Date.now();
+        }
+      }
     }
   }]);
   return GravityGardens;

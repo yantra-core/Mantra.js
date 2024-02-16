@@ -137,8 +137,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           }
         }
       } else {
-        // no target, do nothing
-        return;
+        // no target, do nothing, continue
       }
       switch (event.button) {
         case 0:
@@ -160,6 +159,8 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           x: event.clientX,
           y: event.clientY
         };
+        // set cursor to grabbing
+        // document.body.style.cursor = 'grabbing';
         // prevents default browser scrolling
         event.preventDefault();
       }
@@ -179,6 +180,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       // truncate to 3 decimal places
       position.x = Math.round(position.x * 1000) / 1000;
       position.y = Math.round(position.y * 1000) / 1000;
+      position.button = this.mouseButtons;
       position.entityId = this.game.selectedEntityId || null;
       // Remark: We may need better logic here to determine intent of the user pointerDown
       // TODO: add conditional check here to see if we should be processing mouse events

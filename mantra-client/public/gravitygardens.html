@@ -14,11 +14,23 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
 
+
+      // check to see if 'graphics' is query string param
+      let graphics = ['css'];
+
+      if (window.location.search) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const graphicsParam = urlParams.get('graphics');
+        if (graphicsParam) {
+          graphics = graphicsParam.split(',');
+        }
+      }
+
       let game = new MANTRA.Game({
         defaultPlayer: false,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
-        graphics: ['css'], // array enum, 'babylon', 'css', 'three'
+        graphics: graphics, // array enum, 'babylon', 'css', 'three'
         camera: 'follow',
         options: {
           scriptRoot: '.',

@@ -162,13 +162,19 @@ var CSSCamera = /*#__PURE__*/function () {
       if (this.config.initialZoom) {
         this.zoom(this.config.initialZoom);
       }
+
+      // Remark: 2/16/2024 - can we remove this?
       game.on('entityInput::handleInputs', function (entityId, data, sequenceNumber) {
         //console.log("CSSCamera.js", entityId, data, sequenceNumber)
         if (data.mouse) {
           // Update camera position based on drag deltas
           if (data.mouse.buttons.RIGHT) {
-            _this.gameViewport.style.cursor = 'grabbing';
+            // this.gameViewport.style.cursor = 'grabbing';
           }
+          if (data.mouse.buttons.MIDDLE) {
+            // this.gameViewport.style.cursor = 'grabbing';
+          }
+
           // console.log('Current Zoom', game.data.camera.currentZoom);
           data.mouse.dx = data.mouse.dx || 0;
           data.mouse.dy = data.mouse.dy || 0;
@@ -218,7 +224,7 @@ var CSSCamera = /*#__PURE__*/function () {
         y: 0
       };
       // Reset cursor style back to default
-      this.gameViewport.style.cursor = 'grab';
+      // this.gameViewport.style.cursor = 'grab';
     }
   }, {
     key: "unload",
@@ -392,7 +398,7 @@ function applyThrow() {
 
   if (!this.isThrowing) {
     // Reset cursor style back to default at the end of a throw
-    this.gameViewport.style.cursor = 'grab';
+    // this.gameViewport.style.cursor = 'grab';
     //console.log("2 STOPPED THROWING")
   }
 }
@@ -743,8 +749,8 @@ function updateCameraPosition(dx, dy, isDragging) {
     this.cancelThrow();
   }
   if (isDragging) {
-    this.gameViewport.style.cursor = 'grabbing';
     this.isDragging = true;
+    // document.body.style.cursor = 'grabbing'; 
     // this.follow = false;
     if (typeof dx === 'number') {
       game.data.camera.offsetX += dx;
@@ -757,6 +763,8 @@ function updateCameraPosition(dx, dy, isDragging) {
     // console.log('THROWING', dx, dy)
     this.isThrowing = true;
     this.isDragging = false;
+    // document.body.style.cursor = 'grabbing'; 
+
     if (Math.abs(dx) > 2) {
       this.dragInertia.x = dx * 1.6;
     }
@@ -767,6 +775,7 @@ function updateCameraPosition(dx, dy, isDragging) {
   }
   if (!isDragging) {
     this.isDragging = false;
+    // document.body.style.cursor = 'default'; 
   }
 }
 
@@ -1106,7 +1115,7 @@ function inflateBox(entityElement, entityData) {
     }
 
     // add pointer cursor for buttons on hover
-    entityElement.style.cursor = 'pointer';
+    //  entityElement.style.cursor = 'pointer';
     this.bindYCraftEvents(entityData, entityElement);
   }
 

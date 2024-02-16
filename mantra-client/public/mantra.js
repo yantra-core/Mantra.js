@@ -1519,7 +1519,9 @@ function construct(game) {
       position: {
         x: 0,
         y: 0
-      }
+      },
+      offsetX: 0,
+      offsetY: 0
     },
     scenes: {},
     chunks: {}
