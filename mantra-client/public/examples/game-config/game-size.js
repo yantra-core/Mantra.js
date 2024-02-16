@@ -1,6 +1,6 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  gameRoot: 'http://192.168.1.80:7777/',
+
   /*
     Game size can be set at construction or after construction
   */

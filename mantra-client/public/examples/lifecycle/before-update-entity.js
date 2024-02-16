@@ -1,7 +1,6 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Border'],
-  gameRoot: 'http://192.168.1.80:7777/'
+  plugins: ['Border']
 });
 
 //

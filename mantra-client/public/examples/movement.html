@@ -50,6 +50,7 @@
       font-size: 1.3em;
       min-width: 300px;
       max-width: 400px;
+      min-height: 400px;
     }
 
     /* glowing white / grey box shadow */
@@ -74,8 +75,12 @@
     .categoryExample {
       min-height: 200px;
       text-align: left;
-      padding-left: 5px;
-      padding-top: 5px;
+      padding-left: 10px;
+      padding-top: 10px;
+      /* add some shadow and make eggshell white */
+      color: #fff;
+      opacity: 0.77;
+
     }
 
     .category h3 {
@@ -95,12 +100,20 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
+      
+      white-space: nowrap; /* Prevents the text from wrapping to a new line */
+      overflow: hidden; /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
     }
 
     .category p {
       padding: 10px;
       margin: 0;
       flex-grow: 1;
+      font-size: 1.2em;
 
     }
 
@@ -244,25 +257,25 @@
   </div>
   <!-- <div class="resize-handle"></div> Resize handle -->
   <div class="categories">
-    <a class="staticExampleLink" href="movement/top-down-movement.html">
-      <div class="category" style="background-color: #2196f3;">
+    <a class="staticExampleLink" href="movement/jumping.html">
+      <div class="category" style="background-color: #ffeb3b;">
         <span class="categoryExample">Movement</span>
-        <p>Top down movement system for players and entities.</p>
-        <h3>Top Down Movement</h3>
+        <p>Jumping system for players and entities.</p>
+        <h3>Jumping</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="movement/side-scroller-movement.html">
-      <div class="category" style="background-color: #2196f3;">
+      <div class="category" style="background-color: #ffeb3b;">
         <span class="categoryExample">Movement</span>
         <p>Side scroller movement system for players and entities.</p>
         <h3>Side Scroller Movement</h3>
       </div>
     </a>
-    <a class="staticExampleLink" href="movement/jumping.html">
-      <div class="category" style="background-color: #2196f3;">
+    <a class="staticExampleLink" href="movement/top-down-movement.html">
+      <div class="category" style="background-color: #ffeb3b;">
         <span class="categoryExample">Movement</span>
-        <p>Jumping system for players and entities.</p>
-        <h3>Jumping</h3>
+        <p>Top down movement system for players and entities.</p>
+        <h3>Top Down Movement</h3>
       </div>
     </a></div>
   <div class="tags">
