@@ -8,6 +8,9 @@ class GravityGardens {
 
   constructor() {
     this.id = GravityGardens.id;
+    this.type = GravityGardens.type;
+    this.dropping = false;
+    this.slurping = false;
   }
 
   init(game) {
@@ -119,94 +122,97 @@ class GravityGardens {
 
   }
 
+  // Plugin.update() is called once per game tick
+  update() {
+
+    // mouse drops particles logic
+    if (this.dropping && game.tick % 3 === 0) {
+      // console.log('dropping', mousePosition.x, mousePosition.y);
+      let randomRadialPosition = game.randomPositionRadial(this.mousePosition.x, this.mousePosition.y, 15);
+      let randomColor = game.randomColor();
+      // create burst of particles at this position
+      game.createEntity({
+        type: 'PARTICLE',
+        kind: 'START',
+        color: randomColor,
+        isSensor: true,
+        size: {
+          width: 8,
+          height: 8
+        },
+        position: randomRadialPosition
+      });
+    }
+
+    // show repeating ping ( commented out for being too visually busy )
+    /*
+    if (this.dropping && game.tick % 10 === 0) {
+      game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+    }
+    */
+
+    // mouse slurps up particles logic
+    if (this.slurping && game.tick % 3 === 0) {
+      Object.keys(game.data.ents._).forEach(eId => {
+        let entity = game.data.ents._[eId];
+        if (entity.type !== 'BLACK_HOLE' && entity.type !== 'PLAYER') {
+          game.applyGravity({ position: this.mousePosition, mass: 1000 }, entity, 0.01);
+        }
+      });
+    }
+
+    // show repeating ping ( commented out for being too visually busy )
+    /* 
+    if (this.slurping && game.tick % 10 === 0) {
+      game.pingPosition(mousePosition.clientX, that.mousePosition.clientY, -1, { color: 'red', reverse: true, duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+    }
+    */
+
+  }
+
   bindEvents() {
     let game = this.game;
-    let dropping = false;
-    let slurping = false;
-    let mousePosition = { x: 0, y: 0 };
+    this.mousePosition = { x: 0, y: 0 };
+    let that = this;
+
     game.on('pointerUp', function (position, event) {
-      dropping = false;
-      slurping = false;
+      that.dropping = false;
+      that.slurping = false;
     });
 
     game.on('pointerDown', function (position, event) {
-      mousePosition = position;
+      that.mousePosition = position;
 
       // adjust position for game camera offset
-      mousePosition.x = mousePosition.x - game.data.camera.offsetX;
-      mousePosition.y = mousePosition.y - game.data.camera.offsetY;
+      that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
+      that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
 
-      mousePosition.clientX = event.clientX;
-      mousePosition.clientY = event.clientY;
+      that.mousePosition.clientX = event.clientX;
+      that.mousePosition.clientY = event.clientY;
       // if right click
       if (event.button === 0) {
-        slurping = true;
+        that.slurping = true;
         game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
 
       // if left click
       if (event.button === 2) {
-        dropping = true;
+        that.dropping = true;
         game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
     });
 
     game.on('pointerMove', function (position, event) {
-      mousePosition = position;
-      mousePosition.x = mousePosition.x - game.data.camera.offsetX;
-      mousePosition.y = mousePosition.y - game.data.camera.offsetY;
-    });
-
-    // mouse drops particles logic
-    game.before('update', function () {
-      if (dropping && game.tick % 3 === 0) {
-        // console.log('dropping', mousePosition.x, mousePosition.y);
-        let randomRadialPosition = game.randomPositionRadial(mousePosition.x, mousePosition.y, 15);
-        let randomColor = game.randomColor();
-        // create burst of particles at this position
-        game.createEntity({
-          type: 'PARTICLE',
-          kind: 'START',
-          color: randomColor,
-          isSensor: true,
-          size: {
-            width: 8,
-            height: 8
-          },
-          position: randomRadialPosition
-        });
-      }
-
-      // show repeating ping
-      if (dropping && game.tick % 10 === 0) {
-        // game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
-      }
-
-    });
-
-    // mouse slurps up particles logic
-    game.before('update', function () {
-      if (slurping && game.tick % 3 === 0) {
-        Object.keys(game.data.ents._).forEach(eId => {
-          let entity = game.data.ents._[eId];
-          if (entity.type !== 'BLACK_HOLE' && entity.type !== 'PLAYER') {
-            game.applyGravity({ position: mousePosition, mass: 1000 }, entity, 0.01);
-          }
-        });
-      }
-
-      // show repeating ping
-      if (slurping && game.tick % 10 === 0) {
-        // game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'red', reverse: true, duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
-      }
-
+      that.mousePosition = position;
+      that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
+      that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
     });
 
   }
 
   createFounts(game) {
 
-    let fountA = game.build()
+    game.build()
       .type('FOUNT')
       .name('fountA')
       .color(0xf03025)
@@ -215,8 +221,8 @@ class GravityGardens {
       .position(200, 0)
       .sutra(fount, { sprayAngle: 0, color: 0xf03025 })
       .createEntity(); // Finalizes and creates the entity
-  
-    let fountB = game.build()
+
+    game.build()
       .type('FOUNT')
       .name('fountB')
       .color(0x14b161)
@@ -225,8 +231,8 @@ class GravityGardens {
       .position(-200, 0)
       .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161 })
       .createEntity(); // Finalizes and creates the entity
-  
-    let fountC = game.build()
+
+    game.build()
       .type('FOUNT')
       .name('fountC')
       .color(0x3c62f8)
@@ -235,8 +241,8 @@ class GravityGardens {
       .position(0, -200)
       .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
       .createEntity(); // Finalizes and creates the entity
-  
-    let fountD = game.build()
+
+    game.build()
       .type('FOUNT')
       .name('fountD')
       .color(0xe9dd34)
@@ -245,13 +251,15 @@ class GravityGardens {
       .position(0, 200)
       .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
       .createEntity(); // Finalizes and creates the entity
-  
+
   }
-  
+
   playerSwitchedGravity(entity, gameState) {
+
     if (typeof gameState.lastGravitySwitch === 'undefined') {
       gameState.lastGravitySwitch = 0;
     }
+
     if (Date.now() - gameState.lastGravitySwitch >= 1000) {
       gameState.repulsion = !gameState.repulsion;
 
@@ -282,6 +290,5 @@ class GravityGardens {
   }
 
 }
-
 
 export default GravityGardens;

@@ -103,13 +103,18 @@ export default function use(game) {
     pluginInstanceOrId.init(game, game.engine, game.scene);
     game._plugins[pluginId] = pluginInstanceOrId;
 
-    if (pluginInstanceOrId.type === 'world') {
+    // can we only check static property here? no need to check instance.type?
+    if (pluginInstanceOrId.type === 'world' || pluginInstanceOrId.constructor.type === 'world') {
       game.worlds.push(pluginInstanceOrId);
+      // register all worlds as systems ( for now )
+      // we could make this a config flag of the scene ( for performance )
+      game.systemsManager.addSystem(pluginId, pluginInstanceOrId);
     }
 
     game.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
     game.emit('plugin::loaded', pluginId);
 
+    // Remark: Duplicate conditional, remove and cleanup
     if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
       game.emit(`world::loaded::${pluginInstanceOrId.id}`, pluginInstanceOrId);
       game.emit('world::loaded', pluginInstanceOrId);
@@ -128,7 +133,6 @@ export default function use(game) {
       // register all scenes as systems ( for now )
       // we could make this a config flag of the scene ( for performance )
       game.systemsManager.addSystem(pluginId, pluginInstanceOrId);
-
     }
 
     return game;
