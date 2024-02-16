@@ -27,7 +27,7 @@ class GravityGardens {
     if (game.isTouchDevice()) {
       game.zoom(1);
     } else {
-      game.zoom(1);
+      game.zoom(2.5);
     }
 
     let player = game.createPlayer({
@@ -198,7 +198,7 @@ class GravityGardens {
         Object.keys(game.data.ents._).forEach(eId => {
           let entity = game.data.ents._[eId];
           if (entity.type !== 'BLACK_HOLE' && entity.type !== 'PLAYER') {
-            game.applyGravity({ position: mousePosition, mass: 1000 }, entity, 3.33);
+            game.applyGravity({ position: mousePosition, mass: 1000 }, entity, 0.01);
           }
         });
       }
@@ -207,7 +207,6 @@ class GravityGardens {
       if (slurping && game.tick % 10 === 0 ) {
         // game.pingPosition(mousePosition.clientX, mousePosition.clientY, -1, { color: 'red', reverse: true, duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
-
 
     });
 

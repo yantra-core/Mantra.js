@@ -8,8 +8,8 @@ export default function updateCameraPosition(dx, dy, isDragging) {
   }
 
   if (isDragging) {
-    this.gameViewport.style.cursor = 'grabbing';
     this.isDragging = true;
+    // document.body.style.cursor = 'grabbing'; 
     // this.follow = false;
     if (typeof dx === 'number') {
       game.data.camera.offsetX += dx;
@@ -23,6 +23,8 @@ export default function updateCameraPosition(dx, dy, isDragging) {
     // console.log('THROWING', dx, dy)
     this.isThrowing = true;
     this.isDragging = false;
+    // document.body.style.cursor = 'grabbing'; 
+
 
     if (Math.abs(dx) > 2) {
       this.dragInertia.x = dx * 1.6;
@@ -35,5 +37,6 @@ export default function updateCameraPosition(dx, dy, isDragging) {
 
   if (!isDragging) {
     this.isDragging = false;
+    // document.body.style.cursor = 'default'; 
   }
 }

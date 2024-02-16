@@ -49,7 +49,7 @@ export default function inflateBox(entityElement, entityData) {
     }
 
     // add pointer cursor for buttons on hover
-    entityElement.style.cursor = 'pointer';
+    //  entityElement.style.cursor = 'pointer';
     this.bindYCraftEvents(entityData, entityElement);
   }
 

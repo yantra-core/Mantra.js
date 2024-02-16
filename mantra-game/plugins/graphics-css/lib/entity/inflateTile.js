@@ -40,7 +40,7 @@ export default function inflateTile(entityElement, entityData) {
     }
 
     // add pointer cursor for buttons on hover
-    entityElement.style.cursor = 'pointer';
+    // entityElement.style.cursor = 'pointer';
 
     // add hover state with 3d drop shadow effect
     entityElement.addEventListener('mouseover', () => {

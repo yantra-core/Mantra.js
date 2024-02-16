@@ -86,13 +86,19 @@ class CSSCamera {
       this.zoom(this.config.initialZoom);
     }
 
+    // Remark: 2/16/2024 - can we remove this?
     game.on('entityInput::handleInputs', (entityId, data, sequenceNumber) => {
       //console.log("CSSCamera.js", entityId, data, sequenceNumber)
       if (data.mouse) {
         // Update camera position based on drag deltas
         if (data.mouse.buttons.RIGHT) {
-          this.gameViewport.style.cursor = 'grabbing';
+          // this.gameViewport.style.cursor = 'grabbing';
         }
+
+        if (data.mouse.buttons.MIDDLE) {
+          // this.gameViewport.style.cursor = 'grabbing';
+        }
+
         // console.log('Current Zoom', game.data.camera.currentZoom);
         data.mouse.dx = data.mouse.dx || 0;
         data.mouse.dy = data.mouse.dy || 0;
@@ -134,7 +140,7 @@ class CSSCamera {
     this.isThrowing = false;
     this.dragInertia = { x: 0, y: 0 };
     // Reset cursor style back to default
-    this.gameViewport.style.cursor = 'grab';
+    // this.gameViewport.style.cursor = 'grab';
   }
 
   unload () {

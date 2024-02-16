@@ -22,7 +22,7 @@ export default function applyThrow() {
 
   if (!this.isThrowing) {
     // Reset cursor style back to default at the end of a throw
-    this.gameViewport.style.cursor = 'grab';
+    // this.gameViewport.style.cursor = 'grab';
     //console.log("2 STOPPED THROWING")
   }
 
