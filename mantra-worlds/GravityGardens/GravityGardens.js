@@ -13,8 +13,8 @@ class GravityGardens {
   init(game) {
     this.game = game;
     this.createWorld();
+    this.bindEvents();
     game.use('CurrentFPS');
-
   }
 
   createWorld() {
@@ -50,7 +50,7 @@ class GravityGardens {
     rules.if('USE_ITEM_4').then('ZOOM_OUT');
 
     rules.on('switchGravity', (entity, node, gameState) => {
-      switchGravity(entity, gameState);
+      this.playerSwitchedGravity(entity, gameState);
     });
 
     rules.on('shakeCamera', (entity, node, gameState) => {
@@ -75,6 +75,52 @@ class GravityGardens {
       game.use('Border', { autoBorder: true })
     }
 
+    this.createFounts(game);
+
+    // Particles will be removed when they collide with the wall
+    let wallCollision = game.createSutra();
+
+    wallCollision.addCondition('particleTouchedWall', (entity, gameState) => {
+      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BORDER;
+    });
+
+    wallCollision.if('particleTouchedWall').then('particleWallCollision');
+
+    wallCollision.on('particleWallCollision', (collision) => {
+      let particle = collision.PARTICLE || collision.STAR;
+      if (particle) {
+        // remove the entity
+        game.removeEntity(particle.id);
+      }
+    });
+
+    game.useSutra(wallCollision, 'wallCollision');
+    // Apply the blackhole behavior to existing entities
+    game.updateEntity({
+      id: player.id,
+      sutra: blackhole(game, player)
+    });
+
+    game.build()
+      .type('WARP')
+      .exit({ world: 'Home' })
+      .texture('warp-to-home')
+      .size(64, 64, 64)
+      .isStatic(true)
+      .position(600, -30, 0)
+      .createEntity();
+
+    game.build()
+      .type('TEXT')
+      .text('Warp To Mantra')
+      .style({ padding: '2px', fontSize: '16px', color: '#ffffff', textAlign: 'center' })
+      .position(595, -60, 0)
+      .createEntity();
+
+  }
+
+  bindEvents() {
+    let game = this.game;
     let dropping = false;
     let slurping = false;
     let mousePosition = { x: 0, y: 0 };
@@ -156,131 +202,86 @@ class GravityGardens {
 
     });
 
-    createFounts(game);
+  }
 
-    // Particles will be removed when they collide with the wall
-    let wallCollision = game.createSutra();
+  createFounts(game) {
 
-    wallCollision.addCondition('particleTouchedWall', (entity, gameState) => {
-      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BORDER;
-    });
-
-    wallCollision.if('particleTouchedWall').then('particleWallCollision');
-
-    wallCollision.on('particleWallCollision', (collision) => {
-      let particle = collision.PARTICLE || collision.STAR;
-      if (particle) {
-        // remove the entity
-        // only remove if ctick is very old to game.tick
-        game.removeEntity(particle.id);
-        /*
-        if (particle.ctick < game.tick - 1000) {}
-        */
-      }
-    });
-
-    game.useSutra(wallCollision, 'wallCollision');
-    // Apply the blackhole behavior to existing entities
-    game.updateEntity({
-      id: player.id,
-      sutra: blackhole(game, player)
-    });
-
-    game.build()
-      .type('WARP')
-      .exit({ world: 'Home' })
-      .texture('warp-to-home')
-      .size(64, 64, 64)
+    let fountA = game.build()
+      .type('FOUNT')
+      .name('fountA')
+      .color(0xf03025)
       .isStatic(true)
-      .position(600, -30, 0)
-      .createEntity();
-
-    game.build()
-      .type('TEXT')
-      .text('Warp To Mantra')
-      .style({ padding: '2px', fontSize: '16px', color: '#ffffff', textAlign: 'center' })
-      .position(595, -60, 0)
-      .createEntity();
-
-    function switchGravity(entity, gameState) {
-
-      if (typeof gameState.lastGravitySwitch === 'undefined') {
-        gameState.lastGravitySwitch = 0;
-      }
-      if (Date.now() - gameState.lastGravitySwitch >= 1000) {
-        gameState.repulsion = !gameState.repulsion;
-
-        // pings the screen center, assuming player is there
-        let x = window.innerWidth / 2;
-        let y = window.innerHeight / 2;
-        x = x - game.data.camera.offsetX;
-        y = y - game.data.camera.offsetY;
-
-        if (gameState.repulsion) {
-          game.pingPosition(x, y, 1, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
-          game.updateEntity({
-            id: entity.id,
-            color: 0xff0000
-          });
-        } else {
-          game.pingPosition(x, y, 1, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
-          // update the player color
-          game.updateEntity({
-            id: entity.id,
-            color: 0xffffff
-          });
-        }
-
-        gameState.lastGravitySwitch = Date.now();
-      }
-
+      .size(8, 8)
+      .position(200, 0)
+      .sutra(fount, { sprayAngle: 0, color: 0xf03025 })
+      .createEntity(); // Finalizes and creates the entity
+  
+    let fountB = game.build()
+      .type('FOUNT')
+      .name('fountB')
+      .color(0x14b161)
+      .isStatic(true)
+      .size(8, 8)
+      .position(-200, 0)
+      .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161 })
+      .createEntity(); // Finalizes and creates the entity
+  
+    let fountC = game.build()
+      .type('FOUNT')
+      .name('fountC')
+      .color(0x3c62f8)
+      .isStatic(true)
+      .size(8, 8)
+      .position(0, -200)
+      .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
+      .createEntity(); // Finalizes and creates the entity
+  
+    let fountD = game.build()
+      .type('FOUNT')
+      .name('fountD')
+      .color(0xe9dd34)
+      .isStatic(true)
+      .size(8, 8)
+      .position(0, 200)
+      .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
+      .createEntity(); // Finalizes and creates the entity
+  
+  }
+  
+  playerSwitchedGravity(entity, gameState) {
+    if (typeof gameState.lastGravitySwitch === 'undefined') {
+      gameState.lastGravitySwitch = 0;
     }
+    if (Date.now() - gameState.lastGravitySwitch >= 1000) {
+      gameState.repulsion = !gameState.repulsion;
+
+      // pings the screen center, assuming player is there
+      let x = window.innerWidth / 2;
+      let y = window.innerHeight / 2;
+      x = x - game.data.camera.offsetX;
+      y = y - game.data.camera.offsetY;
+
+      if (gameState.repulsion) {
+        game.pingPosition(x, y, 1, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+        game.updateEntity({
+          id: entity.id,
+          color: 0xff0000
+        });
+      } else {
+        game.pingPosition(x, y, 1, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+        // update the player color
+        game.updateEntity({
+          id: entity.id,
+          color: 0xffffff
+        });
+      }
+
+      gameState.lastGravitySwitch = Date.now();
+    }
+
   }
 
 }
 
-function createFounts(game) {
-
-  let fountA = game.build()
-    .type('FOUNT')
-    .name('fountA')
-    .color(0xf03025)
-    .isStatic(true)
-    .size(8, 8)
-    .position(200, 0)
-    .sutra(fount, { sprayAngle: 0, color: 0xf03025 })
-    .createEntity(); // Finalizes and creates the entity
-
-  let fountB = game.build()
-    .type('FOUNT')
-    .name('fountB')
-    .color(0x14b161)
-    .isStatic(true)
-    .size(8, 8)
-    .position(-200, 0)
-    .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161 })
-    .createEntity(); // Finalizes and creates the entity
-
-  let fountC = game.build()
-    .type('FOUNT')
-    .name('fountC')
-    .color(0x3c62f8)
-    .isStatic(true)
-    .size(8, 8)
-    .position(0, -200)
-    .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
-    .createEntity(); // Finalizes and creates the entity
-
-  let fountD = game.build()
-    .type('FOUNT')
-    .name('fountD')
-    .color(0xe9dd34)
-    .isStatic(true)
-    .size(8, 8)
-    .position(0, 200)
-    .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
-    .createEntity(); // Finalizes and creates the entity
-
-}
 
 export default GravityGardens;
