@@ -143,7 +143,7 @@ export default function construct(game, plugins = []) {
 
   // Helper for building entity data configurations
   game.build = function() {
-    return new EntityBuilder();
+    return new EntityBuilder(game);
   };
   
   // Bind loadScripts from util

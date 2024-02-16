@@ -186,41 +186,21 @@ class GravityGardens {
       sutra: blackhole(game, player)
     });
 
-    // warp to Platform level
-    game.createEntity({
-      type: 'WARP',
-      exit: {
-        world: 'Home'
-      },
-      texture: 'warp-to-home',
-      width: 64,
-      height: 64,
-      depth: 64,
-      isStatic: true,
-      position: {
-        x: 600,
-        y: -30,
-        z: 0
-      }
-    });
+    game.build()
+      .type('WARP')
+      .exit({ world: 'Home' })
+      .texture('warp-to-home')
+      .size(64, 64, 64)
+      .isStatic(true)
+      .position(600, -30, 0)
+      .createEntity();
 
-    // text "Warp to Mantra"
-    game.createEntity({
-      type: 'TEXT',
-      text: 'Warp To Mantra',
-      // kind: 'dynamic',
-      style: {
-        padding: '2px',
-        fontSize: '16px',
-        color: '#ffffff',
-        textAlign: 'center'
-      },
-      body: false,
-      position: {
-        x: 595,
-        y: -60
-      }
-    });
+    game.build()
+      .type('TEXT')
+      .text('Warp To Mantra')
+      .style({ padding: '2px', fontSize: '16px', color: '#ffffff', textAlign: 'center' })
+      .position(595, -60, 0)
+      .createEntity();
 
     function switchGravity(entity, gameState) {
 
