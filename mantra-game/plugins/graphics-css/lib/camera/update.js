@@ -34,7 +34,7 @@ export default function update() {
   let baseX = 0, baseY = 0;
 
   // If following the player, set the base position to the player's position
-  if (this.follow && currentPlayer && currentPlayer.position) {
+  if (this.game.data.camera.mode === 'follow' && currentPlayer && currentPlayer.position) {
     baseX = currentPlayer.position.x;
     baseY = currentPlayer.position.y;
   }

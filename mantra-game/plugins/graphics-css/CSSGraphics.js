@@ -29,14 +29,6 @@ class CSSGraphics extends GraphicsInterface {
   constructor({ camera } = {}) {
     super();
 
-    // legacy API, remove in future
-    if (typeof camera === 'string') {
-      camera = { follow: true };
-    }
-
-    // Config scope for convenience
-    this.config = { camera };
-
     this.id = CSSGraphics.id;
     this.async = CSSGraphics.async;
     this.cameraPosition = { x: 0, y: 0 };

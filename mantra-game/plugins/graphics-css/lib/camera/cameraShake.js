@@ -8,7 +8,7 @@ export default function cameraShake({ initialIntensity = 100, duration = 777 }) 
 
   // Debounce mechanism
   if (gameViewport.dataset.isShaking === 'true') {
-    console.log('Camera is already shaking. Ignoring additional shake requests.');
+    // console.log('Camera is already shaking. Ignoring additional shake requests.');
     return;
   }
   gameViewport.dataset.isShaking = 'true';

@@ -27,8 +27,6 @@ class CSSCamera {
     this.id = CSSCamera.id;
     this.scene = scene;
     this.config = config;
-
-    this.follow = true;
     this.isDragging = false;
     this.dragInertia = { x: 0, y: 0 };
     this.isThrowing = false;
@@ -49,11 +47,14 @@ class CSSCamera {
     game.zoom = this.zoom.bind(this);
     game.setZoom = this.zoom.bind(this); // TODO: legacy remove
 
-    game.data.camera = {
-      mode: 'follow',
-      position: {
-        x: 0,
-        y: 0
+    // Remark: We can remove this soon, camera should be initialized in the game
+    if (typeof game.data.camera === 'undefined') {
+      game.data.camera = {
+        mode: 'follow',
+        position: {
+          x: 0,
+          y: 0
+        }
       }
     }
 
@@ -66,9 +67,6 @@ class CSSCamera {
 
     // hoist rotateCamera to game
     game.rotateCamera = rotateCameraOverTime.bind(this);
-
-    // sets auto-follow player when starting CSSGraphics ( for now )
-    this.follow = true;
 
     this.game.systemsManager.addSystem('graphics-css-camera', this);
 
