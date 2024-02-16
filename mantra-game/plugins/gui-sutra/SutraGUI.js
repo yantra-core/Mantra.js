@@ -115,6 +115,10 @@ class SutraGUI {
 
     // gui.setTheme('light');
     rules.onAny(function (ev, data, node) {
+      if (typeof node === 'undefined') {
+        // could be tick event, check for performance impact
+        return;
+      }
       let sutraPath = node.sutraPath;
       let humanReadablePath = rules.getReadableSutraPath(sutraPath);
       document.querySelectorAll(`[data-path='${sutraPath}']`).forEach(node => {
