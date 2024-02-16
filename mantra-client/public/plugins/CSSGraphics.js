@@ -452,7 +452,7 @@ function cameraShake(_ref) {
       var entity = _this.game.data.ents._[eId];
       // TODO: make more configurable / part of constructor config
       // TODO: add a shakeable flag to entities / add parameter for tracking "shakeability", etc
-      if (entity.type === 'PARTICLE' || entity.type === 'STAR' || entity.type === 'HEXAPOD' || entity.type === 'DEMON') {
+      if (entity.type === 'PARTICLE' || entity.type === 'STAR' || entity.type === 'HEXAPOD' || entity.type === 'DEMON' || entity.type === 'NONE') {
         var forceX = Math.random() * intensity - intensity / 2;
         var forceY = Math.random() * intensity - intensity / 2;
         forceX = forceX * 0.01;

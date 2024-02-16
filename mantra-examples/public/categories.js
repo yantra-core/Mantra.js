@@ -127,6 +127,7 @@ let categories = [
     url: 'game-config.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  /*
   {
     title: 'Movement', // Yellow
     name: 'movement',
@@ -136,6 +137,7 @@ let categories = [
     url: 'movement.html',
     tags: ['movement', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
   },
+  */
   {
     title: 'Scenes', // Lime
     name: 'scenes',
@@ -802,6 +804,7 @@ let config_examples = [
     url: 'game-config/game-graphics.html',
     tags: ['game', 'graphics', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  /*
   {
     title: 'Game Plugins',
     category: 'config',
@@ -810,6 +813,7 @@ let config_examples = [
     url: 'game-config/game-plugins.html',
     tags: ['game', 'plugins', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  */
   {
     title: 'Field of View',
     category: ['config', 'entity'],
@@ -930,6 +934,7 @@ let camera_examples = [
     url: 'camera/follow-player.html',
     tags: ['follow', 'player', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
   },
+  /* // needs better demo
   {
     title: 'Camera Zoom',
     category: 'camera',
@@ -938,6 +943,7 @@ let camera_examples = [
     url: 'camera/camera-zoom.html',
     tags: ['zoom', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
   },
+  */
   {
     title: 'Camera Shake',
     category: 'camera',
@@ -959,9 +965,10 @@ let camera_examples = [
     category: 'camera',
     description: 'Set the camera position.',
     image: 'placeholder-image.jpg',
-    url: 'camera/set-position.html',
+    url: 'camera/camera-set-position.html',
     tags: ['set', 'position', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
   },
+  /* // needs better demo
   {
     title: 'Rotate Camera',
     category: 'camera',
@@ -970,6 +977,7 @@ let camera_examples = [
     url: 'camera/rotate-camera.html',
     tags: ['rotate', 'camera', 'view', 'tracking', 'movement', 'position', 'rotation', 'scale']
   }
+  */
 ];
 
 // concat all arr to examples
@@ -987,7 +995,7 @@ examples = examples.concat(behaviors_examples);
 examples = examples.concat(tiles_examples);
 examples = examples.concat(terrains_examples);
 examples = examples.concat(config_examples);
-examples = examples.concat(movement_examples);
+// examples = examples.concat(movement_examples);
 examples = examples.concat(container_examples);
 examples = examples.concat(scenes_examples);
 examples = examples.concat(lifecycle_examples);

@@ -103,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       //         <button class="view-category">View Category</button>
 
-      console.log('category', category)
       // set the categoryElement background color to the category color
       categoryElement.style.backgroundColor = category.color;
 

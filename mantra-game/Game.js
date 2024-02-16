@@ -302,6 +302,14 @@ class Game {
     this.data.camera.mode = mode;
   }
 
+  setCameraPosition(x, y) {
+    // Remark: We can we not just set the camera position directly?
+    // game.data.camera.position.x = x;
+    // game.data.camera.position.y = y;
+    game.data.camera.offsetX = x;
+    game.data.camera.offsetY = y;
+  }
+
   zoom(scale) {
     if (this.camera && this.camera.zoom) {
       this.camera.zoom(scale);

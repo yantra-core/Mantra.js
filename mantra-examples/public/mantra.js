@@ -621,6 +621,15 @@ var Game = exports.Game = /*#__PURE__*/function () {
       this.data.camera.mode = mode;
     }
   }, {
+    key: "setCameraPosition",
+    value: function setCameraPosition(x, y) {
+      // Remark: We can we not just set the camera position directly?
+      // game.data.camera.position.x = x;
+      // game.data.camera.position.y = y;
+      game.data.camera.offsetX = x;
+      game.data.camera.offsetY = y;
+    }
+  }, {
     key: "zoom",
     value: function zoom(scale) {
       if (this.camera && this.camera.zoom) {
@@ -1504,6 +1513,7 @@ function construct(game) {
     fieldOfView: game.config.fieldOfView,
     // global for game, not camera specific
     camera: {
+      mode: null,
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
       position: {
@@ -1511,13 +1521,20 @@ function construct(game) {
         y: 0
       }
     },
+    scenes: {},
     chunks: {}
   };
+
+  // TODO: clean-up camera config
   if (typeof game.data.camera.follow === 'undefined') {
     game.data.camera.follow = true;
   }
   if (typeof game.data.camera.currentZoom === 'undefined') {
     game.data.camera.currentZoom = 1;
+  }
+  if (typeof game.config.camera === 'string') {
+    //
+    game.data.camera.mode = game.config.camera;
   }
   if (typeof game.config.fps === 'number') {
     // if fps is provide, set game.config.hzMS to 1000 / fps
@@ -1838,6 +1855,9 @@ function unload(game) {
               cb = function noop() {};
             }
             console.log('Unloading plugin', pluginInstanceOrId);
+
+            // TODO: do not store entire scene reference in data, only store the id
+            // TOOD: store scene references on game.scenes scope
             scene = this.data.scenes[pluginInstanceOrId];
             if (scene) {
               // iterate all ents and remove them if scene matches
@@ -1846,10 +1866,11 @@ function unload(game) {
                 game.removeEntity(Number(entId));
               });
             }
+            delete game.data.scenes[pluginInstanceOrId];
 
             // attempt to remove the system if it exists
             game.removeSystem(pluginInstanceOrId);
-          case 7:
+          case 8:
           case "end":
             return _context.stop();
         }
@@ -2023,6 +2044,10 @@ function use(game) {
               // data scopes seems OK here
               game.data.scenes = game.data.scenes || {};
               game.data.scenes[pluginId] = pluginInstanceOrId;
+
+              // register all scenes as systems ( for now )
+              // we could make this a config flag of the scene ( for performance )
+              game.systemsManager.addSystem(pluginId, pluginInstanceOrId);
             }
             return _context2.abrupt("return", game);
           case 40:

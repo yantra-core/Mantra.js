@@ -53,6 +53,7 @@ export default function construct(game, plugins = []) {
     fps: game.config.fps,
     fieldOfView: game.config.fieldOfView, // global for game, not camera specific
     camera: {
+      mode: null,
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
       position: { x: 0, y: 0 },
@@ -61,12 +62,17 @@ export default function construct(game, plugins = []) {
     chunks: {}
   };
 
+  // TODO: clean-up camera config
   if (typeof game.data.camera.follow === 'undefined') {
     game.data.camera.follow = true;
   }
 
   if (typeof game.data.camera.currentZoom === 'undefined') {
     game.data.camera.currentZoom = 1;
+  }
+
+  if (typeof game.config.camera === 'string') { //
+    game.data.camera.mode = game.config.camera;
   }
 
   if (typeof game.config.fps === 'number') {

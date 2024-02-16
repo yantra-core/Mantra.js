@@ -1,9 +1,9 @@
-
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
   camera: 'follow',
-  plugins: ['RBush', 'Tile', 'Bullet', 'Boomerang'], // RBush is required for Field of View
+  // RBush is required for Field of View
+  plugins: ['RBush', 'Tile', 'Bullet', 'Boomerang', 'Gamepad', 'GamepadGUI'],
   /*
     fieldOfView- Field of View distance can be set in the constructor or after construction
   */
@@ -11,10 +11,10 @@ let game = new MANTRA.Game({
   /*
     useFoV- Field of View can be turned on or off in the constructor or after construction
   */
-  useFoV: true,
-  gameRoot: 'http://192.168.1.80:7777'
+  useFoV: true
 });
 game.start(function () {
+
   game.zoom(2.5);
   game.createPlayer();
 

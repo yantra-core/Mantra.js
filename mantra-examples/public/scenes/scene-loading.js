@@ -1,4 +1,3 @@
-
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true
@@ -7,7 +6,8 @@ let game = new MANTRA.Game({
 class MyScene {
   static id = 'myscene';
   static type = 'scene'; // type is optional for Plugins
-  constructor() {
+  constructor(game) {
+    this.game = game; // Store the reference to the game logic
     this.id = MyScene.id;
     this.type = MyScene.type;
   }

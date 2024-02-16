@@ -1,9 +1,9 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  defaultMovement: true,
-  gameRoot: 'http://192.168.1.80:7777'
+  defaultMovement: true
 });
+
 game.start(function () {
 
   let tickCount = 0;
@@ -13,7 +13,8 @@ game.start(function () {
   class MyScene {
     static id = 'myscene';
     static type = 'scene'; // type is optional for Plugins
-    constructor() {
+    constructor(game) {
+      this.game = game; // Store the reference to the game logic
       this.id = MyScene.id;
       this.type = MyScene.type;
     }

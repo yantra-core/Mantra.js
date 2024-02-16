@@ -6,7 +6,6 @@ let game = new MANTRA.Game({
   // RBush is required plugin for Field of View
   plugins: ['RBush', 'Tile', 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang'],
   useFoV: true,
-  gameRoot: 'http://192.168.1.80:7777'
 });
 
 game.start(function () {
