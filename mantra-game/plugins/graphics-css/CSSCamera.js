@@ -109,8 +109,8 @@ class CSSCamera {
 
   resetCameraState() {
     // Reset other camera properties as needed
-    this.game.viewportCenterXOffset = 0;
-    this.game.viewportCenterYOffset = 0;
+    this.game.data.camera.offsetX = 0;
+    this.game.data.camera.offsetY = 0;
   }
 
   initZoomControls() {

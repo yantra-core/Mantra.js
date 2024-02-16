@@ -237,28 +237,28 @@ class ASCIIGraphics extends GraphicsInterface {
     let zoomFactor = this.game.data.camera.currentZoom;
     // console.log('zoomFactor', zoomFactor)
   
-    if (typeof game.viewportCenterXOffset !== 'number') {
-      game.viewportCenterXOffset = 0;
+    if (typeof game.data.camera.offsetX !== 'number') {
+      game.data.camera.offsetX = 0;
     }
-    if (typeof game.viewportCenterYOffset !== 'number') {
-      game.viewportCenterYOffset = 0;
+    if (typeof game.data.camera.offsetY !== 'number') {
+      game.data.camera.offsetY = 0;
     }
 
     if (/*this.follow && */currentPlayer && currentPlayer.position) {
 
       // If following a player, adjust the camera position based on the player's position and the calculated offset
-      //this.scene.cameraPosition.x = currentPlayer.position.x + game.viewportCenterXOffset;
-      this.game.data.camera.position.x = currentPlayer.position.x + game.viewportCenterXOffset;
+      //this.scene.cameraPosition.x = currentPlayer.position.x + game.data.camera.offsetX;
+      this.game.data.camera.position.x = currentPlayer.position.x + game.data.camera.offsetX;
       //this.scene.cameraPosition.x = this.scene.cameraPosition.x / zoomFactor;
   
-      //let newY = currentPlayer.position.y + game.viewportCenterYOffset;
-      let newY = currentPlayer.position.y + game.viewportCenterYOffset;
+      //let newY = currentPlayer.position.y + game.data.camera.offsetY;
+      let newY = currentPlayer.position.y + game.data.camera.offsetY;
       this.scene.cameraPosition.y = newY;
   
     } else {
       // If not following a player, use the calculated offsets directly
-      this.scene.cameraPosition.x = game.viewportCenterXOffset;
-      this.scene.cameraPosition.y = game.viewportCenterYOffset;
+      this.scene.cameraPosition.x = game.data.camera.offsetX;
+      this.scene.cameraPosition.y = game.data.camera.offsetY;
     }
 
   }

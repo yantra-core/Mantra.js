@@ -298,8 +298,8 @@ class Game {
     // not implemented directly, Graphics plugin will hoist this
   }
   
-  setCamera(camera) {
-    this.camera = camera;
+  setCameraMode(mode) {
+    this.data.camera.mode = mode;
   }
 
   zoom(scale) {
@@ -464,6 +464,8 @@ class Game {
 
     // reset the default player controls
     this.setControls({});
+
+    this.setCameraMode('follow');
 
     // set the default movement sutra
     if (this.systems.sutra) {

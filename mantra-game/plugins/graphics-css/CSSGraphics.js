@@ -78,8 +78,8 @@ class CSSGraphics extends GraphicsInterface {
 
     game.loadingPluginsCount--;
 
-    this.game.viewportCenterXOffset = 0;
-    this.game.viewportCenterYOffset = 0;
+    this.game.data.camera.offsetX = 0;
+    this.game.data.camera.offsetY = 0;
 
     document.body.style.cursor = 'default';
 

@@ -15,19 +15,19 @@ export default function update() {
   let zoomFactor = this.game.data.camera.currentZoom;
   // console.log('zoomFactor', zoomFactor)
 
-  if (typeof game.viewportCenterXOffset !== 'number') {
-    game.viewportCenterXOffset = 0;
+  if (typeof game.data.camera.offsetX !== 'number') {
+    game.data.camera.offsetX = 0;
   }
-  if (typeof game.viewportCenterYOffset !== 'number') {
-    game.viewportCenterYOffset = 0;
+  if (typeof game.data.camera.offsetY !== 'number') {
+    game.data.camera.offsetY = 0;
   }
 
   // Initialize offsets if they are not numbers
-  if (typeof game.viewportCenterXOffset !== 'number') {
-    game.viewportCenterXOffset = 0;
+  if (typeof game.data.camera.offsetX !== 'number') {
+    game.data.camera.offsetX = 0;
   }
-  if (typeof game.viewportCenterYOffset !== 'number') {
-    game.viewportCenterYOffset = 0;
+  if (typeof game.data.camera.offsetY !== 'number') {
+    game.data.camera.offsetY = 0;
   }
 
   // Determine the base position of the camera
@@ -40,8 +40,8 @@ export default function update() {
   }
 
   // Apply viewport offsets to the base position
-  this.scene.cameraPosition.x = baseX + game.viewportCenterXOffset;
-  this.scene.cameraPosition.y = baseY + game.viewportCenterYOffset;
+  this.scene.cameraPosition.x = baseX + game.data.camera.offsetX;
+  this.scene.cameraPosition.y = baseY + game.data.camera.offsetY;
 
   // Find the center of the screen
   let centerX = window.innerWidth / 2;

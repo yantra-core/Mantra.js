@@ -15,8 +15,8 @@ export default function pingPosition(x, y, z, options = {}) {
   config.finalSize *= scale;
 
   // adjust based on the current this.game.data.camera.position
-  //x += this.game.viewportCenterXOffset;
-  //y += this.game.viewportCenterYOffset;
+  //x += this.game.data.camera.offsetX;
+  //y += this.game.data.camera.offsetY;
 
   // Create the ripple element
   const ripple = document.createElement('div');

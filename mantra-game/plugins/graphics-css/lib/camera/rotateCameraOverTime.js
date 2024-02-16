@@ -23,7 +23,7 @@ export default function rotateCameraOverTime(targetAngle = 90, duration = 1100) 
   // no need for X?
   // centerX = centerX / currentZoom;
   // centerY = centerY / currentZoom;
-  // centerY = centerY + this.game.viewportCenterYOffset;
+  // centerY = centerY + this.game.data.camera.offsetY;
   // centerY = centerY +  this.game.data.camera.position.y / currentZoom;
   // Set the transition property on the gameViewport
   this.gameViewport.style.transition = `transform ${duration}ms`;

@@ -1,4 +1,8 @@
 export default function cssMouseWheelZoom(event) {
+
+  // Prevent default scrolling behavior
+  event.preventDefault();
+
   if (!this.mouseWheelEnabled) {
     return;
   }
@@ -20,9 +24,6 @@ export default function cssMouseWheelZoom(event) {
     logBase: 2       // Logarithmic base
   };
 
-  // Prevent default scrolling behavior
-  event.preventDefault();
-
   // Determine zoom direction
   const delta = event.wheelDelta ? event.wheelDelta : -event.detail;
   const direction = delta > 0 ? 1 : -1;
@@ -33,4 +34,5 @@ export default function cssMouseWheelZoom(event) {
 
   // Update scale
   this.zoom(newScale);
+  return false;
 }

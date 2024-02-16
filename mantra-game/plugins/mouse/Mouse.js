@@ -80,8 +80,8 @@ export default class Mouse {
     let mouseY = event.clientY;
 
     // Convert screen coordinates to world coordinates
-    let worldX = (mouseX - window.innerWidth / 2 + game.viewportCenterXOffset) / game.data.camera.currentZoom + game.data.camera.position.x;
-    let worldY = (mouseY - window.innerHeight / 2 + game.viewportCenterYOffset) / game.data.camera.currentZoom + game.data.camera.position.y;
+    let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
+    let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
     
     this.game.emit('pointerMove', { x: worldX, y: worldY }, event)
 
@@ -142,8 +142,8 @@ export default class Mouse {
     let mouseY = event.clientY;
 
     // Convert screen coordinates to world coordinates
-    let worldX = (mouseX - window.innerWidth / 2 + game.viewportCenterXOffset) / game.data.camera.currentZoom + game.data.camera.position.x;
-    let worldY = (mouseY - window.innerHeight / 2 + game.viewportCenterYOffset) / game.data.camera.currentZoom + game.data.camera.position.y;
+    let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
+    let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
     
     let position = { x: worldX, y: worldY };
 

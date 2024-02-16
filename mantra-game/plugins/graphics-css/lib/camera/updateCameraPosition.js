@@ -12,10 +12,10 @@ export default function updateCameraPosition(dx, dy, isDragging) {
     this.isDragging = true;
     // this.follow = false;
     if (typeof dx === 'number') {
-      game.viewportCenterXOffset += dx;
+      game.data.camera.offsetX += dx;
     }
     if (typeof dy === 'number') {
-      game.viewportCenterYOffset += dy;
+      game.data.camera.offsetY += dy;
     }
   }
 

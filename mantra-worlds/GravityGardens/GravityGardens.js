@@ -55,8 +55,8 @@ class GravityGardens {
         // pings the screen center, assuming player is there
         let x = window.innerWidth / 2;
         let y = window.innerHeight / 2;
-        x = x - game.viewportCenterXOffset;
-        y = y - game.viewportCenterYOffset;
+        x = x - game.data.camera.offsetX;
+        y = y - game.data.camera.offsetY;
 
         if (gameState.repulsion) {
           game.pingPosition(x, y, 1, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
@@ -141,8 +141,8 @@ class GravityGardens {
       mousePosition = position;
 
       // adjust position for game camera offset
-      mousePosition.x = mousePosition.x - game.viewportCenterXOffset;
-      mousePosition.y = mousePosition.y - game.viewportCenterYOffset;
+      mousePosition.x = mousePosition.x - game.data.camera.offsetX;
+      mousePosition.y = mousePosition.y - game.data.camera.offsetY;
 
       mousePosition.clientX = event.clientX;
       mousePosition.clientY = event.clientY;
@@ -161,8 +161,8 @@ class GravityGardens {
 
     game.on('pointerMove', function (position, event) {
       mousePosition = position;
-      mousePosition.x = mousePosition.x - game.viewportCenterXOffset;
-      mousePosition.y = mousePosition.y - game.viewportCenterYOffset;
+      mousePosition.x = mousePosition.x - game.data.camera.offsetX;
+      mousePosition.y = mousePosition.y - game.data.camera.offsetY;
     });
 
     // mouse drops particles logic

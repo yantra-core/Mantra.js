@@ -5,8 +5,8 @@ export default function applyThrow() {
   let game = this.game;
   const decayFactor = 0.985; // Increase closer to 1 for longer throws
 
-  game.viewportCenterXOffset += this.dragInertia.x;
-  game.viewportCenterYOffset += this.dragInertia.y;
+  game.data.camera.offsetX += this.dragInertia.x;
+  game.data.camera.offsetY += this.dragInertia.y;
 
   // Decrease the inertia
   this.dragInertia.x *= decayFactor;
