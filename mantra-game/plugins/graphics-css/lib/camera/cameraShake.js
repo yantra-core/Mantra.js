@@ -42,7 +42,7 @@ export default function cameraShake({ initialIntensity = 100, duration = 777 }) 
       let entity = this.game.data.ents._[eId];
       // TODO: make more configurable / part of constructor config
       // TODO: add a shakeable flag to entities / add parameter for tracking "shakeability", etc
-      if (entity.type === 'PARTICLE' || entity.type === 'STAR' || entity.type === 'HEXAPOD' || entity.type === 'DEMON') {
+      if (entity.type === 'PARTICLE' || entity.type === 'STAR' || entity.type === 'HEXAPOD' || entity.type === 'DEMON' || entity.type === 'NONE') {
         let forceX = Math.random() * intensity - intensity / 2;
         let forceY = Math.random() * intensity - intensity / 2;
         forceX = forceX * 0.01;

@@ -482,12 +482,16 @@ function cssMouseWheelZoom(event) {
     return;
   }
 
-  // check that target is gameHolder, if not cancel
-  // Remark: This should suffice for CSSGraphics, this is required for embedding or other page interactions
-  //         outside of the Mantra Game
-  if (event.target !== document.body) {
-    return false;
-  }
+  /*
+     Remark: Removed 2/16/2024, as this was preventing mouse wheel zoom from working
+     // check that target is gameHolder, if not cancel
+    // Remark: This should suffice for CSSGraphics, this is required for embedding or other page interactions
+    //         outside of the Mantra Game
+    if (event.target !== document.body) {
+      return false;
+    }
+  */
+
   var game = this.game;
   var scale = game.data.camera.currentZoom;
 
