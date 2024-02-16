@@ -3,6 +3,7 @@
 import EntityClass from '../../../Entity/Entity.js';
 // TODO: remove TimersComponent import, use game reference instead ( reduce imported code )
 import TimersComponent from '../../../Component/TimersComponent.js';
+import ensureColorInt from './util/ensureColorInt.js';
 import layoutEntity from './layoutEntity.js';
 
 function distanceSquared(x1, y1, x2, y2) {
@@ -59,6 +60,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       container: null,
       items: null,
       sutra: null,
+      scene: null,
       meta: null,
       collectable: false,
       hasInventory: true,
@@ -143,7 +145,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -187,6 +189,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
   this.game.addComponent(entityId, 'sutra', sutra);
+  this.game.addComponent(entityId, 'scene', scene);
+
   this.game.addComponent(entityId, 'meta', meta);
   this.game.addComponent(entityId, 'collectable', collectable);
   
@@ -296,44 +300,4 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   updatedEntity = this.game.lifecycle.triggerHook('after.createEntity', config);
 
   return updatedEntity;
-}
-
-function ensureColorInt(color) {
-
-  if (!color) {
-    return color;
-  }
-
-  // Mapping of common color names to hex values
-  const colorNameToHex = {
-    red: '#FF0000',
-    green: '#00FF00',
-    blue: '#0000FF',
-    black: '#000000',
-    white: '#FFFFFF',
-    yellow: '#FFFF00',
-    purple: '#800080',
-    orange: '#FFA500',
-    pink: '#FFC0CB',
-    // Add more common colors as needed
-  };
-
-  // If color is already a number, return it as is
-  if (typeof color === 'number') {
-    return color;
-  }
-
-  // If color is a hex string (with #), convert it to an integer
-  if (typeof color === 'string' && color.startsWith('#')) {
-    return parseInt(color.replace('#', ''), 16);
-  }
-
-  // If color is a common color name, convert it using the mapping
-  if (typeof color === 'string' && colorNameToHex[color.toLowerCase()]) {
-    return parseInt(colorNameToHex[color.toLowerCase()].replace('#', ''), 16);
-  }
-
-  // If color format is unrecognized, throw an error or return a default color
-  console.error('Unrecognized color format:', color);
-  return parseInt('000000', 16); // Default to black
 }

@@ -210,6 +210,7 @@ export default function construct(game, plugins = []) {
     items: new Component('items', game),
     hasInventory: new Component('hasInventory', game),
     sutra: new Component('sutra', game),
+    scene: new Component('scene', game),
     // meta property allows for arbitrary data to be attached to an entity
     // you should *not* use meta for any high-frequency data updates as it is not optimized for that
     // if you find yourself needing to put a larger amount of data in meta, consider creating a new component
@@ -250,6 +251,9 @@ export default function construct(game, plugins = []) {
 
   // Systems Manager
   game.systemsManager = new SystemsManager(game);
+
+  // Scene Manager
+  game.scenes = {};
 
   // Graphics rendering pipeline
   game.graphics = [];

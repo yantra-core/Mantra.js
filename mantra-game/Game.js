@@ -3,6 +3,7 @@
 import Component from './Component/Component.js';
 import construct from './lib/Game/construct.js';
 import use from './lib/Game/use.js';
+import unload from './lib/Game/unload.js';
 import start from './lib/Game/start.js';
 
 // The Game class is the main entry point for Mantra games
@@ -69,6 +70,7 @@ class Game {
     // Game.use('PluginName') is a helper function for loading plugins
     // must be defined before construct() is called
     this.use = use(this, config.plugins);
+    this.unload = unload(this, config.plugins);
 
     // Additional construction logic
     construct(this, config.plugins);
@@ -295,6 +297,10 @@ class Game {
   setZoom() { // TODO: remove setZoom, use delegation to camera.zoom() instead of hoisting
     // not implemented directly, Graphics plugin will hoist this
   }
+  
+  setCamera(camera) {
+    this.camera = camera;
+  }
 
   zoom(scale) {
     if (this.camera && this.camera.zoom) {
@@ -354,6 +360,19 @@ class Game {
     color = '#' + color.toString(16);
     return color;
 
+  }
+
+  randomForce(maxSpeed = 1) {
+    // Generate a random angle in radians
+    const angle = Math.random() * 2 * Math.PI; // TODO: use game.seed, game.random instead of Math.random
+    // Generate a random speed up to maxSpeed
+    const speed = Math.random() * maxSpeed;
+    // Convert polar coordinates (angle, speed) to cartesian coordinates (x, y)
+    const force = {
+      x: Math.cos(angle) * speed,
+      y: Math.sin(angle) * speed
+    };
+    return force;
   }
 
   randomPositionSquare(centerX, centerY, distance) {
@@ -432,11 +451,11 @@ class Game {
 
     // clear any events that were bound to the game from World
     for (let listener in game.listeners) {
-      // remmove any event that doesn't contain '::'
+      // Remove any event that doesn't contain '::'
       // TODO: we may want to make this more specific, bound to scenes or systems
       if (listener.indexOf('::') === -1) {
         // game.off(listener, game.listeners[listener]);
-        delete  game.listeners[listener];
+        delete game.listeners[listener];
       }
     }
 

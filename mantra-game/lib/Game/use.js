@@ -88,6 +88,8 @@ export default function use(game) {
       throw new Error('All plugins must have a static id property');
     }
 
+    pluginGameSceneMethods(game, pluginInstanceOrId);
+
     const pluginId = pluginInstanceOrId.id;
     game.loadedPlugins.push(pluginId);
 
@@ -104,6 +106,7 @@ export default function use(game) {
     if (pluginInstanceOrId.type === 'world') {
       game.worlds.push(pluginInstanceOrId);
     }
+
     game.emit(`plugin::loaded::${pluginId}`, pluginInstanceOrId);
     game.emit('plugin::loaded', pluginId);
 
@@ -113,10 +116,39 @@ export default function use(game) {
     }
 
     game.data.plugins = game.data.plugins || {};
-
     game.data.plugins[pluginId] = options;
+
+    if (pluginInstanceOrId.constructor.type === 'scene') {
+      // Remark: why was mutating game.scenes not working as expected?
+      // game.scenes[pluginId] = pluginInstanceOrId;
+      // data scopes seems OK here
+      game.data.scenes = game.data.scenes || {};
+      game.data.scenes[pluginId] = pluginInstanceOrId;
+    }
 
     return game;
 
   }
+}
+
+//
+// Extends plugins with scoped scene methods
+//
+function pluginGameSceneMethods (game, pluginInstance) {
+
+  // attach scene methods to plugin, game methods wrapped to scope entity to plugin scene
+  pluginInstance.createEntity = function (data) {
+    data.scene = pluginInstance.id;
+    return game.createEntity(data);
+  }
+
+  pluginInstance.removeEntity = function (ent) {
+    return game.removeEntity(ent);
+  }
+
+  pluginInstance.createText = function (data) {
+    data.scene = pluginInstance.id;
+    return game.createText(data);
+  }
+
 }

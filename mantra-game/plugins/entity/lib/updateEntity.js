@@ -1,3 +1,5 @@
+import ensureColorInt from './util/ensureColorInt.js';
+
 export default function updateEntity(entityDataOrId, entityData) {
 
   if (typeof entityDataOrId === 'string' || typeof entityDataOrId === 'number') {
@@ -48,12 +50,13 @@ export default function updateEntity(entityDataOrId, entityData) {
     ent.pendingRender[graphicsInterface.id] = true;
   });
 
-  // TODO: add additional component types that can be updated ( should be most of them )
   if (entityData.color) {
-    this.game.components.color.set(entityId, entityData.color);
-    //if (!this.game.changedEntities.has(entityId)) {}
-    // this.game.changedEntities.add(entityId);
-    // console.log("SETTING COLOR", entityData.color)
+    // entityData.color may be color name as string, hex code, or integer value
+    // ensureColorInt will convert incoming color to safe integer value
+    //console.log('entityData.color', entityData.color)
+    let ensuredColor = ensureColorInt(entityData.color);
+    // console.log('ensuredColor', ensuredColor)
+    this.game.components.color.set(entityId, ensuredColor);
   }
 
   let updateSize = false;

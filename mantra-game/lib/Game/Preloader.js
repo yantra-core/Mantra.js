@@ -59,6 +59,11 @@ export default class Preloader {
   }
 
   async loadImage(asset) {
+
+    if (this.game.isServer) {
+      return;
+    }
+
     // clonse asset
     // let asset = Object.assign({}, _asset);
     return new Promise((resolve, reject) => {

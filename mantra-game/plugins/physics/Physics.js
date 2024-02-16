@@ -36,8 +36,6 @@ export default class Physics {
 
     let Vector = this.Vector;
 
-    console.log('e1e2', ent1, ent2)
-
     var distance = Vector.sub(ent2.position, ent1.position);
     var magnitude = Vector.magnitude(distance);
   

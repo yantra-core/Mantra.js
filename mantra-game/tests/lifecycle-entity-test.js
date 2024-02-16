@@ -183,7 +183,7 @@ tap.test('Lifecycle hooks - before.removeEntity', (t) => {
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });
-  game.removeEntity(ent);
+  game.removeEntity(ent.id);
 
   // Assertions
   t.ok(hookSpy.called, 'before.removeEntity hook should be called');
@@ -204,7 +204,7 @@ tap.test('Lifecycle hooks - after.remove.entity', (t) => {
 
   // Simulate creating and then removing an entity
   let ent = game.createEntity({ name: 'Test Entity' });
-  game.removeEntity(ent);
+  game.removeEntity(ent.id);
 
   // Assertions
   t.ok(hookSpy.called, 'after.remove.entity hook should be called');
