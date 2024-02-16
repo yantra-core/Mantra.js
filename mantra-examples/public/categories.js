@@ -893,6 +893,7 @@ let container_examples = [
 ];
 
 let scenes_examples = [
+  /*
   {
     title: 'Scene Transition',
     category: 'scenes',
@@ -901,6 +902,7 @@ let scenes_examples = [
     url: 'scenes/scene-transition.html',
     tags: ['scene', 'transition', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
+  */
   {
     title: 'Scene Loading',
     category: 'scenes',

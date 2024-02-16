@@ -7,6 +7,8 @@ export default function unload(game) {
 
     console.log('Unloading plugin', pluginInstanceOrId);
 
+    // TODO: do not store entire scene reference in data, only store the id
+    // TOOD: store scene references on game.scenes scope
     let scene = this.data.scenes[pluginInstanceOrId];
 
     if (scene) {
@@ -16,6 +18,8 @@ export default function unload(game) {
         game.removeEntity(Number(entId));
       });
     }
+
+    delete game.data.scenes[pluginInstanceOrId];
 
     // attempt to remove the system if it exists
     game.removeSystem(pluginInstanceOrId);

@@ -124,6 +124,11 @@ export default function use(game) {
       // data scopes seems OK here
       game.data.scenes = game.data.scenes || {};
       game.data.scenes[pluginId] = pluginInstanceOrId;
+
+      // register all scenes as systems ( for now )
+      // we could make this a config flag of the scene ( for performance )
+      game.systemsManager.addSystem(pluginId, pluginInstanceOrId);
+
     }
 
     return game;
@@ -151,4 +156,5 @@ function pluginGameSceneMethods (game, pluginInstance) {
     return game.createText(data);
   }
 
+  
 }
