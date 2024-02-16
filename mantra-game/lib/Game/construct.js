@@ -15,6 +15,8 @@ import onlineGameLoop from '../onlineGameLoop.js';
 
 import Lifecycle from './Lifecycle.js';
 
+import EntityBuilder from '../../Entity/EntityBuilder.js';
+
 // Action Rate Limiter, suitable for any Systems action that should be rate limited
 import ActionRateLimiter from '../../Component/ActionRateLimiter.js';
 import TimersComponent from '../../Component/TimersComponent.js';
@@ -139,6 +141,11 @@ export default function construct(game, plugins = []) {
   game.listeners = eventEmitter.listeners;
   game.emitters = eventEmitter.emitters;
 
+  // Helper for building entity data configurations
+  game.build = function() {
+    return new EntityBuilder();
+  };
+  
   // Bind loadScripts from util
   game.loadScripts = loadScripts.bind(game);
   // Bind loadCSS from util
