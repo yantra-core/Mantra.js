@@ -540,7 +540,7 @@ class Game {
   }
 
   async awaitAllPlugins () {
-    await Promise.all(Object.values(game.loadingPluginPromises));
+    await Promise.all(Object.values(this.loadingPluginPromises));
   }
 
 }
