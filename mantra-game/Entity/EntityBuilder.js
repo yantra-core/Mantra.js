@@ -132,6 +132,7 @@ export default class EntityBuilder {
   }
 
   // Event handlers
+  // Remark: Do all event handlers now need to be arrays, so we can add multiple handlers?
   pointerdown(handler) {
     this.config.pointerdown = handler;
     return this;
@@ -148,6 +149,9 @@ export default class EntityBuilder {
   }
 
   sutra(rules, config) {
+    // TODO: This will overwrite Sutras as chain progresses left-to-right,
+    // leaving only the last Sutra as active
+    // TODO: merge rules existing sutra based on config ( default true )
     this.config.sutra = { rules, config };
     return this;
   }

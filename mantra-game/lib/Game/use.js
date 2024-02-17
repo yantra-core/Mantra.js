@@ -122,8 +122,8 @@ function pluginGameSceneMethods(game, pluginInstance) {
 }
 
 function extendEntityBuilder(game, pluginInstance) {
-  let pluginId = pluginInstance.id;
-  game.EntityBuilder.prototype[pluginId] = function(...args) {
+  let pluginName= pluginInstance.constructor.name;
+  game.EntityBuilder.prototype[pluginName] = function(...args) {
     const componentValue = pluginInstance.build.call(pluginInstance, ...args);
     if (typeof componentValue === 'object') {
       for (let key in componentValue) {

@@ -1,9 +1,9 @@
-// Blackhole.js - Marak Squires 2023
-export default class Blackhole {
+// GravityWell.js - Marak Squires 2023
+export default class GravityWell {
   static id = 'blackhole';
   static type = 'sutra';
   constructor(config = {}) {
-    this.id = Blackhole.id;
+    this.id = GravityWell.id;
   }
 
   init(game) {
@@ -42,10 +42,11 @@ export default class Blackhole {
     }
 
     // Create the Black Hole entity
-    const blackHole = game.createEntity(this.build(entityData));
+    const blackHole = this.game.createEntity(this.build(entityData));
   }
 
   sutra() {
+    let game = this.game;
     // Define the gravitational constant
     const GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
 
@@ -65,8 +66,8 @@ export default class Blackhole {
     });
 
     // TODO: rework collision handlers to use new collisionContext system
-    // rules.if('entTouchedBlackhole').then('blackHoleCollision');
-    rules.addCondition('entTouchedBlackhole', (entity, gameState) => {
+    // rules.if('entTouchedGravityWell').then('blackHoleCollision');
+    rules.addCondition('entTouchedGravityWell', (entity, gameState) => {
       // check if this running locally on a context or globally on all BLACK_HOLE entities
       if (typeof context !== 'undefined') {
         return entity.type === 'COLLISION' && entity.kind === 'START' && entity[context.type];

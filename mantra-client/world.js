@@ -7,6 +7,11 @@ import { Game } from '../mantra-game';
 import plugins from '../mantra-game/plugins.js';
 import worlds from '../mantra-worlds/index.js';
 
+import GravityWell from '../mantra-game/plugins/gravitywell/GravityWell.js';
+import Flame from '../mantra-game/plugins/flame/Flame.js';
+
+import GravityGardens from '../mantra-worlds/GravityGardens/GravityGardens.js';
+import Boomerang from '../mantra-game/plugins/boomerang/Boomerang.js';
 
 let game = new Game({
   width: 800,
@@ -46,8 +51,43 @@ let game = new Game({
 
 window.game = game;
 let home = new worlds.Platform();
-home = new worlds.GravityGardens();
+home = new worlds.Home();
 
 game.start(function () {
   game.use(home);
+  //game.use(new GravityGardens());
+  game.use(new GravityWell());
+  game.use(new Flame());
+  //game.use(new GravityGardens());
+  //game.createPlayer();
+  let data = game.build()
+    .GravityWell()      // build a GravityWell
+    // .Flame()           // Now it's a GravityWell with Fire
+    .position(20, 20) // Adjust component properties as needed
+    .createEntity();  // Create the entity
+    //let ent = game.build().fire().boomerang().position(100, 100).createEntity();
+
+  /*
+  game.systems.blackhole.create({
+    position: {
+      x: -100,
+      y: 0
+    }
+  });
+  */
+
+  /*
+  game.build()
+    .type('BLACKHOLE')
+    .createEntity();
+
+
+  */
+
+  /*
+  game.build()
+    .type('BLACKHOLE')
+    .createEntity();
+    */
+
 });

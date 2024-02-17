@@ -27,14 +27,16 @@ export default class Flame {
       //texture: 'flame',
       //color: 0xff0000,
       collisionStart: this.touchedFlame,
-      width: 16,
-      height: 16,
-      depth: 16,
+      size: {
+        width: 16,
+        height: 16,
+        depth: 16,
+      },
       isStatic: true,
       position: {
-        x: -80,
-        y: -60,
-        z: 16
+        x: 0,
+        y: 0,
+        z: 1
       }
     };
   }
@@ -105,7 +107,7 @@ export default class Flame {
 
   bindEvents() {
     // TODO: move pointerDown event into Sutra
-    game.on('pointerDown', (entity, ev) => {
+    this.game.on('pointerDown', (entity, ev) => {
       if (entity.type === 'FLAME') {
         game.playNote('G4');
       }

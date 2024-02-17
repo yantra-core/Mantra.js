@@ -13,7 +13,7 @@ const plugins = [
   './plugins/block/Block.js',
   './plugins/tile/Tile.js',
   './plugins/platform/Platform.js',
-  './plugins/blackhole/Blackhole.js',
+  './plugins/gravitywell/GravityWell.js',
   './plugins/flame/Flame.js',
   './plugins/border/Border.js',
   './plugins/bomb/Bomb.js',
