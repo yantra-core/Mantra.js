@@ -49,6 +49,7 @@ class CSSGraphics extends GraphicsInterface {
     this.bindYCraftEvents = bindYCraftEvents.bind(this);
     this.unload = unload.bind(this);
 
+
     // TODO: make this function lookup with defaults ( instead of -1 )
     this.depthChart = [
       'background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER',
@@ -106,9 +107,6 @@ class CSSGraphics extends GraphicsInterface {
     this.renderDiv = renderDiv;
   }
 
-  update() {
-    // Update logic goes here
-  }
 }
 
 export default CSSGraphics;

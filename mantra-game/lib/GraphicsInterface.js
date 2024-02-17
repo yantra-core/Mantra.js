@@ -11,7 +11,7 @@ class GraphicInterface {
 
   // called once per game tick, using fixed time step
   update(entities) {
-    throw new Error("update method not implemented.");
+    // throw new Error("update method not implemented.");
   }
 
   // used to inflate entity data from the server

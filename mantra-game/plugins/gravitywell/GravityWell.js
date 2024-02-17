@@ -4,11 +4,12 @@ export default class GravityWell {
   static type = 'sutra';
   constructor(config = {}) {
     this.id = GravityWell.id;
+    this.GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
+
   }
 
   init(game) {
     this.game = game;
-    this.bindRules();
     this.game.systemsManager.addSystem('blackhole', this);
   }
 
@@ -21,9 +22,11 @@ export default class GravityWell {
       type: 'BLACK_HOLE',
       isStatic: true,
       isSensor: true,
-      width: 4,
-      height: 4,
-      //radius: 20,
+      size: {
+        width: 4,
+        height: 4
+        // radius: 20,
+      },
       position: {
         x: entityData.position.x,
         y: entityData.position.y
@@ -47,8 +50,6 @@ export default class GravityWell {
 
   sutra() {
     let game = this.game;
-    // Define the gravitational constant
-    const GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
 
     let rules = game.createSutra();
     rules.addCondition('gravityTick', (entity, gameState) => gameState.tick % 5 === 0);
@@ -59,64 +60,14 @@ export default class GravityWell {
       Object.keys(gameState.ents._).forEach(eId => {
         let entity = gameState.ents._[eId];
         if (entity.id !== entityData.id && !entity.destroyed) {
-          let blackhole = gameState.ents._[entityData.id];
-          this.game.applyGravity(blackhole, entity, GRAVITATIONAL_CONSTANT, gameState);
+          let gravityWell = gameState.ents._[entityData.id];
+          this.game.applyGravity(gravityWell, entity, this.GRAVITATIONAL_CONSTANT);
         }
       });
     });
 
-    // TODO: rework collision handlers to use new collisionContext system
-    // rules.if('entTouchedGravityWell').then('blackHoleCollision');
-    rules.addCondition('entTouchedGravityWell', (entity, gameState) => {
-      // check if this running locally on a context or globally on all BLACK_HOLE entities
-      if (typeof context !== 'undefined') {
-        return entity.type === 'COLLISION' && entity.kind === 'START' && entity[context.type];
-      } else {
-        return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BLACK_HOLE;
-      }
-    });
-
-    rules.on('blackHoleCollision', (collision, node, gameState) => {
-      let pendingDestroy = collision.bodyA;
-      let blackHole = collision.bodyB;
-
-      if (collision.bodyA.type === 'BLACK_HOLE') {
-        pendingDestroy = collision.bodyB;
-        blackHole = collision.bodyA;
-      }
-
-      if (typeof context !== 'undefined') {
-        if (collision.bodyA.type === context.type) {
-          pendingDestroy = collision.bodyB;
-        } else {
-          pendingDestroy = collision.bodyA;
-        }
-        blackHole = context;
-      }
-
-      if (pendingDestroy && blackHole) {
-        // here we have pendingDestroy.position, pendingDestroy.velocity, and blackHole.position
-        // game.playSpatialSound(pendingDestroy, blackHole);
-        // increase size of black hole
-        // console.log(blackHole.height, blackHole.width)
-        game.removeEntity(pendingDestroy.id);
-
-      }
-
-      // teleport the ent to a random radial a bit away from source
-      //let randomPosition = game.randomPositionRadial(blackHole.position.x, blackHole.position.y, 1000);
-      //this.game.updateEntity(pendingDestroy.id, { position: randomPosition });
-
-    });
     return rules;
 
   }
 
-  bindRules() {
-
-  }
-
-  update() {
-
-  }
 }
