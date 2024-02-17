@@ -7,6 +7,12 @@ export default function removeEntity(entityId, removeFromGameData = true) {
     return;
   }
 
+  let _afterRemoveEntity;
+
+  if (typeof ent.afterRemoveEntity === 'function') {
+    _afterRemoveEntity = ent.afterRemoveEntity;
+  }
+
   let canBeRemoved = this.game.lifecycle.triggerHook('before.removeEntity', ent);
 
   if (canBeRemoved === false) {
@@ -43,6 +49,9 @@ export default function removeEntity(entityId, removeFromGameData = true) {
 
   }
 
+  if (_afterRemoveEntity) {
+    _afterRemoveEntity(ent);
+  }
   this.game.lifecycle.triggerHook('after.removeEntity', ent);
 
 }

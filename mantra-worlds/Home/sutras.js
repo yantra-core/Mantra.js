@@ -7,7 +7,7 @@ import walker from '../TowerDefense/sutras/walker.js';
 // routing helper to create vector routes
 import routing from '../sutras/routing.js';
 
-import fire from "../../mantra-sutras/fire.js";
+// import fire from "../../mantra-sutras/fire.js";
 import block from "./sutras/block.js";
 import demon from "../../mantra-sutras/demon.js";
 import hexapod from '../../mantra-sutras/hexapod.js';
@@ -45,7 +45,7 @@ export default function sutras(game) {
   rules.on('playNote', (collision) => game.playNote(collision.note));
 
   // fire entity
-  rules.use(fire(game), 'fire');
+  // rules.use(fire(game), 'fire');
 
   // block entity
   rules.use(block(game), 'block');

@@ -1,15 +1,15 @@
-// Fire.js - Marak Squires 2023
-export default class Fire {
-  static id = 'fire';
+// Flame.js - Marak Squires 2023
+export default class Flame {
+  static id = 'flame';
   static type = 'sutra';
   constructor(config = {}) {
-    this.id = Fire.id;
+    this.id = Flame.id;
   }
 
   init(game) {
     this.game = game;
     this.bindEvents();
-    this.game.systemsManager.addSystem('fire', this);
+    this.game.systemsManager.addSystem('flame', this);
   }
 
   build (entityData = {}) {
@@ -18,15 +18,15 @@ export default class Fire {
     }
     //let rules = this.sutra();
     return {
-      type: 'FIRE',
+      type: 'FLAME',
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'fire',
         // frame: 0 // TODO: support single frame / bypass animation of array
       },
-      //texture: 'fire',
+      //texture: 'flame',
       //color: 0xff0000,
-      collisionStart: this.touchedFire,
+      collisionStart: this.touchedFlame,
       width: 16,
       height: 16,
       depth: 16,
@@ -45,12 +45,12 @@ export default class Fire {
       entityData.position = { x: 0, y: 0 };
     }
 
-    // Create the Fire entity
-    const fire = game.createEntity(this.build(entityData));
+    // Create the Flame entity
+    const flame = game.createEntity(this.build(entityData));
   }
 
-  touchedFire(a, b, pair, context) {
-    // fire will not affect itself
+  touchedFlame(a, b, pair, context) {
+    // flame will not affect itself
     if (context.owner.owner !== context.target.id) {
       game.removeEntity(context.target.id);
     }
@@ -60,19 +60,19 @@ export default class Fire {
     /*
     let rules = game.createSutra();
 
-    rules.addCondition('entityTouchedFire', (entity, gameState) => {
+    rules.addCondition('entityTouchedFlame', (entity, gameState) => {
       if (entity.type === 'COLLISION' && entity.kind === 'START') {
-        if (entity.bodyA.type === 'FIRE') {
+        if (entity.bodyA.type === 'FLAME') {
           return true;
         }
-        if (entity.bodyB.type === 'FIRE') {
+        if (entity.bodyB.type === 'FLAME') {
           return true;
         }
       }
     });
   
     rules
-      .if('entityTouchedFire')
+      .if('entityTouchedFlame')
       .then('playNote', {
         note: 'F#4'
       })
@@ -80,7 +80,7 @@ export default class Fire {
   
     rules.on('damageEntity', (collision) => {
       let ent;
-      if (collision.bodyA.type === 'FIRE') {
+      if (collision.bodyA.type === 'FLAME') {
         ent = collision.bodyB;
       } else {
         ent = collision.bodyA;
@@ -106,7 +106,7 @@ export default class Fire {
   bindEvents() {
     // TODO: move pointerDown event into Sutra
     game.on('pointerDown', (entity, ev) => {
-      if (entity.type === 'FIRE') {
+      if (entity.type === 'FLAME') {
         game.playNote('G4');
       }
     });

@@ -46,6 +46,15 @@ export default function createDefaultPlayer(playerConfig = {}) {
     color: playerConfig.color,
     radius: playerConfig.radius,
     texture: playerConfig.texture,
+    /*
+    afterRemoveEntity: function(entity){
+      // creates the same player again with the same config
+      // console.log('player removed', entity.id)
+      //throw new Error('Player removed');
+      // causing issues wit warping worlds since we remove all ents and this re-creates the player
+      //game.createPlayer(playerConfig);
+    },
+    */
     mass: 222,
     // sutra: topdown(game), // TODO: replace with more comprehensive player sutra with sprites and item actions
     friction: 0.5,  // Default friction

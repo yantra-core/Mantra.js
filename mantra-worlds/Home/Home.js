@@ -98,6 +98,7 @@ class Home {
     game.setGravity(0, 0, 0);
 
     game.createPlayer({
+      respawns: true,
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'player',
@@ -115,13 +116,20 @@ class Home {
     game.use('Border', { autoBorder: true })
     game.use('Bullet');
     game.use('Boomerang');
-    game.use('Tone');
-    
+    game.use('Flame');
+    // game.use('Tone');
+    this.createTwinFlames();    
     welcomeMessage(game);
     game.useSutra(sutras(game), 'HOME');
 
     createBackground(game);
 
+  }
+
+  createTwinFlames () {
+    // See Flame plugin for .build() entity config
+    this.game.build().flame().position(-80, -60, 16).createEntity();
+    this.game.build().flame().position(80, -60, 16).createEntity();
   }
 
   unload() {
