@@ -104,26 +104,6 @@ class GravityGardens {
       game.setZoom(currentZoom - 0.01);
     });
 
-
-    // Particles will be removed when they collide with the wall
-    let wallCollision = game.createSutra();
-
-    wallCollision.addCondition('particleTouchedWall', (entity, gameState) => {
-      return entity.type === 'COLLISION' && entity.kind === 'START' && entity.BORDER;
-    });
-
-    wallCollision.if('particleTouchedWall').then('particleWallCollision');
-
-    wallCollision.on('particleWallCollision', (collision) => {
-      let particle = collision.PARTICLE || collision.STAR;
-      if (particle) {
-        // remove the entity
-        game.removeEntity(particle.id);
-      }
-    });
-
-    game.useSutra(wallCollision, 'wallCollision');
-
   }
 
   // Plugin.update() is called once per game tick
@@ -202,6 +182,12 @@ class GravityGardens {
 
   createFounts(game) {
 
+    function particleCollision (a, b, pair, context) {
+      if (context.PARTICLE && context.BORDER) {
+        game.removeEntity(context.PARTICLE.id);
+      }
+    }
+
     game.build()
       .type('FOUNT')
       .name('fountA')
@@ -209,7 +195,7 @@ class GravityGardens {
       .isStatic(true)
       .size(8, 8)
       .position(200, 0)
-      .sutra(fount, { sprayAngle: 0, color: 0xf03025 })
+      .sutra(fount, { sprayAngle: 0, color: 0xf03025, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
     game.build()
@@ -219,7 +205,7 @@ class GravityGardens {
       .isStatic(true)
       .size(8, 8)
       .position(-200, 0)
-      .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161 })
+      .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
     game.build()
@@ -229,7 +215,7 @@ class GravityGardens {
       .isStatic(true)
       .size(8, 8)
       .position(0, -200)
-      .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8 })
+      .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
     game.build()
@@ -239,7 +225,7 @@ class GravityGardens {
       .isStatic(true)
       .size(8, 8)
       .position(0, 200)
-      .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34 })
+      .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
   }

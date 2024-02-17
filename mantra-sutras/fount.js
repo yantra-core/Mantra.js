@@ -1,6 +1,6 @@
 // fount.js - Marak Squires 2023
 // Sutra for Generating Units
-export default function fountSutra(game, context, sprayConfig = {}) {
+export default function fountSutra(game, entityId, sprayConfig = { collisionStart : false, collisionEnd : false, collisionActive : false }) {
 
   let rules = game.createSutra();
 
@@ -25,9 +25,9 @@ export default function fountSutra(game, context, sprayConfig = {}) {
     let rgbColorString = `rgba(${rgbColor.join(',')}, 0.5)`; // Adjust opacity as needed
     return game.createEntity({
       type: settings.unitType,
-      collisionActive: false,
-      collisionEnd: false,
-      collisionStart: false,
+      collisionActive: sprayConfig.collisionActive,
+      collisionEnd: sprayConfig.collisionEnd,
+      collisionStart: sprayConfig.collisionStart,
       // texture: settings.texture,
       height: settings.unitSize.height,
       color: settings.color,
@@ -56,7 +56,7 @@ export default function fountSutra(game, context, sprayConfig = {}) {
   
   // Rule for generating and spraying units
   rules.if('fountTick').then('fountSpray');
-  rules.addCondition('fountTick', (entity, gameState) => entity.name === context.name && gameState.tick % 10 === 0);
+  rules.addCondition('fountTick', (entity, gameState) => entity.id === entityId && gameState.tick % 10 === 0);
   
   rules.on('fountSpray', (context, node, gameState) => {
     // Determine the position of the fount (can be context-dependent)

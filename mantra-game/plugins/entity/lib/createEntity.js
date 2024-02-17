@@ -227,6 +227,9 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       // it is assumed the signature of the rules function is (game, entityId, config)
       // this may change in the future
       _sutra = sutra.rules(this.game, entityId, sutra.config);
+    } else {
+      // could be a Sutra instance object instance without config object
+      _sutra = sutra;
     }
   } else {
     // the incoming sutra was not a non-null object

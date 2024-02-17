@@ -67,17 +67,34 @@ class Collisions {
       }
 
     }
+
+    // all entity collision events need context
+    let collisionContext = {
+      type: 'COLLISION',
+      kind: 'START',
+      entityIdA: bodyA.myEntityId,
+      entityIdB: bodyB.myEntityId,
+      bodyA: entityA,
+      bodyB: entityB
+    };
+
+
     if (entityA.collisionStart) {
+
+      // add entity onto the collision by type name
+      collisionContext[entityA.type] = entityA;
+      collisionContext[entityB.type] = entityB;
+      // pair.context = collisionContext;
       if (typeof entityA.collisionStart === 'function') {
         // console.log('calling entityA.collisionStart', entityA.collisionStart, entityA, entityB)
-        entityA.collisionStart.call(this.game, entityB, entityA);
+        entityA.collisionStart.call(this.game, entityB, entityA, pair, collisionContext);
       }
     }
 
     if (entityB.collisionStart) {
       if (typeof entityB.collisionStart === 'function') {
         // console.log('calling entityB.collisionStart', entityB.collisionStart, entityB, entityA)
-        entityB.collisionStart.call(this.game, entityA, entityB);
+        entityB.collisionStart.call(this.game, entityA, entityB, pair, collisionContext);
       }
     }
 
@@ -146,16 +163,8 @@ class Collisions {
       // Remark: This could be this.game.systems.sutra
       this.game.data.collisions = this.game.data.collisions || [];
       // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-      let collisionContext = {
-        type: 'COLLISION',
-        kind: 'START',
-        entityIdA: bodyA.myEntityId,
-        entityIdB: bodyB.myEntityId,
-        bodyA: entityA,
-        bodyB: entityB
-      };
-
       // add entity onto the collision by type name
+
       collisionContext[entityA.type] = entityA;
       collisionContext[entityB.type] = entityB;
 
@@ -200,15 +209,25 @@ class Collisions {
       return;
     }
 
+    let collisionContext = {
+      type: 'COLLISION',
+      kind: 'END',
+      entityIdA: bodyA.myEntityId,
+      entityIdB: bodyB.myEntityId,
+      bodyA: entityA,
+      bodyB: entityB
+    };
+
+
     if (entityA.collisionEnd) {
       if (typeof entityA.collisionEnd === 'function') {
-        entityA.collisionEnd.call(this.game, entityB, entityA);
+        entityA.collisionEnd.call(this.game, entityB, entityA, collisionContext);
       }
     }
 
     if (entityB.collisionEnd) {
       if (typeof entityB.collisionEnd === 'function') {
-        entityB.collisionEnd.call(this.game, entityA, entityB);
+        entityB.collisionEnd.call(this.game, entityA, entityB, collisionContext);
       }
     }
 
@@ -216,14 +235,6 @@ class Collisions {
 
       this.game.data.collisions = this.game.data.collisions || [];
       // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-      let collisionContext = {
-        type: 'COLLISION',
-        kind: 'END',
-        entityIdA: bodyA.myEntityId,
-        entityIdB: bodyB.myEntityId,
-        bodyA: entityA,
-        bodyB: entityB
-      };
 
       // Find and remove the active collision
       this.game.data.collisions = this.game.data.collisions.filter(collision => {
@@ -268,16 +279,26 @@ class Collisions {
       return;
     }
 
+    let collisionContext = {
+      type: 'COLLISION',
+      kind: 'ACTIVE',
+      entityIdA: bodyA.myEntityId,
+      entityIdB: bodyB.myEntityId,
+      ticks: 1,
+      duration: 1,
+      bodyA: entityA,
+      bodyB: entityB
+    };
 
     if (entityA.collisionActive) {
       if (typeof entityA.collisionActive === 'function') {
-        entityA.collisionActive.call(this.game, entityB, entityA);
+        entityA.collisionActive.call(this.game, entityB, entityA, collisionContext);
       }
     }
 
     if (entityB.collisionActive) {
       if (typeof entityB.collisionActive === 'function') {
-        entityB.collisionActive.call(this.game, entityA, entityB);
+        entityB.collisionActive.call(this.game, entityA, entityB, collisionContext);
       }
     }
 
@@ -285,16 +306,6 @@ class Collisions {
 
       this.game.data.collisions = this.game.data.collisions || [];
       // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-      let collisionContext = {
-        type: 'COLLISION',
-        kind: 'ACTIVE',
-        entityIdA: bodyA.myEntityId,
-        entityIdB: bodyB.myEntityId,
-        ticks: 1,
-        duration: 1,
-        bodyA: entityA,
-        bodyB: entityB
-      };
 
       // add entity onto the collision by type name
       collisionContext[entityA.type] = entityA;
