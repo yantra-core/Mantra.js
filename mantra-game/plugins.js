@@ -67,6 +67,7 @@ import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 import Flame from './plugins/flame/Flame.js';
 import Platform from './plugins/platform/Platform.js';
+import Player from './plugins/player/Player.js';
 import Sword from './plugins/sword/Sword.js';
 import Tile from './plugins/tile/Tile.js';
 
@@ -121,6 +122,7 @@ const plugins = {
   YCraft,
   Block,
   Platform,
+  Player,
   Tile,
   // Game Objects
   GravityWell,

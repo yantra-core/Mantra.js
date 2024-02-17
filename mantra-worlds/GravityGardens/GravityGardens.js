@@ -13,6 +13,10 @@ class GravityGardens {
     this.slurping = false;
   }
 
+  preload (game) {
+    game.use('Player');
+  }
+
   init(game) {
     this.game = game;
     this.createWorld();
@@ -42,16 +46,14 @@ class GravityGardens {
       game.zoom(2.5);
     }
 
-    // create a player
-    let player = game.createPlayer({
-      color: 0xcccccc,
-      texture: null, // default texture is a player sprite
-      position: {
-        x: 0,
-        y: 0,
-        z: 0
-      }
-    });
+    let player = game.build()
+      .Player()
+      .texture(null)     // default texture is a player sprite
+      .color(0xffcccc)   // gives a color to the player
+      .position(0, 0, 0) // sets the player position
+      .createEntity();   // Finalizes and creates the entity
+    
+    game.setPlayerId(player.id);
 
     // Apply the blackhole behavior to existing entities
     game.updateEntity({

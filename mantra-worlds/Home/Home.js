@@ -83,9 +83,10 @@ class Home {
     game.use('Bullet');
     game.use('Boomerang');
     game.use('Flame');
+    game.use('Player');
+
 
   }
-
 
   init(game) {
     this.game = game;
@@ -95,16 +96,8 @@ class Home {
   update () {
     if (this.game.tick % 10 === 0) { // TODO: better exists check for player alive status
       if (!this.game.data.ents._[this.game.currentPlayerId]) {
-        this.game.createPlayer({
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'player',
-          },
-          position: {
-            x: 0,
-            y: 0
-          }
-        });
+        let player1 = game.build().Player().createEntity();
+        game.setPlayerId(player1.id);
       }
     }
   }
@@ -126,16 +119,8 @@ class Home {
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
-    game.createPlayer({
-      texture: {
-        sheet: 'loz_spritesheet',
-        sprite: 'player',
-      },
-      position: {
-        x: 0,
-        y: 0
-      }
-    });
+    let player1 = game.build().Player().createEntity();
+    game.setPlayerId(player1.id);
 
     /*
     game.after('removeEntity', function(entity) {
