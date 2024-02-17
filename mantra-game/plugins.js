@@ -65,7 +65,7 @@ import Bomb from './plugins/bomb/Bomb.js';
 import Boomerang from './plugins/boomerang/Boomerang.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
-import Fire from './plugins/fire/Fire.js';
+import Flame from './plugins/flame/Flame.js';
 import Platform from './plugins/platform/Platform.js';
 import Sword from './plugins/sword/Sword.js';
 import Tile from './plugins/tile/Tile.js';
@@ -128,7 +128,7 @@ const plugins = {
   Bomb,
   Boomerang,
   Bullet,
-  Fire,
+  Flame,
   Sword,
   // Core
   Collision,

@@ -14,6 +14,7 @@ const plugins = [
   './plugins/tile/Tile.js',
   './plugins/platform/Platform.js',
   './plugins/blackhole/Blackhole.js',
+  './plugins/flame/Flame.js',
   './plugins/border/Border.js',
   './plugins/bomb/Bomb.js',
   './plugins/boomerang/Boomerang.js',
