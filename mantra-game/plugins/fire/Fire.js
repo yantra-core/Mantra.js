@@ -8,7 +8,7 @@ export default class Fire {
 
   init(game) {
     this.game = game;
-    this.bindRules();
+    this.bindEvents();
     this.game.systemsManager.addSystem('fire', this);
   }
 
@@ -26,6 +26,7 @@ export default class Fire {
       },
       //texture: 'fire',
       //color: 0xff0000,
+      collisionStart: this.touchedFire,
       width: 16,
       height: 16,
       depth: 16,
@@ -44,14 +45,19 @@ export default class Fire {
       entityData.position = { x: 0, y: 0 };
     }
 
-    // Create the Black Hole entity
-    const blackHole = game.createEntity(this.build(entityData));
+    // Create the Fire entity
+    const fire = game.createEntity(this.build(entityData));
+  }
+
+  touchedFire(a, b, pair, context) {
+    // fire will not affect itself
+    if (context.owner.owner !== context.target.id) {
+      game.removeEntity(context.target.id);
+    }
   }
 
   sutra() {
-    // Define the gravitational constant
-    const GRAVITATIONAL_CONSTANT = 0.01; // Adjust as needed for gameplay
-
+    /*
     let rules = game.createSutra();
 
     rules.addCondition('entityTouchedFire', (entity, gameState) => {
@@ -93,24 +99,19 @@ export default class Fire {
       }
     });
   
+    return rules;
+    */
+  }
+
+  bindEvents() {
     // TODO: move pointerDown event into Sutra
     game.on('pointerDown', (entity, ev) => {
       if (entity.type === 'FIRE') {
         game.playNote('G4');
       }
     });
-  
-    return rules;
-
   }
 
-  bindRules() {
-
-  }
-
-  update() {
-
-  }
 }
 
 

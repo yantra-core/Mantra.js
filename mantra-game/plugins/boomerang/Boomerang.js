@@ -20,6 +20,48 @@ class Boomerang {
     this.game.systemsManager.addSystem('boomerang', this);
   }
 
+  build(entityData = {}) {
+    // Define default values
+    const defaults = {
+      type: 'BOOMERANG',
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'boomerang',
+        playing: true
+      },
+      width: 12,
+      height: 12,
+      position: { x: 0, y: 0, z: 4 },
+      isSensor: true,
+      isStatic: false,
+      owner: null,
+      velocity: { x: 0, y: 0 },
+      style: { zIndex: 99 } // Assuming zIndex should default to 99 but can be overridden
+    };
+  
+    // Merge defaults with entityData, ensuring nested objects like position and velocity are merged correctly
+    const mergedConfig = {
+      ...defaults,
+      ...entityData,
+      position: { ...defaults.position, ...entityData.position },
+      velocity: { ...defaults.velocity, ...entityData.velocity },
+      texture: { ...defaults.texture, ...entityData.texture },
+      style: { ...defaults.style, ...entityData.style }
+    };
+  
+    // Handle specific properties like rotation and speed, if they're not part of defaults
+    if (entityData.rotation !== undefined) {
+      mergedConfig.rotation = entityData.rotation;
+    }
+    if (entityData.speed !== undefined) {
+      mergedConfig.speed = entityData.speed;
+    }
+  
+    // Return the merged configuration
+    return mergedConfig;
+  }
+  
+
   update() {
     // TODO: we can perform this check less frequently
     // Iterate through all boomerang entities in the game data
@@ -95,7 +137,6 @@ class Boomerang {
   returnToOwner(boomerang) {
     // Find the owner entity using the owner ID stored in the boomerang
     let ownerEntity = this.game.getEntity(boomerang.owner);
-
     if (ownerEntity) {
       let ownerPosition = ownerEntity.position;
       let currentPosition = boomerang.position;
@@ -203,7 +244,6 @@ class Boomerang {
     boomerangVelocity.x = Math.min(boomerangVelocity.x, 10);
     boomerangVelocity.y = Math.min(boomerangVelocity.y, 10);
 
-
     boomerangstartingPosition.z = 4;
     const boomerangConfig = {
       type: 'BOOMERANG',
@@ -225,7 +265,15 @@ class Boomerang {
       },
     };
 
-    this.game.createEntity(boomerangConfig);
+    let data = this.build(boomerangConfig);
+    
+    // Experimental, making fire boomerang / composing plugins
+    // let builder = this.game.build().fire().boomerang(boomerangConfig);
+    //     this.game.createEntity(builder.config);
+
+    let builder = this.build(boomerangConfig);
+    this.game.createEntity(builder);
+
   }
 }
 
