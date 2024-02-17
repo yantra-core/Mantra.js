@@ -19,7 +19,6 @@ export default class Blackhole {
     let rules = this.sutra();
     return {
       type: 'BLACK_HOLE',
-      texture: 'fire',
       isStatic: true,
       isSensor: true,
       width: 4,
@@ -29,6 +28,8 @@ export default class Blackhole {
         x: entityData.position.x,
         y: entityData.position.y
       },
+      // runs every tick, recommended to keep this light and use this.game % 5 === 0 for heavier operations, etc
+      // update: function () {},
       mass: 100,
       sutra: rules
     };
@@ -54,33 +55,17 @@ export default class Blackhole {
     rules.if('gravityTick').then('applyGravity');
 
     rules.on('applyGravity', (entityData, node, gameState) => {
-
-      // check if this running locally on a context or globally on all BLACK_HOLE entities
-      if (typeof context !== 'undefined') {
-        // must get updated position of context
-        let updatedContext = gameState.ents._[context.id];
-        Object.keys(gameState.ents._).forEach(eId => {
-          let entity = gameState.ents._[eId];
-          if (entity.type !== 'BLACK_HOLE') {
-            game.applyGravity(updatedContext, entity, GRAVITATIONAL_CONSTANT, gameState);
-          }
-        });
-        return;
-      }
-
-      if (gameState.ents.BLACK_HOLE) {
-        gameState.ents.BLACK_HOLE.forEach(blackHole => {
-          Object.keys(gameState.ents._).forEach(eId => {
-            let entity = gameState.ents._[eId];
-            if (entity.type !== 'BLACK_HOLE') {
-              this.game.applyGravity(blackHole, entity, GRAVITATIONAL_CONSTANT, gameState);
-            }
-          });
-        });
-      }
+      Object.keys(gameState.ents._).forEach(eId => {
+        let entity = gameState.ents._[eId];
+        if (entity.id !== entityData.id && !entity.destroyed) {
+          let blackhole = gameState.ents._[entityData.id];
+          this.game.applyGravity(blackhole, entity, GRAVITATIONAL_CONSTANT, gameState);
+        }
+      });
     });
 
-    rules.if('entTouchedBlackhole').then('blackHoleCollision');
+    // TODO: rework collision handlers to use new collisionContext system
+    // rules.if('entTouchedBlackhole').then('blackHoleCollision');
     rules.addCondition('entTouchedBlackhole', (entity, gameState) => {
       // check if this running locally on a context or globally on all BLACK_HOLE entities
       if (typeof context !== 'undefined') {
@@ -113,10 +98,14 @@ export default class Blackhole {
         // game.playSpatialSound(pendingDestroy, blackHole);
         // increase size of black hole
         // console.log(blackHole.height, blackHole.width)
+        game.removeEntity(pendingDestroy.id);
 
       }
 
-      game.removeEntity(pendingDestroy.id);
+      // teleport the ent to a random radial a bit away from source
+      //let randomPosition = game.randomPositionRadial(blackHole.position.x, blackHole.position.y, 1000);
+      //this.game.updateEntity(pendingDestroy.id, { position: randomPosition });
+
     });
     return rules;
 
