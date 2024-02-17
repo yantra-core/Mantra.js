@@ -140,10 +140,11 @@ export default function construct(game, plugins = []) {
   game.listenerCount = eventEmitter.listenerCount.bind(eventEmitter);
   game.listeners = eventEmitter.listeners;
   game.emitters = eventEmitter.emitters;
+  game.EntityBuilder = EntityBuilder;
 
   // Helper for building entity data configurations
   game.build = function() {
-    return new EntityBuilder(game);
+    return new game.EntityBuilder(game);
   };
   
   // Bind loadScripts from util

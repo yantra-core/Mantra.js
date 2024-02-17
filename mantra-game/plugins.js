@@ -60,6 +60,7 @@ import Lifetime from './plugins/lifetime/Lifetime.js';
 
 // Game Objects
 import Border from './plugins/border/Border.js';
+import Blackhole from './plugins/blackhole/Blackhole.js';
 import Bomb from './plugins/bomb/Bomb.js';
 import Boomerang from './plugins/boomerang/Boomerang.js';
 import Bullet from './plugins/bullet/Bullet.js';
@@ -120,11 +121,14 @@ const plugins = {
   Block,
   Platform,
   Tile,
+  // Game Objects
+  Blackhole,
   Border,
   Bomb,
   Boomerang,
   Bullet,
   Sword,
+  // Core
   Collision,
   ChronoControl,
   Client,

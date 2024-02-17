@@ -88,6 +88,11 @@ export default function use(game) {
       throw new Error('All plugins must have a static id property');
     }
 
+
+    if (typeof pluginInstanceOrId.build === 'function') {
+      extendEntityBuilder(game, pluginInstanceOrId);
+    }
+
     pluginGameSceneMethods(game, pluginInstanceOrId);
 
     const pluginId = pluginInstanceOrId.id;
@@ -159,6 +164,33 @@ function pluginGameSceneMethods (game, pluginInstance) {
     data.scene = pluginInstance.id;
     return game.createText(data);
   }
+}
 
-  
+function extendEntityBuilder(game, pluginInstance) {
+  let pluginId = pluginInstance.id;
+
+  // Add a new method to the EntityBuilder class prototype
+  game.EntityBuilder.prototype[pluginId] = function(...args) {
+
+    // call the build method with it's own plugin scope + any potential entityData config objects
+    const componentValue = pluginInstance.build.call(pluginInstance, ...args);
+
+    if (typeof componentValue === 'object') {
+      // assume nested object and iterate
+      // TODO: array
+      for (let key in componentValue) {
+        this.config[key] = componentValue[key];
+      }
+    }
+
+    if (typeof componentValue === 'number' || typeof componentValue === 'string') {
+      // Update the config with the new component
+      this.config[pluginId] = componentValue;
+    }
+
+    // TODO: function / undefined
+
+    // Return 'this' to maintain the fluent interface
+    return this;
+  };
 }
