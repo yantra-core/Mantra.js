@@ -1,5 +1,4 @@
 // GravityGardens.js - Marak Squires 2024
-import blackhole from '../../mantra-sutras/blackhole.js'
 import fount from '../../mantra-sutras/fount.js'
 
 class GravityGardens {
@@ -13,7 +12,7 @@ class GravityGardens {
     this.slurping = false;
   }
 
-  preload (game) {
+  preload(game) {
     game.use('Player');
   }
 
@@ -46,20 +45,23 @@ class GravityGardens {
       game.zoom(2.5);
     }
 
-    let player = game.build()
+    // Builds a Player config with GravityWell 
+    let playerConfig = game.build()
+      .GravityWell()
       .Player()
       .texture(null)     // default texture is a player sprite
       .color(0xffcccc)   // gives a color to the player
       .position(0, 0, 0) // sets the player position
-      .createEntity();   // Finalizes and creates the entity
-    
-    game.setPlayerId(player.id);
+      .build();
 
-    // Apply the blackhole behavior to existing entities
-    game.updateEntity({
-      id: player.id,
-      sutra: blackhole(game, player)
-    });
+    // whenever the player collides with something, we remove the other entity
+    playerConfig.collisionStart = function (a, b, pair, context) {
+      game.removeEntity(context.target.id);
+    }
+
+    let player = game.createEntity(playerConfig);
+
+    game.setPlayerId(player.id);
 
     game.build()
       .type('WARP')
@@ -184,11 +186,8 @@ class GravityGardens {
 
   createFounts(game) {
 
-    function particleCollision (a, b, pair, context) {
-      if (context.PARTICLE && context.BORDER) {
-        game.removeEntity(context.PARTICLE.id);
-      }
-    }
+    // will set the collistionStart flag to true in order to register collision events
+    let particleCollision = true;
 
     game.build()
       .type('FOUNT')
@@ -246,21 +245,27 @@ class GravityGardens {
       let y = window.innerHeight / 2;
       x = x - game.data.camera.offsetX;
       y = y - game.data.camera.offsetY;
-
-      if (gameState.repulsion) {
-        game.pingPosition(x, y, 1, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+      if (entity.meta.repulsion) {
+        game.pingPosition(x, y, 1, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
         game.updateEntity({
           id: entity.id,
-          color: 0xff0000
+          color: 0xff0000,
+          meta: {
+            repulsion: false
+          }
         });
       } else {
-        game.pingPosition(x, y, 1, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
+        game.pingPosition(x, y, 1, { color: 'red', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
         // update the player color
         game.updateEntity({
           id: entity.id,
-          color: 0xffffff
+          color: 0xffffff,
+          meta: {
+            repulsion: true
+          }
         });
       }
+
 
       gameState.lastGravitySwitch = Date.now();
     }

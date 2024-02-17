@@ -256,8 +256,8 @@ class Game {
     }
   }
 
-  applyGravity(entA, entB, gravity) {
-    this.systems.physics.applyGravity(entA, entB, gravity);
+  applyGravity(entA, entB, gravity, repulsion = false) {
+    this.systems.physics.applyGravity(entA, entB, gravity, repulsion);
   }
 
   setPosition(entityId, position) {

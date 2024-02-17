@@ -1,18 +1,17 @@
 // Player.js - Marak Squires 2024
 export default class Player {
   static id = 'player';
-  static type = 'sutra';
   constructor(config = {}) {
     this.id = Player.id;
   }
 
   init(game) {
     this.game = game;
-    this.bindEvents();
     this.game.systemsManager.addSystem('player', this);
   }
 
   build(playerConfig = {}) {
+
     if (typeof playerConfig.position === 'undefined') {
       playerConfig.position = { x: 0, y: 0 };
     }
@@ -28,8 +27,7 @@ export default class Player {
     if (typeof playerConfig.rotation !== 'number') {
       playerConfig.rotation = 0;
     }
-
-    if (typeof playerConfig.texture === 'undefined') {
+    if (typeof playerConfig.texture === 'undefined' && playerConfig.texture !== null) {
       playerConfig.texture = {
         sheet: 'loz_spritesheet',
         sprite: 'player',

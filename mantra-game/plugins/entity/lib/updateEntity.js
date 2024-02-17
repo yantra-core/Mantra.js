@@ -108,6 +108,16 @@ export default function updateEntity(entityDataOrId, entityData) {
     this.game.components.width.set(entityId, entityData.thickness);
   }
 
+
+  //
+  // Meta properties
+  //
+  if (typeof entityData.meta !== 'undefined') {
+    // overwrite all meta ( for now )
+    // Remark: in the future we could merge instead of overwrite
+    this.game.components.meta.set(entityId, entityData.meta);
+  }
+
   if (typeof entityData.score !== 'undefined' && entityData.score !== null) {
     this.game.components.score.set(entityId, entityData.score);
   }
