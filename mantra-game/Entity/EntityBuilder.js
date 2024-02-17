@@ -1,3 +1,4 @@
+// EntityBuilder.js - Marak Squires 2024
 export default class EntityBuilder {
   constructor(game) {
     this.game = game;
@@ -104,7 +105,7 @@ export default class EntityBuilder {
     this.config.style = value;
     return this;
   }
-  
+
   // Behavior and capabilities
   maxSpeed(value) {
     this.config.maxSpeed = value;
@@ -131,21 +132,39 @@ export default class EntityBuilder {
     return this;
   }
 
-  // Event handlers
-  // Remark: Do all event handlers now need to be arrays, so we can add multiple handlers?
-  pointerdown(handler) {
-    this.config.pointerdown = handler;
+  // Private method to add an event handler
+  _addEventHandler(eventName, handler) {
+    // Check if a composite function already exists for this event
+    if (typeof this.config[eventName] !== 'function') {
+      // If not, create a new composite function
+      this.config[eventName] = (...args) => {
+        this.config[eventName].handlers.forEach(h => h(...args));
+      };
+      // Initialize the handlers array within the composite function
+      this.config[eventName].handlers = [handler];
+    } else {
+      // For subsequent handlers, just add them to the composite function's handlers array
+      this.config[eventName].handlers.push(handler);
+    }
+
     return this;
+  }
+
+  // Public methods to add specific event handlers
+  pointerdown(handler) {
+    return this._addEventHandler('pointerdown', handler);
   }
 
   collisionStart(handler) {
-    this.config.collisionStart = handler;
-    return this;
+    return this._addEventHandler('collisionStart', handler);
+  }
+
+  collisionActive(handler) {
+    return this._addEventHandler('collisionActive', handler);
   }
 
   collisionEnd(handler) {
-    this.config.collisionEnd = handler;
-    return this;
+    return this._addEventHandler('collisionEnd', handler);
   }
 
   sutra(rules, config) {
@@ -167,7 +186,7 @@ export default class EntityBuilder {
     this.config.meta = value;
     return this;
   }
-  
+
   text(value) {
     this.config.text = value;
     return this;

@@ -1,5 +1,5 @@
 export default function use(game) {
-  return async function use(pluginInstanceOrId, options = {}, cb = () => {}) {
+  return async function use(pluginInstanceOrId, options = {}, cb = () => { }) {
     let basePath = '/plugins/'; // Base path for loading plugins
     basePath = game.scriptRoot + basePath;
 
@@ -68,7 +68,7 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
   }
 
   pluginGameSceneMethods(game, pluginInstance);
-  
+
   game.loadedPlugins.push(pluginId);
 
   if (pluginInstance.preload) {
@@ -120,17 +120,32 @@ function pluginGameSceneMethods(game, pluginInstance) {
     return game.createText(data);
   }
 }
-
 function extendEntityBuilder(game, pluginInstance) {
-  let pluginName= pluginInstance.constructor.name;
-  game.EntityBuilder.prototype[pluginName] = function(...args) {
+  let pluginName = pluginInstance.constructor.name;
+  game.EntityBuilder.prototype[pluginName] = function (...args) {
     const componentValue = pluginInstance.build.call(pluginInstance, ...args);
+
     if (typeof componentValue === 'object') {
       for (let key in componentValue) {
-        this.config[key] = componentValue[key];
+        const value = componentValue[key];
+        if (typeof value === 'function') {
+          // Check if the composite function already exists, if not, initialize it
+          if (typeof this.config[key] !== 'function') {
+            // Define the composite function
+            this.config[key] = (...handlerArgs) => {
+              this.config[key].handlers.forEach(handler => handler(...handlerArgs));
+            };
+            // Initialize with an empty handlers array
+            this.config[key].handlers = [];
+          }
+          // Add the new handler to the composite function's handlers array
+          this.config[key].handlers.push(value);
+        } else {
+          this.config[key] = value;
+        }
       }
     } else if (typeof componentValue === 'number' || typeof componentValue === 'string') {
-      this.config[pluginId] = componentValue;
+      this.config[pluginName] = componentValue;
     }
     return this;
   };
