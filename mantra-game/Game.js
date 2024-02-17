@@ -539,6 +539,9 @@ class Game {
     client.disconnect();
   }
 
+  async awaitAllPlugins () {
+    await Promise.all(Object.values(game.loadingPluginPromises));
+  }
 
 }
 

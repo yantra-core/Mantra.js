@@ -22,26 +22,32 @@ export default function use(game) {
       game.loadingPluginsCount++;
       game.emit('plugin::loading', pluginId);
 
-      try {
-        const scriptUrl = `${basePath}${pluginId}.js`;
-        await game.loadPluginScript(scriptUrl);
+      // Store the loading promise
+      game.loadingPluginPromises[pluginId] = (async () => {
+        try {
+          const scriptUrl = `${basePath}${pluginId}.js`;
+          await game.loadPluginScript(scriptUrl);
+          console.log(`Loaded: ${pluginId}`);
 
-        console.log(`Loaded: ${pluginId}`);
-
-        if (typeof PLUGINS === 'object' && PLUGINS[pluginId]) {
-          let pluginInstance = new PLUGINS[pluginId].default(options);
-          await handlePluginInstance(game, pluginInstance, pluginId, options, cb);
-        } else {
-          console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
-          throw new Error('PLUGINS object not found, cannot load plugin');
+          if (typeof PLUGINS === 'object' && PLUGINS[pluginId]) {
+            let pluginInstance = new PLUGINS[pluginId].default(options);
+            await handlePluginInstance(game, pluginInstance, pluginId, options, cb);
+          } else {
+            console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
+            throw new Error('PLUGINS object not found, cannot load plugin');
+          }
+        } catch (err) {
+          console.error(`Error loading plugin ${pluginId}:`, err);
+          game._plugins[pluginId] = { status: 'error' };
+          game.loadingPluginsCount--;
+          cb(err);
+          throw err; // Rethrow or handle as needed
+        } finally {
+          // Remove the promise from the tracking object once it's settled
+          delete game.loadingPluginPromises[pluginId];
         }
-      } catch (err) {
-        console.error(`Error loading plugin ${pluginId}:`, err);
-        game._plugins[pluginId] = { status: 'error' };
-        game.loadingPluginsCount--;
-        cb(err);
-        throw err; // Rethrow or handle as needed
-      }
+      })();
+
     } else {
       if (!pluginInstanceOrId.id) {
         console.log('Error with pluginInstance', pluginInstanceOrId);
@@ -54,14 +60,23 @@ export default function use(game) {
   }
 }
 
-async function handlePluginInstance(game, pluginInstance, pluginId, options, cb) {
-  extendEntityBuilder(game, pluginInstance);
-  pluginGameSceneMethods(game, pluginInstance);
 
+async function handlePluginInstance(game, pluginInstance, pluginId, options, cb) {
+
+  if (typeof pluginInstance.build === 'function') {
+    extendEntityBuilder(game, pluginInstance);
+  }
+
+  pluginGameSceneMethods(game, pluginInstance);
+  
   game.loadedPlugins.push(pluginId);
 
   if (pluginInstance.preload) {
     await pluginInstance.preload(game);
+    // await all game.use(pluginName) in parallel
+    await game.awaitAllPlugins();
+    // Remark: we could also await assets here
+
   }
 
   pluginInstance.init(game, game.engine, game.scene);

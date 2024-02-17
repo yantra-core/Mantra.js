@@ -142,6 +142,9 @@ export default function construct(game, plugins = []) {
   game.emitters = eventEmitter.emitters;
   game.EntityBuilder = EntityBuilder;
 
+  // Stores references to Promises of all plugins that are currently loading
+  game.loadingPluginPromises = {};
+
   // Helper for building entity data configurations
   game.build = function() {
     return new game.EntityBuilder(game);

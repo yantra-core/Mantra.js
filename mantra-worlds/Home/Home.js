@@ -45,6 +45,7 @@ class Home {
   constructor() {
     this.id = Home.id;
     this.type = Home.type;
+    
   }
 
   async preload(game) {
@@ -72,12 +73,40 @@ class Home {
     //
     //     await game.preloader.loadAll();
     //
+
+    //
+    // Use plugins in the preloader so that will be available when init() is called
+    // You can await each plugin here, or let them preload in parallel automatically
+    game.use('Block');
+    game.use('Bomb');
+    game.use('Border')
+    game.use('Bullet');
+    game.use('Boomerang');
+    game.use('Flame');
+
   }
 
 
   init(game) {
     this.game = game;
     this.createWorld();
+  }
+
+  update () {
+    if (this.game.tick % 10 === 0) { // TODO: better exists check for player alive status
+      if (!this.game.data.ents._[this.game.currentPlayerId]) {
+        this.game.createPlayer({
+          texture: {
+            sheet: 'loz_spritesheet',
+            sprite: 'player',
+          },
+          position: {
+            x: 0,
+            y: 0
+          }
+        });
+      }
+    }
   }
 
   createWorld() {
@@ -98,7 +127,6 @@ class Home {
     game.setGravity(0, 0, 0);
 
     game.createPlayer({
-      respawns: true,
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'player',
@@ -109,14 +137,26 @@ class Home {
       }
     });
 
+    /*
+    game.after('removeEntity', function(entity) {
+      if (entity.type === 'PLAYER') {
+        game.createPlayer({
+          respawns: true,
+          texture: {
+            sheet: 'loz_spritesheet',
+            sprite: 'player',
+          },
+          position: {
+            x: 0,
+            y: 0
+          }
+        });
+      }
+    });
+    */
+
     game.setBackground('#007fff');
 
-    game.use('Block');
-    game.use('Bomb');
-    game.use('Border', { autoBorder: true })
-    game.use('Bullet');
-    game.use('Boomerang');
-    game.use('Flame');
     // game.use('Tone');
     this.createTwinFlames();    
     welcomeMessage(game);

@@ -65,7 +65,7 @@ class Boomerang {
   update() {
     // TODO: we can perform this check less frequently
     // Iterate through all boomerang entities in the game data
-    if (this.game.data.ents.BOOMERANG) {
+    if (this.game.data.ents && this.game.data.ents.BOOMERANG) {
       for (let eId in this.game.data.ents.BOOMERANG) {
         let boomerang = this.game.data.ents.BOOMERANG[eId];
         // Update each boomerang's position and check return conditions
