@@ -40,8 +40,23 @@ export default class EntityBuilder {
     return this;
   }
 
-  body (value = true) {
+  body(value = true) {
     this.config.body = value;
+    return this;
+  }
+
+  friction(value) {
+    this.config.friction = value;
+    return this;
+  }
+
+  frictionStatic(value) {
+    this.config.frictionStatic = value;
+    return this;
+  }
+
+  frictionAir(value) {
+    this.config.frictionAir = value;
     return this;
   }
 
@@ -74,6 +89,11 @@ export default class EntityBuilder {
 
   score(value) {
     this.config.score = value;
+    return this;
+  }
+
+  lifetime(value) {
+    this.config.lifetime = value;
     return this;
   }
 
@@ -254,6 +274,7 @@ export default class EntityBuilder {
           this.config[key].handlers = [];
         }
         // Add the new handler to the composite function's handlers array
+        // TODO: this may not work as intended? add more entity mixin tests
         this.config[key].handlers.push(value);
       } else if (typeof value === 'object' && this.config[key] && typeof this.config[key] === 'object') {
         // For object types, merge the objects
