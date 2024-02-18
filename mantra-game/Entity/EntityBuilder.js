@@ -229,8 +229,20 @@ export default class EntityBuilder {
     return this.config;
   }
 
+  repeat(count) {
+    this.config.repeat = count;
+    return this;
+  }
+
   createEntity() {
     // Create a new entity with the current configuration
+    if (typeof this.config.repeat === 'number') {
+      let entities = [];
+      for (let i = 0; i < this.config.repeat; i++) {
+        entities.push(this.game.createEntity(this.config));
+      }
+      return entities;
+    }
     return this.game.createEntity(this.config);
   }
 
