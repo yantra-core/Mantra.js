@@ -263,6 +263,516 @@ var _default = exports["default"] = TimersComponent;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = void 0;
+var _ensureColorInt = _interopRequireDefault(require("../plugins/entity/lib/util/ensureColorInt.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // EntityBuilder.js - Marak Squires 2024
+var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
+  function EntityBuilder(game) {
+    _classCallCheck(this, EntityBuilder);
+    this.game = game;
+    this.config = {
+      position: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      offset: {
+        x: 0,
+        y: 0,
+        z: 0
+      }
+    };
+  }
+
+  // Basic properties
+  _createClass(EntityBuilder, [{
+    key: "type",
+    value: function type(value) {
+      this.config.type = value;
+      if (value === 'TEXT') {
+        // text entities should not have a body by default
+        // can be overridden by calling body(true) after type('TEXT')
+        this.config.body = false;
+      }
+      return this;
+    }
+  }, {
+    key: "name",
+    value: function name(value) {
+      this.config.name = value;
+      return this;
+    }
+  }, {
+    key: "kind",
+    value: function kind(value) {
+      this.config.kind = value;
+      return this;
+    }
+  }, {
+    key: "startingPosition",
+    value: function startingPosition(x, y) {
+      this.config.startingPosition = {
+        x: x,
+        y: y
+      };
+      return this;
+    }
+  }, {
+    key: "body",
+    value: function body() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      this.config.body = value;
+      return this;
+    }
+  }, {
+    key: "friction",
+    value: function friction(value) {
+      this.config.friction = value;
+      return this;
+    }
+  }, {
+    key: "frictionStatic",
+    value: function frictionStatic(value) {
+      this.config.frictionStatic = value;
+      return this;
+    }
+  }, {
+    key: "frictionAir",
+    value: function frictionAir(value) {
+      this.config.frictionAir = value;
+      return this;
+    }
+  }, {
+    key: "velocity",
+    value: function velocity(x, y) {
+      this.config.velocity = {
+        x: x,
+        y: y
+      };
+      return this;
+    }
+  }, {
+    key: "rotation",
+    value: function rotation(value) {
+      this.config.rotation = value;
+      return this;
+    }
+
+    // Physical properties
+  }, {
+    key: "mass",
+    value: function mass(value) {
+      this.config.mass = value;
+      return this;
+    }
+  }, {
+    key: "density",
+    value: function density(value) {
+      this.config.density = value;
+      return this;
+    }
+
+    // Health and scoring
+  }, {
+    key: "health",
+    value: function health(value) {
+      this.config.health = value;
+      return this;
+    }
+  }, {
+    key: "score",
+    value: function score(value) {
+      this.config.score = value;
+      return this;
+    }
+  }, {
+    key: "lifetime",
+    value: function lifetime(value) {
+      this.config.lifetime = value;
+      return this;
+    }
+
+    // Dimensions
+  }, {
+    key: "size",
+    value: function size(width, height, depth) {
+      if (typeof height === 'undefined') {
+        height = width;
+      }
+      this.config.size = {
+        width: width,
+        height: height
+      };
+      if (typeof depth !== 'undefined') {
+        // 2d games may not have a depth, we may want to default to 0
+        this.config.size.depth = depth;
+      } else {
+        this.config.size.depth = height;
+      }
+      return this;
+    }
+  }, {
+    key: "radius",
+    value: function radius(value) {
+      this.config.radius = value;
+      return this;
+    }
+
+    // Styling and appearance
+  }, {
+    key: "shape",
+    value: function shape(value) {
+      this.config.shape = value;
+      return this;
+    }
+  }, {
+    key: "color",
+    value: function color(value) {
+      this.config.color = value;
+      return this;
+    }
+  }, {
+    key: "texture",
+    value: function texture(value) {
+      this.config.texture = value;
+      return this;
+    }
+  }, {
+    key: "style",
+    value: function style(value) {
+      this.config.style = value;
+      return this;
+    }
+
+    // Behavior and capabilities
+  }, {
+    key: "maxSpeed",
+    value: function maxSpeed(value) {
+      this.config.maxSpeed = value;
+      return this;
+    }
+  }, {
+    key: "owner",
+    value: function owner(value) {
+      this.config.owner = value;
+      return this;
+    }
+  }, {
+    key: "hasInventory",
+    value: function hasInventory() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      this.config.hasInventory = value;
+      return this;
+    }
+  }, {
+    key: "isSensor",
+    value: function isSensor() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      this.config.isSensor = value;
+      return this;
+    }
+  }, {
+    key: "isStatic",
+    value: function isStatic() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      this.config.isStatic = value;
+      return this;
+    }
+
+    // Private method to add an event handler
+  }, {
+    key: "_addEventHandler",
+    value: function _addEventHandler(eventName, handler) {
+      // console.log(`Adding handler for event: ${eventName}`);
+
+      // Define a variable outside the composite function to hold the handlers
+      var handlers;
+
+      // Check if a composite function already exists for this event
+      if (typeof this.config[eventName] !== 'function') {
+        // console.log(`No composite function for ${eventName}, creating new.`);
+
+        // Initialize the handlers array and store it in the variable
+        handlers = [handler];
+
+        // Create a new composite function that uses the handlers variable
+        this.config[eventName] = function () {
+          for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+          // console.log(`Executing composite function for ${eventName} with args:`, args);
+          handlers.forEach(function (h) {
+            // console.log(`Executing handler for ${eventName}`);
+            h.apply(void 0, args);
+          });
+        };
+      } else {
+        // console.log(`Composite function exists for ${eventName}, adding to existing handlers.`);
+
+        // If the composite function exists, retrieve its handlers array
+        handlers = this.config[eventName].handlers;
+
+        // Add the new handler to the array
+        handlers.push(handler);
+      }
+
+      // Attach the handlers array to the composite function for potential future reference
+      this.config[eventName].handlers = handlers;
+      // console.log(`Total handlers for ${eventName}: ${handlers.length}`);
+
+      return this;
+    }
+
+    // Public methods to add specific event handlers
+  }, {
+    key: "pointerdown",
+    value: function pointerdown(handler) {
+      return this._addEventHandler('pointerdown', handler);
+    }
+  }, {
+    key: "collisionStart",
+    value: function collisionStart(handler) {
+      return this._addEventHandler('collisionStart', handler);
+    }
+  }, {
+    key: "collisionActive",
+    value: function collisionActive(handler) {
+      return this._addEventHandler('collisionActive', handler);
+    }
+  }, {
+    key: "collisionEnd",
+    value: function collisionEnd(handler) {
+      return this._addEventHandler('collisionEnd', handler);
+    }
+  }, {
+    key: "onUpdate",
+    value: function onUpdate(handler) {
+      return this._addEventHandler('update', handler);
+    }
+  }, {
+    key: "sutra",
+    value: function sutra(rules, config) {
+      // TODO: This will overwrite Sutras as chain progresses left-to-right,
+      // leaving only the last Sutra as active
+      // TODO: merge rules existing sutra based on config ( default true )
+      this.config.sutra = {
+        rules: rules,
+        config: config
+      };
+      return this;
+    }
+
+    // TODO: better name for "exit" semantics
+  }, {
+    key: "exit",
+    value: function exit(handler) {
+      this.config.exit = handler;
+      return this;
+    }
+
+    // Meta and Data
+  }, {
+    key: "meta",
+    value: function meta(value) {
+      // TODO: meta should be able to merge with existing meta if required
+      this.config.meta = value;
+      return this;
+    }
+  }, {
+    key: "text",
+    value: function text(value) {
+      this.config.text = value;
+      return this;
+    }
+
+    // Positioning and movement
+  }, {
+    key: "position",
+    value: function position(x, y, z) {
+      this.config.position = {
+        x: x,
+        y: y
+      };
+      if (typeof z === 'number') {
+        this.config.position.z = z;
+      }
+      return this;
+    }
+  }, {
+    key: "offset",
+    value: function offset(x, y, z) {
+      this.config.offset = {
+        x: x,
+        y: y
+      };
+      if (typeof z === 'number') {
+        this.config.offset.z = z;
+      }
+      return this;
+    }
+
+    // Finalization
+  }, {
+    key: "build",
+    value: function build() {
+      // Return a deep copy to prevent further modifications
+      return this.config;
+    }
+
+    // Creates *exact* copies of the entity with the specified configuration
+  }, {
+    key: "clone",
+    value: function clone(count) {
+      this.config.clone = count;
+      return this;
+    }
+
+    // TODO: implement repeat
+    // Creates a copy of the entity with the specified configuration, but will apply
+    // the offset.x and offset.y basd on the index of the clone
+  }, {
+    key: "repeat",
+    value: function repeat(count) {
+      this.config.repeat = count;
+      return this;
+    }
+  }, {
+    key: "createEntity",
+    value: function createEntity() {
+      if (typeof this.config.clone === 'number') {
+        var entities = [];
+        for (var i = 0; i < this.config.clone; i++) {
+          entities.push(this.game.createEntity(this.config));
+        }
+        return entities;
+      } else if (typeof this.config.repeat === 'number') {
+        var _entities = [];
+        for (var _i = 0; _i < this.config.repeat; _i++) {
+          var entityConfig = JSON.parse(JSON.stringify(this.config));
+
+          // Calculate the offset for each repeated entity
+          // .ofset() is treated separately as modifier for position, it can be used without repeaters
+          console.log('this.config.position', this.config.position);
+          console.log('this.config.offset', this.config.offset);
+          var offsetX = this.config.position.x + _i * this.config.offset.x;
+          var offsetY = this.config.position.y + _i * this.config.offset.y;
+          var offsetZ = this.config.position.z + _i * this.config.offset.z;
+          // Remark: Both x and y must be numbers to be applied
+          if (typeof offsetX === 'number' && typeof offsetY === 'number') {
+            entityConfig.position = {
+              x: offsetX,
+              y: offsetY
+            };
+          }
+          if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
+            entityConfig.position.z = offsetZ;
+          }
+
+          // Apply each modifier for the repeated entity
+          for (var _i2 = 0, _Object$entries = Object.entries(this.repeatModifiers); _i2 < _Object$entries.length; _i2++) {
+            var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
+              prop = _Object$entries$_i[0],
+              modifier = _Object$entries$_i[1];
+            if (typeof modifier === 'function') {
+              // Pass the current index and total count to the modifier function
+              entityConfig[prop] = modifier(_i, this.config.repeat, this.config[prop]);
+            }
+          }
+
+          // Remove repeat-related properties to avoid infinite recursion and irrelevant data
+          delete entityConfig.repeat;
+          delete entityConfig.repeatModifiers;
+          _entities.push(this.game.createEntity(entityConfig));
+        }
+        return _entities;
+      } else {
+        return this.game.createEntity(this.config);
+      }
+    }
+  }, {
+    key: "repeaters",
+    value: function repeaters(modifiers) {
+      this.repeatModifiers = modifiers;
+      return this;
+    }
+  }, {
+    key: "mix",
+    value: function mix(mixinConfig) {
+      var _this = this;
+      var _loop = function _loop(key) {
+        var value = mixinConfig[key];
+        if (typeof value === 'function') {
+          // Check if a composite function already exists for this key
+          if (typeof _this.config[key] !== 'function') {
+            // Define the composite function
+            _this.config[key] = function () {
+              for (var _len2 = arguments.length, handlerArgs = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                handlerArgs[_key2] = arguments[_key2];
+              }
+              _this.config[key].handlers.forEach(function (handler) {
+                return handler.apply(void 0, handlerArgs);
+              });
+            };
+            // Initialize with an empty handlers array
+            _this.config[key].handlers = [];
+          }
+          // Add the new handler to the composite function's handlers array
+          // TODO: this may not work as intended? add more entity mixin tests
+          _this.config[key].handlers.push(value);
+        } else if (_typeof(value) === 'object' && _this.config[key] && _typeof(_this.config[key]) === 'object') {
+          // For object types, merge the objects
+          _this.config[key] = _objectSpread(_objectSpread({}, _this.config[key]), value);
+        } else {
+          // For color types, blend the colors
+          if (key === 'color') {
+            if (_this.config[key] !== undefined) {
+              var existingColor = (0, _ensureColorInt["default"])(_this.config[key]);
+              var newColor = (0, _ensureColorInt["default"])(value);
+              value = blendColors(existingColor, newColor);
+            }
+          }
+          // TODO we can add a merge / mix strategy for other types
+          // For position we could average, hi-low, etc
+          // For primitive types or new keys, simply overwrite/set the value
+          _this.config[key] = value;
+        }
+      };
+      for (var key in mixinConfig) {
+        _loop(key);
+      }
+      return this; // Enable chaining
+    }
+  }]);
+  return EntityBuilder;
+}(); // Function to blend two colors
+function blendColors(color1, color2) {
+  var r = (color1 >> 16) + (color2 >> 16) >> 1;
+  var g = (color1 >> 8 & 0xFF) + (color2 >> 8 & 0xFF) >> 1;
+  var b = (color1 & 0xFF) + (color2 & 0xFF) >> 1;
+  return r << 16 | g << 8 | b;
+}
+
+},{"../plugins/entity/lib/util/ensureColorInt.js":26}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.Game = void 0;
 var _Component = _interopRequireDefault(require("./Component/Component.js"));
 var _construct = _interopRequireDefault(require("./lib/Game/construct.js"));
@@ -270,6 +780,9 @@ var _use = _interopRequireDefault(require("./lib/Game/use.js"));
 var _unload = _interopRequireDefault(require("./lib/Game/unload.js"));
 var _start = _interopRequireDefault(require("./lib/Game/start.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -568,7 +1081,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "applyGravity",
     value: function applyGravity(entA, entB, gravity) {
-      this.systems.physics.applyGravity(entA, entB, gravity);
+      var repulsion = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      this.systems.physics.applyGravity(entA, entB, gravity, repulsion);
     }
   }, {
     key: "setPosition",
@@ -743,6 +1257,8 @@ var Game = exports.Game = /*#__PURE__*/function () {
       entityData.body = false;
       return this.createEntity(entityData);
     }
+
+    // TODO: replace with EntityBuilder API
   }, {
     key: "createBorder",
     value: function createBorder() {
@@ -753,20 +1269,23 @@ var Game = exports.Game = /*#__PURE__*/function () {
         height = _ref$height === void 0 ? this.height : _ref$height,
         _ref$thickness = _ref.thickness,
         thickness = _ref$thickness === void 0 ? 8 : _ref$thickness,
-        color = _ref.color;
+        color = _ref.color,
+        collisionStart = _ref.collisionStart;
       var game = this;
       if (game.systems.border) {
         game.systems.border.createBorder({
           width: game.width,
           height: game.height,
-          thickness: thickness
+          thickness: thickness,
+          collisionStart: collisionStart
         });
       } else {
         game.use('Border', {}, function () {
           game.systems.border.createBorder({
             width: game.width,
             height: game.height,
-            thickness: thickness
+            thickness: thickness,
+            collisionStart: collisionStart
           });
         });
       }
@@ -893,11 +1412,31 @@ var Game = exports.Game = /*#__PURE__*/function () {
       var client = this.getSystem('client');
       client.disconnect();
     }
+  }, {
+    key: "awaitAllPlugins",
+    value: function () {
+      var _awaitAllPlugins = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return Promise.all(Object.values(this.loadingPluginPromises));
+            case 2:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, this);
+      }));
+      function awaitAllPlugins() {
+        return _awaitAllPlugins.apply(this, arguments);
+      }
+      return awaitAllPlugins;
+    }()
   }]);
   return Game;
 }();
 
-},{"./Component/Component.js":2,"./lib/Game/construct.js":10,"./lib/Game/start.js":11,"./lib/Game/unload.js":12,"./lib/Game/use.js":13}],5:[function(require,module,exports){
+},{"./Component/Component.js":2,"./lib/Game/construct.js":11,"./lib/Game/start.js":12,"./lib/Game/unload.js":13,"./lib/Game/use.js":14}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1073,7 +1612,7 @@ var SystemsManager = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":15}],6:[function(require,module,exports){
+},{"../lib/eventEmitter.js":16}],7:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -1081,7 +1620,7 @@ MANTRA.Game = require('./Game.js').Game;
 MANTRA.plugins = {}; // empty plugin scope, may be populated by using plugins
 module.exports = MANTRA;
 
-},{"./Game.js":4}],7:[function(require,module,exports){
+},{"./Game.js":5}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1186,7 +1725,7 @@ var Lifecycle = exports["default"] = /*#__PURE__*/function () {
   return Lifecycle;
 }();
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1392,7 +1931,7 @@ var Preloader = exports["default"] = /*#__PURE__*/function () {
   return Preloader;
 }();
 
-},{"./Preloader/FBXLoader.js":9}],9:[function(require,module,exports){
+},{"./Preloader/FBXLoader.js":10}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1458,7 +1997,7 @@ function _loader() {
   return _loader.apply(this, arguments);
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1472,6 +2011,7 @@ var _gameTick = _interopRequireDefault(require("../gameTick.js"));
 var _localGameLoop = _interopRequireDefault(require("../localGameLoop.js"));
 var _onlineGameLoop = _interopRequireDefault(require("../onlineGameLoop.js"));
 var _Lifecycle = _interopRequireDefault(require("./Lifecycle.js"));
+var _EntityBuilder = _interopRequireDefault(require("../../Entity/EntityBuilder.js"));
 var _ActionRateLimiter = _interopRequireDefault(require("../../Component/ActionRateLimiter.js"));
 var _TimersComponent = _interopRequireDefault(require("../../Component/TimersComponent.js"));
 var _storage = _interopRequireDefault(require("../storage/storage.js"));
@@ -1597,6 +2137,15 @@ function construct(game) {
   game.listenerCount = _eventEmitter["default"].listenerCount.bind(_eventEmitter["default"]);
   game.listeners = _eventEmitter["default"].listeners;
   game.emitters = _eventEmitter["default"].emitters;
+  game.EntityBuilder = _EntityBuilder["default"];
+
+  // Stores references to Promises of all plugins that are currently loading
+  game.loadingPluginPromises = {};
+
+  // Helper for building entity data configurations
+  game.build = function () {
+    return new game.EntityBuilder(game);
+  };
 
   // Bind loadScripts from util
   game.loadScripts = _loadScripts["default"].bind(game);
@@ -1753,7 +2302,7 @@ function construct(game) {
   }
 }
 
-},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../System/SystemsManager.js":5,"../createDefaultPlayer.js":14,"../eventEmitter.js":15,"../gameTick.js":16,"../loadPluginsFromConfig.js":17,"../localGameLoop.js":18,"../onlineGameLoop.js":19,"../storage/storage.js":21,"../switchWorlds.js":22,"../util/loadCSS.js":23,"../util/loadScripts.js":24,"./Lifecycle.js":7,"./Preloader.js":8}],11:[function(require,module,exports){
+},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../Entity/EntityBuilder.js":4,"../../System/SystemsManager.js":6,"../createDefaultPlayer.js":15,"../eventEmitter.js":16,"../gameTick.js":17,"../loadPluginsFromConfig.js":18,"../localGameLoop.js":19,"../onlineGameLoop.js":20,"../storage/storage.js":22,"../switchWorlds.js":23,"../util/loadCSS.js":24,"../util/loadScripts.js":25,"./Lifecycle.js":8,"./Preloader.js":9}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1828,7 +2377,7 @@ function start(cb) {
   });
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -1885,7 +2434,7 @@ function unload(game) {
   }();
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1902,157 +2451,110 @@ function use(game) {
       var options,
         cb,
         basePath,
-        _pluginId,
-        scriptUrl,
         pluginId,
         _args2 = arguments;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
             options = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : {};
-            cb = _args2.length > 2 ? _args2[2] : undefined;
-            if (typeof cb === 'undefined') {
-              cb = function noop() {};
-            }
-
-            // TODO: make game configurable
+            cb = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : function () {};
             basePath = '/plugins/'; // Base path for loading plugins
             basePath = game.scriptRoot + basePath;
-            //console.log("FOUND SCRIPT ROOT", game.scriptRoot)
-            //console.log("LOADING FROM BASEPATH", basePath)
-            // Check if the argument is a string (plugin ID)
             if (!(typeof pluginInstanceOrId === 'string')) {
-              _context2.next = 21;
+              _context2.next = 20;
               break;
             }
-            _pluginId = pluginInstanceOrId; // Check if the plugin is already loaded or loading
-            if (!game._plugins[_pluginId]) {
-              _context2.next = 10;
+            pluginId = pluginInstanceOrId;
+            if (!game._plugins[pluginId]) {
+              _context2.next = 9;
               break;
             }
-            // maybe add world here?
-            console.log("Plugin ".concat(_pluginId, " is already loaded or loading."));
+            console.log("Plugin ".concat(pluginId, " is already loaded or loading."));
             return _context2.abrupt("return", game);
-          case 10:
+          case 9:
             if (!game.isServer) {
-              _context2.next = 15;
+              _context2.next = 14;
               break;
             }
-            if (!game.plugins[_pluginId]) {
-              _context2.next = 13;
+            if (!game.plugins[pluginId]) {
+              _context2.next = 12;
               break;
             }
-            return _context2.abrupt("return", game.use(new game.plugins[_pluginId](options)));
-          case 13:
-            console.log("Attempted to load plugin by string name \"".concat(_pluginId, "\"on server, could not find! skipping"));
+            return _context2.abrupt("return", game.use(new game.plugins[pluginId](options)));
+          case 12:
+            console.log("Attempted to load plugin by string name \"".concat(pluginId, "\" on server, could not find! Skipping"));
             return _context2.abrupt("return");
-          case 15:
-            // Mark the plugin as loading
-            game._plugins[_pluginId] = {
+          case 14:
+            game._plugins[pluginId] = {
               status: 'loading'
             };
             game.loadingPluginsCount++;
-            game.emit('plugin::loading', _pluginId);
+            game.emit('plugin::loading', pluginId);
 
-            // Dynamically load the plugin script
-            scriptUrl = "".concat(basePath).concat(_pluginId, ".js");
-            game.loadPluginScript(scriptUrl).then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-              var pluginInstance;
+            // Store the loading promise
+            game.loadingPluginPromises[pluginId] = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+              var scriptUrl, pluginInstance;
               return _regeneratorRuntime().wrap(function _callee$(_context) {
                 while (1) switch (_context.prev = _context.next) {
                   case 0:
-                    // The script is expected to call `game.use(pluginInstance)` after loading
-                    console.log("Loaded: ".concat(_pluginId));
-                    if ((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object') {
-                      //console.log('creating new instance', pluginId, PLUGINS[pluginId], PLUGINS)
-                      pluginInstance = new PLUGINS[_pluginId]["default"](options);
-                      if (pluginInstance.preload) {
-                        // alert('pluginInstance.preload')
-                        // console.log("pluginInstance.preload", pluginInstance.preload)
-                        // await pluginInstance.preload(game);
-                        // we could preload here as well, i don't think we need to since it will happen below
-                      }
-                      game.use(pluginInstance);
-                      // check to see if pluginInstance is async, if so
-                      // we'll assume it will emit a ready event when it's ready
-                      if (pluginInstance.async) {// TODO: remove this and have better async init semantics
-                        // plugin must perform async operation before it's ready
-                        // plugin author *must* emit their own ready event game will not start
-                      } else {
-                        game.loadingPluginsCount--;
-                        delete game._plugins[_pluginId];
-                        game.emit('plugin::ready::' + _pluginId, pluginInstance);
-                        cb();
-                      }
-                    } else {
-                      // decrement loadingPluginsCount even if it fails
-                      // game means applications will attempt to load even if plugins fail
-                      console.log('Warning: PLUGINS object not found, cannot load plugin', _pluginId);
-                      delete game._plugins[_pluginId];
-                      game.loadingPluginsCount--;
-                      cb(new Error('PLUGINS object not found, cannot load plugin'));
+                    _context.prev = 0;
+                    scriptUrl = "".concat(basePath).concat(pluginId, ".js");
+                    _context.next = 4;
+                    return game.loadPluginScript(scriptUrl);
+                  case 4:
+                    console.log("Loaded: ".concat(pluginId));
+                    if (!((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object' && PLUGINS[pluginId])) {
+                      _context.next = 11;
+                      break;
                     }
-                  case 2:
+                    pluginInstance = new PLUGINS[pluginId]["default"](options);
+                    _context.next = 9;
+                    return handlePluginInstance(game, pluginInstance, pluginId, options, cb);
+                  case 9:
+                    _context.next = 13;
+                    break;
+                  case 11:
+                    console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
+                    throw new Error('PLUGINS object not found, cannot load plugin');
+                  case 13:
+                    _context.next = 22;
+                    break;
+                  case 15:
+                    _context.prev = 15;
+                    _context.t0 = _context["catch"](0);
+                    console.error("Error loading plugin ".concat(pluginId, ":"), _context.t0);
+                    game._plugins[pluginId] = {
+                      status: 'error'
+                    };
+                    game.loadingPluginsCount--;
+                    cb(_context.t0);
+                    throw _context.t0;
+                  case 22:
+                    _context.prev = 22;
+                    // Remove the promise from the tracking object once it's settled
+                    delete game.loadingPluginPromises[pluginId];
+                    return _context.finish(22);
+                  case 25:
                   case "end":
                     return _context.stop();
                 }
-              }, _callee);
-            })))["catch"](function (err) {
-              console.error("Error loading plugin ".concat(_pluginId, ":"), err);
-              game._plugins[_pluginId] = {
-                status: 'error'
-              };
-              throw err;
-            });
-            return _context2.abrupt("return", game);
-          case 21:
-            if (!(typeof pluginInstanceOrId.id === 'undefined')) {
-              _context2.next = 24;
+              }, _callee, null, [[0, 15, 22, 25]]);
+            }))();
+            _context2.next = 25;
+            break;
+          case 20:
+            if (pluginInstanceOrId.id) {
+              _context2.next = 23;
               break;
             }
             console.log('Error with pluginInstance', pluginInstanceOrId);
             throw new Error('All plugins must have a static id property');
-          case 24:
-            pluginGameSceneMethods(game, pluginInstanceOrId);
-            pluginId = pluginInstanceOrId.id;
-            game.loadedPlugins.push(pluginId);
-
-            //
-            // If the Plugin has a .preload() method, call it
-            //
-            if (!pluginInstanceOrId.preload) {
-              _context2.next = 30;
-              break;
-            }
-            _context2.next = 30;
-            return pluginInstanceOrId.preload(game);
-          case 30:
-            pluginInstanceOrId.init(game, game.engine, game.scene);
-            game._plugins[pluginId] = pluginInstanceOrId;
-            if (pluginInstanceOrId.type === 'world') {
-              game.worlds.push(pluginInstanceOrId);
-            }
-            game.emit("plugin::loaded::".concat(pluginId), pluginInstanceOrId);
-            game.emit('plugin::loaded', pluginId);
-            if (typeof pluginInstanceOrId.type !== 'undefined' && pluginInstanceOrId.type === 'world') {
-              game.emit("world::loaded::".concat(pluginInstanceOrId.id), pluginInstanceOrId);
-              game.emit('world::loaded', pluginInstanceOrId);
-            }
-            game.data.plugins = game.data.plugins || {};
-            game.data.plugins[pluginId] = options;
-            if (pluginInstanceOrId.constructor.type === 'scene') {
-              // Remark: why was mutating game.scenes not working as expected?
-              // game.scenes[pluginId] = pluginInstanceOrId;
-              // data scopes seems OK here
-              game.data.scenes = game.data.scenes || {};
-              game.data.scenes[pluginId] = pluginInstanceOrId;
-
-              // register all scenes as systems ( for now )
-              // we could make this a config flag of the scene ( for performance )
-              game.systemsManager.addSystem(pluginId, pluginInstanceOrId);
-            }
+          case 23:
+            _context2.next = 25;
+            return handlePluginInstance(game, pluginInstanceOrId, pluginInstanceOrId.id, options, cb);
+          case 25:
             return _context2.abrupt("return", game);
-          case 40:
+          case 26:
           case "end":
             return _context2.stop();
         }
@@ -2064,12 +2566,58 @@ function use(game) {
     return use;
   }();
 }
-
-//
-// Extends plugins with scoped scene methods
-//
+function handlePluginInstance(_x2, _x3, _x4, _x5, _x6) {
+  return _handlePluginInstance.apply(this, arguments);
+}
+function _handlePluginInstance() {
+  _handlePluginInstance = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(game, pluginInstance, pluginId, options, cb) {
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          if (typeof pluginInstance.build === 'function') {
+            extendEntityBuilder(game, pluginInstance);
+          }
+          pluginGameSceneMethods(game, pluginInstance);
+          game.loadedPlugins.push(pluginId);
+          if (!pluginInstance.preload) {
+            _context3.next = 8;
+            break;
+          }
+          _context3.next = 6;
+          return pluginInstance.preload(game);
+        case 6:
+          _context3.next = 8;
+          return game.awaitAllPlugins();
+        case 8:
+          pluginInstance.init(game, game.engine, game.scene);
+          game._plugins[pluginId] = pluginInstance;
+          game.loadingPluginsCount--;
+          delete game._plugins[pluginId];
+          game.emit("plugin::loaded::".concat(pluginId), pluginInstance);
+          game.emit('plugin::loaded', pluginId);
+          cb();
+          if (pluginInstance.type === 'world' || pluginInstance.constructor.type === 'world') {
+            game.worlds.push(pluginInstance);
+            game.systemsManager.addSystem(pluginId, pluginInstance);
+            game.emit("world::loaded::".concat(pluginInstance.id), pluginInstance);
+            game.emit('world::loaded', pluginInstance);
+          }
+          if (pluginInstance.constructor.type === 'scene') {
+            game.data.scenes = game.data.scenes || {};
+            game.data.scenes[pluginId] = pluginInstance;
+            game.systemsManager.addSystem(pluginId, pluginInstance);
+          }
+          game.data.plugins = game.data.plugins || {};
+          game.data.plugins[pluginId] = options;
+        case 19:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3);
+  }));
+  return _handlePluginInstance.apply(this, arguments);
+}
 function pluginGameSceneMethods(game, pluginInstance) {
-  // attach scene methods to plugin, game methods wrapped to scope entity to plugin scene
   pluginInstance.createEntity = function (data) {
     data.scene = pluginInstance.id;
     return game.createEntity(data);
@@ -2082,8 +2630,50 @@ function pluginGameSceneMethods(game, pluginInstance) {
     return game.createText(data);
   };
 }
+function extendEntityBuilder(game, pluginInstance) {
+  var pluginName = pluginInstance.constructor.name;
+  game.EntityBuilder.prototype[pluginName] = function () {
+    var _pluginInstance$build,
+      _this = this;
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+    var componentValue = (_pluginInstance$build = pluginInstance.build).call.apply(_pluginInstance$build, [pluginInstance].concat(args));
+    if (_typeof(componentValue) === 'object') {
+      var _loop = function _loop(key) {
+        var value = componentValue[key];
+        if (typeof value === 'function') {
+          // Check if the composite function already exists, if not, initialize it
+          if (typeof _this.config[key] !== 'function') {
+            // Define the composite function
+            _this.config[key] = function () {
+              for (var _len2 = arguments.length, handlerArgs = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                handlerArgs[_key2] = arguments[_key2];
+              }
+              _this.config[key].handlers.forEach(function (handler) {
+                return handler.apply(void 0, handlerArgs);
+              });
+            };
+            // Initialize with an empty handlers array
+            _this.config[key].handlers = [];
+          }
+          // Add the new handler to the composite function's handlers array
+          _this.config[key].handlers.push(value);
+        } else {
+          _this.config[key] = value;
+        }
+      };
+      for (var key in componentValue) {
+        _loop(key);
+      }
+    } else if (typeof componentValue === 'number' || typeof componentValue === 'string') {
+      this.config[pluginName] = componentValue;
+    }
+    return this;
+  };
+}
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2137,6 +2727,15 @@ function createDefaultPlayer() {
     color: playerConfig.color,
     radius: playerConfig.radius,
     texture: playerConfig.texture,
+    /*
+    afterRemoveEntity: function(entity){
+      // creates the same player again with the same config
+      // console.log('player removed', entity.id)
+      //throw new Error('Player removed');
+      // causing issues wit warping worlds since we remove all ents and this re-creates the player
+      //game.createPlayer(playerConfig);
+    },
+    */
     mass: 222,
     // sutra: topdown(game), // TODO: replace with more comprehensive player sutra with sprites and item actions
     friction: 0.5,
@@ -2155,7 +2754,7 @@ function createDefaultPlayer() {
 }
 ;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2297,7 +2896,7 @@ eventEmitter.listenerCount = function (eventPattern) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2377,7 +2976,7 @@ function gameTick() {
 }
 var _default = exports["default"] = gameTick;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2541,7 +3140,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":25,"../plugins/physics/Physics.js":26,"../plugins/typer-ghost/GhostTyper.js":27}],18:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":27,"../plugins/physics/Physics.js":28,"../plugins/typer-ghost/GhostTyper.js":30}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2626,7 +3225,7 @@ function _requestAnimationFrame(callback) {
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2714,7 +3313,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2767,7 +3366,7 @@ var MemoryBackend = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = MemoryBackend;
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2847,7 +3446,7 @@ var storage = function () {
 }();
 var _default = exports["default"] = storage;
 
-},{"./MemoryBackend.js":20}],22:[function(require,module,exports){
+},{"./MemoryBackend.js":21}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2933,7 +3532,7 @@ function _switchWorlds() {
   return _switchWorlds.apply(this, arguments);
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3030,7 +3629,7 @@ function _loadCSS() {
   return _loadCSS.apply(this, arguments);
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3122,7 +3721,53 @@ function _loadScripts() {
   return _loadScripts.apply(this, arguments);
 }
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = ensureColorInt;
+function ensureColorInt(color) {
+  if (!color) {
+    return color;
+  }
+
+  // Mapping of common color names to hex values
+  var colorNameToHex = {
+    red: '#FF0000',
+    green: '#00FF00',
+    blue: '#0000FF',
+    black: '#000000',
+    white: '#FFFFFF',
+    yellow: '#FFFF00',
+    purple: '#800080',
+    orange: '#FFA500',
+    pink: '#FFC0CB'
+    // Add more common colors as needed
+  };
+
+  // If color is already a number, return it as is
+  if (typeof color === 'number') {
+    return color;
+  }
+
+  // If color is a hex string (with #), convert it to an integer
+  if (typeof color === 'string' && color.startsWith('#')) {
+    return parseInt(color.replace('#', ''), 16);
+  }
+
+  // If color is a common color name, convert it using the mapping
+  if (typeof color === 'string' && colorNameToHex[color.toLowerCase()]) {
+    return parseInt(colorNameToHex[color.toLowerCase()].replace('#', ''), 16);
+  }
+
+  // If color format is unrecognized, throw an error or return a default color
+  console.error('Unrecognized color format:', color);
+  return parseInt('000000', 16); // Default to black
+}
+
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3447,26 +4092,28 @@ var LoadingScreen = /*#__PURE__*/function () {
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _applyGravity = _interopRequireDefault(require("./applyGravity.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// Physics.js - Marak Squires 2024
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // Physics.js - Marak Squires 2024
 // Generic Math-Only Physics, designed to be used in-code without Physics engine
 var Physics = exports["default"] = /*#__PURE__*/function () {
   function Physics(config) {
     _classCallCheck(this, Physics);
     this.id = Physics.id;
+    this.applyGravity = _applyGravity["default"].bind(this);
   }
   _createClass(Physics, [{
     key: "init",
@@ -3513,37 +4160,43 @@ var Physics = exports["default"] = /*#__PURE__*/function () {
         }
       };
     }
-  }, {
-    key: "applyGravity",
-    value: function applyGravity(ent1, ent2, gravity) {
-      var repulsion = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-      if (!ent1 || !ent2) {
-        return;
-      }
-      var Vector = this.Vector;
-      var distance = Vector.sub(ent2.position, ent1.position);
-      var magnitude = Vector.magnitude(distance);
-      if (magnitude < 0.5) {
-        // This prevents extreme forces at very close distances
-        return;
-      }
-      distance = Vector.normalize(distance);
-      var force = gravity * ent1.mass * ent2.mass / (magnitude * magnitude);
-      var maxForce = 1; // Prevents excessively large forces
-      force = Math.min(force, maxForce);
-      var sign = repulsion ? 1 : -1;
-      game.applyForce(ent2.id, {
-        x: sign * distance.x * force,
-        y: sign * distance.y * force
-      });
-    }
   }]);
   return Physics;
 }();
 _defineProperty(Physics, "id", 'physics');
 _defineProperty(Physics, "removable", false);
 
-},{}],27:[function(require,module,exports){
+},{"./applyGravity.js":29}],29:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = applyGravity;
+function applyGravity(ent1, ent2, gravity) {
+  var repulsion = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  if (!ent1 || !ent2) {
+    return;
+  }
+  var Vector = this.Vector;
+  var distance = Vector.sub(ent2.position, ent1.position);
+  var magnitude = Vector.magnitude(distance);
+  if (magnitude < 0.5) {
+    // This prevents extreme forces at very close distances
+    return;
+  }
+  distance = Vector.normalize(distance);
+  var force = gravity * ent1.mass * ent2.mass / (magnitude * magnitude);
+  var maxForce = 1; // Prevents excessively large forces
+  force = Math.min(force, maxForce);
+  var sign = repulsion ? 1 : -1;
+  game.applyForce(ent2.id, {
+    x: sign * distance.x * force,
+    y: sign * distance.y * force
+  });
+}
+
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3729,5 +4382,5 @@ var Typer = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = GhostTyper;
 
-},{}]},{},[6])(6)
+},{}]},{},[7])(7)
 });

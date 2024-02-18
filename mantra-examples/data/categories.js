@@ -40,6 +40,15 @@ let categories = [
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
   {
+    title: 'NPCs', // deep orange
+    name: 'npc',
+    color: '#ff5722',
+    description: 'Non-Player Characters.',
+    image: 'placeholder-image.jpg',
+    url: 'npc.html',
+    tags: ['npc', 'characters', 'enemies', 'allies', 'monsters', 'creatures', 'beasts', 'animals', 'mobs', 'villagers', 'townsfolk']
+  },
+  {
     "title": "Collisions",
     "name": "collisions",
     "color": "#ff9800", // orange
@@ -221,6 +230,14 @@ let entity_examples = [
     url: 'entity/clone-entity.html',
     tags: ['clone', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'copy', 'duplicate']
   },
+  {
+    title: 'Repeat Entity',
+    category: 'entity',
+    description: 'Repeat an entity with an offset padding.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/repeat-entity.html',
+    tags: ['repeat', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate', 'offset', 'padding']
+  },
 
   {
     title: 'Combine Entities',
@@ -346,9 +363,9 @@ let item_examples = [
     tags: ['teleporter', 'item', 'inventory', 'transport', 'teleport', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
   },
   {
-    title: 'UnitSpawner',
+    title: 'Unit Spawner',
     category: 'items',
-    description: 'UnitSpawners can be placed and used to spawn units.',
+    description: 'Unit Spawners can be placed and used to spawn units.',
     image: 'placeholder-image.jpg',
     url: 'items/unit-spawner.html',
     tags: ['unit', 'spawner', 'item', 'inventory', 'spawn', 'unit', 'build', 'timer']

@@ -3,7 +3,18 @@ import ensureColorInt from '../plugins/entity/lib/util/ensureColorInt.js';
 export default class EntityBuilder {
   constructor(game) {
     this.game = game;
-    this.config = {};
+    this.config = {
+      position: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+      offset: {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+    };
   }
 
   // Basic properties
@@ -26,12 +37,6 @@ export default class EntityBuilder {
 
   kind(value) {
     this.config.kind = value;
-    return this;
-  }
-
-  // Positioning and movement
-  position(x, y) {
-    this.config.position = { x, y };
     return this;
   }
 
@@ -107,6 +112,8 @@ export default class EntityBuilder {
     this.config.size = { width, height };
     if (typeof depth !== 'undefined') { // 2d games may not have a depth, we may want to default to 0
       this.config.size.depth = depth;
+    } else {
+      this.config.size.depth = height;
     }
     return this;
   }
@@ -162,7 +169,7 @@ export default class EntityBuilder {
     this.config.isStatic = value;
     return this;
   }
-  
+
   // Private method to add an event handler
   _addEventHandler(eventName, handler) {
     // console.log(`Adding handler for event: ${eventName}`);
@@ -249,14 +256,88 @@ export default class EntityBuilder {
     return this;
   }
 
+
+  // Positioning and movement
+  position(x, y, z) {
+    this.config.position = { x, y };
+    if (typeof z === 'number') {
+      this.config.position.z = z;
+    }
+    return this;
+  }
+
+  offset(x, y, z) {
+    this.config.offset = { x, y };
+    if (typeof z === 'number') {
+      this.config.offset.z = z;
+    }
+    return this;
+  }
+
+
   // Finalization
   build() {
     // Return a deep copy to prevent further modifications
     return this.config;
   }
 
+  // Creates *exact* copies of the entity with the specified configuration
   clone(count) {
     this.config.clone = count;
+    return this;
+  }
+
+  // Creates a copy of the entity with the specified configuration, but will apply
+  // all "repeaters" with index and count arguments, allowing for dynamic modifications
+  // separately, the offset.x and offset.y will add to the position
+  repeat(count) {
+    this.config.repeat = count;
+    return this;
+  }
+
+  createEntity() {
+    if (typeof this.config.clone === 'number') {
+      let entities = [];
+      for (let i = 0; i < this.config.clone; i++) {
+        entities.push(this.game.createEntity(this.config));
+      }
+      return entities;
+    } else if (typeof this.config.repeat === 'number') {
+      let entities = [];
+      for (let i = 0; i < this.config.repeat; i++) {
+        let entityConfig = JSON.parse(JSON.stringify(this.config));
+        // Calculate the offset for each repeated entity
+        // .ofset() is treated separately as modifier for position, it can be used without repeaters
+        let offsetX = this.config.position.x + i * this.config.offset.x;
+        let offsetY = this.config.position.y + i * this.config.offset.y;
+        let offsetZ = this.config.position.z + i * this.config.offset.z;
+        // Remark: Both x and y must be numbers to be applied
+        if (typeof offsetX === 'number' && typeof offsetY === 'number') {
+          entityConfig.position = { x: offsetX, y: offsetY };
+        }
+        if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
+          entityConfig.position.z = offsetZ;
+        }
+        // Apply each modifier for the repeated entity
+        for (let [prop, modifier] of Object.entries(this.repeatModifiers)) {
+          if (typeof modifier === 'function') {
+            // Pass the current index and total count to the modifier function
+            entityConfig[prop] = modifier(i, this.config.repeat, this.config[prop]);
+          }
+        }
+        // Remove repeat-related properties to avoid infinite recursion and irrelevant data
+        delete entityConfig.repeat;
+        delete entityConfig.repeatModifiers;
+        entities.push(this.game.createEntity(entityConfig));
+      }
+      return entities;
+    } else {
+      return this.game.createEntity(this.config);
+    }
+  }
+
+  repeaters(modifiers) {
+    this.repeatModifiers = modifiers;
     return this;
   }
 
@@ -296,26 +377,12 @@ export default class EntityBuilder {
     }
     return this; // Enable chaining
   }
-
-
-  createEntity() {
-    // Create a new entity with the current configuration
-    if (typeof this.config.clone === 'number') {
-      let entities = [];
-      for (let i = 0; i < this.config.clone; i++) {
-        entities.push(this.game.createEntity(this.config));
-      }
-      return entities;
-    }
-    return this.game.createEntity(this.config);
-  }
-
 }
 
-  // Function to blend two colors
-  function blendColors(color1, color2) {
-    const r = ((color1 >> 16) + (color2 >> 16)) >> 1;
-    const g = (((color1 >> 8) & 0xFF) + ((color2 >> 8) & 0xFF)) >> 1;
-    const b = ((color1 & 0xFF) + (color2 & 0xFF)) >> 1;
-    return (r << 16) | (g << 8) | b;
-  }
+// Function to blend two colors
+function blendColors(color1, color2) {
+  const r = ((color1 >> 16) + (color2 >> 16)) >> 1;
+  const g = (((color1 >> 8) & 0xFF) + ((color2 >> 8) & 0xFF)) >> 1;
+  const b = ((color1 & 0xFF) + (color2 & 0xFF)) >> 1;
+  return (r << 16) | (g << 8) | b;
+}
