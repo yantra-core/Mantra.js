@@ -130,7 +130,7 @@ export default class EntityBuilder {
   }
 
   color(value) {
-    this.config.color = value;
+    this.config.color = ensureColorInt(value); // converts string and hex color to int
     return this;
   }
 
@@ -267,7 +267,15 @@ export default class EntityBuilder {
   }
 
   offset(x, y, z) {
-    this.config.offset = { x, y };
+    if (typeof this.config.offset !== 'object' || this.config.offset === null) {
+      this.config.offset = {};
+    }
+    if (typeof x === 'number') {
+      this.config.offset.x = x;
+    }
+    if (typeof y === 'number') {
+      this.config.offset.y = y;
+    }
     if (typeof z === 'number') {
       this.config.offset.z = z;
     }
@@ -299,30 +307,32 @@ export default class EntityBuilder {
     if (typeof this.config.clone === 'number') {
       let entities = [];
       for (let i = 0; i < this.config.clone; i++) {
-        entities.push(this.game.createEntity(this.config));
+        let clonedConfig = { ...this.config }; // Shallow copy for non-function properties
+        // Explicitly reassign functions and bound event handlers
+        clonedConfig.collisionStart = this.config.collisionStart;
+        entities.push(this.game.createEntity(clonedConfig));
       }
       return entities;
     } else if (typeof this.config.repeat === 'number') {
       let entities = [];
       for (let i = 0; i < this.config.repeat; i++) {
-        let entityConfig = JSON.parse(JSON.stringify(this.config));
+        let entityConfig = { ...this.config }; // Shallow copy for non-function properties
+  
         // Calculate the offset for each repeated entity
-        // .ofset() is treated separately as modifier for position, it can be used without repeaters
-        let offsetX = this.config.position.x + i * this.config.offset.x;
-        let offsetY = this.config.position.y + i * this.config.offset.y;
-        let offsetZ = this.config.position.z + i * this.config.offset.z;
-        // Remark: Both x and y must be numbers to be applied
+        let offsetX = entityConfig.position.x + i * entityConfig.offset.x;
+        let offsetY = entityConfig.position.y + i * entityConfig.offset.y;
+        let offsetZ = entityConfig.position.z + i * entityConfig.offset.z;
         if (typeof offsetX === 'number' && typeof offsetY === 'number') {
-          entityConfig.position = { x: offsetX, y: offsetY };
+          entityConfig.position = { x: offsetX, y: offsetY, z: entityConfig.position.z };
         }
         if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
           entityConfig.position.z = offsetZ;
         }
-        // Apply each modifier for the repeated entity
-        for (let [prop, modifier] of Object.entries(this.repeatModifiers)) {
-          if (typeof modifier === 'function') {
-            // Pass the current index and total count to the modifier function
-            entityConfig[prop] = modifier(i, this.config.repeat, this.config[prop]);
+        if (typeof this.repeatModifiers === 'object' && this.repeatModifiers !== null) {
+          for (let [prop, modifier] of Object.entries(this.repeatModifiers)) {
+            if (typeof modifier === 'function') {
+              entityConfig[prop] = modifier(i, this.config.repeat, entityConfig[prop]);
+            }
           }
         }
         // Remove repeat-related properties to avoid infinite recursion and irrelevant data
@@ -332,7 +342,10 @@ export default class EntityBuilder {
       }
       return entities;
     } else {
-      return this.game.createEntity(this.config);
+      let singleConfig = { ...this.config }; // Shallow copy for non-function properties
+      // Explicitly reassign functions and bound event handlers
+      singleConfig.collisionStart = this.config.collisionStart;
+      return this.game.createEntity(singleConfig);
     }
   }
 

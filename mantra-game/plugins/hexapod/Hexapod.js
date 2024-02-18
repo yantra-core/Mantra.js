@@ -23,10 +23,7 @@ export default class Hexapod {
       height: 8,
       collisionStart: this.grow.bind(this),
       update: this.think.bind(this),
-      position: {
-        x: x,
-        y: y
-      }
+      position: entityData.position
     };
   }
   

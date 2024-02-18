@@ -45,6 +45,7 @@ class SwitchGraphics {
       transform: translateX(-50%);
       text-align: center;
       padding: 10px 0;
+      z-index: 1000;
     `;
 
     return container;

@@ -34,7 +34,7 @@ export default class Mouse {
   }
 
   handleMouseMove(event) {
-
+    let game = this.game;
     // TODO: common function for selecting entities
     // TODO: have editor be aware if inspector is loaded
     // if so, show additional UX for selecting entities

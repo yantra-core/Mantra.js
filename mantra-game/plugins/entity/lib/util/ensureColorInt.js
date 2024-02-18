@@ -8,7 +8,7 @@ export default function ensureColorInt(color) {
   const colorNameToHex = {
     red: '#FF0000',
     green: '#00FF00',
-    blue: '#0000FF',
+    blue: '#fff007',
     black: '#000000',
     white: '#FFFFFF',
     yellow: '#FFFF00',

@@ -1,20 +1,19 @@
 // Block.js - Marak Squires 2023
 class Block {
   static id = 'block';
+  static MAX_SPLITS = 4; // Assuming a max split limit
+
   constructor({ MIN_BLOCK_SIZE = 50, width = 40, height = 40 } = {}) {
     this.id = Block.id;
-    // Assuming the config includes width and height properties
-    this.width = width; // Default size if none provided
-    this.height = height; // Default size if none provided
+    this.width = width;
+    this.height = height;
     this.MIN_BLOCK_SIZE = MIN_BLOCK_SIZE;
     this.splits = 0;
     this.rgbColorsInts = [
       0x0000ff,  // Blue
-      // 0x00ff00,  // Green
-      // 0xff0000,  // Red
       0xffff00,  // Yellow
-      0x00ffff,  // Cyan (a shade of Blue-Green, not in ROYGBIV)
-      0xff00ff,  // Magenta (a shade of Red-Violet, not in ROYGBIV)
+      0x00ffff,  // Cyan
+      0xff00ff,  // Magenta
       0xffa500,  // Orange
       0x4b0082,  // Indigo
       0x8a2be2   // Violet
@@ -26,94 +25,83 @@ class Block {
     this.game.systemsManager.addSystem('block', this);
   }
 
-  update() {
-  }
-
-  handleCollision(pair, bodyA, bodyB) {
-
-    if (bodyA.myEntityId && bodyB.myEntityId) {
-      const entityIdA = bodyA.myEntityId;
-      const entityIdB = bodyB.myEntityId;
-
-      const entityA = this.game.entities.get(entityIdA);
-      const entityB = this.game.entities.get(entityIdB);
-
-      if (!entityA || !entityB) {
-        console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
-        return;
-      }
-
-      if (entityA.type === 'BLOCK' && entityB.type === 'BULLET') {
-        this.blockBulletCollision(entityIdA, entityIdB, entityA, entityB);
-      }
-
-      if (entityA.type === 'BULLET' && entityB.type === 'BLOCK') {
-        this.blockBulletCollision(entityIdB, entityIdA, entityB, entityA);
-      }
+  build(entityData = {}) {
+    if (typeof entityData.position === 'undefined') {
+      entityData.position = { x: 0, y: 0 };
     }
+
+    return {
+      type: 'BLOCK',
+      texture: entityData.texture || 'tile-block',
+      size: entityData.size || { width: this.width, height: this.height },
+      position: entityData.position,
+      collisionStart: (a, b, pair, context) => this.splitBlock(a, b, pair, context),
+      ...entityData // Spread the rest of entityData to override defaults as necessary
+    };
   }
 
-  // TODO: add option to cancel collision pairs
-  // TODO: move the block splitting logic into separate function
-  blockBulletCollision(entityIdA, entityIdB, entityA, entityB) {
-    if (this.game.mode === 'local' || !this.game.isClient) {
+  create(entityData = {}) {
+    return this.game.createEntity(this.build(entityData));
+  }
 
-      if (entityA.destroyed || entityB.destroyed) {
-        return;
-      }
+  splitBlock(a, b, pair, context) {
+    if (context.target.type !== 'BULLET') {
+      return;
+    }
+    console.log("Block.splitBlock", a, b, pair, context);
 
-      // console.log("Block.handleCollision", entityIdA, entityIdB, entityA, entityB)
-      this.game.removeEntity(entityIdB);
+    const blockEntity = this.game.data.ents._[context.owner.id];
+    const bulletEntity = this.game.data.ents._[context.target.id];
 
-      if (entityA.width * entityA.height <= this.MIN_BLOCK_SIZE || entityA.splits >= Block.MAX_SPLITS) {
-        this.game.removeEntity(entityIdA);
-        return;
-      }
+    if (!blockEntity || !bulletEntity) {
+      console.log('Block.splitBlock no entity found. Skipping...', blockEntity, bulletEntity);
+      return;
+    }
 
-      const newWidth = entityA.width / 2;
-      const newHeight = entityA.height / 2;
-      const newSplits = entityA.splits + 1;
+    if (blockEntity.destroyed || bulletEntity.destroyed) {
+      return;
+    }
 
-      // inherit important properties from parent
-      let lifetime = entityA.lifetime;
-      let color = entityA.color;
+    this.game.removeEntity(bulletEntity.id);
 
-      for (let i = 0; i < 4; i++) {
-        // TODO: make option for new random color to be config flag
-        let newColor = this.rgbColorsInts[Math.floor(Math.random() * this.rgbColorsInts.length)];
-        const xOffset = (i % 2) * newWidth;
-        const yOffset = Math.floor(i / 2) * newHeight;
-        this.game.createEntity({
-          type: entityA.type,
-          position: {
-            x: entityA.position.x + xOffset,
-            y: entityA.position.y + yOffset,
-            z: entityA.position.z
-          },
-          velocity: {
-            x: (Math.random() * 2 - 1) * 10, // Adjusted for less extreme velocities
-            y: (Math.random() * 2 - 1) * 10
-          },
-          // inherit color from parent
-          texture: entityA.texture,
-          isSensor: entityA.isSensor,
-          // color: newColor,
+    if (blockEntity.width * blockEntity.height <= this.MIN_BLOCK_SIZE || blockEntity.splits >= Block.MAX_SPLITS) {
+      this.game.removeEntity(blockEntity.id);
+      return;
+    }
+
+    const newWidth = blockEntity.width / 2;
+    const newHeight = blockEntity.height / 2;
+    const newSplits = blockEntity.splits + 1;
+
+    for (let i = 0; i < 4; i++) {
+      const xOffset = (i % 2) * newWidth;
+      const yOffset = Math.floor(i / 2) * newHeight;
+      const newPosition = {
+        x: blockEntity.position.x + xOffset,
+        y: blockEntity.position.y + yOffset,
+        z: blockEntity.position.z
+      };
+
+      // Use the builder pattern and ensure collisionStart is set on the new block
+      this.create({
+        position: newPosition,
+        velocity: {
+          x: (Math.random() * 2 - 1) * 10,
+          y: (Math.random() * 2 - 1) * 10
+        },
+        size: {
           width: newWidth,
           height: newHeight,
-          splits: newSplits,
-          //friction: 0.5,
-          frictionAir: 0.2,
-          color: color,
-          lifetime: lifetime,
-          //frictionStatic: 0.5,
-          // TODO: needs to inherit other properties from parent such as frictoin
-        });
-      }
-
-      this.game.removeEntity(entityIdA);
+        },
+        splits: newSplits,
+        frictionAir: 0.2,
+        color: blockEntity.color,
+        lifetime: blockEntity.lifetime,
+      });
     }
-  }
 
+    this.game.removeEntity(blockEntity.id);
+  }
 }
 
 export default Block;

@@ -34,7 +34,8 @@ tap.test('game.build() API', (t) => {
       .build();
 
     // Check that the configuration matches what was set in the builder
-    t.equal(entityConfig.color, 'red', 'Color should be set to red');
+    // colors are stored as integers in the game, so we need to check the integer value
+    t.equal(entityConfig.color, 16711680, 'Color should be set to red integer value');
     t.deepEqual(entityConfig.position, { x: 100, y: 200 }, 'Position should be set to (100, 200)');
     t.deepEqual(entityConfig.size, { width: 50, height: 60, depth: 60 }, 'Size should be set to 50x60x60');
     t.end();
