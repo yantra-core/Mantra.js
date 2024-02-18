@@ -48,6 +48,10 @@ export default class UnitSpawner {
   unitSpawnerUpdate(entityData) {
     if (this.game.tick % 10 === 0) {
       // check for any unit-spawner entities
+      // get current position of ent from reference
+      let position = entityData.position;
+      entityData.meta.unitConfig.position = position;
+      delete entityData.meta.unitConfig.id; // Remark: Clean clone might be better
       let unit = this.createEntity(entityData.meta.unitConfig || {});
       this.applySprayForce(unit);
     }
