@@ -37,6 +37,87 @@ const indexTemplate = fs.readFileSync(path.join(__dirname, '/_template.html'), '
 if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
+function generateGalleryFile() {
+    const galleryTemplatePath = path.join(__dirname, 'gallery_template.html');
+    const galleryHTMLPath = path.join(outputDir, 'gallery.html');
+    const galleryTemplate = fs.readFileSync(galleryTemplatePath, 'utf8');
+
+    // Generate JSON array of example URLs
+    const exampleURLs = examples.map(example => example.url);
+    const exampleURLsJSON = JSON.stringify(exampleURLs);
+
+    const jsCode = `
+    const exampleURLs = ${exampleURLsJSON};
+    let currentIndex = 0;
+    let intervalId;
+    let countdownValue = 5; // 5-second countdown
+    let isPlaying = true;
+
+    function cycleExamples() {
+        const frame = document.getElementById('exampleFrame');
+        const title = document.getElementById('exampleTitle');
+        const nextPreview = document.getElementById('nextPreview');
+        const currentUrl = exampleURLs[currentIndex];
+        frame.src = currentUrl;
+
+        const titleText = currentUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
+        title.textContent = 'Currently Viewing: ' + titleText;
+
+        const nextIndex = (currentIndex + 1) % exampleURLs.length;
+        const nextUrl = exampleURLs[nextIndex];
+        const nextTitleText = nextUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
+        nextPreview.textContent = 'Up Next: ' + nextTitleText;
+
+        currentIndex = nextIndex;
+        resetCountdown();
+    }
+
+    function updateCountdown() {
+        const countdown = document.getElementById('countdown');
+        countdown.textContent = countdownValue;
+        countdownValue--;
+
+        if (countdownValue < 0) {
+            cycleExamples();
+        }
+    }
+
+    function resetCountdown() {
+        countdownValue = 5; // Reset to 5 seconds
+        updateCountdown();
+    }
+
+    function togglePlayPause() {
+        const btn = document.getElementById('playPauseBtn');
+        isPlaying = !isPlaying;
+
+        if (isPlaying) {
+            btn.textContent = 'Pause';
+            intervalId = setInterval(updateCountdown, 1000);
+        } else {
+            btn.textContent = 'Play';
+            clearInterval(intervalId);
+        }
+    }
+
+    document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+
+    function startGallery() {
+        intervalId = setInterval(updateCountdown, 1000);
+        cycleExamples(); // Start cycling on load
+    }
+
+    startGallery();
+`;
+
+    // Replace placeholders in the template with actual content
+    const finalHTML = galleryTemplate.replace('$$$jsCode$$$', jsCode);
+
+    // Write the final HTML to the gallery.html file
+    fs.writeFileSync(galleryHTMLPath, finalHTML, 'utf8');
+    console.log('gallery.html file generated successfully.');
+}
+
 
 function generateCategoryHTML(category) {
     const categoryExamples = examples.filter(example => {
@@ -220,3 +301,5 @@ writeCategoryFiles();
 writeIndexFile();
 copyCategoriesData();
 generateExampleFiles();
+
+generateGalleryFile(); // Add this line to generate the gallery page
