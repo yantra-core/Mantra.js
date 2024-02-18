@@ -8,7 +8,6 @@ export default class Hexapod {
 
   init(game) {
     this.game = game;
-    this.bindEvents();
     this.game.systemsManager.addSystem('hexapod', this);
   }
 
@@ -119,7 +118,7 @@ export default class Hexapod {
       cohesion = Vector.sub(cohesion, hexapod.position);
       separation = Vector.div(separation, hexapods.length - 1);
     }
-    console.log('VectorVectorVector', Vector)
+
     alignment = Vector.mult(Vector.normalize(alignment), ALIGNMENT_FORCE);
     cohesion = Vector.mult(Vector.normalize(cohesion), COHESION_FORCE);
     separation = Vector.mult(Vector.normalize(separation), SEPARATION_FORCE);

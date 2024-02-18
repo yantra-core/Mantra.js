@@ -10,7 +10,7 @@ import routing from '../sutras/routing.js';
 // import fire from "../../mantra-sutras/fire.js";
 import block from "./sutras/block.js";
 import demon from "../../mantra-sutras/demon.js";
-import hexapod from '../../mantra-sutras/hexapod.js';
+// import hexapod from '../../mantra-sutras/hexapod.js';
 import movement from "../../mantra-sutras/player-movement/top-down.js";
 
 import bomb from '../../mantra-sutras/bomb.js';
@@ -54,7 +54,7 @@ export default function sutras(game) {
   rules.use(demon(game), 'demon');
 
   // hexapod entity
-  rules.use(hexapod(game), 'hexapod');
+  // rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use(bomb(game), 'bomb');

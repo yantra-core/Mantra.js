@@ -45,7 +45,7 @@ class Home {
   constructor() {
     this.id = Home.id;
     this.type = Home.type;
-    
+
   }
 
   async preload(game) {
@@ -84,8 +84,7 @@ class Home {
     game.use('Boomerang');
     game.use('Flame');
     game.use('Player');
-
-
+    game.use('Hexapod');
   }
 
   init(game) {
@@ -93,7 +92,7 @@ class Home {
     this.createWorld();
   }
 
-  update () {
+  update() {
     if (this.game.tick % 10 === 0) { // TODO: better exists check for player alive status
       if (!this.game.data.ents._[this.game.currentPlayerId]) {
         let player1 = game.build().Player().createEntity();
@@ -116,13 +115,41 @@ class Home {
       game.zoom(4.5);
     }
 
+
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
-    let player1 = game.build().Player().createEntity();
-    game.setPlayerId(player1.id);
+    let playerConfig = game.build().Player();
 
     /*
+    playerConfig.collisionStart(function () {
+      console.log('overrides the Teleport collision?')
+    });
+    */
+
+
+    let player1 = playerConfig.createEntity();
+
+    game.setPlayerId(player1.id);
+
+    //
+    // Create 22 Hexapods
+    //
+    game.build().Hexapod().position(-40, 0, 0).repeat(22).createEntity();
+
+    /*
+
+
+    game.build().Teleporter({
+      destination: {
+        position: {
+          x: 20,
+          y: 0
+        }
+      }
+    })
+    .position(-50, 50).size(32).createEntity();
+
     game.after('removeEntity', function(entity) {
       if (entity.type === 'PLAYER') {
         game.createPlayer({
@@ -143,7 +170,7 @@ class Home {
     game.setBackground('#007fff');
 
     // game.use('Tone');
-    this.createTwinFlames();    
+    this.createTwinFlames();
     welcomeMessage(game);
     game.useSutra(sutras(game), 'HOME');
 
@@ -151,7 +178,7 @@ class Home {
 
   }
 
-  createTwinFlames () {
+  createTwinFlames() {
     // See Flame plugin for .build() entity config
     this.game.build().Flame().position(-80, -60, 16).createEntity();
     this.game.build().Flame().position(80, -60, 16).createEntity();
