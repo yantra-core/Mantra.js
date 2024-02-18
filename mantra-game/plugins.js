@@ -69,7 +69,9 @@ import Flame from './plugins/flame/Flame.js';
 import Platform from './plugins/platform/Platform.js';
 import Player from './plugins/player/Player.js';
 import Sword from './plugins/sword/Sword.js';
+import Teleporter from './plugins/teleporter/Teleporter.js';
 import Tile from './plugins/tile/Tile.js';
+import UnitSpawner from './plugins/unit-spawner/UnitSpawner.js';
 
 // Geospatial
 import RBush from './plugins/rbush/RBush.js';
@@ -115,7 +117,6 @@ import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovemen
 import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.js';
 import MovementPong from './plugins/entity-movement/strategies/PongMovement.js';
 
-
 const plugins = {
   Behaviors,
   Sutra,
@@ -124,6 +125,8 @@ const plugins = {
   Platform,
   Player,
   Tile,
+  Teleporter,
+  UnitSpawner,
   // Game Objects
   GravityWell,
   Border,

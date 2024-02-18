@@ -108,7 +108,6 @@ export default function updateEntity(entityDataOrId, entityData) {
     this.game.components.width.set(entityId, entityData.thickness);
   }
 
-
   //
   // Meta properties
   //

@@ -26,6 +26,8 @@ export default function render(game, alpha) {
 
   } else {
 
+
+    // LOOP1 render loop ( cannot remove? )
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       this.inflateGraphic(ent, alpha);

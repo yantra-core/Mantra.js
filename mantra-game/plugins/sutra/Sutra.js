@@ -6,7 +6,7 @@ import platform from '../../lib/Game/defaults/defaultPlatformMovement.js';
 
 class Sutra {
   static id = 'sutra';
-  constructor({ defaultMovement = true }) {
+  constructor({ defaultMovement = true } = {}) {
     this.id = Sutra.id;
     this.inputCache = {};
     this.inputTickCount = {};
@@ -15,7 +15,7 @@ class Sutra {
     this.inputsBound = false;
   }
 
-  init(game,) {
+  init(game) {
     this.game = game;
     this.game.createSutra = createSutra;
     this.game.setSutra = this.setSutra.bind(this);
@@ -70,6 +70,7 @@ class Sutra {
 
   bindGamepadToSutraConditions() {
     if (this.game.systems.gamepad) {
+      console.log("Binding all gamepad events to Sutra conditions...")
       let gamepadControls = this.game.systems.gamepad.controls;
       for (let mantraCode in gamepadControls) {
         // Remark: Do we want to imply isPlayer here?
@@ -88,6 +89,7 @@ class Sutra {
 
   bindKeyCodesToSutraConditions() {
     if (this.game.systems.keyboard) {
+      console.log("Binding all keyboard events to Sutra conditions...")
       let keyControls = this.game.systems.keyboard.controls;
 
       for (let mantraCode in keyControls) {
@@ -178,7 +180,16 @@ class Sutra {
     }
 
     // TODO: can we consolidate these into a single rules.tick() call?
+    // TODO: loop through sutra components instead of entity list
+    // LOOP1 - O(n) for each entity
     for (let [entityId, entity] of game.entities.entries()) {
+
+      if (typeof entity.update == 'function') {
+        // console.log('sutra is helping and running entity.update() in LOOP1 O(n) for each entity');
+        // no arguments ( for now, perhaps delta )
+        entity.update(entity);
+      }
+
       // console.log('entity', entityId, entity)
       game.data.game = game;
       if (game.rules) {
@@ -207,6 +218,9 @@ class Sutra {
         return collisionEvent.kind === 'ACTIVE';
       });
     }
+
+    // TODO: check this for performance
+    game.rules.emit('tick', game.data);
 
     game.data.input = {};
     game.data.inputTicks = {};

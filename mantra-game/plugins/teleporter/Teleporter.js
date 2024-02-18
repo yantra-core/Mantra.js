@@ -1,15 +1,15 @@
-// Flame.js - Marak Squires 2023
-export default class Flame {
-  static id = 'flame';
+// Teleporter.js - Marak Squires 2024
+export default class Teleporter {
+  static id = 'teleporter';
   static type = 'sutra';
   constructor(config = {}) {
-    this.id = Flame.id;
+    this.id = Teleporter.id;
   }
 
   init(game) {
     this.game = game;
     this.bindEvents();
-    this.game.systemsManager.addSystem('flame', this);
+    this.game.systemsManager.addSystem('teleporter', this);
   }
 
   build (entityData = {}) {
@@ -18,15 +18,15 @@ export default class Flame {
     }
     //let rules = this.sutra();
     return {
-      type: 'FLAME',
+      type: 'TELEPORTER',
       texture: {
         sheet: 'loz_spritesheet',
-        sprite: 'fire',
+        sprite: 'ayyoDoor',
         // frame: 0 // TODO: support single frame / bypass animation of array
       },
-      //texture: 'flame',
+      //texture: 'teleporter',
       //color: 0xff0000,
-      collisionStart: this.touchedFlame,
+      collisionStart: this.touchedTeleporter,
       size: {
         width: 16,
         height: 16,
@@ -41,21 +41,21 @@ export default class Flame {
     };
   }
 
-  // TODO: rename to create? we probably need this.createEntity scope preserved for scene
   createEntity(entityData = {}) {
 
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
 
-    // Create the Flame entity
-    const flame = game.createEntity(this.build(entityData));
+    // Create the Teleporter entity
+    const teleporter = game.createEntity(this.build(entityData));
   }
 
-  touchedFlame(a, b, pair, context) {
-    // flame will not affect itself
+  touchedTeleporter(a, b, pair, context) {
+    // teleporter will not affect itself
+    console.log("TODO TELEPORT");
     if (context.owner.owner !== context.target.id) {
-      game.removeEntity(context.target.id);
+      //game.removeEntity(context.target.id);
     }
   }
 

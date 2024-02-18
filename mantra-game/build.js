@@ -15,6 +15,8 @@ const plugins = [
   './plugins/platform/Platform.js',
   './plugins/player/Player.js',
   './plugins/gravitywell/GravityWell.js',
+  './plugins/teleporter/Teleporter.js',
+  './plugins/unit-spawner/UnitSpawner.js',
   './plugins/flame/Flame.js',
   './plugins/border/Border.js',
   './plugins/bomb/Bomb.js',

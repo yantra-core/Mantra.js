@@ -82,6 +82,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       collisionStart: true,
       collisionEnd: false,
       afterRemoveEntity: null,
+      update: null,
       exit: null,
       ctick: this.game.tick
     };
@@ -146,7 +147,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, afterRemoveEntity, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, afterRemoveEntity, update, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -217,8 +218,10 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
+  this.game.addComponent(entityId, 'update', update);
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
+
 
   let _sutra;
   // if the incoming sutra is an object, it is config object which needs to be scoped to the new entity
