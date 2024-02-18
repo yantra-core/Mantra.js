@@ -11,42 +11,44 @@ export default class UnitSpawner {
     this.game.systemsManager.addSystem('unit-spawner', this);
   }
 
-  build (entityData = {}) {
-    if (typeof entityData.position === 'undefined') {
-      entityData.position = { x: 0, y: 0 };
-    }
-    //let rules = this.sutra();
+  build(entityData = {}) {
+    // Ensure entityData has a position property
+    entityData.position = entityData.position || { x: 0, y: 0 };
+  
+    // Define default configuration for unitConfig
+    const defaultUnitConfig = {
+      position: { x: 0, y: 0 },
+      size: { width: 4, height: 4 },
+      friction: 0.05,
+      frictionAir: 0.005,
+      frictionStatic: 0.25,
+      sprayAngle: Math.PI / 8,
+    };
 
+    // entityData.meta = entityData.meta || {};
+      // Combine the default configuration with the entityData
+    const unitConfig = { ...defaultUnitConfig, ...entityData.unitConfig};
+
+    // console.log('unitConfig', unitConfig)
+    // Return the combined entity configuration
     return {
       type: 'UNIT_SPAWNER',
-      texture: 'tile-path-brown',
-      //texture: 'unit-spawner',
-      //color: 0xff0000,
-      // collisionStart: this.touchedUnitSpawner,
+      texture: entityData.texture || 'none',
+      meta: { unitConfig },
       update: this.unitSpawnerUpdate.bind(this),
       size: {
         width: 16,
         height: 16,
         depth: 16,
       },
-      position: {
-        x: 0,
-        y: 0,
-        z: 1
-      }
+      position: entityData.position
     };
   }
-
+  
   unitSpawnerUpdate(entityData) {
     if (this.game.tick % 10 === 0) {
       // check for any unit-spawner entities
-      let unit = this.create({
-        size: {
-          width: 4,
-          height: 4
-        },
-        position: entityData.position
-      });
+      let unit = this.createEntity(entityData.meta.unitConfig || {});
       this.applySprayForce(unit);
     }
   }
@@ -61,42 +63,13 @@ export default class UnitSpawner {
     const unitSpawner = game.createEntity(this.build(entityData));
   }
 
-  touchedUnitSpawner(a, b, pair, context) {
-    // unit-spawner will not affect itself
-    if (context.owner.owner !== context.target.id) {
-      // game.removeEntity(context.target.id);
-    }
-  }
-
   create(entityData = {}) {
-    let rgbColor = entityData.color || 0x00ff00;
-    // convert from int to rgb
-    rgbColor = [(rgbColor >> 16) & 255, (rgbColor >> 8) & 255, rgbColor & 255];
-    let rgbColorString = `rgba(${rgbColor.join(',')}, 0.5)`; // Adjust opacity as needed
-    return game.createEntity({
-      type: entityData.type,
-      collisionActive: entityData.collisionActive,
-      collisionEnd: entityData.collisionEnd,
-      collisionStart: entityData.collisionStart,
-      // texture: settings.texture,
-      size: entityData.size,
-      color: entityData.color,
-      lifetime: 1000,
-      position: entityData.position,
-      friction: 0.05,
-      frictionAir: 0.005,
-      frictionStatic: 0.25,
-      style: {
-        backgroundColor: rgbColorString
-      },
-      // isSensor: true
-    });
+    return game.createEntity(this.build(entityData));
   }
 
   applySprayForce(unitConfig, baseAngle = Math.PI / 8, sprayWidth = Math.PI / 4, forceMagnitude = 0.5) {
     const angleOffset = (Math.random() - 0.5) * sprayWidth; // Random offset within a specified width
-    const angle = baseAngle + angleOffset;
-  
+    const angle = unitConfig.sprayAngle + angleOffset;
     const force = {
       x: forceMagnitude * Math.cos(angle),
       y: forceMagnitude * Math.sin(angle)

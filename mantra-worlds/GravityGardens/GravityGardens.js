@@ -1,6 +1,4 @@
 // GravityGardens.js - Marak Squires 2024
-import fount from '../../mantra-sutras/fount.js'
-
 class GravityGardens {
   static id = 'gravity-gardens';
   static type = 'world';
@@ -14,6 +12,8 @@ class GravityGardens {
 
   preload(game) {
     game.use('Player');
+    game.use('GravityWell');
+    game.use('UnitSpawner');
   }
 
   init(game) {
@@ -30,7 +30,7 @@ class GravityGardens {
     let game = this.game;
 
     // we reset the game to clear any previous state
-    game.reset();
+    // game.reset();
 
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
@@ -184,49 +184,80 @@ class GravityGardens {
 
   }
 
-  createFounts(game) {
+
+  createFounts() {
 
     // will set the collistionStart flag to true in order to register collision events
     let particleCollision = true;
 
+    // .sutra(fount, { sprayAngle: 0, color: 0xf03025, collisionStart: particleCollision })
+
+
     game.build()
-      .type('FOUNT')
       .name('fountA')
+      .type('FOUNT')
+      .UnitSpawner({
+        unitConfig: {
+          color: 0xf03025,
+          isSensor: true,
+          position: { x: 200, y: 0 },
+        }
+      })
       .color(0xf03025)
       .isStatic(true)
       .size(8, 8)
       .position(200, 0)
-      .sutra(fount, { sprayAngle: 0, color: 0xf03025, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
     game.build()
-      .type('FOUNT')
       .name('fountB')
+      .type('FOUNT')
+      .UnitSpawner({
+        unitConfig: {
+          color: 0x14b161,
+          isSensor: true,
+          position: { x: -200, y: 0 },
+          sprayAngle: Math.PI,
+        }
+      })
       .color(0x14b161)
       .isStatic(true)
       .size(8, 8)
       .position(-200, 0)
-      .sutra(fount, { sprayAngle: Math.PI, color: 0x14b161, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
     game.build()
-      .type('FOUNT')
       .name('fountC')
+      .type('FOUNT')
+      .UnitSpawner({
+        unitConfig: {
+          color: 0x3c62f8,
+          isSensor: true,
+          position: { x: 0, y: -200 },
+          sprayAngle: Math.PI / 2,
+        }
+      })
       .color(0x3c62f8)
       .isStatic(true)
       .size(8, 8)
       .position(0, -200)
-      .sutra(fount, { sprayAngle: Math.PI / 2, color: 0x3c62f8, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
     game.build()
-      .type('FOUNT')
       .name('fountD')
+      .type('FOUNT')
+      .UnitSpawner({
+        unitConfig: {
+          color: 0xe9dd34,
+          isSensor: true,
+          position: { x: 0, y: 200 },
+          sprayAngle: -Math.PI / 2,
+        }
+      })
       .color(0xe9dd34)
       .isStatic(true)
       .size(8, 8)
       .position(0, 200)
-      .sutra(fount, { sprayAngle: -Math.PI / 2, color: 0xe9dd34, collisionStart: particleCollision })
       .createEntity(); // Finalizes and creates the entity
 
   }
