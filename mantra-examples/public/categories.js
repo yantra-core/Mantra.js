@@ -1,3 +1,5 @@
+// import entity_examples from "./examples/entity_examples.js";
+
 let categories = [
   {
     title: 'Entity', // pink
@@ -193,6 +195,77 @@ let categories = [
 
 let examples = [];
 
+let entity_examples = [
+
+  {
+    title: 'Create Entity',
+    category: 'entity',
+    description: 'Create a new entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/create-entity.html',
+    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
+  },
+  {
+    title: 'Entity Builder',
+    category: 'entity',
+    description: 'Create an entity using the Entity Builder.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/entity-builder.html',
+    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
+  },
+  {
+    title: 'Clone Entity',
+    category: 'entity',
+    description: 'Clone an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/clone-entity.html',
+    tags: ['clone', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'copy', 'duplicate']
+  },
+
+  {
+    title: 'Combine Entities',
+    category: 'entity',
+    description: 'Compose entities together.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/entity-composition.html',
+    tags: ['compose', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate', 'combine']
+  },
+
+  {
+    title: 'Remove Entity',
+    category: 'entity',
+    description: 'Remove an entity',
+    image: 'placeholder-image.jpg',
+    url: 'entity/remove-entity.html',
+    tags: ['remove', 'entity', 'scene', 'delete', 'destroy', 'dispose', 'clear', 'purge', 'eliminate', 'exterminate']
+  },
+  {
+    title: 'Update Entity',
+    category: 'entity',
+    description: 'Update an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/update-entity.html',
+    tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Get Entity',
+    category: 'entity',
+    description: 'Get an entity',
+    image: 'placeholder-image.jpg',
+    url: 'entity/get-entity.html',
+    tags: ['get', 'entity', 'scene', 'find', 'search', 'locate', 'retrieve', 'fetch', 'obtain', 'acquire', 'detect']
+  },
+  {
+    title: 'Entity Lifetime',
+    category: 'entity',
+    description: 'Set the time duration an entity will exist.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/entity-lifetime.html',
+    tags: ['entity', 'lifetime', 'duration', 'time', 'exist', 'live', 'survive', 'persist', 'endure', 'continue', 'remain']
+  }
+
+];
+
 let physics_examples = [
   {
     title: 'Apply Force',
@@ -217,6 +290,17 @@ let physics_examples = [
     image: 'placeholder-image.jpg',
     url: 'physics/rotate.html',
     tags: ['rotate', 'entity', 'physics', 'motion', 'movement', 'velocity', 'acceleration', 'inertia', 'friction', 'gravity']
+  }
+];
+
+let npc_examples = [
+  {
+    title: 'Hexapod',
+    category: 'npc',
+    description: 'A hexapod is a six-legged flying robot.',
+    image: 'placeholder-image.jpg',
+    url: 'npc/hexapod.html',
+    tags: ['hexapod', 'npc', 'robot', 'flying', 'six', 'legged', 'legs', 'swarm', 'hive']
   }
 ];
 
@@ -252,53 +336,33 @@ let item_examples = [
     image: 'placeholder-image.jpg',
     url: 'items/boomerang.html',
     tags: ['boomerang', 'item', 'inventory', 'throwing', 'damage', 'return', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
+  },
+  {
+    title: 'Teleporter',
+    category: 'items',
+    description: 'Teleporters can be placed and used to teleport to other locations.',
+    image: 'placeholder-image.jpg',
+    url: 'items/teleporter.html',
+    tags: ['teleporter', 'item', 'inventory', 'transport', 'teleport', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
+  },
+  {
+    title: 'UnitSpawner',
+    category: 'items',
+    description: 'UnitSpawners can be placed and used to spawn units.',
+    image: 'placeholder-image.jpg',
+    url: 'items/unit-spawner.html',
+    tags: ['unit', 'spawner', 'item', 'inventory', 'spawn', 'unit', 'build', 'timer']
+  },
+  {
+    title: 'Flame',
+    category: 'items',
+    description: 'Flames cause damage to entities.',
+    image: 'placeholder-image.jpg',
+    url: 'items/flame.html',
+    tags: ['flame', 'item', 'inventory', 'damage', 'burn', 'fire', 'range', 'speed', 'accuracy', 'penetration', 'piercing']
   }
 ];
 
-let entity_examples = [
-
-  {
-    title: 'Create Entity',
-    category: 'entity',
-    description: 'Create a new entity.',
-    image: 'placeholder-image.jpg',
-    url: 'entity/create-entity.html',
-    tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
-  },
-  {
-    title: 'Remove Entity',
-    category: 'entity',
-    description: 'Remove an entity',
-    image: 'placeholder-image.jpg',
-    url: 'entity/remove-entity.html',
-    tags: ['remove', 'entity', 'scene', 'delete', 'destroy', 'dispose', 'clear', 'purge', 'eliminate', 'exterminate']
-  },
-  {
-    title: 'Update Entity',
-    category: 'entity',
-    description: 'Update an entity.',
-    image: 'placeholder-image.jpg',
-    url: 'entity/update-entity.html',
-    tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
-  },
-  {
-    title: 'Get Entity',
-    category: 'entity',
-    description: 'Get an entity',
-    image: 'placeholder-image.jpg',
-    url: 'entity/get-entity.html',
-    tags: ['get', 'entity', 'scene', 'find', 'search', 'locate', 'retrieve', 'fetch', 'obtain', 'acquire', 'detect']
-  },
-  {
-    title: 'Entity Lifetime',
-    category: 'entity',
-    description: 'Set the time duration an entity will exist.',
-    image: 'placeholder-image.jpg',
-    url: 'entity/entity-lifetime.html',
-    tags: ['entity', 'lifetime', 'duration', 'time', 'exist', 'live', 'survive', 'persist', 'endure', 'continue', 'remain']
-  }
-
-];
 
 // before.collisionStart, after.collisionStart
 // before.collisionEnd,  after.collisionEnd
@@ -980,7 +1044,36 @@ let camera_examples = [
   */
 ];
 
+let _examples = [];
+_examples.push(item_examples);
+_examples.push(npc_examples);
+_examples.push(entity_examples);
+_examples.push(physics_examples);
+_examples.push(texture_examples);
+_examples.push(render_examples);
+_examples.push(asset_examples);
+_examples.push(input_examples);
+_examples.push(audio_examples);
+_examples.push(collision_examples);
+_examples.push(camera_examples);
+_examples.push(behaviors_examples);
+_examples.push(tiles_examples);
+_examples.push(terrains_examples);
+_examples.push(config_examples);
+_examples.push(movement_examples);
+_examples.push(container_examples);
+_examples.push(scenes_examples);
+_examples.push(lifecycle_examples);
+
+_examples.forEach((arr) => {
+  arr.sort((a, b) => (a.title > b.title) ? 1 : -1);
+  examples = examples.concat(arr);
+});
+
+
+/*
 // concat all arr to examples
+// sort item_examples by title
 examples = examples.concat(item_examples);
 examples = examples.concat(entity_examples);
 examples = examples.concat(physics_examples);
@@ -1001,7 +1094,11 @@ examples = examples.concat(scenes_examples);
 examples = examples.concat(lifecycle_examples);
 
 // sort all the examples by title
-examples.sort((a, b) => (a.title > b.title) ? 1 : -1);
+//examples.sort((a, b) => (a.title > b.title) ? 1 : -1);
+
+// sort again by first category value in category array
+//examples.sort((a, b) => (a.category[0] > b.category[0]) ? 1 : -1);
+*/
 
 // examples count
 console.log('examples count:', examples.length)

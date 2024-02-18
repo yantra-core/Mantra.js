@@ -1,4 +1,5 @@
 // EntityBuilder.js - Marak Squires 2024
+import ensureColorInt from '../plugins/entity/lib/util/ensureColorInt.js';
 export default class EntityBuilder {
   constructor(game) {
     this.game = game;
@@ -36,6 +37,11 @@ export default class EntityBuilder {
 
   startingPosition(x, y) {
     this.config.startingPosition = { x, y };
+    return this;
+  }
+
+  body (value = true) {
+    this.config.body = value;
     return this;
   }
 
@@ -155,7 +161,7 @@ export default class EntityBuilder {
       this.config[eventName] = (...args) => {
         // console.log(`Executing composite function for ${eventName} with args:`, args);
         handlers.forEach(h => {
-          console.log(`Executing handler for ${eventName}`);
+          // console.log(`Executing handler for ${eventName}`);
           h(...args);
         });
       };
@@ -229,16 +235,53 @@ export default class EntityBuilder {
     return this.config;
   }
 
-  repeat(count) {
-    this.config.repeat = count;
+  clone(count) {
+    this.config.clone = count;
     return this;
   }
 
+  mix(mixinConfig) {
+    for (let key in mixinConfig) {
+      let value = mixinConfig[key];
+      if (typeof value === 'function') {
+        // Check if a composite function already exists for this key
+        if (typeof this.config[key] !== 'function') {
+          // Define the composite function
+          this.config[key] = (...handlerArgs) => {
+            this.config[key].handlers.forEach(handler => handler(...handlerArgs));
+          };
+          // Initialize with an empty handlers array
+          this.config[key].handlers = [];
+        }
+        // Add the new handler to the composite function's handlers array
+        this.config[key].handlers.push(value);
+      } else if (typeof value === 'object' && this.config[key] && typeof this.config[key] === 'object') {
+        // For object types, merge the objects
+        this.config[key] = { ...this.config[key], ...value };
+      } else {
+        // For color types, blend the colors
+        if (key === 'color') {
+          if (this.config[key] !== undefined) {
+            const existingColor = ensureColorInt(this.config[key]);
+            const newColor = ensureColorInt(value);
+            value = blendColors(existingColor, newColor);
+          }
+        }
+        // TODO we can add a merge / mix strategy for other types
+        // For position we could average, hi-low, etc
+        // For primitive types or new keys, simply overwrite/set the value
+        this.config[key] = value;
+      }
+    }
+    return this; // Enable chaining
+  }
+
+
   createEntity() {
     // Create a new entity with the current configuration
-    if (typeof this.config.repeat === 'number') {
+    if (typeof this.config.clone === 'number') {
       let entities = [];
-      for (let i = 0; i < this.config.repeat; i++) {
+      for (let i = 0; i < this.config.clone; i++) {
         entities.push(this.game.createEntity(this.config));
       }
       return entities;
@@ -247,3 +290,11 @@ export default class EntityBuilder {
   }
 
 }
+
+  // Function to blend two colors
+  function blendColors(color1, color2) {
+    const r = ((color1 >> 16) + (color2 >> 16)) >> 1;
+    const g = (((color1 >> 8) & 0xFF) + ((color2 >> 8) & 0xFF)) >> 1;
+    const b = ((color1 & 0xFF) + (color2 & 0xFF)) >> 1;
+    return (r << 16) | (g << 8) | b;
+  }
