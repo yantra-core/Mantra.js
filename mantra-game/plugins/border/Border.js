@@ -1,20 +1,22 @@
 // Border.js - Marak Squires 2023
+// TODO: refactor to support .build() method
 class Border {
 
   static id = 'border';
 
-  constructor({ autoBorder = false, position = { x: 0, y: 0 }, thickness = 20, health = 100 } = {}) {
+  constructor({ autoBorder = false, position = { x: 0, y: 0 }, collisionStart = false, thickness = 20, health = 100 } = {}) {
     this.id = Border.id;
     this.position = position;
     this.autoBorder = autoBorder;
     this.thickness = thickness;
+    this.collisionStart = collisionStart;
     this.health = health;
   }
 
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem('border', this);
-
+    // TODO: refactor to use the builder api
     // create the border based on the game size
     if (this.autoBorder) {
       this.createAutoBorder();
@@ -99,6 +101,7 @@ class Border {
           x: border.position.x,
           y: border.position.y
         },
+        collisionStart: entityData.collisionStart || this.collisionStart,
         style: border.style,
         width: border.size.width,
         height: border.size.height,
@@ -112,6 +115,7 @@ class Border {
 
   unload () {
     // remove any border types from the game
+    // Remark: This is not correct, unloading shouldn't mutate globalish state
     for (let [eId, state] of this.game.entities.entries()) {
       if (state.type === 'BORDER') {
         this.game.removeEntity(eId);

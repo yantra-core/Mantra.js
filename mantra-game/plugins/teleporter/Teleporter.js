@@ -24,9 +24,12 @@ export default class Teleporter {
         sprite: 'ayyoDoor',
         // frame: 0 // TODO: support single frame / bypass animation of array
       },
+      meta: {
+        destination: entityData.destination
+      },
       //texture: 'teleporter',
       //color: 0xff0000,
-      collisionStart: this.touchedTeleporter,
+      collisionStart: this.touchedTeleporter.bind(this),
       size: {
         width: 16,
         height: 16,
@@ -52,11 +55,25 @@ export default class Teleporter {
   }
 
   touchedTeleporter(a, b, pair, context) {
-    // teleporter will not affect itself
-    console.log("TODO TELEPORT");
-    if (context.owner.owner !== context.target.id) {
-      //game.removeEntity(context.target.id);
+
+    if (context.owner.meta &&  context.owner.meta.destination) {
+      let destination = context.owner.meta.destination;
+
+      if (typeof destination === 'function') {
+        destination.call(game, context.target, context.owner);
+      } else {
+        if (typeof destination.world !== 'undefined') {
+          if (context.target.type === 'PLAYER') { // could be other types as well
+            game.switchWorlds(destination.world);
+          }
+        }
+        if (typeof destination.position !== 'undefined') {
+          game.setPosition(context.target.id, { x: destination.position.x, y: destination.position.y });
+        }
+      }
+
     }
+
   }
 
   sutra() {

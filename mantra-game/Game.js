@@ -406,20 +406,23 @@ class Game {
     return this.createEntity(entityData);
   }
 
-  createBorder({ width = this.width, height = this.height, thickness = 8, color } = {}) {
+  // TODO: replace with EntityBuilder API
+  createBorder({ width = this.width, height = this.height, thickness = 8, color, collisionStart } = {}) {
     let game = this;
     if (game.systems.border) {
       game.systems.border.createBorder({
         width: game.width,
         height: game.height,
-        thickness: thickness
+        thickness: thickness,
+        collisionStart: collisionStart
       });
     } else {
       game.use('Border', {}, function () {
         game.systems.border.createBorder({
           width: game.width,
           height: game.height,
-          thickness: thickness
+          thickness: thickness,
+          collisionStart: collisionStart
         });
       });
     }

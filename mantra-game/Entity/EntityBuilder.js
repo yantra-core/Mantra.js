@@ -73,6 +73,11 @@ export default class EntityBuilder {
 
   // Dimensions
   size(width, height, depth) {
+
+    if (typeof height === 'undefined') {
+      height = width;
+    }
+
     this.config.size = { width, height };
     if (typeof depth !== 'undefined') { // 2d games may not have a depth, we may want to default to 0
       this.config.size.depth = depth;
@@ -131,24 +136,46 @@ export default class EntityBuilder {
     this.config.isStatic = value;
     return this;
   }
-
+  
   // Private method to add an event handler
   _addEventHandler(eventName, handler) {
+    // console.log(`Adding handler for event: ${eventName}`);
+
+    // Define a variable outside the composite function to hold the handlers
+    let handlers;
+
     // Check if a composite function already exists for this event
     if (typeof this.config[eventName] !== 'function') {
-      // If not, create a new composite function
+      // console.log(`No composite function for ${eventName}, creating new.`);
+
+      // Initialize the handlers array and store it in the variable
+      handlers = [handler];
+
+      // Create a new composite function that uses the handlers variable
       this.config[eventName] = (...args) => {
-        this.config[eventName].handlers.forEach(h => h(...args));
+        // console.log(`Executing composite function for ${eventName} with args:`, args);
+        handlers.forEach(h => {
+          console.log(`Executing handler for ${eventName}`);
+          h(...args);
+        });
       };
-      // Initialize the handlers array within the composite function
-      this.config[eventName].handlers = [handler];
     } else {
-      // For subsequent handlers, just add them to the composite function's handlers array
-      this.config[eventName].handlers.push(handler);
+      // console.log(`Composite function exists for ${eventName}, adding to existing handlers.`);
+
+      // If the composite function exists, retrieve its handlers array
+      handlers = this.config[eventName].handlers;
+
+      // Add the new handler to the array
+      handlers.push(handler);
     }
+
+    // Attach the handlers array to the composite function for potential future reference
+    this.config[eventName].handlers = handlers;
+    // console.log(`Total handlers for ${eventName}: ${handlers.length}`);
 
     return this;
   }
+
 
   // Public methods to add specific event handlers
   pointerdown(handler) {
@@ -165,6 +192,10 @@ export default class EntityBuilder {
 
   collisionEnd(handler) {
     return this._addEventHandler('collisionEnd', handler);
+  }
+
+  onUpdate(handler) {
+    return this._addEventHandler('update', handler);
   }
 
   sutra(rules, config) {
