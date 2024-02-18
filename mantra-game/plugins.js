@@ -66,6 +66,7 @@ import Boomerang from './plugins/boomerang/Boomerang.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
 import Flame from './plugins/flame/Flame.js';
+import Hexapod from './plugins/hexapod/Hexapod.js';
 import Platform from './plugins/platform/Platform.js';
 import Player from './plugins/player/Player.js';
 import Sword from './plugins/sword/Sword.js';
@@ -124,6 +125,7 @@ const plugins = {
   Block,
   Platform,
   Player,
+  Hexapod,
   Tile,
   Teleporter,
   UnitSpawner,

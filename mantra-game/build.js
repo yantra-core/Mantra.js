@@ -11,6 +11,7 @@ const plugins = [
   './plugins/graphics-ascii/ASCIIGraphics.js',
   './plugins/graphics-babylon/BabylonGraphics.js',
   './plugins/block/Block.js',
+  './plugins/hexapod/Hexapod.js',
   './plugins/tile/Tile.js',
   './plugins/platform/Platform.js',
   './plugins/player/Player.js',
