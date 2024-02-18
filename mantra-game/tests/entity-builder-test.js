@@ -36,7 +36,7 @@ tap.test('game.build() API', (t) => {
     // Check that the configuration matches what was set in the builder
     t.equal(entityConfig.color, 'red', 'Color should be set to red');
     t.deepEqual(entityConfig.position, { x: 100, y: 200 }, 'Position should be set to (100, 200)');
-    t.deepEqual(entityConfig.size, { width: 50, height: 60 }, 'Size should be set to 50x60');
+    t.deepEqual(entityConfig.size, { width: 50, height: 60, depth: 60 }, 'Size should be set to 50x60x60');
     t.end();
   });
 
@@ -55,7 +55,7 @@ tap.test('game.build() API', (t) => {
     // Check that the entity has the properties set through the builder
     t.equal(game.getComponent(entity.id, 'color'), 16711680, 'Entity color should be blue');
     t.deepEqual(game.getComponent(entity.id, 'position'), { x: 0, y: 0 }, 'Entity position should be (0, 0)');
-    t.deepEqual(game.getComponent(entity.id, 'size'), { width: 32, height: 32 }, 'Entity size should be 32x32');
+    t.deepEqual(game.getComponent(entity.id, 'size'), { width: 32, height: 32, depth: 32 }, 'Entity size should be 32x32x32');
     t.end();
   });
 
@@ -77,7 +77,7 @@ tap.test('game.build() API', (t) => {
     // Check that the entity has the properties set through the builder
     t.equal(game.getComponent(entity.id, 'color'), 16711680, 'Entity color should be red');
     t.deepEqual(game.getComponent(entity.id, 'position'), { x: 0, y: 0 }, 'Entity position should be (0, 0)');
-    t.deepEqual(game.getComponent(entity.id, 'size'), { width: 32, height: 32 }, 'Entity size should be 32x32');
+    t.deepEqual(game.getComponent(entity.id, 'size'), { width: 32, height: 32, depth: 32 }, 'Entity size should be 32x32x32');
     t.end();
   });
 

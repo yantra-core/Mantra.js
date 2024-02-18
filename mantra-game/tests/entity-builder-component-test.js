@@ -86,7 +86,7 @@ tap.test('EntityBuilder configuration', (t) => {
       .color('red')
       .build();
 
-    t.deepEqual(entityConfig.size, { width: 50, height: 60 }, 'Size should be 50x60');
+    t.deepEqual(entityConfig.size, { width: 50, height: 60, depth: 60 }, 'Size should be 50x60x60');
     t.equal(entityConfig.radius, 15, 'Radius should be 15');
     t.equal(entityConfig.shape, 'circle', 'Shape should be circle');
     t.equal(entityConfig.color, 'red', 'Color should be red');
