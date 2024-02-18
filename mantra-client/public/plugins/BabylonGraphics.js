@@ -33,7 +33,7 @@ var GraphicInterface = /*#__PURE__*/function () {
   }, {
     key: "update",
     value: function update(entities) {
-      throw new Error("update method not implemented.");
+      // throw new Error("update method not implemented.");
     }
 
     // used to inflate entity data from the server

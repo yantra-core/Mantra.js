@@ -33,7 +33,7 @@ var GraphicInterface = /*#__PURE__*/function () {
   }, {
     key: "update",
     value: function update(entities) {
-      throw new Error("update method not implemented.");
+      // throw new Error("update method not implemented.");
     }
 
     // used to inflate entity data from the server
@@ -354,11 +354,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         gameHolder.appendChild(renderDiv);
       }
       this.renderDiv = renderDiv;
-    }
-  }, {
-    key: "update",
-    value: function update() {
-      // Update logic goes here
     }
   }]);
   return CSSGraphics;
@@ -1617,6 +1612,7 @@ function render(game, alpha) {
       }
     });
   } else {
+    // LOOP1 render loop ( cannot remove? )
     var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
       _step;
     try {

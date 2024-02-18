@@ -438,8 +438,9 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { createSutra } from '@yantra-core/sutra';
 // handles input controller events and relays them to the game logic
 var Sutra = /*#__PURE__*/function () {
-  function Sutra(_ref) {
-    var _ref$defaultMovement = _ref.defaultMovement,
+  function Sutra() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$defaultMovement = _ref.defaultMovement,
       defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement;
     _classCallCheck(this, Sutra);
     this.id = Sutra.id;
@@ -508,7 +509,6 @@ var Sutra = /*#__PURE__*/function () {
     key: "bindGamepadToSutraConditions",
     value: function bindGamepadToSutraConditions() {
       var _this = this;
-      console.log("CHECKING FOR GAMEPADS", this.game.systems.gamepad);
       if (this.game.systems.gamepad) {
         console.log("Binding all gamepad events to Sutra conditions...");
         var gamepadControls = this.game.systems.gamepad.controls;
@@ -629,6 +629,8 @@ var Sutra = /*#__PURE__*/function () {
       }
 
       // TODO: can we consolidate these into a single rules.tick() call?
+      // TODO: loop through sutra components instead of entity list
+      // LOOP1 - O(n) for each entity
       var _iterator = _createForOfIteratorHelper(game.entities.entries()),
         _step;
       try {
@@ -636,6 +638,12 @@ var Sutra = /*#__PURE__*/function () {
           var _step$value = _slicedToArray(_step.value, 2),
             entityId = _step$value[0],
             entity = _step$value[1];
+          if (typeof entity.update == 'function') {
+            // console.log('sutra is helping and running entity.update() in LOOP1 O(n) for each entity');
+            // no arguments ( for now, perhaps delta )
+            entity.update(entity);
+          }
+
           // console.log('entity', entityId, entity)
           game.data.game = game;
           if (game.rules) {
@@ -668,6 +676,8 @@ var Sutra = /*#__PURE__*/function () {
           return collisionEvent.kind === 'ACTIVE';
         });
       }
+
+      // TODO: check this for performance
       game.rules.emit('tick', game.data);
       game.data.input = {};
       game.data.inputTicks = {};
@@ -1878,7 +1888,13 @@ var Sutra = /*#__PURE__*/function () {
         // if so, execute them and replace the value with the result
         // this is to allow for dynamic data to be passed to the action
         if (typeof value === 'function') {
-          object[key] = value(entityData, gameState, node);
+          // We may need to add a flag for dynamic value execution on the data object
+          // Remark: Do not attempt to run event listeners as value functions
+          // Parent APIs may call into Sutra with functions that should not be executed as values
+          var isEventListener = key.includes('after') || key.includes('before') || key.includes('on');
+          if (!isEventListener) {
+            object[key] = value(entityData, gameState, node);
+          }
         } else {
           object[key] = value;
         }
@@ -1941,41 +1957,6 @@ var Sutra = /*#__PURE__*/function () {
       return pathArray.reduce(function (current, part) {
         return current && current[part] !== undefined ? current[part] : undefined;
       }, obj);
-    }
-  }, {
-    key: "removeNodes",
-    value: function removeNodes(query) {
-      var _this8 = this;
-      var results = this.searchNode(query);
-      results.forEach(function (node) {
-        _this8.removeNode(node.sutraPath);
-      });
-      // search all subtrees recursively
-      if (this.subtrees) {
-        Object.values(this.subtrees).forEach(function (subSutra) {
-          subSutra.removeNodes(query);
-        });
-      }
-    }
-  }, {
-    key: "searchNode",
-    value: function searchNode(query) {
-      var results = [];
-      if (typeof query["if"] === 'string') {
-        // search all nodes that have this condition
-        this.tree.forEach(function (node) {
-          if (node["if"] === query["if"]) {
-            results.push(node);
-          }
-        });
-        // search all subtrees recursively
-        if (_typeof(this.subtrees) === 'object') {
-          Object.values(this.subtrees).forEach(function (subSutra) {
-            results = results.concat(subSutra.searchNode(query));
-          });
-        }
-      }
-      return results;
     }
   }, {
     key: "findNode",
@@ -2059,7 +2040,7 @@ var Sutra = /*#__PURE__*/function () {
   }, {
     key: "tick",
     value: function tick(data) {
-      var _this9 = this;
+      var _this8 = this;
       var gameState = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       // Reset state for all nodes
       this.tree.forEach(function (node) {
@@ -2075,9 +2056,9 @@ var Sutra = /*#__PURE__*/function () {
       this.tree.forEach(function (node) {
         if (node.subtree) {
           subtreeEvaluated = true;
-          _this9.traverseNode(node, data, gameState);
+          _this8.traverseNode(node, data, gameState);
         } else {
-          _this9.traverseNode(node, data, gameState);
+          _this8.traverseNode(node, data, gameState);
         }
       });
 

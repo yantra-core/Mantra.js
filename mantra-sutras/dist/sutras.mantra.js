@@ -490,7 +490,7 @@ function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" 
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 // fount.js - Marak Squires 2023
 // Sutra for Generating Units
-function fountSutra(game, context) {
+function fountSutra(game, entityId) {
   var sprayConfig = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var rules = game.createSutra();
 
@@ -555,7 +555,7 @@ function fountSutra(game, context) {
   // Rule for generating and spraying units
   rules["if"]('fountTick').then('fountSpray');
   rules.addCondition('fountTick', function (entity, gameState) {
-    return entity.name === context.name && gameState.tick % 10 === 0;
+    return entity.id === entityId && gameState.tick % 10 === 0;
   });
   rules.on('fountSpray', function (context, node, gameState) {
     // Determine the position of the fount (can be context-dependent)

@@ -642,9 +642,9 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       return this;
     }
 
-    // TODO: implement repeat
     // Creates a copy of the entity with the specified configuration, but will apply
-    // the offset.x and offset.y basd on the index of the clone
+    // all "repeaters" with index and count arguments, allowing for dynamic modifications
+    // separately, the offset.x and offset.y will add to the position
   }, {
     key: "repeat",
     value: function repeat(count) {
@@ -664,11 +664,8 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         var _entities = [];
         for (var _i = 0; _i < this.config.repeat; _i++) {
           var entityConfig = JSON.parse(JSON.stringify(this.config));
-
           // Calculate the offset for each repeated entity
           // .ofset() is treated separately as modifier for position, it can be used without repeaters
-          console.log('this.config.position', this.config.position);
-          console.log('this.config.offset', this.config.offset);
           var offsetX = this.config.position.x + _i * this.config.offset.x;
           var offsetY = this.config.position.y + _i * this.config.offset.y;
           var offsetZ = this.config.position.z + _i * this.config.offset.z;
@@ -682,7 +679,6 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
           if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
             entityConfig.position.z = offsetZ;
           }
-
           // Apply each modifier for the repeated entity
           for (var _i2 = 0, _Object$entries = Object.entries(this.repeatModifiers); _i2 < _Object$entries.length; _i2++) {
             var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
@@ -693,7 +689,6 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
               entityConfig[prop] = modifier(_i, this.config.repeat, this.config[prop]);
             }
           }
-
           // Remove repeat-related properties to avoid infinite recursion and irrelevant data
           delete entityConfig.repeat;
           delete entityConfig.repeatModifiers;

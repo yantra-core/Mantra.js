@@ -50,9 +50,11 @@ var Collisions = /*#__PURE__*/function () {
       //const entityB = this.game.getEntity(entityIdB);
       var entityA = bodyA.entity;
       var entityB = bodyB.entity;
+      // console.log('handleCollision', entityA.type, entityB.type)
+
       var canCollide = this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
       if (canCollide === false) {
-        // console.log('before.collisionStart returned false, skipping collision', entityIdA, entityIdB);
+        console.log('before.collisionStart returned false, skipping collision', entityIdA, entityIdB);
         return;
       }
       if (!entityA || !entityB) {
@@ -60,8 +62,7 @@ var Collisions = /*#__PURE__*/function () {
         return;
       }
 
-      // TODO: remove this in favor of collisionStart() handler?
-      // Remark: May have many of these? Only allow on per entity? may need array?
+      // TODO: 2/17/2024 remove this and use Teleporer instead
       if (entityA.exit || entityB.exit) {
         var exitEnt = entityA.exit ? entityA : entityB;
         var enterEnt = entityA.exit ? entityB : entityA;
@@ -83,16 +84,37 @@ var Collisions = /*#__PURE__*/function () {
           }
         }
       }
+
+      // all entity collision events need context
+      var collisionContext = {
+        type: 'COLLISION',
+        kind: 'START',
+        entityIdA: bodyA.myEntityId,
+        entityIdB: bodyB.myEntityId,
+        bodyA: entityA,
+        bodyB: entityB
+      };
+
+      // add entity onto the collision by type name
+      collisionContext[entityA.type] = entityA;
+      collisionContext[entityB.type] = entityB;
       if (entityA.collisionStart) {
+        //console.log('entityA.collisionStart', entityA.collisionStart, entityA, entityB)
+        collisionContext.owner = entityA;
+        collisionContext.target = entityB;
+        // pair.context = collisionContext;
         if (typeof entityA.collisionStart === 'function') {
           // console.log('calling entityA.collisionStart', entityA.collisionStart, entityA, entityB)
-          entityA.collisionStart.call(this.game, entityB, entityA);
+          entityA.collisionStart.call(this.game, entityB, entityA, pair, collisionContext);
         }
       }
       if (entityB.collisionStart) {
+        //console.log('entityB.collisionStart', entityB.collisionStart, entityB, entityA)
+        collisionContext.owner = entityB;
+        collisionContext.target = entityA;
         if (typeof entityB.collisionStart === 'function') {
           // console.log('calling entityB.collisionStart', entityB.collisionStart, entityB, entityA)
-          entityB.collisionStart.call(this.game, entityA, entityB);
+          entityB.collisionStart.call(this.game, entityA, entityB, pair, collisionContext);
         }
       }
 
@@ -157,18 +179,11 @@ var Collisions = /*#__PURE__*/function () {
         // Remark: This could be this.game.systems.sutra
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-        var collisionContext = {
-          type: 'COLLISION',
-          kind: 'START',
-          entityIdA: bodyA.myEntityId,
-          entityIdB: bodyB.myEntityId,
-          bodyA: entityA,
-          bodyB: entityB
-        };
-
         // add entity onto the collision by type name
-        collisionContext[entityA.type] = entityA;
-        collisionContext[entityB.type] = entityB;
+
+        //collisionContext[entityA.type] = entityA;
+        //collisionContext[entityB.type] = entityB;
+
         this.game.data.collisions.push(collisionContext);
         this.game.lifecycle.triggerHook('after.collisionStart', entityA, entityB, pair);
       }
@@ -217,36 +232,40 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
+      var collisionContext = {
+        type: 'COLLISION',
+        kind: 'END',
+        entityIdA: bodyA.myEntityId,
+        entityIdB: bodyB.myEntityId,
+        bodyA: entityA,
+        bodyB: entityB
+      };
+
+      // add entity onto the collision by type name
+      collisionContext[entityA.type] = entityA;
+      collisionContext[entityB.type] = entityB;
       if (entityA.collisionEnd) {
+        collisionContext.owner = entityA;
+        collisionContext.target = entityB;
         if (typeof entityA.collisionEnd === 'function') {
-          entityA.collisionEnd.call(this.game, entityB, entityA);
+          entityA.collisionEnd.call(this.game, entityB, entityA, collisionContext);
         }
       }
       if (entityB.collisionEnd) {
+        collisionContext.owner = entityB;
+        collisionContext.target = entityA;
         if (typeof entityB.collisionEnd === 'function') {
-          entityB.collisionEnd.call(this.game, entityA, entityB);
+          entityB.collisionEnd.call(this.game, entityA, entityB, collisionContext);
         }
       }
       if (this.shouldSendCollisionEvent(bodyA, bodyB, 'END')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-        var collisionContext = {
-          type: 'COLLISION',
-          kind: 'END',
-          entityIdA: bodyA.myEntityId,
-          entityIdB: bodyB.myEntityId,
-          bodyA: entityA,
-          bodyB: entityB
-        };
 
         // Find and remove the active collision
         this.game.data.collisions = this.game.data.collisions.filter(function (collision) {
           return !(collision.entityIdA === bodyA.myEntityId && collision.entityIdB === bodyB.myEntityId && collision.kind === 'ACTIVE');
         });
-
-        // add entity onto the collision by type name
-        collisionContext[entityA.type] = entityA;
-        collisionContext[entityB.type] = entityB;
         this.game.data.collisions.push(collisionContext);
       }
 
@@ -284,33 +303,37 @@ var Collisions = /*#__PURE__*/function () {
         // console.log('handleCollision no entity found. Skipping...', entityIdA, entityA, entityIdB, entityB);
         return;
       }
+      var collisionContext = {
+        type: 'COLLISION',
+        kind: 'ACTIVE',
+        entityIdA: bodyA.myEntityId,
+        entityIdB: bodyB.myEntityId,
+        ticks: 1,
+        duration: 1,
+        bodyA: entityA,
+        bodyB: entityB
+      };
+
+      // add entity onto the collision by type name
+      collisionContext[entityA.type] = entityA;
+      collisionContext[entityB.type] = entityB;
       if (entityA.collisionActive) {
+        collisionContext.owner = entityA;
+        collisionContext.target = entityB;
         if (typeof entityA.collisionActive === 'function') {
-          entityA.collisionActive.call(this.game, entityB, entityA);
+          entityA.collisionActive.call(this.game, entityB, entityA, collisionContext);
         }
       }
       if (entityB.collisionActive) {
+        collisionContext.owner = entityB;
+        collisionContext.target = entityA;
         if (typeof entityB.collisionActive === 'function') {
-          entityB.collisionActive.call(this.game, entityA, entityB);
+          entityB.collisionActive.call(this.game, entityA, entityB, collisionContext);
         }
       }
       if (this.shouldSendCollisionEvent(bodyA, bodyB, 'ACTIVE')) {
         this.game.data.collisions = this.game.data.collisions || [];
         // console.log('adding collision to game.data.collisions', bodyA.myEntityId, entityA.type, bodyB.myEntityId, entityB.type, this.game.data.collisions.length)
-        var collisionContext = {
-          type: 'COLLISION',
-          kind: 'ACTIVE',
-          entityIdA: bodyA.myEntityId,
-          entityIdB: bodyB.myEntityId,
-          ticks: 1,
-          duration: 1,
-          bodyA: entityA,
-          bodyB: entityB
-        };
-
-        // add entity onto the collision by type name
-        collisionContext[entityA.type] = entityA;
-        collisionContext[entityB.type] = entityB;
 
         // Find existing collision, if any
         var existingCollision = this.game.data.collisions.find(function (collision) {

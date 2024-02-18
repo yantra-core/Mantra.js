@@ -15,7 +15,6 @@ import Boomerang from '../mantra-game/plugins/boomerang/Boomerang.js';
 import Player from '../mantra-game/plugins/player/Player.js';
 import Teleporter from '../mantra-game/plugins/teleporter/Teleporter.js';
 import UnitSpawner from '../mantra-game/plugins/unit-spawner/UnitSpawner.js';
-
 let game = new Game({
   width: 800,
   height: 600,
@@ -50,6 +49,8 @@ let game = new Game({
   */
 });
 
+game.use(new plugins.SwitchGraphicsGUI());
+
 // game.gameConfig = TowerWorld;
 
 window.game = game;
@@ -58,18 +59,61 @@ home = new worlds.Home();
 
 game.use(new Lifetime());
 game.start(function () {
-  //game.reset();
-  // game.use(home);
-  //game.use(new GravityGardens());
-  //game.use(new GravityWell());
-  //game.use(new Flame());
-  game.use(new Player());
-  game.use(new UnitSpawner());
-  game.setZoom(2);
+  game.reset();
+  // game.use(new Teleporter());
+  //game.use(new plugins.Hexapod())
 
-  let player = game.build().UnitSpawner().Player().createEntity();
-  game.setPlayerId(player.id);
+  game.use(home);
   //game.use(new GravityGardens());
+
+
+
+ // game.use(new plugins.Border())
+  //game.use(new GravityGardens());
+  // //game.use(new GravityWell());
+  /*
+  game.use(new UnitSpawner());
+  game.use(new Flame());
+  */
+ /*
+  game.use(new Player());
+  let player = game.build().Player().createEntity();
+
+  game.setPlayerId(player.id);
+
+  game.use(new Teleporter());
+  game.setZoom(3.5);
+
+  */
+ /*
+  game.build().Teleporter({
+    destination: {
+      position: {
+        x: 20,
+        y: 0
+      }
+    }
+  })
+  .position(-50, 50).size(32).createEntity();
+
+
+  game.build().Teleporter({
+    destination: {
+      world: 'Home'
+    }
+  })
+  .position(50, -50).size(32).createEntity();
+
+  game.build().Teleporter({
+    destination: function customTeleport (entity, gameState) {
+      // console.log("CUSTOM TELEPORT");
+      game.anime('CUSTOM TELEPORT')
+    }
+  })
+  .position(50, 50).size(32).createEntity();
+  */
+  // game.use(new GravityGardens());
+
   //game.createPlayer();
   /*
   let data = game.build()

@@ -441,6 +441,10 @@ var SutraGUI = /*#__PURE__*/function () {
 
       // gui.setTheme('light');
       rules.onAny(function (ev, data, node) {
+        if (typeof node === 'undefined') {
+          // could be tick event, check for performance impact
+          return;
+        }
         var sutraPath = node.sutraPath;
         var humanReadablePath = rules.getReadableSutraPath(sutraPath);
         document.querySelectorAll("[data-path='".concat(sutraPath, "']")).forEach(function (node) {

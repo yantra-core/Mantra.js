@@ -20,6 +20,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 // Border.js - Marak Squires 2023
+// TODO: refactor to support .build() method
 var Border = /*#__PURE__*/function () {
   function Border() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -30,6 +31,8 @@ var Border = /*#__PURE__*/function () {
         x: 0,
         y: 0
       } : _ref$position,
+      _ref$collisionStart = _ref.collisionStart,
+      collisionStart = _ref$collisionStart === void 0 ? false : _ref$collisionStart,
       _ref$thickness = _ref.thickness,
       thickness = _ref$thickness === void 0 ? 20 : _ref$thickness,
       _ref$health = _ref.health,
@@ -39,6 +42,7 @@ var Border = /*#__PURE__*/function () {
     this.position = position;
     this.autoBorder = autoBorder;
     this.thickness = thickness;
+    this.collisionStart = collisionStart;
     this.health = health;
   }
   _createClass(Border, [{
@@ -46,7 +50,7 @@ var Border = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem('border', this);
-
+      // TODO: refactor to use the builder api
       // create the border based on the game size
       if (this.autoBorder) {
         this.createAutoBorder();
@@ -152,6 +156,7 @@ var Border = /*#__PURE__*/function () {
             x: border.position.x,
             y: border.position.y
           },
+          collisionStart: entityData.collisionStart || this.collisionStart,
           style: border.style,
           width: border.size.width,
           height: border.size.height,
@@ -165,6 +170,7 @@ var Border = /*#__PURE__*/function () {
     key: "unload",
     value: function unload() {
       // remove any border types from the game
+      // Remark: This is not correct, unloading shouldn't mutate globalish state
       var _iterator = _createForOfIteratorHelper(this.game.entities.entries()),
         _step;
       try {

@@ -565,7 +565,7 @@ function createEntity() {
       container: null,
       items: null,
       sutra: null,
-      scene: null,
+      scene: [],
       meta: null,
       collectable: false,
       hasInventory: true,
@@ -594,6 +594,8 @@ function createEntity() {
       collisionActive: false,
       collisionStart: true,
       collisionEnd: false,
+      afterRemoveEntity: null,
+      update: null,
       exit: null,
       ctick: this.game.tick
     };
@@ -699,6 +701,8 @@ function createEntity() {
     collisionActive = _config.collisionActive,
     collisionStart = _config.collisionStart,
     collisionEnd = _config.collisionEnd,
+    afterRemoveEntity = _config.afterRemoveEntity,
+    update = _config.update,
     exit = _config.exit,
     ctick = _config.ctick;
   var x = position.x,
@@ -742,7 +746,6 @@ function createEntity() {
   this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
   this.game.addComponent(entityId, 'owner', owner);
   this.game.addComponent(entityId, 'items', items);
-  this.game.addComponent(entityId, 'sutra', sutra);
   this.game.addComponent(entityId, 'scene', scene);
   this.game.addComponent(entityId, 'meta', meta);
   this.game.addComponent(entityId, 'collectable', collectable);
@@ -763,11 +766,34 @@ function createEntity() {
   this.game.addComponent(entityId, 'text', text);
   this.game.addComponent(entityId, 'style', style);
   this.game.addComponent(entityId, 'texture', texture);
+  this.game.addComponent(entityId, 'afterRemoveEntity', afterRemoveEntity);
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
+  this.game.addComponent(entityId, 'update', update);
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
+  var _sutra;
+  // if the incoming sutra is an object, it is config object which needs to be scoped to the new entity
+  if (_typeof(sutra) === 'object' && sutra !== null) {
+    if (typeof sutra.rules === 'function') {
+      if (_typeof(sutra.config) !== 'object') {
+        sutra.config = {};
+      }
+      // if there is a valid rules function, we will create the Sutra instance
+      // it is assumed the signature of the rules function is (game, entityId, config)
+      // this may change in the future
+      _sutra = sutra.rules(this.game, entityId, sutra.config);
+    } else {
+      // could be a Sutra instance object instance without config object
+      _sutra = sutra;
+    }
+  } else {
+    // the incoming sutra was not a non-null object
+    // it could be null or a function, assign component value without modification
+    _sutra = sutra;
+  }
+  this.game.addComponent(entityId, 'sutra', _sutra);
   if (body) {
     // remove this step, have everything work in addToWorld
     var _body = {
@@ -1136,6 +1162,10 @@ function removeEntity(entityId) {
   if (!ent) {
     return;
   }
+  var _afterRemoveEntity;
+  if (typeof ent.afterRemoveEntity === 'function') {
+    _afterRemoveEntity = ent.afterRemoveEntity;
+  }
   var canBeRemoved = this.game.lifecycle.triggerHook('before.removeEntity', ent);
   if (canBeRemoved === false) {
     return;
@@ -1166,6 +1196,9 @@ function removeEntity(entityId) {
         delete this.game.deferredEntities[entityId];
       }
     }
+  }
+  if (_afterRemoveEntity) {
+    _afterRemoveEntity(ent);
   }
   this.game.lifecycle.triggerHook('after.removeEntity', ent);
 }
@@ -1280,6 +1313,15 @@ function updateEntity(entityDataOrId, entityData) {
   }
   if (typeof entityData.thickness !== 'undefined' && entityData.thickness !== null) {
     this.game.components.width.set(entityId, entityData.thickness);
+  }
+
+  //
+  // Meta properties
+  //
+  if (typeof entityData.meta !== 'undefined') {
+    // overwrite all meta ( for now )
+    // Remark: in the future we could merge instead of overwrite
+    this.game.components.meta.set(entityId, entityData.meta);
   }
   if (typeof entityData.score !== 'undefined' && entityData.score !== null) {
     this.game.components.score.set(entityId, entityData.score);
