@@ -50,6 +50,7 @@ const plugins = [
   './plugins/gui-yantra/YantraGUI.js',
   './plugins/gui-sutra/SutraGUI.js',
   './plugins/gui-scoreboard/Scoreboard.js',
+  './plugins/gui-switch-graphics/SwitchGraphics.js',
   './plugins/gui-editor/Editor.js',
   './plugins/gui-game-editor/GameEditorGui.js',
   './plugins/gui-inspector/Inspector.js',
