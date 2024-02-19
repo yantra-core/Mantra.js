@@ -404,6 +404,17 @@ class Game {
     return { x, y };
   }
 
+  exists(entityId) {
+    if (this.data && this.data.ents && this.data.ents._) {
+      let ent = this.data.ents._[entityId];
+      if (ent) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
   //
   // Text
   //

@@ -76,11 +76,27 @@ export default class Droppable {
         context.dropTarget = ent;
   
         // TODO: add highlight to selectedDropTarget
+       
+        // iterate all other droppable entities and remove border
+        let dropTargets = game.components.onDrop.data;
+        // droppables is a map
+        for (let key in dropTargets) {
+          // let dropTarget = dropTargets[key.toString()];
+          if (key.toString() !== ent.id.toString()) {
+            game.updateEntity(key, {
+              style: {
+                border: 'none'
+              }
+            });
+          }
+        }
+
         game.updateEntity(ent.id, {
           style: {
             border: '2px solid red'
           }
-        })
+        });
+
   
         // console.log('selectedDropTarget', ent)
         context.dropTarget = ent;
@@ -99,7 +115,7 @@ export default class Droppable {
   
       if (context.dropTarget) {
         let ent = game.data.ents._[context.dropTarget.id]
-        if (typeof ent.onDrop === 'function') {
+        if (ent && typeof ent.onDrop === 'function') {
           ent.onDrop(context, event);
         }
       }

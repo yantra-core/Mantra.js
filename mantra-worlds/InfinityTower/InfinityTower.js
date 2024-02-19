@@ -71,6 +71,13 @@ export default class InfinityTower {
         let configA = game.build().color(colorA).build();
         let configB = game.build().color(colorB).build();
         let mixed = game.build().mix(configA).mix(configB).build();
+        
+        // check that ent exists
+        let exists = game.exists(context.id);
+        if (!exists) {
+          // console.log('context entity does not exist');
+          return;
+        }
         game.updateEntity(context.id, {
           color: mixed.color,
           size: {
