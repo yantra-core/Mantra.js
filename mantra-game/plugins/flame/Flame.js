@@ -26,7 +26,7 @@ export default class Flame {
       },
       //texture: 'flame',
       //color: 0xff0000,
-      collisionStart: this.touchedFlame,
+      collisionStart: this.touchedFlame.bind(this),
       size: {
         width: 16,
         height: 16,
@@ -53,6 +53,7 @@ export default class Flame {
   }
 
   touchedFlame(a, b, pair, context) {
+    let game = this.game;
     // flame will not affect itself
     if (context.owner.owner !== context.target.id) {
       game.removeEntity(context.target.id);

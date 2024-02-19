@@ -86,6 +86,7 @@ class Home {
     game.use('Player');
     game.use('Tone');
     game.use('Hexapod');
+    game.use('Teleporter');
   }
 
   init(game) {

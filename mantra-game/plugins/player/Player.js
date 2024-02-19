@@ -54,6 +54,7 @@ export default class Player {
       radius: playerConfig.radius,
       texture: playerConfig.texture,
       afterRemoveEntity: function(entity){
+        let game = that.game; // this should work here?, test again
         // check to see if has any lives left
         if (entity.meta && typeof entity.meta.lives === 'number' && entity.meta.lives > 0) {
           // creates the same player again with the same config
