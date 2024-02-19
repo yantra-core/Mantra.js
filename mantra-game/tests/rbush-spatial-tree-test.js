@@ -56,8 +56,8 @@ tap.test('RBush plugin integration tests', (t) => {
     }, true);
 
     // Check if the correct entities are returned
-    t.equal(foundEntities.some(e => e.name === 'entity1'), true, 'Entity1 should be found in the search area');
-    t.equal(foundEntities.some(e => e.name === 'entity2'), true, 'Entity2 should be found in the search area');
+    t.equal(foundEntities.some(e => e.id === 1), true, 'Entity1 should be found in the search area');
+    t.equal(foundEntities.some(e => e.id === 2), true, 'Entity2 should be found in the search area');
 
     t.end();
   });

@@ -7,7 +7,7 @@ class RBush {
 
   constructor() {
     this.id = RBush.id;
-
+    this.idToNodeMap = new Map(); // Map to track IDs to RBush nodes
   }
 
   init(game) {
@@ -19,23 +19,41 @@ class RBush {
   addEntity(entity) {
     const spatialData = this._extractSpatialData(entity);
     this.tree.insert(spatialData);
+    this.idToNodeMap.set(entity.id.toString(), spatialData);
   }
 
   updateEntity(entity) {
-    const spatialData = this._extractSpatialData(entity);
-    this.tree.remove(spatialData, (a, b) => a.id === b.id);
-    this.tree.insert(spatialData);
+    const entityIdString = entity.id.toString();
+    const oldSpatialData = this.idToNodeMap.get(entityIdString);
+    // Directly remove the old node if it exists
+    if (oldSpatialData) {
+      this.tree.remove(oldSpatialData); // RBush's remove expects the exact node reference
+      this.idToNodeMap.delete(entityIdString); // Remove the old entry from the map
+    }
+    // Insert the updated entity and update the map
+    const newSpatialData = this._extractSpatialData(entity);
+    this.tree.insert(newSpatialData);
+    this.idToNodeMap.set(entityIdString, newSpatialData);
   }
 
   removeEntity(entity) {
-    const spatialData = this._extractSpatialData(entity);
-    this.tree.remove(spatialData, (a, b) => a.id === b.id);
+    const spatialData = this.idToNodeMap.get(entity.id.toString());
+    if (spatialData) {
+      this.tree.remove(spatialData);
+      this.idToNodeMap.delete(entity.id.toString());
+    }
   }
 
   search(query, mergeData = false) {
-    // Query should be an object with {minX, minY, maxX, maxY}
+    let that = this;
     if (mergeData) {
-      return this.tree.search(query).map(item => this.game.getEntity(item.id));
+      return this.tree.search(query).filter(function (item) {
+        let entRef = that.game.data.ents._[item.id.toString()];
+        if (entRef && entRef !== null && entRef.destroyed !== true) {
+          return that.game.data.ents._[item.id.toString()];
+        }
+        return false;
+      });
     } else {
       return this.tree.search(query).map(item => item.id);
     }
@@ -64,7 +82,7 @@ class RBush {
     if (tick % 3 !== 0) return;
 
     let currentPlayer = this.game.getCurrentPlayer();
-    
+
     //
     // If there is a current player and the `Tile` plugin is loaded,
     // Check the players position and load the tiles for the area around the player
