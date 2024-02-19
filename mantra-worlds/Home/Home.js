@@ -84,11 +84,8 @@ class Home {
     game.use('Boomerang');
     game.use('Flame');
     game.use('Player');
-    //game.use('Hexapod');
-    game.use('Tile', {
-      loadDefaultTilemap: true
-    })
-
+    game.use('Tone');
+    game.use('Hexapod');
   }
 
   init(game) {
@@ -97,12 +94,6 @@ class Home {
   }
 
   update() {
-    if (this.game.tick % 10 === 0) { // TODO: better exists check for player alive status
-      if (!this.game.data.ents._[this.game.currentPlayerId]) {
-        let player1 = game.build().Player().createEntity();
-        game.setPlayerId(player1.id);
-      }
-    }
   }
 
   createWorld() {
@@ -110,6 +101,7 @@ class Home {
     let game = this.game;
 
     game.reset();
+    game.setBackground('#007fff');
 
     game.data.camera.follow = true;
 
@@ -124,10 +116,9 @@ class Home {
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
-    
-
-    let player1 =  game.build().Player().createEntity();
-
+    let player1 =  game.build().Player({
+      lives: 99,
+    }).createEntity();
     game.setPlayerId(player1.id);
 
     //
@@ -145,9 +136,8 @@ class Home {
       game.build().Hexapod().size(8).position(x, y, 0).createEntity();
     };  
 
-    game.setBackground('#007fff');
+    game.build().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
 
-    // game.use('Tone');
     this.createTwinFlames();
     welcomeMessage(game);
     game.useSutra(sutras(game), 'HOME');
