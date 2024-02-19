@@ -94,6 +94,7 @@ class Boomerang {
   }
 
   handleCollision(pair, bodyA, bodyB) {
+    let game = this.game;
     if (bodyA.myEntityId && bodyB.myEntityId) {
       const entityIdA = bodyA.myEntityId;
       const entityIdB = bodyB.myEntityId;

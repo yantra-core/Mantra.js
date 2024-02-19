@@ -101,7 +101,7 @@ export default function createDoors(game) {
             game.removeEntity(key.id);
           });
           // create a new key at where it started
-          createHomeKey();
+          createHomeKey(game);
         }
 
         game.flash();
@@ -190,7 +190,7 @@ export default function createDoors(game) {
     });
   }
 
-  createHomeKey();
+  createHomeKey(game);
 
   // create text label instruction for picking up keys
   game.createEntity({
@@ -214,7 +214,7 @@ export default function createDoors(game) {
 
 }
 
-function createHomeKey () {
+function createHomeKey (game) {
 
   game.createEntity({
     type: 'KEY',

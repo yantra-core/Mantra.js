@@ -61,7 +61,7 @@ export default class Teleporter {
   }
 
   touchedTeleporter(a, b, pair, context) {
-
+    let game = this.game;
     if (context.owner.meta &&  context.owner.meta.destination) {
       let destination = context.owner.meta.destination;
       if (typeof destination === 'function') {

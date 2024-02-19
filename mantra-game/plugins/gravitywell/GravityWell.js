@@ -69,7 +69,7 @@ export default class GravityWell {
         if (entity.id !== entityData.id && !entity.destroyed) {
           let gravityWell = gameState.ents._[entityData.id];
           if (gravityWell && gravityWell.meta) {
-            this.game.applyGravity(gravityWell, entity, this.GRAVITATIONAL_CONSTANT, gravityWell.meta.repulsion);
+            game.applyGravity(gravityWell, entity, this.GRAVITATIONAL_CONSTANT, gravityWell.meta.repulsion);
           }
         }
       });

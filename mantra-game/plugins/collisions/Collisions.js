@@ -58,7 +58,7 @@ class Collisions {
       } else {
         if (typeof exitEnt.exit.world !== 'undefined') {
           if (enterEnt.type === 'PLAYER') {
-            game.switchWorlds(exitEnt.exit.world);
+            this.game.switchWorlds(exitEnt.exit.world);
           }
         }
         if (typeof exitEnt.exit.position !== 'undefined') {

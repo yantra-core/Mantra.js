@@ -36,7 +36,6 @@ class GravityGardens {
   createWorld() {
     let game = this.game;
 
-
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
     game.createBorder({
@@ -99,7 +98,7 @@ class GravityGardens {
   }
 
   bindSutraRules() {
-
+    let game = this.game;
     let rules = game.rules;
 
     rules.if('USE_ITEM_1').then('switchGravity');
@@ -129,7 +128,7 @@ class GravityGardens {
 
   // Plugin.update() is called once per game tick
   update() {
-
+    let game = this.game;
     // mouse drops particles logic
     if (this.dropping && game.tick % 3 === 0) {
       // console.log('dropping', mousePosition.x, mousePosition.y);
@@ -201,8 +200,9 @@ class GravityGardens {
 
   }
 
-
   createFounts() {
+
+    let game = this.game;
 
     // will set the collistionStart flag to true in order to register collision events
     let particleCollision = true;
@@ -282,6 +282,7 @@ class GravityGardens {
 
   playerSwitchedGravity(entity, gameState) {
 
+    let game = this.game;
     if (typeof gameState.lastGravitySwitch === 'undefined') {
       gameState.lastGravitySwitch = 0;
     }
@@ -314,7 +315,6 @@ class GravityGardens {
           }
         });
       }
-
 
       gameState.lastGravitySwitch = Date.now();
     }

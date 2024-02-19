@@ -1,5 +1,6 @@
 import Home from './Home/Home.js';
 import GravityGardens from './GravityGardens/GravityGardens.js';
+import InfinityTower from './InfinityTower/InfinityTower.js';
 import Maze from './Maze/Maze.js';
 import Music from './Music/Music.js';
 import Platform from './Platform/Platform.js';
@@ -13,6 +14,7 @@ import YCraft from './YCraft/YCraft.js';
 const worlds = {};
 worlds.Home = Home;
 worlds.GravityGardens = GravityGardens;
+worlds.InfinityTower = InfinityTower;
 worlds.Maze = Maze;
 worlds.Music = Music;
 worlds.Platform = Platform;

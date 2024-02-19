@@ -1,3 +1,4 @@
+// TODO: needs to be able to attach by container/entity id or name, not just by name
 export default function layoutEntity(container, entityId) {
 
   let containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity

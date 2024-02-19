@@ -2,7 +2,7 @@ import createDoors from './lib/createDoors';
 
 class Maze {
   static id = 'world-maze';
-  static type = 'maze';
+  static type = 'world';
 
   constructor() {
     this.id = Maze.id;
@@ -39,19 +39,9 @@ class Maze {
     game.use('Tone');
     game.use('Tile');
     game.use('Collectable');
-
-
-    // TODO: create containers of entities
-    // containers can have layouts applied to them
-    // if a container is already created an entity can be added to it
-    // we wish to layout the entity upon creation when possible instead of on update ( to prevent flickering )
-
-    // a container will not be sent over the wire?
-    // game.createPlayer();
-
     createDoors(game);
 
-        //
+    //
     // warp to Mantra Home World
     //
     game.createEntity({
@@ -88,25 +78,6 @@ class Maze {
         y: -120
       }
     });
-
-    /*
-    game.createEntity({
-      size: {
-        width: 16,
-        height: 16
-      },
-      name: 'maze-door-0',
-      texture: 'tile-entrance',
-      color: 0x00ff00,
-      container: 'laby-container',
-      position: { // relative to the container
-        x: 100,
-        y: 0,
-        z: 0
-      }
-    });
-    */
-
 
   }
 

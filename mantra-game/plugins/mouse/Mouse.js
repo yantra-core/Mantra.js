@@ -88,6 +88,7 @@ export default class Mouse {
 
   handleMouseDown(event) {
     let target = event.target;
+    let game = this.game;
     // console.log('handleMouseDown', target)
     // check to see if target has a mantra-id attribute
     if (target && target.getAttribute) {

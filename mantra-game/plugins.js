@@ -73,6 +73,7 @@ import Player from './plugins/player/Player.js';
 import Sword from './plugins/sword/Sword.js';
 import Teleporter from './plugins/teleporter/Teleporter.js';
 import Tile from './plugins/tile/Tile.js';
+import Tower from './plugins/tower/Tower.js';
 import UnitSpawner from './plugins/unit-spawner/UnitSpawner.js';
 
 // Geospatial
@@ -133,6 +134,7 @@ const plugins = {
   Hexapod,
   Tile,
   Teleporter,
+  Tower,
   Key,
   UnitSpawner,
   // Game Objects

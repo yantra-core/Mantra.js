@@ -1,4 +1,7 @@
 export default function createTileMap(tileMap) {
+
+  let game = this.game;
+
   let labyrinthos = this.labyrinthos;
   // console.log('createTileMap', tileMap);
 

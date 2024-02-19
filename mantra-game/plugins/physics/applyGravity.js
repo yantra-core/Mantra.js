@@ -1,5 +1,6 @@
 export default function applyGravity(ent1, ent2, gravity, repulsion = false) {
 
+  let game = this.game;
   if (!ent1 || !ent2) {
     return;
   }
