@@ -73,13 +73,13 @@ export default class InfinityTower {
     hexapodConfig.meta({
       maxUnits: 22
     });
-    console.log('hexapodConfighexapodConfig', hexapodConfig)
     let unitSpawner = game.build().UnitSpawner({
       unitConfig: hexapodConfig.config,
     }).texture(null).radius(1).color('red').position(300, -800, 0).createEntity()
 
-
-    // create a solid red line that has collisionStart handler to destroy ents is static
+    //
+    // End zone - create a solid red line that has collisionStart handler to destroy ents
+    //
     let endzoneConfig = game.build().position(-80, 50, 0).color('red').isStatic(true).width(400).height(10);
     endzoneConfig.collisionStart(function (ent) {
       if (ent.type === 'HEXAPOD') {
@@ -87,7 +87,6 @@ export default class InfinityTower {
       }
     });
     endzoneConfig.createEntity();
-
 
     //
     // warp to Mantra Home World
