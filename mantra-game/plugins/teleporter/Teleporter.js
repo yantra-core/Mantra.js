@@ -25,11 +25,17 @@ export default class Teleporter {
         // frame: 0 // TODO: support single frame / bypass animation of array
       },
       meta: {
-        destination: entityData.destination
+        destination: entityData.destination || {
+          position: {
+            x: 0,
+            y: 0,
+            z: 0
+          }
+        }
       },
       //texture: 'teleporter',
       //color: 0xff0000,
-      collisionStart: this.touchedTeleporter.bind(this),
+      collisionStart: entityData.collisionStart || this.touchedTeleporter.bind(this),
       size: {
         width: 16,
         height: 16,
@@ -58,7 +64,6 @@ export default class Teleporter {
 
     if (context.owner.meta &&  context.owner.meta.destination) {
       let destination = context.owner.meta.destination;
-
       if (typeof destination === 'function') {
         destination.call(game, context.target, context.owner);
       } else {
@@ -67,11 +72,24 @@ export default class Teleporter {
             game.switchWorlds(destination.world);
           }
         }
+        // same as world, duplicate code
+        if (typeof destination.plugin !== 'undefined') {
+          if (context.target.type === 'PLAYER') { // could be other types as well
+            game.switchWorlds(destination.plugin);
+          }
+        }
+        // handle entity case
+        if (typeof destination.entity !== 'undefined') {
+          // get latest position for ent ( if available )
+          let ent = game.data.ents._[destination.entity]; // TODO: game.getEntity() with improved perf
+          if (ent) {
+            game.setPosition(context.target.id, { x: ent.position.x, y: ent.position.y });
+          }
+        }
         if (typeof destination.position !== 'undefined') {
           game.setPosition(context.target.id, { x: destination.position.x, y: destination.position.y });
         }
       }
-
     }
 
   }
