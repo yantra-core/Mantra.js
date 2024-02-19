@@ -90,6 +90,9 @@ import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 
+// GUI GameObjects
+import Text from './plugins/text/Text.js';
+
 // GUI
 import Inspector from './plugins/gui-inspector/Inspector.js';
 import Creator from './plugins/gui-creator/Creator.js';
@@ -138,6 +141,8 @@ const plugins = {
   Bullet,
   Flame,
   Sword,
+  // UI Objects
+  Text,
   // Core
   Collision,
   ChronoControl,
