@@ -20,6 +20,7 @@ export default class InfinityTower {
     game.use('RBush');
     game.use('UnitSpawner');
     game.use('Teleporter');
+    game.use('Draggable');
 
   }
 
@@ -53,6 +54,10 @@ export default class InfinityTower {
     //
     game.build().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
     game.build().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
+
+    game.build().Tower().Draggable().color('yellow').position(0, 140).createEntity();
+    game.build().Tower().Draggable().color('yellow').position(-175, 140).createEntity();
+
 
     //
     // Left NPC Spawner

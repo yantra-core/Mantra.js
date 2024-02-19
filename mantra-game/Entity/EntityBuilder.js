@@ -56,8 +56,10 @@ export default class EntityBuilder {
     return this;
   }
 
-  friction(value) {
+  friction(value) { // friction will default override the other friction values
     this.config.friction = value;
+    this.config.frictionStatic = value;
+    this.config.frictionAir = value;
     return this;
   }
 
@@ -212,25 +214,50 @@ export default class EntityBuilder {
     return this;
   }
 
+  //
   // Public methods to add specific event handlers
+  //
+  // Pointer events
   pointerdown(handler) {
     return this._addEventHandler('pointerdown', handler);
   }
+  pointerup(handler) {
+    return this._addEventHandler('pointerup', handler);
+  }
+  pointermove(handler) {
+    return this._addEventHandler('pointermove', handler);
+  }
+  pointerover(handler) {
+    return this._addEventHandler('pointerover', handler);
+  }
+  pointerout(handler) {
+    return this._addEventHandler('pointerout', handler);
+  }
+  pointerenter(handler) {
+    return this._addEventHandler('pointerenter', handler);
+  }
+  pointerleave(handler) {
+    return this._addEventHandler('pointerleave', handler);
+  }
 
+  // Collision events
   collisionStart(handler) {
     return this._addEventHandler('collisionStart', handler);
   }
-
   collisionActive(handler) {
     return this._addEventHandler('collisionActive', handler);
   }
-
   collisionEnd(handler) {
     return this._addEventHandler('collisionEnd', handler);
   }
 
+  // Lifecycle events
   onUpdate(handler) {
     return this._addEventHandler('update', handler);
+  }
+
+  afterRemoveEntity(handler) {
+    return this._addEventHandler('afterRemoveEntity', handler);
   }
 
   sutra(rules, config) {

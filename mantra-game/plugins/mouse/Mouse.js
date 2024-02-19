@@ -91,12 +91,20 @@ export default class Mouse {
     let game = this.game;
     // console.log('handleMouseDown', target)
     // check to see if target has a mantra-id attribute
-    if (target && target.getAttribute) {
+    // TODO: we'll need entity detection per Graphics adapter
+    // Remark: The current approach only works for DOM HTML, for canvas, we'll need the adapter ( three ) to query scene and return ent id
+    if (target && target.getAttribute) { 
       let mantraId = target.getAttribute('mantra-id');
       if (mantraId) {
         // if this is a Mantra entity, set the selectedEntityId
         // this is used for GUI rendering and CSSGraphics
         this.game.selectedEntityId = mantraId;
+        // get the reference to this ent, check for pointerdown event
+        const ent = this.game.data.ents._[mantraId];
+        if (ent && ent.pointerdown) {
+          let context = ent;
+          ent.pointerdown(ent, event);
+        }
       }
 
       if (!mantraId) {
@@ -180,6 +188,13 @@ export default class Mouse {
       event.preventDefault();
     }
 
+    // get the reference to this ent, check for pointerdown event
+    const ent = this.game.data.ents._[this.game.selectedEntityId];
+    if (ent && ent.pointerup) {
+      let context = ent;
+      ent.pointerup(ent, event);
+    }
+
     this.game.emit('pointerUp', this.game.selectedEntityId, event)
     this.sendMouseData(event);
   }
@@ -203,8 +218,14 @@ export default class Mouse {
       dragStartPosition: this.dragStartPosition,
       dx: this.dx,
       dy: this.dy,
-      event: event
+      event: event,
+      worldPosition: {
+        x: (this.mousePosition.x - window.innerWidth / 2 + this.game.data.camera.offsetX) / this.game.data.camera.currentZoom + this.game.data.camera.position.x,
+        y: (this.mousePosition.y - window.innerHeight / 2 + this.game.data.camera.offsetY) / this.game.data.camera.currentZoom + this.game.data.camera.position.y
+      }
     };
+    // this.game.data.mouse = this.game.data.mouse || {};
+    this.game.data.mouse = mouseData;
     if (this.game.communicationClient) {
       this.game.communicationClient.sendMessage('player_input', { mouse: mouseData });
     }

@@ -457,6 +457,8 @@ class Game {
 
   reset(mode, clearSutra = true) {
 
+    let game = this;
+
     // reset all Sutra rules
     if (clearSutra) {
       this.rules = this.createSutra();

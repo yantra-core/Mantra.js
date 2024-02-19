@@ -4,6 +4,10 @@ export default async function loadScripts(scripts, finalCallback) {
     return;
   }
 
+  if (typeof scripts ==='string') {
+    scripts = [scripts];
+  }
+
   // Function to load an individual script and return a Promise
   const loadScript = async (script) => {
     return new Promise((resolve, reject) => {

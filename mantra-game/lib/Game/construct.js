@@ -263,6 +263,15 @@ export default function construct(game, plugins = []) {
   game.components.collisionStart = new Component('collisionStart', game);
   game.components.collisionEnd = new Component('collisionEnd', game);
 
+  game.components.pointerdown = new Component('pointerdown', game);
+  game.components.pointerup = new Component('pointerup', game);
+  game.components.pointermove = new Component('pointermove', game);
+  game.components.pointerover = new Component('pointerover', game);
+  game.components.pointerout = new Component('pointerout', game);
+  game.components.pointerenter = new Component('pointerenter', game);
+  game.components.pointerleave = new Component('pointerleave', game);
+  
+
   // stores a location to teleport to when the entity is touched
   game.components.exit = new Component('exit', game);
 

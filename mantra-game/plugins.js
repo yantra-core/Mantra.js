@@ -44,6 +44,8 @@ import Mouse from './plugins/mouse/Mouse.js';
 import Keyboard from './plugins/keyboard/Keyboard.js';
 import Gamepad from './plugins/gamepad/Gamepad.js';
 
+import Draggable from './plugins/draggable/Draggable.js';
+
 // Multimedia Devices
 import Midi from './plugins/midi/Midi.js';
 import MidiGUI from './plugins/gui-midi/MidiGUI.js';
@@ -147,6 +149,7 @@ const plugins = {
   Sword,
   // UI Objects
   Text,
+  Draggable,
   // Core
   Collision,
   ChronoControl,

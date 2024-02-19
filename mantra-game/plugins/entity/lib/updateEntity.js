@@ -109,6 +109,26 @@ export default function updateEntity(entityDataOrId, entityData) {
   }
 
   //
+  // Event handlers / Lifecycle Events
+  //
+  if (typeof entityData.update !== 'undefined') {
+    // get the current component value
+    let currentFn = this.game.components.update.get(entityId);
+    let entRef = this.game.data.ents._[entityId];
+    if (entRef && Array.isArray(entRef.update.handlers)) {
+      // push the new event
+
+      if (entityData.update === null) {
+        // just remove the last handler
+        entRef.update.handlers.pop();
+      } else {
+        entRef.update.handlers.push(entityData.update);
+      }
+
+    }
+  }
+
+  //
   // Meta properties
   //
   if (typeof entityData.meta !== 'undefined') {
