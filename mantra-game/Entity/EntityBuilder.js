@@ -9,6 +9,7 @@ export default class EntityBuilder {
         y: 0,
         z: 0
       },
+      rotation: 0, // TODO: x / y z
       size: {
         width: 16,
         height: 16,
@@ -137,7 +138,7 @@ export default class EntityBuilder {
     this.config.size.depth = value;
     return this;
   }
-  
+
   radius(value) {
     this.config.radius = value;
     return this;
@@ -190,45 +191,26 @@ export default class EntityBuilder {
     return this;
   }
 
-  // Private method to add an event handler
   _addEventHandler(eventName, handler) {
-    // console.log(`Adding handler for event: ${eventName}`);
-
-    // Define a variable outside the composite function to hold the handlers
-    let handlers;
-
-    // Check if a composite function already exists for this event
-    if (typeof this.config[eventName] !== 'function') {
-      // console.log(`No composite function for ${eventName}, creating new.`);
-
-      // Initialize the handlers array and store it in the variable
-      handlers = [handler];
-
-      // Create a new composite function that uses the handlers variable
-      this.config[eventName] = (...args) => {
-        // console.log(`Executing composite function for ${eventName} with args:`, args);
-        handlers.forEach(h => {
-          // console.log(`Executing handler for ${eventName}`);
-          h(...args);
-        });
-      };
+    // Check if the event already has a composite function with handlers
+    if (typeof this.config[eventName] === 'function' && Array.isArray(this.config[eventName].handlers)) {
+      this.config[eventName].handlers.push(handler); // Add to existing handlers
     } else {
-      // console.log(`Composite function exists for ${eventName}, adding to existing handlers.`);
-
-      // If the composite function exists, retrieve its handlers array
-      handlers = this.config[eventName].handlers;
-
-      // Add the new handler to the array
-      handlers.push(handler);
+      if (typeof handler === 'boolean') {
+        this.config[eventName] = handler;
+      }
+      if (typeof handler === 'function') {
+        // Otherwise, create a new composite function and handlers array
+        const handlers = [handler];
+        this.config[eventName] = (...args) => {
+          handlers.forEach(h => h(...args)); // Execute all handlers
+        };
+        this.config[eventName].handlers = handlers; // Store handlers
+      }
     }
-
-    // Attach the handlers array to the composite function for potential future reference
-    this.config[eventName].handlers = handlers;
-    // console.log(`Total handlers for ${eventName}: ${handlers.length}`);
 
     return this;
   }
-
 
   // Public methods to add specific event handlers
   pointerdown(handler) {
@@ -275,7 +257,6 @@ export default class EntityBuilder {
     this.config.text = value;
     return this;
   }
-
 
   // Positioning and movement
   position(x, y, z) {
@@ -328,8 +309,6 @@ export default class EntityBuilder {
       let entities = [];
       for (let i = 0; i < this.config.clone; i++) {
         let clonedConfig = { ...this.config }; // Shallow copy for non-function properties
-        // Explicitly reassign functions and bound event handlers
-        clonedConfig.collisionStart = this.config.collisionStart;
         entities.push(this.game.createEntity(clonedConfig));
       }
       return entities;
@@ -337,7 +316,6 @@ export default class EntityBuilder {
       let entities = [];
       for (let i = 0; i < this.config.repeat; i++) {
         let entityConfig = { ...this.config }; // Shallow copy for non-function properties
-  
         // Calculate the offset for each repeated entity
         let offsetX = entityConfig.position.x + i * entityConfig.offset.x;
         let offsetY = entityConfig.position.y + i * entityConfig.offset.y;
@@ -363,10 +341,10 @@ export default class EntityBuilder {
       return entities;
     } else {
       let singleConfig = { ...this.config }; // Shallow copy for non-function properties
-      // Explicitly reassign functions and bound event handlers
-      singleConfig.collisionStart = this.config.collisionStart;
       return this.game.createEntity(singleConfig);
     }
+
+
   }
 
   repeaters(modifiers) {

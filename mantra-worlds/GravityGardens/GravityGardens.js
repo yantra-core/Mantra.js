@@ -10,10 +10,13 @@ class GravityGardens {
     this.slurping = false;
   }
 
-  preload(game) {
+  async preload(game) {
+    // preload these plugins before the plugin starts
     game.use('Player');
     game.use('GravityWell');
     game.use('UnitSpawner');
+    game.use('Teleporter');
+    game.use('Sutra');
   }
 
   init(game) {
@@ -22,6 +25,7 @@ class GravityGardens {
     this.createFounts(game);
     this.bindEvents();
     this.bindSutraRules();
+    // we can lazy load these after the plugin has started
     game.use('CurrentFPS');
     game.use('StarField');
   }
@@ -30,12 +34,17 @@ class GravityGardens {
     let game = this.game;
 
     // we reset the game to clear any previous state
-    // game.reset();
+    game.reset();
 
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
     game.createBorder({
       thickness: 20,
+      collisionStart: function (a, b, pair, context) {
+        if (context.target.type === 'PARTICLE') {
+          game.removeEntity(context.target.id);
+        }
+      }
     });
 
     // set the zoom level based on device type
@@ -47,29 +56,35 @@ class GravityGardens {
 
     // Builds a Player config with GravityWell 
     let playerConfig = game.build()
-      .GravityWell()
-      .Player()
+      .GravityWell()     // The player will have a gravity well
+      .Player()          // The player Plugin
       .texture(null)     // default texture is a player sprite
       .color(0xffcccc)   // gives a color to the player
       .position(0, 0, 0) // sets the player position
-      .build();
 
-    // whenever the player collides with something, we remove the other entity
-    playerConfig.collisionStart = function (a, b, pair, context) {
-      game.removeEntity(context.target.id);
-    }
+    playerConfig.collisionStart(function (a, b, pair, context) {
+      if (context.target.type !== 'WARP') {
+        game.removeEntity(context.target.id);
+      }
+    });
+
+    playerConfig = playerConfig.build();
 
     let player = game.createEntity(playerConfig);
-
     game.setPlayerId(player.id);
 
     game.build()
       .type('WARP')
-      .exit({ world: 'Home' })
+      .Teleporter({
+        destination: {
+          world: 'Home'
+        }
+      })
       .texture('warp-to-home')
       .size(64, 64, 64)
       .isStatic(true)
-      .position(600, -30, 0)
+      //.isSensor(true)
+      .position(595, -30, 0)
       .createEntity();
 
     game.build()
@@ -190,14 +205,12 @@ class GravityGardens {
     // will set the collistionStart flag to true in order to register collision events
     let particleCollision = true;
 
-    // .sutra(fount, { sprayAngle: 0, color: 0xf03025, collisionStart: particleCollision })
-
-
     game.build()
       .name('fountA')
       .type('FOUNT')
       .UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0xf03025,
           isSensor: true,
           position: { x: 200, y: 0 },
@@ -214,6 +227,7 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0x14b161,
           isSensor: true,
           position: { x: -200, y: 0 },
@@ -231,6 +245,7 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0x3c62f8,
           isSensor: true,
           position: { x: 0, y: -200 },
@@ -248,6 +263,7 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0xe9dd34,
           isSensor: true,
           position: { x: 0, y: 200 },

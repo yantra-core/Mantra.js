@@ -1,85 +1,50 @@
 export default function createBackground(game) {
 
 
-  game.createEntity({
-    type: "BACKGROUND",
-    texture: 'garden',
-    width: 300,
-    height: 300,
-    body: false,
-    position: {
-      x: 0,
-      y: 0,
-      z: -10
-    }
-  })
+  game.build()
+    .type('BACKGROUND')
+    .texture('garden')
+    .body(false)
+    .size(300, 300, 1)
+    .position(0, 0, -10)
+    .createEntity();
+
+  game.build()
+
+    .type('BACKGROUND')
+    .texture('sutra-tree')
+    .body(false)
+    .size(1024 / 4, 1024 / 4, 1)
+    .position(0, 300, 32)
+    .createEntity();
+
+  game.build()
+    .type('BACKGROUND')
+    .texture('robot-arms-apartment')
+    .kind('building')
+    .size(1340, 3668, 1)
+    .body(false)
+    .position(900, -1800, -1)
+    .createEntity();
+
+  game.build()
+    .type('BACKGROUND')
+    .texture('planet-express-base')
+    .kind('building')
+    .size(2048, 2048, 1)
+    .body(false)
+    .position(-900, -800, -1)
+    .createEntity();
 
 
-  // create some background and text entities for navigation
-  game.createEntity({
-    name: 'sutra-tree',
-    type: 'BACKGROUND',
-    // kind: 'building',
-    width: 1024 / 4,
-    height: 1024 / 4,
-    //depth: 256,
-    depth: 1,
-    texture: 'sutra-tree',
-    body: false,
-    position: {
-      x: 0,
-      y: 300,
-      z: 32
-    }
-  });
+  game.build()
+    .type('BLOCK')
+    .texture('tile-block')
+    .size(200, 200, 1)
+    .mass(10000)
+    .position(200, -800, -8)
+    .createEntity();
 
-  // convert the Sutra.js rules to English text
-  //     let rulesEnglish = game.rules.toEnglish();
-  game.createEntity({
-    type: 'BACKGROUND',
-    texture: 'robot-arms-apartment',
-    kind: 'building',
-    depth: 1,
-
-    width: 1340,
-    height: 3668,
-    body: false,
-    position: { // position to right
-      x: 900,
-      y: -1800,
-      z: -1
-    }
-  });
-
-  game.createEntity({
-    type: 'BACKGROUND',
-    texture: 'planet-express-base',
-    kind: 'building',
-
-    width: 2048,
-    height: 2048,
-    depth: 1,
-    body: false,
-    position: { // position to right
-      x: -900,
-      y: -800,
-      z: -1
-    }
-  });
-
-  game.createEntity({
-    type: 'BLOCK',
-    texture: 'tile-block',
-    width: 200,
-    height: 200,
-    mass: 10000,
-    // body: false,
-    position: { // position to right
-      x: 200,
-      y: -800,
-      z: -8
-    }
-  });
 
   // if touch warp, switch to YCraft level
   game.createEntity({
@@ -146,57 +111,18 @@ export default function createBackground(game) {
     }
   });
 
-  game.createEntity({
-    type: 'DOOR',
-    /*
-    exit: {
-      position: {
-        x: -1000,
-        y: -500
-      },
-    },
-    */
-    body: true,
-    isStatic: true,
-    collisionStart: true,
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'ayyoDoor',
-    },
-    width: 16,
-    height: 16,
-    position: { // position to right
-      x: 55,
-      y: 71,
-      z: 10
-    }
-  });
+  game.build().Teleporter().position(55, 71, 10)
+    .size(16)
+    .width(16)
+    .height(16)
+    .createEntity();
 
-  game.createEntity({
-    type: 'DOOR',
-    /*
-    exit: {
-      position: {
-        x: 1100,
-        y: -500
-      },
-    },
-    */
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'ayyoDoor',
-    },
-    width: 16,
-    height: 16,
-    body: true,
-    isStatic: true,
-    collisionStart: true,
-    position: { // position to left
-      x: -55,
-      y: 71,
-      z: 10
-    }
-  });
+    game.build().Teleporter().position(-55, 71, 10)
+    .size(16)
+    .width(16)
+    .height(16)
+    .createEntity();
+  
 
   // if touch warp, switch to Music level
   game.createEntity({
@@ -379,155 +305,155 @@ export default function createBackground(game) {
 
 
 
-    /*
-    // switch to CSSGraphics
-    game.createEntity({
-      name: 'CSSGraphics',
-      kind: 'CSSGraphics',
-      collisionActive: true,
-      collisionEnd: true,
-      collisionStart: true,
+/*
+// switch to CSSGraphics
+game.createEntity({
+  name: 'CSSGraphics',
+  kind: 'CSSGraphics',
+  collisionActive: true,
+  collisionEnd: true,
+  collisionStart: true,
 
-      type: 'TEXT',
-      text: 'CSS',
-      width: 60,
-      height: 50,
-      //color: 0xffffff,
-      style: {
-        width: '60px',
-        height: '30px',
-        fontSize: '12px',
-        color: 'white',
-        textAlign: 'center',
-        // border: '1px solid white',
-        opacity: 0.7
-      },
-      body: true,
-      isSensor: true,
-      position: {
-        x: -55,
-        y: 75,
-        z: 10
-      }
-    });
-    */
+  type: 'TEXT',
+  text: 'CSS',
+  width: 60,
+  height: 50,
+  //color: 0xffffff,
+  style: {
+    width: '60px',
+    height: '30px',
+    fontSize: '12px',
+    color: 'white',
+    textAlign: 'center',
+    // border: '1px solid white',
+    opacity: 0.7
+  },
+  body: true,
+  isSensor: true,
+  position: {
+    x: -55,
+    y: 75,
+    z: 10
+  }
+});
+*/
 
-    /*
-    // switch to 3d text label
-    game.createEntity({
-      name: 'BabylonGraphics',
-      collisionActive: true,
-      collisionEnd: true,
-      collisionStart: true,
-      kind: 'BabylonGraphics',
-      type: 'TEXT',
-      text: '3D',
-      width: 60,
-      height: 50,
-      color: 0x000000,
-      style: {
-        width: '60px',
-        height: '30px',
-        fontSize: '12px',
-        color: 'white',
-        textAlign: 'center',
-        opacity: 0.7
-      },
-      body: true,
-      isSensor: true,
-      position: {
-        x: 55,
-        y: 75,
-        z: 64
-      }
-    });
-    */
-
-
-
-
-    /*
-    game.createEntity({
-      name: 'noteInfo',
-      type: 'TEXT',
-      text: 'This is a note, touch it to play a sound',
-      fontSize: 16,
-      color: 0x000000,
-      body: false,
-      style: {
-        fontSize: '16px'
-      },
-      position: {
-        x: 0,
-        y: -200,
-        z: 64
-      }
-    });
-    */
-
-        /*
-
-    game.createEntity({
-      name: 'raiden-left',
-      type: 'BACKGROUND',
-      width: 64,
-      height: 64,
-      depth: 64,
-      style: {
-        display: 'none'
-      },
-      texture: 'raiden',
-      body: false,
-      position: {
-        x: 0,
-        y: 10,
-        z: 32
-      }
-    });
-
-    game.createEntity({
-      name: 'raiden-right',
-      type: 'BACKGROUND',
-      width: 64,
-      height: 64,
-      depth: 64,
-      style: {
-        display: 'none'
-      },
-      texture: 'raiden',
-      body: false,
-      position: {
-        x: 100,
-        y: 10,
-        z: 32
-      }
-    });
-
-    */
+/*
+// switch to 3d text label
+game.createEntity({
+  name: 'BabylonGraphics',
+  collisionActive: true,
+  collisionEnd: true,
+  collisionStart: true,
+  kind: 'BabylonGraphics',
+  type: 'TEXT',
+  text: '3D',
+  width: 60,
+  height: 50,
+  color: 0x000000,
+  style: {
+    width: '60px',
+    height: '30px',
+    fontSize: '12px',
+    color: 'white',
+    textAlign: 'center',
+    opacity: 0.7
+  },
+  body: true,
+  isSensor: true,
+  position: {
+    x: 55,
+    y: 75,
+    z: 64
+  }
+});
+*/
 
 
 
 
-    /*
-    // displays some items from the spritesheet
-    let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
-    itemsList = []; // for now
-    itemsList.forEach((item, index) => {
-      game.createEntity({
-        type: item.toUpperCase(),
-        kind: item,
-        width: 16,
-        height: 16,
-        depth: 32,
-        texture: {
-          sheet: 'loz_spritesheet',
-          sprite: item,
-        },
-        position: {
-          x: -100 + (index * 32),
-          y: 150,
-          z: 32
-        }
-      });
-    });
-    */
+/*
+game.createEntity({
+  name: 'noteInfo',
+  type: 'TEXT',
+  text: 'This is a note, touch it to play a sound',
+  fontSize: 16,
+  color: 0x000000,
+  body: false,
+  style: {
+    fontSize: '16px'
+  },
+  position: {
+    x: 0,
+    y: -200,
+    z: 64
+  }
+});
+*/
+
+/*
+
+game.createEntity({
+name: 'raiden-left',
+type: 'BACKGROUND',
+width: 64,
+height: 64,
+depth: 64,
+style: {
+display: 'none'
+},
+texture: 'raiden',
+body: false,
+position: {
+x: 0,
+y: 10,
+z: 32
+}
+});
+
+game.createEntity({
+name: 'raiden-right',
+type: 'BACKGROUND',
+width: 64,
+height: 64,
+depth: 64,
+style: {
+display: 'none'
+},
+texture: 'raiden',
+body: false,
+position: {
+x: 100,
+y: 10,
+z: 32
+}
+});
+
+*/
+
+
+
+
+/*
+// displays some items from the spritesheet
+let itemsList = ['arrow', 'sword', 'lantern', 'fire', 'bomb', 'iceArrow', 'boomerang'];
+itemsList = []; // for now
+itemsList.forEach((item, index) => {
+  game.createEntity({
+    type: item.toUpperCase(),
+    kind: item,
+    width: 16,
+    height: 16,
+    depth: 32,
+    texture: {
+      sheet: 'loz_spritesheet',
+      sprite: item,
+    },
+    position: {
+      x: -100 + (index * 32),
+      y: 150,
+      z: 32
+    }
+  });
+});
+*/

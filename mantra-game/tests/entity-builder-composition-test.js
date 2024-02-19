@@ -308,5 +308,124 @@ tap.test('game.build() API', (t) => {
 
   });
 
+  tap.test('Direct assignment of event handlers after build integrates with existing handlers', (t) => {
+    let handler1Executed = false;
+    let handler2Executed = false;
+
+    // Build the initial entity configuration with one event handler
+    let entityConfig = game.build()
+      .collisionStart(() => {
+        handler1Executed = true;
+      })
+      .build();
+
+    // Directly assign a new collisionStart handler, intending to integrate with the existing one
+    const originalCollisionStart = entityConfig.collisionStart;
+    entityConfig.collisionStart = function () {
+      originalCollisionStart.apply(entityConfig, arguments); // Call the original composite function
+      handler2Executed = true; // Mark the new handler as executed
+    };
+
+    // Trigger the collisionStart event
+    entityConfig.collisionStart();
+
+    // Verify that both the original and the newly assigned handlers are executed
+    t.equal(handler1Executed, true, 'Original collisionStart handler should be executed');
+    t.equal(handler2Executed, true, 'Newly assigned collisionStart handler should be executed');
+    t.end();
+  });
+
+  tap.test('Separate entities maintain their own collisionStart handlers', (t) => {
+    let entity1HandlerExecuted = false;
+    let entity2HandlerExecuted = false;
+
+    // Build the first entity configuration with a collisionStart handler
+    let entityConfig1 = game.build();
+
+    entityConfig1
+      .collisionStart(() => {
+        entity1HandlerExecuted = true; // Mark the handler for the first entity as executed
+      });
+
+    // Build the second entity configuration with a different collisionStart handler
+    let entityConfig2 = game.build()
+      .collisionStart(() => {
+        entity2HandlerExecuted = true; // Mark the handler for the second entity as executed
+      });
+
+    // Create entities from the configurations
+    let entity1 = entityConfig1.createEntity();
+    let entity2 = entityConfig2.createEntity();
+
+    // Trigger the collisionStart event for both entities
+    entity1.collisionStart();
+    entity2.collisionStart();
+
+    // Verify that each entity's collisionStart handler was executed independently
+    t.equal(entity1HandlerExecuted, true, 'The collisionStart handler for entity 1 should be executed');
+    t.equal(entity2HandlerExecuted, true, 'The collisionStart handler for entity 2 should be executed');
+    t.end();
+  });
+
+  tap.test('collisionStart initially true, then function handler added', (t) => {
+    let handlerExecuted = false;
+
+    // Build the entity configuration with collisionStart initially set to true
+    let entityConfig = game.build()
+      .collisionStart(true); // Initially set collisionStart to true
+
+    // Add a collisionStart function handler after the initial true value
+    entityConfig.collisionStart(() => {
+      handlerExecuted = true; // Mark the handler as executed
+    });
+
+    // assert entityConfig is now wrapped in a function
+    console.log('entityConfig.collisionStart', entityConfig.config)
+    t.equal(typeof entityConfig.collisionStart, 'function', 'collisionStart should be a function');
+
+    // Create the entity from the configuration
+    let entity = entityConfig.createEntity();
+
+    // Trigger the collisionStart event
+    if (typeof entity.collisionStart === 'function') {
+      entity.collisionStart();
+    }
+
+    // Verify that the function handler was executed
+    t.equal(handlerExecuted, true, 'The collisionStart function handler should be executed');
+    t.end();
+
+
+  });
+
+  tap.test('collisionStart initially true, then function handler added', (t) => {
+    let handlerExecuted = false;
+  
+    // Build the entity configuration with collisionStart initially set to true
+    let entityConfig = game.build().collisionStart(true);
+  
+    // Add a collisionStart function handler after the initial true value
+    entityConfig.collisionStart(() => {
+      handlerExecuted = true;
+    });
+  
+    // Create the entity from the configuration
+    let entity = entityConfig.createEntity();
+  
+    // Manually call the collisionStart function to simulate an event
+    if (typeof entity.collisionStart === 'function') {
+      entity.collisionStart();
+    }
+  
+    // Verify that the function handler was executed
+    t.equal(handlerExecuted, true, 'The collisionStart function handler should be executed');
+    t.equal(Array.isArray(entity.collisionStart.handlers), true, 'Handlers should be an array');
+    t.equal(entity.collisionStart.handlers.includes(true), false, 'Handlers array should not contain true');
+    t.end();
+  });
+  
+
+
+
 });
 

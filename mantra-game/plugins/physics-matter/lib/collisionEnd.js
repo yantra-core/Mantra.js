@@ -4,7 +4,7 @@ export default function collisionEnd(game, callback) {
     for (let pair of event.pairs) {
       const bodyA = pair.bodyA;
       const bodyB = pair.bodyB;
-      if (bodyA.entity.collisionEnd === true || bodyB.entity.collisionEnd === true) {
+      if (bodyA.entity.collisionEnd || bodyB.entity.collisionEnd) {
         game.emit('collision::end', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }

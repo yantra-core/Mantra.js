@@ -14,7 +14,7 @@ export default function  collisionStart(game, callback) {
       bodyA.entity = entityA;
       bodyB.entity = entityB;
 
-      if (bodyA.entity.collisionStart === true || bodyB.entity.collisionStart === true) {
+      if (bodyA.entity.collisionStart || bodyB.entity.collisionStart ) {
         game.emit('collisionStart', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }

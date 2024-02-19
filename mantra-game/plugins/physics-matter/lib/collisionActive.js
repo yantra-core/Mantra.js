@@ -4,7 +4,7 @@ export default function collisionActive(game, callback) {
       const bodyA = pair.bodyA;
       const bodyB = pair.bodyB;
       // console.log('collisionActive', bodyA.entity, bodyB.entity)
-      if (bodyA.entity.collisionActive === true || bodyB.entity.collisionActive === true) {
+      if (bodyA.entity.collisionActive || bodyB.entity.collisionActive) {
         game.emit('collision::active', { pair, bodyA, bodyB })
         callback(pair, bodyA, bodyB);
       }

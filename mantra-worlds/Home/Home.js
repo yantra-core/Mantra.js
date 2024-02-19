@@ -84,7 +84,11 @@ class Home {
     game.use('Boomerang');
     game.use('Flame');
     game.use('Player');
-    game.use('Hexapod');
+    //game.use('Hexapod');
+    game.use('Tile', {
+      loadDefaultTilemap: true
+    })
+
   }
 
   init(game) {
@@ -115,57 +119,31 @@ class Home {
       game.zoom(4.5);
     }
 
+    // game.build().Block().size(16).clone(10).createEntity();
 
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
-    let playerConfig = game.build().Player();
+    
 
-    /*
-    playerConfig.collisionStart(function () {
-      console.log('overrides the Teleport collision?')
-    });
-    */
-
-
-    let player1 = playerConfig.createEntity();
+    let player1 =  game.build().Player().createEntity();
 
     game.setPlayerId(player1.id);
 
     //
     // Create 22 Hexapods
     //
-    game.build().Hexapod().position(-40, 0, 0).repeat(22).createEntity();
-
-    /*
-
-
-    game.build().Teleporter({
-      destination: {
-        position: {
-          x: 20,
-          y: 0
-        }
-      }
-    })
-    .position(-50, 50).size(32).createEntity();
-
-    game.after('removeEntity', function(entity) {
-      if (entity.type === 'PLAYER') {
-        game.createPlayer({
-          respawns: true,
-          texture: {
-            sheet: 'loz_spritesheet',
-            sprite: 'player',
-          },
-          position: {
-            x: 0,
-            y: 0
-          }
-        });
-      }
-    });
-    */
+    const numberOfHexapods = 24;
+    const radius = 80;
+    for (let i = 0; i < numberOfHexapods; i++) {
+      // Calculate the angle for each hexapod
+      let angle = (i / numberOfHexapods) * 2 * Math.PI;
+  
+      // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
+      let x = radius * Math.cos(angle);
+      let y = radius * Math.sin(angle);
+      game.build().Hexapod().size(8).position(x, y, 0).createEntity();
+    };  
 
     game.setBackground('#007fff');
 
