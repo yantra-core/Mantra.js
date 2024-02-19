@@ -4,9 +4,6 @@ export default class Draggable {
 
   constructor(config = {}) {
     this.id = Draggable.id;
-    this.maxShield = config.maxShield || 100; // Maximum shield strength
-    this.regenRate = config.regenRate || 1; // Shield regeneration rate per tick
-    this.cooldown = config.cooldown || 5000; // Cooldown before regeneration starts (ms)
   }
 
   init(game) {

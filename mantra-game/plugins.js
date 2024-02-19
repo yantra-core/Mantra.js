@@ -45,6 +45,7 @@ import Keyboard from './plugins/keyboard/Keyboard.js';
 import Gamepad from './plugins/gamepad/Gamepad.js';
 
 import Draggable from './plugins/draggable/Draggable.js';
+import Droppable from './plugins/droppable/Droppable.js';
 
 // Multimedia Devices
 import Midi from './plugins/midi/Midi.js';
@@ -150,6 +151,7 @@ const plugins = {
   // UI Objects
   Text,
   Draggable,
+  Droppable,
   // Core
   Collision,
   ChronoControl,

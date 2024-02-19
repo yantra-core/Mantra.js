@@ -91,6 +91,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       pointerenter: false,
       pointerleave: false,
 
+      onDrop: null,
+
       afterRemoveEntity: null,
       update: null,
       exit: null,
@@ -157,7 +159,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, afterRemoveEntity, update, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, update, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -236,6 +238,9 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'pointerleave', pointerleave);
   this.game.addComponent(entityId, 'pointerover', pointerover);
   this.game.addComponent(entityId, 'pointerout', pointerout);
+
+  // Drag and Drop Events
+  this.game.addComponent(entityId, 'onDrop', onDrop);
 
   this.game.addComponent(entityId, 'update', update);
   this.game.addComponent(entityId, 'exit', exit);

@@ -31,6 +31,7 @@ const plugins = [
   './plugins/client/Client.js',
   './plugins/chrono-control/ChronoControl.js',
   './plugins/draggable/Draggable.js',
+  './plugins/droppable/Droppable.js',
   './plugins/collisions/Collisions.js',
   './plugins/gui-creator/Creator.js',
   './plugins/entity/Entity.js',

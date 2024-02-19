@@ -271,6 +271,7 @@ export default function construct(game, plugins = []) {
   game.components.pointerenter = new Component('pointerenter', game);
   game.components.pointerleave = new Component('pointerleave', game);
   
+  game.components.onDrop = new Component('onDrop', game);
 
   // stores a location to teleport to when the entity is touched
   game.components.exit = new Component('exit', game);

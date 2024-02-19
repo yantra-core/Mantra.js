@@ -252,6 +252,10 @@ export default class EntityBuilder {
   }
 
   // Lifecycle events
+  onDrop(handler) {
+    return this._addEventHandler('onDrop', handler);
+  }
+
   onUpdate(handler) {
     return this._addEventHandler('update', handler);
   }

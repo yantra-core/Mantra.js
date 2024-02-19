@@ -80,7 +80,23 @@ export default class Mouse {
 
     // Convert screen coordinates to world coordinates
     let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
+
+    // apply offset
+    worldX = worldX - game.data.camera.offsetX / game.data.camera.currentZoom;
     let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
+
+    // apply offset
+    // worldY = worldY - game.data.camera.offsetY / game.data.camera.currentZoom;
+
+
+    // get the reference to this ent, check for pointerdown event
+    if (this.game.data && this.game.data.ents && this.game.data.ents._) {
+      const ent = this.game.data.ents._[this.game.selectedEntityId];
+      if (ent && ent.pointermove) {
+        let context = ent;
+        ent.pointermove(ent, event);
+      }
+    }
     
     this.game.emit('pointerMove', { x: worldX, y: worldY }, event)
 
@@ -93,17 +109,20 @@ export default class Mouse {
     // check to see if target has a mantra-id attribute
     // TODO: we'll need entity detection per Graphics adapter
     // Remark: The current approach only works for DOM HTML, for canvas, we'll need the adapter ( three ) to query scene and return ent id
-    if (target && target.getAttribute) { 
+    if (target && target.getAttribute) {
       let mantraId = target.getAttribute('mantra-id');
       if (mantraId) {
         // if this is a Mantra entity, set the selectedEntityId
         // this is used for GUI rendering and CSSGraphics
         this.game.selectedEntityId = mantraId;
-        // get the reference to this ent, check for pointerdown event
-        const ent = this.game.data.ents._[mantraId];
-        if (ent && ent.pointerdown) {
-          let context = ent;
-          ent.pointerdown(ent, event);
+        if (this.game.data && this.game.data.ents) {
+          // get the reference to this ent, check for pointerdown event
+          const ent = this.game.data.ents._[mantraId];
+          if (ent && ent.pointerdown) {
+            let context = ent;
+            ent.pointerdown(ent, event);
+          }
+
         }
       }
 
@@ -153,7 +172,7 @@ export default class Mouse {
     // Convert screen coordinates to world coordinates
     let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
     let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
-    
+
     let position = { x: worldX, y: worldY };
 
     // truncate to 3 decimal places
@@ -244,7 +263,7 @@ export default class Mouse {
 
     // TODO: drag and drop to move map
     // TODO: two finger pinch to zoom
-    document.addEventListener('touchmove', function(event) {
+    document.addEventListener('touchmove', function (event) {
       if (event.touches.length > 1) {
         event.preventDefault();
       }
