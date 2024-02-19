@@ -291,6 +291,8 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         y: 0,
         z: 0
       },
+      rotation: 0,
+      // TODO: x / y z
       size: {
         width: 16,
         height: 16,
@@ -516,47 +518,31 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       this.config.isStatic = value;
       return this;
     }
-
-    // Private method to add an event handler
   }, {
     key: "_addEventHandler",
     value: function _addEventHandler(eventName, handler) {
-      // console.log(`Adding handler for event: ${eventName}`);
-
-      // Define a variable outside the composite function to hold the handlers
-      var handlers;
-
-      // Check if a composite function already exists for this event
-      if (typeof this.config[eventName] !== 'function') {
-        // console.log(`No composite function for ${eventName}, creating new.`);
-
-        // Initialize the handlers array and store it in the variable
-        handlers = [handler];
-
-        // Create a new composite function that uses the handlers variable
-        this.config[eventName] = function () {
-          for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-          }
-          // console.log(`Executing composite function for ${eventName} with args:`, args);
-          handlers.forEach(function (h) {
-            // console.log(`Executing handler for ${eventName}`);
-            h.apply(void 0, args);
-          });
-        };
+      // Check if the event already has a composite function with handlers
+      if (typeof this.config[eventName] === 'function' && Array.isArray(this.config[eventName].handlers)) {
+        this.config[eventName].handlers.push(handler); // Add to existing handlers
       } else {
-        // console.log(`Composite function exists for ${eventName}, adding to existing handlers.`);
+        if (typeof handler === 'boolean') {
+          this.config[eventName] = handler;
+        }
+        if (typeof handler === 'function') {
+          // Otherwise, create a new composite function and handlers array
+          var handlers = [handler];
+          this.config[eventName] = function () {
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+            handlers.forEach(function (h) {
+              return h.apply(void 0, args);
+            }); // Execute all handlers
+          };
 
-        // If the composite function exists, retrieve its handlers array
-        handlers = this.config[eventName].handlers;
-
-        // Add the new handler to the array
-        handlers.push(handler);
+          this.config[eventName].handlers = handlers; // Store handlers
+        }
       }
-
-      // Attach the handlers array to the composite function for potential future reference
-      this.config[eventName].handlers = handlers;
-      // console.log(`Total handlers for ${eventName}: ${handlers.length}`);
 
       return this;
     }
@@ -686,8 +672,6 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         var entities = [];
         for (var i = 0; i < this.config.clone; i++) {
           var clonedConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
-          // Explicitly reassign functions and bound event handlers
-          clonedConfig.collisionStart = this.config.collisionStart;
           entities.push(this.game.createEntity(clonedConfig));
         }
         return entities;
@@ -695,7 +679,6 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         var _entities = [];
         for (var _i = 0; _i < this.config.repeat; _i++) {
           var entityConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
-
           // Calculate the offset for each repeated entity
           var offsetX = entityConfig.position.x + _i * entityConfig.offset.x;
           var offsetY = entityConfig.position.y + _i * entityConfig.offset.y;
@@ -728,8 +711,6 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         return _entities;
       } else {
         var singleConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
-        // Explicitly reassign functions and bound event handlers
-        singleConfig.collisionStart = this.config.collisionStart;
         return this.game.createEntity(singleConfig);
       }
     }
@@ -3513,6 +3494,16 @@ function _switchWorlds() {
               }
             });
           }
+
+          // we need to reset some state about the player here, such as respawn
+          // since switching levels may result in a new player entity
+          // this may or may not be the case, we'll have to see
+          // remote player.meta.lives so player won't respawn
+          game.updateEntity(game.currentPlayerId, {
+            meta: {
+              lives: 0
+            }
+          });
           game.systems.entity.removeAllEntities(true);
           worldName = 'XState';
           worldName = 'Sutra';
@@ -3521,12 +3512,12 @@ function _switchWorlds() {
           // TODO: remove global WORLDS reference for server
           worldClass = WORLDS.worlds[worldName];
           if (worldClass) {
-            _context.next = 11;
+            _context.next = 12;
             break;
           }
           console.error("World ".concat(worldName, " not found"));
           return _context.abrupt("return");
-        case 11:
+        case 12:
           worldInstance = new worldClass();
           game.once('plugin::loaded::' + worldInstance.id, function () {
             // alert('loaded')
@@ -3552,7 +3543,7 @@ function _switchWorlds() {
           // persist this intention to the local storage
           // so that it can be restored on next page load
           game.storage.set('world', selectedWorld);
-        case 17:
+        case 18:
         case "end":
           return _context.stop();
       }

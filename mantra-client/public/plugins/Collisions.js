@@ -50,11 +50,9 @@ var Collisions = /*#__PURE__*/function () {
       //const entityB = this.game.getEntity(entityIdB);
       var entityA = bodyA.entity;
       var entityB = bodyB.entity;
-      // console.log('handleCollision', entityA.type, entityB.type)
-
       var canCollide = this.game.lifecycle.triggerHook('before.collisionStart', entityA, entityB, pair);
       if (canCollide === false) {
-        console.log('before.collisionStart returned false, skipping collision', entityIdA, entityIdB);
+        // console.log('before.collisionStart returned false, skipping collision', entityIdA, entityIdB);
         return;
       }
       if (!entityA || !entityB) {
@@ -62,7 +60,8 @@ var Collisions = /*#__PURE__*/function () {
         return;
       }
 
-      // TODO: 2/17/2024 remove this and use Teleporer instead
+      // TODO: remove this in favor of collisionStart() handler?
+      // Remark: May have many of these? Only allow on per entity? may need array?
       if (entityA.exit || entityB.exit) {
         var exitEnt = entityA.exit ? entityA : entityB;
         var enterEnt = entityA.exit ? entityB : entityA;
@@ -99,7 +98,6 @@ var Collisions = /*#__PURE__*/function () {
       collisionContext[entityA.type] = entityA;
       collisionContext[entityB.type] = entityB;
       if (entityA.collisionStart) {
-        //console.log('entityA.collisionStart', entityA.collisionStart, entityA, entityB)
         collisionContext.owner = entityA;
         collisionContext.target = entityB;
         // pair.context = collisionContext;
@@ -109,7 +107,6 @@ var Collisions = /*#__PURE__*/function () {
         }
       }
       if (entityB.collisionStart) {
-        //console.log('entityB.collisionStart', entityB.collisionStart, entityB, entityA)
         collisionContext.owner = entityB;
         collisionContext.target = entityA;
         if (typeof entityB.collisionStart === 'function') {

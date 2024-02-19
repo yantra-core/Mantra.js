@@ -3362,8 +3362,7 @@ var GravityGardens = /*#__PURE__*/function () {
       var game = this.game;
 
       // we reset the game to clear any previous state
-      // game.reset();
-
+      game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
       game.createBorder({
@@ -3383,44 +3382,24 @@ var GravityGardens = /*#__PURE__*/function () {
       }
 
       // Builds a Player config with GravityWell 
-      var playerConfig = game.build().GravityWell().Player().texture(null) // default texture is a player sprite
+      var playerConfig = game.build().GravityWell() // The player will have a gravity well
+      .Player() // The player Plugin
+      .texture(null) // default texture is a player sprite
       .color(0xffcccc) // gives a color to the player
       .position(0, 0, 0); // sets the player position
 
-      console.log('playerConfig', playerConfig);
-      // whenever the player collides with something, we remove the other entity
-      console.log('playerConfig', playerConfig);
       playerConfig.collisionStart(function (a, b, pair, context) {
         if (context.target.type !== 'WARP') {
           game.removeEntity(context.target.id);
         }
       });
       playerConfig = playerConfig.build();
-      console.log('playerConfig', playerConfig);
       var player = game.createEntity(playerConfig);
       game.setPlayerId(player.id);
-
-      /*
-      game.build().Teleporter({
-        destination: {
-          position: {
-            x: 20,
-            y: 0
-          }
-        }
-      })
-      .position(-50, 50).size(32).createEntity();
-      */
-
-      game.build().type('WARP')
-      /*
-      .Teleporter({
+      game.build().type('WARP').Teleporter({
         destination: {
           world: 'Home'
         }
-      })
-      */.exit({
-        world: 'Home'
       }).texture('warp-to-home').size(64, 64, 64).isStatic(true)
       //.isSensor(true)
       .position(595, -30, 0).createEntity();
@@ -3760,8 +3739,9 @@ var Home = /*#__PURE__*/function () {
               game.use('Boomerang');
               game.use('Flame');
               game.use('Player');
+              game.use('Tone');
               game.use('Hexapod');
-            case 16:
+            case 17:
             case "end":
               return _context.stop();
           }
@@ -3780,74 +3760,45 @@ var Home = /*#__PURE__*/function () {
     }
   }, {
     key: "update",
-    value: function update() {
-      if (this.game.tick % 10 === 0) {
-        // TODO: better exists check for player alive status
-        if (!this.game.data.ents._[this.game.currentPlayerId]) {
-          var player1 = game.build().Player().createEntity();
-          game.setPlayerId(player1.id);
-        }
-      }
-    }
+    value: function update() {}
   }, {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
       game.reset();
+      game.setBackground('#007fff');
       game.data.camera.follow = true;
       if (game.isTouchDevice()) {
         game.zoom(1.44);
       } else {
         game.zoom(4.5);
       }
+
+      // game.build().Block().size(16).clone(10).createEntity();
+
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
-      var playerConfig = game.build().Player();
-
-      /*
-      playerConfig.collisionStart(function () {
-        console.log('overrides the Teleport collision?')
-      });
-      */
-
-      var player1 = playerConfig.createEntity();
+      var player1 = game.build().Player({
+        lives: 99
+      }).createEntity();
       game.setPlayerId(player1.id);
 
       //
       // Create 22 Hexapods
       //
-      // game.build().Hexapod().position(-40, 0, 0).clone(22).createEntity();
+      var numberOfHexapods = 24;
+      var radius = 80;
+      for (var i = 0; i < numberOfHexapods; i++) {
+        // Calculate the angle for each hexapod
+        var angle = i / numberOfHexapods * 2 * Math.PI;
 
-      /*
-        game.build().Teleporter({
-        destination: {
-          position: {
-            x: 20,
-            y: 0
-          }
-        }
-      })
-      .position(-50, 50).size(32).createEntity();
-       game.after('removeEntity', function(entity) {
-        if (entity.type === 'PLAYER') {
-          game.createPlayer({
-            respawns: true,
-            texture: {
-              sheet: 'loz_spritesheet',
-              sprite: 'player',
-            },
-            position: {
-              x: 0,
-              y: 0
-            }
-          });
-        }
-      });
-      */
-
-      game.setBackground('#007fff');
-
-      // game.use('Tone');
+        // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
+        var x = radius * Math.cos(angle);
+        var y = radius * Math.sin(angle);
+        game.build().Hexapod().size(8).position(x, y, 0).createEntity();
+      }
+      ;
+      game.build().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
       this.createTwinFlames();
       (0, _welcomeMessage["default"])(game);
       game.useSutra((0, _sutras["default"])(game), 'HOME');
@@ -3941,11 +3892,6 @@ function createBackground(game) {
   game.build().type('BACKGROUND').texture('planet-express-base').kind('building').size(2048, 2048, 1).body(false).position(-900, -800, -1).createEntity();
   game.build().type('BLOCK').texture('tile-block').size(200, 200, 1).mass(10000).position(200, -800, -8).createEntity();
 
-  /*
-  game.build()
-  .type('WARP')
-  */
-
   // if touch warp, switch to YCraft level
   game.createEntity({
     type: 'WARP',
@@ -4010,58 +3956,8 @@ function createBackground(game) {
       z: -2
     }
   });
-  game.createEntity({
-    type: 'DOOR',
-    /*
-    exit: {
-      position: {
-        x: -1000,
-        y: -500
-      },
-    },
-    */
-    body: true,
-    isStatic: true,
-    collisionStart: true,
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'ayyoDoor'
-    },
-    width: 16,
-    height: 16,
-    position: {
-      // position to right
-      x: 55,
-      y: 71,
-      z: 10
-    }
-  });
-  game.createEntity({
-    type: 'DOOR',
-    /*
-    exit: {
-      position: {
-        x: 1100,
-        y: -500
-      },
-    },
-    */
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'ayyoDoor'
-    },
-    width: 16,
-    height: 16,
-    body: true,
-    isStatic: true,
-    collisionStart: true,
-    position: {
-      // position to left
-      x: -55,
-      y: 71,
-      z: 10
-    }
-  });
+  game.build().Teleporter().position(55, 71, 10).size(16).width(16).height(16).createEntity();
+  game.build().Teleporter().position(-55, 71, 10).size(16).width(16).height(16).createEntity();
 
   // if touch warp, switch to Music level
   game.createEntity({
@@ -4839,7 +4735,7 @@ function createDoors(game) {
           createHomeKey();
         }
         game.flash();
-        game.anime(algos[i]);
+        game.flashText(algos[i]);
 
         // clear all current tiles
         if (game.data.ents.TILE) {
@@ -5673,6 +5569,9 @@ var Platform = /*#__PURE__*/function () {
         texture: {
           sheet: 'blackMage',
           sprite: 'playerRight'
+        },
+        meta: {
+          lives: 99
         },
         position: {
           x: 10,
@@ -7797,6 +7696,9 @@ var YCraft = /*#__PURE__*/function () {
         texture: {
           sheet: 'loz_spritesheet',
           sprite: 'player'
+        },
+        meta: {
+          lives: 99
         },
         position: {
           x: 100,

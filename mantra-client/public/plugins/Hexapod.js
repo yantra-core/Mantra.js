@@ -41,6 +41,7 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         texture: 'demon',
         width: 8,
         height: 8,
+        body: true,
         collisionStart: this.grow.bind(this),
         update: this.think.bind(this),
         position: entityData.position

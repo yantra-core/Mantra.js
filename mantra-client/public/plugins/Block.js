@@ -89,11 +89,10 @@ var Block = /*#__PURE__*/function () {
       if (context.target.type !== 'BULLET') {
         return;
       }
-      console.log("Block.splitBlock", a, b, pair, context);
       var blockEntity = this.game.data.ents._[context.owner.id];
       var bulletEntity = this.game.data.ents._[context.target.id];
       if (!blockEntity || !bulletEntity) {
-        console.log('Block.splitBlock no entity found. Skipping...', blockEntity, bulletEntity);
+        // console.log('Block.splitBlock no entity found. Skipping...', blockEntity, bulletEntity);
         return;
       }
       if (blockEntity.destroyed || bulletEntity.destroyed) {

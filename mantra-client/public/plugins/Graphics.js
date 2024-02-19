@@ -67,7 +67,7 @@ var Graphics = /*#__PURE__*/function () {
       }
 
       game.flash = triggerItemPickupEffect;
-      game.anime = triggerAnimeTextEffect;
+      game.flashText = triggerAnimeTextEffect;
     }
   }, {
     key: "update",
@@ -144,7 +144,6 @@ function downloadCanvasAsImage(canvasElement, filename) {
 
 */
 function triggerItemPickupEffect() {
-  return;
   var effect = document.getElementById('itemPickupEffect');
 
   // Create the effect element if it doesn't exist

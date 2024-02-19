@@ -246,6 +246,7 @@ var _inflateEntity = _interopRequireDefault(require("./lib/inflateEntity.js"));
 var _removeEntity = _interopRequireDefault(require("./lib/removeEntity.js"));
 var _updateEntity = _interopRequireDefault(require("./lib/updateEntity.js"));
 var _layoutEntity = _interopRequireDefault(require("./lib/layoutEntity.js"));
+var _removeAllEntities = _interopRequireDefault(require("./lib/removeAllEntities.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -289,7 +290,8 @@ var Entity = /*#__PURE__*/function () {
       this.game.inflateEntity = _inflateEntity["default"].bind(this);
       this.game.hasEntity = this.hasEntity.bind(this);
       this.game.findEntity = this.findEntity.bind(this);
-      this.game.removeAllEntities = this.removeAllEntities.bind(this);
+      this.game.removeAllEntities = _removeAllEntities["default"].bind(this);
+      this.removeAllEntities = _removeAllEntities["default"].bind(this);
       this.layoutEntity = _layoutEntity["default"].bind(this);
     }
   }, {
@@ -437,37 +439,6 @@ var Entity = /*#__PURE__*/function () {
         }
       }
     }
-  }, {
-    key: "removeAllEntities",
-    value: function removeAllEntities(options) {
-      var _this2 = this;
-      // curry arguments, legacy API
-      var clearCurrentPlayer = false;
-      var excludeByName = [];
-      if (typeof options === 'boolean') {
-        clearCurrentPlayer = options;
-      }
-      if (_typeof(options) === 'object' && Array.isArray(options.excludeByName)) {
-        excludeByName = options.excludeByName;
-      }
-      this.game.entities.forEach(function (ent) {
-        // Do not remove the current player if clearCurrentPlayer is false
-        if (ent.id === _this2.game.currentPlayerId && !clearCurrentPlayer) {
-          return;
-        }
-        // Do not remove entities that are excluded by name
-        if (excludeByName.includes(ent.name)) {
-          return;
-        }
-        if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
-          ent.yCraft.part.unload();
-        }
-        _this2.game.removeEntity(ent.id);
-      });
-      if (clearCurrentPlayer) {
-        this.game.currentPlayerId = null;
-      }
-    }
   }]);
   return Entity;
 }();
@@ -481,7 +452,7 @@ const entity = new Entity(entityId);
 
 */
 
-},{"./lib/createEntity.js":5,"./lib/getEntity.js":6,"./lib/inflateEntity.js":7,"./lib/layoutEntity.js":8,"./lib/removeEntity.js":9,"./lib/updateEntity.js":10}],5:[function(require,module,exports){
+},{"./lib/createEntity.js":5,"./lib/getEntity.js":6,"./lib/inflateEntity.js":7,"./lib/layoutEntity.js":8,"./lib/removeAllEntities.js":9,"./lib/removeEntity.js":10,"./lib/updateEntity.js":11}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -875,7 +846,7 @@ function createEntity() {
   return updatedEntity;
 }
 
-},{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3,"./layoutEntity.js":8,"./util/ensureColorInt.js":11}],6:[function(require,module,exports){
+},{"../../../Component/TimersComponent.js":2,"../../../Entity/Entity.js":3,"./layoutEntity.js":8,"./util/ensureColorInt.js":12}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1154,6 +1125,47 @@ function layoutEntity(container, entityId) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = removeAllEntities;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function removeAllEntities(options) {
+  // curry arguments, legacy API
+  var clearCurrentPlayer = false;
+  var excludeByName = [];
+  if (typeof options === 'boolean') {
+    clearCurrentPlayer = options;
+  }
+  if (_typeof(options) === 'object' && Array.isArray(options.excludeByName)) {
+    excludeByName = options.excludeByName;
+  }
+  if (this.game.data.ents) {
+    for (var eId in this.game.data.ents._) {
+      var ent = this.game.data.ents._[eId];
+
+      // Do not remove the current player if clearCurrentPlayer is false
+      if (ent.id === this.game.currentPlayerId && !clearCurrentPlayer) {
+        return;
+      }
+      // Do not remove entities that are excluded by name
+      if (excludeByName.includes(ent.name)) {
+        return;
+      }
+      if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
+        ent.yCraft.part.unload();
+      }
+      this.game.removeEntity(ent.id);
+    }
+    if (clearCurrentPlayer) {
+      this.game.currentPlayerId = null;
+    }
+  }
+}
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = removeEntity;
 // TODO: double check that all components values are being cleared on removal of ent
 function removeEntity(entityId) {
@@ -1203,7 +1215,7 @@ function removeEntity(entityId) {
   this.game.lifecycle.triggerHook('after.removeEntity', ent);
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1389,7 +1401,7 @@ function updateEntity(entityDataOrId, entityData) {
   return ent;
 }
 
-},{"./util/ensureColorInt.js":11}],11:[function(require,module,exports){
+},{"./util/ensureColorInt.js":12}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

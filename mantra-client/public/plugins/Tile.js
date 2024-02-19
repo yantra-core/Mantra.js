@@ -1863,80 +1863,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = ALGORITHM_METROIDVANIA;
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var _roomGeneration = require("../util/roomGeneration.js");
+var _tileBuilder = require("../util/tileBuilder.js");
+var _platformGenerator = require("../util/platformGenerator.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-/**
- * Metroidvania.js - Abbey Hawk Sparrow 2024
- * Originally written by Thomas Hunter II
- *
- * Originally written on June 12, 2013
- * Originally hosted at https://github.com/PhobosRising/javascript-roguelike-map-generator
- */
-
-var WALL = 'wall';
-var DOOR = 'door';
-var OPEN = 'open';
-var EXIT = 'exit';
-var DIRECTIONS = ['n', 'e', 's', 'w'];
-var TILE = {
-  VOID: 0,
-  WALL: 1,
-  FLOOR: 2,
-  DOOR: 3,
-  SPECIAL_DOOR: 4,
-  ENTER: 5,
-  EXIT: 6
-};
-var toCharGrid = function toCharGrid() {
-  var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return string.split('\n').map(function (line) {
-    return line.split('');
-  });
-};
-var Grid = /*#__PURE__*/function () {
-  function Grid() {
-    var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    _classCallCheck(this, Grid);
-    this.grid = toCharGrid(str);
-  }
-  _createClass(Grid, [{
-    key: "overlay",
-    value: function overlay(subgrid, y, x) {
-      var grid = Array.isArray(subgrid) ? subgrid : toCharGrid(subgrid);
-      for (var row = 0; row < grid.length; row++) {
-        for (var col = 0; col < grid[row].length; col++) {
-          if (!this.grid[x + row]) this.grid[x + row] = [];
-          this.grid[x + row][y + col] = grid[row][col];
-        }
-      }
-    }
-  }, {
-    key: "fill",
-    value: function fill(tile, max_width, max_height) {
-      for (var y = 0; y < max_height; y++) {
-        this.grid[y] = [];
-        for (var x = 0; x < max_width; x++) {
-          this.grid[y][x] = tile;
-        }
-      }
-    }
-  }, {
-    key: "toString",
-    value: function toString(incoming) {
-      return (incoming || this.grid).map(function (chars) {
-        return chars.join('');
-      }).join('\n');
-    }
-  }]);
-  return Grid;
-}();
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } /**
+                                                                                                                                                                                                                                                                                                                                                                                               * Metroidvania.js - Abbey Hawk Sparrow 2024
+                                                                                                                                                                                                                                                                                                                                                                                               * Originally written by Thomas Hunter II
+                                                                                                                                                                                                                                                                                                                                                                                               *
+                                                                                                                                                                                                                                                                                                                                                                                               * Originally written on June 12, 2013
+                                                                                                                                                                                                                                                                                                                                                                                               * Originally hosted at https://github.com/PhobosRising/javascript-roguelike-map-generator
+                                                                                                                                                                                                                                                                                                                                                                                               */
+var TILE = _tileBuilder.defaultTileMap;
 var Metroidvania = /*#__PURE__*/function () {
   function Metroidvania() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1967,8 +1909,8 @@ var Metroidvania = /*#__PURE__*/function () {
     key: "build",
     value: function build(random) {
       this.random = random;
-      var data = platformGenerator(this.options, random);
-      var grid = new Grid();
+      var data = (0, _platformGenerator.platformGenerator)(this.options, random);
+      var grid = new _tileBuilder.Grid();
       var roomWidth = this.options.roomWidth || 10;
       var roomHeight = this.options.roomHeight || 10;
       grid.fill(TILE.VOID, this.options.gridWidth, this.options.gridHeight);
@@ -1976,7 +1918,7 @@ var Metroidvania = /*#__PURE__*/function () {
         for (var row = 0; row < data.rooms[col].length; row++) {
           var location = data.rooms[col][row];
           var roomData = data.map[location.y][location.x];
-          var room = buildRoom(roomData, this.options.roomHeight, this.options.roomWidth
+          var room = (0, _roomGeneration.buildRoom)(roomData, this.options.roomHeight, this.options.roomWidth
           /*{
           room: roomData,
           roomWidth: this.options.roomWidth,
@@ -1987,540 +1929,163 @@ var Metroidvania = /*#__PURE__*/function () {
         }
       }
       data.world = grid.grid;
+      this.scale(data, roomWidth, roomHeight);
       return data;
+    }
+  }, {
+    key: "scale",
+    value: function scale(built, roomWidth, roomHeight) {
+      var _this = this;
+      built.scaledExits = {};
+      var chr = null;
+      var offsetX = function offsetX(coord) {
+        return coord + Math.floor(_this.options.roomWidth / 2);
+      };
+      var offsetY = function offsetY(coord) {
+        return coord + Math.floor(_this.options.roomHeight / 2);
+      };
+      var scaleX = function scaleX(coord) {
+        return coord * _this.options.roomWidth;
+      };
+      var scaleY = function scaleY(coord) {
+        return coord * _this.options.roomHeight;
+      };
+      ['north', 'south', 'east', 'west'].forEach(function (direction) {
+        chr = direction[0];
+        var scaled = {
+          x: built.exits[chr].x * _this.options.roomWidth,
+          y: built.exits[chr].y * _this.options.roomHeight
+        };
+        built.scaledExits[direction] = [];
+        switch (direction) {
+          case 'north':
+            scaled.x = offsetX(scaled.x);
+            built.scaledExits[direction].push(scaled);
+            built.scaledExits[direction].push({
+              x: scaled.x - 1,
+              y: scaled.y
+            });
+            break;
+          case 'south':
+            scaled.x = offsetX(scaled.x);
+            scaled.y += _this.options.roomHeight - 1;
+            built.scaledExits[direction].push(scaled);
+            built.scaledExits[direction].push({
+              x: scaled.x - 1,
+              y: scaled.y
+            });
+            break;
+          case 'east':
+            scaled.y = offsetY(scaled.y);
+            scaled.x += _this.options.roomWidth - 1;
+            built.scaledExits[direction].push(scaled);
+            built.scaledExits[direction].push({
+              x: scaled.x,
+              y: scaled.y - 1
+            });
+            break;
+          case 'west':
+            scaled.y = offsetY(scaled.y);
+            built.scaledExits[direction].push(scaled);
+            built.scaledExits[direction].push({
+              x: scaled.x,
+              y: scaled.y - 1
+            });
+            break;
+        }
+      });
+      built.scaledRooms = built.rooms.map(function (roomGroup) {
+        return roomGroup.map(function (_ref) {
+          var x = _ref.x,
+            y = _ref.y;
+          return {
+            x: scaleX(x),
+            y: scaleY(y)
+          };
+        });
+      });
     }
   }]);
   return Metroidvania;
 }();
-var inDoorRange = function inDoorRange(n, max, range) {
-  var half = Math.floor(max / 2);
-  var odd = !!(max % 2);
-  var halfRange = Math.floor(range / 2);
-  if (odd) {
-    if (n === half && range) {
-      //in center
-      return true;
+function ALGORITHM_METROIDVANIA(tileMap) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  try {
+    tileMap.fill(0); // Fill with walls
+    var maxDimension = Math.max(tileMap.width, tileMap.height);
+    if (maxDimension <= 5) {
+      return;
+    }
+    var fractional = Math.sqrt(maxDimension);
+    if (fractional % 2 !== 1) fractional++;
+    var size = maxDimension < 10 ? Math.floor(maxDimension / 2) : 10;
+    var doorDiff = maxDimension < 10 ? 1 : 2;
+    var roomSizeHeight = Math.floor(tileMap.width / size);
+    var roomSizeWidth = Math.floor(tileMap.height / size);
+    var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
+    var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
+    var maxCount = Math.floor(numRoomsWide * numRoomsHigh * 0.8);
+    var minCount = Math.floor(maxCount / 4);
+    var generator = new Metroidvania({
+      roomWidth: roomSizeWidth,
+      roomHeight: roomSizeHeight,
+      maxFails: 25000,
+      width: numRoomsWide,
+      // Max number of zones wide
+      height: numRoomsWide,
+      // Max number of zones tall
+      gridHeight: tileMap.height,
+      gridWidth: tileMap.width,
+      minZonesPerRoom: 1,
+      // Minimum number of zones per room
+      maxZonesPerRoom: 3,
+      // Maximum number of zones per room
+      minRoomsPerMap: minCount,
+      // Minimum number of rooms per map
+      maxRoomsPerMap: maxCount,
+      // Maximum number of rooms per map
+      newDoors: doorDiff,
+      // # doors to add to prevent tedious linear mazes
+      roomDiff: doorDiff,
+      // When adding a new door, room ID distance
+      roomDiffOdds: 1 / 2 // Odds of inserting a new door on opportunity
+    });
+
+    var built = null;
+    if (options.retries) {
+      var generated = false;
+      var currentTry = 0;
+      while (currentTry < options.retries && !generated) {
+        try {
+          currentTry++;
+          built = generator.build(function () {
+            return tileMap.random();
+          });
+          generated = true;
+        } catch (ex) {
+          console.log('RTX', ex);
+        }
+      }
     } else {
-      if (n < half) {
-        return n > half - halfRange;
-      } else {
-        return n < half + halfRange;
-      }
+      built = generator.build(function () {
+        return tileMap.random();
+      });
     }
-  } else {
-    if (n <= half) {
-      return n >= half - halfRange;
-    } else {
-      return n < half + halfRange;
+    var flattened = built.world.reduce(function (agg, line) {
+      return agg.concat(line);
+    }, []);
+    built.world = null;
+    if (!built) throw new Error('failed to build world');
+    tileMap.world = built;
+    for (var lcv = 0; lcv < tileMap.data.length; lcv++) {
+      tileMap.data[lcv] = flattened[lcv];
     }
-  }
-};
-var buildRoom = function buildRoom() {
-  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var roomHeight = arguments.length > 1 ? arguments[1] : undefined;
-  var roomWidth = arguments.length > 2 ? arguments[2] : undefined;
-  var width = roomHeight;
-  var height = roomWidth;
-  var lines = [];
-  for (var y = 0; y < height; y++) {
-    var row = [];
-    for (var x = 0; x < width; x++) {
-      if (x === 0 || x === width - 1) {
-        //TODO: doors
-        if (x === 0) {
-          if (options.edges.w === 'open') {
-            if (y === 0 || y === height - 1) row.push(TILE.WALL);else row.push(TILE.FLOOR);
-          } else {
-            if ((options.edges.w === 'door' || options.edges.w === 'exit') && inDoorRange(y, height, 2)) {
-              if (options.edges.w === 'door') {
-                row.push(TILE.DOOR);
-              } else {
-                row.push(TILE.EXIT);
-              }
-            } else {
-              row.push(TILE.WALL);
-            }
-          }
-        } else {
-          if (options.edges.e === 'open') {
-            if (y === 0 || y === height - 1) row.push(TILE.WALL);else row.push(TILE.FLOOR);
-          } else {
-            if ((options.edges.e === 'door' || options.edges.e === 'exit') && inDoorRange(y, height, 2)) {
-              if (options.edges.e === 'door') {
-                row.push(TILE.DOOR);
-              } else {
-                row.push(TILE.EXIT);
-              }
-            } else {
-              row.push(TILE.WALL);
-            }
-          }
-        }
-      } else {
-        if (y === 0 || y === height - 1) {
-          if (y === 0) {
-            if (options.edges.n === 'open') {
-              row.push(TILE.FLOOR);
-            } else {
-              if ((options.edges.n === 'door' || options.edges.n === 'exit') && inDoorRange(x, width, 2)) {
-                if (options.edges.n === 'door') {
-                  row.push(TILE.DOOR);
-                } else {
-                  row.push(TILE.EXIT);
-                }
-              } else {
-                row.push(TILE.WALL);
-              }
-            }
-          } else {
-            if (options.edges.s === 'open') {
-              row.push(TILE.FLOOR);
-            } else {
-              if ((options.edges.s === 'door' || options.edges.s === 'exit') && inDoorRange(x, width, 2)) {
-                if (options.edges.s === 'door') {
-                  row.push(TILE.DOOR);
-                } else {
-                  row.push(TILE.EXIT);
-                }
-              } else {
-                row.push(TILE.WALL);
-              }
-            }
-          }
-        } else {
-          row.push(TILE.FLOOR);
-        }
-      }
-    }
-    lines.push(row);
-  }
-  return lines;
-};
-var platformGenerator = function platformGenerator() {
-  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var random = arguments.length > 1 ? arguments[1] : undefined;
-  var MAP_WIDTH = config.width || 20;
-  var MAP_HEIGHT = config.height || 20;
-  var MIN_ZONES_PER_ROOM = config.minZonesPerRoom || 1;
-  var MAX_ZONES_PER_ROOM = config.maxZonesPerRoom || 4;
-  var MIN_ROOMS_PER_MAP = config.minRoomsPerMap || 10;
-  var MAX_ROOMS_PER_MAP = config.maxRoomsPerMap || 20;
-
-  // If we don't get at least this many random doors, start over
-  var NEW_DOOR_MIN_THRESHOLD = config.newDoors || 3;
-
-  // How this really should work is the odds of creating a door are higher as the room id's get farther apart
-  var ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD = config.roomDiff || 3; // How different should two rooms be?
-  var ROOM_ID_DIFF_RANDOM_DOOR_ODDS = config.roomDiffOdds || 1 / 5; // What are the odds we'll act upon this?
-
-  var failCount = 0;
-  var result = null;
-  while (!result) {
-    result = build(initialize(MAP_WIDTH, MAP_HEIGHT));
-  }
-  return result;
-  function build(map) {
-    // Determin the total number of rooms in the beginning
-    var number_of_rooms = rangedRandom(MIN_ROOMS_PER_MAP, MAX_ROOMS_PER_MAP, random);
-
-    // The cursor is this special little pointer for the next zone being built
-    var cursor = {
-      x: Math.floor(MAP_WIDTH / 2),
-      y: Math.floor(MAP_WIDTH / 2)
-    };
-    var exits = {
-      n: {
-        // negative Y
-        x: cursor.x,
-        y: cursor.y
-      },
-      s: {
-        // positive Y
-        x: cursor.x,
-        y: cursor.y
-      },
-      e: {
-        // positive X
-        x: cursor.x,
-        y: cursor.y
-      },
-      w: {
-        // negative X
-        x: cursor.x,
-        y: cursor.y
-      }
-    };
-
-    // Each placed zone will have its own id
-    var zone_id = 0;
-
-    // An array of room id's, and the room locations within it
-    var all_room_zones = [];
-
-    // Run this loop once per room we're going to build
-    for (var room = 0; room < number_of_rooms; room++) {
-      // determine the number of zones in this room at the beginning
-      var number_of_zones = rangedRandom(MIN_ZONES_PER_ROOM, MAX_ZONES_PER_ROOM, random);
-      var zones_in_this_room = [];
-
-      // Run this loop once per zone within this room
-      for (var zone_number = 0; zone_number < number_of_zones; zone_number++) {
-        if (!cursor) {
-          return null;
-        }
-        var zone = map[cursor.y][cursor.x];
-        zones_in_this_room.push({
-          x: cursor.x,
-          y: cursor.y
-        });
-        zone.open = true;
-        zone.room = room;
-        zone.zone = zone_id;
-        zone_id++;
-        if (cursor.x <= exits.w.x) exits.w = cursor;
-        if (cursor.x >= exits.e.x) exits.e = cursor;
-        if (cursor.y <= exits.n.y) exits.n = cursor;
-        if (cursor.y >= exits.s.y) exits.s = cursor;
-        cursor = moveCursor(map, cursor, random);
-        if (!cursor) {
-          // When this happens, we should just instead start building from somewhere else
-          //console.log('CURSOR STUCK. Rebuild...');
-          failCount++;
-          if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
-          return false;
-        }
-      }
-
-      // Build walls between this room and other rooms / void
-      for (var _i = 0, _zones_in_this_room = zones_in_this_room; _i < _zones_in_this_room.length; _i++) {
-        var zone_location = _zones_in_this_room[_i];
-        buildWallsForZone(map, zone_location);
-      }
-      all_room_zones[room] = zones_in_this_room;
-
-      // Move cursor to an area outside but next to this room, and add door
-      if (room != number_of_rooms - 1) {
-        cursor = findNakedAdjacent(map, zones_in_this_room, random);
-      }
-    }
-
-    // Lets add some random doors between rooms, otherwise it's too linear
-    var new_door_count = 0;
-    for (var _i2 = 0, _all_room_zones = all_room_zones; _i2 < _all_room_zones.length; _i2++) {
-      var room_zones = _all_room_zones[_i2];
-      var _iterator = _createForOfIteratorHelper(room_zones),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var coords = _step.value;
-          if (coords.x === 0 || coords.y === 0 || coords.x >= MAP_WIDTH - 1 || coords.y >= MAP_HEIGHT - 1) {
-            // Don't attempt to build random doors on extremes. Could be more specific though, doesn't always need to be avoided.
-            continue;
-          }
-          var this_zone = map[coords.y][coords.x];
-          var this_room_id = this_zone.room;
-          var comparedZone = null;
-
-          // South
-          comparedZone = map[coords.y + 1][coords.x];
-          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
-            buildDoorBetweenZones(map, coords, {
-              x: coords.x,
-              y: coords.y + 1
-            });
-            new_door_count++;
-          }
-
-          // North
-          comparedZone = map[coords.y - 1][coords.x];
-          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
-            buildDoorBetweenZones(map, coords, {
-              x: coords.x,
-              y: coords.y - 1
-            });
-            new_door_count++;
-          }
-
-          // West
-          comparedZone = map[coords.y][coords.x - 1];
-          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
-            buildDoorBetweenZones(map, coords, {
-              x: coords.x - 1,
-              y: coords.y
-            });
-            new_door_count++;
-          }
-
-          // East
-          comparedZone = map[coords.y][coords.x + 1];
-          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
-            buildDoorBetweenZones(map, coords, {
-              x: coords.x + 1,
-              y: coords.y
-            });
-            new_door_count++;
-          }
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    }
-    if (new_door_count < NEW_DOOR_MIN_THRESHOLD) {
-      failCount++;
-      if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
-      //console.log('UNMET DOOR THRESHOLD: ' + new_door_count + ' OF ' + //NEW_DOOR_MIN_THRESHOLD + '. Rebuild...');
-      return false;
-    }
-
-    // Build our exits
-    for (var _i3 = 0, _DIRECTIONS = DIRECTIONS; _i3 < _DIRECTIONS.length; _i3++) {
-      var dir = _DIRECTIONS[_i3];
-      map[exits[dir].y][exits[dir].x].edges[dir] = EXIT;
-      map[exits[dir].y][exits[dir].x].exit = true;
-    }
-    return {
-      map: map,
-      exits: exits,
-      failCount: failCount,
-      rooms: all_room_zones
-    };
-  }
-
-  // Finds an open zone which is adjacent to one of the supplied zones
-  function findNakedAdjacent(map, zones, random) {
-    zones = shuffle(zones, random);
-    var _iterator2 = _createForOfIteratorHelper(zones),
-      _step2;
-    try {
-      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        var current_zone = _step2.value;
-        var newZone = moveCursor(map, current_zone, random);
-        if (newZone) {
-          buildDoorBetweenZones(map, current_zone, newZone);
-          return newZone;
-        }
-      }
-    } catch (err) {
-      _iterator2.e(err);
-    } finally {
-      _iterator2.f();
-    }
-    return false;
-  }
-
-  // Move the cursor to an available adjacent zone
-  function moveCursor(map, cursor, random) {
-    var adjacents = shuffle([{
-      d: 'n',
-      x: 0,
-      y: 1
-    }, {
-      d: 'e',
-      x: 1,
-      y: 0
-    }, {
-      d: 's',
-      x: 0,
-      y: -1
-    }, {
-      d: 'w',
-      x: -1,
-      y: 0
-    }], random);
-    var direction = null;
-    var newCursor = null;
-    //eslint-disable-next-line no-cond-assign
-    while (direction = adjacents.pop()) {
-      newCursor = {
-        x: cursor.x + direction.x,
-        y: cursor.y + direction.y
-      };
-      if (newCursor.x < 0 || newCursor.y < 0 || newCursor.x >= MAP_WIDTH || newCursor.y >= MAP_HEIGHT) {
-        // When this happens, we should just move the cursor somewhere else
-        //console.log('CURSOR OUT OF BOUNDS. Rebuild...');
-        failCount++;
-        if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
-        return null;
-      }
-      if (!map[newCursor.y][newCursor.x].open) {
-        return newCursor;
-      }
-    }
-    return false;
-  }
-
-  // Takes the coordinates of a zone, and map info, and works on building
-  // walls for that particular zone. Should also update this so that we make
-  // sure we're not looking outside the bounds of our array (<0 | >MAX).
-  // Also, don't want to blow away doors...
-  function buildWallsForZone(map, loc) {
-    var room = map[loc.y][loc.x].room;
-
-    // NORTH
-    if (map[loc.y][loc.x].edges.n != DOOR) {
-      if (loc.y === 0 || !map[loc.y - 1][loc.x].open || map[loc.y - 1][loc.x].room != room) {
-        map[loc.y][loc.x].edges.n = WALL;
-      } else {
-        map[loc.y][loc.x].edges.n = OPEN;
-      }
-    }
-
-    // EAST
-    if (map[loc.y][loc.x].edges.e != DOOR) {
-      if (loc.x >= MAP_WIDTH - 1 || !map[loc.y][loc.x + 1].open || map[loc.y][loc.x + 1].room != room) {
-        map[loc.y][loc.x].edges.e = WALL;
-      } else {
-        map[loc.y][loc.x].edges.e = OPEN;
-      }
-    }
-
-    // SOUTH
-    if (map[loc.y][loc.x].edges.s != DOOR) {
-      if (loc.y >= MAP_HEIGHT - 1 || !map[loc.y + 1][loc.x].open || map[loc.y + 1][loc.x].room != room) {
-        map[loc.y][loc.x].edges.s = WALL;
-      } else {
-        map[loc.y][loc.x].edges.s = OPEN;
-      }
-    }
-
-    // WEST
-    if (map[loc.y][loc.x].edges.w != DOOR) {
-      if (loc.x === 0 || !map[loc.y][loc.x - 1].open || map[loc.y][loc.x - 1].room != room) {
-        map[loc.y][loc.x].edges.w = WALL;
-      } else {
-        map[loc.y][loc.x].edges.w = OPEN;
-      }
-    }
-  }
-};
-
-// Get a random integer between the supplied min and max
-function rangedRandom(min, max, random) {
-  return Math.floor(random() * (max + 1 - min) + min);
-}
-
-// Builds a door between these two (hopefully) adjacent zones
-function buildDoorBetweenZones(map, zonePos1, zonePos2) {
-  var zone1 = map[zonePos1.y][zonePos1.x];
-  var zone2 = map[zonePos2.y][zonePos2.x];
-  if (zonePos1.x == zonePos2.x && zonePos1.y > zonePos2.y) {
-    // ZONE1 SOUTH OF ZONE2
-    zone1.edges.n = DOOR;
-    zone2.edges.s = DOOR;
-  } else if (zonePos1.x == zonePos2.x && zonePos1.y < zonePos2.y) {
-    // ZONE1 NORTH OF ZONE2
-    zone1.edges.s = DOOR;
-    zone2.edges.n = DOOR;
-  } else if (zonePos1.y == zonePos2.y && zonePos1.x > zonePos2.x) {
-    // ZONE1 EAST OF ZONE2
-    zone1.edges.w = DOOR;
-    zone2.edges.e = DOOR;
-  } else if (zonePos1.y == zonePos2.y && zonePos1.x < zonePos2.x) {
-    // ZONE1 WEST OF ZONE2
-    zone1.edges.e = DOOR;
-    zone2.edges.w = DOOR;
-  } else {
-    console.log('BUILD DOOR FAILURE', zone1, zone2);
+  } catch (ex) {
+    console.log('MV generation error', ex);
   }
 }
 
-// Randomizes an array
-function shuffle(array, random) {
-  var arr = array.slice(); // clone array
-  var i = arr.length,
-    j,
-    tempi,
-    tempj;
-  if (i == 0) return false;
-  while (--i) {
-    j = Math.floor(random() * (i + 1));
-    tempi = arr[i];
-    tempj = arr[j];
-    arr[i] = tempj;
-    arr[j] = tempi;
-  }
-  return arr;
-}
-
-// Builds a big empty square array, an entire map
-function initialize(width, height) {
-  var map = [];
-  for (var y = 0; y < height; y++) {
-    map[y] = [];
-    for (var x = 0; x < width; x++) {
-      map[y][x] = {
-        open: false,
-        room: null,
-        exit: null,
-        zone: null,
-        edges: {
-          n: null,
-          e: null,
-          s: null,
-          w: null
-        }
-      };
-    }
-  }
-  return map;
-}
-function ALGORITHM_METROIDVANIA(tileMap, options) {
-  tileMap.fill(0); // Fill with walls
-  var maxDimension = Math.max(tileMap.width, tileMap.height);
-  if (maxDimension <= 5) {
-    return;
-  }
-  var fractional = Math.sqrt(maxDimension);
-  if (fractional % 2 !== 1) fractional++;
-  var size = maxDimension < 10 ? Math.floor(maxDimension / 2) : 10;
-  var doorDiff = maxDimension < 10 ? 1 : 2;
-  var roomSizeHeight = Math.floor(tileMap.width / size);
-  var roomSizeWidth = Math.floor(tileMap.height / size);
-  var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
-  var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
-  var maxCount = Math.floor(numRoomsWide * numRoomsHigh * 0.8);
-  var minCount = Math.floor(maxCount / 4);
-  var generator = new Metroidvania({
-    roomWidth: roomSizeWidth,
-    roomHeight: roomSizeHeight,
-    maxFails: 25000,
-    width: numRoomsWide,
-    // Max number of zones wide
-    height: numRoomsWide,
-    // Max number of zones tall
-    gridHeight: tileMap.height,
-    gridWidth: tileMap.width,
-    minZonesPerRoom: 1,
-    // Minimum number of zones per room
-    maxZonesPerRoom: 3,
-    // Maximum number of zones per room
-    minRoomsPerMap: minCount,
-    // Minimum number of rooms per map
-    maxRoomsPerMap: maxCount,
-    // Maximum number of rooms per map
-    newDoors: doorDiff,
-    // # doors to add to prevent tedious linear mazes
-    roomDiff: doorDiff,
-    // When adding a new door, room ID distance
-    roomDiffOdds: 1 / 2 // Odds of inserting a new door on opportunity
-  });
-
-  var built = generator.build(function () {
-    return tileMap.random();
-  });
-  var flattened = built.world.reduce(function (agg, line) {
-    return agg.concat(line);
-  }, []);
-  built.world = null;
-  tileMap.world = built;
-  for (var lcv = 0; lcv < tileMap.data.length; lcv++) {
-    tileMap.data[lcv] = flattened[lcv];
-  }
-}
-
-},{}],15:[function(require,module,exports){
+},{"../util/platformGenerator.js":27,"../util/roomGeneration.js":28,"../util/tileBuilder.js":29}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4234,6 +3799,608 @@ var _default = exports["default"] = p5;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.platformGenerator = void 0;
+var _roomGeneration = require("./roomGeneration.js");
+var _tileBuilder = require("./tileBuilder.js");
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var platformGenerator = exports.platformGenerator = function platformGenerator() {
+  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var random = arguments.length > 1 ? arguments[1] : undefined;
+  var MAP_WIDTH = config.width || 20;
+  var MAP_HEIGHT = config.height || 20;
+  var MIN_ZONES_PER_ROOM = config.minZonesPerRoom || 1;
+  var MAX_ZONES_PER_ROOM = config.maxZonesPerRoom || 4;
+  var MIN_ROOMS_PER_MAP = config.minRoomsPerMap || 10;
+  var MAX_ROOMS_PER_MAP = config.maxRoomsPerMap || 20;
+
+  // If we don't get at least this many random doors, start over
+  var NEW_DOOR_MIN_THRESHOLD = config.newDoors || 3;
+
+  // How this really should work is the odds of creating a door are higher as the room id's get farther apart
+  var ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD = config.roomDiff || 3; // How different should two rooms be?
+  var ROOM_ID_DIFF_RANDOM_DOOR_ODDS = config.roomDiffOdds || 1 / 5; // What are the odds we'll act upon this?
+
+  var failCount = 0;
+  var result = null;
+  while (!result) {
+    result = build(initialize(MAP_WIDTH, MAP_HEIGHT));
+  }
+  return result;
+  function build(map) {
+    // Determin the total number of rooms in the beginning
+    var number_of_rooms = rangedRandom(MIN_ROOMS_PER_MAP, MAX_ROOMS_PER_MAP, random);
+
+    // The cursor is this special little pointer for the next zone being built
+    var cursor = {
+      x: Math.floor(MAP_WIDTH / 2),
+      y: Math.floor(MAP_WIDTH / 2)
+    };
+    var exits = {
+      n: {
+        // negative Y
+        x: cursor.x,
+        y: cursor.y
+      },
+      s: {
+        // positive Y
+        x: cursor.x,
+        y: cursor.y
+      },
+      e: {
+        // positive X
+        x: cursor.x,
+        y: cursor.y
+      },
+      w: {
+        // negative X
+        x: cursor.x,
+        y: cursor.y
+      }
+    };
+
+    // Each placed zone will have its own id
+    var zone_id = 0;
+
+    // An array of room id's, and the room locations within it
+    var all_room_zones = [];
+
+    // Run this loop once per room we're going to build
+    for (var room = 0; room < number_of_rooms; room++) {
+      // determine the number of zones in this room at the beginning
+      var number_of_zones = rangedRandom(MIN_ZONES_PER_ROOM, MAX_ZONES_PER_ROOM, random);
+      var zones_in_this_room = [];
+
+      // Run this loop once per zone within this room
+      for (var zone_number = 0; zone_number < number_of_zones; zone_number++) {
+        if (!cursor) {
+          return null;
+        }
+        var zone = map[cursor.y][cursor.x];
+        zones_in_this_room.push({
+          x: cursor.x,
+          y: cursor.y
+        });
+        zone.open = true;
+        zone.room = room;
+        zone.zone = zone_id;
+        zone_id++;
+        if (cursor.x <= exits.w.x) exits.w = cursor;
+        if (cursor.x >= exits.e.x) exits.e = cursor;
+        if (cursor.y <= exits.n.y) exits.n = cursor;
+        if (cursor.y >= exits.s.y) exits.s = cursor;
+        cursor = moveCursor(map, cursor, random);
+        if (!cursor) {
+          // When this happens, we should just instead start building from somewhere else
+          //console.log('CURSOR STUCK. Rebuild...');
+          failCount++;
+          if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
+          return false;
+        }
+      }
+
+      // Build walls between this room and other rooms / void
+      for (var _i = 0, _zones_in_this_room = zones_in_this_room; _i < _zones_in_this_room.length; _i++) {
+        var zone_location = _zones_in_this_room[_i];
+        buildWallsForZone(map, zone_location);
+      }
+      all_room_zones[room] = zones_in_this_room;
+
+      // Move cursor to an area outside but next to this room, and add door
+      if (room != number_of_rooms - 1) {
+        cursor = findNakedAdjacent(map, zones_in_this_room, random);
+      }
+    }
+
+    // Lets add some random doors between rooms, otherwise it's too linear
+    var new_door_count = 0;
+    for (var _i2 = 0, _all_room_zones = all_room_zones; _i2 < _all_room_zones.length; _i2++) {
+      var room_zones = _all_room_zones[_i2];
+      var _iterator = _createForOfIteratorHelper(room_zones),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var coords = _step.value;
+          if (coords.x === 0 || coords.y === 0 || coords.x >= MAP_WIDTH - 1 || coords.y >= MAP_HEIGHT - 1) {
+            // Don't attempt to build random doors on extremes. Could be more specific though, doesn't always need to be avoided.
+            continue;
+          }
+          var this_zone = map[coords.y][coords.x];
+          var this_room_id = this_zone.room;
+          var comparedZone = null;
+
+          // South
+          comparedZone = map[coords.y + 1][coords.x];
+          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
+            (0, _roomGeneration.buildDoorBetweenZones)(map, coords, {
+              x: coords.x,
+              y: coords.y + 1
+            });
+            new_door_count++;
+          }
+
+          // North
+          comparedZone = map[coords.y - 1][coords.x];
+          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
+            (0, _roomGeneration.buildDoorBetweenZones)(map, coords, {
+              x: coords.x,
+              y: coords.y - 1
+            });
+            new_door_count++;
+          }
+
+          // West
+          comparedZone = map[coords.y][coords.x - 1];
+          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
+            (0, _roomGeneration.buildDoorBetweenZones)(map, coords, {
+              x: coords.x - 1,
+              y: coords.y
+            });
+            new_door_count++;
+          }
+
+          // East
+          comparedZone = map[coords.y][coords.x + 1];
+          if (comparedZone.open && Math.abs(comparedZone.room - this_room_id) > ROOM_ID_DIFF_RANDOM_DOOR_THRESHOLD && Math.random() <= ROOM_ID_DIFF_RANDOM_DOOR_ODDS) {
+            (0, _roomGeneration.buildDoorBetweenZones)(map, coords, {
+              x: coords.x + 1,
+              y: coords.y
+            });
+            new_door_count++;
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+    }
+    if (new_door_count < NEW_DOOR_MIN_THRESHOLD) {
+      failCount++;
+      if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
+      //console.log('UNMET DOOR THRESHOLD: ' + new_door_count + ' OF ' + //NEW_DOOR_MIN_THRESHOLD + '. Rebuild...');
+      return false;
+    }
+
+    // Build our exits
+    var _iterator2 = _createForOfIteratorHelper(_tileBuilder.DIRECTIONS),
+      _step2;
+    try {
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        var dir = _step2.value;
+        map[exits[dir].y][exits[dir].x].edges[dir] = _tileBuilder.EXIT;
+        map[exits[dir].y][exits[dir].x].exit = true;
+      }
+    } catch (err) {
+      _iterator2.e(err);
+    } finally {
+      _iterator2.f();
+    }
+    return {
+      map: map,
+      exits: exits,
+      failCount: failCount,
+      rooms: all_room_zones
+    };
+  }
+
+  // Finds an open zone which is adjacent to one of the supplied zones
+  function findNakedAdjacent(map, zones, random) {
+    zones = shuffle(zones, random);
+    var _iterator3 = _createForOfIteratorHelper(zones),
+      _step3;
+    try {
+      for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+        var current_zone = _step3.value;
+        var newZone = moveCursor(map, current_zone, random);
+        if (newZone) {
+          (0, _roomGeneration.buildDoorBetweenZones)(map, current_zone, newZone);
+          return newZone;
+        }
+      }
+    } catch (err) {
+      _iterator3.e(err);
+    } finally {
+      _iterator3.f();
+    }
+    return false;
+  }
+
+  // Move the cursor to an available adjacent zone
+  function moveCursor(map, cursor, random) {
+    var adjacents = shuffle([{
+      d: 'n',
+      x: 0,
+      y: 1
+    }, {
+      d: 'e',
+      x: 1,
+      y: 0
+    }, {
+      d: 's',
+      x: 0,
+      y: -1
+    }, {
+      d: 'w',
+      x: -1,
+      y: 0
+    }], random);
+    var direction = null;
+    var newCursor = null;
+    //eslint-disable-next-line no-cond-assign
+    while (direction = adjacents.pop()) {
+      newCursor = {
+        x: cursor.x + direction.x,
+        y: cursor.y + direction.y
+      };
+      if (newCursor.x < 0 || newCursor.y < 0 || newCursor.x >= MAP_WIDTH || newCursor.y >= MAP_HEIGHT) {
+        // When this happens, we should just move the cursor somewhere else
+        //console.log('CURSOR OUT OF BOUNDS. Rebuild...');
+        failCount++;
+        if (config.maxFails && failCount > config.maxFails) throw new Error('Failed too many times to generate this configuration');
+        return null;
+      }
+      if (!map[newCursor.y][newCursor.x].open) {
+        return newCursor;
+      }
+    }
+    return false;
+  }
+
+  // Takes the coordinates of a zone, and map info, and works on building
+  // walls for that particular zone. Should also update this so that we make
+  // sure we're not looking outside the bounds of our array (<0 | >MAX).
+  // Also, don't want to blow away doors...
+  function buildWallsForZone(map, loc) {
+    var room = map[loc.y][loc.x].room;
+
+    // NORTH
+    if (map[loc.y][loc.x].edges.n != _tileBuilder.DOOR) {
+      if (loc.y === 0 || !map[loc.y - 1][loc.x].open || map[loc.y - 1][loc.x].room != room) {
+        map[loc.y][loc.x].edges.n = _tileBuilder.WALL;
+      } else {
+        map[loc.y][loc.x].edges.n = _tileBuilder.OPEN;
+      }
+    }
+
+    // EAST
+    if (map[loc.y][loc.x].edges.e != _tileBuilder.DOOR) {
+      if (loc.x >= MAP_WIDTH - 1 || !map[loc.y][loc.x + 1].open || map[loc.y][loc.x + 1].room != room) {
+        map[loc.y][loc.x].edges.e = _tileBuilder.WALL;
+      } else {
+        map[loc.y][loc.x].edges.e = _tileBuilder.OPEN;
+      }
+    }
+
+    // SOUTH
+    if (map[loc.y][loc.x].edges.s != _tileBuilder.DOOR) {
+      if (loc.y >= MAP_HEIGHT - 1 || !map[loc.y + 1][loc.x].open || map[loc.y + 1][loc.x].room != room) {
+        map[loc.y][loc.x].edges.s = _tileBuilder.WALL;
+      } else {
+        map[loc.y][loc.x].edges.s = _tileBuilder.OPEN;
+      }
+    }
+
+    // WEST
+    if (map[loc.y][loc.x].edges.w != _tileBuilder.DOOR) {
+      if (loc.x === 0 || !map[loc.y][loc.x - 1].open || map[loc.y][loc.x - 1].room != room) {
+        map[loc.y][loc.x].edges.w = _tileBuilder.WALL;
+      } else {
+        map[loc.y][loc.x].edges.w = _tileBuilder.OPEN;
+      }
+    }
+  }
+};
+
+// Get a random integer between the supplied min and max
+function rangedRandom(min, max, random) {
+  return Math.floor(random() * (max + 1 - min) + min);
+}
+/*
+// Builds a door between these two (hopefully) adjacent zones
+function buildDoorBetweenZones(map, zonePos1, zonePos2) {
+    const zone1 = map[zonePos1.y][zonePos1.x];
+    const zone2 = map[zonePos2.y][zonePos2.x];
+
+    if (zonePos1.x == zonePos2.x && zonePos1.y > zonePos2.y) {
+        // ZONE1 SOUTH OF ZONE2
+        zone1.edges.n = DOOR;
+        zone2.edges.s = DOOR;
+    } else if (zonePos1.x == zonePos2.x && zonePos1.y < zonePos2.y) {
+        // ZONE1 NORTH OF ZONE2
+        zone1.edges.s = DOOR;
+        zone2.edges.n = DOOR;
+    } else if (zonePos1.y == zonePos2.y && zonePos1.x > zonePos2.x) {
+        // ZONE1 EAST OF ZONE2
+        zone1.edges.w = DOOR;
+        zone2.edges.e = DOOR;
+    } else if (zonePos1.y == zonePos2.y && zonePos1.x < zonePos2.x) {
+        // ZONE1 WEST OF ZONE2
+        zone1.edges.e = DOOR;
+        zone2.edges.w = DOOR;
+    } else {
+        console.log('BUILD DOOR FAILURE', zone1, zone2);
+    }
+}*/
+
+// Randomizes an array
+function shuffle(array, random) {
+  var arr = array.slice(); // clone array
+  var i = arr.length,
+    j,
+    tempi,
+    tempj;
+  if (i == 0) return false;
+  while (--i) {
+    j = Math.floor(random() * (i + 1));
+    tempi = arr[i];
+    tempj = arr[j];
+    arr[i] = tempj;
+    arr[j] = tempi;
+  }
+  return arr;
+}
+
+// Builds a big empty square array, an entire map
+function initialize(width, height) {
+  var map = [];
+  for (var y = 0; y < height; y++) {
+    map[y] = [];
+    for (var x = 0; x < width; x++) {
+      map[y][x] = {
+        open: false,
+        room: null,
+        exit: null,
+        zone: null,
+        edges: {
+          n: null,
+          e: null,
+          s: null,
+          w: null
+        }
+      };
+    }
+  }
+  return map;
+}
+
+},{"./roomGeneration.js":28,"./tileBuilder.js":29}],28:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.inDoorRange = exports.buildRoom = exports.buildDoorBetweenZones = void 0;
+var _tileBuilder = require("../util/tileBuilder.js");
+var TILE = _tileBuilder.defaultTileMap;
+var inDoorRange = exports.inDoorRange = function inDoorRange(n, max, range) {
+  var half = Math.floor(max / 2);
+  var odd = !!(max % 2);
+  var halfRange = Math.floor(range / 2);
+  if (odd) {
+    if (n === half && range) {
+      //in center
+      return true;
+    } else {
+      if (n < half) {
+        return n > half - halfRange;
+      } else {
+        return n < half + halfRange;
+      }
+    }
+  } else {
+    if (n <= half) {
+      return n >= half - halfRange;
+    } else {
+      return n < half + halfRange;
+    }
+  }
+};
+var buildRoom = exports.buildRoom = function buildRoom() {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var roomHeight = arguments.length > 1 ? arguments[1] : undefined;
+  var roomWidth = arguments.length > 2 ? arguments[2] : undefined;
+  var width = roomHeight;
+  var height = roomWidth;
+  var lines = [];
+  for (var y = 0; y < height; y++) {
+    var row = [];
+    for (var x = 0; x < width; x++) {
+      if (x === 0 || x === width - 1) {
+        //TODO: doors
+        if (x === 0) {
+          if (options.edges.w === 'open') {
+            if (y === 0 || y === height - 1) row.push(TILE.WALL);else row.push(TILE.FLOOR);
+          } else {
+            if ((options.edges.w === 'door' || options.edges.w === 'exit') && inDoorRange(y, height, 2)) {
+              if (options.edges.w === 'door') {
+                row.push(TILE.DOOR);
+              } else {
+                row.push(TILE.EXIT);
+              }
+            } else {
+              row.push(TILE.WALL);
+            }
+          }
+        } else {
+          if (options.edges.e === 'open') {
+            if (y === 0 || y === height - 1) row.push(TILE.WALL);else row.push(TILE.FLOOR);
+          } else {
+            if ((options.edges.e === 'door' || options.edges.e === 'exit') && inDoorRange(y, height, 2)) {
+              if (options.edges.e === 'door') {
+                row.push(TILE.DOOR);
+              } else {
+                row.push(TILE.EXIT);
+              }
+            } else {
+              row.push(TILE.WALL);
+            }
+          }
+        }
+      } else {
+        if (y === 0 || y === height - 1) {
+          if (y === 0) {
+            if (options.edges.n === 'open') {
+              row.push(TILE.FLOOR);
+            } else {
+              if ((options.edges.n === 'door' || options.edges.n === 'exit') && inDoorRange(x, width, 2)) {
+                if (options.edges.n === 'door') {
+                  row.push(TILE.DOOR);
+                } else {
+                  row.push(TILE.EXIT);
+                }
+              } else {
+                row.push(TILE.WALL);
+              }
+            }
+          } else {
+            if (options.edges.s === 'open') {
+              row.push(TILE.FLOOR);
+            } else {
+              if ((options.edges.s === 'door' || options.edges.s === 'exit') && inDoorRange(x, width, 2)) {
+                if (options.edges.s === 'door') {
+                  row.push(TILE.DOOR);
+                } else {
+                  row.push(TILE.EXIT);
+                }
+              } else {
+                row.push(TILE.WALL);
+              }
+            }
+          }
+        } else {
+          row.push(TILE.FLOOR);
+        }
+      }
+    }
+    lines.push(row);
+  }
+  return lines;
+};
+
+// Builds a door between these two (hopefully) adjacent zones
+var buildDoorBetweenZones = exports.buildDoorBetweenZones = function buildDoorBetweenZones(map, zonePos1, zonePos2) {
+  var zone1 = map[zonePos1.y][zonePos1.x];
+  var zone2 = map[zonePos2.y][zonePos2.x];
+  if (zonePos1.x == zonePos2.x && zonePos1.y > zonePos2.y) {
+    // ZONE1 SOUTH OF ZONE2
+    zone1.edges.n = _tileBuilder.DOOR;
+    zone2.edges.s = _tileBuilder.DOOR;
+  } else if (zonePos1.x == zonePos2.x && zonePos1.y < zonePos2.y) {
+    // ZONE1 NORTH OF ZONE2
+    zone1.edges.s = _tileBuilder.DOOR;
+    zone2.edges.n = _tileBuilder.DOOR;
+  } else if (zonePos1.y == zonePos2.y && zonePos1.x > zonePos2.x) {
+    // ZONE1 EAST OF ZONE2
+    zone1.edges.w = _tileBuilder.DOOR;
+    zone2.edges.e = _tileBuilder.DOOR;
+  } else if (zonePos1.y == zonePos2.y && zonePos1.x < zonePos2.x) {
+    // ZONE1 WEST OF ZONE2
+    zone1.edges.e = _tileBuilder.DOOR;
+    zone2.edges.w = _tileBuilder.DOOR;
+  } else {
+    console.log('BUILD DOOR FAILURE', zone1, zone2);
+  }
+};
+
+},{"../util/tileBuilder.js":29}],29:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.toCharGrid = exports.defaultTileMap = exports.WALL = exports.OPEN = exports.Grid = exports.EXIT = exports.DOOR = exports.DIRECTIONS = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var defaultTileMap = exports.defaultTileMap = {
+  VOID: 0,
+  WALL: 1,
+  FLOOR: 2,
+  DOOR: 3,
+  SPECIAL_DOOR: 4,
+  ENTER: 5,
+  EXIT: 6
+};
+var WALL = exports.WALL = 'wall';
+var DOOR = exports.DOOR = 'door';
+var OPEN = exports.OPEN = 'open';
+var EXIT = exports.EXIT = 'exit';
+var DIRECTIONS = exports.DIRECTIONS = ['n', 'e', 's', 'w'];
+var toCharGrid = exports.toCharGrid = function toCharGrid() {
+  var string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  return string.split('\n').map(function (line) {
+    return line.split('');
+  });
+};
+var Grid = exports.Grid = /*#__PURE__*/function () {
+  function Grid() {
+    var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    _classCallCheck(this, Grid);
+    this.grid = toCharGrid(str);
+  }
+  _createClass(Grid, [{
+    key: "overlay",
+    value: function overlay(subgrid, y, x) {
+      var grid = Array.isArray(subgrid) ? subgrid : toCharGrid(subgrid);
+      for (var row = 0; row < grid.length; row++) {
+        for (var col = 0; col < grid[row].length; col++) {
+          if (!this.grid[x + row]) this.grid[x + row] = [];
+          this.grid[x + row][y + col] = grid[row][col];
+        }
+      }
+    }
+  }, {
+    key: "fill",
+    value: function fill(tile, max_width, max_height) {
+      for (var y = 0; y < max_height; y++) {
+        this.grid[y] = [];
+        for (var x = 0; x < max_width; x++) {
+          this.grid[y][x] = tile;
+        }
+      }
+    }
+  }, {
+    key: "toString",
+    value: function toString(incoming) {
+      return (incoming || this.grid).map(function (chars) {
+        return chars.join('');
+      }).join('\n');
+    }
+  }]);
+  return Grid;
+}();
+
+},{}],30:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = void 0;
 var _labyrinthos = _interopRequireDefault(require("../../../../Labyrinthos.js/lib/labyrinthos.js"));
 var _defaultOrthogonalMap = _interopRequireDefault(require("./maps/defaultOrthogonalMap.js"));
@@ -4263,9 +4430,10 @@ var exitConfig = {
     y: 0,
     z: 0
   },
+  // TODO: remove this in favor of collisionStart handler
   exitHandler: function exitHandler(enterEnt, exitEnt) {
     var game = this;
-    console.log('exitHandler', game, enterEnt, exitEnt);
+    // console.log('exitHandler', game, enterEnt, exitEnt);
 
     // default behavior is to clear all tiles
     // clear all current tiles
@@ -4557,7 +4725,7 @@ var Tile = /*#__PURE__*/function () {
 _defineProperty(Tile, "id", 'tile');
 var _default = exports["default"] = Tile;
 
-},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":28,"./lib/createLayer.js":29,"./lib/createTile.js":30,"./lib/createTileMap.js":31,"./lib/createTileMapFromTiledJSON.js":32,"./lib/getChunkFiles.js":33,"./lib/handleChunkLoadFailure.js":34,"./lib/loadChunk.js":35,"./lib/loadTilesForArea.js":36,"./lib/processTile.js":37,"./maps/defaultOrthogonalMap.js":38}],28:[function(require,module,exports){
+},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":31,"./lib/createLayer.js":32,"./lib/createTile.js":33,"./lib/createTileMap.js":34,"./lib/createTileMapFromTiledJSON.js":35,"./lib/getChunkFiles.js":36,"./lib/handleChunkLoadFailure.js":37,"./lib/loadChunk.js":38,"./lib/loadTilesForArea.js":39,"./lib/processTile.js":40,"./maps/defaultOrthogonalMap.js":41}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4596,7 +4764,7 @@ function calculateTilePosition(index, layer) {
   };
 }
 
-},{}],29:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4629,7 +4797,7 @@ function createLayer(layer, tileWidth, tileHeight) {
   }
 }
 
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4742,7 +4910,7 @@ function createTile(tile, x, y) {
   return ent;
 }
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4976,7 +5144,7 @@ function generateEntrances(map, entranceCount) {
   return entrances;
 }
 
-},{}],32:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5004,7 +5172,7 @@ function createTileMapFromTiledJSON(tiledJSON) {
   });
 }
 
-},{}],33:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5041,7 +5209,7 @@ function pathJoin(dir, file) {
   }
 }
 
-},{}],34:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5090,7 +5258,7 @@ function handleChunkLoadFailure(chunkPath, chunkKey) {
   }
 }
 
-},{}],35:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5128,7 +5296,7 @@ function loadChunk(chunkPath, chunkKey) {
   }
 }
 
-},{}],36:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5180,7 +5348,7 @@ function loadTilesForArea(position) {
   });
 }
 
-},{}],37:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5229,7 +5397,7 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) 
   this.createTile(tile, x, y, z, tileWidth, tileHeight, tileDepth, layer.color, customDepth);
 }
 
-},{}],38:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5270,5 +5438,5 @@ var defaultOrthogonalMap = {
 };
 var _default = exports["default"] = defaultOrthogonalMap;
 
-},{}]},{},[27])(27)
+},{}]},{},[30])(30)
 });

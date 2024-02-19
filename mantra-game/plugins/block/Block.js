@@ -48,13 +48,12 @@ class Block {
     if (context.target.type !== 'BULLET') {
       return;
     }
-    console.log("Block.splitBlock", a, b, pair, context);
 
     const blockEntity = this.game.data.ents._[context.owner.id];
     const bulletEntity = this.game.data.ents._[context.target.id];
 
     if (!blockEntity || !bulletEntity) {
-      console.log('Block.splitBlock no entity found. Skipping...', blockEntity, bulletEntity);
+      // console.log('Block.splitBlock no entity found. Skipping...', blockEntity, bulletEntity);
       return;
     }
 

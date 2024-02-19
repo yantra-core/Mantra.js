@@ -54,6 +54,11 @@ var Player = exports["default"] = /*#__PURE__*/function () {
           sprite: 'player'
         };
       }
+      if (typeof playerConfig.lives === 'number') {
+        playerConfig.meta = playerConfig.meta || {};
+        playerConfig.meta.lives = playerConfig.lives;
+      }
+      var that = this;
       return {
         name: playerConfig.name,
         type: 'PLAYER',
@@ -67,16 +72,19 @@ var Player = exports["default"] = /*#__PURE__*/function () {
         color: playerConfig.color,
         radius: playerConfig.radius,
         texture: playerConfig.texture,
-        /*
-        afterRemoveEntity: function(entity){
-          // creates the same player again with the same config
-          // console.log('player removed', entity.id)
-          //throw new Error('Player removed');
-          // causing issues wit warping worlds since we remove all ents and this re-creates the player
-          //game.createPlayer(playerConfig);
+        afterRemoveEntity: function afterRemoveEntity(entity) {
+          // check to see if has any lives left
+          if (entity.teleported !== true, entity.meta && typeof entity.meta.lives === 'number' && entity.meta.lives > 0) {
+            // creates the same player again with the same config
+            // TODO: better merging of player config, copy some of "entity" and some of "playerConfig"
+            var respawnedPlayer = game.createEntity(that.build({
+              lives: entity.meta.lives - 1
+            }));
+            game.setPlayerId(respawnedPlayer.id);
+          }
         },
-        */
         mass: 222,
+        meta: playerConfig.meta,
         // sutra: topdown(game), // TODO: replace with more comprehensive player sutra with sprites and item actions
         friction: 0.5,
         // Default friction
