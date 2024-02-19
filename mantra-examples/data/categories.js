@@ -31,23 +31,15 @@ let categories = [
     tags: ['behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   {
-    title: 'Items', // light blue
-    name: 'items',
-    color: '#03a9f4',
-    description: 'Items can be collected and used.',
+    title: 'Scenes', // Lime
+    name: 'scenes',
+    color: '#3f51b5',
+    description: 'Manage scenes and transitions.',
     image: 'placeholder-image.jpg',
-    url: 'items.html',
-    tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
+    url: 'scenes.html',
+    tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
-  {
-    title: 'NPCs', // deep orange
-    name: 'npc',
-    color: '#ff5722',
-    description: 'Non-Player Characters.',
-    image: 'placeholder-image.jpg',
-    url: 'npc.html',
-    tags: ['npc', 'characters', 'enemies', 'allies', 'monsters', 'creatures', 'beasts', 'animals', 'mobs', 'villagers', 'townsfolk']
-  },
+
   {
     "title": "Collisions",
     "name": "collisions",
@@ -67,14 +59,34 @@ let categories = [
     tags: ['camera', 'view', 'perspective', 'angle', 'zoom', 'pan', 'tilt', 'rotate', 'follow', 'look', 'focus', 'position']
   },
   {
-    title: 'Textures', // amber
-    name: 'textures',
-    color: '#ffc107',
-    description: 'Change the appearance of entities.',
-    image: 'placeholder-image.jpg',
-    url: 'textures.html',
-    tags: ['textures', 'images', 'graphics', 'assets', 'resources', 'files', 'loading', 'unloading', 'applying', 'updating', 'changing', 'modifying', 'replacing']
+    "title": "Input Controls",
+    "name": "inputs",
+    "color": "#ff5722", // deep orange
+    "description": "Mouse, Keyboard, Gamepad, Touch, and other input methods.",
+    "image": "placeholder-image.jpg",
+    "url": "inputs.html",
+    "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
   },
+
+  {
+    title: 'Items', // light blue
+    name: 'items',
+    color: '#03a9f4',
+    description: 'Items can be collected and used.',
+    image: 'placeholder-image.jpg',
+    url: 'items.html',
+    tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
+  },
+  {
+    title: 'NPCs', // deep orange
+    name: 'npc',
+    color: '#ff5722',
+    description: 'Non-Player Characters.',
+    image: 'placeholder-image.jpg',
+    url: 'npc.html',
+    tags: ['npc', 'characters', 'enemies', 'allies', 'monsters', 'creatures', 'beasts', 'animals', 'mobs', 'villagers', 'townsfolk']
+  },
+
   {
     title: 'Render', // Deep Brown
     name: 'render',
@@ -85,15 +97,6 @@ let categories = [
     tags: ['graphics', 'engine', 'rendering', 'shaders', 'lighting', 'textures', 'materials', 'models', 'animation', 'effects']
   },
   {
-    "title": "Assets",
-    name: "assets",
-    "color": "#795548", // brown
-    "description": "Load and use custom game assets.",
-    "image": "placeholder-image.jpg",
-    "url": "assets.html",
-    "tags": ["assets", "management", "loading", "unloading", "resources", "optimization", "storage", "caching", "streaming"]
-  },
-  {
     "title": "Audio & Sound",
     name: "audio",
     "color": "#00bcd4", // cyan
@@ -101,15 +104,6 @@ let categories = [
     "image": "placeholder-image.jpg",
     "url": "sound.html",
     "tags": ["audio", "sound", "music", "effects", "background music", "soundtrack", "volume", "playback", "midi", "tone"]
-  },
-  {
-    "title": "Input Controls",
-    "name": "inputs",
-    "color": "#ff5722", // deep orange
-    "description": "Mouse, Keyboard, Gamepad, Touch, and other input methods.",
-    "image": "placeholder-image.jpg",
-    "url": "inputs.html",
-    "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
   },
   {
     "title": "Tiles",
@@ -150,13 +144,22 @@ let categories = [
   },
   */
   {
-    title: 'Scenes', // Lime
-    name: 'scenes',
-    color: '#3f51b5',
-    description: 'Manage scenes and transitions.',
+    title: 'Textures', // amber
+    name: 'textures',
+    color: '#ffc107',
+    description: 'Change the appearance of entities.',
     image: 'placeholder-image.jpg',
-    url: 'scenes.html',
-    tags: ['scenes', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+    url: 'textures.html',
+    tags: ['textures', 'images', 'graphics', 'assets', 'resources', 'files', 'loading', 'unloading', 'applying', 'updating', 'changing', 'modifying', 'replacing']
+  },
+  {
+    "title": "Assets",
+    name: "assets",
+    "color": "#795548", // brown
+    "description": "Load and use custom game assets.",
+    "image": "placeholder-image.jpg",
+    "url": "assets.html",
+    "tags": ["assets", "management", "loading", "unloading", "resources", "optimization", "storage", "caching", "streaming"]
   },
   {
     title: 'Containers', // Lime
@@ -314,7 +317,7 @@ let npc_examples = [
   {
     title: 'Hexapod',
     category: 'npc',
-    description: 'A hexapod is a six-legged flying robot.',
+    description: 'A six-legged flying robot.',
     image: 'placeholder-image.jpg',
     url: 'npc/hexapod.html',
     tags: ['hexapod', 'npc', 'robot', 'flying', 'six', 'legged', 'legs', 'swarm', 'hive']

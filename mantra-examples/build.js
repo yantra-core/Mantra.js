@@ -248,12 +248,22 @@ function exampleTemplateHTML(example) {
 <html>
     <link href="../prism.css" rel="stylesheet" />
     <script src="../code-editor.js"></script>
+    <style>
+        iframe {
+            min-height: 600px;
+            min-width: 800px;
+            width: 100%;
+            height: 50%;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             loadEditor('./${name}.js');
         });
     </script>
-    <iframe src="../demo.html?source=${path}" width="100%" height="50%"></iframe>
+    <iframe src="../demo.html?source=${path}"></iframe>
     <script src="../prism.min.js"></script>
 </html>
     `;
@@ -263,7 +273,6 @@ function exampleTemplateJS(example) {
     return `
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start();
     `;
@@ -286,10 +295,12 @@ function generateExampleFiles() {
         const exampleHTMLPath = path.join(dirPath, `${baseName}.html`);
         const exampleJSPath = path.join(dirPath, `${baseName}.js`);
 
-        if (!fs.existsSync(exampleHTMLPath)) {
-            fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
-        }
+        if (!fs.existsSync(exampleHTMLPath)) {}
+        // regen the HTML file each time
+        fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
 
+        
+        // do not overwrite the js example code if it already exists
         if (!fs.existsSync(exampleJSPath)) {
             fs.writeFileSync(exampleJSPath, exampleTemplateJS(example), 'utf8');
         }

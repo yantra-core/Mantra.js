@@ -46,11 +46,17 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
         },
 
         meta: {
-          destination: entityData.destination
+          destination: entityData.destination || {
+            position: {
+              x: 0,
+              y: 0,
+              z: 0
+            }
+          }
         },
         //texture: 'teleporter',
         //color: 0xff0000,
-        collisionStart: this.touchedTeleporter.bind(this),
+        collisionStart: entityData.collisionStart || this.touchedTeleporter.bind(this),
         size: {
           width: 16,
           height: 16,
@@ -90,6 +96,24 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
             if (context.target.type === 'PLAYER') {
               // could be other types as well
               game.switchWorlds(destination.world);
+            }
+          }
+          // same as world, duplicate code
+          if (typeof destination.plugin !== 'undefined') {
+            if (context.target.type === 'PLAYER') {
+              // could be other types as well
+              game.switchWorlds(destination.plugin);
+            }
+          }
+          // handle entity case
+          if (typeof destination.entity !== 'undefined') {
+            // get latest position for ent ( if available )
+            var ent = game.data.ents._[destination.entity]; // TODO: game.getEntity() with improved perf
+            if (ent) {
+              game.setPosition(context.target.id, {
+                x: ent.position.x,
+                y: ent.position.y
+              });
             }
           }
           if (typeof destination.position !== 'undefined') {

@@ -51,6 +51,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "handleMouseMove",
     value: function handleMouseMove(event) {
+      var game = this.game;
       // TODO: common function for selecting entities
       // TODO: have editor be aware if inspector is loaded
       // if so, show additional UX for selecting entities

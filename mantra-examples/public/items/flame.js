@@ -1,10 +1,9 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['Flame', 'Player'],
+  plugins: ['Flame', 'Player', 'Gamepad', 'GamepadGUI'],
   defaultMovement: true,
   defaultPlayer: true,
-  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function(){
   game.setBackground('black');

@@ -266,16 +266,16 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _ensureColorInt = _interopRequireDefault(require("../plugins/entity/lib/util/ensureColorInt.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -290,6 +290,11 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         x: 0,
         y: 0,
         z: 0
+      },
+      size: {
+        width: 16,
+        height: 16,
+        depth: 16
       },
       offset: {
         x: 0,
@@ -427,6 +432,24 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       return this;
     }
   }, {
+    key: "width",
+    value: function width(value) {
+      this.config.size.width = value;
+      return this;
+    }
+  }, {
+    key: "height",
+    value: function height(value) {
+      this.config.size.height = value;
+      return this;
+    }
+  }, {
+    key: "depth",
+    value: function depth(value) {
+      this.config.size.depth = value;
+      return this;
+    }
+  }, {
     key: "radius",
     value: function radius(value) {
       this.config.radius = value;
@@ -443,7 +466,7 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "color",
     value: function color(value) {
-      this.config.color = value;
+      this.config.color = (0, _ensureColorInt["default"])(value); // converts string and hex color to int
       return this;
     }
   }, {
@@ -616,10 +639,15 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "offset",
     value: function offset(x, y, z) {
-      this.config.offset = {
-        x: x,
-        y: y
-      };
+      if (_typeof(this.config.offset) !== 'object' || this.config.offset === null) {
+        this.config.offset = {};
+      }
+      if (typeof x === 'number') {
+        this.config.offset.x = x;
+      }
+      if (typeof y === 'number') {
+        this.config.offset.y = y;
+      }
       if (typeof z === 'number') {
         this.config.offset.z = z;
       }
@@ -657,36 +685,39 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       if (typeof this.config.clone === 'number') {
         var entities = [];
         for (var i = 0; i < this.config.clone; i++) {
-          entities.push(this.game.createEntity(this.config));
+          var clonedConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
+          // Explicitly reassign functions and bound event handlers
+          clonedConfig.collisionStart = this.config.collisionStart;
+          entities.push(this.game.createEntity(clonedConfig));
         }
         return entities;
       } else if (typeof this.config.repeat === 'number') {
         var _entities = [];
         for (var _i = 0; _i < this.config.repeat; _i++) {
-          var entityConfig = JSON.parse(JSON.stringify(this.config));
+          var entityConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
+
           // Calculate the offset for each repeated entity
-          // .ofset() is treated separately as modifier for position, it can be used without repeaters
-          var offsetX = this.config.position.x + _i * this.config.offset.x;
-          var offsetY = this.config.position.y + _i * this.config.offset.y;
-          var offsetZ = this.config.position.z + _i * this.config.offset.z;
-          // Remark: Both x and y must be numbers to be applied
+          var offsetX = entityConfig.position.x + _i * entityConfig.offset.x;
+          var offsetY = entityConfig.position.y + _i * entityConfig.offset.y;
+          var offsetZ = entityConfig.position.z + _i * entityConfig.offset.z;
           if (typeof offsetX === 'number' && typeof offsetY === 'number') {
             entityConfig.position = {
               x: offsetX,
-              y: offsetY
+              y: offsetY,
+              z: entityConfig.position.z
             };
           }
           if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
             entityConfig.position.z = offsetZ;
           }
-          // Apply each modifier for the repeated entity
-          for (var _i2 = 0, _Object$entries = Object.entries(this.repeatModifiers); _i2 < _Object$entries.length; _i2++) {
-            var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
-              prop = _Object$entries$_i[0],
-              modifier = _Object$entries$_i[1];
-            if (typeof modifier === 'function') {
-              // Pass the current index and total count to the modifier function
-              entityConfig[prop] = modifier(_i, this.config.repeat, this.config[prop]);
+          if (_typeof(this.repeatModifiers) === 'object' && this.repeatModifiers !== null) {
+            for (var _i2 = 0, _Object$entries = Object.entries(this.repeatModifiers); _i2 < _Object$entries.length; _i2++) {
+              var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
+                prop = _Object$entries$_i[0],
+                modifier = _Object$entries$_i[1];
+              if (typeof modifier === 'function') {
+                entityConfig[prop] = modifier(_i, this.config.repeat, entityConfig[prop]);
+              }
             }
           }
           // Remove repeat-related properties to avoid infinite recursion and irrelevant data
@@ -696,7 +727,10 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         }
         return _entities;
       } else {
-        return this.game.createEntity(this.config);
+        var singleConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
+        // Explicitly reassign functions and bound event handlers
+        singleConfig.collisionStart = this.config.collisionStart;
+        return this.game.createEntity(singleConfig);
       }
     }
   }, {
@@ -3732,7 +3766,7 @@ function ensureColorInt(color) {
   var colorNameToHex = {
     red: '#FF0000',
     green: '#00FF00',
-    blue: '#0000FF',
+    blue: '#fff007',
     black: '#000000',
     white: '#FFFFFF',
     yellow: '#FFFF00',

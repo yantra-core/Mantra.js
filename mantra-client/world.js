@@ -49,7 +49,7 @@ let game = new Game({
   */
 });
 
-game.use(new plugins.SwitchGraphicsGUI());
+game.use(new plugins.SwitchGraphics());
 
 // game.gameConfig = TowerWorld;
 
@@ -60,10 +60,19 @@ home = new worlds.Home();
 game.use(new Lifetime());
 game.start(function () {
   game.reset();
-  // game.use(new Teleporter());
+  game.use(new Teleporter());
   //game.use(new plugins.Hexapod())
+  game.use(new plugins.Block())
+  game.use(new plugins.Text())
 
-  game.use(home);
+
+  //game.use(home);
+  // game.build().Block().clone(3).createEntity();
+  game.build().Teleporter().position(-100, 0, 0).createEntity();
+  game.build().Text().text('Teleport to position').width(200).position(0, 0, 0).createEntity();
+  game.build().Text().text('Teleport to function').width(200).position(0, 0, 0).createEntity();
+  game.build().Text().text('Teleport to Plugin').width(200).position(0, 0, 0).createEntity();
+
   //game.use(new GravityGardens());
 
 

@@ -3,7 +3,6 @@ let game = new MANTRA.Game({
   defaultMovement: true, // adds movement to player
   virtualGamepad: false, // adds virtual gamepad to player
   plugins: ['Block', 'Border'], // plugins at construction
-  gameRoot: 'http://192.168.1.80:7777'
 });
 
 game.use('Bullet'); // plugins at runtime

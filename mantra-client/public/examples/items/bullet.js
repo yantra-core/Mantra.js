@@ -7,7 +7,6 @@ let game = new MANTRA.Game({
 
 game.use('Bullet'); // plugins at runtime
 
-
 // TODO: demos should have simple control mappings with Sutra, no default mappings
 game.start(function () {
   game.setBackground('#000000');
@@ -17,29 +16,16 @@ game.start(function () {
   });
 
   game.createPlayer({
-    rotation: Math.PI / 2 // player faces right
+    rotation: Math.PI / 2 // player aims to the right
   });
 
-  // create a few entities to shoot, aligned horizontally in front of the gun
-  let entities = [];
-  let startPosition = { x: 100, y: 0 };
-  let blockSpacing = 60; // Adjust as needed for spacing between blocks
-  for (let i = 0; i < 10; i++) {
-    let entity = game.createEntity({
-      type: 'BLOCK',
-      size: {
-        width: 50,
-        height: 50
-      },
-      hasCollisionStart: true,
-      position: {
-        x: startPosition.x + (i * blockSpacing), // Position blocks in a line to the right of the gun
-        y: startPosition.y // Align blocks vertically with the gun
-      }
-    });
-    entities.push(entity);
-  }
-
+  // create a few entities in a straight line to shoot
+  game.build()
+    .Block()
+    .position(100, 0, 0)
+    .offset(48)
+    .repeat(11)
+    .createEntity();
 
 });
 window.game = game;

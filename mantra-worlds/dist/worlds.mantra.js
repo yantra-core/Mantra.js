@@ -3327,12 +3327,13 @@ var GravityGardens = /*#__PURE__*/function () {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              // preload these plugins before the plugin starts
               game.use('Player');
               game.use('GravityWell');
               game.use('UnitSpawner');
-              // should *not* be needed? dev settings?
-              // await game.loadAllPlugins();
-            case 3:
+              game.use('Teleporter');
+              game.use('Sutra');
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -3351,6 +3352,7 @@ var GravityGardens = /*#__PURE__*/function () {
       this.createFounts(game);
       this.bindEvents();
       this.bindSutraRules();
+      // we can lazy load these after the plugin has started
       game.use('CurrentFPS');
       game.use('StarField');
     }
@@ -3365,7 +3367,12 @@ var GravityGardens = /*#__PURE__*/function () {
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
       game.createBorder({
-        thickness: 20
+        thickness: 20,
+        collisionStart: function collisionStart(a, b, pair, context) {
+          if (context.target.type === 'PARTICLE') {
+            game.removeEntity(context.target.id);
+          }
+        }
       });
 
       // set the zoom level based on device type
@@ -3378,18 +3385,45 @@ var GravityGardens = /*#__PURE__*/function () {
       // Builds a Player config with GravityWell 
       var playerConfig = game.build().GravityWell().Player().texture(null) // default texture is a player sprite
       .color(0xffcccc) // gives a color to the player
-      .position(0, 0, 0) // sets the player position
-      .build();
+      .position(0, 0, 0); // sets the player position
 
+      console.log('playerConfig', playerConfig);
       // whenever the player collides with something, we remove the other entity
-      playerConfig.collisionStart = function (a, b, pair, context) {
-        game.removeEntity(context.target.id);
-      };
+      console.log('playerConfig', playerConfig);
+      playerConfig.collisionStart(function (a, b, pair, context) {
+        if (context.target.type !== 'WARP') {
+          game.removeEntity(context.target.id);
+        }
+      });
+      playerConfig = playerConfig.build();
+      console.log('playerConfig', playerConfig);
       var player = game.createEntity(playerConfig);
       game.setPlayerId(player.id);
-      game.build().type('WARP').exit({
+
+      /*
+      game.build().Teleporter({
+        destination: {
+          position: {
+            x: 20,
+            y: 0
+          }
+        }
+      })
+      .position(-50, 50).size(32).createEntity();
+      */
+
+      game.build().type('WARP')
+      /*
+      .Teleporter({
+        destination: {
+          world: 'Home'
+        }
+      })
+      */.exit({
         world: 'Home'
-      }).texture('warp-to-home').size(64, 64, 64).isStatic(true).position(600, -30, 0).createEntity();
+      }).texture('warp-to-home').size(64, 64, 64).isStatic(true)
+      //.isSensor(true)
+      .position(595, -30, 0).createEntity();
       game.build().type('TEXT').text('Warp To Mantra').style({
         padding: '2px',
         fontSize: '16px',
@@ -3519,11 +3553,9 @@ var GravityGardens = /*#__PURE__*/function () {
     value: function createFounts() {
       // will set the collistionStart flag to true in order to register collision events
       var particleCollision = true;
-
-      // .sutra(fount, { sprayAngle: 0, color: 0xf03025, collisionStart: particleCollision })
-
       game.build().name('fountA').type('FOUNT').UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0xf03025,
           isSensor: true,
           position: {
@@ -3535,6 +3567,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
       game.build().name('fountB').type('FOUNT').UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0x14b161,
           isSensor: true,
           position: {
@@ -3547,6 +3580,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
       game.build().name('fountC').type('FOUNT').UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0x3c62f8,
           isSensor: true,
           position: {
@@ -3559,6 +3593,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
       game.build().name('fountD').type('FOUNT').UnitSpawner({
         unitConfig: {
+          type: 'PARTICLE',
           color: 0xe9dd34,
           isSensor: true,
           position: {
@@ -3725,7 +3760,8 @@ var Home = /*#__PURE__*/function () {
               game.use('Boomerang');
               game.use('Flame');
               game.use('Player');
-            case 15:
+              game.use('Hexapod');
+            case 16:
             case "end":
               return _context.stop();
           }
@@ -3766,11 +3802,33 @@ var Home = /*#__PURE__*/function () {
       }
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
-      var player1 = game.build().Player().createEntity();
-      game.setPlayerId(player1.id);
+      var playerConfig = game.build().Player();
 
       /*
-      game.after('removeEntity', function(entity) {
+      playerConfig.collisionStart(function () {
+        console.log('overrides the Teleport collision?')
+      });
+      */
+
+      var player1 = playerConfig.createEntity();
+      game.setPlayerId(player1.id);
+
+      //
+      // Create 22 Hexapods
+      //
+      // game.build().Hexapod().position(-40, 0, 0).clone(22).createEntity();
+
+      /*
+        game.build().Teleporter({
+        destination: {
+          position: {
+            x: 20,
+            y: 0
+          }
+        }
+      })
+      .position(-50, 50).size(32).createEntity();
+       game.after('removeEntity', function(entity) {
         if (entity.type === 'PLAYER') {
           game.createPlayer({
             respawns: true,
@@ -3877,83 +3935,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createBackground;
 function createBackground(game) {
-  game.createEntity({
-    type: "BACKGROUND",
-    texture: 'garden',
-    width: 300,
-    height: 300,
-    body: false,
-    position: {
-      x: 0,
-      y: 0,
-      z: -10
-    }
-  });
+  game.build().type('BACKGROUND').texture('garden').body(false).size(300, 300, 1).position(0, 0, -10).createEntity();
+  game.build().type('BACKGROUND').texture('sutra-tree').body(false).size(1024 / 4, 1024 / 4, 1).position(0, 300, 32).createEntity();
+  game.build().type('BACKGROUND').texture('robot-arms-apartment').kind('building').size(1340, 3668, 1).body(false).position(900, -1800, -1).createEntity();
+  game.build().type('BACKGROUND').texture('planet-express-base').kind('building').size(2048, 2048, 1).body(false).position(-900, -800, -1).createEntity();
+  game.build().type('BLOCK').texture('tile-block').size(200, 200, 1).mass(10000).position(200, -800, -8).createEntity();
 
-  // create some background and text entities for navigation
-  game.createEntity({
-    name: 'sutra-tree',
-    type: 'BACKGROUND',
-    // kind: 'building',
-    width: 1024 / 4,
-    height: 1024 / 4,
-    //depth: 256,
-    depth: 1,
-    texture: 'sutra-tree',
-    body: false,
-    position: {
-      x: 0,
-      y: 300,
-      z: 32
-    }
-  });
-
-  // convert the Sutra.js rules to English text
-  //     let rulesEnglish = game.rules.toEnglish();
-  game.createEntity({
-    type: 'BACKGROUND',
-    texture: 'robot-arms-apartment',
-    kind: 'building',
-    depth: 1,
-    width: 1340,
-    height: 3668,
-    body: false,
-    position: {
-      // position to right
-      x: 900,
-      y: -1800,
-      z: -1
-    }
-  });
-  game.createEntity({
-    type: 'BACKGROUND',
-    texture: 'planet-express-base',
-    kind: 'building',
-    width: 2048,
-    height: 2048,
-    depth: 1,
-    body: false,
-    position: {
-      // position to right
-      x: -900,
-      y: -800,
-      z: -1
-    }
-  });
-  game.createEntity({
-    type: 'BLOCK',
-    texture: 'tile-block',
-    width: 200,
-    height: 200,
-    mass: 10000,
-    // body: false,
-    position: {
-      // position to right
-      x: 200,
-      y: -800,
-      z: -8
-    }
-  });
+  /*
+  game.build()
+  .type('WARP')
+  */
 
   // if touch warp, switch to YCraft level
   game.createEntity({
@@ -4256,7 +4247,8 @@ game.createEntity({
   collisionActive: true,
   collisionEnd: true,
   collisionStart: true,
-   type: 'TEXT',
+
+  type: 'TEXT',
   text: 'CSS',
   width: 60,
   height: 50,
@@ -4331,6 +4323,7 @@ game.createEntity({
 */
 
 /*
+
 game.createEntity({
 name: 'raiden-left',
 type: 'BACKGROUND',
@@ -4348,6 +4341,7 @@ y: 10,
 z: 32
 }
 });
+
 game.createEntity({
 name: 'raiden-right',
 type: 'BACKGROUND',
@@ -4365,6 +4359,7 @@ y: 10,
 z: 32
 }
 });
+
 */
 
 /*
@@ -4403,7 +4398,6 @@ var _walker = _interopRequireDefault(require("../TowerDefense/sutras/walker.js")
 var _routing = _interopRequireDefault(require("../sutras/routing.js"));
 var _block = _interopRequireDefault(require("./sutras/block.js"));
 var _demon = _interopRequireDefault(require("../../mantra-sutras/demon.js"));
-var _hexapod = _interopRequireDefault(require("../../mantra-sutras/hexapod.js"));
 var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 var _bomb = _interopRequireDefault(require("../../mantra-sutras/bomb.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -4414,6 +4408,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 // routing helper to create vector routes
 
 // import fire from "../../mantra-sutras/fire.js";
+
+// import hexapod from '../../mantra-sutras/hexapod.js';
 
 function sutras(game) {
   var rules = game.createSutra();
@@ -4455,7 +4451,7 @@ function sutras(game) {
   rules.use((0, _demon["default"])(game), 'demon');
 
   // hexapod entity
-  rules.use((0, _hexapod["default"])(game), 'hexapod');
+  // rules.use(hexapod(game), 'hexapod');
 
   // bomb item
   rules.use((0, _bomb["default"])(game), 'bomb');
@@ -4464,7 +4460,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/hexapod.js":24,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":54,"../sutras/routing.js":60,"../sutras/switchGraphics.js":61,"./sutras/block.js":33}],33:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":54,"../sutras/routing.js":60,"../sutras/switchGraphics.js":61,"./sutras/block.js":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
