@@ -75,6 +75,12 @@ export default function updateEntity(entityDataOrId, entityData) {
     // this.game.components.radius.set(entityId, entityData.radius);
   }
 
+  // size is new API, remove root level height, width, radius
+  if (entityData.size) {
+    updateSize = true;
+    this.game.components.size.set(entityId, entityData.size);
+  }
+
   /*
   if (entityData.body === false) {
     // alert("remove body");

@@ -27,8 +27,18 @@ export default class Droppable {
     };
     */
 
-    entityData.pointerdown = function (context, event) {
+    entityData.pointerout = function (context, event) {
+      // remove the border from context
+      if (context && context.dropTarget) {
+        game.updateEntity(context.dropTarget.id, {
+          style: {
+            border: 'none'
+          }
+        })
+      }
+    }
 
+    entityData.pointerdown = function (context, event) {
       // fix the context ( entity ) to the pointer
       game.updateEntity(context.id, {
         update: function (entity) {
@@ -74,7 +84,6 @@ export default class Droppable {
   
         // console.log('selectedDropTarget', ent)
         context.dropTarget = ent;
-        // ent.onDrop(context, event);
       }
     }
   
@@ -90,20 +99,12 @@ export default class Droppable {
   
       if (context.dropTarget) {
         let ent = game.data.ents._[context.dropTarget.id]
-  
-        // TODO: add highlight to selectedDropTarget
-        game.updateEntity(ent.id, {
-          style: {
-            border: '2px solid red'
-          }
-        })
-  
-        // console.log('selectedDropTarget', ent)
-        ent.onDrop(context, event);
+        if (typeof ent.onDrop === 'function') {
+          ent.onDrop(context, event);
+        }
       }
   
     }
-
 
     return {
       ...entityData,
@@ -111,93 +112,3 @@ export default class Droppable {
     };
   }
 }
-
-
-/*
-
-
-take this working code and refactor it to confirm to plugin structure for ECS
-assume all events you need will work as expected
-
-droppable.pointerdown(function (context, event) {
-
-    // fix the context ( entity ) to the pointer
-    game.updateEntity(context.id, {
-      update: function (entity) {
-        // console.log('sup dating', game.data.mouse.position)
-        //entity.position.x = event.x;
-        //entity.position.y = event.y;
-        game.updateEntity(entity.id, {
-          position: game.data.mouse.worldPosition
-        });
-      }
-    })
-  });
-
-  droppable.onDrop(function (context, event) {
-    console.log('ddd', context.dropTarget);
-  })
-
-  droppable.pointermove(function (context, event) {
-    // console.log("droppable.pointermove", context.size, context.position);
-
-    // perform rbush search for context.position + range of context.size with small buffer
-    let entsInFov = game.getPlayerFieldOfView(context, context.size.width, true);
-
-    let selectedDropTarget = null;
-    // go through all the entsInFov, pick the first which id is *not* context.id
-    // and has a onDrop function
-    // console.log(entsInFov)
-    for (let i = 0; i < entsInFov.length; i++) {
-      let ent = game.data.ents._[entsInFov[i].id]
-      // console.log(ent)
-      if (ent.id !== context.id && ent.onDrop && typeof ent.onDrop === 'function') {
-        selectedDropTarget = ent;
-        break;
-      }
-    }
-
-    if (selectedDropTarget) {
-      let ent = game.data.ents._[selectedDropTarget.id]
-      context.dropTarget = ent;
-
-      // TODO: add highlight to selectedDropTarget
-      game.updateEntity(ent.id, {
-        style: {
-          border: '2px solid red'
-        }
-      })
-
-      // console.log('selectedDropTarget', ent)
-      context.dropTarget = ent;
-      // ent.onDrop(context, event);
-    }
-  });
-
-
-  droppable.pointerup(function (context, event) {
-    // release the context ( entity ) from the pointer by clearing the update
-    // TODO: this will remove all updates, we'll need to manage the wrapped fn.events array here
-    //       it is already possible with current architecture, just need to implement it
-    game.updateEntity(context.id, {
-      update: null
-    });
-
-
-    if (context.dropTarget) {
-      let ent = game.data.ents._[context.dropTarget.id]
-
-      // TODO: add highlight to selectedDropTarget
-      game.updateEntity(ent.id, {
-        style: {
-          border: '2px solid red'
-        }
-      })
-
-      // console.log('selectedDropTarget', ent)
-      ent.onDrop(context, event);
-    }
-
-  });
-
-*/

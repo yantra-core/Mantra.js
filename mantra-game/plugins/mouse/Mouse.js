@@ -80,11 +80,9 @@ export default class Mouse {
 
     // Convert screen coordinates to world coordinates
     let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
-
     // apply offset
     worldX = worldX - game.data.camera.offsetX / game.data.camera.currentZoom;
     let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
-
     // apply offset
     // worldY = worldY - game.data.camera.offsetY / game.data.camera.currentZoom;
 
@@ -97,7 +95,7 @@ export default class Mouse {
         ent.pointermove(ent, event);
       }
     }
-    
+
     this.game.emit('pointerMove', { x: worldX, y: worldY }, event)
 
   }
@@ -219,6 +217,25 @@ export default class Mouse {
   }
 
   handleMouseOut(event) {
+    // TODO: refactor all mouse event handling into common function that can
+    // create the world position and other context data we need to pass forward to ECS
+    let target = event.target;
+    let game = this.game;
+    if (target && target.getAttribute) {
+      let mantraId = target.getAttribute('mantra-id');
+      if (mantraId) {
+        this.game.selectedEntityId = mantraId;
+        if (this.game.data && this.game.data.ents) {
+          // get the reference to this ent, check for pointerout event
+          const ent = this.game.data.ents._[mantraId];
+          if (ent && ent.pointerout) {
+            let context = ent;
+            ent.pointerout(ent, event);
+          }
+
+        }
+      }
+    }
     this.game.emit('pointerOut', event)
   }
 
