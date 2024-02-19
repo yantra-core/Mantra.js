@@ -5,6 +5,7 @@ import inflateEntity from './lib/inflateEntity.js';
 import removeEntity from './lib/removeEntity.js';
 import updateEntity from './lib/updateEntity.js';
 import layoutEntity from './lib/layoutEntity.js';
+import removeAllEntities from './lib/removeAllEntities.js';
 
 class Entity {
 
@@ -38,7 +39,8 @@ class Entity {
     this.game.inflateEntity = inflateEntity.bind(this);
     this.game.hasEntity = this.hasEntity.bind(this);
     this.game.findEntity = this.findEntity.bind(this);
-    this.game.removeAllEntities = this.removeAllEntities.bind(this);
+    this.game.removeAllEntities = removeAllEntities.bind(this);
+    this.removeAllEntities = removeAllEntities.bind(this);
     this.layoutEntity = layoutEntity.bind(this);
   }
 
@@ -150,38 +152,6 @@ class Entity {
           console.log('Error: No such component or invalid value for', key);
         }
       }
-    }
-  }
-
-  removeAllEntities(options) {
-
-    // curry arguments, legacy API
-    let clearCurrentPlayer = false;
-    let excludeByName = [];
-    if (typeof options === 'boolean') {
-      clearCurrentPlayer = options;
-    }
-
-    if (typeof options === 'object' && Array.isArray(options.excludeByName)) {
-      excludeByName = options.excludeByName;
-    }
-
-    this.game.entities.forEach(ent => {
-      // Do not remove the current player if clearCurrentPlayer is false
-      if (ent.id === this.game.currentPlayerId && !clearCurrentPlayer) {
-        return;
-      }
-      // Do not remove entities that are excluded by name
-      if (excludeByName.includes(ent.name)) {
-        return;
-      }
-      if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
-        ent.yCraft.part.unload();
-      }
-      this.game.removeEntity(ent.id);
-    });
-    if (clearCurrentPlayer) {
-      this.game.currentPlayerId = null;
     }
   }
 

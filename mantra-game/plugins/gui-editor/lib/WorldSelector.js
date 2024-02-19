@@ -31,7 +31,10 @@ class WorldSelector {
     // this.addOption(selectBox, 'Maze World', 'Maze');
 
     this.addOption(selectBox, 'Platform World', 'Platform');
+    this.addOption(selectBox, 'Maze World', 'Maze');
     this.addOption(selectBox, 'Music World', 'Music');
+    this.addOption(selectBox, 'Mantra Gallery', 'Gallery');
+
     this.addOption(selectBox, 'Gravity Gardens', 'GravityGardens');
 
     // this.addOption(selectBox, 'Space World', 'Platform');
@@ -42,7 +45,6 @@ class WorldSelector {
 
 
     this.addOption(selectBox, 'YCraft World', 'YCraft');
-    this.addOption(selectBox, 'Sutra World', 'Sutra');
     // this.addOption(selectBox, 'XState World', 'XState');
 
     // this.addOption(selectBox, 'Experimental 3D Space Flight', 'Space');
