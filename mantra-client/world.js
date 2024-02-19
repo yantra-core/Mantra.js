@@ -60,6 +60,7 @@ home = new worlds.Home();
 game.use(new Lifetime());
 game.start(function () {
   game.reset();
+  /*
   game.use(new Teleporter());
   //game.use(new plugins.Hexapod())
   game.use(new plugins.Block())
@@ -68,9 +69,10 @@ game.start(function () {
   game.use(new plugins.Player())
   game.use(new plugins.Teleporter())
   game.use(new plugins.Boomerang())
-  //game.use(new GravityGardens())
+  */
+  game.use(new GravityGardens())
 
-   game.use(home);
+  //game.use(home);
 
 /*
   let config = game.build().Player();

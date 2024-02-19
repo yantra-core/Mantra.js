@@ -3402,12 +3402,12 @@ var GravityGardens = /*#__PURE__*/function () {
       }).texture('warp-to-home').size(64, 64, 64).isStatic(true)
       //.isSensor(true)
       .position(595, -30, 0).createEntity();
-      game.build().type('TEXT').text('Warp To Mantra').style({
+      game.build().type('TEXT').text('Warp To Mantra').width(200).style({
         padding: '2px',
         fontSize: '16px',
         color: '#ffffff',
         textAlign: 'center'
-      }).position(595, -60, 0).createEntity();
+      }).position(590, 30, 0).createEntity();
     }
   }, {
     key: "bindSutraRules",

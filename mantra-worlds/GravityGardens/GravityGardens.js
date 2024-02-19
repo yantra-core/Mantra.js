@@ -16,11 +16,14 @@ class GravityGardens {
     game.use('GravityWell');
     game.use('UnitSpawner');
     game.use('Teleporter');
-    game.use('Sutra');
   }
 
   init(game) {
     this.game = game;
+
+    // we reset the game to clear any previous state
+    game.reset();
+
     this.createWorld();
     this.createFounts(game);
     this.bindEvents();
@@ -33,8 +36,6 @@ class GravityGardens {
   createWorld() {
     let game = this.game;
 
-    // we reset the game to clear any previous state
-    game.reset();
 
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
@@ -90,8 +91,9 @@ class GravityGardens {
     game.build()
       .type('TEXT')
       .text('Warp To Mantra')
+      .width(200)
       .style({ padding: '2px', fontSize: '16px', color: '#ffffff', textAlign: 'center' })
-      .position(595, -60, 0)
+      .position(590, 30, 0)
       .createEntity();
 
   }
@@ -292,7 +294,7 @@ class GravityGardens {
       let y = window.innerHeight / 2;
       x = x - game.data.camera.offsetX;
       y = y - game.data.camera.offsetY;
-      if (entity.meta.repulsion) {
+      if (entity.meta && entity.meta.repulsion) {
         game.pingPosition(x, y, 1, { reverse: true, color: 'white', duration: 1500, size: 50, finalSize: 200, borderWidth: 3 });
         game.updateEntity({
           id: entity.id,
