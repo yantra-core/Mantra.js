@@ -115,7 +115,7 @@ export default function updateEntity(entityDataOrId, entityData) {
     // get the current component value
     let currentFn = this.game.components.update.get(entityId);
     let entRef = this.game.data.ents._[entityId];
-    if (entRef && Array.isArray(entRef.update.handlers)) {
+    if (entRef && entRef.update && Array.isArray(entRef.update.handlers)) {
       // push the new event
 
       if (entityData.update === null) {
