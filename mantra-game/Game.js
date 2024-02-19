@@ -388,6 +388,13 @@ class Game {
     let y = centerY + Math.random() * 2 * distance - distance; // Random y within distance from centerY
     return { x, y };
   }
+  
+  radialSpread(centerX, centerY, distance, count, index) {
+    let angle = (index / count) * 2 * Math.PI; // Evenly spaced angle
+    let x = centerX + distance * Math.cos(angle); // Convert polar to Cartesian coordinates
+    let y = centerY + distance * Math.sin(angle);
+    return { x, y };
+  }
 
   randomPositionRadial(centerX, centerY, distance, count) {
     let angle = Math.random() * 2 * Math.PI; // Random angle

@@ -1245,6 +1245,17 @@ var Game = exports.Game = /*#__PURE__*/function () {
       };
     }
   }, {
+    key: "radialSpread",
+    value: function radialSpread(centerX, centerY, distance, count, index) {
+      var angle = index / count * 2 * Math.PI; // Evenly spaced angle
+      var x = centerX + distance * Math.cos(angle); // Convert polar to Cartesian coordinates
+      var y = centerY + distance * Math.sin(angle);
+      return {
+        x: x,
+        y: y
+      };
+    }
+  }, {
     key: "randomPositionRadial",
     value: function randomPositionRadial(centerX, centerY, distance, count) {
       var angle = Math.random() * 2 * Math.PI; // Random angle

@@ -2,7 +2,6 @@ let game = new MANTRA.Game({
   defaultPlayer: true,
   defaultMovement: true,
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  gameRoot: 'http://192.168.1.80:7777',
   plugins: ['UnitSpawner', "Lifetime", 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang']
 });
 game.start(function () {

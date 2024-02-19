@@ -5,11 +5,8 @@ let game = new MANTRA.Game({
   defaultMovement: true,
   plugins: ['Teleporter', 'Text', 'Block', 'Gamepad', 'GamepadGUI'],
 });
-game.start(function(){
+game.start(function () {
   game.setZoom(3.5);
-
-
-  
 
   game.build().Text().text('Teleport to position').width(200).position(-80, -20, 0).createEntity();
   game.build()
@@ -33,7 +30,6 @@ game.start(function(){
 
   // block ref will contain the block.id
   let block = game.build().Block().name('a-block').position(0, 75).size(16).createEntity();
-
   // we can get ent by name later
   // let block = game.getEntityByName('a-block');
 
@@ -61,5 +57,4 @@ game.start(function(){
     })
     .position(100, 0, 0)
     .createEntity();
-
 });
