@@ -58,7 +58,7 @@ class Graphics {
     }
 
     game.flash = triggerItemPickupEffect;
-    game.anime = triggerAnimeTextEffect;
+    game.flashText = triggerAnimeTextEffect;
 
   }
 
@@ -132,7 +132,7 @@ function downloadCanvasAsImage(canvasElement, filename) {
 */
 
 function triggerItemPickupEffect() {
-  return;
+
   let effect = document.getElementById('itemPickupEffect');
 
   // Create the effect element if it doesn't exist
@@ -197,8 +197,6 @@ function triggerItemPickupEffect() {
   }, 2000); // Hide effect after 2 seconds
 }
 
-
-
 function triggerAnimeTextEffect(textMessage, options = {
   styles: {
     color: '#FF0', // Custom style overrides
@@ -212,7 +210,7 @@ function triggerAnimeTextEffect(textMessage, options = {
   ],
   totalDuration: 4000 // Total duration to keep the effect visible
 }) {
-  return;
+  // return;
   let textEffect = document.getElementById('animeTextEffect');
 
   // Create the text effect element if it doesn't exist

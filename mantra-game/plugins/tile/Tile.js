@@ -22,9 +22,10 @@ let exitConfig = {
     y: 0,
     z: 0
   },
+  // TODO: remove this in favor of collisionStart handler
   exitHandler: function (enterEnt, exitEnt) {
     let game = this;
-    console.log('exitHandler', game, enterEnt, exitEnt);
+    // console.log('exitHandler', game, enterEnt, exitEnt);
 
     // default behavior is to clear all tiles
     // clear all current tiles
@@ -64,7 +65,6 @@ let exitConfig = {
     };
     */
 
-
     // set the new seed
     game.systems.tile.tileMap.seed = seed;
 
@@ -85,8 +85,6 @@ const defaultTileSet = [
   ENTER: 5,
   EXIT: 6
   */
-
-
 
   // void
   { id: 0, kind: 'empty' },
@@ -119,6 +117,12 @@ class Tile {
 
     this.id = Tile.id;
     this.labyrinthos = labyrinthos;
+    this.TileMap = labyrinthos.TileMap;
+    this.TileSet = labyrinthos.TileSet;
+    this.Biome = labyrinthos.Biome;
+    this.terrains = labyrinthos.terrains;
+    this.mazes = labyrinthos.mazes;
+    this.shapes = labyrinthos.shapes;
     // in debug mode we will add colors to each chunk
     this.debug = false;
 
@@ -195,6 +199,12 @@ class Tile {
   init(game) {
     this.game = game;
     this.game.addSystem('tile', this);
+    this.game.TileMap = this.TileMap;
+    this.game.TileSet = this.TileSet;
+    this.game.Biome = this.Biome;
+    this.game.terrains = this.terrains;
+    this.game.mazes = this.mazes;
+    // this.game.shapes = this.shapes;
 
     if (this.loadInitialChunk) {
       if (this.tiledServer) {

@@ -44,6 +44,9 @@ class Platform {
         sheet: 'blackMage',
         sprite: 'playerRight',
       },
+      meta: {
+        lives: 99
+      },
       position: {
         x: 10,
         y: -100

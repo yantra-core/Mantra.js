@@ -105,7 +105,7 @@ export default function createDoors(game) {
         }
 
         game.flash();
-        game.anime(algos[i]);
+        game.flashText(algos[i]);
 
         // clear all current tiles
         if (game.data.ents.TILE) {

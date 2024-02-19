@@ -62,8 +62,6 @@ export default class Player {
             lives: entity.meta.lives - 1,
           }));
           game.setPlayerId(respawnedPlayer.id);
-        } else {
-          game.anime('GAME OVER PAL!');
         }
       },
       mass: 222,

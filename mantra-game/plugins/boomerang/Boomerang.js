@@ -65,6 +65,9 @@ class Boomerang {
   update() {
     // TODO: we can perform this check less frequently
     // Iterate through all boomerang entities in the game data
+    // Remark: We need to remove this pattern of O(n) in each item
+    // We should have a single O(n) loop to process all entities that is hooked in systems
+    // LOOP1
     if (this.game.data.ents && this.game.data.ents.BOOMERANG) {
       for (let eId in this.game.data.ents.BOOMERANG) {
         let boomerang = this.game.data.ents.BOOMERANG[eId];
