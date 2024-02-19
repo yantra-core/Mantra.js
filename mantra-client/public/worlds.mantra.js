@@ -3741,7 +3741,8 @@ var Home = /*#__PURE__*/function () {
               game.use('Player');
               game.use('Tone');
               game.use('Hexapod');
-            case 17:
+              game.use('Teleporter');
+            case 18:
             case "end":
               return _context.stop();
           }
