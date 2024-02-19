@@ -9,6 +9,11 @@ export default class EntityBuilder {
         y: 0,
         z: 0
       },
+      size: {
+        width: 16,
+        height: 16,
+        depth: 16
+      },
       offset: {
         x: 0,
         y: 0,
@@ -118,6 +123,21 @@ export default class EntityBuilder {
     return this;
   }
 
+  width(value) {
+    this.config.size.width = value;
+    return this;
+  }
+
+  height(value) {
+    this.config.size.height = value;
+    return this;
+  }
+
+  depth(value) {
+    this.config.size.depth = value;
+    return this;
+  }
+  
   radius(value) {
     this.config.radius = value;
     return this;
