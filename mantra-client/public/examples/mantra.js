@@ -1480,7 +1480,7 @@ var SystemsManager = /*#__PURE__*/function () {
       var _this = this;
       if (this.systems.has(systemId)) {
         // throw new Error(`System with name ${systemId} already exists!`);
-        console.log("Warning: System with name ".concat(systemId, " already exists!"));
+        console.log("Loading ".concat(systemId, " from memory..."));
         return;
       }
 
@@ -2550,21 +2550,22 @@ function use(game) {
                 }
               }, _callee, null, [[0, 15, 22, 25]]);
             }))();
-            _context2.next = 25;
+            _context2.next = 26;
             break;
           case 20:
+            game.loadingPluginsCount++;
             if (pluginInstanceOrId.id) {
-              _context2.next = 23;
+              _context2.next = 24;
               break;
             }
             console.log('Error with pluginInstance', pluginInstanceOrId);
             throw new Error('All plugins must have a static id property');
-          case 23:
-            _context2.next = 25;
+          case 24:
+            _context2.next = 26;
             return handlePluginInstance(game, pluginInstanceOrId, pluginInstanceOrId.id, options, cb);
-          case 25:
-            return _context2.abrupt("return", game);
           case 26:
+            return _context2.abrupt("return", game);
+          case 27:
           case "end":
             return _context2.stop();
         }
@@ -2601,7 +2602,6 @@ function _handlePluginInstance() {
         case 8:
           pluginInstance.init(game, game.engine, game.scene);
           game._plugins[pluginId] = pluginInstance;
-          game.loadingPluginsCount--;
           delete game._plugins[pluginId];
           game.emit("plugin::loaded::".concat(pluginId), pluginInstance);
           game.emit('plugin::loaded', pluginId);
@@ -2611,14 +2611,17 @@ function _handlePluginInstance() {
             game.systemsManager.addSystem(pluginId, pluginInstance);
             game.emit("world::loaded::".concat(pluginInstance.id), pluginInstance);
             game.emit('world::loaded', pluginInstance);
+            console.log('Loaded World:', pluginInstance.id);
           }
           if (pluginInstance.constructor.type === 'scene') {
             game.data.scenes = game.data.scenes || {};
             game.data.scenes[pluginId] = pluginInstance;
             game.systemsManager.addSystem(pluginId, pluginInstance);
+            console.log('Loaded Scene:', pluginInstance.id);
           }
           game.data.plugins = game.data.plugins || {};
           game.data.plugins[pluginId] = options;
+          game.loadingPluginsCount--;
         case 19:
         case "end":
           return _context3.stop();
@@ -3502,7 +3505,8 @@ function _switchWorlds() {
           game.updateEntity(game.currentPlayerId, {
             meta: {
               lives: 0
-            }
+            },
+            sutra: null
           });
           game.systems.entity.removeAllEntities(true);
           worldName = 'XState';

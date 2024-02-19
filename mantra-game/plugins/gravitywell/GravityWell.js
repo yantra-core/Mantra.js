@@ -19,12 +19,16 @@ export default class GravityWell {
     }
     let rules = this.sutra();
 
-    let meta = entityData.meta || {
-      repulsion: false
-    };
+    entityData.meta = entityData.meta || {};
 
-    if (typeof entityData.repulsion == 'boolean') {
-      meta.repulsion = entityData.repulsion;
+    // supports repulsion as main prop, passed to meta
+    if (typeof entityData.meta.repulsion === 'undefined') {
+      entityData.meta.repulsion = false;
+    } else {
+      entityData.meta.repulsion = entityData.repulsion;
+    }
+    if (typeof entityData.repulsion !== 'undefined') {
+      entityData.meta.repulsion = entityData.repulsion;
     }
     return {
       type: 'BLACK_HOLE',
@@ -33,7 +37,7 @@ export default class GravityWell {
         x: entityData.position.x,
         y: entityData.position.y
       },
-      meta: meta,
+      meta: entityData.meta,
       // runs every tick, recommended to keep this light and use this.game % 5 === 0 for heavier operations, etc
       // update: function () {},
       mass: 100,
@@ -64,7 +68,7 @@ export default class GravityWell {
         let entity = gameState.ents._[eId];
         if (entity.id !== entityData.id && !entity.destroyed) {
           let gravityWell = gameState.ents._[entityData.id];
-          if (gravityWell) {
+          if (gravityWell && gravityWell.meta) {
             this.game.applyGravity(gravityWell, entity, this.GRAVITATIONAL_CONSTANT, gravityWell.meta.repulsion);
           }
         }

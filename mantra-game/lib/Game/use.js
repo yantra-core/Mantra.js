@@ -1,7 +1,9 @@
 export default function use(game) {
-  return async function use(pluginInstanceOrId, options = {}, cb = () => { }) {
+  return async function use(pluginInstanceOrId, options = {}, cb = () => {}) {
     let basePath = '/plugins/'; // Base path for loading plugins
     basePath = game.scriptRoot + basePath;
+
+
 
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
@@ -49,6 +51,7 @@ export default function use(game) {
       })();
 
     } else {
+      game.loadingPluginsCount++;
       if (!pluginInstanceOrId.id) {
         console.log('Error with pluginInstance', pluginInstanceOrId);
         throw new Error('All plugins must have a static id property');
@@ -81,7 +84,6 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
 
   pluginInstance.init(game, game.engine, game.scene);
   game._plugins[pluginId] = pluginInstance;
-  game.loadingPluginsCount--;
   delete game._plugins[pluginId];
 
   game.emit(`plugin::loaded::${pluginId}`, pluginInstance);
@@ -93,16 +95,20 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
     game.systemsManager.addSystem(pluginId, pluginInstance);
     game.emit(`world::loaded::${pluginInstance.id}`, pluginInstance);
     game.emit('world::loaded', pluginInstance);
+    console.log('Loaded World:', pluginInstance.id);
   }
 
   if (pluginInstance.constructor.type === 'scene') {
     game.data.scenes = game.data.scenes || {};
     game.data.scenes[pluginId] = pluginInstance;
     game.systemsManager.addSystem(pluginId, pluginInstance);
+    console.log('Loaded Scene:', pluginInstance.id);
   }
 
   game.data.plugins = game.data.plugins || {};
   game.data.plugins[pluginId] = options;
+  game.loadingPluginsCount--;
+
 }
 
 function pluginGameSceneMethods(game, pluginInstance) {

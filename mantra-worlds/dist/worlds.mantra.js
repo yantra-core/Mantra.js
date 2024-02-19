@@ -3332,8 +3332,7 @@ var GravityGardens = /*#__PURE__*/function () {
               game.use('GravityWell');
               game.use('UnitSpawner');
               game.use('Teleporter');
-              game.use('Sutra');
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -3348,6 +3347,9 @@ var GravityGardens = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+
+      // we reset the game to clear any previous state
+      game.reset();
       this.createWorld();
       this.createFounts(game);
       this.bindEvents();
@@ -3360,9 +3362,6 @@ var GravityGardens = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
-
-      // we reset the game to clear any previous state
-      game.reset();
       game.setGravity(0, 0, 0);
       game.setSize(800, 600);
       game.createBorder({
@@ -3597,7 +3596,7 @@ var GravityGardens = /*#__PURE__*/function () {
         var y = window.innerHeight / 2;
         x = x - game.data.camera.offsetX;
         y = y - game.data.camera.offsetY;
-        if (entity.meta.repulsion) {
+        if (entity.meta && entity.meta.repulsion) {
           game.pingPosition(x, y, 1, {
             reverse: true,
             color: 'white',

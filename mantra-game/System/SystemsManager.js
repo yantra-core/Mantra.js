@@ -10,7 +10,7 @@ class SystemsManager {
   addSystem(systemId, system) {
     if (this.systems.has(systemId)) {
       // throw new Error(`System with name ${systemId} already exists!`);
-      console.log(`Warning: System with name ${systemId} already exists!`);
+      console.log(`Loading ${systemId} from memory...`);
       return;
     }
 

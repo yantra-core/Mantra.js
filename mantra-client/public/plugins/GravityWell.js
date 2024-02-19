@@ -37,11 +37,16 @@ var GravityWell = exports["default"] = /*#__PURE__*/function () {
         };
       }
       var rules = this.sutra();
-      var meta = entityData.meta || {
-        repulsion: false
-      };
-      if (typeof entityData.repulsion == 'boolean') {
-        meta.repulsion = entityData.repulsion;
+      entityData.meta = entityData.meta || {};
+
+      // supports repulsion as main prop, passed to meta
+      if (typeof entityData.meta.repulsion === 'undefined') {
+        entityData.meta.repulsion = false;
+      } else {
+        entityData.meta.repulsion = entityData.repulsion;
+      }
+      if (typeof entityData.repulsion !== 'undefined') {
+        entityData.meta.repulsion = entityData.repulsion;
       }
       return {
         type: 'BLACK_HOLE',
@@ -50,7 +55,7 @@ var GravityWell = exports["default"] = /*#__PURE__*/function () {
           x: entityData.position.x,
           y: entityData.position.y
         },
-        meta: meta,
+        meta: entityData.meta,
         // runs every tick, recommended to keep this light and use this.game % 5 === 0 for heavier operations, etc
         // update: function () {},
         mass: 100,
@@ -86,7 +91,7 @@ var GravityWell = exports["default"] = /*#__PURE__*/function () {
           var entity = gameState.ents._[eId];
           if (entity.id !== entityData.id && !entity.destroyed) {
             var gravityWell = gameState.ents._[entityData.id];
-            if (gravityWell) {
+            if (gravityWell && gravityWell.meta) {
               _this.game.applyGravity(gravityWell, entity, _this.GRAVITATIONAL_CONSTANT, gravityWell.meta.repulsion);
             }
           }

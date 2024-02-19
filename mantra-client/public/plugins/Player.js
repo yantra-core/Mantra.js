@@ -74,7 +74,7 @@ var Player = exports["default"] = /*#__PURE__*/function () {
         texture: playerConfig.texture,
         afterRemoveEntity: function afterRemoveEntity(entity) {
           // check to see if has any lives left
-          if (entity.teleported !== true, entity.meta && typeof entity.meta.lives === 'number' && entity.meta.lives > 0) {
+          if (entity.meta && typeof entity.meta.lives === 'number' && entity.meta.lives > 0) {
             // creates the same player again with the same config
             // TODO: better merging of player config, copy some of "entity" and some of "playerConfig"
             var respawnedPlayer = game.createEntity(that.build({

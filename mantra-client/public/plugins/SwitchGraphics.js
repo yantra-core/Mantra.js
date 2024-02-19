@@ -60,7 +60,7 @@ var SwitchGraphics = /*#__PURE__*/function () {
   }, {
     key: "lookupGraphicsPlugin",
     value: function lookupGraphicsPlugin(graphicsMode) {
-      return graphicsMode === '2D' ? 'css' : 'three';
+      return graphicsMode === '2D' ? 'css' : 'babylon'; // TODO: three
     }
   }, {
     key: "nextMode",

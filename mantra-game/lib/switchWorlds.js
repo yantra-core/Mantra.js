@@ -19,9 +19,10 @@ export default async function switchWorlds (selectedWorld) {
   // since switching levels may result in a new player entity
   // this may or may not be the case, we'll have to see
   // remote player.meta.lives so player won't respawn
-  game.updateEntity(game.currentPlayerId, { meta: { lives: 0 } });
+  game.updateEntity(game.currentPlayerId, { meta: { lives: 0 }, sutra: null });
 
   game.systems.entity.removeAllEntities(true);
+
   let worldName = 'XState';
   worldName = 'Sutra';
   worldName = selectedWorld;
