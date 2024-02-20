@@ -25,6 +25,12 @@ export default class EntityBuilder {
     };
   }
 
+  // Remark: id is not used when creating entities, it's used for building configs
+  id(value) {
+    this.config.id = value;
+    return this;
+  }
+
   // Basic properties
   type(value) {
     this.config.type = value;
@@ -266,6 +272,10 @@ export default class EntityBuilder {
     return this._addEventHandler('afterRemoveEntity', handler);
   }
 
+  afterCreateEntity(handler) {
+    return this._addEventHandler('afterCreateEntity', handler);
+  }
+
   sutra(rules, config) {
     // TODO: This will overwrite Sutras as chain progresses left-to-right,
     // leaving only the last Sutra as active
@@ -345,6 +355,7 @@ export default class EntityBuilder {
   }
 
   createEntity() {
+
     if (typeof this.config.clone === 'number') {
       let entities = [];
       for (let i = 0; i < this.config.clone; i++) {

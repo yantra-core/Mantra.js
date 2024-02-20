@@ -1,7 +1,7 @@
 //
 // createLayer.js - Will process the entire TileMap.data array and create the tiles for the layer
 //
-export default function  createLayer(layer, tileWidth, tileHeight) {
+export default function createLayer(layer, tileWidth, tileHeight) {
   // Check if the layer.data is a 3D array
   if (typeof layer.data[0] === 'object') {
     // 3D data handling

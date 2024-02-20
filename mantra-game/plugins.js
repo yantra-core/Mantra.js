@@ -76,6 +76,9 @@ import Player from './plugins/player/Player.js';
 import Sword from './plugins/sword/Sword.js';
 import Teleporter from './plugins/teleporter/Teleporter.js';
 import Tile from './plugins/tile/Tile.js';
+import TileMap from './plugins/tilemap/TileMap.js';
+import TileSet from './plugins/tileset/TileSet.js';
+
 import Tower from './plugins/tower/Tower.js';
 import UnitSpawner from './plugins/unit-spawner/UnitSpawner.js';
 
@@ -136,6 +139,8 @@ const plugins = {
   Player,
   Hexapod,
   Tile,
+  TileMap,
+  TileSet,
   Teleporter,
   Tower,
   Key,

@@ -1,3 +1,11 @@
+//
+// Remark: 2/19/2024 - This iteration of Tile.js is being replaced with `TileMap.js`
+//
+// there are several concerns handled in this file that are better handled in TileMap.js
+// and there are other concerns that are better handled in a new file called TileSet.js
+// additional concerns are better handled tiled-server chunking
+// additional concerns are better handled in LABYRINTHOS.js
+
 import labyrinthos from 'labyrinthos';
 // import labyrinthos from '../../../../Labyrinthos.js/lib/labyrinthos.js';
 
@@ -16,6 +24,7 @@ import createTileMapFromTiledJSON from './lib/createTileMapFromTiledJSON.js';
 import createLayer from './lib/createLayer.js';
 import processTile from './lib/processTile.js';
 
+// TODO: Removing exitConfig entire in favor of composing Teleporter() class, can remove *all* exitConfig references
 let exitConfig = {
   position: {
     x: 0,

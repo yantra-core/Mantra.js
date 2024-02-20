@@ -53,11 +53,11 @@ export default function layoutEntity(container, entityId) {
       offsetY = -containerEnt.size.height / 2;
     }
 
-
     // Calculate the entity's new position relative to the container's position
+    // Remark: is - containerEnt.size.width / 2 adjustment required? 
     let newPosition = {
-      x: containerPosition.x + offsetX,
-      y: containerPosition.y + offsetY,
+      x: containerPosition.x + offsetX + entity.position.x - containerEnt.size.width / 2,
+      y: containerPosition.y + offsetY + entity.position.y - containerEnt.size.height / 2,
       z: containerPosition.z // Assuming z-index remains constant or is managed elsewhere
     };
 
@@ -65,7 +65,7 @@ export default function layoutEntity(container, entityId) {
     this.game.updateEntity({ id: entityId, position: newPosition });
 
     // Log for debugging purposes
-    console.log(`Entity ${entityId} positioned at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) relative to container`);
+    // console.log(`Entity ${entityId} positioned at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) relative to container`);
   }
 
   //

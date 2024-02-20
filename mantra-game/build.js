@@ -14,6 +14,8 @@ const plugins = [
   './plugins/hexapod/Hexapod.js',
   './plugins/key/Key.js',
   './plugins/tile/Tile.js',
+  './plugins/tilemap/TileMap.js',
+  './plugins/tileset/TileSet.js',
   './plugins/platform/Platform.js',
   './plugins/player/Player.js',
   './plugins/gravitywell/GravityWell.js',

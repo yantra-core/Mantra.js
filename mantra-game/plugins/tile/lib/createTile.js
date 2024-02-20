@@ -1,5 +1,5 @@
 export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, tileDepth, color, customZ = true) {
-
+  let layer = tile.layer || {}; // for now
   let tileId = tile.id;
 
   if (tile.kind === 'empty') {
@@ -72,6 +72,7 @@ export default function createTile(tile, x, y, z = 0, tileWidth, tileHeight, til
     name: tile.name || tile.kind,
     kind: tile.kind,
     body: body,
+    container: layer.container,
     mass,
     // Remark: By default we will disable all collision events for Tiles
     //         This is done universally for performance reasons

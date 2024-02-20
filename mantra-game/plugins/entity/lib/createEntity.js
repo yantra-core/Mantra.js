@@ -94,6 +94,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       onDrop: null,
 
       afterRemoveEntity: null,
+      afterCreateEntity: null,
       update: null,
       exit: null,
       ctick: this.game.tick
@@ -159,7 +160,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, update, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, update, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -226,6 +227,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'texture', texture);
 
   this.game.addComponent(entityId, 'afterRemoveEntity', afterRemoveEntity);
+  this.game.addComponent(entityId, 'afterCreateEntity', afterRemoveEntity);
+
 
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
@@ -349,6 +352,21 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
 
+
+  //
+  // Entity Lifecycle afterCreateEntity
+  //
+  let _afterCreateEntity;
+  if (typeof config.afterCreateEntity === 'function') {
+    _afterCreateEntity = config.afterCreateEntity;
+  }
+  if (_afterCreateEntity) {
+    _afterCreateEntity(config);
+  }
+
+  //
+  //
+  // Game Lifecycle after.createEntity
   updatedEntity = this.game.lifecycle.triggerHook('after.createEntity', config);
 
   return updatedEntity;
