@@ -20,6 +20,8 @@ export default class EntityBuilder {
         y: 0,
         z: 0
       },
+      meta: {}
+
     };
   }
 
@@ -279,8 +281,15 @@ export default class EntityBuilder {
   }
 
   // Meta and Data
-  meta(value) { // TODO: meta should be able to merge with existing meta if required
-    this.config.meta = value;
+  meta(value) {
+    if (typeof value === 'object' && value !== null) {
+      if (typeof this.config.meta === 'object' && this.config.meta !== null) {
+        console.log("MERGING THE IDEA", value)
+        this.config.meta = { ...this.config.meta, ...value };
+      } else {
+        this.config.meta = value;
+      }
+    }
     return this;
   }
 

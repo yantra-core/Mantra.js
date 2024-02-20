@@ -244,6 +244,63 @@ let defaultAssets = {
         ]
       },
 
+      arrowA: {
+        frames: [
+          { x: 0, y: -494 }
+        ]
+      },
+
+      arrowB: {
+        frames: [
+          { x: -32, y: -494 }
+        ]
+      },
+
+      arrowC: {
+        frames: [
+          { x: -48, y: -494 }
+        ]
+      },
+
+      arrowD: {
+        frames: [
+          { x: 0, y: -480 }
+        ]
+      },
+
+      arrowE: {
+        frames: [
+          { x: -16, y: -480 }
+        ]
+      },
+
+      arrowF: {
+        frames: [
+          { x: -32, y: -480 }
+        ]
+      },
+
+      arrowG: {
+        frames: [
+          { x: -48, y: -480 }
+        ]
+      },
+
+      arrowH: {
+        frames: [
+          { x: -160, y: -496 }
+        ]
+      },
+
+      arrowI: {
+        frames: [
+          { x: -16, y: -494 }
+        ]
+      },
+
+
+
+
       iceArrow: {
         frames: [
           { x: -160, y: -496 }

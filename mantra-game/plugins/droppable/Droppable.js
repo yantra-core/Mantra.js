@@ -15,8 +15,6 @@ export default class Droppable {
     // Ensure `meta` exists and initialize shield properties
     const meta = entityData.meta || {};
 
-    entityData.position = entityData.position || { x: 0, y: 0, z: 0 };
-
     /*
     entityData.onDrop = function(context, event){
       if (typeof entityData.onDrop === 'function') {
@@ -26,6 +24,8 @@ export default class Droppable {
       }
     };
     */
+
+    entityData.isSensor = true;
 
     entityData.pointerout = function (context, event) {
       // remove the border from context

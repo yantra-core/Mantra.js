@@ -117,23 +117,23 @@ export default function updateEntity(entityDataOrId, entityData) {
   //
   // Event handlers / Lifecycle Events
   //
+
   if (typeof entityData.update !== 'undefined') {
     // get the current component value
     let currentFn = this.game.components.update.get(entityId);
     let entRef = this.game.data.ents._[entityId];
-    if (entRef && entRef.update && Array.isArray(entRef.update.handlers)) {
-      // push the new event
-
-      if (entityData.update === null) {
-        // just remove the last handler
-        entRef.update.handlers.pop();
-      } else {
-        entRef.update.handlers.push(entityData.update);
-      }
-
+    if (entRef) {
+      // create a quick config to store the events, we'll want to convert entire function to use this
+      let updateConfig = this.game.build();
+      updateConfig.onUpdate(entityData.update);
+      // inherit the current update function, creates a tree of functions
+      // do we want to do this? what are the implications?
+      // updateConfig.onUpdate(entRef.update); 
+      this.game.components.update.set(entityId, updateConfig.config.update);
     }
   }
 
+  
   //
   // Meta properties
   //
@@ -216,3 +216,49 @@ export default function updateEntity(entityDataOrId, entityData) {
   return ent;
 
 }
+
+/* TODO: we need to iterate all events for composite updates
+   TODO: add unit tests for Entity.updateEntity({ eventName }) tests
+         be sure to check all cases
+         double check our usage of using null to pop fn from array
+         see about exact fn match for removal
+
+function updateEntityEvents(entityId, entityData) {
+  console.log("Updating Entity Events");
+
+  // List of known event names
+  const eventNames = [
+    'pointerdown', 'pointerup', 'pointermove', 'pointerover', 'pointerout',
+    'pointerenter', 'pointerleave', 'collisionStart', 'collisionActive',
+    'collisionEnd', 'onDrop', 'update', 'afterRemoveEntity'
+  ];
+
+  let entRef = this.game.data.ents._[entityId];
+  if (!entRef) {
+    console.log("Entity reference not found");
+    return;
+  }
+
+  eventNames.forEach(eventName => {
+    if (typeof entityData[eventName] !== 'undefined') {
+      console.log(`Processing ${eventName}`);
+
+      // Create a quick config to store the events
+      let eventConfig = this.game.build();
+
+      // Add the new event handler
+      eventConfig['_addEventHandler'](eventName, entityData[eventName]);
+
+      // Check if there are existing event handlers to preserve
+      let existingEventFn = this.game.components[eventName].get(entityId);
+      if (typeof existingEventFn === 'function' && Array.isArray(existingEventFn.handlers)) {
+        // Add each existing handler to the new configuration to preserve them
+        existingEventFn.handlers.forEach(handler => eventConfig['_addEventHandler'](eventName, handler));
+      }
+
+      // Set the updated configuration
+      this.game.components[eventName].set(entityId, eventConfig.config[eventName]);
+    }
+  });
+}
+*/

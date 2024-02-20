@@ -8,7 +8,7 @@ export default class InfinityTower {
   }
 
   preload(game) {
-    game.use('Tower');
+    //game.use('Tower');
     game.use('Hexapod');
     game.use('Block');
     // game.use('Border', { autoBorder: true });
@@ -47,19 +47,13 @@ export default class InfinityTower {
     });
 
     game.setBackground('#000000');
-
-
     //
     // Create initial Towers
     //
     //game.build().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
     //game.build().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
-
     //game.build().Tower().Draggable().color('yellow').position(0, 140).createEntity();
-    
     // let a = game.build().Tower().Draggable().color('yellow').position(-175, 140);
-
-
 
     function onDrop(context, event) {
       // update the position of the context entity to the dropTarget
@@ -98,8 +92,21 @@ export default class InfinityTower {
 
     // assume 24 color HSV wheel and generate all colors as int or hex whatever is easy
     for (let i = 0; i < 24; i++) {
-      let conf = game.build().Tower().Draggable().Droppable().onDrop(onDrop).position(-200 + i * 40, 0);
+      let conf = game.build().Tower({
+        fireRate: 100,
+        bulletConfig: {
+          texture: {
+            sheet: 'loz_spritesheet',
+            sprite: 'player',
+          },
+          velocity: {
+            x: 0,
+            y: 1
+          },
+        }
+      }).Draggable().Droppable().onDrop(onDrop).position(-200 + i * 40, 0);
       conf.isSensor(true);
+      console.log('conf', conf)
       // we need to generate color wheel here as int or hex
       //let color = ;
       let color = '#' + Math.floor(Math.random() * 16777215).toString(16);
