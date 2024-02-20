@@ -93,7 +93,6 @@ tap.test('EntityBuilder configuration', (t) => {
     t.end();
   });
 
-  // Continue with tests for behavior, capabilities, event handlers, etc.
   // Final test for event handlers
   t.test('Event handlers', (t) => {
     const handler1 = function() {}; // Define a handler function

@@ -128,7 +128,7 @@ export default function updateEntity(entityDataOrId, entityData) {
       updateConfig.onUpdate(entityData.update);
       // inherit the current update function, creates a tree of functions
       // do we want to do this? what are the implications?
-      // updateConfig.onUpdate(entRef.update); 
+      updateConfig.onUpdate(entRef.update); 
       this.game.components.update.set(entityId, updateConfig.config.update);
     }
   }
