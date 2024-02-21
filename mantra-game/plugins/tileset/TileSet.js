@@ -1,4 +1,3 @@
-// import Tile from '../tile/Tile.js'; // for now
 // TileSet.js - Marak Squires 2024
 export default class TileSet {
   static id = 'tileset';
@@ -21,11 +20,6 @@ export default class TileSet {
       entityData.position.z = 0;
     }
 
-    //let rules = this.sutra();
-
-    // set actual x y z values as string if not exist
-    // let coordinateKey = entityData.coordinateKey || entityData.position.x + ',' + entityData.position.y + ',' + entityData.position.z;
-
     const defaultTileSet = [
       /*
       VOID: 0,
@@ -47,9 +41,11 @@ export default class TileSet {
       { id: 6, kind: 'exit', texture: 'tile-exit', body: true, isStatic: true, isSensor: true }, // exit
     ];
 
+    let meta = entityData.meta || {};
+    meta.tileSet = meta.tileSet || entityData.tileSet || defaultTileSet;
     return {
       type: 'TILESET',
-      meta: entityData.tileSet || defaultTileSet,
+      meta: meta,
       name: entityData.name || 'No TileSet Name Set',
       position: entityData.position,
       data: entityData.data || [],

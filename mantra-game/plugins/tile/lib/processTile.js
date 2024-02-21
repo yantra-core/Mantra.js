@@ -7,22 +7,23 @@ export default function processTile(tileValue, index, layer, tileWidth, tileHeig
   let tile;
   let tileSet = this.tileSet;
 
-  if (layer.tileSet && Array.isArray(layer.tileSet) && layer.tileSet.length > 5) {
+  if (layer.tileSet && layer.tileSet.length > 0) {
     tileSet = layer.tileSet;
   }
+
+  // console.log('did layer find tile', layer.tileSet)
+
   // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
   // look up the tile kind and use that as the tile
   if (typeof tileValue === 'number') {
     // Find id = tile in tileSet
-    let tileId = tileValue;
-    // TODO: remove this.tileSet
-    let tileKind = tileSet.find(tileKind => tileKind.id === tileId);
-    if (tileKind) {
-      tile = tileKind;
-    } else {
-      // Default tile kind if not found
-      tile = tileSet[3];
+    // perform direct lookup based on tile value
+    tile = tileSet[tileValue];
+
+    if (!tile) {
+      tile = tileSet[0]; // was previously 3
     }
+
   } else {
     console.log('Warning: tileValue was not a number. This should not happen:', tileValue);
     return;

@@ -14,6 +14,7 @@ export default class TileMap {
   }
 
   build (entityData = {}) {
+
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0, z: 0};
     }
@@ -29,10 +30,45 @@ export default class TileMap {
       entityData.meta.tileMapHeight = entityData.tileMapHeight;
     }
 
-    entityData.meta.data = entityData.data || {};
-    entityData.meta.tileSet = entityData.tileSet || [];
+    if (entityData.tileSize) {
+      entityData.meta.tileSize = entityData.tileSize;
+      entityData.meta.tileWidth = entityData.tileSize;
+      entityData.meta.tileHeight = entityData.tileSize;
+    }
 
-    //let rules = this.sutra();
+    if (entityData.tileWidth && entityData.tileHeight) {
+      entityData.meta.tileWidth = entityData.tileWidth;
+      entityData.meta.tileHeight = entityData.tileHeight;
+    }
+
+    // provide a small default tile map if none is provided
+    entityData.meta.data = entityData.data || [
+      0,0,0,0,
+      0,0,0,0,
+      0,0,0,0,
+      0,0,0,0
+    ];
+
+    let meta = {};
+   
+    if (entityData.meta) {
+      meta = entityData.meta;
+    }
+
+    if (entityData._previous && entityData._previous.meta && entityData._previous.meta.tileSet) {
+      meta.tileSet = entityData._previous.meta.tileSet;
+    }
+   
+    if (entityData.tileSet) {
+      meta.tileSet = entityData.tileSet;
+    }
+
+    if (!meta.tileSet) {
+      meta.tileSet = [
+        { id: 0, texture: 'tile-grass' },
+        { id: 1, texture: 'tile-bush' },
+      ];
+    }
 
     // set actual x y z values as string if not exist
     let coordinateKey = entityData.coordinateKey || entityData.position.x + ',' + entityData.position.y + ',' + entityData.position.z;
@@ -41,14 +77,16 @@ export default class TileMap {
       type: 'TILEMAP',
       name: coordinateKey,
       position: entityData.position,
-      meta: entityData.meta,
+      meta: meta,
+      style: {
+        display: 'none', // since TILEMAP itself is the container, we don't want to see it
+      },
       afterCreateEntity: (entityData) => {
-        //alert('afterCreateEntity')
         // after the tile map container is created, create all the tiles as children
-
         // create the tiles scoped to entityData.id as container
-        console.log(entityData)
-        console.log('coordinateKey', coordinateKey)
+        // console.log(entityData)
+        // console.log('coordinateKey', coordinateKey)
+        // console.log('using the tileset', entityData.meta.tileSet)
         let tileMap = {
           container: coordinateKey,
           data: entityData.meta.data,
@@ -65,9 +103,11 @@ export default class TileMap {
             1,1,1,1,
             1,1,1,1,
           ]*/
-
           position: { x: 0, y: 0 },
-          tileSize: 16, // can make object later
+          tileWidth: entityData.meta.tileWidth || 16,
+          tileHeight: entityData.meta.tileHeight || 16,
+          tileDepth: entityData.meta.tileDepth || 16,
+          tileSize:  entityData.meta.tileWidth, // TODO: remove this
         };
         console.log('sending', tileMap)
         game.systems.tile.createLayer(tileMap, tileMap.tileSize, tileMap.tileSize)

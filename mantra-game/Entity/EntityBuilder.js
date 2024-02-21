@@ -213,7 +213,17 @@ export default class EntityBuilder {
         // Otherwise, create a new composite function and handlers array
         const handlers = [handler];
         this.config[eventName] = (...args) => {
-          handlers.forEach(h => h(...args)); // Execute all handlers
+          try {
+            handlers.forEach(function(h){
+              if (typeof h === 'function') {
+                h(...args);
+              } else {
+                console.warn("handler is not a function", h, args)
+              }
+            }); // Execute all handlers
+          } catch (err) {
+            console.error(`Error in event handler for ${eventName}:`, err);
+          }
         };
         this.config[eventName].handlers = handlers; // Store handlers
       }
@@ -287,6 +297,12 @@ export default class EntityBuilder {
   // TODO: better name for "exit" semantics
   exit(handler) {
     this.config.exit = handler;
+    return this;
+  }
+
+  // Entity Flags - make this it's own system
+  collectable(value = true) {
+    this.config.collectable = value;
     return this;
   }
 

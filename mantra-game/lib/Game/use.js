@@ -129,7 +129,16 @@ function pluginGameSceneMethods(game, pluginInstance) {
 function extendEntityBuilder(game, pluginInstance) {
   let pluginName = pluginInstance.constructor.name;
   game.EntityBuilder.prototype[pluginName] = function (...args) {
-    const componentValue = pluginInstance.build.call(pluginInstance, ...args);
+    // Create a copy of the arguments and add the _previous property
+    // This is used to pass along the current/previous state of the builder config
+    // Some plugins use this as optionally depending on previous plugin builder state
+    // Like TileSet.meta.tileSet->TileMap.meta.tileSet
+    // Remark: We tried to merge the builder config scope with plugin instance scope;
+    //         however it wasn't quite working and was adding complexity
+    let enhancedArgs = args.map(arg => ({ ...arg, _previous: { ...this.config } }));
+    
+    // Call the plugin's build function with the enhanced arguments
+    const componentValue = pluginInstance.build.apply(pluginInstance, enhancedArgs);
 
     if (typeof componentValue === 'object') {
       for (let key in componentValue) {
@@ -137,9 +146,11 @@ function extendEntityBuilder(game, pluginInstance) {
         if (typeof value === 'function') {
           // Check if the composite function already exists, if not, initialize it
           if (typeof this.config[key] !== 'function') {
-            // Define the composite function
             this.config[key] = (...handlerArgs) => {
-              this.config[key].handlers.forEach(handler => handler(...handlerArgs));
+              this.config[key].handlers.forEach(handler => {
+                // Call each handler with the original arguments enhanced with _previous
+                handler(...handlerArgs.map(arg => ({ ...arg, _previous: { ...this.config } })));
+              });
             };
             // Initialize with an empty handlers array
             this.config[key].handlers = [];
@@ -147,12 +158,13 @@ function extendEntityBuilder(game, pluginInstance) {
           // Add the new handler to the composite function's handlers array
           this.config[key].handlers.push(value);
         } else {
+          // Directly set non-function properties
           this.config[key] = value;
         }
       }
     } else if (typeof componentValue === 'number' || typeof componentValue === 'string') {
       this.config[pluginName] = componentValue;
     }
-    return this;
+    return this; // Allow chaining by returning the EntityBuilder instance
   };
 }
