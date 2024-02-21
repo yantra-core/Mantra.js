@@ -18,11 +18,22 @@ export default class Mouse {
       MIDDLE: null
     };
 
+    this.activeTouches = {}; // Store active touches
+    // TODO: support 3+ touches
+    this.firstTouchId = null; // Track the first touch for movement
+    this.secondTouchId = null; // Track the second touch for firing
+    this.endedFirstTouch = false;
+    this.endedSecondTouch = false;
+
     this.boundHandleMouseMove = this.handleMouseMove.bind(this);
     this.boundHandleMouseDown = this.handleMouseDown.bind(this);
     this.boundHandleMouseUp = this.handleMouseUp.bind(this);
     this.boundHandleMouseOut = this.handleMouseOut.bind(this);
     this.boundHandleMouseOver = this.handleMouseOver.bind(this);
+
+    this.boundHandlePointerDown = this.handlePointerDown.bind(this);
+    this.boundHandlePointerMove = this.handlePointerMove.bind(this);
+    this.boundHandlePointerUp = this.handlePointerUp.bind(this);
 
   }
 
@@ -33,23 +44,60 @@ export default class Mouse {
     this.game.systemsManager.addSystem(this.id, this);
   }
 
+  // Common function to generate mouse context with world coordinates
+  createMouseContext(event) {
+    const { clientX, clientY } = event;
+    const canvas = event.target instanceof HTMLCanvasElement ? event.target : null;
+    let canvasPosition = null;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      canvasPosition = { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    // Convert screen coordinates to world coordinates
+    const worldX = (clientX - window.innerWidth / 2 + this.game.data.camera.offsetX) / this.game.data.camera.currentZoom + this.game.data.camera.position.x;
+    const worldY = (clientY - window.innerHeight / 2 + this.game.data.camera.offsetY) / this.game.data.camera.currentZoom + this.game.data.camera.position.y;
+
+    // Construct the context object
+    const context = {
+      mousePosition: { x: clientX, y: clientY },
+      canvasPosition,
+      worldPosition: { x: worldX, y: worldY },
+      event,
+      entityId: this.game.selectedEntityId || null,
+      isDragging: this.isDragging,
+      dragStartPosition: this.dragStartPosition,
+      buttons: this.mouseButtons,
+      firstTouchId: this.firstTouchId,
+      secondTouchId: this.secondTouchId,
+      // Number of active touches can be useful for multi-touch logic
+      activeTouchCount: Object.keys(this.activeTouches).length,
+      // Provide detailed information on active touches if needed
+      activeTouches: this.activeTouches,
+      // Add any other relevant data here
+    };
+
+    // alias for worldPosition - developer context is usually in world coordinates
+    context.position = context.worldPosition;
+
+    return context;
+  }
+
   handleMouseMove(event) {
     let game = this.game;
-    // TODO: common function for selecting entities
-    // TODO: have editor be aware if inspector is loaded
-    // if so, show additional UX for selecting entities
     let target = event.target;
+
     /* TODO: mouse over selects ent, make this configurable
-       was making it hard to debug the editor since it would switch entities
-    if (target && target.getAttribute) {
-      let mantraId = target.getAttribute('mantra-id');
-      if (mantraId) {
-        // if this is a Mantra entity, set the selectedEntityId
-        // this is used for GUI rendering and CSSGraphics
-        this.game.selectedEntityId = mantraId;
-      }
-    }
-    */
+      was making it hard to debug the editor since it would switch entities
+        if (target && target.getAttribute) {
+          let mantraId = target.getAttribute('mantra-id');
+          if (mantraId) {
+            // if this is a Mantra entity, set the selectedEntityId
+            // this is used for GUI rendering and CSSGraphics
+            this.game.selectedEntityId = mantraId;
+          }
+        }
+      */
 
     this.mousePosition = { x: event.clientX, y: event.clientY };
     if (event.target instanceof HTMLCanvasElement) {
@@ -74,19 +122,6 @@ export default class Mouse {
 
     this.sendMouseData();
 
-    // Get mouse position
-    let mouseX = event.clientX;
-    let mouseY = event.clientY;
-
-    // Convert screen coordinates to world coordinates
-    let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
-    // apply offset
-    worldX = worldX - game.data.camera.offsetX / game.data.camera.currentZoom;
-    let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
-    // apply offset
-    // worldY = worldY - game.data.camera.offsetY / game.data.camera.currentZoom;
-
-
     // get the reference to this ent, check for pointerdown event
     if (this.game.data && this.game.data.ents && this.game.data.ents._) {
       const ent = this.game.data.ents._[this.game.selectedEntityId];
@@ -96,15 +131,46 @@ export default class Mouse {
       }
     }
 
-    this.game.emit('pointerMove', { x: worldX, y: worldY }, event)
+    let context = this.createMouseContext(event);
+    context.x = context.position.x; // legacy API expects world position at root x and y
+    context.y = context.position.y; // can remove these mappings later
+    this.game.emit('pointerMove', context, event)
 
+  }
+
+  updateMouseButtons(event, isDown) {
+
+    if (game.isTouchDevice()) {
+      switch (event.button) {
+        case 2:
+          this.mouseButtons.LEFT = isDown;
+          break;
+        case 1:
+          this.mouseButtons.MIDDLE = isDown;
+          break;
+        case 0:
+          this.mouseButtons.RIGHT = isDown;
+          break;
+      }
+    } else {
+
+      switch (event.button) {
+        case 0:
+          this.mouseButtons.LEFT = isDown;
+          break;
+        case 1:
+          this.mouseButtons.MIDDLE = isDown;
+          break;
+        case 2:
+          this.mouseButtons.RIGHT = isDown;
+          break;
+      }
+    }
   }
 
   handleMouseDown(event) {
     let target = event.target;
     let game = this.game;
-    // console.log('handleMouseDown', target)
-    // check to see if target has a mantra-id attribute
     // TODO: we'll need entity detection per Graphics adapter
     // Remark: The current approach only works for DOM HTML, for canvas, we'll need the adapter ( three ) to query scene and return ent id
     if (target && target.getAttribute) {
@@ -115,7 +181,7 @@ export default class Mouse {
         this.game.selectedEntityId = mantraId;
         if (this.game.data && this.game.data.ents) {
           // get the reference to this ent, check for pointerdown event
-          const ent = this.game.data.ents._[mantraId];
+          const ent = this.game.data.ents._[Number(mantraId)];
           if (ent && ent.pointerdown) {
             let context = ent;
             ent.pointerdown(ent, event);
@@ -141,17 +207,7 @@ export default class Mouse {
       // no target, do nothing, continue
     }
 
-    switch (event.button) {
-      case 0:
-        this.mouseButtons.LEFT = true;
-        break;
-      case 1:
-        this.mouseButtons.MIDDLE = true;
-        break;
-      case 2:
-        this.mouseButtons.RIGHT = true;
-        break;
-    }
+    this.updateMouseButtons(event, true);
 
     // middle mouse button
     if (event.button === 1) { // Middle mouse button
@@ -163,41 +219,16 @@ export default class Mouse {
       event.preventDefault();
     }
 
-    // Get mouse position
-    let mouseX = event.clientX;
-    let mouseY = event.clientY;
+    let context = this.createMouseContext(event);
 
-    // Convert screen coordinates to world coordinates
-    let worldX = (mouseX - window.innerWidth / 2 + game.data.camera.offsetX) / game.data.camera.currentZoom + game.data.camera.position.x;
-    let worldY = (mouseY - window.innerHeight / 2 + game.data.camera.offsetY) / game.data.camera.currentZoom + game.data.camera.position.y;
-
-    let position = { x: worldX, y: worldY };
-
-    // truncate to 3 decimal places
-    position.x = Math.round(position.x * 1000) / 1000;
-    position.y = Math.round(position.y * 1000) / 1000;
-    position.button = this.mouseButtons;
-    position.entityId = this.game.selectedEntityId || null;
-    // Remark: We may need better logic here to determine intent of the user pointerDown
-    // TODO: add conditional check here to see if we should be processing mouse events
-    //       should support configurable options for mouse events
-    this.game.emit('pointerDown', position, event)
+    this.game.emit('pointerDown', context, event)
     this.sendMouseData(event);
 
   }
 
   handleMouseUp(event) {
-    switch (event.button) {
-      case 0:
-        this.mouseButtons.LEFT = false;
-        break;
-      case 1:
-        this.mouseButtons.MIDDLE = false;
-        break;
-      case 2:
-        this.mouseButtons.RIGHT = false;
-        break;
-    }
+
+    this.updateMouseButtons(event, false);
 
     if (event.button === 1) { // Middle mouse button
       this.isDragging = false;
@@ -212,7 +243,11 @@ export default class Mouse {
       ent.pointerup(ent, event);
     }
 
-    this.game.emit('pointerUp', this.game.selectedEntityId, event)
+    let context = this.createMouseContext(event);
+    context.endedFirstTouch = this.endedFirstTouch;
+    context.endedSecondTouch = this.endedSecondTouch;
+
+    this.game.emit('pointerUp', context, event)
     this.sendMouseData(event);
   }
 
@@ -245,6 +280,60 @@ export default class Mouse {
     this.sendMouseData(event);
   }
 
+  handlePointerDown(event) {
+    // Add the new touch to the active touches
+    this.activeTouches[event.pointerId] = { x: event.clientX, y: event.clientY };
+
+    // Assign first and second touches if not already assigned
+    if (this.firstTouchId === null) {
+      this.firstTouchId = event.pointerId;
+      // First touch logic (e.g., movement)
+    } else if (this.secondTouchId === null) {
+      this.secondTouchId = event.pointerId;
+      // alert('second')
+      // Second touch logic (e.g., firing)
+    }
+    // once we have done special processing, call the regular mantra mouse event
+    this.handleMouseDown(event);
+  }
+
+  handlePointerMove(event) {
+    if (this.activeTouches[event.pointerId]) {
+      // Update touch position
+      this.activeTouches[event.pointerId] = { x: event.clientX, y: event.clientY };
+
+      // Movement or other continuous actions based on pointerId
+      if (event.pointerId === this.firstTouchId) {
+        // Movement logic
+      } else if (event.pointerId === this.secondTouchId) {
+        // Firing logic
+      }
+    }
+    // once we have done special processing, call the regular mantra mouse event
+    this.handleMouseMove(event);
+  }
+
+  handlePointerUp(event) {
+
+    // Determine if this pointerId matches first or second touch identifiers
+    this.endedFirstTouch = event.pointerId === this.firstTouchId;
+    this.endedSecondTouch = event.pointerId === this.secondTouchId;
+
+    // Remove the touch from active touches
+    delete this.activeTouches[event.pointerId];
+
+    // Reset first or second touch ID if they are lifted
+    if (event.pointerId === this.firstTouchId) {
+      this.firstTouchId = null;
+    } else if (event.pointerId === this.secondTouchId) {
+      this.secondTouchId = null;
+    }
+
+    // once we have done special processing, call the regular mantra mouse event
+    this.handleMouseUp(event);
+  }
+
+
   sendMouseData(event) {
     const mouseData = {
       position: this.mousePosition, // absolute position
@@ -268,14 +357,30 @@ export default class Mouse {
   }
 
   bindInputControls() {
-    document.addEventListener('pointerover', this.boundHandleMouseOver);
-    document.addEventListener('pointerout', this.boundHandleMouseOut);
-    document.addEventListener('pointermove', this.boundHandleMouseMove);
-    document.addEventListener('pointerdown', this.boundHandleMouseDown);
-    document.addEventListener('pointerup', this.boundHandleMouseUp);
+
+    if (game.isTouchDevice()) {
+      document.addEventListener('pointerover', this.boundHandleMouseOver);
+      document.addEventListener('pointerout', this.boundHandleMouseOut);
+      document.addEventListener('pointermove', this.boundHandlePointerMove);
+      document.addEventListener('pointerdown', this.boundHandlePointerDown);
+      document.addEventListener('pointerup', this.boundHandlePointerUp);
+    } else {
+      document.addEventListener('mouseover', this.boundHandleMouseOver);
+      document.addEventListener('mouseout', this.boundHandleMouseOut);
+      document.addEventListener('mousemove', this.boundHandleMouseMove);
+      document.addEventListener('mousedown', this.boundHandleMouseDown);
+      document.addEventListener('mouseup', this.boundHandleMouseUp);
+    }
+
     // TODO: could be a config option
     if (this.disableContextMenu) {
-      document.addEventListener('contextmenu', event => event.preventDefault());
+      document.addEventListener('contextmenu', event => {
+        // Handle internal Mantra events first before prevent default to disable browser right click menu
+        //let context = this.createMouseContext(event); 
+        //this.game.emit('ecsInternalEvent', context); 
+        // Prevent the default context menu from appearing
+        event.preventDefault();
+      });
     }
 
     // TODO: drag and drop to move map
@@ -288,12 +393,21 @@ export default class Mouse {
 
   }
   unbindAllEvents() {
-    // unbind all events
-    document.removeEventListener('pointerover', this.boundHandleMouseOver);
-    document.removeEventListener('pointerout', this.boundHandleMouseOut);
-    document.removeEventListener('pointermove', this.boundHandleMouseMove);
-    document.removeEventListener('pointerdown', this.boundHandleMouseDown);
-    document.removeEventListener('pointerup', this.boundHandleMouseUp);
+    if (game.isTouchDevice()) {
+      // unbind all events
+      document.removeEventListener('pointerover', this.boundHandleMouseOver);
+      document.removeEventListener('pointerout', this.boundHandleMouseOut);
+      document.removeEventListener('pointermove', this.boundHandlePointerMove);
+      document.removeEventListener('pointerdown', this.boundHandlePointerDown);
+      document.removeEventListener('pointerup', this.boundHandlePointerUp);
+    } else {
+      // unbind all events
+      document.removeEventListener('mouseover', this.boundHandleMouseOver);
+      document.removeEventListener('mouseout', this.boundHandleMouseOut);
+      document.removeEventListener('mousemove', this.boundHandleMouseMove);
+      document.removeEventListener('mousedown', this.boundHandleMouseDown);
+      document.removeEventListener('mouseup', this.boundHandleMouseUp);
+    }
   }
 
   unload() {
