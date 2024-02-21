@@ -92,6 +92,7 @@ export default function createBackground(game) {
   });
 
   game.createEntity({
+    name: 'css-text',
     type: 'TEXT',
     text: 'CSSGraphics Engine',
     width: 20,

@@ -1,3 +1,7 @@
+function createHomeKey (game) {
+  game.build().Key().position(-100, 30, 0).createEntity();
+}
+
 export default function createDoors(game) {
 
   //
@@ -212,29 +216,4 @@ export default function createDoors(game) {
     }
   });
 
-}
-
-function createHomeKey (game) {
-
-  game.createEntity({
-    type: 'KEY',
-    size: {
-      width: 16,
-      height: 8
-    },
-    // equippable: true,
-    isSensor: true,
-    collectable: true,
-    //onCollect: true
-
-    name: 'maze-door-0',
-    texture: "ayyo-key",
-    color: 0x00ff00,
-    // container: 'laby-container',
-    position: { // relative to the container
-      x: -100,
-      y: -30,
-      z: 0
-    }
-  });
 }

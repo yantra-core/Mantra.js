@@ -170,7 +170,8 @@ class GravityGardens {
       that.slurping = false;
     });
 
-    game.on('pointerDown', function (position, event) {
+    game.on('pointerDown', function (context, event) {
+      let position = context.position;
       that.mousePosition = position;
 
       // adjust position for game camera offset

@@ -92,6 +92,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       pointerleave: false,
 
       onDrop: null,
+      afterItemCollected: null,
 
       afterRemoveEntity: null,
       afterCreateEntity: null,
@@ -160,7 +161,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, update, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterItemCollected, update, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -225,6 +226,10 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'text', text);
   this.game.addComponent(entityId, 'style', style);
   this.game.addComponent(entityId, 'texture', texture);
+
+
+  this.game.addComponent(entityId, 'afterItemCollected', afterItemCollected);
+
 
   this.game.addComponent(entityId, 'afterRemoveEntity', afterRemoveEntity);
   this.game.addComponent(entityId, 'afterCreateEntity', afterRemoveEntity);

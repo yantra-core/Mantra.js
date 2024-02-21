@@ -51,6 +51,7 @@ class CSSGraphics extends GraphicsInterface {
 
 
     // TODO: make this function lookup with defaults ( instead of -1 )
+    // TODO: remove in favor of using position.z for zIndex
     this.depthChart = [
       'background', 'border', 'wire', 'PART', 'TEXT', 'PLAYER',
       'BLOCK', 'FIRE', 'WARP', 'NOTE'

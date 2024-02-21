@@ -1,3 +1,6 @@
+// TODO: defaultPlatformMouseMovement.js
+import defaultMouseMovement from "./defaultMouseMovement.js";
+
 export default function platformMovement(game) {
 
   let rules = game.createSutra();
@@ -166,7 +169,7 @@ export default function platformMovement(game) {
 
     }
   })
-
+  defaultMouseMovement(game);
   return rules; 
 
 }

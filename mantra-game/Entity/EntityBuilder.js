@@ -281,6 +281,10 @@ export default class EntityBuilder {
     return this._addEventHandler('update', handler);
   }
 
+  afterItemCollected(handler) {
+    return this._addEventHandler('afterItemCollected', handler);
+  }
+
   afterRemoveEntity(handler) {
     return this._addEventHandler('afterRemoveEntity', handler);
   }

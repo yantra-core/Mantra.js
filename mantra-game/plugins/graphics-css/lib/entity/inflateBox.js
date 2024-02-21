@@ -24,9 +24,12 @@ export default function inflateBox(entityElement, entityData) {
   // entityElement.style.borderRadius = '10px';  // Optional: to make it rounded
 
   // set default depth based on type
-  entityElement.style.zIndex = depthChart.indexOf(entityData.type);
+  //entityElement.style.zIndex = depthChart.indexOf(entityData.type);
+  // console.log('setting position', entityData.z, entityData.type, entityData.texture)
+  entityElement.style.zIndex = entityData.position.z;
 
-  this.bindEntityEvents(entityData, entityElement);
+  // Remark: No longer binding events directly to entity, instead delegating from Mouse.js
+  // this.bindEntityEvents(entityData, entityElement);
 
   // TODO: move to separate file for inflatePart,
   if (entityData.type === 'PART') {

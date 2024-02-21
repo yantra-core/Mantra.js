@@ -99,6 +99,7 @@ import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 
 // GUI GameObjects
+import Label from './plugins/label/Label.js';
 import Text from './plugins/text/Text.js';
 
 // GUI
@@ -154,6 +155,7 @@ const plugins = {
   Flame,
   Sword,
   // UI Objects
+  Label,
   Text,
   Draggable,
   Droppable,

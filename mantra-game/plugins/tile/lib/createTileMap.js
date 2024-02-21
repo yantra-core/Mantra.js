@@ -1,3 +1,4 @@
+// TODO: Refactor and remove this file, should be TileMap.create() or TileMap.createTileMap()
 export default function createTileMap(tileMap) {
 
   let game = this.game;

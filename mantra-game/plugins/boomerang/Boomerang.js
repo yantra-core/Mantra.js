@@ -188,15 +188,14 @@ class Boomerang {
     boomerang.isReturning = false; // Reset the return state for the next use
   }
 
-  throwBoomerang(entityId) {
+  throwBoomerang(entityId, angleInRadians = null) {
     let entity = this.game.getEntity(entityId);
-
+  
     if (!entity) {
       console.log('Boomerang.throwBoomerang no entity found for id', entityId);
       return;
     }
-
-
+  
     // Ensure only a limited number of boomerangs can be thrown by one player
     let boomerangCount = 0;
     if (this.game.data.ents.BOOMERANG) {
@@ -204,63 +203,52 @@ class Boomerang {
         let b = this.game.data.ents.BOOMERANG[eId];
         if (b.owner === entityId) {
           boomerangCount++;
-
-          // if any of these are been thrown within N ctick then we should not throw another one
-          if (game.tick - b.ctick < this.throwBoomerangTickDelay) {
+  
+          if (this.game.tick - b.ctick < this.throwBoomerangTickDelay) {
             return;
           }
-
-          if (boomerangCount >= this.maxBoomarangCount) {
+  
+          if (boomerangCount >= this.maxBoomerangCount) {
             return;
           }
         }
       }
     }
-
-    let ownerId = entityId; // Set the owner of the boomerang
-
+  
+    let ownerId = entityId;
     let playerPos = entity.position;
-    let playerRotation = entity.rotation; // in radians, if applicable
-    let playerVelocity = entity.velocity || { x: 0, y: 0 }; // Get the player's current velocity, assuming it's stored in entity.velocity
-
-    // Initial boomerang position should be close to the player
-    let boomerangstartingPosition = {
-      x: playerPos.x + Math.sin(playerRotation) * 10, // Offset by 10 units in the direction of player's facing
-      y: playerPos.y - Math.cos(playerRotation) * 10,
-    };
-
-    // Initial boomerang position should be close to the player
+    let playerVelocity = entity.velocity || { x: 0, y: 0 };
+  
+    // Use the provided angleInRadians or adjust and fall back to the entity's rotation
+    let throwAngle = angleInRadians !== null ? angleInRadians : entity.rotation - Math.PI / 2; // Adjust entity.rotation as needed
+  
+    // Adjust the starting position and velocity according to the game's coordinate system
     let boomerangStartingPosition = {
-      x: playerPos.x + Math.sin(playerRotation) * 10, // Offset by 10 units in the direction of player's facing
-      y: playerPos.y - Math.cos(playerRotation) * 10,
-      // z: 4 // Assuming boomerangs are thrown at a certain height
+      x: playerPos.x + Math.cos(throwAngle) * 10, // Use cos for x to align with the angle calculation
+      y: playerPos.y + Math.sin(throwAngle) * 10, // Use sin for y and remove the negative sign
+      z: 4
     };
-    // adjust force for entity.rotation
-    //boomerangVelocity.x = Math.sin(playerRotation) * this.speed;
-    //boomerangVelocity.y = -Math.cos(playerRotation) * this.speed;
-
-    // Set initial boomerang velocity to include player's current velocity
+  
     let boomerangVelocity = {
-      x: Math.sin(playerRotation) * this.speed + playerVelocity.x,
-      y: -Math.cos(playerRotation) * this.speed + playerVelocity.y
+      x: Math.cos(throwAngle) * this.speed + playerVelocity.x, // Use cos for x
+      y: Math.sin(throwAngle) * this.speed + playerVelocity.y, // Use sin for y without negation
     };
-
+  
+    // Limit the velocity to a maximum for balance
     boomerangVelocity.x = Math.min(boomerangVelocity.x, 10);
     boomerangVelocity.y = Math.min(boomerangVelocity.y, 10);
-
-    boomerangstartingPosition.z = 4;
+  
     const boomerangConfig = {
       type: 'BOOMERANG',
       height: 12,
       width: 12,
-      position: boomerangstartingPosition,
-      rotation: entity.rotation, // TODO: get the player's rotation
+      position: boomerangStartingPosition,
+      rotation: throwAngle,
       speed: this.speed,
-      // isSensor: true,
       owner: ownerId,
       velocity: boomerangVelocity,
       style: {
-        zIndex: 99 // TODO: should not be need, should use position.z
+        zIndex: 99
       },
       texture: {
         sheet: 'loz_spritesheet',
@@ -268,17 +256,13 @@ class Boomerang {
         playing: true
       },
     };
-
-    let data = this.build(boomerangConfig);
-    
-    // Experimental, making fire boomerang / composing plugins
-    // let builder = this.game.build().fire().boomerang(boomerangConfig);
-    //     this.game.createEntity(builder.config);
-
+  
     let builder = this.build(boomerangConfig);
     this.game.createEntity(builder);
-
   }
+  
+  
+  
 }
 
 export default Boomerang;

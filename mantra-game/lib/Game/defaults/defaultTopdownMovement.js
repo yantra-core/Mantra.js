@@ -1,3 +1,5 @@
+import defaultMouseMovement from "./defaultMouseMovement.js";
+
 export default function topdownMovement(game) {
 
   let rules = game.createSutra();
@@ -184,5 +186,14 @@ export default function topdownMovement(game) {
     game.setZoom(currentZoom - 0.05);
   });
 
+  //
+  // Adds pointer events
+  //
+  // These are currently slightly out of band since they are not implemented is Entity Input
+  // This is a temporary solution to allow for pointer events to be used in the game and local demos
+  // We'll need to implement these mouse movements as a movement system for entity input
+  // In order to support multiplayer mouse controls, its all there including mouse position and button states, 
+  // just needs to be mapped as Entity Input with label names for Sutra conditions
+  defaultMouseMovement(game);
   return rules;
 }

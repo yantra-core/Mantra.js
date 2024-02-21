@@ -70,13 +70,25 @@ export default class TileMap {
       ];
     }
 
+    // calculate the container size by multiplying the tile map width and height by the tile size
+    entityData.size = {
+      width: entityData.meta.tileMapWidth * entityData.meta.tileWidth,
+      height: entityData.meta.tileMapHeight * entityData.meta.tileHeight,
+    };
+
+    // adds a border buffer around the tile map ( for now )
+    entityData.size.width += 16;
+    entityData.size.height += 16;
+
     // set actual x y z values as string if not exist
     let coordinateKey = entityData.coordinateKey || entityData.position.x + ',' + entityData.position.y + ',' + entityData.position.z;
-
     return {
       type: 'TILEMAP',
+      isSensor: true,
+      body: false,
       name: coordinateKey,
       position: entityData.position,
+      size: entityData.size, // size of the container for the tile map
       meta: meta,
       style: {
         display: 'none', // since TILEMAP itself is the container, we don't want to see it
@@ -95,23 +107,15 @@ export default class TileMap {
           y: 0, // Actual values will be x * 16, y * 16
           width: entityData.meta.tileMapWidth || 4,
           height: entityData.meta.tileMapHeight || 4,
-          /*
-          tileSize: 16,
-          data: [
-            1,1,1,1,
-            1,1,1,1,
-            1,1,1,1,
-            1,1,1,1,
-          ]*/
-          position: { x: 0, y: 0 },
+          // TileMap renders relative to 0,0,0 on the parent TILEMAP container
+          position: { x: 0, y: 0, z: 0 },
           tileWidth: entityData.meta.tileWidth || 16,
           tileHeight: entityData.meta.tileHeight || 16,
           tileDepth: entityData.meta.tileDepth || 16,
           tileSize:  entityData.meta.tileWidth, // TODO: remove this
         };
-        console.log('sending', tileMap)
+        // TODO: refactor `Tile.createLayer` to `TileMap.create()`
         game.systems.tile.createLayer(tileMap, tileMap.tileSize, tileMap.tileSize)
-
       }
     };
   }

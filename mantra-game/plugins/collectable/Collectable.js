@@ -26,9 +26,15 @@ class Collectable {
     // for each entity that has items, iterate those items and set position to relative of parent
     for (let id in itemsData) {
       let parentEnt = this.game.entities.get(Number(id));
-      //console.log('parentEnt', parentEnt)
+      // console.log('parentEnt', parentEnt, itemsData[id])
       if (!parentEnt || parentEnt.type === 'CONTAINER') {
         //skip
+        continue;
+      }
+
+
+      if (parentEnt.destroyed === true) {
+        // console.log('parentEnt is destroyed', parentEnt);
         continue;
       }
 
@@ -37,9 +43,11 @@ class Collectable {
       childEnts.forEach((childEntId) => {
         // TODO: only get positional component data, not entire ent
         let entity = this.game.entities.get(childEntId);
-        if (entity) {
+        if (entity && !entity.destroyed) {
           // console.log('found a child entity with items', entity);
-
+          // TODO: this should be using the container API, not manually adjusting position
+          // Add the item to the entity as entity.items and it should align based on 
+          // layout configs, etc, needs more tests for Entity.layout()
           // adjust the position relative to the parent ent, attach for now
           this.game.updateEntity({
             id: entity.id,

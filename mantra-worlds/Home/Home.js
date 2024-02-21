@@ -125,112 +125,29 @@ class Home {
       lives: 99,
     });
 
-    let moving = false;
-    let movingToPosition = {};
-
-
-    player1.onUpdate(function (entity) {
-      if (moving && movingToPosition.x && movingToPosition.y) {
-        // move the player based on the angle of the mouse compared to the player
-        // create a new force based on angle and speed
-        let radians = movingToPosition.rotation
-        let force = {
-          x: Math.cos(radians) * 1.5,
-          y: Math.sin(radians) * 1.5
-        };
-        // Remark: Directly apply forces to player, this is local only
-        //         Networked movements need to go through Entity Input systems with control inputs
-        // TODO:   Update default top-down movement system to support mouse movements
-        game.applyForce(game.data.ents.PLAYER[0].id, force);
-
-      }
-    });
-
-
     player1 = player1.createEntity();
 
     game.setPlayerId(player1.id);
-    game.build().Key().position(-100, 100, 10).createEntity();
-
-    game.on('pointerUp', function (context, event) {
-      if (game.isTouchDevice()) {
-        if (context.endedFirstTouch) {
-          moving = false;
-        }
-      } else {
-        // Consider whether to stop movement based on which button was released
-        if (context.buttons.RIGHT === false) {
-          moving = false;
-        }
-      }
-    });
-
-    game.on('pointerMove', function (context, event) {
-      let gamePointerPosition = context.position;
-      let currentPlayer = game.data.ents.PLAYER[0];
-      let playerPosition = currentPlayer.position;
-
-      if (playerPosition && moving) { // Ensure we update the movement only if the player is set to move.
-        let radians = Math.atan2(gamePointerPosition.y - playerPosition.y, gamePointerPosition.x - playerPosition.x);
-        movingToPosition = {
-          x: gamePointerPosition.x,
-          y: gamePointerPosition.y,
-          rotation: radians
-        };
-      }
-    });
-
-    game.on('pointerDown', function (context, event) {
-
-      let gamePointerPosition = context.position;
-      let currentPlayer = game.data.ents.PLAYER[0];
-      let playerPosition = currentPlayer.position;
-
-      if (playerPosition) {
-        let radians = Math.atan2(gamePointerPosition.y - playerPosition.y, gamePointerPosition.x - playerPosition.x);
-
-        // Simplified touch and non-touch device handling. 
-        // Assumes first touch or right-click for movement, second touch or left-click for boomerang.
-        if (game.isTouchDevice()) {
-          if (event.pointerId === context.firstTouchId) {
-            moving = true;
-            movingToPosition = {
-              x: gamePointerPosition.x,
-              y: gamePointerPosition.y,
-              rotation: radians
-            };
-          } else if (event.pointerId === context.secondTouchId) {
-            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
-          }
-        } else {
-          // For non-touch devices, use right-click for movement and left-click for boomerang.
-          if (context.buttons.RIGHT) {
-            moving = true;
-            movingToPosition = {
-              x: gamePointerPosition.x,
-              y: gamePointerPosition.y,
-              rotation: radians
-            };
-          }
-          if (context.buttons.LEFT) {
-            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
-          }
-        }
-      }
-    });
+    // TODO: setup doors and keys on home page like Maze World ( easy )
+    // game.build().Key().position(-100, 100, 10).createEntity();
 
     //
     // Create 22 Hexapods
     //
     const numberOfHexapods = 24;
     const radius = 80;
+    let collectFn = function (entity) {
+      console.log('got hexapod', entity.id)
+    }
     for (let i = 0; i < numberOfHexapods; i++) {
       // Calculate the angle for each hexapod
       let angle = (i / numberOfHexapods) * 2 * Math.PI;
       // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
       let x = radius * Math.cos(angle);
       let y = radius * Math.sin(angle);
-      game.build().Hexapod().Draggable().collectable(true).size(8).position(x, y, 0).createEntity();
+      
+      game.build().Hexapod().Draggable().size(8).position(x, y, 0).createEntity();
+      // .collectable(true).afterItemCollected(collectFn)
     };
 
     game.build().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
