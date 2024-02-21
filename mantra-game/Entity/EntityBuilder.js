@@ -204,6 +204,9 @@ export default class EntityBuilder {
   _addEventHandler(eventName, handler) {
     // Check if the event already has a composite function with handlers
     if (typeof this.config[eventName] === 'function' && Array.isArray(this.config[eventName].handlers)) {
+      if (typeof handler === 'undefined') {
+        throw new Error(`Handler for ${eventName} event is undefined`);
+      }
       this.config[eventName].handlers.push(handler); // Add to existing handlers
     } else {
       if (typeof handler === 'boolean') {
@@ -330,6 +333,25 @@ export default class EntityBuilder {
     if (typeof z === 'number') {
       this.config.position.z = z;
     }
+    return this;
+  }
+
+  // Sugar syntax for x,y,z positioning
+  x(value) {
+    this.config.position.x = value;
+    return this;
+  }
+  y(value) {
+    this.config.position.y = value;
+    return this;
+  }
+  z(value) {
+    this.config.position.z = value;
+    return this;
+  }
+
+  container(value) {
+    this.config.container = value;
     return this;
   }
 
@@ -464,3 +486,85 @@ function blendColors(color1, color2) {
   const b = ((color1 & 0xFF) + (color2 & 0xFF)) >> 1;
   return (r << 16) | (g << 8) | b;
 }
+
+/* TODO: refactor to store Map() of OG references for granular removals / updates
+
+// Initialize a map to keep track of original handlers for each composite function
+const originalHandlersMap = new Map();
+
+_addEventHandler(eventName, handler) {
+    // Check if the event already has a composite function with handlers
+    if (typeof this.config[eventName] === 'function' && Array.isArray(this.config[eventName].handlers)) {
+        if (typeof handler === 'undefined') {
+            throw new Error(`Handler for ${eventName} event is undefined`);
+        }
+        this.config[eventName].handlers.push(handler); // Add to existing handlers
+        // Update the map with the new set of handlers for the composite function
+        originalHandlersMap.set(this.config[eventName], this.config[eventName].handlers.slice());
+    } else {
+        if (typeof handler === 'boolean') {
+            this.config[eventName] = handler;
+        }
+        if (typeof handler === 'function') {
+            // Otherwise, create a new composite function and handlers array
+            const handlers = [handler];
+            const compositeFunction = (...args) => {
+                try {
+                    handlers.forEach(function(h) {
+                        if (typeof h === 'function') {
+                            h(...args);
+                        } else {
+                            console.warn("handler is not a function", h, args);
+                        }
+                    }); // Execute all handlers
+                } catch (err) {
+                    console.error(`Error in event handler for ${eventName}:`, err);
+                }
+            };
+            this.config[eventName] = compositeFunction;
+            this.config[eventName].handlers = handlers; // Store handlers
+
+            // Map the composite function to its original handlers
+            originalHandlersMap.set(compositeFunction, handlers);
+        }
+    }
+
+    return this;
+}
+
+
+_removeEventHandler(eventName, handler) {
+    // Check if the event for the given name exists and has handlers
+    if (typeof this.config[eventName] === 'function' && Array.isArray(this.config[eventName].handlers)) {
+        // Retrieve the composite function for the eventName
+        const compositeFunction = this.config[eventName];
+
+        // Retrieve the original handlers from the map using the composite function
+        const originalHandlers = originalHandlersMap.get(compositeFunction);
+
+        if (originalHandlers) {
+            // Find the index of the handler to be removed
+            const index = originalHandlers.findIndex(h => h === handler);
+
+            // If the handler is found, remove it from the array of original handlers
+            if (index !== -1) {
+                originalHandlers.splice(index, 1);
+
+                // Update the handlers array in the config to reflect the removal
+                this.config[eventName].handlers = originalHandlers.slice();
+
+                // Update the map to reflect the new set of handlers
+                originalHandlersMap.set(compositeFunction, this.config[eventName].handlers);
+
+                // If after removal, there are no handlers left, consider cleaning up
+                if (originalHandlers.length === 0) {
+                    // Remove the composite function and clean up the map
+                    delete this.config[eventName];
+                    originalHandlersMap.delete(compositeFunction);
+                }
+            }
+        }
+    }
+}
+
+*/

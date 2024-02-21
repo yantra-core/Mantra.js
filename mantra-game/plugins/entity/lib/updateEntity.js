@@ -118,22 +118,38 @@ export default function updateEntity(entityDataOrId, entityData) {
   // Event handlers / Lifecycle Events
   //
 
+  //
+  // Entity event lifecycle events will merge by default ( for now )
   if (typeof entityData.update !== 'undefined') {
     // get the current component value
     let currentFn = this.game.components.update.get(entityId);
     let entRef = this.game.data.ents._[entityId];
     if (entRef) {
-      // create a quick config to store the events, we'll want to convert entire function to use this
-      let updateConfig = this.game.build();
-      updateConfig.onUpdate(entityData.update);
-      // inherit the current update function, creates a tree of functions
-      // do we want to do this? what are the implications?
-      updateConfig.onUpdate(entRef.update); 
-      this.game.components.update.set(entityId, updateConfig.config.update);
+      // clear out all existing update functions
+      // TODO: add better mappings in EntityBuilder.js for granular removals
+      if (entityData.update === null) {
+        this.game.components.update.set(entityId, null);
+      } else {
+        // create a quick config to store the events, we'll want to convert entire function to use this
+        let updateConfig = this.game.build();
+        updateConfig.onUpdate(entityData.update);
+        // inherit the current update function, creates a tree of functions
+        // do we want to do this? what are the implications?
+        if (currentFn && currentFn.handlers && currentFn.handlers.length) {
+          currentFn.handlers.forEach(function (fn) {
+            // console.log("adding existing fn to updateConfig", fn.toString())
+            updateConfig.onUpdate(fn);
+          });
+        }
+        // console.log("new updateConfig", updateConfig.config.update)
+        // Update the current ent that will be returned from updateEntity(entityId, entityData)
+        ent.update = updateConfig.config.update;
+        // Update the component value
+        this.game.components.update.set(entityId, updateConfig.config.update);
+      }
     }
   }
 
-  
   //
   // Meta properties
   //

@@ -425,7 +425,47 @@ tap.test('game.build() API', (t) => {
   });
   
 
-
-
 });
 
+/*
+
+// Example TestPlugin to be used with the EntityBuilder
+class TestPlugin {
+  build(entityBuilder, ...args) {
+    // The entityBuilder is the first argument passed to build
+    // The second argument (args[0]) is expected to be an object containing the _previous property
+    const previousConfig = args[0]._previous;
+
+    // Check if the _previous property exists and return it for testing purposes
+    if (previousConfig) {
+      return {
+        testResult: {
+          previousPosition: previousConfig.position,
+          previousSize: previousConfig.size,
+        },
+      };
+    }
+  }
+}
+
+// Extend the EntityBuilder with the TestPlugin
+extendEntityBuilder(game, new TestPlugin());
+
+// Now, write a test to ensure the _previous property is passed correctly
+t.test('Builder passes _previous config to Plugin.build methods', (t) => {
+  // Start building an entity configuration
+  const builder = game.build()
+    .position({ x: 10, y: 20, z: 30 }) // Set some initial configuration
+    .size({ width: 40, height: 50, depth: 60 })
+    .TestPlugin(); // Use the TestPlugin to check the _previous property
+
+  const entityConfig = builder.build(); // Finalize the entity configuration
+
+  // Check that the testResult contains the previous configuration
+  t.deepEqual(entityConfig.testResult.previousPosition, { x: 10, y: 20, z: 30 }, 'Previous position should match the initial configuration');
+  t.deepEqual(entityConfig.testResult.previousSize, { width: 40, height: 50, depth: 60 }, 'Previous size should match the initial configuration');
+  t.end();
+});
+
+
+*/

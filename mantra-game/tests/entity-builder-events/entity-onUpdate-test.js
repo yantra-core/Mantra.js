@@ -123,7 +123,69 @@ tap.test('Entity lifecycle events - Entity.update integration', (t) => {
     t.end();
   });
 
+  tap.test('Entity lifecycle events - Entity.update integration', (t) => {
+    // Test overwriting an Entity.update event handler
+    
+    t.test('Merging an Entity.update event handler', (t) => {
+      let initialHandlerCalled = false;
+      let newHandlerCalled = false;
+    
+      // Create an entity with an initial update event handler
+      const entityConfig = game.build()
+        .onUpdate(() => { initialHandlerCalled = true; })
+        .build();
+    
+      // Trigger the update to confirm the initial handler works
+      entityConfig.update();
+      t.equal(initialHandlerCalled, true, 'Initial Entity.update event handler should be executed');
+    
+      // Create the entity in the ECS
+      let createdEntity = game.createEntity(entityConfig);
+    
+      initialHandlerCalled = false; // Reset the initial handler flag
 
+      createdEntity.update(); // Trigger the update to confirm the initial handler works
+
+      t.equal(initialHandlerCalled, true, 'Initial Entity.update event handler should be executed after merging');
+
+      initialHandlerCalled = false;
+
+      //
+      // Update the entity, which performs merge by default
+      //
+      let updatedEntity = game.updateEntity(createdEntity.id, {
+        update: () => { newHandlerCalled = true; }
+      });
+
+      //
+      // Verify the component value
+      //
+      let componentValue = game.components.update.get(updatedEntity.id);
+      // Reset the initial handler flag
+      initialHandlerCalled = false;
+      // Trigger the componentValue to test if both handlers are called
+      componentValue();
+    
+      // Verify that both the initial and new handlers were called
+      t.equal(initialHandlerCalled, true, 'Initial Entity.update event handler should be executed after merging');
+      // TODO: this test is failing? why?
+      t.equal(newHandlerCalled, true, 'New Entity.update event handler should be executed after merging');
+
+      //
+      // Verify the updateEntity value
+      //
+      initialHandlerCalled = false;
+      newHandlerCalled = false;
+
+      updatedEntity.update();
+      // Verify that both the initial and new handlers were called
+      t.equal(initialHandlerCalled, true, 'Initial Entity.update event handler should be executed after merging');
+      // TODO: this test is failing? why?
+      t.equal(newHandlerCalled, true, 'New Entity.update event handler should be executed after merging');
+    
+      t.end();
+    });
+    
+  });
 
 });
-
