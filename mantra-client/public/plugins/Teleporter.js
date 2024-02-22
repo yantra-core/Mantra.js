@@ -36,7 +36,16 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
           y: 0
         };
       }
-      //let rules = this.sutra();
+      entityData.destination = entityData.destination || {
+        position: {
+          x: 0,
+          y: 0,
+          z: 0
+        }
+      };
+      if (typeof entityData.url !== 'undefined') {
+        entityData.destination.url = entityData.url;
+      }
       return {
         type: 'TELEPORTER',
         texture: {
@@ -46,13 +55,7 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
         },
 
         meta: {
-          destination: entityData.destination || {
-            position: {
-              x: 0,
-              y: 0,
-              z: 0
-            }
-          }
+          destination: entityData.destination
         },
         //texture: 'teleporter',
         //color: 0xff0000,
@@ -91,8 +94,14 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
       if (context.owner.meta && context.owner.meta.destination) {
         var destination = context.owner.meta.destination;
         if (typeof destination === 'function') {
+          // remark why the if/else here? refactor
           destination.call(game, context.target, context.owner);
         } else {
+          if (typeof destination.url !== 'undefined') {
+            // redirect the entire page to this url
+            window.location = destination.url;
+            return;
+          }
           if (typeof destination.world !== 'undefined') {
             if (context.target.type === 'PLAYER') {
               // could be other types as well

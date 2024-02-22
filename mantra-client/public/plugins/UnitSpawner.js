@@ -64,6 +64,9 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
         // decrement unitsSpawned for this unitConfig
         // update the owner of this ent with meta
         var parentUnitSpawner = game.data.ents._[ent.owner];
+        if (!parentUnitSpawner) {
+          return;
+        }
         parentUnitSpawner.meta.unitConfig.meta.unitsSpawned -= 1;
         game.updateEntity(ent.owner, {
           meta: {
