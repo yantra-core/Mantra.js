@@ -12,7 +12,7 @@ export default class Teleporter {
     this.game.systemsManager.addSystem('teleporter', this);
   }
 
-  build (entityData = {}) {
+  build(entityData = {}) {
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
@@ -68,14 +68,24 @@ export default class Teleporter {
 
   touchedTeleporter(a, b, pair, context) {
     let game = this.game;
-    if (context.owner.meta &&  context.owner.meta.destination) {
+    if (context.owner.meta && context.owner.meta.destination) {
       let destination = context.owner.meta.destination;
       if (typeof destination === 'function') { // remark why the if/else here? refactor
         destination.call(game, context.target, context.owner);
       } else {
         if (typeof destination.url !== 'undefined') {
-          // redirect the entire page to this url
-          window.location = destination.url;
+
+          if (context.target.type === 'PLAYER') { // could be other types as well
+            // this page is inside an iframe, change the parent url to this url
+            // Remark: we'll want to make this behavior configurable
+            // Some users may wish for their embeds to not update parent window by default
+            if (window.parent !== window) {
+              window.parent.location = destination.url;
+              return;
+            }
+            // redirect the entire page to this url
+            window.location = destination.url;
+          }
           return;
         }
 

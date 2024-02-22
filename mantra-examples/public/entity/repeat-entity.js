@@ -1,10 +1,13 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['Hexapod', 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang', 'SwitchGraphics'],
+  plugins: ['Player', 'Hexapod', 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang', 'SwitchGraphics'],
+  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function () {
   game.setBackground('black');
+
+  game.build().Player().createEntity();
   game
     .build()
     .color('red')
@@ -145,6 +148,10 @@ game.start(function () {
     */
     
 
+  // Teleporter to the next example
+  game.build().Teleporter({
+    url: 'http://192.168.1.80:8888/entity/repeat-entity',
+  }).position(-200, 0).createEntity()
 
 });    
 

@@ -39,7 +39,7 @@ class Game {
       editor: true,
       sutra: true,
       lifetime: false,
-      defaultMovement: false,
+      defaultMovement: true,
       // data compression
       protobuf: false,
       msgpack: false,
