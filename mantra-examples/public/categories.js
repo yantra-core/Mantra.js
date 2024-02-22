@@ -350,6 +350,7 @@ let item_examples = [
     url: 'items/block.html',
     tags: ['block', 'item', 'inventory', 'building', 'construction', 'material', 'structure', 'obstacle', 'barrier', 'wall', 'floor']
   },
+  /*
   {
     title: 'Bomb',
     category: 'items',
@@ -358,6 +359,7 @@ let item_examples = [
     url: 'items/bomb.html',
     tags: ['bomb', 'item', 'inventory', 'explosive', 'damage', 'area', 'effect', 'blast', 'radius', 'timer', 'fuse']
   },
+  */
   {
     title: 'Bullet',
     category: 'items',

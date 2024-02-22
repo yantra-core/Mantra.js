@@ -831,7 +831,12 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         return _entities;
       } else {
         var singleConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
-        return this.game.createEntity(singleConfig);
+        var singleCreatedEntity = this.game.createEntity(singleConfig);
+        if (singleCreatedEntity.type === 'PLAYER') {
+          // TODO: check to see if there are no other active players / if so set this one
+          game.setPlayerId(singleCreatedEntity.id);
+        }
+        return singleCreatedEntity;
       }
     }
   }, {

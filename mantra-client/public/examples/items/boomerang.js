@@ -1,7 +1,7 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
   defaultMovement: true, // adds movement to player
-  plugins: ['Block', 'Key', 'Collectable', 'Gamepad', 'GamepadGUI'], // plugins at construction
+  plugins: ['Boomerang', 'Key', 'Block', 'Collectable', 'Gamepad'], // plugins at construction
 });
 
 game.use('Boomerang'); // plugins at runtime
@@ -13,10 +13,6 @@ game.start(function () {
 
   game.createPlayer({
     rotation: Math.PI / 2 // player aims to the right
-  });
-
-  game.on('pointerDown', function (event) {
-    game.systems.boomerang.throwBoomerang(game.data.ents.PLAYER[0].id);
   });
 
   for (let i = 0; i < 10; i++) {

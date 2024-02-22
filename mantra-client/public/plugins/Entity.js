@@ -1289,6 +1289,11 @@ function updateEntity(entityDataOrId, entityData) {
 
   // Remark: See: ./Game/Lifecyle.js for Mantra Lifecycle Hooks
   entityData = this.game.lifecycle.triggerHook('before.updateEntity', entityData);
+  if (entityData == null) {
+    console.warn('updateEntity was not provided a valid entityData', entityData);
+    console.warn('This is most likely the result of passing invalid data to updateEntity()');
+    return;
+  }
 
   // console.log('updateEntity', entityData)
   var entityId = entityData.id;

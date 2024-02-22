@@ -1,21 +1,47 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['Flame', 'Player', 'Gamepad', 'GamepadGUI'],
-  defaultMovement: true,
-  defaultPlayer: true,
+  plugins: ['Player', 'Boomerang', 'Flame', 'Text', 'Gamepad'],
+  defaultMovement: true
 });
-game.start(function(){
+game.start(function () {
   game.setBackground('black');
   game.setZoom(4.5);
+
+  //
+  // Create a Player
+  //
+  game.build().Player().createEntity();
+
+  //
+  // Create a Flame with custom collisionStart behavior
+  //
   game
     .build()
     .Flame()
+    .collisionStart(function () {
+      // Default collisionStart behavior of Flame is to destroy the entity that touches it
+      // We can add additional collisionStart behaviors in the Builder, they will be called in order
+      game.build().Player().createEntity();
+    })
     .position(-60, -50, 0)
     .offset(120)
     .repeat(2)
     .createEntity();
-  
-  game.build().Player().createEntity();
+
+  // adds text, do not touch flame
+  game.build().Text()
+    .text('Do not touch the flame')
+    .width(300)
+    .position(60, -25)
+    .style({
+      fontSize: '18px',
+      color: 'white',
+      fontFamily: 'Arial'
+    })
+    .createEntity();
+
 });
-    
+
+//
+//
