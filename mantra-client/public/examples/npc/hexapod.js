@@ -1,7 +1,7 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   plugins: ['Hexapod', 'Player', 'Gamepad','Bullet', 'Boomerang', 'Teleporter'],
-  gameRoot: 'http://192.168.1.80:7777'
+
 });
 game.start(function(){
   game.setBackground('black');
@@ -12,7 +12,7 @@ game.start(function(){
 
   // teleports to the next example
   game.build().Teleporter({
-    url: 'http://192.168.1.80:8888/tilesmaps/tilemap-data',
+    url: 'https://yantra.gg/mantra/examples/tilesmaps/tilemap-data',
   }).position(200, 0).createEntity()
 
 

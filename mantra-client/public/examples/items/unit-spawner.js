@@ -3,7 +3,7 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   camera: 'follow',
   plugins: ['UnitSpawner', 'Player', 'Lifetime', 'Gamepad', 'Bullet', 'Boomerang', 'Teleporter'],
-  gameRoot: 'http://192.168.1.80:7777'
+
 });
 game.start(function () {
 
@@ -92,7 +92,7 @@ game.start(function () {
 
   // teleports to the next example
   game.build().Teleporter({
-    url: 'http://192.168.1.80:8888/npc/hexapod',
+    url: 'https://yantra.gg/mantra/examples/npc/hexapod',
   }).position(200, 200).createEntity()
 
 

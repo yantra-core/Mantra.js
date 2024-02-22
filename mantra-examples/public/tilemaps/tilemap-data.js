@@ -3,7 +3,7 @@ let game = new MANTRA.Game({
   defaultMovement: true,
   camera: 'follow',
   plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Boomerang', 'Teleporter'],
-  gameRoot: 'http://192.168.1.80:7777',
+,
 });
 game.start(function () {
   game.zoom(2.5);
@@ -71,7 +71,7 @@ game.start(function () {
   
   // teleports to the next example
   game.build().Teleporter({
-    url: 'http://192.168.1.80:8888/tilemaps/tile-collisions',
+    url: 'https://yantra.gg/mantra/examples/tilemaps/tile-collisions',
   }).position(200, 0).createEntity()
 
 });

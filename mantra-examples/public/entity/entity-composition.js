@@ -2,7 +2,7 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   plugins: ['Player', 'Teleporter'],
-  gameRoot: 'http://192.168.1.80:7777'
+
 });
 game.start(function(){
 
@@ -41,7 +41,7 @@ game.start(function(){
 
   // Teleporter to the next example
   game.build().Teleporter({
-    url: 'http://192.168.1.80:8888/entity/create-entity',
+    url: 'https://yantra.gg/mantra/examples/entity/create-entity',
   }).position(-200, 0).createEntity()
   
 

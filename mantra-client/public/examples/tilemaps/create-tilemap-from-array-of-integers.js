@@ -3,7 +3,7 @@ let game = new MANTRA.Game({
   defaultMovement: true,
   camera: 'follow',
   plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Boomerang'],
-  gameRoot: 'http://192.168.1.80:7777',
+,
 });
 game.start(function () {
   game.zoom(2.5);

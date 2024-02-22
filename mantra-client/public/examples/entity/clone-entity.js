@@ -3,7 +3,7 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   defaultMovement: true,
   plugins: ['Player', 'Teleporter'],
-  gameRoot: 'http://192.168.1.80:7777'
+
 });
 game.start(function(){
 
@@ -48,7 +48,7 @@ game.start(function(){
 
     // teleports to the next example
     game.build().Teleporter({
-      url: 'http://192.168.1.80:8888/entity/entity-composition',
+      url: 'https://yantra.gg/mantra/examples/entity/entity-composition',
     }).position(-200, 0).createEntity()
 
 });    

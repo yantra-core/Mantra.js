@@ -4,7 +4,7 @@ let game = new MANTRA.Game({
   defaultPlayer: true,
   defaultMovement: true,
   plugins: ['Teleporter', 'Text', 'Flame', 'Block', 'Gamepad'],
-  gameRoot: 'http://192.168.1.80:7777'
+
 });
 game.start(function () {
   game.setZoom(3.5);

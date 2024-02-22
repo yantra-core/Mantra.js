@@ -1,7 +1,7 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
   plugins: ['Player', 'Key', 'Block', 'Collectable', 'Teleporter', 'Gamepad'], // plugins at construction
-  gameRoot: 'http://192.168.1.80:7777'
+
 });
 
 game.use('Boomerang'); // plugins at runtime
@@ -21,7 +21,7 @@ game.start(function () {
 
   // teleports to the next example
   game.build().Teleporter({
-    url: 'http://192.168.1.80:8888/items/unit-spawner',
+    url: 'https://yantra.gg/mantra/examples/items/unit-spawner',
   }).position(200, 0).createEntity()
 
 });
