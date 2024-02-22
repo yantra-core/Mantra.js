@@ -8,6 +8,16 @@ class Maze {
     this.id = Maze.id;
   }
 
+  preload (game) {
+    game.use('Key');
+    game.use('Block');
+    game.use('Bullet');
+    game.use('Boomerang');
+    game.use('Tone');
+    game.use('Tile');
+    game.use('Collectable');
+  }
+
   init(game) {
     this.game = game;
     this.createWorld();
@@ -30,15 +40,24 @@ class Maze {
       }
     });
 
+    // TODO: sugar syntax for equipping items
+    // Remark: Entity.items is reserved for layout and positioning
+    //         Entity.meta.equippedItems is reserved for current eqipped item systems
+    //         Entity.meta.inventory is reserved for inventory systems
+    game.updateEntity(game.currentPlayerId, {
+      meta: {
+        equippedItems: [
+          {
+            plugin: 'bullet',
+            method: 'fireBullet',
+          }
+        ]
+      }
+    })
+
     game.setBackground('#000000');
 
-    game.use('Block');
     // game.use('Border', { autoBorder: true });
-    game.use('Bullet');
-    game.use('Boomerang');
-    game.use('Tone');
-    game.use('Tile');
-    game.use('Collectable');
     createDoors(game);
 
     //
