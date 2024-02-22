@@ -1048,7 +1048,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       editor: true,
       sutra: true,
       lifetime: false,
-      defaultMovement: false,
+      defaultMovement: true,
       // data compression
       protobuf: false,
       msgpack: false,

@@ -1,6 +1,8 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
+  plugins: ['Player', 'Teleporter'],
+  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function(){
 
@@ -8,6 +10,8 @@ game.start(function(){
   game.createBorder();
   game.setZoom(1.5);
 
+  game.build().Player().x(100).createEntity();
+ 
   // define a yellow jet engine configuration with velocity
   let jetEngineConfig = game.build()
     .color('yellow')
@@ -34,6 +38,12 @@ game.start(function(){
 
   // create an orange Chevy car with a jet engine
   game.createEntity(jetCarConfig);
+
+  // Teleporter to the next example
+  game.build().Teleporter({
+    url: 'http://192.168.1.80:8888/entity/create-entity',
+  }).position(-200, 0).createEntity()
+  
 
 });
     

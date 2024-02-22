@@ -90,7 +90,9 @@ function defaultMouseMovement(game) {
             rotation: radians
           };
         } else if (event.pointerId === context.secondTouchId) {
-          game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          if (game.systems.boomerang) {
+            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          }
         }
       } else {
         // Use variables for button checks
@@ -103,7 +105,9 @@ function defaultMouseMovement(game) {
           };
         }
         if (context.buttons[mouseActionButton]) {
-          game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          if (game.systems.boomerang) {
+            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          }
         }
       }
     }

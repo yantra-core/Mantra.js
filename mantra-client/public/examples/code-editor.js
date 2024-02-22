@@ -4,6 +4,9 @@ let loaded = false;
 function loadEditor(sourceUrl) {
   if (loaded) return;
 
+  // TODO: create a "Copy to Clipboard" button on top right with graphic
+  // should be prepopulated with the code example after its been formatted and sanitized
+
   let jsSource = sourceUrl;
   console.log('loading remote source', jsSource)
   fetchAndDisplayCode();
@@ -17,13 +20,39 @@ function loadEditor(sourceUrl) {
         code = code.trim().split('\n').slice(0, -1).join('\n');
         code = code.trim().split('\n').slice(0, -1).join('\n');
 
+        let sourceUrl = 'https://yantra.gg/mantra/examples' + jsSource.replace('.', '');
+        let mantraUrl = 'https://yantra.gg/mantra.js';
+        //code = stripIndent(code);
+
+        let htmlTemplate = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantra.js Gallery Page - ${jsSource.replace('.js', '').replace('./', '').replace('-', ' ')}</title>
+    <script src="${mantraUrl}"></script>
+</head>
+<body>
+    <script>
+${code}</script>
+</body>
+</html>
+        `;
+
+        // sanitize the htmlTemplate
+        htmlTemplate = htmlTemplate.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        // Apply the stripIndent function to remove the left padding
+        //htmlTemplate = stripIndent(htmlTemplate);
+
+        //htmlTemplate = formatWithIndent(htmlTemplate);
 
         // check to see if code-editor exists in DOM, if not create it
         if (!document.querySelector('.code-editor')) {
           const codeEditor = document.createElement('div');
           codeEditor.className = 'code-editor';
-          codeEditor.innerHTML = `<pre><code>${code}</code></pre><div class="resize-handle"></div>`;
-
+          codeEditor.innerHTML = `<pre><code>${htmlTemplate}</code></pre><div class="resize-handle"></div>`;
+          console.log('htmlTemplate', htmlTemplate)
           // set the styles
           codeEditor.style.width = '100%';
           // codeEditor.style.height = '30vh'; // Set initial height
@@ -50,11 +79,15 @@ function loadEditor(sourceUrl) {
           // set background opacity
           codeEditor.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
 
+          let copyButton = createCopyButton(htmlTemplate, codeEditor);
+          codeEditor.appendChild(copyButton);
+
+
           // append at end of document
           document.body.appendChild(codeEditor);
         } else {
           // If code-editor exists, just update its content
-          document.querySelector('.code-editor pre code').textContent = code;
+          document.querySelector('.code-editor pre code').textContent = htmlTemplate;
         }
         Prism.highlightAll()
 
@@ -83,5 +116,54 @@ function loadEditor(sourceUrl) {
         console.error('Error fetching the code example:', error);
       });
   }
+
+}
+
+function createCopyButton (htmlTemplate, codeEditor) {
+
+  // Create a "Copy to Clipboard" button
+  const copyButton = document.createElement('button');
+  copyButton.textContent = 'Copy to Clipboard';
+  copyButton.style.position = 'absolute';
+  copyButton.style.top = '10px';
+  copyButton.style.right = '10px';
+  copyButton.style.zIndex = '10'; // Ensure button is clickable and visible
+
+  
+  // Function to show a temporary message
+  function showTemporaryMessage(message, duration = 3000) {
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    messageDiv.style.position = 'absolute';
+    messageDiv.style.bottom = '10px';
+    messageDiv.style.right = '10px';
+    messageDiv.style.backgroundColor = '#f8f9fa';
+    messageDiv.style.border = '1px solid #ccc';
+    messageDiv.style.padding = '5px';
+    messageDiv.style.borderRadius = '5px';
+    messageDiv.style.zIndex = '10';
+
+    codeEditor.appendChild(messageDiv);
+
+    setTimeout(() => {
+      codeEditor.removeChild(messageDiv);
+    }, duration);
+  }
+
+  // Copy to Clipboard functionality
+  copyButton.addEventListener('click', function () {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(htmlTemplate).then(() => {
+        //showTemporaryMessage('Code copied to clipboard!');
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+        //showTemporaryMessage('Failed to copy code.', 5000); // Show the error message longer
+      });
+    } else {
+      console.error('Clipboard API not available');
+      showTemporaryMessage('Clipboard not supported.', 5000);
+    }
+  });
+  return copyButton;
 
 }

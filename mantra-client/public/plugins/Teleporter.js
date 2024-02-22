@@ -98,8 +98,18 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
           destination.call(game, context.target, context.owner);
         } else {
           if (typeof destination.url !== 'undefined') {
-            // redirect the entire page to this url
-            window.location = destination.url;
+            if (context.target.type === 'PLAYER') {
+              // could be other types as well
+              // this page is inside an iframe, change the parent url to this url
+              // Remark: we'll want to make this behavior configurable
+              // Some users may wish for their embeds to not update parent window by default
+              if (window.parent !== window) {
+                window.parent.location = destination.url;
+                return;
+              }
+              // redirect the entire page to this url
+              window.location = destination.url;
+            }
             return;
           }
           if (typeof destination.world !== 'undefined') {
