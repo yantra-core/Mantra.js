@@ -7,6 +7,7 @@ let game = new MANTRA.Game({
 });
 game.start(function(){
 
+  game.setZoom(2.5);
   game.setBackground('black');
   game.build().Player().createEntity();
 

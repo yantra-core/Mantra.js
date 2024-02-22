@@ -4,9 +4,6 @@ let loaded = false;
 function loadEditor(sourceUrl) {
   if (loaded) return;
 
-  // TODO: create a "Copy to Clipboard" button on top right with graphic
-  // should be prepopulated with the code example after its been formatted and sanitized
-
   let jsSource = sourceUrl;
   console.log('loading remote source', jsSource)
   fetchAndDisplayCode();

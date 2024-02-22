@@ -35,9 +35,11 @@
 </head>
 
 <body>
+              <!--
+
   <div class="container">
-    <h1>Welcome to Mantra, my friend.</h1>
     <section class="demo-category">
+
       <h2><a href="home.html">Enter Mantra World</a></h2>
       <a href="home.html">
         <img class="mantraLogo" src="img/game/env/warp-to-mantra-home.png" />
@@ -47,8 +49,23 @@
     <br />
     <br />
     <br />
+
   </div>
-  <div id="breadcrumb"> Mantra Gallery <a href="./examples/gallery">/examples/gallery</a></div> <!-- Breadcrumb placeholder -->
+            -->
+
+
+  
+
+
+     <!--     
+  <div id="breadcrumb">
+    <a href="home.html">
+      <img class="mantraLogo" src="img/game/env/warp-to-mantra-home.png" />
+    </a>
+    <span>Welcome to Mantra, my friend.</span> Mantra Gallery <a href="./examples/gallery">/examples/gallery</a>
+  </div>
+  -->
+    <!-- Breadcrumb placeholder -->
   <iframe id="mantraGalleryIframe" src="./examples/gallery.html" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
 
   <div id="breadcrumb">Mantra Examples <a href="./examples">/examples</a></div> <!-- Breadcrumb placeholder -->
@@ -57,10 +74,17 @@
   <script>
     // Initialize the resizing function for the iframe when the document is fully loaded
     document.addEventListener('DOMContentLoaded', function() {
+
+
       const iframe = document.getElementById('mantraGalleryIframe');
+
+      let height = 1200;
+      iframe.style.height = height + 'px';
       resizeIframeToFitContent(iframe);
+
       const iframe2 = document.getElementById('mantraExamplesIframe');
       resizeIframeToFitContent(iframe2);
+      
     });
   </script>
 

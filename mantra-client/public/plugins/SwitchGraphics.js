@@ -35,8 +35,8 @@ var SwitchGraphics = /*#__PURE__*/function () {
 
       // Update the graphics mode first
       this.graphicsMode = nextGraphicsMode;
+      // this.game.data.camera.currentZoom = 2.5;
       this.game.switchGraphics(this.lookupGraphicsPlugin(this.graphicsMode));
-
       // Then update the button label to reflect the new mode
       this.updateButtonLabel(this.nextMode());
     }

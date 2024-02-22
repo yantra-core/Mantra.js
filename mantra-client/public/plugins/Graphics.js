@@ -663,6 +663,10 @@ function _switchGraphics() {
           console.warn('Invalid graphics interface: ' + graphicsInterfaceName);
           document.body.style.cursor = 'default';
         case 16:
+          if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
+            game.setZoom(3.5);
+          }
+        case 17:
         case "end":
           return _context.stop();
       }

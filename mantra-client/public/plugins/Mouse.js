@@ -255,6 +255,21 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       }
       var context = this.createMouseContext(event);
       this.game.emit('pointerDown', context, event);
+
+      // check to see if game is running in iframe, if soo broadcast the event with context
+      // check if in iframe
+      if (window.parent !== window) {
+        // TODO: make this a config option
+        // send the message to the iframe
+        window.parent.postMessage({
+          type: 'pointerDown',
+          context: {
+            entityId: this.game.selectedEntityId,
+            position: context.position,
+            buttons: this.mouseButtons
+          }
+        }, '*');
+      }
       this.sendMouseData(event);
     }
   }, {

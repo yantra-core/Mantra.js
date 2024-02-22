@@ -90,9 +90,8 @@ function defaultMouseMovement(game) {
             rotation: radians
           };
         } else if (event.pointerId === context.secondTouchId) {
-          if (game.systems.boomerang) {
-            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
-          }
+          // TODO: emit sutra event for action
+          useItem(game, currentPlayer, radians);
         }
       } else {
         // Use variables for button checks
@@ -105,13 +104,34 @@ function defaultMouseMovement(game) {
           };
         }
         if (context.buttons[mouseActionButton]) {
-          if (game.systems.boomerang) {
-            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
-          }
+          // TODO: emit sutra event for action
+          useItem(game, currentPlayer, radians);
         }
       }
     }
   });
+}
+
+// Stubs for meta.equippedItems / equippable items API
+function useItem(game, currentPlayer, radians) {
+  //console.log('useItem', currentPlayer, radians);
+  if (currentPlayer.meta && currentPlayer.meta.equippedItems && currentPlayer.meta.equippedItems.length) {
+    // pick the first item in the array
+    var equippedItem = currentPlayer.meta.equippedItems[0];
+    var system = game.systems[equippedItem.plugin]; // as string name, 'bullet'
+    var method = system[equippedItem.method]; // as string name, 'fireBullet'
+
+    if (typeof method === 'function') {
+      method(currentPlayer.id, radians);
+    } else {
+      console.error('Method not found', equippedItem.method);
+    }
+  } else {
+    // boomerang is default item ( for now )
+    if (game.systems.boomerang) {
+      game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+    }
+  }
 }
 
 },{}],2:[function(require,module,exports){

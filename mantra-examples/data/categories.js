@@ -800,7 +800,7 @@ let tiles_examples = [
     category: 'tiles',
     description: 'Create a tilemap from an array of integers.',
     image: 'placeholder-image.jpg',
-    url: 'tilemaps/create-tilemap-from-array-of-integers.html',
+    url: 'tilemaps/tilemap-data.html',
     tags: ['create', 'tilemap', 'array', 'integers', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
   /*
@@ -1100,7 +1100,7 @@ let games_examples = [
     category: 'games',
     description: 'Create a top down shooter game.',
     image: 'placeholder-image.jpg',
-    url: 'games/top-down-shooter.html',
+    url: 'games/home.html',
     tags: ['top', 'down', 'shooter', 'game', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
   {

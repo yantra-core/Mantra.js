@@ -4750,6 +4750,17 @@ var Maze = /*#__PURE__*/function () {
     this.id = Maze.id;
   }
   _createClass(Maze, [{
+    key: "preload",
+    value: function preload(game) {
+      game.use('Key');
+      game.use('Block');
+      game.use('Bullet');
+      game.use('Boomerang');
+      game.use('Tone');
+      game.use('Tile');
+      game.use('Collectable');
+    }
+  }, {
     key: "init",
     value: function init(game) {
       this.game = game;
@@ -4773,14 +4784,22 @@ var Maze = /*#__PURE__*/function () {
           z: 1
         }
       });
+
+      // TODO: sugar syntax for equipping items
+      // Remark: Entity.items is reserved for layout and positioning
+      //         Entity.meta.equippedItems is reserved for current eqipped item systems
+      //         Entity.meta.inventory is reserved for inventory systems
+      game.updateEntity(game.currentPlayerId, {
+        meta: {
+          equippedItems: [{
+            plugin: 'bullet',
+            method: 'fireBullet'
+          }]
+        }
+      });
       game.setBackground('#000000');
-      game.use('Block');
+
       // game.use('Border', { autoBorder: true });
-      game.use('Bullet');
-      game.use('Boomerang');
-      game.use('Tone');
-      game.use('Tile');
-      game.use('Collectable');
       (0, _createDoors["default"])(game);
 
       //

@@ -19,10 +19,8 @@ import Mouse from '../mantra-game/plugins/mouse/Mouse.js';
 let game = new Game({
   width: 800,
   height: 600,
-  defaultMovement: true,
-  defaultPlayer: true,
   plugins: ['Gamepad'],
-  graphics: ['three'],
+  graphics: ['css'], // 'three', 'babylon', 'css'
   gameRoot: '.',
   defaultMovement: true,
 
@@ -86,10 +84,11 @@ game.use(new Lifetime());
 game.start(function () {
   game.reset();
   game.setZoom(2);
+
   // game.build().RadialMenu().size(100).createEntity();
   // game.use(new plugins.RadialMenu());
 
-  //game.use(new worlds.GravityGardens());
+  game.use(new worlds.Home());
   /*
   //let f = game.build().Tower().Draggable().createEntity();
   game.build().Label({
@@ -452,8 +451,6 @@ game.start(function () {
   //game.build().Text().text('Teleport to Plugin').width(200).position(0, 0, 0).createEntity();
 
   //game.use(new GravityGardens());
-
-
 
   // game.use(new plugins.Border())
   //game.use(new GravityGardens());

@@ -25,50 +25,58 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
+      flex-wrap: wrap;
+      /* Allows controls to wrap on smaller screens */
       background-color: #000;
       color: #fff;
-
     }
 
     .navigation {
       display: flex;
       justify-content: center;
       flex-grow: 1;
-      /* Allows the navigation container to take up all available space */
     }
 
-    .navigation h3,
     .navigation h2 {
       margin: 0;
       padding: 5px 10px;
+      font-size: 42px;
     }
 
-    .navigation h3 {
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .navigation h3:hover {
-      /* better hover color for dark bg*/
-      background-color: #333;
-      border-radius: 5px;
-    }
-
+    .control-buttons,
     .control-buttons-left {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-right: 26px;
-      /* Space between playPauseBtn and countdown */
+      flex-wrap: wrap;
+      /* Allow wrapping within control buttons */
     }
 
+    .control-buttons-right {
+      padding-right: 35px;
+    }
 
-    .control-buttons {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-right: 26px;
-      /* Space between playPauseBtn and countdown */
+    .control-buttons select,
+    .control-buttons button {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      font-size: 1.3em;
+      background-color: #d000ff;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      flex: 0 1 auto;
+      /* Do not grow, allow shrink, and base width on content */
+      min-width: 100px;
+      /* Minimum width to ensure buttons and select are not too small */
+      height: 40px;
+      /* Fixed height for better control */
+    }
+
+    .control-buttons button:hover {
+      background-color: #b300ff;
+      /* Slightly darker on hover */
     }
 
     #countdown {
@@ -79,62 +87,104 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    #playPauseBtn {
-      padding: 5px 10px;
-      cursor: pointer;
-      border: none;
-      background-color: #d000ff;
-      color: white;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
-
-    #playPauseBtn:hover {
-      background-color: #d000ff;
+      flex: 0 1 50px;
+      /* Do not grow, allow shrink, and base width on content */
     }
 
     iframe {
       width: 100%;
       height: 1200px;
-      /* Adjust as needed */
       border: none;
-      padding-top: 60px;
+      padding-top: 0px;
       /* Height of the fixed controls container */
     }
 
     @media (max-width: 768px) {
-      .navigation h2 {
-        font-size: 16px;
-        /* Smaller font size for smaller screens */
+      .fixed-controls-container {
+        flex-direction: column;
+        /* Stack elements vertically */
+        align-items: flex-start;
+        /* Initially align items to the left */
+        position: relative;
+        /* Ensure the countdown is positioned relative to this container */
       }
 
-      .navigation h3 {
-        font-size: 14px;
-        /* Smaller font size for smaller screens */
+      .control-buttons,
+      .control-buttons-left,
+      .control-buttons-right {
+        justify-content: flex-start;
+        /* Align elements to the left within their containers */
+        width: 100%;
+        /* Take full width to align content to the left */
+        margin-top: 10px;
+        /* Add some space between elements */
+      }
+
+      .navigation {
+        order: 1;
+        /* Move the navigation (which contains the exampleTitle) to the end */
+        width: 100%;
+        /* Ensure the navigation container takes full width */
+        display: flex;
+        /* Use flexbox to align the h2 */
+        justify-content: center;
+        /* Center-align the flex items (h2) horizontally */
+        align-items: center;
+        /* Center-align the flex items (h2) vertically */
+      }
+
+      .navigation h2 {
+        padding-top: 40px;
+        font-size: 32px;
+        /* Adjust font size for smaller screens */
+        margin: 0;
+        /* Remove margin to ensure center alignment */
+      }
+
+      #countdown {
+        position: absolute;
+        /* Position the countdown clock absolutely within the fixed container */
+        top: 10px;
+        /* Distance from the top of the container */
+        right: 50px;
+        /* Distance from the right of the container */
       }
     }
   </style>
+
+
+
 </head>
 
 <body>
+
+  <script>
+    // listen for messages from the iframe
+    window.addEventListener('message', event => {
+      // log the data
+      console.log(event.data);
+      togglePlayPause(true);
+      // alert('hide')
+    });
+
+  </script>
   <div class="fixed-controls-container">
 
-    <div class="control-buttons-left">
+    <div class="control-buttons control-buttons-left">
       <select id="exampleDropdown" onchange="loadSelectedExample()">
         <option value="">Select an Example</option>
         <!-- Options will be dynamically populated here -->
       </select>
+      <button id="prevPreview"></button>
     </div>
 
 
     <div class="navigation">
-      <h3 id="prevPreview"></h3>
       <h2 id="exampleTitle"></h2>
-      <h3 id="nextPreview"></h3>
     </div>
-    <div class="control-buttons">
+    <div class="control-buttons control-buttons-right">
+      <button id="nextPreview"></button>
+
       <button id="playPauseBtn">Pause</button>
       <div id="countdown">5</div>
     </div>
@@ -142,138 +192,158 @@
   <iframe id="exampleFrame"></iframe>
   <script>
     // 
-    const exampleURLs = ["physics/rotate.html","npc/hexapod.html","physics/set-position.html","collisions/collision-start.html","collisions/collision-active.html","games/top-down-shooter.html","games/platformer.html","games/music-world.html","games/maze-world.html","games/gravity-gardens.html","lifecycle/before-update-entity.html","lifecycle/before-update.html","lifecycle/before-remove-entity.html","lifecycle/before-create-entity.html","lifecycle/before-collision-start.html","lifecycle/before-collision-end.html","lifecycle/before-collision-active.html","lifecycle/after-update-entity.html","lifecycle/after-update.html","lifecycle/after-remove-entity.html","lifecycle/after-create-entity.html","lifecycle/after-collision-start.html","lifecycle/after-collision-end.html","lifecycle/after-collision-active.html","scenes/scene-unloading.html","scenes/scene-loading.html","containers/stack-layout.html","containers/group-entities.html","containers/grid-layout.html","movement/top-down-movement.html","movement/side-scroller-movement.html","movement/jumping.html","game-config/game-config-object.html","game-config/game-size.html","game-config/game-root.html","game-config/game-graphics.html","game-config/field-of-view.html","game-config/frames-per-second.html","terrain/procedural-maze.html","terrain/procedural-biome.html","terrain/infinite-maze.html","tilemaps/tileset.html","tilemaps/create-tilemap-from-array-of-integers.html","tilemaps/tilemap-object.html","tilemaps/tile-collisions.html","tilemaps/tilemap-from-labyrinthos.html","behaviors/keyboard-input.html","behaviors/gamepad-input.html","behaviors/game-tick.html","behaviors/entity-state.html","behaviors/entity-collision.html","camera/follow-player.html","camera/camera-shake.html","camera/camera-set-position.html","camera/camera-move.html","collisions/collision-start.html","collisions/collision-end.html","collisions/collision-active.html","audio/virtual-piano.html","audio/play-tone.html","inputs/mouse.html","inputs/mouse.html","inputs/keyboard.html","inputs/gamepad.html","assets/load-sprite-sheet.html","assets/load-image.html","render/three.html","render/css3.html","render/babylon.html","textures/update-texture.html","textures/sprite-sheets.html","textures/set-texture.html","physics/set-position.html","physics/rotate.html","physics/apply-force.html","entity/update-entity.html","entity/repeat-entity.html","entity/remove-entity.html","entity/get-entity.html","entity/entity-lifetime.html","entity/entity-builder.html","entity/draggable-entity.html","entity/create-entity.html","entity/entity-composition.html","entity/clone-entity.html","npc/hexapod.html","items/unit-spawner.html","items/teleporter.html","items/flame.html","items/bullet.html","items/boomerang.html","items/block.html"]; // Assuming exampleURLsJSON is defined elsewhere
+    // 
+    const exampleURLs = ["physics/rotate.html","npc/hexapod.html","physics/set-position.html","collisions/collision-start.html","collisions/collision-active.html","games/home.html","games/platformer.html","games/music-world.html","games/maze-world.html","games/gravity-gardens.html","lifecycle/before-update-entity.html","lifecycle/before-update.html","lifecycle/before-remove-entity.html","lifecycle/before-create-entity.html","lifecycle/before-collision-start.html","lifecycle/before-collision-end.html","lifecycle/before-collision-active.html","lifecycle/after-update-entity.html","lifecycle/after-update.html","lifecycle/after-remove-entity.html","lifecycle/after-create-entity.html","lifecycle/after-collision-start.html","lifecycle/after-collision-end.html","lifecycle/after-collision-active.html","scenes/scene-unloading.html","scenes/scene-loading.html","containers/stack-layout.html","containers/group-entities.html","containers/grid-layout.html","movement/top-down-movement.html","movement/side-scroller-movement.html","movement/jumping.html","game-config/game-config-object.html","game-config/game-size.html","game-config/game-root.html","game-config/game-graphics.html","game-config/field-of-view.html","game-config/frames-per-second.html","terrain/procedural-maze.html","terrain/procedural-biome.html","terrain/infinite-maze.html","tilemaps/tileset.html","tilemaps/tilemap-data.html","tilemaps/tilemap-object.html","tilemaps/tile-collisions.html","tilemaps/tilemap-from-labyrinthos.html","behaviors/keyboard-input.html","behaviors/gamepad-input.html","behaviors/game-tick.html","behaviors/entity-state.html","behaviors/entity-collision.html","camera/follow-player.html","camera/camera-shake.html","camera/camera-set-position.html","camera/camera-move.html","collisions/collision-start.html","collisions/collision-end.html","collisions/collision-active.html","audio/virtual-piano.html","audio/play-tone.html","inputs/mouse.html","inputs/mouse.html","inputs/keyboard.html","inputs/gamepad.html","assets/load-sprite-sheet.html","assets/load-image.html","render/three.html","render/css3.html","render/babylon.html","textures/update-texture.html","textures/sprite-sheets.html","textures/set-texture.html","physics/set-position.html","physics/rotate.html","physics/apply-force.html","entity/update-entity.html","entity/repeat-entity.html","entity/remove-entity.html","entity/get-entity.html","entity/entity-lifetime.html","entity/entity-builder.html","entity/draggable-entity.html","entity/create-entity.html","entity/entity-composition.html","entity/clone-entity.html","npc/hexapod.html","items/unit-spawner.html","items/teleporter.html","items/flame.html","items/bullet.html","items/boomerang.html","items/block.html"]; // Assuming exampleURLsJSON is defined elsewhere
+
+
+
+    let galleryRoot = '../examples/';
+    galleryRoot = './'; // for dev testing
     let currentIndex = 0;
     let intervalId;
     let countdownValue = 5; // 5-second countdown
     let isPlaying = true;
-    
+
+
     function cycleExamples(direction = 'forward') {
-        const frame = document.getElementById('exampleFrame');
-        const title = document.getElementById('exampleTitle');
-        const nextPreview = document.getElementById('nextPreview');
-        const prevPreview = document.getElementById('prevPreview');
-        const dropdown = document.getElementById('exampleDropdown');
-    
-        if (direction === 'forward') {
-            currentIndex = (currentIndex + 1) % exampleURLs.length;
-        } else if (direction === 'backward') {
-            currentIndex = (currentIndex - 1 + exampleURLs.length) % exampleURLs.length;
-        }
-    
-        const currentUrl = exampleURLs[currentIndex];
-        frame.src = currentUrl;
+      const frame = document.getElementById('exampleFrame');
+      const title = document.getElementById('exampleTitle');
+      const nextPreview = document.getElementById('nextPreview');
+      const prevPreview = document.getElementById('prevPreview');
+      const dropdown = document.getElementById('exampleDropdown');
 
+      if (direction === 'forward') {
+        currentIndex = (currentIndex + 1) % exampleURLs.length;
+      } else if (direction === 'backward') {
+        currentIndex = (currentIndex - 1 + exampleURLs.length) % exampleURLs.length;
+      }
 
-        // Extract a meaningful part of the URL, for example, the filename without extension
-        const urlSegment = currentUrl.split('/').pop().split('.html')[0];
-        // TODO: enable push state to example links
-        //let pushSegement = currentUrl.replace('.html', '');
-        // Update the browser's URL to reflect the current example, using a hash or query parameter
-        //window.history.pushState({}, '', pushSegement); // or '?example=' + urlSegment for query parameters
-    
-        const titleText = currentUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
-        title.textContent = 'Currently Viewing: ' + titleText;
-    
-        const nextIndex = (currentIndex + 1) % exampleURLs.length;
-        const nextUrl = exampleURLs[nextIndex];
-        const nextTitleText = nextUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
-        nextPreview.textContent = 'Up Next: ' + nextTitleText;
-    
-        if (currentIndex === 0) {
-            prevPreview.style.display = 'none';
-        } else {
-            prevPreview.style.display = '';
-            const prevIndex = (currentIndex - 1 + exampleURLs.length) % exampleURLs.length;
-            const prevUrl = exampleURLs[prevIndex];
-            const prevTitleText = prevUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
-            prevPreview.textContent = 'Previously: ' + prevTitleText;
-        }
-    
-        // Update dropdown to show the current example
-        dropdown.selectedIndex = currentIndex + 1; // +1 because the first option is "Select an Example"
-    
-        resetCountdown();
+      let currentUrl = exampleURLs[currentIndex];
+      frame.src = galleryRoot + currentUrl;
+
+      // Use a clean and consistent way to generate the URL for pushState
+      //const stateUrl = generateStateUrl(currentUrl);
+      //window.history.pushState({ index: currentIndex }, '', stateUrl);
+
+      let titleSlug = urlToNiceName(currentUrl);
+
+      title.textContent = titleSlug;
+
+      const nextIndex = (currentIndex + 1) % exampleURLs.length;
+      const nextUrl = exampleURLs[nextIndex];
+      // const nextTitleText = nextUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
+      let nextTitleText = urlToNiceName(nextUrl);
+      nextPreview.textContent = 'Up Next: ' + nextTitleText;
+
+      if (currentIndex === 0) {
+        prevPreview.style.display = 'none';
+      } else {
+        prevPreview.style.display = '';
+        const prevIndex = (currentIndex - 1 + exampleURLs.length) % exampleURLs.length;
+        const prevUrl = exampleURLs[prevIndex];
+        // const prevTitleText = prevUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
+        let prevTitleText = urlToNiceName(prevUrl);
+        prevPreview.textContent = 'Previously: ' + prevTitleText;
+      }
+
+      // Update dropdown to show the current example
+      dropdown.selectedIndex = currentIndex + 1; // +1 because the first option is "Select an Example"
+
+      resetCountdown();
     }
-    
+
     function updateCountdown() {
-        const countdown = document.getElementById('countdown');
-        countdown.textContent = countdownValue;
-        countdownValue--;
-    
-        if (countdownValue < 0) {
-            cycleExamples();
-        }
-    }
-    
-    function resetCountdown() {
-        countdownValue = 5; // Reset to 5 seconds
-        updateCountdown();
-    }
-    
-    function togglePlayPause(forcePause = false) {
-        const btn = document.getElementById('playPauseBtn');
-        isPlaying = forcePause ? false : !isPlaying;
-    
-        btn.textContent = isPlaying ? 'Pause' : 'Play';
-        if (isPlaying) {
-            intervalId = setInterval(updateCountdown, 1000);
-        } else {
-            clearInterval(intervalId);
-        }
-    }
-    
-    document.addEventListener('click', () => {
-        togglePlayPause(true); // Pause the timer on any document click
-    });
-    
-    document.getElementById('playPauseBtn').addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent the document click event from firing
-        togglePlayPause();
-    });
-    
-    document.getElementById('nextPreview').addEventListener('click', (e) => {
-        e.stopPropagation();
-        cycleExamples('forward');
-    });
-    
-    document.getElementById('prevPreview').addEventListener('click', (e) => {
-        e.stopPropagation();
-        cycleExamples('backward');
-    });
-    
-    function populateDropdown() {
-        const dropdown = document.getElementById('exampleDropdown');
-        exampleURLs.forEach((url, index) => {
-            const option = document.createElement('option');
-            const title = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
-            option.text = title;
-            option.value = index;
-            dropdown.appendChild(option);
-        });
-    }
-    
-    function loadSelectedExample() {
-        const dropdown = document.getElementById('exampleDropdown');
-        const selectedValue = dropdown.value;
-    
-        if (selectedValue) {
-            currentIndex = parseInt(selectedValue, 10);
-            togglePlayPause(true); // Force pause when selecting from dropdown
-            cycleExamples();
-        }
-    }
-    
-    document.getElementById('exampleDropdown').addEventListener('change', loadSelectedExample);
-    
-    function startGallery() {
-        populateDropdown();
-        intervalId = setInterval(updateCountdown, 1000);
+      const countdown = document.getElementById('countdown');
+      countdown.textContent = countdownValue;
+      countdownValue--;
+
+      if (countdownValue < 0) {
         cycleExamples();
+      }
     }
-    
+
+    function resetCountdown() {
+      countdownValue = 5; // Reset to 5 seconds
+      updateCountdown();
+    }
+
+    function togglePlayPause(forcePause = false) {
+      const btn = document.getElementById('playPauseBtn');
+      isPlaying = forcePause ? false : !isPlaying;
+
+      btn.textContent = isPlaying ? 'Pause' : 'Play';
+      if (isPlaying) {
+        intervalId = setInterval(updateCountdown, 1000);
+      } else {
+        clearInterval(intervalId);
+      }
+    }
+
+    // converts url string to example name with category
+    function urlToNiceName(url) {
+      url = url.replace('.html', '').replace('/', ' ').replace('-', ' ');
+      return url.split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+    }
+
+    // Generate a clean URL for pushState
+    function generateStateUrl(url) {
+      // alert(url)
+      // Assuming your site's examples are all under a specific path like '/examples/'
+      return `/${url.replace('.html', '')}`;
+    }
+
+    document.addEventListener('click', () => {
+      togglePlayPause(true); // Pause the timer on any document click
+    });
+
+    document.getElementById('playPauseBtn').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent the document click event from firing
+      togglePlayPause();
+    });
+
+    document.getElementById('nextPreview').addEventListener('click', (e) => {
+      e.stopPropagation();
+      cycleExamples('forward');
+    });
+
+    document.getElementById('prevPreview').addEventListener('click', (e) => {
+      e.stopPropagation();
+      cycleExamples('backward');
+    });
+
+    function populateDropdown() {
+      const dropdown = document.getElementById('exampleDropdown');
+      exampleURLs.forEach((url, index) => {
+        const option = document.createElement('option');
+        // const title = url.split('/').pop().replace('.html', '').replace(/-/g, ' ');
+        let title = urlToNiceName(url);
+        option.text = title;
+        option.value = index;
+        dropdown.appendChild(option);
+      });
+    }
+
+    function loadSelectedExample() {
+      const dropdown = document.getElementById('exampleDropdown');
+      const selectedValue = dropdown.value;
+
+      if (selectedValue) {
+        currentIndex = parseInt(selectedValue, 10);
+        togglePlayPause(true); // Force pause when selecting from dropdown
+        cycleExamples();
+      }
+    }
+
+    document.getElementById('exampleDropdown').addEventListener('change', loadSelectedExample);
+
+    function startGallery() {
+      populateDropdown();
+      intervalId = setInterval(updateCountdown, 1000);
+      cycleExamples();
+    }
+
     startGallery();
-    
+
 
   </script>
 </body>

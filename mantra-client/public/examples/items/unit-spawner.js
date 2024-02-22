@@ -1,10 +1,13 @@
 let game = new MANTRA.Game({
-  defaultPlayer: true,
   defaultMovement: true,
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['UnitSpawner', "Lifetime", 'Gamepad', 'Bullet', 'Boomerang']
+  camera: 'follow',
+  plugins: ['UnitSpawner', 'Player', 'Lifetime', 'Gamepad', 'Bullet', 'Boomerang', 'Teleporter'],
+  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function () {
+
+  game.build().Player().createEntity();
 
   let particleConfig = game.build()
     .type('PARTICLE')
@@ -86,5 +89,12 @@ game.start(function () {
     .size(8, 8)
     .position(0, 200)
     .createEntity(); // Finalizes and creates the entity
+
+  // teleports to the next example
+  game.build().Teleporter({
+    url: 'http://192.168.1.80:8888/npc/hexapod',
+  }).position(200, 200).createEntity()
+
+
 
 });
