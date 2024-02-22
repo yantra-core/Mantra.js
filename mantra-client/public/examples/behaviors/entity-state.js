@@ -2,7 +2,7 @@ let game = new MANTRA.Game({
   defaultMovement: true,
   width: 400,
   height: 300,
-  plugins: ['Gamepad', 'GamepadGUI'],
+  plugins: ['Text', 'Gamepad'],
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
 });
 
@@ -61,65 +61,33 @@ game.start(function () {
   });
   game.createBorder();
 
-  let colorBlock = game.createEntity({
-    type: 'MY_TYPE',
-    width: 32,
-    height: 32,
-    depth: 16,
-    isStatic: true,
-    position: {
-      x: -80,
-      y: -60,
-      z: 16
-    }
-  });
+  // REMARK: notice the new builder APIs? these are the category of changes we need
+  let colorBlockLeft = game.build().type('MY_TYPE').isStatic(true).size(32).position(-80, -60, 16).createEntity();
 
-  game.createEntity({
-    type: 'MY_TYPE',
-    width: 32,
-    height: 32,
-    depth: 16,
-    isStatic: true,
-    position: {
-      x: 80,
-      y: -60,
-      z: 16
-    }
-  });
+  let colorBlockRight = game.build()
+    .type('MY_TYPE')
+    .size(32) // Assuming this sets both width and height
+    .isStatic(true)
+    .position(80, -60, 16)
+    .createEntity();
 
-  // draw a horizontal line in the middle of the screen
-  game.createEntity({
-    width: 400,
-    height: 10,
+  let horizontalLine = game.build()
+    .size(400, 10) // Assuming the first argument is width, the second is height
+    .body(false)
+    .position(0, 0, 0)
+    .createEntity();
 
-    body: false,
-    isStatic: true,
-    position: {
-      x: 0,
-      y: 0,
-      z: 0
-    }
-  });
-
-  // add text to describe the party zone, cross to enter
-  game.createText({
-    text: 'Cross line to change color!',
-    color: 'white',
-    position: {
-      x: 0,
-      y: 50
-    },
-    body: false,
-    size: {
-      width: 300,
-      height: 50,
-    },
-    color: 0xffffff,
-    style: {
+  let partyZoneText = game.build()
+    .Text()
+    .text('Cross line to change color!')
+    .color('white')
+    .position(0, 50)
+    .size(300, 50) // Assuming this sets the width and height for the text box
+    .style({
       backgroundColor: 'black',
       fontSize: '24px',
       textAlign: 'center'
-    },
-  });
+    })
+    .createEntity();
 
 });

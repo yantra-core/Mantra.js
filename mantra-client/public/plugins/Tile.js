@@ -183,6 +183,10 @@ exports["default"] = void 0;
 var _generateTiledJSON = _interopRequireDefault(require("./util/generateTiledJSON.js"));
 var _mersenne = _interopRequireDefault(require("./util/mersenne.js"));
 var _noise = _interopRequireDefault(require("./util/noise.js"));
+var _getTileAt = _interopRequireDefault(require("./TileMap/getTileAt.js"));
+var _transform = _interopRequireDefault(require("./TileMap/transform.js"));
+var _query = _interopRequireDefault(require("./TileMap/query.js"));
+var _merge = _interopRequireDefault(require("./TileMap/merge.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -230,7 +234,13 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
     this.Noise = new _noise["default"]();
     this.noise = this.Noise.noise;
     this.seedNoise = this.Noise.noiseSeed;
+    this.transform = _transform["default"].bind(this);
+    this.query = _query["default"].bind(this);
+    this.merge = _merge["default"].bind(this);
+    this.getTileAt = _getTileAt["default"].bind(this);
     this.data = this.initializeDataArray();
+    this.tileSet = [];
+
     // ASCII representations for tiles 0-10
     // TODO: Is there a better default set of ASCII characters we can use?
     this.defaultRogueLike = ['-', '#', '+', '0', '<', '>', '$', '⌂', '@', '&', '?'];
@@ -390,15 +400,6 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "getTileAt",
-    value: function getTileAt(x, y, z) {
-      if (this.is3D) {
-        return this.data[z][y * this.width + x];
-      } else {
-        return this.data[y * this.width + x];
-      }
-    }
-  }, {
     key: "toJSON",
     value: function toJSON() {
       return JSON.stringify({
@@ -414,66 +415,19 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
     value: function toTiledJSON() {
       return (0, _generateTiledJSON["default"])(this);
     }
+
+    // query3D is WIP - not fully implemented yet, see: ./test/tilemap-query-test.js 
   }, {
-    key: "query",
-    value: function query() {
+    key: "query3D",
+    value: function query3D() {
       var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         x = _ref2.x,
         y = _ref2.y,
+        z = _ref2.z,
         width = _ref2.width,
         height = _ref2.height,
-        z = _ref2.z,
+        depth = _ref2.depth,
         tileName = _ref2.tileName;
-      var results = [];
-      if (x !== undefined && y !== undefined && width !== undefined && height !== undefined) {
-        for (var offsetY = 0; offsetY < height; offsetY++) {
-          for (var offsetX = 0; offsetX < width; offsetX++) {
-            var queryX = x + offsetX;
-            var queryY = y + offsetY;
-            if (queryX >= this.width || queryY >= this.height) {
-              results.push(undefined); // Add undefined for out-of-bounds indices
-            } else {
-              var index = queryY * this.width + queryX; // Calculate the correct index in the 1D array
-              if (this.is3D) {
-                if (z !== undefined && this.data[z] && this.data[z][index] !== undefined) {
-                  results.push(this.data[z][index]);
-                } else {
-                  results.push(undefined);
-                }
-              } else {
-                if (this.data[index] !== undefined) {
-                  results.push(this.data[index]);
-                } else {
-                  results.push(undefined);
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // create a new TileMap instance from the results
-      var subsection = new TileMap({
-        width: width,
-        height: height,
-        is3D: this.is3D
-      });
-      subsection.data = results;
-      return subsection;
-    }
-  }, {
-    key: "query3D",
-    value:
-    // query3D is WIP - not fully implemented yet, see: ./test/tilemap-query-test.js 
-    function query3D() {
-      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        x = _ref3.x,
-        y = _ref3.y,
-        z = _ref3.z,
-        width = _ref3.width,
-        height = _ref3.height,
-        depth = _ref3.depth,
-        tileName = _ref3.tileName;
       var results = [];
       if (x !== undefined && y !== undefined && z !== undefined && width !== undefined && height !== undefined && depth !== undefined) {
         for (var offsetZ = 0; offsetZ < depth; offsetZ++) {
@@ -575,7 +529,196 @@ function init3DArray(width, height, depth) {
 }
 */
 
-},{"./util/generateTiledJSON.js":24,"./util/mersenne.js":25,"./util/noise.js":26}],5:[function(require,module,exports){
+},{"./TileMap/getTileAt.js":5,"./TileMap/merge.js":6,"./TileMap/query.js":7,"./TileMap/transform.js":8,"./util/generateTiledJSON.js":28,"./util/mersenne.js":29,"./util/noise.js":30}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = getTileAt;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function getTileAt(x, y, z) {
+  var tileId; // This will hold the actual value from the data array
+
+  // Retrieve the tile value based on whether the map is 3D or 2D
+  // TODO: remove .is3d and use depth instead
+  if (this.is3D) {
+    if (z !== undefined && this.data[z] !== undefined) {
+      tileId = this.data[z][y * this.width + x];
+    } else {
+      return undefined; // Return undefined if the z layer does not exist
+    }
+  } else {
+    tileId = this.data[y * this.width + x];
+  }
+
+  // Construct the tile object with the id, value, and coordinates
+  var tileObject = _objectSpread({
+    // id: tileId, // Tile ID from the tileSet array
+    id: tileId,
+    // Actual tile ID from the data array
+    value: tileId,
+    // Actual value from the data array
+    x: x,
+    y: y
+  }, this.is3D ? {
+    z: z
+  } : {});
+
+  // If the tileSet is defined and contains an entry for this tile ID, merge its properties into the tile object
+  if (Array.isArray(this.tileSet) && this.tileSet[tileId]) {
+    tileObject = _objectSpread(_objectSpread({}, tileObject), this.tileSet[tileId]);
+  }
+  return tileObject;
+}
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = merge;
+function merge(otherMap) {
+  var startX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var startY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var startZ = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  for (var z = 0; z < otherMap.depth; z++) {
+    for (var y = 0; y < otherMap.height; y++) {
+      for (var x = 0; x < otherMap.width; x++) {
+        var targetX = startX + x;
+        var targetY = startY + y;
+        var targetZ = startZ + z;
+
+        // Extend the current map if necessary
+        // this.ensureBounds(targetX, targetY, targetZ);
+
+        // Replace the tile in the current map with the tile from the other map
+        if (this.is3D) {
+          this.data[targetZ][targetY * this.width + targetX] = otherMap.getTileAt(x, y, z).value;
+        } else {
+          this.data[targetY * this.width + targetX] = otherMap.getTileAt(x, y).value;
+        }
+      }
+    }
+  }
+}
+
+// TODO: we can implement options to extend / cut the map based on the other map's dimensions
+// Ensure the current map can accommodate a tile at the given position
+function ensureBounds(x, y) {
+  var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  if (this.is3D) {
+    // Logic to extend the map in 3D if necessary
+  } else {
+    // Logic to extend the map in 2D if necessary
+  }
+  // Note: Implement the logic to extend the map's bounds as needed
+}
+
+},{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = query;
+var _TileMap = _interopRequireDefault(require("../TileMap.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+// self reference required for new TileMap instance
+
+function query() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+    x = _ref.x,
+    y = _ref.y,
+    width = _ref.width,
+    height = _ref.height,
+    z = _ref.z,
+    tile = _ref.tile;
+  var results = [];
+  if (x !== undefined && y !== undefined && width !== undefined && height !== undefined) {
+    for (var offsetY = 0; offsetY < height; offsetY++) {
+      for (var offsetX = 0; offsetX < width; offsetX++) {
+        var queryX = x + offsetX;
+        var queryY = y + offsetY;
+        if (queryX >= this.width || queryY >= this.height) {
+          results.push(undefined); // Add undefined for out-of-bounds indices
+        } else {
+          var index = queryY * this.width + queryX; // Calculate the correct index in the 1D array
+          // TODO: remove .is3d and use depth instead
+          if (this.is3D) {
+            if (z !== undefined && this.data[z] && this.data[z][index] !== undefined) {
+              results.push(this.data[z][index]);
+            } else {
+              results.push(undefined);
+            }
+          } else {
+            if (this.data[index] !== undefined) {
+              results.push(this.data[index]);
+            } else {
+              results.push(undefined);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // create a new TileMap instance from the results
+  var subsection = new _TileMap["default"]({
+    width: width,
+    height: height,
+    is3D: this.is3D
+  });
+  subsection.data = results;
+  return subsection;
+}
+;
+
+},{"../TileMap.js":4}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = transform;
+function transform(transformFunction) {
+  // Check if the map is 3D
+  if (this.depth > 1) {
+    for (var z = 0; z < this.depth; z++) {
+      for (var y = 0; y < this.height; y++) {
+        for (var x = 0; x < this.width; x++) {
+          // Use getTileAt to get the tile object
+          var tileObject = this.getTileAt(x, y, z);
+          // Apply the transformation function to the tile object
+          var transformedTile = transformFunction(tileObject, x, y, z);
+          // Assuming the transformation function returns a tile object with an updated 'value'
+          // Update the data array with the new value
+          this.data[z][y * this.width + x] = transformedTile;
+        }
+      }
+    }
+  } else {
+    // Handle 2D map transformation
+    for (var _y = 0; _y < this.height; _y++) {
+      for (var _x = 0; _x < this.width; _x++) {
+        // Use getTileAt to get the tile object for 2D maps (z is undefined)
+        var _tileObject = this.getTileAt(_x, _y);
+        // Apply the transformation function to the tile object
+        var _transformedTile = transformFunction(_tileObject, _x, _y);
+        // Update the data array with the new value
+        this.data[_y * this.width + _x] = _transformedTile.id;
+      }
+    }
+  }
+}
+
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -624,7 +767,7 @@ var TileSet = exports["default"] = /*#__PURE__*/function () {
   return TileSet;
 }();
 
-},{}],6:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -712,7 +855,7 @@ labyrinthos.TileMap = _TileMap["default"];
 labyrinthos.TileSet = _TileSet["default"];
 var _default = exports["default"] = labyrinthos;
 
-},{"./Biome.js":1,"./LSystem.js":2,"./Tile.js":3,"./TileMap.js":4,"./TileSet.js":5,"./mazes/AldousBroder.js":7,"./mazes/AldousBroder3D.js":8,"./mazes/BeattieSchoberth.js":9,"./mazes/BinaryTree.js":10,"./mazes/CellularAutomata.js":11,"./mazes/EllersAlgorithm.js":12,"./mazes/GrowingTree.js":13,"./mazes/Metroidvania.js":14,"./mazes/RecursiveBacktrack.js":15,"./mazes/RecursiveDivision.js":16,"./mazes/ThomasHunter.js":17,"./shapes/Circle.js":18,"./shapes/Square.js":19,"./shapes/Triangle.js":20,"./terrains/FaultLine.js":21,"./terrains/PerlinNoise.js":22,"./util/noise.js":26}],7:[function(require,module,exports){
+},{"./Biome.js":1,"./LSystem.js":2,"./Tile.js":3,"./TileMap.js":4,"./TileSet.js":9,"./mazes/AldousBroder.js":11,"./mazes/AldousBroder3D.js":12,"./mazes/BeattieSchoberth.js":13,"./mazes/BinaryTree.js":14,"./mazes/CellularAutomata.js":15,"./mazes/EllersAlgorithm.js":16,"./mazes/GrowingTree.js":17,"./mazes/Metroidvania.js":18,"./mazes/RecursiveBacktrack.js":19,"./mazes/RecursiveDivision.js":20,"./mazes/ThomasHunter.js":21,"./shapes/Circle.js":22,"./shapes/Square.js":23,"./shapes/Triangle.js":24,"./terrains/FaultLine.js":25,"./terrains/PerlinNoise.js":26,"./util/noise.js":30}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -747,7 +890,7 @@ function ALGORITHM_ALDOUS_BRODER(tileMap, options) {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -785,7 +928,7 @@ function ALGORITHM_ALDOUS_BRODER_3D(tileMap, options) {
   }
 }
 
-},{}],9:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1642,7 +1785,7 @@ function ALGORITHM_BEATTIE_SCHOBERTH(tileMap, options) {
   tileMap.world = built;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1678,7 +1821,7 @@ function ALGORITHM_BINARY_TREE(tileMap, options) {
   }
 }
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1725,7 +1868,7 @@ function generateCellularAutomataMap(tileMap, options) {
   }
 }
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1793,7 +1936,7 @@ function generateEllersAlgorithmMap(tileMap, options) {
   }
 }
 
-},{}],13:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1856,7 +1999,7 @@ function generateGrowingTreeAlgorithmMap(tileMap, options) {
   }
 }
 
-},{}],14:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2085,7 +2228,7 @@ function ALGORITHM_METROIDVANIA(tileMap) {
   }
 }
 
-},{"../util/platformGenerator.js":27,"../util/roomGeneration.js":28,"../util/tileBuilder.js":29}],15:[function(require,module,exports){
+},{"../util/platformGenerator.js":31,"../util/roomGeneration.js":32,"../util/tileBuilder.js":33}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2145,7 +2288,7 @@ function generateMap(tileMap, options) {
   visitCell(startX, startY);
 }
 
-},{}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2183,7 +2326,7 @@ function generateRecursiveDivisionMap(tileMap, options) {
   addWalls(0, 0, tileMap.width, tileMap.height);
 }
 
-},{}],17:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2788,7 +2931,7 @@ function ALGORITHM_THOMAS_HUNTER(tileMap, options) {
   }
 }
 
-},{}],18:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2809,7 +2952,7 @@ function SHAPE_CIRCLE(tileMap, options) {
   }
 }
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2828,7 +2971,7 @@ function SHAPE_SQUARE(tileMap, options) {
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2846,7 +2989,7 @@ function SHAPE_TRIANGLE(tileMap, options) {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2894,7 +3037,7 @@ function applyHeightToTileMap(tileMap, heightMap) {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2917,7 +3060,7 @@ function generatePerlinNoiseMap(tileMap, options) {
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3187,7 +3330,7 @@ function MersenneTwister19937() {
 //exports.MersenneTwister19937 = MersenneTwister19937;
 var _default = exports["default"] = MersenneTwister19937;
 
-},{}],24:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3325,7 +3468,7 @@ function generateTiledJSON(tileMap) {
   }],
   */
 
-},{}],25:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3385,7 +3528,7 @@ function Mersenne() {
 }
 var _default = exports["default"] = Mersenne;
 
-},{"./MersenneTwister19937.js":23}],26:[function(require,module,exports){
+},{"./MersenneTwister19937.js":27}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3793,7 +3936,7 @@ p5.prototype.noiseSeed = function (seed) {
 };
 var _default = exports["default"] = p5;
 
-},{}],27:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4185,7 +4328,7 @@ function initialize(width, height) {
   return map;
 }
 
-},{"./roomGeneration.js":28,"./tileBuilder.js":29}],28:[function(require,module,exports){
+},{"./roomGeneration.js":32,"./tileBuilder.js":33}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4324,7 +4467,7 @@ var buildDoorBetweenZones = exports.buildDoorBetweenZones = function buildDoorBe
   }
 };
 
-},{"../util/tileBuilder.js":29}],29:[function(require,module,exports){
+},{"../util/tileBuilder.js":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4395,7 +4538,7 @@ var Grid = exports.Grid = /*#__PURE__*/function () {
   return Grid;
 }();
 
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4421,9 +4564,17 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import labyrinthos from 'labyrinthos';
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } //
+// Remark: 2/19/2024 - This iteration of Tile.js is being replaced with `TileMap.js`
+//
+// there are several concerns handled in this file that are better handled in TileMap.js
+// and there are other concerns that are better handled in a new file called TileSet.js
+// additional concerns are better handled tiled-server chunking
+// additional concerns are better handled in LABYRINTHOS.js
+// import labyrinthos from 'labyrinthos';
 //import mediumOrthogonalMap from './maps/mediumOrthogonalMap.js';
 //import largeOrthogonalMap from './maps/largeOrthogonalMap.js';
+// TODO: Removing exitConfig entire in favor of composing Teleporter() class, can remove *all* exitConfig references
 var exitConfig = {
   position: {
     x: 0,
@@ -4725,7 +4876,7 @@ var Tile = /*#__PURE__*/function () {
 _defineProperty(Tile, "id", 'tile');
 var _default = exports["default"] = Tile;
 
-},{"../../../../Labyrinthos.js/lib/labyrinthos.js":6,"./lib/calculateTilePosition.js":31,"./lib/createLayer.js":32,"./lib/createTile.js":33,"./lib/createTileMap.js":34,"./lib/createTileMapFromTiledJSON.js":35,"./lib/getChunkFiles.js":36,"./lib/handleChunkLoadFailure.js":37,"./lib/loadChunk.js":38,"./lib/loadTilesForArea.js":39,"./lib/processTile.js":40,"./maps/defaultOrthogonalMap.js":41}],31:[function(require,module,exports){
+},{"../../../../Labyrinthos.js/lib/labyrinthos.js":10,"./lib/calculateTilePosition.js":35,"./lib/createLayer.js":36,"./lib/createTile.js":37,"./lib/createTileMap.js":38,"./lib/createTileMapFromTiledJSON.js":39,"./lib/getChunkFiles.js":40,"./lib/handleChunkLoadFailure.js":41,"./lib/loadChunk.js":42,"./lib/loadTilesForArea.js":43,"./lib/processTile.js":44,"./maps/defaultOrthogonalMap.js":45}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4764,7 +4915,7 @@ function calculateTilePosition(index, layer) {
   };
 }
 
-},{}],32:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4797,7 +4948,7 @@ function createLayer(layer, tileWidth, tileHeight) {
   }
 }
 
-},{}],33:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4811,6 +4962,7 @@ function createTile(tile, x, y) {
   var tileDepth = arguments.length > 6 ? arguments[6] : undefined;
   var color = arguments.length > 7 ? arguments[7] : undefined;
   var customZ = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : true;
+  var layer = tile.layer || {}; // for now
   var tileId = tile.id;
   if (tile.kind === 'empty') {
     return;
@@ -4874,6 +5026,7 @@ function createTile(tile, x, y) {
     name: tile.name || tile.kind,
     kind: tile.kind,
     body: body,
+    container: layer.container,
     mass: mass,
     // Remark: By default we will disable all collision events for Tiles
     //         This is done universally for performance reasons
@@ -4910,7 +5063,7 @@ function createTile(tile, x, y) {
   return ent;
 }
 
-},{}],34:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4918,7 +5071,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createTileMap;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+// TODO: Refactor and remove this file, should be TileMap.create() or TileMap.createTileMap()
 function createTileMap(tileMap) {
+  var game = this.game;
   var labyrinthos = this.labyrinthos;
   // console.log('createTileMap', tileMap);
 
@@ -5144,7 +5299,7 @@ function generateEntrances(map, entranceCount) {
   return entrances;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5172,7 +5327,7 @@ function createTileMapFromTiledJSON(tiledJSON) {
   });
 }
 
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5209,7 +5364,7 @@ function pathJoin(dir, file) {
   }
 }
 
-},{}],37:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5258,7 +5413,7 @@ function handleChunkLoadFailure(chunkPath, chunkKey) {
   }
 }
 
-},{}],38:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5296,7 +5451,7 @@ function loadChunk(chunkPath, chunkKey) {
   }
 }
 
-},{}],39:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5348,7 +5503,7 @@ function loadTilesForArea(position) {
   });
 }
 
-},{}],40:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5362,20 +5517,21 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) 
   // TODO: we currently always pull from `Tile.tileSet`, which is active default
   //       we can add logic for checking `Tile.tileSets[key]` if we have multiple tileSets 
   var tile;
+  var tileSet = this.tileSet;
+  if (layer.tileSet && layer.tileSet.length > 0) {
+    tileSet = layer.tileSet;
+  }
+
+  // console.log('did layer find tile', layer.tileSet)
+
   // If the tileValue is a number as this point, it's an id of a tile kind ( TileSet )
   // look up the tile kind and use that as the tile
   if (typeof tileValue === 'number') {
     // Find id = tile in tileSet
-    var tileId = tileValue;
-    // TODO: remove this.tileSet
-    var tileKind = this.tileSet.find(function (tileKind) {
-      return tileKind.id === tileId;
-    });
-    if (tileKind) {
-      tile = tileKind;
-    } else {
-      // Default tile kind if not found
-      tile = this.tileSet[3];
+    // perform direct lookup based on tile value
+    tile = tileSet[tileValue];
+    if (!tile) {
+      tile = tileSet[0]; // was previously 3
     }
   } else {
     console.log('Warning: tileValue was not a number. This should not happen:', tileValue);
@@ -5394,10 +5550,11 @@ function processTile(tileValue, index, layer, tileWidth, tileHeight, tileDepth) 
     z = _this$calculateTilePo.z;
   // console.log('processTile.js: x, y, z:', tile, x, y, z);
   // TODO: check to see if existing tile exsting at this slot?
+  tile.layer = layer; // for now
   this.createTile(tile, x, y, z, tileWidth, tileHeight, tileDepth, layer.color, customDepth);
 }
 
-},{}],41:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5438,5 +5595,5 @@ var defaultOrthogonalMap = {
 };
 var _default = exports["default"] = defaultOrthogonalMap;
 
-},{}]},{},[30])(30)
+},{}]},{},[34])(34)
 });

@@ -92,7 +92,7 @@ var GravityWell = exports["default"] = /*#__PURE__*/function () {
           if (entity.id !== entityData.id && !entity.destroyed) {
             var gravityWell = gameState.ents._[entityData.id];
             if (gravityWell && gravityWell.meta) {
-              _this.game.applyGravity(gravityWell, entity, _this.GRAVITATIONAL_CONSTANT, gravityWell.meta.repulsion);
+              game.applyGravity(gravityWell, entity, _this.GRAVITATIONAL_CONSTANT, gravityWell.meta.repulsion);
             }
           }
         });

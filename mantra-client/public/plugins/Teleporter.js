@@ -87,6 +87,7 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "touchedTeleporter",
     value: function touchedTeleporter(a, b, pair, context) {
+      var game = this.game;
       if (context.owner.meta && context.owner.meta.destination) {
         var destination = context.owner.meta.destination;
         if (typeof destination === 'function') {

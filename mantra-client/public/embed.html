@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="/mantra.css">
+<script src="/mantra.js"></script>
+<script type="module" src="/worlds.mantra.js"></script>
+<script type="module" src="/sutras.mantra.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    let game = new MANTRA.Game({
+        defaultPlayer: false,
+        physics: 'matter', // enum, 'physx', 'matter
+        collisions: true,
+        graphics: ['css'], // array enum, 'babylon', 'css', 'three'
+        camera: 'follow',
+        options: {
+          scriptRoot: '.'
+        }
+      });
+
+      // game.use('Bullet');
+      game.use('Sutra');
+      game.use('Gamepad');
+      game.use('GamepadGUI');
+      game.start(function () {
+        
+        game.setZoom(4.5);
+        //game.use('StarField');
+        game.use('Editor');
+
+        //let fire = SUTRAS.fire(game);
+        // let hexapod = SUTRAS.hexapod(game);
+        // let blackhole = SUTRAS.blackhole(game);
+        // game.setSutra(blackhole);
+        // console.log(fire);
+
+        game.use(new WORLDS.worlds['Home']());
+      });
+      window.game = game;
+
+  });
+</script>

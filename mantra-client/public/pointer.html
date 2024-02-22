@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-Touch Pointer Events Example</title>
+  <script>
+    let activePointers = {};
+
+    document.addEventListener('pointerdown', function(event) {
+      // Log the pointer down event and its button (if applicable, mainly for mouse)
+      console.log('Pointer Down:', event.pointerId, 'Button:', event.button);
+
+      // Add the pointer to the active pointers map
+      activePointers[event.pointerId] = event;
+
+      // Check the number of active pointers
+      const activeCount = Object.keys(activePointers).length;
+
+      if (activeCount === 1) {
+        // First touch - move the player
+        console.log('Move player:', event.clientX, event.clientY);
+      } else if (activeCount > 1) {
+        // Additional touches - shoot
+        console.log('Shoot:', event.clientX, event.clientY);
+      }
+    });
+
+    document.addEventListener('pointerup', function(event) {
+      // Log the pointer up event
+      console.log('Pointer Up:', event.pointerId);
+
+      // Remove the pointer from the active pointers map
+      delete activePointers[event.pointerId];
+    });
+
+    // Prevent the context menu from appearing on right click
+    document.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+    });
+  </script>
+</head>
+
+<body>
+  <p>Touch once to move the player. Touch again while the first touch is active to shoot.</p>
+</body>
+
+</html>

@@ -80,7 +80,7 @@ var Bullet = /*#__PURE__*/function () {
         collisionStart: true,
         position: bulletStartPosition,
         lifetime: this.lifetime,
-        texture: {
+        texture: bulletConfig.texture || {
           sheet: 'loz_spritesheet',
           sprite: 'arrow'
         },
@@ -91,8 +91,8 @@ var Bullet = /*#__PURE__*/function () {
           x: directionX * this.speed,
           y: directionY * this.speed
         },
-        width: 8,
-        height: 16,
+        width: 16,
+        height: 8,
         radius: 8,
         // Assuming a default radius
         damage: 10 // Assuming default damage
@@ -100,6 +100,11 @@ var Bullet = /*#__PURE__*/function () {
 
       // Merge the bulletConfig into the defaultBulletConfig
       var mergedBulletConfig = Object.assign({}, defaultBulletConfig, bulletConfig);
+      if (bulletConfig.velocity) {
+        mergedBulletConfig.velocity = {};
+        mergedBulletConfig.velocity.x = bulletConfig.velocity.x;
+        mergedBulletConfig.velocity.y = bulletConfig.velocity.y;
+      }
 
       // Create the bullet entity with the merged configuration
       return this.game.createEntity(mergedBulletConfig);
@@ -142,6 +147,7 @@ var Bullet = /*#__PURE__*/function () {
 
         // TODO: collision groups for TileSets
         if (entityA.type === 'BULLET' && entityB.type === 'TILE') {
+          // for now, if tile has health, destroy it
           if (entityB.kind !== 'bush') {
             return;
           }

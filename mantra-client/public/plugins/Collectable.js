@@ -42,36 +42,44 @@ var Collectable = /*#__PURE__*/function () {
 
       // for each entity that has items, iterate those items and set position to relative of parent
       var _loop = function _loop() {
-        var parentEnt = _this.game.entities.get(Number(id));
-        //console.log('parentEnt', parentEnt)
-        if (!parentEnt || parentEnt.type === 'CONTAINER') {
-          //skip
-          return 1; // continue
-        }
-        var childEnts = itemsData[id];
-        // console.log("childEnts", childEnts)
-        childEnts.forEach(function (childEntId) {
-          // TODO: only get positional component data, not entire ent
-          var entity = _this.game.entities.get(childEntId);
-          if (entity) {
-            // console.log('found a child entity with items', entity);
-
-            // adjust the position relative to the parent ent, attach for now
-            _this.game.updateEntity({
-              id: entity.id,
-              body: false,
-              // TODO: does this work?
-              // rotation: parentEnt.rotation,
-              position: {
-                x: parentEnt.position.x + 10,
-                y: parentEnt.position.y
-              }
-            });
+          var parentEnt = _this.game.entities.get(Number(id));
+          // console.log('parentEnt', parentEnt, itemsData[id])
+          if (!parentEnt || parentEnt.type === 'CONTAINER') {
+            //skip
+            return 0; // continue
           }
-        });
-      };
+          if (parentEnt.destroyed === true) {
+            // console.log('parentEnt is destroyed', parentEnt);
+            return 0; // continue
+          }
+          var childEnts = itemsData[id];
+          // console.log("childEnts", childEnts)
+          childEnts.forEach(function (childEntId) {
+            // TODO: only get positional component data, not entire ent
+            var entity = _this.game.entities.get(childEntId);
+            if (entity && !entity.destroyed) {
+              // console.log('found a child entity with items', entity);
+              // TODO: this should be using the container API, not manually adjusting position
+              // Add the item to the entity as entity.items and it should align based on 
+              // layout configs, etc, needs more tests for Entity.layout()
+              // adjust the position relative to the parent ent, attach for now
+              _this.game.updateEntity({
+                id: entity.id,
+                body: false,
+                // TODO: does this work?
+                // rotation: parentEnt.rotation,
+                position: {
+                  x: parentEnt.position.x + 10,
+                  y: parentEnt.position.y
+                }
+              });
+            }
+          });
+        },
+        _ret;
       for (var id in itemsData) {
-        if (_loop()) continue;
+        _ret = _loop();
+        if (_ret === 0) continue;
       }
 
       // }

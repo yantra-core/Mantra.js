@@ -2,7 +2,7 @@ let game = new MANTRA.Game({
   defaultPlayer: true,
   defaultMovement: true, // TODO: remove these, should work without
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Block', 'Border', 'Lifetime', 'Gamepad'], // plugins at construction
+  plugins: ['Text', 'Block', 'Border', 'Lifetime', 'Gamepad'], // plugins at construction
 });
 
 game.start(function () {
@@ -10,7 +10,6 @@ game.start(function () {
   game.setBackground('#000000');
   game.setGravity(0, 2);
   game.createBorder();
-
 
   game.rules.if('DPAD_UP').then('createColorBlock');
   game.rules.if('SPACE').then('createColorBlock');
@@ -35,23 +34,16 @@ game.start(function () {
     });
   });
 
-  // instruction text
-  game.createEntity({
-    type: 'TEXT',
-    body: false,
-    width: 700,
-    height: 50,
-    color: 0xffffff,
-    text: `Press SPACE to create a color block`,
-    position: {
-      x: 0,
-      y: 0
-    },
-    style: {
+  game.build().Text()
+   .text('Press SPACE Key')
+   .color('#ffffff')
+   .width(400)
+    .height(50)
+    .style({
       backgroundColor: 'black',
-      fontSize: '44px',
-    },
-  })
+      fontSize: '44px'
+    }).createEntity();
+
 
 
 });

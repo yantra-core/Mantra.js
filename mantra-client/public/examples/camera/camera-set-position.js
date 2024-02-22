@@ -1,7 +1,7 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Gamepad', 'GamepadGUI'],
+  plugins: ['Text', 'Gamepad'],
   defaultMovement: true,
   defaultPlayer: true
 });
@@ -17,13 +17,10 @@ game.start(function () {
 
   game.before('update', function () {
     if (game.tick % 70 === 0) {
-
       // set the camera to a random radial position
       let randomPosition = game.randomPositionRadial(0, 0, 300);
-
       game.setCameraPosition(randomPosition.x, randomPosition.y);
-
-      game.updateEntity(text.id, {
+      game.updateEntity(cameraPositionText.id, {
         text: `Camera position: ${game.data.camera.offsetX.toFixed(3)}, ${game.data.camera.offsetY.toFixed(3)}`
       })
     }
@@ -38,40 +35,26 @@ game.start(function () {
       width: Math.random() * 100
     };
     // TODO: random shapes
-    let entity = game.createEntity({
-      color: randomColor,
-      size: {
-        width: 32,
-        height: 32
-      },
-      hasCollisionStart: true,
-      position: {
-        // random positions start from top left corner
-        x: Math.random() * -game.width / 4,
-        y: Math.random() * -game.height / 4
-      }
-    });
+    let entity = game.build()
+      .color(randomColor)
+      .size(32, 32)
+      .position(Math.random() * -game.width / 4, Math.random() * -game.height / 4)
+      .createEntity();
+
     entities.push(entity.id);
   }
 
-  // create text that says use WASD or Gamepad to move the camera
-  let text = game.createText({
-    text: `Camera position: ${game.data.camera.offsetX}, ${game.data.camera.offsetY}`,
-    position: {
-      x: 40,
-      y: 50
-    },
-    body: false,
-    size: {
-      width: 500,
-      height: 50,
-    },
-    color: 0xffffff,
-    style: {
+  let cameraPositionText = game.build().Text()
+    .text(`Camera position: ${game.data.camera.offsetX}, ${game.data.camera.offsetY}`)
+    .position(40, 50)
+    .body(false)
+    .size(500, 50)
+    .color('white')
+    .style({
       backgroundColor: 'black',
-      fontSize: '24px',
-    }
-  });
+      fontSize: '24px'
+    })
+    .createEntity();
 
 });
 window.game = game;

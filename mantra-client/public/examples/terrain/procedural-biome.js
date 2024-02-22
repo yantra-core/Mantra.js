@@ -1,6 +1,6 @@
 
 let game = new MANTRA.Game({
-  graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
+  graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
   plugins: ['RBush', 'Tile'], // RBush is required for Field of View
 });

@@ -2538,7 +2538,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
         var entityA = this.game.entities.get(entityIdA);
         var entityB = this.game.entities.get(entityIdB);
         if (!entityA || !entityB) {
-          console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
+          // console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
           return;
         }
         this.processCollisionEnd(entityA, entityB, bodyB, entityIdB);
@@ -2557,7 +2557,7 @@ var YCraft = /*#__PURE__*/function (_Plugin) {
         var entityA = this.game.entities.get(entityIdA);
         var entityB = this.game.entities.get(entityIdB);
         if (!entityA || !entityB) {
-          console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
+          // console.log('Block.handleCollision no entity found. Skipping...', entityA, entityB);
           return;
         }
         this.processCollisionStart(entityA, entityB, bodyB, entityIdB);

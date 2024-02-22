@@ -47,7 +47,7 @@ var Flame = exports["default"] = /*#__PURE__*/function () {
 
         //texture: 'flame',
         //color: 0xff0000,
-        collisionStart: this.touchedFlame,
+        collisionStart: this.touchedFlame.bind(this),
         size: {
           width: 16,
           height: 16,
@@ -80,6 +80,7 @@ var Flame = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "touchedFlame",
     value: function touchedFlame(a, b, pair, context) {
+      var game = this.game;
       // flame will not affect itself
       if (context.owner.owner !== context.target.id) {
         game.removeEntity(context.target.id);

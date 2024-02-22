@@ -3413,6 +3413,7 @@ var GravityGardens = /*#__PURE__*/function () {
     key: "bindSutraRules",
     value: function bindSutraRules() {
       var _this = this;
+      var game = this.game;
       var rules = game.rules;
       rules["if"]('USE_ITEM_1').then('switchGravity');
       rules["if"]('USE_ITEM_2').then('shakeCamera');
@@ -3442,6 +3443,7 @@ var GravityGardens = /*#__PURE__*/function () {
     key: "update",
     value: function update() {
       var _this2 = this;
+      var game = this.game;
       // mouse drops particles logic
       if (this.dropping && game.tick % 3 === 0) {
         // console.log('dropping', mousePosition.x, mousePosition.y);
@@ -3487,7 +3489,8 @@ var GravityGardens = /*#__PURE__*/function () {
         that.dropping = false;
         that.slurping = false;
       });
-      game.on('pointerDown', function (position, event) {
+      game.on('pointerDown', function (context, event) {
+        var position = context.position;
         that.mousePosition = position;
 
         // adjust position for game camera offset
@@ -3529,6 +3532,8 @@ var GravityGardens = /*#__PURE__*/function () {
   }, {
     key: "createFounts",
     value: function createFounts() {
+      var game = this.game;
+
       // will set the collistionStart flag to true in order to register collision events
       var particleCollision = true;
       game.build().name('fountA').type('FOUNT').UnitSpawner({
@@ -3585,6 +3590,7 @@ var GravityGardens = /*#__PURE__*/function () {
   }, {
     key: "playerSwitchedGravity",
     value: function playerSwitchedGravity(entity, gameState) {
+      var game = this.game;
       if (typeof gameState.lastGravitySwitch === 'undefined') {
         gameState.lastGravitySwitch = 0;
       }
@@ -3741,7 +3747,10 @@ var Home = /*#__PURE__*/function () {
               game.use('Tone');
               game.use('Hexapod');
               game.use('Teleporter');
-            case 18:
+              game.use('Draggable');
+              game.use('Collectable');
+              game.use('Key');
+            case 21:
             case "end":
               return _context.stop();
           }
@@ -3756,6 +3765,10 @@ var Home = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+
+      // moves with right click, shoots with left
+      game.config.mouseMovementButton = 'RIGHT';
+      game.config.mouseActionButton = 'LEFT';
       this.createWorld();
     }
   }, {
@@ -3780,22 +3793,28 @@ var Home = /*#__PURE__*/function () {
       game.setGravity(0, 0, 0);
       var player1 = game.build().Player({
         lives: 99
-      }).createEntity();
+      });
+      player1 = player1.createEntity();
       game.setPlayerId(player1.id);
+      // TODO: setup doors and keys on home page like Maze World ( easy )
+      // game.build().Key().position(-100, 100, 10).createEntity();
 
       //
       // Create 22 Hexapods
       //
       var numberOfHexapods = 24;
       var radius = 80;
+      var collectFn = function collectFn(entity) {
+        console.log('got hexapod', entity.id);
+      };
       for (var i = 0; i < numberOfHexapods; i++) {
         // Calculate the angle for each hexapod
         var angle = i / numberOfHexapods * 2 * Math.PI;
-
         // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
         var x = radius * Math.cos(angle);
         var y = radius * Math.sin(angle);
-        game.build().Hexapod().size(8).position(x, y, 0).createEntity();
+        game.build().Hexapod().Draggable().size(8).position(x, y, 0).createEntity();
+        // .collectable(true).afterItemCollected(collectFn)
       }
       ;
       game.build().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
@@ -3938,6 +3957,7 @@ function createBackground(game) {
     }
   });
   game.createEntity({
+    name: 'css-text',
     type: 'TEXT',
     text: 'CSSGraphics Engine',
     width: 20,
@@ -4356,7 +4376,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":54,"../sutras/routing.js":60,"../sutras/switchGraphics.js":61,"./sutras/block.js":33}],33:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":55,"../sutras/routing.js":61,"../sutras/switchGraphics.js":62,"./sutras/block.js":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4506,6 +4526,215 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var InfinityTower = exports["default"] = /*#__PURE__*/function () {
+  function InfinityTower() {
+    _classCallCheck(this, InfinityTower);
+    this.id = InfinityTower.id;
+  }
+  _createClass(InfinityTower, [{
+    key: "preload",
+    value: function preload(game) {
+      //game.use('Tower');
+      game.use('Hexapod');
+      game.use('Block');
+      // game.use('Border', { autoBorder: true });
+      game.use('Bullet');
+      game.use('Boomerang');
+      game.use('Tone');
+      game.use('Tile');
+      game.use('Collectable');
+      game.use('RBush');
+      game.use('UnitSpawner');
+      game.use('Teleporter');
+      game.use('Draggable');
+    }
+  }, {
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.createWorld();
+    }
+  }, {
+    key: "createWorld",
+    value: function createWorld() {
+      var game = this.game;
+      game.reset();
+      game.zoom(2.5);
+      game.setGravity(0, 0, 0);
+      game.createPlayer({
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'player'
+        },
+        position: {
+          x: -100,
+          y: 10,
+          z: 1
+        }
+      });
+      game.setBackground('#000000');
+      //
+      // Create initial Towers
+      //
+      //game.build().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
+      //game.build().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
+      //game.build().Tower().Draggable().color('yellow').position(0, 140).createEntity();
+      // let a = game.build().Tower().Draggable().color('yellow').position(-175, 140);
+
+      function onDrop(context, event) {
+        // update the position of the context entity to the dropTarget
+        // mix the current colors if possible
+        var colorA = context.color;
+        var colorB = context.dropTarget.color;
+        if (colorA && colorB) {
+          console.log('colorA', colorA, 'colorB', colorB);
+          var configA = game.build().color(colorA).build();
+          var configB = game.build().color(colorB).build();
+          var mixed = game.build().mix(configA).mix(configB).build();
+
+          // check that ent exists
+          var exists = game.exists(context.id);
+          if (!exists) {
+            // console.log('context entity does not exist');
+            return;
+          }
+          game.updateEntity(context.id, {
+            color: mixed.color,
+            size: {
+              width: context.size.width * 1.5,
+              height: context.size.height * 1.5
+            }
+
+            // increase size of entity by 1.5x
+            /* Remark: why did this not work for CSSGraphics?
+            */
+          });
+        }
+        game.updateEntity(context.id, {
+          position: context.dropTarget.position
+        });
+        game.removeEntity(context.dropTarget.id);
+      }
+
+      // assume 24 color HSV wheel and generate all colors as int or hex whatever is easy
+      for (var i = 0; i < 24; i++) {
+        var conf = game.build().Tower({
+          fireRate: 100,
+          bulletConfig: {
+            texture: {
+              sheet: 'loz_spritesheet',
+              sprite: 'player'
+            },
+            velocity: {
+              x: 0,
+              y: 1
+            }
+          }
+        }).Draggable().Droppable().onDrop(onDrop).position(-200 + i * 40, 0);
+        conf.isSensor(true);
+        console.log('conf', conf);
+        // we need to generate color wheel here as int or hex
+        //let color = ;
+        var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        conf.color(color);
+        conf.createEntity();
+      }
+
+      //
+      // Left NPC Spawner
+      //
+      var hexapodConfigLeft = game.build().Hexapod().texture(null).radius(4).color('#007fff');
+      hexapodConfigLeft.meta({
+        maxUnits: 22
+      });
+      var unitSpawnerLeft = game.build().UnitSpawner({
+        unitConfig: hexapodConfigLeft.config,
+        sprayAngle: Math.PI
+      }).texture(null).radius(1).color('red').position(-300, -800, 0).createEntity();
+
+      //
+      // Right NPC Spawner
+      //
+      var hexapodConfig = game.build().Hexapod().texture(null).radius(4).color('red');
+      hexapodConfig.meta({
+        maxUnits: 22
+      });
+      var unitSpawner = game.build().UnitSpawner({
+        unitConfig: hexapodConfig.config
+      }).texture(null).radius(1).color('red').position(300, -800, 0).createEntity();
+
+      //
+      // End zone - create a solid red line that has collisionStart handler to destroy ents
+      //
+      var endzoneConfig = game.build().position(-80, 50, 0).color('red').isStatic(true).width(400).height(10);
+      endzoneConfig.collisionStart(function (ent) {
+        if (ent.type === 'HEXAPOD') {
+          game.removeEntity(ent.id);
+        }
+      });
+      endzoneConfig.createEntity();
+
+      //
+      // warp to Mantra Home World
+      //
+      game.build().Teleporter({
+        destination: {
+          world: 'Home'
+        }
+      }).size(64).position(-400, -100, 0).texture('warp-to-home').createEntity();
+      game.createEntity({
+        type: 'WARP',
+        exit: {
+          world: 'Home'
+        },
+        texture: 'warp-to-home',
+        width: 64,
+        height: 64,
+        isStatic: true,
+        position: {
+          x: -400,
+          y: -100,
+          z: 0
+        }
+      });
+
+      // text "Warp to Mantra"
+      game.createEntity(_defineProperty(_defineProperty({
+        type: 'TEXT',
+        text: 'Warp To Mantra',
+        body: false,
+        // kind: 'dynamic',
+        style: {
+          padding: '2px',
+          fontSize: '16px',
+          color: '#ffffff',
+          textAlign: 'center'
+        }
+      }, "body", false), "position", {
+        x: -400,
+        y: -120
+      }));
+    }
+  }]);
+  return InfinityTower;
+}();
+_defineProperty(InfinityTower, "id", 'world-infinity-tower');
+_defineProperty(InfinityTower, "type", 'world');
+
+},{}],36:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
 var _createDoors = _interopRequireDefault(require("./lib/createDoors"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -4552,15 +4781,6 @@ var Maze = /*#__PURE__*/function () {
       game.use('Tone');
       game.use('Tile');
       game.use('Collectable');
-
-      // TODO: create containers of entities
-      // containers can have layouts applied to them
-      // if a container is already created an entity can be added to it
-      // we wish to layout the entity upon creation when possible instead of on update ( to prevent flickering )
-
-      // a container will not be sent over the wire?
-      // game.createPlayer();
-
       (0, _createDoors["default"])(game);
 
       //
@@ -4598,39 +4818,24 @@ var Maze = /*#__PURE__*/function () {
         x: -400,
         y: -120
       }));
-
-      /*
-      game.createEntity({
-        size: {
-          width: 16,
-          height: 16
-        },
-        name: 'maze-door-0',
-        texture: 'tile-entrance',
-        color: 0x00ff00,
-        container: 'laby-container',
-        position: { // relative to the container
-          x: 100,
-          y: 0,
-          z: 0
-        }
-      });
-      */
     }
   }]);
   return Maze;
 }();
 _defineProperty(Maze, "id", 'world-maze');
-_defineProperty(Maze, "type", 'maze');
+_defineProperty(Maze, "type", 'world');
 var _default = exports["default"] = Maze;
 
-},{"./lib/createDoors":36}],36:[function(require,module,exports){
+},{"./lib/createDoors":37}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = createDoors;
+function createHomeKey(game) {
+  game.build().Key().position(-100, 30, 0).createEntity();
+}
 function createDoors(game) {
   //
   // Creates a CONTAINER to hold the doors
@@ -4732,7 +4937,7 @@ function createDoors(game) {
             game.removeEntity(key.id);
           });
           // create a new key at where it started
-          createHomeKey();
+          createHomeKey(game);
         }
         game.flash();
         game.flashText(algos[i]);
@@ -4823,7 +5028,7 @@ function createDoors(game) {
   for (var i = 0; i < 10; i++) {
     _loop(i);
   }
-  createHomeKey();
+  createHomeKey(game);
 
   // create text label instruction for picking up keys
   game.createEntity({
@@ -4845,32 +5050,8 @@ function createDoors(game) {
     }
   });
 }
-function createHomeKey() {
-  game.createEntity({
-    type: 'KEY',
-    size: {
-      width: 16,
-      height: 8
-    },
-    // equippable: true,
-    isSensor: true,
-    collectable: true,
-    //onCollect: true
 
-    name: 'maze-door-0',
-    texture: "ayyo-key",
-    color: 0x00ff00,
-    // container: 'laby-container',
-    position: {
-      // relative to the container
-      x: -100,
-      y: -30,
-      z: 0
-    }
-  });
-}
-
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5141,7 +5322,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../../mantra-sutras/player-movement/top-down.js":27,"./instruments/createDrumKit.js":38,"./instruments/createPiano.js":39,"./sutras.js":40}],38:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":27,"./instruments/createDrumKit.js":39,"./instruments/createPiano.js":40,"./sutras.js":41}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5247,7 +5428,7 @@ function createDrumKit(game, config) {
   });
 }
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5372,7 +5553,7 @@ function createPiano(game, config) {
   */
 }
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5493,7 +5674,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../sutras/switchGraphics.js":61}],41:[function(require,module,exports){
+},{"../sutras/switchGraphics.js":62}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5784,7 +5965,7 @@ _defineProperty(Platform, "id", 'world-platform');
 _defineProperty(Platform, "type", 'world');
 var _default = exports["default"] = Platform;
 
-},{"../../mantra-sutras/player-movement/platform.js":26}],42:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/platform.js":26}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5969,7 +6150,7 @@ var Pong = /*#__PURE__*/function () {
 _defineProperty(Pong, "id", 'world-pong');
 var _default = exports["default"] = Pong;
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6057,7 +6238,7 @@ _defineProperty(Space, "id", 'world-space');
 _defineProperty(Space, "type", 'world');
 var _default = exports["default"] = Space;
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6252,7 +6433,7 @@ _defineProperty(Sutra, "id", 'world-sutra');
 _defineProperty(Sutra, "type", 'world');
 var _default = exports["default"] = Sutra;
 
-},{"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/game-of-life.js":23,"../../mantra-sutras/hexapod.js":24,"../../mantra-sutras/note.js":25}],45:[function(require,module,exports){
+},{"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/game-of-life.js":23,"../../mantra-sutras/hexapod.js":24,"../../mantra-sutras/note.js":25}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6464,7 +6645,7 @@ _defineProperty(Tiled, "id", 'world-home');
 _defineProperty(Tiled, "type", 'world');
 var _default = exports["default"] = Tiled;
 
-},{"./sutras.js":46,"./welcomeMessage.js":47}],46:[function(require,module,exports){
+},{"./sutras.js":47,"./welcomeMessage.js":48}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6527,9 +6708,9 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":24,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":54,"../sutras/routing.js":60,"../sutras/switchGraphics.js":61,"../sutras/warpToWorld.js":62}],47:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":24,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":55,"../sutras/routing.js":61,"../sutras/switchGraphics.js":62,"../sutras/warpToWorld.js":63}],48:[function(require,module,exports){
 arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],48:[function(require,module,exports){
+},{"dup":34}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6863,7 +7044,7 @@ var _default = exports["default"] = TowerWorld;
 
 */
 
-},{"./sutras/colorChanges.js":49,"./sutras/enemy.js":50,"./sutras/input.js":51,"./sutras/player.js":52,"./sutras/round.js":53}],49:[function(require,module,exports){
+},{"./sutras/colorChanges.js":50,"./sutras/enemy.js":51,"./sutras/input.js":52,"./sutras/player.js":53,"./sutras/round.js":54}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6913,7 +7094,7 @@ function colorChanges() {
   return colorChanges;
 }
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7080,7 +7261,7 @@ function spawner() {
   return spawner;
 }
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7192,7 +7373,7 @@ function input() {
 }
 ;
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7251,7 +7432,7 @@ function player() {
   return player;
 }
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7305,7 +7486,7 @@ function round() {
   return round;
 }
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7443,7 +7624,7 @@ function createWalker(game, config) {
   return walker;
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7641,7 +7822,7 @@ _defineProperty(XState, "id", 'world-xstate');
 _defineProperty(XState, "type", 'world');
 var _default = exports["default"] = XState;
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7823,7 +8004,7 @@ _defineProperty(YCraft, "id", 'world-ycraft');
 _defineProperty(YCraft, "type", 'world');
 var _default = exports["default"] = YCraft;
 
-},{"../../mantra-sutras/player-movement/top-down.js":27,"./contraptions-example.js":57}],57:[function(require,module,exports){
+},{"../../mantra-sutras/player-movement/top-down.js":27,"./contraptions-example.js":58}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8016,7 +8197,7 @@ function roverLight(x, y, z) {
   return contraption;
 }
 
-},{"../../../YCraft.js/index.js":1}],58:[function(require,module,exports){
+},{"../../../YCraft.js/index.js":1}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8031,7 +8212,7 @@ Object.defineProperty(exports, "worlds", {
 var _index = _interopRequireDefault(require("./index.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./index.js":59}],59:[function(require,module,exports){
+},{"./index.js":60}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8040,6 +8221,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _Home = _interopRequireDefault(require("./Home/Home.js"));
 var _GravityGardens = _interopRequireDefault(require("./GravityGardens/GravityGardens.js"));
+var _InfinityTower = _interopRequireDefault(require("./InfinityTower/InfinityTower.js"));
 var _Maze = _interopRequireDefault(require("./Maze/Maze.js"));
 var _Music = _interopRequireDefault(require("./Music/Music.js"));
 var _Platform = _interopRequireDefault(require("./Platform/Platform.js"));
@@ -8054,6 +8236,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var worlds = {};
 worlds.Home = _Home["default"];
 worlds.GravityGardens = _GravityGardens["default"];
+worlds.InfinityTower = _InfinityTower["default"];
 worlds.Maze = _Maze["default"];
 worlds.Music = _Music["default"];
 worlds.Platform = _Platform["default"];
@@ -8066,7 +8249,7 @@ worlds.TowerDefense = _TowerDefense["default"];
 worlds.YCraft = _YCraft["default"];
 var _default = exports["default"] = worlds;
 
-},{"./GravityGardens/GravityGardens.js":28,"./Home/Home.js":29,"./Maze/Maze.js":35,"./Music/Music.js":37,"./Platform/Platform.js":41,"./Pong/Pong.js":42,"./Space/Space.js":43,"./Sutra/Sutra.js":44,"./Tiled/Tiled.js":45,"./TowerDefense/TowerDefense.js":48,"./XState/XState.js":55,"./YCraft/YCraft.js":56}],60:[function(require,module,exports){
+},{"./GravityGardens/GravityGardens.js":28,"./Home/Home.js":29,"./InfinityTower/InfinityTower.js":35,"./Maze/Maze.js":36,"./Music/Music.js":38,"./Platform/Platform.js":42,"./Pong/Pong.js":43,"./Space/Space.js":44,"./Sutra/Sutra.js":45,"./Tiled/Tiled.js":46,"./TowerDefense/TowerDefense.js":49,"./XState/XState.js":56,"./YCraft/YCraft.js":57}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8103,7 +8286,7 @@ const circleRoute = createCircleRoute(100, 100, 50, 20);
 */
 var _default = exports["default"] = routing;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8200,7 +8383,7 @@ function switchGraphics(game) {
   return rules;
 }
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8234,5 +8417,5 @@ function warpToWorld(game) {
   return rules;
 }
 
-},{}]},{},[58])(58)
+},{}]},{},[59])(59)
 });

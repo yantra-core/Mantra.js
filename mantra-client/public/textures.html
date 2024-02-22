@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra Home World</title>
+  <link rel="stylesheet" href="/mantra.css">
+</head>
+
+<body>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+
+  <script type="module" src="/ycraft.js"></script>
+
+  <script>
+
+
+
+    document.addEventListener('DOMContentLoaded', async (event) => {
+
+      let game = new MANTRA.Game({
+        graphics: ['css'],
+        defaultMovement: false,
+        options: {
+          scriptRoot: '.'
+        }
+      });
+
+      // defaults
+      // game.assetRoot = 'https://yantra.gg/assets/';
+      game.addAsset('fire', '/img/game/env/loz_fire.png');
+
+      // will wait for the game to be ready
+      await game.start();
+
+      
+      // create a new entity texture
+      game.createEntity({
+        type: 'whateverTypeYouLike',
+        width: 50,
+        height: 50,
+        depth: 200,
+        texture: "fire",
+        position: {
+          x: 50,
+          y: 0
+        },
+      });
+
+      let currentPlayer = game.getCurrentPlayer();
+
+      // map inputs to actions using Sutura rules
+      // More flexible, easier to maintain
+      game.rules.if('W').then('MOVEMENT_FORWARD');
+      game.rules.if('A').then('MOVEMENT_LEFT');
+      game.rules.if('S').then('MOVEMENT_BACKWARD');
+      game.rules.if('D').then('MOVEMENT_RIGHT');
+
+      // map inputs to actions
+      // Easy to do, but not very flexible
+      // Useful for basic mappings and prototyping
+      game.setActions({
+        'W': 'MOVEMENT_FORWARD',
+        'A': 'MOVEMENT_LEFT',
+        'S': 'MOVEMENT_BACKWARD',
+        'D': 'MOVEMENT_RIGHT'
+      });
+
+      // map actions to functions
+      game.rules.on('MOVEMENT_FORWARD', function (entity) {
+        console.log("MOVEMENT_FORWARD", entity)
+        game.applyForce(entity.id, { x: 0, y: -10, z: 0 });
+      });
+
+      game.rules.on('MOVEMENT_LEFT', function (entity) {
+        console.log("MOVEMENT_LEFT", entity)
+        game.applyForce(entity.id, { x: -10, y: 0, z: 0 });
+      });
+
+      game.rules.on('MOVEMENT_BACKWARD', function (entity) {
+        console.log("MOVEMENT_BACKWARD", entity)
+        game.applyForce(entity.id, { x: 0, y: 10, z: 0 });
+      });
+
+      game.rules.on('MOVEMENT_RIGHT', function (entity) {
+        console.log("MOVEMENT_RIGHT", entity)
+        game.applyForce(entity.id, { x: 10, y: 0, z: 0 });
+      });
+
+      // Since all rules are Sutras, we can export them to English
+      console.log('rules', game.rules.toEnglish());
+      // console.log('rules', game.rules.toJSON()); // also JSON
+
+
+      // directly map inputs to functions
+      // Easy to do, but not very flexible
+      // Not recommended
+      game.setControls({
+        W: function (ev) {
+          console.log("W", ev)
+          game.applyForce(currentPlayer.id, { x: 0, y: -10, z: 0 });
+        },
+        A: function (ev) {
+          console.log("A", ev)
+          game.applyForce(currentPlayer.id, { x: -10, y: 0, z: 0 });
+        },
+        S: function (ev) {
+          console.log("S", ev)
+          game.applyForce(currentPlayer.id, { x: 0, y: 10, z: 0 });
+        },
+        D: function (ev) {
+          console.log("D", ev)
+          game.applyForce(currentPlayer.id, { x: 10, y: 0, z: 0 });
+        }
+      });
+
+      window.game = game;
+
+    });
+  </script>
+  <div id="gameHolder"></div>
+</body>
+
+</html>

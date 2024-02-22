@@ -32,13 +32,10 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
     key: "build",
     value: function build() {
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      // Ensure entityData has a position property
       entityData.position = entityData.position || {
         x: 0,
         y: 0
       };
-
-      // Define default configuration for unitConfig
       var defaultUnitConfig = {
         position: {
           x: 0,
@@ -51,15 +48,29 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
         friction: 0.05,
         frictionAir: 0.005,
         frictionStatic: 0.25,
-        sprayAngle: Math.PI / 8
+        sprayAngle: Math.PI / 8,
+        meta: {
+          maxUnits: 10,
+          // Default max units
+          unitsSpawned: 0 // Initialize unitsSpawned
+        }
       };
 
-      // entityData.meta = entityData.meta || {};
-      // Combine the default configuration with the entityData
       var unitConfig = _objectSpread(_objectSpread({}, defaultUnitConfig), entityData.unitConfig);
-
-      // console.log('unitConfig', unitConfig)
-      // Return the combined entity configuration
+      if (typeof unitConfig.meta.unitsSpawned !== 'number') {
+        unitConfig.meta.unitsSpawned = 0;
+      }
+      unitConfig.afterRemoveEntity = function (ent) {
+        // decrement unitsSpawned for this unitConfig
+        // update the owner of this ent with meta
+        var parentUnitSpawner = game.data.ents._[ent.owner];
+        parentUnitSpawner.meta.unitConfig.meta.unitsSpawned -= 1;
+        game.updateEntity(ent.owner, {
+          meta: {
+            unitConfig: parentUnitSpawner.meta.unitConfig
+          }
+        });
+      };
       return {
         type: 'UNIT_SPAWNER',
         texture: entityData.texture || 'none',
@@ -78,14 +89,24 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "unitSpawnerUpdate",
     value: function unitSpawnerUpdate(entityData) {
-      if (this.game.tick % 10 === 0) {
-        // check for any unit-spawner entities
-        // get current position of ent from reference
+      var unitConfig = entityData.meta.unitConfig;
+      if (this.game.tick % 10 === 0 && unitConfig.meta.unitsSpawned < unitConfig.meta.maxUnits) {
         var position = entityData.position;
-        entityData.meta.unitConfig.position = position;
-        delete entityData.meta.unitConfig.id; // Remark: Clean clone might be better
-        var unit = this.createEntity(entityData.meta.unitConfig || {});
-        this.applySprayForce(unit);
+        unitConfig.position = position;
+        unitConfig.owner = entityData.id;
+        delete unitConfig.id; // Clean clone might be better
+        var unit = this.createEntity(unitConfig);
+        if (unit) {
+          // Assuming createEntity returns the created unit or null/undefined if not created
+          unitConfig.meta.unitsSpawned += 1; // Increment unitsSpawned for this unitConfig
+          this.applySprayForce(unit);
+          // this needs to update entity.meta.unitConfig.unitsSpawned
+          this.game.updateEntity(entityData.id, {
+            meta: {
+              unitConfig: unitConfig
+            }
+          });
+        }
       }
     }
   }, {
@@ -114,6 +135,7 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
       var baseAngle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Math.PI / 8;
       var sprayWidth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Math.PI / 4;
       var forceMagnitude = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.5;
+      var game = this.game;
       var angleOffset = (Math.random() - 0.5) * sprayWidth; // Random offset within a specified width
       var angle = unitConfig.sprayAngle + angleOffset;
       var force = {
@@ -128,79 +150,6 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
   }]);
   return UnitSpawner;
 }();
-/*
-// fount.js - Marak Squires 2023
-// Sutra for Generating Units
-export default function fountSutra(game, entityId, sprayConfig = { collisionStart : false, collisionEnd : false, collisionActive : false }) {
-
-  let rules = game.createSutra();
-
-  // TODO: custom unit configs for Fount
-  // Default configuration for the Fount
-  const settings = {
-    unitType: 'PARTICLE', // Type of unit to generate
-    collisionActive: false, // Whether or not the unit will emit collisionActive actives ( performance hit )
-    texture: 'pixel', // Texture for the unit
-    color: 0x00ff00, // Color of the unit
-    unitSize: { width: 4, height: 4 }, // Size of the unit
-    sprayAngle: Math.PI / 8, // Angle of the spray arc (in radians)
-    sprayWidth: Math.PI / 4, // Width of the spray arc (in radians)
-    forceMagnitude: 0.5, // Magnitude of the force applied to each unit
-    ...sprayConfig
-  };
-
-  // Function to create a unit
-  function createUnit(position) {
-    let rgbColor = settings.color;
-    // convert from int to rgb
-    rgbColor = [(rgbColor >> 16) & 255, (rgbColor >> 8) & 255, rgbColor & 255];
-    let rgbColorString = `rgba(${rgbColor.join(',')}, 0.5)`; // Adjust opacity as needed
-    return game.createEntity({
-      type: settings.unitType,
-      collisionActive: sprayConfig.collisionActive,
-      collisionEnd: sprayConfig.collisionEnd,
-      collisionStart: sprayConfig.collisionStart,
-      // texture: settings.texture,
-      height: settings.unitSize.height,
-      color: settings.color,
-      width: settings.unitSize.width,
-      position: position,
-      friction: 0.05,
-      frictionAir: 0.005,
-      frictionStatic: 0.25,
-      style: {
-        backgroundColor: rgbColorString
-      },
-      isSensor: true
-    });
-  }
-
-  function applySprayForce(unit, baseAngle = settings.sprayAngle) {
-    const angleOffset = (Math.random() - 0.5) * settings.sprayWidth; // Random offset within a specified width
-    const angle = baseAngle + angleOffset;
-  
-    const force = {
-      x: settings.forceMagnitude * Math.cos(angle),
-      y: settings.forceMagnitude * Math.sin(angle)
-    };
-    game.applyForce(unit.id, force);
-  }
-  
-  // Rule for generating and spraying units
-  rules.if('fountTick').then('fountSpray');
-  rules.addCondition('fountTick', (entity, gameState) => entity.id === entityId && gameState.tick % 10 === 0);
-  
-  rules.on('fountSpray', (context, node, gameState) => {
-    // Determine the position of the fount (can be context-dependent)
-    const fountPosition = (typeof context !== 'undefined') ? context.position : { x: 0, y: 0 };
-    // Create a unit and apply force
-    const unit = createUnit(fountPosition);
-    applySprayForce(unit);
-  });
-
-  return rules;
-}
-*/
 _defineProperty(UnitSpawner, "id", 'unit-spawner');
 
 },{}]},{},[1])(1)

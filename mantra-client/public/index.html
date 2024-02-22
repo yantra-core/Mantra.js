@@ -23,7 +23,7 @@
           const fullPath = baseUrl + currentPath;
   
           // Update the breadcrumb with the link
-          breadcrumbDiv.innerHTML = 'Mantra > <a href="' + fullPath + '" target="_blank">' + currentPath + '</a>';
+          // breadcrumbDiv.innerHTML = 'Mantra > <a href="' + fullPath + '" target="_blank">' + currentPath + '</a>';
         } catch (e) {
           console.error("Error resizing iframe: " + e);
           // Handle errors here, if the content is cross-origin, you might not be able to access the content of the iframe
@@ -48,18 +48,21 @@
     <br />
     <br />
   </div>
-  <div id="breadcrumb">Mantra Example Gallery <a href="./examples">/examples</a></div> <!-- Breadcrumb placeholder -->
+  <div id="breadcrumb"> Mantra Gallery <a href="./examples/gallery">/examples/gallery</a></div> <!-- Breadcrumb placeholder -->
+  <iframe id="mantraGalleryIframe" src="./examples/gallery.html" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
 
-  <!-- 
-    <iframe id="mantraIframe" src="./examples" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
+  <div id="breadcrumb">Mantra Examples <a href="./examples">/examples</a></div> <!-- Breadcrumb placeholder -->
+  <iframe id="mantraExamplesIframe" src="./examples/index.html" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
+
   <script>
     // Initialize the resizing function for the iframe when the document is fully loaded
     document.addEventListener('DOMContentLoaded', function() {
-      const iframe = document.getElementById('mantraIframe');
+      const iframe = document.getElementById('mantraGalleryIframe');
       resizeIframeToFitContent(iframe);
+      const iframe2 = document.getElementById('mantraExamplesIframe');
+      resizeIframeToFitContent(iframe2);
     });
   </script>
-  -->
 
 
 </body>

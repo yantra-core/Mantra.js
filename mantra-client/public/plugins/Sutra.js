@@ -4,7 +4,123 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = defaultMouseMovement;
+// Remark: This module scoped variables are out of band, they will be removed, see comment in defaultTopdownMovement.js
+// Assuming 'LEFT' and 'RIGHT' are properties indicating the state of mouse buttons in context.buttons
+
+var moving = false;
+var movingToPosition = {};
+
+// Map your variables to the BUTTONS object
+//let mouseMovementButton = 'RIGHT'; // Use 'RIGHT' for movement
+//let mouseActionButton = 'LEFT'; // Use 'LEFT' for action (e.g., throwing a boomerang)
+
+function defaultMouseMovement(game) {
+  game.on('pointerUp', function (context, event) {
+    var mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
+    if (game.isTouchDevice()) {
+      if (context.endedFirstTouch) {
+        moving = false;
+        game.updateEntity(game.currentPlayerId, {
+          update: null
+        });
+      }
+    } else {
+      // Use the variable instead of the hardcoded value
+      if (context.buttons[mouseMovementButton] === false) {
+        moving = false;
+        game.updateEntity(game.currentPlayerId, {
+          update: null
+        });
+      }
+    }
+  });
+  game.on('pointerMove', function (context, event) {
+    if (!game.data || !game.data.ents || !game.data.ents.PLAYER) {
+      return;
+    }
+    var gamePointerPosition = context.position;
+    var currentPlayer = game.data.ents.PLAYER[0];
+    var playerPosition = currentPlayer.position;
+    if (playerPosition && moving) {
+      var radians = Math.atan2(gamePointerPosition.y - playerPosition.y, gamePointerPosition.x - playerPosition.x);
+      movingToPosition = {
+        x: gamePointerPosition.x,
+        y: gamePointerPosition.y,
+        rotation: radians
+      };
+    }
+  });
+  game.on('pointerDown', function (context, event) {
+    if (!game.data || !game.data.ents || !game.data.ents.PLAYER) {
+      return;
+    }
+    var mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
+    var mouseActionButton = game.config.mouseActionButton || 'LEFT';
+    var gamePointerPosition = context.position;
+    var currentPlayer = game.data.ents.PLAYER[0];
+    var playerPosition = currentPlayer.position;
+    if (playerPosition) {
+      if (typeof currentPlayer.update !== 'function') {
+        game.updateEntity(currentPlayer.id, {
+          update: function update(player) {
+            if (moving && movingToPosition.x && movingToPosition.y) {
+              // move the player based on the angle of the mouse compared to the player
+              // create a new force based on angle and speed
+              var _radians = movingToPosition.rotation;
+              var force = {
+                x: Math.cos(_radians) * 1.5,
+                y: Math.sin(_radians) * 1.5
+              };
+              // Remark: Directly apply forces to player, this is local only
+              //         Networked movements need to go through Entity Input systems with control inputs
+              // Remark: Update default top-down movement system to support mouse movements
+              game.applyForce(game.data.ents.PLAYER[0].id, force);
+            }
+          }
+        });
+      }
+      var radians = Math.atan2(gamePointerPosition.y - playerPosition.y, gamePointerPosition.x - playerPosition.x);
+      if (game.isTouchDevice()) {
+        if (event.pointerId === context.firstTouchId) {
+          moving = true;
+          movingToPosition = {
+            x: gamePointerPosition.x,
+            y: gamePointerPosition.y,
+            rotation: radians
+          };
+        } else if (event.pointerId === context.secondTouchId) {
+          game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+        }
+      } else {
+        // Use variables for button checks
+        if (context.buttons[mouseMovementButton]) {
+          moving = true;
+          movingToPosition = {
+            x: gamePointerPosition.x,
+            y: gamePointerPosition.y,
+            rotation: radians
+          };
+        }
+        if (context.buttons[mouseActionButton]) {
+          game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+        }
+      }
+    }
+  });
+}
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = platformMovement;
+var _defaultMouseMovement = _interopRequireDefault(require("./defaultMouseMovement.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+// TODO: defaultPlatformMouseMovement.js
+
 function platformMovement(game) {
   var rules = game.createSutra();
   rules.addCondition('PLAYER_UP', {
@@ -189,16 +305,19 @@ function platformMovement(game) {
       game.systems.sword.swingSword(player.id);
     }
   });
+  (0, _defaultMouseMovement["default"])(game);
   return rules;
 }
 
-},{}],2:[function(require,module,exports){
+},{"./defaultMouseMovement.js":1}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = topdownMovement;
+var _defaultMouseMovement = _interopRequireDefault(require("./defaultMouseMovement.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
@@ -408,10 +527,20 @@ function topdownMovement(game) {
     var currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });
+
+  //
+  // Adds pointer events
+  //
+  // These are currently slightly out of band since they are not implemented is Entity Input
+  // This is a temporary solution to allow for pointer events to be used in the game and local demos
+  // We'll need to implement these mouse movements as a movement system for entity input
+  // In order to support multiplayer mouse controls, its all there including mouse position and button states, 
+  // just needs to be mapped as Entity Input with label names for Sutra conditions
+  (0, _defaultMouseMovement["default"])(game);
   return rules;
 }
 
-},{}],3:[function(require,module,exports){
+},{"./defaultMouseMovement.js":1}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -705,7 +834,7 @@ var Sutra = /*#__PURE__*/function () {
 _defineProperty(Sutra, "id", 'sutra');
 var _default = exports["default"] = Sutra;
 
-},{"../../../../sutra/index.js":4,"../../lib/Game/defaults/defaultPlatformMovement.js":1,"../../lib/Game/defaults/defaultTopdownMovement.js":2}],4:[function(require,module,exports){
+},{"../../../../sutra/index.js":5,"../../lib/Game/defaults/defaultPlatformMovement.js":2,"../../lib/Game/defaults/defaultTopdownMovement.js":3}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -724,7 +853,7 @@ function createSutra() {
   return new _sutra["default"]();
 }
 
-},{"./lib/sutra.js":14}],5:[function(require,module,exports){
+},{"./lib/sutra.js":15}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -756,7 +885,7 @@ function evaluateCompositeCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -811,7 +940,7 @@ function evaluateCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -869,7 +998,7 @@ function evaluateDSLCondition(conditionObj, data, gameState) {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -922,7 +1051,7 @@ function evaluateSingleCondition(condition, data, gameState) {
   return false;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1095,7 +1224,7 @@ function exportToEnglish() {
   //return this.tree.map(node => describeAction(node, indentLevel)).join('\n').concat('') + '\n' + conditionDescriptions;
 }
 
-},{"./i18n.js":10}],10:[function(require,module,exports){
+},{"./i18n.js":11}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1143,7 +1272,7 @@ var languageConfig = {
 };
 var _default = exports["default"] = languageConfig;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1168,7 +1297,7 @@ var _default = exports["default"] = {
   '!': 'not'
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1188,7 +1317,7 @@ function parsePath(path) {
   }, []);
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1237,7 +1366,7 @@ function serializeNode(node) {
   return serializedNode;
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2096,5 +2225,5 @@ var Sutra = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = Sutra;
 
-},{"./evaluateCompositeCondition.js":5,"./evaluateCondition.js":6,"./evaluateDSLCondition.js":7,"./evaluateSingleCondition.js":8,"./exportToEnglish.js":9,"./operatorAliases.js":11,"./parsePath.js":12,"./serializeToJson.js":13}]},{},[3])(3)
+},{"./evaluateCompositeCondition.js":6,"./evaluateCondition.js":7,"./evaluateDSLCondition.js":8,"./evaluateSingleCondition.js":9,"./exportToEnglish.js":10,"./operatorAliases.js":12,"./parsePath.js":13,"./serializeToJson.js":14}]},{},[4])(4)
 });

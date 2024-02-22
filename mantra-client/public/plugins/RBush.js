@@ -30,6 +30,7 @@ var RBush = /*#__PURE__*/function () {
   function RBush() {
     _classCallCheck(this, RBush);
     this.id = RBush.id;
+    this.idToNodeMap = new Map(); // Map to track IDs to RBush nodes
   }
   _createClass(RBush, [{
     key: "init",
@@ -43,33 +44,44 @@ var RBush = /*#__PURE__*/function () {
     value: function addEntity(entity) {
       var spatialData = this._extractSpatialData(entity);
       this.tree.insert(spatialData);
+      this.idToNodeMap.set(entity.id.toString(), spatialData);
     }
   }, {
     key: "updateEntity",
     value: function updateEntity(entity) {
-      var spatialData = this._extractSpatialData(entity);
-      this.tree.remove(spatialData, function (a, b) {
-        return a.id === b.id;
-      });
-      this.tree.insert(spatialData);
+      var entityIdString = entity.id.toString();
+      var oldSpatialData = this.idToNodeMap.get(entityIdString);
+      // Directly remove the old node if it exists
+      if (oldSpatialData) {
+        this.tree.remove(oldSpatialData); // RBush's remove expects the exact node reference
+        this.idToNodeMap["delete"](entityIdString); // Remove the old entry from the map
+      }
+      // Insert the updated entity and update the map
+      var newSpatialData = this._extractSpatialData(entity);
+      this.tree.insert(newSpatialData);
+      this.idToNodeMap.set(entityIdString, newSpatialData);
     }
   }, {
     key: "removeEntity",
     value: function removeEntity(entity) {
-      var spatialData = this._extractSpatialData(entity);
-      this.tree.remove(spatialData, function (a, b) {
-        return a.id === b.id;
-      });
+      var spatialData = this.idToNodeMap.get(entity.id.toString());
+      if (spatialData) {
+        this.tree.remove(spatialData);
+        this.idToNodeMap["delete"](entity.id.toString());
+      }
     }
   }, {
     key: "search",
     value: function search(query) {
-      var _this = this;
       var mergeData = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      // Query should be an object with {minX, minY, maxX, maxY}
+      var that = this;
       if (mergeData) {
-        return this.tree.search(query).map(function (item) {
-          return _this.game.getEntity(item.id);
+        return this.tree.search(query).filter(function (item) {
+          var entRef = that.game.data.ents._[item.id.toString()];
+          if (entRef && entRef !== null && entRef.destroyed !== true) {
+            return that.game.data.ents._[item.id.toString()];
+          }
+          return false;
         });
       } else {
         return this.tree.search(query).map(function (item) {
@@ -101,7 +113,7 @@ var RBush = /*#__PURE__*/function () {
   }, {
     key: "update",
     value: function update() {
-      var _this2 = this;
+      var _this = this;
       // run once per game loop
 
       var tick = this.game.tick;
@@ -153,11 +165,11 @@ var RBush = /*#__PURE__*/function () {
       }
       nearbyEntities.forEach(function (eId) {
         if (eId) {
-          var exists = _this2.game.data.ents._[eId.toString()];
+          var exists = _this.game.data.ents._[eId.toString()];
           if (!exists) {
-            var entityData = _this2.game.deferredEntities[eId.toString()];
+            var entityData = _this.game.deferredEntities[eId.toString()];
             if (entityData && entityData.destroyed !== true) {
-              _this2.game.createEntity(entityData, true); // ignore create setup, goes straight to create
+              _this.game.createEntity(entityData, true); // ignore create setup, goes straight to create
             }
           }
         }

@@ -73,6 +73,7 @@ var Player = exports["default"] = /*#__PURE__*/function () {
         radius: playerConfig.radius,
         texture: playerConfig.texture,
         afterRemoveEntity: function afterRemoveEntity(entity) {
+          var game = that.game; // this should work here?, test again
           // check to see if has any lives left
           if (entity.meta && typeof entity.meta.lives === 'number' && entity.meta.lives > 0) {
             // creates the same player again with the same config

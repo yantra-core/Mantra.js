@@ -1,48 +1,46 @@
 // TODO: add flash on collision
 let game = new MANTRA.Game({
   defaultMovement: true,
-  plugins: ['Tone', 'Gamepad', 'GamepadGUI'], // rename VirtualGamepad
+  plugins: ['Text', 'Flame', 'Tone', 'Gamepad'],
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
 });
 
 game.start(function () {
+
+  // overrides default movement
+  game.config.mouseMovementButton = 'LEFT';
+
   game.setBackground('#000000');
   game.zoom(2.5);
   game.createPlayer();
-  game.createEntity({
-    type: 'FIRE',
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'fire',
-    },
-    width: 16,
-    height: 16,
-    depth: 16,
-    isStatic: true,
-    position: {
-      x: -80,
-      y: -60,
-      z: 16
-    }
+ 
+  // creates (3) flames
+  game.build().Flame().position(-80, -60, 16).createEntity();
+  game.build().Flame().position(80, -60, 16).createEntity();
+  game.build().Flame().position(0, 60, 16).createEntity();
+
+  // Create text instructions
+  let text = game.build().Text().width(310).position(80, -40).text('Do not walk into the fire');
+  text.style({
+    backgroundColor: 'black',
+    color: 'white',
+    fontSize: '14px',
+  });
+  
+  text.createEntity();
+
+  // instructions to move, click mouse, or use WASD or USB Gamepad
+  let inputText = game.build().Text().position(170, 20).text('Move with mouse, WASD, or USB Gamepad');
+  inputText.width(600);
+  inputText.style({
+    backgroundColor: 'black',
+    color: 'white',
+    fontSize: '14px',
   });
 
-  game.createEntity({
-    type: 'FIRE',
-    texture: {
-      sheet: 'loz_spritesheet',
-      sprite: 'fire',
-    },
-    width: 16,
-    height: 16,
-    depth: 16,
-    isStatic: true,
-    position: {
-      x: 80,
-      y: -60,
-      z: 16
-    }
-  });
+  inputText.createEntity();
 
+  /*
   // create text, do not walk into fire
   game.createText({
     width: 310,
@@ -58,6 +56,7 @@ game.start(function () {
       fontSize: '14px',
     },
   })
+  */
 
   game.rules.addCondition('entityTouchedFire', (entity, gameState) => {
     if (entity.type === 'COLLISION' && entity.kind === 'START') {

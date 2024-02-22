@@ -562,10 +562,20 @@ function createEntity() {
       text: null,
       style: null,
       texture: null,
-      collisionActive: false,
       collisionStart: true,
+      collisionActive: false,
       collisionEnd: false,
+      pointerdown: false,
+      pointerup: false,
+      pointermove: false,
+      pointerover: false,
+      pointerout: false,
+      pointerenter: false,
+      pointerleave: false,
+      onDrop: null,
+      afterItemCollected: null,
       afterRemoveEntity: null,
+      afterCreateEntity: null,
       update: null,
       exit: null,
       ctick: this.game.tick
@@ -672,7 +682,17 @@ function createEntity() {
     collisionActive = _config.collisionActive,
     collisionStart = _config.collisionStart,
     collisionEnd = _config.collisionEnd,
+    pointerdown = _config.pointerdown,
+    pointerup = _config.pointerup,
+    pointermove = _config.pointermove,
+    pointerenter = _config.pointerenter,
+    pointerleave = _config.pointerleave,
+    pointerover = _config.pointerover,
+    pointerout = _config.pointerout,
+    onDrop = _config.onDrop,
     afterRemoveEntity = _config.afterRemoveEntity,
+    afterCreateEntity = _config.afterCreateEntity,
+    afterItemCollected = _config.afterItemCollected,
     update = _config.update,
     exit = _config.exit,
     ctick = _config.ctick;
@@ -737,10 +757,22 @@ function createEntity() {
   this.game.addComponent(entityId, 'text', text);
   this.game.addComponent(entityId, 'style', style);
   this.game.addComponent(entityId, 'texture', texture);
+  this.game.addComponent(entityId, 'afterItemCollected', afterItemCollected);
   this.game.addComponent(entityId, 'afterRemoveEntity', afterRemoveEntity);
+  this.game.addComponent(entityId, 'afterCreateEntity', afterRemoveEntity);
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
+  this.game.addComponent(entityId, 'pointerdown', pointerdown);
+  this.game.addComponent(entityId, 'pointerup', pointerup);
+  this.game.addComponent(entityId, 'pointermove', pointermove);
+  this.game.addComponent(entityId, 'pointerenter', pointerenter);
+  this.game.addComponent(entityId, 'pointerleave', pointerleave);
+  this.game.addComponent(entityId, 'pointerover', pointerover);
+  this.game.addComponent(entityId, 'pointerout', pointerout);
+
+  // Drag and Drop Events
+  this.game.addComponent(entityId, 'onDrop', onDrop);
   this.game.addComponent(entityId, 'update', update);
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
@@ -842,6 +874,21 @@ function createEntity() {
   this.game.data.ents._[entityId] = updatedEntity;
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
+
+  //
+  // Entity Lifecycle afterCreateEntity
+  //
+  var _afterCreateEntity;
+  if (typeof config.afterCreateEntity === 'function') {
+    _afterCreateEntity = config.afterCreateEntity;
+  }
+  if (_afterCreateEntity) {
+    _afterCreateEntity(config);
+  }
+
+  //
+  //
+  // Game Lifecycle after.createEntity
   updatedEntity = this.game.lifecycle.triggerHook('after.createEntity', config);
   return updatedEntity;
 }
@@ -930,6 +977,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = layoutEntity;
+// TODO: needs to be able to attach by container/entity id or name, not just by name
 function layoutEntity(container, entityId) {
   var _this = this;
   var containerEnt = this.game.findEntity(container); // Adjust this line to match how you access the boss entity
@@ -987,9 +1035,10 @@ function layoutEntity(container, entityId) {
     }
 
     // Calculate the entity's new position relative to the container's position
+    // Remark: is - containerEnt.size.width / 2 adjustment required? 
     var newPosition = {
-      x: containerPosition.x + offsetX,
-      y: containerPosition.y + offsetY,
+      x: containerPosition.x + offsetX + entity.position.x - containerEnt.size.width / 2,
+      y: containerPosition.y + offsetY + entity.position.y - containerEnt.size.height / 2,
       z: containerPosition.z // Assuming z-index remains constant or is managed elsewhere
     };
 
@@ -1000,7 +1049,7 @@ function layoutEntity(container, entityId) {
     });
 
     // Log for debugging purposes
-    console.log("Entity ".concat(entityId, " positioned at (").concat(newPosition.x, ", ").concat(newPosition.y, ", ").concat(newPosition.z, ") relative to container"));
+    // console.log(`Entity ${entityId} positioned at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) relative to container`);
   }
 
   //
@@ -1140,14 +1189,13 @@ function removeAllEntities(options) {
   if (this.game.data.ents) {
     for (var eId in this.game.data.ents._) {
       var ent = this.game.data.ents._[eId];
-
       // Do not remove the current player if clearCurrentPlayer is false
       if (ent.id === this.game.currentPlayerId && !clearCurrentPlayer) {
-        return;
+        continue;
       }
       // Do not remove entities that are excluded by name
       if (excludeByName.includes(ent.name)) {
-        return;
+        continue;
       }
       if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
         ent.yCraft.part.unload();
@@ -1300,6 +1348,12 @@ function updateEntity(entityDataOrId, entityData) {
     // this.game.components.radius.set(entityId, entityData.radius);
   }
 
+  // size is new API, remove root level height, width, radius
+  if (entityData.size) {
+    updateSize = true;
+    this.game.components.size.set(entityId, entityData.size);
+  }
+
   /*
   if (entityData.body === false) {
     // alert("remove body");
@@ -1325,6 +1379,42 @@ function updateEntity(entityDataOrId, entityData) {
   }
   if (typeof entityData.thickness !== 'undefined' && entityData.thickness !== null) {
     this.game.components.width.set(entityId, entityData.thickness);
+  }
+
+  //
+  // Event handlers / Lifecycle Events
+  //
+
+  //
+  // Entity event lifecycle events will merge by default ( for now )
+  if (typeof entityData.update !== 'undefined') {
+    // get the current component value
+    var currentFn = this.game.components.update.get(entityId);
+    var entRef = this.game.data.ents._[entityId];
+    if (entRef) {
+      // clear out all existing update functions
+      // TODO: add better mappings in EntityBuilder.js for granular removals
+      if (entityData.update === null) {
+        this.game.components.update.set(entityId, null);
+      } else {
+        // create a quick config to store the events, we'll want to convert entire function to use this
+        var updateConfig = this.game.build();
+        updateConfig.onUpdate(entityData.update);
+        // inherit the current update function, creates a tree of functions
+        // do we want to do this? what are the implications?
+        if (currentFn && currentFn.handlers && currentFn.handlers.length) {
+          currentFn.handlers.forEach(function (fn) {
+            // console.log("adding existing fn to updateConfig", fn.toString())
+            updateConfig.onUpdate(fn);
+          });
+        }
+        // console.log("new updateConfig", updateConfig.config.update)
+        // Update the current ent that will be returned from updateEntity(entityId, entityData)
+        ent.update = updateConfig.config.update;
+        // Update the component value
+        this.game.components.update.set(entityId, updateConfig.config.update);
+      }
+    }
   }
 
   //
@@ -1400,6 +1490,52 @@ function updateEntity(entityDataOrId, entityData) {
   ent = this.game.lifecycle.triggerHook('after.updateEntity', ent);
   return ent;
 }
+
+/* TODO: we need to iterate all events for composite updates
+   TODO: add unit tests for Entity.updateEntity({ eventName }) tests
+         be sure to check all cases
+         double check our usage of using null to pop fn from array
+         see about exact fn match for removal
+
+function updateEntityEvents(entityId, entityData) {
+  console.log("Updating Entity Events");
+
+  // List of known event names
+  const eventNames = [
+    'pointerdown', 'pointerup', 'pointermove', 'pointerover', 'pointerout',
+    'pointerenter', 'pointerleave', 'collisionStart', 'collisionActive',
+    'collisionEnd', 'onDrop', 'update', 'afterRemoveEntity'
+  ];
+
+  let entRef = this.game.data.ents._[entityId];
+  if (!entRef) {
+    console.log("Entity reference not found");
+    return;
+  }
+
+  eventNames.forEach(eventName => {
+    if (typeof entityData[eventName] !== 'undefined') {
+      console.log(`Processing ${eventName}`);
+
+      // Create a quick config to store the events
+      let eventConfig = this.game.build();
+
+      // Add the new event handler
+      eventConfig['_addEventHandler'](eventName, entityData[eventName]);
+
+      // Check if there are existing event handlers to preserve
+      let existingEventFn = this.game.components[eventName].get(entityId);
+      if (typeof existingEventFn === 'function' && Array.isArray(existingEventFn.handlers)) {
+        // Add each existing handler to the new configuration to preserve them
+        existingEventFn.handlers.forEach(handler => eventConfig['_addEventHandler'](eventName, handler));
+      }
+
+      // Set the updated configuration
+      this.game.components[eventName].set(entityId, eventConfig.config[eventName]);
+    }
+  });
+}
+*/
 
 },{"./util/ensureColorInt.js":12}],12:[function(require,module,exports){
 "use strict";
