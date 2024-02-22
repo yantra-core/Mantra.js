@@ -437,7 +437,7 @@ export default class EntityBuilder {
       let singleCreatedEntity = this.game.createEntity(singleConfig);
       if (singleCreatedEntity.type === 'PLAYER') {
         // TODO: check to see if there are no other active players / if so set this one
-        game.setPlayerId(singleCreatedEntity.id)
+        this.game.setPlayerId(singleCreatedEntity.id)
       }
       return singleCreatedEntity;
     }
