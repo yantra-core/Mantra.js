@@ -2,7 +2,6 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
   defaultMovement: true, // adds movement to player
   plugins: ['Block', 'Key', 'Collectable', 'Gamepad', 'GamepadGUI'], // plugins at construction
-  gameRoot: 'http://192.168.1.80:7777'
 });
 
 game.use('Boomerang'); // plugins at runtime

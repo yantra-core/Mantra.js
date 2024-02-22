@@ -21,6 +21,40 @@ game.start(function () {
     tileHeight: 16 // TODO: tileSet.tileheight
   });
 
+
+  let tileMapConfig = game.build().TileMap({
+    tileData: [], // this is the tileData array from wherever ( LABY )
+  });
+
+  let teleporterConfig = game.build().Teleporter({
+    destination: {
+      plugin: 'Level-2',
+    }
+  })
+  .texture('tile-exit')
+  .build();
+
+  // manually map 6, exit tile
+  teleporterConfig.id = 6;
+  let exitTileConfig = teleporterConfig;
+  // constructions options or can be configured at runtime
+  tileMapConfig.meta({
+    tileSet: [ // this is the tileSet array from wherever ( LABY )
+      { id: 0, kind: 'empty' },
+      { id: 1, kind: 'wall', texture: 'tile-bush', body: true, isStatic: true, customZ: true, z: 16 /* size: { depth: 32 } */ },
+      { id: 2, kind: 'grass' },
+      { id: 3, kind: 'block', type: 'BLOCK', body: true, z: 16 },
+      { id: 4, kind: 'path-green' },
+      { id: 5, kind: 'entrance', texture: 'tile-entrance' },
+      exitTileConfig, // <--- tile id value 6 is the exit tile
+    ], 
+  });
+
+  // we map the tileSet to some actions
+
+
+
+
   // file entire tilemap with grass
   tileMap.fill(2);
   tileMap.seed('123456');

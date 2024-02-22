@@ -1,54 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Example Gallery</title>
-    <style>
-.controls-container {
-    display: flex;
-    align-items: center; /* Align vertically */
-    justify-content: flex-start; /* Align horizontally */
-    gap: 10px; /* Space between elements */
-    margin-bottom: 20px; /* Space before the iframe */
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+    }
 
-#countdown {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    .fixed-controls-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #f8f9fa;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #000;
+      color: #fff;
 
-#playPauseBtn {
-    cursor: pointer;
-}
+    }
 
-#exampleTitle, #nextPreview {
-    margin: 0; /* Remove default margins */
-    padding: 0 10px; /* Add some padding on the sides */
-}
+    .navigation {
+      display: flex;
+      justify-content: center;
+      flex-grow: 1;
+      /* Allows the navigation container to take up all available space */
+    }
 
-iframe {
-    width: 100%;
-    height: 1200px; /* Adjust as needed */
-}
-    </style>
+    .navigation h3,
+    .navigation h2 {
+      margin: 0;
+      padding: 5px 10px;
+    }
+
+    .navigation h3 {
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .navigation h3:hover {
+      /* better hover color for dark bg*/
+      background-color: #333;
+      border-radius: 5px;
+    }
+
+    .control-buttons-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: 26px;
+      /* Space between playPauseBtn and countdown */
+    }
+
+
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: 26px;
+      /* Space between playPauseBtn and countdown */
+    }
+
+    #countdown {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #d000ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #playPauseBtn {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      background-color: #d000ff;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    #playPauseBtn:hover {
+      background-color: #d000ff;
+    }
+
+    iframe {
+      width: 100%;
+      height: 1200px;
+      /* Adjust as needed */
+      border: none;
+      padding-top: 60px;
+      /* Height of the fixed controls container */
+    }
+
+    @media (max-width: 768px) {
+      .navigation h2 {
+        font-size: 16px;
+        /* Smaller font size for smaller screens */
+      }
+
+      .navigation h3 {
+        font-size: 14px;
+        /* Smaller font size for smaller screens */
+      }
+    }
+  </style>
 </head>
-<body>
-    <div class="controls-container">
-        <h2 id="exampleTitle"></h2>
-        <h3 id="nextPreview"></h3>
-        <button id="playPauseBtn">Pause</button>
-        <div id="countdown">5</div>
 
+<body>
+  <div class="fixed-controls-container">
+
+    <div class="control-buttons-left">
+      <select id="exampleDropdown" onchange="loadSelectedExample()">
+        <option value="">Select an Example</option>
+        <!-- Options will be dynamically populated here -->
+      </select>
     </div>
-    <iframe id="exampleFrame" width="100%" height="1200"></iframe>
-    <script>
-        // $$$jsCode$$$
-    </script>
+
+
+    <div class="navigation">
+      <h3 id="prevPreview"></h3>
+      <h2 id="exampleTitle"></h2>
+      <h3 id="nextPreview"></h3>
+    </div>
+    <div class="control-buttons">
+      <button id="playPauseBtn">Pause</button>
+      <div id="countdown">5</div>
+    </div>
+  </div>
+  <iframe id="exampleFrame"></iframe>
+  <script>
+    // $$$jsCode$$$
+  </script>
 </body>
+
 </html>

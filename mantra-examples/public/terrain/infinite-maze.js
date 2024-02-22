@@ -11,6 +11,7 @@ let game = new MANTRA.Game({
     useFoV- Field of View can be turned on or off in the constructor or after construction
   */
   useFoV: true,
+  camera: 'follow'
 });
 
 game.use('Tile', {

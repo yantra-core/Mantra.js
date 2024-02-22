@@ -1,7 +1,7 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Gamepad', 'GamepadGUI'],
+  plugins: ['Text', 'Gamepad'],
   defaultMovement: false,
   defaultPlayer: true
 });
@@ -57,24 +57,18 @@ game.start(function () {
     entities.push(entity.id);
   }
 
-  // create text that says use WASD or Gamepad to move the camera
-  let text = game.createText({
-    text: 'Use WASD or Gamepad to move Camera',
-    position: {
-      x: 40,
-      y: 50
-    },
-    body: false,
-    size: {
-      width: 500,
-      height: 50,
-    },
-    color: 0xffffff,
-    style: {
-      backgroundColor: 'black',
-      fontSize: '24px',
-    }
-  });
+  let instructionText = game.build().Text()
+    .text('Use WASD or Gamepad to move Camera')
+    .position(40, 50)
+    .body(false)
+    .size(500, 50)
+    .color('white')
+    .style({
+        backgroundColor: 'black',
+        fontSize: '24px'
+    })
+    .createEntity();
+
 
 });
 window.game = game;

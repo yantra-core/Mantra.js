@@ -2,7 +2,8 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
-  plugins: ['Tile'], // RBush is required for Field of View
+  plugins: ['TileMap', 'Tile'], // RBush is required for Field of View
+  gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function () {
   game.zoom(2.5);
@@ -12,6 +13,9 @@ game.start(function () {
   // Creating a TileMap can be done at the lowest-level using arrays of integers
   //
 
+  game.build().TileMap().createEntity();
+
+  /*
   // TODO: have this be new game.TileMap({ ... })
   let tileMap = {
     x: 20, // Remark: This will place tile map in TileMap units, not pixed
@@ -24,5 +28,9 @@ game.start(function () {
 
   game.systems.tile.tileMap = tileMap
   game.systems.tile.createTileMap(tileMap);
+  */
 
 });
+
+//
+//

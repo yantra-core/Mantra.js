@@ -48,8 +48,9 @@
       cursor: pointer;
       transition: box-shadow 0.3s;
       font-size: 1.3em;
-      min-width: 300px;
-      max-width: 400px;
+      max-width: 440px;
+      max-height: 400px;
+      min-width: 360px;
       min-height: 400px;
     }
 
@@ -100,9 +101,11 @@
       text-align: center;
       /* Ensure the text is centered */
       font-size: 2em;
-      
-      white-space: nowrap; /* Prevents the text from wrapping to a new line */
-      overflow: hidden; /* Ensures that the overflow text is hidden */
+
+      white-space: nowrap;
+      /* Prevents the text from wrapping to a new line */
+      overflow: hidden;
+      /* Ensures that the overflow text is hidden */
       /*
       text-overflow: ellipsis;
       max-width: 400px;
@@ -216,6 +219,7 @@
       .category {
         flex: 0 1 calc(50% - 40px);
       }
+
       .staticExampleLink {
         flex: 0 1 calc(50% - 40px);
       }
@@ -229,6 +233,68 @@
 
       .search-container input {
         width: 80%;
+      }
+    }
+
+    /* Adjust font sizes for smaller devices */
+    @media (max-width: 768px) {
+      .category h3 {
+        font-size: 1.5em;
+        /* Smaller font size for medium devices */
+      }
+
+      .category p {
+        font-size: 1em;
+        /* Adjust paragraph font size */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .category h3 {
+        font-size: 1.2em;
+        /* Even smaller font size for small devices */
+      }
+
+      .category p {
+        font-size: 0.9em;
+        /* Further adjust paragraph font size */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .category {
+        min-width: 250px;
+        /* Slightly smaller min-width for medium devices */
+        max-width: 350px;
+        /* Adjust max-width accordingly */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .category {
+        min-width: 200px;
+        /* Further reduce min-width for small devices */
+        max-width: 300px;
+        /* Adjust max-width accordingly */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .categories {
+        padding: 10px;
+        /* Reduce padding */
+      }
+
+      .category {
+        margin: 10px;
+        /* Reduce margin */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-container {
+        padding: 10px;
+        /* Adjust padding for search container */
       }
     }
   </style>
@@ -271,7 +337,14 @@
       <div class="category" style="background-color: #ff5722;">
         <span class="categoryExample">Input Controls</span>
         <p>Handle mouse input.</p>
-        <h3>Mouse</h3>
+        <h3>Mouse Move</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="inputs/mouse.html">
+      <div class="category" style="background-color: #ff5722;">
+        <span class="categoryExample">Input Controls</span>
+        <p>Handle mouse input.</p>
+        <h3>Mouse Position</h3>
       </div>
     </a>
     <a class="staticExampleLink" href="behaviors/gamepad-input.html">

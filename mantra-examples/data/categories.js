@@ -179,6 +179,15 @@ let categories = [
     url: 'lifecycle.html',
     tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
   },
+  {
+    title: 'Games',
+    name: 'games',
+    color: '#ff5722',
+    description: 'Explore examples featuring game Worlds.',
+    image: 'placeholder-image.jpg',
+    url: 'games.html',
+    tags: ['games', 'gameplay', 'game', 'worlds', 'levels', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  }
 
 ];
 
@@ -266,6 +275,14 @@ let entity_examples = [
     image: 'placeholder-image.jpg',
     url: 'entity/update-entity.html',
     tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
+  },
+  {
+    title: 'Draggable Entity',
+    category: ['mouse', 'entity'],
+    description: 'Drag an entity with mouse or touch.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/draggable-entity.html',
+    tags: ['drag', 'entity', 'dragging', 'scene', 'move', 'slide', 'shift', 'relocate', 'transfer', 'transport', 'carry', 'pull', 'push']
   },
   {
     title: 'Get Entity',
@@ -384,16 +401,9 @@ let item_examples = [
 ];
 
 
-// before.collisionStart, after.collisionStart
-// before.collisionEnd,  after.collisionEnd
-// before.collisionActive, after.collisionActive
-// before.createEntity, after.createEntity
-// before.removeEntity, after.removeEntity
-// before.updateEntity, after.updateEntity
-// before.createEntity, after.createEntity
 let lifecycle_examples = [
   {
-    title: 'before.update',
+    title: 'before <br/> update',
     category: 'lifecycle',
     description: 'Run code before the update loop.',
     image: 'placeholder-image.jpg',
@@ -401,7 +411,7 @@ let lifecycle_examples = [
     tags: ['before', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'lifecycle', 'event', 'emitter']
   },
   {
-    title: 'after.update',
+    title: 'after <br/> update',
     category: 'lifecycle',
     description: 'Run code after the update loop.',
     image: 'placeholder-image.jpg',
@@ -409,7 +419,7 @@ let lifecycle_examples = [
     tags: ['after', 'update', 'loop', 'game', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'before.createEntity',
+    title: 'before <br/> createEntity',
     category: ['lifecycle', 'entity'],
     description: 'Run code before an entity is created.',
     image: 'placeholder-image.jpg',
@@ -417,7 +427,7 @@ let lifecycle_examples = [
     tags: ['before', 'create', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'after.createEntity',
+    title: 'after <br/> createEntity',
     category: ['lifecycle', 'entity'],
     description: 'Run code after an entity is created.',
     image: 'placeholder-image.jpg',
@@ -425,7 +435,7 @@ let lifecycle_examples = [
     tags: ['after', 'create', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'before.removeEntity',
+    title: 'before <br/> removeEntity',
     category: ['lifecycle', 'entity'],
     description: 'Run code before an entity is removed.',
     image: 'placeholder-image.jpg',
@@ -433,7 +443,7 @@ let lifecycle_examples = [
     tags: ['before', 'remove', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'after.removeEntity',
+    title: 'after <br/> removeEntity',
     category: ['lifecycle', 'entity'],
     description: 'Run code after an entity is removed.',
     image: 'placeholder-image.jpg',
@@ -441,7 +451,7 @@ let lifecycle_examples = [
     tags: ['after', 'remove', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'before.updateEntity',
+    title: 'before <br/> updateEntity',
     category: ['lifecycle', 'entity'],
     description: 'Run code before an entity is updated.',
     image: 'placeholder-image.jpg',
@@ -449,7 +459,7 @@ let lifecycle_examples = [
     tags: ['before', 'update', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'after.updateEntity',
+    title: 'after <br/> updateEntity',
     category: ['lifecycle', 'entity'],
     description: 'Run code after an entity is updated.',
     image: 'placeholder-image.jpg',
@@ -457,7 +467,7 @@ let lifecycle_examples = [
     tags: ['after', 'update', 'entity', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'before.collisionStart',
+    title: 'before <br/> collisionStart',
     category: ['lifecycle', 'collisions', 'entity'],
     description: 'Run code before a collision starts.',
     image: 'placeholder-image.jpg',
@@ -465,7 +475,7 @@ let lifecycle_examples = [
     tags: ['before', 'collision', 'start', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'after.collisionStart',
+    title: 'after <br/> collisionStart',
     category: ['lifecycle', 'collisions', 'entity'],
     description: 'Run code after a collision starts.',
     image: 'placeholder-image.jpg',
@@ -473,7 +483,7 @@ let lifecycle_examples = [
     tags: ['after', 'collision', 'start', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'before.collisionEnd',
+    title: 'before <br/> collisionEnd',
     category: ['lifecycle', 'collisions', 'entity'],
     description: 'Run code before a collision ends.',
     image: 'placeholder-image.jpg',
@@ -481,7 +491,7 @@ let lifecycle_examples = [
     tags: ['before', 'collision', 'end', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'after.collisionEnd',
+    title: 'after <br/> collisionEnd',
     category: ['lifecycle', 'collisions', 'entity'],
     description: 'Run code after a collision ends.',
     image: 'placeholder-image.jpg',
@@ -489,7 +499,7 @@ let lifecycle_examples = [
     tags: ['after', 'collision', 'end', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'before.collisionActive',
+    title: 'before <br/> collisionActive',
     category: ['lifecycle', 'collisions', 'entity'],
     description: 'Run code before a collision is active.',
     image: 'placeholder-image.jpg',
@@ -497,7 +507,7 @@ let lifecycle_examples = [
     tags: ['before', 'collision', 'active', 'run', 'execute', 'code', 'function', 'hook', 'event', 'lifecycle', 'emitter']
   },
   {
-    title: 'after.collisionActive',
+    title: 'after <br/> collisionActive',
     category: ['lifecycle', 'collisions', 'entity'],
     description: 'Run code after a collision is active.',
     image: 'placeholder-image.jpg',
@@ -607,13 +617,22 @@ let input_examples = [
     tags: ['keyboard', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   },
   {
-    title: 'Mouse',
+    title: 'Mouse Move',
     category: 'inputs',
     description: 'Handle mouse input.',
     image: 'placeholder-image.jpg',
     url: 'inputs/mouse.html',
     tags: ['mouse', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   },
+  {
+    title: 'Mouse Position',
+    category: 'inputs',
+    description: 'Handle mouse input.',
+    image: 'placeholder-image.jpg',
+    url: 'inputs/mouse.html',
+    tags: ['mouse', 'input', 'controls', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+
   {
     title: 'Gamepad',
     category: 'inputs',
@@ -737,7 +756,7 @@ let behaviors_examples = [
   },
   {
     title: 'Keyboard Input',
-    category: ['behaviors', 'inputs'],
+    category: ['behaviors', 'inputs', 'keyboard'],
     description: 'Run a behavior based on keyboard input.',
     image: 'placeholder-image.jpg',
     url: 'behaviors/keyboard-input.html',
@@ -775,7 +794,7 @@ let tiles_examples = [
 
 
   {
-    title: 'TileMap Array',
+    title: 'TileMap.data Array',
     category: 'tiles',
     description: 'Create a tilemap from an array of integers.',
     image: 'placeholder-image.jpg',
@@ -793,11 +812,11 @@ let tiles_examples = [
   },
   */
   {
-    title: 'TileSets',
+    title: 'TileSet',
     category: 'tiles',
-    description: 'Create custom tilesets.',
+    description: 'Create custom TileSets.',
     image: 'placeholder-image.jpg',
-    url: 'tilemaps/custom-tilesets.html',
+    url: 'tilemaps/tileset.html',
     tags: ['custom', 'tilesets', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
   {
@@ -1064,6 +1083,50 @@ let camera_examples = [
   */
 ];
 
+
+let games_examples = [
+  {
+    title: 'Platformer',
+    category: 'games',
+    description: 'Create a platformer game.',
+    image: 'placeholder-image.jpg',
+    url: 'games/platformer.html',
+    tags: ['platformer', 'game', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Top Down Shooter',
+    category: 'games',
+    description: 'Create a top down shooter game.',
+    image: 'placeholder-image.jpg',
+    url: 'games/top-down-shooter.html',
+    tags: ['top', 'down', 'shooter', 'game', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Maze World',
+    category: 'games',
+    description: 'Create a maze world game.',
+    image: 'placeholder-image.jpg',
+    url: 'games/maze-world.html',
+    tags: ['maze', 'world', 'game', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Gravity Gardens',
+    category: 'games',
+    description: 'Create a gravity gardens game.',
+    image: 'placeholder-image.jpg',
+    url: 'games/gravity-gardens.html',
+    tags: ['gravity', 'gardens', 'game', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
+  {
+    title: 'Music World',
+    category: 'games',
+    description: 'Create a music world game.',
+    image: 'placeholder-image.jpg',
+    url: 'games/music-world.html',
+    tags: ['music', 'world', 'game', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  }
+]
+
 let _examples = [];
 _examples.push(item_examples);
 _examples.push(npc_examples);
@@ -1084,6 +1147,7 @@ _examples.push(movement_examples);
 _examples.push(container_examples);
 _examples.push(scenes_examples);
 _examples.push(lifecycle_examples);
+_examples.push(games_examples);
 
 _examples.forEach((arr) => {
   arr.sort((a, b) => (a.title > b.title) ? 1 : -1);

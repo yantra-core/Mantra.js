@@ -30,6 +30,21 @@ let ogPath = window.location.pathname;
 // TODO: decouple main fn from DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
 
+  if (window.location !== window.parent.location) {
+    // in this mode we need to bind to all the ahref links and open in new window instead of default behavior
+    let links = document.querySelectorAll('a');
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open(link.href, '_blank');
+      });
+    });
+    // console.log("in iframe")
+    // open new window with example url
+    //window.open(exampleUrl, '_blank');
+    //return;
+  }
+
 
   // only render if root page
   //if (window.location.pathname !== '/') return;
@@ -108,12 +123,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // get all .category elements
       categoryElement.addEventListener('click', () => {
+
+    
         const categoryTitle = category.title; // Get the title of the clicked category
         let categoryName = category.name;
         // console.log("categoryTitle", categoryTitle)
 
         // update url push state
         let newPath = `${window.location.pathname}${category.url.replace('.html', '')}`;
+
+        if (window.location !== window.parent.location) {
+          // console.log("in iframe")
+          // open new window with example url
+          window.open(newPath, '_blank');
+          return;
+        }
+
+
         window.history.pushState({ type: 'category', title: category.title }, categoryTitle, newPath);
         //let categoryPath = category.url.replace('.html', '');
         //window.history.pushState({ type: 'category', title: category.title }, categoryPath, `/${categoryPath}`);
@@ -150,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
       exampleElement.style.backgroundColor = category ? category.color : 'defaultColor'; // Use a default color if category is not found
 
       categoriesContainer.appendChild(exampleElement);
-
       exampleElement.addEventListener('click', () => {
         example.url = example.url;
         loadExampleEmbed(example); // Load the example iframe
@@ -158,11 +183,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-
   function loadExampleEmbed(example) {
     // console.log("loadExampleEmbed", example)
+
     let exampleUrl = '' + example.url; // Get the URL of the clicked example
+    // TODO: check if env is run in iframe, if so instead of changing child iframe
+    // open new window with example url
+    if (window.location !== window.parent.location) {
+      // console.log("in iframe")
+      // open new window with example url
+      window.open(exampleUrl, '_blank');
+      return;
+    }
+
 
     // if not runnnig port 8888 dev mode, remove .html from url
     if (window.location.port !== '8889') {

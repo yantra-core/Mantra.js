@@ -6,23 +6,33 @@ let game = new MANTRA.Game({
       Set to 'follow' to enable the follow camera
   */
   camera: 'follow',
-  plugins: ['Tile', 'Bullet', 'Boomerang', 'Gamepad', 'GamepadGUI'],
+  plugins: ['Text', 'Tile', 'Bullet', 'Boomerang', 'Gamepad', 'GamepadGUI'],
 });
 game.start(function () {
 
   //
   // Changes the camera mode on pointer up
   //
-  game.on('pointerUp', function (event) {
+
+  let box = game.build().size(64).position(-200, 0).body(false).z(100).color('purple').pointerdown(function (box) {
     if (game.data.camera.mode === 'none') {
       game.data.camera.mode = 'follow';
+      // set box to purple
+      game.updateEntity(box.id, {
+        color: 'purple'
+      })
     } else {
+      // set box to yellow
+      game.updateEntity(box.id, {
+        color: 'yellow'
+      });
       game.data.camera.mode = 'none';
     }
     game.updateEntity(mode.id, {
       text: `Camera mode: ${game.data.camera.mode}`
     });
-  });
+  }).createEntity();
+
 
   game.zoom(2.5);
   game.createPlayer();
@@ -43,18 +53,8 @@ game.start(function () {
   game.systems.tile.createLayer(tileMap, 16, 16);
 
   // create text that says click to change camera mode
-  game.createText({
-    text: 'Click to change camera mode',
-    size: {
-      width: 500,
-      height: 100
-    },
-    position: {
-      x: 130,
-      y: 0
-    }
-  });
-
+  game.build().Text().text('Click Purple Box to change camera mode').size(500, 100).position(130, 0).createEntity();
+  
   // show mode as text entity
   let mode = game.createText({
     name: 'mode',
