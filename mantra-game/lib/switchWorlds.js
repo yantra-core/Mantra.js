@@ -21,6 +21,13 @@ export default async function switchWorlds (selectedWorld) {
   // remote player.meta.lives so player won't respawn
   game.updateEntity(game.currentPlayerId, { meta: { lives: 0 }, sutra: null });
 
+  // switching player to already constructed plugin classes
+  if (typeof selectedWorld === 'object') {
+    game.systems.entity.removeAllEntities();
+    game.use(selectedWorld);
+    return;
+  }
+
   game.systems.entity.removeAllEntities(true);
 
   let worldName = 'XState';

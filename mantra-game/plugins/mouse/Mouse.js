@@ -18,6 +18,7 @@ export default class Mouse {
       MIDDLE: null
     };
 
+
     this.activeTouches = {}; // Store active touches
     // TODO: support 3+ touches
     this.firstTouchId = null; // Track the first touch for movement
@@ -40,6 +41,10 @@ export default class Mouse {
   init(game) {
     this.game = game;
     this.id = Mouse.id;
+    game.config.mouseMovementButton = 'LEFT';
+    game.config.mouseActionButton = 'RIGHT';
+
+
     this.bindInputControls();
     this.game.systemsManager.addSystem(this.id, this);
   }

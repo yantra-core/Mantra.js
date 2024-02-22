@@ -2,7 +2,7 @@ let game = new MANTRA.Game({
   defaultPlayer: true,
   defaultMovement: true,
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['UnitSpawner', "Lifetime", 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang']
+  plugins: ['UnitSpawner', "Lifetime", 'Gamepad', 'Bullet', 'Boomerang']
 });
 game.start(function () {
 
@@ -15,6 +15,7 @@ game.start(function () {
     .build();
 
   game.setBackground('black');
+  game.setZoom(2.5);
   
   game.build()
     .name('fountA')

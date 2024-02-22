@@ -3,7 +3,7 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   defaultPlayer: true,
   defaultMovement: true,
-  plugins: ['Teleporter', 'Text', 'Block', 'Gamepad', 'GamepadGUI'],
+  plugins: ['Teleporter', 'Text', 'Flame', 'Block', 'Gamepad'],
   gameRoot: 'http://192.168.1.80:7777'
 });
 game.start(function () {
@@ -60,7 +60,6 @@ game.start(function () {
     .createEntity();
 });
 
-
 class DemoScene {
   static id = 'demo-scene';
   static type = 'scene'; // type is optional for Plugins
@@ -95,7 +94,7 @@ class DemoScene {
       },
     });
 
-    this.game.build().Fire().createEntity();
+    this.game.build().Flame().y(-50).createEntity();
 
   }
 

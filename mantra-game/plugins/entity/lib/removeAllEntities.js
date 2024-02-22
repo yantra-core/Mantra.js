@@ -12,18 +12,15 @@ export default function removeAllEntities(options) {
   }
 
   if (this.game.data.ents) {
-
     for (let eId in this.game.data.ents._) {
-
       let ent = this.game.data.ents._[eId];
-
       // Do not remove the current player if clearCurrentPlayer is false
       if (ent.id === this.game.currentPlayerId && !clearCurrentPlayer) {
-        return;
+        continue;
       }
       // Do not remove entities that are excluded by name
       if (excludeByName.includes(ent.name)) {
-        return;
+        continue;
       }
       if (ent && ent.yCraft && ent.yCraft.part && ent.yCraft.part.unload) {
         ent.yCraft.part.unload();

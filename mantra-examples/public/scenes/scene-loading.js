@@ -1,5 +1,6 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
+  plugins: ['Text', 'Hexapod', 'Bullet'],
   defaultMovement: true
 });
 
@@ -16,7 +17,7 @@ class MyScene {
     game.addAsset('/img/game/tiles/tile-block.png', 'image', 'tile-block-0');  // custom asset
   }
 
-  init (game) {
+  init(game) {
     console.log("Initializing MyScene");
     this.game.setBackground('#000000');
     this.createText({
@@ -37,29 +38,26 @@ class MyScene {
       },
     });
 
-    // create grass block
-    this.createEntity({
-      type: 'BLOCK',
-      size: {
-        width: 50,
-        height: 50
-      },
-      hasCollisionStart: true,
-      position: {
-        x: -32,
-        y: -100
-      },
-      texture: 'tile-block-0'
-    });
+    let customEnt = game.build()
+      .type('BLOCK')
+      .size(50, 50)
+      .position(-32, -100)
+      .texture('tile-block-0')
+      .createEntity();
+    
+    this.game.build().Hexapod().repeat(6).position(-300, 0).createEntity();
+    this.game.build().Hexapod().repeat(6).position(300, 0).createEntity();
+
+    
 
   }
 
-  unload () {
+  unload() {
     console.log("Unloading MyScene");
   }
 }
 
-game.start(function(){
+game.start(function () {
 
   let myScene = new MyScene(game);
 
@@ -68,29 +66,21 @@ game.start(function(){
     if (!game.data.scenes.myscene) {
       // Use the scene class instance
       game.use(myScene);
-      game.removeEntity(text.id);
+      game.removeEntity(clickToLoadText.id);
     }
   });
 
-  // create text that says click to load scene
-  let text = game.createText({
-    text: 'Click to load scene',
-    position: {
-      x: 0,
-      y: 0
-    },
-    size: {
-      width: 400,
-      height: 50,
-    },
-    color: 0xffffff,
-    style: {
+  let clickToLoadText = game.build().Text()
+    .text('Click to load scene')
+    .position(0, 0)
+    .size(400, 50)
+    .color('white')
+    .style({
       backgroundColor: 'black',
       fontSize: '44px',
       textAlign: 'center'
-    },
-  });
-
+    })
+    .createEntity();
 
 
   game.createPlayer({

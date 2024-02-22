@@ -52,6 +52,7 @@ const plugins = [
   './plugins/gui-plugin-explorer/PluginExplorer.js',
   './plugins/snapshot-manager/SnapshotManager.js',
   './plugins/label/Label.js',
+  './plugins/menu-radial/RadialMenu.js',
   './plugins/text/Text.js',
   './plugins/gui-plugins/PluginsGUI.js',
   './plugins/gui-ycraft/YCraftGUI.js',

@@ -95,7 +95,14 @@ class Home {
 
   init(game) {
     this.game = game;
+
+    // moves with right click, shoots with left
+    game.config.mouseMovementButton = 'RIGHT';
+    game.config.mouseActionButton = 'LEFT';
+
+
     this.createWorld();
+
   }
 
   update() {
