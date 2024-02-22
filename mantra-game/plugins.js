@@ -101,6 +101,7 @@ import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 // GUI GameObjects
 import Label from './plugins/label/Label.js';
 import Text from './plugins/text/Text.js';
+import RadialMenu from './plugins/menu-radial/RadialMenu.js';
 
 // GUI
 import Inspector from './plugins/gui-inspector/Inspector.js';
@@ -157,6 +158,7 @@ const plugins = {
   // UI Objects
   Label,
   Text,
+  RadialMenu,
   Draggable,
   Droppable,
   // Core

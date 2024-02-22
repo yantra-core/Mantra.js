@@ -42,6 +42,9 @@ class YCraft {
         sheet: 'loz_spritesheet',
         sprite: 'player'
       },
+      meta: {
+        lives: 99
+      },
       position: {
         x: 100,
         y: 100
