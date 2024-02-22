@@ -52,7 +52,7 @@ class SwitchGraphics {
   }
 
   lookupGraphicsPlugin(graphicsMode) {
-    return graphicsMode === '2D' ? 'css' : 'babylon'; // TODO: three
+    return graphicsMode === '2D' ? 'css' : 'three';
   }
 
   nextMode() {

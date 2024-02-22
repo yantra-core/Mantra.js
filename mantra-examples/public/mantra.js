@@ -1064,8 +1064,6 @@ var Game = exports.Game = /*#__PURE__*/function () {
       addLifecycleHooksToAllPlugins: true // default behavior is to add lifecycle hooks to all plugin methods
     };
 
-    defaultConfig.gameRoot = 'http://192.168.1.80:7777';
-
     // Merge custom configuration with defaults
     var config = _objectSpread(_objectSpread({}, defaultConfig), customConfig);
     // Override for server-specific defaults
@@ -3773,22 +3771,17 @@ function _switchWorlds() {
             },
             sutra: null
           });
-          game.systems.entity.removeAllEntities(true);
 
-          // already constructed plugin classes
+          // switching player to already constructed plugin classes
           if (!(_typeof(selectedWorld) === 'object')) {
-            _context.next = 9;
+            _context.next = 8;
             break;
           }
-          alert('loading s');
+          game.systems.entity.removeAllEntities();
           game.use(selectedWorld);
-
-          // USER INTENT: Change world
-          // persist this intention to the local storage
-          // so that it can be restored on next page load
-          // game.storage.set('world', selectedWorld);
           return _context.abrupt("return");
-        case 9:
+        case 8:
+          game.systems.entity.removeAllEntities(true);
           worldName = 'XState';
           worldName = 'Sutra';
           worldName = selectedWorld;

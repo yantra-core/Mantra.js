@@ -1,6 +1,6 @@
 // ThreeGraphics.js - Marak Squires 2023
 import { Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Vector3 } from 'three';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
@@ -76,6 +76,14 @@ class ThreeGraphics extends GraphicsInterface {
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.domElement.id = 'three-render-canvas';
+
+    let gameHolder = document.getElementById('gameHolder');
+    if (!gameHolder) {
+      gameHolder = document.createElement('div');
+      gameHolder.id = 'gameHolder';
+      document.body.appendChild(gameHolder);
+    }
+
     document.getElementById('gameHolder').appendChild(this.renderer.domElement);
 
     // Create and configure the camera
@@ -104,7 +112,7 @@ class ThreeGraphics extends GraphicsInterface {
     this.camera.position.set(0, 0, 0);
     this.camera.lookAt(new Vector3(0, 0, 0));
     // TODO: Initialize controls for camera interaction
-    //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     // this.controls.enableZoom = true; // Enable zooming
     // async:true plugins *must* self report when they are ready
     // game.emit('plugin::ready::graphics-three', this);
