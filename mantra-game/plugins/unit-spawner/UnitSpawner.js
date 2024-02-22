@@ -37,6 +37,9 @@ export default class UnitSpawner {
       // decrement unitsSpawned for this unitConfig
       // update the owner of this ent with meta
       let parentUnitSpawner = game.data.ents._[ent.owner];
+      if (!parentUnitSpawner) {
+        return;
+      }
       parentUnitSpawner.meta.unitConfig.meta.unitsSpawned -= 1;
       game.updateEntity(ent.owner, {
         meta: {

@@ -80,7 +80,9 @@ export default function defaultMouseMovement(game) {
           moving = true;
           movingToPosition = { x: gamePointerPosition.x, y: gamePointerPosition.y, rotation: radians };
         } else if (event.pointerId === context.secondTouchId) {
-          game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          if (game.systems.boomerang) {
+            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          }
         }
       } else {
         // Use variables for button checks
@@ -89,7 +91,9 @@ export default function defaultMouseMovement(game) {
           movingToPosition = { x: gamePointerPosition.x, y: gamePointerPosition.y, rotation: radians };
         }
         if (context.buttons[mouseActionButton]) {
-          game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          if (game.systems.boomerang) {
+            game.systems.boomerang.throwBoomerang(currentPlayer.id, radians);
+          }
         }
       }
     }
