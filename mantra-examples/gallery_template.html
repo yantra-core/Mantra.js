@@ -119,6 +119,17 @@
 </head>
 
 <body>
+
+  <script>
+      // listen for messages from the iframe
+      window.addEventListener('message', event => {
+        // log the data
+        console.log(event.data);
+        togglePlayPause(true);
+        // alert('hide')
+      });
+
+  </script>
   <div class="fixed-controls-container">
 
     <div class="control-buttons-left">
