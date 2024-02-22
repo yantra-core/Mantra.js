@@ -16,7 +16,19 @@ export default class Teleporter {
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
-    //let rules = this.sutra();
+
+    entityData.destination = entityData.destination || {
+      position: {
+        x: 0,
+        y: 0,
+        z: 0
+      }
+    };
+
+    if (typeof entityData.url !== 'undefined') {
+      entityData.destination.url = entityData.url;
+    }
+
     return {
       type: 'TELEPORTER',
       texture: {
@@ -25,13 +37,7 @@ export default class Teleporter {
         // frame: 0 // TODO: support single frame / bypass animation of array
       },
       meta: {
-        destination: entityData.destination || {
-          position: {
-            x: 0,
-            y: 0,
-            z: 0
-          }
-        }
+        destination: entityData.destination
       },
       //texture: 'teleporter',
       //color: 0xff0000,
@@ -64,9 +70,15 @@ export default class Teleporter {
     let game = this.game;
     if (context.owner.meta &&  context.owner.meta.destination) {
       let destination = context.owner.meta.destination;
-      if (typeof destination === 'function') {
+      if (typeof destination === 'function') { // remark why the if/else here? refactor
         destination.call(game, context.target, context.owner);
       } else {
+        if (typeof destination.url !== 'undefined') {
+          // redirect the entire page to this url
+          window.location = destination.url;
+          return;
+        }
+
         if (typeof destination.world !== 'undefined') {
           if (context.target.type === 'PLAYER') { // could be other types as well
             game.switchWorlds(destination.world);
