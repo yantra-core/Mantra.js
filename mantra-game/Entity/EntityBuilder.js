@@ -434,9 +434,13 @@ export default class EntityBuilder {
       return entities;
     } else {
       let singleConfig = { ...this.config }; // Shallow copy for non-function properties
-      return this.game.createEntity(singleConfig);
+      let singleCreatedEntity = this.game.createEntity(singleConfig);
+      if (singleCreatedEntity.type === 'PLAYER') {
+        // TODO: check to see if there are no other active players / if so set this one
+        game.setPlayerId(singleCreatedEntity.id)
+      }
+      return singleCreatedEntity;
     }
-
 
   }
 
