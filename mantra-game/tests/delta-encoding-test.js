@@ -31,8 +31,6 @@ tap.test('deltaEncoding.encode - basic functionality', (t) => {
   
   encoded = deltaEncoding.encode('player1', updatedSnapshot);
 
-  console.log('eeee', encoded)
-
   t.equal(encoded.state.length, 1, 'should encode updated entity state');
   t.equal(encoded.state[0].position.x, 10, 'position x should be updated');
   t.equal(encoded.state[0].position.y, 10, 'position y should be updated');

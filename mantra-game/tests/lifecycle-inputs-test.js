@@ -33,7 +33,7 @@ tap.test('Lifecycle hooks - before.handleInput', (t) => {
   // Define a test hook
   lifecycle.addHook('before.handleInput', (entityId, input, sequence) => {
     trigger = true;
-    console.log('before.handleInput hook triggered', entityId, input, sequence);
+    // console.log('before.handleInput hook triggered', entityId, input, sequence);
   });
   
   let player = game.createEntity();
@@ -61,7 +61,7 @@ tap.test('Lifecycle hooks - after.handleInput', (t) => {
   // Define a test hook
   lifecycle.addHook('after.handleInput', (entityId, input, sequence) => {
     trigger = true;
-    console.log('after.handleInput hook triggered', entityId, input, sequence);
+    // console.log('after.handleInput hook triggered', entityId, input, sequence);
   });
   
   let player = game.createEntity();

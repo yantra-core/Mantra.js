@@ -380,7 +380,7 @@ tap.test('game.make() API', (t) => {
     });
 
     // assert entityConfig is now wrapped in a function
-    console.log('entityConfig.collisionStart', entityConfig.config)
+    // console.log('entityConfig.collisionStart', entityConfig.config)
     t.equal(typeof entityConfig.collisionStart, 'function', 'collisionStart should be a function');
 
     // Create the entity from the configuration

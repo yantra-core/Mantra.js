@@ -1,5 +1,5 @@
 //
-// This file tests EntityBuilder game.build() to ensure all component properties are set correctly
+// This file tests EntityBuilder game.make() to ensure all component properties are set correctly
 //
 import tap from 'tape';
 import { Game } from '../Game.js';
@@ -24,10 +24,10 @@ game.use(new Entity());
 game.use(new EntityInput());
 game.use(new SnapshotManager());
 
-tap.test('game.build() API', (t) => {
+tap.test('game.make() API', (t) => {
   // Test the builder's basic functionality
   t.test('Builder creates correct entity configuration', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .color('red')
       .position(100, 200)
       .size(50, 60)
@@ -43,7 +43,7 @@ tap.test('game.build() API', (t) => {
 
   // Test integration with createEntity()
   t.test('createEntity() with builder configuration', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .color('red')
       .position(0, 0)
       .size(32, 32)
@@ -62,7 +62,7 @@ tap.test('game.build() API', (t) => {
 
   // Test integration with updateEntity()
   t.test('updateEntity() with builder configuration', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .color('red')
       .position(0, 0)
       .size(32, 32)

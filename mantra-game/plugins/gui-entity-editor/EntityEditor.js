@@ -141,7 +141,7 @@ class EntityEditor {
     // TODO: needs a more formalized way to add components to entity
     // game.addComponentToEntity(component, entity) or entity.addComponent()
     entity[component] = '';
-    console.log('eeee', entity)
+    // console.log('eeee', entity)
     // Re-render the entity editor
     this.setEntity(entity);
   }
