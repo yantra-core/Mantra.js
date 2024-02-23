@@ -3348,12 +3348,24 @@ var GravityGardens = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
 
+      // enables mouse wheel zoom
+      game.data.camera.mouseWheelZoomEnabled = true;
+
+      // Movements with right click, switch default left-click-to-move behavior
+      game.config.mouseMovementButton = 'RIGHT';
+      // Actions with left click
+      game.config.mouseActionButton = 'LEFT';
+
+      // disables the default top-down mouse movements
+      // game.config.defaultMouseMovement = false;
+
       // we reset the game to clear any previous state
       game.reset();
       this.createWorld();
       this.createFounts(game);
       this.bindEvents();
       this.bindSutraRules();
+
       // we can lazy load these after the plugin has started
       game.use('CurrentFPS');
       game.use('StarField');
@@ -3381,7 +3393,7 @@ var GravityGardens = /*#__PURE__*/function () {
       }
 
       // Builds a Player config with GravityWell 
-      var playerConfig = game.build().GravityWell() // The player will have a gravity well
+      var playerConfig = game.make().GravityWell() // The player will have a gravity well
       .Player() // The player Plugin
       .texture(null) // default texture is a player sprite
       .color(0xffcccc) // gives a color to the player
@@ -3395,14 +3407,14 @@ var GravityGardens = /*#__PURE__*/function () {
       playerConfig = playerConfig.build();
       var player = game.createEntity(playerConfig);
       game.setPlayerId(player.id);
-      game.build().type('WARP').Teleporter({
+      game.make().type('WARP').Teleporter({
         destination: {
           world: 'Home'
         }
       }).texture('warp-to-home').size(64, 64, 64).isStatic(true)
       //.isSensor(true)
       .position(595, -30, 0).createEntity();
-      game.build().type('TEXT').text('Warp To Mantra').width(200).style({
+      game.make().type('TEXT').text('Warp To Mantra').width(200).style({
         padding: '2px',
         fontSize: '16px',
         color: '#ffffff',
@@ -3499,23 +3511,22 @@ var GravityGardens = /*#__PURE__*/function () {
         that.mousePosition.clientX = event.clientX;
         that.mousePosition.clientY = event.clientY;
         // if right click
-        if (event.button === 0) {
-          that.slurping = true;
-          game.pingPosition(event.clientX, event.clientY, 1, {
-            reverse: true,
-            color: 'red',
-            duration: 1500,
-            size: 25,
-            finalSize: 100,
-            borderWidth: 3
-          });
-        }
+        if (event.button === 0) {}
 
         // if left click
         if (event.button === 2) {
           that.dropping = true;
           game.pingPosition(event.clientX, event.clientY, 1, {
             color: 'white',
+            duration: 1500,
+            size: 25,
+            finalSize: 100,
+            borderWidth: 3
+          });
+          that.slurping = true;
+          game.pingPosition(event.clientX, event.clientY, 1, {
+            reverse: true,
+            color: 'red',
             duration: 1500,
             size: 25,
             finalSize: 100,
@@ -3536,7 +3547,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
       // will set the collistionStart flag to true in order to register collision events
       var particleCollision = true;
-      game.build().name('fountA').type('FOUNT').UnitSpawner({
+      game.make().name('fountA').type('FOUNT').UnitSpawner({
         unitConfig: {
           type: 'PARTICLE',
           color: 0xf03025,
@@ -3548,7 +3559,7 @@ var GravityGardens = /*#__PURE__*/function () {
         }
       }).color(0xf03025).isStatic(true).size(8, 8).position(200, 0).createEntity(); // Finalizes and creates the entity
 
-      game.build().name('fountB').type('FOUNT').UnitSpawner({
+      game.make().name('fountB').type('FOUNT').UnitSpawner({
         unitConfig: {
           type: 'PARTICLE',
           color: 0x14b161,
@@ -3561,7 +3572,7 @@ var GravityGardens = /*#__PURE__*/function () {
         }
       }).color(0x14b161).isStatic(true).size(8, 8).position(-200, 0).createEntity(); // Finalizes and creates the entity
 
-      game.build().name('fountC').type('FOUNT').UnitSpawner({
+      game.make().name('fountC').type('FOUNT').UnitSpawner({
         unitConfig: {
           type: 'PARTICLE',
           color: 0x3c62f8,
@@ -3574,7 +3585,7 @@ var GravityGardens = /*#__PURE__*/function () {
         }
       }).color(0x3c62f8).isStatic(true).size(8, 8).position(0, -200).createEntity(); // Finalizes and creates the entity
 
-      game.build().name('fountD').type('FOUNT').UnitSpawner({
+      game.make().name('fountD').type('FOUNT').UnitSpawner({
         unitConfig: {
           type: 'PARTICLE',
           color: 0xe9dd34,
@@ -3766,9 +3777,18 @@ var Home = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
 
-      // moves with right click, shoots with left
+      // reset any previous worlds / game state
+      game.reset();
+
+      // Movements with right click, switch default left-click-to-move behavior
       game.config.mouseMovementButton = 'RIGHT';
+      // Actions with left click
       game.config.mouseActionButton = 'LEFT';
+      // enables the default top-down mouse movements
+      game.config.defaultMouseMovement = true;
+
+      // enables mouse wheel zoom
+      game.data.camera.mouseWheelZoomEnabled = true;
       this.createWorld();
     }
   }, {
@@ -3778,7 +3798,6 @@ var Home = /*#__PURE__*/function () {
     key: "createWorld",
     value: function createWorld() {
       var game = this.game;
-      game.reset();
       game.setBackground('#007fff');
       game.data.camera.follow = true;
       if (game.isTouchDevice()) {
@@ -3787,17 +3806,17 @@ var Home = /*#__PURE__*/function () {
         game.zoom(4.5);
       }
 
-      // game.build().Block().size(16).clone(10).createEntity();
+      // game.make().Block().size(16).clone(10).createEntity();
 
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
-      var player1 = game.build().Player({
+      var player1 = game.make().Player({
         lives: 99
       });
       player1 = player1.createEntity();
       game.setPlayerId(player1.id);
       // TODO: setup doors and keys on home page like Maze World ( easy )
-      // game.build().Key().position(-100, 100, 10).createEntity();
+      // game.make().Key().position(-100, 100, 10).createEntity();
 
       //
       // Create 22 Hexapods
@@ -3813,11 +3832,11 @@ var Home = /*#__PURE__*/function () {
         // Convert polar coordinates (angle, radius) to Cartesian coordinates (x, y)
         var x = radius * Math.cos(angle);
         var y = radius * Math.sin(angle);
-        game.build().Hexapod().Draggable().size(8).position(x, y, 0).createEntity();
+        game.make().Hexapod().Draggable().size(8).position(x, y, 0).createEntity();
         // .collectable(true).afterItemCollected(collectFn)
       }
       ;
-      game.build().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
+      game.make().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
       this.createTwinFlames();
       (0, _welcomeMessage["default"])(game);
       game.useSutra((0, _sutras["default"])(game), 'HOME');
@@ -3827,8 +3846,8 @@ var Home = /*#__PURE__*/function () {
     key: "createTwinFlames",
     value: function createTwinFlames() {
       // See Flame plugin for .build() entity config
-      this.game.build().Flame().position(-80, -60, 16).createEntity();
-      this.game.build().Flame().position(80, -60, 16).createEntity();
+      this.game.make().Flame().position(-80, -60, 16).createEntity();
+      this.game.make().Flame().position(80, -60, 16).createEntity();
     }
   }, {
     key: "unload",
@@ -3905,11 +3924,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createBackground;
 function createBackground(game) {
-  game.build().type('BACKGROUND').texture('garden').body(false).size(300, 300, 1).position(0, 0, -10).createEntity();
-  game.build().type('BACKGROUND').texture('sutra-tree').body(false).size(1024 / 4, 1024 / 4, 1).position(0, 300, 32).createEntity();
-  game.build().type('BACKGROUND').texture('robot-arms-apartment').kind('building').size(1340, 3668, 1).body(false).position(900, -1800, -1).createEntity();
-  game.build().type('BACKGROUND').texture('planet-express-base').kind('building').size(2048, 2048, 1).body(false).position(-900, -800, -1).createEntity();
-  game.build().type('BLOCK').texture('tile-block').size(200, 200, 1).mass(10000).position(200, -800, -8).createEntity();
+  game.make().type('BACKGROUND').texture('garden').body(false).size(300, 300, 1).position(0, 0, -10).createEntity();
+  game.make().type('BACKGROUND').texture('sutra-tree').body(false).size(1024 / 4, 1024 / 4, 1).position(0, 300, 32).createEntity();
+  game.make().type('BACKGROUND').texture('robot-arms-apartment').kind('building').size(1340, 3668, 1).body(false).position(900, -1800, -1).createEntity();
+  game.make().type('BACKGROUND').texture('planet-express-base').kind('building').size(2048, 2048, 1).body(false).position(-900, -800, -1).createEntity();
+  game.make().type('BLOCK').texture('tile-block').size(200, 200, 1).mass(10000).position(200, -800, -8).createEntity();
 
   // if touch warp, switch to YCraft level
   game.createEntity({
@@ -3976,8 +3995,8 @@ function createBackground(game) {
       z: -2
     }
   });
-  game.build().Teleporter().position(55, 71, 10).size(16).width(16).height(16).createEntity();
-  game.build().Teleporter().position(-55, 71, 10).size(16).width(16).height(16).createEntity();
+  game.make().Teleporter().position(55, 71, 10).size(16).width(16).height(16).createEntity();
+  game.make().Teleporter().position(-55, 71, 10).size(16).width(16).height(16).createEntity();
 
   // if touch warp, switch to Music level
   game.createEntity({
@@ -4505,11 +4524,11 @@ function welcomeMessage(game) {
   // TODO: custom messages for mobile / vs desktop
   // Queueing additional messages
   typer.queueText('Welcome to Mantra Worlds', 5000, 2000);
-  typer.queueText('Use WASD to move', 5000, 3000);
-  typer.queueText('Click objects to interact', 5000, 3000);
-  typer.queueText('Zoom with Slider or Mouse Wheel', 5000, 3000);
-  typer.queueText('Press START to Switch Worlds', 5000, 2000);
-  typer.queueText('Press SELECT to Open Menu', 5000, 2000);
+  typer.queueText('WASD to move', 5000, 3000);
+  typer.queueText('Click to interact', 5000, 3000);
+  //typer.queueText('Zoom with Mouse Wheel', 5000, 3000);
+  //typer.queueText('Press START to Switch Worlds', 5000, 2000);
+  //typer.queueText('Press SELECT to Open Menu', 5000, 2000);
   typer.queueText('USB Gamepad Support', 5000, 2000);
 
   // Start processing the queue
@@ -4583,10 +4602,10 @@ var InfinityTower = exports["default"] = /*#__PURE__*/function () {
       //
       // Create initial Towers
       //
-      //game.build().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
-      //game.build().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
-      //game.build().Tower().Draggable().color('yellow').position(0, 140).createEntity();
-      // let a = game.build().Tower().Draggable().color('yellow').position(-175, 140);
+      //game.make().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
+      //game.make().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
+      //game.make().Tower().Draggable().color('yellow').position(0, 140).createEntity();
+      // let a = game.make().Tower().Draggable().color('yellow').position(-175, 140);
 
       function onDrop(context, event) {
         // update the position of the context entity to the dropTarget
@@ -4595,9 +4614,9 @@ var InfinityTower = exports["default"] = /*#__PURE__*/function () {
         var colorB = context.dropTarget.color;
         if (colorA && colorB) {
           console.log('colorA', colorA, 'colorB', colorB);
-          var configA = game.build().color(colorA).build();
-          var configB = game.build().color(colorB).build();
-          var mixed = game.build().mix(configA).mix(configB).build();
+          var configA = game.make().color(colorA).build();
+          var configB = game.make().color(colorB).build();
+          var mixed = game.make().mix(configA).mix(configB).build();
 
           // check that ent exists
           var exists = game.exists(context.id);
@@ -4625,7 +4644,7 @@ var InfinityTower = exports["default"] = /*#__PURE__*/function () {
 
       // assume 24 color HSV wheel and generate all colors as int or hex whatever is easy
       for (var i = 0; i < 24; i++) {
-        var conf = game.build().Tower({
+        var conf = game.make().Tower({
           fireRate: 100,
           bulletConfig: {
             texture: {
@@ -4650,30 +4669,31 @@ var InfinityTower = exports["default"] = /*#__PURE__*/function () {
       //
       // Left NPC Spawner
       //
-      var hexapodConfigLeft = game.build().Hexapod().texture(null).radius(4).color('#007fff');
+      var hexapodConfigLeft = game.make().Hexapod().texture(null).radius(4).color('#007fff');
       hexapodConfigLeft.meta({
         maxUnits: 22
       });
-      var unitSpawnerLeft = game.build().UnitSpawner({
+      var unitSpawnerLeft = game.make().UnitSpawner({
         unitConfig: hexapodConfigLeft.config,
-        sprayAngle: Math.PI
-      }).texture(null).radius(1).color('red').position(-300, -800, 0).createEntity();
+        sprayAngle: Math.PI,
+        texture: 'hexapod'
+      }).texture('hexapod').radius(1).position(-300, -200, 0).createEntity();
 
       //
       // Right NPC Spawner
       //
-      var hexapodConfig = game.build().Hexapod().texture(null).radius(4).color('red');
+      var hexapodConfig = game.make().Hexapod().texture(null).radius(4).color('red');
       hexapodConfig.meta({
         maxUnits: 22
       });
-      var unitSpawner = game.build().UnitSpawner({
+      var unitSpawner = game.make().UnitSpawner({
         unitConfig: hexapodConfig.config
       }).texture(null).radius(1).color('red').position(300, -800, 0).createEntity();
 
       //
       // End zone - create a solid red line that has collisionStart handler to destroy ents
       //
-      var endzoneConfig = game.build().position(-80, 50, 0).color('red').isStatic(true).width(400).height(10);
+      var endzoneConfig = game.make().position(-80, 50, 0).color('red').isStatic(true).width(400).height(10);
       endzoneConfig.collisionStart(function (ent) {
         if (ent.type === 'HEXAPOD') {
           game.removeEntity(ent.id);
@@ -4684,7 +4704,7 @@ var InfinityTower = exports["default"] = /*#__PURE__*/function () {
       //
       // warp to Mantra Home World
       //
-      game.build().Teleporter({
+      game.make().Teleporter({
         destination: {
           world: 'Home'
         }
@@ -4853,7 +4873,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = createDoors;
 function createHomeKey(game) {
-  game.build().Key().position(-100, 30, 0).createEntity();
+  game.make().Key().position(-100, 30, 0).createEntity();
 }
 function createDoors(game) {
   //
@@ -6728,8 +6748,73 @@ function sutras(game) {
 }
 
 },{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/fire.js":22,"../../mantra-sutras/hexapod.js":24,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":55,"../sutras/routing.js":61,"../sutras/switchGraphics.js":62,"../sutras/warpToWorld.js":63}],48:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],49:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = welcomeMessage;
+function welcomeMessage(game) {
+  if (game.hasShownWelcomeMessage !== true) {
+    game.hasShownWelcomeMessage = true;
+  } else {
+    console.log('welcomeMessage already run once');
+    return;
+  }
+  if (typeof window === 'undefined') {
+    console.log('welcomeMessage only runs on client');
+    return;
+  }
+  // calculate font size based on window size
+  var fontSize = Math.floor(window.innerWidth / 15) + 'px';
+  // calculate x / y based on window size
+  var x = Math.floor(window.innerWidth / 2);
+  var y = 110;
+  if (is_touch_enabled()) {
+    y = 30;
+  }
+  var typer = game.systems['typer-ghost'].createQueuedText({
+    x: x,
+    y: y,
+    style: {
+      color: 'white',
+      fontSize: fontSize,
+      width: '100%',
+      // adds 3d shadow to text with black outline
+      textShadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000',
+      position: 'absolute',
+      textAlign: 'center',
+      top: '0px',
+      // Adjust this value to position the text lower or higher from the top
+      left: '50%',
+      // Center horizontally
+      transform: 'translateX(-50%)',
+      // Ensure exact centering
+      lineHeight: '1',
+      zIndex: '999'
+    },
+    duration: 5000,
+    removeDuration: 6000
+  });
+
+  // TODO: custom messages for mobile / vs desktop
+  // Queueing additional messages
+  typer.queueText('Welcome to Mantra Worlds', 5000, 2000);
+  typer.queueText('Use WASD to move', 5000, 3000);
+  typer.queueText('Click objects to interact', 5000, 3000);
+  typer.queueText('Zoom with Slider or Mouse Wheel', 5000, 3000);
+  typer.queueText('Press START to Switch Worlds', 5000, 2000);
+  typer.queueText('Press SELECT to Open Menu', 5000, 2000);
+  typer.queueText('USB Gamepad Support', 5000, 2000);
+
+  // Start processing the queue
+  typer.processQueue();
+}
+function is_touch_enabled() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+
+},{}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

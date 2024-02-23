@@ -25,7 +25,7 @@ game.use(new SnapshotManager());
 tap.test('EntityBuilder configuration', (t) => {
   // Test for basic properties
   t.test('Basic properties', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .type('NPC')
       .name('Test Entity')
       .kind('Enemy')
@@ -39,7 +39,7 @@ tap.test('EntityBuilder configuration', (t) => {
 
   // Test for positioning and movement
   t.test('Positioning and movement', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .position(100, 200)
       .startingPosition(50, 50)
       .velocity(10, -5)
@@ -55,7 +55,7 @@ tap.test('EntityBuilder configuration', (t) => {
 
   // Test for physical properties
   t.test('Physical properties', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .mass(10)
       .density(2)
       .build();
@@ -67,7 +67,7 @@ tap.test('EntityBuilder configuration', (t) => {
 
   // Test for health and scoring
   t.test('Health and scoring', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .health(100)
       .score(50)
       .build();
@@ -79,7 +79,7 @@ tap.test('EntityBuilder configuration', (t) => {
 
   // Test for dimensions and appearance
   t.test('Dimensions and appearance', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .size(50, 60)
       .radius(15)
       .shape('circle')
@@ -98,7 +98,7 @@ tap.test('EntityBuilder configuration', (t) => {
     const handler1 = function() {}; // Define a handler function
     const handler2 = function() {}; // Define another handler function
 
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .pointerdown(handler1)
       .collisionStart(handler2)
       // Assuming collisionEnd method exists

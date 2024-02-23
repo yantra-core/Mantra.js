@@ -194,6 +194,8 @@ export default function topdownMovement(game) {
   // We'll need to implement these mouse movements as a movement system for entity input
   // In order to support multiplayer mouse controls, its all there including mouse position and button states, 
   // just needs to be mapped as Entity Input with label names for Sutra conditions
-  defaultMouseMovement(game);
+  if (game.config.defaultMouseMovement !== false) {
+    defaultMouseMovement(game);
+  }
   return rules;
 }

@@ -35,7 +35,7 @@ tap.test('Entity lifecycle events - Entity.beforeCreateEntity integration', (t) 
   let beforeCreateState = false;
   // Test adding a single beforeCreateEntity event handler
   t.test('Adding a single Entity.beforeCreateEntity event handler', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .beforeCreateEntity(() => { beforeCreateState = true; }) // Add a beforeCreateEntity handler that modifies 'beforeCreateState'
       .build();
 
@@ -54,7 +54,7 @@ tap.test('Entity lifecycle events - Entity.beforeCreateEntity integration', (t) 
   t.test('Stacking multiple Entity.beforeCreateEntity event handlers', (t) => {
     let executionOrder = [];
 
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .beforeCreateEntity(() => executionOrder.push('first'))  // First beforeCreateEntity handler
       .beforeCreateEntity(() => executionOrder.push('second')) // Second beforeCreateEntity handler
       .build();
@@ -74,11 +74,11 @@ tap.test('Entity lifecycle events - Entity.beforeCreateEntity integration', (t) 
     let entity1BeforeCreateState = false;
     let entity2BeforeCreateState = false;
 
-    const entityConfig1 = game.build()
+    const entityConfig1 = game.make()
       .beforeCreateEntity(() => entity1BeforeCreateState = true) // beforeCreateEntity handler for the first entity
       .build();
 
-    const entityConfig2 = game.build()
+    const entityConfig2 = game.make()
       .beforeCreateEntity(() => entity2BeforeCreateState = true) // beforeCreateEntity handler for the second entity
       .build();
 

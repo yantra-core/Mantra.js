@@ -1,5 +1,5 @@
 function createHomeKey (game) {
-  game.build().Key().position(-100, 30, 0).createEntity();
+  game.make().Key().position(-100, 30, 0).createEntity();
 }
 
 export default function createDoors(game) {

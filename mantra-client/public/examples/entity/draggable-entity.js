@@ -2,7 +2,7 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   plugins: ['Draggable', 'Droppable', 'RBush', 'Flame', 'Tower', 'Bullet', 'Hexapod', 'GamepadGUI', 'Editor'],
-  scriptRoot: 'http://192.168.1.80:7777'
+  
 });
 game.start(function () {
 
@@ -23,18 +23,18 @@ game.start(function () {
   }
 
   /*
-  let conf = game.build().Draggable().Droppable().color('red').size(32).position(-100, 0).offset(48).repeat(10);
+  let conf = game.make().Draggable().Droppable().color('red').size(32).position(-100, 0).offset(48).repeat(10);
   conf.onDrop(onDrop).isSensor(true);
   console.log(conf.config)
   conf.createEntity();
   */
 
-  let conf2 = game.build().Draggable().size(64).color('red').position(100, 0, 2);
+  let conf2 = game.make().Draggable().size(64).color('red').position(100, 0, 2);
   //conf2.onDrop(onDrop).isSensor(true);
   console.log(conf2.config)
   //conf2.createEntity();
 
-  let dropArea = game.build().size(100, 100).color('yellow').position(0, -140, -1);
+  let dropArea = game.make().size(100, 100).color('yellow').position(0, -140, -1);
 
   dropArea.onDrop(onDrop)
   dropArea.createEntity();
@@ -47,9 +47,9 @@ game.start(function () {
     let colorB = context.dropTarget.color;
     if (colorA && colorB) {
       console.log('colorA', colorA, 'colorB', colorB);
-      let configA = game.build().color(colorA).build();
-      let configB = game.build().color(colorB).build();
-      let mixed = game.build().mix(configA).mix(configB).build();
+      let configA = game.make().color(colorA).build();
+      let configB = game.make().color(colorB).build();
+      let mixed = game.make().mix(configA).mix(configB).build();
       
       // check that ent exists
       let exists = game.exists(context.id);
@@ -77,7 +77,7 @@ game.start(function () {
 
   // assume 24 color HSV wheel and generate all colors as int or hex whatever is easy
   for (let i = 0; i < 24; i++) {
-    let conf = game.build().Draggable().Droppable().radius(8).onDrop(onDrop).position(-200 + i * 40, 0);
+    let conf = game.make().Draggable().Droppable().radius(8).onDrop(onDrop).position(-200 + i * 40, 0);
     conf.isSensor(true);
     console.log('conf', conf)
     // we need to generate color wheel here as int or hex
@@ -88,7 +88,7 @@ game.start(function () {
   }
 
   /*
-  let draggable = game.build().Tower().color('yellow').position(-175, 140);
+  let draggable = game.make().Tower().color('yellow').position(-175, 140);
   draggable.pointerdown(function (context, event) {
 
     // fix the context ( entity ) to the pointer

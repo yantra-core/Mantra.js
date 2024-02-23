@@ -34,7 +34,7 @@ game.start(function () {
     });
   });
 
-  game.build().Text()
+  game.make().Text()
    .text('Press SPACE Key')
    .color('#ffffff')
    .width(400)

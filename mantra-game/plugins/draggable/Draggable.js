@@ -12,6 +12,8 @@ export default class Draggable {
   }
 
   build(entityData = {}) {
+
+    let game = this.game;
     // Ensure `meta` exists and initialize shield properties
     const meta = entityData.meta || {};
 

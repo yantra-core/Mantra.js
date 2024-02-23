@@ -1,5 +1,5 @@
 //
-// This file tests EntityBuilder game.build() to ensure all entity configs can compose and build correctly
+// This file tests EntityBuilder game.make() to ensure all entity configs can compose and build correctly
 // This includes aggregating event functions like pointer or collision into composite handlers
 // Most values will be overwritten by the last value in the chain, but event handlers will be aggregated
 //
@@ -93,11 +93,11 @@ class CustomPluginB {
 
 game.use(new CustomPluginB());
 
-tap.test('game.build() API', (t) => {
+tap.test('game.make() API', (t) => {
 
   // Test the builder's basic functionality
   t.test('Builder can use Plugin.build methods to build configurations', (t) => {
-    const entityConfig = game.build().Flame().build();
+    const entityConfig = game.make().Flame().build();
     // Check that the configuration matches what was set in the builder
     t.deepEqual(entityConfig.position, { x: 0, y: 0, z: 1 }, 'Position should be set to (100, 200)');
     t.deepEqual(entityConfig.size, { width: 16, height: 16, depth: 16 }, 'Size should be set to 50x60');
@@ -106,7 +106,7 @@ tap.test('game.build() API', (t) => {
 
   // Test the builder's basic functionality
   t.test('Builder can use compose Plugin.build configurations', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .CustomPluginA()
       .CustomPluginB()
       .build();
@@ -129,7 +129,7 @@ tap.test('game.build() API', (t) => {
     collisionState.a = false;
     collisionState.b = false;
 
-    let entityConfig = game.build()
+    let entityConfig = game.make()
       .CustomPluginA()
       .CustomPluginB();
 
@@ -153,7 +153,7 @@ tap.test('game.build() API', (t) => {
 
   t.test('Multiple event handlers for the same event on a single entity are all executed', (t) => {
     let executionOrder = [];
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .collisionStart(() => executionOrder.push('first'))
       .collisionStart(() => executionOrder.push('second'))
       .build();
@@ -170,11 +170,11 @@ tap.test('game.build() API', (t) => {
     let entity1State = false;
     let entity2State = false;
 
-    const entityConfig1 = game.build()
+    const entityConfig1 = game.make()
       .collisionStart(() => entity1State = true)
       .build();
 
-    const entityConfig2 = game.build()
+    const entityConfig2 = game.make()
       .collisionStart(() => entity2State = true)
       .build();
 
@@ -192,7 +192,7 @@ tap.test('game.build() API', (t) => {
     let handler1Executed = false;
     let handler2Executed = false;
 
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .collisionStart(() => handler1Executed = true)
       .collisionStart(() => handler2Executed = true)
       .build();
@@ -208,7 +208,7 @@ tap.test('game.build() API', (t) => {
   });
 
   t.test('Event handlers from different plugins on the same entity are all executed', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .CustomPluginA()
       .CustomPluginB()
       .build();
@@ -232,7 +232,7 @@ tap.test('game.build() API', (t) => {
     collisionState.b = false;
     collisionState.c = false;
 
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .CustomPluginA()
       .CustomPluginB()
       .build();
@@ -251,8 +251,8 @@ tap.test('game.build() API', (t) => {
     collisionState.b = false;
     collisionState.c = false;
 
-    const entityConfig1 = game.build().CustomPluginA().build();
-    const entityConfig2 = game.build().CustomPluginB().build();
+    const entityConfig1 = game.make().CustomPluginA().build();
+    const entityConfig2 = game.make().CustomPluginB().build();
 
     entityConfig1.collisionStart();
     entityConfig2.collisionStart();
@@ -267,7 +267,7 @@ tap.test('game.build() API', (t) => {
     let additionalHandlerExecuted = false;
 
     // Build the initial entity configuration
-    let entityConfig = game.build().CustomPluginA().build();
+    let entityConfig = game.make().CustomPluginA().build();
 
     // Directly add a new collisionStart handler
     entityConfig.collisionStart = function () {
@@ -289,7 +289,7 @@ tap.test('game.build() API', (t) => {
     collisionState.b = false;
     collisionState.c = false;
 
-    let entityConfig = game.build().CustomPluginA();
+    let entityConfig = game.make().CustomPluginA();
 
     entityConfig.collisionStart(function () {
       additionalHandlerExecuted = true;
@@ -313,7 +313,7 @@ tap.test('game.build() API', (t) => {
     let handler2Executed = false;
 
     // Build the initial entity configuration with one event handler
-    let entityConfig = game.build()
+    let entityConfig = game.make()
       .collisionStart(() => {
         handler1Executed = true;
       })
@@ -340,7 +340,7 @@ tap.test('game.build() API', (t) => {
     let entity2HandlerExecuted = false;
 
     // Build the first entity configuration with a collisionStart handler
-    let entityConfig1 = game.build();
+    let entityConfig1 = game.make();
 
     entityConfig1
       .collisionStart(() => {
@@ -348,7 +348,7 @@ tap.test('game.build() API', (t) => {
       });
 
     // Build the second entity configuration with a different collisionStart handler
-    let entityConfig2 = game.build()
+    let entityConfig2 = game.make()
       .collisionStart(() => {
         entity2HandlerExecuted = true; // Mark the handler for the second entity as executed
       });
@@ -371,7 +371,7 @@ tap.test('game.build() API', (t) => {
     let handlerExecuted = false;
 
     // Build the entity configuration with collisionStart initially set to true
-    let entityConfig = game.build()
+    let entityConfig = game.make()
       .collisionStart(true); // Initially set collisionStart to true
 
     // Add a collisionStart function handler after the initial true value
@@ -402,7 +402,7 @@ tap.test('game.build() API', (t) => {
     let handlerExecuted = false;
   
     // Build the entity configuration with collisionStart initially set to true
-    let entityConfig = game.build().collisionStart(true);
+    let entityConfig = game.make().collisionStart(true);
   
     // Add a collisionStart function handler after the initial true value
     entityConfig.collisionStart(() => {
@@ -454,7 +454,7 @@ extendEntityBuilder(game, new TestPlugin());
 // Now, write a test to ensure the _previous property is passed correctly
 t.test('Builder passes _previous config to Plugin.build methods', (t) => {
   // Start building an entity configuration
-  const builder = game.build()
+  const builder = game.make()
     .position({ x: 10, y: 20, z: 30 }) // Set some initial configuration
     .size({ width: 40, height: 50, depth: 60 })
     .TestPlugin(); // Use the TestPlugin to check the _previous property

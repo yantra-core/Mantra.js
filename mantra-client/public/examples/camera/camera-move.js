@@ -1,9 +1,7 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Text', 'Gamepad'],
-  defaultMovement: false,
-  defaultPlayer: true
+  plugins: ['Player', 'Text', 'Gamepad', 'GamepadGUI'],
 });
 
 game.use('Block');
@@ -14,6 +12,8 @@ game.start(function () {
   game.zoom(1);
   game.createBorder();
   game.setBackground('#000000');
+
+  game.make().Player().createEntity();
 
   let rules = game.rules;
 
@@ -40,26 +40,21 @@ game.start(function () {
       height: Math.random() * 100,
       width: Math.random() * 100
     };
-    // TODO: random shapes
-    let entity = game.createEntity({
-      color: randomColor,
-      size: {
-        width: 32,
-        height: 32
-      },
-      hasCollisionStart: true,
-      position: {
-        // random positions start from top left corner
-        x: Math.random() * -game.width / 4,
-        y: Math.random() * -game.height / 4
-      }
-    });
+    let randomPosition = {
+      x: Math.random() * 100,
+      y: Math.random() * 100 - 100
+    };
+    let entity = game.make()
+      .color(randomColor)
+      .size(32)
+      .position(randomPosition.x, randomPosition.y)
+      .createEntity();
     entities.push(entity.id);
   }
 
-  let instructionText = game.build().Text()
-    .text('Use WASD or Gamepad to move Camera')
-    .position(40, 50)
+  let instructionText = game.make().Text()
+    .text('Move Camera with: WASD, Middle Mouse Click, or Gamepad')
+    .position(40, 50, -1)
     .body(false)
     .size(500, 50)
     .color('white')
@@ -69,7 +64,7 @@ game.start(function () {
     })
     .createEntity();
 
-
 });
-window.game = game;
 
+//
+//

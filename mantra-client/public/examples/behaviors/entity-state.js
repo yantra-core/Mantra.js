@@ -62,22 +62,22 @@ game.start(function () {
   game.createBorder();
 
   // REMARK: notice the new builder APIs? these are the category of changes we need
-  let colorBlockLeft = game.build().type('MY_TYPE').isStatic(true).size(32).position(-80, -60, 16).createEntity();
+  let colorBlockLeft = game.make().type('MY_TYPE').isStatic(true).size(32).position(-80, -60, 16).createEntity();
 
-  let colorBlockRight = game.build()
+  let colorBlockRight = game.make()
     .type('MY_TYPE')
     .size(32) // Assuming this sets both width and height
     .isStatic(true)
     .position(80, -60, 16)
     .createEntity();
 
-  let horizontalLine = game.build()
+  let horizontalLine = game.make()
     .size(400, 10) // Assuming the first argument is width, the second is height
     .body(false)
     .position(0, 0, 0)
     .createEntity();
 
-  let partyZoneText = game.build()
+  let partyZoneText = game.make()
     .Text()
     .text('Cross line to change color!')
     .color('white')

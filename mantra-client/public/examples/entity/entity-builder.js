@@ -11,7 +11,7 @@ game.start(function () {
     game.createBorder();
     game.setGravity(0, 0.5);
 
-    game.build().createEntity();
+    game.make().createEntity();
 
     let entityConfig = game
       .build()

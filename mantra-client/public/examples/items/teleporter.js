@@ -9,8 +9,8 @@ let game = new MANTRA.Game({
 game.start(function () {
   game.setZoom(3.5);
 
-  game.build().Text().text('Teleport to position').width(200).position(-80, -20, 0).createEntity();
-  game.build()
+  game.make().Text().text('Teleport to position').width(200).position(-80, -20, 0).createEntity();
+  game.make()
     .Teleporter({
       destination: {
         position: { x: 0, y: 0, z: 0 }
@@ -19,8 +19,8 @@ game.start(function () {
     .position(-100, 0, 0)
     .createEntity();
 
-  game.build().Text().text('Teleport to Plugin').width(200).position(-80, 70, 0).createEntity();
-  game.build()
+  game.make().Text().text('Teleport to Plugin').width(200).position(-80, 70, 0).createEntity();
+  game.make()
     .Teleporter({
       destination: {
         plugin: new DemoScene(game)
@@ -30,12 +30,12 @@ game.start(function () {
     .createEntity();
 
   // block ref will contain the block.id
-  let block = game.build().Block().isStatic(true).name('a-block').position(0, 50).size(16).createEntity();
+  let block = game.make().Block().isStatic(true).name('a-block').position(0, 50).size(16).createEntity();
   // we can get ent by name later
   // let block = game.getEntityByName('a-block');
 
-  game.build().Text().text('Teleport to Entity').width(200).position(120, 70, 0).createEntity();
-  game.build()
+  game.make().Text().text('Teleport to Entity').width(200).position(120, 70, 0).createEntity();
+  game.make()
     .Teleporter({
       destination: {
         entity: block.id
@@ -43,8 +43,8 @@ game.start(function () {
     })
     .position(100, 50, 0).createEntity();
 
-  game.build().Text().text('Teleport to function').width(200).position(120, -20, 0).createEntity();
-  game.build()
+  game.make().Text().text('Teleport to function').width(200).position(120, -20, 0).createEntity();
+  game.make()
     .Teleporter({
       // define custom teleportation behavior
       collisionStart: function (a, b, pair, context) {
@@ -94,7 +94,7 @@ class DemoScene {
       },
     });
 
-    this.game.build().Flame().y(-50).createEntity();
+    this.game.make().Flame().y(-50).createEntity();
 
   }
 

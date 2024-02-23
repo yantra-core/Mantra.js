@@ -32,17 +32,16 @@
             // rebroadcast the message to the parent window
             window.addEventListener('message', event => {
                 // log the data
-                console.log(event.data);
-                let context = event.data.context;
-                window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
+                //let context = event.data.context;
+                //window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
               });
 
             // on click
             window.addEventListener('click', event => {
                 // log the data
-                console.log(event);
-                let context = { x: event.clientX, y: event.clientY };
-                window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
+                //console.log(event);
+                //let context = { x: event.clientX, y: event.clientY };
+                //window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
             });
           
             loadEditor('./tile-collisions.js');

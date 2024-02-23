@@ -46,6 +46,20 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
       if (typeof entityData.url !== 'undefined') {
         entityData.destination.url = entityData.url;
       }
+
+      //
+      // Click to teleport
+      //
+      if (entityData.clickToTeleport !== false) {
+        // default behavior is true, click to teleport
+        entityData.pointerdown = entityData.collisionStart || this.touchedTeleporter.bind(this);
+      }
+      var style = {};
+      if (entityData.clickToTeleport !== false) {
+        style = {
+          cursor: 'pointer'
+        };
+      }
       return {
         type: 'TELEPORTER',
         texture: {
@@ -59,7 +73,10 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
         },
         //texture: 'teleporter',
         //color: 0xff0000,
+        pointerdown: entityData.pointerdown,
+        // undefined is fine, null will remove the event
         collisionStart: entityData.collisionStart || this.touchedTeleporter.bind(this),
+        style: style,
         size: {
           width: 16,
           height: 16,

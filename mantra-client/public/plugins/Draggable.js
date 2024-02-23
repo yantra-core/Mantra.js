@@ -31,6 +31,7 @@ var Draggable = exports["default"] = /*#__PURE__*/function () {
     key: "build",
     value: function build() {
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var game = this.game;
       // Ensure `meta` exists and initialize shield properties
       var meta = entityData.meta || {};
       entityData.position = entityData.position || {

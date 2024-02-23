@@ -7,9 +7,9 @@ let game = new MANTRA.Game({
 });
 game.start(function () {
 
-  game.build().Player().createEntity();
+  game.make().Player().createEntity();
 
-  let particleConfig = game.build()
+  let particleConfig = game.make()
     .type('PARTICLE')
     .color(0xf03025)
     .lifetime(10000)
@@ -20,7 +20,7 @@ game.start(function () {
   game.setBackground('black');
   game.setZoom(2.5);
   
-  game.build()
+  game.make()
     .name('fountA')
     .type('FOUNT')
     .UnitSpawner({
@@ -33,7 +33,7 @@ game.start(function () {
     .createEntity(); // Finalizes and creates the entity
 
 
-  game.build()
+  game.make()
     .name('fountB')
     .type('FOUNT')
     .UnitSpawner({
@@ -52,7 +52,7 @@ game.start(function () {
     .position(-200, 0)
     .createEntity(); // Finalizes and creates the entity
 
-  game.build()
+  game.make()
     .name('fountC')
     .type('FOUNT')
     .UnitSpawner({
@@ -71,7 +71,7 @@ game.start(function () {
     .position(0, -200)
     .createEntity(); // Finalizes and creates the entity
 
-  game.build()
+  game.make()
     .name('fountD')
     .type('FOUNT')
     .UnitSpawner({
@@ -91,7 +91,7 @@ game.start(function () {
     .createEntity(); // Finalizes and creates the entity
 
   // teleports to the next example
-  game.build().Teleporter({
+  game.make().Teleporter({
     url: 'https://yantra.gg/mantra/examples/npc/hexapod',
   }).position(200, 200).createEntity()
 

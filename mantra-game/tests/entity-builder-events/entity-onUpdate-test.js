@@ -34,7 +34,7 @@ tap.test('Entity lifecycle events - Entity.update integration', (t) => {
 
   // Test adding a single update event handler
   t.test('Adding a single Entity.update event handler', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .onUpdate(() => { updateState = true; }) // Add an update handler that modifies 'updateState'
       .build();
 
@@ -50,7 +50,7 @@ tap.test('Entity lifecycle events - Entity.update integration', (t) => {
   t.test('Stacking multiple Entity.update event handlers', (t) => {
     let executionOrder = [];
 
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .onUpdate(() => executionOrder.push('first'))  // First update handler
       .onUpdate(() => executionOrder.push('second')) // Second update handler
       .build();
@@ -68,11 +68,11 @@ tap.test('Entity lifecycle events - Entity.update integration', (t) => {
     let entity1UpdateState = false;
     let entity2UpdateState = false;
 
-    const entityConfig1 = game.build()
+    const entityConfig1 = game.make()
       .onUpdate(() => entity1UpdateState = true) // Update handler for the first entity
       .build();
 
-    const entityConfig2 = game.build()
+    const entityConfig2 = game.make()
       .onUpdate(() => entity2UpdateState = true) // Update handler for the second entity
       .build();
 
@@ -93,7 +93,7 @@ tap.test('Entity lifecycle events - Entity.update integration', (t) => {
     let updatedUpdateState = false;
 
     // Set up an initial entity with an onUpdate handler
-    const initialEntityConfig = game.build()
+    const initialEntityConfig = game.make()
       .onUpdate(() => { initialUpdateState = true; });
 
     const entity = initialEntityConfig.createEntity();
@@ -131,7 +131,7 @@ tap.test('Entity lifecycle events - Entity.update integration', (t) => {
       let newHandlerCalled = false;
     
       // Create an entity with an initial update event handler
-      const entityConfig = game.build()
+      const entityConfig = game.make()
         .onUpdate(() => { initialHandlerCalled = true; })
         .build();
     

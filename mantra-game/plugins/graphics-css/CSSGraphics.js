@@ -49,7 +49,6 @@ class CSSGraphics extends GraphicsInterface {
     this.bindYCraftEvents = bindYCraftEvents.bind(this);
     this.unload = unload.bind(this);
 
-
     // TODO: make this function lookup with defaults ( instead of -1 )
     // TODO: remove in favor of using position.z for zIndex
     this.depthChart = [

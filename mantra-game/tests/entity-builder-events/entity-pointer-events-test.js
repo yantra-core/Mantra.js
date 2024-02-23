@@ -42,7 +42,7 @@ tap.test('Entity pointer events integration', (t) => {
     // Test adding a single handler for each pointer event
     t.test(`Adding a single Entity.${event} event handler`, (t) => {
       let eventState = false;
-      const entityConfig = game.build()
+      const entityConfig = game.make()
         [event](() => { eventState = true; }) // Add an event handler that modifies 'eventState'
         .build();
 
@@ -59,7 +59,7 @@ tap.test('Entity pointer events integration', (t) => {
     // Test stacking multiple handlers for each pointer event
     t.test(`Stacking multiple Entity.${event} event handlers`, (t) => {
       let executionOrder = [];
-      const entityConfig = game.build()
+      const entityConfig = game.make()
         [event](() => executionOrder.push('first'))  // First event handler
         [event](() => executionOrder.push('second')) // Second event handler
         .build();

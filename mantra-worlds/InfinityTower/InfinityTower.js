@@ -50,10 +50,10 @@ export default class InfinityTower {
     //
     // Create initial Towers
     //
-    //game.build().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
-    //game.build().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
-    //game.build().Tower().Draggable().color('yellow').position(0, 140).createEntity();
-    // let a = game.build().Tower().Draggable().color('yellow').position(-175, 140);
+    //game.make().Tower().color('#d000ff').position(-200, -20).offset(50).repeat(5).createEntity();
+    //game.make().Tower().color('purple').position(-175, -40).offset(50).repeat(4).createEntity();
+    //game.make().Tower().Draggable().color('yellow').position(0, 140).createEntity();
+    // let a = game.make().Tower().Draggable().color('yellow').position(-175, 140);
 
     function onDrop(context, event) {
       // update the position of the context entity to the dropTarget
@@ -62,9 +62,9 @@ export default class InfinityTower {
       let colorB = context.dropTarget.color;
       if (colorA && colorB) {
         console.log('colorA', colorA, 'colorB', colorB);
-        let configA = game.build().color(colorA).build();
-        let configB = game.build().color(colorB).build();
-        let mixed = game.build().mix(configA).mix(configB).build();
+        let configA = game.make().color(colorA).build();
+        let configB = game.make().color(colorB).build();
+        let mixed = game.make().mix(configA).mix(configB).build();
         
         // check that ent exists
         let exists = game.exists(context.id);
@@ -92,7 +92,7 @@ export default class InfinityTower {
 
     // assume 24 color HSV wheel and generate all colors as int or hex whatever is easy
     for (let i = 0; i < 24; i++) {
-      let conf = game.build().Tower({
+      let conf = game.make().Tower({
         fireRate: 100,
         bulletConfig: {
           texture: {
@@ -117,30 +117,31 @@ export default class InfinityTower {
     //
     // Left NPC Spawner
     //
-    let hexapodConfigLeft = game.build().Hexapod().texture(null).radius(4).color('#007fff');
+    let hexapodConfigLeft = game.make().Hexapod().texture(null).radius(4).color('#007fff');
     hexapodConfigLeft.meta({
       maxUnits: 22
     });
-    let unitSpawnerLeft = game.build().UnitSpawner({
+    let unitSpawnerLeft = game.make().UnitSpawner({
       unitConfig: hexapodConfigLeft.config,
-      sprayAngle: Math.PI
-    }).texture(null).radius(1).color('red').position(-300, -800, 0).createEntity()
+      sprayAngle: Math.PI,
+      texture: 'hexapod'
+    }).texture('hexapod').radius(1).position(-300, -200, 0).createEntity()
 
     //
     // Right NPC Spawner
     //
-    let hexapodConfig = game.build().Hexapod().texture(null).radius(4).color('red');
+    let hexapodConfig = game.make().Hexapod().texture(null).radius(4).color('red');
     hexapodConfig.meta({
       maxUnits: 22
     });
-    let unitSpawner = game.build().UnitSpawner({
+    let unitSpawner = game.make().UnitSpawner({
       unitConfig: hexapodConfig.config,
     }).texture(null).radius(1).color('red').position(300, -800, 0).createEntity()
 
     //
     // End zone - create a solid red line that has collisionStart handler to destroy ents
     //
-    let endzoneConfig = game.build().position(-80, 50, 0).color('red').isStatic(true).width(400).height(10);
+    let endzoneConfig = game.make().position(-80, 50, 0).color('red').isStatic(true).width(400).height(10);
     endzoneConfig.collisionStart(function (ent) {
       if (ent.type === 'HEXAPOD') {
         game.removeEntity(ent.id);
@@ -151,7 +152,7 @@ export default class InfinityTower {
     //
     // warp to Mantra Home World
     //
-    game.build().Teleporter({
+    game.make().Teleporter({
       destination: {
         world: 'Home'
       }

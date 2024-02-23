@@ -35,7 +35,7 @@ tap.test('Entity lifecycle events - Entity.afterCreateEntity integration', (t) =
 
   // Test adding a single afterCreateEntity event handler
   t.test('Adding a single Entity.afterCreateEntity event handler', (t) => {
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .afterCreateEntity(() => { createEntityState = true; }) // Add an afterCreateEntity handler that modifies 'createEntityState'
       .build();
 
@@ -54,7 +54,7 @@ tap.test('Entity lifecycle events - Entity.afterCreateEntity integration', (t) =
   t.test('Stacking multiple Entity.afterCreateEntity event handlers', (t) => {
     let executionOrder = [];
 
-    const entityConfig = game.build()
+    const entityConfig = game.make()
       .afterCreateEntity(() => executionOrder.push('first'))  // First afterCreateEntity handler
       .afterCreateEntity(() => executionOrder.push('second')) // Second afterCreateEntity handler
       .build();
@@ -74,11 +74,11 @@ tap.test('Entity lifecycle events - Entity.afterCreateEntity integration', (t) =
     let entity1CreateState = false;
     let entity2CreateState = false;
 
-    const entityConfig1 = game.build()
+    const entityConfig1 = game.make()
       .afterCreateEntity(() => entity1CreateState = true) // afterCreateEntity handler for the first entity
       .build();
 
-    const entityConfig2 = game.build()
+    const entityConfig2 = game.make()
       .afterCreateEntity(() => entity2CreateState = true) // afterCreateEntity handler for the second entity
       .build();
 

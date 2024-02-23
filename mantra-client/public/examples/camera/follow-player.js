@@ -14,7 +14,7 @@ game.start(function () {
   // Changes the camera mode on pointer up
   //
 
-  let box = game.build().size(64).position(-200, 0).body(false).z(100).color('purple').pointerdown(function (box) {
+  let box = game.make().size(64).position(-200, 0).body(false).z(100).color('purple').pointerdown(function (box) {
     if (game.data.camera.mode === 'none') {
       game.data.camera.mode = 'follow';
       // set box to purple
@@ -53,7 +53,7 @@ game.start(function () {
   game.systems.tile.createLayer(tileMap, 16, 16);
 
   // create text that says click to change camera mode
-  game.build().Text().text('Click Purple Box to change camera mode').size(500, 100).position(130, 0).createEntity();
+  game.make().Text().text('Click Purple Box to change camera mode').size(500, 100).position(130, 0).createEntity();
   
   // show mode as text entity
   let mode = game.createText({

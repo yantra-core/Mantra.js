@@ -35,4 +35,8 @@ export default async function switchGraphics(graphicsInterfaceName, cb) {
     document.body.style.cursor = 'default';
   }
 
+  if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
+    game.setZoom(3.5);
+  }
+
 }

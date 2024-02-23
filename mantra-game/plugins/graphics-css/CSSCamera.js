@@ -80,7 +80,8 @@ class CSSCamera {
     this.gameViewport = document.getElementById('gameHolder');
     this.gameViewport.style.transformOrigin = 'center center';
 
-    this.initZoomControls();
+    this.initMouseWheelZoomControls();
+
     // set initial zoom based on config
     if (this.config.initialZoom) {
       this.zoom(this.config.initialZoom);
@@ -119,7 +120,7 @@ class CSSCamera {
     this.game.data.camera.offsetY = 0;
   }
 
-  initZoomControls() {
+  initMouseWheelZoomControls() {
     document.addEventListener('wheel', this.mouseWheelZoom, { passive: false });
     this.scene.mouseWheelEnabled = true;
   }

@@ -4,23 +4,24 @@ let game = new MANTRA.Game({
 
 });
 
+// TODO: manually call boomerang for demo
 game.use('Boomerang'); // plugins at runtime
 
 game.start(function () {
 
   game.setBackground('#000000');
   game.setZoom(2.5);
-  game.build().Player().createEntity();
+  game.make().Player().createEntity();
 
   for (let i = 0; i < 10; i++) {
     let randomRadial = game.radialSpread(0, 0, 100, 10, i);
-    game.build().Key({
+    game.make().Key({
       position: randomRadial
     }).createEntity();  
   }
 
   // teleports to the next example
-  game.build().Teleporter({
+  game.make().Teleporter({
     url: 'https://yantra.gg/mantra/examples/items/unit-spawner',
   }).position(200, 0).createEntity()
 

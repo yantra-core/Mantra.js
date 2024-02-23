@@ -43,13 +43,14 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         height: 8,
         body: true,
         collisionStart: this.grow.bind(this),
-        update: this.think.bind(this),
+        update: this.swarmBehavior.bind(this),
         position: entityData.position
       };
     }
   }, {
     key: "grow",
     value: function grow(a, b, pair, context) {
+      var game = this.game;
       // eats bullets and grows
       if (context.target.type === 'BULLET') {
         var hexapod = context.owner;
@@ -73,8 +74,8 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "think",
-    value: function think(entity) {
+    key: "swarmBehavior",
+    value: function swarmBehavior(entity) {
       var gameState = this.game.data;
       var game = this.game;
       var Vector = this.game.systems.physics.Vector;
@@ -154,6 +155,91 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
       // Apply forces
       var force = Vector.add(Vector.add(Vector.add(alignment, cohesion), separation), targetForce);
       // Update hexapod position
+      var newPosition = Vector.add(hexapod.position, Vector.mult(force, 1));
+      newPosition.z = 1; // for now
+      game.updateEntity({
+        id: hexapod.id,
+        position: newPosition
+      });
+    }
+  }, {
+    key: "groupLimitSwarmBehavior",
+    value: function groupLimitSwarmBehavior(entity) {
+      var gameState = this.game.data;
+      var game = this.game;
+      var Vector = this.game.systems.physics.Vector;
+      var ALIGNMENT_FORCE = 0.1;
+      var COHESION_FORCE = 0.4;
+      var SEPARATION_FORCE = 0.81;
+      var GROUP_SEPARATION_FORCE = 1.2;
+      var PERCEPTION_RADIUS = 1500;
+      var GROUP_SEPARATION_RADIUS = 600;
+      var GROUP_LIMIT = 3;
+      var GROUP_TOLERANCE = 0.8; // 80% tolerance over the GROUP_LIMIT
+
+      var hexapod = entity;
+      var hexapods = gameState.ents.HEXAPOD;
+      var alignment = {
+        x: 0,
+        y: 0
+      };
+      var cohesion = {
+        x: 0,
+        y: 0
+      };
+      var separation = {
+        x: 0,
+        y: 0
+      };
+      var groupSeparation = {
+        x: 0,
+        y: 0
+      };
+      var groupMembers = [];
+      var otherGroups = [];
+      var targetForce = {
+        x: 0,
+        y: 0
+      };
+      if (typeof gameState.currentPlayer !== 'undefined' && gameState.currentPlayer) {
+        var target = gameState.currentPlayer.position;
+        var targetDirection = Vector.sub(target, hexapod.position);
+        targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+      }
+      hexapods.forEach(function (otherHexapod) {
+        if (otherHexapod.id !== hexapod.id) {
+          var d = Vector.magnitude(Vector.sub(hexapod.position, otherHexapod.position));
+          var joinGroupChance = Math.random();
+          if (d < PERCEPTION_RADIUS && (groupMembers.length < GROUP_LIMIT || joinGroupChance < GROUP_TOLERANCE)) {
+            groupMembers.push(otherHexapod);
+            alignment = Vector.add(alignment, otherHexapod.velocity);
+            cohesion = Vector.add(cohesion, otherHexapod.position);
+          } else if (d < GROUP_SEPARATION_RADIUS) {
+            otherGroups.push(otherHexapod);
+          }
+          if (d < hexapod.width + otherHexapod.width) {
+            var diff = Vector.sub(hexapod.position, otherHexapod.position);
+            separation = Vector.add(separation, Vector.div(diff, d * d));
+          }
+        }
+      });
+      otherGroups.forEach(function (otherHexapod) {
+        var diff = Vector.sub(hexapod.position, otherHexapod.position);
+        var d = Vector.magnitude(diff);
+        if (d > 0) {
+          groupSeparation = Vector.add(groupSeparation, Vector.div(diff, d * d));
+        }
+      });
+      if (groupMembers.length > 0) {
+        alignment = Vector.div(alignment, groupMembers.length);
+        cohesion = Vector.div(cohesion, groupMembers.length);
+        cohesion = Vector.sub(cohesion, hexapod.position);
+      }
+      alignment = Vector.mult(Vector.normalize(alignment), ALIGNMENT_FORCE);
+      cohesion = Vector.mult(Vector.normalize(cohesion), COHESION_FORCE);
+      separation = Vector.mult(Vector.normalize(separation), SEPARATION_FORCE);
+      groupSeparation = Vector.mult(Vector.normalize(groupSeparation), GROUP_SEPARATION_FORCE);
+      var force = Vector.add(Vector.add(Vector.add(Vector.add(alignment, cohesion), separation), groupSeparation), targetForce);
       var newPosition = Vector.add(hexapod.position, Vector.mult(force, 1));
       newPosition.z = 1; // for now
       game.updateEntity({

@@ -96,23 +96,28 @@ class Home {
   init(game) {
     this.game = game;
 
-    // moves with right click, shoots with left
+    // reset any previous worlds / game state
+    game.reset();
+
+    // Movements with right click, switch default left-click-to-move behavior
     game.config.mouseMovementButton = 'RIGHT';
+    // Actions with left click
     game.config.mouseActionButton = 'LEFT';
-
-
+    // enables the default top-down mouse movements
+    game.config.defaultMouseMovement = true;
+    
+    // enables mouse wheel zoom
+    game.data.camera.mouseWheelZoomEnabled = true;
     this.createWorld();
 
   }
 
-  update() {
-  }
+  update() {}
 
   createWorld() {
 
     let game = this.game;
 
-    game.reset();
     game.setBackground('#007fff');
 
     game.data.camera.follow = true;
@@ -123,12 +128,12 @@ class Home {
       game.zoom(4.5);
     }
 
-    // game.build().Block().size(16).clone(10).createEntity();
+    // game.make().Block().size(16).clone(10).createEntity();
 
     game.setSize(16000, 9000);
     game.setGravity(0, 0, 0);
 
-    let player1 = game.build().Player({
+    let player1 = game.make().Player({
       lives: 99,
     });
 
@@ -136,7 +141,7 @@ class Home {
 
     game.setPlayerId(player1.id);
     // TODO: setup doors and keys on home page like Maze World ( easy )
-    // game.build().Key().position(-100, 100, 10).createEntity();
+    // game.make().Key().position(-100, 100, 10).createEntity();
 
     //
     // Create 22 Hexapods
@@ -153,11 +158,11 @@ class Home {
       let x = radius * Math.cos(angle);
       let y = radius * Math.sin(angle);
       
-      game.build().Hexapod().Draggable().size(8).position(x, y, 0).createEntity();
+      game.make().Hexapod().Draggable().size(8).position(x, y, 0).createEntity();
       // .collectable(true).afterItemCollected(collectFn)
     };
 
-    game.build().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
+    game.make().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
 
     this.createTwinFlames();
     welcomeMessage(game);
@@ -169,8 +174,8 @@ class Home {
 
   createTwinFlames() {
     // See Flame plugin for .build() entity config
-    this.game.build().Flame().position(-80, -60, 16).createEntity();
-    this.game.build().Flame().position(80, -60, 16).createEntity();
+    this.game.make().Flame().position(-80, -60, 16).createEntity();
+    this.game.make().Flame().position(80, -60, 16).createEntity();
   }
 
   unload() {

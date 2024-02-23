@@ -42,7 +42,7 @@ var Tower = exports["default"] = /*#__PURE__*/function () {
       };
 
       // Define default configuration for unitConfig
-      // const defaultBulletConfig = game.build().radius(8).build();
+      // const defaultBulletConfig = game.make().radius(8).build();
       var defaultBulletConfig = {
         radius: 8,
         velocoity: {

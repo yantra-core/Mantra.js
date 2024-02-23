@@ -12,6 +12,8 @@ export default class UnitSpawner {
   }
 
   build(entityData = {}) {
+
+    let game = this.game;
     entityData.position = entityData.position || { x: 0, y: 0 };
 
     const defaultUnitConfig = {
@@ -86,11 +88,11 @@ export default class UnitSpawner {
     }
 
     // Create the UnitSpawner entity
-    const unitSpawner = game.createEntity(this.build(entityData));
+    const unitSpawner = this.game.createEntity(this.build(entityData));
   }
 
   create(entityData = {}) {
-    return game.createEntity(this.build(entityData));
+    return this.game.createEntity(this.build(entityData));
   }
 
   applySprayForce(unitConfig, baseAngle = Math.PI / 8, sprayWidth = Math.PI / 4, forceMagnitude = 0.5) {

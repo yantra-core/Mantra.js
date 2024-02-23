@@ -38,23 +38,21 @@ class MyScene {
       },
     });
 
-    let customEnt = game.build()
+    let customEnt = game.make()
       .type('BLOCK')
       .size(50, 50)
       .position(-32, -100)
       .texture('tile-block-0')
       .createEntity();
     
-    this.game.build().Hexapod().repeat(6).position(-300, 0).createEntity();
-    this.game.build().Hexapod().repeat(6).position(300, 0).createEntity();
-
-    
-
+    this.game.make().Hexapod().repeat(6).position(-300, 0).createEntity();
+    this.game.make().Hexapod().repeat(6).position(300, 0).createEntity();
   }
 
   unload() {
     console.log("Unloading MyScene");
   }
+
 }
 
 game.start(function () {
@@ -70,7 +68,7 @@ game.start(function () {
     }
   });
 
-  let clickToLoadText = game.build().Text()
+  let clickToLoadText = game.make().Text()
     .text('Click to load scene')
     .position(0, 0)
     .size(400, 50)
@@ -89,4 +87,5 @@ game.start(function () {
       y: 100
     }
   });
+
 });

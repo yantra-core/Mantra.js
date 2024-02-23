@@ -21,6 +21,17 @@ class GravityGardens {
   init(game) {
     this.game = game;
 
+    // enables mouse wheel zoom
+    game.data.camera.mouseWheelZoomEnabled = true;
+
+    // Movements with right click, switch default left-click-to-move behavior
+    game.config.mouseMovementButton = 'RIGHT';
+    // Actions with left click
+    game.config.mouseActionButton = 'LEFT';
+
+    // disables the default top-down mouse movements
+    // game.config.defaultMouseMovement = false;
+
     // we reset the game to clear any previous state
     game.reset();
 
@@ -28,6 +39,7 @@ class GravityGardens {
     this.createFounts(game);
     this.bindEvents();
     this.bindSutraRules();
+
     // we can lazy load these after the plugin has started
     game.use('CurrentFPS');
     game.use('StarField');
@@ -55,7 +67,7 @@ class GravityGardens {
     }
 
     // Builds a Player config with GravityWell 
-    let playerConfig = game.build()
+    let playerConfig = game.make()
       .GravityWell()     // The player will have a gravity well
       .Player()          // The player Plugin
       .texture(null)     // default texture is a player sprite
@@ -73,7 +85,7 @@ class GravityGardens {
     let player = game.createEntity(playerConfig);
     game.setPlayerId(player.id);
 
-    game.build()
+    game.make()
       .type('WARP')
       .Teleporter({
         destination: {
@@ -87,7 +99,7 @@ class GravityGardens {
       .position(595, -30, 0)
       .createEntity();
 
-    game.build()
+    game.make()
       .type('TEXT')
       .text('Warp To Mantra')
       .width(200)
@@ -182,14 +194,14 @@ class GravityGardens {
       that.mousePosition.clientY = event.clientY;
       // if right click
       if (event.button === 0) {
-        that.slurping = true;
-        game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
 
       // if left click
       if (event.button === 2) {
         that.dropping = true;
         game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+        that.slurping = true;
+        game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
     });
 
@@ -208,7 +220,7 @@ class GravityGardens {
     // will set the collistionStart flag to true in order to register collision events
     let particleCollision = true;
 
-    game.build()
+    game.make()
       .name('fountA')
       .type('FOUNT')
       .UnitSpawner({
@@ -225,7 +237,7 @@ class GravityGardens {
       .position(200, 0)
       .createEntity(); // Finalizes and creates the entity
 
-    game.build()
+    game.make()
       .name('fountB')
       .type('FOUNT')
       .UnitSpawner({
@@ -243,7 +255,7 @@ class GravityGardens {
       .position(-200, 0)
       .createEntity(); // Finalizes and creates the entity
 
-    game.build()
+    game.make()
       .name('fountC')
       .type('FOUNT')
       .UnitSpawner({
@@ -261,7 +273,7 @@ class GravityGardens {
       .position(0, -200)
       .createEntity(); // Finalizes and creates the entity
 
-    game.build()
+    game.make()
       .name('fountD')
       .type('FOUNT')
       .UnitSpawner({

@@ -1,9 +1,7 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
-  defaultMovement: true,
   plugins: ['TileMap', 'Tile'], // RBush is required for Field of View
-
 });
 game.start(function () {
   game.zoom(2.5);
@@ -13,7 +11,7 @@ game.start(function () {
   // Creating a TileMap can be done at the lowest-level using arrays of integers
   //
 
-  game.build().TileMap().createEntity();
+  game.make().TileMap().createEntity();
 
   /*
   // TODO: have this be new game.TileMap({ ... })

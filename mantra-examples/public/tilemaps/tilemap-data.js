@@ -2,18 +2,17 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
   camera: 'follow',
-  plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Boomerang', 'Teleporter'],
-,
+  plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Boomerang', 'Teleporter']
 });
 game.start(function () {
   game.zoom(2.5);
   game.createPlayer();
 
   // A Tile config can be any Entity, create a simple block
-  let blockTileConfig = game.build().Block().body(true).size(16).build();
+  let blockTileConfig = game.make().Block().body(true).size(16).build();
 
   // Construct the TileMap config
-  let tileMap = game.build().TileMap({
+  let tileMap = game.make().TileMap({
     tileMapWidth: 6,
     tileMapHeight: 4,
     tileSize: 16,
@@ -36,7 +35,7 @@ game.start(function () {
   tileMap.createEntity();
 
   // Use Entity Builder to create a TileMap with TileSet
-  let ent = game.build();
+  let ent = game.make();
 
   // Create a TileSet config ( slightly scaled up from the previous example )
   ent.TileSet({
@@ -70,7 +69,7 @@ game.start(function () {
   ent.createEntity();
   
   // teleports to the next example
-  game.build().Teleporter({
+  game.make().Teleporter({
     url: 'https://yantra.gg/mantra/examples/tilemaps/tile-collisions',
   }).position(200, 0).createEntity()
 

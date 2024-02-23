@@ -509,7 +509,8 @@ var CSSCamera = /*#__PURE__*/function () {
 
       this.gameViewport = document.getElementById('gameHolder');
       this.gameViewport.style.transformOrigin = 'center center';
-      this.initZoomControls();
+      this.initMouseWheelZoomControls();
+
       // set initial zoom based on config
       if (this.config.initialZoom) {
         this.zoom(this.config.initialZoom);
@@ -546,8 +547,8 @@ var CSSCamera = /*#__PURE__*/function () {
       this.game.data.camera.offsetY = 0;
     }
   }, {
-    key: "initZoomControls",
-    value: function initZoomControls() {
+    key: "initMouseWheelZoomControls",
+    value: function initMouseWheelZoomControls() {
       document.addEventListener('wheel', this.mouseWheelZoom, {
         passive: false
       });
@@ -704,11 +705,20 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = cssMouseWheelZoom;
 function cssMouseWheelZoom(event) {
-  // Prevent default scrolling behavior
-  event.preventDefault();
+  var game = this.game;
   if (!this.mouseWheelEnabled) {
+    // legacy API, use game.data.camera instead
     return;
   }
+  if (game.data.camera && game.data.camera.mouseWheelZoomEnabled !== true) {
+    return;
+  }
+
+  // Prevent default scrolling behavior
+  // Prevents the default *after* checking to see if mouse enabled
+  // This is to best serve user so Mantra won't eat their scroll events
+  // We could add an additional flag here in cases we want an embedded Mantra to scroll
+  event.preventDefault();
 
   /*
      Remark: Removed 2/16/2024, as this was preventing mouse wheel zoom from working
@@ -720,7 +730,6 @@ function cssMouseWheelZoom(event) {
     }
   */
 
-  var game = this.game;
   var scale = game.data.camera.currentZoom;
 
   // Zoom settings

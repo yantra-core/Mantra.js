@@ -5,19 +5,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = defaultMouseMovement;
-// Remark: This module scoped variables are out of band, they will be removed, see comment in defaultTopdownMovement.js
-// Assuming 'LEFT' and 'RIGHT' are properties indicating the state of mouse buttons in context.buttons
-
+// Mantra Default Mouse Movement - Marak Squires 2024
+//
+// Remark: The following module scoped variables "moving" and "movingToPosition" are out of band, 
+// they will be removed, see comment in defaultTopdownMovement.js
+//
 var moving = false;
 var movingToPosition = {};
-
-// Map your variables to the BUTTONS object
-//let mouseMovementButton = 'RIGHT'; // Use 'RIGHT' for movement
-//let mouseActionButton = 'LEFT'; // Use 'LEFT' for action (e.g., throwing a boomerang)
-
 function defaultMouseMovement(game) {
   game.on('pointerUp', function (context, event) {
     var mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
+
+    // TOOD: better game.getActivePlayer() checks
+    if (typeof game.currentPlayerId === 'undefined' || !game.currentPlayerId) {
+      return;
+    }
     if (game.isTouchDevice()) {
       if (context.endedFirstTouch) {
         moving = false;
@@ -41,6 +43,9 @@ function defaultMouseMovement(game) {
     }
     var gamePointerPosition = context.position;
     var currentPlayer = game.data.ents.PLAYER[0];
+    if (typeof currentPlayer === 'undefined') {
+      return;
+    }
     var playerPosition = currentPlayer.position;
     if (playerPosition && moving) {
       var radians = Math.atan2(gamePointerPosition.y - playerPosition.y, gamePointerPosition.x - playerPosition.x);
@@ -59,6 +64,11 @@ function defaultMouseMovement(game) {
     var mouseActionButton = game.config.mouseActionButton || 'LEFT';
     var gamePointerPosition = context.position;
     var currentPlayer = game.data.ents.PLAYER[0];
+
+    // TOOD: better game.getActivePlayer() checks
+    if (typeof currentPlayer === 'undefined') {
+      return;
+    }
     var playerPosition = currentPlayer.position;
     if (playerPosition) {
       if (typeof currentPlayer.update !== 'function') {
@@ -560,7 +570,9 @@ function topdownMovement(game) {
   // We'll need to implement these mouse movements as a movement system for entity input
   // In order to support multiplayer mouse controls, its all there including mouse position and button states, 
   // just needs to be mapped as Entity Input with label names for Sutra conditions
-  (0, _defaultMouseMovement["default"])(game);
+  if (game.config.defaultMouseMovement !== false) {
+    (0, _defaultMouseMovement["default"])(game);
+  }
   return rules;
 }
 

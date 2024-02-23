@@ -15,12 +15,12 @@ game.start(function () {
   game.createPlayer();
  
   // creates (3) flames
-  game.build().Flame().position(-80, -60, 16).createEntity();
-  game.build().Flame().position(80, -60, 16).createEntity();
-  game.build().Flame().position(0, 60, 16).createEntity();
+  game.make().Flame().position(-80, -60, 16).createEntity();
+  game.make().Flame().position(80, -60, 16).createEntity();
+  game.make().Flame().position(0, 60, 16).createEntity();
 
   // Create text instructions
-  let text = game.build().Text().width(310).position(80, -40).text('Do not walk into the fire');
+  let text = game.make().Text().width(310).position(80, -40).text('Do not walk into the fire');
   text.style({
     backgroundColor: 'black',
     color: 'white',
@@ -30,7 +30,7 @@ game.start(function () {
   text.createEntity();
 
   // instructions to move, click mouse, or use WASD or USB Gamepad
-  let inputText = game.build().Text().position(170, 20).text('Move with mouse, WASD, or USB Gamepad');
+  let inputText = game.make().Text().position(170, 20).text('Move with mouse, WASD, or USB Gamepad');
   inputText.width(600);
   inputText.style({
     backgroundColor: 'black',

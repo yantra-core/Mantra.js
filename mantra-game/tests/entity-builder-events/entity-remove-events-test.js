@@ -36,7 +36,7 @@ tap.test('Removing Entity.onUpdate event handlers', (t) => {
   const onUpdateHandler = () => { updateState = true; };
 
   // Set up an entity with the onUpdate handler
-  const entityConfig = game.build().onUpdate(onUpdateHandler);
+  const entityConfig = game.make().onUpdate(onUpdateHandler);
   const entity = entityConfig.createEntity();
 
   // Trigger the update event to test the handler

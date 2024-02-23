@@ -7,9 +7,9 @@ let game = new MANTRA.Game({
 game.start(function () {
   game.setBackground('black');
 
-  game.build().Player().createEntity();
+  game.make().Player().createEntity();
   game
-    .build()
+    .make()
     .color('red')
     .size(8)
     .body(false)
@@ -30,7 +30,7 @@ game.start(function () {
     .createEntity()
 
     game
-    .build()
+    .make()
     .color('red')
     .size(8)
     .body(false)
@@ -52,7 +52,7 @@ game.start(function () {
 
 
     game
-    .build()
+    .make()
     .color('red')
     .size(8)
     .body(false)
@@ -73,7 +73,7 @@ game.start(function () {
     .createEntity()
 
     game
-    .build()
+    .make()
     .color('red')
     .size(8)
     .body(false)
@@ -95,7 +95,7 @@ game.start(function () {
 
     /*
     game
-    .build()
+    .make()
     .color('red')
     .size(16)
     .body(false)
@@ -112,7 +112,7 @@ game.start(function () {
     .createEntity()
 
     game
-    .build()
+    .make()
     .color('red')
     .size(16)
     .body(false)
@@ -129,7 +129,7 @@ game.start(function () {
     .createEntity()
 
     game
-    .build()
+    .make()
     .color('red')
     .size(16)
     .body(false)
@@ -149,7 +149,7 @@ game.start(function () {
     
 
   // Teleporter to the next example
-  game.build().Teleporter({
+  game.make().Teleporter({
     url: 'https://yantra.gg/mantra/examples/entity/repeat-entity',
   }).position(-200, 0).createEntity()
 

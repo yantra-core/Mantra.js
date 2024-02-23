@@ -19,30 +19,53 @@ export default class Tower {
     entityData.position = entityData.position || { x: 0, y: 0 };
 
     // Define default configuration for unitConfig
-    const defaultUnitConfig = game.build().radius(8).build();
-
+    // const defaultBulletConfig = game.make().radius(8).build();
+    let defaultBulletConfig = {
+      radius: 8,
+      velocoity: {
+        x: 0,
+        y: -2
+      },
+    }
     // entityData.meta = entityData.meta || {};
       // Combine the default configuration with the entityData
-    const unitConfig = { ...defaultUnitConfig, ...entityData.unitConfig};
+    const bulletConfig = { ...defaultBulletConfig, ...entityData.bulletConfig};
 
     entityData.meta = entityData.meta || {};
-    entityData.meta.unitConfig =  unitConfig;
+    entityData.meta.bulletConfig =  bulletConfig;
 
+    if (typeof entityData.isShooting !== 'undefined') {
+      // tower is shooting property
+      entityData.meta.isShooting = entityData.isShooting;
+    }
+
+    console.log('bulletConfigbulletConfig', bulletConfig)
     return {
       ...entityData,
       type: 'TOWER',
       texture: entityData.texture || 'towerSprite',
       meta: {
-        ...entityData.meta,
-        fireRate: this.fireRate,
+        bulletConfig: bulletConfig,
+        fireRate: entityData.fireRate || this.fireRate,
         range: this.range,
+        isShooting: entityData.meta.isShooting,
         weaponType: this.weaponType,
         lastFired: 0 // Game tick at which the last shot was fired
       },
       update: (entity) => {
 
+        /*
+        if (!entity.meta.isShooting) {
+          return;
+        }
+        */
         // shoot a bullet
-        if (this.game.tick % 10 === 0) {
+        let fireRate = entity.meta.fireRate || this.fireRate;
+        // fireRate is in ms, convert to game ticks via game.fps
+        //console.log('fireRate', fireRate)
+        //tickRate = Math.round(tickRate);
+        // console.log('tickRate', tickRate, this.game.tick, this.game.tick % tickRate)
+        if (this.game.tick % fireRate === 0) {
           /*
           if (entity.meta.unitConfig) {
             this.game.createEntity(entity.meta.unitConfig);
@@ -50,7 +73,8 @@ export default class Tower {
             this.game.systems.bullet.fireBullet(entity.id);
           }
           */
-          this.game.systems.bullet.fireBullet(entity.id);
+         // console.log('entity.meta.bulletConfig', entity)
+          this.game.systems.bullet.fireBullet(entity.id, entity.meta.bulletConfig);
 
         }
         /*

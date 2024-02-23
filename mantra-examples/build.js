@@ -49,9 +49,9 @@ function generateGalleryFile() {
     // push the first 10 or so in manual display order for demo purposes
     exampleURLs.unshift('collisions/collision-active.html');
     exampleURLs.unshift('collisions/collision-start.html');
+    exampleURLs.unshift('physics/rotate.html');
     exampleURLs.unshift('physics/set-position.html');
     exampleURLs.unshift('npc/hexapod.html');
-    exampleURLs.unshift('physics/rotate.html');
     
     const exampleURLsJSON = JSON.stringify(exampleURLs);
     const jsCode = `
@@ -173,6 +173,10 @@ function writeIndexFile() {
     let indexHTML = indexTemplate.replace('$$$categories$$$', mainCategoriesHTML);
     indexHTML = indexHTML.replace('$$$title$$$', 'Mantra - Examples - Main Categories');
 
+    // TODO categories.foreach
+    //const htmlTags = category.tags.map(tag => `<span class="tag">${tag}</span>`).join('\n');
+    //indexHTML = indexHTML.replace('$$tags$$$', htmlTags);
+
     const indexPath = path.join(outputDir, 'index.html');
     fs.writeFile(indexPath, indexHTML, err => {
         if (err) {
@@ -227,17 +231,16 @@ function exampleTemplateHTML(example) {
             // rebroadcast the message to the parent window
             window.addEventListener('message', event => {
                 // log the data
-                console.log(event.data);
-                let context = event.data.context;
-                window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
+                //let context = event.data.context;
+                //window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
               });
 
             // on click
             window.addEventListener('click', event => {
                 // log the data
-                console.log(event);
-                let context = { x: event.clientX, y: event.clientY };
-                window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
+                //console.log(event);
+                //let context = { x: event.clientX, y: event.clientY };
+                //window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
             });
           
             loadEditor('./${name}.js');
@@ -272,14 +275,21 @@ function generateExampleFiles() {
             fs.mkdirSync(dirPath, { recursive: true });
         }
 
-        const exampleHTMLPath = path.join(dirPath, `${baseName}.html`);
+        let exampleHTMLPath = path.join(dirPath, `${baseName}.html`);
         const exampleJSPath = path.join(dirPath, `${baseName}.js`);
 
-        if (!fs.existsSync(exampleHTMLPath)) {}
+
+        const htmlTags = example.tags.map(tag => `<span class="tag">${tag}</span>`).join('\n');
+        console.log('writing tags', htmlTags)
+        exampleHTMLPath = exampleHTMLPath.replace('$$tags$$$', htmlTags);
+
+        // if (!fs.existsSync(exampleHTMLPath)) {}
         // regen the HTML file each time
         fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
 
         
+    
+
         // do not overwrite the js example code if it already exists
         if (!fs.existsSync(exampleJSPath)) {
             fs.writeFileSync(exampleJSPath, exampleTemplateJS(example), 'utf8');

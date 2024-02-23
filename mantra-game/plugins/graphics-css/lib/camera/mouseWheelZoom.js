@@ -1,11 +1,20 @@
 export default function cssMouseWheelZoom(event) {
 
-  // Prevent default scrolling behavior
-  event.preventDefault();
+  let game = this.game;
 
-  if (!this.mouseWheelEnabled) {
+  if (!this.mouseWheelEnabled) { // legacy API, use game.data.camera instead
     return;
   }
+
+  if (game.data.camera && game.data.camera.mouseWheelZoomEnabled !== true) {
+    return;
+  }
+
+  // Prevent default scrolling behavior
+  // Prevents the default *after* checking to see if mouse enabled
+  // This is to best serve user so Mantra won't eat their scroll events
+  // We could add an additional flag here in cases we want an embedded Mantra to scroll
+  event.preventDefault();
 
   /*
 
@@ -19,7 +28,6 @@ export default function cssMouseWheelZoom(event) {
     }
   */
 
-  let game = this.game;
   let scale = game.data.camera.currentZoom;
 
   // Zoom settings

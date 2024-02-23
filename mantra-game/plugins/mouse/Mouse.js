@@ -144,7 +144,7 @@ export default class Mouse {
   }
 
   updateMouseButtons(event, isDown) {
-
+    let game = this.game;
     if (game.isTouchDevice()) {
       switch (event.button) {
         case 2:
@@ -375,7 +375,7 @@ export default class Mouse {
   }
 
   bindInputControls() {
-
+    let game = this.game;
     if (game.isTouchDevice()) {
       document.addEventListener('pointerover', this.boundHandleMouseOver);
       document.addEventListener('pointerout', this.boundHandleMouseOut);
@@ -411,6 +411,7 @@ export default class Mouse {
 
   }
   unbindAllEvents() {
+    let game = this.game;
     if (game.isTouchDevice()) {
       // unbind all events
       document.removeEventListener('pointerover', this.boundHandleMouseOver);

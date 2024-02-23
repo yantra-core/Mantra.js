@@ -40,6 +40,7 @@ class Game {
       sutra: true,
       lifetime: false,
       defaultMovement: true,
+      defaultMouseMovement: true,
       // data compression
       protobuf: false,
       msgpack: false,

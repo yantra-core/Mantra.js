@@ -1403,7 +1403,7 @@ function updateEntity(entityDataOrId, entityData) {
         this.game.components.update.set(entityId, null);
       } else {
         // create a quick config to store the events, we'll want to convert entire function to use this
-        var updateConfig = this.game.build();
+        var updateConfig = this.game.make();
         updateConfig.onUpdate(entityData.update);
         // inherit the current update function, creates a tree of functions
         // do we want to do this? what are the implications?
@@ -1523,7 +1523,7 @@ function updateEntityEvents(entityId, entityData) {
       console.log(`Processing ${eventName}`);
 
       // Create a quick config to store the events
-      let eventConfig = this.game.build();
+      let eventConfig = this.game.make();
 
       // Add the new event handler
       eventConfig['_addEventHandler'](eventName, entityData[eventName]);

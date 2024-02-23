@@ -30,7 +30,7 @@ game.start(function () {
       height: Math.random() * 100,
       width: Math.random() * 100
     };
-    let entity = game.build()
+    let entity = game.make()
     .color(randomColor)
     .size(16, 16)
     .position(randomPosition.x, randomPosition.y)

@@ -1,18 +1,21 @@
-// Remark: This module scoped variables are out of band, they will be removed, see comment in defaultTopdownMovement.js
-// Assuming 'LEFT' and 'RIGHT' are properties indicating the state of mouse buttons in context.buttons
-
+// Mantra Default Mouse Movement - Marak Squires 2024
+//
+// Remark: The following module scoped variables "moving" and "movingToPosition" are out of band, 
+// they will be removed, see comment in defaultTopdownMovement.js
+//
 let moving = false;
 let movingToPosition = {};
-
-// Map your variables to the BUTTONS object
-//let mouseMovementButton = 'RIGHT'; // Use 'RIGHT' for movement
-//let mouseActionButton = 'LEFT'; // Use 'LEFT' for action (e.g., throwing a boomerang)
 
 export default function defaultMouseMovement(game) {
 
   game.on('pointerUp', function (context, event) {
 
     let mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
+
+    // TOOD: better game.getActivePlayer() checks
+    if (typeof game.currentPlayerId === 'undefined' || !game.currentPlayerId) {
+      return;
+    }
 
     if (game.isTouchDevice()) {
       if (context.endedFirstTouch) {
@@ -35,6 +38,11 @@ export default function defaultMouseMovement(game) {
 
     let gamePointerPosition = context.position;
     let currentPlayer = game.data.ents.PLAYER[0];
+
+    if (typeof currentPlayer === 'undefined') {
+      return;
+    }
+
     let playerPosition = currentPlayer.position;
 
     if (playerPosition && moving) {
@@ -53,6 +61,12 @@ export default function defaultMouseMovement(game) {
 
     let gamePointerPosition = context.position;
     let currentPlayer = game.data.ents.PLAYER[0];
+
+    // TOOD: better game.getActivePlayer() checks
+    if (typeof currentPlayer === 'undefined') {
+      return;
+    }
+
     let playerPosition = currentPlayer.position;
 
     if (playerPosition) {

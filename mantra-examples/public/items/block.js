@@ -22,7 +22,7 @@ game.start(function () {
   let startPosition = { x: 100, y: 0 };
   let blockSpacing = 60; // Adjust as needed for spacing between blocks
   for (let i = 0; i < 10; i++) {
-    game.build().Block().position(startPosition.x + (i * blockSpacing), startPosition.y, 0).createEntity();
+    game.make().Block().position(startPosition.x + (i * blockSpacing), startPosition.y, 0).createEntity();
   }
 
 });

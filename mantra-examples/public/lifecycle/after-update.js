@@ -10,19 +10,12 @@ game.start(function () {
   let entities = [];
   for (let i = 0; i < 22; i++) {
     let randomColor = game.randomColor();
-    let entity = game.createEntity({
-      color: randomColor,
-      size: {
-        width: 16,
-        height: 16
-      },
-      hasCollisionStart: true,
-      position: {
-        // random positions start from top left corner
-        x: Math.random() * -game.width / 2,
-        y: Math.random() * -game.height / 2
-      }
-    });
+
+    let entity = game.make()
+      .color(randomColor)
+      .size(16)
+      .position(Math.random() * game.width / 2, Math.random() * game.height / 2)
+
     entities.push(entity);
   }
 

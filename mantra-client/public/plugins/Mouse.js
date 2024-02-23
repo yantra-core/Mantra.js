@@ -174,6 +174,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "updateMouseButtons",
     value: function updateMouseButtons(event, isDown) {
+      var game = this.game;
       if (game.isTouchDevice()) {
         switch (event.button) {
           case 2:
@@ -416,6 +417,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "bindInputControls",
     value: function bindInputControls() {
+      var game = this.game;
       if (game.isTouchDevice()) {
         document.addEventListener('pointerover', this.boundHandleMouseOver);
         document.addEventListener('pointerout', this.boundHandleMouseOut);
@@ -454,6 +456,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "unbindAllEvents",
     value: function unbindAllEvents() {
+      var game = this.game;
       if (game.isTouchDevice()) {
         // unbind all events
         document.removeEventListener('pointerover', this.boundHandleMouseOver);

@@ -741,6 +741,7 @@ var defaultAssets = {
   'demon': '/img/game/npc/demon.gif',
   'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
   'ayyo-key': '/img/game/env/ayyo-key-medium.png',
+  'hexapod': '/img/game/npc/hexapod.png',
   /*
   'raiden': {
     type: 'spritesheet',

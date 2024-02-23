@@ -22,11 +22,11 @@ game.start(function () {
   });
 
 
-  let tileMapConfig = game.build().TileMap({
+  let tileMapConfig = game.make().TileMap({
     tileData: [], // this is the tileData array from wherever ( LABY )
   });
 
-  let teleporterConfig = game.build().Teleporter({
+  let teleporterConfig = game.make().Teleporter({
     destination: {
       plugin: 'Level-2',
     }

@@ -34,5 +34,3 @@ game.start(function () {
   }
 
 });
-window.game = game;
-

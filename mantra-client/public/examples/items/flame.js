@@ -11,18 +11,18 @@ game.start(function () {
   //
   // Create a Player
   //
-  game.build().Player().createEntity();
+  game.make().Player().createEntity();
 
   //
   // Create a Flame with custom collisionStart behavior
   //
   game
-    .build()
+    .make()
     .Flame()
     .collisionStart(function () {
       // Default collisionStart behavior of Flame is to destroy the entity that touches it
       // We can add additional collisionStart behaviors in the Builder, they will be called in order
-      game.build().Player().createEntity();
+      game.make().Player().createEntity();
     })
     .position(-60, -50, 0)
     .offset(120)
@@ -30,7 +30,7 @@ game.start(function () {
     .createEntity();
 
   // adds text, do not touch flame
-  game.build().Text()
+  game.make().Text()
     .text('Do not touch the flame')
     .width(300)
     .position(60, -25)

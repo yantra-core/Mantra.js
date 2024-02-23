@@ -10,10 +10,10 @@ game.start(function(){
   game.createBorder();
   game.setZoom(1.5);
 
-  game.build().Player().x(100).createEntity();
+  game.make().Player().x(100).createEntity();
  
   // define a yellow jet engine configuration with velocity
-  let jetEngineConfig = game.build()
+  let jetEngineConfig = game.make()
     .color('yellow')
     .size(16)
     .body(true)
@@ -22,7 +22,7 @@ game.start(function(){
     .build();
 
   // define a red car configuration
-  let carConfig = game.build()
+  let carConfig = game.make()
     .color('red')
     .size(40, 100)
     .kind('Chevy')
@@ -30,7 +30,7 @@ game.start(function(){
     .build();
 
   // mix the car and jet engine configurations to create a new jet car configuration
-  let jetCarConfig = game.build()
+  let jetCarConfig = game.make()
     .mix(jetEngineConfig)
     .mix(carConfig)
     .position(0, 200)
@@ -40,7 +40,7 @@ game.start(function(){
   game.createEntity(jetCarConfig);
 
   // Teleporter to the next example
-  game.build().Teleporter({
+  game.make().Teleporter({
     url: 'https://yantra.gg/mantra/examples/entity/create-entity',
   }).position(-200, 0).createEntity()
   

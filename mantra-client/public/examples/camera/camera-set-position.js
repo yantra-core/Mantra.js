@@ -35,7 +35,7 @@ game.start(function () {
       width: Math.random() * 100
     };
     // TODO: random shapes
-    let entity = game.build()
+    let entity = game.make()
       .color(randomColor)
       .size(32, 32)
       .position(Math.random() * -game.width / 4, Math.random() * -game.height / 4)
@@ -44,7 +44,7 @@ game.start(function () {
     entities.push(entity.id);
   }
 
-  let cameraPositionText = game.build().Text()
+  let cameraPositionText = game.make().Text()
     .text(`Camera position: ${game.data.camera.offsetX}, ${game.data.camera.offsetY}`)
     .position(40, 50)
     .body(false)

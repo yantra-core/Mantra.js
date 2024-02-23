@@ -2,17 +2,16 @@ let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
   camera: 'follow',
-  plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Boomerang'],
-,
+  plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Boomerang']
 });
 game.start(function () {
   game.zoom(2.5);
   game.createPlayer();
 
-  let blockConfig = game.build().Block().build();
+  let blockConfig = game.make().Block().build();
 
   // Construct the TileMap config
-  let tileMap = game.build().TileMap({
+  let tileMap = game.make().TileMap({
     tileMapWidth: 6,
     tileMapHeight: 4,
     tileSize: 16,
@@ -34,7 +33,7 @@ game.start(function () {
 
 
   // Use Entity Builder to create a TileMap with TileSet
-  let ent = game.build();
+  let ent = game.make();
 
   // Create a TileSet config
   ent.TileSet({

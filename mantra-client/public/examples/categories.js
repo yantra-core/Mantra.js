@@ -20,16 +20,6 @@ let categories = [
     url: 'physics.html',
     tags: ['physics', 'engine', 'motion', 'movement', 'gravity', 'force', 'velocity', 'mass', 'acceleration', 'inertia', 'friction']
   },
-
-  {
-    title: 'Behavior Trees', // deep purple
-    name: 'behaviors',
-    color: '#673ab7',
-    description: 'Sutra Behavioral Trees for game logic.',
-    image: 'placeholder-image.jpg',
-    url: 'behaviors.html',
-    tags: ['behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
-  },
   {
     title: 'Scenes', // Lime
     name: 'scenes',
@@ -85,6 +75,16 @@ let categories = [
     image: 'placeholder-image.jpg',
     url: 'npc.html',
     tags: ['npc', 'characters', 'enemies', 'allies', 'monsters', 'creatures', 'beasts', 'animals', 'mobs', 'villagers', 'townsfolk']
+  },
+
+  {
+    title: 'Behavior Trees', // deep purple
+    name: 'behaviors',
+    color: '#673ab7',
+    description: 'Sutra Behavioral Trees for game logic.',
+    image: 'placeholder-image.jpg',
+    url: 'behaviors.html',
+    tags: ['behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
 
   {
@@ -276,6 +276,7 @@ let entity_examples = [
     url: 'entity/update-entity.html',
     tags: ['update', 'entity', 'scene', 'modify', 'change', 'edit', 'adjust', 'transform', 'position', 'rotation', 'scale']
   },
+  /*
   {
     title: 'Draggable Entity',
     category: ['mouse', 'entity'],
@@ -284,6 +285,7 @@ let entity_examples = [
     url: 'entity/draggable-entity.html',
     tags: ['drag', 'entity', 'dragging', 'scene', 'move', 'slide', 'shift', 'relocate', 'transfer', 'transport', 'carry', 'pull', 'push']
   },
+  */
   {
     title: 'Get Entity',
     category: 'entity',
@@ -748,6 +750,7 @@ let behaviors_examples = [
     tags: ['conditional', 'entity', 'tick', 'time', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
   */
+  /* TODO: add back
   {
     title: 'Entity Collisions',
     category: ['behaviors', 'entity', 'collisions', 'physics'],
@@ -756,6 +759,7 @@ let behaviors_examples = [
     url: 'behaviors/entity-collision.html',
     tags: ['conditional', 'entity', 'collision', 'behavior', 'tree', 'sutra', 'AI', 'decision', 'making', 'strategy', 'state', 'management', 'rules', 'gameplay']
   },
+  */
   {
     title: 'Keyboard Input',
     category: ['behaviors', 'inputs', 'keyboard'],
@@ -785,6 +789,8 @@ let behaviors_examples = [
 ];
 
 let tiles_examples = [
+
+  /*
   {
     title: 'TileMap Object',
     category: 'tiles',
@@ -793,7 +799,7 @@ let tiles_examples = [
     url: 'tilemaps/tilemap-object.html',
     tags: ['create', 'tilemap', 'array', 'integers', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
-
+  */
 
   {
     title: 'TileMap.data Array',
@@ -813,6 +819,7 @@ let tiles_examples = [
     tags: ['create', 'tilemap', 'tiled', 'editor', 'json', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
   */
+ /*
   {
     title: 'TileSet',
     category: 'tiles',
@@ -821,14 +828,18 @@ let tiles_examples = [
     url: 'tilemaps/tileset.html',
     tags: ['custom', 'tilesets', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
-  {
-    title: 'Labyrinthos.js TileMaps',
-    category: 'tiles',
-    description: 'Create a tilemap from Labyrinthos.',
-    image: 'placeholder-image.jpg',
-    url: 'tilemaps/tilemap-from-labyrinthos.html',
-    tags: ['tilemap', 'labyrinthos', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
-  },
+  */
+ /*
+  */
+ {
+  title: 'Labyrinthos.js',
+  category: 'tiles',
+  description: 'Create a tilemap from Labyrinthos.',
+  image: 'placeholder-image.jpg',
+  url: 'tilemaps/tilemap-from-labyrinthos.html',
+  tags: ['tilemap', 'labyrinthos', 'map', 'levels', 'worlds', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+},
+
   {
     title: 'Tile Collisions',
     category: ['tiles', 'collisions'],
@@ -877,6 +888,7 @@ let terrains_examples = [
 ];
 
 let config_examples = [
+  /*
   {
     title: 'GameConfig Object',
     category: 'config',
@@ -885,6 +897,7 @@ let config_examples = [
     url: 'game-config/game-config-object.html',
     tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
   },
+  */
   {
     title: 'Game Root',
     category: 'config',
@@ -1145,7 +1158,7 @@ _examples.push(behaviors_examples);
 _examples.push(tiles_examples);
 _examples.push(terrains_examples);
 _examples.push(config_examples);
-_examples.push(movement_examples);
+// _examples.push(movement_examples);
 _examples.push(container_examples);
 _examples.push(scenes_examples);
 _examples.push(lifecycle_examples);

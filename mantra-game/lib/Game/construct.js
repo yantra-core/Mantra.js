@@ -145,8 +145,10 @@ export default function construct(game, plugins = []) {
   // Stores references to Promises of all plugins that are currently loading
   game.loadingPluginPromises = {};
 
-  // Helper for building entity data configurations
-  game.build = function() {
+  //
+  // Entity Builder / helpers / sugar syntax for constructing and composing entities
+  //
+  game.make = function() {
     return new game.EntityBuilder(game);
   };
   

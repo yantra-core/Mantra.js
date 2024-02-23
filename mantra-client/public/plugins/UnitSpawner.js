@@ -32,6 +32,7 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
     key: "build",
     value: function build() {
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var game = this.game;
       entityData.position = entityData.position || {
         x: 0,
         y: 0
@@ -124,13 +125,13 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
       }
 
       // Create the UnitSpawner entity
-      var unitSpawner = game.createEntity(this.build(entityData));
+      var unitSpawner = this.game.createEntity(this.build(entityData));
     }
   }, {
     key: "create",
     value: function create() {
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      return game.createEntity(this.build(entityData));
+      return this.game.createEntity(this.build(entityData));
     }
   }, {
     key: "applySprayForce",

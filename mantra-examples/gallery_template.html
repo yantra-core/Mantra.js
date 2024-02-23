@@ -13,6 +13,10 @@
       background-color: #000;
     }
 
+    .mantraLogo {
+      width: 32px;
+    }
+
     .fixed-controls-container {
       position: fixed;
       top: 0;
@@ -33,8 +37,8 @@
 
     .navigation {
       display: flex;
-      justify-content: center;
-      flex-grow: 1;
+      justify-content: left;
+      flex-grow: 0.5;
     }
 
     .navigation h2 {
@@ -88,8 +92,11 @@
       justify-content: center;
       align-items: center;
       flex: 0 1 50px;
+      cursor: pointer;
       /* Do not grow, allow shrink, and base width on content */
     }
+
+
 
     iframe {
       width: 100%;
@@ -149,11 +156,50 @@
         right: 50px;
         /* Distance from the right of the container */
       }
+
+      #playPauseBtn {
+        display: none;
+      }
+
+      #exampleTitle {
+        display: none !important;
+      }
+
+      /* moves the mantraLogo to bottom right fixed position top screen absolute */
+      .mantraLink {
+        position: absolute;
+        bottom: 0;
+        right: 52px;
+        margin: 10px;
+      }
+
+    }
+
+    .link-with-cursor::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-left: 2px solid black;
+    border-top: 2px solid black;
+    transform: rotate(45deg);
+    margin-right: 5px;
+  }
+  
+    /* box shadow 3d effect*/
+    .mantraLogo:hover {
+      box-shadow: 0 0 10px #9a9cff;
+      /* drop shadow effect */
+      -webkit-box-shadow: 0 0 10px #9a9cff;
+      -moz-box-shadow: 0 0 10px #9a9cff;
+      box-shadow: 0 0 10px #9a9cff;
+      /* border radius */
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
-
-
-
 </head>
 
 <body>
@@ -162,31 +208,33 @@
     // listen for messages from the iframe
     window.addEventListener('message', event => {
       // log the data
-      console.log(event.data);
-      togglePlayPause(true);
+      // console.log(event.data);
+      // togglePlayPause(true);
       // alert('hide')
     });
-
   </script>
+
   <div class="fixed-controls-container">
 
     <div class="control-buttons control-buttons-left">
-      <select id="exampleDropdown" onchange="loadSelectedExample()">
+      <a class="mantraLink" target="_blank" href="https://github.com/yantra-core/Mantra.js">
+        <img class="mantraLogo" src="https://yantra.gg/mantra/img/game/env/warp-to-mantra-home.png" />
+      </a>
+
+      <select id="exampleDropdown">
         <option value="">Select an Example</option>
         <!-- Options will be dynamically populated here -->
       </select>
       <button id="prevPreview"></button>
     </div>
-
-
     <div class="navigation">
       <h2 id="exampleTitle"></h2>
     </div>
     <div class="control-buttons control-buttons-right">
       <button id="nextPreview"></button>
 
-      <button id="playPauseBtn">Pause</button>
-      <div id="countdown">5</div>
+      <!-- <button id="playPauseBtn">Play</button> -->
+      <div title="Click to Auto-Play Gallery Examples" id="countdown">...</div>
     </div>
   </div>
   <iframe id="exampleFrame"></iframe>
@@ -199,10 +247,9 @@
     let currentIndex = 0;
     let intervalId;
     let countdownValue = 5; // 5-second countdown
-    let isPlaying = true;
+    let isPlaying = false;
 
-
-    function cycleExamples(direction = 'forward') {
+    function cycleExamples(direction = 'forward', index = null) {
       const frame = document.getElementById('exampleFrame');
       const title = document.getElementById('exampleTitle');
       const nextPreview = document.getElementById('nextPreview');
@@ -215,7 +262,13 @@
         currentIndex = (currentIndex - 1 + exampleURLs.length) % exampleURLs.length;
       }
 
-      let currentUrl = exampleURLs[currentIndex];
+      let currentUrl = exampleURLs[currentIndex - 1];
+
+      if (typeof currentUrl === 'undefined') {
+        // assume last index
+        currentUrl = exampleURLs[exampleURLs.length - 1];
+      }
+
       frame.src = galleryRoot + currentUrl;
 
       // Use a clean and consistent way to generate the URL for pushState
@@ -226,32 +279,39 @@
 
       title.textContent = titleSlug;
 
-      const nextIndex = (currentIndex + 1) % exampleURLs.length;
+      title.style.display = 'none';
+
+      const nextIndex = (currentIndex) % exampleURLs.length;
       const nextUrl = exampleURLs[nextIndex];
       // const nextTitleText = nextUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
       let nextTitleText = urlToNiceName(nextUrl);
-      nextPreview.textContent = 'Up Next: ' + nextTitleText;
-
-      if (currentIndex === 0) {
+      nextPreview.textContent = nextTitleText + ' ►' ;
+      // alert(currentIndex)
+      if (currentIndex === 1) {
         prevPreview.style.display = 'none';
       } else {
         prevPreview.style.display = '';
-        const prevIndex = (currentIndex - 1 + exampleURLs.length) % exampleURLs.length;
+        const prevIndex = (currentIndex - 2 + exampleURLs.length) % exampleURLs.length;
         const prevUrl = exampleURLs[prevIndex];
         // const prevTitleText = prevUrl.split('/').pop().replace('.html', '').replace(/-/g, ' ');
         let prevTitleText = urlToNiceName(prevUrl);
-        prevPreview.textContent = 'Previously: ' + prevTitleText;
+        prevPreview.textContent = '◄ ' + prevTitleText;
       }
 
       // Update dropdown to show the current example
-      dropdown.selectedIndex = currentIndex + 1; // +1 because the first option is "Select an Example"
+      dropdown.selectedIndex = currentIndex; // +1 because the first option is "Select an Example"
 
       resetCountdown();
     }
 
     function updateCountdown() {
       const countdown = document.getElementById('countdown');
-      countdown.textContent = countdownValue;
+
+      if (countdownValue === 5) {
+        countdown.textContent = '...';
+      } else {
+        countdown.textContent = countdownValue;
+      }
       countdownValue--;
 
       if (countdownValue < 0) {
@@ -265,14 +325,17 @@
     }
 
     function togglePlayPause(forcePause = false) {
-      const btn = document.getElementById('playPauseBtn');
+      //const btn = document.getElementById('playPauseBtn');
       isPlaying = forcePause ? false : !isPlaying;
 
-      btn.textContent = isPlaying ? 'Pause' : 'Play';
+      //btn.textContent = isPlaying ? 'Pause' : 'Play';
       if (isPlaying) {
         intervalId = setInterval(updateCountdown, 1000);
       } else {
-        clearInterval(intervalId);
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+        // clearInterval(intervalId);
       }
     }
 
@@ -293,9 +356,19 @@
       togglePlayPause(true); // Pause the timer on any document click
     });
 
+    /*
     document.getElementById('playPauseBtn').addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent the document click event from firing
       togglePlayPause();
+    });
+    */
+
+    document.getElementById('countdown').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent the document click event from firing
+      togglePlayPause();
+      // color the background of the clock
+      const countdown = document.getElementById('countdown');
+      countdown.style.backgroundColor = isPlaying ? '#d000ff' : '#000000';
     });
 
     document.getElementById('nextPreview').addEventListener('click', (e) => {
@@ -323,7 +396,7 @@
     function loadSelectedExample() {
       const dropdown = document.getElementById('exampleDropdown');
       const selectedValue = dropdown.value;
-
+      // alert(selectedValue)
       if (selectedValue) {
         currentIndex = parseInt(selectedValue, 10);
         togglePlayPause(true); // Force pause when selecting from dropdown
@@ -335,7 +408,7 @@
 
     function startGallery() {
       populateDropdown();
-      intervalId = setInterval(updateCountdown, 1000);
+      // intervalId = setInterval(updateCountdown, 1000);
       cycleExamples();
     }
 

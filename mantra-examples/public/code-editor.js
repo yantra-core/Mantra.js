@@ -19,6 +19,7 @@ function loadEditor(sourceUrl) {
 
         let sourceUrl = 'https://yantra.gg/mantra/examples' + jsSource.replace('.', '');
         let mantraUrl = 'https://yantra.gg/mantra.js';
+        let mantraWorldsUrl = 'https://yantra.gg/worlds.mantra.js';
         //code = stripIndent(code);
 
         let htmlTemplate = `<!DOCTYPE html>
@@ -28,6 +29,7 @@ function loadEditor(sourceUrl) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mantra.js Gallery Page - ${jsSource.replace('.js', '').replace('./', '').replace('-', ' ')}</title>
     <script src="${mantraUrl}"></script>
+    <script src="${mantraWorldsUrl}"></script>
 </head>
 <body>
     <script>

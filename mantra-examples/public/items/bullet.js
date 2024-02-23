@@ -20,7 +20,7 @@ game.start(function () {
   });
 
   // create a few entities in a straight line to shoot
-  game.build()
+  game.make()
     .Block()
     .position(100, 0, 0)
     .offset(48)

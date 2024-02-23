@@ -1,7 +1,7 @@
 export default function createBackground(game) {
 
 
-  game.build()
+  game.make()
     .type('BACKGROUND')
     .texture('garden')
     .body(false)
@@ -9,7 +9,7 @@ export default function createBackground(game) {
     .position(0, 0, -10)
     .createEntity();
 
-  game.build()
+  game.make()
 
     .type('BACKGROUND')
     .texture('sutra-tree')
@@ -18,7 +18,7 @@ export default function createBackground(game) {
     .position(0, 300, 32)
     .createEntity();
 
-  game.build()
+  game.make()
     .type('BACKGROUND')
     .texture('robot-arms-apartment')
     .kind('building')
@@ -27,7 +27,7 @@ export default function createBackground(game) {
     .position(900, -1800, -1)
     .createEntity();
 
-  game.build()
+  game.make()
     .type('BACKGROUND')
     .texture('planet-express-base')
     .kind('building')
@@ -37,7 +37,7 @@ export default function createBackground(game) {
     .createEntity();
 
 
-  game.build()
+  game.make()
     .type('BLOCK')
     .texture('tile-block')
     .size(200, 200, 1)
@@ -112,13 +112,13 @@ export default function createBackground(game) {
     }
   });
 
-  game.build().Teleporter().position(55, 71, 10)
+  game.make().Teleporter().position(55, 71, 10)
     .size(16)
     .width(16)
     .height(16)
     .createEntity();
 
-    game.build().Teleporter().position(-55, 71, 10)
+    game.make().Teleporter().position(-55, 71, 10)
     .size(16)
     .width(16)
     .height(16)

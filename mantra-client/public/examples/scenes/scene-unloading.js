@@ -28,7 +28,7 @@ game.start(function () {
       console.log("Initializing MyScene");
       this.game.setBackground('#000000');
 
-      let mySceneLoadedText = game.build().Text()
+      let mySceneLoadedText = game.make().Text()
         .text('MyScene loaded')
         .position(0, 0, -1)
         .size(400, 50)
@@ -39,14 +39,14 @@ game.start(function () {
         })
         .createEntity();
 
-      let grassBlock = game.build()
+      let grassBlock = game.make()
         .Block()
         .size(50, 50)
         .position(-32, -100)
         .texture('tile-block-0')
         .createEntity();
 
-      unloadSceneText = game.build().Text()
+      unloadSceneText = game.make().Text()
         .text(`Scene will unload ${100 - tickCount} ticks`)
         .position(0, 0)
         .size(400, 50)
@@ -79,9 +79,9 @@ game.start(function () {
 
     unload() {
       console.log("Unloading MyScene");
-
       // create text that says click to load scene
-      reloadText = game.build().Text()
+      reloadText = game.make()
+        .Text()
         .text('MyScene unloaded. Click to reload.')
         .position(0, 0)
         .size(400, 50)
@@ -92,7 +92,6 @@ game.start(function () {
           textAlign: 'center'
         })
         .createEntity();
-
     }
   }
 

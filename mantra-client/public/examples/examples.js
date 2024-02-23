@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
       let categoryName = Array.isArray(example.category) ? example.category[0] : example.category;
       let category = categories.find(cat => cat.name === categoryName);
 
-      console.log("category", category);
-      console.log('example', example);
+      //console.log("category", category);
+      //console.log('example', example);
       exampleElement.style.backgroundColor = category ? category.color : 'defaultColor'; // Use a default color if category is not found
 
       categoriesContainer.appendChild(exampleElement);
