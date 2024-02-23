@@ -83,14 +83,9 @@ You can just as easily copy the `mantra.js` file to your local system. No need t
 
 Using the [Sutra.js](https://github.com/yantra-core/Sutra.js) library `mantra` game logic can be created using JSON files or a Fluent JavaScript API. `sutra` supports `i18n` compatible exports to a human readable defintions like this:
 
-**Example Sutra**
-```
-if isBoss
-  if isHealthLow
-    entity::updateEntity
-      color: 0xff0000
-      speed: 5
-```
+### Examples
+
+[https://yantra.gg/mantra/examples/behaviors](https://yantra.gg/mantra/examples/behaviors)
 
 ## Start Local Websocket Server
 
@@ -188,55 +183,6 @@ game.connect('ws://localhost:8888'); // connects to a mantra-server instance at 
 ```js
 let game = new Game({ isServer: true });
 game.listen(8888); // starts a listening WebSocket server on port 8888
-```
-  
-## Game API
-
-### Entity API
-
-```js
-game.getEntity(entityId);
-game.createEntity(entityData)
-game.updateEntity(entityData)
-game.destroyEntity(entityId)
-```
-
-### Component API
-
-```js
-game.getComponent(entityId, componentType)
-game.addComponent(entityId, componentType, data)
-```
-
-### System API
-
-```js
-game.getSystem(systemName)
-game.addSystem(systemName, system)
-game.removeSystem(systemName)
-```
-
-### Collision API
-
-```js
-game.on('collisionStart', (event) => {})
-game.on('collisionActive', (event) => {})
-game.on('collisionEnd', (event) => {})
-```
-
-### Snapshot API
-
-```js
-game.getPlayerSnapshot(playerId)
-game.getSnapshot(snapshotId)
-```
-
-### Plugins API
-
-```js
-game.use(pluginInstance)
-game.use(pluginIdAsString)
-
 ```
 
 <a name="plugins"></a>
