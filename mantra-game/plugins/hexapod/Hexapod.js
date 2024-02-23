@@ -23,12 +23,13 @@ export default class Hexapod {
       height: 8,
       body: true,
       collisionStart: this.grow.bind(this),
-      update: this.think.bind(this),
+      update: this.swarmBehavior.bind(this),
       position: entityData.position
     };
   }
   
   grow(a, b, pair, context) {
+    let game = this.game;
     // eats bullets and grows
     if (context.target.type === 'BULLET') {
       let hexapod = context.owner;
@@ -53,7 +54,7 @@ export default class Hexapod {
 
   }
 
-  think(entity) {
+  swarmBehavior(entity) {
 
     let gameState = this.game.data;
     let game = this.game;
@@ -131,6 +132,85 @@ export default class Hexapod {
       position: newPosition
     });
 
+  }
+
+  groupLimitSwarmBehavior(entity) {
+    let gameState = this.game.data;
+    let game = this.game;
+    let Vector = this.game.systems.physics.Vector;
+  
+    const ALIGNMENT_FORCE = 0.1;
+    const COHESION_FORCE = 0.4;
+    const SEPARATION_FORCE = 0.81;
+    const GROUP_SEPARATION_FORCE = 1.2;
+    const PERCEPTION_RADIUS = 1500;
+    const GROUP_SEPARATION_RADIUS = 600;
+    const GROUP_LIMIT = 3;
+    const GROUP_TOLERANCE = 0.8; // 80% tolerance over the GROUP_LIMIT
+  
+    let hexapod = entity;
+    let hexapods = gameState.ents.HEXAPOD;
+    let alignment = { x: 0, y: 0 };
+    let cohesion = { x: 0, y: 0 };
+    let separation = { x: 0, y: 0 };
+    let groupSeparation = { x: 0, y: 0 };
+    let groupMembers = [];
+    let otherGroups = [];
+  
+    let targetForce = { x: 0, y: 0 };
+    if (typeof gameState.currentPlayer !== 'undefined' && gameState.currentPlayer) {
+      let target = gameState.currentPlayer.position;
+      let targetDirection = Vector.sub(target, hexapod.position);
+      targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+    }
+  
+    hexapods.forEach(otherHexapod => {
+      if (otherHexapod.id !== hexapod.id) {
+        let d = Vector.magnitude(Vector.sub(hexapod.position, otherHexapod.position));
+        let joinGroupChance = Math.random();
+  
+        if (d < PERCEPTION_RADIUS && (groupMembers.length < GROUP_LIMIT || joinGroupChance < GROUP_TOLERANCE)) {
+          groupMembers.push(otherHexapod);
+          alignment = Vector.add(alignment, otherHexapod.velocity);
+          cohesion = Vector.add(cohesion, otherHexapod.position);
+        } else if (d < GROUP_SEPARATION_RADIUS) {
+          otherGroups.push(otherHexapod);
+        }
+  
+        if (d < hexapod.width + otherHexapod.width) {
+          let diff = Vector.sub(hexapod.position, otherHexapod.position);
+          separation = Vector.add(separation, Vector.div(diff, d * d));
+        }
+      }
+    });
+  
+    otherGroups.forEach(otherHexapod => {
+      let diff = Vector.sub(hexapod.position, otherHexapod.position);
+      let d = Vector.magnitude(diff);
+      if (d > 0) {
+        groupSeparation = Vector.add(groupSeparation, Vector.div(diff, d * d));
+      }
+    });
+  
+    if (groupMembers.length > 0) {
+      alignment = Vector.div(alignment, groupMembers.length);
+      cohesion = Vector.div(cohesion, groupMembers.length);
+      cohesion = Vector.sub(cohesion, hexapod.position);
+    }
+  
+    alignment = Vector.mult(Vector.normalize(alignment), ALIGNMENT_FORCE);
+    cohesion = Vector.mult(Vector.normalize(cohesion), COHESION_FORCE);
+    separation = Vector.mult(Vector.normalize(separation), SEPARATION_FORCE);
+    groupSeparation = Vector.mult(Vector.normalize(groupSeparation), GROUP_SEPARATION_FORCE);
+  
+    let force = Vector.add(Vector.add(Vector.add(Vector.add(alignment, cohesion), separation), groupSeparation), targetForce);
+  
+    let newPosition = Vector.add(hexapod.position, Vector.mult(force, 1));
+    newPosition.z = 1; // for now
+    game.updateEntity({
+      id: hexapod.id,
+      position: newPosition
+    });
   }
 
   // TODO: rename to create? we probably need this.createEntity scope preserved for scene
