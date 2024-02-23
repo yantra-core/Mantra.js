@@ -162,8 +162,15 @@ plugins.forEach((plugin, index) => {
 
       // If last plugin, write checksums to file
       if (index === plugins.length - 1) {
-        const checksumsFilePath = './lib/Game/pluginChecksums.js'
-        const checksumsContent = `export default ${JSON.stringify(checksums)};`;
+        const checksumsFilePath = './lib/Game/pluginChecksums.js';
+
+        // sort the checksums object by key
+        const sortedChecksums = Object.keys(checksums).sort().reduce((acc, key) => {
+          acc[key] = checksums[key];
+          return acc;
+        }, {});
+
+        const checksumsContent = `export default ${JSON.stringify(sortedChecksums, true, 2)};`;
         fs.writeFileSync(checksumsFilePath, checksumsContent);
         console.log('All plugins bundled, checksums written to checksums.js');
       }
