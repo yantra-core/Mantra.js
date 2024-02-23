@@ -14,30 +14,33 @@
 
 ## Introduction
 
-Welcome to `@yantra-core/mantra` –  a versatile Javascript game development framework
+Welcome. Mantra.js is a Javascript game dev framework.
 
-Mantra lets you focus on game logic and design without worrying about the complexities of physics simulation and high-performance netcode. 
-
-You can start building a simple offline game in seconds using your favorite libraries, take this same game code, and effortlessly run it later as a high-performance authoritative game server in a serverless environment. 
+Easiest way to get started: [https://yantra.gg/mantra/gallery]([https://yantra.gg/mantra/gallery])
 
 # Mantra itself is very small and very fast
 
 The [Mantra.js](https://yantra.gg/mantra.js) file is currently under `111kb` and will most likely get smaller. It's best to think of Mantra as the orchestrator for your game. You can import Mantra once and immediately begin adding new functionality dynamically. 
 
+Mantra lets you focus on game logic and design without worrying about the complexities of physics simulation and high-performance netcode. 
+
+You can start building a simple offline game in seconds using your favorite libraries, take this same game code, and effortlessly run it later as a high-performance authoritative game server in a serverless environment. 
+
 Let us help guide you on your game development journey, and we promise you will be saying Mantra every day.
 
 # Get Started Now
 
+The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
+
 ## Examples Gallery
+
+[https://yantra.gg/mantra](https://yantra.gg/mantra)
+
+## 100+ Code Examples
 
 [https://yantra.gg/mantra/examples](https://yantra.gg/mantra/examples)
 
-
 ## Try Mantra Worlds ( ALPHA )
-
-The best way to learn about Mantra.js is to play. Visit the Home World and start playing in fractions of a second.
-
-[https://yantra.gg/mantra](https://yantra.gg/mantra)
 
 #### Home World
 
