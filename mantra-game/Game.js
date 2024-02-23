@@ -144,7 +144,21 @@ class Game {
   // Plugin APIs
   //
   loadPluginScript(scriptUrl) {
+
     console.log('Loading', scriptUrl)
+
+    // check to see if there is a checksum to load with
+    if (typeof this.pluginChecksums === 'object') {
+      let checksum = this.pluginChecksums[scriptUrl];
+      if (typeof checksum === 'string') {
+        scriptUrl += '?c=' + checksum;
+      }
+    }
+
+    // Remark: We could enable secure loading of plugins by checking the checksum
+    // of the returned script and comparing it to the checksum in the pluginChecksums object
+    // This would require usage of fetch() api instead of <script> tag
+    // 2/23/2023- Performance + Complexity cost for little security gain
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = scriptUrl;

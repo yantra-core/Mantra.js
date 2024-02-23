@@ -30,6 +30,7 @@ import loadPluginsFromConfig from '../loadPluginsFromConfig.js';
 import Preloader from "./Preloader.js";
 
 // Utility function for loading external assets
+import pluginChecksums from './pluginChecksums.js'; // checksums for plugins
 import loadScripts from '../util/loadScripts.js';
 import loadCSS from '../util/loadCSS.js';
 
@@ -156,6 +157,9 @@ export default function construct(game, plugins = []) {
     return new game.EntityBuilder(game);
   };
   
+  // maintains a list of plugin checksums for cache busting and security
+  game.pluginChecksums = pluginChecksums;
+
   // Bind loadScripts from util
   game.loadScripts = loadScripts.bind(game);
   // Bind loadCSS from util

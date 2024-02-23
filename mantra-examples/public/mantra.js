@@ -984,7 +984,7 @@ _removeEventHandler(eventName, handler) {
 
 */
 
-},{"../plugins/entity/lib/util/ensureColorInt.js":26}],5:[function(require,module,exports){
+},{"../plugins/entity/lib/util/ensureColorInt.js":27}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1166,6 +1166,19 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "loadPluginScript",
     value: function loadPluginScript(scriptUrl) {
       console.log('Loading', scriptUrl);
+
+      // check to see if there is a checksum to load with
+      if (_typeof(this.pluginChecksums) === 'object') {
+        var checksum = this.pluginChecksums[scriptUrl];
+        if (typeof checksum === 'string') {
+          scriptUrl += '?c=' + checksum;
+        }
+      }
+
+      // Remark: We could enable secure loading of plugins by checking the checksum
+      // of the returned script and comparing it to the checksum in the pluginChecksums object
+      // This would require usage of fetch() api instead of <script> tag
+      // 2/23/2023- Performance + Complexity cost for little security gain
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
         script.src = scriptUrl;
@@ -1679,7 +1692,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
   return Game;
 }();
 
-},{"./Component/Component.js":2,"./lib/Game/construct.js":11,"./lib/Game/start.js":12,"./lib/Game/unload.js":13,"./lib/Game/use.js":14}],6:[function(require,module,exports){
+},{"./Component/Component.js":2,"./lib/Game/construct.js":11,"./lib/Game/start.js":13,"./lib/Game/unload.js":14,"./lib/Game/use.js":15}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1855,7 +1868,7 @@ var SystemsManager = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = SystemsManager;
 
-},{"../lib/eventEmitter.js":16}],7:[function(require,module,exports){
+},{"../lib/eventEmitter.js":17}],7:[function(require,module,exports){
 "use strict";
 
 var MANTRA = {};
@@ -2260,6 +2273,7 @@ var _TimersComponent = _interopRequireDefault(require("../../Component/TimersCom
 var _storage = _interopRequireDefault(require("../storage/storage.js"));
 var _loadPluginsFromConfig = _interopRequireDefault(require("../loadPluginsFromConfig.js"));
 var _Preloader = _interopRequireDefault(require("./Preloader.js"));
+var _pluginChecksums = _interopRequireDefault(require("./pluginChecksums.js"));
 var _loadScripts = _interopRequireDefault(require("../util/loadScripts.js"));
 var _loadCSS = _interopRequireDefault(require("../util/loadCSS.js"));
 var _switchWorlds = _interopRequireDefault(require("../switchWorlds.js"));
@@ -2276,6 +2290,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 // Game local data storage
 // Loads plugins from config, can be disabled with gameConfig.loadDefaultPlugins = false
 // Utility function for loading external assets
+// checksums for plugins
 function construct(game) {
   var plugins = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   // fetch the gamegame.config from localStorage
@@ -2326,8 +2341,9 @@ function construct(game) {
     game.config.hzMS = 1000 / game.config.fps;
     // set precision to 3 decimal places, preserve the last repeating digit
     game.config.hzMS = game.config.hzMS.toFixed(3);
-    console.log('Setting custom FPS:', game.config.fps);
+    // console.log('Setting custom FPS:', game.config.fps);
   }
+
   console.log("Mantra starting...");
 
   // Define the scriptRoot variable for loading external scripts
@@ -2338,7 +2354,9 @@ function construct(game) {
   // Could be another CDN or other remote location
   // For local development, try game.scriptRoot = './';
   if (game.config.gameRoot) {
-    console.log("Mantra is using the follow path as it's root for both scripts and assets:", game.config.gameRoot);
+    if (!game.isServer) {
+      console.log("Mantra is using the follow path as it's root for both scripts and assets:", game.config.gameRoot);
+    }
     game.gameRoot = game.config.gameRoot;
     game.scriptRoot = game.config.gameRoot;
     game.assetRoot = game.config.gameRoot;
@@ -2348,11 +2366,11 @@ function construct(game) {
   // Remark: options scope being removed, everything should be mounted on GameConfig
   //
   if (game.config.options.scriptRoot) {
-    console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot);
+    // console.log("Mantra is using the follow path as it's script root:", game.config.options.scriptRoot)
     game.scriptRoot = game.config.options.scriptRoot;
   }
   if (game.config.options.assetRoot) {
-    console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot);
+    // console.log("Mantra is using the follow path as it's asset root:", game.config.options.assetRoot)
     game.assetRoot = game.config.options.assetRoot;
   }
   //
@@ -2368,7 +2386,9 @@ function construct(game) {
     console.log("Mantra is using the follow path as it's asset root:", game.config.assetRoot);
     game.assetRoot = game.config.assetRoot;
   }
-  console.log("new Game(".concat(JSON.stringify(game.config, true, 2), ")"));
+  if (typeof window !== 'undefined') {
+    console.log("new Game(".concat(JSON.stringify(game.config, true, 2), ")"));
+  }
 
   // Bind eventEmitter methods to maintain correct scope
   game.on = _eventEmitter["default"].on.bind(_eventEmitter["default"]);
@@ -2391,6 +2411,9 @@ function construct(game) {
   game.make = function () {
     return new game.EntityBuilder(game);
   };
+
+  // maintains a list of plugin checksums for cache busting and security
+  game.pluginChecksums = _pluginChecksums["default"];
 
   // Bind loadScripts from util
   game.loadScripts = _loadScripts["default"].bind(game);
@@ -2555,7 +2578,96 @@ function construct(game) {
   }
 }
 
-},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../Entity/EntityBuilder.js":4,"../../System/SystemsManager.js":6,"../createDefaultPlayer.js":15,"../eventEmitter.js":16,"../gameTick.js":17,"../loadPluginsFromConfig.js":18,"../localGameLoop.js":19,"../onlineGameLoop.js":20,"../storage/storage.js":22,"../switchWorlds.js":23,"../util/loadCSS.js":24,"../util/loadScripts.js":25,"./Lifecycle.js":8,"./Preloader.js":9}],12:[function(require,module,exports){
+},{"../../Component/ActionRateLimiter.js":1,"../../Component/Component.js":2,"../../Component/TimersComponent.js":3,"../../Entity/EntityBuilder.js":4,"../../System/SystemsManager.js":6,"../createDefaultPlayer.js":16,"../eventEmitter.js":17,"../gameTick.js":18,"../loadPluginsFromConfig.js":19,"../localGameLoop.js":20,"../onlineGameLoop.js":21,"../storage/storage.js":23,"../switchWorlds.js":24,"../util/loadCSS.js":25,"../util/loadScripts.js":26,"./Lifecycle.js":8,"./Preloader.js":9,"./pluginChecksums.js":12}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _default = exports["default"] = {
+  "./plugins/LocalClient.js": "62886ed824f7bc714cde5664ecca9447e6d2a047eb65b5309f2dad765cef746e",
+  "./plugins/Block.js": "8a1f60d0008b88c23af3e4507883d51ca37b3e34c79c6d45e7e509f458cc425d",
+  "./plugins/Platform.js": "d6ea32e84aac9d6dfe517ce910708e6536a98c9cb28da1e71ef497c41bc52080",
+  "./plugins/Behaviors.js": "7b7a58950a66608f894d22cedc281c75c15c5b169d763a525c0d0c32a234e101",
+  "./plugins/Flame.js": "15b2ccbdc64f1779e22a354d7a67328c26541d9898433cbd463e5669ec571abb",
+  "./plugins/Player.js": "ff1d070119fbb38b26f7a307a8d20f4c515a8a28385e48f48330b4c01e56ca0b",
+  "./plugins/Border.js": "776ff9a840aee4e40b98ac21a2ece7846157de59c843f7fa335d0497baaa2b7a",
+  "./plugins/Bomb.js": "f7a362f2807f41676bcc49901c6c16d0a01b8d741dfddcd726a2d2b2b1619621",
+  "./plugins/Sword.js": "4ed88fd1e3f9fafe239d88db8b3bb3ee1189fff9c7b3c9ff54ac9b151c58fd32",
+  "./plugins/Draggable.js": "58c9cabeb501780b0cb153f72a932bc50b4cb096bef8229e6458f9f1ff5374f9",
+  "./plugins/Creator.js": "61d6002a0e5d51df00e5735ee8ffeeaecb7083e9f5ca6747a0991ef9bb39c306",
+  "./plugins/LoadingScreen.js": "a83930e9d45f160bc2f61af8894283bda3e58488e449ccde5374feda9f236612",
+  "./plugins/PingTime.js": "df3ff245078e918c5c09e017266c29e58973a6b97e025c931bc25af0cc176ffe",
+  "./plugins/Label.js": "16cd42e7c61bbb5b28cf22fcc4e5e1fc8a6a25a42f237fd4c7c6379d176d1774",
+  "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
+  "./plugins/GravityWell.js": "a213708152c92ddbdd30a0c6b553abd368627f5adaaab72b82b181502b8781ee",
+  "./plugins/Boomerang.js": "90364957a5c5ea213c226e07ad8e96150af836d57dd96d92ee59c0ba8d3eccf1",
+  "./plugins/Bullet.js": "e93090b3fd0f8fe97d8769cdff8b5c0c3bb26ac4dc7e8f0fd58a9331acf8d83c",
+  "./plugins/YantraGUI.js": "e9416f1e539bedae38a4c85d6fdce421b4e452cda1986b4495ae0481a3aea8a6",
+  "./plugins/SwitchGraphics.js": "154775d7459b8a7c08be7f8ce08b3d5a2292df00b10d71eaf2fa5e9de1833f44",
+  "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
+  "./plugins/Keyboard.js": "9bc6e95c0369af1c55c26aca65c28e623e79bd3179254d741ed4d336d93ab838",
+  "./plugins/Lifetime.js": "126648fa1b787f25fa302e56603a85d2073ab372b97d66b177930c27c4ae9f68",
+  "./plugins/Collectable.js": "a428d356c2fc2ce1a14b3badc8044e26eb65ed5a9e810c7c020f8a5483f9f46b",
+  "./plugins/Text.js": "387eeeb7a8ba1396b067933bcf6d866e5df2fe58073afa39efdb219a34175179",
+  "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
+  "./plugins/GhostTyper.js": "d13d0a0a2aa3eaefc3f5c50fa7a0a969dea114afa1fb5746c2954e1b27d2e8a6",
+  "./plugins/Midi.js": "3c8b738ed48341c4221cf20e53f631907935bdf722ebbcafb2dee3a40f544fba",
+  "./plugins/Hexapod.js": "d42dad1b18b6840e064991599292cebb60958a6d2d17638b44ac0ed9e41e9a68",
+  "./plugins/BabylonStarField.js": "bcbeb93b6bd0a1490055f9ad862177173fe51d2c2fcbd964a899d519017b1b72",
+  "./plugins/Droppable.js": "3861edc41aee15b701ceeff2c81a5d2ab039885921830c48594417b4cf4f7c72",
+  "./plugins/FloatyTyper.js": "0e42af84fa1f30be41ce34969bc625ee6d1c275e557d832be035be76c8de1bcd",
+  "./plugins/TileSet.js": "730987abc1a69c466047444b005ed25d49a6c3dab03c8128701e086e29eb6c57",
+  "./plugins/RadialMenu.js": "4151c73e5be8a17f8d3fd44c218a323fd36c3ed120eb27a6829f2305b1f00d62",
+  "./plugins/Tower.js": "2059fe468cc2c58193863292ef7e07d6c776de9a631e460a4d323dd8e428278f",
+  "./plugins/Teleporter.js": "f6739f8fe1682ac41881d1f326ce10072b52e21868b660d6723d13ea9e0aa4fd",
+  "./plugins/CurrentFPS.js": "6e200e9d32a7d223d64f2399006f289c0e276e75bca63e7826622a62ee2917da",
+  "./plugins/Key.js": "14be871e2d98ae2a84558d4680c456da0b717ab32f14ff6e3db394791b3be456",
+  "./plugins/Collisions.js": "f123f7b3154b1749306aabba1ec65bc81958d67fd926994c3e51ebfa36d63375",
+  "./plugins/Mouse.js": "b9cc9f53c8985b62e7cd8aa2be0966cc599d2b128b5574b8210989a13202ef28",
+  "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
+  "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
+  "./plugins/FroggerMovement.js": "43df155f295793a316270e286bee3943cc4805e93ba5da366da7f139cff687c2",
+  "./plugins/PongMovement.js": "519a2acd2ac6f47789322111b81d53240e5102a28fb31b4665f2794bb80d290d",
+  "./plugins/PacManMovement.js": "e7b7dbe97b3192004c8bb2c58e952e27e2281a9604785faf3d0ee43771444205",
+  "./plugins/RBush.js": "83680f4f42de4695e7f2ba92d7e0561fe7cc30d3be67bd6fb97fe4c246fe66f4",
+  "./plugins/ChronoControl.js": "3d1eb99a514dc0726c3055371cf47fb32e25190a4f7c16b823792ecc7858dfa1",
+  "./plugins/MatterPhysics.js": "326a33fc8455237784c221a83005ca45d50308de7c9e4ae26979f35f12514e62",
+  "./plugins/StarField.js": "d33e4ee1e02b8719edc5b7988b3eb2ded91a214dc911b3d800b52bfe19572669",
+  "./plugins/Inspector.js": "fda5c903185dfdeba99096d42f58ff7daafc757b016090bd440c74770dc2fc53",
+  "./plugins/Scoreboard.js": "7556ebd8c54d1d05466c4e857ba0608bfb1e60fc86925dd01183a52c5dc6f6ca",
+  "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",
+  "./plugins/PluginExplorer.js": "10a1a744380c0e425c603cf05156a6f12b7f0365daacf4b3765d88789d3e2bf4",
+  "./plugins/GameEditorGui.js": "73b832620d31a9a20253bbb7dad0da557b6795fb6aa32fdcbb543ee4f82f84ad",
+  "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
+  "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
+  "./plugins/ControlsGUI.js": "d54f58ed4eabb78b5897a2428591e1ef0256d5d67773dcbe13c4d75f8075e63b",
+  "./plugins/Nes.js": "ac0daf03fb84c715d217d68ac477f349f7250c651ab677922f91b2fc30e15a4f",
+  "./plugins/EntitiesGUI.js": "bc66200e73eebd08e38cfc060d2f4d6b748aeac903d2d314b8c23c11c3bc3d0f",
+  "./plugins/PluginsGUI.js": "c8259a06f4fe79bf42c8365d224d542da67100c0a66d4bf9d1eb45256363295b",
+  "./plugins/EventInspector.js": "6ca05415864ef09766a010f0176db7d9caac6020df1252a3a680daee4f2b4fd1",
+  "./plugins/Gamepad.js": "6eac485cee65c05d5a46f86d0d4b02ecdf827a93f11f1ae45454e4a6ff41f4ba",
+  "./plugins/GamepadGUI.js": "f9b8b834be215bb38a1e20112cdb79ebc4098e22bfbe588add62e4507d14a973",
+  "./plugins/Tone.js": "d108292b7b9ca54609200b15005a28d4f4c7ba83f882e62b1e3e01f85a3b5d86",
+  "./plugins/Graphics.js": "e83dc4884aec0f3a3c980f4b20308e46884a605d89da186798d2039abd35bb1a",
+  "./plugins/BabylonGraphics.js": "90a03683013b2c9ad7e51e5bbabd120359752c400daed81a248a22086eccefbe",
+  "./plugins/SnapshotSize.js": "7c7d856ce1b439df52123474c1089d930b3c81582388c8e1133108d8d2d3fde7",
+  "./plugins/EntityInput.js": "9c56bbc6c2b3b4c5a985f8e7f3488b5cce5e6d0ba99639be1bc23cfc096ab1e7",
+  "./plugins/EntityMovement.js": "95617e5e5d02350640d591f545a736802d23edb4f157370f3ede85d0eecc6e46",
+  "./plugins/PhysXPhysics.js": "42d70e5cbde1d94b4895a92b6d51739a05a4762c41c208b32b2e0b1188dd7879",
+  "./plugins/SnapshotManager.js": "c176ef73983f464725ec172bdd42217435dc5b6020d87dbfb451612ade122375",
+  "./plugins/CSSGraphics.js": "fbe41705edcbb4b1adcf7b9367811140a9e3a0443d35102f2f1cbb42b773df36",
+  "./plugins/Timers.js": "a851809e3b6281010be54bef5f96a904ad687a860db2fc76fcb2e859adc40c23",
+  "./plugins/ThreeGraphics.js": "02a91241d96846b0729e8e6e87658afeb6fc0735772cbc1231df7d844b6a2156",
+  "./plugins/ASCIIGraphics.js": "0c3b325faceec0059b084ac9eb033a01de2458632d106c47977076f2d2745372",
+  "./plugins/SutraGUI.js": "e45bf5a66b9357d88b10f8ea3673cf57e381bb95890414be9bbf9904b386d3ac",
+  "./plugins/Sutra.js": "0dad85de23e251d907c0f0c7366db1d34a7a5da26a9e4152665a6cc487f524b0",
+  "./plugins/PhaserGraphics.js": "e14cc1c2e7256c540595b170447be93e0b38feae954772709084026a967d09e7",
+  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed"
+};
+
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2630,7 +2742,7 @@ function start(cb) {
   });
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -2687,7 +2799,7 @@ function unload(game) {
   }();
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2957,7 +3069,7 @@ function extendEntityBuilder(game, pluginInstance) {
   };
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3038,7 +3150,7 @@ function createDefaultPlayer() {
 }
 ;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3180,7 +3292,7 @@ eventEmitter.listenerCount = function (eventPattern) {
 };
 var _default = exports["default"] = eventEmitter;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3260,7 +3372,7 @@ function gameTick() {
 }
 var _default = exports["default"] = gameTick;
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3424,7 +3536,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":27,"../plugins/physics/Physics.js":28,"../plugins/typer-ghost/GhostTyper.js":30}],19:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":28,"../plugins/physics/Physics.js":29,"../plugins/typer-ghost/GhostTyper.js":31}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3509,7 +3621,7 @@ function _requestAnimationFrame(callback) {
 }
 var _default = exports["default"] = localGameLoop;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3597,7 +3709,7 @@ function onlineGameLoop(game) {
 }
 var _default = exports["default"] = onlineGameLoop;
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3650,7 +3762,7 @@ var MemoryBackend = /*#__PURE__*/function () {
 }();
 var _default = exports["default"] = MemoryBackend;
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3730,7 +3842,7 @@ var storage = function () {
 }();
 var _default = exports["default"] = storage;
 
-},{"./MemoryBackend.js":21}],23:[function(require,module,exports){
+},{"./MemoryBackend.js":22}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3837,7 +3949,7 @@ function _switchWorlds() {
   return _switchWorlds.apply(this, arguments);
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3934,7 +4046,7 @@ function _loadCSS() {
   return _loadCSS.apply(this, arguments);
 }
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4030,7 +4142,7 @@ function _loadScripts() {
   return _loadScripts.apply(this, arguments);
 }
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4076,7 +4188,7 @@ function ensureColorInt(color) {
   return parseInt('000000', 16); // Default to black
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4401,7 +4513,7 @@ var LoadingScreen = /*#__PURE__*/function () {
 _defineProperty(LoadingScreen, "id", 'loading-screen');
 var _default = exports["default"] = LoadingScreen;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4475,7 +4587,7 @@ var Physics = exports["default"] = /*#__PURE__*/function () {
 _defineProperty(Physics, "id", 'physics');
 _defineProperty(Physics, "removable", false);
 
-},{"./applyGravity.js":29}],29:[function(require,module,exports){
+},{"./applyGravity.js":30}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4506,7 +4618,7 @@ function applyGravity(ent1, ent2, gravity) {
   });
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
