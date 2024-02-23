@@ -2,6 +2,7 @@ import browserify from 'browserify';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import uglifyify from 'uglifyify';
 
 import pluginChecksums from './lib/Game/pluginChecksums.js';
 
@@ -148,33 +149,49 @@ plugins.forEach((plugin, index) => {
 
   const fileName = getFileName(plugin);
   const outputFilePath = `../mantra-client/public/plugins/${fileName}.js`;
+  const minifiedOutputFilePath = `../mantra-client/public/plugins/${fileName}.min.js`; // Path for minified file
 
-  const b = browserify(plugin, { standalone: `PLUGINS.${getFileName(plugin)}` })
-    .transform('babelify', { presets: ['@babel/preset-env'] }) // Ensure babelify uses the preset-env
+  // Bundle for the original (non-minified) version
+  browserify(plugin, { standalone: `PLUGINS.${fileName}` })
+    .transform('babelify', { presets: ['@babel/preset-env'] })
     .bundle()
-    .on('error', function (err) { console.error(err); }) // Add error handling to catch and log bundling errors
+    .on('error', err => console.error(err))
     .pipe(fs.createWriteStream(outputFilePath))
-    .on('finish', function () {
-      // Compute checksum of the bundled file
+    .on('finish', () => {
       const checksum = computeChecksum(outputFilePath);
-      checksums['./plugins/' + fileName + '.js'] = checksum;
-      logStep(plugin, `Bundling completed with checksum: ${checksum}`);
+      checksums['./plugins/' + fileName + '.js'] = checksum; // Store checksum for the original file
+      logStep(plugin, `Original file bundling completed with checksum: ${checksum}`);
+    });
 
-      // If last plugin, write checksums to file
+  // Bundle for the minified version
+  browserify(plugin, { standalone: `PLUGINS.${fileName}` })
+    .transform('babelify', { presets: ['@babel/preset-env'] })
+    .transform(uglifyify, { global: true }) // Add uglifyify transform for minification
+    .bundle()
+    .on('error', err => console.error(err))
+    .pipe(fs.createWriteStream(minifiedOutputFilePath))
+    .on('finish', () => {
+      const checksum = computeChecksum(minifiedOutputFilePath);
+      checksums['./plugins/' + fileName + '.min.js'] = checksum; // Store checksum for minified file
+      logStep(plugin, `Minified file bundling completed with checksum: ${checksum}`);
+
+      // If last plugin and last version (minified), write checksums to file
       if (index === plugins.length - 1) {
         const checksumsFilePath = './lib/Game/pluginChecksums.js';
 
-        // sort the checksums object by key
+        // Sort the checksums object by key
         const sortedChecksums = Object.keys(checksums).sort().reduce((acc, key) => {
           acc[key] = checksums[key];
           return acc;
         }, {});
 
-        const checksumsContent = `export default ${JSON.stringify(sortedChecksums, true, 2)};`;
+        const checksumsContent = `export default ${JSON.stringify(sortedChecksums, null, 2)};`;
         fs.writeFileSync(checksumsFilePath, checksumsContent);
         console.log('All plugins bundled, checksums written to checksums.js');
       }
     });
+
+
   // After bundling the plugin, copy its subdirectories
   const pluginDir = path.dirname(plugin);
   const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;

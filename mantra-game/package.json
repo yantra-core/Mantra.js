@@ -26,8 +26,8 @@
     "sinon": "^17.0.1",
     "tap": "^18.5.2",
     "tape": "^5.7.2",
-    "three": "^0.161.0"
-
+    "three": "^0.161.0",
+    "uglifyify": "^5.0.2"
   },
   "dependencies": {
     "@yantra-core/sutra": "^1.8.0",

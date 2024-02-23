@@ -27,7 +27,7 @@ export default function use(game) {
       // Store the loading promise
       game.loadingPluginPromises[pluginId] = (async () => {
         try {
-          const scriptUrl = `${basePath}${pluginId}.js`;
+          const scriptUrl = `${basePath}${pluginId}.min.js`;
           await game.loadPluginScript(scriptUrl);
           console.log(`Loaded: ${pluginId}`);
 
