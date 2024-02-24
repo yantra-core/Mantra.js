@@ -1193,79 +1193,11 @@ function inflateBox(entityElement, entityData) {
       entityElement.style[key] = entityData.style[key];
     });
   }
-  if (entityData.type === 'BLOCK' && entityData.kind === 'Tile') {
-    // TODO: refactor API
-    // tileFlip(entityElement, hexColor, getTexture, entityData);
-  }
 
   // console.log('entityElement', entityElement)
 
   this.updateEntityPosition(entityElement, entityData);
   return entityElement;
-}
-function tileFlip(entityElement, hexColor, getTexture, entityData) {
-  var texture = getTexture(entityData.texture);
-  // Calculate animation duration based on X and Y coordinates
-  var duration = Math.abs(entityData.position.x) + Math.abs(entityData.position.y);
-  duration = duration / 500; // Divide by 1000 to get a duration in seconds
-
-  // cap duration at min of 0.5
-  duration = Math.max(duration, 0.1);
-  duration = Math.min(duration, 3.3);
-
-  // Create a wrapper element for the flip effect
-  var flipWrapper = document.createElement('div');
-  flipWrapper.style.position = 'relative';
-  flipWrapper.style.width = '100%';
-  flipWrapper.style.height = '100%';
-  flipWrapper.style.perspective = '1000px'; // Set the perspective for the 3D effect
-
-  // Create the front and back faces of the tile
-  var frontFace = document.createElement('div');
-  frontFace.style.position = 'absolute';
-  frontFace.style.width = '100%';
-  frontFace.style.height = '100%';
-  frontFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
-  frontFace.style.animation = "flip ".concat(duration, "s ease"); // Set the animation using keyframes
-  frontFace.style.background = "url('".concat(texture.url, "')");
-  frontFace.style.backgroundRepeat = 'no-repeat';
-  frontFace.style.backgroundSize = 'cover';
-  var backFace = document.createElement('div');
-  backFace.style.position = 'absolute';
-  backFace.style.width = '100%';
-  backFace.style.height = '100%';
-  backFace.style.backfaceVisibility = 'hidden'; // Hide the back face during the animation
-  backFace.style.animation = "flip ".concat(duration, "s ease"); // Set the animation using keyframes
-  backFace.style.transform = 'rotateY(180deg)'; // Initial rotation for the back face, flipped
-  backFace.style.background = hexColor;
-
-  // Append front and back faces to the wrapper
-  flipWrapper.appendChild(frontFace);
-  flipWrapper.appendChild(backFace);
-
-  // Append the wrapper to the entityElement
-  entityElement.appendChild(flipWrapper);
-
-  // Remove the flipWrapper after animation is complete
-  flipWrapper.addEventListener('animationend', function () {
-    //entityElement.background = 
-    entityElement.style.background = "url('".concat(texture.url, "')");
-    entityElement.style.backgroundRepeat = 'no-repeat';
-    entityElement.style.backgroundSize = 'cover';
-
-    // clear animations styles
-    frontFace.style.animation = '';
-    frontFace.style.transform = '';
-    backFace.style.animation = '';
-    backFace.style.transform = '';
-
-    //flipWrapper.removeChild(frontFace);
-    //flipWrapper.removeChild(backFace);
-    if (entityElement) {
-      //entityElement.removeChild(flipWrapper);
-    }
-    flipWrapper.remove();
-  });
 }
 
 },{}],17:[function(require,module,exports){

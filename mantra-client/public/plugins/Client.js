@@ -1023,25 +1023,25 @@ var defaultAssets = {
       arrow: {
         frames: [{
           x: -16,
-          y: -494
+          y: -496
         }]
       },
       arrowA: {
         frames: [{
           x: 0,
-          y: -494
+          y: -496
         }]
       },
       arrowB: {
         frames: [{
           x: -32,
-          y: -494
+          y: -496
         }]
       },
       arrowC: {
         frames: [{
           x: -48,
-          y: -494
+          y: -496
         }]
       },
       arrowD: {

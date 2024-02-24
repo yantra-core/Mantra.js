@@ -1577,6 +1577,14 @@ var Game = exports.Game = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "setConfig",
+    value: function setConfig(config) {
+      // for each property in config, set it on game.config
+      for (var prop in config) {
+        this.config[prop] = config[prop];
+      }
+    }
+  }, {
     key: "reset",
     value: function reset(mode) {
       var clearSutra = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -2614,14 +2622,14 @@ var _default = exports["default"] = {
   "./plugins/Boomerang.min.js": "ab95b39bf542fdf14a638c2ae80b88e4a5b0b16bfc90fd710ed9bc1319deccc4",
   "./plugins/Border.js": "776ff9a840aee4e40b98ac21a2ece7846157de59c843f7fa335d0497baaa2b7a",
   "./plugins/Border.min.js": "3584e32fb60aae9ee6a291e4b3a89722f9eb62b345bc0b68cc06b450c854ade5",
-  "./plugins/Bullet.js": "e93090b3fd0f8fe97d8769cdff8b5c0c3bb26ac4dc7e8f0fd58a9331acf8d83c",
-  "./plugins/Bullet.min.js": "8689e737faac219536d215b2f2b3a327fbead5fa3353d4b16499e8bd5c50b336",
+  "./plugins/Bullet.js": "e74dc967fd6ee2a3c3c1073a2f153e75813a07e004e3d024a67d8035866d65e9",
+  "./plugins/Bullet.min.js": "912b40049e8fdac7c1c5d5f25e4ffa209f65472562521e0111686eced5599053",
   "./plugins/Button.js": "c3532f5e666df486e436f3cadfe7e908dcff50b192cece9e99e5d829db2f82fa",
   "./plugins/Button.min.js": "2ff07541d6d72e0f04ae8e7bc72943ea295e9bd4a3adc6e1a9f9f606805321e1",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "b87823242361c0b8b3c00444547455b33c331e37dc6ddcf81bb7601eb75f27c7",
-  "./plugins/CSSGraphics.min.js": "a7ca29c34d68bd9582b5c7869c9b171986361c6427a72d6eb0b906a8d616eb44",
+  "./plugins/CSSGraphics.js": "10ae389e00ecce2cc17e2e5120bd1e82dd8c86e0e3553b5d67d3d4d9d6e17b65",
+  "./plugins/CSSGraphics.min.js": "c90ea67d9499f85c8b913a6081210384a19fe4f6e9e73c4600d4e5a46362f011",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
   "./plugins/Checkbox.min.js": "788db3172873ba0a5c8f6f596be2c54a55ba875d1b9759af1758ea2f2107494c",
   "./plugins/ChronoControl.js": "3d1eb99a514dc0726c3055371cf47fb32e25190a4f7c16b823792ecc7858dfa1",
@@ -2670,8 +2678,8 @@ var _default = exports["default"] = {
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
   "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
-  "./plugins/Hexapod.js": "0ac8415892d74c55455cd52fe877f9a77eea7b9894768119c7fbef1064c8f92a",
-  "./plugins/Hexapod.min.js": "50629839c93dd7b2c49bb6bcb0ae663e0ca14b482a0439cc859a99854327dcb0",
+  "./plugins/Hexapod.js": "93a22407d5ee45eff171fb144221e419191369a7775a2af59a56a01a9ca822bf",
+  "./plugins/Hexapod.min.js": "fec5b1c81df0044a1fbdba1baae3587f606b381dde94f5a81f4ccbcc673d972e",
   "./plugins/Iframe.js": "70af66a53a453ecf3767a5b9f52fba601035764fe17c75df59df0e9982f12797",
   "./plugins/Iframe.min.js": "b2796026ba715d3ffd4e5cf8d7d914b51de102deff9b24e2ab56e0ff08bf5cc3",
   "./plugins/Input.js": "d0684ed311bbfacaf094fbbf4b70e23296b7fdc077e4e3f92e6ee3487a5ce83f",
@@ -2748,7 +2756,7 @@ var _default = exports["default"] = {
   "./plugins/Sword.min.js": "68708f6deb1b0b7de5a4fda1eabf50f1bc12d2a97433b491a72deabba506e33d",
   "./plugins/Teleporter.js": "c28f7b00415ef15c0f9555d5839e6ec7a65fc74464b279dc90cbf0b684fbc3d5",
   "./plugins/Teleporter.min.js": "13940bc70dd287c8fd87aec4db788d0eba03891d58569d34aa2f7debc0f0be62",
-  "./plugins/Text.js": "4ca296f11482ccb4b89db35634872fe6352bba40dbfc9db3417c2f466fcc88a0",
+  "./plugins/Text.js": "27544f21ebef3c32e5b021dec64cd62dec7db06ae78d03b6dc65601fbcbbeca0",
   "./plugins/Text.min.js": "16502feef1ae35a9b9e523ffb2f36f9a8c14b537dec87c0fd83f3197fa2938d0",
   "./plugins/Textarea.js": "a9f16f27cf2721e3d75a504fd5ae68cb8238d945ac7dbb10f3787d7a12d680bb",
   "./plugins/Textarea.min.js": "4ee950d2815ee75c63ae64b260f4b95ffbce227a37ca58a9596d2a317a56b03b",
@@ -2980,30 +2988,31 @@ function use(game) {
                 while (1) switch (_context.prev = _context.next) {
                   case 0:
                     _context.prev = 0;
-                    scriptUrl = "".concat(basePath).concat(pluginId, ".js"); //min.js
+                    // Load unminified version of the plugin
+                    scriptUrl = "".concat(basePath).concat(pluginId, ".js"); // TODO: Load minified version of the plugin ( with config flag )
+                    // const scriptUrl = `${basePath}${pluginId}.min.js`;
                     _context.next = 4;
                     return game.loadPluginScript(scriptUrl);
                   case 4:
                     console.log("Loaded: ".concat(pluginId));
                     if (!((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object' && PLUGINS[pluginId])) {
-                      _context.next = 12;
+                      _context.next = 11;
                       break;
                     }
                     pluginInstance = new PLUGINS[pluginId]["default"](options);
-                    console.log('asaaaffff', pluginInstance);
-                    _context.next = 10;
+                    _context.next = 9;
                     return handlePluginInstance(game, pluginInstance, pluginId, options, cb);
-                  case 10:
-                    _context.next = 14;
+                  case 9:
+                    _context.next = 13;
                     break;
-                  case 12:
+                  case 11:
                     console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
                     throw new Error('PLUGINS object not found, cannot load plugin');
-                  case 14:
-                    _context.next = 23;
+                  case 13:
+                    _context.next = 22;
                     break;
-                  case 16:
-                    _context.prev = 16;
+                  case 15:
+                    _context.prev = 15;
                     _context.t0 = _context["catch"](0);
                     console.error("Error loading plugin ".concat(pluginId, ":"), _context.t0);
                     game._plugins[pluginId] = {
@@ -3012,16 +3021,16 @@ function use(game) {
                     game.loadingPluginsCount--;
                     cb(_context.t0);
                     throw _context.t0;
-                  case 23:
-                    _context.prev = 23;
+                  case 22:
+                    _context.prev = 22;
                     // Remove the promise from the tracking object once it's settled
                     delete game.loadingPluginPromises[pluginId];
-                    return _context.finish(23);
-                  case 26:
+                    return _context.finish(22);
+                  case 25:
                   case "end":
                     return _context.stop();
                 }
-              }, _callee, null, [[0, 16, 23, 26]]);
+              }, _callee, null, [[0, 15, 22, 25]]);
             }))();
             _context2.next = 26;
             break;
@@ -3058,22 +3067,21 @@ function _handlePluginInstance() {
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
-          console.log('handlePluginInstance', pluginInstance);
           if (typeof pluginInstance.build === 'function') {
             extendEntityBuilder(game, pluginInstance);
           }
           pluginGameSceneMethods(game, pluginInstance);
           game.loadedPlugins.push(pluginId);
           if (!pluginInstance.preload) {
-            _context3.next = 9;
+            _context3.next = 8;
             break;
           }
-          _context3.next = 7;
+          _context3.next = 6;
           return pluginInstance.preload(game);
-        case 7:
-          _context3.next = 9;
+        case 6:
+          _context3.next = 8;
           return game.awaitAllPlugins();
-        case 9:
+        case 8:
           pluginInstance.init(game, game.engine, game.scene);
           game._plugins[pluginId] = pluginInstance;
           delete game._plugins[pluginId];
@@ -3096,7 +3104,7 @@ function _handlePluginInstance() {
           game.data.plugins = game.data.plugins || {};
           game.data.plugins[pluginId] = options;
           game.loadingPluginsCount--;
-        case 20:
+        case 19:
         case "end":
           return _context3.stop();
       }
@@ -3118,7 +3126,6 @@ function pluginGameSceneMethods(game, pluginInstance) {
   };
 }
 function extendEntityBuilder(game, pluginInstance) {
-  console.log("XXXXX", pluginInstance.constructor.name);
   var pluginName = pluginInstance.constructor.name;
   game.EntityBuilder.prototype[pluginName] = function () {
     var _this = this;

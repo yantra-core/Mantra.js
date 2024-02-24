@@ -1151,6 +1151,7 @@ let games_examples = [
 ]
 
 let ui_examples = [
+  /*
   {
     title: 'All Components',
     category: 'ui',
@@ -1159,6 +1160,7 @@ let ui_examples = [
     url: 'ui/ui-components.html',
     tags: ['ui', 'components', 'interface', 'user experience', 'input', 'navigation', 'form', 'radio', 'checkbox', 'button', 'select', 'range', 'slider', 'iframe', 'text', 'image', 'flash', 'message']
   },
+  */
   {
     title: 'Button',
     category: 'ui',

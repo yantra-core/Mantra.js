@@ -1,4 +1,3 @@
-
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   plugins: ['Button', 'Text']
@@ -8,6 +7,7 @@ game.start(function(){
   game.setBackground('black');
   game.setZoom(2);
 
+  let counter = 0;
   //
   // <button>
   //
@@ -15,7 +15,8 @@ game.start(function(){
     .Button()
     .body(true)
     .pointerdown(function (entity) {
-      game.updateEntity(text.id, { text: `Button clicked` });
+      counter++;
+      game.updateEntity(text.id, { text: `Button clicked ${counter} times` });
     })
     .isStatic(false)
     .position(0, 0)

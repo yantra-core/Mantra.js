@@ -22,7 +22,8 @@ let game = new Game({
   plugins: ['Gamepad'],
   graphics: ['css'], // 'three', 'babylon', 'css'
   gameRoot: '.',
-  defaultMovement: true,
+  //defaultMovement: true,
+  //defaultMouseMovement: false
 
   /*
   fps: 60,
@@ -76,6 +77,20 @@ game.use(new plugins.TileSet());
 game.use(new plugins.Flame());
 game.use(new plugins.Label());
 game.use(new plugins.Boomerang());
+game.use(new plugins.Hexapod());
+game.use(new plugins.Flash());
+
+game.use(new plugins.Button());
+game.use(new plugins.Select());
+game.use(new plugins.Textarea());
+game.use(new plugins.Input());
+game.use(new plugins.Range());
+game.use(new plugins.Checkbox());
+game.use(new plugins.Iframe());
+game.use(new plugins.Radio());
+game.use(new plugins.Text());
+
+game.use(new plugins.CSSGraphics());
 
 game.use(new Mouse());
 
@@ -83,15 +98,52 @@ game.use(new Lifetime());
 
 game.start(function () {
   game.reset();
-  game.setZoom(2);
+  game.setZoom(1.5);
+  // game.make().Player().createEntity();
 
-  // game.build().RadialMenu().size(100).createEntity();
+  // TODO: make this a helper
+  // game.data.camera.mouseWheelZoomEnabled = true;
+
+  //game.use(new worlds.Maze())
+  game.use(new worlds.Home())
+  //game.use(new worlds.Platform())
+  //game.use(new worlds.YCraft())
+  //game.use(new worlds.GravityGardens())
+  // game.use(new worlds.Home())
+
+
+/*
+  
+
+*/
+  // game.make().Flash().createEntity();
+
+  //game.make().Player().createEntity();
+
+
+  //game.make().Hexapod().repeat(22).offset(100, -22).createEntity();
+  //game.make().Hexapod().repeat(22).offset(-22, 100).createEntity();
+
+  // TODO: rename game.make() to game.make(), so we can use game.make() for building the game object
+  // shortcuts to game.m() for make, game.b() for build
+
+  // game.make().Player().createEntity();
+
+  // game.m()     // make
+  // game.m().b() // make and build
+  // game.m().c() // create
+
+  // game.m().Player()     // make player
+  // game.m().Player().b() // make and build player
+  // game.m().Player().c() // create player
+
+
+  // game.make().RadialMenu().size(100).createEntity();
   // game.use(new plugins.RadialMenu());
-
-  game.use(new worlds.Home());
+  // game.use(new worlds.Music());
   /*
-  //let f = game.build().Tower().Draggable().createEntity();
-  game.build().Label({
+  //let f = game.make().Tower().Draggable().createEntity();
+  game.make().Label({
     text: "Player 1",
     targetEntity: 1,
     offset: {
@@ -101,14 +153,14 @@ game.start(function () {
   }).createEntity();
 
 
-  game.build().Flame().position(-100, 0).Label().text('hooo').createEntity();
+  game.make().Flame().position(-100, 0).Label().text('hooo').createEntity();
 
   
 
   //game.use(new worlds.InfinityTower());
 
   /*
-  let tileMap = game.build().TileMap({
+  let tileMap = game.make().TileMap({
     x: 0, // Remark: This will place tile map in TileMap units, not pixel
     y: 0, // Actual values will be x * 16, y * 16
     position: {
@@ -130,7 +182,7 @@ game.start(function () {
   tileMap.createEntity();
 
 
-  let tileSet = game.build().TileSet([
+  let tileSet = game.make().TileSet([
     { id: 0, texture: 'tile-block' },
     { id: 1, texture: 'tile-block' },
   ]).build();
@@ -138,7 +190,7 @@ game.start(function () {
 
   console.log("tileSet", tileSet.meta)
 
-  let tileMap2 = game.build().TileMap({
+  let tileMap2 = game.make().TileMap({
     position: {
       x: 100,
       y: 0
@@ -168,9 +220,9 @@ game.start(function () {
   //
   // Creating a TileMap can be done at the lowest-level using arrays of integers
   //
-  let teleporterTile = game.build().Teleporter().build();
-  let flameTile = game.build().Flame().build();
-  let blockTile = game.build().Block().size(16).build();
+  let teleporterTile = game.make().Teleporter().build();
+  let flameTile = game.make().Flame().build();
+  let blockTile = game.make().Block().size(16).build();
   let exampleTileSet = [
     // voice
     { id: 0, kind: 'empty' },
@@ -185,11 +237,11 @@ game.start(function () {
     { id: 6, kind: 'exit', texture: 'tile-exit', body: true, isStatic: true, isSensor: true }, // exit
   ];
 
-  let tileSet = game.build().TileSet({
+  let tileSet = game.make().TileSet({
     tileSet: exampleTileSet
   }).build();
 
-  let tileMap = game.build().TileMap({
+  let tileMap = game.make().TileMap({
     tileSet: tileSet.meta,
     position: {
       x: -400,
@@ -210,7 +262,7 @@ game.start(function () {
 
   tileMap.createEntity();
 
-  let tileMap2 = game.build().TileMap({
+  let tileMap2 = game.make().TileMap({
     position: {
       x: 200,
       y: 0
@@ -232,9 +284,7 @@ game.start(function () {
   tileMap2.createEntity();
   */
 
-  // game.use(new worlds.Maze())
-  // game.use(new worlds.Home())
-
+ 
   /*
   game.use(new Teleporter());
   //game.use(new plugins.Hexapod())
@@ -253,9 +303,9 @@ game.start(function () {
      let colorB = context.dropTarget.color;
      if (colorA && colorB) {
        console.log('colorA', colorA, 'colorB', colorB);
-       let configA = game.build().color(colorA).build();
-       let configB = game.build().color(colorB).build();
-       let mixed = game.build().mix(configA).mix(configB).build();
+       let configA = game.make().color(colorA).build();
+       let configB = game.make().color(colorB).build();
+       let mixed = game.make().mix(configA).mix(configB).build();
        
        // check that ent exists
        let exists = game.exists(context.id);
@@ -302,7 +352,7 @@ game.start(function () {
   // assume 24 color HSV wheel and generate all colors as int or hex whatever is easy
   /*
   for (let i = 0; i < 24; i++) {
-    let conf = game.build().isStatic(false).Droppable().Draggable().position(-200 + i * 40, 0);
+    let conf = game.make().isStatic(false).Droppable().Draggable().position(-200 + i * 40, 0);
     conf.isSensor(true);
     console.log('conf', conf)
     // we need to generate color wheel here as int or hex
@@ -403,7 +453,7 @@ game.start(function () {
   //game.use(home);
 
   /*
-    let config = game.build().Player();
+    let config = game.make().Player();
     config.position(-40, 0)
     config.collisionStart(function(){
       console.log('breaks the teleport and this never fires');
@@ -430,10 +480,10 @@ game.start(function () {
       // collisionStart: false  // this also breaks the teleporter expected, collision disabled
     })
   
-    game.build().Teleporter().position(30, 10).createEntity();
+    game.make().Teleporter().position(30, 10).createEntity();
   
   
-    let blockConfig = game.build().Block().size(16).build();
+    let blockConfig = game.make().Block().size(16).build();
     console.log('blockConfig', blockConfig)
     blockConfig.collisionStart = function(){
       // as soon as we add this teleporter event stops working
@@ -444,11 +494,11 @@ game.start(function () {
   */
 
 
-  // game.build().Block().clone(3).createEntity();
-  //game.build().Teleporter().position(-100, 0, 0).createEntity();
-  //game.build().Text().text('Teleport to position').width(200).position(0, 0, 0).createEntity();
-  //game.build().Text().text('Teleport to function').width(200).position(0, 0, 0).createEntity();
-  //game.build().Text().text('Teleport to Plugin').width(200).position(0, 0, 0).createEntity();
+  // game.make().Block().clone(3).createEntity();
+  //game.make().Teleporter().position(-100, 0, 0).createEntity();
+  //game.make().Text().text('Teleport to position').width(200).position(0, 0, 0).createEntity();
+  //game.make().Text().text('Teleport to function').width(200).position(0, 0, 0).createEntity();
+  //game.make().Text().text('Teleport to Plugin').width(200).position(0, 0, 0).createEntity();
 
   //game.use(new GravityGardens());
 
@@ -461,7 +511,7 @@ game.start(function () {
   */
   /*
    game.use(new Player());
-   let player = game.build().Player().createEntity();
+   let player = game.make().Player().createEntity();
  
    game.setPlayerId(player.id);
  
@@ -470,7 +520,7 @@ game.start(function () {
  
    */
   /*
-   game.build().Teleporter({
+   game.make().Teleporter({
      destination: {
        position: {
          x: 20,
@@ -481,14 +531,14 @@ game.start(function () {
    .position(-50, 50).size(32).createEntity();
  
  
-   game.build().Teleporter({
+   game.make().Teleporter({
      destination: {
        world: 'Home'
      }
    })
    .position(50, -50).size(32).createEntity();
  
-   game.build().Teleporter({
+   game.make().Teleporter({
      destination: function customTeleport (entity, gameState) {
        // console.log("CUSTOM TELEPORT");
        game.flashText('CUSTOM TELEPORT')
@@ -500,12 +550,12 @@ game.start(function () {
 
   //game.createPlayer();
   /*
-  let data = game.build()
+  let data = game.make()
     .GravityWell()      // build a GravityWell
     // .Flame()           // Now it's a GravityWell with Fire
     .position(20, 20) // Adjust component properties as needed
     .createEntity();  // Create the entity
-    //let ent = game.build().fire().boomerang().position(100, 100).createEntity();
+    //let ent = game.make().fire().boomerang().position(100, 100).createEntity();
   */
   /*
   game.systems.blackhole.create({
@@ -517,7 +567,7 @@ game.start(function () {
   */
 
   /*
-  game.build()
+  game.make()
     .type('BLACKHOLE')
     .createEntity();
 
@@ -525,7 +575,7 @@ game.start(function () {
   */
 
   /*
-  game.build()
+  game.make()
     .type('BLACKHOLE')
     .createEntity();
     */

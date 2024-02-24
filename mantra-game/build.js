@@ -7,6 +7,18 @@ import uglifyify from 'uglifyify';
 import pluginChecksums from './lib/Game/pluginChecksums.js';
 
 const plugins = [
+
+  // ui components
+  './plugins/button/Button.js',
+  './plugins/checkbox/Checkbox.js',
+  './plugins/message-flash/FlashMessage.js',
+  './plugins/input/Input.js',
+  './plugins/iframe/Iframe.js',
+  './plugins/radio/Radio.js',
+  './plugins/range/Range.js',
+  './plugins/select/Select.js',
+  './plugins/textarea/Textarea.js',
+
   './plugins/entity-movement/strategies/AsteroidsMovement.js',
   './plugins/behaviors/Behaviors.js',
   './plugins/sutra/Sutra.js',
@@ -14,6 +26,8 @@ const plugins = [
   './plugins/graphics-babylon/camera/BabylonCamera.js',
   './plugins/graphics-ascii/ASCIIGraphics.js',
   './plugins/graphics-babylon/BabylonGraphics.js',
+  // game objects
+
   './plugins/block/Block.js',
   './plugins/hexapod/Hexapod.js',
   './plugins/key/Key.js',
@@ -143,6 +157,21 @@ let checksumArray = [];
 // include additions files and dirs aside from the Plugin class file
 const includeDirs = ['vendor'];
 
+// Function to determine if a file needs to be rebuilt based on checksum
+function needsRebuild(filePath, storedChecksums) {
+
+  let currentPath = './plugins' + filePath;
+  console.log('filePathfilePath', currentPath)
+
+  if (!fs.existsSync(currentPath)) return false; // If the file doesn't exist, no need to rebuild
+
+  const currentChecksum = computeChecksum(currentPath);
+  const storedChecksum = storedChecksums[currentPath];
+
+  // Rebuild if there's no stored checksum or if checksums don't match
+  return !storedChecksum || currentChecksum !== storedChecksum;
+}
+
 plugins.forEach((plugin, index) => {
   logStep(plugin, 'Starting bundling');
 
@@ -151,57 +180,68 @@ plugins.forEach((plugin, index) => {
   const outputFilePath = `../mantra-client/public/plugins/${fileName}.js`;
   const minifiedOutputFilePath = `../mantra-client/public/plugins/${fileName}.min.js`; // Path for minified file
 
-  // Bundle for the original (non-minified) version
-  browserify(plugin, { standalone: `PLUGINS.${fileName}` })
-    .transform('babelify', { presets: ['@babel/preset-env'] })
-    .bundle()
-    .on('error', err => console.error(err))
-    .pipe(fs.createWriteStream(outputFilePath))
-    .on('finish', () => {
-      const checksum = computeChecksum(outputFilePath);
-      checksums['./plugins/' + fileName + '.js'] = checksum; // Store checksum for the original file
-      logStep(plugin, `Original file bundling completed with checksum: ${checksum}`);
-    });
 
-  // Bundle for the minified version
-  browserify(plugin, { standalone: `PLUGINS.${fileName}` })
-    .transform('babelify', { presets: ['@babel/preset-env'] })
-    .transform(uglifyify, { global: true }) // Add uglifyify transform for minification
-    .bundle()
-    .on('error', err => console.error(err))
-    .pipe(fs.createWriteStream(minifiedOutputFilePath))
-    .on('finish', () => {
-      const checksum = computeChecksum(minifiedOutputFilePath);
-      checksums['./plugins/' + fileName + '.min.js'] = checksum; // Store checksum for minified file
-      logStep(plugin, `Minified file bundling completed with checksum: ${checksum}`);
+  if (true || needsRebuild(plugin, pluginChecksums)) {
+    logStep(plugin, 'File changed or new, starting bundling');
+    // Bundle for the minified version
+    browserify(plugin, { standalone: `PLUGINS.${fileName}` })
+      .transform('babelify', { presets: ['@babel/preset-env'] })
+      .transform(uglifyify) // Add uglifyify transform for minification
+      .bundle()
+      .on('error', err => console.error(err))
+      .pipe(fs.createWriteStream(minifiedOutputFilePath))
+      .on('finish', () => {
+        const checksum = computeChecksum(minifiedOutputFilePath);
+        checksums['./plugins/' + fileName + '.min.js'] = checksum; // Store checksum for minified file
+        logStep(plugin, `Minified file bundling completed with checksum: ${checksum}`);
 
-      // If last plugin and last version (minified), write checksums to file
-      if (index === plugins.length - 1) {
-        const checksumsFilePath = './lib/Game/pluginChecksums.js';
+        // If last plugin and last version (minified), write checksums to file
+        if (index === plugins.length - 1) {
+          const checksumsFilePath = './lib/Game/pluginChecksums.js';
 
-        // Sort the checksums object by key
-        const sortedChecksums = Object.keys(checksums).sort().reduce((acc, key) => {
-          acc[key] = checksums[key];
-          return acc;
-        }, {});
+          // Sort the checksums object by key
+          const sortedChecksums = Object.keys(checksums).sort().reduce((acc, key) => {
+            acc[key] = checksums[key];
+            return acc;
+          }, {});
 
-        const checksumsContent = `export default ${JSON.stringify(sortedChecksums, null, 2)};`;
-        fs.writeFileSync(checksumsFilePath, checksumsContent);
-        console.log('All plugins bundled, checksums written to checksums.js');
-      }
-    });
+          const checksumsContent = `export default ${JSON.stringify(sortedChecksums, null, 2)};`;
+          fs.writeFileSync(checksumsFilePath, checksumsContent);
+          console.log('All plugins bundled, checksums written to checksums.js');
+        }
+      });
 
 
-  // After bundling the plugin, copy its subdirectories
-  const pluginDir = path.dirname(plugin);
-  const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;
+    // After bundling the plugin, copy its subdirectories
+    const pluginDir = path.dirname(plugin);
+    const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;
 
-  fs.readdirSync(pluginDir, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory() && includeDirs.includes(dirent.name))
-    .forEach(dirent => {
-      copyDirSync(path.join(pluginDir, dirent.name), path.join(destDir, dirent.name));
-      logStep(plugin, `Copied subdirectory: ${dirent.name}`);
-    });
+    fs.readdirSync(pluginDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory() && includeDirs.includes(dirent.name))
+      .forEach(dirent => {
+        copyDirSync(path.join(pluginDir, dirent.name), path.join(destDir, dirent.name));
+        logStep(plugin, `Copied subdirectory: ${dirent.name}`);
+      });
+
+
+    // Bundle for the original (non-minified) version
+    browserify(plugin, { standalone: `PLUGINS.${fileName}` })
+      .transform('babelify', { presets: ['@babel/preset-env'] })
+      .bundle()
+      .on('error', err => console.error(err))
+      .pipe(fs.createWriteStream(outputFilePath))
+      .on('finish', () => {
+        const checksum = computeChecksum(outputFilePath);
+        checksums['./plugins/' + fileName + '.js'] = checksum; // Store checksum for the original file
+        logStep(plugin, `Original file bundling completed with checksum: ${checksum}`);
+      });
+
+  } else {
+    logStep(plugin, 'No change in file, skipping bundling');
+    return;
+  }
+
+
 });
 
 

@@ -40,6 +40,7 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         texture: 'demon',
         width: 8,
         height: 8,
+        health: 50,
         body: true,
         collisionStart: this.grow.bind(this),
         update: this.swarmBehavior.bind(this),
@@ -54,11 +55,14 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
       if (context.target.type === 'BULLET') {
         var hexapod = context.owner;
         var style;
+        hexapod.health = hexapod.health - 10;
+        console.log('bullet velocity', context.target.velocity);
+
         // at a certain size, invert the colors
-        if (hexapod.width > 16) {
+        if (hexapod.health < 50) {
           style = {
             // Define the animation name and duration
-            animation: 'pulse-invert 5s',
+            animation: 'pulse-invert 2s',
             // Initial filter style
             filter: 'invert(90%)'
           };
@@ -66,10 +70,17 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         // update entity size by 11%
         game.updateEntity({
           id: hexapod.id,
-          width: hexapod.width * 1.1,
-          height: hexapod.height * 1.1,
+          health: hexapod.health,
           style: style
         });
+
+        // apply a force to the Hexapod based on the bullet's velocity
+        // invert the force
+        var force = {
+          x: -context.target.velocity.x * 10,
+          y: -context.target.velocity.y * 10
+        };
+        game.applyForce(hexapod.id, force);
       }
     }
   }, {

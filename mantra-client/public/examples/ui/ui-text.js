@@ -1,10 +1,9 @@
 
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['Select', 'Text']
+  plugins: ['Text', 'Player']
 });
 game.start(function(){
- 
   // Text() header
   //
   game.make()
@@ -12,8 +11,12 @@ game.start(function(){
     .text('<h1>Hello</h1> World')
     .body(true)
     .isStatic(false)
-    .x(-400)
+    .x(-20)
+    .y(-10)
     .size(100)
     .createEntity();
+
+    game.make().Player().createEntity();
+    game.setZoom(2.5);
 
 });
