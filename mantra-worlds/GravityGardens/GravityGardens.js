@@ -21,16 +21,18 @@ class GravityGardens {
   init(game) {
     this.game = game;
 
-    // enables mouse wheel zoom
-    game.data.camera.mouseWheelZoomEnabled = true;
+    // Changes the default mouse controls
 
+    // Enables mouse wheel zoom
+    game.data.camera.mouseWheelZoomEnabled = true;
     // Movements with right click, switch default left-click-to-move behavior
     game.config.mouseMovementButton = 'RIGHT';
     // Actions with left click
     game.config.mouseActionButton = 'LEFT';
 
-    // disables the default top-down mouse movements
-    // game.config.defaultMouseMovement = false;
+    // enables the default top-down mouse movements
+    game.config.defaultMouseMovement = true;
+
 
     // we reset the game to clear any previous state
     game.reset();
@@ -193,11 +195,10 @@ class GravityGardens {
       that.mousePosition.clientX = event.clientX;
       that.mousePosition.clientY = event.clientY;
       // if right click
-      if (event.button === 0) {
-      }
+      if (event.button === 2) {}
 
       // if left click
-      if (event.button === 2) {
+      if (event.button === 0) {
         that.dropping = true;
         game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
         that.slurping = true;

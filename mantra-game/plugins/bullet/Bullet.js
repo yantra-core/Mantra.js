@@ -74,7 +74,7 @@ class Bullet {
             y: directionY * this.speed
         },
         width: 16,
-        height: 8,
+        height: 16,
         radius: 8, // Assuming a default radius
         damage: 10 // Assuming default damage
     };

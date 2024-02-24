@@ -3,8 +3,6 @@ export default function use(game) {
     let basePath = '/plugins/'; // Base path for loading plugins
     basePath = game.scriptRoot + basePath;
 
-
-
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
       if (game._plugins[pluginId]) {
@@ -27,10 +25,15 @@ export default function use(game) {
       // Store the loading promise
       game.loadingPluginPromises[pluginId] = (async () => {
         try {
-          const scriptUrl = `${basePath}${pluginId}.min.js`;
+
+          // Load unminified version of the plugin
+          const scriptUrl = `${basePath}${pluginId}.js`;
+
+          // TODO: Load minified version of the plugin ( with config flag )
+          // const scriptUrl = `${basePath}${pluginId}.min.js`;
+
           await game.loadPluginScript(scriptUrl);
           console.log(`Loaded: ${pluginId}`);
-
           if (typeof PLUGINS === 'object' && PLUGINS[pluginId]) {
             let pluginInstance = new PLUGINS[pluginId].default(options);
             await handlePluginInstance(game, pluginInstance, pluginId, options, cb);
@@ -38,6 +41,7 @@ export default function use(game) {
             console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
             throw new Error('PLUGINS object not found, cannot load plugin');
           }
+
         } catch (err) {
           console.error(`Error loading plugin ${pluginId}:`, err);
           game._plugins[pluginId] = { status: 'error' };
@@ -62,7 +66,6 @@ export default function use(game) {
     return game;
   }
 }
-
 
 async function handlePluginInstance(game, pluginInstance, pluginId, options, cb) {
 

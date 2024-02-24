@@ -19,7 +19,7 @@ tap.test('deltaEncoding.encode - basic functionality', (t) => {
 
   // Test encoding of a new entity
   let encoded = deltaEncoding.encode('player1', initialSnapshot);
-  console.log('encoded', encoded.state)
+  // console.log('encoded', encoded.state)
 
   t.equal(encoded.state.length, 1, 'should encode new entity state');
   

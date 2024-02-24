@@ -15,12 +15,12 @@ export default class Hexapod {
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
-    //let rules = this.sutra();
     return {
       type: 'HEXAPOD',
       texture: 'demon',
       width: 8,
       height: 8,
+      health: 50,
       body: true,
       collisionStart: this.grow.bind(this),
       update: this.swarmBehavior.bind(this),
@@ -34,11 +34,16 @@ export default class Hexapod {
     if (context.target.type === 'BULLET') {
       let hexapod = context.owner;
       let style;
+
+      hexapod.health = hexapod.health - 10;
+
+      console.log('bullet velocity', context.target.velocity);
+
       // at a certain size, invert the colors
-      if (hexapod.width > 16) {
+      if (hexapod.health < 50) {
         style = {
           // Define the animation name and duration
-          animation: 'pulse-invert 5s',
+          animation: 'pulse-invert 2s',
           // Initial filter style
           filter: 'invert(90%)'
         }
@@ -46,10 +51,18 @@ export default class Hexapod {
       // update entity size by 11%
       game.updateEntity({
         id: hexapod.id,
-        width: hexapod.width * 1.1,
-        height: hexapod.height * 1.1,
+        health: hexapod.health,
         style: style
       });
+
+      // apply a force to the Hexapod based on the bullet's velocity
+      // invert the force
+      let force = {
+        x: -context.target.velocity.x * 10,
+        y: -context.target.velocity.y * 10
+      };
+      game.applyForce(hexapod.id, force);
+
     }
 
   }

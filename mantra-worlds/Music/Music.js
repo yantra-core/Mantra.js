@@ -17,6 +17,9 @@ class Music {
 
   init(game) {
     this.game = game;
+    game.config.defaultMouseMovement = false;
+
+
     game.reset();
     this.createWorld();
   }
@@ -54,6 +57,7 @@ class Music {
         y: 80
       }
     });
+
 
     game.customMovement = false;
     game.setBackground('black');

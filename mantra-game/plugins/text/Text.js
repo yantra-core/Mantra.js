@@ -14,7 +14,7 @@ export default class Text {
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
-    //let rules = this.sutra();
+
     return {
       type: 'TEXT',
       body: false,
@@ -26,14 +26,11 @@ export default class Text {
 
   // TODO: rename to create? we probably need this.createEntity scope preserved for scene
   createEntity(entityData = {}) {
-
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
-
     // Create the Text entity
     const text = game.createEntity(this.build(entityData));
   }
-
 
 }

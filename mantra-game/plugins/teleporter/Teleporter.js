@@ -90,6 +90,8 @@ export default class Teleporter {
   }
 
   // TODO: Unifiy context signature from collisions
+  // TODO: map context.buttons.LEFT against entityData.clickToTeleport existence
+  //       in order to enable only left click to teleport, not other pointer downs
   touchedTeleporter(a, b, pair, context) {
     let game = this.game;
     if (context.owner.meta && context.owner.meta.destination) {
