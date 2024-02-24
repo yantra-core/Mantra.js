@@ -21,6 +21,15 @@ class Music {
     this.createWorld();
   }
 
+
+  async preload(game) {
+
+    game.use('Text');
+    game.use('Platform');
+    game.use('Teleporter');
+
+  }
+
   createWorld() {
 
     let game = this.game;
@@ -127,42 +136,29 @@ class Music {
     // set the Sutra rules for Home world
     game.useSutra(sutras(game), 'MUSIC');
 
-    //
-    // warp to Mantra Home World
-    //
-    game.createEntity({
-      type: 'WARP',
-      exit: {
-        world: 'Home'
-      },
-      texture: 'warp-to-home',
-      width: 64,
-      height: 64,
-      isStatic: true,
-      position: {
-        x: 200,
-        y: -10,
-        z: 0
-      }
-    });
+    // Teleports the Player to the Home world
+    game.make()
+      .Teleporter({
+        destination: {
+          world: 'Home'
+        },
+      })
+      .texture('warp-to-home')
+      .size(64)
+      .position(195, -10, 1)
+      .createEntity();
 
-    // text "Warp to Mantra"
-    game.createEntity({
-      type: 'TEXT',
-      text: 'Warp To Mantra',
-      // kind: 'dynamic',
-      style: {
+    game.make().Text()
+      .text('Warp To Mantra')
+      .width(200)
+      .style({
         padding: '2px',
         fontSize: '16px',
         color: '#ffffff',
         textAlign: 'center'
-      },
-      body: false,
-      position: {
-        x: 195,
-        y: -20
-      }
-    });
+      })
+      .position(195, -60)
+      .createEntity();
 
     game.createEntity({
       type: 'PLATFORM',
@@ -176,71 +172,6 @@ class Music {
         y: 210
       }
     });
-
-    /*
-    // if touch note play sound
-    game.createEntity({
-      type: 'NOTE',
-      kind: 'C4', // etc, a note as formatted for Tone.js library
-      color: 0xccff00,
-      width: 64,
-      height: 64,
-      isStatic: true,
-      position: {
-        x: 0,
-        y: -200
-      }
-    });
-    */
-
-    /*
-
-    function createPianoRoll() {
-      let keyCodes = game.systems['tone'].keyCodes;
-
-
-      // for each key code object, create a new box entity with key code as text
-      let i = 0;
-      for (let tKey in keyCodes) {
-        i++;
-        let tKeyCode = keyCodes[tKey];
-        let tEntity = game.createEntity({
-          type: 'NOTE',
-          kind: tKeyCode.toneCode,
-          text: tKey,
-          width: 64,
-          height: 64,
-          isStatic: true,
-          position: {
-            x: -300 + (i * 64),
-            y: 200
-          },
-          //text: tKeyCode.keyName,
-          //tone: tKeyCode.toneCode
-        });
-        console.log("tEntity", tEntity)
-      }
-      console.log("keyCodes", keyCodes)
-      //game.use('GhostTyper');
-      console.log(game.systems)
-    }
-
-
-    if (game.systems.tone) {
-      createPianoRoll();
-    } else {
-      game.once('plugin::loaded::tone', function () {
-        createPianoRoll();
-      });
-    }
-    */
-
-    /*
-    game.systems.graphics.switchGraphics('BabylonGraphics', function(){
-      game.use('StarField');
-      game.createDefaultPlayer();
-    });
-    */
 
   }
 

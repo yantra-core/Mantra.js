@@ -11,7 +11,6 @@ export default function sutras(game) {
 
   rules.addCondition('isTile', (entity) => entity.type === 'BLOCK');
 
-
   rules.addCondition('entityTouchedNote', (entity, gameState) => {
     if (entity.type === 'COLLISION' && entity.kind === 'START') {
       // console.log('spawnUnitTouchedHomebase', entity)
@@ -98,6 +97,7 @@ export default function sutras(game) {
 
   console.log('created sutra', rules.toEnglish())
 
+  // TODO: update these event handler new signature function(context, event)
   // TODO: move these events into a Sutra
   game.on('pointerDown', (entity) => {
     if (entity.type === 'NOTE' || entity.name === 'piano-roll-text') {

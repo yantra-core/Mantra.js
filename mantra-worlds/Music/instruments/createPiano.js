@@ -21,6 +21,9 @@ export default function createPiano(game, config) {
         style: {
           borderRadius: '0px'
         },
+        pointerdown: function () {
+          // alert('play')
+        },
         width: keyWidth,
         height: keyHeight,
         isStatic: true,

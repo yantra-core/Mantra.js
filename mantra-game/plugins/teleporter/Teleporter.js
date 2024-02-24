@@ -1,14 +1,12 @@
 // Teleporter.js - Marak Squires 2024
 export default class Teleporter {
   static id = 'teleporter';
-  static type = 'sutra';
   constructor(config = {}) {
     this.id = Teleporter.id;
   }
 
   init(game) {
     this.game = game;
-    this.bindEvents();
     this.game.systemsManager.addSystem('teleporter', this);
   }
 
@@ -29,6 +27,19 @@ export default class Teleporter {
       entityData.destination.url = entityData.url;
     }
 
+    //
+    // Click to teleport
+    //
+    if (entityData.clickToTeleport !== false) { // default behavior is true, click to teleport
+      entityData.pointerdown = entityData.pointerdown || this.pointerdownWrap.bind(this)
+    }
+    let style = {};
+    if (entityData.clickToTeleport !== false) {
+      style = {
+        cursor: 'pointer'
+      };
+    }
+
     return {
       type: 'TELEPORTER',
       texture: {
@@ -41,7 +52,9 @@ export default class Teleporter {
       },
       //texture: 'teleporter',
       //color: 0xff0000,
+      pointerdown: entityData.pointerdown || this.pointerdownWrap.bind(this),
       collisionStart: entityData.collisionStart || this.touchedTeleporter.bind(this),
+      style: style,
       size: {
         width: 16,
         height: 16,
@@ -57,15 +70,26 @@ export default class Teleporter {
   }
 
   createEntity(entityData = {}) {
-
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
-
     // Create the Teleporter entity
     const teleporter = game.createEntity(this.build(entityData));
   }
 
+  // TODO: unified function signature for mantra pointer events and collision events
+  pointerdownWrap (context, event) {
+    // teleport expects a Collision.js event, not a pointer event
+    // TODO: refactor to use a single event signature
+    // NOTE: swap owner and target, since the owner of pointer event is probably Player, not Teleporter 
+    this.touchedTeleporter(null, null, event, {
+      target: context.owner, // owner from pointerdown is the owner of the event ( usually Player )
+      owner: context.target, // target from pointerdown is the target of the event ( usually what was clicked on )
+      event: event
+    });
+  }
+
+  // TODO: Unifiy context signature from collisions
   touchedTeleporter(a, b, pair, context) {
     let game = this.game;
     if (context.owner.meta && context.owner.meta.destination) {
@@ -114,19 +138,6 @@ export default class Teleporter {
       }
     }
 
-  }
-
-  sutra() {
-
-  }
-
-  bindEvents() {
-    // TODO: move pointerDown event into Sutra
-    this.game.on('pointerDown', (entity, ev) => {
-      if (entity.type === 'FLAME') {
-        game.playNote('G4');
-      }
-    });
   }
 
 }
