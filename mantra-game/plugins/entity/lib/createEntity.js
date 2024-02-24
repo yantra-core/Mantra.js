@@ -66,6 +66,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       hasInventory: true,
       owner: 0, // 0 = server
       inputs: null,
+      value: null,
       destroyed: false,
       type: 'NONE',
       friction: 0.1,  // Default friction
@@ -161,7 +162,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterItemCollected, update, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, value, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterItemCollected, update, exit, ctick } = config;
 
   let { x, y } = position;
 
@@ -211,6 +212,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   
   // if entity is allowed to pickup items, add an inventory component
   this.game.addComponent(entityId, 'hasInventory', hasInventory);
+
+  this.game.addComponent(entityId, 'value', value);
 
   this.game.addComponent(entityId, 'inputs', inputs);
   this.game.addComponent(entityId, 'lifetime', lifetime);

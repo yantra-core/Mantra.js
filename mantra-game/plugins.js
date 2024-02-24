@@ -98,10 +98,22 @@ import PluginsGUI from './plugins/gui-plugins/PluginsGUI.js';
 import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 
-// GUI GameObjects
+// HTML DOM GUI GameObjects
+import Checkbox from './plugins/checkbox/Checkbox.js';
+import Button from './plugins/button/Button.js';
+import Iframe from './plugins/iframe/Iframe.js';
+import Input from './plugins/input/Input.js';
+import Radio from './plugins/radio/Radio.js';
+import Range from './plugins/range/Range.js';
+import Select from './plugins/select/Select.js';
+import Textarea from './plugins/textarea/Textarea.js';
+
+// TODO: may have rename Label, since it's semi-reserved here
+//       The label behavior might just be a attach / container situation with a Text object
 import Label from './plugins/label/Label.js';
-import Text from './plugins/text/Text.js';
 import RadialMenu from './plugins/menu-radial/RadialMenu.js';
+import Flash from './plugins/message-flash/FlashMessage.js';
+import Text from './plugins/text/Text.js';
 
 // GUI
 import Inspector from './plugins/gui-inspector/Inspector.js';
@@ -156,8 +168,17 @@ const plugins = {
   Flame,
   Sword,
   // UI Objects
+  Flash,
+  Button,
+  Input,
+  Select,
   Label,
   Text,
+  Radio,
+  Checkbox,
+  Iframe,
+  Range,
+  Textarea,
   RadialMenu,
   Draggable,
   Droppable,

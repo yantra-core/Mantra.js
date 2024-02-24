@@ -54,8 +54,19 @@ export default class Mouse {
     const canvas = event.target instanceof HTMLCanvasElement ? event.target : null;
     const canvasPosition = canvas ? this.getCanvasPosition(canvas, clientX, clientY) : null;
     const worldPosition = this.getWorldPosition(clientX, clientY);
-    const mantraId = event.target.getAttribute ? event.target.getAttribute('mantra-id') : null;
-  
+    
+
+    let targetElement = event.target;
+    let mantraId = null;
+    
+    while (targetElement && targetElement !== document.body) {
+        if (targetElement.getAttribute && targetElement.getAttribute('mantra-id')) {
+            mantraId = targetElement.getAttribute('mantra-id');
+            break; // Mantra ID found, break the loop
+        }
+        targetElement = targetElement.parentNode; // Move up to the parent node
+    }
+      
     this.updateSelectedEntity(mantraId, event.target);
   
     const context = {

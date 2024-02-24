@@ -157,6 +157,13 @@ export default function updateEntity(entityDataOrId, entityData) {
   }
 
   //
+  // UI Component Properties
+  //
+  if (typeof entityData.value !== 'undefined') {
+    this.game.components.value.set(entityId, entityData.value);
+  }
+
+  //
   // Meta properties
   //
   if (typeof entityData.meta !== 'undefined') {

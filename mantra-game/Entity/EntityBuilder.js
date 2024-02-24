@@ -313,6 +313,12 @@ export default class EntityBuilder {
     return this;
   }
 
+  // used for components like 'Input' or 'Button'
+  value(value) {
+    this.config.value = value;
+    return this;
+  }
+
   // Meta and Data
   meta(value) {
     if (typeof value === 'object' && value !== null) {

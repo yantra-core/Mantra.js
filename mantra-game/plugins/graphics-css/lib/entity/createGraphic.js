@@ -55,6 +55,44 @@ export default function createGraphic(entityData) {
     case 'TEXT':
       entityElement = this.inflateText(entityElement, entityData);
       break;
+
+    case 'BUTTON':
+      entityElement = this.inflateButton(entityElement, entityData);
+      break;
+    case 'INPUT':
+      // For INPUT entities, create an input
+      entityElement = this.inflateInput(entityElement, entityData);
+      break;
+    case 'SELECT':
+      // For SELECT entities, create a box
+      entityElement = this.inflateSelect(entityElement, entityData);
+      break;
+    case 'IMAGE':
+      // For IMAGE entities, create an image
+      entityElement = this.inflateImage(entityElement, entityData);
+      break;
+    case 'TEXTAREA':
+      // For TEXTAREA entities, create a textarea
+      entityElement = this.inflateTextarea(entityElement, entityData);
+      break;
+    case 'RANGE':
+      // For RANGE entities, create a range input
+      entityElement = this.inflateRange(entityElement, entityData);
+      break;
+    case 'CHECKBOX':
+      // For CHECKBOX entities, create a checkbox input
+      entityElement = this.inflateCheckbox(entityElement, entityData);
+      break;
+    case 'RADIO':
+      // For RADIO entities, create a radio input
+      entityElement = this.inflateRadio(entityElement, entityData);
+      break;
+
+    case 'IFRAME':
+      // For IFRAME entities, create an iframe
+      entityElement = this.inflateIframe(entityElement, entityData);
+      break;
+      
     default:
 
       if (entityData.type === 'PART' && entityData.name === 'Display') {
@@ -66,7 +104,7 @@ export default function createGraphic(entityData) {
       break;
   }
 
-
+  // console.log(entityData.type, entityElement)
   // new api for entity.size
   if (typeof entityData.radius !== 'undefined') {
     // set circle size
