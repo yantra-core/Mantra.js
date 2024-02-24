@@ -543,6 +543,7 @@ function createEntity() {
       owner: 0,
       // 0 = server
       inputs: null,
+      value: null,
       destroyed: false,
       type: 'NONE',
       friction: 0.1,
@@ -674,6 +675,7 @@ function createEntity() {
     hasInventory = _config.hasInventory,
     owner = _config.owner,
     inputs = _config.inputs,
+    value = _config.value,
     lifetime = _config.lifetime,
     yCraft = _config.yCraft,
     text = _config.text,
@@ -743,6 +745,7 @@ function createEntity() {
 
   // if entity is allowed to pickup items, add an inventory component
   this.game.addComponent(entityId, 'hasInventory', hasInventory);
+  this.game.addComponent(entityId, 'value', value);
   this.game.addComponent(entityId, 'inputs', inputs);
   this.game.addComponent(entityId, 'lifetime', lifetime);
   this.game.addComponent(entityId, 'destroyed', false);
@@ -1420,6 +1423,13 @@ function updateEntity(entityDataOrId, entityData) {
         this.game.components.update.set(entityId, updateConfig.config.update);
       }
     }
+  }
+
+  //
+  // UI Component Properties
+  //
+  if (typeof entityData.value !== 'undefined') {
+    this.game.components.value.set(entityId, entityData.value);
   }
 
   //

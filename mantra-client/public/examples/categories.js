@@ -57,7 +57,15 @@ let categories = [
     "url": "inputs.html",
     "tags": ["gui", "controls", "interface", "user experience", "input", "navigation", "interaction", "gamepad", "keyboard", "mouse"]
   },
-
+  {
+    title: 'UI Components', // deep purple
+    name: 'ui',
+    color: '#673ab7',
+    description: 'User Interface components.',
+    image: 'placeholder-image.jpg',
+    url: 'ui.html',
+    tags: ['ui', 'user interface', 'interface', 'controls', 'navigation', 'interaction', 'buttons', 'menus', 'windows', 'panels', 'dialogs', 'forms', 'input']
+  },
   {
     title: 'Items', // light blue
     name: 'items',
@@ -1142,6 +1150,107 @@ let games_examples = [
   }
 ]
 
+let ui_examples = [
+  {
+    title: 'All Components',
+    category: 'ui',
+    description: 'All UI components.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-components.html',
+    tags: ['ui', 'components', 'interface', 'user experience', 'input', 'navigation', 'form', 'radio', 'checkbox', 'button', 'select', 'range', 'slider', 'iframe', 'text', 'image', 'flash', 'message']
+  },
+  {
+    title: 'Button',
+    category: 'ui',
+    description: 'Create a UI button.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-button.html',
+    tags: ['ui', 'button', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  /*
+  {
+    title: 'Input',
+    category: 'ui',
+    description: 'Create a UI input.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-input.html',
+    tags: ['ui', 'input', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  */
+  /*
+  {
+    title: 'Checkbox',
+    category: 'ui',
+    description: 'Create a UI checkbox.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-checkbox.html',
+    tags: ['ui', 'checkbox', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  */
+  /*
+  {
+    title: 'Radio',
+    category: 'ui',
+    description: 'Create a UI radio button.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-radio.html',
+    tags: ['ui', 'radio', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  */
+  {
+    title: 'Select',
+    category: 'ui',
+    description: 'Create a UI select.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-select.html',
+    tags: ['ui', 'select', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Range',
+    category: 'ui',
+    description: 'Create a UI Range slider.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-range.html',
+    tags: ['ui', 'range', 'slider', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Iframe',
+    category: 'ui',
+    description: 'Create a UI iframe.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-iframe.html',
+    tags: ['ui', 'iframe', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  // TODO: input
+  {
+    title: 'Text',
+    category: 'ui',
+    description: 'Create UI text.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-text.html',
+    tags: ['ui', 'text', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  /* TODO: add this later, we already have texture system, this would be simple CSS only images
+  // such as overlays or simple menus
+  {
+    title: 'Image',
+    category: 'ui',
+    description: 'Create UI image.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-image.html',
+    tags: ['ui', 'image', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  */
+  {
+    title: 'Flash Message',
+    category: 'ui',
+    description: 'Create a flash message.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/flash-message.html',
+    tags: ['flash', 'message', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  }
+];
+
 let _examples = [];
 _examples.push(item_examples);
 _examples.push(npc_examples);
@@ -1161,6 +1270,7 @@ _examples.push(config_examples);
 // _examples.push(movement_examples);
 _examples.push(container_examples);
 _examples.push(scenes_examples);
+_examples.push(ui_examples);
 _examples.push(lifecycle_examples);
 _examples.push(games_examples);
 

@@ -1,15 +1,14 @@
-
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
-  plugins: ['Player', 'Hexapod', 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang', 'SwitchGraphics'],
+  plugins: ['Player', 'Teleporter', 'Gamepad', 'GamepadGUI', 'Bullet', 'Boomerang', 'SwitchGraphics'],
 
 });
 game.start(function () {
   game.setBackground('black');
 
-  game.make().Player().createEntity();
+  game.build().Player().createEntity();
   game
-    .make()
+    .build()
     .color('red')
     .size(8)
     .body(false)
@@ -30,7 +29,7 @@ game.start(function () {
     .createEntity()
 
     game
-    .make()
+    .build()
     .color('red')
     .size(8)
     .body(false)
@@ -52,7 +51,7 @@ game.start(function () {
 
 
     game
-    .make()
+    .build()
     .color('red')
     .size(8)
     .body(false)
@@ -73,7 +72,7 @@ game.start(function () {
     .createEntity()
 
     game
-    .make()
+    .build()
     .color('red')
     .size(8)
     .body(false)
@@ -93,63 +92,9 @@ game.start(function () {
     .repeat(24)
     .createEntity()
 
-    /*
-    game
-    .make()
-    .color('red')
-    .size(16)
-    .body(false)
-    .position(0, 0)
-    .offset(-24, 24)
-    .repeaters({
-      size: (index, total, current) => ({ width: current.width * index, height: current.height * index }),
-      // TODO: generate colors as repeater with index
-      color: (index, total, current) => colorFromIndex(index, total),
-      // position: (index, total, current) => ({ x: current.x + index * 24, y: current.y + index * 24}),
-      // velocity: (index, total, current) => ({ x: current.x + index * 2, y: current.y })
-    })
-    .repeat(24)
-    .createEntity()
-
-    game
-    .make()
-    .color('red')
-    .size(16)
-    .body(false)
-    .position(0, 0)
-    .offset(-24, -24)
-    .repeaters({
-      size: (index, total, current) => ({ width: current.width * index, height: current.height * index }),
-      // TODO: generate colors as repeater with index
-      color: (index, total, current) => colorFromIndex(index, total),
-      // position: (index, total, current) => ({ x: current.x + index * 24, y: current.y + index * 24}),
-      // velocity: (index, total, current) => ({ x: current.x + index * 2, y: current.y })
-    })
-    .repeat(24)
-    .createEntity()
-
-    game
-    .make()
-    .color('red')
-    .size(16)
-    .body(false)
-    .position(0, 0)
-    .offset(24, -24)
-    .repeaters({
-      size: (index, total, current) => ({ width: current.width * index, height: current.height * index }),
-      // TODO: generate colors as repeater with index
-      color: (index, total, current) => colorFromIndex(index, total),
-      // position: (index, total, current) => ({ x: current.x + index * 24, y: current.y + index * 24}),
-      // velocity: (index, total, current) => ({ x: current.x + index * 2, y: current.y })
-    })
-    .repeat(24)
-    .createEntity()
-    
-    */
-    
 
   // Teleporter to the next example
-  game.make().Teleporter({
+  game.build().Teleporter({
     url: 'https://yantra.gg/mantra/examples/entity/repeat-entity',
   }).position(-200, 0).createEntity()
 

@@ -3810,6 +3810,8 @@ var Home = /*#__PURE__*/function () {
 
       game.setSize(16000, 9000);
       game.setGravity(0, 0, 0);
+      var ffff = game.make();
+      console.log('ffffff', ffff);
       var player1 = game.make().Player({
         lives: 99
       });
@@ -5232,6 +5234,12 @@ var Music = /*#__PURE__*/function () {
       //
       // warp to Mantra Home World
       //
+
+      game.make().Teleporter({
+        destination: {
+          world: 'Home'
+        }
+      }).createEntity();
       game.createEntity({
         type: 'WARP',
         exit: {
@@ -5496,6 +5504,9 @@ function createPiano(game, config) {
         // White key color
         style: {
           borderRadius: '0px'
+        },
+        pointerdown: function pointerdown() {
+          // alert('play')
         },
         width: keyWidth,
         height: keyHeight,

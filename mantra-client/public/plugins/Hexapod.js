@@ -35,7 +35,6 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
           y: 0
         };
       }
-      //let rules = this.sutra();
       return {
         type: 'HEXAPOD',
         texture: 'demon',

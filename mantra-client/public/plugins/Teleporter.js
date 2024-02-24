@@ -23,7 +23,6 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.bindEvents();
       this.game.systemsManager.addSystem('teleporter', this);
     }
   }, {
@@ -52,7 +51,7 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
       //
       if (entityData.clickToTeleport !== false) {
         // default behavior is true, click to teleport
-        entityData.pointerdown = entityData.collisionStart || this.touchedTeleporter.bind(this);
+        entityData.pointerdown = entityData.pointerdown || this.pointerdownWrap.bind(this);
       }
       var style = {};
       if (entityData.clickToTeleport !== false) {
@@ -73,8 +72,7 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
         },
         //texture: 'teleporter',
         //color: 0xff0000,
-        pointerdown: entityData.pointerdown,
-        // undefined is fine, null will remove the event
+        pointerdown: entityData.pointerdown || this.pointerdownWrap.bind(this),
         collisionStart: entityData.collisionStart || this.touchedTeleporter.bind(this),
         style: style,
         size: {
@@ -100,10 +98,29 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
           y: 0
         };
       }
-
       // Create the Teleporter entity
       var teleporter = game.createEntity(this.build(entityData));
     }
+
+    // TODO: unified function signature for mantra pointer events and collision events
+  }, {
+    key: "pointerdownWrap",
+    value: function pointerdownWrap(context, event) {
+      // teleport expects a Collision.js event, not a pointer event
+      // TODO: refactor to use a single event signature
+      // NOTE: swap owner and target, since the owner of pointer event is probably Player, not Teleporter 
+      this.touchedTeleporter(null, null, event, {
+        target: context.owner,
+        // owner from pointerdown is the owner of the event ( usually Player )
+        owner: context.target,
+        // target from pointerdown is the target of the event ( usually what was clicked on )
+        event: event
+      });
+    }
+
+    // TODO: Unifiy context signature from collisions
+    // TODO: map context.buttons.LEFT against entityData.clickToTeleport existence
+    //       in order to enable only left click to teleport, not other pointer downs
   }, {
     key: "touchedTeleporter",
     value: function touchedTeleporter(a, b, pair, context) {
@@ -162,24 +179,10 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
         }
       }
     }
-  }, {
-    key: "sutra",
-    value: function sutra() {}
-  }, {
-    key: "bindEvents",
-    value: function bindEvents() {
-      // TODO: move pointerDown event into Sutra
-      this.game.on('pointerDown', function (entity, ev) {
-        if (entity.type === 'FLAME') {
-          game.playNote('G4');
-        }
-      });
-    }
   }]);
   return Teleporter;
 }();
 _defineProperty(Teleporter, "id", 'teleporter');
-_defineProperty(Teleporter, "type", 'sutra');
 
 },{}]},{},[1])(1)
 });

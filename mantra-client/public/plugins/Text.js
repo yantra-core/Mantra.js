@@ -37,6 +37,7 @@ var Text = exports["default"] = /*#__PURE__*/function () {
           y: 0
         };
       }
+
       //let rules = this.sutra();
       return _objectSpread({
         type: 'TEXT',

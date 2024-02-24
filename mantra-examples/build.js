@@ -287,9 +287,7 @@ function generateExampleFiles() {
         // regen the HTML file each time
         fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
 
-        
     
-
         // do not overwrite the js example code if it already exists
         if (!fs.existsSync(exampleJSPath)) {
             fs.writeFileSync(exampleJSPath, exampleTemplateJS(example), 'utf8');

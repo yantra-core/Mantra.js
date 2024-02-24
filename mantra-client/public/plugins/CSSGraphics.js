@@ -248,11 +248,19 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
 var _CSSCamera = _interopRequireDefault(require("./CSSCamera.js"));
-var _inflateBox = _interopRequireDefault(require("./lib/entity/inflateBox.js"));
-var _inflateText = _interopRequireDefault(require("./lib/entity/inflateText.js"));
+var _inflateBox = _interopRequireDefault(require("./lib/entity/inflate/inflateBox.js"));
+var _inflateText = _interopRequireDefault(require("./lib/entity/inflate/inflateText.js"));
 var _inflateGraphic = _interopRequireDefault(require("./lib/entity/inflateGraphic.js"));
 var _inflateTexture = _interopRequireDefault(require("./lib/entity/inflateTexture.js"));
 var _createGraphic = _interopRequireDefault(require("./lib/entity/createGraphic.js"));
+var _inflateButton = _interopRequireDefault(require("./lib/entity/inflate/inflateButton.js"));
+var _inflateCheckbox = _interopRequireDefault(require("./lib/entity/inflate/inflateCheckbox.js"));
+var _inflateInput = _interopRequireDefault(require("./lib/entity/inflate/inflateInput.js"));
+var _inflateIframe = _interopRequireDefault(require("./lib/entity/inflate/inflateIframe.js"));
+var _inflateRadio = _interopRequireDefault(require("./lib/entity/inflate/inflateRadio.js"));
+var _inflateRange = _interopRequireDefault(require("./lib/entity/inflate/inflateRange.js"));
+var _inflateSelect = _interopRequireDefault(require("./lib/entity/inflate/inflateSelect.js"));
+var _inflateTextarea = _interopRequireDefault(require("./lib/entity/inflate/inflateTextarea.js"));
 var _updateGraphic = _interopRequireDefault(require("./lib/entity/updateGraphic.js"));
 var _bindEntityEvents = _interopRequireDefault(require("./lib/entity/bindEntityEvents.js"));
 var _bindYCraftEvents = _interopRequireDefault(require("./lib/entity/bindYCraftEvents.js"));
@@ -303,6 +311,18 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateGraphic = _inflateGraphic["default"].bind(_assertThisInitialized(_this));
     _this.inflateTexture = _inflateTexture["default"].bind(_assertThisInitialized(_this));
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
+
+    // HTML DOM elements as Mantra entities
+    _this.inflateButton = _inflateButton["default"].bind(_assertThisInitialized(_this));
+    _this.inflateSelect = _inflateSelect["default"].bind(_assertThisInitialized(_this));
+    _this.inflateRange = _inflateRange["default"].bind(_assertThisInitialized(_this));
+    _this.inflateRadio = _inflateRadio["default"].bind(_assertThisInitialized(_this));
+    _this.inflateInput = _inflateInput["default"].bind(_assertThisInitialized(_this));
+    _this.inflateTextarea = _inflateTextarea["default"].bind(_assertThisInitialized(_this));
+    _this.inflateCheckbox = _inflateCheckbox["default"].bind(_assertThisInitialized(_this));
+    //this.inflateImage = inflateImage.bind(this);
+    //this.inflateVideo = inflateVideo.bind(this);
+    _this.inflateIframe = _inflateIframe["default"].bind(_assertThisInitialized(_this));
     _this.render = _render["default"].bind(_assertThisInitialized(_this));
     _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
     _this.bindEntityEvents = _bindEntityEvents["default"].bind(_assertThisInitialized(_this));
@@ -365,7 +385,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflateBox.js":16,"./lib/entity/inflateGraphic.js":17,"./lib/entity/inflateText.js":18,"./lib/entity/inflateTexture.js":19,"./lib/entity/removeGraphic.js":20,"./lib/entity/updateGraphic.js":21,"./lib/render.js":22,"./lib/unload.js":23}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCheckbox.js":18,"./lib/entity/inflate/inflateIframe.js":19,"./lib/entity/inflate/inflateInput.js":20,"./lib/entity/inflate/inflateRadio.js":21,"./lib/entity/inflate/inflateRange.js":22,"./lib/entity/inflate/inflateSelect.js":23,"./lib/entity/inflate/inflateText.js":24,"./lib/entity/inflate/inflateTextarea.js":25,"./lib/entity/inflateGraphic.js":26,"./lib/entity/inflateTexture.js":27,"./lib/entity/removeGraphic.js":28,"./lib/entity/updateGraphic.js":29,"./lib/render.js":30,"./lib/unload.js":31}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1036,6 +1056,41 @@ function createGraphic(entityData) {
     case 'TEXT':
       entityElement = this.inflateText(entityElement, entityData);
       break;
+    case 'BUTTON':
+      entityElement = this.inflateButton(entityElement, entityData);
+      break;
+    case 'INPUT':
+      // For INPUT entities, create an input
+      entityElement = this.inflateInput(entityElement, entityData);
+      break;
+    case 'SELECT':
+      // For SELECT entities, create a box
+      entityElement = this.inflateSelect(entityElement, entityData);
+      break;
+    case 'IMAGE':
+      // For IMAGE entities, create an image
+      entityElement = this.inflateImage(entityElement, entityData);
+      break;
+    case 'TEXTAREA':
+      // For TEXTAREA entities, create a textarea
+      entityElement = this.inflateTextarea(entityElement, entityData);
+      break;
+    case 'RANGE':
+      // For RANGE entities, create a range input
+      entityElement = this.inflateRange(entityElement, entityData);
+      break;
+    case 'CHECKBOX':
+      // For CHECKBOX entities, create a checkbox input
+      entityElement = this.inflateCheckbox(entityElement, entityData);
+      break;
+    case 'RADIO':
+      // For RADIO entities, create a radio input
+      entityElement = this.inflateRadio(entityElement, entityData);
+      break;
+    case 'IFRAME':
+      // For IFRAME entities, create an iframe
+      entityElement = this.inflateIframe(entityElement, entityData);
+      break;
     default:
       if (entityData.type === 'PART' && entityData.name === 'Display') {
         this.inflateText(entityElement, entityData);
@@ -1045,6 +1100,7 @@ function createGraphic(entityData) {
       break;
   }
 
+  // console.log(entityData.type, entityElement)
   // new api for entity.size
   if (typeof entityData.radius !== 'undefined') {
     // set circle size
@@ -1218,6 +1274,467 @@ function tileFlip(entityElement, hexColor, getTexture, entityData) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = inflateButton;
+function inflateButton(entityElement, entityData) {
+  // Create the button
+  var button = document.createElement('button');
+
+  // Set button text if provided
+  if (entityData.text) {
+    button.innerHTML = entityData.text;
+  }
+
+  // Apply default and custom button styles
+  applyButtonStyles(button, entityData);
+
+  // Append the button to the entityElement
+  entityElement.appendChild(button);
+
+  // Optional: Set width and color of the entityElement if provided
+  if (entityData.width) {
+    entityElement.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.color) {
+    entityElement.style.color = convertColorToHex(entityData.color);
+  }
+
+  // Event listeners for hover and pressed states
+  button.addEventListener('mouseover', function () {
+    button.style.backgroundColor = '#e6e6e6'; // Lighter shade for hover
+  });
+
+  button.addEventListener('mouseout', function () {
+    button.style.backgroundColor = defaultButtonStyles.backgroundColor; // Default background color
+  });
+
+  button.addEventListener('mousedown', function () {
+    button.style.backgroundColor = '#cccccc'; // Darker shade for pressed
+  });
+
+  button.addEventListener('mouseup', function () {
+    button.style.backgroundColor = '#e6e6e6'; // Lighter shade for hover
+  });
+
+  return entityElement;
+}
+var defaultButtonStyles = {
+  border: 'none',
+  padding: '15px 32px',
+  textAlign: 'center',
+  textDecoration: 'none',
+  display: 'inline-block',
+  fontSize: '16px',
+  margin: '4px 2px',
+  cursor: 'pointer',
+  borderRadius: '12px',
+  backgroundColor: '#f2f2f2',
+  color: 'black',
+  transition: 'background-color 0.4s ease, color 0.4s ease'
+};
+function applyButtonStyles(button, entityData) {
+  Object.assign(button.style, defaultButtonStyles, entityData.style);
+}
+function convertColorToHex(color) {
+  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
+}
+
+},{}],18:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateCheckbox;
+function inflateCheckbox(entityElement, entityData) {
+  if (Array.isArray(entityData.options)) {
+    entityData.options.forEach(function (optionData) {
+      var label = document.createElement('label');
+      var checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = optionData.value;
+      if (optionData.checked) {
+        checkbox.checked = true;
+      }
+      label.appendChild(checkbox);
+      label.append(optionData.label);
+      entityElement.appendChild(label);
+    });
+  }
+
+  // Optional: Apply custom styles to checkboxes
+  // No default styling function provided, adapt if needed
+
+  return entityElement;
+}
+
+},{}],19:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateIframe;
+function inflateIframe(entityElement, entityData) {
+  var iframe = document.createElement('iframe');
+  if (entityData.meta && entityData.meta.src) {
+    iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+  }
+
+  // Optional: Apply default and custom iframe styles
+  applyIframeStyles(iframe, entityData);
+  entityElement.appendChild(iframe);
+  if (entityData.width) {
+    iframe.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.height) {
+    iframe.style.height = "".concat(entityData.height, "px");
+  }
+  return entityElement;
+}
+function applyIframeStyles(iframe, entityData) {
+  // Define and apply default styles for iframe here
+  // Similar to applySelectStyles function
+}
+
+},{}],20:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateInput;
+function inflateInput(entityElement, entityData) {
+  // Create the input element
+  var input = document.createElement('input');
+
+  // Set input type if provided, default to 'text'
+  input.type = entityData.type || 'text';
+
+  // Set input value if provided
+  if (entityData.value) {
+    input.value = entityData.value;
+  }
+
+  // Set input placeholder if provided
+  if (entityData.placeholder) {
+    input.placeholder = entityData.placeholder;
+  }
+
+  // Apply default and custom input styles
+  applyInputStyles(input, entityData);
+
+  // Append the input element to the entityElement
+  entityElement.appendChild(input);
+
+  // Optional: Set width of the entityElement if provided
+  if (entityData.width) {
+    input.style.width = "".concat(entityData.width, "px");
+  }
+
+  // Optional: Set color of the input text if provided
+  if (entityData.color) {
+    input.style.color = convertColorToHex(entityData.color);
+  }
+
+  // Event listener for input changes
+  input.addEventListener('input', function (event) {
+    var _input = event.target;
+    // Update entity value in ECS on range change
+    game.updateEntity(entityData.id, {
+      value: _input.value
+    });
+  });
+  return entityElement;
+}
+var defaultInputStyles = {
+  padding: '10px',
+  fontSize: '16px',
+  margin: '4px 2px',
+  cursor: 'text',
+  borderRadius: '4px',
+  backgroundColor: '#fff',
+  color: '#333',
+  border: '1px solid #ccc',
+  appearance: 'none',
+  // Removes default browser styling
+  transition: 'border-color 0.4s ease, box-shadow 0.4s ease'
+};
+function applyInputStyles(input, entityData) {
+  Object.assign(input.style, defaultInputStyles, entityData.style);
+
+  // Add focus and change event listeners for interactive styles
+  input.addEventListener('focus', function () {
+    input.style.borderColor = '#80bdff';
+    input.style.boxShadow = '0 0 0 0.2rem rgba(0,123,255,.25)';
+  });
+  input.addEventListener('blur', function () {
+    input.style.borderColor = '#ccc';
+    input.style.boxShadow = 'none';
+  });
+}
+function convertColorToHex(color) {
+  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
+}
+
+},{}],21:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateRadio;
+function inflateRadio(entityElement, entityData) {
+  if (entityData.meta && entityData.meta.options) {
+    var options = entityData.meta.options;
+    if (Array.isArray(options)) {
+      options.forEach(function (optionData) {
+        var label = document.createElement('label');
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = entityData.groupName; // Ensure all radio buttons have the same 'name' attribute
+        radio.value = optionData.value;
+        if (optionData.checked) {
+          radio.checked = true;
+        }
+        label.appendChild(radio);
+        label.append(optionData.label);
+        entityElement.appendChild(label);
+      });
+    }
+  }
+
+  // Optional: Apply custom styles to radio buttons
+  // No default styling function provided, adapt if needed
+
+  return entityElement;
+}
+
+},{}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateRange;
+function inflateRange(entityElement, entityData) {
+  var range = document.createElement('input');
+  range.type = 'range';
+  range.value = entityData.value || 100; // Default value if none provided
+
+  if (entityData.min) {
+    range.min = entityData.min;
+  }
+  if (entityData.max) {
+    range.max = entityData.max;
+  }
+  if (entityData.step) {
+    range.step = entityData.step;
+  }
+
+  // Apply default and custom range styles
+  applyRangeStyles(range, entityData);
+  console.log('rrrrr', range);
+  // Append the range input to the entityElement
+  entityElement.appendChild(range);
+  if (entityData.width) {
+    entityElement.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.color) {
+    entityElement.style.color = convertColorToHex(entityData.color);
+  }
+
+  // Event listener for range input changes
+  range.addEventListener('input', function (event) {
+    var _range = event.target;
+    // Update entity value in ECS on range change
+    game.updateEntity(entityData.id, {
+      value: _range.value
+    });
+  });
+  return entityElement;
+}
+function applyRangeStyles(range, entityData) {
+  // Basic default styles for range input
+  var defaultRangeStyles = {
+    // Example default styles; adjust as needed
+    display: 'block',
+    width: '100%',
+    // Takes full width of the container
+    margin: '8px 0',
+    // Adds some space around the slider
+    cursor: 'pointer'
+  };
+  Object.assign(range.style, defaultRangeStyles, entityData.style);
+
+  // Additional styling can be applied through entityData.style
+}
+
+function convertColorToHex(color) {
+  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
+}
+
+},{}],23:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateSelect;
+function inflateSelect(entityElement, entityData) {
+  // Create the select element
+  var select = document.createElement('select');
+  if (entityData.meta && entityData.meta.options) {
+    var options = entityData.meta.options;
+    // Populate the select element with options
+    if (Array.isArray(options)) {
+      options.forEach(function (optionData) {
+        var option = document.createElement('option');
+        option.value = optionData.value;
+        option.textContent = optionData.label;
+        // Optional: Set the option as selected
+        if (optionData.selected) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+    }
+  }
+
+  // Apply default and custom select styles
+  applySelectStyles(select, entityData);
+
+  // Append the select element to the entityElement
+  entityElement.appendChild(select);
+
+  // Optional: Set width and color of the entityElement if provided
+  if (entityData.width) {
+    entityElement.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.color) {
+    entityElement.style.color = convertColorToHex(entityData.color);
+  }
+  return entityElement;
+}
+var defaultSelectStyles = {
+  padding: '10px 15px',
+  fontSize: '16px',
+  margin: '4px 2px',
+  cursor: 'pointer',
+  borderRadius: '8px',
+  backgroundColor: '#f2f2f2',
+  color: 'black',
+  border: '1px solid #ccc',
+  appearance: 'none',
+  // Removes default browser styling
+  transition: 'border-color 0.4s ease, box-shadow 0.4s ease'
+};
+function applySelectStyles(select, entityData) {
+  Object.assign(select.style, defaultSelectStyles, entityData.style);
+
+  // Add focus and change event listeners for interactive styles
+  select.addEventListener('focus', function () {
+    select.style.borderColor = '#80bdff';
+    select.style.boxShadow = '0 0 0 0.2rem rgba(0,123,255,.25)';
+  });
+  select.addEventListener('blur', function () {
+    select.style.borderColor = '#ccc';
+    select.style.boxShadow = 'none';
+  });
+
+  // change event
+  select.addEventListener('change', function (event) {
+    var _select = event.target;
+    // Update entity value in ECS on select change
+    game.updateEntity(entityData.id, {
+      value: _select.value
+    });
+  });
+}
+function convertColorToHex(color) {
+  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
+}
+
+},{}],24:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateText;
+function inflateText(entityElement, entityData) {
+  // Create a container for the text
+
+  entityElement.innerText = entityData.text;
+
+  // Ensure the background is transparent by default
+  entityElement.style.backgroundColor = 'transparent';
+
+  // Apply custom styles from entityData.style
+  if (entityData.style) {
+    for (var key in entityData.style) {
+      entityElement.style[key] = entityData.style[key];
+    }
+  }
+
+  // Set width if provided
+  if (entityData.width) {
+    entityElement.style.width = "".concat(entityData.width, "px");
+  }
+
+  // Convert and set color if provided
+  if (entityData.color) {
+    var hexColor;
+    // Convert integer color to hex format
+    if (typeof entityData.color === 'number') {
+      hexColor = "#".concat(entityData.color.toString(16).padStart(6, '0')); // Ensure proper hex format with padding
+    } else {
+      hexColor = entityData.color; // Assume it's already a string in a valid format
+    }
+
+    entityElement.style.color = hexColor;
+  }
+  console.log(entityElement);
+  return entityElement;
+}
+
+},{}],25:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateTextarea;
+function inflateTextarea(entityElement, entityData) {
+  var textarea = document.createElement('textarea');
+  textarea.textContent = entityData.text || ''; // Default text if none provided
+
+  // Apply default and custom textarea styles
+  applyTextareaStyles(textarea, entityData);
+
+  // Append the textarea to the entityElement
+  entityElement.appendChild(textarea);
+  if (entityData.width) {
+    textarea.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.height) {
+    textarea.style.height = "".concat(entityData.height, "px");
+  }
+  if (entityData.color) {
+    textarea.style.color = convertColorToHex(entityData.color);
+  }
+  return entityElement;
+}
+function applyTextareaStyles(textarea, entityData) {
+  // Define and apply default styles for textarea here
+  // Similar to applySelectStyles function
+}
+
+},{}],26:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = inflateEntity;
 function inflateEntity(entity, alpha) {
   // checks for existence of entity, performs update or create
@@ -1239,56 +1756,7 @@ function inflateEntity(entity, alpha) {
   this.inflateTexture(entity, graphic);
 }
 
-},{}],18:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = inflateText;
-function inflateText(entityElement, entityData) {
-  var depthChart = this.depthChart;
-  // TODO: check if chat bubble already exists, if so just update it
-  // Create a container for the chat bubble
-
-  entityElement.innerText = entityData.text;
-  if (entityData.style) {
-    // apply styles
-    for (var key in entityData.style) {
-      entityElement.style[key] = entityData.style[key];
-    }
-  }
-  if (entityData.width) {
-    entityElement.style.width = entityData.width + 'px';
-  }
-  if (entityData.color) {
-    // convert int color to hex
-    if (typeof entityData.color === 'number') {
-      var hexColor = '#' + entityData.color.toString(16);
-      entityElement.style.color = hexColor;
-    }
-  }
-
-  /* Remark: No need to bind each entity to a pointerdown event for CSSGraphics, we can delegate
-  // console.log('inflateBox', entityData.type, entityElement.style.zIndex)
-  chatBubble.addEventListener('pointerdown', (ev) => {
-    //console.log(ev.target, entityData.id, entityData.type, entityData)
-    // get the full ent from the game
-    let ent = game.getEntity(entityData.id);
-    game.emit('pointerDown', ent, ev);
-  });
-  */
-
-  // console.log('appending new text element')
-  // Append the chat bubble to the container
-  // entityElement.appendChild(chatBubble);
-  // Update the position of the chat bubble container
-  //this.updateEntityElementPosition(entityElement, entityData);
-
-  return entityElement;
-}
-
-},{}],19:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1368,7 +1836,7 @@ function applyTextureStyles(texture, element, textureUrl, spritePosition, entity
   });
 }
 
-},{}],20:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1386,7 +1854,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1459,7 +1927,7 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1518,7 +1986,7 @@ function render(game, alpha) {
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

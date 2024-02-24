@@ -61,36 +61,34 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     }
 
     // Common function to generate mouse context with world coordinates
+    // TODO: we'll need implement createMouseContext and entity detection per Graphics adapter
   }, {
     key: "createMouseContext",
     value: function createMouseContext(event) {
       var clientX = event.clientX,
         clientY = event.clientY;
       var canvas = event.target instanceof HTMLCanvasElement ? event.target : null;
-      var canvasPosition = null;
-      if (canvas) {
-        var rect = canvas.getBoundingClientRect();
-        canvasPosition = {
-          x: clientX - rect.left,
-          y: clientY - rect.top
-        };
+      var canvasPosition = canvas ? this.getCanvasPosition(canvas, clientX, clientY) : null;
+      var worldPosition = this.getWorldPosition(clientX, clientY);
+      var targetElement = event.target;
+      var mantraId = null;
+      while (targetElement && targetElement !== document.body) {
+        if (targetElement.getAttribute && targetElement.getAttribute('mantra-id')) {
+          mantraId = targetElement.getAttribute('mantra-id');
+          break; // Mantra ID found, break the loop
+        }
+
+        targetElement = targetElement.parentNode; // Move up to the parent node
       }
 
-      // Convert screen coordinates to world coordinates
-      var worldX = (clientX - window.innerWidth / 2 + this.game.data.camera.offsetX) / this.game.data.camera.currentZoom + this.game.data.camera.position.x;
-      var worldY = (clientY - window.innerHeight / 2 + this.game.data.camera.offsetY) / this.game.data.camera.currentZoom + this.game.data.camera.position.y;
-
-      // Construct the context object
+      this.updateSelectedEntity(mantraId, event.target);
       var context = {
         mousePosition: {
           x: clientX,
           y: clientY
         },
         canvasPosition: canvasPosition,
-        worldPosition: {
-          x: worldX,
-          y: worldY
-        },
+        worldPosition: worldPosition,
         event: event,
         entityId: this.game.selectedEntityId || null,
         isDragging: this.isDragging,
@@ -98,35 +96,52 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         buttons: this.mouseButtons,
         firstTouchId: this.firstTouchId,
         secondTouchId: this.secondTouchId,
-        // Number of active touches can be useful for multi-touch logic
         activeTouchCount: Object.keys(this.activeTouches).length,
-        // Provide detailed information on active touches if needed
-        activeTouches: this.activeTouches
-        // Add any other relevant data here
+        activeTouches: this.activeTouches,
+        target: this.game.data.ents._[this.game.selectedEntityId] || null,
+        owner: this.game.data.ents._[this.game.currentPlayerId] || null
       };
 
-      // alias for worldPosition - developer context is usually in world coordinates
+      // Alias for worldPosition for developer convenience
       context.position = context.worldPosition;
       return context;
+    }
+  }, {
+    key: "getCanvasPosition",
+    value: function getCanvasPosition(canvas, clientX, clientY) {
+      var rect = canvas.getBoundingClientRect();
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+  }, {
+    key: "getWorldPosition",
+    value: function getWorldPosition(clientX, clientY) {
+      var _this$game$data$camer = this.game.data.camera,
+        offsetX = _this$game$data$camer.offsetX,
+        offsetY = _this$game$data$camer.offsetY,
+        currentZoom = _this$game$data$camer.currentZoom,
+        position = _this$game$data$camer.position;
+      return {
+        x: (clientX - window.innerWidth / 2 + offsetX) / currentZoom + position.x,
+        y: (clientY - window.innerHeight / 2 + offsetY) / currentZoom + position.y
+      };
+    }
+  }, {
+    key: "updateSelectedEntity",
+    value: function updateSelectedEntity(mantraId, target) {
+      if (mantraId) {
+        this.game.selectedEntityId = mantraId;
+      } else if (target.tagName !== 'BODY') {
+        this.game.selectedEntityId = null;
+      }
     }
   }, {
     key: "handleMouseMove",
     value: function handleMouseMove(event) {
       var game = this.game;
       var target = event.target;
-
-      /* TODO: mouse over selects ent, make this configurable
-        was making it hard to debug the editor since it would switch entities
-          if (target && target.getAttribute) {
-            let mantraId = target.getAttribute('mantra-id');
-            if (mantraId) {
-              // if this is a Mantra entity, set the selectedEntityId
-              // this is used for GUI rendering and CSSGraphics
-              this.game.selectedEntityId = mantraId;
-            }
-          }
-        */
-
       this.mousePosition = {
         x: event.clientX,
         y: event.clientY
@@ -206,39 +221,6 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     value: function handleMouseDown(event) {
       var target = event.target;
       var game = this.game;
-      // TODO: we'll need entity detection per Graphics adapter
-      // Remark: The current approach only works for DOM HTML, for canvas, we'll need the adapter ( three ) to query scene and return ent id
-      if (target && target.getAttribute) {
-        var mantraId = target.getAttribute('mantra-id');
-        if (mantraId) {
-          // if this is a Mantra entity, set the selectedEntityId
-          // this is used for GUI rendering and CSSGraphics
-          this.game.selectedEntityId = mantraId;
-          if (this.game.data && this.game.data.ents) {
-            // get the reference to this ent, check for pointerdown event
-            var ent = this.game.data.ents._[Number(mantraId)];
-            if (ent && ent.pointerdown) {
-              var _context2 = ent;
-              ent.pointerdown(ent, event);
-            }
-          }
-        }
-        if (!mantraId) {
-          // if no mantraID was found, a non-game element was clicked
-          // in most cases this is a GUI element, so we should clear the selectedEntityId
-          this.game.selectedEntityId = null;
-          // and do nothing else
-          // if it happens to be the body, it could still be the game canvas ( empty area )
-          // in that case, we still want to process the mouse event
-          // check to see if the target is not the body
-          if (target.tagName != 'BODY') {
-            this.game.selectedEntityId = null;
-            return;
-          }
-        }
-      } else {
-        // no target, do nothing, continue
-      }
       this.updateMouseButtons(event, true);
 
       // middle mouse button
@@ -255,6 +237,9 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         event.preventDefault();
       }
       var context = this.createMouseContext(event);
+      if (context.target && context.target.pointerdown) {
+        context.target.pointerdown(context, event);
+      }
       this.game.emit('pointerDown', context, event);
 
       // check to see if game is running in iframe, if soo broadcast the event with context
@@ -287,7 +272,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       // get the reference to this ent, check for pointerdown event
       var ent = this.game.data.ents._[this.game.selectedEntityId];
       if (ent && ent.pointerup) {
-        var _context3 = ent;
+        var _context2 = ent;
         ent.pointerup(ent, event);
       }
       var context = this.createMouseContext(event);
