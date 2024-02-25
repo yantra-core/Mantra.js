@@ -248,11 +248,13 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
 var _CSSCamera = _interopRequireDefault(require("./CSSCamera.js"));
+var _createGraphic = _interopRequireDefault(require("./lib/entity/createGraphic.js"));
 var _inflateBox = _interopRequireDefault(require("./lib/entity/inflate/inflateBox.js"));
 var _inflateText = _interopRequireDefault(require("./lib/entity/inflate/inflateText.js"));
+var _inflateCanvas = _interopRequireDefault(require("./lib/entity/inflate/inflateCanvas.js"));
+var _inflateImage = _interopRequireDefault(require("./lib/entity/inflate/inflateImage.js"));
 var _inflateGraphic = _interopRequireDefault(require("./lib/entity/inflateGraphic.js"));
 var _inflateTexture = _interopRequireDefault(require("./lib/entity/inflateTexture.js"));
-var _createGraphic = _interopRequireDefault(require("./lib/entity/createGraphic.js"));
 var _inflateButton = _interopRequireDefault(require("./lib/entity/inflate/inflateButton.js"));
 var _inflateCheckbox = _interopRequireDefault(require("./lib/entity/inflate/inflateCheckbox.js"));
 var _inflateInput = _interopRequireDefault(require("./lib/entity/inflate/inflateInput.js"));
@@ -320,8 +322,9 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateInput = _inflateInput["default"].bind(_assertThisInitialized(_this));
     _this.inflateTextarea = _inflateTextarea["default"].bind(_assertThisInitialized(_this));
     _this.inflateCheckbox = _inflateCheckbox["default"].bind(_assertThisInitialized(_this));
-    //this.inflateImage = inflateImage.bind(this);
+    _this.inflateImage = _inflateImage["default"].bind(_assertThisInitialized(_this));
     //this.inflateVideo = inflateVideo.bind(this);
+    _this.inflateCanvas = _inflateCanvas["default"].bind(_assertThisInitialized(_this));
     _this.inflateIframe = _inflateIframe["default"].bind(_assertThisInitialized(_this));
     _this.render = _render["default"].bind(_assertThisInitialized(_this));
     _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
@@ -367,6 +370,13 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         gameHolder.id = 'gameHolder';
         document.body.appendChild(gameHolder);
       }
+
+      // Disable drag behavior for all images within the game container
+      gameHolder.addEventListener('dragstart', function (event) {
+        if (event.target.tagName === 'IMG') {
+          event.preventDefault();
+        }
+      });
       var renderDiv = document.getElementById('css-render-div');
       if (!renderDiv) {
         renderDiv = document.createElement('div');
@@ -385,7 +395,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCheckbox.js":18,"./lib/entity/inflate/inflateIframe.js":19,"./lib/entity/inflate/inflateInput.js":20,"./lib/entity/inflate/inflateRadio.js":21,"./lib/entity/inflate/inflateRange.js":22,"./lib/entity/inflate/inflateSelect.js":23,"./lib/entity/inflate/inflateText.js":24,"./lib/entity/inflate/inflateTextarea.js":25,"./lib/entity/inflateGraphic.js":26,"./lib/entity/inflateTexture.js":27,"./lib/entity/removeGraphic.js":28,"./lib/entity/updateGraphic.js":29,"./lib/render.js":30,"./lib/unload.js":31}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCanvas.js":18,"./lib/entity/inflate/inflateCheckbox.js":19,"./lib/entity/inflate/inflateIframe.js":20,"./lib/entity/inflate/inflateImage.js":21,"./lib/entity/inflate/inflateInput.js":22,"./lib/entity/inflate/inflateRadio.js":23,"./lib/entity/inflate/inflateRange.js":24,"./lib/entity/inflate/inflateSelect.js":25,"./lib/entity/inflate/inflateText.js":26,"./lib/entity/inflate/inflateTextarea.js":27,"./lib/entity/inflateGraphic.js":28,"./lib/entity/inflateTexture.js":29,"./lib/entity/removeGraphic.js":30,"./lib/entity/updateGraphic.js":31,"./lib/render.js":32,"./lib/unload.js":33}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1091,6 +1101,10 @@ function createGraphic(entityData) {
       // For IFRAME entities, create an iframe
       entityElement = this.inflateIframe(entityElement, entityData);
       break;
+    case 'CANVAS':
+      // For CANVAS entities, create a canvas
+      entityElement = this.inflateCanvas(entityElement, entityData);
+      break;
     default:
       if (entityData.type === 'PART' && entityData.name === 'Display') {
         this.inflateText(entityElement, entityData);
@@ -1276,6 +1290,74 @@ function convertColorToHex(color) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = inflateCanvas;
+function inflateCanvas(entityElement, entityData) {
+  var canvas;
+
+  // Check if a canvas or canvas context is passed in entityData.meta.canvas
+  if (entityData.meta && entityData.meta.canvas) {
+    // Assuming entityData.meta.canvas could be a canvas element or a canvas context
+    canvas = entityData.meta.canvas instanceof HTMLCanvasElement ? entityData.meta.canvas : entityData.meta.canvas.canvas;
+  } else {
+    // Create a new canvas if none is provided
+    canvas = document.createElement('canvas');
+    // Use entityData.width and entityData.height directly
+    canvas.width = entityData.width || 300;
+    canvas.height = entityData.height || 150;
+
+    // Optional: Apply default and custom canvas styles
+    applyCanvasStyles(canvas, entityData);
+  }
+
+  // Append the canvas to the entityElement if it's not already there
+  // This check is important to avoid re-adding an existing canvas to the DOM
+  if (!entityElement.contains(canvas)) {
+    entityElement.appendChild(canvas);
+  }
+
+  // Adjust canvas dimensions using CSS for visual scaling if necessary
+  // Use entityData.width and entityData.height directly for CSS styles
+  if (entityData.width) {
+    canvas.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.height) {
+    canvas.style.height = "".concat(entityData.height, "px");
+  }
+
+  // Additional logic to handle drawing on the canvas if an image is provided
+  if (entityData.meta && entityData.meta.imageData) {
+    var ctx = canvas.getContext('2d');
+
+    // Check if imageData is actually an Image or Canvas element
+    if (entityData.meta.imageData instanceof HTMLImageElement || entityData.meta.imageData instanceof HTMLCanvasElement) {
+      // Draw the image or canvas onto the canvas
+      ctx.drawImage(entityData.meta.imageData, 0, 0, canvas.width, canvas.height);
+    } else if (entityData.meta.imageData instanceof ImageData) {
+      // If it's ImageData, use putImageData
+      ctx.putImageData(entityData.meta.imageData, 0, 0);
+    } else {
+      console.error('Unsupported imageData type:', entityData.meta.imageData);
+    }
+  }
+  return entityElement;
+}
+function applyCanvasStyles(canvas, entityData) {
+  // canvas.style.border = '1px solid #000'; // Example default style
+
+  // Apply any custom styles defined in entityData
+  if (entityData.styles) {
+    Object.keys(entityData.styles).forEach(function (styleKey) {
+      canvas.style[styleKey] = entityData.styles[styleKey];
+    });
+  }
+}
+
+},{}],19:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = inflateCheckbox;
 function inflateCheckbox(entityElement, entityData) {
   if (Array.isArray(entityData.options)) {
@@ -1299,7 +1381,7 @@ function inflateCheckbox(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1328,7 +1410,60 @@ function applyIframeStyles(iframe, entityData) {
   // Similar to applySelectStyles function
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateImage;
+function inflateImage(entityElement, entityData) {
+  var element; // This can be an <img> or <canvas>
+  // Check for imageData in meta and use it if available
+  if (entityData.meta && typeof entityData.meta.imageData !== 'undefined') {
+    if (entityData.meta.imageData instanceof HTMLCanvasElement) {
+      // Directly use the canvas instead of converting it to a data URL
+      element = entityData.meta.imageData;
+    } else {
+      console.error('Unsupported imageData type:', entityData.meta.imageData);
+      return;
+    }
+  } else {
+    // Fallback to creating an <img> if imageData is not available or not a canvas
+    element = document.createElement('img');
+    if (entityData.meta && entityData.meta.src) {
+      element.src = entityData.meta.src;
+    }
+  }
+
+  // Optional: Apply default and custom styles
+  applyImageStyles(element, entityData);
+  entityElement.appendChild(element);
+
+  // Set dimensions if specified in entityData
+  if (entityData.width) {
+    element.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.height) {
+    element.style.height = "".concat(entityData.height, "px");
+  }
+  return entityElement;
+}
+function applyImageStyles(img, entityData) {
+  // Define and apply default styles for img here
+  // This function is similar to applyIframeStyles but for <img> elements
+  // For example, setting a default border, margin, or any other styles
+  img.style.border = 'none'; // Example default style
+
+  // Apply any custom styles defined in entityData
+  if (entityData.styles) {
+    Object.keys(entityData.styles).forEach(function (styleKey) {
+      img.style[styleKey] = entityData.styles[styleKey];
+    });
+  }
+}
+
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1408,7 +1543,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1441,7 +1576,7 @@ function inflateRadio(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1505,7 +1640,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1586,7 +1721,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1629,7 +1764,7 @@ function inflateText(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1661,7 +1796,7 @@ function applyTextareaStyles(textarea, entityData) {
   // Similar to applySelectStyles function
 }
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1688,7 +1823,7 @@ function inflateEntity(entity, alpha) {
   this.inflateTexture(entity, graphic);
 }
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1768,7 +1903,7 @@ function applyTextureStyles(texture, element, textureUrl, spritePosition, entity
   });
 }
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1786,7 +1921,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1852,6 +1987,14 @@ function updateGraphic(entityData) {
         entityElement.style[key] = entityData.style[key];
       });
     }
+    if (entityData.type === 'IFRAME') {
+      var iframe = entityElement.querySelector('iframe');
+
+      // check to see if iframe src matches entityData.meta.src
+      if (iframe && iframe.src !== entityData.meta.src) {
+        iframe.src = entityData.meta.src;
+      }
+    }
     return this.updateEntityPosition(entityElement, entityData);
   } else {
     // If the entity element does not exist, create it
@@ -1859,7 +2002,7 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1918,7 +2061,7 @@ function render(game, alpha) {
   }
 }
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

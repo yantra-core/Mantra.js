@@ -20,7 +20,7 @@ var Tower = exports["default"] = /*#__PURE__*/function () {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, Tower);
     this.id = Tower.id;
-    this.fireRate = config.fireRate || 100; // Time between shots in game ticks
+    this.fireRate = config.fireRate || 10; // Time between shots in game ticks
     this.range = config.range || 200; // Range within which the tower can target and fire
     this.weaponType = config.weaponType || 'bullet'; // Default weapon type
   }

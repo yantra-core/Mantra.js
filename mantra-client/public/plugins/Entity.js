@@ -577,6 +577,7 @@ function createEntity() {
       afterItemCollected: null,
       afterRemoveEntity: null,
       afterCreateEntity: null,
+      afterUpdate: null,
       update: null,
       exit: null,
       ctick: this.game.tick
@@ -694,6 +695,7 @@ function createEntity() {
     onDrop = _config.onDrop,
     afterRemoveEntity = _config.afterRemoveEntity,
     afterCreateEntity = _config.afterCreateEntity,
+    afterUpdateEntity = _config.afterUpdateEntity,
     afterItemCollected = _config.afterItemCollected,
     update = _config.update,
     exit = _config.exit,
@@ -763,6 +765,7 @@ function createEntity() {
   this.game.addComponent(entityId, 'afterItemCollected', afterItemCollected);
   this.game.addComponent(entityId, 'afterRemoveEntity', afterRemoveEntity);
   this.game.addComponent(entityId, 'afterCreateEntity', afterRemoveEntity);
+  this.game.addComponent(entityId, 'afterUpdateEntity', afterUpdateEntity);
   this.game.addComponent(entityId, 'collisionActive', collisionActive);
   this.game.addComponent(entityId, 'collisionStart', collisionStart);
   this.game.addComponent(entityId, 'collisionEnd', collisionEnd);
@@ -1502,8 +1505,20 @@ function updateEntity(entityDataOrId, entityData) {
   if (this.game.systems.rbush) {
     // this.game.systems.rbush.updateEntity(ent);
   }
-  ent = this.game.lifecycle.triggerHook('after.updateEntity', ent);
-  return ent;
+
+  //
+  // Entity Lifecycle afterUpdateEntity
+  //
+  var updatedEnt = this.game.getEntity(entityId);
+  var _afterUpdateEntity;
+  if (typeof updatedEnt.afterUpdateEntity === 'function') {
+    _afterUpdateEntity = updatedEnt.afterUpdateEntity;
+  }
+  if (_afterUpdateEntity) {
+    _afterUpdateEntity(updatedEnt);
+  }
+  updatedEnt = this.game.lifecycle.triggerHook('after.updateEntity', updatedEnt);
+  return updatedEnt;
 }
 
 /* TODO: we need to iterate all events for composite updates

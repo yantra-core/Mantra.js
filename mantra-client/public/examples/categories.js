@@ -1232,8 +1232,6 @@ let ui_examples = [
     url: 'ui/ui-text.html',
     tags: ['ui', 'text', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   },
-  /* TODO: add this later, we already have texture system, this would be simple CSS only images
-  // such as overlays or simple menus
   {
     title: 'Image',
     category: 'ui',
@@ -1242,7 +1240,14 @@ let ui_examples = [
     url: 'ui/ui-image.html',
     tags: ['ui', 'image', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   },
-  */
+  {
+    title: 'Canvas',
+    category: 'ui',
+    description: 'Create UI canvas.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-canvas.html',
+    tags: ['ui', 'canvas', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
   {
     title: 'Flash Message',
     category: 'ui',

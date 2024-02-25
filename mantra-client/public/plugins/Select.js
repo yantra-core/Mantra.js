@@ -47,6 +47,19 @@ var Select = exports["default"] = /*#__PURE__*/function () {
         entityData.meta = entityData.meta || {};
         entityData.meta.options = entityData.options;
       }
+
+      // convert any string options to objects
+      if (typeof entityData.meta.options !== 'undefined') {
+        entityData.meta.options = entityData.meta.options.map(function (option) {
+          if (typeof option === 'string') {
+            return {
+              label: option,
+              value: option
+            };
+          }
+          return option;
+        });
+      }
       return _objectSpread({
         type: 'SELECT',
         body: false,

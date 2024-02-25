@@ -1,9 +1,12 @@
+// Remark: These should all be more closely tied to ./plugins directory
+// and scope / codepaths. we should be able to load the World plugins from .use('WorldName')
 import Home from './Home/Home.js';
 import GravityGardens from './GravityGardens/GravityGardens.js';
 import InfinityTower from './InfinityTower/InfinityTower.js';
 import Maze from './Maze/Maze.js';
 import Music from './Music/Music.js';
 import Platform from './Platform/Platform.js';
+import Playground from './Playground/Playground.js';
 import Pong from './Pong/Pong.js';
 import Space from './Space/Space.js';
 import Sutra from './Sutra/Sutra.js';
@@ -18,6 +21,7 @@ worlds.InfinityTower = InfinityTower;
 worlds.Maze = Maze;
 worlds.Music = Music;
 worlds.Platform = Platform;
+worlds.Playground = Playground;
 worlds.Pong = Pong;
 worlds.Space = Space;
 worlds.Sutra = Sutra;

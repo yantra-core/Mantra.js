@@ -23,7 +23,8 @@ let game = new Game({
   graphics: ['css'], // 'three', 'babylon', 'css'
   gameRoot: '.',
   //defaultMovement: true,
-  //defaultMouseMovement: false
+  // defaultMouseMovement: false
+
 
   /*
   fps: 60,
@@ -89,33 +90,140 @@ game.use(new plugins.Checkbox());
 game.use(new plugins.Iframe());
 game.use(new plugins.Radio());
 game.use(new plugins.Text());
-
+game.use(new plugins.Image());
+game.use(new plugins.Canvas());
 game.use(new plugins.CSSGraphics());
+game.use(new plugins.GravityWell());
 
 game.use(new Mouse());
 
 game.use(new Lifetime());
 
+game.data.camera.mouseWheelZoomEnabled = true;
+
+
 game.start(function () {
   game.reset();
   game.setZoom(1.5);
-  // game.make().Player().createEntity();
+  game.make().Player().createEntity();
 
   // TODO: make this a helper
   // game.data.camera.mouseWheelZoomEnabled = true;
 
+  game.make().Image({
+    width: 256,
+    height: 256,
+    src: 'https://yantra.gg/mantra/img/game/env/warp-to-mantra-home-256.png'
+  }).createEntity();
   //game.use(new worlds.Maze())
-  game.use(new worlds.Home())
+  // game.use(new worlds.Playground())
+
+  // game.make().GravityWell().isStatic(true).createEntity();
+
+  function isCanvasEmpty(canvas, context) {
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] !== 0) { // Check the alpha channel; if any pixel is not fully transparent, the canvas is not empty
+        return false;
+      }
+    }
+    return true; // All pixels are fully transparent
+  }
+
+  function sliceCanvasToEnts(canvas, tileWidth, tileHeight) {
+    const context = canvas.getContext('2d');
+    const numRows = Math.ceil(canvas.height / tileHeight);
+    const numCols = Math.ceil(canvas.width / tileWidth);
+
+    for (let row = 0; row < numRows; row++) {
+      for (let col = 0; col < numCols; col++) {
+        // Create a new canvas for each tile
+        const tileCanvas = document.createElement('canvas');
+        tileCanvas.width = tileWidth;
+        tileCanvas.height = tileHeight;
+        const tileContext = tileCanvas.getContext('2d');
+
+        // Draw the image slice (from the main canvas) onto the tile canvas
+        tileContext.drawImage(
+          canvas,
+          col * tileWidth, row * tileHeight, // Source x and y from the main canvas
+          tileWidth, tileHeight, // Source width and height
+          0, 0, // Destination x and y on the tile canvas
+          tileWidth, tileHeight // Destination width and height on the tile canvas
+        );
+
+        let imgEnt = game.make().Image();
+        // imgEnt.Hexapod();
+        imgEnt.text(null);
+        imgEnt.x(col * tileWidth);
+        imgEnt.y(row * tileHeight);
+        imgEnt.body(true);
+        imgEnt.meta({
+          imageData: tileCanvas
+        })
+        imgEnt.createEntity();
+
+      }
+    }
+  }
+
+  /*
+
+  const image = document.getElementById('testImage');
+
+  function processImage(image) {
+    let ent = game.make().Canvas({
+      meta: {
+        imageData: image
+      },
+      style: {
+        display: 'none'
+      },
+    }).width(image.width).height(image.height).createEntity();
+    console.log('ahhhh ', ent)
+    // get updated canvas component
+    //let graphic = game.components.graphics.get(ent.id);
+    //let canvas = graphic['graphics-css'].querySelector('canvas');
+    // needs to be on the next tick to pickup graphics change
+    // TODO: should be implement game.nextTick() and game.prevTick() to handle this
+    // why not, ChronoControl.js
+    setTimeout(function () {
+      let updatedEnt = game.getEntity(ent.id);
+      let graphic = updatedEnt.graphics['graphics-css'];
+      let canvas = graphic.querySelector('canvas');
+
+      console.log('updatedEnt', updatedEnt)
+      sliceCanvasToEnts(canvas, 16, 16);
+    }, 1)
+    //
+
+  }
+
+  image.onload = function () {
+    processImage(image);
+  };
+
+  // If the image is already loaded (e.g., cached by the browser), draw it immediately
+  if (image.complete) {
+    processImage(image);
+
+  }
+
+  */
+
+  //game.use(new worlds.Music())
   //game.use(new worlds.Platform())
   //game.use(new worlds.YCraft())
   //game.use(new worlds.GravityGardens())
   // game.use(new worlds.Home())
 
 
-/*
+  /*
+    
   
-
-*/
+  */
   // game.make().Flash().createEntity();
 
   //game.make().Player().createEntity();
@@ -284,7 +392,7 @@ game.start(function () {
   tileMap2.createEntity();
   */
 
- 
+
   /*
   game.use(new Teleporter());
   //game.use(new plugins.Hexapod())

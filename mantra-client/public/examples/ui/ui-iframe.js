@@ -9,7 +9,7 @@ game.start(function(){
 // <iframe> element
 //
 game.make()
-  .Iframe({ src: 'http://marak.com' })
+  .Iframe({ src: 'https://marak.com' })
   .body(true)
   .width(800)
   .height(600)

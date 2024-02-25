@@ -45,6 +45,23 @@ var Iframe = exports["default"] = /*#__PURE__*/function () {
       // Define the meta for iframe specifics like dimensions
       entityData.meta = entityData.meta || {};
       entityData.meta.src = src;
+      entityData.afterUpdateEntity = function (entity) {
+        // check the iframe src vs the entity src
+        // if they are different, update the iframe src\
+        var graphic = entity.graphics['css-graphic'];
+        if (graphic) {
+          // graphic is a DOM object, find it's first child iframe
+          var iframe = graphic.firstChild;
+          if (iframe) {
+            iframe.src = entity.meta.src;
+          }
+        }
+      };
+      if (typeof entityData.size === 'undefined') {
+        // default iframe size
+        entityData.width = 800;
+        entityData.height = 600;
+      }
 
       /*
       if (typeof entityData.width !== 'undefined') {

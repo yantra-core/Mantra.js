@@ -8,10 +8,9 @@ game.start(function () {
   game.systems.flash.showMessage('Hello')
 
   setInterval(() => {
-    // Defaults info with duration of 3000ms
+    // Defaults info with duration of 5 seconds
     game.systems.flash.showMessage('Ping ' + new Date().getTime())
   }, 5000);
-
 
   game.systems.flash.showMessage({
     message: 'Stays until clicked',
@@ -57,3 +56,7 @@ game.start(function () {
   });
 
 });
+
+
+//
+//
