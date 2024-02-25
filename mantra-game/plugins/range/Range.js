@@ -18,7 +18,7 @@ export default class Range {
     return {
       type: 'RANGE',
       body: false,
-      value: entityData.value || 0, // Default value if none provided
+      value: entityData.value || 50, // Default value if none provided
       min: entityData.min || 0, // Default minimum value
       max: entityData.max || 100, // Default maximum value
       step: entityData.step || 1, // Default step value

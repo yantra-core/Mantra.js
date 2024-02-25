@@ -15,6 +15,16 @@ export default class Text {
       entityData.position = { x: 0, y: 0 };
     }
 
+    if (typeof entityData.x !== 'undefined') {
+      entityData.position.x = entityData.x;
+      delete entityData.x;
+    }
+
+    if (typeof entityData.y !== 'undefined') {
+      entityData.position.y = entityData.y;
+      delete entityData.y;
+    }
+
     return {
       type: 'TEXT',
       body: false,

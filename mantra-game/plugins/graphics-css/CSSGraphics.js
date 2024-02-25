@@ -20,6 +20,7 @@ import inflateRadio from './lib/entity/inflate/inflateRadio.js';
 import inflateRange from './lib/entity/inflate/inflateRange.js';
 import inflateSelect from './lib/entity/inflate/inflateSelect.js';
 import inflateTextarea from './lib/entity/inflate/inflateTextarea.js';
+import inflateCode from './lib/entity/inflate/inflateCode.js';
 
 import updateGraphic from './lib/entity/updateGraphic.js';
 
@@ -63,6 +64,7 @@ class CSSGraphics extends GraphicsInterface {
     this.inflateRadio = inflateRadio.bind(this);
     this.inflateInput = inflateInput.bind(this);
     this.inflateTextarea = inflateTextarea.bind(this);
+    this.inflateCode = inflateCode.bind(this);
     this.inflateCheckbox = inflateCheckbox.bind(this);
     this.inflateImage = inflateImage.bind(this);
     //this.inflateVideo = inflateVideo.bind(this);

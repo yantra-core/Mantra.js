@@ -96,6 +96,11 @@ export default function createGraphic(entityData) {
       // For CANVAS entities, create a canvas
       entityElement = this.inflateCanvas(entityElement, entityData);
       break;      
+
+    case 'CODE':
+      // For CODE entities, create a code block
+      entityElement = this.inflateCode(entityElement, entityData);
+      break;
     default:
 
       if (entityData.type === 'PART' && entityData.name === 'Display') {

@@ -71,16 +71,24 @@ export default function updateGraphic(entityData) {
 
 
     if (entityData.type === 'IFRAME') {
-
       let iframe = entityElement.querySelector('iframe');
-
       // check to see if iframe src matches entityData.meta.src
       if (iframe && iframe.src !== entityData.meta.src) {
         iframe.src = entityData.meta.src;
       }
-
     }
     
+    if (entityData.type === 'CODE') {
+      // TODO: remove these style of query selector inside update() loop, no good
+      // need to be a data cache on O(1) lookup
+      let code = entityElement.querySelector('code');
+      // check to see if iframe src matches entityData.meta.src
+      if (code && code.code !== entityData.meta.code) {
+        code.textContent = entityData.meta.code;
+      }
+    }
+
+
     return this.updateEntityPosition(entityElement, entityData);
 
 
