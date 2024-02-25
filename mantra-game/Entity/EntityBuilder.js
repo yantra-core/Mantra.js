@@ -96,6 +96,13 @@ export default class EntityBuilder {
     return this;
   }
 
+  angle(value) { // angle is alias for rotaion
+    // convert the incoming degrees to radians
+    let radians = value * (Math.PI / 180);
+    this.config.rotation = radians;
+    return this;
+  }
+
   // Physical properties
   mass(value) {
     this.config.mass = value;
@@ -332,7 +339,6 @@ export default class EntityBuilder {
   meta(value) {
     if (typeof value === 'object' && value !== null) {
       if (typeof this.config.meta === 'object' && this.config.meta !== null) {
-        console.log("MERGING THE IDEA", value)
         this.config.meta = { ...this.config.meta, ...value };
       } else {
         this.config.meta = value;
