@@ -1,6 +1,6 @@
 import ensureColorInt from './util/ensureColorInt.js';
 
-export default function updateEntity(entityDataOrId, entityData) {
+export default function updateEntity(entityDataOrId, entityData, updateOptions = {}) {
 
   if (typeof entityDataOrId === 'string' || typeof entityDataOrId === 'number') {
     entityData = { id: entityDataOrId, ...entityData };
@@ -243,14 +243,18 @@ export default function updateEntity(entityDataOrId, entityData) {
   //
   // Entity Lifecycle afterUpdateEntity
   //
-  let updatedEnt = this.game.getEntity(entityId);
-  let _afterUpdateEntity;
 
-  if (typeof updatedEnt.afterUpdateEntity === 'function') {
-    _afterUpdateEntity = updatedEnt.afterUpdateEntity;
-  }
-  if (_afterUpdateEntity) {
-    _afterUpdateEntity(updatedEnt);
+  let updatedEnt = this.game.getEntity(entityId);
+
+  if (updateOptions.skipAfterUpdateEntity !== true) {
+    let _afterUpdateEntity;
+
+    if (typeof updatedEnt.afterUpdateEntity === 'function') {
+      _afterUpdateEntity = updatedEnt.afterUpdateEntity;
+    }
+    if (_afterUpdateEntity) {
+      _afterUpdateEntity(updatedEnt);
+    }
   }
 
   updatedEnt = this.game.lifecycle.triggerHook('after.updateEntity', updatedEnt);

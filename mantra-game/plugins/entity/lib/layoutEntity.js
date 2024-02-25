@@ -124,7 +124,9 @@ export default function layoutEntity(container, entityId) {
       };
 
       // Update the entity's position using the game framework's method
-      this.game.updateEntity({ id: item.id, position: itemPosition });
+      this.game.updateEntity({ id: item.id, position: itemPosition }, {
+        skipAfterUpdateEntity: true
+      });
 
       // console.log(`Item ${item.id} positioned at row ${row}, column ${col}`);
     });
