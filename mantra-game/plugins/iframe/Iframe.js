@@ -24,6 +24,26 @@ export default class Iframe {
     entityData.meta = entityData.meta || {};
     entityData.meta.src = src;
 
+    entityData.afterUpdateEntity = function (entity) {
+
+      // check the iframe src vs the entity src
+      // if they are different, update the iframe src\
+      let graphic = entity.graphics['css-graphic'];
+      if (graphic) {
+        // graphic is a DOM object, find it's first child iframe
+        let iframe = graphic.firstChild;
+        if (iframe) {
+          iframe.src = entity.meta.src;
+        }
+      }
+    };
+
+    if (typeof entityData.size === 'undefined') {
+      // default iframe size
+      entityData.width = 800;
+      entityData.height = 600;
+    }
+
     /*
     if (typeof entityData.width !== 'undefined') {
       entityData.meta.width = entityData.width;

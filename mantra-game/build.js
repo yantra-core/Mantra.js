@@ -14,6 +14,9 @@ const plugins = [
   './plugins/message-flash/FlashMessage.js',
   './plugins/input/Input.js',
   './plugins/iframe/Iframe.js',
+  './plugins/canvas/Canvas.js',
+  './plugins/image/Image.js',
+
   './plugins/radio/Radio.js',
   './plugins/range/Range.js',
   './plugins/select/Select.js',

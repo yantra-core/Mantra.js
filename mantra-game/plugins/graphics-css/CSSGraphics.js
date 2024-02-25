@@ -2,11 +2,15 @@
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 import CSSCamera from './CSSCamera.js';
 
+import createGraphic from './lib/entity/createGraphic.js';
+
 import inflateBox from './lib/entity/inflate/inflateBox.js';
 import inflateText from './lib/entity/inflate/inflateText.js';
+import inflateCanvas from './lib/entity/inflate/inflateCanvas.js';
+import inflateImage from './lib/entity/inflate/inflateImage.js';
+
 import inflateGraphic from './lib/entity/inflateGraphic.js';
 import inflateTexture from './lib/entity/inflateTexture.js';
-import createGraphic from './lib/entity/createGraphic.js';
 
 import inflateButton from './lib/entity/inflate/inflateButton.js';
 import inflateCheckbox from './lib/entity/inflate/inflateCheckbox.js';
@@ -60,8 +64,9 @@ class CSSGraphics extends GraphicsInterface {
     this.inflateInput = inflateInput.bind(this);
     this.inflateTextarea = inflateTextarea.bind(this);
     this.inflateCheckbox = inflateCheckbox.bind(this);
-    //this.inflateImage = inflateImage.bind(this);
+    this.inflateImage = inflateImage.bind(this);
     //this.inflateVideo = inflateVideo.bind(this);
+    this.inflateCanvas = inflateCanvas.bind(this);
     this.inflateIframe = inflateIframe.bind(this);
 
 
@@ -115,6 +120,13 @@ class CSSGraphics extends GraphicsInterface {
       gameHolder.id = 'gameHolder';
       document.body.appendChild(gameHolder);
     }
+
+    // Disable drag behavior for all images within the game container
+    gameHolder.addEventListener('dragstart', function(event) {
+      if (event.target.tagName === 'IMG') {
+        event.preventDefault();
+      }
+    });
 
     let renderDiv = document.getElementById('css-render-div');
     if (!renderDiv) {

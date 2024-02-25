@@ -92,7 +92,10 @@ export default function createGraphic(entityData) {
       // For IFRAME entities, create an iframe
       entityElement = this.inflateIframe(entityElement, entityData);
       break;
-      
+    case 'CANVAS':
+      // For CANVAS entities, create a canvas
+      entityElement = this.inflateCanvas(entityElement, entityData);
+      break;      
     default:
 
       if (entityData.type === 'PART' && entityData.name === 'Display') {

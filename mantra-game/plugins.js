@@ -99,8 +99,10 @@ import StarField from './plugins/starfield/StarField.js';
 import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 
 // HTML DOM GUI GameObjects
-import Checkbox from './plugins/checkbox/Checkbox.js';
 import Button from './plugins/button/Button.js';
+import Checkbox from './plugins/checkbox/Checkbox.js';
+import Canvas from './plugins/canvas/Canvas.js';
+import Image from './plugins/image/Image.js';
 import Iframe from './plugins/iframe/Iframe.js';
 import Input from './plugins/input/Input.js';
 import Radio from './plugins/radio/Radio.js';
@@ -176,6 +178,8 @@ const plugins = {
   Text,
   Radio,
   Checkbox,
+  Canvas,
+  Image,
   Iframe,
   Range,
   Textarea,
