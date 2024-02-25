@@ -10,6 +10,11 @@ export default class EntityBuilder {
         z: 0
       },
       rotation: 0, // TODO: x / y z
+      // TODO: defaults should be applied at the end,
+      //       during build() or .createEntity()
+      //       it is unexpected to see default values during make() process
+      //       it is better to leave the defaults off until the end
+      // TODO: add tests for default values
       size: {
         width: 16,
         height: 16,
@@ -291,6 +296,10 @@ export default class EntityBuilder {
 
   afterCreateEntity(handler) {
     return this._addEventHandler('afterCreateEntity', handler);
+  }
+
+  afterUpdateEntity(handler) {
+    return this._addEventHandler('afterUpdateEntity', handler);
   }
 
   sutra(rules, config) {

@@ -240,9 +240,22 @@ export default function updateEntity(entityDataOrId, entityData) {
     // this.game.systems.rbush.updateEntity(ent);
   }
 
-  ent = this.game.lifecycle.triggerHook('after.updateEntity', ent);
+  //
+  // Entity Lifecycle afterUpdateEntity
+  //
+  let updatedEnt = this.game.getEntity(entityId);
+  let _afterUpdateEntity;
 
-  return ent;
+  if (typeof updatedEnt.afterUpdateEntity === 'function') {
+    _afterUpdateEntity = updatedEnt.afterUpdateEntity;
+  }
+  if (_afterUpdateEntity) {
+    _afterUpdateEntity(updatedEnt);
+  }
+
+  updatedEnt = this.game.lifecycle.triggerHook('after.updateEntity', updatedEnt);
+
+  return updatedEnt;
 
 }
 

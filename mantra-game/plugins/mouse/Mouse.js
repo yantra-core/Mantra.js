@@ -82,10 +82,16 @@ export default class Mouse {
       secondTouchId: this.secondTouchId,
       activeTouchCount: Object.keys(this.activeTouches).length,
       activeTouches: this.activeTouches,
-      target: this.game.data.ents._[this.game.selectedEntityId] || null,
-      owner: this.game.data.ents._[this.game.currentPlayerId] || null,
+      target: null,
+      owner: null,
     };
-  
+
+    // Assign the target and owner entities if they exist
+    if (this.game.data && this.game.data.ents && this.game.data.ents._) {
+      context.target = this.game.data.ents._[this.game.selectedEntityId] || null;
+      context.owner = this.game.data.ents._[this.game.currentPlayerId] || null;
+    }
+
     // Alias for worldPosition for developer convenience
     context.position = context.worldPosition;
   

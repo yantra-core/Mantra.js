@@ -27,6 +27,19 @@ export default class Select {
       entityData.meta.options = entityData.options;
     }
 
+    // convert any string options to objects
+    if (typeof entityData.meta.options !== 'undefined') {
+      entityData.meta.options = entityData.meta.options.map((option) => {
+        if (typeof option === 'string') {
+          return {
+            label: option,
+            value: option
+          };
+        }
+        return option;
+      });
+    }
+
     return {
       type: 'SELECT',
       body: false,

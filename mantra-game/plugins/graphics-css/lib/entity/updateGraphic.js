@@ -61,14 +61,24 @@ export default function updateGraphic(entityData) {
         entityElement.style.height = entityData.size.height + 'px';
       }
   
-
     }
-
 
     if (entityData.style) {
       Object.keys(entityData.style).forEach((key) => {
         entityElement.style[key] = entityData.style[key];
       });
+    }
+
+
+    if (entityData.type === 'IFRAME') {
+
+      let iframe = entityElement.querySelector('iframe');
+
+      // check to see if iframe src matches entityData.meta.src
+      if (iframe && iframe.src !== entityData.meta.src) {
+        iframe.src = entityData.meta.src;
+      }
+
     }
     
     return this.updateEntityPosition(entityElement, entityData);
