@@ -1,3 +1,6 @@
+let exampleRoot = 'https://yantra.gg/mantra/';
+// exampleRoot = 'http://192.168.1.80:7777/';
+
 export default class Playground {
   static id = 'world-playground';
   // "world" type has special features in that it can be unloaded and reloaded.
@@ -128,8 +131,6 @@ export default class Playground {
     });
 
     let currentUrl = null;
-    let exampleRoot = 'https://yantra.gg/mantra/';
-    //exampleRoot = 'http://192.168.1.80:7777/';
 
     categories = categories.filter(function(cat) {
       let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];

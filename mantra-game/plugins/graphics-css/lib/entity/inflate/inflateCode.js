@@ -43,10 +43,9 @@ export default function inflateCode(entityElement, entityData) {
         .then(content => {
           // Update the code element directly once the content is fetched
           Array.from(document.querySelectorAll(`code[data-src="${src}"]`)).forEach((el) => {
-            el.textContent = content;
-            Prism.highlightAll();
+            let html = Prism.highlight(content, Prism.languages.javascript, 'javascript');
+            el.innerHTML = html;
           });
-
           // Store the fetched content for future use, replacing the promise
           this.fetchSourceHandles[src] = { content };
         })
@@ -54,10 +53,11 @@ export default function inflateCode(entityElement, entityData) {
           console.error('Error fetching source code:', error);
           // Update all code elements with the error message
           Array.from(document.querySelectorAll(`code[data-src="${src}"]`)).forEach((el) => {
-            el.textContent = '// Error fetching source code';
+            el.textContent = '// Error fetching source code \n' + error;
           });
           // Store the error message for future use, replacing the promise
           this.fetchSourceHandles[src] = { error: '// Error fetching source code' };
+          throw error;
         });
     }
 
