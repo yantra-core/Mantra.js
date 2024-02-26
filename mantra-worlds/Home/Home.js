@@ -89,6 +89,7 @@ class Home {
     game.use('Teleporter');
     game.use('Draggable');
     game.use('Collectable');
+    game.use('SwitchGraphics');
     game.use('Key');
 
   }
@@ -96,15 +97,16 @@ class Home {
   init(game) {
     this.game = game;
 
-    // reset any previous worlds / game state
-    game.reset();
-
     // Movements with right click, switch default left-click-to-move behavior
     game.config.mouseMovementButton = 'RIGHT';
     // Actions with left click
     game.config.mouseActionButton = 'LEFT';
     // enables the default top-down mouse movements
-    game.config.defaultMouseMovement = true;
+
+    // reset any previous worlds / game state
+    game.reset();
+
+    let mouse = game.systems.mouse;
     
     // enables mouse wheel zoom
     game.data.camera.mouseWheelZoomEnabled = true;

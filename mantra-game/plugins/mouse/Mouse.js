@@ -26,6 +26,9 @@ export default class Mouse {
       RIGHT: 2   // Default to the standard right button index
     };
 
+    this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A'];
+
+
     this.activeTouches = {}; // Store active touches
     // TODO: support 3+ touches
     this.firstTouchId = null; // Track the first touch for movement
@@ -222,9 +225,8 @@ export default class Mouse {
       // elements the user may still wish to interact with
       // Remark: We seem to have an issue preventing default on PRE and CODE elements
       // TODO: Allow prevent default on PRE and CODE elements
-      let allowDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A'];
       // check to see if target element is interactive ( such as button / input / textarea / etc )
-      if (!allowDefaultEvent.includes(target.tagName)) {
+      if (!this.tagAllowsDefaultEvent.includes(target.tagName)) {
         //console.log('preventing default event', target)
         event.preventDefault();
       } else {

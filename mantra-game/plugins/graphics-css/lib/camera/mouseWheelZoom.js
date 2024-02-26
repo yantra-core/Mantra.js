@@ -14,8 +14,38 @@ export default function cssMouseWheelZoom(event) {
   // Prevents the default *after* checking to see if mouse enabled
   // This is to best serve user so Mantra won't eat their scroll events
   // We could add an additional flag here in cases we want an embedded Mantra to scroll
-  event.preventDefault();
 
+  let mouse = this.game.systems.mouse;
+  let target = event.target;
+  let defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE'];
+
+  // console.log("Event target tag:", target.tagName);
+
+  // If the target is a CODE element, use its parent PRE for overflow check
+  if (target.tagName.toUpperCase() === 'CODE') {
+    target = target.parentNode; // Assuming the immediate parent is always a PRE
+  }
+
+  // Check if the event target is one of the default scroll elements
+  if (defaultScrollElements.includes(target.tagName.toUpperCase())) {
+    // Determine if the target element (PRE) is overflowing
+    let isOverflowing = target.scrollHeight > target.clientHeight;
+
+    // If the target element is not overflowing, prevent the default scroll
+    if (!isOverflowing) {
+      event.preventDefault();
+      // console.log("Custom wheel event action");
+    } else {
+      // If the target element is overflowing, allow the default browser scroll
+      // console.log("Default scroll allowed for overflowing content");
+      // Return here to prevent camera zooming
+      return;
+    }
+  } else {
+    // For elements other than 'TEXTAREA', 'PRE', 'CODE', prevent default scroll
+    event.preventDefault();
+    // console.log("Custom wheel event action for non-default scroll elements");
+  }
   /*
 
     Remark: Removed 2/16/2024, as this was preventing mouse wheel zoom from working

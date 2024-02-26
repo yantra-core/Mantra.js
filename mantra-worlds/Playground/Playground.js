@@ -28,7 +28,6 @@ export default class Playground {
 
     game.data.camera.mode = 'none';
 
-
     // Remark: Not ideal for mapping Mouse buttons, 
     // as they should be conditionals in Sutra tree like Keyboard events are
     let mouse = game.systems.mouse;
@@ -76,16 +75,18 @@ export default class Playground {
       backgroundColor: 'rgba(0, 0, 0, 0)',
     }).position(-800, -400).createEntity();
 
-    let introText = game.make().Text().text('Select an example from the drop downs.');
+    let introText = game.make().Text().text('Select an example from the drop downs');
     introText.color('white');
+    introText.position(0, 10);
     introText.style({
       fontSize: '64px',
+      // textAlign: 'right', // Not working? CSS style seems applied in DOM, Text() might be better as child span element
     })
     introText.container('side-text-group');
     introText.createEntity();
 
     // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-    let mouseControlText = game.make().Text().text('Left-click drag to move the screen. Click on the examples to interact.');
+    let mouseControlText = game.make().Text().text('Drag to move map <br/>Wheel to Zoom <br/>Click to interact');
     mouseControlText.position(200, 550);
     mouseControlText.width(400);
     mouseControlText.color('white');
@@ -109,27 +110,30 @@ export default class Playground {
 
     //let entities = text2Entities(text);
 
+    // TODO: remove createContainer, upgrade to Container() plugin instead
     let container = game.createContainer({
       name: 'container-a',
       layout: 'grid', // optional. can also be "flex" or "none"
       color: 0xff00ff,
       position: {
-        x: 0,
+        x: 170,
         y: 450,
         z: -1
       },
       body: false,
       size: {
-        width: 800,
-        height: 500
+        width: 1960,
+        height: 400
       },
       grid: {
-        columns: 2,
-        rows: 4
+        columns: 7,
+        rows: 3
       },
       style: { // supports CSS property names
-        padding: 0,
+        //padding: 0,
         margin: 0,
+        paddingLeft: -5,
+        paddingTop: -5,
         // background: '#ff0000', // can also use Entity.color
         border: {
           color: '#000000',
@@ -140,10 +144,12 @@ export default class Playground {
 
     let currentUrl = null;
 
+    /*
     categories = categories.filter(function(cat) {
       let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
       return allowed.includes(cat.name);
     })
+    */
 
     let primaryGameEmbed = game.make()
       .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang' })
@@ -157,10 +163,10 @@ export default class Playground {
       //  code: 'hello <h1>'
       src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
     })
-    .height(800)
+    .height(700)
     .width(660)
     .x(800)
-    .y(-100)
+    .y(-170)
     .createEntity();
 
     // Function to create a dropdown select with given options and append it to a specified container
@@ -246,8 +252,8 @@ export default class Playground {
       });
 
       // Set style and dimensions for the dropdown
-      dropdownSelect.width(300).height(80).style({
-        fontSize: '28px',
+      dropdownSelect.width(230).height(80).style({
+        fontSize: '32px',
         backgroundColor: categories.find(cat => cat.title === dropdownTitle)?.color || '#e0e0e0' // Use category color if available
       }).createEntity();
     }

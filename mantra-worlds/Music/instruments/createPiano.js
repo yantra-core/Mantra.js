@@ -27,6 +27,7 @@ export default function createPiano(game, config) {
         width: keyWidth,
         height: keyHeight,
         isStatic: true,
+        isSensor: true,
         position: {
           x: xPosition,
           y: config.position.y
@@ -66,6 +67,7 @@ export default function createPiano(game, config) {
           width: blackKeyWidth,
           height: blackKeyHeight,
           isStatic: true,
+          isSensor: true,
           style: {
             border: 'solid',
             zIndex: 9999,
