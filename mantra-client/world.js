@@ -20,8 +20,9 @@ let game = new Game({
   width: 800,
   height: 600,
   plugins: ['Gamepad'],
-  editor: true,
-  graphics: ['none'], // 'three', 'babylon', 'css'
+  editor: false,
+  graphics: ['css'], // 'three', 'babylon', 'css'
+  plugins: ['SwitchGraphics'],
   gameRoot: '.',
   //defaultMovement: true,
   // defaultMouseMovement: false
@@ -100,8 +101,8 @@ game.use(new plugins.Code());
 game.use(new plugins.Mouse());
    
 game.use(new Mouse());
-game.use(new plugins.Editor());
-game.use(new Lifetime());
+// game.use(new plugins.Editor());
+// game.use(new Lifetime());
 
 game.data.camera.mouseWheelZoomEnabled = true;
 
@@ -112,7 +113,7 @@ game.start(function () {
   // game.use(new plugins.ThreeGraphics());
 
   // game.use(new worlds.EatWorld());
-  game.use(new worlds.Playground());
+  game.use(new worlds.GravityGardens());
 
 
   //game.use(home);

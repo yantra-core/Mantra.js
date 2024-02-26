@@ -13,6 +13,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 // Mouse.js - Marak Squires 2023
+var inputsBound = false;
 var Mouse = exports["default"] = /*#__PURE__*/function () {
   function Mouse(communicationClient) {
     _classCallCheck(this, Mouse);
@@ -29,7 +30,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
-
+    this.inputsBound = false;
     // Stores current values of mouse buttons
     this.mouseButtons = {
       LEFT: null,
@@ -250,6 +251,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     value: function handleMouseDown(event) {
       var target = event.target;
       var game = this.game;
+      var preventDefault = false;
       this.updateMouseButtons(event, true);
 
       // middle mouse button
@@ -269,12 +271,16 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // check to see if target element is interactive ( such as button / input / textarea / etc )
         if (!this.tagAllowsDefaultEvent.includes(target.tagName)) {
           //console.log('preventing default event', target)
-          event.preventDefault();
+          // event.preventDefault();
         } else {
           //console.log('allowing default event', target)
+          preventDefault = true;
         }
       }
       var context = this.createMouseContext(event);
+      if (preventDefault) {
+        event.stopPropagation();
+      }
       if (context.target && context.target.pointerdown) {
         context.target.pointerdown(context, event);
       }
@@ -439,6 +445,10 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "bindInputControls",
     value: function bindInputControls() {
+      if (inputsBound === true) {
+        return;
+      }
+      inputsBound = true;
       var game = this.game;
       if (game.isTouchDevice()) {
         document.addEventListener('pointerover', this.boundHandleMouseOver);

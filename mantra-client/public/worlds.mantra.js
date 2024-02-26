@@ -3498,7 +3498,9 @@ var GravityGardens = /*#__PURE__*/function () {
       .Player() // The player Plugin
       .texture(null) // default texture is a player sprite
       .color(0xffcccc) // gives a color to the player
-      .position(0, 0, 0); // sets the player position
+      .meta({
+        repulsion: false // set the repulsion flag to false, attracts
+      }).position(0, 0, 0); // sets the player position
 
       playerConfig.collisionStart(function (a, b, pair, context) {
         if (context.target.type !== 'WARP') {
@@ -3507,7 +3509,6 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       playerConfig = playerConfig.build();
       var player = game.createEntity(playerConfig);
-      game.setPlayerId(player.id);
       game.make().type('WARP').Teleporter({
         destination: {
           world: 'Home'
@@ -3861,9 +3862,9 @@ var Home = /*#__PURE__*/function () {
               game.use('Teleporter');
               game.use('Draggable');
               game.use('Collectable');
-              game.use('SwitchGraphics');
+              // game.use('SwitchGraphics');
               game.use('Key');
-            case 22:
+            case 21:
             case "end":
               return _context.stop();
           }
@@ -5224,15 +5225,13 @@ var Music = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      game.config.defaultMouseMovement = false;
 
       // Movements with right click, switch default left-click-to-move behavior
-      game.config.mouseMovementButton = 'RIGHT';
+      game.config.mouseMovementButton = 'LEFT';
       // Actions with left click
-      game.config.mouseActionButton = 'LEFT';
+      game.config.mouseActionButton = 'RIGHT';
       // enables the default top-down mouse movements
-      // game.config.defaultMouseMovement = true;
-
+      game.config.defaultMouseMovement = true;
       game.reset();
       this.bindEvents();
       this.createWorld();
@@ -5252,19 +5251,20 @@ var Music = /*#__PURE__*/function () {
         that.slurping = false;
       });
       game.on('pointerDown', function (context, event) {
+        // alert('event')
         var position = context.position;
         that.mousePosition = position;
-        console.log('ccccasdasd', context);
         // adjust position for game camera offset
         that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
         that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
         that.mousePosition.clientX = event.clientX;
         that.mousePosition.clientY = event.clientY;
         // if right click
-        if (event.button === 2) {}
-        game.make().Tower({
-          fireRate: 10
-        }).x(position.x).y(position.y).angle(-180).createEntity();
+        if (context.buttons[game.config.mouseActionButton]) {
+          game.make().Tower({
+            fireRate: 10
+          }).x(position.x).y(position.y).angle(-180).createEntity();
+        }
 
         // if left click
         if (event.button === 0) {
@@ -5290,7 +5290,10 @@ var Music = /*#__PURE__*/function () {
               game.use('Text');
               game.use('Platform');
               game.use('Teleporter');
-            case 3:
+              game.use('Hexapod');
+              game.use('Player');
+              game.use('Tower');
+            case 6:
             case "end":
               return _context.stop();
           }

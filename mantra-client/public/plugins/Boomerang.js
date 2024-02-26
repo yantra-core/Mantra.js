@@ -261,7 +261,12 @@ var Boomerang = /*#__PURE__*/function () {
       };
 
       // Use the provided angleInRadians or adjust and fall back to the entity's rotation
-      var throwAngle = angleInRadians !== null ? angleInRadians : entity.rotation - Math.PI / 2; // Adjust entity.rotation as needed
+      var throwAngle;
+      if (_typeof(angleInRadians) !== null && !Number.isNaN(angleInRadians)) {
+        throwAngle = angleInRadians;
+      } else {
+        throwAngle = entity.rotation - Math.PI / 2; // Adjust entity.rotation as needed
+      }
 
       // Adjust the starting position and velocity according to the game's coordinate system
       var boomerangStartingPosition = {
@@ -298,6 +303,9 @@ var Boomerang = /*#__PURE__*/function () {
           playing: true
         }
       };
+
+      // console.log('boomerangConfig', boomerangConfig)
+
       var builder = this.build(boomerangConfig);
       this.game.createEntity(builder);
     }
