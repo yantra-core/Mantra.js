@@ -29,10 +29,13 @@ export default class Playground {
     game.data.camera.mode = 'none';
 
 
-    // Remark: Not ideal for mapping buttons, they should be conditionals in Sutra tree like Keyboard is
+    // Remark: Not ideal for mapping Mouse buttons, 
+    // as they should be conditionals in Sutra tree like Keyboard events are
     let mouse = game.systems.mouse;
     mouse.setButtonMapping('LEFT', 1);
     mouse.setButtonMapping('MIDDLE', 0);
+    // enables mouse wheel zoom
+    game.data.camera.mouseWheelZoomEnabled = true;
 
 
     this.createWorld();
@@ -192,6 +195,34 @@ export default class Playground {
         if (typeof primaryGameEmbed === 'undefined') {
           return;
         }
+
+        //
+        // Set all the other dropdowns to the first option
+        //
+        
+        // Remark: In order to do this through the ECS, we'd have to implement a non-bubbling update event,
+        // tests would need to be written first, this type of update action is self-ref and cascade.
+        // we also would be much better off using `onchange` event support instead of `afterUpdateEntity` for this
+        /*
+        let dropdowns = game.getEntitiesByType('SELECT');
+        dropdowns.forEach(dropdown => {
+          game.updateEntity(dropdown.id, {
+            value: ''
+          });
+        });
+        */
+
+        //
+        // Since the Playground is built using CSSGraphics, we can use the DOM to reset the dropdowns
+        // This wouldn't be considered "best practice", however it will work fine for now until we have
+        // implemented non-bubbling onchange event handling in the ECS with tests
+        let currentSelect = context.graphics['graphics-css'].querySelectorAll('select')[0];
+        let selectElements = document.querySelectorAll('select');
+        selectElements.forEach(select => {
+          if (select !== currentSelect) {
+            select.value = '';
+          }
+        });
 
         //
         // Updates the IFrame src to the selected example

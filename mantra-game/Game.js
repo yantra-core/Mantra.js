@@ -207,6 +207,11 @@ class Game {
     this.currentPlayerId = playerId;
   }
 
+  getEntitiesByType(type) {
+    if (this.data && this.data.ents && this.data.ents[type])
+    return this.data.ents[type];
+  }
+
   getCurrentPlayer() {
     return this.getEntity(this.currentPlayerId);
   }
@@ -246,6 +251,7 @@ class Game {
   //
   // Containers
   //
+  // TODO: move to Container.js
   createContainer(entityData) { // helper method for containers
     entityData.type = 'CONTAINER'
     entityData.style = entityData.style || {};
