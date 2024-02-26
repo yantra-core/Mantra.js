@@ -22,6 +22,24 @@ export default function inflateIframe(entityElement, entityData) {
 }
 
 function applyIframeStyles(iframe, entityData) {
-  // Define and apply default styles for iframe here
-  // Similar to applySelectStyles function
+  // Define default styles for the iframe
+  iframe.style.border = "2px solid #999"; // Default border
+  iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
+  iframe.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
+
+  // Define hover effect styles
+  const hoverBorderStyle = "2px solid #fff"; // Border color for hover state
+  const hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
+
+  // Add event listeners to change styles on hover
+  iframe.addEventListener('mouseenter', () => {
+    iframe.style.border = hoverBorderStyle;
+    iframe.style.boxShadow = hoverBoxShadowStyle;
+  });
+
+  // Revert to default styles when not hovering
+  iframe.addEventListener('mouseleave', () => {
+    iframe.style.border = "2px solid #999";
+    iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+  });
 }

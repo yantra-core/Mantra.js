@@ -8,9 +8,11 @@ let movingToPosition = {};
 
 export default function defaultMouseMovement(game) {
 
-  game.on('pointerUp', function (context, event) {
+  let movingButton = game.config.mouseMovementButton || 'LEFT';
+  let actionButton = game.config.mouseActionButton || 'RIGHT';
+  let cameraMoveButton = game.config.mouseCameraButton || 'MIDDLE';
 
-    let mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
+  game.on('pointerUp', function (context, event) {
 
     // TOOD: better game.getActivePlayer() checks
     if (typeof game.currentPlayerId === 'undefined' || !game.currentPlayerId) {
@@ -23,8 +25,7 @@ export default function defaultMouseMovement(game) {
         game.updateEntity(game.currentPlayerId, { update: null });
       }
     } else {
-      // Use the variable instead of the hardcoded value
-      if (context.buttons[mouseMovementButton] === false) {
+      if (context.buttons[movingButton] === false) {
         moving = false;
         game.updateEntity(game.currentPlayerId, { update: null });
       }
@@ -55,9 +56,6 @@ export default function defaultMouseMovement(game) {
     if (!game.data || !game.data.ents || !game.data.ents.PLAYER) {
       return;
     }
-
-    let mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
-    let mouseActionButton = game.config.mouseActionButton || 'LEFT';
 
     let gamePointerPosition = context.position;
     let currentPlayer = game.data.ents.PLAYER[0];
@@ -99,11 +97,11 @@ export default function defaultMouseMovement(game) {
         }
       } else {
         // Use variables for button checks
-        if (context.buttons[mouseMovementButton]) {
+        if (context.buttons[movingButton]) {
           moving = true;
           movingToPosition = { x: gamePointerPosition.x, y: gamePointerPosition.y, rotation: radians };
         }
-        if (context.buttons[mouseActionButton]) {
+        if (context.buttons[actionButton]) {
           // TODO: emit sutra event for action
           useItem(game, currentPlayer, radians);
         }

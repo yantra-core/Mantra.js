@@ -68,7 +68,7 @@ export default function inflateCode(entityElement, entityData) {
     code.textContent = entityData.meta && entityData.meta.code || '';
   }
 
-  applyCodeStyles(pre, code, entityData);
+  applyCodeStyles(entityElement, pre, code, entityData);
 
   // Additional style adjustments
   if (entityData.width) {
@@ -86,21 +86,65 @@ export default function inflateCode(entityElement, entityData) {
   return entityElement;
 }
 
-function applyCodeStyles(pre, code, entityData) {
+function applyCodeStyles(entityElement, pre, code, entityData) {
   // Define and apply default styles for code element here
   // For example, setting a monospace font and a background color
   pre.style.display = 'block';
   pre.style.overflow = 'auto';
   pre.style.padding = '5px';
   pre.style.backgroundColor = '#1E1E1E'; // Dark background for the code block
-
+  
   code.style.fontFamily = 'monospace';
   code.style.fontSize = '14px';
   code.style.color = '#D4D4D4'; // Light color for the text for better contrast
+
+  // entityElement.style.border = "2px solid #999"; // Default border
+  entityElement.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
+  entityElement.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
+
+  // Define hover effect styles
+  const hoverBorderStyle = "2px solid #fff"; // Border color for hover state
+  const hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
+
+  // Add event listeners to change styles on hover
+  entityElement.addEventListener('mouseenter', () => {
+    entityElement.style.border = hoverBorderStyle;
+    entityElement.style.boxShadow = hoverBoxShadowStyle;
+  });
+
+  // Revert to default styles when not hovering
+  entityElement.addEventListener('mouseleave', () => {
+    entityElement.style.border = "2px solid #999";
+    entityElement.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+  });
 
   // Apply any custom styles from entityData if provided
   if (entityData.style) {
     Object.assign(pre.style, entityData.style.pre); // Apply styles to the <pre> element
     Object.assign(code.style, entityData.style.code); // Apply styles to the <code> element
   }
+}
+
+// TODO: similiar styles for applyCodeStyles
+function applyIframeStyles(iframe, entityData) {
+  // Define default styles for the iframe
+  iframe.style.border = "2px solid #999"; // Default border
+  iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
+  iframe.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
+
+  // Define hover effect styles
+  const hoverBorderStyle = "2px solid #fff"; // Border color for hover state
+  const hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
+
+  // Add event listeners to change styles on hover
+  iframe.addEventListener('mouseenter', () => {
+    iframe.style.border = hoverBorderStyle;
+    iframe.style.boxShadow = hoverBoxShadowStyle;
+  });
+
+  // Revert to default styles when not hovering
+  iframe.addEventListener('mouseleave', () => {
+    iframe.style.border = "2px solid #999";
+    iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+  });
 }

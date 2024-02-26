@@ -12,10 +12,18 @@ export default class Mouse {
     this.isDragging = false;
     this.dragStartPosition = { x: 0, y: 0 };
 
+    // Stores current values of mouse buttons
     this.mouseButtons = {
       LEFT: null,
       RIGHT: null,
       MIDDLE: null
+    };
+
+    // Configurable mouse button mappings
+    this.buttonMappings = {
+      LEFT: 0,   // Default to the standard left button index
+      MIDDLE: 1, // Default to the standard middle button index
+      RIGHT: 2   // Default to the standard right button index
     };
 
     this.activeTouches = {}; // Store active touches
@@ -47,6 +55,20 @@ export default class Mouse {
     this.game.systemsManager.addSystem(this.id, this);
   }
 
+  // Method to update button mappings
+  setButtonMapping(button, newMapping) {
+    if (this.buttonMappings.hasOwnProperty(button)) {
+      this.buttonMappings[button] = newMapping;
+    } else {
+      console.error(`Invalid button: ${button}`);
+    }
+  }
+
+  // Method to get the current mapping for a button
+  getButtonMapping(button) {
+    return this.buttonMappings[button] || null;
+  }
+
   // Common function to generate mouse context with world coordinates
   // TODO: we'll need implement createMouseContext and entity detection per Graphics adapter
   createMouseContext(event) {
@@ -54,21 +76,20 @@ export default class Mouse {
     const canvas = event.target instanceof HTMLCanvasElement ? event.target : null;
     const canvasPosition = canvas ? this.getCanvasPosition(canvas, clientX, clientY) : null;
     const worldPosition = this.getWorldPosition(clientX, clientY);
-    
 
     let targetElement = event.target;
     let mantraId = null;
-    
+
     while (targetElement && targetElement !== document.body) {
-        if (targetElement.getAttribute && targetElement.getAttribute('mantra-id')) {
-            mantraId = targetElement.getAttribute('mantra-id');
-            break; // Mantra ID found, break the loop
-        }
-        targetElement = targetElement.parentNode; // Move up to the parent node
+      if (targetElement.getAttribute && targetElement.getAttribute('mantra-id')) {
+        mantraId = targetElement.getAttribute('mantra-id');
+        break; // Mantra ID found, break the loop
+      }
+      targetElement = targetElement.parentNode; // Move up to the parent node
     }
-      
+
     this.updateSelectedEntity(mantraId, event.target);
-  
+
     const context = {
       mousePosition: { x: clientX, y: clientY },
       canvasPosition,
@@ -94,15 +115,15 @@ export default class Mouse {
 
     // Alias for worldPosition for developer convenience
     context.position = context.worldPosition;
-  
+
     return context;
   }
-  
+
   getCanvasPosition(canvas, clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     return { x: clientX - rect.left, y: clientY - rect.top };
   }
-  
+
   getWorldPosition(clientX, clientY) {
     const { offsetX, offsetY, currentZoom, position } = this.game.data.camera;
     return {
@@ -110,7 +131,7 @@ export default class Mouse {
       y: (clientY - window.innerHeight / 2 + offsetY) / currentZoom + position.y
     };
   }
-  
+
   updateSelectedEntity(mantraId, target) {
     if (mantraId) {
       this.game.selectedEntityId = mantraId;
@@ -163,49 +184,52 @@ export default class Mouse {
   }
 
   updateMouseButtons(event, isDown) {
-    let game = this.game;
-    if (game.isTouchDevice()) {
-      switch (event.button) {
-        case 2:
-          this.mouseButtons.LEFT = isDown;
-          break;
-        case 1:
-          this.mouseButtons.MIDDLE = isDown;
-          break;
-        case 0:
-          this.mouseButtons.RIGHT = isDown;
-          break;
-      }
-    } else {
-
-      switch (event.button) {
-        case 0:
-          this.mouseButtons.LEFT = isDown;
-          break;
-        case 1:
-          this.mouseButtons.MIDDLE = isDown;
-          break;
-        case 2:
-          this.mouseButtons.RIGHT = isDown;
-          break;
-      }
+    let buttonType;
+    switch (event.button) {
+      case this.buttonMappings.LEFT:
+        buttonType = 'LEFT';
+        break;
+      case this.buttonMappings.MIDDLE:
+        buttonType = 'MIDDLE';
+        break;
+      case this.buttonMappings.RIGHT:
+        buttonType = 'RIGHT';
+        break;
+      default:
+        console.error(`Unknown button index: ${event.button}`);
+        return;
+    }
+  
+    if (buttonType) {
+      this.mouseButtons[buttonType] = isDown;
     }
   }
 
   handleMouseDown(event) {
     let target = event.target;
     let game = this.game;
-   
+
     this.updateMouseButtons(event, true);
 
     // middle mouse button
-    if (event.button === 1) { // Middle mouse button
+    if (event.button === this.buttonMappings.MIDDLE) {
       this.isDragging = true;
       this.dragStartPosition = { x: event.clientX, y: event.clientY };
-      // set cursor to grabbing
+      // TODO: set cursor to grabbing
       // document.body.style.cursor = 'grabbing';
-      // prevents default browser scrolling
-      event.preventDefault();
+
+      // If LEFT mouse button is mapped to camera drag, prevent default event for inputs and other
+      // elements the user may still wish to interact with
+      // Remark: We seem to have an issue preventing default on PRE and CODE elements
+      // TODO: Allow prevent default on PRE and CODE elements
+      let allowDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A'];
+      // check to see if target element is interactive ( such as button / input / textarea / etc )
+      if (!allowDefaultEvent.includes(target.tagName)) {
+        //console.log('preventing default event', target)
+        event.preventDefault();
+      } else {
+        //console.log('allowing default event', target)
+      }
     }
 
     let context = this.createMouseContext(event);
@@ -221,11 +245,13 @@ export default class Mouse {
     if (window.parent !== window) {
       // TODO: make this a config option
       // send the message to the iframe
-      window.parent.postMessage({ type: 'pointerDown', context: {
-        entityId: this.game.selectedEntityId,
-        position: context.position,
-        buttons: this.mouseButtons,
-      } }, '*');
+      window.parent.postMessage({
+        type: 'pointerDown', context: {
+          entityId: this.game.selectedEntityId,
+          position: context.position,
+          buttons: this.mouseButtons,
+        }
+      }, '*');
     }
 
     this.sendMouseData(event);
@@ -236,7 +262,7 @@ export default class Mouse {
 
     this.updateMouseButtons(event, false);
 
-    if (event.button === 1) { // Middle mouse button
+    if (event.button === this.buttonMappings.MIDDLE) {
       this.isDragging = false;
       // prevent default right click menu
       event.preventDefault();

@@ -27,6 +27,14 @@ export default class Playground {
     game.reset();
 
     game.data.camera.mode = 'none';
+
+
+    // Remark: Not ideal for mapping buttons, they should be conditionals in Sutra tree like Keyboard is
+    let mouse = game.systems.mouse;
+    mouse.setButtonMapping('LEFT', 1);
+    mouse.setButtonMapping('MIDDLE', 0);
+
+
     this.createWorld();
   }
 
@@ -52,12 +60,6 @@ export default class Playground {
     //game.systems.editor.init(game);
     // game.systems.editor.show();
 
-
-    let button1 = game.make().Button().pointerdown(function(){
-      // alert("hi")
-    }).build();
-
-
     let text = game.make().Text().text('Mantra.js Playground').style({
       fontSize: '64px',
     });
@@ -66,7 +68,10 @@ export default class Playground {
     text.position(85, -500, 0);
     text.createEntity();
 
-    let sideTextGroup = game.make().name('side-text-group').position(-800, -400).createEntity();
+    let sideTextGroup = game.make().name('side-text-group').style({
+      border: 'none',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+    }).position(-800, -400).createEntity();
 
     let introText = game.make().Text().text('Select an example from the drop downs.');
     introText.color('white');
@@ -77,7 +82,7 @@ export default class Playground {
     introText.createEntity();
 
     // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-    let mouseControlText = game.make().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
+    let mouseControlText = game.make().Text().text('Left-click drag to move the screen. Click on the examples to interact.');
     mouseControlText.position(200, 550);
     mouseControlText.width(400);
     mouseControlText.color('white');
@@ -138,7 +143,7 @@ export default class Playground {
     })
 
     let primaryGameEmbed = game.make()
-      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=npc/hexapod' })
+      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang' })
       .width(800)
       .height(600)
       .x(0)
@@ -147,7 +152,7 @@ export default class Playground {
 
     let codeEditor = game.make().Code({
       //  code: 'hello <h1>'
-      src: 'https://yantra.gg/mantra/examples/npc/hexapod.js'
+      src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
     })
     .height(800)
     .width(660)
