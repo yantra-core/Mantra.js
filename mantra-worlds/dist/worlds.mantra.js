@@ -3462,6 +3462,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
       // we reset the game to clear any previous state
       game.reset();
+      game.data.camera.follow = true;
       this.createWorld();
       this.createFounts(game);
       this.bindEvents();
@@ -3509,6 +3510,7 @@ var GravityGardens = /*#__PURE__*/function () {
       });
       playerConfig = playerConfig.build();
       var player = game.createEntity(playerConfig);
+      game.setPlayerId(player.id);
       game.make().type('WARP').Teleporter({
         destination: {
           world: 'Home'

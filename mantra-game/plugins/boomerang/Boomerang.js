@@ -263,7 +263,7 @@ class Boomerang {
       },
     };
 
-    console.log('boomerangConfig', boomerangConfig)
+    // console.log('boomerangConfig', boomerangConfig)
   
     let builder = this.build(boomerangConfig);
     this.game.createEntity(builder);
