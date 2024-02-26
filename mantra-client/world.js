@@ -97,7 +97,6 @@ game.use(new plugins.Canvas());
 game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
 game.use(new plugins.Code());
-game.use(new plugins.Toolbar());
    
 game.use(new Mouse());
 game.use(new plugins.Editor());
