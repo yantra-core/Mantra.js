@@ -18,6 +18,11 @@ uglifyjs ./dist/mantra.js -o ./dist/mantra.min.js -c -m
 cp ./dist/mantra.js ../mantra-client/public/mantra.js
 cp ./dist/mantra.min.js ../mantra-client/public/mantra.min.js
 
+# Copies the categories and prism files ( for now )
+cp ../mantra-examples/public/prism.min.js ../mantra-client/public/prism.min.js
+cp ../mantra-examples/public/prism.css ../mantra-client/public/prism.css
+cp ../mantra-examples/public/categories.js ../mantra-client/public/categories.js
+
 # Copies the browser bundle the mantra-examples project
 # cp ./dist/mantra.js ../mantra-examples/public/mantra.js
 
