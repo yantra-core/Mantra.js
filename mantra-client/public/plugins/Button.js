@@ -20,6 +20,10 @@ var Button = exports["default"] = /*#__PURE__*/function () {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, Button);
     this.id = Button.id;
+    this.disabled = false;
+    if (typeof config.disabled === 'boolean') {
+      this.disabled = config.disabled;
+    }
   }
   _createClass(Button, [{
     key: "init",
@@ -36,6 +40,10 @@ var Button = exports["default"] = /*#__PURE__*/function () {
           x: 0,
           y: 0
         };
+      }
+      entityData.meta = entityData.meta || {};
+      if (typeof entityData.disabled !== 'undefined') {
+        entityData.meta.disabled = entityData.disabled;
       }
       return _objectSpread({
         type: 'BUTTON',

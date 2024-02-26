@@ -37,6 +37,14 @@ var Text = exports["default"] = /*#__PURE__*/function () {
           y: 0
         };
       }
+      if (typeof entityData.x !== 'undefined') {
+        entityData.position.x = entityData.x;
+        delete entityData.x;
+      }
+      if (typeof entityData.y !== 'undefined') {
+        entityData.position.y = entityData.y;
+        delete entityData.y;
+      }
       return _objectSpread({
         type: 'TEXT',
         body: false,

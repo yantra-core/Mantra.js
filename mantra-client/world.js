@@ -20,7 +20,8 @@ let game = new Game({
   width: 800,
   height: 600,
   plugins: ['Gamepad'],
-  graphics: ['css'], // 'three', 'babylon', 'css'
+  editor: true,
+  graphics: ['none'], // 'three', 'babylon', 'css'
   gameRoot: '.',
   //defaultMovement: true,
   // defaultMouseMovement: false
@@ -53,14 +54,15 @@ let game = new Game({
   */
 });
 
-game.use(new plugins.SwitchGraphics());
-game.use(new plugins.Entity())
+//game.use(new plugins.SwitchGraphics());
+//game.use(new plugins.Entity())
 
 // game.gameConfig = TowerWorld;
 
 window.game = game;
 let home = new worlds.Platform();
 home = new worlds.Home();
+
 game.use(new plugins.Tower())
 game.use(new plugins.UnitSpawner())
 game.use(new plugins.Teleporter())
@@ -94,30 +96,38 @@ game.use(new plugins.Image());
 game.use(new plugins.Canvas());
 game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
-
+game.use(new plugins.Code());
+game.use(new plugins.Toolbar());
+   
 game.use(new Mouse());
-
+game.use(new plugins.Editor());
 game.use(new Lifetime());
 
 game.data.camera.mouseWheelZoomEnabled = true;
 
-
 game.start(function () {
   game.reset();
-  game.setZoom(1.5);
-  game.make().Player().createEntity();
+  game.setZoom(1);
+
+  // game.use(new plugins.ThreeGraphics());
+
+  // game.use(new worlds.EatWorld());
+  game.use(new worlds.Playground());
+
+  //game.use(home);
+
+  // game.make().Player().createEntity();
 
   // TODO: make this a helper
   // game.data.camera.mouseWheelZoomEnabled = true;
-
+/*
   game.make().Image({
     width: 256,
     height: 256,
     src: 'https://yantra.gg/mantra/img/game/env/warp-to-mantra-home-256.png'
   }).createEntity();
   //game.use(new worlds.Maze())
-  // game.use(new worlds.Playground())
-
+  */
   // game.make().GravityWell().isStatic(true).createEntity();
 
   function isCanvasEmpty(canvas, context) {

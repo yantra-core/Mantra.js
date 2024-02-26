@@ -8,7 +8,7 @@ game.start(function(){
   game.setZoom(1.5);
   let container = game.createContainer({
     name: 'laby-container',
-    layout: 'grid', // optional. can also be "flex" or "none"
+    layout: 'stack', // optional. can also be "flex" or "none"
     color: 0xff00ff,
     position: {
       x: 0,

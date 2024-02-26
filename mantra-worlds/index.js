@@ -1,6 +1,7 @@
 // Remark: These should all be more closely tied to ./plugins directory
 // and scope / codepaths. we should be able to load the World plugins from .use('WorldName')
 import Home from './Home/Home.js';
+import EatWorld from './EatWorld/EatWorld.js';
 import GravityGardens from './GravityGardens/GravityGardens.js';
 import InfinityTower from './InfinityTower/InfinityTower.js';
 import Maze from './Maze/Maze.js';
@@ -16,6 +17,7 @@ import XState from './XState/XState.js';
 import YCraft from './YCraft/YCraft.js';
 const worlds = {};
 worlds.Home = Home;
+worlds.EatWorld = EatWorld;
 worlds.GravityGardens = GravityGardens;
 worlds.InfinityTower = InfinityTower;
 worlds.Maze = Maze;

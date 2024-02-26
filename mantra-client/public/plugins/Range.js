@@ -39,7 +39,7 @@ var Range = exports["default"] = /*#__PURE__*/function () {
       return _objectSpread({
         type: 'RANGE',
         body: false,
-        value: entityData.value || 0,
+        value: entityData.value || 50,
         // Default value if none provided
         min: entityData.min || 0,
         // Default minimum value

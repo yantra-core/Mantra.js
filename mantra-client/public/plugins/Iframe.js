@@ -46,6 +46,9 @@ var Iframe = exports["default"] = /*#__PURE__*/function () {
       entityData.meta = entityData.meta || {};
       entityData.meta.src = src;
       entityData.afterUpdateEntity = function (entity) {
+        if (!entity || !entity.graphic) {
+          return;
+        }
         // check the iframe src vs the entity src
         // if they are different, update the iframe src\
         var graphic = entity.graphics['css-graphic'];

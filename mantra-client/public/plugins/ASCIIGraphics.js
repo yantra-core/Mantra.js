@@ -704,6 +704,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = cssMouseWheelZoom;
+// TODO: add a mode where mouse wheel will scroll camera veritcally
 function cssMouseWheelZoom(event) {
   var game = this.game;
   if (!this.mouseWheelEnabled) {
@@ -734,11 +735,11 @@ function cssMouseWheelZoom(event) {
 
   // Zoom settings
   var zoomSettings = {
-    intensity: 0.1,
+    intensity: 0.01,
     // Base zoom intensity
     minScale: 0.1,
     // Minimum scale limit
-    logBase: 2 // Logarithmic base
+    logBase: 10 // Logarithmic base
   };
 
   // Determine zoom direction
@@ -1049,6 +1050,16 @@ function updateEntityPosition(entityElement, entityData) {
     x: position.x,
     y: position.y
   };
+
+  // if the entity happens to be position: 'fixed' set the entityElement to absolute position with no adjustments
+  if (entityData.style && entityData.style.position === 'fixed') {
+    entityElement.style.position = 'absolute';
+    entityElement.style.left = position.x + 'px';
+    entityElement.style.top = position.y + 'px';
+    entityElement.style.display = ''; // Make sure the element is visible
+    return entityElement;
+  }
+
   // Check if the entity is within the field of view
   // Remark: Field of View is disabled ( for now ), it *should* be working as expected,
   //         the current implementation will hide the entity, we should removeEntity() instead

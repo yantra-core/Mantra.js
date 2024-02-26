@@ -769,6 +769,75 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       return this;
     }
   }, {
+    key: "origin",
+    value: function origin(value) {
+      // Map of origin positions to their relative offsets
+      var origins = {
+        'center': {
+          x: 0.5,
+          y: 0.5
+        },
+        'top': {
+          x: 0.5,
+          y: 0
+        },
+        'bottom': {
+          x: 0.5,
+          y: 1
+        },
+        'left': {
+          x: 0,
+          y: 0.5
+        },
+        'right': {
+          x: 1,
+          y: 0.5
+        },
+        'top-left': {
+          x: 0,
+          y: 0
+        },
+        'top-right': {
+          x: 1,
+          y: 0
+        },
+        'bottom-left': {
+          x: 0,
+          y: 1
+        },
+        'bottom-right': {
+          x: 1,
+          y: 1
+        }
+      };
+      var originOffset = origins[value];
+      if (originOffset) {
+        // Ensure the offset object exists
+        if (_typeof(this.config.offset) !== 'object' || this.config.offset === null) {
+          this.config.offset = {
+            x: 0,
+            y: 0,
+            z: 0
+          }; // Initialize with default values
+        }
+
+        // Adjust the existing offsets based on the origin
+        // Assuming a default entity size to calculate the origin offset, adjust as needed
+        var entitySize = {
+          width: 100,
+          height: 100
+        }; // Default size, replace with actual entity size if available
+        var offsetX = entitySize.width * (originOffset.x - 0.5); // Subtracting 0.5 to center the origin
+        var offsetY = entitySize.height * (originOffset.y - 0.5); // Subtracting 0.5 to center the origin
+
+        // Add the calculated origin offsets to the existing offsets
+        this.offset(this.config.offset.x + offsetX, this.config.offset.y + offsetY, this.config.offset.z);
+      } else {
+        console.warn("Invalid origin value: '".concat(value, "'. Valid origins are center, top, bottom, left, right, top-left, top-right, bottom-left, bottom-right."));
+      }
+      return this;
+    }
+  }, {
     key: "offset",
     value: function offset(x, y, z) {
       if (_typeof(this.config.offset) !== 'object' || this.config.offset === null) {
@@ -814,10 +883,18 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "createEntity",
     value: function createEntity() {
+      var applyOffset = function applyOffset(config) {
+        var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+        // Apply the offset to the position based on the index
+        config.position.x += config.offset.x * index;
+        config.position.y += config.offset.y * index;
+        config.position.z += config.offset.z * index;
+      };
       if (typeof this.config.clone === 'number') {
         var entities = [];
         for (var i = 0; i < this.config.clone; i++) {
           var clonedConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
+          applyOffset(clonedConfig); // No index needed for clones, as they are exact copies
           entities.push(this.game.createEntity(clonedConfig));
         }
         return entities;
@@ -825,20 +902,9 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         var _entities = [];
         for (var _i = 0; _i < this.config.repeat; _i++) {
           var entityConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
-          // Calculate the offset for each repeated entity
-          var offsetX = entityConfig.position.x + _i * entityConfig.offset.x;
-          var offsetY = entityConfig.position.y + _i * entityConfig.offset.y;
-          var offsetZ = entityConfig.position.z + _i * entityConfig.offset.z;
-          if (typeof offsetX === 'number' && typeof offsetY === 'number') {
-            entityConfig.position = {
-              x: offsetX,
-              y: offsetY,
-              z: entityConfig.position.z
-            };
-          }
-          if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
-            entityConfig.position.z = offsetZ;
-          }
+          // TODO: return cloned offset, cannot mutate like this? double check, tests would be good
+          applyOffset(entityConfig, _i); // Apply offset based on the index for repeated entities
+
           if (_typeof(this.repeatModifiers) === 'object' && this.repeatModifiers !== null) {
             for (var _i2 = 0, _Object$entries = Object.entries(this.repeatModifiers); _i2 < _Object$entries.length; _i2++) {
               var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
@@ -857,6 +923,7 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         return _entities;
       } else {
         var singleConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
+        applyOffset(singleConfig); // Apply offset for a single entity
         var singleCreatedEntity = this.game.createEntity(singleConfig);
         if (singleCreatedEntity.type === 'PLAYER') {
           // TODO: check to see if there are no other active players / if so set this one
@@ -1071,7 +1138,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       mouse: true,
       gamepad: false,
       virtualGamepad: false,
-      editor: true,
+      editor: false,
       sutra: true,
       lifetime: false,
       defaultMovement: true,
@@ -1449,6 +1516,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "setBackground",
     value: function setBackground(color) {
       // not implemented directly, Graphics plugin will handle this
+    }
+  }, {
+    key: "convertColorToHex",
+    value: function convertColorToHex(color) {
+      return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
     }
   }, {
     key: "randomColor",
@@ -2612,8 +2684,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "0c3b325faceec0059b084ac9eb033a01de2458632d106c47977076f2d2745372",
-  "./plugins/ASCIIGraphics.min.js": "43bb558f654a6ae17abe4bb6994647f69aa3598db0b224df1a3f5272344a34a4",
+  "./plugins/ASCIIGraphics.js": "03f44030c855df4482d5286eff3255338b030b02c56369803cdd0ea9e41875fc",
+  "./plugins/ASCIIGraphics.min.js": "8c405f6a66e4f10d6e1f53c79ffecba6d4047ebdb7abdb9a044d349dce1f4197",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2634,12 +2706,12 @@ var _default = exports["default"] = {
   "./plugins/Border.min.js": "3584e32fb60aae9ee6a291e4b3a89722f9eb62b345bc0b68cc06b450c854ade5",
   "./plugins/Bullet.js": "e74dc967fd6ee2a3c3c1073a2f153e75813a07e004e3d024a67d8035866d65e9",
   "./plugins/Bullet.min.js": "912b40049e8fdac7c1c5d5f25e4ffa209f65472562521e0111686eced5599053",
-  "./plugins/Button.js": "c3532f5e666df486e436f3cadfe7e908dcff50b192cece9e99e5d829db2f82fa",
-  "./plugins/Button.min.js": "2ff07541d6d72e0f04ae8e7bc72943ea295e9bd4a3adc6e1a9f9f606805321e1",
+  "./plugins/Button.js": "45fdc92448bf3e870b7f50d68b719304c69a0001e7d443391abfb81fff4af666",
+  "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "31817b62cd1ab122eb035172b80a5c5e57d3ca0ba7f2db460ea67e1d96181616",
-  "./plugins/CSSGraphics.min.js": "db062852215e25cc71239ad7462e9e13d49bd13b9243afa6e366a9382054f79c",
+  "./plugins/CSSGraphics.js": "74809432c4fd660d6b52755e119bd75da65116041d1e93585d7460cbc1dc7d96",
+  "./plugins/CSSGraphics.min.js": "b9afc8b8fb1df5cd21e0087dfeecda711ed1ae60cf4100fb5ec991ec89fc5c9c",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
@@ -2692,8 +2764,8 @@ var _default = exports["default"] = {
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
   "./plugins/Hexapod.js": "93a22407d5ee45eff171fb144221e419191369a7775a2af59a56a01a9ca822bf",
   "./plugins/Hexapod.min.js": "fec5b1c81df0044a1fbdba1baae3587f606b381dde94f5a81f4ccbcc673d972e",
-  "./plugins/Iframe.js": "78d5c7a3e872a1e708cc2fdef3f45b8f87057b613be97e4b21249da28ff2bb7b",
-  "./plugins/Iframe.min.js": "110135976ab0487a22c1e21ca376ec8d23b7aaecc39eee77d7983fb56f04cc7e",
+  "./plugins/Iframe.js": "ef82c243d98dc49ab09ba5b54d7483128eb0fb49a4e733e1032d25730a095db0",
+  "./plugins/Iframe.min.js": "486536e022cee0dc0274cd5a99b24f456ed94715b20fa2de8bbfa88c36ada101",
   "./plugins/Image.js": "ca10bf24414dc4324989865027abec8d266f54b3dcc2ee26c3a29ad598430a70",
   "./plugins/Image.min.js": "c3e643c3152a2cec852ea59932b4ec79adc264e82fb63cba733d5a97306653ab",
   "./plugins/Input.js": "d0684ed311bbfacaf094fbbf4b70e23296b7fdc077e4e3f92e6ee3487a5ce83f",
@@ -2747,8 +2819,8 @@ var _default = exports["default"] = {
   "./plugins/RadialMenu.min.js": "2091b1073a9d3e41d2133c7cc4ec5b22fb8dae4a9f0c255a013e72842bc315a9",
   "./plugins/Radio.js": "f942470e3247bc192bca7713e77549ed8e7f8e990eaca65b6af0413651b2a77c",
   "./plugins/Radio.min.js": "cc039b7b38781356c7a5e3b603f476d81c9d5787d525a0221e13efbe98d513cb",
-  "./plugins/Range.js": "134ca73e435e8fc75cdd1c6830494f500597d79074a4f09c60b71e252ec8d3f2",
-  "./plugins/Range.min.js": "a5d638e352835133b1ca31b6dcd9724bf4fe2611837345936e8d550d8b886e89",
+  "./plugins/Range.js": "70ee15e4608edd602bd2e931d268da8d2e613ee9dd49d96793ebdf9da0197523",
+  "./plugins/Range.min.js": "0c4743bd74df70a2e7bf9486077dce5611e215a898aa6ba9f418edf9b534f171",
   "./plugins/Scoreboard.js": "7556ebd8c54d1d05466c4e857ba0608bfb1e60fc86925dd01183a52c5dc6f6ca",
   "./plugins/Scoreboard.min.js": "f79d065a822319e0c74c3e36a1f17da4cae47c66b9770e1f10e9075fd40ab436",
   "./plugins/Select.js": "6b54a878ad5b3c2152294020280a4adc08dc8ef42b38daa69b87612a679260e7",
@@ -2761,20 +2833,20 @@ var _default = exports["default"] = {
   "./plugins/StarField.min.js": "302c7e8878c277e6d3dc553ca7767fc98e16f66a8964c1a74cf7e4b972892467",
   "./plugins/Sutra.js": "0dad85de23e251d907c0f0c7366db1d34a7a5da26a9e4152665a6cc487f524b0",
   "./plugins/Sutra.min.js": "33bcf42fd7ead59d6ea30466e51e37aa4eca7bd198785dae10e338ab83ff5d75",
-  "./plugins/SutraGUI.js": "e45bf5a66b9357d88b10f8ea3673cf57e381bb95890414be9bbf9904b386d3ac",
-  "./plugins/SutraGUI.min.js": "aaee96d84ed969f8d99d59732a7dd689e791fa7112f470d9da77a9ff2b828c0d",
+  "./plugins/SutraGUI.js": "410b907e0b0cc0633cb9dd164fc861419d50927aa82289b1b8c5e9ba6f4838e5",
+  "./plugins/SutraGUI.min.js": "978af8d0050820c3056c3410b3b4a954a8882d4dd06677c31049f5f8db167f65",
   "./plugins/SwitchGraphics.js": "154775d7459b8a7c08be7f8ce08b3d5a2292df00b10d71eaf2fa5e9de1833f44",
   "./plugins/SwitchGraphics.min.js": "f090ece198364cd6ebb3658404d8413a8122a55c5419d3ab411ec4acd0919c0a",
   "./plugins/Sword.js": "4ed88fd1e3f9fafe239d88db8b3bb3ee1189fff9c7b3c9ff54ac9b151c58fd32",
   "./plugins/Sword.min.js": "68708f6deb1b0b7de5a4fda1eabf50f1bc12d2a97433b491a72deabba506e33d",
   "./plugins/Teleporter.js": "c28f7b00415ef15c0f9555d5839e6ec7a65fc74464b279dc90cbf0b684fbc3d5",
   "./plugins/Teleporter.min.js": "13940bc70dd287c8fd87aec4db788d0eba03891d58569d34aa2f7debc0f0be62",
-  "./plugins/Text.js": "27544f21ebef3c32e5b021dec64cd62dec7db06ae78d03b6dc65601fbcbbeca0",
-  "./plugins/Text.min.js": "16502feef1ae35a9b9e523ffb2f36f9a8c14b537dec87c0fd83f3197fa2938d0",
+  "./plugins/Text.js": "eeb50f1cffc6e0f781a77bf982ed046d02b817c572e40c4cb9da1467f3f82e5d",
+  "./plugins/Text.min.js": "388b6baebbe73c0d0d736442ecc04cf00b383660c6c7bd87b3d2c554bae69d86",
   "./plugins/Textarea.js": "a9f16f27cf2721e3d75a504fd5ae68cb8238d945ac7dbb10f3787d7a12d680bb",
   "./plugins/Textarea.min.js": "4ee950d2815ee75c63ae64b260f4b95ffbce227a37ca58a9596d2a317a56b03b",
-  "./plugins/ThreeGraphics.js": "02a91241d96846b0729e8e6e87658afeb6fc0735772cbc1231df7d844b6a2156",
-  "./plugins/ThreeGraphics.min.js": "1b8fdf611aef73f9278fcf16b9c0417736cdf25a2f69e404f4dd7d0fa1965940",
+  "./plugins/ThreeGraphics.js": "e67c742857c35edb479ea783da8deeb75ff50472d02bcd47b0ba298a25f686a9",
+  "./plugins/ThreeGraphics.min.js": "85b8c5737465d62908d771f38a89f5d4a62c47a2e68613a3a1416cab707adffb",
   "./plugins/TileSet.js": "730987abc1a69c466047444b005ed25d49a6c3dab03c8128701e086e29eb6c57",
   "./plugins/TileSet.min.js": "9a83b80581a1611b7f34e2f8cc4fe9e4eef910ea55372a19a0eda54eb2033649",
   "./plugins/Timers.js": "a851809e3b6281010be54bef5f96a904ad687a860db2fc76fcb2e859adc40c23",

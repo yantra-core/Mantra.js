@@ -1116,6 +1116,8 @@ function layoutEntity(container, entityId) {
       _this.game.updateEntity({
         id: item.id,
         position: itemPosition
+      }, {
+        skipAfterUpdateEntity: true
       });
 
       // console.log(`Item ${item.id} positioned at row ${row}, column ${col}`);
@@ -1285,6 +1287,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function updateEntity(entityDataOrId, entityData) {
+  var updateOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   if (typeof entityDataOrId === 'string' || typeof entityDataOrId === 'number') {
     entityData = _objectSpread({
       id: entityDataOrId
@@ -1509,13 +1512,16 @@ function updateEntity(entityDataOrId, entityData) {
   //
   // Entity Lifecycle afterUpdateEntity
   //
+
   var updatedEnt = this.game.getEntity(entityId);
-  var _afterUpdateEntity;
-  if (typeof updatedEnt.afterUpdateEntity === 'function') {
-    _afterUpdateEntity = updatedEnt.afterUpdateEntity;
-  }
-  if (_afterUpdateEntity) {
-    _afterUpdateEntity(updatedEnt);
+  if (updateOptions.skipAfterUpdateEntity !== true) {
+    var _afterUpdateEntity;
+    if (typeof updatedEnt.afterUpdateEntity === 'function') {
+      _afterUpdateEntity = updatedEnt.afterUpdateEntity;
+    }
+    if (_afterUpdateEntity) {
+      _afterUpdateEntity(updatedEnt);
+    }
   }
   updatedEnt = this.game.lifecycle.triggerHook('after.updateEntity', updatedEnt);
   return updatedEnt;

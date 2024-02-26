@@ -54826,6 +54826,27 @@ function updateGraphic(entityData) {
     // console.log("UPDATING POSITON OF GROUP", entityData.position, group)
     group.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
   }
+
+  // check the current size of the group versus the entityData size
+  // grow / shrink the group if needed
+  // TODO: fix this to handle scaling correctly? needs to resize the ent
+  if (entityData.size && group.scale.x !== entityData.size.width) {
+    // console.log("entityData", entityData.size)
+    // group.scale.set(entityData.size.width, entityData.size.height, entityData.size.depth);
+  }
+
+  // Update group scale if necessary
+  // This assumes 'entityData.size' contains 'width', 'height', and 'depth' properties to represent scale
+  if (entityData.size) {
+    // Check if the current scale is different from the desired scale
+    var hasScaleChanged = group.scale.x !== entityData.size.width || group.scale.y !== entityData.size.height || group.scale.z !== entityData.size.depth;
+    if (hasScaleChanged) {
+      // Update the scale of the group to match the desired size
+      // group.scale.set(entityData.size.width, entityData.size.height, entityData.size.depth);
+    }
+  }
+
+  // console.log("CONFIRM")
 }
 
 },{}],10:[function(require,module,exports){

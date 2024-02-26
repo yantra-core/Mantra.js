@@ -263,6 +263,7 @@ var _inflateRadio = _interopRequireDefault(require("./lib/entity/inflate/inflate
 var _inflateRange = _interopRequireDefault(require("./lib/entity/inflate/inflateRange.js"));
 var _inflateSelect = _interopRequireDefault(require("./lib/entity/inflate/inflateSelect.js"));
 var _inflateTextarea = _interopRequireDefault(require("./lib/entity/inflate/inflateTextarea.js"));
+var _inflateCode = _interopRequireDefault(require("./lib/entity/inflate/inflateCode.js"));
 var _updateGraphic = _interopRequireDefault(require("./lib/entity/updateGraphic.js"));
 var _bindEntityEvents = _interopRequireDefault(require("./lib/entity/bindEntityEvents.js"));
 var _bindYCraftEvents = _interopRequireDefault(require("./lib/entity/bindYCraftEvents.js"));
@@ -321,6 +322,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateRadio = _inflateRadio["default"].bind(_assertThisInitialized(_this));
     _this.inflateInput = _inflateInput["default"].bind(_assertThisInitialized(_this));
     _this.inflateTextarea = _inflateTextarea["default"].bind(_assertThisInitialized(_this));
+    _this.inflateCode = _inflateCode["default"].bind(_assertThisInitialized(_this));
     _this.inflateCheckbox = _inflateCheckbox["default"].bind(_assertThisInitialized(_this));
     _this.inflateImage = _inflateImage["default"].bind(_assertThisInitialized(_this));
     //this.inflateVideo = inflateVideo.bind(this);
@@ -395,7 +397,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCanvas.js":18,"./lib/entity/inflate/inflateCheckbox.js":19,"./lib/entity/inflate/inflateIframe.js":20,"./lib/entity/inflate/inflateImage.js":21,"./lib/entity/inflate/inflateInput.js":22,"./lib/entity/inflate/inflateRadio.js":23,"./lib/entity/inflate/inflateRange.js":24,"./lib/entity/inflate/inflateSelect.js":25,"./lib/entity/inflate/inflateText.js":26,"./lib/entity/inflate/inflateTextarea.js":27,"./lib/entity/inflateGraphic.js":28,"./lib/entity/inflateTexture.js":29,"./lib/entity/removeGraphic.js":30,"./lib/entity/updateGraphic.js":31,"./lib/render.js":32,"./lib/unload.js":33}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCanvas.js":18,"./lib/entity/inflate/inflateCheckbox.js":19,"./lib/entity/inflate/inflateCode.js":20,"./lib/entity/inflate/inflateIframe.js":21,"./lib/entity/inflate/inflateImage.js":22,"./lib/entity/inflate/inflateInput.js":23,"./lib/entity/inflate/inflateRadio.js":24,"./lib/entity/inflate/inflateRange.js":25,"./lib/entity/inflate/inflateSelect.js":26,"./lib/entity/inflate/inflateText.js":27,"./lib/entity/inflate/inflateTextarea.js":28,"./lib/entity/inflateGraphic.js":29,"./lib/entity/inflateTexture.js":30,"./lib/entity/removeGraphic.js":31,"./lib/entity/updateGraphic.js":32,"./lib/render.js":33,"./lib/unload.js":34}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -508,6 +510,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = cssMouseWheelZoom;
+// TODO: add a mode where mouse wheel will scroll camera veritcally
 function cssMouseWheelZoom(event) {
   var game = this.game;
   if (!this.mouseWheelEnabled) {
@@ -538,11 +541,11 @@ function cssMouseWheelZoom(event) {
 
   // Zoom settings
   var zoomSettings = {
-    intensity: 0.1,
+    intensity: 0.01,
     // Base zoom intensity
     minScale: 0.1,
     // Minimum scale limit
-    logBase: 2 // Logarithmic base
+    logBase: 10 // Logarithmic base
   };
 
   // Determine zoom direction
@@ -853,6 +856,16 @@ function updateEntityPosition(entityElement, entityData) {
     x: position.x,
     y: position.y
   };
+
+  // if the entity happens to be position: 'fixed' set the entityElement to absolute position with no adjustments
+  if (entityData.style && entityData.style.position === 'fixed') {
+    entityElement.style.position = 'absolute';
+    entityElement.style.left = position.x + 'px';
+    entityElement.style.top = position.y + 'px';
+    entityElement.style.display = ''; // Make sure the element is visible
+    return entityElement;
+  }
+
   // Check if the entity is within the field of view
   // Remark: Field of View is disabled ( for now ), it *should* be working as expected,
   //         the current implementation will hide the entity, we should removeEntity() instead
@@ -1105,6 +1118,16 @@ function createGraphic(entityData) {
       // For CANVAS entities, create a canvas
       entityElement = this.inflateCanvas(entityElement, entityData);
       break;
+    case 'CODE':
+      // For CODE entities, create a code block
+      entityElement = this.inflateCode(entityElement, entityData);
+      break;
+    case 'TOOLBAR':
+      // For CANVAS entities, create a canvas
+      if (this.game.systems.toolbar) {
+        entityElement = this.game.systems.toolbar.inflate(entityElement, entityData);
+      }
+      break;
     default:
       if (entityData.type === 'PART' && entityData.name === 'Display') {
         this.inflateText(entityElement, entityData);
@@ -1134,7 +1157,20 @@ function createGraphic(entityData) {
     // entityElement.style.background = randomHexColor;
   }
 
-  this.renderDiv.appendChild(entityElement);
+  // if style.position is absolute, append to gameHolder instead
+  if (typeof entityData.style !== 'undefined' && entityData.style.position === 'absolute') {
+    // if style has been manually set to absolute, place the entity directly in gameHolder ( instead of css-render-dev)
+    // using absolute values. this will ensure that the entity is not affected by camera scroll and zoom 
+    var gameHolder = document.getElementById('gameHolder');
+    entityElement.style.position = 'flex';
+    entityElement.style.top = "".concat(entityData.position.y, "px");
+    entityElement.style.left = "".concat(entityData.position.x, "px");
+    entityElement.style.width = "".concat(entityData.width, "px");
+    entityElement.style.height = "".concat(entityData.height, "px");
+    gameHolder.appendChild(entityElement);
+  } else {
+    this.renderDiv.appendChild(entityElement);
+  }
 
   // Update the position of the entity element
   this.updateEntityPosition(entityElement, entityData);
@@ -1221,9 +1257,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = inflateButton;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function inflateButton(entityElement, entityData) {
   // Create the button
   var button = document.createElement('button');
+  console.log('entityData', entityData);
+  if (_typeof(entityData.meta) === 'object' && entityData.meta.disabled === true) {
+    button.disabled = true;
+  }
 
   // Set button text if provided
   if (entityData.text) {
@@ -1387,6 +1428,110 @@ function inflateCheckbox(entityElement, entityData) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = inflateCode;
+// TODO: Move this to Code.js Plugin inflate()
+function inflateCode(entityElement, entityData) {
+  var _this = this;
+  var graphic = entityData.graphics && entityData.graphics['graphics-css'];
+  var pre, code;
+  if (graphic) {
+    // graphic is top level DOM, all other elements are children
+    pre = graphic.querySelectorAll('pre')[0];
+    code = graphic.querySelectorAll('code')[0];
+  } else {
+    pre = document.createElement('pre');
+    code = document.createElement('code');
+    pre.appendChild(code);
+    entityElement.appendChild(pre);
+  }
+
+  // add class "language-javascript" to the code element
+  var codeHighlightClassName = 'language-' + entityData.meta.language;
+  codeHighlightClassName = 'language-javascript'; // TODO: remove this line
+  code.classList.add(codeHighlightClassName);
+
+  // Initialize fetchSourceHandles if it doesn't exist
+  this.fetchSourceHandles = this.fetchSourceHandles || {};
+  var src = entityData.meta && entityData.meta.src;
+  if (src) {
+    // Set initial content to indicate loading
+    code.textContent = "Loading... ".concat(src);
+    if (!this.fetchSourceHandles[src]) {
+      // Create a mutex and start fetching the content
+      this.fetchSourceHandles[src] = fetch(src).then(function (response) {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      }).then(function (content) {
+        // Update the code element directly once the content is fetched
+        Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
+          el.textContent = content;
+          Prism.highlightAll();
+        });
+
+        // Store the fetched content for future use, replacing the promise
+        _this.fetchSourceHandles[src] = {
+          content: content
+        };
+      })["catch"](function (error) {
+        console.error('Error fetching source code:', error);
+        // Update all code elements with the error message
+        Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
+          el.textContent = '// Error fetching source code';
+        });
+        // Store the error message for future use, replacing the promise
+        _this.fetchSourceHandles[src] = {
+          error: '// Error fetching source code'
+        };
+      });
+    }
+
+    // Mark the code element with a data attribute for future updates
+    code.setAttribute('data-src', src);
+  } else {
+    // Set default code text if none provided and no src is specified
+    code.textContent = entityData.meta && entityData.meta.code || '';
+  }
+  applyCodeStyles(pre, code, entityData);
+
+  // Additional style adjustments
+  if (entityData.width) {
+    pre.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.height) {
+    pre.style.height = "".concat(entityData.height, "px");
+  }
+  if (entityData.color) {
+    code.style.color = convertColorToHex(entityData.color);
+  }
+  return entityElement;
+}
+function applyCodeStyles(pre, code, entityData) {
+  // Define and apply default styles for code element here
+  // For example, setting a monospace font and a background color
+  pre.style.display = 'block';
+  pre.style.overflow = 'auto';
+  pre.style.padding = '5px';
+  pre.style.backgroundColor = '#1E1E1E'; // Dark background for the code block
+
+  code.style.fontFamily = 'monospace';
+  code.style.fontSize = '14px';
+  code.style.color = '#D4D4D4'; // Light color for the text for better contrast
+
+  // Apply any custom styles from entityData if provided
+  if (entityData.style) {
+    Object.assign(pre.style, entityData.style.pre); // Apply styles to the <pre> element
+    Object.assign(code.style, entityData.style.code); // Apply styles to the <code> element
+  }
+}
+
+},{}],21:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = inflateIframe;
 function inflateIframe(entityElement, entityData) {
   var iframe = document.createElement('iframe');
@@ -1410,7 +1555,7 @@ function applyIframeStyles(iframe, entityData) {
   // Similar to applySelectStyles function
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1463,7 +1608,7 @@ function applyImageStyles(img, entityData) {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1543,7 +1688,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1576,7 +1721,7 @@ function inflateRadio(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1621,9 +1766,7 @@ function inflateRange(entityElement, entityData) {
   return entityElement;
 }
 function applyRangeStyles(range, entityData) {
-  // Basic default styles for range input
   var defaultRangeStyles = {
-    // Example default styles; adjust as needed
     display: 'block',
     width: '100%',
     // Takes full width of the container
@@ -1631,16 +1774,32 @@ function applyRangeStyles(range, entityData) {
     // Adds some space around the slider
     cursor: 'pointer'
   };
+
+  // Apply default and custom styles from entityData
   Object.assign(range.style, defaultRangeStyles, entityData.style);
+
+  // Attempt to adjust the slider thumb size and track height for WebKit browsers
+  if (entityData.height) {
+    var thumbHeight = "".concat(entityData.height, "px");
+    var trackHeight = "".concat(Math.round(parseInt(entityData.height) / 2), "px"); // Adjust track height as needed
+
+    range.style.webkitAppearance = 'none'; // Removes default styling
+    range.style.height = thumbHeight; // Attempts to set the thumb height, might not work as expected
+
+    // Custom styles for the thumb
+    range.style.setProperty("--thumb-height", thumbHeight);
+    range.style.setProperty("--track-height", trackHeight);
+    range.style.background = "\n      linear-gradient(transparent, transparent),\n      url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"".concat(thumbHeight, "\" width=\"").concat(thumbHeight, "\" viewBox=\"0 0 20 20\"><circle cx=\"10\" cy=\"10\" r=\"8\" fill=\"").concat(entityData.color ? convertColorToHex(entityData.color) : '#CCC', "\"/></svg>') no-repeat center,\n      linear-gradient(transparent, transparent)\n    ");
+
+    // Additional custom thumb and track styles for WebKit browsers
+    range.style.setProperty("--webkit-slider-thumb", "\n      -webkit-appearance: none;\n      width: var(--thumb-height);\n      height: var(--thumb-height);\n      border-radius: 50%;\n      background: ".concat(entityData.color ? convertColorToHex(entityData.color) : '#CCC', ";\n      cursor: pointer;\n      margin-top: calc((var(--track-height) - var(--thumb-height)) / 2); // Centers the thumb vertically\n    "));
+    range.style.setProperty("--webkit-slider-runnable-track", "\n      width: 100%;\n      height: var(--track-height);\n      background: #DDD;\n      border-radius: calc(var(--track-height) / 2);\n    ");
+  }
 
   // Additional styling can be applied through entityData.style
 }
 
-function convertColorToHex(color) {
-  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
-}
-
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1648,57 +1807,77 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = inflateSelect;
 function inflateSelect(entityElement, entityData) {
-  // Create the select element
   var select = document.createElement('select');
-  if (entityData.meta && entityData.meta.options) {
-    var options = entityData.meta.options;
-    // Populate the select element with options
-    if (Array.isArray(options)) {
-      options.forEach(function (optionData) {
-        var option = document.createElement('option');
-        option.value = optionData.value;
-        option.textContent = optionData.label;
-        // Optional: Set the option as selected
-        if (optionData.selected) {
-          option.selected = true;
-        }
-        select.appendChild(option);
-      });
-    }
+
+  // Populate the select element with options if available
+  if (entityData.meta && entityData.meta.options && Array.isArray(entityData.meta.options)) {
+    entityData.meta.options.forEach(function (optionData) {
+      var option = document.createElement('option');
+      option.value = optionData.value;
+      option.textContent = optionData.label;
+
+      // Set fontSize and other styles directly on the option if needed
+      if (entityData.style && entityData.style.fontSize) {
+        option.style.fontSize = entityData.style.fontSize;
+      }
+      // Apply other styles as needed
+      if (entityData.style && entityData.style.color) {
+        option.style.color = entityData.style.color;
+      }
+      if (optionData.selected) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
   }
 
-  // Apply default and custom select styles
+  // Apply default and custom styles
   applySelectStyles(select, entityData);
 
   // Append the select element to the entityElement
   entityElement.appendChild(select);
-
-  // Optional: Set width and color of the entityElement if provided
-  if (entityData.width) {
-    entityElement.style.width = "".concat(entityData.width, "px");
-  }
-  if (entityData.color) {
-    entityElement.style.color = convertColorToHex(entityData.color);
-  }
   return entityElement;
 }
-var defaultSelectStyles = {
-  padding: '10px 15px',
-  fontSize: '16px',
-  margin: '4px 2px',
-  cursor: 'pointer',
-  borderRadius: '8px',
-  backgroundColor: '#f2f2f2',
-  color: 'black',
-  border: '1px solid #ccc',
-  appearance: 'none',
-  // Removes default browser styling
-  transition: 'border-color 0.4s ease, box-shadow 0.4s ease'
-};
 function applySelectStyles(select, entityData) {
-  Object.assign(select.style, defaultSelectStyles, entityData.style);
+  var defaultSelectStyles = {
+    padding: '10px 15px',
+    fontSize: '16px',
+    margin: '4px 2px',
+    cursor: 'pointer',
+    borderRadius: '8px',
+    backgroundColor: '#f2f2f2',
+    color: 'black',
+    border: '1px solid #ccc',
+    appearance: 'none',
+    // Removes default browser styling
+    transition: 'border-color 0.4s ease, box-shadow 0.4s ease'
+  };
 
-  // Add focus and change event listeners for interactive styles
+  // Apply default styles
+  Object.assign(select.style, defaultSelectStyles);
+
+  // Set width and height if provided
+  if (entityData.width) {
+    select.style.width = "".concat(entityData.width, "px");
+  }
+  if (entityData.height) {
+    select.style.height = "".concat(entityData.height, "px");
+    // Adjust padding and font size based on height if necessary
+    var adjustedPadding = Math.max(0, (entityData.height - 20) / 2); // Example adjustment
+    // select.style.padding = `${adjustedPadding}px 15px`;
+  }
+
+  // Set color if provided
+  if (entityData.color) {
+    select.style.color = convertColorToHex(entityData.color);
+  }
+
+  // Apply custom styles from entityData
+  if (entityData.style) {
+    Object.assign(select.style, entityData.style);
+  }
+
+  // Event listeners for interactive styles and entity updates
   select.addEventListener('focus', function () {
     select.style.borderColor = '#80bdff';
     select.style.boxShadow = '0 0 0 0.2rem rgba(0,123,255,.25)';
@@ -1707,8 +1886,6 @@ function applySelectStyles(select, entityData) {
     select.style.borderColor = '#ccc';
     select.style.boxShadow = 'none';
   });
-
-  // change event
   select.addEventListener('change', function (event) {
     var _select = event.target;
     // Update entity value in ECS on select change
@@ -1718,10 +1895,11 @@ function applySelectStyles(select, entityData) {
   });
 }
 function convertColorToHex(color) {
+  // Ensure color conversion logic is consistent with your needs
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1764,7 +1942,7 @@ function inflateText(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1787,7 +1965,7 @@ function inflateTextarea(entityElement, entityData) {
     textarea.style.height = "".concat(entityData.height, "px");
   }
   if (entityData.color) {
-    textarea.style.color = convertColorToHex(entityData.color);
+    textarea.style.color = this.game.convertColorToHex(entityData.color);
   }
   return entityElement;
 }
@@ -1796,7 +1974,7 @@ function applyTextareaStyles(textarea, entityData) {
   // Similar to applySelectStyles function
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1823,7 +2001,7 @@ function inflateEntity(entity, alpha) {
   this.inflateTexture(entity, graphic);
 }
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1903,7 +2081,7 @@ function applyTextureStyles(texture, element, textureUrl, spritePosition, entity
   });
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1921,7 +2099,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1943,7 +2121,8 @@ function updateGraphic(entityData) {
   var entityElement = document.getElementById("entity-".concat(entityData.id));
   if (entityElement) {
     // Update the entity color
-    if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+    // TODO: remove this refactor all code to inflate* paths
+    if (typeof entityData.color !== 'undefined' && entityData.color !== null && entityData.type !== 'TEXT') {
       // entityData.color is int number here we need a hex
       var hexColor = '#' + entityData.color.toString(16);
       // update the background color
@@ -1989,10 +2168,19 @@ function updateGraphic(entityData) {
     }
     if (entityData.type === 'IFRAME') {
       var iframe = entityElement.querySelector('iframe');
-
       // check to see if iframe src matches entityData.meta.src
       if (iframe && iframe.src !== entityData.meta.src) {
         iframe.src = entityData.meta.src;
+      }
+    }
+    if (entityData.type === 'CODE') {
+      // Query entityElement for the first code tag that has a 'data-src' attribute matching entityData.meta.src
+      var codeElement = entityElement.querySelector("code[data-src=\"".concat(entityData.meta.src, "\"]"));
+      //console.log('entityElement', entityElement);
+
+      if (codeElement) {} else {
+        console.log("No code element with matching data-src found.", entityData.meta.src);
+        this.inflateCode(entityElement, entityData);
       }
     }
     return this.updateEntityPosition(entityElement, entityData);
@@ -2002,7 +2190,7 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2061,7 +2249,7 @@ function render(game, alpha) {
   }
 }
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -412,6 +412,7 @@ var SutraGUI = /*#__PURE__*/function () {
       this.drawTable();
       if (this.game.rules) {
         this.setRules(this.game.rules);
+        this.viewSutraEnglish();
       } else {
         // add message to indicate no sutra
         var container = document.getElementById('sutraTable');

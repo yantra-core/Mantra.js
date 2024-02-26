@@ -243,6 +243,14 @@ let entity_examples = [
     tags: ['create', 'entity', 'scene', 'add', 'new', 'instance', 'object', 'prefab', 'clone', 'copy', 'duplicate']
   },
   {
+    title: 'Entity Origin',
+    category: 'entity',
+    description: 'Set the origin of an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/entity-origin.html',
+    tags: ['origin', 'entity', 'scene', 'origin', 'position', 'center', 'middle', 'top', 'bottom', 'left', 'right', 'front', 'back']
+  },
+  {
     title: 'Clone Entity',
     category: 'entity',
     description: 'Clone an entity.',
@@ -1019,7 +1027,17 @@ let container_examples = [
     image: 'placeholder-image.jpg',
     url: 'containers/stack-layout.html',
     tags: ['stack', 'layout', 'arrange', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'assemblage', 'aggregation']
+  },
+  /*
+  {
+    title: 'Fixed Position',
+    category: 'containers',
+    description: 'Arrange entities in a fixed position.',
+    image: 'placeholder-image.jpg',
+    url: 'containers/fixed-position.html',
+    tags: ['fixed', 'position', 'arrange', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'assemblage', 'aggregation']
   }
+  */
 ];
 
 let scenes_examples = [
@@ -1255,6 +1273,22 @@ let ui_examples = [
     image: 'placeholder-image.jpg',
     url: 'ui/flash-message.html',
     tags: ['flash', 'message', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Textarea',
+    category: 'ui',
+    description: 'Create a textarea.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-textarea.html',
+    tags: ['textarea', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Code',
+    category: 'ui',
+    description: 'Create a code block.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-code.html',
+    tags: ['code', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   }
 ];
 

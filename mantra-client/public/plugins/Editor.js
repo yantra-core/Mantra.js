@@ -26,14 +26,15 @@ var Editor = /*#__PURE__*/function () {
     this.sutraEditor = sutraEditor;
     this.createToolbar = _createToolbar["default"].bind(this);
   }
+
+  // Remark: Legacy init(), this has a side-effect
   _createClass(Editor, [{
     key: "init",
     value: function init(game) {
       var _this = this;
       this.game = game;
       // register the plugin with the game
-      // this.game.systemsManager.addSystem(this.id, this);
-
+      this.game.systemsManager.addSystem(this.id, this);
       document.body.style.perspective = 'none';
       this.dropdownTimers = new Map(); // To manage delayed close timers
 
@@ -48,6 +49,26 @@ var Editor = /*#__PURE__*/function () {
         this.jqueryReady();
       }
       // game.use(new this.game.plugins.PluginsGUI());
+    }
+  }, {
+    key: "toggle",
+    value: function toggle() {
+      if (this.toolbarMenu.toggleStatus === 'open') {
+        this.hide();
+      } else {
+        this.show();
+      }
+    }
+  }, {
+    key: "show",
+    value: function show() {
+      //this.toolbarMenu.style.display = 'block';
+      this.toolbarMenu.slideInToolbar();
+    }
+  }, {
+    key: "hide",
+    value: function hide() {
+      this.toolbarMenu.slideOutToolbar();
     }
   }, {
     key: "jqueryReady",
@@ -65,9 +86,9 @@ var Editor = /*#__PURE__*/function () {
       var element = document.createElement('img');
       element.src = "".concat(featherRoot, "/vendor/feather/").concat(name, ".svg");
       element.classList.add('feather-icon');
-      element.style.width = '36px';
-      element.style.height = '36px';
-      element.style.paddingTop = '5px';
+      element.style.width = '24px';
+      element.style.height = '24px';
+      element.style.paddingTop = '2px';
       // element.style.marginRight = '10px';
       element.style.cursor = 'pointer';
       element.style.filter = 'invert(100%)';
@@ -322,7 +343,7 @@ var Editor = /*#__PURE__*/function () {
   }]);
   return Editor;
 }();
-_defineProperty(Editor, "id", 'gui-editor');
+_defineProperty(Editor, "id", 'editor');
 _defineProperty(Editor, "async", true);
 var _default = exports["default"] = Editor;
 
@@ -689,10 +710,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+// TODO: refactor this out into a Plugin UI Component
 var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
   function ToolbarMenu() {
     _classCallCheck(this, ToolbarMenu);
-    this.toggleStatus = 'open';
+    this.toggleStatus = 'closed';
     // Add an isTransitioning flag to track transition state
     this.isTransitioning = false;
 
@@ -724,6 +746,7 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
     this.setStyle(this.toolbar, {
       position: 'fixed',
       top: '0',
+      height: '50px',
       width: '100%',
       display: 'flex',
       justifyContent: 'space-between',
@@ -738,6 +761,7 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
     // Responsive design for smaller screens
     window.addEventListener('resize', this.updateResponsiveStyles.bind(this));
     this.updateResponsiveStyles();
+    this.slideInToolbar();
   }
   _createClass(ToolbarMenu, [{
     key: "setTransitioningState",
@@ -814,20 +838,29 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
         item.title = itemObj.hint;
       }
       var itemText = document.createElement('div');
+      var textSpan = document.createElement('span');
+      textSpan.textContent = itemObj.text;
+      textSpan.style.position = 'relative';
+      textSpan.style.bottom = '5px';
+      textSpan.style.paddingLeft = '5px';
+      if (_typeof(itemObj.icon) === 'object') {
+        if (prepend) {
+          itemText.appendChild(itemObj.icon);
+        } else {
+          itemText.appendChild(itemObj.icon);
+        }
+      }
       itemText.className = 'menu-item-text';
-      itemText.textContent = itemObj.text;
+      itemText.appendChild(textSpan);
       itemText.style.textAlign = 'center';
+      //itemText.style.position = 'relative';
+      //itemText.style.bottom = '10px';
+      //itemText.style.left = '10px';
+
       if (prepend) {
         item.appendChild(itemText, item.firstChild);
       } else {
         item.appendChild(itemText);
-      }
-      if (_typeof(itemObj.icon) === 'object') {
-        if (prepend) {
-          item.insertBefore(itemObj.icon, item.firstChild);
-        } else {
-          item.appendChild(itemObj.icon);
-        }
       }
       this.setStyle(item, {
         margin: '5px',
@@ -1154,8 +1187,13 @@ function createToolbar(game) {
   inspectorIcon.style.cursor = 'pointer';
   inspectorIcon.title = 'Click to open Entity Inspector';
   inspectorIcon.style.marginRight = '10px';
-  inspectorIcon.style.marginLeft = '10px';
-  inspectorIcon.style.marginTop = '5px';
+  inspectorIcon.style.marginLeft = '5px';
+  //inspectorIcon.style.marginTop = '5px';
+  inspectorIcon.style.width = '32px';
+  inspectorIcon.style.height = '32px';
+  inspectorIcon.style.bottom = '12px';
+  inspectorIcon.style.left = '9px';
+  inspectorIcon.style.position = 'relative';
   inspectorIcon.style.filter = 'invert(100%)';
   if (is_touch_enabled()) {
     // hide inspector icon on touch devices
@@ -1169,10 +1207,16 @@ function createToolbar(game) {
   };
 
   // toolbarMenu.addElement('secondary', inspectorIcon);
-
+  function openGithub() {
+    window.open('https://github.com/yantra-core/Mantra.js', '_blank');
+  }
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
-    icon: this.createIcon('slack')
+    icon: this.createIcon('slack'),
+    onClick: function onClick() {
+      return openGithub();
+    }
+
     /*
     subItems: [
       { text: 'View Source', onClick: () => this.showSourceCode() },
@@ -1216,79 +1260,76 @@ function createToolbar(game) {
       return _this.showEventsInspector();
     }
   });
-  var worldIcon = this.createIcon('globe');
+
+  /*
+  let worldIcon = this.createIcon('globe');
   worldIcon.style.marginTop = '0px';
   worldIcon.style.paddingTop = '0px';
   worldIcon.style.position = 'relative';
   worldIcon.style.top = '10px';
-  var graphicsIcon = this.createIcon('tv');
+   let graphicsIcon = this.createIcon('tv');
   graphicsIcon.style.marginTop = '0px';
   graphicsIcon.style.paddingTop = '0px';
   graphicsIcon.style.position = 'relative';
   graphicsIcon.style.top = '10px';
-
+  
   // toolbarMenu.addItem('secondary', { text: 'Settings' });
-  var graphicsSelector = new _GraphicsSelector["default"](this);
+  const graphicsSelector = new GraphicsSelector(this);
   graphicsSelector.selectBox.style.fontSize = '22px';
   graphicsSelector.selectBox.style.cursor = 'pointer';
   graphicsSelector.selectBox.style.margin = '20px';
-
-  // create item holder for graphicsSelector
-  var graphicsSelectorItem = document.createElement('div');
+    // create item holder for graphicsSelector
+  let graphicsSelectorItem = document.createElement('div');
   graphicsSelectorItem.appendChild(graphicsIcon);
-
-  // create text label element to show current graphics engine
-  var graphicsSelectorLabel = document.createElement('span');
+   // create text label element to show current graphics engine
+  let graphicsSelectorLabel = document.createElement('span');
   graphicsSelectorLabel.style.fontSize = '22px';
   graphicsSelectorLabel.style.marginRight = '10px';
   graphicsSelectorLabel.style.marginLeft = '10px';
   graphicsSelectorLabel.style.marginTop = '10px';
   graphicsSelectorLabel.style.marginBottom = '10px';
   graphicsSelectorLabel.style.cursor = 'pointer';
-
-  // set value to foo
+   // set value to foo
   graphicsSelectorLabel.innerText = 'Graphics';
-
-  // add label to graphicsSelectorItem
+   // add label to graphicsSelectorItem
   graphicsSelectorItem.appendChild(graphicsSelectorLabel);
-  graphicsSelectorItem.onpointerdown = function () {
-    // close world selector
+  graphicsSelectorItem.onpointerdown = () => {
+     // close world selector
     worldSelector.selectPicker.hideModal();
-
-    // toggle select picker
+     // toggle select picker
     graphicsSelector.selectPicker.toggle();
-  };
-  graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
+  }
+   graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
   graphicsSelectorItem.title = 'Select Graphics Engine';
-  var worldSelector = new _WorldSelector["default"](this.game);
+  */
+  /*
+  const worldSelector = new WorldSelector(this.game);
   worldSelector.selectBox.style.fontSize = '22px';
   worldSelector.selectBox.style.cursor = 'pointer';
   worldSelector.selectBox.style.margin = '20px';
-  var worldSelectorItem = document.createElement('div');
+   let worldSelectorItem = document.createElement('div');
   worldSelectorItem.appendChild(worldIcon);
-
-  // create text label element to show current world
-  var worldSelectorLabel = document.createElement('span');
+   // create text label element to show current world
+  let worldSelectorLabel = document.createElement('span');
   worldSelectorLabel.style.fontSize = '22px';
   worldSelectorLabel.style.marginRight = '10px';
   worldSelectorLabel.style.marginLeft = '10px';
   worldSelectorLabel.style.marginTop = '10px';
   worldSelectorLabel.style.marginBottom = '10px';
   worldSelectorLabel.style.cursor = 'pointer';
-
-  // set value to foo
+   // set value to foo
   worldSelectorLabel.innerText = 'Worlds';
-
-  // add label to worldSelectorItem
+   // add label to worldSelectorItem
   worldSelectorItem.appendChild(worldSelectorLabel);
-  worldSelectorItem.onpointerdown = function () {
+   worldSelectorItem.onpointerdown = () => {
     // hide world selector
     graphicsSelector.selectPicker.hideModal();
     // toggle select picker
     worldSelector.selectPicker.toggle();
   };
-  worldSelectorItem.appendChild(worldSelector.selectBox);
+   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
+  */
 
   // Create a flex container for the selectors
   var selectorsContainer = document.createElement('div');
@@ -1298,12 +1339,12 @@ function createToolbar(game) {
   selectorsContainer.style.margin = '20px'; // Add some margin for aesthetics
 
   selectorsContainer.appendChild(inspectorIcon);
-  selectorsContainer.appendChild(graphicsSelectorItem);
-  selectorsContainer.appendChild(worldSelectorItem);
+  //selectorsContainer.appendChild(graphicsSelectorItem);
+  //selectorsContainer.appendChild(worldSelectorItem);
   toolbarMenu.addElement('secondary', selectorsContainer);
   if (game.worlds.length > 0) {
     var currentWorldName = game.worlds[0].constructor.name;
-    worldSelector.selectElement(currentWorldName);
+    // worldSelector.selectElement(currentWorldName);
   }
 
   // toolbarMenu.toolbar.style.display = 'none';

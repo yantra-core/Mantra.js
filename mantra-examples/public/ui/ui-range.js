@@ -28,7 +28,8 @@ game.start(function(){
     })
     .isStatic(false)
     .position(0, 0)
-    .size(100)
+    .width(500)
+    .height(50)
     .createEntity();
 
   // <input> text to hold range value

@@ -1,0 +1,53 @@
+
+<html>
+    <link href="../prism.css" rel="stylesheet" />
+    <script src="../code-editor.js"></script>
+    <style>
+        body {
+            overflow: auto;
+        }
+        /* This will force the scrollbar to be always visible */
+        ::-webkit-scrollbar {
+            -webkit-appearance: none;
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 4px;
+            background-color: rgba(0,0,0,.5);
+            -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+        }
+
+        iframe {
+            min-height: 600px;
+            min-width: 800px;
+            width: 100%;
+            height: 50%;
+            border: 1px solid #000;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // rebroadcast the message to the parent window
+            window.addEventListener('message', event => {
+                // log the data
+                //let context = event.data.context;
+                //window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
+              });
+
+            // on click
+            window.addEventListener('click', event => {
+                // log the data
+                //console.log(event);
+                //let context = { x: event.clientX, y: event.clientY };
+                //window.parent.postMessage({ type: 'pointerDown', context: context }, '*');
+            });
+          
+            loadEditor('./ui-textarea.js');
+        });
+    </script>
+    <iframe src="../demo.html?source=ui/ui-textarea"></iframe>
+    <script src="../prism.min.js"></script>
+</html>
+    
