@@ -108,8 +108,8 @@ export default function layoutEntity(container, entityId) {
         return;
       }
 
-      let paddingTop = containerEnt.style.paddingTop || 20;
-      let paddingLeft = containerEnt.style.paddingLeft || -10;
+      let paddingTop = 0;
+      let paddingLeft = 0;
 
       // Set the starting position to the top-left corner of the container's bounding box
       let positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;

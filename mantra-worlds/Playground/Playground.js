@@ -132,8 +132,8 @@ export default class Playground {
       style: { // supports CSS property names
         //padding: 0,
         margin: 0,
-        paddingLeft: -5,
-        paddingTop: -5,
+        paddingLeft: 0,
+        paddingTop: 0,
         // background: '#ff0000', // can also use Entity.color
         border: {
           color: '#000000',
@@ -171,8 +171,9 @@ export default class Playground {
 
     // Function to create a dropdown select with given options and append it to a specified container
     function createDropdown(primaryGameEmbed, options, containerId, dropdownTitle) {
+
       let optionsFormatted = options.map(item => ({
-        label: item.title, // Use the title as the option text
+        label: item.title.replace('<br/>', ''), // <-- legacy examples API can remove soon
         value: exampleRoot + 'examples/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
       }));
 
@@ -205,18 +206,6 @@ export default class Playground {
         //
         // Set all the other dropdowns to the first option
         //
-        
-        // Remark: In order to do this through the ECS, we'd have to implement a non-bubbling update event,
-        // tests would need to be written first, this type of update action is self-ref and cascade.
-        // we also would be much better off using `onchange` event support instead of `afterUpdateEntity` for this
-        /*
-        let dropdowns = game.getEntitiesByType('SELECT');
-        dropdowns.forEach(dropdown => {
-          game.updateEntity(dropdown.id, {
-            value: ''
-          });
-        });
-        */
 
         //
         // Since the Playground is built using CSSGraphics, we can use the DOM to reset the dropdowns
@@ -229,6 +218,19 @@ export default class Playground {
             select.value = '';
           }
         });
+
+        // Remark: In order to do this through the ECS, we'd have to implement a non-bubbling update event,
+        // tests would need to be written first, this type of update action is self-ref and cascade.
+        // we also would be much better off using `onchange` event support instead of `afterUpdateEntity` for this
+        /*
+        let dropdowns = game.getEntitiesByType('SELECT');
+        dropdowns.forEach(dropdown => {
+          game.updateEntity(dropdown.id, {
+            value: ''
+          });
+        });
+        */
+
 
         //
         // Updates the IFrame src to the selected example
@@ -257,16 +259,23 @@ export default class Playground {
         backgroundColor: categories.find(cat => cat.title === dropdownTitle)?.color || '#e0e0e0' // Use category color if available
       }).createEntity();
     }
-
-    // Iterate over categories and create a dropdown for each with its examples as options
     categories.forEach(category => {
-      // Filter examples that belong to the current category
-      let categoryExamples = examples.filter(example => example.category === category.name);
-
+      // Filter examples based on whether 'example.category' is an array or a string
+      let categoryExamples = examples.filter(example => {
+        if (Array.isArray(example.category)) {
+          // If 'example.category' is an array, check if it includes the current 'category.name'
+          return example.category.includes(category.name);
+        } else {
+          // If 'example.category' is a string, perform direct comparison
+          return example.category === category.name;
+        }
+      });
+    
       // Create a dropdown for the current category with its examples
       createDropdown(primaryGameEmbed, categoryExamples, 'container-a', category.title); // Assume 'container-a' exists or is dynamically created for each category
     });
-
+    
+    
     // let addSceneButton = game.make().Button({ text: 'Load Example as Scene', disabled: true }).width(250).position(650, 500).createEntity();
     // let deployToYantraButton = game.make().Button({ text: 'Deploy to Yantra.gg' }).width(200).position(900, 500).createEntity();
     // let copyCodeButton = game.make().Button({ text: 'Copy Code' }).width(200).position(1000, 500).createEntity();

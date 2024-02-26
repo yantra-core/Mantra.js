@@ -25,7 +25,7 @@ export default function inflateSelect(entityElement, entityData) {
   }
 
   // Apply default and custom styles
-  applySelectStyles(select, entityData);
+  applySelectStyles(entityElement, select, entityData);
 
   // Append the select element to the entityElement
   entityElement.appendChild(select);
@@ -33,24 +33,58 @@ export default function inflateSelect(entityElement, entityData) {
   return entityElement;
 }
 
-function applySelectStyles(select, entityData) {
+function applySelectStyles(entityElement, select, entityData) {
 
   const defaultSelectStyles = {
     padding: '10px 15px',
     fontSize: '16px',
-    margin: '4px 2px',
     cursor: 'pointer',
-    borderRadius: '8px',
     backgroundColor: '#f2f2f2',
     color: 'black',
-    border: '1px solid #ccc',
+    border: 'none', // Ensure no border for the select element
+    borderRadius: '8px', // Optional: Match container's border-radius if desired
     appearance: 'none', // Removes default browser styling
-    transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
+    transition: 'background-color 0.3s ease', // Smooth transition for background color
   };
-
+  
+  const defaultSelectEntityHolderStyle = {
+    padding: '0', // Adjust padding to be handled by the select element inside
+    borderRadius: '8px', // Rounded corners for the container
+    backgroundColor: '#f2f2f2', // Match select background color
+    border: '1px solid #ccc', // Singular border on the container
+    'boxShadow': '0 2px 4px rgba(0,0,0,0.1)', // Subtle shadow for depth
+    transition: 'box-shadow 0.3s ease, border-color 0.3s ease', // Smooth transition for shadow and border color
+  };
+  
   // Apply default styles
   Object.assign(select.style, defaultSelectStyles);
+  Object.assign(entityElement.style, defaultSelectEntityHolderStyle);
+  
+  // Additional style adjustments for the focus state of the select element
+  select.addEventListener('focus', () => {
+    entityElement.style.borderColor = 'lightblue'; // Highlight border color on focus
+    entityElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)'; // Deeper shadow on focus
+  });
+  
+  select.addEventListener('blur', () => {
+    entityElement.style.borderColor = '#ccc'; // Revert border color on blur
+    entityElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'; // Revert shadow on blur
+  });
 
+  entityElement.addEventListener('mouseenter', () => {
+    entityElement.style.borderColor = 'lightblue'; // Highlight border color on hover
+    entityElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)'; // Deeper and more pronounced shadow for a "pop" effect
+    entityElement.style.transform = 'translateY(-2px)'; // Slightly raise the element for a 3D effect
+    entityElement.style.transition = 'all 0.2s ease-out'; // Smooth transition for all properties
+  });
+  
+  entityElement.addEventListener('mouseleave', () => {
+    entityElement.style.borderColor = '#ccc'; // Revert border color on mouse leave
+    entityElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'; // Revert shadow on mouse leave
+    entityElement.style.transform = 'translateY(0)'; // Reset the position of the element
+    entityElement.style.transition = 'all 0.2s ease-in'; // Smooth transition for all properties
+  });
+  
   // Set width and height if provided
   if (entityData.width) {
     select.style.width = `${entityData.width}px`;

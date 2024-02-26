@@ -37,6 +37,9 @@ class GravityGardens {
     // we reset the game to clear any previous state
     game.reset();
 
+    game.data.camera.follow = true;
+
+
     this.createWorld();
     this.createFounts(game);
     this.bindEvents();
@@ -88,6 +91,7 @@ class GravityGardens {
     playerConfig = playerConfig.build();
 
     let player = game.createEntity(playerConfig);
+    game.setPlayerId(player.id);
 
     game.make()
       .type('WARP')
