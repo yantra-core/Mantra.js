@@ -190,7 +190,7 @@ class Boomerang {
 
   throwBoomerang(entityId, angleInRadians = null) {
     let entity = this.game.getEntity(entityId);
-  
+
     if (!entity) {
       console.log('Boomerang.throwBoomerang no entity found for id', entityId);
       return;
@@ -220,8 +220,14 @@ class Boomerang {
     let playerVelocity = entity.velocity || { x: 0, y: 0 };
   
     // Use the provided angleInRadians or adjust and fall back to the entity's rotation
-    let throwAngle = angleInRadians !== null ? angleInRadians : entity.rotation - Math.PI / 2; // Adjust entity.rotation as needed
-  
+    let throwAngle;
+
+    if (typeof angleInRadians !== null && ! Number.isNaN(angleInRadians) ) {
+        throwAngle = angleInRadians;
+    } else {
+        throwAngle = entity.rotation - Math.PI / 2; // Adjust entity.rotation as needed
+    }
+
     // Adjust the starting position and velocity according to the game's coordinate system
     let boomerangStartingPosition = {
       x: playerPos.x + Math.cos(throwAngle) * 10, // Use cos for x to align with the angle calculation
@@ -256,6 +262,8 @@ class Boomerang {
         playing: true
       },
     };
+
+    console.log('boomerangConfig', boomerangConfig)
   
     let builder = this.build(boomerangConfig);
     this.game.createEntity(builder);

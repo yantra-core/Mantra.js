@@ -74,6 +74,9 @@ class GravityGardens {
       .Player()          // The player Plugin
       .texture(null)     // default texture is a player sprite
       .color(0xffcccc)   // gives a color to the player
+      .meta({
+        repulsion: false // set the repulsion flag to false, attracts
+      })
       .position(0, 0, 0) // sets the player position
 
     playerConfig.collisionStart(function (a, b, pair, context) {
@@ -85,7 +88,6 @@ class GravityGardens {
     playerConfig = playerConfig.build();
 
     let player = game.createEntity(playerConfig);
-    game.setPlayerId(player.id);
 
     game.make()
       .type('WARP')

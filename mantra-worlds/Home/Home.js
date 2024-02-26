@@ -89,7 +89,7 @@ class Home {
     game.use('Teleporter');
     game.use('Draggable');
     game.use('Collectable');
-    game.use('SwitchGraphics');
+    // game.use('SwitchGraphics');
     game.use('Key');
 
   }

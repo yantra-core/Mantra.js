@@ -17,32 +17,33 @@ class Music {
 
   init(game) {
     this.game = game;
-    game.config.defaultMouseMovement = false;
 
     // Movements with right click, switch default left-click-to-move behavior
-    game.config.mouseMovementButton = 'RIGHT';
+    game.config.mouseMovementButton = 'LEFT';
     // Actions with left click
-    game.config.mouseActionButton = 'LEFT';
+    game.config.mouseActionButton = 'RIGHT';
     // enables the default top-down mouse movements
-    // game.config.defaultMouseMovement = true;
+    game.config.defaultMouseMovement = true;
+
 
     game.reset();
     this.bindEvents();
     this.createWorld();
 
     game.make()
-    .Tower()
-    .color('purple')
-    .mass(10000)
-    .position(300, -40)
-    .angle(-180)
-    .offset(50)
-    .createEntity();
+      .Tower()
+      .color('purple')
+      .mass(10000)
+      .position(300, -40)
+      .angle(-180)
+      .offset(50)
+      .createEntity();
 
   }
 
 
   bindEvents() {
+
     let game = this.game;
     this.mousePosition = { x: 0, y: 0 };
     let that = this;
@@ -53,9 +54,9 @@ class Music {
     });
 
     game.on('pointerDown', function (context, event) {
+      // alert('event')
       let position = context.position;
       that.mousePosition = position;
-      console.log('ccccasdasd', context)
       // adjust position for game camera offset
       that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
       that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
@@ -63,20 +64,20 @@ class Music {
       that.mousePosition.clientX = event.clientX;
       that.mousePosition.clientY = event.clientY;
       // if right click
-      if (event.button === 2) {}
-      game.make().Tower({
-        fireRate: 10,
-      }).x(position.x).y(position.y).angle(-180).createEntity();
+      if (context.buttons[game.config.mouseActionButton]) {
+        game.make().Tower({
+          fireRate: 10,
+        }).x(position.x).y(position.y).angle(-180).createEntity();
+      }
 
       // if left click
       if (event.button === 0) {
-
-
         that.dropping = true;
         //game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
         that.slurping = true;
         //game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
+
     });
 
     game.on('pointerMove', function (position, event) {
@@ -91,6 +92,9 @@ class Music {
     game.use('Text');
     game.use('Platform');
     game.use('Teleporter');
+    game.use('Hexapod');
+    game.use('Player');
+    game.use('Tower');
 
   }
 
@@ -112,8 +116,8 @@ class Music {
 
     game.make().Player().texture(
       {
-          sheet: 'loz_spritesheet',
-          sprite: 'player'
+        sheet: 'loz_spritesheet',
+        sprite: 'player'
       }
     ).position(352, 80, 2).createEntity();
 
