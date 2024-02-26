@@ -6151,11 +6151,11 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
               game.use('Platform');
               game.use('Teleporter');
               game.use('Editor');
-              //game.use('Code');
+              game.use('Code');
               game.use('Iframe');
               game.use('Select');
-              // game.use('IFrame');
-            case 7:
+              game.use('Button');
+            case 9:
             case "end":
               return _context.stop();
           }
@@ -6196,7 +6196,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       introText.createEntity();
 
       // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-      var mouseControlText = game.make().Draggable().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
+      var mouseControlText = game.make().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
       mouseControlText.position(200, 550);
       mouseControlText.width(400);
       mouseControlText.color('white');
@@ -6251,8 +6251,9 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         }
       });
       var currentUrl = null;
-      var exampleRoot = 'https://yantra.gg/mantra/examples/demo?source=';
-      exampleRoot = 'http://192.168.1.80:7777/';
+      var exampleRoot = 'https://yantra.gg/mantra/';
+      //exampleRoot = 'http://192.168.1.80:7777/';
+
       categories = categories.filter(function (cat) {
         var allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
         return allowed.includes(cat.name);
@@ -6310,7 +6311,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           //
           // Updates the Code src to the selected example
           //
-          var sourceLink = context.value.replace('https://yantra.gg', 'http://192.168.1.80:7777').replace('demo.html?source=', '') + '.js';
+          var sourceLink = context.value.replace('demo.html?source=', '') + '.js';
           console.log('sourceLink', sourceLink);
           // alert(sourceLink)
           game.updateEntity(codeEditor.id, {

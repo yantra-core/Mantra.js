@@ -1467,8 +1467,10 @@ function inflateCode(entityElement, entityData) {
         // Update the code element directly once the content is fetched
         Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
           el.textContent = content;
-          Prism.highlightAll();
         });
+        if (typeof Prism !== 'undefined') {
+          Prism.highlightAll();
+        }
 
         // Store the fetched content for future use, replacing the promise
         _this.fetchSourceHandles[src] = {

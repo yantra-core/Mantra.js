@@ -34,10 +34,10 @@ export default class Playground {
     game.use('Platform');
     game.use('Teleporter');
     game.use('Editor');
-    //game.use('Code');
+    game.use('Code');
     game.use('Iframe');
     game.use('Select');
-    // game.use('IFrame');
+    game.use('Button')
 
   }
 
@@ -74,7 +74,7 @@ export default class Playground {
     introText.createEntity();
 
     // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-    let mouseControlText = game.make().Draggable().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
+    let mouseControlText = game.make().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
     mouseControlText.position(200, 550);
     mouseControlText.width(400);
     mouseControlText.color('white');
@@ -128,8 +128,8 @@ export default class Playground {
     });
 
     let currentUrl = null;
-    let exampleRoot = 'https://yantra.gg/mantra/examples/demo?source=';
-    exampleRoot = 'http://192.168.1.80:7777/';
+    let exampleRoot = 'https://yantra.gg/mantra/';
+    //exampleRoot = 'http://192.168.1.80:7777/';
 
     categories = categories.filter(function(cat) {
       let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
@@ -198,7 +198,7 @@ export default class Playground {
         //
         // Updates the Code src to the selected example
         //
-        let sourceLink = context.value.replace('https://yantra.gg', 'http://192.168.1.80:7777').replace('demo.html?source=', '') + '.js';
+        let sourceLink = context.value.replace('demo.html?source=', '') + '.js';
         console.log('sourceLink', sourceLink)
         // alert(sourceLink)
         game.updateEntity(codeEditor.id, {
