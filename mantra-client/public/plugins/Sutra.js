@@ -13,9 +13,10 @@ exports["default"] = defaultMouseMovement;
 var moving = false;
 var movingToPosition = {};
 function defaultMouseMovement(game) {
+  var movingButton = game.config.mouseMovementButton || 'LEFT';
+  var actionButton = game.config.mouseActionButton || 'RIGHT';
+  var cameraMoveButton = game.config.mouseCameraButton || 'MIDDLE';
   game.on('pointerUp', function (context, event) {
-    var mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
-
     // TOOD: better game.getActivePlayer() checks
     if (typeof game.currentPlayerId === 'undefined' || !game.currentPlayerId) {
       return;
@@ -28,8 +29,7 @@ function defaultMouseMovement(game) {
         });
       }
     } else {
-      // Use the variable instead of the hardcoded value
-      if (context.buttons[mouseMovementButton] === false) {
+      if (context.buttons[movingButton] === false) {
         moving = false;
         game.updateEntity(game.currentPlayerId, {
           update: null
@@ -60,8 +60,6 @@ function defaultMouseMovement(game) {
     if (!game.data || !game.data.ents || !game.data.ents.PLAYER) {
       return;
     }
-    var mouseMovementButton = game.config.mouseMovementButton || 'RIGHT';
-    var mouseActionButton = game.config.mouseActionButton || 'LEFT';
     var gamePointerPosition = context.position;
     var currentPlayer = game.data.ents.PLAYER[0];
 
@@ -105,7 +103,7 @@ function defaultMouseMovement(game) {
         }
       } else {
         // Use variables for button checks
-        if (context.buttons[mouseMovementButton]) {
+        if (context.buttons[movingButton]) {
           moving = true;
           movingToPosition = {
             x: gamePointerPosition.x,
@@ -113,7 +111,7 @@ function defaultMouseMovement(game) {
             rotation: radians
           };
         }
-        if (context.buttons[mouseActionButton]) {
+        if (context.buttons[actionButton]) {
           // TODO: emit sutra event for action
           useItem(game, currentPlayer, radians);
         }

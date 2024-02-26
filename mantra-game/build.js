@@ -13,6 +13,8 @@ const plugins = [
   './plugins/checkbox/Checkbox.js',
   './plugins/message-flash/FlashMessage.js',
   './plugins/input/Input.js',
+  './plugins/code/Code.js',
+
   './plugins/iframe/Iframe.js',
   './plugins/canvas/Canvas.js',
   './plugins/image/Image.js',

@@ -510,7 +510,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = cssMouseWheelZoom;
-// TODO: add a mode where mouse wheel will scroll camera veritcally
 function cssMouseWheelZoom(event) {
   var game = this.game;
   if (!this.mouseWheelEnabled) {
@@ -525,8 +524,38 @@ function cssMouseWheelZoom(event) {
   // Prevents the default *after* checking to see if mouse enabled
   // This is to best serve user so Mantra won't eat their scroll events
   // We could add an additional flag here in cases we want an embedded Mantra to scroll
-  event.preventDefault();
 
+  var mouse = this.game.systems.mouse;
+  var target = event.target;
+  var defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE'];
+
+  // console.log("Event target tag:", target.tagName);
+
+  // If the target is a CODE element, use its parent PRE for overflow check
+  if (target.tagName.toUpperCase() === 'CODE') {
+    target = target.parentNode; // Assuming the immediate parent is always a PRE
+  }
+
+  // Check if the event target is one of the default scroll elements
+  if (defaultScrollElements.includes(target.tagName.toUpperCase())) {
+    // Determine if the target element (PRE) is overflowing
+    var isOverflowing = target.scrollHeight > target.clientHeight;
+
+    // If the target element is not overflowing, prevent the default scroll
+    if (!isOverflowing) {
+      event.preventDefault();
+      // console.log("Custom wheel event action");
+    } else {
+      // If the target element is overflowing, allow the default browser scroll
+      // console.log("Default scroll allowed for overflowing content");
+      // Return here to prevent camera zooming
+      return;
+    }
+  } else {
+    // For elements other than 'TEXTAREA', 'PRE', 'CODE', prevent default scroll
+    event.preventDefault();
+    // console.log("Custom wheel event action for non-default scroll elements");
+  }
   /*
      Remark: Removed 2/16/2024, as this was preventing mouse wheel zoom from working
      // check that target is gameHolder, if not cancel
@@ -541,11 +570,11 @@ function cssMouseWheelZoom(event) {
 
   // Zoom settings
   var zoomSettings = {
-    intensity: 0.01,
+    intensity: 0.1,
     // Base zoom intensity
     minScale: 0.1,
     // Minimum scale limit
-    logBase: 10 // Logarithmic base
+    logBase: 2 // Logarithmic base
   };
 
   // Determine zoom direction
@@ -1466,12 +1495,9 @@ function inflateCode(entityElement, entityData) {
       }).then(function (content) {
         // Update the code element directly once the content is fetched
         Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
-          el.textContent = content;
+          var html = Prism.highlight(content, Prism.languages.javascript, 'javascript');
+          el.innerHTML = html;
         });
-        if (typeof Prism !== 'undefined') {
-          Prism.highlightAll();
-        }
-
         // Store the fetched content for future use, replacing the promise
         _this.fetchSourceHandles[src] = {
           content: content
@@ -1480,12 +1506,13 @@ function inflateCode(entityElement, entityData) {
         console.error('Error fetching source code:', error);
         // Update all code elements with the error message
         Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
-          el.textContent = '// Error fetching source code';
+          el.textContent = '// Error fetching source code \n' + error;
         });
         // Store the error message for future use, replacing the promise
         _this.fetchSourceHandles[src] = {
           error: '// Error fetching source code'
         };
+        throw error;
       });
     }
 
@@ -1495,7 +1522,7 @@ function inflateCode(entityElement, entityData) {
     // Set default code text if none provided and no src is specified
     code.textContent = entityData.meta && entityData.meta.code || '';
   }
-  applyCodeStyles(pre, code, entityData);
+  applyCodeStyles(entityElement, pre, code, entityData);
 
   // Additional style adjustments
   if (entityData.width) {
@@ -1509,7 +1536,7 @@ function inflateCode(entityElement, entityData) {
   }
   return entityElement;
 }
-function applyCodeStyles(pre, code, entityData) {
+function applyCodeStyles(entityElement, pre, code, entityData) {
   // Define and apply default styles for code element here
   // For example, setting a monospace font and a background color
   pre.style.display = 'block';
@@ -1521,11 +1548,55 @@ function applyCodeStyles(pre, code, entityData) {
   code.style.fontSize = '14px';
   code.style.color = '#D4D4D4'; // Light color for the text for better contrast
 
+  // entityElement.style.border = "2px solid #999"; // Default border
+  entityElement.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
+  entityElement.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
+
+  // Define hover effect styles
+  var hoverBorderStyle = "2px solid #fff"; // Border color for hover state
+  var hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
+
+  // Add event listeners to change styles on hover
+  entityElement.addEventListener('mouseenter', function () {
+    entityElement.style.border = hoverBorderStyle;
+    entityElement.style.boxShadow = hoverBoxShadowStyle;
+  });
+
+  // Revert to default styles when not hovering
+  entityElement.addEventListener('mouseleave', function () {
+    entityElement.style.border = "2px solid #999";
+    entityElement.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+  });
+
   // Apply any custom styles from entityData if provided
   if (entityData.style) {
     Object.assign(pre.style, entityData.style.pre); // Apply styles to the <pre> element
     Object.assign(code.style, entityData.style.code); // Apply styles to the <code> element
   }
+}
+
+// TODO: similiar styles for applyCodeStyles
+function applyIframeStyles(iframe, entityData) {
+  // Define default styles for the iframe
+  iframe.style.border = "2px solid #999"; // Default border
+  iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
+  iframe.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
+
+  // Define hover effect styles
+  var hoverBorderStyle = "2px solid #fff"; // Border color for hover state
+  var hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
+
+  // Add event listeners to change styles on hover
+  iframe.addEventListener('mouseenter', function () {
+    iframe.style.border = hoverBorderStyle;
+    iframe.style.boxShadow = hoverBoxShadowStyle;
+  });
+
+  // Revert to default styles when not hovering
+  iframe.addEventListener('mouseleave', function () {
+    iframe.style.border = "2px solid #999";
+    iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+  });
 }
 
 },{}],21:[function(require,module,exports){
@@ -1553,8 +1624,26 @@ function inflateIframe(entityElement, entityData) {
   return entityElement;
 }
 function applyIframeStyles(iframe, entityData) {
-  // Define and apply default styles for iframe here
-  // Similar to applySelectStyles function
+  // Define default styles for the iframe
+  iframe.style.border = "2px solid #999"; // Default border
+  iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
+  iframe.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
+
+  // Define hover effect styles
+  var hoverBorderStyle = "2px solid #fff"; // Border color for hover state
+  var hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
+
+  // Add event listeners to change styles on hover
+  iframe.addEventListener('mouseenter', function () {
+    iframe.style.border = hoverBorderStyle;
+    iframe.style.boxShadow = hoverBoxShadowStyle;
+  });
+
+  // Revert to default styles when not hovering
+  iframe.addEventListener('mouseleave', function () {
+    iframe.style.border = "2px solid #999";
+    iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+  });
 }
 
 },{}],22:[function(require,module,exports){
@@ -1768,7 +1857,9 @@ function inflateRange(entityElement, entityData) {
   return entityElement;
 }
 function applyRangeStyles(range, entityData) {
+  // Basic default styles for range input
   var defaultRangeStyles = {
+    // Example default styles; adjust as needed
     display: 'block',
     width: '100%',
     // Takes full width of the container
@@ -1776,29 +1867,13 @@ function applyRangeStyles(range, entityData) {
     // Adds some space around the slider
     cursor: 'pointer'
   };
-
-  // Apply default and custom styles from entityData
   Object.assign(range.style, defaultRangeStyles, entityData.style);
 
-  // Attempt to adjust the slider thumb size and track height for WebKit browsers
-  if (entityData.height) {
-    var thumbHeight = "".concat(entityData.height, "px");
-    var trackHeight = "".concat(Math.round(parseInt(entityData.height) / 2), "px"); // Adjust track height as needed
-
-    range.style.webkitAppearance = 'none'; // Removes default styling
-    range.style.height = thumbHeight; // Attempts to set the thumb height, might not work as expected
-
-    // Custom styles for the thumb
-    range.style.setProperty("--thumb-height", thumbHeight);
-    range.style.setProperty("--track-height", trackHeight);
-    range.style.background = "\n      linear-gradient(transparent, transparent),\n      url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"".concat(thumbHeight, "\" width=\"").concat(thumbHeight, "\" viewBox=\"0 0 20 20\"><circle cx=\"10\" cy=\"10\" r=\"8\" fill=\"").concat(entityData.color ? convertColorToHex(entityData.color) : '#CCC', "\"/></svg>') no-repeat center,\n      linear-gradient(transparent, transparent)\n    ");
-
-    // Additional custom thumb and track styles for WebKit browsers
-    range.style.setProperty("--webkit-slider-thumb", "\n      -webkit-appearance: none;\n      width: var(--thumb-height);\n      height: var(--thumb-height);\n      border-radius: 50%;\n      background: ".concat(entityData.color ? convertColorToHex(entityData.color) : '#CCC', ";\n      cursor: pointer;\n      margin-top: calc((var(--track-height) - var(--thumb-height)) / 2); // Centers the thumb vertically\n    "));
-    range.style.setProperty("--webkit-slider-runnable-track", "\n      width: 100%;\n      height: var(--track-height);\n      background: #DDD;\n      border-radius: calc(var(--track-height) / 2);\n    ");
-  }
-
   // Additional styling can be applied through entityData.style
+}
+
+function convertColorToHex(color) {
+  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
 },{}],26:[function(require,module,exports){

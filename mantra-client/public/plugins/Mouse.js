@@ -29,11 +29,24 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       x: 0,
       y: 0
     };
+
+    // Stores current values of mouse buttons
     this.mouseButtons = {
       LEFT: null,
       RIGHT: null,
       MIDDLE: null
     };
+
+    // Configurable mouse button mappings
+    this.buttonMappings = {
+      LEFT: 0,
+      // Default to the standard left button index
+      MIDDLE: 1,
+      // Default to the standard middle button index
+      RIGHT: 2 // Default to the standard right button index
+    };
+
+    this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A'];
     this.activeTouches = {}; // Store active touches
     // TODO: support 3+ touches
     this.firstTouchId = null; // Track the first touch for movement
@@ -58,6 +71,24 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       game.config.mouseActionButton = 'RIGHT';
       this.bindInputControls();
       this.game.systemsManager.addSystem(this.id, this);
+    }
+
+    // Method to update button mappings
+  }, {
+    key: "setButtonMapping",
+    value: function setButtonMapping(button, newMapping) {
+      if (this.buttonMappings.hasOwnProperty(button)) {
+        this.buttonMappings[button] = newMapping;
+      } else {
+        console.error("Invalid button: ".concat(button));
+      }
+    }
+
+    // Method to get the current mapping for a button
+  }, {
+    key: "getButtonMapping",
+    value: function getButtonMapping(button) {
+      return this.buttonMappings[button] || null;
     }
 
     // Common function to generate mouse context with world coordinates
@@ -195,31 +226,23 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "updateMouseButtons",
     value: function updateMouseButtons(event, isDown) {
-      var game = this.game;
-      if (game.isTouchDevice()) {
-        switch (event.button) {
-          case 2:
-            this.mouseButtons.LEFT = isDown;
-            break;
-          case 1:
-            this.mouseButtons.MIDDLE = isDown;
-            break;
-          case 0:
-            this.mouseButtons.RIGHT = isDown;
-            break;
-        }
-      } else {
-        switch (event.button) {
-          case 0:
-            this.mouseButtons.LEFT = isDown;
-            break;
-          case 1:
-            this.mouseButtons.MIDDLE = isDown;
-            break;
-          case 2:
-            this.mouseButtons.RIGHT = isDown;
-            break;
-        }
+      var buttonType;
+      switch (event.button) {
+        case this.buttonMappings.LEFT:
+          buttonType = 'LEFT';
+          break;
+        case this.buttonMappings.MIDDLE:
+          buttonType = 'MIDDLE';
+          break;
+        case this.buttonMappings.RIGHT:
+          buttonType = 'RIGHT';
+          break;
+        default:
+          console.error("Unknown button index: ".concat(event.button));
+          return;
+      }
+      if (buttonType) {
+        this.mouseButtons[buttonType] = isDown;
       }
     }
   }, {
@@ -230,17 +253,26 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       this.updateMouseButtons(event, true);
 
       // middle mouse button
-      if (event.button === 1) {
-        // Middle mouse button
+      if (event.button === this.buttonMappings.MIDDLE) {
         this.isDragging = true;
         this.dragStartPosition = {
           x: event.clientX,
           y: event.clientY
         };
-        // set cursor to grabbing
+        // TODO: set cursor to grabbing
         // document.body.style.cursor = 'grabbing';
-        // prevents default browser scrolling
-        event.preventDefault();
+
+        // If LEFT mouse button is mapped to camera drag, prevent default event for inputs and other
+        // elements the user may still wish to interact with
+        // Remark: We seem to have an issue preventing default on PRE and CODE elements
+        // TODO: Allow prevent default on PRE and CODE elements
+        // check to see if target element is interactive ( such as button / input / textarea / etc )
+        if (!this.tagAllowsDefaultEvent.includes(target.tagName)) {
+          //console.log('preventing default event', target)
+          event.preventDefault();
+        } else {
+          //console.log('allowing default event', target)
+        }
       }
       var context = this.createMouseContext(event);
       if (context.target && context.target.pointerdown) {
@@ -268,8 +300,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     key: "handleMouseUp",
     value: function handleMouseUp(event) {
       this.updateMouseButtons(event, false);
-      if (event.button === 1) {
-        // Middle mouse button
+      if (event.button === this.buttonMappings.MIDDLE) {
         this.isDragging = false;
         // prevent default right click menu
         event.preventDefault();

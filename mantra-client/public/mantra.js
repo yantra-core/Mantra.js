@@ -1329,6 +1329,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
       this.currentPlayerId = playerId;
     }
   }, {
+    key: "getEntitiesByType",
+    value: function getEntitiesByType(type) {
+      if (this.data && this.data.ents && this.data.ents[type]) return this.data.ents[type];
+    }
+  }, {
     key: "getCurrentPlayer",
     value: function getCurrentPlayer() {
       return this.getEntity(this.currentPlayerId);
@@ -1368,6 +1373,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
     //
     // Containers
     //
+    // TODO: move to Container.js
   }, {
     key: "createContainer",
     value: function createContainer(entityData) {
@@ -2684,8 +2690,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "03f44030c855df4482d5286eff3255338b030b02c56369803cdd0ea9e41875fc",
-  "./plugins/ASCIIGraphics.min.js": "8c405f6a66e4f10d6e1f53c79ffecba6d4047ebdb7abdb9a044d349dce1f4197",
+  "./plugins/ASCIIGraphics.js": "fa588108e264d01b4beebabb82d6fe28491c91398510737686fd3351a0c48d1d",
+  "./plugins/ASCIIGraphics.min.js": "24b03d9743b3d40f3b0d566b9685b0eb772bc0b32d95e2d345129d377a5532c2",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2710,8 +2716,8 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "a0afa779e611c7d716118ca76c49272232b30b1d4114c9ee2f85bdcaeb36a6c9",
-  "./plugins/CSSGraphics.min.js": "e2828adf572883fc6ded8a18767b0bee78d3d155535dbde781a5f3939aa775a2",
+  "./plugins/CSSGraphics.js": "9eb7210f60319c5f45537838312d537592f4a53bb6cb93d9727b0ae2bcf48249",
+  "./plugins/CSSGraphics.min.js": "98e46bdfd4129ee70d6b36cbee4a475eec239b0f65a08f0da44d3196a9ccad01",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
@@ -2792,8 +2798,8 @@ var _default = exports["default"] = {
   "./plugins/Midi.min.js": "5ef8a15f87866a63e014ecbf3433f93a6c463c26d48a1c3a4448604ee8b5d229",
   "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
   "./plugins/MidiGUI.min.js": "ceb780abf5f2fadc904cbb683dde98548db60f5bdf0f90f1398728c76a0f923f",
-  "./plugins/Mouse.js": "fb6602142db0af06b0eb4126a4318d12721b98c7c3f35f259cdb968c3988f58b",
-  "./plugins/Mouse.min.js": "1b2c6e55113763db4fd1681d158eea8b21d855d6bc2f4d4f074684332396ac8d",
+  "./plugins/Mouse.js": "2ef6e446ef4794695d1196539a7dc53a76b243ff14176cbe8dd613e0e150e674",
+  "./plugins/Mouse.min.js": "bf10a34a23c431b47209212f8c8bc87485b6986887ec6bf82b0a7e5c5aba7d9b",
   "./plugins/Nes.js": "ac0daf03fb84c715d217d68ac477f349f7250c651ab677922f91b2fc30e15a4f",
   "./plugins/Nes.min.js": "5d3b9ac893448fdf60dce5bce6ee1a32acacec1db8b9ca72b1017123af6cfe3b",
   "./plugins/PacManMovement.js": "e7b7dbe97b3192004c8bb2c58e952e27e2281a9604785faf3d0ee43771444205",
@@ -2834,8 +2840,8 @@ var _default = exports["default"] = {
   "./plugins/SnapshotSize.min.js": "85719ef7d6a63b398d45dda88aaabeb38963aada0731c8cfc689ab0580670f9b",
   "./plugins/StarField.js": "d33e4ee1e02b8719edc5b7988b3eb2ded91a214dc911b3d800b52bfe19572669",
   "./plugins/StarField.min.js": "302c7e8878c277e6d3dc553ca7767fc98e16f66a8964c1a74cf7e4b972892467",
-  "./plugins/Sutra.js": "0dad85de23e251d907c0f0c7366db1d34a7a5da26a9e4152665a6cc487f524b0",
-  "./plugins/Sutra.min.js": "33bcf42fd7ead59d6ea30466e51e37aa4eca7bd198785dae10e338ab83ff5d75",
+  "./plugins/Sutra.js": "780072e528746ed347b7ff96f5cb8ef8acf484ff05cec21243bc51f2695a4eb9",
+  "./plugins/Sutra.min.js": "56c241079bee76d5d87b7f3a6657d231f774165a657b7d32c698604a5b58ee23",
   "./plugins/SutraGUI.js": "410b907e0b0cc0633cb9dd164fc861419d50927aa82289b1b8c5e9ba6f4838e5",
   "./plugins/SutraGUI.min.js": "978af8d0050820c3056c3410b3b4a954a8882d4dd06677c31049f5f8db167f65",
   "./plugins/SwitchGraphics.js": "154775d7459b8a7c08be7f8ce08b3d5a2292df00b10d71eaf2fa5e9de1833f44",
@@ -2860,6 +2866,7 @@ var _default = exports["default"] = {
   "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
   "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
+  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
   "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
   "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
   "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",

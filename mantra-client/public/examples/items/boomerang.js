@@ -1,10 +1,10 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Player', 'Key', 'Block', 'Collectable', 'Teleporter', 'Gamepad'], // plugins at construction
-
+  // Plugins at construction
+  plugins: ['Player', 'Key', 'Block', 'Collectable', 'Teleporter', 'Gamepad']
 });
 
-// TODO: manually call boomerang for demo
+// Plugins at runtime
 game.use('Boomerang'); // plugins at runtime
 
 game.start(function () {
@@ -20,10 +20,6 @@ game.start(function () {
     }).createEntity();  
   }
 
-  // teleports to the next example
-  game.make().Teleporter({
-    url: 'https://yantra.gg/mantra/examples/items/unit-spawner',
-  }).position(200, 0).createEntity()
-
 });
-window.game = game;
+
+//

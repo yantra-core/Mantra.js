@@ -3879,15 +3879,15 @@ var Home = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
 
-      // reset any previous worlds / game state
-      game.reset();
-
       // Movements with right click, switch default left-click-to-move behavior
       game.config.mouseMovementButton = 'RIGHT';
       // Actions with left click
       game.config.mouseActionButton = 'LEFT';
       // enables the default top-down mouse movements
-      game.config.defaultMouseMovement = true;
+
+      // reset any previous worlds / game state
+      game.reset();
+      var mouse = game.systems.mouse;
 
       // enables mouse wheel zoom
       game.data.camera.mouseWheelZoomEnabled = true;
@@ -6117,6 +6117,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var exampleRoot = 'https://yantra.gg/mantra/';
+// exampleRoot = 'http://192.168.1.80:7777/';
 var Playground = exports["default"] = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Playground() {
@@ -6137,6 +6139,14 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       game.config.defaultMouseMovement = true;
       game.reset();
       game.data.camera.mode = 'none';
+
+      // Remark: Not ideal for mapping Mouse buttons, 
+      // as they should be conditionals in Sutra tree like Keyboard events are
+      var mouse = game.systems.mouse;
+      mouse.setButtonMapping('LEFT', 1);
+      mouse.setButtonMapping('MIDDLE', 0);
+      // enables mouse wheel zoom
+      game.data.camera.mouseWheelZoomEnabled = true;
       this.createWorld();
     }
   }, {
@@ -6176,9 +6186,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       //game.systems.editor.init(game);
       // game.systems.editor.show();
 
-      var button1 = game.make().Button().pointerdown(function () {
-        // alert("hi")
-      }).build();
       var text = game.make().Text().text('Mantra.js Playground').style({
         fontSize: '64px'
       });
@@ -6186,17 +6193,22 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       text.width(900);
       text.position(85, -500, 0);
       text.createEntity();
-      var sideTextGroup = game.make().name('side-text-group').position(-800, -400).createEntity();
-      var introText = game.make().Text().text('Select an example from the drop downs.');
+      var sideTextGroup = game.make().name('side-text-group').style({
+        border: 'none',
+        backgroundColor: 'rgba(0, 0, 0, 0)'
+      }).position(-800, -400).createEntity();
+      var introText = game.make().Text().text('Select an example from the drop downs');
       introText.color('white');
+      introText.position(0, 10);
       introText.style({
         fontSize: '64px'
+        // textAlign: 'right', // Not working? CSS style seems applied in DOM, Text() might be better as child span element
       });
       introText.container('side-text-group');
       introText.createEntity();
 
       // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-      var mouseControlText = game.make().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
+      var mouseControlText = game.make().Text().text('Drag to move map <br/>Wheel to Zoom <br/>Click to interact');
       mouseControlText.position(200, 550);
       mouseControlText.width(400);
       mouseControlText.color('white');
@@ -6220,29 +6232,32 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
 
       //let entities = text2Entities(text);
 
+      // TODO: remove createContainer, upgrade to Container() plugin instead
       var container = game.createContainer({
         name: 'container-a',
         layout: 'grid',
         // optional. can also be "flex" or "none"
         color: 0xff00ff,
         position: {
-          x: 0,
+          x: 170,
           y: 450,
           z: -1
         },
         body: false,
         size: {
-          width: 800,
-          height: 500
+          width: 1960,
+          height: 400
         },
         grid: {
-          columns: 2,
-          rows: 4
+          columns: 7,
+          rows: 3
         },
         style: {
           // supports CSS property names
-          padding: 0,
+          //padding: 0,
           margin: 0,
+          paddingLeft: -5,
+          paddingTop: -5,
           // background: '#ff0000', // can also use Entity.color
           border: {
             color: '#000000',
@@ -6251,20 +6266,21 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         }
       });
       var currentUrl = null;
-      var exampleRoot = 'https://yantra.gg/mantra/';
-      //exampleRoot = 'http://192.168.1.80:7777/';
 
-      categories = categories.filter(function (cat) {
-        var allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
+      /*
+      categories = categories.filter(function(cat) {
+        let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
         return allowed.includes(cat.name);
-      });
+      })
+      */
+
       var primaryGameEmbed = game.make().Iframe({
-        src: 'https://yantra.gg/mantra/examples/demo?source=npc/hexapod'
+        src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang'
       }).width(800).height(600).x(0).y(-100).createEntity();
       var codeEditor = game.make().Code({
         //  code: 'hello <h1>'
-        src: 'https://yantra.gg/mantra/examples/npc/hexapod.js'
-      }).height(800).width(660).x(800).y(-100).createEntity();
+        src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+      }).height(700).width(660).x(800).y(-170).createEntity();
 
       // Function to create a dropdown select with given options and append it to a specified container
       function createDropdown(primaryGameEmbed, options, containerId, dropdownTitle) {
@@ -6301,6 +6317,34 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           }
 
           //
+          // Set all the other dropdowns to the first option
+          //
+
+          // Remark: In order to do this through the ECS, we'd have to implement a non-bubbling update event,
+          // tests would need to be written first, this type of update action is self-ref and cascade.
+          // we also would be much better off using `onchange` event support instead of `afterUpdateEntity` for this
+          /*
+          let dropdowns = game.getEntitiesByType('SELECT');
+          dropdowns.forEach(dropdown => {
+            game.updateEntity(dropdown.id, {
+              value: ''
+            });
+          });
+          */
+
+          //
+          // Since the Playground is built using CSSGraphics, we can use the DOM to reset the dropdowns
+          // This wouldn't be considered "best practice", however it will work fine for now until we have
+          // implemented non-bubbling onchange event handling in the ECS with tests
+          var currentSelect = context.graphics['graphics-css'].querySelectorAll('select')[0];
+          var selectElements = document.querySelectorAll('select');
+          selectElements.forEach(function (select) {
+            if (select !== currentSelect) {
+              select.value = '';
+            }
+          });
+
+          //
           // Updates the IFrame src to the selected example
           //
           game.updateEntity(primaryGameEmbed.id, {
@@ -6322,8 +6366,8 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         });
 
         // Set style and dimensions for the dropdown
-        dropdownSelect.width(300).height(80).style({
-          fontSize: '28px',
+        dropdownSelect.width(230).height(80).style({
+          fontSize: '32px',
           backgroundColor: ((_categories$find = categories.find(function (cat) {
             return cat.title === dropdownTitle;
           })) === null || _categories$find === void 0 ? void 0 : _categories$find.color) || '#e0e0e0' // Use category color if available

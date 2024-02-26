@@ -97,6 +97,7 @@ game.use(new plugins.Canvas());
 game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
 game.use(new plugins.Code());
+game.use(new plugins.Mouse());
    
 game.use(new Mouse());
 game.use(new plugins.Editor());
@@ -112,6 +113,7 @@ game.start(function () {
 
   // game.use(new worlds.EatWorld());
   game.use(new worlds.Playground());
+
 
   //game.use(home);
 
