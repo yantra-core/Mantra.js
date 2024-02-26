@@ -40,6 +40,12 @@ export default class Code {
       entityData.meta.src = entityData.src;
     }
 
+    if (typeof entityData.language !== 'undefined') {
+      entityData.meta.language = entityData.language;
+    } else {
+      entityData.meta.language = 'javascript'; // Default language for syntax highlighting
+    }
+
     return {
       type: 'CODE',
       body: false, // Assuming 'body' is used similarly to 'textarea' for physical representation

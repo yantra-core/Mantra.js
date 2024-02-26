@@ -17,7 +17,7 @@ export default function inflateTextarea(entityElement, entityData) {
   }
 
   if (entityData.color) {
-    textarea.style.color = convertColorToHex(entityData.color);
+    textarea.style.color = this.game.convertColorToHex(entityData.color);
   }
 
   return entityElement;

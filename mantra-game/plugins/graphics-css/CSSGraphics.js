@@ -71,7 +71,6 @@ class CSSGraphics extends GraphicsInterface {
     this.inflateCanvas = inflateCanvas.bind(this);
     this.inflateIframe = inflateIframe.bind(this);
 
-
     this.render = render.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
     this.bindEntityEvents = bindEntityEvents.bind(this);

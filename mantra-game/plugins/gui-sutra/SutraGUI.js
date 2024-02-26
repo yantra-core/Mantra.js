@@ -84,6 +84,8 @@ class SutraGUI {
 
     if (this.game.rules) {
       this.setRules(this.game.rules);
+      this.viewSutraEnglish();
+
     } else {
       // add message to indicate no sutra
       let container = document.getElementById('sutraTable');

@@ -3,6 +3,10 @@ export default class Button {
   static id = 'button';
   constructor(config = {}) {
     this.id = Button.id;
+    this.disabled = false;
+    if (typeof config.disabled === 'boolean') {
+      this.disabled = config.disabled;     
+    }
   }
 
   init(game) {
@@ -14,6 +18,13 @@ export default class Button {
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
+
+    entityData.meta = entityData.meta || {};
+
+    if (typeof entityData.disabled !== 'undefined') {
+      entityData.meta.disabled = entityData.disabled;
+    }
+
     return {
       type: 'BUTTON',
       body: false,

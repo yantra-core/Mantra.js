@@ -101,6 +101,16 @@ export default function createGraphic(entityData) {
       // For CODE entities, create a code block
       entityElement = this.inflateCode(entityElement, entityData);
       break;
+
+      case 'TOOLBAR':
+        // For CANVAS entities, create a canvas
+        if (this.game.systems.toolbar) {
+          entityElement = this.game.systems.toolbar.inflate(entityElement, entityData);
+  
+        }
+        break;      
+  
+
     default:
 
       if (entityData.type === 'PART' && entityData.name === 'Display') {
@@ -133,7 +143,22 @@ export default function createGraphic(entityData) {
     // entityElement.style.background = randomHexColor;
   }
 
-  this.renderDiv.appendChild(entityElement);
+
+  // if style.position is absolute, append to gameHolder instead
+  if (typeof entityData.style !== 'undefined' && entityData.style.position === 'absolute') {
+    // if style has been manually set to absolute, place the entity directly in gameHolder ( instead of css-render-dev)
+    // using absolute values. this will ensure that the entity is not affected by camera scroll and zoom 
+    let gameHolder = document.getElementById('gameHolder');
+    entityElement.style.position = 'flex';
+    entityElement.style.top = `${entityData.position.y}px`;
+    entityElement.style.left = `${entityData.position.x}px`;
+    entityElement.style.width = `${entityData.width}px`;
+    entityElement.style.height = `${entityData.height}px`;
+    gameHolder.appendChild(entityElement);
+  } else {
+    this.renderDiv.appendChild(entityElement);
+
+  }
 
   // Update the position of the entity element
   this.updateEntityPosition(entityElement, entityData);

@@ -13,6 +13,7 @@ export default class Playground {
     this.game = game;
     game.config.defaultMouseMovement = false;
 
+    
     // Movements with right click, switch default left-click-to-move behavior
     game.config.mouseMovementButton = 'RIGHT';
     // Actions with left click
@@ -34,8 +35,8 @@ export default class Playground {
     game.use('Teleporter');
     game.use('Editor');
     //game.use('Code');
-
-    //game.use('Iframe');
+    game.use('Iframe');
+    game.use('Select');
     // game.use('IFrame');
 
   }
@@ -48,28 +49,54 @@ export default class Playground {
     //game.systems.editor.init(game);
     // game.systems.editor.show();
 
+
+    let button1 = game.make().Button().pointerdown(function(){
+      // alert("hi")
+    }).build();
+
+
     let text = game.make().Text().text('Mantra.js Playground').style({
       fontSize: '64px',
     });
+    text.color('white');
     text.width(900);
-    text.position(85, -400, 0);
+    text.position(85, -500, 0);
     text.createEntity();
-    
+
+    let sideTextGroup = game.make().name('side-text-group').position(-800, -400).createEntity();
+
+    let introText = game.make().Text().text('Select an example from the drop downs.');
+    introText.color('white');
+    introText.style({
+      fontSize: '64px',
+    })
+    introText.container('side-text-group');
+    introText.createEntity();
+
+    // TODO: conditional text based on device and mouse controls, mac , windows, iphone
+    let mouseControlText = game.make().Draggable().Text().text('Right-click to move the camera. Left-click to interact with the scene.');
+    mouseControlText.position(200, 550);
+    mouseControlText.width(400);
+    mouseControlText.color('white');
+    mouseControlText.style({
+      fontSize: '32px',
+    })
+    mouseControlText.container('side-text-group');
+    mouseControlText.createEntity();
+
+    /*
+    let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
+    iframeControlText.position(800, 490);
+    iframeControlText.width(600);
+    iframeControlText.color('white');
+    iframeControlText.style({
+      fontSize: '32px',
+    })
+    // iframeControlText.container('side-text-group');
+    iframeControlText.createEntity();
+    */
+
     //let entities = text2Entities(text);
-
-    let currentUrl = null;
-    let exampleRoot = 'https://yantra.gg/mantra/examples/demo?source=';
-    exampleRoot = 'http://192.168.1.80:7777/';
-
-    let examples = [
-      //      'https://yantra.gg/mantra/examples/demo?source=npc/hexapod',
-      //      'https://yantra.gg/mantra/examples/demo?source=item/boomerang',
-      //      'https://yantra.gg/mantra/examples/demo?source=item/flame',
-      //      'https://yantra.gg/mantra/examples/demo?source=item/bullet',
-      'demo?source=item/flame',
-      'demo?source=item/boomerang',
-      'demo?source=item/bullet',
-    ];
 
     let container = game.createContainer({
       name: 'container-a',
@@ -77,7 +104,7 @@ export default class Playground {
       color: 0xff00ff,
       position: {
         x: 0,
-        y: 550,
+        y: 450,
         z: -1
       },
       body: false,
@@ -100,37 +127,106 @@ export default class Playground {
       },
     });
 
-    let dropdownSelect = game.make().Select({
-      options: examples
-    })
-    .container('container-a')
+    let currentUrl = null;
+    let exampleRoot = 'https://yantra.gg/mantra/examples/demo?source=';
+    exampleRoot = 'http://192.168.1.80:7777/';
 
-    dropdownSelect.afterUpdateEntity(function (context, event) {
-      if (currentUrl === context.value) return;
-      game.updateEntity(primaryGameEmbed.id, {
-        meta: {
-          src: exampleRoot + context.value
-        }
-      });
-    });
-    dropdownSelect.width(300).height(80);
-    // dropdownSelect.position(-400, 500, 0);
-    dropdownSelect.style({
-      fontSize: '28px'
+    categories = categories.filter(function(cat) {
+      let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
+      return allowed.includes(cat.name);
     })
 
-    dropdownSelect.clone(8).createEntity();
-
-    let primaryGameEmbed = game.make().Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=npc/hexapod' })
-    primaryGameEmbed.width(800).height(600)
-    primaryGameEmbed.x(0);
-    primaryGameEmbed = primaryGameEmbed.createEntity();
+    let primaryGameEmbed = game.make()
+      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=npc/hexapod' })
+      .width(800)
+      .height(600)
+      .x(0)
+      .y(-100)
+      .createEntity();
 
     let codeEditor = game.make().Code({
-    //  code: 'hello <h1>'
+      //  code: 'hello <h1>'
       src: 'https://yantra.gg/mantra/examples/npc/hexapod.js'
-    }).height(800).width(600).x(800).createEntity();
+    })
+    .height(800)
+    .width(660)
+    .x(800)
+    .y(-100)
+    .createEntity();
 
+    // Function to create a dropdown select with given options and append it to a specified container
+    function createDropdown(primaryGameEmbed, options, containerId, dropdownTitle) {
+      let optionsFormatted = options.map(item => ({
+        label: item.title, // Use the title as the option text
+        value: exampleRoot + 'examples/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
+      }));
+
+      // first options is the label
+      optionsFormatted.unshift({
+        label: dropdownTitle + '...',
+        value: ''
+      });
+      // Create the select dropdown
+      let dropdownSelect = game.make().Select({
+        options: optionsFormatted,
+        title: dropdownTitle // Optional: Use title for labeling or categorizing the dropdown
+      }).container(containerId);
+
+      // Function to handle after an option is selected and update the entity accordingly
+      // TODO: add EntityBuilder.onchange event
+      dropdownSelect.afterUpdateEntity(function (context, event) {
+  
+        if (!context || typeof context.value === 'undefined') {
+          return;
+        }
+
+        if (currentUrl === context.value) return;
+        console.log('afterUpdateEntity', primaryGameEmbed, context.value, event);
+
+        if (typeof primaryGameEmbed === 'undefined') {
+          return;
+        }
+
+        //
+        // Updates the IFrame src to the selected example
+        //
+        game.updateEntity(primaryGameEmbed.id, {
+          meta: {
+            src: context.value
+          }
+        });
+        //
+        // Updates the Code src to the selected example
+        //
+        let sourceLink = context.value.replace('https://yantra.gg', 'http://192.168.1.80:7777').replace('demo.html?source=', '') + '.js';
+        console.log('sourceLink', sourceLink)
+        // alert(sourceLink)
+        game.updateEntity(codeEditor.id, {
+          meta: {
+            src: sourceLink
+          }
+        });
+      });
+
+      // Set style and dimensions for the dropdown
+      dropdownSelect.width(300).height(80).style({
+        fontSize: '28px',
+        backgroundColor: categories.find(cat => cat.title === dropdownTitle)?.color || '#e0e0e0' // Use category color if available
+      }).createEntity();
+    }
+
+    // Iterate over categories and create a dropdown for each with its examples as options
+    categories.forEach(category => {
+      // Filter examples that belong to the current category
+      let categoryExamples = examples.filter(example => example.category === category.name);
+
+      // Create a dropdown for the current category with its examples
+      createDropdown(primaryGameEmbed, categoryExamples, 'container-a', category.title); // Assume 'container-a' exists or is dynamically created for each category
+    });
+
+    // let addSceneButton = game.make().Button({ text: 'Load Example as Scene', disabled: true }).width(250).position(650, 500).createEntity();
+    // let deployToYantraButton = game.make().Button({ text: 'Deploy to Yantra.gg' }).width(200).position(900, 500).createEntity();
+    // let copyCodeButton = game.make().Button({ text: 'Copy Code' }).width(200).position(1000, 500).createEntity();
     /*
 
     let gravitySlider = game.make().Range().width(100).position(-540, -400, 0).createEntity();
@@ -147,9 +243,44 @@ export default class Playground {
     */
 
     let player = game.make().Player();
-    player.position(-300, 500, 0);
+    player.position(500, 500, 0);
     player.createEntity();
-    game.setZoom(0.5);
+
+    let screenWidth = window.innerWidth;
+    let screenHeight = window.innerHeight;
+
+    // Width-based zoom calculation
+    let zoomRatioWidth = 0.5 / game.width; // Derived ratio for width
+    let baseWidth = game.width;
+    let baseZoomWidth = 0.5;
+    let zoomWidth = baseZoomWidth + (screenWidth - baseWidth) * zoomRatioWidth;
+    
+    // Height-based zoom calculation (assuming similar ratios and base values for height)
+    let zoomRatioHeight = 0.5 / game.height; // You might need to adjust this based on your game's height scaling
+    let baseHeight = game.height; // Adjust this base height as per your requirements
+    let baseZoomHeight = 0.5;
+    let zoomHeight = baseZoomHeight + (screenHeight - baseHeight) * zoomRatioHeight;
+    
+    // Choose the smaller zoom level to ensure content fits both width and height
+    let zoom = Math.min(zoomWidth, zoomHeight);
+    
+    // Clamp the zoom level between 0.4 and 1
+    zoom = Math.max(0.4, Math.min(zoom, 1));
+    
+    game.setZoom(zoom);
+    
+    // TODO code responsive layout for mobile
+    /*
+    if (screenWidth < 400) {
+      // move the code editor to same x as embed
+      // move embed up
+      game.updateEntity(codeEditor.id, {
+        x: primaryGameEmbed.position.x,
+        y: primaryGameEmbed.position.y - 800
+      })
+    }
+    */
+
 
   }
 }

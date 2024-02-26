@@ -1,7 +1,8 @@
+// TODO: refactor this out into a Plugin UI Component
 export default class ToolbarMenu {
   constructor() {
 
-    this.toggleStatus = 'open';
+    this.toggleStatus = 'closed';
      // Add an isTransitioning flag to track transition state
      this.isTransitioning = false;
 
@@ -33,6 +34,7 @@ export default class ToolbarMenu {
     this.setStyle(this.toolbar, {
       position: 'fixed',
       top: '0',
+      height: '50px',
       width: '100%',
       display: 'flex',
       justifyContent: 'space-between',
@@ -47,6 +49,8 @@ export default class ToolbarMenu {
     // Responsive design for smaller screens
     window.addEventListener('resize', this.updateResponsiveStyles.bind(this));
     this.updateResponsiveStyles();
+
+    this.slideInToolbar();
   }
 
   setTransitioningState(isTransitioning) {
@@ -75,6 +79,7 @@ export default class ToolbarMenu {
     if (this.isTransitioning || this.toggleStatus === 'open') {
       return;
     }
+
     this.setTransitioningState(true);
     this.toggleStatus = 'open';
     this.setStyle(this.toolbar, {
@@ -102,7 +107,6 @@ export default class ToolbarMenu {
       } else if (group === 'secondary') {
         this.secondaryGroup.appendChild(element);
       }
-  
     }
 
   }
@@ -116,25 +120,33 @@ export default class ToolbarMenu {
       item.title = itemObj.hint;
     }
     let itemText = document.createElement('div');
+
+    let textSpan = document.createElement('span');
+    textSpan.textContent = itemObj.text;
+    textSpan.style.position = 'relative';
+    textSpan.style.bottom = '5px';
+    textSpan.style.paddingLeft = '5px';
+
+
+    if (typeof itemObj.icon === 'object') {
+      if (prepend) {
+        itemText.appendChild(itemObj.icon);
+      } else {
+        itemText.appendChild(itemObj.icon);
+      }
+    }
+
     itemText.className = 'menu-item-text';
-    itemText.textContent = itemObj.text;
-    
+    itemText.appendChild(textSpan);
     itemText.style.textAlign = 'center';
+    //itemText.style.position = 'relative';
+    //itemText.style.bottom = '10px';
+    //itemText.style.left = '10px';
 
     if (prepend) {
       item.appendChild(itemText, item.firstChild);
     } else {
       item.appendChild(itemText);
-    }
-
-
-    if (typeof itemObj.icon === 'object') {
-      if (prepend) {
-        item.insertBefore(itemObj.icon, item.firstChild);
-      } else {
-        item.appendChild(itemObj.icon);
-  
-      }
     }
 
     this.setStyle(item, {

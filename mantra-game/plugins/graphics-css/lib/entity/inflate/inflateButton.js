@@ -2,6 +2,11 @@ export default function inflateButton(entityElement, entityData) {
   // Create the button
   let button = document.createElement('button');
 
+  console.log('entityData', entityData)
+  if (typeof entityData.meta === 'object' && entityData.meta.disabled === true) {
+    button.disabled = true;
+  }
+
   // Set button text if provided
   if (entityData.text) {
     button.innerHTML = entityData.text;

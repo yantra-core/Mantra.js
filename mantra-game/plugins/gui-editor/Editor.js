@@ -1,7 +1,7 @@
 import createToolbar from './lib/createToolbar.js';
 class Editor {
 
-  static id = 'gui-editor';
+  static id = 'editor';
   static async = true;
 
   constructor({ sourceCode, sutraEditor = false } = {}) {
@@ -11,10 +11,11 @@ class Editor {
     this.createToolbar = createToolbar.bind(this);
   }
 
+  // Remark: Legacy init(), this has a side-effect
   init(game) {
     this.game = game;
     // register the plugin with the game
-    // this.game.systemsManager.addSystem(this.id, this);
+    this.game.systemsManager.addSystem(this.id, this);
 
     document.body.style.perspective = 'none';
 
@@ -36,6 +37,24 @@ class Editor {
     // game.use(new this.game.plugins.PluginsGUI());
   }
 
+  toggle() {
+    if (this.toolbarMenu.toggleStatus === 'open') {
+      this.hide();
+    } else {
+      this.show();
+    }
+  }
+
+  show () {
+    //this.toolbarMenu.style.display = 'block';
+    this.toolbarMenu.slideInToolbar();
+
+  }
+
+  hide () {
+    this.toolbarMenu.slideOutToolbar();
+  }
+
   jqueryReady() {
     this.createToolbar(this.game);
     this.setupGlobalClickListener();
@@ -49,9 +68,9 @@ class Editor {
     let element = document.createElement('img');
     element.src = `${featherRoot}/vendor/feather/${name}.svg`;
     element.classList.add('feather-icon');
-    element.style.width = '36px';
-    element.style.height = '36px';
-    element.style.paddingTop = '5px';
+    element.style.width = '24px';
+    element.style.height = '24px';
+    element.style.paddingTop = '2px';
     // element.style.marginRight = '10px';
     element.style.cursor = 'pointer';
     element.style.filter = 'invert(100%)';
@@ -61,7 +80,6 @@ class Editor {
   createMenu(menuTitle, onClickAction = null) {
     const $menu = $('<div>', { class: 'menu' });
     const $button = $('<button>').text(menuTitle);
-
     if (onClickAction) {
       $button.on('click', onClickAction);
     } else {

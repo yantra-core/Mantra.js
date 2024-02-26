@@ -6,7 +6,6 @@ export default function createToolbar(game) {
 
   // Create menus
   const $fileMenu = this.createMenu('File');
-
   const toolbarMenu = new ToolbarMenu();
   this.toolbarMenu = toolbarMenu;
 
@@ -38,8 +37,14 @@ export default function createToolbar(game) {
   inspectorIcon.style.cursor = 'pointer';
   inspectorIcon.title = 'Click to open Entity Inspector';
   inspectorIcon.style.marginRight = '10px';
-  inspectorIcon.style.marginLeft = '10px';
-  inspectorIcon.style.marginTop = '5px';
+  inspectorIcon.style.marginLeft = '5px';
+  //inspectorIcon.style.marginTop = '5px';
+  inspectorIcon.style.width = '32px';
+  inspectorIcon.style.height = '32px';
+  inspectorIcon.style.bottom = '12px';
+  inspectorIcon.style.left = '9px';
+  inspectorIcon.style.position = 'relative';
+
   inspectorIcon.style.filter = 'invert(100%)';
 
   if (is_touch_enabled()) {
@@ -52,10 +57,16 @@ export default function createToolbar(game) {
   inspectorIcon.onclick = () => this.showInspector();
 
   // toolbarMenu.addElement('secondary', inspectorIcon);
+  function openGithub() {
+    window.open('https://github.com/yantra-core/Mantra.js', '_blank');
+  }
+
 
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
     icon: this.createIcon('slack'),
+    onClick: () => openGithub()
+
     /*
     subItems: [
       { text: 'View Source', onClick: () => this.showSourceCode() },
@@ -95,6 +106,7 @@ export default function createToolbar(game) {
     onClick: () => this.showEventsInspector()
   });
 
+  /*
   let worldIcon = this.createIcon('globe');
   worldIcon.style.marginTop = '0px';
   worldIcon.style.paddingTop = '0px';
@@ -145,7 +157,8 @@ export default function createToolbar(game) {
 
   graphicsSelectorItem.appendChild(graphicsSelector.selectBox);
   graphicsSelectorItem.title = 'Select Graphics Engine';
-
+  */
+  /*
   const worldSelector = new WorldSelector(this.game);
   worldSelector.selectBox.style.fontSize = '22px';
   worldSelector.selectBox.style.cursor = 'pointer';
@@ -178,6 +191,7 @@ export default function createToolbar(game) {
 
   worldSelectorItem.appendChild(worldSelector.selectBox);
   worldSelectorItem.title = 'Select World';
+  */
 
   // Create a flex container for the selectors
   let selectorsContainer = document.createElement('div');
@@ -187,13 +201,13 @@ export default function createToolbar(game) {
   selectorsContainer.style.margin = '20px'; // Add some margin for aesthetics
 
   selectorsContainer.appendChild(inspectorIcon);
-  selectorsContainer.appendChild(graphicsSelectorItem);
-  selectorsContainer.appendChild(worldSelectorItem);
+  //selectorsContainer.appendChild(graphicsSelectorItem);
+  //selectorsContainer.appendChild(worldSelectorItem);
   toolbarMenu.addElement('secondary', selectorsContainer);
   
   if (game.worlds.length > 0) {
     let currentWorldName = game.worlds[0].constructor.name;
-    worldSelector.selectElement(currentWorldName);
+    // worldSelector.selectElement(currentWorldName);
   }
 
   // toolbarMenu.toolbar.style.display = 'none';

@@ -13,7 +13,8 @@ export default function updateGraphic(entityData) {
   const entityElement = document.getElementById(`entity-${entityData.id}`);
   if (entityElement) {
     // Update the entity color
-    if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
+    // TODO: remove this refactor all code to inflate* paths
+    if (typeof entityData.color !== 'undefined' && entityData.color !== null && entityData.type !== 'TEXT') {
       // entityData.color is int number here we need a hex
       let hexColor = '#' + entityData.color.toString(16);
       // update the background color
@@ -23,7 +24,6 @@ export default function updateGraphic(entityData) {
     if (typeof entityData.position.z === 'number') {
       entityElement.style.zIndex = entityData.position.z;
     }
-  
 
     if (entityData.type === 'TEXT' && typeof entityData.text !== 'undefined' && entityData.text !== null) {
       // check that text has changed
@@ -41,7 +41,6 @@ export default function updateGraphic(entityData) {
       entityElement.style.height = entityData.height + 'px';
     }
 
-
     if (typeof entityData.radius !== 'number') {
     } else {
       // Multiply the radius by 2 to get the diameter for CSS
@@ -50,17 +49,16 @@ export default function updateGraphic(entityData) {
       entityElement.style.height = diameter + 'px';
     }
 
-
     // Size is new API, remove direct refs at ent root to height and width and radius
     if (typeof entityData.size === 'object') {
       if (typeof entityData.size.width !== 'undefined') {
         entityElement.style.width = entityData.size.width + 'px';
       }
-  
+
       if (typeof entityData.size.height !== 'undefined') {
         entityElement.style.height = entityData.size.height + 'px';
       }
-  
+
     }
 
     if (entityData.style) {
@@ -69,7 +67,6 @@ export default function updateGraphic(entityData) {
       });
     }
 
-
     if (entityData.type === 'IFRAME') {
       let iframe = entityElement.querySelector('iframe');
       // check to see if iframe src matches entityData.meta.src
@@ -77,20 +74,21 @@ export default function updateGraphic(entityData) {
         iframe.src = entityData.meta.src;
       }
     }
-    
+
     if (entityData.type === 'CODE') {
-      // TODO: remove these style of query selector inside update() loop, no good
-      // need to be a data cache on O(1) lookup
-      let code = entityElement.querySelector('code');
-      // check to see if iframe src matches entityData.meta.src
-      if (code && code.code !== entityData.meta.code) {
-        code.textContent = entityData.meta.code;
+      // Query entityElement for the first code tag that has a 'data-src' attribute matching entityData.meta.src
+      let codeElement = entityElement.querySelector(`code[data-src="${entityData.meta.src}"]`);
+      //console.log('entityElement', entityElement);
+
+      if (codeElement) {
+      } else {
+        console.log("No code element with matching data-src found.", entityData.meta.src);
+        this.inflateCode(entityElement, entityData);
       }
+
     }
 
-
     return this.updateEntityPosition(entityElement, entityData);
-
 
   } else {
     // If the entity element does not exist, create it

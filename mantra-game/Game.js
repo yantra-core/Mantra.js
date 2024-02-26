@@ -36,7 +36,7 @@ class Game {
       mouse: true,
       gamepad: false,
       virtualGamepad: false,
-      editor: true,
+      editor: false,
       sutra: true,
       lifetime: false,
       defaultMovement: true,
@@ -366,6 +366,10 @@ class Game {
 
   setBackground(color) {
     // not implemented directly, Graphics plugin will handle this
+  }
+
+  convertColorToHex(color) {
+    return typeof color === 'number' ? `#${color.toString(16)}` : color;
   }
 
   randomColor(format = 'int') {

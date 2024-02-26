@@ -1,5 +1,6 @@
-export default function inflateCode(entityElement, entityData) {
 
+// TODO: Move this to Code.js Plugin inflate()
+export default function inflateCode(entityElement, entityData) {
 
   let graphic = entityData.graphics && entityData.graphics['graphics-css'];
 
@@ -15,6 +16,11 @@ export default function inflateCode(entityElement, entityData) {
     pre.appendChild(code);
     entityElement.appendChild(pre);
   }
+
+  // add class "language-javascript" to the code element
+  let codeHighlightClassName = 'language-' + entityData.meta.language;
+  codeHighlightClassName = 'language-javascript'; // TODO: remove this line
+  code.classList.add(codeHighlightClassName);
 
   // Initialize fetchSourceHandles if it doesn't exist
   this.fetchSourceHandles = this.fetchSourceHandles || {};
@@ -38,10 +44,11 @@ export default function inflateCode(entityElement, entityData) {
           // Update the code element directly once the content is fetched
           Array.from(document.querySelectorAll(`code[data-src="${src}"]`)).forEach((el) => {
             el.textContent = content;
+            Prism.highlightAll();
           });
+
           // Store the fetched content for future use, replacing the promise
           this.fetchSourceHandles[src] = { content };
-          Prism.highlightAll();
         })
         .catch(error => {
           console.error('Error fetching source code:', error);
