@@ -110,6 +110,7 @@ var originalScriptCopyPrefix = 'mantra-code-src-';
 var usePrism = true;
 function inflateCode(entityElement, entityData) {
   var _this = this;
+  var game = this.game;
   var graphic = entityData.graphics && entityData.graphics['graphics-css'];
   var pre, code;
   if (graphic) {

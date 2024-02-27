@@ -6233,7 +6233,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         // using the same source code and position / dimensions
 
         // monaco a second to get ready
-        //setTimeout(function(){
         var monacoEditor = game.make().Monaco({
           code: codeEditor.meta.code
         }).height(700).width(660).x(codeEditor.position.x).y(codeEditor.position.y).z(32).createEntity();
@@ -6245,8 +6244,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
             display: 'block'
           }
         });
-
-        //}, 1000)
 
         /*
         // hides the codeEditor
@@ -6260,9 +6257,16 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       function openMonaco() {
         // set the cursor to wait
         document.body.style.cursor = 'wait';
+
+        // hide the open monaco button
+        game.updateEntity(openMonacoButton.id, {
+          style: {
+            display: 'none'
+          }
+        });
         if (!game.systems.monaco) {
           game.use('Monaco', {}, function () {
-            createMonacoEditor();
+            createMonacoEditor(game);
           });
         } else {
           createMonacoEditor(game);
@@ -6314,7 +6318,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       */
 
       var primaryGameEmbed = game.make().Iframe({
-        src: 'https://yantra.gg/mantra/examples/demo?source=games/home'
+        src: 'https://yantra.gg/mantra/examples/demo?source=games/gravity-gardens'
       }).width(800).height(600).x(0).y(-100).createEntity();
       var evalEmbed = game.make().Iframe({
         src: 'https://yantra.gg/mantra/eval'
@@ -6362,13 +6366,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         text: 'Open Monaco Editor'
       }).width(200).height(40).position(origin.x, origin.y, 33).pointerdown(function (context, event) {
         openMonaco();
-
-        // hide this
-        game.updateEntity(openMonacoButton.id, {
-          style: {
-            display: 'none'
-          }
-        });
       }).createEntity();
       var evalRunButton = game.make().Button({
         text: 'Run Code'
@@ -6426,7 +6423,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         primaryGameEmbed.src = null;
       }).createEntity();
       var player = game.make().Player();
-      player.position(evalRunButton.position.x + 50, evalRunButton.position.y, 0).z(64);
+      player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 15, 0).z(64);
       player.createEntity();
       var hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
 

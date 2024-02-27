@@ -1380,14 +1380,15 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "unbindKeyboard",
     value: function unbindKeyboard() {
-      if (game.systems['keyboard']) {}
-      game.systems['keyboard'].unbindAllEvents();
+      if (this.systems['keyboard']) {
+        this.systems['keyboard'].unbindAllEvents();
+      }
     }
   }, {
     key: "bindKeyboard",
     value: function bindKeyboard() {
-      if (game.systems['keyboard']) {
-        game.systems['keyboard'].bindInputControls();
+      if (this.systems['keyboard']) {
+        this.systems['keyboard'].bindInputControls();
       }
     }
 
@@ -2737,16 +2738,16 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "609a847961ae02bf5acfb8889ac8e315be760e9ecf8f1229ca10ea34217cf408",
-  "./plugins/CSSGraphics.min.js": "8aaa2682269e6e69c672618c395039be37ce443c9b761eaa3a68e9868576bad8",
+  "./plugins/CSSGraphics.js": "6215d5aca6d4ae44dbb0cfce250ae0fc4b18f8c095903d663cd617bf94da3976",
+  "./plugins/CSSGraphics.min.js": "7a27fd9de334825ffef95b519e7b7ab6984f419d1bdd23d2d006096c5457da15",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
   "./plugins/Checkbox.min.js": "788db3172873ba0a5c8f6f596be2c54a55ba875d1b9759af1758ea2f2107494c",
   "./plugins/ChronoControl.js": "3d1eb99a514dc0726c3055371cf47fb32e25190a4f7c16b823792ecc7858dfa1",
   "./plugins/ChronoControl.min.js": "a9a511015708f05075041a02a32b9bcfd56e8cc73d07a5836699b0c1c2f1ae83",
-  "./plugins/Code.js": "89be70a4a61b86ade143630568a5b41528674ff2dfa30c6a9609314ad3818c82",
-  "./plugins/Code.min.js": "ce764e559c8a56ee7ab9e5213ca00c3c82d7588d4443ab2dcdddfebe259b979f",
+  "./plugins/Code.js": "bfc5d9ed0a8cd34f25f0ddccc03dc1da75904cd93d7a56e13dd11787cb741141",
+  "./plugins/Code.min.js": "11b7f565913a9059ff2b440ac19bd38cffb97f880bdeb07a29e48704288a2544",
   "./plugins/Collectable.js": "a428d356c2fc2ce1a14b3badc8044e26eb65ed5a9e810c7c020f8a5483f9f46b",
   "./plugins/Collectable.min.js": "a4921133c0c33773e21409a0663245b191d79742636a39d443fafb3e0f26487c",
   "./plugins/Collisions.js": "f123f7b3154b1749306aabba1ec65bc81958d67fd926994c3e51ebfa36d63375",
@@ -2827,7 +2828,6 @@ var _default = exports["default"] = {
   "./plugins/PacManMovement.min.js": "31f12aa5c1ec52ed3b22dd49420a5a42ff749954306411e3983c25f257fbbe13",
   "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
   "./plugins/PhaserCamera.min.js": "da4dbe5ab58c17a3716130d51ac103492a4fd201da6fa61ad5b106e2fc158459",
-  "./plugins/PhaserGraphics.js": "e14cc1c2e7256c540595b170447be93e0b38feae954772709084026a967d09e7",
   "./plugins/PhaserGraphics.min.js": "2f436654a1728b390b3f17e6802b9e202a70d3733afbea96f5741baf4e2ff981",
   "./plugins/PhysXPhysics.js": "42d70e5cbde1d94b4895a92b6d51739a05a4762c41c208b32b2e0b1188dd7879",
   "./plugins/PhysXPhysics.min.js": "f91a1b58ea914c437eb0082c78aa3c54570065978b853ef2592364f19759c401",
@@ -2887,7 +2887,6 @@ var _default = exports["default"] = {
   "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
   "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
-  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
   "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
   "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
   "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",
