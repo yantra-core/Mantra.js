@@ -118,6 +118,7 @@ var CSSCamera = /*#__PURE__*/function () {
     this.setTransform = _setTransform["default"].bind(this);
     this.updateEntityPosition = _updateEntityPosition["default"].bind(this);
     this.cameraShake = _cameraShake["default"].bind(this);
+    this.cameraThrowEnabled = true;
   }
   _createClass(CSSCamera, [{
     key: "init",
@@ -263,7 +264,6 @@ var _inflateRadio = _interopRequireDefault(require("./lib/entity/inflate/inflate
 var _inflateRange = _interopRequireDefault(require("./lib/entity/inflate/inflateRange.js"));
 var _inflateSelect = _interopRequireDefault(require("./lib/entity/inflate/inflateSelect.js"));
 var _inflateTextarea = _interopRequireDefault(require("./lib/entity/inflate/inflateTextarea.js"));
-var _inflateCode = _interopRequireDefault(require("./lib/entity/inflate/inflateCode.js"));
 var _updateGraphic = _interopRequireDefault(require("./lib/entity/updateGraphic.js"));
 var _bindEntityEvents = _interopRequireDefault(require("./lib/entity/bindEntityEvents.js"));
 var _bindYCraftEvents = _interopRequireDefault(require("./lib/entity/bindYCraftEvents.js"));
@@ -285,6 +285,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // CSSGraphics.js - Marak Squires 2023
+// import inflateCode from './lib/entity/inflate/inflateCode.js';
 // touch / mouse events on entities
 // TODO: remove bindYCraftEvents.js file, replace with a Sutra
 var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
@@ -322,7 +323,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.inflateRadio = _inflateRadio["default"].bind(_assertThisInitialized(_this));
     _this.inflateInput = _inflateInput["default"].bind(_assertThisInitialized(_this));
     _this.inflateTextarea = _inflateTextarea["default"].bind(_assertThisInitialized(_this));
-    _this.inflateCode = _inflateCode["default"].bind(_assertThisInitialized(_this));
+    // this.inflateCode = inflateCode.bind(this);
     _this.inflateCheckbox = _inflateCheckbox["default"].bind(_assertThisInitialized(_this));
     _this.inflateImage = _inflateImage["default"].bind(_assertThisInitialized(_this));
     //this.inflateVideo = inflateVideo.bind(this);
@@ -397,7 +398,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCanvas.js":18,"./lib/entity/inflate/inflateCheckbox.js":19,"./lib/entity/inflate/inflateCode.js":20,"./lib/entity/inflate/inflateIframe.js":21,"./lib/entity/inflate/inflateImage.js":22,"./lib/entity/inflate/inflateInput.js":23,"./lib/entity/inflate/inflateRadio.js":24,"./lib/entity/inflate/inflateRange.js":25,"./lib/entity/inflate/inflateSelect.js":26,"./lib/entity/inflate/inflateText.js":27,"./lib/entity/inflate/inflateTextarea.js":28,"./lib/entity/inflateGraphic.js":29,"./lib/entity/inflateTexture.js":30,"./lib/entity/removeGraphic.js":31,"./lib/entity/updateGraphic.js":32,"./lib/render.js":33,"./lib/unload.js":34}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCanvas.js":18,"./lib/entity/inflate/inflateCheckbox.js":19,"./lib/entity/inflate/inflateIframe.js":20,"./lib/entity/inflate/inflateImage.js":21,"./lib/entity/inflate/inflateInput.js":22,"./lib/entity/inflate/inflateRadio.js":23,"./lib/entity/inflate/inflateRange.js":24,"./lib/entity/inflate/inflateSelect.js":25,"./lib/entity/inflate/inflateText.js":26,"./lib/entity/inflate/inflateTextarea.js":27,"./lib/entity/inflateGraphic.js":28,"./lib/entity/inflateTexture.js":29,"./lib/entity/removeGraphic.js":30,"./lib/entity/updateGraphic.js":31,"./lib/render.js":32,"./lib/unload.js":33}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -407,8 +408,11 @@ exports["default"] = applyThrow;
 // Apply the throw inertia to the camera
 function applyThrow() {
   if (!this.isThrowing) return;
+  if (!this.cameraThrowEnabled) {
+    return;
+  }
   var game = this.game;
-  var decayFactor = 0.985; // Increase closer to 1 for longer throws
+  var decayFactor = 0.555; // Increase closer to 1 for longer throws
 
   game.data.camera.offsetX += this.dragInertia.x;
   game.data.camera.offsetY += this.dragInertia.y;
@@ -527,7 +531,7 @@ function cssMouseWheelZoom(event) {
 
   var mouse = this.game.systems.mouse;
   var target = event.target;
-  var defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE'];
+  var defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE', 'BUTTON', 'INPUT'];
 
   // console.log("Event target tag:", target.tagName);
 
@@ -810,6 +814,13 @@ exports["default"] = updateCameraPosition;
 // Method to update camera position based on drag
 function updateCameraPosition(dx, dy, isDragging) {
   var game = this.game;
+  var draggingAllowed = true;
+  if (typeof game.data.camera.draggingAllowed === 'boolean') {
+    draggingAllowed = game.data.camera.draggingAllowed;
+  }
+  if (!draggingAllowed) {
+    return;
+  }
 
   // New throw is starting, cancel existing throw
   if (this.isDragging && !isDragging) {
@@ -1147,12 +1158,20 @@ function createGraphic(entityData) {
       // For CANVAS entities, create a canvas
       entityElement = this.inflateCanvas(entityElement, entityData);
       break;
+    case 'MONACO':
+      // For CODE entities, create a code block
+      console.log('inflating monaco', entityData, this.game.systems);
+      if (this.game.systems.monaco) {
+        entityElement = this.game.systems.monaco.inflate(entityElement, entityData);
+      }
+      break;
     case 'CODE':
       // For CODE entities, create a code block
-      entityElement = this.inflateCode(entityElement, entityData);
+      if (this.game.systems.code) {
+        entityElement = this.game.systems.code.inflate(entityElement, entityData);
+      }
       break;
     case 'TOOLBAR':
-      // For CANVAS entities, create a canvas
       if (this.game.systems.toolbar) {
         entityElement = this.game.systems.toolbar.inflate(entityElement, entityData);
       }
@@ -1457,159 +1476,17 @@ function inflateCheckbox(entityElement, entityData) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = inflateCode;
-// TODO: Move this to Code.js Plugin inflate()
-function inflateCode(entityElement, entityData) {
-  var _this = this;
-  var graphic = entityData.graphics && entityData.graphics['graphics-css'];
-  var pre, code;
-  if (graphic) {
-    // graphic is top level DOM, all other elements are children
-    pre = graphic.querySelectorAll('pre')[0];
-    code = graphic.querySelectorAll('code')[0];
-  } else {
-    pre = document.createElement('pre');
-    code = document.createElement('code');
-    pre.appendChild(code);
-    entityElement.appendChild(pre);
-  }
-
-  // add class "language-javascript" to the code element
-  var codeHighlightClassName = 'language-' + entityData.meta.language;
-  codeHighlightClassName = 'language-javascript'; // TODO: remove this line
-  code.classList.add(codeHighlightClassName);
-
-  // Initialize fetchSourceHandles if it doesn't exist
-  this.fetchSourceHandles = this.fetchSourceHandles || {};
-  var src = entityData.meta && entityData.meta.src;
-  if (src) {
-    // Set initial content to indicate loading
-    code.textContent = "Loading... ".concat(src);
-    if (!this.fetchSourceHandles[src]) {
-      // Create a mutex and start fetching the content
-      this.fetchSourceHandles[src] = fetch(src).then(function (response) {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.text();
-      }).then(function (content) {
-        // Update the code element directly once the content is fetched
-        Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
-          var html = Prism.highlight(content, Prism.languages.javascript, 'javascript');
-          el.innerHTML = html;
-        });
-        // Store the fetched content for future use, replacing the promise
-        _this.fetchSourceHandles[src] = {
-          content: content
-        };
-      })["catch"](function (error) {
-        console.error('Error fetching source code:', error);
-        // Update all code elements with the error message
-        Array.from(document.querySelectorAll("code[data-src=\"".concat(src, "\"]"))).forEach(function (el) {
-          el.textContent = '// Error fetching source code \n' + error;
-        });
-        // Store the error message for future use, replacing the promise
-        _this.fetchSourceHandles[src] = {
-          error: '// Error fetching source code'
-        };
-        throw error;
-      });
-    }
-
-    // Mark the code element with a data attribute for future updates
-    code.setAttribute('data-src', src);
-  } else {
-    // Set default code text if none provided and no src is specified
-    code.textContent = entityData.meta && entityData.meta.code || '';
-  }
-  applyCodeStyles(entityElement, pre, code, entityData);
-
-  // Additional style adjustments
-  if (entityData.width) {
-    pre.style.width = "".concat(entityData.width, "px");
-  }
-  if (entityData.height) {
-    pre.style.height = "".concat(entityData.height, "px");
-  }
-  if (entityData.color) {
-    code.style.color = convertColorToHex(entityData.color);
-  }
-  return entityElement;
-}
-function applyCodeStyles(entityElement, pre, code, entityData) {
-  // Define and apply default styles for code element here
-  // For example, setting a monospace font and a background color
-  pre.style.display = 'block';
-  pre.style.overflow = 'auto';
-  pre.style.padding = '5px';
-  pre.style.backgroundColor = '#1E1E1E'; // Dark background for the code block
-
-  code.style.fontFamily = 'monospace';
-  code.style.fontSize = '14px';
-  code.style.color = '#D4D4D4'; // Light color for the text for better contrast
-
-  // entityElement.style.border = "2px solid #999"; // Default border
-  entityElement.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
-  entityElement.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
-
-  // Define hover effect styles
-  var hoverBorderStyle = "2px solid #fff"; // Border color for hover state
-  var hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
-
-  // Add event listeners to change styles on hover
-  entityElement.addEventListener('mouseenter', function () {
-    entityElement.style.border = hoverBorderStyle;
-    entityElement.style.boxShadow = hoverBoxShadowStyle;
-  });
-
-  // Revert to default styles when not hovering
-  entityElement.addEventListener('mouseleave', function () {
-    entityElement.style.border = "2px solid #999";
-    entityElement.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
-  });
-
-  // Apply any custom styles from entityData if provided
-  if (entityData.style) {
-    Object.assign(pre.style, entityData.style.pre); // Apply styles to the <pre> element
-    Object.assign(code.style, entityData.style.code); // Apply styles to the <code> element
-  }
-}
-
-// TODO: similiar styles for applyCodeStyles
-function applyIframeStyles(iframe, entityData) {
-  // Define default styles for the iframe
-  iframe.style.border = "2px solid #999"; // Default border
-  iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)"; // Soft shadow for a subtle effect
-  iframe.style.transition = "all 0.3s ease-in-out"; // Smooth transition for hover effect
-
-  // Define hover effect styles
-  var hoverBorderStyle = "2px solid #fff"; // Border color for hover state
-  var hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
-
-  // Add event listeners to change styles on hover
-  iframe.addEventListener('mouseenter', function () {
-    iframe.style.border = hoverBorderStyle;
-    iframe.style.boxShadow = hoverBoxShadowStyle;
-  });
-
-  // Revert to default styles when not hovering
-  iframe.addEventListener('mouseleave', function () {
-    iframe.style.border = "2px solid #999";
-    iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
-  });
-}
-
-},{}],21:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports["default"] = inflateIframe;
 function inflateIframe(entityElement, entityData) {
   var iframe = document.createElement('iframe');
   if (entityData.meta && entityData.meta.src) {
-    iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+    if (entityData.meta.src === null) {
+      // clear the iframe
+      iframe.src = 'about:blank';
+      // TODO: custom about:mantra page
+    } else {
+      iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+    }
   }
 
   // Optional: Apply default and custom iframe styles
@@ -1644,9 +1521,15 @@ function applyIframeStyles(iframe, entityData) {
     iframe.style.border = "2px solid #999";
     iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
   });
+
+  // On any iframe message bubble the event to game.emit('iframeMessage')
+  iframe.addEventListener('message', function (event) {
+    //console.log("IFRAME GOT MESSAGE inflateIframe")
+    game.emit('iframeMessage', event);
+  });
 }
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1699,7 +1582,7 @@ function applyImageStyles(img, entityData) {
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1779,7 +1662,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1812,7 +1695,7 @@ function inflateRadio(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1876,7 +1759,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1909,29 +1792,70 @@ function inflateSelect(entityElement, entityData) {
   }
 
   // Apply default and custom styles
-  applySelectStyles(select, entityData);
+  applySelectStyles(entityElement, select, entityData);
 
   // Append the select element to the entityElement
   entityElement.appendChild(select);
   return entityElement;
 }
-function applySelectStyles(select, entityData) {
+function applySelectStyles(entityElement, select, entityData) {
   var defaultSelectStyles = {
     padding: '10px 15px',
     fontSize: '16px',
-    margin: '4px 2px',
     cursor: 'pointer',
-    borderRadius: '8px',
     backgroundColor: '#f2f2f2',
     color: 'black',
-    border: '1px solid #ccc',
+    border: 'none',
+    // Ensure no border for the select element
+    borderRadius: '8px',
+    // Optional: Match container's border-radius if desired
     appearance: 'none',
     // Removes default browser styling
-    transition: 'border-color 0.4s ease, box-shadow 0.4s ease'
+    transition: 'background-color 0.3s ease' // Smooth transition for background color
+  };
+
+  var defaultSelectEntityHolderStyle = {
+    padding: '0',
+    // Adjust padding to be handled by the select element inside
+    borderRadius: '8px',
+    // Rounded corners for the container
+    backgroundColor: '#f2f2f2',
+    // Match select background color
+    border: '1px solid #ccc',
+    // Singular border on the container
+    'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
+    // Subtle shadow for depth
+    transition: 'box-shadow 0.3s ease, border-color 0.3s ease' // Smooth transition for shadow and border color
   };
 
   // Apply default styles
   Object.assign(select.style, defaultSelectStyles);
+  Object.assign(entityElement.style, defaultSelectEntityHolderStyle);
+
+  // Additional style adjustments for the focus state of the select element
+  select.addEventListener('focus', function () {
+    entityElement.style.borderColor = 'lightblue'; // Highlight border color on focus
+    entityElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)'; // Deeper shadow on focus
+  });
+
+  select.addEventListener('blur', function () {
+    entityElement.style.borderColor = '#ccc'; // Revert border color on blur
+    entityElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'; // Revert shadow on blur
+  });
+
+  entityElement.addEventListener('mouseenter', function () {
+    entityElement.style.borderColor = 'lightblue'; // Highlight border color on hover
+    entityElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)'; // Deeper and more pronounced shadow for a "pop" effect
+    entityElement.style.transform = 'translateY(-2px)'; // Slightly raise the element for a 3D effect
+    entityElement.style.transition = 'all 0.2s ease-out'; // Smooth transition for all properties
+  });
+
+  entityElement.addEventListener('mouseleave', function () {
+    entityElement.style.borderColor = '#ccc'; // Revert border color on mouse leave
+    entityElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'; // Revert shadow on mouse leave
+    entityElement.style.transform = 'translateY(0)'; // Reset the position of the element
+    entityElement.style.transition = 'all 0.2s ease-in'; // Smooth transition for all properties
+  });
 
   // Set width and height if provided
   if (entityData.width) {
@@ -1976,7 +1900,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2019,7 +1943,7 @@ function inflateText(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2051,7 +1975,7 @@ function applyTextareaStyles(textarea, entityData) {
   // Similar to applySelectStyles function
 }
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2078,7 +2002,7 @@ function inflateEntity(entity, alpha) {
   this.inflateTexture(entity, graphic);
 }
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2158,7 +2082,7 @@ function applyTextureStyles(texture, element, textureUrl, spritePosition, entity
   });
 }
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2176,7 +2100,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2247,9 +2171,16 @@ function updateGraphic(entityData) {
       var iframe = entityElement.querySelector('iframe');
       // check to see if iframe src matches entityData.meta.src
       if (iframe && iframe.src !== entityData.meta.src) {
-        iframe.src = entityData.meta.src;
+        if (entityData.meta.src === null) {
+          // clear the iframe
+          iframe.src = 'about:blank';
+          // TODO: custom about:mantra page
+        } else {
+          iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+        }
       }
     }
+
     if (entityData.type === 'CODE') {
       // Query entityElement for the first code tag that has a 'data-src' attribute matching entityData.meta.src
       var codeElement = entityElement.querySelector("code[data-src=\"".concat(entityData.meta.src, "\"]"));
@@ -2257,7 +2188,9 @@ function updateGraphic(entityData) {
 
       if (codeElement) {} else {
         console.log("No code element with matching data-src found.", entityData.meta.src);
-        this.inflateCode(entityElement, entityData);
+        if (this.game.systems.code) {
+          this.game.systems.code.inflate(entityElement, entityData);
+        }
       }
     }
     return this.updateEntityPosition(entityElement, entityData);
@@ -2267,7 +2200,7 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2326,7 +2259,7 @@ function render(game, alpha) {
   }
 }
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -1095,8 +1095,8 @@ function layoutEntity(container, entityId) {
         console.log('warning: item not found in container', index, item);
         return;
       }
-      var paddingTop = containerEnt.style.paddingTop || 20;
-      var paddingLeft = containerEnt.style.paddingLeft || -10;
+      var paddingTop = 0;
+      var paddingLeft = 0;
 
       // Set the starting position to the top-left corner of the container's bounding box
       var positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
@@ -1442,9 +1442,14 @@ function updateEntity(entityDataOrId, entityData) {
   // Meta properties
   //
   if (typeof entityData.meta !== 'undefined') {
-    // overwrite all meta ( for now )
-    // Remark: in the future we could merge instead of overwrite
-    this.game.components.meta.set(entityId, entityData.meta);
+    var merged = {};
+    var componentData = this.game.components.meta.get(entityId);
+    if (componentData) {
+      merged = _objectSpread(_objectSpread({}, componentData), entityData.meta);
+    } else {
+      merged = entityData.meta;
+    }
+    this.game.components.meta.set(entityId, merged);
   }
   if (typeof entityData.score !== 'undefined' && entityData.score !== null) {
     this.game.components.score.set(entityId, entityData.score);

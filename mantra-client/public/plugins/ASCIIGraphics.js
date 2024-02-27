@@ -470,6 +470,7 @@ var CSSCamera = /*#__PURE__*/function () {
     this.setTransform = _setTransform["default"].bind(this);
     this.updateEntityPosition = _updateEntityPosition["default"].bind(this);
     this.cameraShake = _cameraShake["default"].bind(this);
+    this.cameraThrowEnabled = true;
   }
   _createClass(CSSCamera, [{
     key: "init",
@@ -601,8 +602,11 @@ exports["default"] = applyThrow;
 // Apply the throw inertia to the camera
 function applyThrow() {
   if (!this.isThrowing) return;
+  if (!this.cameraThrowEnabled) {
+    return;
+  }
   var game = this.game;
-  var decayFactor = 0.985; // Increase closer to 1 for longer throws
+  var decayFactor = 0.555; // Increase closer to 1 for longer throws
 
   game.data.camera.offsetX += this.dragInertia.x;
   game.data.camera.offsetY += this.dragInertia.y;
@@ -721,7 +725,7 @@ function cssMouseWheelZoom(event) {
 
   var mouse = this.game.systems.mouse;
   var target = event.target;
-  var defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE'];
+  var defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE', 'BUTTON', 'INPUT'];
 
   // console.log("Event target tag:", target.tagName);
 
@@ -1004,6 +1008,13 @@ exports["default"] = updateCameraPosition;
 // Method to update camera position based on drag
 function updateCameraPosition(dx, dy, isDragging) {
   var game = this.game;
+  var draggingAllowed = true;
+  if (typeof game.data.camera.draggingAllowed === 'boolean') {
+    draggingAllowed = game.data.camera.draggingAllowed;
+  }
+  if (!draggingAllowed) {
+    return;
+  }
 
   // New throw is starting, cancel existing throw
   if (this.isDragging && !isDragging) {

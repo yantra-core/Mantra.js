@@ -6170,7 +6170,10 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
               game.use('Iframe');
               game.use('Select');
               game.use('Button');
-            case 9:
+              game.use('Hexapod');
+
+              // game.use('Monaco');
+            case 10:
             case "end":
               return _context.stop();
           }
@@ -6235,6 +6238,22 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       iframeControlText.createEntity();
       */
 
+      function createMonacoEditor() {
+        var codeEditor = game.getEntityByName('code-editor');
+        // Creates a Monaco Editor on top of the <code> element
+        // using the same source code and position / dimensions
+        var monacoEditor = game.make().Monaco({
+          code: codeEditor.meta.code
+        }).height(700).width(660).x(codeEditor.position.x).y(codeEditor.position.y).z(32).createEntity();
+
+        // hides the codeEditor
+        game.updateEntity(codeEditor.id, {
+          style: {
+            display: 'none'
+          }
+        });
+      }
+
       //let entities = text2Entities(text);
 
       // TODO: remove createContainer, upgrade to Container() plugin instead
@@ -6261,8 +6280,8 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           // supports CSS property names
           //padding: 0,
           margin: 0,
-          paddingLeft: -5,
-          paddingTop: -5,
+          paddingLeft: 0,
+          paddingTop: 0,
           // background: '#ff0000', // can also use Entity.color
           border: {
             color: '#000000',
@@ -6282,18 +6301,116 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       var primaryGameEmbed = game.make().Iframe({
         src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang'
       }).width(800).height(600).x(0).y(-100).createEntity();
+      var evalEmbed = game.make()
+      // .Iframe({ src: 'https://yantra.gg/mantra/examples/eval' })
+      .Iframe({
+        src: 'http://192.168.1.80:7777/eval.html'
+      }).name('eval-embed').width(800).height(600).x(primaryGameEmbed.position.x).y(primaryGameEmbed.position.y).style({
+        display: 'none'
+      }).createEntity();
+
+      // Creates a <code> element with the given source
+      // Allows for remote code sources
       var codeEditor = game.make().Code({
         //  code: 'hello <h1>'
         src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
-      }).height(700).width(660).x(800).y(-170).createEntity();
+      }).name('code-editor').pointerdown( /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(context, event) {
+          return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+            while (1) switch (_context2.prev = _context2.next) {
+              case 0:
+                if (game.systems.monaco) {
+                  _context2.next = 7;
+                  break;
+                }
+                console.log('prepromise');
+                _context2.next = 4;
+                return game.use('Monaco', {}, function () {
+                  createMonacoEditor(game);
+                });
+              case 4:
+                console.log('postpromise');
+                _context2.next = 9;
+                break;
+              case 7:
+                console.log('CCreating mo');
+                createMonacoEditor(game);
+              case 9:
+              case "end":
+                return _context2.stop();
+            }
+          }, _callee2);
+        }));
+        return function (_x2, _x3) {
+          return _ref.apply(this, arguments);
+        };
+      }()).height(700).width(660).x(800).y(-170).createEntity();
+
+      // TODO: use EntityBuilder.origin() property ( WIP )
+      var origin = {
+        // top-right origin
+        x: codeEditor.position.x - codeEditor.size.width / 2,
+        y: codeEditor.position.y + codeEditor.size.height / 2
+      };
+      origin.x += 110;
+      game.on('iframeMessage', function (event) {
+        console.log('iframeMessage', event);
+        game.flashText(event.data.message);
+      });
+      var evalRunButton = game.make().Button({
+        text: 'Run'
+      }).width(200).position(origin.x, origin.y, 32).pointerdown(function (context, event) {
+        // Get the <iframe> element reference
+        var evalEmbed = game.getEntityByName('eval-embed');
+        var graphic = evalEmbed.graphics['graphics-css'];
+        var evalIframe = graphic.querySelectorAll('iframe')[0];
+
+        // hides the primaryGameEmbed
+        game.updateEntity(evalEmbed.id, {
+          style: {
+            display: 'block'
+          }
+        });
+
+        // Get the <code> from the code editor
+        //let source = game.getEntityByName('code-editor').meta.code;
+        var source = game.systems.monaco.editor.getValue();
+        console.log('sssss', source);
+
+        // Add a one-time event listener for the iframe's load event
+        evalIframe.onload = function () {
+          // Send the code to the iframe
+          evalIframe.contentWindow.postMessage({
+            code: source
+          }, '*'); // Consider specifying the iframe's origin instead of '*'
+        };
+
+        // Reload the evalIframe from it's src to clear state
+        evalIframe.src = evalIframe.src;
+
+        // hides the primaryGameEmbed
+        game.updateEntity(primaryGameEmbed.id, {
+          meta: {
+            src: null
+          },
+          style: {
+            display: 'none'
+          }
+        });
+        primaryGameEmbed.src = null;
+      }).createEntity();
+      var player = game.make().Player();
+      player.position(evalRunButton.position.x + 50, evalRunButton.position.y, 0).z(64);
+      player.createEntity();
+      var hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
 
       // Function to create a dropdown select with given options and append it to a specified container
       function createDropdown(primaryGameEmbed, options, containerId, dropdownTitle) {
         var _categories$find;
         var optionsFormatted = options.map(function (item) {
           return {
-            label: item.title,
-            // Use the title as the option text
+            label: item.title.replace('<br/>', ''),
+            // <-- legacy examples API can remove soon
             value: exampleRoot + 'examples/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
           };
         });
@@ -6325,18 +6442,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           // Set all the other dropdowns to the first option
           //
 
-          // Remark: In order to do this through the ECS, we'd have to implement a non-bubbling update event,
-          // tests would need to be written first, this type of update action is self-ref and cascade.
-          // we also would be much better off using `onchange` event support instead of `afterUpdateEntity` for this
-          /*
-          let dropdowns = game.getEntitiesByType('SELECT');
-          dropdowns.forEach(dropdown => {
-            game.updateEntity(dropdown.id, {
-              value: ''
-            });
-          });
-          */
-
           //
           // Since the Playground is built using CSSGraphics, we can use the DOM to reset the dropdowns
           // This wouldn't be considered "best practice", however it will work fine for now until we have
@@ -6348,6 +6453,18 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
               select.value = '';
             }
           });
+
+          // Remark: In order to do this through the ECS, we'd have to implement a non-bubbling update event,
+          // tests would need to be written first, this type of update action is self-ref and cascade.
+          // we also would be much better off using `onchange` event support instead of `afterUpdateEntity` for this
+          /*
+          let dropdowns = game.getEntitiesByType('SELECT');
+          dropdowns.forEach(dropdown => {
+            game.updateEntity(dropdown.id, {
+              value: ''
+            });
+          });
+          */
 
           //
           // Updates the IFrame src to the selected example
@@ -6368,6 +6485,22 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
               src: sourceLink
             }
           });
+
+          // hides the evalEmbed
+
+          // hides the primaryGameEmbed
+          game.updateEntity(evalEmbed.id, {
+            style: {
+              display: 'none'
+            }
+          });
+
+          // show the primaryGameEmbed
+          game.updateEntity(primaryGameEmbed.id, {
+            style: {
+              display: 'block'
+            }
+          });
         });
 
         // Set style and dimensions for the dropdown
@@ -6378,12 +6511,16 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           })) === null || _categories$find === void 0 ? void 0 : _categories$find.color) || '#e0e0e0' // Use category color if available
         }).createEntity();
       }
-
-      // Iterate over categories and create a dropdown for each with its examples as options
       categories.forEach(function (category) {
-        // Filter examples that belong to the current category
+        // Filter examples based on whether 'example.category' is an array or a string
         var categoryExamples = examples.filter(function (example) {
-          return example.category === category.name;
+          if (Array.isArray(example.category)) {
+            // If 'example.category' is an array, check if it includes the current 'category.name'
+            return example.category.includes(category.name);
+          } else {
+            // If 'example.category' is a string, perform direct comparison
+            return example.category === category.name;
+          }
         });
 
         // Create a dropdown for the current category with its examples
@@ -6405,9 +6542,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       codeEmbed.createEntity();
       */
 
-      var player = game.make().Player();
-      player.position(500, 500, 0);
-      player.createEntity();
       var screenWidth = window.innerWidth;
       var screenHeight = window.innerHeight;
 

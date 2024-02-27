@@ -10,7 +10,15 @@ let categories = [
     url: 'entity.html',
     tags: ['entity', 'system', 'components', 'entities', 'objects', 'instances', 'prefabs', 'instances', 'instances', 'instances']
   },
-
+  {
+    title: 'Games',
+    name: 'games',
+    color: '#ff5722',
+    description: 'Explore examples featuring game Worlds.',
+    image: 'placeholder-image.jpg',
+    url: 'games.html',
+    tags: ['games', 'gameplay', 'game', 'worlds', 'levels', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
+  },
   {
     title: 'Physics', // purple
     name: 'physics',
@@ -187,15 +195,7 @@ let categories = [
     url: 'lifecycle.html',
     tags: ['lifecycle', 'game', 'start', 'update', 'render', 'stop', 'pause', 'resume', 'load', 'unload', 'reset', 'restart', 'hook', 'event', 'before', 'after', 'middle']
   },
-  {
-    title: 'Games',
-    name: 'games',
-    color: '#ff5722',
-    description: 'Explore examples featuring game Worlds.',
-    image: 'placeholder-image.jpg',
-    url: 'games.html',
-    tags: ['games', 'gameplay', 'game', 'worlds', 'levels', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
-  }
+
 
 ];
 

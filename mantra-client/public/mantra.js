@@ -1371,6 +1371,23 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
 
     //
+    // DOM event helpers
+    //
+  }, {
+    key: "unbindKeyboard",
+    value: function unbindKeyboard() {
+      if (game.systems['keyboard']) {}
+      game.systems['keyboard'].unbindAllEvents();
+    }
+  }, {
+    key: "bindKeyboard",
+    value: function bindKeyboard() {
+      if (game.systems['keyboard']) {
+        game.systems['keyboard'].bindInputControls();
+      }
+    }
+
+    //
     // Containers
     //
     // TODO: move to Container.js
@@ -2690,8 +2707,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "fa588108e264d01b4beebabb82d6fe28491c91398510737686fd3351a0c48d1d",
-  "./plugins/ASCIIGraphics.min.js": "24b03d9743b3d40f3b0d566b9685b0eb772bc0b32d95e2d345129d377a5532c2",
+  "./plugins/ASCIIGraphics.js": "c18007817d267bab4743af23c360be3903a18aafdedfeb1b2df840c1cc42af1a",
+  "./plugins/ASCIIGraphics.min.js": "5d4626d54387f69ed313b301bb764ff2dd2869e9a9cf6a3a72b9255aa118691d",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2716,16 +2733,16 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "9eb7210f60319c5f45537838312d537592f4a53bb6cb93d9727b0ae2bcf48249",
-  "./plugins/CSSGraphics.min.js": "98e46bdfd4129ee70d6b36cbee4a475eec239b0f65a08f0da44d3196a9ccad01",
+  "./plugins/CSSGraphics.js": "f71bd416fcc9be8fca583d6f3cf76498e22e6452a4a84d46c330a9c01f911f86",
+  "./plugins/CSSGraphics.min.js": "4356438ce3f2f884426064e657ece9c85ae7df93df936663e6cb3e95f8183e22",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
   "./plugins/Checkbox.min.js": "788db3172873ba0a5c8f6f596be2c54a55ba875d1b9759af1758ea2f2107494c",
   "./plugins/ChronoControl.js": "3d1eb99a514dc0726c3055371cf47fb32e25190a4f7c16b823792ecc7858dfa1",
   "./plugins/ChronoControl.min.js": "a9a511015708f05075041a02a32b9bcfd56e8cc73d07a5836699b0c1c2f1ae83",
-  "./plugins/Code.js": "05b8357bfa1c90ed9cf2cfdc2e6664ccb515be88b513732dce516cea8744d3d5",
-  "./plugins/Code.min.js": "2247f56bb8249e866264a12919fdfe2bbb310500fe8570744998a8935aa56683",
+  "./plugins/Code.js": "89be70a4a61b86ade143630568a5b41528674ff2dfa30c6a9609314ad3818c82",
+  "./plugins/Code.min.js": "ce764e559c8a56ee7ab9e5213ca00c3c82d7588d4443ab2dcdddfebe259b979f",
   "./plugins/Collectable.js": "a428d356c2fc2ce1a14b3badc8044e26eb65ed5a9e810c7c020f8a5483f9f46b",
   "./plugins/Collectable.min.js": "a4921133c0c33773e21409a0663245b191d79742636a39d443fafb3e0f26487c",
   "./plugins/Collisions.js": "f123f7b3154b1749306aabba1ec65bc81958d67fd926994c3e51ebfa36d63375",

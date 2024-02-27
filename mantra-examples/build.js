@@ -109,7 +109,6 @@ function generateCategoryHTML(category) {
     return categoryHTML;
 }
 
-
 function generateMainCategoriesHTML(categories) {
     let categoriesHTML = `<div class="categories">`;
 
