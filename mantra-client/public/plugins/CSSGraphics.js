@@ -1325,9 +1325,14 @@ function inflateButton(entityElement, entityData) {
   // Append the button to the entityElement
   entityElement.appendChild(button);
 
-  // Optional: Set width and color of the entityElement if provided
+  // Set width and color of the entityElement and button if provided
   if (entityData.width) {
     entityElement.style.width = "".concat(entityData.width, "px");
+    button.style.width = '100%';
+  }
+  if (entityData.height) {
+    entityElement.style.height = "".concat(entityData.height, "px");
+    button.style.height = '100%';
   }
   if (entityData.color) {
     entityElement.style.color = convertColorToHex(entityData.color);
@@ -1354,7 +1359,7 @@ function inflateButton(entityElement, entityData) {
 }
 var defaultButtonStyles = {
   border: 'none',
-  padding: '15px 32px',
+  // padding: '15px 32px',
   textAlign: 'center',
   textDecoration: 'none',
   display: 'inline-block',

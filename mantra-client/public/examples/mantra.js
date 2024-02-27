@@ -880,6 +880,10 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       this.config.repeat = count;
       return this;
     }
+
+    // TOOD: we should remove most of this, it should be in build
+    // this will result in build sometimes returning array of objects
+    // offset set / repeat / clone / etc
   }, {
     key: "createEntity",
     value: function createEntity() {
@@ -2733,8 +2737,8 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "eac4fa37e54ba26c082a824f3f1993e663867756ea46631056326f5adee7ce2c",
-  "./plugins/CSSGraphics.min.js": "bb2854421bd301b609b0428142679a2a63248d4fbba20d313840646c1070c851",
+  "./plugins/CSSGraphics.js": "609a847961ae02bf5acfb8889ac8e315be760e9ecf8f1229ca10ea34217cf408",
+  "./plugins/CSSGraphics.min.js": "8aaa2682269e6e69c672618c395039be37ce443c9b761eaa3a68e9868576bad8",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",

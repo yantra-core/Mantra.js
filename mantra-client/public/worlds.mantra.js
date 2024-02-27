@@ -6316,11 +6316,11 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       var primaryGameEmbed = game.make().Iframe({
         src: 'https://yantra.gg/mantra/examples/demo?source=games/home'
       }).width(800).height(600).x(0).y(-100).createEntity();
-      var evalEmbed = game.make()
-      // .Iframe({ src: 'https://yantra.gg/mantra/examples/eval' })
-      .Iframe({
-        src: 'http://192.168.1.80:7777/eval.html'
-      }).name('eval-embed').width(800).height(600).x(primaryGameEmbed.position.x).y(primaryGameEmbed.position.y).style({
+      var evalEmbed = game.make().Iframe({
+        src: 'https://yantra.gg/mantra/examples/eval'
+      })
+      //.Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      .name('eval-embed').width(800).height(600).x(primaryGameEmbed.position.x).y(primaryGameEmbed.position.y).style({
         display: 'none'
       }).createEntity();
 

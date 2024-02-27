@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Iframe Executor</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <script src="/mantra.js"></script>
+    <script src="/worlds.mantra.js"></script>
+    <script>
+        // Function to safely evaluate code
+        function safelyEvaluate(jsCode) {
+
+            if (!loaded) {
+                console.log('Not loaded yet');
+                // try again
+                setTimeout(() => {
+                    safelyEvaluate(jsCode);
+                }, 10);
+                return;
+            }
+            try {
+                // Evaluate the JS code
+                const result = eval(jsCode);
+                console.log('Result:', result);
+                // Optionally, send the result back to the parent
+                window.parent.postMessage({
+                    status: 'success',
+                    result: result
+                }, '*'); // Consider specifying a more restrictive target origin
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle errors, possibly sending them back to the parent
+                window.parent.postMessage({
+                    status: 'error',
+                    error: error.toString()
+                }, '*'); // Consider specifying a more restrictive target origin
+            }
+        }
+
+        let loaded = false;
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loaded = true;
+
+        })
+
+
+        // Listen for messages from the parent window
+        window.addEventListener('message', (event) => {
+            // TODO: Add more stringent checks to ensure security,
+            // such as validating the origin of the message
+            /*
+            if (event.origin !== "http://example.com") { // Replace with your origin
+                return; // Ignore messages from unknown origins for security
+            }
+            */
+            console.log('Received message from parent:', event.data);
+            // Assuming the message contains JS code in 'data.code'
+            if (event.data && event.data.code) {
+                safelyEvaluate(event.data.code);
+            }
+        });
+    </script>
+</body>
+</html>
