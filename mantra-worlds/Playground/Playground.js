@@ -1,5 +1,6 @@
-let exampleRoot = 'https://yantra.gg/mantra/';
-// exampleRoot = 'http://192.168.1.80:7777/';
+let exampleRoot = 'https://yantra.gg/mantra/examples';
+//exampleRoot = 'http://192.168.1.80:8888';
+// exampleRoot = 'http://192.168.1.80:7777/examples';
 
 export default class Playground {
   static id = 'world-playground';
@@ -174,7 +175,7 @@ export default class Playground {
     */
 
     let primaryGameEmbed = game.make()
-      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang' })
+      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/home' })
       .width(800)
       .height(600)
       .x(0)
@@ -302,7 +303,7 @@ export default class Playground {
 
       let optionsFormatted = options.map(item => ({
         label: item.title.replace('<br/>', ''), // <-- legacy examples API can remove soon
-        value: exampleRoot + 'examples/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
+        value: exampleRoot + '/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
       }));
 
       // first options is the label
@@ -483,9 +484,10 @@ export default class Playground {
     text_wheelToZoom.createEntity();
 
     let text_clickToInteract = game.make().Text().text('Click to interact');
-    text_clickToInteract.x(440);  
+    text_clickToInteract.x(220);  
     text_clickToInteract.y(220);
-    text_clickToInteract.width(600);
+    text_clickToInteract.width(170);
+    //text_clickToInteract.height(40);
     text_clickToInteract.color('white');
     text_clickToInteract.style({
       fontSize: '24px',
