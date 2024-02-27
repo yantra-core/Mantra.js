@@ -37,13 +37,26 @@ export default function inflateMonaco(entityElement, entityData) {
     game.bindKeyboard();
   });
 
+  /*
   editor.onDidFocusEditorWidget(() => {
     // Code to execute when the editor gains focus
     console.log('Editor has gained focus');
     game.data.camera.draggingAllowed = false;
     game.unbindKeyboard();
   });
-  
+  */
+  const editorDomElement = editor.getDomNode();
+
+  if (editorDomElement) {
+    editorDomElement.addEventListener('click', () => {
+      console.log('Editor was clicked');
+      game.data.camera.draggingAllowed = false;
+      game.unbindKeyboard();
+      // Any additional logic you want to execute on click
+    });
+  }
+
+  // editor.updateOptions({ mouseWheelScrollSensitivity: 0 });
 
   // After the editor is initialized, adjust its layout as needed
   // adjustEditorLayout(editor, editorElement);

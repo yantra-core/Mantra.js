@@ -52,7 +52,7 @@ export default class Playground {
     game.use('Button')
     game.use('Hexapod')
 
-    game.use('Monaco');
+    // game.use('Monaco');
 
   }
 
@@ -109,6 +109,38 @@ export default class Playground {
     // iframeControlText.container('side-text-group');
     iframeControlText.createEntity();
     */
+
+    function createMonacoEditor() {
+      let codeEditor = game.getEntityByName('code-editor');
+      // Creates a Monaco Editor on top of the <code> element
+      // using the same source code and position / dimensions
+
+      // monaco a second to get ready
+      //setTimeout(function(){
+      let monacoEditor = game.make()
+        .Monaco({
+          code: codeEditor.meta.code
+        })
+        .height(700)
+        .width(660)
+        .x(codeEditor.position.x)
+        .y(codeEditor.position.y)
+        .z(32)
+        .createEntity();
+      //}, 1000)
+
+      /*
+      // hides the codeEditor
+      game.updateEntity(codeEditor.id, {
+        style: {
+          display: 'none'
+        }
+      });
+      */
+
+
+    }
+
 
     //let entities = text2Entities(text);
 
@@ -183,21 +215,19 @@ export default class Playground {
         src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
       })
       .name('code-editor')
+      .pointerdown(async function (context, event) {
+        if (!game.systems.monaco) {
+          game.use('Monaco', {}, () => {
+            createMonacoEditor();
+          });
+        } else {
+          createMonacoEditor(game);
+        }
+      })
       .height(700)
       .width(660)
       .x(800)
       .y(-170)
-      .createEntity();
-
-    // Creates a Monaco Editor on top of the <code> element
-    // using the same source code and position / dimensions
-    let monacoEditor = game.make()
-      .Monaco()
-      .height(700)
-      .width(660)
-      .x(codeEditor.position.x)
-      .y(codeEditor.position.y)
-      .z(32)
       .createEntity();
 
 
@@ -234,8 +264,13 @@ export default class Playground {
 
         // Get the <code> from the code editor
         //let source = game.getEntityByName('code-editor').meta.code;
-        let source = game.systems.monaco.editor.getValue();
-        console.log('sssss', source)
+        let source;
+
+        if (game.systems.monaco) {
+          source = game.systems.monaco.editor.getValue();
+        } else {
+          source = game.getEntityByName('code-editor').meta.code;
+        }
 
         // Add a one-time event listener for the iframe's load event
         evalIframe.onload = function () {
@@ -360,7 +395,7 @@ export default class Playground {
             display: 'none'
           }
         });
-        
+
         // show the primaryGameEmbed
         game.updateEntity(primaryGameEmbed.id, {
           style: {
@@ -449,7 +484,11 @@ export default class Playground {
 
 
   }
+
+
+
 }
+
 
 
 function text2Entities(text) {

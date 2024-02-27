@@ -1,6 +1,6 @@
 let storeOriginalInHiddenScriptTag = false;
 let originalScriptCopyPrefix = 'mantra-code-src-';
-let usePrism = false;
+let usePrism = true;
 
 export default function inflateCode(entityElement, entityData) {
 

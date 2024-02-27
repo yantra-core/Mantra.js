@@ -249,6 +249,21 @@ class Game {
   }
 
   //
+  // DOM event helpers
+  //
+  unbindKeyboard() {
+    if (game.systems['keyboard']) {
+    }
+    game.systems['keyboard'].unbindAllEvents();
+
+  }
+  bindKeyboard() {
+    if (game.systems['keyboard']) {
+      game.systems['keyboard'].bindInputControls();
+    }
+  }
+
+  //
   // Containers
   //
   // TODO: move to Container.js
