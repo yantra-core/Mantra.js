@@ -52,8 +52,6 @@ export default class Playground {
     game.use('Button')
     game.use('Hexapod')
 
-    // game.use('Monaco');
-
   }
 
   createWorld() {
@@ -69,7 +67,7 @@ export default class Playground {
     });
     text.color('white');
     text.width(900);
-    text.position(85, -500, 0);
+    text.position(50, -480, 0);
     text.createEntity();
 
     let sideTextGroup = game.make().name('side-text-group').style({
@@ -77,27 +75,17 @@ export default class Playground {
       backgroundColor: 'rgba(0, 0, 0, 0)',
     }).position(-800, -400).createEntity();
 
-    let introText = game.make().Text().text('Select an example from the drop downs');
+    let introText = game.make().Text().text('Select from the drop downs');
     introText.color('white');
-    introText.position(0, 10);
+    introText.position(280, 10);
+    introText.width(200);
     introText.style({
       fontSize: '64px',
-      // textAlign: 'right', // Not working? CSS style seems applied in DOM, Text() might be better as child span element
+      textAlign: 'right', // Not working? CSS style seems applied in DOM, Text() might be better as child span element
     })
     introText.container('side-text-group');
     introText.createEntity();
-
-    // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-    let mouseControlText = game.make().Text().text('Drag to move map <br/>Wheel to Zoom <br/>Click to interact');
-    mouseControlText.position(200, 550);
-    mouseControlText.width(400);
-    mouseControlText.color('white');
-    mouseControlText.style({
-      fontSize: '32px',
-    })
-    mouseControlText.container('side-text-group');
-    mouseControlText.createEntity();
-
+ 
     /*
     let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
     iframeControlText.position(800, 490);
@@ -205,7 +193,7 @@ export default class Playground {
         display: 'none'
       })
       .createEntity();
-
+  
 
     // Creates a <code> element with the given source
     // Allows for remote code sources
@@ -216,6 +204,7 @@ export default class Playground {
       })
       .name('code-editor')
       .pointerdown(async function (context, event) {
+        /*
         if (!game.systems.monaco) {
           game.use('Monaco', {}, () => {
             createMonacoEditor();
@@ -223,6 +212,7 @@ export default class Playground {
         } else {
           createMonacoEditor(game);
         }
+        */
       })
       .height(700)
       .width(660)
@@ -245,7 +235,7 @@ export default class Playground {
     });
 
     let evalRunButton = game.make()
-      .Button({ text: 'Run' })
+      .Button({ text: 'Run Code' })
       .width(200)
       .position(origin.x, origin.y, 32)
       .pointerdown(function (context, event) {
@@ -294,6 +284,9 @@ export default class Playground {
         });
         primaryGameEmbed.src = null;
 
+      })
+      .style({
+        display: 'none'
       })
       .createEntity();
 
@@ -467,6 +460,44 @@ export default class Playground {
 
     // Clamp the zoom level between 0.4 and 1
     zoom = Math.max(0.4, Math.min(zoom, 1));
+
+
+    let text_dragToMoveMap = game.make().Text().text('Drag to move map');
+    text_dragToMoveMap.x(200);
+    text_dragToMoveMap.y(220);
+    text_dragToMoveMap.width(600);
+    text_dragToMoveMap.color('white');
+    text_dragToMoveMap.style({
+      fontSize: '24px',
+    })
+    text_dragToMoveMap.createEntity();
+
+    let text_wheelToZoom = game.make().Text().text('Wheel to Zoom');
+    text_wheelToZoom.x(0);
+    text_wheelToZoom.y(220);
+    text_wheelToZoom.width(600);
+    text_wheelToZoom.color('white');
+    text_wheelToZoom.style({
+      fontSize: '24px',
+    })
+    text_wheelToZoom.createEntity();
+
+    let text_clickToInteract = game.make().Text().text('Click to interact');
+    text_clickToInteract.x(440);  
+    text_clickToInteract.y(220);
+    text_clickToInteract.width(600);
+    text_clickToInteract.color('white');
+    text_clickToInteract.style({
+      fontSize: '24px',
+      cursor: 'pointer'
+    })
+    text_clickToInteract.pointerdown(function(context, event) {
+
+      // game.rotate(context.id, 0.1);
+      game.shakeCamera({});
+
+    });
+    text_clickToInteract.createEntity();
 
     game.setZoom(zoom);
 
