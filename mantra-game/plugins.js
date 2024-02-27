@@ -111,9 +111,6 @@ import Select from './plugins/select/Select.js';
 import Textarea from './plugins/textarea/Textarea.js';
 import Code from './plugins/code/Code.js';
 
-import Monaco from './plugins/monaco/Monaco.js';
-
-
 // TODO: may have rename Label, since it's semi-reserved here
 //       The label behavior might just be a attach / container situation with a Text object
 import Label from './plugins/label/Label.js';
@@ -150,7 +147,7 @@ import MovementFrogger from './plugins/entity-movement/strategies/FroggerMovemen
 import MovementPacman from './plugins/entity-movement/strategies/PacManMovement.js';
 import MovementPong from './plugins/entity-movement/strategies/PongMovement.js';
 
-const plugins = {
+let plugins = {
   Behaviors,
   Sutra,
   YCraft,
@@ -188,7 +185,6 @@ const plugins = {
   Range,
   Code,
   Textarea,
-  Monaco,
   RadialMenu,
   Draggable,
   Droppable,
@@ -256,5 +252,9 @@ const plugins = {
   MovementPong,
   XState
 };
+
+
+//import Monaco from './plugins/monaco/Monaco.js';
+//plugins.Monaco = Monaco;
 
 export default plugins;
