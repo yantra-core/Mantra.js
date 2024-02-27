@@ -255,7 +255,7 @@ let plugins = {
 
 
 // This *must* be commented out for tests to pass, TODO: fix this
-import Monaco from './plugins/monaco/Monaco.js';
-plugins.Monaco = Monaco;
+// import Monaco from './plugins/monaco/Monaco.js';
+// plugins.Monaco = Monaco;
 
 export default plugins;
