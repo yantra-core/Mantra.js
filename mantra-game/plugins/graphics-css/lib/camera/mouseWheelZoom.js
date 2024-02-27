@@ -61,7 +61,7 @@ export default function cssMouseWheelZoom(event) {
 
     // Zoom settings
     const zoomSettings = {
-      intensity: 0.01, // Adjust this value to control the base zoom intensity
+      intensity: 0.03, // Adjust this value to control the base zoom intensity
       minScale: 0.0001, // Minimum scale limit
       logBase: 2        // Logarithmic base
     };

@@ -767,7 +767,7 @@ function cssMouseWheelZoom(event) {
 
   // Zoom settings
   var zoomSettings = {
-    intensity: 0.001,
+    intensity: 0.03,
     // Adjust this value to control the base zoom intensity
     minScale: 0.0001,
     // Minimum scale limit
@@ -782,7 +782,6 @@ function cssMouseWheelZoom(event) {
   // Adjust the calculation of logScaledIntensity to decrease the zoom speed
   var logScaledIntensity = zoomSettings.intensity * Math.log(scale + zoomSettings.logBase) / Math.log(zoomSettings.logBase);
   var newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
-  console.log('newScale', newScale);
 
   // Update scale
   this.zoom(newScale);

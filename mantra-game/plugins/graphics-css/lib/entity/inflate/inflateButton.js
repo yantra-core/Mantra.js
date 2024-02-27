@@ -18,9 +18,15 @@ export default function inflateButton(entityElement, entityData) {
   // Append the button to the entityElement
   entityElement.appendChild(button);
 
-  // Optional: Set width and color of the entityElement if provided
+  // Set width and color of the entityElement and button if provided
   if (entityData.width) {
     entityElement.style.width = `${entityData.width}px`;
+    button.style.width = '100%';
+  }
+
+  if (entityData.height) {
+    entityElement.style.height = `${entityData.height}px`;
+    button.style.height = '100%';
   }
 
   if (entityData.color) {
@@ -49,7 +55,7 @@ export default function inflateButton(entityElement, entityData) {
 
 const defaultButtonStyles = {
   border: 'none',
-  padding: '15px 32px',
+  // padding: '15px 32px',
   textAlign: 'center',
   textDecoration: 'none',
   display: 'inline-block',

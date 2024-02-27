@@ -2707,8 +2707,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "a5ad6087cfe1b4bf04988208f3e79502590d0df71938f5468102303de8f46df4",
-  "./plugins/ASCIIGraphics.min.js": "3487ffbf12744d3e1520a83e21043b4d64cca9e8b904f493b4f5df3774d84f88",
+  "./plugins/ASCIIGraphics.js": "72ee22905e2e18d15bb9243d8e0821991c49ecbecbb776c0094e0df871e15e33",
+  "./plugins/ASCIIGraphics.min.js": "1b2e364043ac56185f64a24c1ed649801c52a7d2d668796e4db4451ac12c70fd",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2733,8 +2733,8 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "2fd9ddd9a728f58871af72b1006a99503b56bbf1a4d42a1916735743a8956340",
-  "./plugins/CSSGraphics.min.js": "f75ad04bae30910b1994b6589006d7d4195186d24aaac77a0b72e17f42864580",
+  "./plugins/CSSGraphics.js": "eac4fa37e54ba26c082a824f3f1993e663867756ea46631056326f5adee7ce2c",
+  "./plugins/CSSGraphics.min.js": "bb2854421bd301b609b0428142679a2a63248d4fbba20d313840646c1070c851",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",

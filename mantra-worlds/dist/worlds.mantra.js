@@ -6237,6 +6237,15 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         var monacoEditor = game.make().Monaco({
           code: codeEditor.meta.code
         }).height(700).width(660).x(codeEditor.position.x).y(codeEditor.position.y).z(32).createEntity();
+
+        // restore cursor from wait to default
+        document.body.style.cursor = 'default';
+        game.updateEntity(evalRunButton.id, {
+          style: {
+            display: 'block'
+          }
+        });
+
         //}, 1000)
 
         /*
@@ -6247,6 +6256,17 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           }
         });
         */
+      }
+      function openMonaco() {
+        // set the cursor to wait
+        document.body.style.cursor = 'wait';
+        if (!game.systems.monaco) {
+          game.use('Monaco', {}, function () {
+            createMonacoEditor();
+          });
+        } else {
+          createMonacoEditor(game);
+        }
       }
 
       //let entities = text2Entities(text);
@@ -6314,6 +6334,8 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           return _regeneratorRuntime().wrap(function _callee2$(_context2) {
             while (1) switch (_context2.prev = _context2.next) {
               case 0:
+                openMonaco();
+              case 1:
               case "end":
                 return _context2.stop();
             }
@@ -6330,18 +6352,40 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         x: codeEditor.position.x - codeEditor.size.width / 2,
         y: codeEditor.position.y + codeEditor.size.height / 2
       };
-      origin.x += 110;
+      origin.x += 100;
+      origin.y += 30;
       game.on('iframeMessage', function (event) {
         console.log('iframeMessage', event);
         game.flashText(event.data.message);
       });
+      var openMonacoButton = game.make().Button({
+        text: 'Open Monaco Editor'
+      }).width(200).height(40).position(origin.x, origin.y, 33).pointerdown(function (context, event) {
+        openMonaco();
+
+        // hide this
+        game.updateEntity(openMonacoButton.id, {
+          style: {
+            display: 'none'
+          }
+        });
+      }).createEntity();
       var evalRunButton = game.make().Button({
         text: 'Run Code'
-      }).width(200).position(origin.x, origin.y, 32).pointerdown(function (context, event) {
+      }).width(200).height(40).position(origin.x, origin.y, 32).pointerdown(function (context, event) {
         // Get the <iframe> element reference
         var evalEmbed = game.getEntityByName('eval-embed');
         var graphic = evalEmbed.graphics['graphics-css'];
         var evalIframe = graphic.querySelectorAll('iframe')[0];
+
+        // sets the evalRunButton to disabled
+        /*
+        game.updateEntity(evalRunButton.id, {
+          style: {
+            display: 'none'
+          }
+        });
+        */
 
         // hides the primaryGameEmbed
         game.updateEntity(evalEmbed.id, {
@@ -6380,8 +6424,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           }
         });
         primaryGameEmbed.src = null;
-      }).style({
-        display: 'none'
       }).createEntity();
       var player = game.make().Player();
       player.position(evalRunButton.position.x + 50, evalRunButton.position.y, 0).z(64);

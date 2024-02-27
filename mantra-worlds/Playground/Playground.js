@@ -116,6 +116,17 @@ export default class Playground {
         .y(codeEditor.position.y)
         .z(32)
         .createEntity();
+
+        // restore cursor from wait to default
+        document.body.style.cursor = 'default';
+
+        game.updateEntity(evalRunButton.id, {
+          style: {
+            display: 'block'
+          }
+        });
+
+
       //}, 1000)
 
       /*
@@ -127,6 +138,20 @@ export default class Playground {
       });
       */
 
+
+    }
+
+
+    function openMonaco () {
+      // set the cursor to wait
+      document.body.style.cursor = 'wait';
+      if (!game.systems.monaco) {
+        game.use('Monaco', {}, () => {
+          createMonacoEditor();
+        });
+      } else {
+        createMonacoEditor(game);
+      }
 
     }
 
@@ -195,7 +220,6 @@ export default class Playground {
       })
       .createEntity();
   
-
     // Creates a <code> element with the given source
     // Allows for remote code sources
     let codeEditor = game.make()
@@ -205,15 +229,7 @@ export default class Playground {
       })
       .name('code-editor')
       .pointerdown(async function (context, event) {
-        /*
-        if (!game.systems.monaco) {
-          game.use('Monaco', {}, () => {
-            createMonacoEditor();
-          });
-        } else {
-          createMonacoEditor(game);
-        }
-        */
+        openMonaco();
       })
       .height(700)
       .width(660)
@@ -228,16 +244,36 @@ export default class Playground {
       y: codeEditor.position.y + codeEditor.size.height / 2
     };
 
-    origin.x += 110;
+    origin.x += 100;
+    origin.y += 30;
 
     game.on('iframeMessage', function (event) {
       console.log('iframeMessage', event)
       game.flashText(event.data.message)
     });
 
+    let openMonacoButton = game.make()
+      .Button({ text: 'Open Monaco Editor' })
+      .width(200)
+      .height(40)
+      .position(origin.x, origin.y, 33)
+      .pointerdown(function (context, event) {
+        openMonaco();
+
+        // hide this
+        game.updateEntity(openMonacoButton.id, {
+          style: {
+            display: 'none'
+          }
+        });
+
+      })
+      .createEntity();
+
     let evalRunButton = game.make()
       .Button({ text: 'Run Code' })
       .width(200)
+      .height(40)
       .position(origin.x, origin.y, 32)
       .pointerdown(function (context, event) {
 
@@ -245,6 +281,16 @@ export default class Playground {
         let evalEmbed = game.getEntityByName('eval-embed');
         let graphic = evalEmbed.graphics['graphics-css'];
         let evalIframe = graphic.querySelectorAll('iframe')[0];
+
+
+        // sets the evalRunButton to disabled
+        /*
+        game.updateEntity(evalRunButton.id, {
+          style: {
+            display: 'none'
+          }
+        });
+        */
 
         // hides the primaryGameEmbed
         game.updateEntity(evalEmbed.id, {
@@ -285,9 +331,6 @@ export default class Playground {
         });
         primaryGameEmbed.src = null;
 
-      })
-      .style({
-        display: 'none'
       })
       .createEntity();
 
