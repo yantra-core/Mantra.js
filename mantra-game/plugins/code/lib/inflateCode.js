@@ -4,9 +4,10 @@ let usePrism = true;
 
 export default function inflateCode(entityElement, entityData) {
 
+  let game = this.game;
   let graphic = entityData.graphics && entityData.graphics['graphics-css'];
 
-  let pre, code
+  let pre, code;
 
   if (graphic) {
     // graphic is top level DOM, all other elements are children

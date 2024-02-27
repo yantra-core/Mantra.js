@@ -86,7 +86,7 @@ export default class Playground {
     })
     introText.container('side-text-group');
     introText.createEntity();
- 
+
     /*
     let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
     iframeControlText.position(800, 490);
@@ -105,7 +105,6 @@ export default class Playground {
       // using the same source code and position / dimensions
 
       // monaco a second to get ready
-      //setTimeout(function(){
       let monacoEditor = game.make()
         .Monaco({
           code: codeEditor.meta.code
@@ -117,17 +116,14 @@ export default class Playground {
         .z(32)
         .createEntity();
 
-        // restore cursor from wait to default
-        document.body.style.cursor = 'default';
+      // restore cursor from wait to default
+      document.body.style.cursor = 'default';
 
-        game.updateEntity(evalRunButton.id, {
-          style: {
-            display: 'block'
-          }
-        });
-
-
-      //}, 1000)
+      game.updateEntity(evalRunButton.id, {
+        style: {
+          display: 'block'
+        }
+      });
 
       /*
       // hides the codeEditor
@@ -138,16 +134,22 @@ export default class Playground {
       });
       */
 
-
     }
 
-
-    function openMonaco () {
+    function openMonaco() {
       // set the cursor to wait
       document.body.style.cursor = 'wait';
+
+      // hide the open monaco button
+      game.updateEntity(openMonacoButton.id, {
+        style: {
+          display: 'none'
+        }
+      });
+
       if (!game.systems.monaco) {
         game.use('Monaco', {}, () => {
-          createMonacoEditor();
+          createMonacoEditor(game);
         });
       } else {
         createMonacoEditor(game);
@@ -200,7 +202,7 @@ export default class Playground {
     */
 
     let primaryGameEmbed = game.make()
-      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/home' })
+      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/gravity-gardens' })
       .width(800)
       .height(600)
       .x(0)
@@ -208,8 +210,8 @@ export default class Playground {
       .createEntity();
 
     let evalEmbed = game.make()
-      // .Iframe({ src: 'https://yantra.gg/mantra/examples/eval' })
-      .Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      .Iframe({ src: 'https://yantra.gg/mantra/eval' })
+      //.Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
       .name('eval-embed')
       .width(800)
       .height(600)
@@ -219,7 +221,7 @@ export default class Playground {
         display: 'none'
       })
       .createEntity();
-  
+
     // Creates a <code> element with the given source
     // Allows for remote code sources
     let codeEditor = game.make()
@@ -259,14 +261,6 @@ export default class Playground {
       .position(origin.x, origin.y, 33)
       .pointerdown(function (context, event) {
         openMonaco();
-
-        // hide this
-        game.updateEntity(openMonacoButton.id, {
-          style: {
-            display: 'none'
-          }
-        });
-
       })
       .createEntity();
 
@@ -336,7 +330,7 @@ export default class Playground {
 
 
     let player = game.make().Player();
-    player.position(evalRunButton.position.x + 50, evalRunButton.position.y, 0).z(64);
+    player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 15, 0).z(64);
     player.createEntity();
 
     let hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
@@ -527,7 +521,7 @@ export default class Playground {
     text_wheelToZoom.createEntity();
 
     let text_clickToInteract = game.make().Text().text('Click to interact');
-    text_clickToInteract.x(220);  
+    text_clickToInteract.x(220);
     text_clickToInteract.y(220);
     text_clickToInteract.width(170);
     //text_clickToInteract.height(40);
@@ -536,7 +530,7 @@ export default class Playground {
       fontSize: '24px',
       cursor: 'pointer'
     })
-    text_clickToInteract.pointerdown(function(context, event) {
+    text_clickToInteract.pointerdown(function (context, event) {
 
       // game.rotate(context.id, 0.1);
       game.shakeCamera({});

@@ -29,6 +29,5 @@ export default function inflateText(entityElement, entityData) {
     }
     entityElement.style.color = hexColor;
   }
-  console.log(entityElement)
   return entityElement;
 }

@@ -8,12 +8,25 @@ import '../../../vendor/monaco-editor/esm/vs/basic-languages/javascript/javascri
 //import 'monaco-editor/esm/vs/editor/standalone/browser/themes/vs-dark.js';
 
 export default function inflateMonaco(entityElement, entityData) {
-  if (!this.game.systems.monaco) {
+
+  let game = this.game;
+
+  if (!game.systems.monaco) {
     console.error('Monaco Editor system is not available.');
     return entityElement;
   }
 
+  // ensure entityElement is correct size and visible
+  entityElement.style.width = entityData.size.width + 'px';
+  entityElement.style.height = entityData.size.height + 'px';
+  entityElement.style.display = 'block';
+
   let editorElement = document.createElement('div');
+
+  editorElement.style.width = entityData.size.width + 'px';
+  editorElement.style.height = entityData.size.height + 'px';
+  editorElement.style.display = 'block';
+
   // Temporarily set a reasonable default size or use specific dimensions as needed
   entityElement.appendChild(editorElement);
 
@@ -29,6 +42,19 @@ export default function inflateMonaco(entityElement, entityData) {
 
   // Store the editor instance in the entityData for future reference or manipulation
   entityData.meta.editorInstance = editor;
+
+  /* Optionally we could listen for resizes and adjust ( if needed )
+   // ResizeObserver to watch for size changes and adjust layout
+   const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+      const { width, height } = entry.contentRect;
+      console.log('Resizing Monaco Editor to: ', width, height);
+      editor.layout({ width, height });
+    }
+   });
+   // Start observing the entityElement for size changes
+   resizeObserver.observe(entityElement);
+  */
 
   editor.onDidBlurEditorWidget(() => {
     // Code to execute when the editor loses focus
@@ -60,6 +86,7 @@ export default function inflateMonaco(entityElement, entityData) {
 
   // After the editor is initialized, adjust its layout as needed
   // adjustEditorLayout(editor, editorElement);
+
   editor.layout({ width: entityData.size.width, height: entityData.size.height });
   // Return the updated entity element with the Monaco Editor integrated
   return entityElement;

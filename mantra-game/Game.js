@@ -252,14 +252,13 @@ class Game {
   // DOM event helpers
   //
   unbindKeyboard() {
-    if (game.systems['keyboard']) {
+    if (this.systems['keyboard']) {
+      this.systems['keyboard'].unbindAllEvents();
     }
-    game.systems['keyboard'].unbindAllEvents();
-
   }
   bindKeyboard() {
-    if (game.systems['keyboard']) {
-      game.systems['keyboard'].bindInputControls();
+    if (this.systems['keyboard']) {
+      this.systems['keyboard'].bindInputControls();
     }
   }
 

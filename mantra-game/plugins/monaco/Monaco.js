@@ -16,8 +16,8 @@ export default class Monaco {
       borderRadius: '5px'
       // Add more default styling as needed
     };
-
     this.inflate = inflateMonaco.bind(this);
+
   }
 
   init(game) {
