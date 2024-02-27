@@ -57,25 +57,26 @@ export default function cssMouseWheelZoom(event) {
       return false;
     }
   */
+    let scale = game.data.camera.currentZoom;
 
-  let scale = game.data.camera.currentZoom;
-
-  // Zoom settings
-  const zoomSettings = {
-    intensity: 0.1, // Base zoom intensity
-    minScale: 0.1,   // Minimum scale limit
-    logBase: 2       // Logarithmic base
-  };
-
-  // Determine zoom direction
-  const delta = event.wheelDelta ? event.wheelDelta : -event.detail;
-  const direction = delta > 0 ? 1 : -1;
-
-  // Applying logarithmic scale for smooth zoom
-  let logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
-  const newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
-
-  // Update scale
-  this.zoom(newScale);
+    // Zoom settings
+    const zoomSettings = {
+      intensity: 0.01, // Adjust this value to control the base zoom intensity
+      minScale: 0.0001, // Minimum scale limit
+      logBase: 2        // Logarithmic base
+    };
+    
+    // Determine zoom direction
+    const delta = event.wheelDelta ? event.wheelDelta : -event.detail;
+    const direction = delta > 0 ? 1 : -1;
+    
+    // Applying logarithmic scale for smooth zoom
+    // Adjust the calculation of logScaledIntensity to decrease the zoom speed
+    let logScaledIntensity = zoomSettings.intensity * Math.log(scale + zoomSettings.logBase) / Math.log(zoomSettings.logBase);
+    let newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
+    
+    // Update scale
+    this.zoom(newScale);
+    
   return false;
 }

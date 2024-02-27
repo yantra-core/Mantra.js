@@ -6123,7 +6123,8 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var exampleRoot = 'https://yantra.gg/mantra/';
-// exampleRoot = 'http://192.168.1.80:7777/';
+//exampleRoot = 'http://192.168.1.80:8888';
+// exampleRoot = 'http://192.168.1.80:7777/examples';
 var Playground = exports["default"] = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Playground() {
@@ -6171,8 +6172,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
               game.use('Select');
               game.use('Button');
               game.use('Hexapod');
-
-              // game.use('Monaco');
             case 10:
             case "end":
               return _context.stop();
@@ -6199,32 +6198,22 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       });
       text.color('white');
       text.width(900);
-      text.position(85, -500, 0);
+      text.position(50, -480, 0);
       text.createEntity();
       var sideTextGroup = game.make().name('side-text-group').style({
         border: 'none',
         backgroundColor: 'rgba(0, 0, 0, 0)'
       }).position(-800, -400).createEntity();
-      var introText = game.make().Text().text('Select an example from the drop downs');
+      var introText = game.make().Text().text('Select from the drop downs');
       introText.color('white');
-      introText.position(0, 10);
+      introText.position(280, 10);
+      introText.width(200);
       introText.style({
-        fontSize: '64px'
-        // textAlign: 'right', // Not working? CSS style seems applied in DOM, Text() might be better as child span element
+        fontSize: '64px',
+        textAlign: 'right' // Not working? CSS style seems applied in DOM, Text() might be better as child span element
       });
       introText.container('side-text-group');
       introText.createEntity();
-
-      // TODO: conditional text based on device and mouse controls, mac , windows, iphone
-      var mouseControlText = game.make().Text().text('Drag to move map <br/>Wheel to Zoom <br/>Click to interact');
-      mouseControlText.position(200, 550);
-      mouseControlText.width(400);
-      mouseControlText.color('white');
-      mouseControlText.style({
-        fontSize: '32px'
-      });
-      mouseControlText.container('side-text-group');
-      mouseControlText.createEntity();
 
       /*
       let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
@@ -6242,16 +6231,22 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         var codeEditor = game.getEntityByName('code-editor');
         // Creates a Monaco Editor on top of the <code> element
         // using the same source code and position / dimensions
+
+        // monaco a second to get ready
+        //setTimeout(function(){
         var monacoEditor = game.make().Monaco({
           code: codeEditor.meta.code
         }).height(700).width(660).x(codeEditor.position.x).y(codeEditor.position.y).z(32).createEntity();
+        //}, 1000)
 
+        /*
         // hides the codeEditor
         game.updateEntity(codeEditor.id, {
           style: {
             display: 'none'
           }
         });
+        */
       }
 
       //let entities = text2Entities(text);
@@ -6299,7 +6294,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       */
 
       var primaryGameEmbed = game.make().Iframe({
-        src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang'
+        src: 'https://yantra.gg/mantra/examples/demo?source=games/home'
       }).width(800).height(600).x(0).y(-100).createEntity();
       var evalEmbed = game.make()
       // .Iframe({ src: 'https://yantra.gg/mantra/examples/eval' })
@@ -6319,23 +6314,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           return _regeneratorRuntime().wrap(function _callee2$(_context2) {
             while (1) switch (_context2.prev = _context2.next) {
               case 0:
-                if (game.systems.monaco) {
-                  _context2.next = 7;
-                  break;
-                }
-                console.log('prepromise');
-                _context2.next = 4;
-                return game.use('Monaco', {}, function () {
-                  createMonacoEditor(game);
-                });
-              case 4:
-                console.log('postpromise');
-                _context2.next = 9;
-                break;
-              case 7:
-                console.log('CCreating mo');
-                createMonacoEditor(game);
-              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -6358,7 +6336,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         game.flashText(event.data.message);
       });
       var evalRunButton = game.make().Button({
-        text: 'Run'
+        text: 'Run Code'
       }).width(200).position(origin.x, origin.y, 32).pointerdown(function (context, event) {
         // Get the <iframe> element reference
         var evalEmbed = game.getEntityByName('eval-embed');
@@ -6374,8 +6352,12 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
 
         // Get the <code> from the code editor
         //let source = game.getEntityByName('code-editor').meta.code;
-        var source = game.systems.monaco.editor.getValue();
-        console.log('sssss', source);
+        var source;
+        if (game.systems.monaco) {
+          source = game.systems.monaco.editor.getValue();
+        } else {
+          source = game.getEntityByName('code-editor').meta.code;
+        }
 
         // Add a one-time event listener for the iframe's load event
         evalIframe.onload = function () {
@@ -6398,6 +6380,8 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           }
         });
         primaryGameEmbed.src = null;
+      }).style({
+        display: 'none'
       }).createEntity();
       var player = game.make().Player();
       player.position(evalRunButton.position.x + 50, evalRunButton.position.y, 0).z(64);
@@ -6411,7 +6395,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           return {
             label: item.title.replace('<br/>', ''),
             // <-- legacy examples API can remove soon
-            value: exampleRoot + 'examples/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
+            value: exampleRoot + '/demo.html?source=' + item.url.replace('.html', '') // Concatenate the root path with the example URL
           };
         });
 
@@ -6562,6 +6546,39 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
 
       // Clamp the zoom level between 0.4 and 1
       zoom = Math.max(0.4, Math.min(zoom, 1));
+      var text_dragToMoveMap = game.make().Text().text('Drag to move map');
+      text_dragToMoveMap.x(200);
+      text_dragToMoveMap.y(220);
+      text_dragToMoveMap.width(600);
+      text_dragToMoveMap.color('white');
+      text_dragToMoveMap.style({
+        fontSize: '24px'
+      });
+      text_dragToMoveMap.createEntity();
+      var text_wheelToZoom = game.make().Text().text('Wheel to Zoom');
+      text_wheelToZoom.x(0);
+      text_wheelToZoom.y(220);
+      text_wheelToZoom.width(600);
+      text_wheelToZoom.color('white');
+      text_wheelToZoom.style({
+        fontSize: '24px'
+      });
+      text_wheelToZoom.createEntity();
+      var text_clickToInteract = game.make().Text().text('Click to interact');
+      text_clickToInteract.x(220);
+      text_clickToInteract.y(220);
+      text_clickToInteract.width(170);
+      //text_clickToInteract.height(40);
+      text_clickToInteract.color('white');
+      text_clickToInteract.style({
+        fontSize: '24px',
+        cursor: 'pointer'
+      });
+      text_clickToInteract.pointerdown(function (context, event) {
+        // game.rotate(context.id, 0.1);
+        game.shakeCamera({});
+      });
+      text_clickToInteract.createEntity();
       game.setZoom(zoom);
 
       // TODO code responsive layout for mobile

@@ -84,13 +84,13 @@ let categories = [
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
   {
-    title: 'NPCs', // deep orange
-    name: 'npc',
-    color: '#ff5722',
-    description: 'Non-Player Characters.',
-    image: 'placeholder-image.jpg',
-    url: 'npc.html',
-    tags: ['npc', 'characters', 'enemies', 'allies', 'monsters', 'creatures', 'beasts', 'animals', 'mobs', 'villagers', 'townsfolk']
+    "title": "Terrains",
+    name: "terrain",
+    "color": "#4caf50", // green
+    "description": "Procedurally generate Mazes, Biomes, Terrains.",
+    "image": "placeholder-image.jpg",
+    "url": "terrain.html",
+    "tags": ["terrain", "biomes", "mazes", "labyrinths", "environments", "worlds", "landscapes", "scenery", "backgrounds", "landmarks", "geography"]
   },
 
   {
@@ -131,13 +131,13 @@ let categories = [
     "tags": ["tilemaps", "maps", "levels", "worlds", "environments", "terrain", "landscapes", "scenery", "backgrounds", "landmarks", "geography"]
   },
   {
-    "title": "Terrains",
-    name: "terrain",
-    "color": "#4caf50", // green
-    "description": "Procedurally generate Mazes, Biomes, Terrains.",
-    "image": "placeholder-image.jpg",
-    "url": "terrain.html",
-    "tags": ["terrain", "biomes", "mazes", "labyrinths", "environments", "worlds", "landscapes", "scenery", "backgrounds", "landmarks", "geography"]
+    title: 'NPCs', // deep orange
+    name: 'npc',
+    color: '#ff5722',
+    description: 'Non-Player Characters.',
+    image: 'placeholder-image.jpg',
+    url: 'npc.html',
+    tags: ['npc', 'characters', 'enemies', 'allies', 'monsters', 'creatures', 'beasts', 'animals', 'mobs', 'villagers', 'townsfolk']
   },
   {
     title: 'Game Config', // blue grey
@@ -177,6 +177,7 @@ let categories = [
     "url": "assets.html",
     "tags": ["assets", "management", "loading", "unloading", "resources", "optimization", "storage", "caching", "streaming"]
   },
+  /*
   {
     title: 'Containers', // Lime
     name: 'containers',
@@ -186,6 +187,7 @@ let categories = [
     url: 'containers.html',
     tags: ['containers', 'groups', 'layouts', 'arrangements', 'compositions', 'assemblies', 'collections', 'assemblages', 'aggregations']
   },
+  */
   {
     title: 'Game Lifecycle', // Pink A200
     name: 'lifecycle',

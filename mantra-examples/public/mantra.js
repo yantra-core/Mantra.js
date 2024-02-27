@@ -2707,8 +2707,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "c18007817d267bab4743af23c360be3903a18aafdedfeb1b2df840c1cc42af1a",
-  "./plugins/ASCIIGraphics.min.js": "5d4626d54387f69ed313b301bb764ff2dd2869e9a9cf6a3a72b9255aa118691d",
+  "./plugins/ASCIIGraphics.js": "a5ad6087cfe1b4bf04988208f3e79502590d0df71938f5468102303de8f46df4",
+  "./plugins/ASCIIGraphics.min.js": "3487ffbf12744d3e1520a83e21043b4d64cca9e8b904f493b4f5df3774d84f88",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2733,8 +2733,8 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "f71bd416fcc9be8fca583d6f3cf76498e22e6452a4a84d46c330a9c01f911f86",
-  "./plugins/CSSGraphics.min.js": "4356438ce3f2f884426064e657ece9c85ae7df93df936663e6cb3e95f8183e22",
+  "./plugins/CSSGraphics.js": "2fd9ddd9a728f58871af72b1006a99503b56bbf1a4d42a1916735743a8956340",
+  "./plugins/CSSGraphics.min.js": "f75ad04bae30910b1994b6589006d7d4195186d24aaac77a0b72e17f42864580",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
@@ -2883,6 +2883,7 @@ var _default = exports["default"] = {
   "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
   "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
+  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
   "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
   "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
   "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",

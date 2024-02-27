@@ -763,14 +763,13 @@ function cssMouseWheelZoom(event) {
       return false;
     }
   */
-
   var scale = game.data.camera.currentZoom;
 
   // Zoom settings
   var zoomSettings = {
-    intensity: 0.1,
-    // Base zoom intensity
-    minScale: 0.1,
+    intensity: 0.001,
+    // Adjust this value to control the base zoom intensity
+    minScale: 0.0001,
     // Minimum scale limit
     logBase: 2 // Logarithmic base
   };
@@ -780,8 +779,10 @@ function cssMouseWheelZoom(event) {
   var direction = delta > 0 ? 1 : -1;
 
   // Applying logarithmic scale for smooth zoom
-  var logScaledIntensity = zoomSettings.intensity * Math.log(scale + 1) / Math.log(zoomSettings.logBase);
+  // Adjust the calculation of logScaledIntensity to decrease the zoom speed
+  var logScaledIntensity = zoomSettings.intensity * Math.log(scale + zoomSettings.logBase) / Math.log(zoomSettings.logBase);
   var newScale = Math.max(zoomSettings.minScale, scale + direction * logScaledIntensity);
+  console.log('newScale', newScale);
 
   // Update scale
   this.zoom(newScale);

@@ -38,6 +38,9 @@ function applyIframeStyles(iframe, entityData) {
   const hoverBorderStyle = "2px solid #fff"; // Border color for hover state
   const hoverBoxShadowStyle = "0 0 15px 5px rgba(0, 150, 255, 0.7)"; // Glowing effect for hover state
 
+  // TODO: removed pointer events so mouse zoom works over game until click
+  // iframe.style.pointerEvents = 'none';
+
   // Add event listeners to change styles on hover
   iframe.addEventListener('mouseenter', () => {
     iframe.style.border = hoverBorderStyle;
