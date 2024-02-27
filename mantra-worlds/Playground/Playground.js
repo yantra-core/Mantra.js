@@ -16,7 +16,7 @@ export default class Playground {
     this.game = game;
     game.config.defaultMouseMovement = false;
 
-    
+
     // Movements with right click, switch default left-click-to-move behavior
     game.config.mouseMovementButton = 'RIGHT';
     // Actions with left click
@@ -36,7 +36,6 @@ export default class Playground {
     // enables mouse wheel zoom
     game.data.camera.mouseWheelZoomEnabled = true;
 
-
     this.createWorld();
   }
 
@@ -51,6 +50,9 @@ export default class Playground {
     game.use('Iframe');
     game.use('Select');
     game.use('Button')
+    game.use('Hexapod')
+
+    game.use('Monaco');
 
   }
 
@@ -159,15 +161,113 @@ export default class Playground {
       .y(-100)
       .createEntity();
 
-    let codeEditor = game.make().Code({
-      //  code: 'hello <h1>'
-      src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
-    })
-    .height(700)
-    .width(660)
-    .x(800)
-    .y(-170)
-    .createEntity();
+    let evalEmbed = game.make()
+      // .Iframe({ src: 'https://yantra.gg/mantra/examples/eval' })
+      .Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      .name('eval-embed')
+      .width(800)
+      .height(600)
+      .x(primaryGameEmbed.position.x)
+      .y(primaryGameEmbed.position.y)
+      .style({
+        display: 'none'
+      })
+      .createEntity();
+
+
+    // Creates a <code> element with the given source
+    // Allows for remote code sources
+    let codeEditor = game.make()
+      .Code({
+        //  code: 'hello <h1>'
+        src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+      })
+      .name('code-editor')
+      .height(700)
+      .width(660)
+      .x(800)
+      .y(-170)
+      .createEntity();
+
+    // Creates a Monaco Editor on top of the <code> element
+    // using the same source code and position / dimensions
+    let monacoEditor = game.make()
+      .Monaco()
+      .height(700)
+      .width(660)
+      .x(codeEditor.position.x)
+      .y(codeEditor.position.y)
+      .z(32)
+      .createEntity();
+
+
+    // TODO: use EntityBuilder.origin() property ( WIP )
+    let origin = {     // top-right origin
+      x: codeEditor.position.x - codeEditor.size.width / 2,
+      y: codeEditor.position.y + codeEditor.size.height / 2
+    };
+
+    origin.x += 110;
+
+    game.on('iframeMessage', function (event) {
+      console.log('iframeMessage', event)
+      game.flashText(event.data.message)
+    });
+
+    let evalRunButton = game.make()
+      .Button({ text: 'Run' })
+      .width(200)
+      .position(origin.x, origin.y, 32)
+      .pointerdown(function (context, event) {
+
+        // Get the <iframe> element reference
+        let evalEmbed = game.getEntityByName('eval-embed');
+        let graphic = evalEmbed.graphics['graphics-css'];
+        let evalIframe = graphic.querySelectorAll('iframe')[0];
+
+        // hides the primaryGameEmbed
+        game.updateEntity(evalEmbed.id, {
+          style: {
+            display: 'block'
+          }
+        });
+
+        // Get the <code> from the code editor
+        //let source = game.getEntityByName('code-editor').meta.code;
+        let source = game.systems.monaco.editor.getValue();
+        console.log('sssss', source)
+
+        // Add a one-time event listener for the iframe's load event
+        evalIframe.onload = function () {
+          // Send the code to the iframe
+          evalIframe.contentWindow.postMessage({
+            code: source
+          }, '*'); // Consider specifying the iframe's origin instead of '*'
+        }
+
+        // Reload the evalIframe from it's src to clear state
+        evalIframe.src = evalIframe.src;
+
+        // hides the primaryGameEmbed
+        game.updateEntity(primaryGameEmbed.id, {
+          meta: {
+            src: null
+          },
+          style: {
+            display: 'none'
+          }
+        });
+        primaryGameEmbed.src = null;
+
+      })
+      .createEntity();
+
+
+    let player = game.make().Player();
+    player.position(evalRunButton.position.x + 50, evalRunButton.position.y, 0).z(64);
+    player.createEntity();
+
+    let hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
 
     // Function to create a dropdown select with given options and append it to a specified container
     function createDropdown(primaryGameEmbed, options, containerId, dropdownTitle) {
@@ -191,7 +291,7 @@ export default class Playground {
       // Function to handle after an option is selected and update the entity accordingly
       // TODO: add EntityBuilder.onchange event
       dropdownSelect.afterUpdateEntity(function (context, event) {
-  
+
         if (!context || typeof context.value === 'undefined') {
           return;
         }
@@ -251,6 +351,24 @@ export default class Playground {
             src: sourceLink
           }
         });
+
+        // hides the evalEmbed
+
+        // hides the primaryGameEmbed
+        game.updateEntity(evalEmbed.id, {
+          style: {
+            display: 'none'
+          }
+        });
+        
+        // show the primaryGameEmbed
+        game.updateEntity(primaryGameEmbed.id, {
+          style: {
+            display: 'block'
+          }
+        });
+
+
       });
 
       // Set style and dimensions for the dropdown
@@ -270,12 +388,12 @@ export default class Playground {
           return example.category === category.name;
         }
       });
-    
+
       // Create a dropdown for the current category with its examples
       createDropdown(primaryGameEmbed, categoryExamples, 'container-a', category.title); // Assume 'container-a' exists or is dynamically created for each category
     });
-    
-    
+
+
     // let addSceneButton = game.make().Button({ text: 'Load Example as Scene', disabled: true }).width(250).position(650, 500).createEntity();
     // let deployToYantraButton = game.make().Button({ text: 'Deploy to Yantra.gg' }).width(200).position(900, 500).createEntity();
     // let copyCodeButton = game.make().Button({ text: 'Copy Code' }).width(200).position(1000, 500).createEntity();
@@ -294,10 +412,6 @@ export default class Playground {
     codeEmbed.createEntity();
     */
 
-    let player = game.make().Player();
-    player.position(500, 500, 0);
-    player.createEntity();
-
     let screenWidth = window.innerWidth;
     let screenHeight = window.innerHeight;
 
@@ -306,21 +420,21 @@ export default class Playground {
     let baseWidth = game.width;
     let baseZoomWidth = 0.5;
     let zoomWidth = baseZoomWidth + (screenWidth - baseWidth) * zoomRatioWidth;
-    
+
     // Height-based zoom calculation (assuming similar ratios and base values for height)
     let zoomRatioHeight = 0.5 / game.height; // You might need to adjust this based on your game's height scaling
     let baseHeight = game.height; // Adjust this base height as per your requirements
     let baseZoomHeight = 0.5;
     let zoomHeight = baseZoomHeight + (screenHeight - baseHeight) * zoomRatioHeight;
-    
+
     // Choose the smaller zoom level to ensure content fits both width and height
     let zoom = Math.min(zoomWidth, zoomHeight);
-    
+
     // Clamp the zoom level between 0.4 and 1
     zoom = Math.max(0.4, Math.min(zoom, 1));
-    
+
     game.setZoom(zoom);
-    
+
     // TODO code responsive layout for mobile
     /*
     if (screenWidth < 400) {

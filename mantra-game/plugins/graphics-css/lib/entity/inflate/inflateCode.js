@@ -1,3 +1,5 @@
+let storeOriginalInHiddenScriptTag = false;
+let originalScriptCopyPrefix = 'mantra-code-src-';
 
 // TODO: Move this to Code.js Plugin inflate()
 export default function inflateCode(entityElement, entityData) {
@@ -46,6 +48,34 @@ export default function inflateCode(entityElement, entityData) {
             let html = Prism.highlight(content, Prism.languages.javascript, 'javascript');
             el.innerHTML = html;
           });
+
+          //
+          // Will save the original source code in a hidden script tag,
+          // useful for debugging, could be used if others required such functionality
+          if (storeOriginalInHiddenScriptTag) {
+            let name = 'shared';
+            let domId = originalScriptCopyPrefix + name;
+
+            if (typeof entityData.name !== 'undefined') {
+              domId = entityData.name;
+            }
+
+            // check if exists
+            let script = document.getElementById(domId);
+
+            // if not create
+            if (!script) {
+              script = document.createElement('script');
+              script.id = domId;
+              script.type = 'text/plain';
+              document.body.appendChild(script);
+            }
+            script.textContent = content;
+          }
+
+          // update the meta.code property on the ECS
+          // console.log('updating entity', entityData.id, { meta: { code: content } })
+          game.updateEntity(entityData.id, { meta: { code: content } })
           // Store the fetched content for future use, replacing the promise
           this.fetchSourceHandles[src] = { content };
         })
@@ -91,9 +121,14 @@ function applyCodeStyles(entityElement, pre, code, entityData) {
   // For example, setting a monospace font and a background color
   pre.style.display = 'block';
   pre.style.overflow = 'auto';
-  pre.style.padding = '5px';
+  pre.style.paddingLeft = '5px';
+  pre.style.paddingRight = '5px';
+  pre.style.margin = '0px';
   pre.style.backgroundColor = '#1E1E1E'; // Dark background for the code block
   
+  entityElement.style.padding = '0px'; // Remove padding from the entity element
+  entityElement.style.margin = '0px'; // Remove padding from the entity element
+
   code.style.fontFamily = 'monospace';
   code.style.fontSize = '14px';
   code.style.color = '#D4D4D4'; // Light color for the text for better contrast

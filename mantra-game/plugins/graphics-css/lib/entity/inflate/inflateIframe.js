@@ -2,7 +2,14 @@ export default function inflateIframe(entityElement, entityData) {
   let iframe = document.createElement('iframe');
 
   if (entityData.meta && entityData.meta.src) {
-    iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+
+    if ( entityData.meta.src === null) {
+      // clear the iframe
+      iframe.src = 'about:blank';
+      // TODO: custom about:mantra page
+    } else {
+      iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+    }
   }
 
   // Optional: Apply default and custom iframe styles
@@ -42,4 +49,11 @@ function applyIframeStyles(iframe, entityData) {
     iframe.style.border = "2px solid #999";
     iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
   });
+
+  // On any iframe message bubble the event to game.emit('iframeMessage')
+  iframe.addEventListener('message', (event) => {
+    //console.log("IFRAME GOT MESSAGE inflateIframe")
+    game.emit('iframeMessage', event);
+  });
+
 }

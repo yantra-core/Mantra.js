@@ -71,7 +71,15 @@ export default function updateGraphic(entityData) {
       let iframe = entityElement.querySelector('iframe');
       // check to see if iframe src matches entityData.meta.src
       if (iframe && iframe.src !== entityData.meta.src) {
-        iframe.src = entityData.meta.src;
+
+        if ( entityData.meta.src === null) {
+          // clear the iframe
+          iframe.src = 'about:blank';
+          // TODO: custom about:mantra page
+        } else {
+          iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
+        }
+
       }
     }
 
@@ -83,7 +91,9 @@ export default function updateGraphic(entityData) {
       if (codeElement) {
       } else {
         console.log("No code element with matching data-src found.", entityData.meta.src);
-        this.inflateCode(entityElement, entityData);
+        if (this.game.systems.code) {
+          this.game.systems.code.inflate(entityElement, entityData);
+        }
       }
 
     }

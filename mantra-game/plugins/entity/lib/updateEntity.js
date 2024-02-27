@@ -167,9 +167,14 @@ export default function updateEntity(entityDataOrId, entityData, updateOptions =
   // Meta properties
   //
   if (typeof entityData.meta !== 'undefined') {
-    // overwrite all meta ( for now )
-    // Remark: in the future we could merge instead of overwrite
-    this.game.components.meta.set(entityId, entityData.meta);
+    let merged = {};
+    let componentData = this.game.components.meta.get(entityId);
+    if (componentData) {
+      merged = { ...componentData, ...entityData.meta };
+    } else {
+      merged = entityData.meta;
+    }
+    this.game.components.meta.set(entityId, merged);
   }
 
   if (typeof entityData.score !== 'undefined' && entityData.score !== null) {

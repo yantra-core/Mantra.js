@@ -2,6 +2,17 @@
 export default function updateCameraPosition(dx, dy, isDragging) {
   let game = this.game;
 
+
+  let draggingAllowed = true;
+
+  if (typeof game.data.camera.draggingAllowed === 'boolean') {
+    draggingAllowed = game.data.camera.draggingAllowed;
+  }
+
+  if (!draggingAllowed) {
+    return;
+  }
+
   // New throw is starting, cancel existing throw
   if (this.isDragging && !isDragging) {
     this.cancelThrow();

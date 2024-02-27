@@ -111,6 +111,9 @@ import Select from './plugins/select/Select.js';
 import Textarea from './plugins/textarea/Textarea.js';
 import Code from './plugins/code/Code.js';
 
+import Monaco from './plugins/monaco/Monaco.js';
+
+
 // TODO: may have rename Label, since it's semi-reserved here
 //       The label behavior might just be a attach / container situation with a Text object
 import Label from './plugins/label/Label.js';
@@ -185,6 +188,7 @@ const plugins = {
   Range,
   Code,
   Textarea,
+  Monaco,
   RadialMenu,
   Draggable,
   Droppable,

@@ -87,7 +87,6 @@ export default function createGraphic(entityData) {
       // For RADIO entities, create a radio input
       entityElement = this.inflateRadio(entityElement, entityData);
       break;
-
     case 'IFRAME':
       // For IFRAME entities, create an iframe
       entityElement = this.inflateIframe(entityElement, entityData);
@@ -95,21 +94,27 @@ export default function createGraphic(entityData) {
     case 'CANVAS':
       // For CANVAS entities, create a canvas
       entityElement = this.inflateCanvas(entityElement, entityData);
-      break;      
+      break;
+    case 'MONACO':
+      // For CODE entities, create a code block
+      console.log('inflating monaco', entityData, this.game.systems)
+      if (this.game.systems.monaco) {
+        entityElement = this.game.systems.monaco.inflate(entityElement, entityData);
+      }
+      break;
+
 
     case 'CODE':
       // For CODE entities, create a code block
-      entityElement = this.inflateCode(entityElement, entityData);
+      if (this.game.systems.code) {
+        entityElement = this.game.systems.code.inflate(entityElement, entityData);
+      }
       break;
-
-      case 'TOOLBAR':
-        // For CANVAS entities, create a canvas
-        if (this.game.systems.toolbar) {
-          entityElement = this.game.systems.toolbar.inflate(entityElement, entityData);
-  
-        }
-        break;      
-  
+    case 'TOOLBAR':
+      if (this.game.systems.toolbar) {
+        entityElement = this.game.systems.toolbar.inflate(entityElement, entityData);
+      }
+      break;
 
     default:
 
@@ -131,14 +136,14 @@ export default function createGraphic(entityData) {
     entityElement.style.borderRadius = '50%';  // This will make the div a circle
     // ensure background image will fit / cover expand
     // entityElement.style.backgroundSize = `${entityData.radius}px ${entityData.radius}px`;
-    
+
   }
 
   if (typeof entityData.color !== 'undefined' && entityData.color !== null) {
     // entityData.color is int number here we need a hex
     let hexColor = '#' + entityData.color.toString(16);
     // update the background color
-    let randomHexColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+    let randomHexColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
     // console.log("SETTING BG COLOR", entityData.color, hexColor)
     // entityElement.style.background = randomHexColor;
   }

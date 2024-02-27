@@ -17,7 +17,7 @@ export default function cssMouseWheelZoom(event) {
 
   let mouse = this.game.systems.mouse;
   let target = event.target;
-  let defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE'];
+  let defaultScrollElements = ['TEXTAREA', 'PRE', 'CODE', 'BUTTON', 'INPUT'];
 
   // console.log("Event target tag:", target.tagName);
 

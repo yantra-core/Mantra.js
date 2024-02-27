@@ -22,11 +22,13 @@
     "browserify-shim": "^3.8.16",
     "esmify": "^2.1.1",
     "matter-js": "^0.19.0",
+    "monaco-editor": "^0.46.0",
     "rbush": "^3.0.1",
     "sinon": "^17.0.1",
     "tap": "^18.5.2",
     "tape": "^5.7.2",
     "three": "^0.161.0",
+    "through2": "^4.0.2",
     "uglifyify": "^5.0.2"
   },
   "dependencies": {

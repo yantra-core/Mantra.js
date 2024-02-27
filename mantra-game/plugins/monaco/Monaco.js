@@ -1,12 +1,11 @@
-// Code.js - Marak Squires 2024
-// This plugin is designed to create and manage code block entities within the game environment.
-import inflateCode from './lib/inflateCode.js';
+// Monaco.js - Extends Monaco Plugin for Monaco Editor Integration
+import inflateMonaco from './lib/inflateMonaco.js';
 
-export default class Code {
-  static id = 'code';
+export default class Monaco {
+  static id = 'monaco';
 
   constructor(config = {}) {
-    this.id = Code.id;
+    this.id = Monaco.id;
     // Set default code styling here, if needed
     this.defaultStyle = config.defaultStyle || {
       fontFamily: 'monospace',
@@ -18,12 +17,12 @@ export default class Code {
       // Add more default styling as needed
     };
 
-    this.inflate = inflateCode.bind(this);
+    this.inflate = inflateMonaco.bind(this);
   }
 
   init(game) {
     this.game = game;
-    this.game.systemsManager.addSystem('code', this);
+    this.game.systemsManager.addSystem('monaco', this);
   }
 
   build(entityData = {}) {
@@ -51,7 +50,7 @@ export default class Code {
     }
 
     return {
-      type: 'CODE',
+      type: 'MONACO',
       body: false, // Assuming 'body' is used similarly to 'textarea' for physical representation
       text: entityData.text || '', // Default code text if none provided
       position: entityData.position,
@@ -65,7 +64,7 @@ export default class Code {
       entityData.position = { x: 0, y: 0 };
     }
 
-    // Create the Code entity
+    // Create the Monaco entity
     const codeEntity = this.game.createEntity(this.build(entityData));
 
     // Additional setup for the code entity can be added here

@@ -37,6 +37,7 @@ class CSSCamera {
     this.setTransform = setTransform.bind(this);
     this.updateEntityPosition = updateEntityPosition.bind(this);
     this.cameraShake = cameraShake.bind(this);
+    this.cameraThrowEnabled = true;
 
   }
 

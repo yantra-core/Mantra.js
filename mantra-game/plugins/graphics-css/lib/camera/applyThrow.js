@@ -1,9 +1,16 @@
 // Apply the throw inertia to the camera
 export default function applyThrow() {
+
+
   if (!this.isThrowing) return;
 
+  if (!this.cameraThrowEnabled) {
+    return;
+  }
+
+
   let game = this.game;
-  const decayFactor = 0.985; // Increase closer to 1 for longer throws
+  const decayFactor = 0.555; // Increase closer to 1 for longer throws
 
   game.data.camera.offsetX += this.dragInertia.x;
   game.data.camera.offsetY += this.dragInertia.y;
