@@ -18,7 +18,7 @@
     <script src="/worlds.mantra.js"></script>
     <script>
         // Function to safely evaluate code
-        function safelyEvaluate(jsCode) {
+        async function safelyEvaluate(jsCode) {
 
             if (!loaded) {
                 console.log('Not loaded yet');
@@ -30,8 +30,9 @@
             }
             try {
                 // Evaluate the JS code
-                const result = eval(jsCode);
+                const result = await eval(jsCode);
                 console.log('Result:', result);
+                // console.log('sometimes this returns a promise', jsCode)
                 // Optionally, send the result back to the parent
                 window.parent.postMessage({
                     status: 'success',

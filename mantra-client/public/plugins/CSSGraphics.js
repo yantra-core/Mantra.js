@@ -1222,6 +1222,13 @@ function createGraphic(entityData) {
 
   // Update the position of the entity element
   this.updateEntityPosition(entityElement, entityData);
+  if (typeof entityElement.afterParentElementAppends === 'function') {
+    // give the element a moment to get into the DOM ( not great, Monaco requires this )
+    setTimeout(function () {
+      entityElement.afterParentElementAppends(entityElement, entityData);
+      delete entityElement.afterParentElementAppends;
+    }, 500);
+  }
   return entityElement;
 }
 
@@ -1775,6 +1782,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = inflateSelect;
 function inflateSelect(entityElement, entityData) {
+  var game = this.game;
   var select = document.createElement('select');
 
   // Populate the select element with options if available
@@ -1800,13 +1808,13 @@ function inflateSelect(entityElement, entityData) {
   }
 
   // Apply default and custom styles
-  applySelectStyles(entityElement, select, entityData);
+  applySelectStyles(game, entityElement, select, entityData);
 
   // Append the select element to the entityElement
   entityElement.appendChild(select);
   return entityElement;
 }
-function applySelectStyles(entityElement, select, entityData) {
+function applySelectStyles(game, entityElement, select, entityData) {
   var defaultSelectStyles = {
     padding: '10px 15px',
     fontSize: '16px',

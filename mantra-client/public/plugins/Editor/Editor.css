@@ -571,10 +571,11 @@ pre {
   top: 120px;
   left: 25vw;
   z-index: 1000;
-  width: 550px;
-  min-width: 460px;
+  width: 40vw;
+  font-size: 28px;
+  min-width: 560px;
   min-height: 200px;
-  height: 60%;
+  height: 60vh;
   resize: both;
   overflow: auto;
   position: absolute;
