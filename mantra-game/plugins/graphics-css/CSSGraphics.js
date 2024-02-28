@@ -12,7 +12,6 @@ import inflateImage from './lib/entity/inflate/inflateImage.js';
 import inflateGraphic from './lib/entity/inflateGraphic.js';
 import inflateTexture from './lib/entity/inflateTexture.js';
 
-import inflateButton from './lib/entity/inflate/inflateButton.js';
 import inflateCheckbox from './lib/entity/inflate/inflateCheckbox.js';
 import inflateInput from './lib/entity/inflate/inflateInput.js';
 import inflateIframe from './lib/entity/inflate/inflateIframe.js';
@@ -20,7 +19,6 @@ import inflateRadio from './lib/entity/inflate/inflateRadio.js';
 import inflateRange from './lib/entity/inflate/inflateRange.js';
 import inflateSelect from './lib/entity/inflate/inflateSelect.js';
 import inflateTextarea from './lib/entity/inflate/inflateTextarea.js';
-// import inflateCode from './lib/entity/inflate/inflateCode.js';
 
 import updateGraphic from './lib/entity/updateGraphic.js';
 
@@ -58,18 +56,22 @@ class CSSGraphics extends GraphicsInterface {
     this.updateGraphic = updateGraphic.bind(this);
 
     // HTML DOM elements as Mantra entities
-    this.inflateButton = inflateButton.bind(this);
     this.inflateSelect = inflateSelect.bind(this);
     this.inflateRange = inflateRange.bind(this);
     this.inflateRadio = inflateRadio.bind(this);
     this.inflateInput = inflateInput.bind(this);
     this.inflateTextarea = inflateTextarea.bind(this);
-    // this.inflateCode = inflateCode.bind(this);
     this.inflateCheckbox = inflateCheckbox.bind(this);
     this.inflateImage = inflateImage.bind(this);
     //this.inflateVideo = inflateVideo.bind(this);
     this.inflateCanvas = inflateCanvas.bind(this);
     this.inflateIframe = inflateIframe.bind(this);
+
+
+    // refactored out to Plugins
+    // this.inflateCode = inflateCode.bind(this);
+    // this.inflateButton = inflateButton.bind(this);
+
 
     this.render = render.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
