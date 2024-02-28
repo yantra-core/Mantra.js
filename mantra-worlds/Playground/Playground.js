@@ -52,6 +52,7 @@ export default class Playground {
     game.use('Button')
     game.use('Hexapod')
     game.use('Image');
+    game.use('Link');
 
   }
 
@@ -67,8 +68,26 @@ export default class Playground {
     });
     text.color('white');
     text.width(900);
-    text.position(60, -480, 0);
+    text.position(50, -520, 0);
     text.createEntity();
+
+
+    let link = game.make()
+    .Link({
+      href: 'https://yantra.gg/mantra/home',
+      target: '_blank'
+    })
+    .style({
+      fontSize: '32px',
+      color: 'purple',
+    })
+    .text('/examples/games/home')
+    .width(600)
+    .height(20)
+    .x(-100)
+    .y(-440)
+    .createEntity();
+    
 
     let sideTextGroup = game.make().name('side-text-group').style({
       border: 'none',
@@ -249,9 +268,8 @@ export default class Playground {
     */
 
     let primaryGameEmbed = game.make()
-      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/gravity-gardens' })
+      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/home' })
       // .Iframe({ src: 'http://192.168.1.80:7777/examples/demo.html?source=games/gravity-gardens' })
-
       .width(800)
       .height(600)
       .x(0)
@@ -463,6 +481,7 @@ export default class Playground {
             src: context.value
           }
         });
+
         //
         // Updates the Code src to the selected example
         //
@@ -472,6 +491,18 @@ export default class Playground {
         game.updateEntity(codeEditor.id, {
           meta: {
             src: sourceLink
+          }
+        });
+
+        //
+        // Updates the Examples link to the selected example link
+        //
+        let textLink = sourceLink.replace('https://yantra.gg/mantra', '').replace('.js', '');
+        let exampleLink = sourceLink.replace('.js', '');
+        game.updateEntity(link.id, {
+          text: textLink,
+          meta: {
+            href: exampleLink
           }
         });
 
@@ -490,7 +521,6 @@ export default class Playground {
             display: 'block'
           }
         });
-
 
       });
 
@@ -606,7 +636,6 @@ export default class Playground {
       })
     }
     */
-
 
   }
 
