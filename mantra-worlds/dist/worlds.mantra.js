@@ -6333,8 +6333,8 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       // Allows for remote code sources
       var codeEditor = game.make().Code({
         //  code: 'hello <h1>'
-        // src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
-        src: 'http://192.168.1.80:8888/items/boomerang.js'
+        src: 'https://yantra.gg/mantra/examples/world/gravity-gardens.js'
+        //src: 'http://192.168.1.80:8888/items/boomerang.js'
       }).name('code-editor').pointerdown( /*#__PURE__*/function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(context, event) {
           return _regeneratorRuntime().wrap(function _callee2$(_context2) {
