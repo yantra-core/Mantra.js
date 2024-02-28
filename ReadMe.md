@@ -52,13 +52,29 @@ https://github.com/yantra-core/Mantra.js/assets/70011/ebbf0840-0bfa-4d2c-91bb-59
 
 https://yantra.gg/mantra/home
 
-#### YCraft World
+#### Gravity Gardens
 
-https://yantra.gg/mantra/ycraft
+https://yantra.gg/mantra/gravity-gardens
+
+#### Maze World
+
+https://yantra.gg/mantra/maze
+
+  - *Powered by [https://github.com/yantra-core/Labyrinthos.js](Labyrinthos.js)*
+
+#### Music World
+
+https://yantra.gg/mantra/music
+
 
 #### Platform World
 
 https://yantra.gg/mantra/platform
+
+
+#### YCraft World
+
+https://yantra.gg/mantra/ycraft
 
 
 ## Super Simple Offline First
