@@ -17,6 +17,16 @@ export default function inflateImage(entityElement, entityData) {
     }
   }
 
+  if (entityData.meta && entityData.meta.alt) {
+    element.alt = entityData.meta.alt;
+  } else {
+    element.alt = entityData.meta.src || 'Image ' + entityData.id;
+  }
+
+  if (entityData.meta && entityData.meta.title) {
+    element.title = entityData.meta.title;
+  }
+
   // Optional: Apply default and custom styles
   applyImageStyles(element, entityData);
 

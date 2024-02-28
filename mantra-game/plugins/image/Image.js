@@ -25,6 +25,7 @@ export default class Image {
     // Ensure meta is defined and contains src and alt
     entityData.meta = entityData.meta || {};
     entityData.meta.src = entityData.src || entityData.meta.src || ''; // Default src if none provided
+    entityData.meta.title = entityData.title || entityData.meta.title || ''; // Default title if none provided
     entityData.meta.alt = entityData.alt || entityData.meta.alt || ''; // Default alt if none provided
     // Return the entity configuration
     return {

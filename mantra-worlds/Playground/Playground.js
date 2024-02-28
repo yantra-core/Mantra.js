@@ -92,10 +92,11 @@ export default class Playground {
     // Remark: These images could also be buttons with textures, or ents with in-line textures
     let githubImageLink = game.make()
     .Image({
+      alt: 'Mantra.js Github',
       src: src
     })
     .pointerdown(function (context, event) {
-      // opens new link to AYYO Discord
+      // opens new link to Mantra.js Github
       event.preventDefault();
       window.open('https://github.com/yantra-core/Mantra.js', '_blank');
     })
@@ -108,6 +109,7 @@ export default class Playground {
 
     let discordImageLink = game.make()
     .Image({
+      alt: 'AYYO Discord',
       src: 'https://yantra.gg/mantra/img/game/env/discord-voice-dark.png'
     })
     .pointerdown(function (context, event) {
