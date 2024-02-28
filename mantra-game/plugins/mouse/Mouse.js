@@ -282,17 +282,17 @@ export default class Mouse {
       // TODO: set cursor to grabbing
       // document.body.style.cursor = 'grabbing';
 
-
       // If LEFT mouse button is mapped to camera drag, prevent default event for inputs and other
       // elements the user may still wish to interact with
       // Remark: We seem to have an issue preventing default on PRE and CODE elements
       // TODO: Allow prevent default on PRE and CODE elements
       // check to see if target element is interactive ( such as button / input / textarea / etc )
       if (!this.tagAllowsDefaultEvent.includes(target.tagName)) {
-        //console.log('preventing default event', target)
-        // event.preventDefault();
+        // console.log('allowing default event', target)
+        preventDefault = false;
       } else {
-        //console.log('allowing default event', target)
+        //console.log('preventing default', target)
+        // this will enable things like <a> links to work and <textarea> to gain focus
         preventDefault = true;
       }
     }
@@ -300,7 +300,8 @@ export default class Mouse {
     let context = this.createMouseContext(event);
 
     if (preventDefault) {
-      event.stopPropagation();
+      event.stopPropagation(); // This may not actually be doing what we expect? Test again
+      // event.preventDefault();
     }
 
     if (context.target && context.target.pointerdown) {

@@ -17,7 +17,7 @@ export default class Hexapod {
     }
     return {
       type: 'HEXAPOD',
-      texture: 'demon',
+      texture: 'hexapod-single',
       width: 8,
       height: 8,
       health: 50,

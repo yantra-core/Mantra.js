@@ -72,7 +72,7 @@ export default function updateGraphic(entityData) {
       // check to see if iframe src matches entityData.meta.src
       if (iframe && iframe.src !== entityData.meta.src) {
 
-        if ( entityData.meta.src === null) {
+        if (entityData.meta.src === null) {
           // clear the iframe
           iframe.src = 'about:blank';
           // TODO: custom about:mantra page
@@ -80,6 +80,29 @@ export default function updateGraphic(entityData) {
           iframe.src = entityData.meta.src || 'about:blank'; // Default src if none provided
         }
 
+      }
+    }
+
+    if (entityData.type === 'LINK') {
+      let link = entityElement.querySelector('a');
+      if (link) {
+        // Update link text only if it has changed
+        if (entityData.text && link.innerText !== entityData.text) {
+          link.innerText = entityData.text; // Use innerText for text content to prevent HTML injection
+        }
+
+        // Update link target only if it has changed
+        if (entityData.meta.target && link.target !== entityData.meta.target) {
+          link.target = entityData.meta.target;
+        }
+
+        // Update link href only if it has changed
+        if (entityData.meta.href && link.href !== entityData.meta.href) {
+          // perform a search from left to right for the first instance of a string
+          //
+          // if 
+          link.href = entityData.meta.href;
+        }
       }
     }
 
