@@ -1,6 +1,8 @@
 <h4 align="center">
 
-![mantra-logo-smol](https://github.com/yantra-core/Mantra.js/assets/70011/3a10c09f-3d19-458a-b0c2-a8910420aee1)
+
+https://github.com/yantra-core/Mantra.js/assets/70011/65bb5294-b8ac-4e38-a7a0-7153a3a77e68
+
 
   <a href="https://yantra.gg/mantra">Live Demos</a> •
   <a href="https://yantra.gg/mantra/examples">Examples Gallery</a> •
@@ -34,9 +36,12 @@ The best way to learn about Mantra.js is to play. Visit the Home World and start
 
 ## Examples Gallery
 
+https://github.com/yantra-core/Mantra.js/assets/70011/ebbf0840-0bfa-4d2c-91bb-595685891599
+
 [https://yantra.gg/mantra](https://yantra.gg/mantra)
 
 ## 100+ Code Examples
+
 
 [https://yantra.gg/mantra/examples](https://yantra.gg/mantra/examples)
 
