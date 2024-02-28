@@ -62,12 +62,12 @@ export default class Playground {
     //game.systems.editor.init(game);
     // game.systems.editor.show();
 
-    let text = game.make().Text().text('Mantra.js Playground').style({
+    let text = game.make().Text().text('Mantra.js Alpha Playground').style({
       fontSize: '64px',
     });
     text.color('white');
     text.width(900);
-    text.position(50, -480, 0);
+    text.position(60, -480, 0);
     text.createEntity();
 
     let sideTextGroup = game.make().name('side-text-group').style({
@@ -98,7 +98,12 @@ export default class Playground {
     .pointerdown(function (context, event) {
       // opens new link to Mantra.js Github
       event.preventDefault();
-      window.open('https://github.com/yantra-core/Mantra.js', '_blank');
+      let link = 'https://github.com/yantra-core/Mantra.js';
+      if (game.isTouchDevice()) {
+       window.location = link;
+      } else {
+        window.open(link, '_blank');
+      }
     })
     .style({
       cursor: 'pointer'
@@ -113,8 +118,13 @@ export default class Playground {
       src: 'https://yantra.gg/mantra/img/game/env/discord-voice-dark.png'
     })
     .pointerdown(function (context, event) {
-      // opens new link to AYYO Discord
-      window.open('https://discord.gg/ZyNxBVmFgV', '_blank');
+      let link = 'https://discord.gg/ZyNxBVmFgV';
+      if (game.isTouchDevice()) {
+        window.location = link;
+      } else {
+        // opens new link to AYYO Discord
+        window.open(link, '_blank');
+      }
     })
     .style({
       cursor: 'pointer'

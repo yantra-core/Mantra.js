@@ -1,3 +1,5 @@
+import inflate from './lib/inflateButton.js';
+
 // Button.js - Marak Squires 2023
 export default class Button {
   static id = 'button';
@@ -11,6 +13,7 @@ export default class Button {
 
   init(game) {
     this.game = game;
+    this.inflate = inflate.bind(this);
     this.game.systemsManager.addSystem('button', this);
   }
 

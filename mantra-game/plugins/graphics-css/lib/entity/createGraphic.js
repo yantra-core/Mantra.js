@@ -57,7 +57,9 @@ export default function createGraphic(entityData) {
       break;
 
     case 'BUTTON':
-      entityElement = this.inflateButton(entityElement, entityData);
+      if (this.game.systems.button) {
+        entityElement = this.game.systems.button.inflate(entityElement, entityData);
+      }
       break;
     case 'INPUT':
       // For INPUT entities, create an input
