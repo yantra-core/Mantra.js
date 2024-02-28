@@ -51,6 +51,7 @@ export default class Playground {
     game.use('Select');
     game.use('Button')
     game.use('Hexapod')
+    game.use('Image');
 
   }
 
@@ -58,7 +59,6 @@ export default class Playground {
     let game = this.game;
     // game.make().Platform({ x: 0, y: 0, width: 16000, height: 9000 }).createEntity();
     // game.make().size(100).color('blue').createEntity();
-    console.log('ggg', game.systems)
     //game.systems.editor.init(game);
     // game.systems.editor.show();
 
@@ -85,6 +85,41 @@ export default class Playground {
     })
     introText.container('side-text-group');
     introText.createEntity();
+
+
+    let src = 'https://yantra.gg/mantra/img/game/env/github-link-256.png';
+
+    // Remark: These images could also be buttons with textures, or ents with in-line textures
+    let githubImageLink = game.make()
+    .Image({
+      src: src
+    })
+    .pointerdown(function (context, event) {
+      // opens new link to AYYO Discord
+      event.preventDefault();
+      window.open('https://github.com/yantra-core/Mantra.js', '_blank');
+    })
+    .style({
+      cursor: 'pointer'
+    })
+    .position(-700, 150)
+    .size(128)
+    .createEntity();
+
+    let discordImageLink = game.make()
+    .Image({
+      src: 'https://yantra.gg/mantra/img/game/env/discord-voice-dark.png'
+    })
+    .pointerdown(function (context, event) {
+      // opens new link to AYYO Discord
+      window.open('https://discord.gg/ZyNxBVmFgV', '_blank');
+    })
+    .style({
+      cursor: 'pointer'
+    })
+    .position(-500, 150)
+    .size(128)
+    .createEntity();
 
     /*
     let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
@@ -203,6 +238,8 @@ export default class Playground {
 
     let primaryGameEmbed = game.make()
       .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/gravity-gardens' })
+      // .Iframe({ src: 'http://192.168.1.80:7777/examples/demo.html?source=games/gravity-gardens' })
+
       .width(800)
       .height(600)
       .x(0)
@@ -211,7 +248,7 @@ export default class Playground {
 
     let evalEmbed = game.make()
       .Iframe({ src: 'https://yantra.gg/mantra/eval' })
-      // .Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      //.Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
       .name('eval-embed')
       .width(800)
       .height(600)
@@ -227,8 +264,8 @@ export default class Playground {
     let codeEditor = game.make()
       .Code({
         //  code: 'hello <h1>'
-        // src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
-        src: 'http://192.168.1.80:8888/items/boomerang.js'
+        src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+        //src: 'http://192.168.1.80:8888/items/boomerang.js'
       })
       .name('code-editor')
       .pointerdown(async function (context, event) {
@@ -249,7 +286,7 @@ export default class Playground {
     };
 
     origin.x += 100;
-    origin.y += 22;
+    origin.y += 38;
 
     game.on('iframeMessage', function (event) {
       console.log('iframeMessage', event)
@@ -333,7 +370,7 @@ export default class Playground {
 
 
     let player = game.make().Player();
-    player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 22, 0).z(64);
+    player.position(evalRunButton.position.x + 60, evalRunButton.position.y + 5, 0).z(64);
     player.createEntity();
 
     let hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
@@ -369,6 +406,11 @@ export default class Playground {
         console.log('afterUpdateEntity', primaryGameEmbed, context.value, event);
 
         if (typeof primaryGameEmbed === 'undefined') {
+          return;
+        }
+
+        if (typeof context.value === 'undefined' || context.value === '' || context.value === null) {
+          // do not process invalid selections ( such as the first option which is empty )
           return;
         }
 
@@ -502,7 +544,6 @@ export default class Playground {
     // Clamp the zoom level between 0.4 and 1
     zoom = Math.max(0.4, Math.min(zoom, 1));
 
-
     let text_dragToMoveMap = game.make().Text().text('Drag to move map');
     text_dragToMoveMap.x(200);
     text_dragToMoveMap.y(220);
@@ -533,11 +574,10 @@ export default class Playground {
       fontSize: '24px',
       cursor: 'pointer'
     })
-    text_clickToInteract.pointerdown(function (context, event) {
-
+    text_clickToInteract.pointerup((context, event) => {
+      event.preventDefault();
       // game.rotate(context.id, 0.1);
-      game.shakeCamera({});
-
+      this.game.shakeCamera({});
     });
     text_clickToInteract.createEntity();
 
@@ -558,11 +598,7 @@ export default class Playground {
 
   }
 
-
-
 }
-
-
 
 function text2Entities(text) {
   let entities = [];

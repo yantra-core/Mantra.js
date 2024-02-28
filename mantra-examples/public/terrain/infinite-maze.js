@@ -45,6 +45,8 @@ game.start(function () {
 
   console.log("tileMap", tileMap)
 
-  game.systems.tile.createLayer(tileMap, 16, 16)
+  game.systems.tile.createLayer(tileMap, 16, 16);
+
+  game.setBackground('#000000');
 
 });

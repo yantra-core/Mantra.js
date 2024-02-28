@@ -1,5 +1,7 @@
 // cameraShake.js - Marak Squires 2023
 export default function cameraShake({ initialIntensity = 100, duration = 777 }) {
+
+  let game = this.game;
   let gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');

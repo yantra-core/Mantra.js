@@ -55,9 +55,19 @@ export default function inflateCode(entityElement, entityData) {
   return entityElement;
 }
 
+// Check for cached content before fetching
 function fetchSourceCode(src, codeElement, entityElement, game, entityData) {
-  if (!this.fetchSourceHandles[src]) {
-    this.fetchSourceHandles[src] = fetch(src).then(handleFetchResponse.bind(this, src, codeElement, entityElement, game, entityData)).catch(handleFetchError.bind(null, src, codeElement));
+  if (this.fetchSourceHandles[src]) {
+    const cache = this.fetchSourceHandles[src];
+    if (cache.content) {
+      updateCodeElements(src, cache.content, codeElement, entityElement, game, entityData);
+    } else if (cache.error) {
+      handleFetchError(src, codeElement, cache.error);
+    }
+  } else {
+    this.fetchSourceHandles[src] = fetch(src)
+      .then(handleFetchResponse.bind(this, src, codeElement, entityElement, game, entityData))
+      .catch(handleFetchError.bind(null, src, codeElement));
   }
   codeElement.setAttribute('data-src', src);
 }
@@ -79,16 +89,19 @@ function handleFetchError(src, codeElement, error) {
 function updateCodeElements(src, content, codeElement, entityElement, game, entityData) {
   document.querySelectorAll(`code[data-src="${src}"]`).forEach(el => {
 
-    console.log('elel', el)
-    if (window.Prism && window.Prism.Live) {
-      let textarea = updateOrCreateTextarea(el, content, entityElement);
-      if (textarea.fresh) {
-        console.log("textareatextarea", textarea)
-        new Prism.Live(textarea);
-        console.log('nnnnn')
-        attachTextareaEvents(textarea, game);
+    let textarea = updateOrCreateTextarea(el, content, entityElement);
 
+    if (usePrism) {
+     function tryPrism () {
+        if (window.Prism && window.Prism.Live) {
+          let textarea = updateOrCreateTextarea(el, content, entityElement);
+          new Prism.Live(textarea);
+          attachTextareaEvents(textarea, game);
+        } else {
+          setTimeout(tryPrism, 100);
+        }
       }
+      tryPrism();
     } else {
       el.textContent = content;
     }
@@ -119,7 +132,6 @@ function updateOrCreateTextarea(el, content, entityElement) {
 }
 
 function attachTextareaEvents(textarea, game) {
-  console.log('bind')
   textarea.addEventListener('mousedown', () => {
     game.data.camera.draggingAllowed = false;
     game.data.camera.mouseWheelZoomEnabled = false;

@@ -354,9 +354,10 @@ class Game {
   }
 
   shakeCamera(intensity, duration) {
+    let game = this;
     this.graphics.forEach(function (graphicsInterface) {
       if (graphicsInterface.cameraShake) {
-        graphicsInterface.shakeCamera(intensity, duration);
+        graphicsInterface.shakeCamera({intensity, duration});
       }
     });
   }
