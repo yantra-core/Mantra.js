@@ -3,10 +3,41 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import uglifyify from 'uglifyify';
-
+import through from 'through2';
 import pluginChecksums from './lib/Game/pluginChecksums.js';
 
-const plugins = [
+
+// Function to compare checksums and find changed plugins
+function findChangedPlugins() {
+  const changedPlugins = [];
+
+  Object.keys(pluginChecksums).forEach(pluginPath => {
+    console.log('pluginPath', pluginPath)
+    pluginPath = './lib/' + pluginPath;
+    console.log('pluginPathpluginPath', pluginPath)
+    const currentChecksum = computeChecksum(pluginPath);
+    if (currentChecksum !== pluginChecksums[pluginPath]) {
+      // Extract the plugin name from the path and add to changedPlugins array
+      const pluginName = pluginPath.split('/').pop(); // Assuming the plugin name is the last part of the path
+      changedPlugins.push(pluginName);
+    }
+  });
+
+  return changedPlugins;
+}
+
+// Function to copy CSS files
+function copyCssFiles(srcDir, destDir) {
+  fs.readdirSync(srcDir, { withFileTypes: true })
+    .filter(dirent => dirent.isFile() && /\.css$/.test(dirent.name))
+    .forEach(dirent => {
+      const srcPath = path.join(srcDir, dirent.name);
+      const destPath = path.join(destDir, dirent.name);
+      fs.copyFileSync(srcPath, destPath);
+    });
+}
+
+let plugins = [
 
   // ui components
   './plugins/button/Button.js',
@@ -23,6 +54,7 @@ const plugins = [
   './plugins/range/Range.js',
   './plugins/select/Select.js',
   './plugins/textarea/Textarea.js',
+   // './plugins/monaco/Monaco.js',
 
   './plugins/entity-movement/strategies/AsteroidsMovement.js',
   './plugins/behaviors/Behaviors.js',
@@ -110,12 +142,24 @@ const plugins = [
   './plugins/typer-ghost/GhostTyper.js',
   './plugins/midi/Midi.js',
   './plugins/tone/Tone.js',
-  './plugins/nes/Nes.js',
+  // './plugins/nes/Nes.js',
   // 'MovementPong' is the same as 'PongMovement', so it's not repeated
   // 'MovementAsteroids' is the same as 'AsteroidsMovement', so it's not repeated
   './plugins/xstate/XState.js',
   // ... add other plugins if you have more
 ];
+
+
+
+
+//const changedPlugins = findChangedPlugins();
+//console.log('Changed Plugins:', changedPlugins);
+//process.exit();
+//plugins = [];
+//plugins = ['./plugins/graphics-css/CSSGraphics.js']
+//plugins.push('./plugins/code/Code.js')
+// plugins = ['./plugins/monaco/Monaco.js']
+// plugins.push('./plugins/graphics-css/CSSGraphics.js');
 
 // Function to copy directory recursively
 function copyDirSync(src, dest) {
@@ -153,7 +197,7 @@ let checksums = {};
 
 
 // checksums
-console.log(pluginChecksums, 'pluginChecksumspluginChecksums')
+// / console.log(pluginChecksums, 'pluginChecksumspluginChecksums')
 
 // TODO: fill checksums array with checksums of all plugins as build progresses
 let checksumArray = [];
@@ -177,6 +221,21 @@ function needsRebuild(filePath, storedChecksums) {
   return !storedChecksum || currentChecksum !== storedChecksum;
 }
 
+// Function to exclude CSS files
+function excludeCssFiles(file) {
+  if (/\.css$/.test(file)) {
+    // This is a CSS file, so we're going to ignore it by ending the stream
+    return through(function(buf, enc, next) {
+      next(); // Skip the file by not calling this.push(buf)
+    });
+  } else {
+    // Not a CSS file, pass it through unchanged
+    return through(function(buf, enc, next) {
+      this.push(buf); // Pass through the file content
+      next();
+    });
+  }
+}
 plugins.forEach((plugin, index) => {
   logStep(plugin, 'Starting bundling');
 
@@ -189,7 +248,9 @@ plugins.forEach((plugin, index) => {
   if (true || needsRebuild(plugin, pluginChecksums)) {
     logStep(plugin, 'File changed or new, starting bundling');
     // Bundle for the minified version
+    
     browserify(plugin, { standalone: `PLUGINS.${fileName}` })
+      .transform(excludeCssFiles)
       .transform('babelify', { presets: ['@babel/preset-env'] })
       .transform(uglifyify) // Add uglifyify transform for minification
       .bundle()
@@ -220,6 +281,7 @@ plugins.forEach((plugin, index) => {
     // After bundling the plugin, copy its subdirectories
     const pluginDir = path.dirname(plugin);
     const destDir = `../mantra-client/public/plugins/${getFileName(plugin)}`;
+    copyCssFiles(pluginDir, destDir);
 
     fs.readdirSync(pluginDir, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory() && includeDirs.includes(dirent.name))
@@ -231,7 +293,9 @@ plugins.forEach((plugin, index) => {
 
     // Bundle for the original (non-minified) version
     browserify(plugin, { standalone: `PLUGINS.${fileName}` })
+    .transform(excludeCssFiles)
       .transform('babelify', { presets: ['@babel/preset-env'] })
+
       .bundle()
       .on('error', err => console.error(err))
       .pipe(fs.createWriteStream(outputFilePath))
@@ -248,6 +312,7 @@ plugins.forEach((plugin, index) => {
 
 
 });
+
 
 
 // once build is complete, write the checksums to a file

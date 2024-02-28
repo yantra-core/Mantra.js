@@ -4,18 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantra Home World</title>
-  <link rel="stylesheet" href="/mantra.css">
+  <title>Mantra - Client</title>
   <link rel="stylesheet" href="/prism.css">
-  <!-- <link rel="stylesheet" href="/editor.css"> -->
+  <link rel="stylesheet" href="/vendor/prism-live/style.css">
 
 </head>
 
 <body>
-  <script type="module" src="/mantra.js"></script>
-  <script type="module" src="/worlds.mantra.js"></script>
+  <script src="/vendor/prism-live/src/prism-live.js?load=javascript"></script> <!-- If not already included -->
+
+  <script type="module" src="./mantra.js"></script>
+  <script type="module" src="./worlds.mantra.js"></script>
+  <script type="module" src="./ycraft.js"></script>
   <script src="/categories.js"></script>
   <script  src="/prism.min.js" data-manual></script>
+
+
+  <!-- <script  src="/prism.min.js" data-manual></script> -->
 
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -23,7 +28,6 @@
         defaultPlayer: false,
         physics: 'matter', // enum, 'physx', 'matter
         collisions: true,
-        editor: true,
         graphics: ['css'], // array enum, 'babylon', 'css', 'three'
         camera: 'follow',
         options: {
@@ -31,16 +35,10 @@
           assetRoot: '.'
         }
       });
-
-      // game.use('Bullet');
-      game.use('Sutra');
-      game.use('Gamepad');
       game.start(function () {
         game.use(new WORLDS.worlds['Playground']());
       });
       window.game = game;
-
-
     });
   </script>
   <div id="gameHolder"></div>

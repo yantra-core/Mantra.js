@@ -6124,7 +6124,7 @@ function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" 
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var exampleRoot = 'https://yantra.gg/mantra/examples';
 //exampleRoot = 'http://192.168.1.80:8888';
-// exampleRoot = 'http://192.168.1.80:7777/examples';
+//exampleRoot = 'http://192.168.1.80:7777/examples';
 var Playground = exports["default"] = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Playground() {
@@ -6265,6 +6265,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           }
         });
         if (!game.systems.monaco) {
+          alert("LAYZ LOAD");
           game.use('Monaco', {}, function () {
             createMonacoEditor(game);
           });
@@ -6323,7 +6324,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       var evalEmbed = game.make().Iframe({
         src: 'https://yantra.gg/mantra/eval'
       })
-      //.Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      // .Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
       .name('eval-embed').width(800).height(600).x(primaryGameEmbed.position.x).y(primaryGameEmbed.position.y).style({
         display: 'none'
       }).createEntity();
@@ -6332,14 +6333,13 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       // Allows for remote code sources
       var codeEditor = game.make().Code({
         //  code: 'hello <h1>'
-        src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+        // src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+        src: 'http://192.168.1.80:8888/items/boomerang.js'
       }).name('code-editor').pointerdown( /*#__PURE__*/function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(context, event) {
           return _regeneratorRuntime().wrap(function _callee2$(_context2) {
             while (1) switch (_context2.prev = _context2.next) {
               case 0:
-                openMonaco();
-              case 1:
               case "end":
                 return _context2.stop();
             }
@@ -6348,7 +6348,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         return function (_x2, _x3) {
           return _ref.apply(this, arguments);
         };
-      }()).height(700).width(660).x(800).y(-170).createEntity();
+      }()).height(700).width(660).x(800).y(-170).z(33).createEntity();
 
       // TODO: use EntityBuilder.origin() property ( WIP )
       var origin = {
@@ -6357,16 +6357,24 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         y: codeEditor.position.y + codeEditor.size.height / 2
       };
       origin.x += 100;
-      origin.y += 30;
+      origin.y += 22;
       game.on('iframeMessage', function (event) {
         console.log('iframeMessage', event);
         game.flashText(event.data.message);
       });
-      var openMonacoButton = game.make().Button({
-        text: 'Open Monaco Editor'
-      }).width(200).height(40).position(origin.x, origin.y, 33).pointerdown(function (context, event) {
-        openMonaco();
-      }).createEntity();
+
+      /*
+      let openMonacoButton = game.make()
+        .Button({ text: 'Open Monaco Editor' })
+        .width(200)
+        .height(40)
+        .position(origin.x, origin.y, 33)
+        .pointerdown(function (context, event) {
+          openMonaco();
+        })
+        .createEntity();
+        */
+
       var evalRunButton = game.make().Button({
         text: 'Run Code'
       }).width(200).height(40).position(origin.x, origin.y, 32).pointerdown(function (context, event) {
@@ -6392,17 +6400,16 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         });
 
         // Get the <code> from the code editor
-        //let source = game.getEntityByName('code-editor').meta.code;
+        var codeEditor = game.getEntityByName('code-editor');
+        var graphic2 = codeEditor.graphics['graphics-css'];
+        var textarea = graphic2.querySelectorAll('textarea')[0];
         var source;
-        if (game.systems.monaco) {
-          source = game.systems.monaco.editor.getValue();
-        } else {
-          source = game.getEntityByName('code-editor').meta.code;
-        }
-
+        source = textarea.value;
         // Add a one-time event listener for the iframe's load event
         evalIframe.onload = function () {
           // Send the code to the iframe
+          console.log('onload', source);
+          // alert('post message')
           evalIframe.contentWindow.postMessage({
             code: source
           }, '*'); // Consider specifying the iframe's origin instead of '*'
@@ -6423,7 +6430,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         primaryGameEmbed.src = null;
       }).createEntity();
       var player = game.make().Player();
-      player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 15, 0).z(64);
+      player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 22, 0).z(64);
       player.createEntity();
       var hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
 

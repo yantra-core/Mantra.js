@@ -1222,13 +1222,6 @@ function createGraphic(entityData) {
 
   // Update the position of the entity element
   this.updateEntityPosition(entityElement, entityData);
-  if (typeof entityElement.afterParentElementAppends === 'function') {
-    // give the element a moment to get into the DOM ( not great, Monaco requires this )
-    setTimeout(function () {
-      entityElement.afterParentElementAppends(entityElement, entityData);
-      delete entityElement.afterParentElementAppends;
-    }, 500);
-  }
   return entityElement;
 }
 

@@ -142,7 +142,7 @@ function inflateCode(entityElement, entityData) {
   var prismLiveInstances = document.querySelectorAll('.prism-live');
   // alert(prismLiveInstances.length)
   prismLiveInstances.forEach(function (el) {
-    el.remove();
+    // el.remove();
   });
 
   // Ensure fetchSourceHandles is initialized
@@ -154,7 +154,8 @@ function inflateCode(entityElement, entityData) {
   } else {
     // code.textContent = entityData.meta?.code || ''; // Set default code
   }
-  applyCodeStyles(entityElement, pre, code, entityData);
+
+  // applyCodeStyles(entityElement, pre, code, entityData);
   adjustStyles(pre, code, entityData);
   return entityElement;
 }
@@ -183,12 +184,11 @@ function _handleFetchResponse() {
           return response.text();
         case 4:
           content = _context.sent;
-          console.log("GGGGGGGGG", content);
           updateCodeElements(src, content, codeElement, entityElement, game, entityData);
           this.fetchSourceHandles[src] = {
             content: content
           }; // Cache content
-        case 8:
+        case 7:
         case "end":
           return _context.stop();
       }
@@ -240,7 +240,7 @@ function updateOrCreateTextarea(el, content, entityElement) {
     textarea.setAttribute('spellcheck', 'false');
     textarea.className = 'language-javascript';
     textarea.fresh = true;
-    // textarea.style.overflow = 'auto';
+    textarea.style.overflow = 'hidden';
     el.parentNode.parentNode.appendChild(textarea);
     el.parentNode.style.display = 'none';
   } else {
@@ -251,10 +251,10 @@ function updateOrCreateTextarea(el, content, entityElement) {
 }
 function attachTextareaEvents(textarea, game) {
   console.log('bind');
-  textarea.addEventListener('click', function () {
+  textarea.addEventListener('mousedown', function () {
     game.data.camera.draggingAllowed = false;
     game.data.camera.mouseWheelZoomEnabled = false;
-    console.log('click');
+    console.log('mousedown');
     game.unbindKeyboard();
   });
   textarea.addEventListener('blur', function () {

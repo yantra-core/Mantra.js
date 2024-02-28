@@ -60,7 +60,7 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
-window.game = game;
+// window.game = game;
 let home = new worlds.Platform();
 home = new worlds.Home();
 

@@ -1,6 +1,6 @@
 let exampleRoot = 'https://yantra.gg/mantra/examples';
 //exampleRoot = 'http://192.168.1.80:8888';
-// exampleRoot = 'http://192.168.1.80:7777/examples';
+//exampleRoot = 'http://192.168.1.80:7777/examples';
 
 export default class Playground {
   static id = 'world-playground';
@@ -36,7 +36,6 @@ export default class Playground {
     mouse.setButtonMapping('MIDDLE', 0);
     // enables mouse wheel zoom
     game.data.camera.mouseWheelZoomEnabled = true;
-
     this.createWorld();
   }
 
@@ -148,6 +147,7 @@ export default class Playground {
       });
 
       if (!game.systems.monaco) {
+        alert("LAYZ LOAD")
         game.use('Monaco', {}, () => {
           createMonacoEditor(game);
         });
@@ -211,7 +211,7 @@ export default class Playground {
 
     let evalEmbed = game.make()
       .Iframe({ src: 'https://yantra.gg/mantra/eval' })
-      //.Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      // .Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
       .name('eval-embed')
       .width(800)
       .height(600)
@@ -227,16 +227,18 @@ export default class Playground {
     let codeEditor = game.make()
       .Code({
         //  code: 'hello <h1>'
-        src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+        // src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
+        src: 'http://192.168.1.80:8888/items/boomerang.js'
       })
       .name('code-editor')
       .pointerdown(async function (context, event) {
-        openMonaco();
+        // openMonaco();
       })
       .height(700)
       .width(660)
       .x(800)
       .y(-170)
+      .z(33)
       .createEntity();
 
 
@@ -247,13 +249,14 @@ export default class Playground {
     };
 
     origin.x += 100;
-    origin.y += 30;
+    origin.y += 22;
 
     game.on('iframeMessage', function (event) {
       console.log('iframeMessage', event)
       game.flashText(event.data.message)
     });
 
+    /*
     let openMonacoButton = game.make()
       .Button({ text: 'Open Monaco Editor' })
       .width(200)
@@ -263,6 +266,7 @@ export default class Playground {
         openMonaco();
       })
       .createEntity();
+      */
 
     let evalRunButton = game.make()
       .Button({ text: 'Run Code' })
@@ -294,18 +298,17 @@ export default class Playground {
         });
 
         // Get the <code> from the code editor
-        //let source = game.getEntityByName('code-editor').meta.code;
+        let codeEditor = game.getEntityByName('code-editor');
+        let graphic2 = codeEditor.graphics['graphics-css'];
+        let textarea = graphic2.querySelectorAll('textarea')[0];
         let source;
 
-        if (game.systems.monaco) {
-          source = game.systems.monaco.editor.getValue();
-        } else {
-          source = game.getEntityByName('code-editor').meta.code;
-        }
-
+        source = textarea.value;
         // Add a one-time event listener for the iframe's load event
         evalIframe.onload = function () {
           // Send the code to the iframe
+          console.log('onload', source)
+          // alert('post message')
           evalIframe.contentWindow.postMessage({
             code: source
           }, '*'); // Consider specifying the iframe's origin instead of '*'
@@ -330,7 +333,7 @@ export default class Playground {
 
 
     let player = game.make().Player();
-    player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 15, 0).z(64);
+    player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 22, 0).z(64);
     player.createEntity();
 
     let hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();

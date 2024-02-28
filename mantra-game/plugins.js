@@ -254,8 +254,14 @@ let plugins = {
 };
 
 
+/* 2/27/2024 - Tried Monaco (again), it's very large and breaks tests
+//             Did manage to get it to built and load, 
+//             the main issue was a lazy load CSS layout issue ( minor but breaking )
+//             Switch to Prism-Live for now
+//             Would like to integrate Monaco Editor with auto-completes
 // This *must* be commented out for tests to pass, TODO: fix this
-// import Monaco from './plugins/monaco/Monaco.js';
-// plugins.Monaco = Monaco;
+import Monaco from './plugins/monaco/Monaco.js';
+plugins.Monaco = Monaco;
+*/
 
 export default plugins;
