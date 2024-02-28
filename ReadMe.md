@@ -18,7 +18,7 @@ https://github.com/yantra-core/Mantra.js/assets/70011/65bb5294-b8ac-4e38-a7a0-71
 
 Welcome. Mantra.js is a Javascript game dev framework.
 
-Easiest way to get started: [https://yantra.gg/mantra/gallery]([https://yantra.gg/mantra/gallery])
+Easiest way to get started: [https://yantra.gg/mantra/examples/](https://yantra.gg/mantra/examples/)
 
 # Mantra itself is very small and very fast
 
