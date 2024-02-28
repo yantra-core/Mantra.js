@@ -1,4 +1,5 @@
 export default function inflateSelect(entityElement, entityData) {
+  let game = this.game;
   let select = document.createElement('select');
   
   // Populate the select element with options if available
@@ -25,7 +26,7 @@ export default function inflateSelect(entityElement, entityData) {
   }
 
   // Apply default and custom styles
-  applySelectStyles(entityElement, select, entityData);
+  applySelectStyles(game, entityElement, select, entityData);
 
   // Append the select element to the entityElement
   entityElement.appendChild(select);
@@ -33,7 +34,7 @@ export default function inflateSelect(entityElement, entityData) {
   return entityElement;
 }
 
-function applySelectStyles(entityElement, select, entityData) {
+function applySelectStyles(game, entityElement, select, entityData) {
 
   const defaultSelectStyles = {
     padding: '10px 15px',
