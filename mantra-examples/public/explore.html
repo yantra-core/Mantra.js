@@ -63,14 +63,18 @@
       padding-right: 35px;
     }
 
-    .fixed-footer {
-      position: fixed;
-      bottom: 0;
+    .main-content {
+      
+      height: 100%; /* 100vh is 100% of the viewport height. Adjust 120px to match the combined heights of your fixed header and footer */
       width: 100%;
-      z-index: 9999;
+    }
+
+
+    .fixed-footer {
+      width: 100%;
+      z-index: 11111;
       background-color: #333;
       /* Example footer background color */
-      padding: 10px 5px;
       /* Add some padding inside the footer */
       box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
       /* Optional: adds a shadow for better separation from the content */
@@ -154,7 +158,9 @@
 
     iframe {
       width: 100%;
-      height: 600px;
+      height: 100%;
+      min-height: 600px;
+      min-width: 768px;
       border: none;
       padding-top: 0px;
       /* Height of the fixed controls container */
@@ -172,38 +178,19 @@
       /* Adjust this value based on the actual height of your fixed header */
     }
 
-    @media (max-height: 920px) {
-      .fixed-footer {
-        position: static;
-        /* Make the footer flow with the document */
-        padding: 5px;
-        /* Reduced padding */
-        /* Reduced font size for smaller screens */
-      }
-
-    
-
-      .flex-container {
-        gap: 5px;
-        /* Reduced gap between select boxes */
-      }
-
-      /* Since the footer is not fixed, adjust the bottom margin of content accordingly */
-      #exampleIframe,
-      #exampleCode {
-        margin-bottom: 60px;
-        /* Ensure there's enough space for the footer */
-      }
-    }
 
 
     @media (max-width: 768px) {
       .fixed-footer {
-        padding: 5px;
         /* Reduce padding */
         font-size: 0.8em;
         /* Reduce font size */
       }
+
+      #countdown {
+        display: none;
+      }
+
 
       .fixed-footer select {
         padding: 2px 5px;
@@ -245,9 +232,6 @@
 
     @media (max-width: 768px) {
       .fixed-controls-container {
-        /* Initially align items to the left */
-        position: relative;
-        /* Ensure the countdown is positioned relative to this container */
       }
 
 
@@ -267,7 +251,6 @@
     #exampleCode {
       display: none;
       width: 100%;
-      height: 768px;
     }
 
 
@@ -477,8 +460,8 @@
         <img class="mantraLogo" src="https://yantra.gg/mantra/img/game/env/warp-to-mantra-home.png" />
       </a>
       <select id="exampleDropdown">
-        <option value="">Select an Example</option>
-        <option value="games/home">Top-Down Home World</option>
+        <option value="">Select Example</option>
+        <option value="games/home">Top-Down</option>
         <option value="items/boomerang">Boomerang</option>
         <option value="npc/hexapod">Hexapod NPCs</option>
         <option value="terrain/infinite-maze">Infinite Maze</option>
@@ -501,14 +484,17 @@
     </div>
   </div>
 
+  <div class="main-content">
 
-  <!-- iframe for the embed window -->
+      <!-- iframe for the embed window -->
   <iframe id="exampleIframe" width="50%" onload="resizeIframeToFitContent(this)"></iframe>
 
   <!-- Textarea, hidden by default -->
   <textarea id="exampleCode" spellcheck="false" class="language-javascript">
     Code goes here
 </textarea>
+
+  </div>  
 
   <!-- Fixed footer with flex container for select boxes -->
   <div class="fixed-footer">
