@@ -23,7 +23,25 @@ let defaultAssets = {
   'demon': '/img/game/npc/demon.gif',
   'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
   'ayyo-key': '/img/game/env/ayyo-key-medium.png',
-  'hexapod': '/img/game/npc/hexapod.png',
+  'hexapod-single': '/img/game/npc/hexapod-single.png',
+  /*
+  'hexapod': {
+    type: 'spritesheet',
+    url: '/img/game/npc/hexapod.png',
+    frameTags: {
+      default: {
+        frames: [
+          { x: 0, y: -100 },
+       
+
+        ]
+      },
+    }
+  },
+  */
+
+
+  
   /*
   'raiden': {
     type: 'spritesheet',

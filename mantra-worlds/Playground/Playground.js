@@ -1,6 +1,4 @@
 let exampleRoot = 'https://yantra.gg/mantra/examples';
-//exampleRoot = 'http://192.168.1.80:8888';
-//exampleRoot = 'http://192.168.1.80:7777/examples';
 
 export default class Playground {
   static id = 'world-playground';
@@ -37,40 +35,40 @@ export default class Playground {
     // enables mouse wheel zoom
     game.data.camera.mouseWheelZoomEnabled = true;
     this.createWorld();
+    this.setDefaultZoom();
   }
 
   async preload(game) {
 
-    game.use('Player');
-    game.use('Text');
-    game.use('Platform');
-    game.use('Teleporter');
-    game.use('Editor');
-    game.use('Code');
-    game.use('Iframe');
-    game.use('Select');
     game.use('Button')
+    game.use('Code')
+    game.use('Container')
+    game.use('Editor')
     game.use('Hexapod')
-    game.use('Image');
-    game.use('Link');
+    game.use('Iframe')
+    game.use('Image')
+    game.use('Link')
+    game.use('Platform')
+    game.use('Player')
+    game.use('Select')
+    game.use('Teleporter')
+    game.use('Text')
 
   }
 
   createWorld() {
     let game = this.game;
-    // game.make().Platform({ x: 0, y: 0, width: 16000, height: 9000 }).createEntity();
-    // game.make().size(100).color('blue').createEntity();
-    //game.systems.editor.init(game);
-    // game.systems.editor.show();
+    let currentUrl = null;
 
-    let text = game.make().Text().text('Mantra.js Alpha Playground').style({
-      fontSize: '64px',
-    });
-    text.color('white');
-    text.width(900);
-    text.position(50, -520, 0);
-    text.createEntity();
-
+    let text = game.make().Text()
+      .text('Mantra.js Alpha Playground')
+      .style({
+        fontSize: '64px',
+      })
+      .color('white')
+      .width(900)
+      .position(50, -520, 0)
+      .createEntity();
 
     let link = game.make()
     .Link({
@@ -87,7 +85,6 @@ export default class Playground {
     .x(-100)
     .y(-440)
     .createEntity();
-    
 
     let sideTextGroup = game.make().name('side-text-group').style({
       border: 'none',
@@ -105,147 +102,68 @@ export default class Playground {
     introText.container('side-text-group');
     introText.createEntity();
 
-
     let src = 'https://yantra.gg/mantra/img/game/env/github-link-256.png';
 
-    // Remark: These images could also be buttons with textures, or ents with in-line textures
+    // Remark: These image links could also be buttons with textures, or ents with in-line textures
     let githubImageLink = game.make()
-    .Image({
-      alt: 'Mantra.js Github',
-      src: src
-    })
-    .pointerdown(function (context, event) {
-      // opens new link to Mantra.js Github
-      event.preventDefault();
-      let link = 'https://github.com/yantra-core/Mantra.js';
-      if (game.isTouchDevice()) {
-       window.location = link;
-      } else {
-        window.open(link, '_blank');
-      }
-    })
-    .style({
-      cursor: 'pointer'
-    })
-    .position(-700, 150)
-    .size(128)
-    .createEntity();
+      .Image({
+        alt: 'Mantra.js Github',
+        src: src
+      })
+      .pointerdown(function (context, event) {
+        // opens new link to Mantra.js Github
+        event.preventDefault();
+        let link = 'https://github.com/yantra-core/Mantra.js';
+        if (game.isTouchDevice()) {
+        window.location = link;
+        } else {
+          window.open(link, '_blank');
+        }
+      })
+      .style({
+        cursor: 'pointer'
+      })
+      .position(-700, 150)
+      .size(128)
+      .createEntity();
 
     let discordImageLink = game.make()
-    .Image({
-      alt: 'AYYO Discord',
-      src: 'https://yantra.gg/mantra/img/game/env/discord-voice-dark.png'
-    })
-    .pointerdown(function (context, event) {
-      let link = 'https://discord.gg/ZyNxBVmFgV';
-      if (game.isTouchDevice()) {
-        window.location = link;
-      } else {
-        // opens new link to AYYO Discord
-        window.open(link, '_blank');
-      }
-    })
-    .style({
-      cursor: 'pointer'
-    })
-    .position(-500, 150)
-    .size(128)
-    .createEntity();
-
-    /*
-    let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
-    iframeControlText.position(800, 490);
-    iframeControlText.width(600);
-    iframeControlText.color('white');
-    iframeControlText.style({
-      fontSize: '32px',
-    })
-    // iframeControlText.container('side-text-group');
-    iframeControlText.createEntity();
-    */
-
-    function createMonacoEditor() {
-      let codeEditor = game.getEntityByName('code-editor');
-      // Creates a Monaco Editor on top of the <code> element
-      // using the same source code and position / dimensions
-
-      // monaco a second to get ready
-      let monacoEditor = game.make()
-        .Monaco({
-          code: codeEditor.meta.code
-        })
-        .height(700)
-        .width(660)
-        .x(codeEditor.position.x)
-        .y(codeEditor.position.y)
-        .z(32)
-        .createEntity();
-
-      // restore cursor from wait to default
-      document.body.style.cursor = 'default';
-
-      game.updateEntity(evalRunButton.id, {
-        style: {
-          display: 'block'
+      .Image({
+        alt: 'AYYO Discord',
+        src: 'https://yantra.gg/mantra/img/game/env/discord-voice-dark.png'
+      })
+      .pointerdown(function (context, event) {
+        let link = 'https://discord.gg/ZyNxBVmFgV';
+        if (game.isTouchDevice()) {
+          window.location = link;
+        } else {
+          // opens new link to AYYO Discord
+          window.open(link, '_blank');
         }
-      });
-
-      /*
-      // hides the codeEditor
-      game.updateEntity(codeEditor.id, {
-        style: {
-          display: 'none'
-        }
-      });
-      */
-
-    }
-
-    function openMonaco() {
-      // set the cursor to wait
-      document.body.style.cursor = 'wait';
-
-      // hide the open monaco button
-      game.updateEntity(openMonacoButton.id, {
-        style: {
-          display: 'none'
-        }
-      });
-
-      if (!game.systems.monaco) {
-        alert("LAYZ LOAD")
-        game.use('Monaco', {}, () => {
-          createMonacoEditor(game);
-        });
-      } else {
-        createMonacoEditor(game);
-      }
-
-    }
-
-
-    //let entities = text2Entities(text);
+      })
+      .style({
+        cursor: 'pointer'
+      })
+      .position(-500, 150)
+      .size(128)
+      .createEntity();
 
     // TODO: remove createContainer, upgrade to Container() plugin instead
-    let container = game.createContainer({
-      name: 'container-a',
-      layout: 'grid', // optional. can also be "flex" or "none"
-      color: 0xff00ff,
-      position: {
-        x: 170,
-        y: 450,
-        z: -1
-      },
-      body: false,
-      size: {
-        width: 1960,
-        height: 400
-      },
-      grid: {
-        columns: 7,
-        rows: 3
-      },
-      style: { // supports CSS property names
+
+    let container2 = game.make()
+      .Container({
+        layout: 'grid',
+        grid: {
+          columns: 7,
+          rows: 3
+        }
+      })
+      .color(0xff00ff)
+      .name('container-a')
+      .width(1960)
+      .height(400)
+      .position(170, 450, -1)
+      .style({
         //padding: 0,
         margin: 0,
         paddingLeft: 0,
@@ -255,17 +173,8 @@ export default class Playground {
           color: '#000000',
           width: 0
         }
-      },
-    });
-
-    let currentUrl = null;
-
-    /*
-    categories = categories.filter(function(cat) {
-      let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
-      return allowed.includes(cat.name);
-    })
-    */
+      })
+      .createEntity();
 
     let primaryGameEmbed = game.make()
       .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/home' })
@@ -298,9 +207,6 @@ export default class Playground {
         //src: 'http://192.168.1.80:8888/items/boomerang.js'
       })
       .name('code-editor')
-      .pointerdown(async function (context, event) {
-        // openMonaco();
-      })
       .height(700)
       .width(660)
       .x(800)
@@ -323,17 +229,6 @@ export default class Playground {
       game.flashText(event.data.message)
     });
 
-    /*
-    let openMonacoButton = game.make()
-      .Button({ text: 'Open Monaco Editor' })
-      .width(200)
-      .height(40)
-      .position(origin.x, origin.y, 33)
-      .pointerdown(function (context, event) {
-        openMonaco();
-      })
-      .createEntity();
-      */
 
     let evalRunButton = game.make()
       .Button({ text: 'Run Code' })
@@ -346,7 +241,6 @@ export default class Playground {
         let evalEmbed = game.getEntityByName('eval-embed');
         let graphic = evalEmbed.graphics['graphics-css'];
         let evalIframe = graphic.querySelectorAll('iframe')[0];
-
 
         // sets the evalRunButton to disabled
         /*
@@ -547,44 +441,23 @@ export default class Playground {
     });
 
 
+    // TODO: injects examples into playground scene itself
     // let addSceneButton = game.make().Button({ text: 'Load Example as Scene', disabled: true }).width(250).position(650, 500).createEntity();
+    // TODO: save current scene as world on Yantra
     // let deployToYantraButton = game.make().Button({ text: 'Deploy to Yantra.gg' }).width(200).position(900, 500).createEntity();
+    // TODO: copies code to clipboard
     // let copyCodeButton = game.make().Button({ text: 'Copy Code' }).width(200).position(1000, 500).createEntity();
-    /*
+    // TODO: changes gravity on the entire playground page
+    // let gravitySlider = game.make().Range().width(100).position(-540, -400, 0).createEntity();
 
-    let gravitySlider = game.make().Range().width(100).position(-540, -400, 0).createEntity();
-
-    let docsEmbed = game.make().width(800 * 2).height(600 * 2);
-    docsEmbed.Iframe({ src: 'https://yantra.gg/mantra/examples/entity' })
-    docsEmbed.x(100).y(800);
+    let docsEmbed = game.make().width(768).height(1000);
+    docsEmbed.Iframe({ src: 'https://yantra.gg/mantra/examples' })
+    docsEmbed.style({
+      border: 'none',
+    })
+    docsEmbed.x(0).y(1200);
     docsEmbed.createEntity();
 
-    let codeEmbed = game.make().width(800 * 2).height(600 * 2);
-    codeEmbed.Iframe({ src: 'https://yantra.gg/mantra/examples' })
-    codeEmbed.x(1200).y(800);
-    codeEmbed.createEntity();
-    */
-
-    let screenWidth = window.innerWidth;
-    let screenHeight = window.innerHeight;
-
-    // Width-based zoom calculation
-    let zoomRatioWidth = 0.5 / game.width; // Derived ratio for width
-    let baseWidth = game.width;
-    let baseZoomWidth = 0.5;
-    let zoomWidth = baseZoomWidth + (screenWidth - baseWidth) * zoomRatioWidth;
-
-    // Height-based zoom calculation (assuming similar ratios and base values for height)
-    let zoomRatioHeight = 0.5 / game.height; // You might need to adjust this based on your game's height scaling
-    let baseHeight = game.height; // Adjust this base height as per your requirements
-    let baseZoomHeight = 0.5;
-    let zoomHeight = baseZoomHeight + (screenHeight - baseHeight) * zoomRatioHeight;
-
-    // Choose the smaller zoom level to ensure content fits both width and height
-    let zoom = Math.min(zoomWidth, zoomHeight);
-
-    // Clamp the zoom level between 0.4 and 1
-    zoom = Math.max(0.4, Math.min(zoom, 1));
 
     let text_dragToMoveMap = game.make().Text().text('Drag to move map');
     text_dragToMoveMap.x(200);
@@ -623,8 +496,6 @@ export default class Playground {
     });
     text_clickToInteract.createEntity();
 
-    game.setZoom(zoom);
-
     // TODO code responsive layout for mobile
     /*
     if (screenWidth < 400) {
@@ -639,8 +510,45 @@ export default class Playground {
 
   }
 
+  setDefaultZoom () {
+
+    let game = this.game;
+
+    //
+    // Caclulate the zoom based on the width and height of the window
+    // Remark: We could put this into Mantra as a utility function with parameters
+    //
+    let screenWidth = window.innerWidth;
+    let screenHeight = window.innerHeight;
+
+    // Width-based zoom calculation
+    let zoomRatioWidth = 0.5 / game.width; // Derived ratio for width
+    let baseWidth = game.width;
+    let baseZoomWidth = 0.5;
+    let zoomWidth = baseZoomWidth + (screenWidth - baseWidth) * zoomRatioWidth;
+
+    // Height-based zoom calculation (assuming similar ratios and base values for height)
+    let zoomRatioHeight = 0.5 / game.height; // You might need to adjust this based on your game's height scaling
+    let baseHeight = game.height; // Adjust this base height as per your requirements
+    let baseZoomHeight = 0.5;
+    let zoomHeight = baseZoomHeight + (screenHeight - baseHeight) * zoomRatioHeight;
+
+    // Choose the smaller zoom level to ensure content fits both width and height
+    let zoom = Math.min(zoomWidth, zoomHeight);
+
+    // Clamp the zoom level between 0.4 and 1
+    zoom = Math.max(0.4, Math.min(zoom, 1));
+
+    //
+    // Calls game.setZoom with the calculated zoom level
+    //
+    game.setZoom(zoom);
+    
+  }
+
 }
 
+//let entities = text2Entities(text);
 function text2Entities(text) {
   let entities = [];
   let lines = text.split('');

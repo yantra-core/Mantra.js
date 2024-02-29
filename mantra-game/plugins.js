@@ -102,6 +102,7 @@ import BabylonStarField from './plugins//starfield/BabylonStarField.js';
 import Button from './plugins/button/Button.js';
 import Checkbox from './plugins/checkbox/Checkbox.js';
 import Canvas from './plugins/canvas/Canvas.js';
+import Container from './plugins/container/Container.js';
 import Image from './plugins/image/Image.js';
 import Iframe from './plugins/iframe/Iframe.js';
 import Input from './plugins/input/Input.js';
@@ -181,6 +182,7 @@ let plugins = {
   Radio,
   Checkbox,
   Canvas,
+  Container,
   Image,
   Iframe,
   Range,
