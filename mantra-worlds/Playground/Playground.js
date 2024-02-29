@@ -29,7 +29,6 @@ export default class Playground {
     this.game = game;
 
     game.config.defaultMouseMovement = false;
-
     // Movements with right click, switch default left-click-to-move behavior
     game.config.mouseMovementButton = 'RIGHT';
     // Actions with left click
@@ -39,15 +38,18 @@ export default class Playground {
 
     game.reset();
 
+    document.body.style.overflow = 'auto';
+    document.body.style.position = 'relative';
+
     game.data.camera.mode = 'none';
 
     // Remark: Not ideal for mapping Mouse buttons, 
     // as they should be conditionals in Sutra tree like Keyboard events are
     let mouse = game.systems.mouse;
-    mouse.setButtonMapping('LEFT', 1);
-    mouse.setButtonMapping('MIDDLE', 0);
+    //mouse.setButtonMapping('LEFT', 1);
+    //mouse.setButtonMapping('MIDDLE', 0);
     // enables mouse wheel zoom
-    game.data.camera.mouseWheelZoomEnabled = true;
+    game.data.camera.mouseWheelZoomEnabled = false;
 
     this.createWorld();
     this.setDefaultZoom();
@@ -66,7 +68,12 @@ export default class Playground {
       .color('white')
       .width(900)
       .position(50, -520, 0)
+      //.layout('top-center')
+      //.offset(0, 60)
+      //.origin('top-left')
       .createEntity();
+
+    // alert(text.position.x + ' ' + text.position.y)
 
     let link = game.make()
       .Link({
@@ -83,6 +90,11 @@ export default class Playground {
       .x(-100)
       .y(-440)
       .createEntity();
+
+    let sideTextGroup = game.make().name('side-text-group').style({
+      border: 'none',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+    }).position(-800, -400).createEntity();
 
     let introText = game.make().Text().text('Select from the drop downs');
     introText.color('white');
@@ -450,6 +462,7 @@ export default class Playground {
     docsEmbed.createEntity();
 
 
+    /*
     let text_dragToMoveMap = game.make().Text().text('Drag to move map');
     text_dragToMoveMap.x(200);
     text_dragToMoveMap.y(220);
@@ -459,7 +472,9 @@ export default class Playground {
       fontSize: '24px',
     })
     text_dragToMoveMap.createEntity();
+    */
 
+    /*
     let text_wheelToZoom = game.make().Text().text('Wheel to Zoom');
     text_wheelToZoom.x(0);
     text_wheelToZoom.y(220);
@@ -469,7 +484,9 @@ export default class Playground {
       fontSize: '24px',
     })
     text_wheelToZoom.createEntity();
+    */
 
+    /*
     let text_clickToInteract = game.make().Text().text('Click to interact');
     text_clickToInteract.x(220);
     text_clickToInteract.y(220);
@@ -486,6 +503,7 @@ export default class Playground {
       this.game.shakeCamera({});
     });
     text_clickToInteract.createEntity();
+    */
 
     // TODO code responsive layout for mobile
     /*
