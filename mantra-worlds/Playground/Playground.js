@@ -84,11 +84,6 @@ export default class Playground {
       .y(-440)
       .createEntity();
 
-    let sideTextGroup = game.make().name('side-text-group').style({
-      border: 'none',
-      backgroundColor: 'rgba(0, 0, 0, 0)',
-    }).position(-800, -400).createEntity();
-
     let introText = game.make().Text().text('Select from the drop downs');
     introText.color('white');
     introText.position(280, 10);
