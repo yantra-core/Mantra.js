@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/prism.css">
+  <link rel="stylesheet" href="/vendor/prism-live/style.css">
+
+  <title>Example Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+    }
+
+    .mantraLogo {
+      width: 32px;
+    }
+
+    .fixed-controls-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #f8f9fa;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      flex-wrap: wrap;
+      /* Allows controls to wrap on smaller screens */
+      background-color: #000;
+      color: #fff;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: left;
+      flex-grow: 0.5;
+    }
+
+    .navigation h2 {
+      margin: 0;
+      padding: 5px 10px;
+      font-size: 42px;
+    }
+
+    .control-buttons,
+    .control-buttons-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      /* Allow wrapping within control buttons */
+    }
+
+    .control-buttons-right {
+      padding-right: 35px;
+    }
+
+    .fixed-footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 9999;
+      background-color: #333;
+      /* Example footer background color */
+      padding: 10px 5px;
+      /* Add some padding inside the footer */
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+      /* Optional: adds a shadow for better separation from the content */
+    }
+
+    .flex-container {
+      display: flex;
+      justify-content: flex-start;
+      /* Aligns items to the start of the container */
+      flex-wrap: wrap;
+      /* Allows items to wrap as needed */
+      gap: 10px;
+      /* Space between select boxes */
+    }
+
+    .fixed-footer select {
+      flex: 0 1 auto;
+      /* Do not grow, allow shrink, and base width on content */
+      min-width: 100px;
+      /* Minimum width to ensure select boxes are not too small */
+      height: 60px;
+      /* Fixed height for better control */
+      font-size: 1.5em;
+      /* Adjust font size as needed */
+      padding: 5px 10px;
+      /* Padding inside select boxes for better text visibility */
+      border: 1px solid #ccc;
+      /* Optional: adds a subtle border */
+      border-radius: 5px;
+      /* Rounds the corners of the select boxes */
+      background-color: #d000ff;
+      /* Example select background color */
+      color: white;
+      /* Text color */
+      transition: background-color 0.3s ease;
+      /* Smooth transition for background color */
+      cursor: pointer;
+      /* Changes the cursor to a pointer to indicate it's selectable */
+    }
+
+    .fixed-footer select:hover {
+      background-color: #b000e6;
+      /* Darker shade for hover effect */
+    }
+
+    .control-buttons select,
+    .control-buttons button {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      font-size: 1.3em;
+      background-color: #d000ff;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      flex: 0 1 auto;
+      /* Do not grow, allow shrink, and base width on content */
+      min-width: 100px;
+      /* Minimum width to ensure buttons and select are not too small */
+      height: 40px;
+      /* Fixed height for better control */
+    }
+
+    .control-buttons button:hover {
+      background-color: #b300ff;
+      /* Slightly darker on hover */
+    }
+
+    #countdown {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #d000ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 0 1 50px;
+      cursor: pointer;
+      /* Do not grow, allow shrink, and base width on content */
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      padding-top: 0px;
+      /* Height of the fixed controls container */
+    }
+
+
+    #chooseCategories {
+      display: none;
+    }
+
+    /* Add this after your existing CSS rules */
+    #exampleIframe,
+    .prism-live {
+      margin-top: 80px;
+      /* Adjust this value based on the actual height of your fixed header */
+    }
+
+    @media (max-height: 920px) {
+      .fixed-footer {
+        position: static;
+        /* Make the footer flow with the document */
+        padding: 5px;
+        /* Reduced padding */
+        /* Reduced font size for smaller screens */
+      }
+
+    
+
+      .flex-container {
+        gap: 5px;
+        /* Reduced gap between select boxes */
+      }
+
+      /* Since the footer is not fixed, adjust the bottom margin of content accordingly */
+      #exampleIframe,
+      #exampleCode {
+        margin-bottom: 60px;
+        /* Ensure there's enough space for the footer */
+      }
+    }
+
+
+    @media (max-width: 768px) {
+      .fixed-footer {
+        padding: 5px;
+        /* Reduce padding */
+        font-size: 0.8em;
+        /* Reduce font size */
+      }
+
+      .fixed-footer select {
+        padding: 2px 5px;
+        /* Reduce padding inside select boxes */
+        font-size: 1.5em;
+        /* Reduce font size */
+        min-width: 80px;
+        /* Reduce minimum width */
+        height: 30px;
+        /* Reduce height */
+      }
+
+      .flex-container {
+        gap: 5px;
+        /* Reduce space between select boxes */
+      }
+
+      /* Adjust the bottom margin of the content to accommodate the smaller footer */
+      #exampleIframe,
+      #exampleCode {
+        margin-bottom: 60px;
+        /* Increase the bottom margin to ensure content is not obscured by the footer */
+      }
+
+      /* Additional adjustments for the fixed header and content on mobile */
+      .fixed-controls-container {
+        padding: 5px 10px;
+        /* Reduce padding */
+      }
+
+      #exampleIframe,
+      .prism-live,
+      #exampleCode {
+        margin-top: 100px;
+        /* Increase top margin to avoid overlapping with the header */
+      }
+    }
+
+
+    @media (max-width: 768px) {
+      .fixed-controls-container {
+        /* Initially align items to the left */
+        position: relative;
+        /* Ensure the countdown is positioned relative to this container */
+      }
+
+
+    }
+
+    .link-with-cursor::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-left: 2px solid black;
+      border-top: 2px solid black;
+      transform: rotate(45deg);
+      margin-right: 5px;
+    }
+
+    #exampleCode {
+      display: none;
+      width: 100%;
+      height: 768px;
+    }
+
+
+
+    /* box shadow 3d effect*/
+    .mantraLogo:hover {
+      box-shadow: 0 0 10px #9a9cff;
+      /* drop shadow effect */
+      -webkit-box-shadow: 0 0 10px #9a9cff;
+      -moz-box-shadow: 0 0 10px #9a9cff;
+      box-shadow: 0 0 10px #9a9cff;
+      /* border radius */
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+  <script src="/prism.min.js" data-manual></script>
+  <script src="/categories.js"></script>
+
+  <script src="/vendor/prism-live/src/prism-live.js?load=javascript"></script>
+
+  <script>
+    function resizeIframeToFitContent() { };
+
+
+    let galleryRoot = '../examples/';
+    galleryRoot = './'; // for dev testing
+
+    function resizeIframeToFitContent() { };
+
+    // DOM ready
+    let currentExample = "items/boomerang";
+    let currentSourceURL = currentExample + ".js";
+    let currentExampleEmbedUrl = 'demo.html?source=' + currentExample;
+
+    function loadIframe() {
+      const iframe = document.getElementById('exampleIframe');
+      // Assuming 'currentExample' is defined and holds the current example's name
+      iframe.src = `demo.html?source=${currentExample}`;
+    }
+
+    function loadExampleCode() {
+      const textarea = document.getElementById('exampleCode');
+      // Fetch and load the current source URL content into the textarea
+      fetch(`${currentExample}.js`)
+        .then(response => response.text())
+        .then(data => {
+          textarea.value = data;
+
+          // Apply additional logic here if needed, e.g., syntax highlighting
+        })
+        .catch(error => console.error('Error fetching source code:', error));
+    }
+
+    function showSource() {
+      const textarea = document.getElementById('exampleCode');
+      const iframe = document.getElementById('exampleIframe');
+      const editSourceButton = document.getElementById('nextPreview'); // Assuming this is your button's ID
+
+      textarea.style.display = 'block';
+      iframe.style.display = 'none';
+      editSourceButton.innerHTML = 'View Example';
+
+      // Apply Prism if not already applied
+      if (!textarea.classList.contains('prism-applied')) {
+        applyPrism();
+      }
+
+      // Show Prism editor
+      let prismHolder = document.querySelector('.prism-live');
+      if (prismHolder) {
+        prismHolder.style.display = 'block';
+      }
+    }
+
+    function hideSource() {
+      const textarea = document.getElementById('exampleCode');
+      const iframe = document.getElementById('exampleIframe');
+      const editSourceButton = document.getElementById('nextPreview');
+
+      textarea.style.display = 'none';
+      iframe.style.display = 'block';
+      editSourceButton.innerHTML = 'View Source';
+
+      // Hide Prism editor
+      let prismHolder = document.querySelector('.prism-live');
+      if (prismHolder) {
+        prismHolder.style.display = 'none';
+      }
+    }
+
+    function toggleSource() {
+      const textarea = document.getElementById('exampleCode');
+      if (textarea.style.display === 'block') {
+        hideSource();
+      } else {
+        showSource();
+      }
+    }
+
+    function applyPrism() {
+      const textarea = document.getElementById('exampleCode');
+      function tryPrism() {
+        if (Prism && Prism.Live) {
+          new Prism.Live(textarea);
+          textarea.classList.add('prism-applied');
+        } else {
+          setTimeout(tryPrism, 10);
+        }
+      }
+      tryPrism();
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      let chooseCategories = document.getElementById('chooseCategories');
+      chooseCategories.addEventListener('click', function () {
+        // scroll to bottom of the document
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      const editSourceButton = document.getElementById('nextPreview');
+      const exampleOptionsButton = document.getElementById('countdown');
+      const exampleDropdown = document.getElementById('exampleDropdown');
+      editSourceButton.addEventListener('click', toggleSource);
+      exampleOptionsButton.addEventListener('click', toggleSource);
+
+
+
+
+
+
+      loadIframe();
+      loadExampleCode();
+      createDropdowns();
+
+      exampleDropdown.onchange = function () {
+        currentExample = exampleDropdown.value;
+        loadIframe();
+        loadExampleCode();
+      };
+
+
+    });
+
+
+    function createDropdowns() {
+      // Assuming 'categories' and 'examples' are defined as provided in your question
+      const container = document.getElementById('dropdownContainer'); // Ensure you have a div with this ID in your HTML
+
+      categories.forEach(category => {
+        // Create a select element for each category
+        const select = document.createElement('select');
+        select.style.backgroundColor = category.color; // Setting the background color as per category's color
+        select.id = category.name; // Setting the id of the select to the category name
+
+        // Create a default option
+        const defaultOption = document.createElement('option');
+        defaultOption.textContent = `${category.title}`;
+        select.appendChild(defaultOption);
+
+        // Filter examples that belong to the current category
+        examples.filter(example => {
+          // Handle examples where 'category' is an array
+          const exampleCategory = Array.isArray(example.category) ? example.category[0] : example.category;
+          return exampleCategory === category.name;
+        }).forEach(example => {
+          // Create an option for each example
+          const option = document.createElement('option');
+          option.value = example.url;
+          option.textContent = example.title;
+          select.appendChild(option); // Add the option to the select
+        });
+
+        select.onchange = function () {
+          // Assuming 'currentExample' is defined and holds the current example's name
+
+
+          currentExample = select.value.replace('.html', '');
+          loadIframe();
+          loadExampleCode();
+          const textarea = document.getElementById('exampleCode');
+          hideSource();
+
+
+        };
+        // Add the populated select to the container
+        container.appendChild(select);
+      });
+    }
+
+  </script>
+
+</head>
+
+<body>
+
+  <script src="/vendor/prism-live/src/prism-live.js?load=javascript"></script> <!-- If not already included -->
+
+  <div class="fixed-controls-container">
+
+    <div class="control-buttons control-buttons-left">
+      <a class="mantraLink" target="_blank" href="https://github.com/yantra-core/Mantra.js">
+        <img class="mantraLogo" src="https://yantra.gg/mantra/img/game/env/warp-to-mantra-home.png" />
+      </a>
+      <select id="exampleDropdown">
+        <option value="">Select an Example</option>
+        <option value="games/home">Top-Down Home World</option>
+        <option value="items/boomerang">Boomerang</option>
+        <option value="npc/hexapod">Hexapod NPCs</option>
+        <option value="terrain/infinite-maze">Infinite Maze</option>
+        <option value="inputs/keyboard">Keyboard Typer</option>
+      </select>
+
+      <button id="chooseCategories">Choose From Category</button>
+
+      <!--
+      <button id="prevPreview"></button>
+      -->
+    </div>
+    <div class="navigation">
+      <h2 id="exampleTitle"></h2>
+    </div>
+    <div class="control-buttons control-buttons-right">
+      <!-- TODO: make these edit source buttons, should hide the game and show textarea-->
+      <button id="nextPreview">View Source</button>
+      <div title="Click to Auto-Play Gallery Examples" id="countdown">...</div>
+    </div>
+  </div>
+
+
+  <!-- iframe for the embed window -->
+  <iframe id="exampleIframe" width="50%" onload="resizeIframeToFitContent(this)"></iframe>
+
+  <!-- Textarea, hidden by default -->
+  <textarea id="exampleCode" spellcheck="false" class="language-javascript">
+    Code goes here
+</textarea>
+
+  <!-- Fixed footer with flex container for select boxes -->
+  <div class="fixed-footer">
+    <div class="flex-container" id="dropdownContainer">
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>
