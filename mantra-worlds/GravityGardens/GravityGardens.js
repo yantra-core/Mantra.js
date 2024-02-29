@@ -30,6 +30,7 @@ class GravityGardens {
     // Actions with left click
     game.config.mouseActionButton = 'LEFT';
 
+    game.data.camera.scaleMultiplier = 0.9;
     // enables the default top-down mouse movements
     game.config.defaultMouseMovement = true;
 

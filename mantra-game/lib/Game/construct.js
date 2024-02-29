@@ -57,6 +57,8 @@ export default function construct(game, plugins = []) {
     fieldOfView: game.config.fieldOfView, // global for game, not camera specific
     camera: {
       mode: null,
+      scaleMultiplier: 2.5,
+      adaptiveZoom: true, // will auto-zoom the viewport to fit the game size
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
       position: { x: 0, y: 0 },
