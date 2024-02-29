@@ -2,40 +2,9 @@ let exampleRoot = 'https://yantra.gg/mantra/examples';
 
 export default class Playground {
   static id = 'world-playground';
-  // "world" type has special features in that it can be unloaded and reloaded.
-  //  with special rules such as merge, replace, etc.
-  //  this is currently used when switching between worlds in the GUI Editor
-  //  the default behavior is to unload the world, then load the new world
   static type = 'world'; // type is optional for Plugins
   constructor() {
     this.id = Playground.id;
-  }
-
-  init(game) {
-    this.game = game;
-    game.config.defaultMouseMovement = false;
-
-
-    // Movements with right click, switch default left-click-to-move behavior
-    game.config.mouseMovementButton = 'RIGHT';
-    // Actions with left click
-    game.config.mouseActionButton = 'LEFT';
-    // enables the default top-down mouse movements
-    game.config.defaultMouseMovement = true;
-
-    game.reset();
-
-    game.data.camera.mode = 'none';
-
-    // Remark: Not ideal for mapping Mouse buttons, 
-    // as they should be conditionals in Sutra tree like Keyboard events are
-    let mouse = game.systems.mouse;
-    mouse.setButtonMapping('LEFT', 1);
-    mouse.setButtonMapping('MIDDLE', 0);
-    // enables mouse wheel zoom
-    game.data.camera.mouseWheelZoomEnabled = true;
-    this.createWorld();
-    this.setDefaultZoom();
   }
 
   async preload(game) {
@@ -56,6 +25,35 @@ export default class Playground {
 
   }
 
+  init(game) {
+    this.game = game;
+
+    game.config.defaultMouseMovement = false;
+
+    // Movements with right click, switch default left-click-to-move behavior
+    game.config.mouseMovementButton = 'RIGHT';
+    // Actions with left click
+    game.config.mouseActionButton = 'LEFT';
+    // enables the default top-down mouse movements
+    game.config.defaultMouseMovement = true;
+
+    game.reset();
+
+    game.data.camera.mode = 'none';
+
+    // Remark: Not ideal for mapping Mouse buttons, 
+    // as they should be conditionals in Sutra tree like Keyboard events are
+    let mouse = game.systems.mouse;
+    mouse.setButtonMapping('LEFT', 1);
+    mouse.setButtonMapping('MIDDLE', 0);
+    // enables mouse wheel zoom
+    game.data.camera.mouseWheelZoomEnabled = true;
+
+    this.createWorld();
+    this.setDefaultZoom();
+
+  }
+
   createWorld() {
     let game = this.game;
     let currentUrl = null;
@@ -71,20 +69,20 @@ export default class Playground {
       .createEntity();
 
     let link = game.make()
-    .Link({
-      href: 'https://yantra.gg/mantra/home',
-      target: '_blank'
-    })
-    .style({
-      fontSize: '32px',
-      color: 'purple',
-    })
-    .text('/examples/games/home')
-    .width(600)
-    .height(20)
-    .x(-100)
-    .y(-440)
-    .createEntity();
+      .Link({
+        href: 'https://yantra.gg/mantra/home',
+        target: '_blank'
+      })
+      .style({
+        fontSize: '32px',
+        color: 'purple',
+      })
+      .text('/examples/games/home')
+      .width(600)
+      .height(20)
+      .x(-100)
+      .y(-440)
+      .createEntity();
 
     let sideTextGroup = game.make().name('side-text-group').style({
       border: 'none',
@@ -148,9 +146,7 @@ export default class Playground {
       .size(128)
       .createEntity();
 
-    // TODO: remove createContainer, upgrade to Container() plugin instead
-
-    let container2 = game.make()
+    game.make()
       .Container({
         layout: 'grid',
         grid: {

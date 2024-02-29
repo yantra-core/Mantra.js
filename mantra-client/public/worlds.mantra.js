@@ -6130,31 +6130,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
     this.id = Playground.id;
   }
   _createClass(Playground, [{
-    key: "init",
-    value: function init(game) {
-      this.game = game;
-      game.config.defaultMouseMovement = false;
-
-      // Movements with right click, switch default left-click-to-move behavior
-      game.config.mouseMovementButton = 'RIGHT';
-      // Actions with left click
-      game.config.mouseActionButton = 'LEFT';
-      // enables the default top-down mouse movements
-      game.config.defaultMouseMovement = true;
-      game.reset();
-      game.data.camera.mode = 'none';
-
-      // Remark: Not ideal for mapping Mouse buttons, 
-      // as they should be conditionals in Sutra tree like Keyboard events are
-      var mouse = game.systems.mouse;
-      mouse.setButtonMapping('LEFT', 1);
-      mouse.setButtonMapping('MIDDLE', 0);
-      // enables mouse wheel zoom
-      game.data.camera.mouseWheelZoomEnabled = true;
-      this.createWorld();
-      this.setDefaultZoom();
-    }
-  }, {
     key: "preload",
     value: function () {
       var _preload = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(game) {
@@ -6185,6 +6160,31 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       }
       return preload;
     }()
+  }, {
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      game.config.defaultMouseMovement = false;
+
+      // Movements with right click, switch default left-click-to-move behavior
+      game.config.mouseMovementButton = 'RIGHT';
+      // Actions with left click
+      game.config.mouseActionButton = 'LEFT';
+      // enables the default top-down mouse movements
+      game.config.defaultMouseMovement = true;
+      game.reset();
+      game.data.camera.mode = 'none';
+
+      // Remark: Not ideal for mapping Mouse buttons, 
+      // as they should be conditionals in Sutra tree like Keyboard events are
+      var mouse = game.systems.mouse;
+      mouse.setButtonMapping('LEFT', 1);
+      mouse.setButtonMapping('MIDDLE', 0);
+      // enables mouse wheel zoom
+      game.data.camera.mouseWheelZoomEnabled = true;
+      this.createWorld();
+      this.setDefaultZoom();
+    }
   }, {
     key: "createWorld",
     value: function createWorld() {
@@ -6247,10 +6247,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       }).style({
         cursor: 'pointer'
       }).position(-500, 150).size(128).createEntity();
-
-      // TODO: remove createContainer, upgrade to Container() plugin instead
-
-      var container2 = game.make().Container({
+      game.make().Container({
         layout: 'grid',
         grid: {
           columns: 7,
@@ -6603,10 +6600,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
   return Playground;
 }(); //let entities = text2Entities(text);
 _defineProperty(Playground, "id", 'world-playground');
-// "world" type has special features in that it can be unloaded and reloaded.
-//  with special rules such as merge, replace, etc.
-//  this is currently used when switching between worlds in the GUI Editor
-//  the default behavior is to unload the world, then load the new world
 _defineProperty(Playground, "type", 'world');
 function text2Entities(text) {
   var entities = [];
