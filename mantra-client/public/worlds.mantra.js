@@ -6123,8 +6123,6 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 var exampleRoot = 'https://yantra.gg/mantra/examples';
-//exampleRoot = 'http://192.168.1.80:8888';
-//exampleRoot = 'http://192.168.1.80:7777/examples';
 var Playground = exports["default"] = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Playground() {
@@ -6154,6 +6152,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       // enables mouse wheel zoom
       game.data.camera.mouseWheelZoomEnabled = true;
       this.createWorld();
+      this.setDefaultZoom();
     }
   }, {
     key: "preload",
@@ -6162,17 +6161,20 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              game.use('Player');
-              game.use('Text');
-              game.use('Platform');
-              game.use('Teleporter');
-              game.use('Editor');
-              game.use('Code');
-              game.use('Iframe');
-              game.use('Select');
               game.use('Button');
+              game.use('Code');
+              game.use('Container');
+              game.use('Editor');
               game.use('Hexapod');
-            case 10:
+              game.use('Iframe');
+              game.use('Image');
+              game.use('Link');
+              game.use('Platform');
+              game.use('Player');
+              game.use('Select');
+              game.use('Teleporter');
+              game.use('Text');
+            case 13:
             case "end":
               return _context.stop();
           }
@@ -6186,20 +6188,19 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "createWorld",
     value: function createWorld() {
+      var _this = this;
       var game = this.game;
-      // game.make().Platform({ x: 0, y: 0, width: 16000, height: 9000 }).createEntity();
-      // game.make().size(100).color('blue').createEntity();
-      console.log('ggg', game.systems);
-      //game.systems.editor.init(game);
-      // game.systems.editor.show();
-
-      var text = game.make().Text().text('Mantra.js Playground').style({
+      var currentUrl = null;
+      var text = game.make().Text().text('Mantra.js Alpha Playground').style({
         fontSize: '64px'
-      });
-      text.color('white');
-      text.width(900);
-      text.position(50, -480, 0);
-      text.createEntity();
+      }).color('white').width(900).position(50, -520, 0).createEntity();
+      var link = game.make().Link({
+        href: 'https://yantra.gg/mantra/home',
+        target: '_blank'
+      }).style({
+        fontSize: '32px',
+        color: 'purple'
+      }).text('/examples/games/home').width(600).height(20).x(-100).y(-440).createEntity();
       var sideTextGroup = game.make().name('side-text-group').style({
         border: 'none',
         backgroundColor: 'rgba(0, 0, 0, 0)'
@@ -6214,117 +6215,67 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       });
       introText.container('side-text-group');
       introText.createEntity();
+      var src = 'https://yantra.gg/mantra/img/game/env/github-link-256.png';
 
-      /*
-      let iframeControlText = game.make().Text().text('Examples load in a Mantra UI IFrame(). Click on the code to copy it.');
-      iframeControlText.position(800, 490);
-      iframeControlText.width(600);
-      iframeControlText.color('white');
-      iframeControlText.style({
-        fontSize: '32px',
-      })
-      // iframeControlText.container('side-text-group');
-      iframeControlText.createEntity();
-      */
-
-      function createMonacoEditor() {
-        var codeEditor = game.getEntityByName('code-editor');
-        // Creates a Monaco Editor on top of the <code> element
-        // using the same source code and position / dimensions
-
-        // monaco a second to get ready
-        var monacoEditor = game.make().Monaco({
-          code: codeEditor.meta.code
-        }).height(700).width(660).x(codeEditor.position.x).y(codeEditor.position.y).z(32).createEntity();
-
-        // restore cursor from wait to default
-        document.body.style.cursor = 'default';
-        game.updateEntity(evalRunButton.id, {
-          style: {
-            display: 'block'
-          }
-        });
-
-        /*
-        // hides the codeEditor
-        game.updateEntity(codeEditor.id, {
-          style: {
-            display: 'none'
-          }
-        });
-        */
-      }
-      function openMonaco() {
-        // set the cursor to wait
-        document.body.style.cursor = 'wait';
-
-        // hide the open monaco button
-        game.updateEntity(openMonacoButton.id, {
-          style: {
-            display: 'none'
-          }
-        });
-        if (!game.systems.monaco) {
-          alert("LAYZ LOAD");
-          game.use('Monaco', {}, function () {
-            createMonacoEditor(game);
-          });
+      // Remark: These image links could also be buttons with textures, or ents with in-line textures
+      var githubImageLink = game.make().Image({
+        alt: 'Mantra.js Github',
+        src: src
+      }).pointerdown(function (context, event) {
+        // opens new link to Mantra.js Github
+        event.preventDefault();
+        var link = 'https://github.com/yantra-core/Mantra.js';
+        if (game.isTouchDevice()) {
+          window.location = link;
         } else {
-          createMonacoEditor(game);
+          window.open(link, '_blank');
         }
-      }
-
-      //let entities = text2Entities(text);
+      }).style({
+        cursor: 'pointer'
+      }).position(-700, 150).size(128).createEntity();
+      var discordImageLink = game.make().Image({
+        alt: 'AYYO Discord',
+        src: 'https://yantra.gg/mantra/img/game/env/discord-voice-dark.png'
+      }).pointerdown(function (context, event) {
+        var link = 'https://discord.gg/ZyNxBVmFgV';
+        if (game.isTouchDevice()) {
+          window.location = link;
+        } else {
+          // opens new link to AYYO Discord
+          window.open(link, '_blank');
+        }
+      }).style({
+        cursor: 'pointer'
+      }).position(-500, 150).size(128).createEntity();
 
       // TODO: remove createContainer, upgrade to Container() plugin instead
-      var container = game.createContainer({
-        name: 'container-a',
+
+      var container2 = game.make().Container({
         layout: 'grid',
-        // optional. can also be "flex" or "none"
-        color: 0xff00ff,
-        position: {
-          x: 170,
-          y: 450,
-          z: -1
-        },
-        body: false,
-        size: {
-          width: 1960,
-          height: 400
-        },
         grid: {
           columns: 7,
           rows: 3
-        },
-        style: {
-          // supports CSS property names
-          //padding: 0,
-          margin: 0,
-          paddingLeft: 0,
-          paddingTop: 0,
-          // background: '#ff0000', // can also use Entity.color
-          border: {
-            color: '#000000',
-            width: 0
-          }
         }
-      });
-      var currentUrl = null;
-
-      /*
-      categories = categories.filter(function(cat) {
-        let allowed = ['entity', 'items', 'terrain', 'ui', 'collision', 'camera', 'behaviors'];
-        return allowed.includes(cat.name);
-      })
-      */
-
+      }).color(0xff00ff).name('container-a').width(1960).height(400).position(170, 450, -1).style({
+        //padding: 0,
+        margin: 0,
+        paddingLeft: 0,
+        paddingTop: 0,
+        // background: '#ff0000', // can also use Entity.color
+        border: {
+          color: '#000000',
+          width: 0
+        }
+      }).createEntity();
       var primaryGameEmbed = game.make().Iframe({
-        src: 'https://yantra.gg/mantra/examples/demo?source=games/gravity-gardens'
-      }).width(800).height(600).x(0).y(-100).createEntity();
+        src: 'https://yantra.gg/mantra/examples/demo?source=games/home'
+      })
+      // .Iframe({ src: 'http://192.168.1.80:7777/examples/demo.html?source=games/gravity-gardens' })
+      .width(800).height(600).x(0).y(-100).createEntity();
       var evalEmbed = game.make().Iframe({
         src: 'https://yantra.gg/mantra/eval'
       })
-      // .Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
+      //.Iframe({ src: 'http://192.168.1.80:7777/eval.html' })
       .name('eval-embed').width(800).height(600).x(primaryGameEmbed.position.x).y(primaryGameEmbed.position.y).style({
         display: 'none'
       }).createEntity();
@@ -6333,22 +6284,9 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       // Allows for remote code sources
       var codeEditor = game.make().Code({
         //  code: 'hello <h1>'
-        src: 'https://yantra.gg/mantra/examples/games/gravity-gardens.js'
+        src: 'https://yantra.gg/mantra/examples/items/boomerang.js'
         //src: 'http://192.168.1.80:8888/items/boomerang.js'
-      }).name('code-editor').pointerdown( /*#__PURE__*/function () {
-        var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(context, event) {
-          return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-            while (1) switch (_context2.prev = _context2.next) {
-              case 0:
-              case "end":
-                return _context2.stop();
-            }
-          }, _callee2);
-        }));
-        return function (_x2, _x3) {
-          return _ref.apply(this, arguments);
-        };
-      }()).height(700).width(660).x(800).y(-170).z(33).createEntity();
+      }).name('code-editor').height(700).width(660).x(800).y(-170).z(33).createEntity();
 
       // TODO: use EntityBuilder.origin() property ( WIP )
       var origin = {
@@ -6357,24 +6295,11 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         y: codeEditor.position.y + codeEditor.size.height / 2
       };
       origin.x += 100;
-      origin.y += 22;
+      origin.y += 38;
       game.on('iframeMessage', function (event) {
         console.log('iframeMessage', event);
         game.flashText(event.data.message);
       });
-
-      /*
-      let openMonacoButton = game.make()
-        .Button({ text: 'Open Monaco Editor' })
-        .width(200)
-        .height(40)
-        .position(origin.x, origin.y, 33)
-        .pointerdown(function (context, event) {
-          openMonaco();
-        })
-        .createEntity();
-        */
-
       var evalRunButton = game.make().Button({
         text: 'Run Code'
       }).width(200).height(40).position(origin.x, origin.y, 32).pointerdown(function (context, event) {
@@ -6430,7 +6355,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         primaryGameEmbed.src = null;
       }).createEntity();
       var player = game.make().Player();
-      player.position(evalRunButton.position.x + 85, evalRunButton.position.y + 22, 0).z(64);
+      player.position(evalRunButton.position.x + 60, evalRunButton.position.y + 5, 0).z(64);
       player.createEntity();
       var hexapods = game.make().Hexapod().position(-800, -800).repeat(6).createEntity();
 
@@ -6465,6 +6390,10 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           if (currentUrl === context.value) return;
           console.log('afterUpdateEntity', primaryGameEmbed, context.value, event);
           if (typeof primaryGameEmbed === 'undefined') {
+            return;
+          }
+          if (typeof context.value === 'undefined' || context.value === '' || context.value === null) {
+            // do not process invalid selections ( such as the first option which is empty )
             return;
           }
 
@@ -6504,6 +6433,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
               src: context.value
             }
           });
+
           //
           // Updates the Code src to the selected example
           //
@@ -6513,6 +6443,18 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
           game.updateEntity(codeEditor.id, {
             meta: {
               src: sourceLink
+            }
+          });
+
+          //
+          // Updates the Examples link to the selected example link
+          //
+          var textLink = sourceLink.replace('https://yantra.gg/mantra', '').replace('.js', '');
+          var exampleLink = sourceLink.replace('.js', '');
+          game.updateEntity(link.id, {
+            text: textLink,
+            meta: {
+              href: exampleLink
             }
           });
 
@@ -6557,41 +6499,24 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         createDropdown(primaryGameEmbed, categoryExamples, 'container-a', category.title); // Assume 'container-a' exists or is dynamically created for each category
       });
 
+      // TODO: injects examples into playground scene itself
       // let addSceneButton = game.make().Button({ text: 'Load Example as Scene', disabled: true }).width(250).position(650, 500).createEntity();
+      // TODO: save current scene as world on Yantra
       // let deployToYantraButton = game.make().Button({ text: 'Deploy to Yantra.gg' }).width(200).position(900, 500).createEntity();
+      // TODO: copies code to clipboard
       // let copyCodeButton = game.make().Button({ text: 'Copy Code' }).width(200).position(1000, 500).createEntity();
-      /*
-       let gravitySlider = game.make().Range().width(100).position(-540, -400, 0).createEntity();
-       let docsEmbed = game.make().width(800 * 2).height(600 * 2);
-      docsEmbed.Iframe({ src: 'https://yantra.gg/mantra/examples/entity' })
-      docsEmbed.x(100).y(800);
+      // TODO: changes gravity on the entire playground page
+      // let gravitySlider = game.make().Range().width(100).position(-540, -400, 0).createEntity();
+
+      var docsEmbed = game.make().width(768).height(1000);
+      docsEmbed.Iframe({
+        src: 'https://yantra.gg/mantra/examples'
+      });
+      docsEmbed.style({
+        border: 'none'
+      });
+      docsEmbed.x(0).y(1200);
       docsEmbed.createEntity();
-       let codeEmbed = game.make().width(800 * 2).height(600 * 2);
-      codeEmbed.Iframe({ src: 'https://yantra.gg/mantra/examples' })
-      codeEmbed.x(1200).y(800);
-      codeEmbed.createEntity();
-      */
-
-      var screenWidth = window.innerWidth;
-      var screenHeight = window.innerHeight;
-
-      // Width-based zoom calculation
-      var zoomRatioWidth = 0.5 / game.width; // Derived ratio for width
-      var baseWidth = game.width;
-      var baseZoomWidth = 0.5;
-      var zoomWidth = baseZoomWidth + (screenWidth - baseWidth) * zoomRatioWidth;
-
-      // Height-based zoom calculation (assuming similar ratios and base values for height)
-      var zoomRatioHeight = 0.5 / game.height; // You might need to adjust this based on your game's height scaling
-      var baseHeight = game.height; // Adjust this base height as per your requirements
-      var baseZoomHeight = 0.5;
-      var zoomHeight = baseZoomHeight + (screenHeight - baseHeight) * zoomRatioHeight;
-
-      // Choose the smaller zoom level to ensure content fits both width and height
-      var zoom = Math.min(zoomWidth, zoomHeight);
-
-      // Clamp the zoom level between 0.4 and 1
-      zoom = Math.max(0.4, Math.min(zoom, 1));
       var text_dragToMoveMap = game.make().Text().text('Drag to move map');
       text_dragToMoveMap.x(200);
       text_dragToMoveMap.y(220);
@@ -6620,12 +6545,12 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         fontSize: '24px',
         cursor: 'pointer'
       });
-      text_clickToInteract.pointerdown(function (context, event) {
+      text_clickToInteract.pointerup(function (context, event) {
+        event.preventDefault();
         // game.rotate(context.id, 0.1);
-        game.shakeCamera({});
+        _this.game.shakeCamera({});
       });
       text_clickToInteract.createEntity();
-      game.setZoom(zoom);
 
       // TODO code responsive layout for mobile
       /*
@@ -6639,9 +6564,44 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       }
       */
     }
+  }, {
+    key: "setDefaultZoom",
+    value: function setDefaultZoom() {
+      var game = this.game;
+
+      //
+      // Caclulate the zoom based on the width and height of the window
+      // Remark: We could put this into Mantra as a utility function with parameters
+      //
+      var screenWidth = window.innerWidth;
+      var screenHeight = window.innerHeight;
+
+      // Width-based zoom calculation
+      var zoomRatioWidth = 0.5 / game.width; // Derived ratio for width
+      var baseWidth = game.width;
+      var baseZoomWidth = 0.5;
+      var zoomWidth = baseZoomWidth + (screenWidth - baseWidth) * zoomRatioWidth;
+
+      // Height-based zoom calculation (assuming similar ratios and base values for height)
+      var zoomRatioHeight = 0.5 / game.height; // You might need to adjust this based on your game's height scaling
+      var baseHeight = game.height; // Adjust this base height as per your requirements
+      var baseZoomHeight = 0.5;
+      var zoomHeight = baseZoomHeight + (screenHeight - baseHeight) * zoomRatioHeight;
+
+      // Choose the smaller zoom level to ensure content fits both width and height
+      var zoom = Math.min(zoomWidth, zoomHeight);
+
+      // Clamp the zoom level between 0.4 and 1
+      zoom = Math.max(0.4, Math.min(zoom, 1));
+
+      //
+      // Calls game.setZoom with the calculated zoom level
+      //
+      game.setZoom(zoom);
+    }
   }]);
   return Playground;
-}();
+}(); //let entities = text2Entities(text);
 _defineProperty(Playground, "id", 'world-playground');
 // "world" type has special features in that it can be unloaded and reloaded.
 //  with special rules such as merge, replace, etc.

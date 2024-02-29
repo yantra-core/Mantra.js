@@ -644,6 +644,7 @@ function cameraShake(_ref) {
     initialIntensity = _ref$initialIntensity === void 0 ? 100 : _ref$initialIntensity,
     _ref$duration = _ref.duration,
     duration = _ref$duration === void 0 ? 777 : _ref$duration;
+  var game = this.game;
   var gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');

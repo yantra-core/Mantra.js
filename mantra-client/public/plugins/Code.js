@@ -159,8 +159,17 @@ function inflateCode(entityElement, entityData) {
   adjustStyles(pre, code, entityData);
   return entityElement;
 }
+
+// Check for cached content before fetching
 function fetchSourceCode(src, codeElement, entityElement, game, entityData) {
-  if (!this.fetchSourceHandles[src]) {
+  if (this.fetchSourceHandles[src]) {
+    var cache = this.fetchSourceHandles[src];
+    if (cache.content) {
+      updateCodeElements(src, cache.content, codeElement, entityElement, game, entityData);
+    } else if (cache.error) {
+      handleFetchError(src, codeElement, cache.error);
+    }
+  } else {
     this.fetchSourceHandles[src] = fetch(src).then(handleFetchResponse.bind(this, src, codeElement, entityElement, game, entityData))["catch"](handleFetchError.bind(null, src, codeElement));
   }
   codeElement.setAttribute('data-src', src);
@@ -210,15 +219,18 @@ function handleFetchError(src, codeElement, error) {
 function updateCodeElements(src, content, codeElement, entityElement, game, entityData) {
   document.querySelectorAll("code[data-src=\"".concat(src, "\"]")).forEach(function (el) {
     var _game$systems$monaco;
-    console.log('elel', el);
-    if (window.Prism && window.Prism.Live) {
-      var textarea = updateOrCreateTextarea(el, content, entityElement);
-      if (textarea.fresh) {
-        console.log("textareatextarea", textarea);
-        new Prism.Live(textarea);
-        console.log('nnnnn');
-        attachTextareaEvents(textarea, game);
-      }
+    var textarea = updateOrCreateTextarea(el, content, entityElement);
+    if (usePrism) {
+      var tryPrism = function tryPrism() {
+        if (window.Prism && window.Prism.Live) {
+          var _textarea2 = updateOrCreateTextarea(el, content, entityElement);
+          new Prism.Live(_textarea2);
+          attachTextareaEvents(_textarea2, game);
+        } else {
+          setTimeout(tryPrism, 100);
+        }
+      };
+      tryPrism();
     } else {
       el.textContent = content;
     }
@@ -250,7 +262,6 @@ function updateOrCreateTextarea(el, content, entityElement) {
   return textarea;
 }
 function attachTextareaEvents(textarea, game) {
-  console.log('bind');
   textarea.addEventListener('mousedown', function () {
     game.data.camera.draggingAllowed = false;
     game.data.camera.mouseWheelZoomEnabled = false;

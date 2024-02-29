@@ -256,7 +256,6 @@ var _inflateCanvas = _interopRequireDefault(require("./lib/entity/inflate/inflat
 var _inflateImage = _interopRequireDefault(require("./lib/entity/inflate/inflateImage.js"));
 var _inflateGraphic = _interopRequireDefault(require("./lib/entity/inflateGraphic.js"));
 var _inflateTexture = _interopRequireDefault(require("./lib/entity/inflateTexture.js"));
-var _inflateButton = _interopRequireDefault(require("./lib/entity/inflate/inflateButton.js"));
 var _inflateCheckbox = _interopRequireDefault(require("./lib/entity/inflate/inflateCheckbox.js"));
 var _inflateInput = _interopRequireDefault(require("./lib/entity/inflate/inflateInput.js"));
 var _inflateIframe = _interopRequireDefault(require("./lib/entity/inflate/inflateIframe.js"));
@@ -285,7 +284,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // CSSGraphics.js - Marak Squires 2023
-// import inflateCode from './lib/entity/inflate/inflateCode.js';
 // touch / mouse events on entities
 // TODO: remove bindYCraftEvents.js file, replace with a Sutra
 var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
@@ -317,18 +315,21 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     _this.updateGraphic = _updateGraphic["default"].bind(_assertThisInitialized(_this));
 
     // HTML DOM elements as Mantra entities
-    _this.inflateButton = _inflateButton["default"].bind(_assertThisInitialized(_this));
     _this.inflateSelect = _inflateSelect["default"].bind(_assertThisInitialized(_this));
     _this.inflateRange = _inflateRange["default"].bind(_assertThisInitialized(_this));
     _this.inflateRadio = _inflateRadio["default"].bind(_assertThisInitialized(_this));
     _this.inflateInput = _inflateInput["default"].bind(_assertThisInitialized(_this));
     _this.inflateTextarea = _inflateTextarea["default"].bind(_assertThisInitialized(_this));
-    // this.inflateCode = inflateCode.bind(this);
     _this.inflateCheckbox = _inflateCheckbox["default"].bind(_assertThisInitialized(_this));
     _this.inflateImage = _inflateImage["default"].bind(_assertThisInitialized(_this));
     //this.inflateVideo = inflateVideo.bind(this);
     _this.inflateCanvas = _inflateCanvas["default"].bind(_assertThisInitialized(_this));
     _this.inflateIframe = _inflateIframe["default"].bind(_assertThisInitialized(_this));
+
+    // refactored out to Plugins
+    // this.inflateCode = inflateCode.bind(this);
+    // this.inflateButton = inflateButton.bind(this);
+
     _this.render = _render["default"].bind(_assertThisInitialized(_this));
     _this.removeGraphic = _removeGraphic["default"].bind(_assertThisInitialized(_this));
     _this.bindEntityEvents = _bindEntityEvents["default"].bind(_assertThisInitialized(_this));
@@ -398,7 +399,7 @@ _defineProperty(CSSGraphics, "removable", false);
 _defineProperty(CSSGraphics, "async", true);
 var _default = exports["default"] = CSSGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateButton.js":17,"./lib/entity/inflate/inflateCanvas.js":18,"./lib/entity/inflate/inflateCheckbox.js":19,"./lib/entity/inflate/inflateIframe.js":20,"./lib/entity/inflate/inflateImage.js":21,"./lib/entity/inflate/inflateInput.js":22,"./lib/entity/inflate/inflateRadio.js":23,"./lib/entity/inflate/inflateRange.js":24,"./lib/entity/inflate/inflateSelect.js":25,"./lib/entity/inflate/inflateText.js":26,"./lib/entity/inflate/inflateTextarea.js":27,"./lib/entity/inflateGraphic.js":28,"./lib/entity/inflateTexture.js":29,"./lib/entity/removeGraphic.js":30,"./lib/entity/updateGraphic.js":31,"./lib/render.js":32,"./lib/unload.js":33}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"./CSSCamera.js":2,"./lib/entity/bindEntityEvents.js":13,"./lib/entity/bindYCraftEvents.js":14,"./lib/entity/createGraphic.js":15,"./lib/entity/inflate/inflateBox.js":16,"./lib/entity/inflate/inflateCanvas.js":17,"./lib/entity/inflate/inflateCheckbox.js":18,"./lib/entity/inflate/inflateIframe.js":19,"./lib/entity/inflate/inflateImage.js":20,"./lib/entity/inflate/inflateInput.js":21,"./lib/entity/inflate/inflateRadio.js":22,"./lib/entity/inflate/inflateRange.js":23,"./lib/entity/inflate/inflateSelect.js":24,"./lib/entity/inflate/inflateText.js":25,"./lib/entity/inflate/inflateTextarea.js":26,"./lib/entity/inflateGraphic.js":27,"./lib/entity/inflateTexture.js":28,"./lib/entity/removeGraphic.js":29,"./lib/entity/updateGraphic.js":30,"./lib/render.js":31,"./lib/unload.js":32}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -450,6 +451,7 @@ function cameraShake(_ref) {
     initialIntensity = _ref$initialIntensity === void 0 ? 100 : _ref$initialIntensity,
     _ref$duration = _ref.duration,
     duration = _ref$duration === void 0 ? 777 : _ref$duration;
+  var game = this.game;
   var gameViewport = document.getElementById('gameHolder');
   if (!gameViewport) {
     console.log('Warning: could not find gameHolder div, cannot apply camera shake');
@@ -1120,7 +1122,14 @@ function createGraphic(entityData) {
       entityElement = this.inflateText(entityElement, entityData);
       break;
     case 'BUTTON':
-      entityElement = this.inflateButton(entityElement, entityData);
+      if (this.game.systems.button) {
+        entityElement = this.game.systems.button.inflate(entityElement, entityData);
+      }
+      break;
+    case 'LINK':
+      if (this.game.systems.link) {
+        entityElement = this.game.systems.link.inflate(entityElement, entityData);
+      }
       break;
     case 'INPUT':
       // For INPUT entities, create an input
@@ -1304,86 +1313,6 @@ function inflateBox(entityElement, entityData) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = inflateButton;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function inflateButton(entityElement, entityData) {
-  // Create the button
-  var button = document.createElement('button');
-  console.log('entityData', entityData);
-  if (_typeof(entityData.meta) === 'object' && entityData.meta.disabled === true) {
-    button.disabled = true;
-  }
-
-  // Set button text if provided
-  if (entityData.text) {
-    button.innerHTML = entityData.text;
-  }
-
-  // Apply default and custom button styles
-  applyButtonStyles(button, entityData);
-
-  // Append the button to the entityElement
-  entityElement.appendChild(button);
-
-  // Set width and color of the entityElement and button if provided
-  if (entityData.width) {
-    entityElement.style.width = "".concat(entityData.width, "px");
-    button.style.width = '100%';
-  }
-  if (entityData.height) {
-    entityElement.style.height = "".concat(entityData.height, "px");
-    button.style.height = '100%';
-  }
-  if (entityData.color) {
-    entityElement.style.color = convertColorToHex(entityData.color);
-  }
-
-  // Event listeners for hover and pressed states
-  button.addEventListener('mouseover', function () {
-    button.style.backgroundColor = '#e6e6e6'; // Lighter shade for hover
-  });
-
-  button.addEventListener('mouseout', function () {
-    button.style.backgroundColor = defaultButtonStyles.backgroundColor; // Default background color
-  });
-
-  button.addEventListener('mousedown', function () {
-    button.style.backgroundColor = '#cccccc'; // Darker shade for pressed
-  });
-
-  button.addEventListener('mouseup', function () {
-    button.style.backgroundColor = '#e6e6e6'; // Lighter shade for hover
-  });
-
-  return entityElement;
-}
-var defaultButtonStyles = {
-  border: 'none',
-  // padding: '15px 32px',
-  textAlign: 'center',
-  textDecoration: 'none',
-  display: 'inline-block',
-  fontSize: '16px',
-  margin: '4px 2px',
-  cursor: 'pointer',
-  borderRadius: '12px',
-  backgroundColor: '#f2f2f2',
-  color: 'black',
-  transition: 'background-color 0.4s ease, color 0.4s ease'
-};
-function applyButtonStyles(button, entityData) {
-  Object.assign(button.style, defaultButtonStyles, entityData.style);
-}
-function convertColorToHex(color) {
-  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
-}
-
-},{}],18:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports["default"] = inflateCanvas;
 function inflateCanvas(entityElement, entityData) {
   var canvas;
@@ -1446,7 +1375,7 @@ function applyCanvasStyles(canvas, entityData) {
   }
 }
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1475,7 +1404,7 @@ function inflateCheckbox(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1518,17 +1447,19 @@ function applyIframeStyles(iframe, entityData) {
   // TODO: removed pointer events so mouse zoom works over game until click
   // iframe.style.pointerEvents = 'none';
 
-  // Add event listeners to change styles on hover
-  iframe.addEventListener('mouseenter', function () {
-    iframe.style.border = hoverBorderStyle;
-    iframe.style.boxShadow = hoverBoxShadowStyle;
-  });
+  if (entityData.style && entityData.style.border !== 'none') {
+    // Add event listeners to change styles on hover
+    iframe.addEventListener('mouseenter', function () {
+      iframe.style.border = hoverBorderStyle;
+      iframe.style.boxShadow = hoverBoxShadowStyle;
+    });
 
-  // Revert to default styles when not hovering
-  iframe.addEventListener('mouseleave', function () {
-    iframe.style.border = "2px solid #999";
-    iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
-  });
+    // Revert to default styles when not hovering
+    iframe.addEventListener('mouseleave', function () {
+      iframe.style.border = "2px solid #999";
+      iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
+    });
+  }
 
   // On any iframe message bubble the event to game.emit('iframeMessage')
   iframe.addEventListener('message', function (event) {
@@ -1537,7 +1468,7 @@ function applyIframeStyles(iframe, entityData) {
   });
 }
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1561,6 +1492,14 @@ function inflateImage(entityElement, entityData) {
     if (entityData.meta && entityData.meta.src) {
       element.src = entityData.meta.src;
     }
+  }
+  if (entityData.meta && entityData.meta.alt) {
+    element.alt = entityData.meta.alt;
+  } else {
+    element.alt = entityData.meta.src || 'Image ' + entityData.id;
+  }
+  if (entityData.meta && entityData.meta.title) {
+    element.title = entityData.meta.title;
   }
 
   // Optional: Apply default and custom styles
@@ -1590,7 +1529,7 @@ function applyImageStyles(img, entityData) {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1670,7 +1609,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1703,7 +1642,7 @@ function inflateRadio(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1767,7 +1706,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1909,7 +1848,7 @@ function convertColorToHex(color) {
   return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1951,7 +1890,7 @@ function inflateText(entityElement, entityData) {
   return entityElement;
 }
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1983,7 +1922,7 @@ function applyTextareaStyles(textarea, entityData) {
   // Similar to applySelectStyles function
 }
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2010,7 +1949,7 @@ function inflateEntity(entity, alpha) {
   this.inflateTexture(entity, graphic);
 }
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2090,7 +2029,7 @@ function applyTextureStyles(texture, element, textureUrl, spritePosition, entity
   });
 }
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2108,7 +2047,7 @@ function removeGraphic(entityId) {
   }
 }
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2189,6 +2128,28 @@ function updateGraphic(entityData) {
       }
     }
 
+    if (entityData.type === 'LINK') {
+      var link = entityElement.querySelector('a');
+      if (link) {
+        // Update link text only if it has changed
+        if (entityData.text && link.innerText !== entityData.text) {
+          link.innerText = entityData.text; // Use innerText for text content to prevent HTML injection
+        }
+
+        // Update link target only if it has changed
+        if (entityData.meta.target && link.target !== entityData.meta.target) {
+          link.target = entityData.meta.target;
+        }
+
+        // Update link href only if it has changed
+        if (entityData.meta.href && link.href !== entityData.meta.href) {
+          // perform a search from left to right for the first instance of a string
+          //
+          // if 
+          link.href = entityData.meta.href;
+        }
+      }
+    }
     if (entityData.type === 'CODE') {
       // Query entityElement for the first code tag that has a 'data-src' attribute matching entityData.meta.src
       var codeElement = entityElement.querySelector("code[data-src=\"".concat(entityData.meta.src, "\"]"));
@@ -2208,7 +2169,7 @@ function updateGraphic(entityData) {
   }
 }
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2267,7 +2228,7 @@ function render(game, alpha) {
   }
 }
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -60,7 +60,7 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
-// window.game = game;
+ window.game = game;
 let home = new worlds.Platform();
 home = new worlds.Home();
 
@@ -98,9 +98,12 @@ game.use(new plugins.Canvas());
 game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
 game.use(new plugins.Code());
+game.use(new plugins.Container());
+game.use(new plugins.Entity());
 // game.use(new plugins.Monaco());
 
-// game.use(new plugins.Mouse());
+game.use(new plugins.Mouse());
+game.use(new plugins.Link());
    
 // game.use(new Mouse());
 // game.use(new plugins.Editor());
@@ -110,13 +113,32 @@ game.data.camera.mouseWheelZoomEnabled = true;
 
 game.start(function () {
   game.reset();
-  game.setZoom(1);
+  game.setZoom(2.5);
 
   // game.use(new plugins.ThreeGraphics());
 
-  // game.use(new worlds.EatWorld());
-  game.use(new worlds.Playground());
+   //game.use(new worlds.EatWorld());
+   game.use(new worlds.Playground());
+/*
+  game.createEntity({
+    texture: {
+      sheet: 'hexapod',
+      sprite: 'default',
+    },
+    width: 100,
+    height: 100,
+  })
 
+  game.make()
+  .size(100, 100)
+  .texture({
+    sheet: 'hexapod',
+    sprite: 'default',
+    //frame: 0
+}).createEntity();
+*/
+
+  //game.make().Hexapod().repeat(11).createEntity();
   //game.use(home);
 
   // game.make().Player().createEntity();

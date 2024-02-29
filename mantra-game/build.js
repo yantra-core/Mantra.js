@@ -41,6 +41,7 @@ let plugins = [
 
   // ui components
   './plugins/button/Button.js',
+  './plugins/link/Link.js',
   './plugins/checkbox/Checkbox.js',
   './plugins/message-flash/FlashMessage.js',
   './plugins/input/Input.js',
@@ -48,6 +49,7 @@ let plugins = [
 
   './plugins/iframe/Iframe.js',
   './plugins/canvas/Canvas.js',
+  './plugins/container/Container.js',
   './plugins/image/Image.js',
 
   './plugins/radio/Radio.js',
@@ -156,10 +158,14 @@ let plugins = [
 //console.log('Changed Plugins:', changedPlugins);
 //process.exit();
 //plugins = [];
-//plugins = ['./plugins/graphics-css/CSSGraphics.js']
+//plugins = ['./plugins/client/Client.js']
+
+//plugins = ['./plugins/link/Link.js']
 //plugins.push('./plugins/code/Code.js')
 // plugins = ['./plugins/monaco/Monaco.js']
 // plugins.push('./plugins/graphics-css/CSSGraphics.js');
+//plugins.push('./plugins/gui-editor/Editor.js');
+//plugins.push('./plugins/entity/Entity.js');
 
 // Function to copy directory recursively
 function copyDirSync(src, dest) {

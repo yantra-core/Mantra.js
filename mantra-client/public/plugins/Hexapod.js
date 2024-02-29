@@ -37,7 +37,7 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
       }
       return {
         type: 'HEXAPOD',
-        texture: 'demon',
+        texture: 'hexapod-single',
         width: 8,
         height: 8,
         health: 50,

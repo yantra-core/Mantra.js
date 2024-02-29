@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).Image = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.PLUGINS || (g.PLUGINS = {})).Container = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14,61 +14,61 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-var Image = exports["default"] = /*#__PURE__*/function () {
-  function Image() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    _classCallCheck(this, Image);
-    this.id = Image.id;
+// Container.js - Marak Squires 2023
+var Container = exports["default"] = /*#__PURE__*/function () {
+  function Container() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$width = _ref.width,
+      width = _ref$width === void 0 ? 40 : _ref$width,
+      _ref$height = _ref.height,
+      height = _ref$height === void 0 ? 40 : _ref$height;
+    _classCallCheck(this, Container);
+    this.id = Container.id;
+    this.width = width;
+    this.height = height;
   }
-  _createClass(Image, [{
+  _createClass(Container, [{
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.game.systemsManager.addSystem('image', this);
+      this.game.systemsManager.addSystem('block', this);
     }
   }, {
     key: "build",
     value: function build() {
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      // Ensure position is defined
       if (typeof entityData.position === 'undefined') {
         entityData.position = {
           x: 0,
           y: 0
         };
       }
-
-      /*
-      if (typeof  entityData.position.z === 'undefined') {
-        entityData.position.z = -10; // behind most elements so browser mouse doesn't interfere
-      }
-      */
-
-      // Ensure meta is defined and contains src and alt
       entityData.meta = entityData.meta || {};
-      entityData.meta.src = entityData.src || entityData.meta.src || ''; // Default src if none provided
-      entityData.meta.title = entityData.title || entityData.meta.title || ''; // Default title if none provided
-      entityData.meta.alt = entityData.alt || entityData.meta.alt || ''; // Default alt if none provided
-      // Return the entity configuration
+      entityData.meta.layout = entityData.layout || entityData.meta.layout || 'none';
+      entityData.meta.grid = entityData.grid || entityData.meta.grid || {};
+      entityData.items = entityData.items || entityData.meta.items || [];
+      console.log('cccc', entityData);
       return _objectSpread({
-        type: 'IMAGE',
+        type: 'CONTAINER',
+        layout: 'grid',
+        // optional. can also be "flex" or "none"
         body: false,
-        meta: _objectSpread({}, entityData.meta),
+        grid: {
+          columns: 7,
+          // TODO: config
+          rows: 3
+        },
+        size: entityData.size || {
+          width: this.width,
+          height: this.height
+        },
         position: entityData.position
       }, entityData);
     }
-  }, {
-    key: "createEntity",
-    value: function createEntity() {
-      var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      // Create the Image entity with the provided entity data
-      var imageEntity = this.game.createEntity(this.build(entityData));
-      // Additional logic for handling the image entity can be added here if necessary
-    }
   }]);
-  return Image;
+  return Container;
 }();
-_defineProperty(Image, "id", 'image');
+_defineProperty(Container, "id", 'container');
 
 },{}]},{},[1])(1)
 });

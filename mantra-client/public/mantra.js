@@ -1507,9 +1507,13 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "shakeCamera",
     value: function shakeCamera(intensity, duration) {
+      var game = this;
       this.graphics.forEach(function (graphicsInterface) {
         if (graphicsInterface.cameraShake) {
-          graphicsInterface.shakeCamera(intensity, duration);
+          graphicsInterface.shakeCamera({
+            intensity: intensity,
+            duration: duration
+          });
         }
       });
     }
@@ -2712,8 +2716,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "72ee22905e2e18d15bb9243d8e0821991c49ecbecbb776c0094e0df871e15e33",
-  "./plugins/ASCIIGraphics.min.js": "1b2e364043ac56185f64a24c1ed649801c52a7d2d668796e4db4451ac12c70fd",
+  "./plugins/ASCIIGraphics.js": "21dfa812645721def1b80a801ef0a0ca23d9d99a7797e67e70a6e46ca81420da",
+  "./plugins/ASCIIGraphics.min.js": "e89a4254e749243d8852472c0250d9f3e6c7ba0d8970e756121d8deba62e9017",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2734,24 +2738,26 @@ var _default = exports["default"] = {
   "./plugins/Border.min.js": "3584e32fb60aae9ee6a291e4b3a89722f9eb62b345bc0b68cc06b450c854ade5",
   "./plugins/Bullet.js": "e74dc967fd6ee2a3c3c1073a2f153e75813a07e004e3d024a67d8035866d65e9",
   "./plugins/Bullet.min.js": "912b40049e8fdac7c1c5d5f25e4ffa209f65472562521e0111686eced5599053",
-  "./plugins/Button.js": "45fdc92448bf3e870b7f50d68b719304c69a0001e7d443391abfb81fff4af666",
-  "./plugins/Button.min.js": "b114b0c4862ecead3fc38af305e67fdacab8cb779d4b3be439456ccb0f17276b",
+  "./plugins/Button.js": "27e86d9cb16ab78fe6655a96c0fa69e656efd1ad32c1a258cd9c363658757cfe",
+  "./plugins/Button.min.js": "f9b2f60b9420ce0ae8911c97be62634913da086a0fa7603cab6e9ab20844e84e",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "6fb22f4c3fcc7a631c65e5cad1d5976b31a980a4a219f94aa66ad417e385cf9a",
-  "./plugins/CSSGraphics.min.js": "26790a432d26af028b8704db94824b35abc03db68eb20e61ac4b36d388c25b40",
+  "./plugins/CSSGraphics.js": "8235f132a45fdc52c5c2562c7df049a39dafb1e0b90455873de9892c5a70cc0a",
+  "./plugins/CSSGraphics.min.js": "ec8bcb0c856f2fffc80669c1a4948e91a1cfcec830a8d1f114b45f9f9ed53cb9",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
   "./plugins/Checkbox.min.js": "788db3172873ba0a5c8f6f596be2c54a55ba875d1b9759af1758ea2f2107494c",
   "./plugins/ChronoControl.js": "3d1eb99a514dc0726c3055371cf47fb32e25190a4f7c16b823792ecc7858dfa1",
   "./plugins/ChronoControl.min.js": "a9a511015708f05075041a02a32b9bcfd56e8cc73d07a5836699b0c1c2f1ae83",
-  "./plugins/Code.js": "cc50a4500138bdd262743b368eff912f83538f3dbdec1f1089a2ba0ea7e21576",
-  "./plugins/Code.min.js": "655136564a0c51cc6be335aa18acdcb8265d4b53d7dbaf96c449a0889ff00925",
+  "./plugins/Code.js": "12f5ab80067f8d6121a356f0ad31e4d26321b800fc328d7240e486a33b22db5c",
+  "./plugins/Code.min.js": "0456c74a9a4ba29f7a7f3d48b4af375e8c13718440ee2e8520ef25b36f289930",
   "./plugins/Collectable.js": "a428d356c2fc2ce1a14b3badc8044e26eb65ed5a9e810c7c020f8a5483f9f46b",
   "./plugins/Collectable.min.js": "a4921133c0c33773e21409a0663245b191d79742636a39d443fafb3e0f26487c",
   "./plugins/Collisions.js": "f123f7b3154b1749306aabba1ec65bc81958d67fd926994c3e51ebfa36d63375",
   "./plugins/Collisions.min.js": "94f7be8e3ef8d997a636a184fca96e183b42ac19dfe6e96d0a184c9a087d1b9b",
+  "./plugins/Container.js": "6e32546130328e161e3d495c3b2d03b7cac693b23cc4609ac866aa12f36a7a43",
+  "./plugins/Container.min.js": "8145bc76646a51ca448fb1503ae08def8903e9c9c4810547efd5c3e6a606f2f9",
   "./plugins/ControlsGUI.js": "d54f58ed4eabb78b5897a2428591e1ef0256d5d67773dcbe13c4d75f8075e63b",
   "./plugins/ControlsGUI.min.js": "08c30bc076baeda7379a728a2a188e0b35fcf5d91d031b5221654d319591ff86",
   "./plugins/Creator.js": "61d6002a0e5d51df00e5735ee8ffeeaecb7083e9f5ca6747a0991ef9bb39c306",
@@ -2792,12 +2798,12 @@ var _default = exports["default"] = {
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
   "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
-  "./plugins/Hexapod.js": "93a22407d5ee45eff171fb144221e419191369a7775a2af59a56a01a9ca822bf",
-  "./plugins/Hexapod.min.js": "fec5b1c81df0044a1fbdba1baae3587f606b381dde94f5a81f4ccbcc673d972e",
+  "./plugins/Hexapod.js": "e85b65761c813a982e7989194ed7b04b141d1da8da86a1498b129f157a88741c",
+  "./plugins/Hexapod.min.js": "967843bbedc4dae077f4b09763ac0d70a628739d6467caf1d4f497b078a4a55a",
   "./plugins/Iframe.js": "ef82c243d98dc49ab09ba5b54d7483128eb0fb49a4e733e1032d25730a095db0",
   "./plugins/Iframe.min.js": "486536e022cee0dc0274cd5a99b24f456ed94715b20fa2de8bbfa88c36ada101",
-  "./plugins/Image.js": "ca10bf24414dc4324989865027abec8d266f54b3dcc2ee26c3a29ad598430a70",
-  "./plugins/Image.min.js": "c3e643c3152a2cec852ea59932b4ec79adc264e82fb63cba733d5a97306653ab",
+  "./plugins/Image.js": "a9be3447d72667f4cc83443bdefc6ae1f09be99ec50668ade91212acee362792",
+  "./plugins/Image.min.js": "b1f09111be50b848eed0bdf9f2c197af8d616f6b0f915ee75a0e0cbf83e0f57d",
   "./plugins/Input.js": "d0684ed311bbfacaf094fbbf4b70e23296b7fdc077e4e3f92e6ee3487a5ce83f",
   "./plugins/Input.min.js": "6b17a341cd67a0deab701cf2d40e150bd7e8055e6a91724f201825099ab52221",
   "./plugins/Inspector.js": "fda5c903185dfdeba99096d42f58ff7daafc757b016090bd440c74770dc2fc53",
@@ -2810,6 +2816,8 @@ var _default = exports["default"] = {
   "./plugins/Label.min.js": "44a9e0631d95a8ccf9d23bc2249c2653abdbea4f79db1e3c9f5cfb7faf7f2cdc",
   "./plugins/Lifetime.js": "126648fa1b787f25fa302e56603a85d2073ab372b97d66b177930c27c4ae9f68",
   "./plugins/Lifetime.min.js": "1f0e46af7af17e9fdbda0b7ac3ed9844c7b9993b3ce7682443e0c7f0188b44b5",
+  "./plugins/Link.js": "15613eac362fc089cd4450fa8aeb6a519239a0b6eff35f675827813f12dfa833",
+  "./plugins/Link.min.js": "ef00cc642c22ddd3ce4251674c61761194867bfc9edc484050968c24f00037d5",
   "./plugins/LoadingScreen.js": "a83930e9d45f160bc2f61af8894283bda3e58488e449ccde5374feda9f236612",
   "./plugins/LoadingScreen.min.js": "b3b953dc98813936e5713b170a828db888f2cac1a368281cd8cd18185e4fb17a",
   "./plugins/LocalClient.js": "62886ed824f7bc714cde5664ecca9447e6d2a047eb65b5309f2dad765cef746e",
@@ -2820,13 +2828,12 @@ var _default = exports["default"] = {
   "./plugins/Midi.min.js": "5ef8a15f87866a63e014ecbf3433f93a6c463c26d48a1c3a4448604ee8b5d229",
   "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
   "./plugins/MidiGUI.min.js": "ceb780abf5f2fadc904cbb683dde98548db60f5bdf0f90f1398728c76a0f923f",
-  "./plugins/Mouse.js": "49e1a5fb0f2fbe8ec3eb9a7f10501ed58db14d9c4859d3b6d85cd84140644791",
-  "./plugins/Mouse.min.js": "d0af0fe163ee54b005a2850ed10999c2d101c81840c28a1f79b5f9e0b6c35397",
+  "./plugins/Mouse.js": "2f7e12adacee5b999b7dc87fffa7bd2337164ea035c26f92e38036ac81fb56eb",
+  "./plugins/Mouse.min.js": "23ef56fcc3e9f1d7ac6e93eeb0920026853ee85fd62857305893ab773a8e7226",
   "./plugins/PacManMovement.js": "e7b7dbe97b3192004c8bb2c58e952e27e2281a9604785faf3d0ee43771444205",
   "./plugins/PacManMovement.min.js": "31f12aa5c1ec52ed3b22dd49420a5a42ff749954306411e3983c25f257fbbe13",
   "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
   "./plugins/PhaserCamera.min.js": "da4dbe5ab58c17a3716130d51ac103492a4fd201da6fa61ad5b106e2fc158459",
-  "./plugins/PhaserGraphics.js": "e14cc1c2e7256c540595b170447be93e0b38feae954772709084026a967d09e7",
   "./plugins/PhaserGraphics.min.js": "2f436654a1728b390b3f17e6802b9e202a70d3733afbea96f5741baf4e2ff981",
   "./plugins/PhysXPhysics.js": "42d70e5cbde1d94b4895a92b6d51739a05a4762c41c208b32b2e0b1188dd7879",
   "./plugins/PhysXPhysics.min.js": "f91a1b58ea914c437eb0082c78aa3c54570065978b853ef2592364f19759c401",
@@ -2886,7 +2893,6 @@ var _default = exports["default"] = {
   "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
   "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
-  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
   "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
   "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
   "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",

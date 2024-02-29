@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+var _inflateButton = _interopRequireDefault(require("./lib/inflateButton.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -29,6 +31,7 @@ var Button = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
+      this.inflate = _inflateButton["default"].bind(this);
       this.game.systemsManager.addSystem('button', this);
     }
   }, {
@@ -72,6 +75,86 @@ var Button = exports["default"] = /*#__PURE__*/function () {
   return Button;
 }();
 _defineProperty(Button, "id", 'button');
+
+},{"./lib/inflateButton.js":2}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = inflateButton;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function inflateButton(entityElement, entityData) {
+  // Create the button
+  var button = document.createElement('button');
+  console.log('entityData', entityData);
+  if (_typeof(entityData.meta) === 'object' && entityData.meta.disabled === true) {
+    button.disabled = true;
+  }
+
+  // Set button text if provided
+  if (entityData.text) {
+    button.innerHTML = entityData.text;
+  }
+
+  // Apply default and custom button styles
+  applyButtonStyles(button, entityData);
+
+  // Append the button to the entityElement
+  entityElement.appendChild(button);
+
+  // Set width and color of the entityElement and button if provided
+  if (entityData.width) {
+    entityElement.style.width = "".concat(entityData.width, "px");
+    button.style.width = '100%';
+  }
+  if (entityData.height) {
+    entityElement.style.height = "".concat(entityData.height, "px");
+    button.style.height = '100%';
+  }
+  if (entityData.color) {
+    entityElement.style.color = convertColorToHex(entityData.color);
+  }
+
+  // Event listeners for hover and pressed states
+  button.addEventListener('mouseover', function () {
+    button.style.backgroundColor = '#e6e6e6'; // Lighter shade for hover
+  });
+
+  button.addEventListener('mouseout', function () {
+    button.style.backgroundColor = defaultButtonStyles.backgroundColor; // Default background color
+  });
+
+  button.addEventListener('mousedown', function () {
+    button.style.backgroundColor = '#cccccc'; // Darker shade for pressed
+  });
+
+  button.addEventListener('mouseup', function () {
+    button.style.backgroundColor = '#e6e6e6'; // Lighter shade for hover
+  });
+
+  return entityElement;
+}
+var defaultButtonStyles = {
+  border: 'none',
+  // padding: '15px 32px',
+  textAlign: 'center',
+  textDecoration: 'none',
+  display: 'inline-block',
+  fontSize: '16px',
+  margin: '4px 2px',
+  cursor: 'pointer',
+  borderRadius: '12px',
+  backgroundColor: '#f2f2f2',
+  color: 'black',
+  transition: 'background-color 0.4s ease, color 0.4s ease'
+};
+function applyButtonStyles(button, entityData) {
+  Object.assign(button.style, defaultButtonStyles, entityData.style);
+}
+function convertColorToHex(color) {
+  return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
+}
 
 },{}]},{},[1])(1)
 });

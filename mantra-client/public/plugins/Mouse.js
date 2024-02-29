@@ -47,7 +47,11 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       RIGHT: 2 // Default to the standard right button index
     };
 
-    this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A'];
+    this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A', 'H3'];
+
+    // Window() / gui.js related, ensures UI windows captures clicks
+    this.disallowedPointerDownTags = ['H3'];
+    this.disallowedPointerDownClasses = ['gui-container'];
     this.activeTouches = {}; // Store active touches
     // TODO: support 3+ touches
     this.firstTouchId = null; // Track the first touch for movement
@@ -62,6 +66,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     this.boundHandlePointerDown = this.handlePointerDown.bind(this);
     this.boundHandlePointerMove = this.handlePointerMove.bind(this);
     this.boundHandlePointerUp = this.handlePointerUp.bind(this);
+    this.boundHandleWindowBlur = this.handleWindowBlur.bind(this);
   }
   _createClass(Mouse, [{
     key: "init",
@@ -175,15 +180,47 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         this.game.selectedEntityId = null;
       }
     }
+
+    // Method to handle window blur event
+  }, {
+    key: "handleWindowBlur",
+    value: function handleWindowBlur() {
+      // Reset pointer states
+      this.isDragging = false;
+      this.activeTouches = {};
+      this.firstTouchId = null;
+      this.secondTouchId = null;
+      this.endedFirstTouch = false;
+      this.endedSecondTouch = false;
+
+      // Reset mouse buttons states
+      this.mouseButtons = {
+        LEFT: null,
+        RIGHT: null,
+        MIDDLE: null
+      };
+    }
   }, {
     key: "handleMouseMove",
     value: function handleMouseMove(event) {
       var game = this.game;
       var target = event.target;
-      this.mousePosition = {
-        x: event.clientX,
-        y: event.clientY
-      };
+
+      // only update if single firsTouch id
+      if (this.firstTouchId) {
+        if (event.pointerId === this.firstTouchId && !this.secondTouchId) {
+          //if (event.pointerId === this.firstTouchId || (!this.firstTouchId && event.pointerType === 'mouse')) {
+          this.mousePosition = {
+            x: event.clientX,
+            y: event.clientY
+          };
+        }
+      } else {
+        this.mousePosition = {
+          x: event.clientX,
+          y: event.clientY
+        };
+      }
       if (event.target instanceof HTMLCanvasElement) {
         var canvas = event.target;
         var rect = canvas.getBoundingClientRect();
@@ -256,6 +293,28 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
 
       // middle mouse button
       if (event.button === this.buttonMappings.MIDDLE) {
+        //
+        // Do not allow Game related mouse down events on certain classes such as UI elements
+        //
+        // if the tag ( like the H3 window header is disallowed, return early and not allow dragging
+        if (this.disallowedPointerDownTags.includes(target.tagName)) {
+          return;
+        }
+        // if the class is disallowed, return early and not allow dragging ( gui-content )
+        if (this.disallowedPointerDownClasses.some(function (className) {
+          return target.classList.contains(className);
+        })) {
+          return;
+        }
+
+        //
+        // This is a two finger drag event, do not process as single mouse pointer event
+        //
+        if (this.firstTouchId && this.secondTouchId) {
+          // prevent default right click menu
+          event.preventDefault();
+          return;
+        }
         this.isDragging = true;
         this.dragStartPosition = {
           x: event.clientX,
@@ -270,17 +329,20 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         // TODO: Allow prevent default on PRE and CODE elements
         // check to see if target element is interactive ( such as button / input / textarea / etc )
         if (!this.tagAllowsDefaultEvent.includes(target.tagName)) {
-          //console.log('preventing default event', target)
-          // event.preventDefault();
+          // console.log('allowing default event', target)
+          preventDefault = false;
         } else {
-          //console.log('allowing default event', target)
+          //console.log('preventing default', target)
+          // this will enable things like <a> links to work and <textarea> to gain focus
           preventDefault = true;
         }
       }
       var context = this.createMouseContext(event);
       if (preventDefault) {
-        event.stopPropagation();
+        event.stopPropagation(); // This may not actually be doing what we expect? Test again
+        // event.preventDefault();
       }
+
       if (context.target && context.target.pointerdown) {
         context.target.pointerdown(context, event);
       }
@@ -443,6 +505,18 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "preventMultiTouchDefault",
+    value: function preventMultiTouchDefault(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }
+  }, {
+    key: "preventGestureDefault",
+    value: function preventGestureDefault(event) {
+      event.preventDefault();
+    }
+  }, {
     key: "bindInputControls",
     value: function bindInputControls() {
       if (inputsBound === true) {
@@ -456,6 +530,17 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         document.addEventListener('pointermove', this.boundHandlePointerMove);
         document.addEventListener('pointerdown', this.boundHandlePointerDown);
         document.addEventListener('pointerup', this.boundHandlePointerUp);
+
+        // Prevent default on non-pointer events to handle multi-touch zoom
+        document.addEventListener('touchstart', this.preventMultiTouchDefault, {
+          passive: false
+        });
+        document.addEventListener('touchmove', this.preventMultiTouchDefault, {
+          passive: false
+        });
+        document.addEventListener('gesturestart', this.preventGestureDefault, {
+          passive: false
+        });
       } else {
         document.addEventListener('mouseover', this.boundHandleMouseOver);
         document.addEventListener('mouseout', this.boundHandleMouseOut);
@@ -463,6 +548,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         document.addEventListener('mousedown', this.boundHandleMouseDown);
         document.addEventListener('mouseup', this.boundHandleMouseUp);
       }
+      window.addEventListener('blur', this.boundHandleWindowBlur);
 
       // TODO: could be a config option
       if (this.disableContextMenu) {
@@ -474,13 +560,65 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           event.preventDefault();
         });
       }
+      var initialDistance = null; // Store the initial distance between two touches
+      var currentZoom = 1; // Assuming 1 is your game's initial zoom level
 
-      // TODO: drag and drop to move map
-      // TODO: two finger pinch to zoom
+      // Helper function to calculate the distance between two points
+      function getDistance(touch1, touch2) {
+        var dx = touch1.pageX - touch2.pageX;
+        var dy = touch1.pageY - touch2.pageY;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      // Helper function to clamp the zoom level within the specified range
+      function clampZoom(zoomLevel) {
+        return Math.max(0.5, Math.min(zoomLevel, 3.5));
+      }
+      document.addEventListener('touchstart', function (event) {
+        if (event.touches.length === 2) {
+          // Initialize the initial distance between the two fingers
+          initialDistance = getDistance(event.touches[0], event.touches[1]);
+        }
+      }, {
+        passive: false
+      });
       document.addEventListener('touchmove', function (event) {
         if (event.touches.length > 1) {
-          event.preventDefault();
+          // Calculate the new distance between the two touches
+          var newDistance = getDistance(event.touches[0], event.touches[1]);
+          if (initialDistance !== null) {
+            // Calculate the zoom factor based on the change in distance
+            var zoomFactor = newDistance / initialDistance;
+
+            // Apply the zoom factor to the current zoom level
+            var newZoomLevel = currentZoom * zoomFactor;
+
+            // Clamp the new zoom level to ensure it's within the specified range
+            newZoomLevel = clampZoom(newZoomLevel);
+
+            // Update the game's zoom level
+            //game.zoom(newZoomLevel);
+            //game.flashText(newZoomLevel.toFixed(1)); // Display the new zoom level for debugging
+
+            // Update the current zoom level for the next calculation
+            //currentZoom = newZoomLevel;
+
+            // Update the initial distance for the next move event
+            initialDistance = newDistance;
+          }
+          event.preventDefault(); // Prevent default pinch-to-zoom behavior
         }
+      }, {
+        passive: false
+      });
+      document.addEventListener('touchend', function (event) {
+        // Reset the initial distance when one or both fingers are lifted
+        initialDistance = null;
+      }, {
+        passive: false
+      });
+      document.addEventListener('gesturestart', function (event) {
+        event.preventDefault();
       }, {
         passive: false
       });
@@ -504,6 +642,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         document.removeEventListener('mousedown', this.boundHandleMouseDown);
         document.removeEventListener('mouseup', this.boundHandleMouseUp);
       }
+      window.removeEventListener('blur', this.boundHandleWindowBlur);
     }
   }, {
     key: "unload",

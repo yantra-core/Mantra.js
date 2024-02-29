@@ -41,6 +41,7 @@ function applyIframeStyles(iframe, entityData) {
   // TODO: removed pointer events so mouse zoom works over game until click
   // iframe.style.pointerEvents = 'none';
 
+  if (entityData.style && entityData.style.border !== 'none') {
   // Add event listeners to change styles on hover
   iframe.addEventListener('mouseenter', () => {
     iframe.style.border = hoverBorderStyle;
@@ -52,6 +53,7 @@ function applyIframeStyles(iframe, entityData) {
     iframe.style.border = "2px solid #999";
     iframe.style.boxShadow = "0 0 8px 0 rgba(0, 0, 0, 0.1)";
   });
+  }
 
   // On any iframe message bubble the event to game.emit('iframeMessage')
   iframe.addEventListener('message', (event) => {

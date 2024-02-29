@@ -1189,6 +1189,14 @@ let ui_examples = [
     url: 'ui/ui-button.html',
     tags: ['ui', 'button', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   },
+  {
+    title: 'Link',
+    category: 'ui',
+    description: 'Create a UI link.',
+    image: 'placeholder-image.jpg',
+    url: 'ui/ui-link.html',
+    tags: ['ui', 'link', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
   /*
   {
     title: 'Input',

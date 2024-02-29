@@ -1001,11 +1001,21 @@ function layoutEntity(container, entityId) {
   var layoutType = 'none'; // 'none', 'grid', 'flex', 'stack', 'custom-function'
   var origin = 'center'; // 'center', 'bottom-right', 'top-right', 'bottom-left', 'center-left', 'center-right', 'top-center', 'bottom-center', 'top-left'
 
+  // Legacy API, don't pollute style scope with new / unknown  properties
   if (containerEnt.style && containerEnt.style.layout) {
     layoutType = containerEnt.style.layout;
   }
   if (containerEnt.style && containerEnt.style.origin) {
     origin = containerEnt.style.origin;
+  }
+
+  // New API
+  if (containerEnt.meta && containerEnt.meta.layout) {
+    layoutType = containerEnt.meta.layout;
+  }
+  console.log("containerEntcontainerEntcontainerEntcontainerEnt", containerEnt);
+  if (layoutType === 'grid') {
+    // alert('g')
   }
 
   //
@@ -1061,14 +1071,20 @@ function layoutEntity(container, entityId) {
   //
   // Layout container items using grid layout algorithm
   //
+
   if (layoutType === 'grid') {
-    var cols = containerEnt.style.grid.columns;
-    var rows = containerEnt.style.grid.rows;
+    var cols = containerEnt.meta.grid.columns || 1;
+    var rows = containerEnt.meta.grid.rows || 1;
+    if (containerEnt.style && containerEnt.style.grid) {
+      cols = containerEnt.style.grid.columns || cols;
+      rows = containerEnt.style.grid.rows || rows;
+    }
     if (typeof cols !== 'number' || typeof rows !== 'number') {
       console.log('containerEnt.layout', containerEnt.layout);
       throw new Error('Grid layout requires cols and rows to be numbers');
     }
 
+    //console.log("ahhhhhhhhhh", cols, rows)
     // get all the other items in the container
     var containerItems = containerEnt.items || [];
 
@@ -1082,6 +1098,8 @@ function layoutEntity(container, entityId) {
     // Calculate the width and height for each grid cell
     var cellWidth = containerSize.width / cols;
     var cellHeight = containerSize.height / rows;
+    //alert(containerSize.width)
+    //alert(containerSize.height)
 
     // Loop through each item in the container
     containerItems.forEach(function (item, index) {
@@ -1097,7 +1115,6 @@ function layoutEntity(container, entityId) {
       }
       var paddingTop = 0;
       var paddingLeft = 0;
-
       // Set the starting position to the top-left corner of the container's bounding box
       var positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
       var positionY = containerPosition.y - containerSize.height / 2 + paddingTop;
