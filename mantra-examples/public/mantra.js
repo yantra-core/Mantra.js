@@ -838,6 +838,111 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       return this;
     }
   }, {
+    key: "layout",
+    value: function layout(globalOrigin, referenceDimensions) {
+      // Default to screen size if referenceDimensions are not provided
+      if (typeof referenceDimensions === 'undefined') {
+        referenceDimensions = {
+          width: window.innerWidth,
+          height: window.innerHeight
+        };
+      }
+      console.log("Reference Dimensions:", referenceDimensions);
+
+      // Calculate the center of the screen in screen coordinates
+      var screenCenter = {
+        x: referenceDimensions.width / 2,
+        y: referenceDimensions.height / 2
+      };
+
+      // Map of global origin positions to their function for calculating position
+      var globalOrigins = {
+        'center': function center() {
+          return {
+            x: 0,
+            y: 0
+          };
+        },
+        // Center of game coordinates
+        'top-left': function topLeft() {
+          return {
+            x: -screenCenter.x,
+            y: -screenCenter.y
+          };
+        },
+        'top-center': function topCenter() {
+          return {
+            x: 0,
+            y: -screenCenter.y
+          };
+        },
+        'top-right': function topRight() {
+          return {
+            x: screenCenter.x,
+            y: -screenCenter.y
+          };
+        },
+        'bottom-left': function bottomLeft() {
+          return {
+            x: -screenCenter.x,
+            y: screenCenter.y
+          };
+        },
+        'bottom-center': function bottomCenter() {
+          return {
+            x: 0,
+            y: screenCenter.y
+          };
+        },
+        'bottom-right': function bottomRight() {
+          return {
+            x: screenCenter.x,
+            y: screenCenter.y
+          };
+        },
+        'center-left': function centerLeft() {
+          return {
+            x: -screenCenter.x,
+            y: 0
+          };
+        },
+        'center-right': function centerRight() {
+          return {
+            x: screenCenter.x,
+            y: 0
+          };
+        }
+      };
+      var calculatePosition = globalOrigins[globalOrigin];
+      if (calculatePosition) {
+        // Calculate the position based on the global origin
+        var position = calculatePosition();
+
+        // calculate offset based on origin to keep relative center position
+        if (globalOrigin === 'top-left') {
+          position.x = position.x + this.config.size.width / 2;
+          position.y = position.y + this.config.size.height / 2;
+        }
+        if (globalOrigin === 'top-center') {
+          position.y = position.y + this.config.size.height / 2;
+        }
+        if (globalOrigin === 'top-right') {
+          position.x = position.x - this.config.size.width / 2;
+          position.y = position.y + this.config.size.height / 2;
+        }
+        if (globalOrigin === 'bottom-left') {
+          position.x = position.x + this.config.size.width / 2;
+          position.y = position.y + this.config.size.height / 2;
+        }
+
+        // Update the entity's position by converting screen space to game space
+        this.position(position.x, position.y);
+      } else {
+        console.warn("Invalid global origin value: '".concat(globalOrigin, "'. Valid global origins are center, top-left, top-center, top-right, bottom-left, bottom-center, bottom-right, center-left, center-right."));
+      }
+      return this;
+    }
+  }, {
     key: "offset",
     value: function offset(x, y, z) {
       if (_typeof(this.config.offset) !== 'object' || this.config.offset === null) {
@@ -2442,6 +2547,9 @@ function construct(game) {
     // global for game, not camera specific
     camera: {
       mode: null,
+      scaleMultiplier: 2.5,
+      adaptiveZoom: true,
+      // will auto-zoom the viewport to fit the game size
       follow: game.config.camera.follow,
       currentZoom: game.config.camera.startingZoom,
       position: {
@@ -2716,8 +2824,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "21dfa812645721def1b80a801ef0a0ca23d9d99a7797e67e70a6e46ca81420da",
-  "./plugins/ASCIIGraphics.min.js": "e89a4254e749243d8852472c0250d9f3e6c7ba0d8970e756121d8deba62e9017",
+  "./plugins/ASCIIGraphics.js": "25e24e10fdd04740737aca869da9e925a544588504d379e58824cd1b597d334b",
+  "./plugins/ASCIIGraphics.min.js": "78aa8382ec3ce75a07710f29c5a44f4692c1bf0bdaa77654d809e5dbf21cbb13",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
@@ -2742,8 +2850,8 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "f9b2f60b9420ce0ae8911c97be62634913da086a0fa7603cab6e9ab20844e84e",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "8235f132a45fdc52c5c2562c7df049a39dafb1e0b90455873de9892c5a70cc0a",
-  "./plugins/CSSGraphics.min.js": "ec8bcb0c856f2fffc80669c1a4948e91a1cfcec830a8d1f114b45f9f9ed53cb9",
+  "./plugins/CSSGraphics.js": "a1c42e1000a471fb9ab63847b13101b6379a44477585f1b48a7cffb2c63f2368",
+  "./plugins/CSSGraphics.min.js": "764a8ea86f58518a9f8b3dc0a676b885b5d0ea929074487d450306b56f760749",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
@@ -2834,6 +2942,7 @@ var _default = exports["default"] = {
   "./plugins/PacManMovement.min.js": "31f12aa5c1ec52ed3b22dd49420a5a42ff749954306411e3983c25f257fbbe13",
   "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
   "./plugins/PhaserCamera.min.js": "da4dbe5ab58c17a3716130d51ac103492a4fd201da6fa61ad5b106e2fc158459",
+  "./plugins/PhaserGraphics.js": "e14cc1c2e7256c540595b170447be93e0b38feae954772709084026a967d09e7",
   "./plugins/PhaserGraphics.min.js": "2f436654a1728b390b3f17e6802b9e202a70d3733afbea96f5741baf4e2ff981",
   "./plugins/PhysXPhysics.js": "42d70e5cbde1d94b4895a92b6d51739a05a4762c41c208b32b2e0b1188dd7879",
   "./plugins/PhysXPhysics.min.js": "f91a1b58ea914c437eb0082c78aa3c54570065978b853ef2592364f19759c401",
@@ -2893,6 +3002,7 @@ var _default = exports["default"] = {
   "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
   "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
+  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
   "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
   "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
   "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",

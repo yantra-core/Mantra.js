@@ -3456,7 +3456,7 @@ var GravityGardens = /*#__PURE__*/function () {
       game.config.mouseMovementButton = 'RIGHT';
       // Actions with left click
       game.config.mouseActionButton = 'LEFT';
-
+      game.data.camera.scaleMultiplier = 0.9;
       // enables the default top-down mouse movements
       game.config.defaultMouseMovement = true;
 
@@ -4884,6 +4884,7 @@ var Maze = /*#__PURE__*/function () {
       game.use('Tone');
       game.use('Tile');
       game.use('Collectable');
+      game.use('Container');
     }
   }, {
     key: "init",
@@ -4987,36 +4988,54 @@ function createDoors(game) {
   // Containers are a way to group entities together
   // With no layout given, entities will be placed relative to the container
   // With a layout given, entities will be placed according to the layout algorithm
-  var container = game.createContainer({
-    name: 'laby-container',
+
+  var container = game.make().Container({
     layout: 'grid',
-    // optional. can also be "flex" or "none"
-    color: 0xff00ff,
-    position: {
-      x: -100,
-      y: -100,
-      z: -1
-    },
-    body: false,
-    size: {
-      width: 300,
-      height: 180
-    },
     grid: {
       columns: 4,
       rows: 8
-    },
-    style: {
-      // supports CSS property names
-      padding: 0,
-      margin: 0,
-      // background: '#ff0000', // can also use Entity.color
-      border: {
-        color: '#000000',
-        width: 0
-      }
     }
+  }).color(0xff00ff).name('laby-container').width(300).height(150).position(-100, -100, -1).style({
+    padding: 0,
+    margin: 0,
+    // background: '#ff0000', // can also use Entity.color
+    border: {
+      color: '#000000',
+      width: 0
+    }
+  }).createEntity();
+
+  /*
+  let container2 = game.createContainer({
+  name: 'laby-container-2',
+  layout: 'grid', // optional. can also be "flex" or "none"
+  color: 0xff00ff,
+  position: {
+    x: -100,
+    y: -100,
+    z: -1
+  },
+  body: false,
+  size: {
+    width: 300,
+    height: 180
+  },
+  grid: {
+    columns: 4,
+    rows: 8
+  },
+  style: { // supports CSS property names
+    padding: 0,
+    margin: 0,
+    // background: '#ff0000', // can also use Entity.color
+    border: {
+      color: '#000000',
+      width: 0
+    }
+  },
   });
+  */
+
   var algos = [];
   algos.push('AldousBroder');
   algos.push('BinaryTree');
@@ -5289,13 +5308,14 @@ var Music = /*#__PURE__*/function () {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              game.use('Bullet');
               game.use('Text');
               game.use('Platform');
               game.use('Teleporter');
               game.use('Hexapod');
               game.use('Player');
               game.use('Tower');
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -6165,7 +6185,6 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       game.config.defaultMouseMovement = false;
-
       // Movements with right click, switch default left-click-to-move behavior
       game.config.mouseMovementButton = 'RIGHT';
       // Actions with left click
@@ -6173,27 +6192,35 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       // enables the default top-down mouse movements
       game.config.defaultMouseMovement = true;
       game.reset();
+      document.body.style.overflow = 'auto';
+      document.body.style.position = 'relative';
       game.data.camera.mode = 'none';
 
       // Remark: Not ideal for mapping Mouse buttons, 
       // as they should be conditionals in Sutra tree like Keyboard events are
       var mouse = game.systems.mouse;
-      mouse.setButtonMapping('LEFT', 1);
-      mouse.setButtonMapping('MIDDLE', 0);
+      //mouse.setButtonMapping('LEFT', 1);
+      //mouse.setButtonMapping('MIDDLE', 0);
       // enables mouse wheel zoom
-      game.data.camera.mouseWheelZoomEnabled = true;
+      game.data.camera.mouseWheelZoomEnabled = false;
       this.createWorld();
       this.setDefaultZoom();
     }
   }, {
     key: "createWorld",
     value: function createWorld() {
-      var _this = this;
       var game = this.game;
       var currentUrl = null;
       var text = game.make().Text().text('Mantra.js Alpha Playground').style({
         fontSize: '64px'
-      }).color('white').width(900).position(50, -520, 0).createEntity();
+      }).color('white').width(900).position(50, -520, 0)
+      //.layout('top-center')
+      //.offset(0, 60)
+      //.origin('top-left')
+      .createEntity();
+
+      // alert(text.position.x + ' ' + text.position.y)
+
       var link = game.make().Link({
         href: 'https://yantra.gg/mantra/home',
         target: '_blank'
@@ -6514,25 +6541,33 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       });
       docsEmbed.x(0).y(1200);
       docsEmbed.createEntity();
-      var text_dragToMoveMap = game.make().Text().text('Drag to move map');
+
+      /*
+      let text_dragToMoveMap = game.make().Text().text('Drag to move map');
       text_dragToMoveMap.x(200);
       text_dragToMoveMap.y(220);
       text_dragToMoveMap.width(600);
       text_dragToMoveMap.color('white');
       text_dragToMoveMap.style({
-        fontSize: '24px'
-      });
+        fontSize: '24px',
+      })
       text_dragToMoveMap.createEntity();
-      var text_wheelToZoom = game.make().Text().text('Wheel to Zoom');
+      */
+
+      /*
+      let text_wheelToZoom = game.make().Text().text('Wheel to Zoom');
       text_wheelToZoom.x(0);
       text_wheelToZoom.y(220);
       text_wheelToZoom.width(600);
       text_wheelToZoom.color('white');
       text_wheelToZoom.style({
-        fontSize: '24px'
-      });
+        fontSize: '24px',
+      })
       text_wheelToZoom.createEntity();
-      var text_clickToInteract = game.make().Text().text('Click to interact');
+      */
+
+      /*
+      let text_clickToInteract = game.make().Text().text('Click to interact');
       text_clickToInteract.x(220);
       text_clickToInteract.y(220);
       text_clickToInteract.width(170);
@@ -6541,13 +6576,14 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       text_clickToInteract.style({
         fontSize: '24px',
         cursor: 'pointer'
-      });
-      text_clickToInteract.pointerup(function (context, event) {
+      })
+      text_clickToInteract.pointerup((context, event) => {
         event.preventDefault();
         // game.rotate(context.id, 0.1);
-        _this.game.shakeCamera({});
+        this.game.shakeCamera({});
       });
       text_clickToInteract.createEntity();
+      */
 
       // TODO code responsive layout for mobile
       /*

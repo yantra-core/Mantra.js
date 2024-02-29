@@ -1013,10 +1013,6 @@ function layoutEntity(container, entityId) {
   if (containerEnt.meta && containerEnt.meta.layout) {
     layoutType = containerEnt.meta.layout;
   }
-  console.log("containerEntcontainerEntcontainerEntcontainerEnt", containerEnt);
-  if (layoutType === 'grid') {
-    // alert('g')
-  }
 
   //
   // Add the current new entity id to the container items

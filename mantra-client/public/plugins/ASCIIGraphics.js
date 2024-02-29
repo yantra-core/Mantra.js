@@ -903,6 +903,29 @@ function update() {
   // Get browser window dimensions
   var windowHeight = window.innerHeight;
   var windowWidth = window.innerWidth;
+
+  // TODO: allow overrides if user has started to zoom
+  if (game.data.camera.adaptiveZoom) {
+    var baseWidth = game.config.width;
+    var baseHeight = game.config.height;
+
+    // Calculate the scale ratio
+    var scaleX = windowWidth / baseWidth;
+    var scaleY = windowHeight / baseHeight;
+
+    // Use the smaller scale ratio to ensure the entire game is visible
+    var scale = Math.min(scaleX, scaleY);
+
+    // Set the game zoom level based on the scale
+    // You might want to adjust the multiplier (e.g., 1, 1.5, etc.) based on your game's specific needs
+
+    var scaleMultiplier = 2.5;
+    if (typeof game.data.camera.scaleMultiplier === 'number') {
+      scaleMultiplier = game.data.camera.scaleMultiplier;
+    }
+    game.setZoom(scale * scaleMultiplier); // The multiplier can be adjusted to suit the game's design
+  }
+
   var zoomFactor = this.game.data.camera.currentZoom;
   // console.log('zoomFactor', zoomFactor)
 
