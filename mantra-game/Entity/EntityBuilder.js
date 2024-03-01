@@ -380,6 +380,113 @@ export default class EntityBuilder {
     return this;
   }
 
+  origin(value) {
+    // Map of origin positions to their relative offsets
+    const origins = {
+      'center': { x: 0.5, y: 0.5 },
+      'top': { x: 0.5, y: 0 },
+      'bottom': { x: 0.5, y: 1 },
+      'left': { x: 0, y: 0.5 },
+      'right': { x: 1, y: 0.5 },
+      'top-left': { x: 0, y: 0 },
+      'top-right': { x: 1, y: 0 },
+      'bottom-left': { x: 0, y: 1 },
+      'bottom-right': { x: 1, y: 1 }
+    };
+  
+    const originOffset = origins[value];
+    if (originOffset) {
+      // Ensure the offset object exists
+      if (typeof this.config.offset !== 'object' || this.config.offset === null) {
+        this.config.offset = { x: 0, y: 0, z: 0 }; // Initialize with default values
+      }
+  
+      // Adjust the existing offsets based on the origin
+      // Assuming a default entity size to calculate the origin offset, adjust as needed
+      const entitySize = this.config.size || { width: 16, height: 16, depth: 16 };
+      const offsetX = entitySize.width * (originOffset.x - 0.5); // Subtracting 0.5 to center the origin
+      const offsetY = entitySize.height * (originOffset.y - 0.5); // Subtracting 0.5 to center the origin
+  
+      // Add the calculated origin offsets to the existing offsets
+      this.offset(this.config.offset.x + offsetX, this.config.offset.y + offsetY, this.config.offset.z);
+    } else {
+      console.warn(`Invalid origin value: '${value}'. Valid origins are center, top, bottom, left, right, top-left, top-right, bottom-left, bottom-right.`);
+    }
+  
+    return this;
+  }
+
+  layout(globalOrigin, referenceDimensions) {
+    // Default to screen size if referenceDimensions are not provided
+    if (typeof referenceDimensions === 'undefined') {
+      referenceDimensions = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+      /*
+      referenceDimensions = {
+        width: game.width,
+        height: game.height
+      };
+      */
+
+    }
+  
+    // console.log("Reference Dimensions:", referenceDimensions);
+  
+    // Calculate the center of the screen in screen coordinates
+    const screenCenter = {
+      x: referenceDimensions.width / 2,
+      y: referenceDimensions.height / 2
+    };
+  
+    // Map of global origin positions to their function for calculating position
+    const globalOrigins = {
+      'center': () => ({ x: 0, y: 0 }), // Center of game coordinates
+      'top-left': () => ({ x: -screenCenter.x, y: -screenCenter.y }),
+      'top-center': () => ({ x: 0, y: -screenCenter.y }),
+      'top-right': () => ({ x: screenCenter.x, y: -screenCenter.y }),
+      'bottom-left': () => ({ x: -screenCenter.x, y: screenCenter.y }),
+      'bottom-center': () => ({ x: 0, y: screenCenter.y }),
+      'bottom-right': () => ({ x: screenCenter.x, y: screenCenter.y }),
+      'center-left': () => ({ x: -screenCenter.x, y: 0 }),
+      'center-right': () => ({ x: screenCenter.x, y: 0 })
+    };
+  
+    const calculatePosition = globalOrigins[globalOrigin];
+    if (calculatePosition) {
+      // Calculate the position based on the global origin
+      const position = calculatePosition();
+  
+      // calculate offset based on origin to keep relative center position
+      if (globalOrigin === 'top-left') {
+        //position.x = position.x + (this.config.size.width / 2);
+        //position.y = position.y + (this.config.size.height / 2);
+      }
+      if (globalOrigin === 'top-center') {
+        //position.y = position.y + (this.config.size.height / 2);
+      }
+      if (globalOrigin === 'top-right') {
+        //position.x = position.x - (this.config.size.width / 2);
+        //position.y = position.y + (this.config.size.height / 2);
+      }
+
+      if(globalOrigin === 'bottom-left') {
+       // position.x = position.x + (this.config.size.width / 2);
+       // position.y = position.y + (this.config.size.height / 2);
+      }
+
+      // Update the entity's position by converting screen space to game space
+      this.position(position.x, position.y);
+    } else {
+      console.warn(`Invalid global origin value: '${globalOrigin}'. Valid global origins are center, top-left, top-center, top-right, bottom-left, bottom-center, bottom-right, center-left, center-right.`);
+    }
+  
+    return this;
+  }
+  
+
+
   offset(x, y, z) {
     if (typeof this.config.offset !== 'object' || this.config.offset === null) {
       this.config.offset = {};
@@ -417,12 +524,22 @@ export default class EntityBuilder {
     return this;
   }
 
+  // TOOD: we should remove most of this, it should be in build
+  // this will result in build sometimes returning array of objects
+  // offset set / repeat / clone / etc
   createEntity() {
-
+    const applyOffset = (config, index = 1) => {
+      // Apply the offset to the position based on the index
+      config.position.x += (config.offset.x) * index;
+      config.position.y += (config.offset.y) * index;
+      config.position.z += (config.offset.z) * index;
+    };
+  
     if (typeof this.config.clone === 'number') {
       let entities = [];
       for (let i = 0; i < this.config.clone; i++) {
         let clonedConfig = { ...this.config }; // Shallow copy for non-function properties
+        applyOffset(clonedConfig); // No index needed for clones, as they are exact copies
         entities.push(this.game.createEntity(clonedConfig));
       }
       return entities;
@@ -430,16 +547,9 @@ export default class EntityBuilder {
       let entities = [];
       for (let i = 0; i < this.config.repeat; i++) {
         let entityConfig = { ...this.config }; // Shallow copy for non-function properties
-        // Calculate the offset for each repeated entity
-        let offsetX = entityConfig.position.x + i * entityConfig.offset.x;
-        let offsetY = entityConfig.position.y + i * entityConfig.offset.y;
-        let offsetZ = entityConfig.position.z + i * entityConfig.offset.z;
-        if (typeof offsetX === 'number' && typeof offsetY === 'number') {
-          entityConfig.position = { x: offsetX, y: offsetY, z: entityConfig.position.z };
-        }
-        if (typeof offsetZ === 'number' && !isNaN(offsetZ)) {
-          entityConfig.position.z = offsetZ;
-        }
+        // TODO: return cloned offset, cannot mutate like this? double check, tests would be good
+        applyOffset(entityConfig, i); // Apply offset based on the index for repeated entities
+  
         if (typeof this.repeatModifiers === 'object' && this.repeatModifiers !== null) {
           for (let [prop, modifier] of Object.entries(this.repeatModifiers)) {
             if (typeof modifier === 'function') {
@@ -455,14 +565,14 @@ export default class EntityBuilder {
       return entities;
     } else {
       let singleConfig = { ...this.config }; // Shallow copy for non-function properties
+      applyOffset(singleConfig); // Apply offset for a single entity
       let singleCreatedEntity = this.game.createEntity(singleConfig);
       if (singleCreatedEntity.type === 'PLAYER') {
         // TODO: check to see if there are no other active players / if so set this one
-        this.game.setPlayerId(singleCreatedEntity.id)
+        this.game.setPlayerId(singleCreatedEntity.id);
       }
       return singleCreatedEntity;
     }
-
   }
 
   repeaters(modifiers) {
