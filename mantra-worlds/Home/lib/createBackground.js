@@ -112,6 +112,7 @@ export default function createBackground(game) {
     }
   });
 
+  /*
   game.make().Teleporter().position(55, 71, 10)
     .size(16)
     .width(16)
@@ -123,6 +124,7 @@ export default function createBackground(game) {
     .width(16)
     .height(16)
     .createEntity();
+    */
   
 
   // if touch warp, switch to Music level

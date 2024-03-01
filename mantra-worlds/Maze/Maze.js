@@ -16,6 +16,7 @@ class Maze {
     game.use('Tone');
     game.use('Tile');
     game.use('Collectable');
+    game.use('Container');
   }
 
   init(game) {

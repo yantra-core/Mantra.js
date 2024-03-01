@@ -32,7 +32,6 @@ class Collectable {
         continue;
       }
 
-
       if (parentEnt.destroyed === true) {
         // console.log('parentEnt is destroyed', parentEnt);
         continue;
@@ -40,7 +39,7 @@ class Collectable {
 
       let childEnts = itemsData[id];
       // console.log("childEnts", childEnts)
-      childEnts.forEach((childEntId) => {
+      childEnts.forEach((childEntId, i) => {
         // TODO: only get positional component data, not entire ent
         let entity = this.game.entities.get(childEntId);
         if (entity && !entity.destroyed) {
@@ -55,7 +54,7 @@ class Collectable {
             // rotation: parentEnt.rotation,
             position: {
               x: parentEnt.position.x + 10,
-              y: parentEnt.position.y
+              y: parentEnt.position.y + 10 * i
             }
           });
 

@@ -9,6 +9,8 @@ export default function zoom(scale, transitionTime = '0s') {
     scale = maxZoom;
   }
 
+  // this.game.data.camera.scaleMultiplier = scale;
+  
   this.game.data.camera.currentZoom = scale;
   
 }

@@ -36,6 +36,9 @@ export default class Playground {
     // enables the default top-down mouse movements
     game.config.defaultMouseMovement = true;
 
+    game.data.camera.scaleMultiplier = 0.5;
+   
+
     game.reset();
 
     document.body.style.overflow = 'auto';
@@ -77,14 +80,14 @@ export default class Playground {
 
     let link = game.make()
       .Link({
-        href: 'https://yantra.gg/mantra/home',
+        href: 'https://yantra.gg/mantra/examples/items/boomerang',
         target: '_blank'
       })
       .style({
         fontSize: '32px',
         color: 'purple',
       })
-      .text('/examples/games/home')
+      .text('/examples/items/boomerang')
       .width(600)
       .height(20)
       .x(-100)
@@ -180,7 +183,7 @@ export default class Playground {
       .createEntity();
 
     let primaryGameEmbed = game.make()
-      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=games/home' })
+      .Iframe({ src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang' })
       // .Iframe({ src: 'http://192.168.1.80:7777/examples/demo.html?source=games/gravity-gardens' })
       .width(800)
       .height(600)

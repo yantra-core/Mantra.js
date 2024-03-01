@@ -1,4 +1,4 @@
-function createHomeKey (game) {
+function createHomeKey(game) {
   game.make().Key().position(-100, 30, 0).createEntity();
 }
 
@@ -10,8 +10,36 @@ export default function createDoors(game) {
   // Containers are a way to group entities together
   // With no layout given, entities will be placed relative to the container
   // With a layout given, entities will be placed according to the layout algorithm
-  let container = game.createContainer({
-    name: 'laby-container',
+
+
+  let container = game.make()
+    .Container({
+      layout: 'grid',
+      grid: {
+        columns: 4,
+        rows: 8
+      }
+    })
+    .color(0xff00ff)
+    .name('laby-container')
+    .width(300)
+    .height(150)
+    .position(-100, -100, -1)
+    .style({
+      padding: 0,
+      margin: 0,
+      // background: '#ff0000', // can also use Entity.color
+      border: {
+        color: '#000000',
+        width: 0
+      }
+    })
+    .createEntity();
+
+
+    /*
+  let container2 = game.createContainer({
+    name: 'laby-container-2',
     layout: 'grid', // optional. can also be "flex" or "none"
     color: 0xff00ff,
     position: {
@@ -38,6 +66,7 @@ export default function createDoors(game) {
       }
     },
   });
+  */
 
   let algos = [];
 

@@ -88,7 +88,7 @@ class Music {
   }
 
   async preload(game) {
-
+    game.use('Bullet');
     game.use('Text');
     game.use('Platform');
     game.use('Teleporter');

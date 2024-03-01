@@ -12,12 +12,17 @@ export default function layoutEntity(container, entityId) {
   let layoutType = 'none'; // 'none', 'grid', 'flex', 'stack', 'custom-function'
   let origin = 'center'; // 'center', 'bottom-right', 'top-right', 'bottom-left', 'center-left', 'center-right', 'top-center', 'bottom-center', 'top-left'
 
+  // Legacy API, don't pollute style scope with new / unknown  properties
   if (containerEnt.style && containerEnt.style.layout) {
     layoutType = containerEnt.style.layout;
   }
-
   if (containerEnt.style && containerEnt.style.origin) {
     origin = containerEnt.style.origin;
+  }
+
+  // New API
+  if (containerEnt.meta && containerEnt.meta.layout) {
+    layoutType = containerEnt.meta.layout;
   }
 
   //
@@ -71,15 +76,23 @@ export default function layoutEntity(container, entityId) {
   //
   // Layout container items using grid layout algorithm
   //
+
   if (layoutType === 'grid') {
-    let cols = containerEnt.style.grid.columns;
-    let rows = containerEnt.style.grid.rows;
+
+    let cols = containerEnt.meta.grid.columns || 1;
+    let rows = containerEnt.meta.grid.rows || 1;
+
+    if (containerEnt.style && containerEnt.style.grid) {
+      cols = containerEnt.style.grid.columns || cols;
+      rows = containerEnt.style.grid.rows || rows;
+    }
 
     if (typeof cols !== 'number' || typeof rows !== 'number') {
       console.log('containerEnt.layout', containerEnt.layout);
       throw new Error('Grid layout requires cols and rows to be numbers');
     }
 
+    //console.log("ahhhhhhhhhh", cols, rows)
     // get all the other items in the container
     let containerItems = containerEnt.items || [];
 
@@ -94,6 +107,8 @@ export default function layoutEntity(container, entityId) {
     // Calculate the width and height for each grid cell
     let cellWidth = containerSize.width / cols;
     let cellHeight = containerSize.height / rows;
+    //alert(containerSize.width)
+    //alert(containerSize.height)
 
     // Loop through each item in the container
     containerItems.forEach((item, index) => {
@@ -110,7 +125,6 @@ export default function layoutEntity(container, entityId) {
 
       let paddingTop = 0;
       let paddingLeft = 0;
-
       // Set the starting position to the top-left corner of the container's bounding box
       let positionX = containerPosition.x - containerSize.width / 2 + paddingLeft;
       let positionY = containerPosition.y - containerSize.height / 2 + paddingTop;
