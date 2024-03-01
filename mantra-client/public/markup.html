@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #1e1e1e;
+    }
+
+    m-player,
+    m-hexapod,
+    m-key,
+    m-block,
+    m-teleporter,
+    m-container,
+    m-flame {
+      position: absolute;
+      display: block;
+    }
+
+    m-player {
+      width: 20px;
+      height: 20px;
+      background-color: red;
+    }
+
+    m-hexapod {
+      width: 10px;
+      height: 10px;
+      background-color: green;
+    }
+
+    m-key {
+      width: 20px;
+      height: 20px;
+      background-color: gold;
+    }
+
+    m-block {
+      width: 50px;
+      height: 50px;
+      background-color: grey;
+    }
+
+    m-teleporter {
+      width: 30px;
+      height: 30px;
+      background-color: purple;
+    }
+
+    m-container {
+      width: 100px;
+      height: 100px;
+      border: 2px dashed orange;
+    }
+
+    m-flame {
+      width: 10px;
+      height: 10px;
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="/categories.js"></script>
+  <script type="module" src="./mantra.js"></script>
+  <script type="module" src="./worlds.mantra.js"></script>
+
+  <script>
+    class MantraMarkup {
+      constructor() {
+        this.containerCount = 0; // Moved containerCount into the class scope
+      }
+
+      removeAllCustomElements(game) {
+        let plugins = game.plugins.map(pluginName => `m-${pluginName.toLowerCase()}`);
+        const entities = document.querySelectorAll(plugins.join(','));
+        entities.forEach(entity => entity.remove());
+      }
+
+      defineCustomElements(game) {
+        game.plugins.forEach(pluginName => {
+          const tagName = `m-${pluginName.toLowerCase()}`;
+          if (!customElements.get(tagName)) { // Prevent redefining existing custom elements
+            class CustomElement extends HTMLElement {
+              constructor() {
+                super();
+              }
+            }
+            customElements.define(tagName, CustomElement);
+          }
+        });
+      }
+
+      parseCustomDomElements(game) {
+        game.plugins.reverse().forEach(pluginName => {
+          const tagName = `m-${pluginName.toLowerCase()}`;
+          const entities = document.querySelectorAll(tagName);
+          entities.forEach(entity => {
+            let entityType = pluginName;
+            const ent = game.make();
+            ent[entityType]();
+            this.buildEntity(ent, entity);
+          });
+        });
+        console.log('All entities created.');
+      }
+
+      parseDl(dl, parentObject) {
+        let dts = dl.querySelectorAll('dt');
+        let dds = dl.querySelectorAll('dd');
+        dts.forEach((dt, index) => {
+          let key = dt.textContent.trim();
+          let dd = dds[index];
+          let nestedDl = dd.querySelector('dl');
+          if (nestedDl) {
+            let nestedObject = {};
+            this.parseDl(nestedDl, nestedObject);
+            parentObject[key] = nestedObject;
+          } else {
+            parentObject[key] = dd.textContent.trim();
+          }
+        });
+      }
+
+      buildEntity(ent, entity) {
+        const width = parseInt(entity.getAttribute('data-width'), 10) || 16;
+        const height = parseInt(entity.getAttribute('data-height'), 10) || 16;
+        const x = parseInt(entity.getAttribute('data-x'), 10) || 0;
+        const y = parseInt(entity.getAttribute('data-y'), 10) || 0;
+        const repeat = parseInt(entity.getAttribute('data-repeat'), 10) || 1;
+        ent.x(x).y(y).z(10).width(width).height(height);
+
+        let dls = entity.querySelectorAll('dl');
+        if (dls.length > 0) {
+          let meta = {};
+          dls.forEach(dl => this.parseDl(dl, meta));
+          console.log('Assigning meta:', meta);
+          ent.meta(meta);
+        }
+
+        if (entity.tagName.toLowerCase() === 'm-container') {
+          let containerName = entity.getAttribute('data-name');
+          this.containerCount++;
+          ent.name(containerName);
+        }
+
+        let parentContainer = entity.closest('m-container');
+        if (parentContainer) {
+          let parentContainerName = parentContainer.getAttribute('data-name');
+          if (parentContainerName) {
+            ent.container(parentContainerName);
+          }
+        }
+
+        if (repeat > 1) {
+          ent.repeat(repeat);
+        }
+
+        ent.createEntity();
+      }
+
+      async initializeGame() {
+        let game = new MANTRA.Game({
+          width: 800,
+          height: 600,
+          graphics: ['css'],
+          editor: true,
+          showLoadingScreen: false,
+          plugins: ['Player', 'Hexapod', 'Flame', 'Teleporter', 'Key', 'Block', 'Container'],
+          gameRoot: '.',
+        });
+
+        game.plugins.forEach(pluginName => {
+          const tagName = `m-${pluginName.toLowerCase()}`;
+          const entities = document.querySelectorAll(tagName);
+          entities.forEach(entity => {
+            let x = parseInt(entity.getAttribute('data-x') || 0, 10) + window.innerWidth / 2;
+            let y = parseInt(entity.getAttribute('data-y') || 0, 10) + window.innerHeight / 2;
+            entity.style.left = `${x}px`;
+            entity.style.top = `${y}px`;
+          });
+        });
+
+        window.game = game;
+        game.use('Editor');
+        await game.start();
+        game.reset();
+        game.setZoom(1);
+        this.defineCustomElements(game);
+        this.parseCustomDomElements(game);
+        this.removeAllCustomElements(game);
+      }
+    }
+
+    // Usage
+    window.onload = async function () {
+      const mantraMarkup = new MantraMarkup();
+      await mantraMarkup.initializeGame();
+    };
+
+  </script>
+
+  <m-key data-x="10" data-y="10" width="100" height="100"></m-key>
+  <m-block data-x="10" data-y="10" width="100" height="100"></m-block>
+  <m-player data-x="100"></m-player>
+  <m-hexapod data-radius="8"></m-hexapod>
+  <m-hexapod data-radius="16"></m-hexapod>
+  <m-hexapod></m-hexapod>
+  <m-hexapod data-repeat="11"></m-hexapod>
+  <m-teleporter data-x="200" data-y="200">
+    <dl>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>url</dt>
+          <dd>https://github.com/yantra-core/mantra.js</dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+  <m-container data-name="container-a" data-x="0" data-y="-50" width="100" height="100">
+    <m-flame data-x="50" data-y="50"></m-flame>
+    <m-flame data-x="-50" data-y="50"></m-flame>
+    <m-flame data-x="50" data-y="-50"></m-flame>
+    <m-flame data-x="-50" data-y="-50"></m-flame>
+  </m-container>
+
+</body>
+
+</html>
