@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra - Client</title>
+  <link rel="stylesheet" href="/prism.css">
+  <link rel="stylesheet" href="/vendor/prism-live/style.css">
+</head>
+
+<body>
+  <script src="/vendor/prism-live/src/prism-live.js?load=javascript"></script> <!-- If not already included -->
+  <script type="module" src="https://yantra.gg/mantra.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+
+  <!-- Solarized Dark Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/solarized.min.css">
+
+  <!-- Optional: Theme CSS, here we use 'darcula' -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/seti.min.css">
+
+  <script src="/prism.min.js" data-manual></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      /* Use viewport height for full screen */
+      overflow: hidden;
+      background-color: #1e1e1e;
+    }
+
+    textarea {
+      width: 100%;
+      height: calc(100% - 40px);
+      /* Adjust height to accommodate the run button */
+      background-color: #1e1e1e;
+      /* Dark background */
+      color: #dcdcdc;
+      /* Light grey text for high contrast */
+      font-family: 'Fira Code', 'Consolas', monospace;
+      /* Monospace font for code */
+      padding: 20px;
+      /* Padding inside the textarea */
+      box-sizing: border-box;
+      /* Include padding in the total width and height */
+      border: none;
+      /* Remove default border */
+      resize: none;
+      /* Disable resizing */
+      outline: none;
+      /* Remove focus outline */
+    }
+
+    #run {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: #bf00ff;
+      color: white;
+      border-radius: 5px;
+      font-size: 18px;
+    }
+
+    #code {
+      width: 100%;
+      height: auto;
+      background-color: #1e1e1e;
+      color: #dcdcdc;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      padding: 20px;
+      box-sizing: border-box;
+      border: none;
+      overflow: auto;
+      outline: none;
+      cursor: text;
+    }
+  </style>
+  <script>
+
+    function autoTyper(editor, text, duration) {
+      const textarea = document.getElementById('code');
+      let index = 0;
+      const length = text.length;
+      let timeElapsed = 0;
+
+      // Calculate average speed needed to finish in the given duration
+      const averageSpeed = duration / length;
+
+      // Adjust min and max typing speeds based on the average speed
+      const minTypingSpeed = averageSpeed * 0.5; // 50% of average speed
+      const maxTypingSpeed = averageSpeed * 1.5; // 150% of average speed
+      const pauseProbability = 0.1; // Probability of a pause at any character
+      const maxPauseDuration = averageSpeed * 3; // Max pause is three times the average speed
+
+      function type() {
+        if (index < length) {
+          let newVal = editor.getValue() + text.charAt(index);
+          editor.setValue(newVal);
+          textarea.value += text.charAt(index);
+          //editor.refresh();
+
+          index++;
+          const isPause = Math.random() < pauseProbability;
+          const pauseDuration = isPause ? Math.random() * maxPauseDuration : 0;
+          const nextTypingSpeed = Math.max(minTypingSpeed, Math.min(minTypingSpeed + Math.random() * (maxTypingSpeed - minTypingSpeed), maxTypingSpeed));
+
+          timeElapsed += nextTypingSpeed + pauseDuration;
+          const remainingCharacters = length - index;
+          const remainingTime = duration - timeElapsed;
+          const nextTimeout = remainingCharacters > 0 ? Math.min(nextTypingSpeed + pauseDuration, remainingTime / remainingCharacters) : 0;
+
+          setTimeout(type, nextTimeout);
+        } else {
+          // Done typing
+          textarea.dispatchEvent(new CustomEvent('typingCompleted', { bubbles: true }));
+
+        }
+      }
+
+      type(); // Start typing
+    }
+
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      let run = document.getElementById('run');
+      let code = document.getElementById('code');
+
+
+      let template = `let game = new MANTRA.Game({
+  graphics: ['css'], // array enum, 'babylon', 'css', 'three'
+  plugins: ['Player', 'Key', 'Collectable'], // Plugins at construction
+  width: 400,
+  height: 300
+});
+game.use('Boomerang'); // Plugins at runtime
+game.start(function () {
+  game.setBackground('#000000');
+  game.make().Player().createEntity();
+  for (let i = 0; i < 10; i++) {
+    let radialPosition = game.radialSpread(0, 0, 100, 10, i);
+    game.make().Key({
+      position: radialPosition
+    }).createEntity();  
+  }
+});`;
+
+      let editor = CodeMirror(document.getElementById('code'), {
+        value: template,
+        mode: "javascript",
+        theme: 'seti',
+        lineNumbers: true,
+        viewportMargin: Infinity
+      });
+
+      // Adjust editor size after content is set
+      function adjustEditorSize() {
+        editor.setSize(null, 'auto'); // Set width to null (no change), adjust height based on content
+      }
+
+      // Call adjustEditorSize after setting the content or on content changes
+      adjustEditorSize();
+
+      // Optional: Listen for changes and adjust size
+      editor.on('change', adjustEditorSize);
+      code.addEventListener('typingCompleted', function () {
+        // Simulate mouse movement (conceptual, direct action follows)
+
+        console.log('Typing completed, simulating mouse movement...');
+        console.log('Simulating click on "Run" button...');
+        run.focus();
+
+        setTimeout(() => {
+          // move tab index focus to run button
+          setTimeout(() => {
+            run.click();
+          }, 300);
+          document.body.setAttribute('data-action', 'run-clicked');
+        }, 2200); // Adjust delay as needed
+
+        // Directly trigger click on "Run" button after a short delay
+        setTimeout(() => {
+          // redirect to about:blank
+          window.location = 'about:blank';
+        }, 15000); // Adjust delay as needed
+      });
+      run.addEventListener('click', function () {
+        let script = document.createElement('script');
+        script.type = 'module';
+        script.text = editor.getValue();
+        document.body.appendChild(script);
+        code.style.display = 'none';
+      })
+
+      let originalCode = editor.getValue();
+      editor.setValue('');
+      //code.value = '';
+      // Assuming you want to auto-type the processed code into the textarea
+      autoTyper(editor, originalCode, 5000); // Auto-type over 5 seconds, adjust duration as needed
+
+      
+
+    });
+  </script>
+  <div id="gameHolder"></div>
+  <button id="run">Run</button>
+
+  <div id="code"></div>
+
+</body>
+
+</html>
