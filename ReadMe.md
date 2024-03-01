@@ -4,6 +4,11 @@
 https://github.com/yantra-core/Mantra.js/assets/70011/65bb5294-b8ac-4e38-a7a0-7153a3a77e68
 
 
+
+https://github.com/yantra-core/Mantra.js/assets/70011/5b0aebff-e95a-4e61-ac5f-84dd67ed7da6
+
+
+
   <a href="https://yantra.gg/mantra/playground">Live Coding Playground</a> •
   <a href="https://yantra.gg/mantra/examples">API Examples</a> •
   <a href="https://yantra.gg/mantra/examples">Examples Gallery</a> •
