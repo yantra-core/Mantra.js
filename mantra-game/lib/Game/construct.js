@@ -332,6 +332,7 @@ export default function construct(game, plugins = []) {
       editor: game.config.editor,
       sutra: game.config.sutra,
       lifetime: game.config.lifetime,
+      markup: game.config.markup,
       defaultMovement: game.config.defaultMovement
     });
   }

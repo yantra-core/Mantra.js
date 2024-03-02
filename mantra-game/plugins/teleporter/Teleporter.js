@@ -30,7 +30,7 @@ export default class Teleporter {
     //
     // Click to teleport
     //
-    if (entityData.clickToTeleport !== false) { // default behavior is true, click to teleport
+    if (entityData.clickToTeleport !== false || entityData.meta.clickToTeleport !== false) { // default behavior is true, click to teleport
       entityData.pointerdown = entityData.pointerdown || this.pointerdownWrap.bind(this)
     }
     let style = {};

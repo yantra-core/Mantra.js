@@ -36,6 +36,7 @@ class Game {
       mouse: true,
       gamepad: false,
       virtualGamepad: false,
+      markup: true,
       editor: false,
       sutra: true,
       lifetime: false,
@@ -199,9 +200,9 @@ class Game {
     this.height = height;
   }
 
-  markup () {
+  markup (showOriginalHTML = false) {
     if (this.systems.markup) {
-      this.systems.markup.parseHTML();
+      this.systems.markup.parseHTML(showOriginalHTML);
     }
   }
 

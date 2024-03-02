@@ -126,6 +126,9 @@ export default class Mouse {
 
     // Alias for worldPosition for developer convenience
     context.position = context.worldPosition;
+    // Legacy API / developer helper
+    context.x = context.position.x;
+    context.y = context.position.y;
 
     return context;
   }
@@ -253,8 +256,6 @@ export default class Mouse {
 
     // middle mouse button
     if (event.button === this.buttonMappings.MIDDLE) {
-
-
 
       //
       // Do not allow Game related mouse down events on certain classes such as UI elements

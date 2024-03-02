@@ -14,7 +14,7 @@ export default class TileMap {
   }
 
   build (entityData = {}) {
-
+    let game = this.game;
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0, z: 0};
     }
@@ -28,6 +28,9 @@ export default class TileMap {
     if (entityData.tileMapWidth && entityData.tileMapHeight) {
       entityData.meta.tileMapWidth = entityData.tileMapWidth;
       entityData.meta.tileMapHeight = entityData.tileMapHeight;
+    } else {
+      entityData.meta.tileMapWidth = 4;
+      entityData.meta.tileMapHeight = 4;
     }
 
     if (entityData.tileSize) {
@@ -41,12 +44,19 @@ export default class TileMap {
       entityData.meta.tileHeight = entityData.tileHeight;
     }
 
+    if (typeof entityData.meta.tileWidth !== 'number') {
+      entityData.meta.tileWidth = 32;
+    }
+    if (typeof entityData.meta.tileHeight !== 'number') {
+      entityData.meta.tileHeight = 32;
+    }
+
     // provide a small default tile map if none is provided
     entityData.meta.data = entityData.data || [
-      0,0,0,0,
-      0,0,0,0,
-      0,0,0,0,
-      0,0,0,0
+      1,0,0,1,
+      1,0,0,1,
+      1,0,0,1,
+      1,0,0,1
     ];
 
     let meta = {};
@@ -94,6 +104,7 @@ export default class TileMap {
         display: 'none', // since TILEMAP itself is the container, we don't want to see it
       },
       afterCreateEntity: (entityData) => {
+        let game = this.game;
         // after the tile map container is created, create all the tiles as children
         // create the tiles scoped to entityData.id as container
         // console.log(entityData)
