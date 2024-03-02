@@ -106,10 +106,11 @@ class Home {
     // reset any previous worlds / game state
     game.reset();
 
+    game.data.camera.scaleMultiplier = 2.5;
     let mouse = game.systems.mouse;
     
     // enables mouse wheel zoom
-    game.data.camera.mouseWheelZoomEnabled = true;
+    game.data.camera.mouseWheelZoomEnabled = false;
     this.createWorld();
 
   }
@@ -165,6 +166,7 @@ class Home {
     };
 
     game.make().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
+    game.make().Block().size(16).position(-32, 0).offset(64, 0).repeat(2).createEntity();
 
     this.createTwinFlames();
     welcomeMessage(game);

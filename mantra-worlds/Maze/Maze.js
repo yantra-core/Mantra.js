@@ -94,7 +94,7 @@ class Maze {
       },
       body: false,
       position: {
-        x: -400,
+        x: -350,
         y: -120
       }
     });

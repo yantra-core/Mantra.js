@@ -86,7 +86,7 @@ export default function createBackground(game) {
     body: false,
     position: {
       x: -20,
-      y: -220,
+      y: -260,
       z: 64
     }
   });
@@ -161,7 +161,7 @@ export default function createBackground(game) {
     body: false,
     position: {
       x: -250,
-      y: -30,
+      y: -70,
       z: 64
     }
   });
@@ -240,7 +240,7 @@ export default function createBackground(game) {
     body: false,
     position: {
       x: -235,
-      y: 280,
+      y: 230,
       z: 32
     }
   });
@@ -282,7 +282,7 @@ export default function createBackground(game) {
     body: false,
     position: {
       x: 240,
-      y: 280,
+      y: 230,
       z: 32
     }
   });

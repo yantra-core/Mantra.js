@@ -27,6 +27,8 @@ export default class Teleporter {
       entityData.destination.url = entityData.url;
     }
 
+    entityData.meta = entityData.meta || {};
+
     //
     // Click to teleport
     //

@@ -98,6 +98,30 @@ export default class Markup {
           'padding-right',
           'padding-bottom',
           'padding-left',
+          // font and font decoration
+          'font',
+          'font-family',
+          'font-size',
+          'font-weight',
+          'font-style',
+          'text-decoration',
+          'text-align',
+          'text-transform',
+          'text-shadow',
+          'line-height',
+          'letter-spacing',
+          'word-spacing',
+          'white-space',
+          'vertical-align',
+          'list-style',
+          'list-style-type',
+          'list-style-position',
+          'list-style-image',
+          'cursor',
+          'z-index',
+          'opacity',
+          'visibility',
+          'display',
           // Add other relevant style properties here
         ]);
 
@@ -154,6 +178,7 @@ export default class Markup {
     const texture = entity.getAttribute('data-texture') || null;
     const color = entity.getAttribute('data-color') || null;
     const layout = entity.getAttribute('data-layout') || null;
+    const origin = entity.getAttribute('data-origin') || null;
     // TODO: get any pointerdown events bound to the entity
     const pointerdown = entity.getAttribute('onpointerdown') || null;
 
@@ -176,6 +201,10 @@ export default class Markup {
 
     if (layout) {
       ent.layout(layout);
+    }
+
+    if (origin) {
+      ent.origin(origin);
     }
 
     ent.pointerdown(function(){
@@ -237,6 +266,7 @@ export default class Markup {
         //entity.height = parseInt(entity.getAttribute('height'), 10) || 16;
       });
     });
+    this.displayOrignalHTMLInPreTag();
   }
 
 
@@ -248,6 +278,8 @@ export default class Markup {
     const pre = document.createElement('pre');
     pre.textContent = this.originalHTML;
     document.body.appendChild(pre);
+    let gameHolder = document.querySelector('#gameHolder');
+    gameHolder.appendChild(pre);
   }
 
   parseHTML(displayOriginalHTML) {

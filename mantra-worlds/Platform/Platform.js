@@ -150,7 +150,7 @@ class Platform {
       isStatic: true,
       position: {
         x: -100,
-        y: -100
+        y: -150
       }
     });
 

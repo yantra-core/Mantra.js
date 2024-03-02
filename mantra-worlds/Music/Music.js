@@ -132,25 +132,6 @@ class Music {
       height: 64
     };
 
-    // text label for piano
-    game.createEntity({
-      type: 'TEXT',
-      text: 'Click or Jump on the Piano',
-      // kind: 'dynamic',
-      //color: 0xffffff,
-      style: {
-        fontSize: '16px',
-        color: '#ffffff',
-        textAlign: 'center'
-      },
-      body: false,
-      position: {
-        x: 352,
-        y: 150,
-        z: 64
-      }
-    });
-
     createPiano(game, pianoConfig);
     // Usage example
     const drumKitConfig = {
@@ -208,6 +189,7 @@ class Music {
         destination: {
           world: 'Home'
         },
+        clickToTeleport: false
       })
       .texture('warp-to-home')
       .size(64)

@@ -89,7 +89,7 @@ class YCraft {
       body: false,
       position: {
         x: 260,
-        y: 60,
+        y: 0,
         z: 64
       }
     });

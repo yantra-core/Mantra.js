@@ -5,7 +5,7 @@ import Physics from "../plugins/physics/Physics.js";
 // default player movement, this could be also be set in defaultGameStart.js
 // import movement from './defaultPlayerMovement.js';
 
-export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, virtualGamepad, editor, sutra, ghostTyper, lifetime, defaultMovement = true }) {
+export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, virtualGamepad, editor, sutra, ghostTyper, lifetime, markup, defaultMovement = true }) {
 
   let plugins = this.plugins;
   let gameConfig = this.config
@@ -93,6 +93,10 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
 
     if (virtualGamepad) {
       this.use('GamepadGUI', gamepad);
+    }
+
+    if (markup) {
+      this.use('Markup');
     }
 
     if (sutra) {
