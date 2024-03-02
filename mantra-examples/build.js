@@ -203,6 +203,8 @@ function exampleTemplateHTML(example) {
     <style>
         body {
             overflow: auto;
+            width: 100%;
+            height: 100%;
         }
         /* This will force the scrollbar to be always visible */
         ::-webkit-scrollbar {
@@ -217,8 +219,6 @@ function exampleTemplateHTML(example) {
         }
 
         iframe {
-            min-height: 600px;
-            min-width: 800px;
             width: 100%;
             height: 50%;
             border: 1px solid #000;
@@ -282,11 +282,12 @@ function generateExampleFiles() {
         console.log('writing tags', htmlTags)
         exampleHTMLPath = exampleHTMLPath.replace('$$tags$$$', htmlTags);
 
-        // if (!fs.existsSync(exampleHTMLPath)) {}
-        // regen the HTML file each time
-        fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
+        // do not overwrite the html example code if it already exists
+        // ( some of the examples have custom HTML such as Markup category )
+        if (!fs.existsSync(exampleHTMLPath)) {
+            fs.writeFileSync(exampleHTMLPath, exampleTemplateHTML(example), 'utf8');
+        }
 
-    
         // do not overwrite the js example code if it already exists
         if (!fs.existsSync(exampleJSPath)) {
             fs.writeFileSync(exampleJSPath, exampleTemplateJS(example), 'utf8');

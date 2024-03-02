@@ -2,6 +2,8 @@
 let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
+  width: 400,
+  height: 300,
   plugins: ['RBush', 'Bullet'], // RBush is required for Field of View
   /*
     fieldOfView- Field of View distance can be set in the constructor or after construction

@@ -86,9 +86,8 @@
     }
   </style>
   <script>
-
+  let TOTAL_TIME = 18000;
     function autoTyper(editor, text, duration) {
-      const textarea = document.getElementById('code');
       let index = 0;
       const length = text.length;
       let timeElapsed = 0;
@@ -103,32 +102,35 @@
       const maxPauseDuration = averageSpeed * 3; // Max pause is three times the average speed
 
       function type() {
-        if (index < length) {
-          let newVal = editor.getValue() + text.charAt(index);
-          editor.setValue(newVal);
-          textarea.value += text.charAt(index);
-          //editor.refresh();
+  if (index < length) {
+    let newVal = editor.getValue() + text.charAt(index);
+    editor.setValue(newVal);
 
-          index++;
-          const isPause = Math.random() < pauseProbability;
-          const pauseDuration = isPause ? Math.random() * maxPauseDuration : 0;
-          const nextTypingSpeed = Math.max(minTypingSpeed, Math.min(minTypingSpeed + Math.random() * (maxTypingSpeed - minTypingSpeed), maxTypingSpeed));
+    // Scroll to the last line to keep the text in view, focusing on vertical scroll only
+    let totalLines = editor.lineCount();
+    editor.scrollIntoView({ line: totalLines - 1, ch: 0 }, 20); // Set 'ch' to 0 or a small number
 
-          timeElapsed += nextTypingSpeed + pauseDuration;
-          const remainingCharacters = length - index;
-          const remainingTime = duration - timeElapsed;
-          const nextTimeout = remainingCharacters > 0 ? Math.min(nextTypingSpeed + pauseDuration, remainingTime / remainingCharacters) : 0;
+    index++;
+    const isPause = Math.random() < pauseProbability;
+    const pauseDuration = isPause ? Math.random() * maxPauseDuration : 0;
+    const nextTypingSpeed = Math.max(minTypingSpeed, Math.min(minTypingSpeed + Math.random() * (maxTypingSpeed - minTypingSpeed), maxTypingSpeed));
 
-          setTimeout(type, nextTimeout);
-        } else {
-          // Done typing
-          textarea.dispatchEvent(new CustomEvent('typingCompleted', { bubbles: true }));
+    timeElapsed += nextTypingSpeed + pauseDuration;
+    const remainingCharacters = length - index;
+    const remainingTime = duration - timeElapsed;
+    const nextTimeout = remainingCharacters > 0 ? Math.min(nextTypingSpeed + pauseDuration, remainingTime / remainingCharacters) : 0;
 
-        }
-      }
+    setTimeout(type, nextTimeout);
+  } else {
+    // Done typing
+    editor.getWrapperElement().dispatchEvent(new CustomEvent('typingCompleted', { bubbles: true }));
+  }
+}
+
 
       type(); // Start typing
     }
+
 
 
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -138,21 +140,46 @@
 
       let template = `let game = new MANTRA.Game({
   graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-  plugins: ['Player', 'Key', 'Collectable'], // Plugins at construction
-  width: 400,
-  height: 300
+  width: 200,
+  height: 150,
+  camera: 'follow',
+  plugins: ['TileMap', 'TileSet', 'Bullet', 'Block', 'Player']
 });
-game.use('Boomerang'); // Plugins at runtime
 game.start(function () {
-  game.setBackground('#000000');
+  // A Tile config can be any Entity, create a simple block
+  let blockTileConfig = game.make().Block()
+    .body(true)
+    .size(16)
+    .build();
+
+  // Construct the TileMap config
+  let tileMap = game.make().TileMap({
+    tileMapWidth: 6,
+    tileMapHeight: 4,
+    tileSize: 16,
+    // TileMap.data array of integers ( see: Labyrinthos.js )
+    data: [
+      1,1,1,1,1,1,
+      0,0,0,2,0,0,
+      1,0,0,0,0,0,
+      1,1,1,1,1,1,
+    ],
+    // tileSet can also be a ".TileSet()" builder config
+    tileSet: [
+      // each item is an Entity builder config
+      { id: 0, texture: 'tile-grass' },
+      // supports all Entity builder config options
+      { id: 1, texture: 'tile-bush', body: true, isStatic: true},
+      { id: 2, texture: 'tile-block', ...blockTileConfig },
+    ],
+  }).position(0, 50);
+  
+  // Create the TileMap entity
+  tileMap.createEntity();
   game.make().Player().createEntity();
-  for (let i = 0; i < 10; i++) {
-    let radialPosition = game.radialSpread(0, 0, 100, 10, i);
-    game.make().Key({
-      position: radialPosition
-    }).createEntity();  
-  }
-});`;
+  game.setBackground('black');
+});
+`;
 
       let editor = CodeMirror(document.getElementById('code'), {
         value: template,
@@ -175,13 +202,13 @@ game.start(function () {
       code.addEventListener('typingCompleted', function () {
         // Simulate mouse movement (conceptual, direct action follows)
 
-        console.log('Typing completed, simulating mouse movement...');
-        console.log('Simulating click on "Run" button...');
-        run.focus();
 
         setTimeout(() => {
           // move tab index focus to run button
           setTimeout(() => {
+            console.log('Typing completed, simulating mouse movement...');
+            console.log('Simulating click on "Run" button...');
+            run.focus();
             run.click();
           }, 300);
           document.body.setAttribute('data-action', 'run-clicked');
@@ -205,9 +232,9 @@ game.start(function () {
       editor.setValue('');
       //code.value = '';
       // Assuming you want to auto-type the processed code into the textarea
-      autoTyper(editor, originalCode, 5000); // Auto-type over 5 seconds, adjust duration as needed
+      autoTyper(editor, originalCode, TOTAL_TIME); // Auto-type over 5 seconds, adjust duration as needed
 
-      
+
 
     });
   </script>

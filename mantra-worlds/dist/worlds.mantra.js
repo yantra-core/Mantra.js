@@ -3890,10 +3890,11 @@ var Home = /*#__PURE__*/function () {
 
       // reset any previous worlds / game state
       game.reset();
+      game.data.camera.scaleMultiplier = 2.5;
       var mouse = game.systems.mouse;
 
       // enables mouse wheel zoom
-      game.data.camera.mouseWheelZoomEnabled = true;
+      game.data.camera.mouseWheelZoomEnabled = false;
       this.createWorld();
     }
   }, {
@@ -3942,6 +3943,7 @@ var Home = /*#__PURE__*/function () {
       }
       ;
       game.make().Block().size(16).position(0, -32).offset(0, 64).repeat(2).createEntity();
+      game.make().Block().size(16).position(-32, 0).offset(64, 0).repeat(2).createEntity();
       this.createTwinFlames();
       (0, _welcomeMessage["default"])(game);
       game.useSutra((0, _sutras["default"])(game), 'HOME');
@@ -4100,8 +4102,19 @@ function createBackground(game) {
       z: -2
     }
   });
-  game.make().Teleporter().position(55, 71, 10).size(16).width(16).height(16).createEntity();
-  game.make().Teleporter().position(-55, 71, 10).size(16).width(16).height(16).createEntity();
+
+  /*
+  game.make().Teleporter().position(55, 71, 10)
+    .size(16)
+    .width(16)
+    .height(16)
+    .createEntity();
+     game.make().Teleporter().position(-55, 71, 10)
+    .size(16)
+    .width(16)
+    .height(16)
+    .createEntity();
+    */
 
   // if touch warp, switch to Music level
   game.createEntity({
@@ -5432,7 +5445,8 @@ var Music = /*#__PURE__*/function () {
       game.make().Teleporter({
         destination: {
           world: 'Home'
-        }
+        },
+        clickToTeleport: false
       }).texture('warp-to-home').size(64).position(195, -10, 1).createEntity();
       game.make().Text().text('Warp To Mantra').width(200).style({
         padding: '2px',
@@ -6191,6 +6205,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       game.config.mouseActionButton = 'LEFT';
       // enables the default top-down mouse movements
       game.config.defaultMouseMovement = true;
+      game.data.camera.scaleMultiplier = 0.5;
       game.reset();
       document.body.style.overflow = 'auto';
       document.body.style.position = 'relative';
@@ -6222,12 +6237,12 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
       // alert(text.position.x + ' ' + text.position.y)
 
       var link = game.make().Link({
-        href: 'https://yantra.gg/mantra/home',
+        href: 'https://yantra.gg/mantra/examples/items/boomerang',
         target: '_blank'
       }).style({
         fontSize: '32px',
         color: 'purple'
-      }).text('/examples/games/home').width(600).height(20).x(-100).y(-440).createEntity();
+      }).text('/examples/items/boomerang').width(600).height(20).x(-100).y(-440).createEntity();
       var sideTextGroup = game.make().name('side-text-group').style({
         border: 'none',
         backgroundColor: 'rgba(0, 0, 0, 0)'
@@ -6292,7 +6307,7 @@ var Playground = exports["default"] = /*#__PURE__*/function () {
         }
       }).createEntity();
       var primaryGameEmbed = game.make().Iframe({
-        src: 'https://yantra.gg/mantra/examples/demo?source=games/home'
+        src: 'https://yantra.gg/mantra/examples/demo?source=items/boomerang'
       })
       // .Iframe({ src: 'http://192.168.1.80:7777/examples/demo.html?source=games/gravity-gardens' })
       .width(800).height(600).x(0).y(-100).createEntity();

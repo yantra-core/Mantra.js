@@ -1,12 +1,14 @@
 
 let game = new MANTRA.Game({
+  width: 400,
+  height: 300,
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
-  plugins: ['Tile'], // RBush is required for Field of View
+  plugins: ['Tile', 'Player'], // RBush is required for Field of View
 });
 game.start(function () {
-  game.zoom(2.5);
-  game.createPlayer();
+
+  game.make().Player().position(0, 0, 16).createEntity();
 
   let tileMap = new game.TileMap({
     x: 0,
@@ -18,7 +20,6 @@ game.start(function () {
     tileWidth: 16, // TODO: tileSet.tilewidth
     tileHeight: 16 // TODO: tileSet.tileheight
   });
-
   tileMap.fill(2);
 
   // Supports all options from Labyrinthos.js
@@ -26,7 +27,7 @@ game.start(function () {
   game.mazes.AldousBroder(tileMap, {});
 
   console.log("tileMap", tileMap)
-
   game.systems.tile.createLayer(tileMap, 16, 16)
 
+  game.setBackground('black');
 });

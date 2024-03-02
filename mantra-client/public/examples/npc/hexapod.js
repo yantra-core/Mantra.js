@@ -12,7 +12,6 @@ game.start(function(){
   // Create two groups of Hexapods
   game.make()
     .Hexapod()
-    .texture(null)
     .radius(8)
     .color('#007fff')
     .position(-300, 0, 0)
@@ -21,7 +20,7 @@ game.start(function(){
 
   game.make()
     .Hexapod()
-    .texture(null)
+    .texture('demon')
     .radius(8)
     .color('red')
     .position(300, 0, 0)

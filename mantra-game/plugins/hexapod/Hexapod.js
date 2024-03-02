@@ -13,7 +13,7 @@ export default class Hexapod {
 
   build(entityData = {}) {
     if (typeof entityData.position === 'undefined') {
-      entityData.position = { x: 0, y: 0 };
+      entityData.position = { x: 0, y: 0, z: 1 };
     }
     return {
       type: 'HEXAPOD',

@@ -31,7 +31,7 @@ var Container = exports["default"] = /*#__PURE__*/function () {
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.game.systemsManager.addSystem('block', this);
+      this.game.systemsManager.addSystem(Container.id, this);
     }
   }, {
     key: "build",
@@ -47,7 +47,6 @@ var Container = exports["default"] = /*#__PURE__*/function () {
       entityData.meta.layout = entityData.layout || entityData.meta.layout || 'none';
       entityData.meta.grid = entityData.grid || entityData.meta.grid || {};
       entityData.items = entityData.items || entityData.meta.items || [];
-      console.log('cccc', entityData);
       return _objectSpread({
         type: 'CONTAINER',
         layout: 'grid',

@@ -263,14 +263,14 @@ function updateOrCreateTextarea(el, content, entityElement) {
 }
 function attachTextareaEvents(textarea, game) {
   textarea.addEventListener('mousedown', function () {
-    game.data.camera.draggingAllowed = false;
-    game.data.camera.mouseWheelZoomEnabled = false;
+    //game.data.camera.draggingAllowed = false;
+    //game.data.camera.mouseWheelZoomEnabled = false;
     console.log('mousedown');
     game.unbindKeyboard();
   });
   textarea.addEventListener('blur', function () {
-    game.data.camera.draggingAllowed = true;
-    game.data.camera.mouseWheelZoomEnabled = true;
+    //game.data.camera.draggingAllowed = true;
+    //game.data.camera.mouseWheelZoomEnabled = true;
     game.bindKeyboard();
   });
 }

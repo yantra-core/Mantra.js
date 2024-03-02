@@ -823,10 +823,11 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
 
         // Adjust the existing offsets based on the origin
         // Assuming a default entity size to calculate the origin offset, adjust as needed
-        var entitySize = {
-          width: 100,
-          height: 100
-        }; // Default size, replace with actual entity size if available
+        var entitySize = this.config.size || {
+          width: 16,
+          height: 16,
+          depth: 16
+        };
         var offsetX = entitySize.width * (originOffset.x - 0.5); // Subtracting 0.5 to center the origin
         var offsetY = entitySize.height * (originOffset.y - 0.5); // Subtracting 0.5 to center the origin
 
@@ -846,8 +847,15 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
           width: window.innerWidth,
           height: window.innerHeight
         };
+        /*
+        referenceDimensions = {
+          width: game.width,
+          height: game.height
+        };
+        */
       }
-      console.log("Reference Dimensions:", referenceDimensions);
+
+      // console.log("Reference Dimensions:", referenceDimensions);
 
       // Calculate the center of the screen in screen coordinates
       var screenCenter = {
@@ -920,19 +928,19 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
 
         // calculate offset based on origin to keep relative center position
         if (globalOrigin === 'top-left') {
-          position.x = position.x + this.config.size.width / 2;
-          position.y = position.y + this.config.size.height / 2;
+          //position.x = position.x + (this.config.size.width / 2);
+          //position.y = position.y + (this.config.size.height / 2);
         }
         if (globalOrigin === 'top-center') {
-          position.y = position.y + this.config.size.height / 2;
+          //position.y = position.y + (this.config.size.height / 2);
         }
         if (globalOrigin === 'top-right') {
-          position.x = position.x - this.config.size.width / 2;
-          position.y = position.y + this.config.size.height / 2;
+          //position.x = position.x - (this.config.size.width / 2);
+          //position.y = position.y + (this.config.size.height / 2);
         }
         if (globalOrigin === 'bottom-left') {
-          position.x = position.x + this.config.size.width / 2;
-          position.y = position.y + this.config.size.height / 2;
+          // position.x = position.x + (this.config.size.width / 2);
+          // position.y = position.y + (this.config.size.height / 2);
         }
 
         // Update the entity's position by converting screen space to game space
@@ -1034,7 +1042,8 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
         var singleConfig = _objectSpread({}, this.config); // Shallow copy for non-function properties
         applyOffset(singleConfig); // Apply offset for a single entity
         var singleCreatedEntity = this.game.createEntity(singleConfig);
-        if (singleCreatedEntity.type === 'PLAYER') {
+        // TOOD: remove this from EntityBuilder, place in createEntity()
+        if (singleCreatedEntity.type === 'PLAYER' || singleCreatedEntity.type === 'Player') {
           // TODO: check to see if there are no other active players / if so set this one
           this.game.setPlayerId(singleCreatedEntity.id);
         }
@@ -1247,6 +1256,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       mouse: true,
       gamepad: false,
       virtualGamepad: false,
+      markup: true,
       editor: false,
       sutra: true,
       lifetime: false,
@@ -1426,6 +1436,14 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function setSize(width, height) {
       this.width = width;
       this.height = height;
+    }
+  }, {
+    key: "markup",
+    value: function markup() {
+      var showOriginalHTML = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      if (this.systems.markup) {
+        this.systems.markup.parseHTML(showOriginalHTML);
+      }
     }
 
     //
@@ -2547,7 +2565,7 @@ function construct(game) {
     // global for game, not camera specific
     camera: {
       mode: null,
-      scaleMultiplier: 2.5,
+      scaleMultiplier: 1,
       adaptiveZoom: true,
       // will auto-zoom the viewport to fit the game size
       follow: game.config.camera.follow,
@@ -2811,6 +2829,7 @@ function construct(game) {
       editor: game.config.editor,
       sutra: game.config.sutra,
       lifetime: game.config.lifetime,
+      markup: game.config.markup,
       defaultMovement: game.config.defaultMovement
     });
   }
@@ -2824,7 +2843,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "25e24e10fdd04740737aca869da9e925a544588504d379e58824cd1b597d334b",
+  "./plugins/ASCIIGraphics.js": "bc739c51c99fff3270fe9a54fb57a6633b7c0550189e7becd7ad0f00a24964ca",
   "./plugins/ASCIIGraphics.min.js": "78aa8382ec3ce75a07710f29c5a44f4692c1bf0bdaa77654d809e5dbf21cbb13",
   "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
@@ -2850,22 +2869,22 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "f9b2f60b9420ce0ae8911c97be62634913da086a0fa7603cab6e9ab20844e84e",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "a1c42e1000a471fb9ab63847b13101b6379a44477585f1b48a7cffb2c63f2368",
-  "./plugins/CSSGraphics.min.js": "764a8ea86f58518a9f8b3dc0a676b885b5d0ea929074487d450306b56f760749",
+  "./plugins/CSSGraphics.js": "8270c9f237fee9cd676eb177ad201e4a9056215df30f54ee8573e8c7e8609b65",
+  "./plugins/CSSGraphics.min.js": "97c408eb6cc304872eb672ff144040d2ada758a68adf789a4bb7542719f8eddd",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
   "./plugins/Checkbox.min.js": "788db3172873ba0a5c8f6f596be2c54a55ba875d1b9759af1758ea2f2107494c",
   "./plugins/ChronoControl.js": "3d1eb99a514dc0726c3055371cf47fb32e25190a4f7c16b823792ecc7858dfa1",
   "./plugins/ChronoControl.min.js": "a9a511015708f05075041a02a32b9bcfd56e8cc73d07a5836699b0c1c2f1ae83",
-  "./plugins/Code.js": "12f5ab80067f8d6121a356f0ad31e4d26321b800fc328d7240e486a33b22db5c",
-  "./plugins/Code.min.js": "0456c74a9a4ba29f7a7f3d48b4af375e8c13718440ee2e8520ef25b36f289930",
-  "./plugins/Collectable.js": "a428d356c2fc2ce1a14b3badc8044e26eb65ed5a9e810c7c020f8a5483f9f46b",
-  "./plugins/Collectable.min.js": "a4921133c0c33773e21409a0663245b191d79742636a39d443fafb3e0f26487c",
-  "./plugins/Collisions.js": "f123f7b3154b1749306aabba1ec65bc81958d67fd926994c3e51ebfa36d63375",
-  "./plugins/Collisions.min.js": "94f7be8e3ef8d997a636a184fca96e183b42ac19dfe6e96d0a184c9a087d1b9b",
-  "./plugins/Container.js": "6e32546130328e161e3d495c3b2d03b7cac693b23cc4609ac866aa12f36a7a43",
-  "./plugins/Container.min.js": "8145bc76646a51ca448fb1503ae08def8903e9c9c4810547efd5c3e6a606f2f9",
+  "./plugins/Code.js": "56988694fff92420836c8e44452dcfbe907628d74ccd8a73d15dbac7e777d809",
+  "./plugins/Code.min.js": "cf633478b600ab5b225906fad83d8b353d93d756a7dd1f5f95a034b963e710ea",
+  "./plugins/Collectable.js": "0ef48261adc5fc05911a3a1046f68645d9f4776a90e86b78db4e1563d9f91496",
+  "./plugins/Collectable.min.js": "d6a2315ab43fe54db6af73c2df8f8eb32bc8484cddcc4075e5b3647458f225d0",
+  "./plugins/Collisions.js": "947f90bbc97c4af120e61ac73087b6c20bdb61c78438f6c5c046864495839795",
+  "./plugins/Collisions.min.js": "9b13eaf0d4cf10277aa2efb18354e004a1169a2c109bf9d9caffec80d5a7bb69",
+  "./plugins/Container.js": "e1c826e681c7da4b0d653e66819c3f9f4b38a1f8d51555434a5de8e9f418370f",
+  "./plugins/Container.min.js": "e1c3490ea0f8dbfb2bc93f3bc5eb2138f464a1ddc761f56aeb1cfdf9641db6ff",
   "./plugins/ControlsGUI.js": "d54f58ed4eabb78b5897a2428591e1ef0256d5d67773dcbe13c4d75f8075e63b",
   "./plugins/ControlsGUI.min.js": "08c30bc076baeda7379a728a2a188e0b35fcf5d91d031b5221654d319591ff86",
   "./plugins/Creator.js": "61d6002a0e5d51df00e5735ee8ffeeaecb7083e9f5ca6747a0991ef9bb39c306",
@@ -2906,8 +2925,8 @@ var _default = exports["default"] = {
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
   "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
-  "./plugins/Hexapod.js": "e85b65761c813a982e7989194ed7b04b141d1da8da86a1498b129f157a88741c",
-  "./plugins/Hexapod.min.js": "967843bbedc4dae077f4b09763ac0d70a628739d6467caf1d4f497b078a4a55a",
+  "./plugins/Hexapod.js": "93ebd8c4d1767f2438053c09fb484ec855b2fadd76f5bea512eef32c3c145f09",
+  "./plugins/Hexapod.min.js": "92f7242bfb4b062e28432450a0f94f26b33a54d83a495dd39a2eb5b5d83b74ad",
   "./plugins/Iframe.js": "ef82c243d98dc49ab09ba5b54d7483128eb0fb49a4e733e1032d25730a095db0",
   "./plugins/Iframe.min.js": "486536e022cee0dc0274cd5a99b24f456ed94715b20fa2de8bbfa88c36ada101",
   "./plugins/Image.js": "a9be3447d72667f4cc83443bdefc6ae1f09be99ec50668ade91212acee362792",
@@ -2930,14 +2949,16 @@ var _default = exports["default"] = {
   "./plugins/LoadingScreen.min.js": "b3b953dc98813936e5713b170a828db888f2cac1a368281cd8cd18185e4fb17a",
   "./plugins/LocalClient.js": "62886ed824f7bc714cde5664ecca9447e6d2a047eb65b5309f2dad765cef746e",
   "./plugins/LocalClient.min.js": "a681769ec3ebbd160693301d2780545f63629098867abbeaad8a3880694a04ea",
-  "./plugins/MatterPhysics.js": "326a33fc8455237784c221a83005ca45d50308de7c9e4ae26979f35f12514e62",
-  "./plugins/MatterPhysics.min.js": "7b166c479edfca14322101fbef4b45e393709f74987f8b80406e65bce02a5638",
+  "./plugins/Markup.js": "3058fa66abb0c79091c33a5c04e95fd0efc8d484f798425f1ec3d9b9ff18ba1c",
+  "./plugins/Markup.min.js": "bfa1a27c4e1be4e938c15b4f3bbfa933bf5d29788afd5ea9d3279813460b3023",
+  "./plugins/MatterPhysics.js": "5178aad694dc5b2de5cf7fe9bf2e5c26bd0e70dcffa53a5734a9ee6ad5645771",
+  "./plugins/MatterPhysics.min.js": "97242c00f48c93a2ea854405db5a9e6568229d2017a8149998869dc1527c3313",
   "./plugins/Midi.js": "3c8b738ed48341c4221cf20e53f631907935bdf722ebbcafb2dee3a40f544fba",
   "./plugins/Midi.min.js": "5ef8a15f87866a63e014ecbf3433f93a6c463c26d48a1c3a4448604ee8b5d229",
   "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
   "./plugins/MidiGUI.min.js": "ceb780abf5f2fadc904cbb683dde98548db60f5bdf0f90f1398728c76a0f923f",
-  "./plugins/Mouse.js": "2f7e12adacee5b999b7dc87fffa7bd2337164ea035c26f92e38036ac81fb56eb",
-  "./plugins/Mouse.min.js": "23ef56fcc3e9f1d7ac6e93eeb0920026853ee85fd62857305893ab773a8e7226",
+  "./plugins/Mouse.js": "f1dab6c48d281d6affa695a166de55f6e8cd9ec220111429a172aa82aacd0781",
+  "./plugins/Mouse.min.js": "d49db696ecb9198d7cd38cbd9cf73d7e98729e3b31a02724fa4a8bf589cf0008",
   "./plugins/PacManMovement.js": "e7b7dbe97b3192004c8bb2c58e952e27e2281a9604785faf3d0ee43771444205",
   "./plugins/PacManMovement.min.js": "31f12aa5c1ec52ed3b22dd49420a5a42ff749954306411e3983c25f257fbbe13",
   "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
@@ -2976,16 +2997,16 @@ var _default = exports["default"] = {
   "./plugins/SnapshotSize.min.js": "85719ef7d6a63b398d45dda88aaabeb38963aada0731c8cfc689ab0580670f9b",
   "./plugins/StarField.js": "d33e4ee1e02b8719edc5b7988b3eb2ded91a214dc911b3d800b52bfe19572669",
   "./plugins/StarField.min.js": "302c7e8878c277e6d3dc553ca7767fc98e16f66a8964c1a74cf7e4b972892467",
-  "./plugins/Sutra.js": "780072e528746ed347b7ff96f5cb8ef8acf484ff05cec21243bc51f2695a4eb9",
-  "./plugins/Sutra.min.js": "56c241079bee76d5d87b7f3a6657d231f774165a657b7d32c698604a5b58ee23",
-  "./plugins/SutraGUI.js": "410b907e0b0cc0633cb9dd164fc861419d50927aa82289b1b8c5e9ba6f4838e5",
+  "./plugins/Sutra.js": "b4e5cf15e7cd87a9d1bedc3d8f8cc31de85e3d2c68524cb95241c67513518dcd",
+  "./plugins/Sutra.min.js": "d5f6be60cbe1a99525a021be24414dd47a2802a435cd0ee59a9dfe710503d955",
+  "./plugins/SutraGUI.js": "9ba0fb777b310fce215da25812818205db0af426952d48ea02adfa1979f931fa",
   "./plugins/SutraGUI.min.js": "978af8d0050820c3056c3410b3b4a954a8882d4dd06677c31049f5f8db167f65",
-  "./plugins/SwitchGraphics.js": "154775d7459b8a7c08be7f8ce08b3d5a2292df00b10d71eaf2fa5e9de1833f44",
-  "./plugins/SwitchGraphics.min.js": "f090ece198364cd6ebb3658404d8413a8122a55c5419d3ab411ec4acd0919c0a",
+  "./plugins/SwitchGraphics.js": "939a7ff4575bc302d6bc706ee9290004d543a7658f56e56d245008a755f0fd9e",
+  "./plugins/SwitchGraphics.min.js": "94eb1806cb4d085ba2e43064fa8618a5bcffab2fec62db52721fb0c954ec71e1",
   "./plugins/Sword.js": "4ed88fd1e3f9fafe239d88db8b3bb3ee1189fff9c7b3c9ff54ac9b151c58fd32",
   "./plugins/Sword.min.js": "68708f6deb1b0b7de5a4fda1eabf50f1bc12d2a97433b491a72deabba506e33d",
-  "./plugins/Teleporter.js": "c28f7b00415ef15c0f9555d5839e6ec7a65fc74464b279dc90cbf0b684fbc3d5",
-  "./plugins/Teleporter.min.js": "13940bc70dd287c8fd87aec4db788d0eba03891d58569d34aa2f7debc0f0be62",
+  "./plugins/Teleporter.js": "028610b703c4ea4973bb64c0c7d9faaa59ff21da4dbd7c607d45ff59479e4ff5",
+  "./plugins/Teleporter.min.js": "7eaf854de64a035d01d29b34c5eef0de1205e217afab68c3deaad3fa0fbf4d09",
   "./plugins/Text.js": "eeb50f1cffc6e0f781a77bf982ed046d02b817c572e40c4cb9da1467f3f82e5d",
   "./plugins/Text.min.js": "388b6baebbe73c0d0d736442ecc04cf00b383660c6c7bd87b3d2c554bae69d86",
   "./plugins/Textarea.js": "a9f16f27cf2721e3d75a504fd5ae68cb8238d945ac7dbb10f3787d7a12d680bb",
@@ -3181,30 +3202,39 @@ function use(game) {
             basePath = '/plugins/'; // Base path for loading plugins
             basePath = game.scriptRoot + basePath;
             if (!(typeof pluginInstanceOrId === 'string')) {
-              _context2.next = 20;
+              _context2.next = 23;
               break;
             }
-            pluginId = pluginInstanceOrId;
+            pluginId = pluginInstanceOrId; // Initialize callback storage for this plugin if it doesn't exist
+            if (typeof game.pluginCallbacks === 'undefined') {
+              game.pluginCallbacks = {};
+            }
+            if (typeof game.pluginCallbacks[pluginId] === 'undefined') {
+              game.pluginCallbacks[pluginId] = [];
+            }
+
+            // Store the callback for later execution
+            game.pluginCallbacks[pluginId].push(cb);
             if (!game._plugins[pluginId]) {
-              _context2.next = 9;
+              _context2.next = 12;
               break;
             }
             console.log("Plugin ".concat(pluginId, " is already loaded or loading."));
             return _context2.abrupt("return", game);
-          case 9:
+          case 12:
             if (!game.isServer) {
-              _context2.next = 14;
+              _context2.next = 17;
               break;
             }
             if (!game.plugins[pluginId]) {
-              _context2.next = 12;
+              _context2.next = 15;
               break;
             }
             return _context2.abrupt("return", game.use(new game.plugins[pluginId](options)));
-          case 12:
+          case 15:
             console.log("Attempted to load plugin by string name \"".concat(pluginId, "\" on server, could not find! Skipping"));
             return _context2.abrupt("return");
-          case 14:
+          case 17:
             game._plugins[pluginId] = {
               status: 'loading'
             };
@@ -3226,58 +3256,69 @@ function use(game) {
                   case 4:
                     console.log("Loaded: ".concat(pluginId));
                     if (!((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object' && PLUGINS[pluginId])) {
-                      _context.next = 11;
+                      _context.next = 13;
                       break;
                     }
                     pluginInstance = new PLUGINS[pluginId]["default"](options);
                     _context.next = 9;
-                    return handlePluginInstance(game, pluginInstance, pluginId, options, cb);
+                    return handlePluginInstance(game, pluginInstance, pluginId, options);
                   case 9:
-                    _context.next = 13;
+                    // Execute all callbacks stored for this plugin
+                    game.pluginCallbacks[pluginId].forEach(function (callback) {
+                      return callback();
+                    });
+                    // Clear the callbacks after execution
+                    delete game.pluginCallbacks[pluginId];
+                    _context.next = 15;
                     break;
-                  case 11:
+                  case 13:
                     console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
                     throw new Error('PLUGINS object not found, cannot load plugin');
-                  case 13:
-                    _context.next = 22;
-                    break;
                   case 15:
-                    _context.prev = 15;
+                    _context.next = 25;
+                    break;
+                  case 17:
+                    _context.prev = 17;
                     _context.t0 = _context["catch"](0);
                     console.error("Error loading plugin ".concat(pluginId, ":"), _context.t0);
                     game._plugins[pluginId] = {
                       status: 'error'
                     };
                     game.loadingPluginsCount--;
-                    cb(_context.t0);
+                    // Execute all callbacks with the error
+                    game.pluginCallbacks[pluginId].forEach(function (callback) {
+                      return callback(_context.t0);
+                    });
+                    // Clear the callbacks after execution
+                    delete game.pluginCallbacks[pluginId];
                     throw _context.t0;
-                  case 22:
-                    _context.prev = 22;
+                  case 25:
+                    _context.prev = 25;
                     // Remove the promise from the tracking object once it's settled
                     delete game.loadingPluginPromises[pluginId];
-                    return _context.finish(22);
-                  case 25:
+                    return _context.finish(25);
+                  case 28:
                   case "end":
                     return _context.stop();
                 }
-              }, _callee, null, [[0, 15, 22, 25]]);
+              }, _callee, null, [[0, 17, 25, 28]]);
             }))();
-            _context2.next = 26;
+            _context2.next = 29;
             break;
-          case 20:
+          case 23:
             game.loadingPluginsCount++;
             if (pluginInstanceOrId.id) {
-              _context2.next = 24;
+              _context2.next = 27;
               break;
             }
             console.log('Error with pluginInstance', pluginInstanceOrId);
             throw new Error('All plugins must have a static id property');
-          case 24:
-            _context2.next = 26;
-            return handlePluginInstance(game, pluginInstanceOrId, pluginInstanceOrId.id, options, cb);
-          case 26:
-            return _context2.abrupt("return", game);
           case 27:
+            _context2.next = 29;
+            return handlePluginInstance(game, pluginInstanceOrId, pluginInstanceOrId.id, options, cb);
+          case 29:
+            return _context2.abrupt("return", game);
+          case 30:
           case "end":
             return _context2.stop();
         }
@@ -3289,29 +3330,32 @@ function use(game) {
     return use;
   }();
 }
-function handlePluginInstance(_x2, _x3, _x4, _x5, _x6) {
+function handlePluginInstance(_x2, _x3, _x4, _x5) {
   return _handlePluginInstance.apply(this, arguments);
 }
 function _handlePluginInstance() {
-  _handlePluginInstance = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(game, pluginInstance, pluginId, options, cb) {
+  _handlePluginInstance = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(game, pluginInstance, pluginId, options) {
+    var cb,
+      _args3 = arguments;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
+          cb = _args3.length > 4 && _args3[4] !== undefined ? _args3[4] : function () {};
           if (typeof pluginInstance.build === 'function') {
             extendEntityBuilder(game, pluginInstance);
           }
           pluginGameSceneMethods(game, pluginInstance);
           game.loadedPlugins.push(pluginId);
           if (!pluginInstance.preload) {
-            _context3.next = 8;
+            _context3.next = 9;
             break;
           }
-          _context3.next = 6;
+          _context3.next = 7;
           return pluginInstance.preload(game);
-        case 6:
-          _context3.next = 8;
+        case 7:
+          _context3.next = 9;
           return game.awaitAllPlugins();
-        case 8:
+        case 9:
           pluginInstance.init(game, game.engine, game.scene);
           game._plugins[pluginId] = pluginInstance;
           delete game._plugins[pluginId];
@@ -3334,7 +3378,7 @@ function _handlePluginInstance() {
           game.data.plugins = game.data.plugins || {};
           game.data.plugins[pluginId] = options;
           game.loadingPluginsCount--;
-        case 19:
+        case 20:
         case "end":
           return _context3.stop();
       }
@@ -3745,6 +3789,7 @@ function loadPluginsFromConfig(_ref) {
     sutra = _ref.sutra,
     ghostTyper = _ref.ghostTyper,
     lifetime = _ref.lifetime,
+    markup = _ref.markup,
     _ref$defaultMovement = _ref.defaultMovement,
     defaultMovement = _ref$defaultMovement === void 0 ? true : _ref$defaultMovement;
   var plugins = this.plugins;
@@ -3818,6 +3863,9 @@ function loadPluginsFromConfig(_ref) {
     }
     if (virtualGamepad) {
       this.use('GamepadGUI', gamepad);
+    }
+    if (markup) {
+      this.use('Markup');
     }
     if (sutra) {
       this.use('Sutra', {

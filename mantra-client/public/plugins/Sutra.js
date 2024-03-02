@@ -390,11 +390,11 @@ function topdownMovement(game) {
   });
   rules.addCondition('ZOOM_IN', {
     op: 'or',
-    conditions: ['K', 'BUTTON_A']
+    conditions: ['Q', 'BUTTON_A']
   });
   rules.addCondition('ZOOM_OUT', {
     op: 'or',
-    conditions: ['L', 'BUTTON_Y']
+    conditions: ['E', 'BUTTON_Y']
   });
   rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
     sprite: 'playerUp'

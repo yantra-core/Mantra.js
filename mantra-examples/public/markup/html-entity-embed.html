@@ -1,37 +1,32 @@
 <html>
 <head>
   <script type="module" src="/mantra.js"></script>
+</head>
+<body>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       let game = new MANTRA.Game({
         width: 400,
         height: 300,
-        markup: true,
-        plugins: ['Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame', 'Collectable'],
+        plugins: ['Markup', 'SwitchGraphics', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame', 'Collectable'],
         showLoadingScreen: false,
         gameRoot: 'http://192.168.1.80:7777'
       });
-      game.use('Markup', {
-        displayOriginalHTML: true
-      });
       game.start(function () {
-        game.systems.markup.parseHTML();
+        game.markup();
       });
     });
   </script>
-</head>
-<body>
   <m-key data-x="10" data-y="10"></m-key>
   <m-block data-x="-50" data-y="10" width="32" height="32"></m-block>
   <m-player data-x="100"></m-player>
-  <m-hexapod data-texture="demon"/></m-hexapod>
+  <m-hexapod data-texture="demon" /></m-hexapod>
   <m-hexapod data-texture="demon"></m-hexapod>
   <m-hexapod data-x="-200" data-repeat="11"></m-hexapod>
   <m-key data-x="50" data-y="50"></m-key>
   <m-key data-x="-50" data-y="50"></m-key>
   <m-key data-x="50" data-y="-50"></m-key>
   <m-key data-x="-50" data-y="-50"></m-key>
-
 </body>
 
 </html>

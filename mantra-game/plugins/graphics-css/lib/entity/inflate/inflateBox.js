@@ -56,11 +56,7 @@ export default function inflateBox(entityElement, entityData) {
     this.bindYCraftEvents(entityData, entityElement);
   }
 
-  // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
-  // set border color to black
-  console.log(entityElement.style.border)
   entityElement.style.border = entityElement.style.border || '1px solid black';
-
 
   entityElement.style.background = hexColor;
 

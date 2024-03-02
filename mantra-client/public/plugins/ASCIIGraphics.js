@@ -1186,6 +1186,9 @@ function zoom(scale) {
   if (scale > maxZoom) {
     scale = maxZoom;
   }
+
+  // this.game.data.camera.scaleMultiplier = scale;
+
   this.game.data.camera.currentZoom = scale;
 }
 

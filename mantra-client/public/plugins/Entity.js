@@ -519,8 +519,8 @@ function createEntity() {
       health: Infinity,
       score: 0,
       // radius: null,
-      height: 100,
-      width: 100,
+      height: 16,
+      width: 16,
       depth: 16,
       // Remark: height, width, and depth are being replaced by size
       size: {
@@ -983,6 +983,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = layoutEntity;
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 // TODO: needs to be able to attach by container/entity id or name, not just by name
 function layoutEntity(container, entityId) {
   var _this = this;
@@ -1022,6 +1025,21 @@ function layoutEntity(container, entityId) {
   }
   containerEnt.items.push(entityId); // Remark: We are not saving the associations here?
 
+  // TODO: add better support for 1:1 flex mapping
+  if (layoutType === 'flex') {
+    var flexConfig = containerEnt.meta.flex || containerEnt.style.flex; // Assuming flex config is stored here
+    var items = containerEnt.items.map(function (itemId) {
+      return _this.game.getEntity(itemId);
+    });
+    applyFlexLayout.call(this, containerEnt, items, flexConfig);
+  } else if (layoutType === 'grid') {
+    var gridConfig = containerEnt.meta.grid || containerEnt.style.grid; // Assuming grid config is stored here
+    var _items = containerEnt.items.map(function (itemId) {
+      return _this.game.getEntity(itemId);
+    });
+    applyGridLayout.call(this, containerEnt, _items, gridConfig);
+  }
+
   //
   // Default / no layout indicates relative position from top left origin ( -1, -1 )
   // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
@@ -1036,23 +1054,35 @@ function layoutEntity(container, entityId) {
       return;
     }
 
-    // Optional: Define offsets from the container's top-left corner
-    var offsetX = 0; // Adjust as needed
-    var offsetY = 0; // Adjust as needed
-
+    // When the origin should be centered, calculate offsets to position the entity's center at the container's center
+    var offsetX = entity.position.x; // Centered horizontally
+    var offsetY = entity.position.y; // Centered vertically
+    console.log("originoriginoriginorigin", origin);
+    //alert(origin)
+    // If the origin is explicitly set to 'top-left', adjust offsets to position the top-left corner of the entity at the container's center
     if (origin === 'top-left') {
-      // offset to be calculated by size of container and size of entity
-      offsetX = -containerEnt.size.width / 2;
-      offsetY = -containerEnt.size.height / 2;
+      offsetX = -entity.size.width / 2;
+      offsetY = -entity.size.height / 2;
+    } else {
+      // For a centered origin, adjust so the entity's center aligns with the container's center
+      offsetX -= entity.size.width / 2;
+      offsetY -= entity.size.height / 2;
     }
 
-    // Calculate the entity's new position relative to the container's position
-    // Remark: is - containerEnt.size.width / 2 adjustment required? 
+    // Calculate the cumulative position of the container to account for nesting
+    // TODO: traverse up the container hierarchy to get the cumulative position
+    // let cumulativeContainerPosition = getCumulativePosition(containerEnt);
+    var cumulativeContainerPosition = containerEnt.position;
+
+    // Calculate the entity's new position relative to the cumulative container position
     var newPosition = {
-      x: containerPosition.x + offsetX + entity.position.x - containerEnt.size.width / 2,
-      y: containerPosition.y + offsetY + entity.position.y - containerEnt.size.height / 2,
+      x: cumulativeContainerPosition.x + (origin === 'top-left' ? -entity.size.width / 2 : -entity.size.width / 2),
+      y: cumulativeContainerPosition.y + (origin === 'top-left' ? -entity.size.height / 2 : -entity.size.height / 2),
       z: containerPosition.z // Assuming z-index remains constant or is managed elsewhere
     };
+
+    newPosition.x = containerPosition.x + offsetX;
+    newPosition.y = containerPosition.y + offsetY;
 
     // Update the entity's position
     this.game.updateEntity({
@@ -1187,6 +1217,101 @@ function layoutEntity(container, entityId) {
     console.log('adding item to container using custom layout algorithm');
     throw new Error('Custom layout algorithm functions are yet implemented!');
   }
+}
+function applyFlexLayout(container, items, layoutConfig) {
+  var _layoutConfig$flexDir = layoutConfig.flexDirection,
+    flexDirection = _layoutConfig$flexDir === void 0 ? 'row' : _layoutConfig$flexDir,
+    _layoutConfig$justify = layoutConfig.justifyContent,
+    justifyContent = _layoutConfig$justify === void 0 ? 'flex-start' : _layoutConfig$justify,
+    _layoutConfig$alignIt = layoutConfig.alignItems,
+    alignItems = _layoutConfig$alignIt === void 0 ? 'center' : _layoutConfig$alignIt;
+  var isRow = flexDirection.includes('row');
+  var mainSize = isRow ? 'width' : 'height';
+  var crossSize = isRow ? 'height' : 'width';
+  var mainStart = isRow ? 'x' : 'y';
+  var crossStart = isRow ? 'y' : 'x';
+  var mainAxisCurrentPosition = 0;
+  var crossAxisPosition = 0; // This can be adjusted for alignItems other than 'center'
+  var _iterator = _createForOfIteratorHelper(items),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var item = _step.value;
+      // Position each item along the main axis
+      item.position[mainStart] = mainAxisCurrentPosition;
+      // Adjust main axis position for the next item
+      mainAxisCurrentPosition += item.size[mainSize];
+
+      // Align items along the cross axis
+      switch (alignItems) {
+        case 'flex-start':
+          item.position[crossStart] = 0;
+          break;
+        case 'flex-end':
+          item.position[crossStart] = container.size[crossSize] - item.size[crossSize];
+          break;
+        case 'center':
+        default:
+          item.position[crossStart] = (container.size[crossSize] - item.size[crossSize]) / 2;
+          break;
+      }
+
+      // Update the entity's position in the game
+      this.game.updateEntity({
+        id: item.id,
+        position: item.position
+      });
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+}
+function applyGridLayout(container, items, layoutConfig) {
+  var _this2 = this;
+  var _layoutConfig$gridTem = layoutConfig.gridTemplateColumns,
+    gridTemplateColumns = _layoutConfig$gridTem === void 0 ? '1fr' : _layoutConfig$gridTem,
+    _layoutConfig$gridTem2 = layoutConfig.gridTemplateRows,
+    gridTemplateRows = _layoutConfig$gridTem2 === void 0 ? '1fr' : _layoutConfig$gridTem2;
+  var cols = gridTemplateColumns.split(' ').length; // Simplified assumption
+  var rows = Math.ceil(items.length / cols);
+  var cellWidth = container.size.width / cols;
+  var cellHeight = container.size.height / rows;
+  items.forEach(function (item, index) {
+    var col = index % cols;
+    var row = Math.floor(index / cols);
+    item.position.x = col * cellWidth;
+    item.position.y = row * cellHeight;
+
+    // Update the entity's position in the game
+    _this2.game.updateEntity({
+      id: item.id,
+      position: item.position
+    });
+  });
+}
+
+// Function to calculate the cumulative position of a container
+function getCumulativePosition(container) {
+  var position = {
+    x: container.position.x,
+    y: container.position.y,
+    z: container.position.z
+  };
+  if (!container.container) {
+    return position;
+  }
+  var parentContainer = game.getEntityByName(container.container); // Assuming there's a way to access the parent container
+
+  if (parentContainer) {
+    position.x += parentContainer.position.x;
+    position.y += parentContainer.position.y;
+    // Assuming z-index remains constant or is managed elsewhere, so not accumulating z
+    parentContainer = parentContainer.parent; // Move up to the next parent container
+  }
+
+  return position;
 }
 
 },{}],9:[function(require,module,exports){

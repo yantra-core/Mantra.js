@@ -101,6 +101,7 @@ let plugins = [
   './plugins/graphics/Graphics.js',
   './plugins/health/Health.js',
   './plugins/timers/Timers.js',
+  './plugins/markup/Markup.js',
   './plugins/rbush/RBush.js',
   './plugins/gui-controls/ControlsGUI.js',
   './plugins/loading-screen/LoadingScreen.js',
@@ -158,8 +159,10 @@ let plugins = [
 //console.log('Changed Plugins:', changedPlugins);
 //process.exit();
 //plugins = [];
-//plugins = ['./plugins/client/Client.js']
+//plugins.push('./plugins/entity/Entity.js')
 
+//plugins = ['./plugins/client/Client.js']
+//plugins.push('./plugins/collisions/Collisions.js')
 //plugins = ['./plugins/link/Link.js']
 //plugins.push('./plugins/code/Code.js')
 // plugins = ['./plugins/monaco/Monaco.js']

@@ -1,7 +1,7 @@
 let editor;
 let loaded = false;
 
-function loadEditor(sourceUrl) {
+function loadEditor(sourceUrl, extraWrap = false) {
   if (loaded) return;
 
   let jsSource = sourceUrl;
@@ -11,40 +11,51 @@ function loadEditor(sourceUrl) {
     fetch(jsSource)
       .then(response => response.text())
       .then(code => {
+        let ogSource = code;
         console.log(code)
+        // alert(ogSource)
 
         // Remove the very last line of the code example.
         code = code.trim().split('\n').slice(0, -1).join('\n');
         code = code.trim().split('\n').slice(0, -1).join('\n');
 
+        if (extraWrap) {
+          // remove lines 2-4
+          //code = code.split('\n').slice(4).join('\n');
+          code = code.split('\n').slice(4).join('\n');
+          // remove the last line
+          //alert(code)
+          //code = code.trim().split('\n').slice(0, -1).join('\n');
+        }
+
         let sourceUrl = 'https://yantra.gg/mantra/examples' + jsSource.replace('.', '');
         let mantraUrl = 'https://yantra.gg/mantra.js';
         let mantraWorldsUrl = 'https://yantra.gg/worlds.mantra.js';
-        //code = stripIndent(code);
+
+let body = `<body>
+<script>
+${code}</script>
+</body>`;
+
+        if (extraWrap) {
+          body = code + `
+</body>`;
+        }
 
         let htmlTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mantra.js Gallery Page - ${jsSource.replace('.js', '').replace('./', '').replace('-', ' ')}</title>
-    <script src="${mantraUrl}"></script>
-    <script src="${mantraWorldsUrl}"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mantra.js Gallery Page - ${jsSource.replace('.js', '').replace('./', '').replace('-', ' ')}</title>
+  <script src="${mantraUrl}"></script>
+  <script src="${mantraWorldsUrl}"></script>
 </head>
-<body>
-    <script>
-${code}</script>
-</body>
-</html>
-        `;
+${body}
+</html>`;
 
         // sanitize the htmlTemplate
         htmlTemplate = htmlTemplate.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-        // Apply the stripIndent function to remove the left padding
-        //htmlTemplate = stripIndent(htmlTemplate);
-
-        //htmlTemplate = formatWithIndent(htmlTemplate);
 
         // check to see if code-editor exists in DOM, if not create it
         if (!document.querySelector('.code-editor')) {

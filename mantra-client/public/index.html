@@ -1,94 +1,24 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Mantra Worlds</title>
+  <title>Mantra - Explore</title>
   <link rel="stylesheet" type="text/css" href="admin.css">
-  <script>
-    function resizeIframeToFitContent(iframe) {
-      iframe.onload = function() {
-        try {
-          // Adjust the height of the iframe to match its body's scrollHeight
-          const body = iframe.contentWindow.document.body;
-          const html = iframe.contentWindow.document.documentElement;
-          const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-          iframe.style.height = height + 'px';
-  
-          const currentPath = iframe.contentWindow.location.pathname; // Get the current path of the iframe's content
-          const breadcrumbDiv = document.getElementById('breadcrumb');
-  
-          // Create a clickable link for the breadcrumb
-          // Note: Ensure the base URL matches the domain of your iframe content if it's not relative
-          const baseUrl = './'; // Adjust this base URL as needed
-          const fullPath = baseUrl + currentPath;
-  
-          // Update the breadcrumb with the link
-          // breadcrumbDiv.innerHTML = 'Mantra > <a href="' + fullPath + '" target="_blank">' + currentPath + '</a>';
-        } catch (e) {
-          console.error("Error resizing iframe: " + e);
-          // Handle errors here, if the content is cross-origin, you might not be able to access the content of the iframe
-        }
-      };
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* This prevents scrolling caused by the iframe */
     }
-  </script>
-  
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block; /* Ensures that the iframe is not treated as inline, which can add extra space */
+    }
+  </style>
 </head>
-
 <body>
-              <!--
-
-  <div class="container">
-    <section class="demo-category">
-
-      <h2><a href="home.html">Enter Mantra World</a></h2>
-      <a href="home.html">
-        <img class="mantraLogo" src="img/game/env/warp-to-mantra-home.png" />
-      </a>
-      <h2><a href="home.html">Try Mantra Now by Clicking Here</a></h2>
-    </section>
-    <br />
-    <br />
-    <br />
-
-  </div>
-            -->
-
-
-  
-
-
-     <!--     
-  <div id="breadcrumb">
-    <a href="home.html">
-      <img class="mantraLogo" src="img/game/env/warp-to-mantra-home.png" />
-    </a>
-    <span>Welcome to Mantra, my friend.</span> Mantra Gallery <a href="./examples/gallery">/examples/gallery</a>
-  </div>
-  -->
-    <!-- Breadcrumb placeholder -->
-  <iframe id="mantraGalleryIframe" src="./examples/gallery.html" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
-
-  <div id="breadcrumb">Mantra Examples <a href="./examples">/examples</a></div> <!-- Breadcrumb placeholder -->
-  <iframe id="mantraExamplesIframe" src="./examples/index.html" width="100%" onload="resizeIframeToFitContent(this)"></iframe>
-
-  <script>
-    // Initialize the resizing function for the iframe when the document is fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-
-
-      const iframe = document.getElementById('mantraGalleryIframe');
-
-      let height = 1200;
-      iframe.style.height = height + 'px';
-      resizeIframeToFitContent(iframe);
-
-      const iframe2 = document.getElementById('mantraExamplesIframe');
-      resizeIframeToFitContent(iframe2);
-      
-    });
-  </script>
-
-
+  <iframe id="mantraExplorerIframe" src="./examples/explore.html"></iframe>
 </body>
-
 </html>

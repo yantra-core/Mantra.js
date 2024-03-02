@@ -1,5 +1,7 @@
 
 let game = new MANTRA.Game({
+  width: 400,
+  height: 300,
   graphics: ['css'], // array enum, 'babylon', 'phaser', 'css', 'three',
   defaultPlayer: true,
   defaultMovement: true,
@@ -58,7 +60,18 @@ game.start(function () {
     })
     .position(100, 0, 0)
     .createEntity();
-});
+
+    // Teleport to URL
+    game.make().Text().text('Teleport to URL').width(200).position(120, -120, 0).createEntity();
+    game.make()
+      .Teleporter({
+        destination: {
+          url: 'https://github.com/yantra-core/Mantra.js'
+        }
+      })
+      .position(100, -100, 0)
+      .createEntity();
+  });
 
 class DemoScene {
   static id = 'demo-scene';

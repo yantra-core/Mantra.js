@@ -49,7 +49,7 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
       //
       // Click to teleport
       //
-      if (entityData.clickToTeleport !== false) {
+      if (entityData.clickToTeleport !== false || entityData.meta.clickToTeleport !== false) {
         // default behavior is true, click to teleport
         entityData.pointerdown = entityData.pointerdown || this.pointerdownWrap.bind(this);
       }

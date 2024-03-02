@@ -10,8 +10,8 @@ const Config = {
   fps: 25,
   ffmpeg_Path: '<path of ffmpeg_path>' || null,
   videoFrame: {
-    width: 1024,
-    height: 768,
+    width: 1080,
+    height: 1920 / 2,
   },
   videoCrf: 18,
   videoCodec: 'libx264',
@@ -44,8 +44,18 @@ async function captureVideo() {
   const browser = await puppeteer.launch({ headless: false, slowMo: 100 });
 
   const page = await browser.newPage();
-  const recorder = new PuppeteerScreenRecorder(page);
+  // Set the viewport to 1080x1920 for vertical video format (9:16 aspect ratio)
+  await page.setViewport({ width: 540, height: 960 });
 
+  const recorder = new PuppeteerScreenRecorder(page, {
+    followNewTab: true,
+    fps: 25,
+    videoFrame: {
+      width: 540, // Match viewport width or consider a slight increase
+      height: 960, // Match viewport height or consider a slight increase
+    },
+  });
+  
   await page.goto(homeUrl);
 
   const savePath = './demo.mp4';
@@ -78,49 +88,36 @@ async function captureVideo() {
   // Get the viewport size
   const viewport = await page.viewport();
 
-  // Define the center position based on the viewport size
-  let centerX = viewport.width / 2;
-  let centerY = viewport.height / 2;
-  let distance = 100; // Distance from the center to move the mouse in each direction
-
   // REMARK: this assumes game is 0,0 top left, it is not, game is 0,0 center
-// Assuming game.radialSpread is defined and accessible
+  // Assuming game.radialSpread is defined and accessible
+  await delay(100); // Adjust delay as needed
+  await delay(100); // Adjust delay as needed
 
-let radius = 100; // Radius of the radial spread
-let totalPoints = 10;
-
-// Generate positions in a radial pattern around the center
-for (let i = 0; i < totalPoints; i++) {
-  // Use the radialSpread function to calculate the position for each point
-  let { x, y } = radialSpread(centerX, centerY, radius, totalPoints, i);
-
-  // center to player? player is 16,16
-  //x = x + 16;
-  //y = y + 16;
-  console.log(`Moving mouse to (${x}, ${y})`);
-  await page.mouse.click(x, y, { button: 'right' });
-  await page.mouse.click(x, y, { button: 'right' });
-
-  await delay(50); // Adjust delay as needed
-  await page.mouse.move(x, y);
-  await delay(50); // Adjust delay as needed
-  await page.mouse.click(x, y, { button: 'right' });
-  await page.mouse.click(x, y, { button: 'right' });
-
-  await delay(200); // Adjust delay as needed
-}
-await page.keyboard.press('D');
-
-await page.keyboard.press('D');
-await page.keyboard.press('A');
-await page.keyboard.press('A');
-await page.keyboard.press('S');
-await page.keyboard.press('S');
-await page.keyboard.press('D');
-await page.keyboard.press('W');
-await page.keyboard.press('W');
-await page.keyboard.press('W');
-await page.keyboard.press('A');
+  await page.keyboard.press('W');
+  await delay(100); // Adjust delay as needed
+  //await page.keyboard.press('W');
+  await delay(40); // Adjust delay as needed
+  //await page.keyboard.press('W');
+  await delay(40); // Adjust delay as needed
+  await page.keyboard.press('A');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('A');
+  //await delay(100); // Adjust delay as needed
+  //await page.keyboard.press('A');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('Space');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('Space');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('Space');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('A');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('A');
+  await delay(100); // Adjust delay as needed
+  await page.keyboard.press('A');
+  await page.keyboard.press('S');
+  //await page.keyboard.press('S');
 
 
   // Once detected, perform the desired Puppeteer actions
@@ -157,4 +154,40 @@ function radialSpread(centerX, centerY, distance, count, index) {
   let x = centerX + distance * Math.cos(angle); // Convert polar to Cartesian coordinates
   let y = centerY + distance * Math.sin(angle);
   return { x, y };
+}
+
+
+async function radialPointing() {
+
+  // Define the center position based on the viewport size
+  let centerX = viewport.width / 2;
+  let centerY = viewport.height / 2;
+  let distance = 100; // Distance from the center to move the mouse in each direction
+
+
+
+  let radius = 100; // Radius of the radial spread
+  let totalPoints = 10;
+  await page.mouse.click(centerX, centerY, { button: 'right' });
+
+  // Generate positions in a radial pattern around the center
+  for (let i = 0; i < totalPoints; i++) {
+    // Use the radialSpread function to calculate the position for each point
+    let { x, y } = radialSpread(centerX, centerY, radius, totalPoints, i);
+
+    // center to player? player is 16,16
+    //x = x + 16;
+    //y = y + 16;
+    console.log(`Moving mouse to (${x}, ${y})`);
+    //await page.mouse.click(x, y, { button: 'right' });
+    //await page.mouse.click(x, y, { button: 'right' });
+
+    await delay(50); // Adjust delay as needed
+    await page.mouse.move(x, y);
+    await delay(50); // Adjust delay as needed
+    await page.mouse.click(x, y, { button: 'right' });
+    //await page.mouse.click(x, y, { button: 'right' });
+
+    await delay(200); // Adjust delay as needed
+  }
 }

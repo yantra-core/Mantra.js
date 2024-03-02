@@ -1,12 +1,15 @@
 
 let game = new MANTRA.Game({
+  width: 400,
+  height: 300,
   graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
   defaultMovement: true,
-  plugins: ['RBush', 'Tile'], // RBush is required for Field of View
+  plugins: ['RBush', 'Tile', 'Player'], // RBush is required for Field of View
 });
 game.start(function () {
-  game.zoom(2.5);
-  game.createPlayer();
+  
+  game.make().Player().position(0, 0, 16).createEntity();
+  game.setBackground('#000000');
 
   let tileMap = new game.TileMap({
     x: 0,

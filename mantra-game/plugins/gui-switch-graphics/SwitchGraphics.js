@@ -13,6 +13,24 @@ class SwitchGraphics {
     this.createUI();
   }
 
+  // TODO: make SwitchGraphics() a buildable entity
+  build(entityData = {}) {
+    /*
+    if (typeof entityData.position === 'undefined') {
+      entityData.position = { x: 0, y: 0 };
+    }
+    entityData.meta = entityData.meta || {};
+    entityData.meta.disabled = entityData.disabled;
+    return {
+      type: 'BUTTON',
+      body: false,
+      text: entityData.text || 'Switch Graphics',
+      position: entityData.position,
+      ...entityData // Spread the rest of entityData to override defaults as necessary
+    };
+    */
+  }
+
   setMode() {
     // Determine the next graphics mode
     const nextGraphicsMode = this.nextMode();

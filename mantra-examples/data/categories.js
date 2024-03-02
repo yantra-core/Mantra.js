@@ -20,13 +20,13 @@ let categories = [
     tags: ['games', 'gameplay', 'game', 'worlds', 'levels', 'environments', 'terrain', 'landscapes', 'scenery', 'backgrounds', 'landmarks', 'geography']
   },
   {
-    title: 'Physics', // purple
-    name: 'physics',
-    color: '#9c27b0',
-    description: 'Interact with bodies, forces, gravity.',
+    title: 'Markup', // blue
+    name: 'markup',
+    color: '#2196f3',
+    description: 'Code Mantra Games using HTML Markup',
     image: 'placeholder-image.jpg',
-    url: 'physics.html',
-    tags: ['physics', 'engine', 'motion', 'movement', 'gravity', 'force', 'velocity', 'mass', 'acceleration', 'inertia', 'friction']
+    url: 'markup.html',
+    tags: ['markup', 'html', 'web', 'interface', 'user experience', 'controls', 'navigation', 'interaction', 'buttons', 'menus', 'windows', 'panels', 'dialogs', 'forms', 'input']
   },
   {
     title: 'Scenes', // Lime
@@ -83,6 +83,16 @@ let categories = [
     url: 'items.html',
     tags: ['items', 'system', 'inventory', 'equipment', 'consumables', 'loot', 'rewards', 'currencies', 'trading', 'crafting']
   },
+  {
+    title: 'Physics', // purple
+    name: 'physics',
+    color: '#9c27b0',
+    description: 'Interact with bodies, forces, gravity.',
+    image: 'placeholder-image.jpg',
+    url: 'physics.html',
+    tags: ['physics', 'engine', 'motion', 'movement', 'gravity', 'force', 'velocity', 'mass', 'acceleration', 'inertia', 'friction']
+  },
+
   {
     "title": "Terrains",
     name: "terrain",
@@ -1302,6 +1312,77 @@ let ui_examples = [
   }
 ];
 
+let markup_examples = [
+  {
+    title: 'Entity HTML',
+    category: ['markup', 'entity'],
+    description: 'Create HTML entities.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-entity.html',
+    tags: ['html', 'entities', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Entity Containers',
+    category: ['markup', 'entity'],
+    description: 'Create HTML entity containers.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-entity-containers.html',
+    tags: ['html', 'containers', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Entity Attributes',
+    category: ['markup', 'entity'],
+    description: 'Create HTML entity attributes.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-entity-attributes.html',
+    tags: ['html', 'attributes', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  {
+    title: 'Entity Metadata',
+    category: ['markup', 'entity'],
+    description: 'Create HTML entity metadata.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-entity-metadata.html',
+    tags: ['html', 'metadata', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  },
+  /*
+  {
+    title: 'Game Config',
+    category: ['markup', 'config'],
+    description: 'Create game configuration.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-game-config.html',
+    tags: ['game', 'config', 'settings', 'options', 'preferences', 'parameters', 'variables', 'constants', 'properties', 'values']
+  },
+  */
+  {
+    title: 'Collision Events',
+    category: ['markup', 'collisions'],
+    description: 'Create collision events.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-collision-events.html',
+    tags: ['collision', 'events', 'detection', 'response', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
+  },
+  /*
+  {
+    title: 'Pointer Events',
+    category: ['markup', 'inputs'],
+    description: 'Create pointer events.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-pointer-events.html',
+    tags: ['pointer', 'events', 'detection', 'response', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
+  },
+  {
+    title: 'Preview Render',
+    category: ['markup', 'preview'],
+    description: 'Preview game as HTML.',
+    image: 'placeholder-image.jpg',
+    url: 'markup/html-preview.html',
+    tags: ['preview', 'game', 'html', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
+  }
+  */
+]
+
 let _examples = [];
 _examples.push(item_examples);
 _examples.push(npc_examples);
@@ -1324,6 +1405,7 @@ _examples.push(scenes_examples);
 _examples.push(ui_examples);
 _examples.push(lifecycle_examples);
 _examples.push(games_examples);
+_examples.push(markup_examples);
 
 _examples.forEach((arr) => {
   arr.sort((a, b) => (a.title > b.title) ? 1 : -1);

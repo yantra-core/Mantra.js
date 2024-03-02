@@ -8,31 +8,122 @@
   <link rel="stylesheet" href="/prism.css">
   <link rel="stylesheet" href="/vendor/prism-live/style.css">
   <style></style>
-</head>
-
-<body>
   <script src="/vendor/prism-live/src/prism-live.js?load=javascript"></script> <!-- If not already included -->
 
   <script type="module" src="./world.js"></script>
   <script type="module" src="./worlds.mantra.js"></script>
   <script type="module" src="./ycraft.js"></script>
   <script src="/categories.js"></script>
-  <script  src="/prism.min.js" data-manual></script>
+  <script src="/prism.min.js" data-manual></script>
 
- <!-- 
-    <h1 style="position: absolute; top: 10px; z-index: -10;">Awesome Text</h1>
-      <img id="testImage" src="https://yantra.gg/labyrinthos/browser/img/labyrinthos-speaks.gif" style="display: none;" alt="Test Image">
 
-  -->
-  <img id="testImage" src="https://yantra.gg/mantra/img/game/env/warp-to-mantra-home-256.png" style="display: none;" alt="Test Image">
+  <style>
+     m-player,
+    m-hexapod,
+    m-key,
+    m-block,
+    m-teleporter,
+    m-container,
+    m-flame {
+      position: absolute;
+      display: block;
+    }
+
+    m-player {
+      width: 20px;
+      height: 20px;
+      background-color: red;
+    }
+
+    m-hexapod {
+      width: 10px;
+      height: 10px;
+      background-color: green;
+    }
+
+    m-key {
+      width: 20px;
+      height: 20px;
+      background-color: gold;
+    }
+
+    m-block {
+      width: 50px;
+      height: 50px;
+      background-color: grey;
+    }
+
+    m-teleporter {
+      width: 30px;
+      height: 30px;
+      background-color: purple;
+    }
+
+    m-container {
+      width: 100px;
+      height: 100px;
+      border: 2px dashed orange;
+      z-index: -10;
+    }
+
+    m-flame {
+      width: 10px;
+      height: 10px;
+      background-color: red;
+    }
   
+  </style>
+
   <script>
-    window.onload = function() {
-
-};
-
+    function sayHello () {
+      // alert('hello');
+    }
+    function helloCollision (a, b, pair, context) {
+      console.log('hello collision', a, b, pair, context);
+    }
   </script>
-  
+
+</head>
+
+<body>
+  <m-key
+
+   
+   data-y="10" width="32" height="32"></m-key>
+  <m-block data-x="10" data-y="10" width="100" height="100"></m-block>
+  <!-- 
+    <m-player onpointerdown="sayHello()"
+  -->
+  <m-player data-x="100"></m-player>
+  <m-tilemap 
+    data-x="0" 
+    data-y="0" 
+    data-width="100" 
+    data-height="100" 
+    data-tile-size="32"
+    ></m-tilemap>
+  <m-hexapod data-radius="8"></m-hexapod>
+  <m-hexapod data-radius="16"></m-hexapod>
+  <m-hexapod></m-hexapod>
+  <m-hexapod data-repeat="11"></m-hexapod>
+  <m-teleporter data-x="200" data-y="200">
+    <dl>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>url</dt>
+          <dd>https://github.com/yantra-core/mantra.js</dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+  <m-container data-name="container-a" data-x="0" data-y="-50" width="100" height="100">
+    <m-flame data-x="50" data-y="50"></m-flame>
+    <m-flame data-x="-50" data-y="50"></m-flame>
+    <m-flame data-x="50" data-y="-50"></m-flame>
+    <m-flame data-x="-50" data-y="-50"></m-flame>
+  </m-container>
+
 </body>
 
 </html>

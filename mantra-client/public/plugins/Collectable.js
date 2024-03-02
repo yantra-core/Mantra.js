@@ -54,7 +54,7 @@ var Collectable = /*#__PURE__*/function () {
           }
           var childEnts = itemsData[id];
           // console.log("childEnts", childEnts)
-          childEnts.forEach(function (childEntId) {
+          childEnts.forEach(function (childEntId, i) {
             // TODO: only get positional component data, not entire ent
             var entity = _this.game.entities.get(childEntId);
             if (entity && !entity.destroyed) {
@@ -70,7 +70,7 @@ var Collectable = /*#__PURE__*/function () {
                 // rotation: parentEnt.rotation,
                 position: {
                   x: parentEnt.position.x + 10,
-                  y: parentEnt.position.y
+                  y: parentEnt.position.y + 10 * i
                 }
               });
             }

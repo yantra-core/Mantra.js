@@ -27,6 +27,26 @@ var SwitchGraphics = /*#__PURE__*/function () {
       this.game.systemsManager.addSystem(this.id, this);
       this.createUI();
     }
+
+    // TODO: make SwitchGraphics() a buildable entity
+  }, {
+    key: "build",
+    value: function build() {
+      var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    } /*
+      if (typeof entityData.position === 'undefined') {
+        entityData.position = { x: 0, y: 0 };
+      }
+      entityData.meta = entityData.meta || {};
+      entityData.meta.disabled = entityData.disabled;
+      return {
+        type: 'BUTTON',
+        body: false,
+        text: entityData.text || 'Switch Graphics',
+        position: entityData.position,
+        ...entityData // Spread the rest of entityData to override defaults as necessary
+      };
+      */
   }, {
     key: "setMode",
     value: function setMode() {

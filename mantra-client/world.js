@@ -16,6 +16,9 @@ import Player from '../mantra-game/plugins/player/Player.js';
 import Teleporter from '../mantra-game/plugins/teleporter/Teleporter.js';
 import UnitSpawner from '../mantra-game/plugins/unit-spawner/UnitSpawner.js';
 import Mouse from '../mantra-game/plugins/mouse/Mouse.js';
+
+import Markup from '../mantra-game/plugins/markup/Markup.js';
+
 let game = new Game({
   width: 800,
   height: 600,
@@ -60,9 +63,12 @@ let game = new Game({
 
 // game.gameConfig = TowerWorld;
 
- window.game = game;
+window.game = game;
 let home = new worlds.Platform();
 home = new worlds.Home();
+
+game.data.camera.scaleMultiplier = 1;
+
 
 game.use(new plugins.Tower())
 game.use(new plugins.UnitSpawner())
@@ -97,46 +103,319 @@ game.use(new plugins.Image());
 game.use(new plugins.Canvas());
 game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
+game.use(new plugins.Button());
 game.use(new plugins.Code());
 game.use(new plugins.Container());
 game.use(new plugins.Entity());
 // game.use(new plugins.Monaco());
-
+game.use(new plugins.Key());
+//game.use(new plugins.CSSGraphics())
 game.use(new plugins.Mouse());
 game.use(new plugins.Link());
-   
+
+game.use(new plugins.Markup());
 // game.use(new Mouse());
-// game.use(new plugins.Editor());
+game.use(new plugins.Editor());
 // game.use(new Lifetime());
 
-game.data.camera.mouseWheelZoomEnabled = true;
 
 game.start(function () {
   game.reset();
-  game.setZoom(2.5);
+  //  game.setZoom(1);
+  game.use(new plugins.SwitchGraphics())
+  game.data.camera.mouseWheelZoomEnabled = true;
+  game.data.camera.adaptiveZoom = true;
+  console.log('gggg', game.systems)
+  game.systems.markup.parseHTML(true);
+  //game.systems.markup.preview()
 
+  /*
+  let button = game.make().Button()
+    .text('Render Mantra Markup')
+    .x(-50)
+    .pointerdown(function () {
+      game.systems.markup.parseHTML();
+      game.removeEntity(button.id);
+    })
+    .style({
+      fontSize: '8px',
+    })
+    .createEntity();
+  */
+
+
+  //game.data.camera.scaleMultiplier = 0.2;
+  //game.use(new worlds.Playground());
+
+  //game.data.camera.mouseWheelZoomEnabled = false;
+
+  // allow overflows of body
+  // set body style overflow auto
+  //  document.body.style.overflow = 'auto';
   // game.use(new plugins.ThreeGraphics());
 
-   //game.use(new worlds.EatWorld());
-   game.use(new worlds.Playground());
-/*
-  game.createEntity({
-    texture: {
-      sheet: 'hexapod',
-      sprite: 'default',
-    },
-    width: 100,
-    height: 100,
-  })
+  /*
+
+  game.use(new plugins.Border({
+    autoBorder: true
+  }));
+
+  //
+  // Top Left
+  // 
+  game.make().Text()
+    .text('Top Left')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('top-left')
+    .origin('bottom-right')
+    .z(2)
+    .createEntity();
 
   game.make()
-  .size(100, 100)
-  .texture({
-    sheet: 'hexapod',
-    sprite: 'default',
-    //frame: 0
-}).createEntity();
-*/
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('top-left')
+    .origin('bottom-right')
+    .createEntity();
+
+  //
+  // Top Center
+  //
+
+  game.make().Text()
+    .text('Top Center')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('top-center')
+    .origin('bottom')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('top-center')
+    .origin('top-center')
+    .createEntity();
+
+  //
+  // Top Right
+  //
+
+  game.make().Text()
+    .text('Top Right')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('top-right')
+    .origin('bottom-left')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('top-right')
+    .origin('bottom-left')
+    .createEntity();
+
+
+
+  //
+  // Center Left
+  //
+
+  game.make().Text()
+    .text('Center Left')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('center-left')
+    .origin('right')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('center-left')
+    .origin('center-left')
+    .createEntity();
+
+  //
+  // Center
+  //
+
+  game.make().Text()
+    .text('Center')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('center')
+    .origin('center')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('center')
+    .origin('center')
+    .createEntity();
+
+  //
+  // Center Right
+  //
+
+  game.make().Text()
+    .text('Center Right')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('center-right')
+    .origin('left')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('center-right')
+    .origin('center-right')
+    .createEntity();
+
+  //
+  // Bottom Left
+  //
+
+  game.make().Text()
+    .text('Bottom Left')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .origin('top-right')
+
+    .layout('bottom-left')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('bottom-left')
+    .origin('top-right')
+    .createEntity();
+
+  //
+  // Bottom Center
+  //
+
+  game.make().Text()
+    .text('Bottom Center')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('bottom-center')
+    .origin('top')
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('bottom-center')
+    .origin('bottom-center')
+    .createEntity();
+
+  //
+  // Bottom Right
+  //
+
+  game.make().Text()
+    .text('Bottom Right')
+    .style({
+      fontSize: '32px',
+      textAlign: 'center'
+    })
+    .color('black')
+    .width(100)
+    .height(100)
+    .layout('bottom-right')
+    .origin('top-left')
+
+    .z(2)
+    .createEntity();
+
+  game.make()
+    .color('white')
+    .width(100)
+    .height(100)
+    .layout('bottom-right')
+    .origin('top-left')
+    .createEntity();
+    */
+  //game.use(new worlds.EatWorld());
+  /*
+    game.createEntity({
+      texture: {
+        sheet: 'hexapod',
+        sprite: 'default',
+      },
+      width: 100,
+      height: 100,
+    })
+  
+    game.make()
+    .size(100, 100)
+    .texture({
+      sheet: 'hexapod',
+      sprite: 'default',
+      //frame: 0
+  }).createEntity();
+  */
 
   //game.make().Hexapod().repeat(11).createEntity();
   //game.use(home);
@@ -145,14 +424,14 @@ game.start(function () {
 
   // TODO: make this a helper
   // game.data.camera.mouseWheelZoomEnabled = true;
-/*
-  game.make().Image({
-    width: 256,
-    height: 256,
-    src: 'https://yantra.gg/mantra/img/game/env/warp-to-mantra-home-256.png'
-  }).createEntity();
-  //game.use(new worlds.Maze())
-  */
+  /*
+    game.make().Image({
+      width: 256,
+      height: 256,
+      src: 'https://yantra.gg/mantra/img/game/env/warp-to-mantra-home-256.png'
+    }).createEntity();
+    //game.use(new worlds.Maze())
+    */
   // game.make().GravityWell().isStatic(true).createEntity();
 
   function isCanvasEmpty(canvas, context) {

@@ -1,36 +1,28 @@
 <html>
-<script type="module" src="/mantra.js"></script>
-
-<script>
-
-  document.addEventListener('DOMContentLoaded', () => {
-    let game = new MANTRA.Game({
-      markup: true,
-      plugins: ['Markup', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame'],
-      showLoadingScreen: false,
-      gameRoot: 'http://192.168.1.80:7777'
-    });
-
-    game.start(function () {
-      //game.markup();
-      game.data.camera.mouseWheelZoomEnabled = true;
-      game.data.camera.adaptiveZoom = true;
-      console.log('gggg', game.systems)
-      game.systems.markup.parseHTML();
-      //game.systems.markup.preview()
-    });
-  });
-
-
-</script>
-
+<head>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+</head>
 <body>
-  <m-key data-x="10" data-y="10" width="100" height="100"></m-key>
-  <m-block data-x="10" data-y="10" width="100" height="100"></m-block>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let game = new MANTRA.Game({
+        width: 400,
+        height: 300,
+        plugins: ['Markup', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame'],
+        showLoadingScreen: false,
+        gameRoot: 'http://192.168.1.80:7777'
+      });
+      game.start(function () {
+        game.markup();
+      });
+    });
+  
+  </script>
+
   <m-player data-x="100"></m-player>
 
-  <m-unit-spawner data-x="100" data-y="100" data-radius="100" data-unit="hexapod"></m-unit-spawner>
-  <m-teleporter data-x="200" data-y="200">
+  <m-teleporter data-x="-350" data-y="50">
     <dl>
       <dt>destination</dt>
       <dd>
@@ -41,12 +33,40 @@
       </dd>
     </dl>
   </m-teleporter>
-  <m-container data-name="container-a" data-x="0" data-y="-50" width="100" height="100">
-    <m-flame data-x="50" data-y="50"></m-flame>
-    <m-flame data-x="-50" data-y="50"></m-flame>
-    <m-flame data-x="50" data-y="-50"></m-flame>
-    <m-flame data-x="-50" data-y="-50"></m-flame>
-  </m-container>
+
+  <m-teleporter data-x="-150" data-y="50">
+    <dl>
+      <dt>clickToTeleport</dt>
+      <dd>false</dd>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>plugin</dt>
+          <dd>Home</dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+
+  <m-teleporter data-x="150" data-y="50">
+    <dl>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>position</dt>
+          <dd>
+            <dl>
+              <dt>x</dt>
+              <dd>0</dd>
+              <dt>y</dt>
+              <dd>0</dd>
+            </dl>
+          </dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+
 </body>
 
 </html>

@@ -120,6 +120,7 @@ var Collisions = /*#__PURE__*/function () {
       // this is done by adding to Entity.items() array
       // further checks in Collectibles system can update the position of the collectable
       function addItemIfCollectible(sourceEntity, targetEntity) {
+        // console.log('addItemIfCollectible', sourceEntity, targetEntity);
         if (!targetEntity.hasInventory) {
           return;
         }
@@ -137,6 +138,12 @@ var Collisions = /*#__PURE__*/function () {
             body: false
           })
           */
+
+          // don't let same TYPE items collect each other ( for now )
+          // Remark: This should be a configuration based on collision groups and layers
+          if (sourceEntity.type === targetEntity.type) {
+            return;
+          }
 
           // console.log("ADDING ITEM", sourceEntity.id, targetEntity.id, targetEntity.items)
           targetEntity.items.push(sourceEntity.id);

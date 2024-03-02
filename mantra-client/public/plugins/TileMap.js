@@ -5629,7 +5629,9 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "build",
     value: function build() {
+      var _this = this;
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var game = this.game;
       if (typeof entityData.position === 'undefined') {
         entityData.position = {
           x: 0,
@@ -5644,6 +5646,9 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
       if (entityData.tileMapWidth && entityData.tileMapHeight) {
         entityData.meta.tileMapWidth = entityData.tileMapWidth;
         entityData.meta.tileMapHeight = entityData.tileMapHeight;
+      } else {
+        entityData.meta.tileMapWidth = 4;
+        entityData.meta.tileMapHeight = 4;
       }
       if (entityData.tileSize) {
         entityData.meta.tileSize = entityData.tileSize;
@@ -5654,9 +5659,15 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
         entityData.meta.tileWidth = entityData.tileWidth;
         entityData.meta.tileHeight = entityData.tileHeight;
       }
+      if (typeof entityData.meta.tileWidth !== 'number') {
+        entityData.meta.tileWidth = 32;
+      }
+      if (typeof entityData.meta.tileHeight !== 'number') {
+        entityData.meta.tileHeight = 32;
+      }
 
       // provide a small default tile map if none is provided
-      entityData.meta.data = entityData.data || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      entityData.meta.data = entityData.data || [1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1];
       var meta = {};
       if (entityData.meta) {
         meta = entityData.meta;
@@ -5703,6 +5714,7 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
         },
 
         afterCreateEntity: function afterCreateEntity(entityData) {
+          var game = _this.game;
           // after the tile map container is created, create all the tiles as children
           // create the tiles scoped to entityData.id as container
           // console.log(entityData)

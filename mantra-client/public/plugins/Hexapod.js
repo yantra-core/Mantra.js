@@ -32,7 +32,8 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
       if (typeof entityData.position === 'undefined') {
         entityData.position = {
           x: 0,
-          y: 0
+          y: 0,
+          z: 1
         };
       }
       return {

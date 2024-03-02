@@ -993,6 +993,9 @@ function zoom(scale) {
   if (scale > maxZoom) {
     scale = maxZoom;
   }
+
+  // this.game.data.camera.scaleMultiplier = scale;
+
   this.game.data.camera.currentZoom = scale;
 }
 
@@ -1313,10 +1316,7 @@ function inflateBox(entityElement, entityData) {
     //  entityElement.style.cursor = 'pointer';
     this.bindYCraftEvents(entityData, entityElement);
   }
-
-  // console.log(entityData.type, entityData.name, entityElement.style.zIndex);
-  // set border color to black
-  entityElement.style.border = '1px solid black';
+  entityElement.style.border = entityElement.style.border || '1px solid black';
   entityElement.style.background = hexColor;
   if (entityData.style) {
     Object.keys(entityData.style).forEach(function (key) {
