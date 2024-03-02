@@ -199,6 +199,12 @@ class Game {
     this.height = height;
   }
 
+  markup () {
+    if (this.systems.markup) {
+      this.systems.markup.parseHTML();
+    }
+  }
+
   //
   // Player specific APIs
   //

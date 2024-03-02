@@ -47,8 +47,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       health: Infinity,
       score: 0,
       // radius: null,
-      height: 100,
-      width: 100,
+      height: 16,
+      width: 16,
       depth: 16,
       // Remark: height, width, and depth are being replaced by size
       size: { width: 100, height: 100, depth: 16 },

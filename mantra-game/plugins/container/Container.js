@@ -10,7 +10,7 @@ export default class Container {
 
   init(game) {
     this.game = game;
-    this.game.systemsManager.addSystem('block', this);
+    this.game.systemsManager.addSystem(Container.id, this);
   }
 
   build(entityData = {}) {
@@ -22,7 +22,6 @@ export default class Container {
     entityData.meta.grid = entityData.grid || entityData.meta.grid || {};
     entityData.items = entityData.items || entityData.meta.items || [];
 
-    console.log('cccc', entityData)
     return {
       type: 'CONTAINER',
       layout: 'grid', // optional. can also be "flex" or "none"

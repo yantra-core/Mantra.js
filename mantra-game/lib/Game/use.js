@@ -1,10 +1,22 @@
 export default function use(game) {
-  return async function use(pluginInstanceOrId, options = {}, cb = () => {}) {
+  return async function use(pluginInstanceOrId, options = {}, cb = () => { }) {
     let basePath = '/plugins/'; // Base path for loading plugins
     basePath = game.scriptRoot + basePath;
 
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
+
+      // Initialize callback storage for this plugin if it doesn't exist
+      if (typeof game.pluginCallbacks === 'undefined') {
+        game.pluginCallbacks = {};
+      }
+      if (typeof game.pluginCallbacks[pluginId] === 'undefined') {
+        game.pluginCallbacks[pluginId] = [];
+      }
+
+      // Store the callback for later execution
+      game.pluginCallbacks[pluginId].push(cb);
+
       if (game._plugins[pluginId]) {
         console.log(`Plugin ${pluginId} is already loaded or loading.`);
         return game;
@@ -36,7 +48,12 @@ export default function use(game) {
           console.log(`Loaded: ${pluginId}`);
           if (typeof PLUGINS === 'object' && PLUGINS[pluginId]) {
             let pluginInstance = new PLUGINS[pluginId].default(options);
-            await handlePluginInstance(game, pluginInstance, pluginId, options, cb);
+            await handlePluginInstance(game, pluginInstance, pluginId, options);
+            // Execute all callbacks stored for this plugin
+            game.pluginCallbacks[pluginId].forEach(callback => callback());
+            // Clear the callbacks after execution
+            delete game.pluginCallbacks[pluginId];
+
           } else {
             console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
             throw new Error('PLUGINS object not found, cannot load plugin');
@@ -46,7 +63,10 @@ export default function use(game) {
           console.error(`Error loading plugin ${pluginId}:`, err);
           game._plugins[pluginId] = { status: 'error' };
           game.loadingPluginsCount--;
-          cb(err);
+          // Execute all callbacks with the error
+          game.pluginCallbacks[pluginId].forEach(callback => callback(err));
+          // Clear the callbacks after execution
+          delete game.pluginCallbacks[pluginId];
           throw err; // Rethrow or handle as needed
         } finally {
           // Remove the promise from the tracking object once it's settled
@@ -67,7 +87,7 @@ export default function use(game) {
   }
 }
 
-async function handlePluginInstance(game, pluginInstance, pluginId, options, cb) {
+async function handlePluginInstance(game, pluginInstance, pluginId, options, cb = () => {}) {
 
   if (typeof pluginInstance.build === 'function') {
     extendEntityBuilder(game, pluginInstance);
@@ -139,7 +159,7 @@ function extendEntityBuilder(game, pluginInstance) {
     // Remark: We tried to merge the builder config scope with plugin instance scope;
     //         however it wasn't quite working and was adding complexity
     let enhancedArgs = args.map(arg => ({ ...arg, _previous: { ...this.config } }));
-    
+
     // Call the plugin's build function with the enhanced arguments
     const componentValue = pluginInstance.build.apply(pluginInstance, enhancedArgs);
 

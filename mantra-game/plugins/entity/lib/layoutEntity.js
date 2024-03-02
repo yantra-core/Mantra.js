@@ -33,6 +33,17 @@ export default function layoutEntity(container, entityId) {
   }
   containerEnt.items.push(entityId); // Remark: We are not saving the associations here?
 
+  // TODO: add better support for 1:1 flex mapping
+  if (layoutType === 'flex') {
+    const flexConfig = containerEnt.meta.flex || containerEnt.style.flex; // Assuming flex config is stored here
+    const items = containerEnt.items.map(itemId => this.game.getEntity(itemId));
+    applyFlexLayout.call(this, containerEnt, items, flexConfig);
+  } else if (layoutType === 'grid') {
+    const gridConfig = containerEnt.meta.grid || containerEnt.style.grid; // Assuming grid config is stored here
+    const items = containerEnt.items.map(itemId => this.game.getEntity(itemId));
+    applyGridLayout.call(this, containerEnt, items, gridConfig);
+  }
+
   //
   // Default / no layout indicates relative position from top left origin ( -1, -1 )
   // Remark: May want to add custom origins such as center ( 0, 0 ) or bottom right ( 1, 1 ), etc
@@ -47,24 +58,37 @@ export default function layoutEntity(container, entityId) {
       return;
     }
 
-    // Optional: Define offsets from the container's top-left corner
-    let offsetX = 0; // Adjust as needed
-    let offsetY = 0; // Adjust as needed
-
-
+    // When the origin should be centered, calculate offsets to position the entity's center at the container's center
+    let offsetX = entity.position.x; // Centered horizontally
+    let offsetY = entity.position.y; // Centered vertically
+    console.log("originoriginoriginorigin", origin)
+    //alert(origin)
+    // If the origin is explicitly set to 'top-left', adjust offsets to position the top-left corner of the entity at the container's center
     if (origin === 'top-left') {
-      // offset to be calculated by size of container and size of entity
-      offsetX = -containerEnt.size.width / 2;
-      offsetY = -containerEnt.size.height / 2;
+      offsetX = -entity.size.width / 2;
+      offsetY = -entity.size.height / 2;
+    } else {
+      // For a centered origin, adjust so the entity's center aligns with the container's center
+      offsetX -= entity.size.width / 2;
+      offsetY -= entity.size.height / 2;
     }
 
-    // Calculate the entity's new position relative to the container's position
-    // Remark: is - containerEnt.size.width / 2 adjustment required? 
+
+    // Calculate the cumulative position of the container to account for nesting
+    // TODO: traverse up the container hierarchy to get the cumulative position
+    // let cumulativeContainerPosition = getCumulativePosition(containerEnt);
+    let cumulativeContainerPosition = containerEnt.position;
+    
+    // Calculate the entity's new position relative to the cumulative container position
     let newPosition = {
-      x: containerPosition.x + offsetX + entity.position.x - containerEnt.size.width / 2,
-      y: containerPosition.y + offsetY + entity.position.y - containerEnt.size.height / 2,
+      x: cumulativeContainerPosition.x + (origin === 'top-left' ? -entity.size.width / 2 : -entity.size.width / 2),
+      y: cumulativeContainerPosition.y + (origin === 'top-left' ? -entity.size.height / 2 : -entity.size.height / 2),
       z: containerPosition.z // Assuming z-index remains constant or is managed elsewhere
     };
+
+
+    newPosition.x = containerPosition.x + offsetX;
+    newPosition.y = containerPosition.y + offsetY;
 
     // Update the entity's position
     this.game.updateEntity({ id: entityId, position: newPosition });
@@ -72,6 +96,7 @@ export default function layoutEntity(container, entityId) {
     // Log for debugging purposes
     // console.log(`Entity ${entityId} positioned at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) relative to container`);
   }
+
 
   //
   // Layout container items using grid layout algorithm
@@ -196,4 +221,80 @@ export default function layoutEntity(container, entityId) {
     throw new Error('Custom layout algorithm functions are yet implemented!')
   }
 
+}
+
+function applyFlexLayout(container, items, layoutConfig) {
+  const { flexDirection = 'row', justifyContent = 'flex-start', alignItems = 'center' } = layoutConfig;
+  const isRow = flexDirection.includes('row');
+  const mainSize = isRow ? 'width' : 'height';
+  const crossSize = isRow ? 'height' : 'width';
+  const mainStart = isRow ? 'x' : 'y';
+  const crossStart = isRow ? 'y' : 'x';
+
+  let mainAxisCurrentPosition = 0;
+  let crossAxisPosition = 0; // This can be adjusted for alignItems other than 'center'
+
+  for (const item of items) {
+    // Position each item along the main axis
+    item.position[mainStart] = mainAxisCurrentPosition;
+    // Adjust main axis position for the next item
+    mainAxisCurrentPosition += item.size[mainSize];
+
+    // Align items along the cross axis
+    switch (alignItems) {
+      case 'flex-start':
+        item.position[crossStart] = 0;
+        break;
+      case 'flex-end':
+        item.position[crossStart] = container.size[crossSize] - item.size[crossSize];
+        break;
+      case 'center':
+      default:
+        item.position[crossStart] = (container.size[crossSize] - item.size[crossSize]) / 2;
+        break;
+    }
+
+    // Update the entity's position in the game
+    this.game.updateEntity({ id: item.id, position: item.position });
+  }
+}
+
+function applyGridLayout(container, items, layoutConfig) {
+  const { gridTemplateColumns = '1fr', gridTemplateRows = '1fr' } = layoutConfig;
+  const cols = gridTemplateColumns.split(' ').length; // Simplified assumption
+  const rows = Math.ceil(items.length / cols);
+
+  const cellWidth = container.size.width / cols;
+  const cellHeight = container.size.height / rows;
+
+  items.forEach((item, index) => {
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+
+    item.position.x = col * cellWidth;
+    item.position.y = row * cellHeight;
+
+    // Update the entity's position in the game
+    this.game.updateEntity({ id: item.id, position: item.position });
+  });
+}
+
+
+// Function to calculate the cumulative position of a container
+function getCumulativePosition(container) {
+  let position = { x: container.position.x, y: container.position.y, z: container.position.z };
+
+  if (!container.container) {
+    return position;
+  }
+  let parentContainer = game.getEntityByName(container.container); // Assuming there's a way to access the parent container
+
+  if (parentContainer) {
+    position.x += parentContainer.position.x;
+    position.y += parentContainer.position.y;
+    // Assuming z-index remains constant or is managed elsewhere, so not accumulating z
+    parentContainer = parentContainer.parent; // Move up to the next parent container
+  }
+
+  return position;
 }

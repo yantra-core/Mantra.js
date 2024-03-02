@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="markup, html, web, interface, user experience, controls, navigation, interaction, buttons, menus, windows, panels, dialogs, forms, input, javascript game development, html5 game development, webgl game development, css game development, css3 game development, canvas game development, web game development, browser game development, browser based game development, browser games">
+<meta name="description" content="Code Mantra Games using HTML Markup">
+  <title>Mantra - Examples - Markup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #000000;
+    }
+
+    .search-container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .search-container input {
+      width: 50%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 20px;
+    }
+
+    .category {
+      flex: 0 1 calc(33.333% - 40px);
+      margin: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      background: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: box-shadow 0.3s;
+      font-size: 1.3em;
+      max-width: 440px;
+      max-height: 400px;
+      min-width: 360px;
+      min-height: 400px;
+    }
+
+    /* glowing white / grey box shadow */
+    .category:hover {
+      box-shadow: 0 0 70px rgba(255, 255, 255, 0.5);
+    }
+
+    .category img {
+      width: 100%;
+      height: auto;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .categoryImage {
+      min-height: 200px;
+      text-align: left;
+      padding-left: 5px;
+      padding-top: 5px;
+    }
+
+    .categoryExample {
+      min-height: 200px;
+      text-align: left;
+      padding-left: 10px;
+      padding-top: 10px;
+      /* add some shadow and make eggshell white */
+      color: #fff;
+      opacity: 0.77;
+
+    }
+
+    .category h3 {
+      margin: 0;
+      padding: 15px;
+      background: #333;
+      color: #fff;
+      border-bottom: 1px solid #444;
+      min-height: 20px;
+      /* Set the minimum height */
+      display: flex;
+      /* Enable flexbox */
+      align-items: center;
+      /* Vertically center the content */
+      justify-content: center;
+      /* Horizontally center the content (if needed) */
+      text-align: center;
+      /* Ensure the text is centered */
+      font-size: 2em;
+
+      white-space: nowrap;
+      /* Prevents the text from wrapping to a new line */
+      overflow: hidden;
+      /* Ensures that the overflow text is hidden */
+      /*
+      text-overflow: ellipsis;
+      max-width: 400px;
+      */
+    }
+
+    .category p {
+      padding: 10px;
+      margin: 0;
+      flex-grow: 1;
+      font-size: 1.2em;
+
+    }
+
+    .category a {
+      display: block;
+      padding: 10px;
+      background: #5cb85c;
+      color: #fff;
+      text-decoration: none;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    .exampleEmbeds {
+      display: none;
+    }
+
+    .exampleEmbeds {
+      height: 70vh;
+    }
+
+    .code-editor {
+      position: relative;
+      width: 100%;
+      height: 30vh;
+      /* Initial height */
+      background: #333;
+      color: #fff;
+      overflow: auto;
+      /* Scrollable content */
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: monospace;
+      resize: vertical;
+      /* Make it only resizable vertically */
+      border: 1px solid #888;
+      /* Optional: adds a border for better visibility */
+      display: none;
+    }
+
+    .resize-handle {
+      position: absolute;
+      top: 70vh;
+      /* Adjust based on initial iframe height */
+      left: 0;
+      width: 100%;
+      height: 5px;
+      /* Height of the resize handle */
+      background: #666;
+      /* Visible handle color */
+      cursor: ns-resize;
+      /* Cursor indicates resizing */
+      z-index: 10;
+      /* Ensure it's above other elements */
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      /* Vertically center the items */
+      justify-content: space-between;
+      /* Space between home button and search input */
+      padding: 20px;
+      /* Add some padding around */
+    }
+
+    .docsHomeButon {
+      /* Remove position absolute and other positioning styles */
+      font-size: 36px;
+      color: #fff;
+      margin-right: 20px;
+      /* Add some space between the button and the search input */
+    }
+
+    .docsHomeButon a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .docsHomeButon a:hover {
+      color: #fff;
+      text-decoration: solid;
+    }
+
+    .search-container {
+      /* Remove text-align: center to align it with flex start */
+      flex-grow: 1;
+      /* Allow search container to take up remaining space */
+    }
+
+    /* needs to remove any styles that a tag might have */
+    .staticExampleLink {
+      color: #000 !important;
+      text-decoration: none !important;
+      flex: 0 1 calc(33.333% - 40px);
+      /* flex: 0 1 calc(33.333% - 40px) !important; */
+    }
+
+    @media (max-width: 768px) {
+      .category {
+        flex: 0 1 calc(50% - 40px);
+      }
+
+      .staticExampleLink {
+        flex: 0 1 calc(50% - 40px);
+      }
+
+    }
+
+    @media (max-width: 480px) {
+      .category {
+        flex: 0 1 calc(100% - 40px);
+      }
+
+      .search-container input {
+        width: 80%;
+      }
+    }
+
+    /* Adjust font sizes for smaller devices */
+    @media (max-width: 768px) {
+      .category h3 {
+        font-size: 1.5em;
+        /* Smaller font size for medium devices */
+      }
+
+      .category p {
+        font-size: 1em;
+        /* Adjust paragraph font size */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .category h3 {
+        font-size: 1.2em;
+        /* Even smaller font size for small devices */
+      }
+
+      .category p {
+        font-size: 0.9em;
+        /* Further adjust paragraph font size */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .category {
+        min-width: 250px;
+        /* Slightly smaller min-width for medium devices */
+        max-width: 350px;
+        /* Adjust max-width accordingly */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .category {
+        min-width: 200px;
+        /* Further reduce min-width for small devices */
+        max-width: 300px;
+        /* Adjust max-width accordingly */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .categories {
+        padding: 10px;
+        /* Reduce padding */
+      }
+
+      .category {
+        margin: 10px;
+        /* Reduce margin */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-container {
+        padding: 10px;
+        /* Adjust padding for search container */
+      }
+    }
+  </style>
+  <script src="categories.js"></script>
+  <script src="examples.js"></script>
+
+</head>
+
+<body>
+  <div class="top-bar">
+    <div class="docsHomeButon">
+      <a href="https://yantra.gg/mantra/examples">Mantra Examples</a>
+      <!-- mantra/examples -->
+    </div>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search Examples (i.e. Movement, Bullet, Config)">
+    </div>
+  </div>
+
+  <div class="code-editor">
+    <pre>Loading code from document...</pre>
+  </div>
+  <!-- <div class="resize-handle"></div> Resize handle -->
+  <div class="categories">
+    <a class="staticExampleLink" href="markup/html-collision-events.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Markup</span>
+        <p>Create collision events.</p>
+        <h3>Collision Events</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="markup/html-entity-attributes.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Markup</span>
+        <p>Create HTML entity attributes.</p>
+        <h3>Entity Attributes</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="markup/html-entity-containers.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Markup</span>
+        <p>Create HTML entity containers.</p>
+        <h3>Entity Containers</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="markup/html-entity.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Markup</span>
+        <p>Create HTML entities.</p>
+        <h3>Entity HTML</h3>
+      </div>
+    </a>
+    <a class="staticExampleLink" href="markup/html-entity-metadata.html">
+      <div class="category" style="background-color: #2196f3;">
+        <span class="categoryExample">Markup</span>
+        <p>Create HTML entity metadata.</p>
+        <h3>Entity Metadata</h3>
+      </div>
+    </a></div>
+  <div class="tags">
+    $<span class="tag">markup</span>
+<span class="tag">html</span>
+<span class="tag">web</span>
+<span class="tag">interface</span>
+<span class="tag">user experience</span>
+<span class="tag">controls</span>
+<span class="tag">navigation</span>
+<span class="tag">interaction</span>
+<span class="tag">buttons</span>
+<span class="tag">menus</span>
+<span class="tag">windows</span>
+<span class="tag">panels</span>
+<span class="tag">dialogs</span>
+<span class="tag">forms</span>
+<span class="tag">input</span>
+  </div>
+</body>
+
+
+</html>

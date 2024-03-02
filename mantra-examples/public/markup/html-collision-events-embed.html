@@ -1,0 +1,61 @@
+<html>
+
+<head>
+  <script type="module" src="/mantra.js"></script>
+  <script>
+    let game;
+    function helloCollision(a, b, pair, context) {
+      console.log('hello collision', a, b, pair, context)
+      let text = game.getEntityByName('last-collision-text');
+      console.log('text', text)
+      game.updateEntity(text.id, {
+        text: 'Last Player Collision: ' + context.target.type + ' and ' + context.owner.type
+      });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      game = new MANTRA.Game({
+        width: 400,
+        height: 300,
+        markup: true,
+        plugins: ['Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame', 'Collectable', 'Text'],
+        showLoadingScreen: false,
+        gameRoot: 'http://192.168.1.80:7777'
+      });
+      game.use('Markup', {
+        displayOriginalHTML: true
+      });
+
+      game.start(function () {
+        //game.markup();
+        game.data.camera.mouseWheelZoomEnabled = true;
+        game.data.camera.adaptiveZoom = true;
+        game.systems.markup.parseHTML();
+      });
+    });
+  </script>
+  <style>
+    m-player {
+      border: 1px solid red;
+      background: rgba(255, 0, 0, 0.1);
+    }
+  </style>
+
+</head>
+
+<body>
+  <m-key data-x="10" data-y="10"></m-key>
+  <m-block data-x="-50" data-y="10" width="32" height="32"></m-block>
+  <m-player data-x="100" data-collision-start="helloCollision"></m-player>
+  <m-text data-layout="left" data-name="last-collision-text">Last Player Collision: </m-text>
+    <m-hexapod data-texture="demon"></m-hexapod>
+    <m-hexapod data-texture="demon"></m-hexapod>
+    <m-hexapod data-x="-200" data-repeat="11"></m-hexapod>
+    <m-container data-name="key-container" data-x="-50" data-y="50" width="200" height="200">
+      <m-key data-x="50" data-y="50"></m-key>
+      <m-key data-x="-50" data-y="50"></m-key>
+      <m-key data-x="50" data-y="-50"></m-key>
+      <m-key data-x="-50" data-y="-50"></m-key>
+    </m-container>
+</body>
+
+</html>

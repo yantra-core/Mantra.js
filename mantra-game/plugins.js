@@ -85,6 +85,9 @@ import UnitSpawner from './plugins/unit-spawner/UnitSpawner.js';
 // Geospatial
 import RBush from './plugins/rbush/RBush.js';
 
+// Utility
+import Markup from './plugins/markup/Markup.js';
+
 import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
@@ -209,6 +212,7 @@ let plugins = {
   Lifetime,
   Timers,
   RBush,
+  Markup,
   Midi,
   MidiGUI,
   FloatyTyper,

@@ -567,7 +567,8 @@ export default class EntityBuilder {
       let singleConfig = { ...this.config }; // Shallow copy for non-function properties
       applyOffset(singleConfig); // Apply offset for a single entity
       let singleCreatedEntity = this.game.createEntity(singleConfig);
-      if (singleCreatedEntity.type === 'PLAYER') {
+      // TOOD: remove this from EntityBuilder, place in createEntity()
+      if (singleCreatedEntity.type === 'PLAYER' || singleCreatedEntity.type === 'Player') {
         // TODO: check to see if there are no other active players / if so set this one
         this.game.setPlayerId(singleCreatedEntity.id);
       }
