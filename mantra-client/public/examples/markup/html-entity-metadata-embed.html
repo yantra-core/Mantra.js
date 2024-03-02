@@ -1,0 +1,70 @@
+<html>
+<head>
+  <script type="module" src="/mantra.js"></script>
+  <script type="module" src="/worlds.mantra.js"></script>
+</head>
+<body>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let game = new MANTRA.Game({
+        width: 400,
+        height: 300,
+        plugins: ['Markup', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame'],
+        showLoadingScreen: false,
+        gameRoot: 'http://192.168.1.80:7777'
+      });
+      game.start(function () {
+        game.markup();
+      });
+    });
+  
+  </script>
+  <m-player data-x="100"></m-player>
+  <m-teleporter  data-x="-350" data-y="50">
+    <dl>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>url</dt>
+          <dd>https://github.com/yantra-core/mantra.js</dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+
+  <m-teleporter data-x="-150" data-y="50">
+    <dl>
+      <dt>clickToTeleport</dt>
+      <dd>false</dd>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>plugin</dt>
+          <dd>Home</dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+
+  <m-teleporter  data-x="150" data-y="50">
+    <dl>
+      <dt>destination</dt>
+      <dd>
+        <dl>
+          <dt>position</dt>
+          <dd>
+            <dl>
+              <dt>x</dt>
+              <dd>0</dd>
+              <dt>y</dt>
+              <dd>0</dd>
+            </dl>
+          </dd>
+        </dl>
+      </dd>
+    </dl>
+  </m-teleporter>
+
+</body>
+
+</html>
