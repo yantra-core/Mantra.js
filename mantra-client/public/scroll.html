@@ -218,10 +218,53 @@
 
   <script>
     const iframeArray = []; // Initialize your iframe URLs
+    // Priority examples we wish to display first
+    const priorityExamples = [
+      "items/boomerang",
+      "behaviors/entity-state",
+      "camera/camera-move",
+      "npc/hexapod",
+      "terrain/infinite-maze",
+      "terrain/procedural-maze",
+      "terrain/procedural-biome",
+      // "inputs/keyboard",
+      "games/music-world"
+    ];
+   
+    // A helper function to check if the example is a priority example
+
+    // TODO: needs to check exampleUrl.replace('/examples/demo.html?source=', '')
+    const isPriorityExample = (exampleUrl) => priorityExamples.includes(exampleUrl.replace('/examples/demo.html?source=', ''));
+
+    // Function to add an example to the iframeArray without duplicates
+    const addExample = (example) => {
+      const existingIndex = iframeArray.findIndex(item => item.url === example.url);
+      if (existingIndex === -1) { // Only add if it doesn't already exist
+        iframeArray.push(example);
+      }
+    };
+
+    // TODO: please update the examples array to include the examples you wish to display first
+    // then ensure no duplicates are added to the iframeArray
+    // Modify and sort examples
     examples.forEach(function (example) {
       example.url = '/examples/demo.html?source=' + example.url.replace('.html', '');
-      iframeArray.push(example);
-    })
+
+      if (isPriorityExample(example.url)) {
+        // Add priority examples to the beginning
+        addExample(example);
+      }
+    });
+
+    // Add non-priority examples to the end, ensuring no duplicates
+    examples.forEach(function (example) {
+      if (!isPriorityExample(example.url)) {
+        addExample(example);
+      }
+    });
+
+
+    // console.log('iframeArray', iframeArray)
     let currentIndex = 0;
     let lastScrollTop = 0;
     let lastTime = Date.now();
@@ -260,7 +303,6 @@
       gameIframe.setAttribute('class', 'autohide');
       gameIframe.setAttribute('data-src', example.url);
       gameIframe.src = example.url;
-      console.log('eeeee', example)
       // Display and animate the example name
       /*
       const exampleNameDiv = document.getElementById('exampleName');
