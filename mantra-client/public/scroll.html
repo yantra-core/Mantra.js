@@ -65,8 +65,8 @@
 
     .sourceButton {
       position: absolute;
-      bottom: 10px;
-      right: 10px;
+      bottom: 0px;
+      right: 0px;
       background-color: #007bff;
       color: white;
       padding: 10px 20px;
@@ -92,7 +92,7 @@
 
     .iframeWrapper {
       position: relative;
-      width: 90%;
+      width: 88%;
       max-width: 1200px;
       margin: 20px auto;
       border: 1px solid rgba(138, 43, 226, 0.5);
@@ -161,14 +161,37 @@
     }
 
     .description p {
+      position: relative;
       padding: 10px;
       margin: 0;
+      top: 20px;
     }
 
     .categories {
       position: absolute;
       top: 10px;
       right: 10px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .exampleTitle {
+        font-size: 1.5em;
+      }
+
+      .description {
+        font-size: 1.2em;
+      }
+
+      .description p {
+        max-width: 220px;
+        bottom: 0;
+      }
+
+      .sourceButton {
+        right: 0;
+        bottom: 0;
+      }
+
     }
 
     @keyframes swoopInOut {
@@ -279,6 +302,7 @@
 
       // Description text
       const descriptionText = document.createElement('p');
+      descriptionText.classList.add('descriptionText');
       descriptionText.textContent = example.description;
       descriptionDiv.appendChild(descriptionText);
 
@@ -424,10 +448,14 @@
     window.addEventListener('scroll', () => {
       handleScroll();
     });
-    ensureScrollable(); // Ensure the document is tall enough to enable scrolling
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      ensureScrollable(); // Ensure the document is tall enough to enable scrolling
+      addIframe();
+      addIframe();
+    });
+
   </script>
-
-
 
 </body>
 
