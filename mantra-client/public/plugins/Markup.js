@@ -313,7 +313,6 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
       if (repeat > 1) {
         ent.repeat(repeat);
       }
-      console.log('CCCCC', ent.config);
       ent.createEntity();
     }
   }, {

@@ -5269,17 +5269,7 @@ var Music = /*#__PURE__*/function () {
       game.reset();
       this.bindEvents();
       this.createWorld();
-
-      /*
-      game.make()
-        .Tower()
-        .color('purple')
-        .mass(10000)
-        .position(300, -40)
-        .angle(-180)
-        .offset(50)
-        .createEntity();
-        */
+      game.make().Tower().color('purple').mass(10000).position(300, -40).angle(-180).offset(50).createEntity();
     }
   }, {
     key: "bindEvents",
@@ -5387,6 +5377,36 @@ var Music = /*#__PURE__*/function () {
         } // Base position of the drum kit
       };
       (0, _createDrumKit["default"])(game, drumKitConfig);
+
+      /*
+      game.createEntity({
+        type: 'PLATFORM',
+        isStatic: true,
+        width: 1000,
+        height: 40,
+        position: {
+          x: 0,
+          y: 200
+        }
+      });
+      */
+
+      /*
+      game.createEntity({
+        type: 'BLOCK',
+        texture: 'tile-block',
+        width: 32,
+        height: 32,
+        position: {
+          x: -400,
+          y: -150
+        },
+        friction: 1, 
+        frictionAir: 1, 
+        frictionStatic: 1
+      });
+      */
+
       game.use('Block');
       // game.use('Tile');
       game.use('Tone');
