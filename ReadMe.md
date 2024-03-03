@@ -66,7 +66,7 @@ https://yantra.gg/mantra/gravity-gardens
 
 https://yantra.gg/mantra/maze
 
-  - *Powered by [https://github.com/yantra-core/Labyrinthos.js](Labyrinthos.js)*
+  - *Powered by [Labyrinthos.js](https://github.com/yantra-core/Labyrinthos.js)*
 
 #### Music World
 
