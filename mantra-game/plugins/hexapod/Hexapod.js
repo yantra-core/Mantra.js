@@ -37,8 +37,6 @@ export default class Hexapod {
 
       hexapod.health = hexapod.health - 10;
 
-      console.log('bullet velocity', context.target.velocity);
-
       // at a certain size, invert the colors
       if (hexapod.health < 50) {
         style = {

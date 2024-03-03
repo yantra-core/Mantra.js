@@ -5,6 +5,7 @@ import Physics from "../plugins/physics/Physics.js";
 // default player movement, this could be also be set in defaultGameStart.js
 // import movement from './defaultPlayerMovement.js';
 
+
 export default function loadPluginsFromConfig({ physics, graphics, collisions, keyboard, mouse, gamepad, virtualGamepad, editor, sutra, ghostTyper, lifetime, markup, defaultMovement = true }) {
 
   let plugins = this.plugins;
@@ -41,9 +42,11 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
   }
 
   if (gameConfig.showLoadingScreen && !this.isServer) {
-    this.use(new LoadingScreen({
-      minLoadTime: gameConfig.minLoadTime
-    }));
+    if (!this.systems['loading-screen']) {
+      this.use(new LoadingScreen({
+        minLoadTime: gameConfig.minLoadTime
+      }));
+    }
   }
 
   this.use('Entity');

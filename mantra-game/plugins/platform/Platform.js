@@ -16,6 +16,27 @@ class Platform {
     this.game.systemsManager.addSystem(this.id, this);
   }
 
+  build(platformData = {}) {
+    // Define default values
+    const defaults = {
+      type: 'PLATFORM',
+      hasInventory: false,
+      isStatic: true
+    };
+
+    // Merge defaults with entityData, ensuring nested objects like position and velocity are merged correctly
+    const mergedConfig = {
+      ...defaults,
+      ...platformData,
+      position: { ...defaults.position, ...platformData.position },
+      texture: { ...defaults.texture, ...platformData.texture },
+      style: { ...defaults.style, ...platformData.style }
+    };
+
+    // Return the merged configuration
+    return mergedConfig;
+  }
+
   update() {
   }
 
@@ -56,7 +77,7 @@ class Platform {
     }
   }
 
-  platformPlayerCollision (entityIdA, entityIdB, entityA, entityB) {
+  platformPlayerCollision(entityIdA, entityIdB, entityA, entityB) {
     // console.log('platformPlayerCollision', entityIdA, entityIdB, entityA, entityB);
   }
 

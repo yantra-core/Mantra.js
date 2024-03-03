@@ -136,7 +136,13 @@ export default class Markup {
 
         let entityType = system.constructor.name;
         const ent = game.make();
-        ent[entityType]();
+
+        if (typeof ent[entityType] !== 'function') {
+          console.warn("Markup parsed an unknown tag type, using default instead. tag type:", entityType)
+        } else {
+          ent[entityType](ent.config);
+          console.log('ENT IS NOW', ent.config.type, ent.config)
+        }
         ent.style(safeStyles);
         that.buildEntity(ent, entity);
       });
@@ -179,6 +185,17 @@ export default class Markup {
     const color = entity.getAttribute('data-color') || null;
     const layout = entity.getAttribute('data-layout') || null;
     const origin = entity.getAttribute('data-origin') || null;
+
+    //
+    // Physics Body
+    //
+    const isStatic = entity.getAttribute('data-is-static') === 'true';
+    if (isStatic) {
+      ent.isStatic(true); // default Entity.isStatic is false
+    }
+
+    //
+    // Events
     // TODO: get any pointerdown events bound to the entity
     const pointerdown = entity.getAttribute('onpointerdown') || null;
 
@@ -207,13 +224,13 @@ export default class Markup {
       ent.origin(origin);
     }
 
-    ent.pointerdown(function(){
+    ent.pointerdown(function () {
       // TODO: check ECS pointerevents, was seeing a double event, could have been test env
       // TODO: switch to window or scoped object instead of eval
       pointerdown && eval(pointerdown);
     });
 
-    ent.collisionStart(function(a, b, pair, context){
+    ent.collisionStart(function (a, b, pair, context) {
       window[collisionStart] && window[collisionStart](a, b, pair, context);
     });
 
@@ -227,6 +244,9 @@ export default class Markup {
       ent.meta(meta);
     }
 
+    //
+    // Special case, container children
+    //
     let containerName = entity.getAttribute('data-name');
 
     if (containerName) {
@@ -241,6 +261,64 @@ export default class Markup {
       }
     }
 
+    //
+    // TODO: Check to see if the entity has any children that are also of type m-*
+    // If so, assume inheritance build the children as config only, merge to meta
+    //
+    // Iterate over all immediate children of the entity
+    // do not perform this logic for CONTAINER elements
+    /*
+    if (entity.tagName.toLowerCase() !== 'm-container') {
+      Array.from(entity.children).forEach(child => {
+        // Check if the child's tag name starts with 'm-'
+        if (child.tagName.toLowerCase().startsWith('m-')) {
+          // Initialize childMeta if it hasn't been already
+          //let childMeta = ent.meta() || {}; // Assuming ent.meta() gets or sets metadata
+          let childEnt = this.game.make();
+          let childType = child.tagName.toLowerCase().slice(2); // Remove 'm-' prefix
+          // uppercased first letter
+          childType = childType.charAt(0).toUpperCase() + childType.slice(1);
+          console.log('childType', childType)
+          childEnt[childType]();
+          let childName = child.getAttribute('data-name');
+          if (childName) {
+            // Extract the specific type of the child, without the 'm-' prefix
+            if (typeof childEnt[childType] === 'function') {
+              // Call the function corresponding to the childType on childEnt
+              // Recursively build the entity for the child
+              //this.buildEntity(childEnt, child);
+              // Merge the child's metadata into childMeta
+              //childMeta[childName] = childEnt;
+            }
+          }
+          let pluginId = ent.config.type.toLowerCase().replace('_', '-');
+          if (ent.config.type && this.game.systems[pluginId]) {
+            let builderInputProperty = this.game.systems[pluginId].builderInputProperty || null;
+            if (builderInputProperty) {
+              let _meta = {};
+              this.buildEntity(childEnt, child)
+              _meta[builderInputProperty] = childEnt.config;
+              console.log('about to merge in', _meta)
+              console.log('to this config', ent.config)
+              ent.meta(_meta);
+              console.log('resulting config', ent.config)
+            } else {
+              ent.meta(childEnt);
+            }
+  
+          } else {
+            ent.meta(childEnt);
+
+          }
+        }
+      });
+  
+    }
+      */
+
+
+
+    // Repeat / Clone
     if (repeat > 1) {
       ent.repeat(repeat);
     }
@@ -254,7 +332,6 @@ export default class Markup {
     Object.keys(game.systems).forEach(systemName => {
       const tagName = `m-${systemName.toLowerCase()}`;
       const entities = document.querySelectorAll(tagName);
-      console.log('align')
       entities.forEach(entity => {
         let x = parseInt(entity.getAttribute('data-x') || 0, 10) + window.innerWidth / 2;
         let y = parseInt(entity.getAttribute('data-y') || 0, 10) + window.innerHeight / 2;
@@ -268,7 +345,6 @@ export default class Markup {
     this.displayOrignalHTMLInPreTag();
   }
 
-
   saveOriginalHTML() {
     this.originalHTML = document.body.innerHTML;
   }
@@ -280,6 +356,49 @@ export default class Markup {
     let gameHolder = document.querySelector('#gameHolder');
     gameHolder.appendChild(pre);
   }
+
+  generateMarkup() {
+    let markup = '';
+
+    let entities = this.game.data.ents._;
+
+    Object.keys(entities).forEach(eId => {
+      let entity = entities[eId];
+      // Start the tag based on the entity type
+      markup += `<m-${entity.type.toLowerCase().replace('_', '-')}`;
+
+      // position is always defined with x y z
+      markup += ` data-x="${entity.position.x}" data-y="${entity.position.y}"`;
+      if (entity.position.z !== undefined) markup += ` data-z="${entity.position.z}"`;
+
+      // Add data attributes based on entity properties
+      if (entity.isStatic !== undefined) markup += ` data-is-static="${entity.isStatic}"`;
+      if (entity.x !== undefined) markup += ` data-x="${entity.x}"`;
+      if (entity.y !== undefined) markup += ` data-y="${entity.y}"`;
+      if (entity.width !== undefined) markup += ` data-width="${entity.width}"`;
+      if (entity.height !== undefined) markup += ` data-height="${entity.height}"`;
+      if (entity.texture !== undefined) markup += ` data-texture="${JSON.stringify(entity.texture)}"`;
+      if (entity.name !== undefined) markup += ` data-name="${entity.name}"`;
+      if (entity.layout !== undefined) markup += ` data-layout="${entity.layout}"`;
+      if (entity.origin !== undefined) markup += ` data-origin="${entity.origin}"`;
+      if (entity.repeat !== undefined) markup += ` data-repeat="${entity.repeat}"`;
+
+      // Close the opening tag
+      markup += '>';
+
+      // Handle nested entities, if any
+      if (entity.children && entity.children.length > 0) {
+        markup += generateMarkup(entity.children); // Recursive call for children
+      }
+
+      // Close the tag
+      markup += `</m-${entity.type.toLowerCase().replace('_', '-')}>\n`;
+    });
+
+    return markup;
+  }
+
+
 
   parseHTML(displayOriginalHTML) {
     let game = this.game;

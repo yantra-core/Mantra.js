@@ -108,8 +108,6 @@ class CSSGraphics extends GraphicsInterface {
     // is sync load; however we still need to let the graphics pipeline know we are ready
     game.emit('plugin::ready::graphics-css', this);
 
-    game.loadingPluginsCount--;
-
     this.game.data.camera.offsetX = 0;
     this.game.data.camera.offsetY = 0;
 

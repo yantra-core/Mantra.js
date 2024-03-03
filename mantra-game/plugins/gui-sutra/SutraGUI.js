@@ -1,5 +1,5 @@
 // SutraGUI.js - Marak Squires 2023
-import gui from '../gui-editor/gui.js';
+import gui from '../gui-editor/gui.js'; // TODO: move gui code to Window() plugin + builder
 import drawTable from './lib/drawTable.js';
 
 import dataView from './lib/editor/dataView.js';

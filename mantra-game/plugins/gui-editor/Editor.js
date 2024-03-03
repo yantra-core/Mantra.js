@@ -56,10 +56,14 @@ class Editor {
   }
 
   jqueryReady() {
+
+    // do not create Editor on mobile ( for now )
+    if (this.game.isTouchDevice()) {
+      return;
+    }
     this.createToolbar(this.game);
     this.setupGlobalClickListener();
     // this.createViewSourceModal();
-    this.game.systemsManager.addSystem(this.id, this);
     this.game.loadCSS('/plugins/Editor/Editor.css');
   }
 

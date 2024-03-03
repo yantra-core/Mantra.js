@@ -30,6 +30,11 @@ export default class EntityBuilder {
     };
   }
 
+  // provides a default Entity() builder, required for Mantra Markup
+  Entity () {
+    return this;
+  }
+
   // Remark: id is not used when creating entities, it's used for building configs
   id(value) {
     this.config.id = value;
