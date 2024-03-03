@@ -290,6 +290,8 @@ export default function construct(game, plugins = []) {
 
   // stores the creation tick time of the entity ( which game tick the entity was created )
   game.components.ctick = new Component('ctick', game);
+  // stores the last tick time the entity was updated
+  game.components.ctick = new Component('utick', game);
 
   // Systems Manager
   game.systemsManager = new SystemsManager(game);

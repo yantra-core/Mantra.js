@@ -100,7 +100,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       afterUpdate: null,
       update: null,
       exit: null,
-      ctick: this.game.tick
+      ctick: this.game.tick,
+      utick: this.game.tick
     };
 
     // Remark: Adding support for new Entity.size prop, removing Entity.height and Entity.width
@@ -163,7 +164,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, value, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterUpdateEntity, afterItemCollected, update, exit, ctick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, value, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterUpdateEntity, afterItemCollected, update, exit, ctick, utick } = config;
 
   let { x, y } = position;
 
@@ -258,6 +259,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'update', update);
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
+  this.game.addComponent(entityId, 'utick', utick);
 
   let _sutra;
   // if the incoming sutra is an object, it is config object which needs to be scoped to the new entity

@@ -101,8 +101,10 @@ export default function updateEntity(entityDataOrId, entityData, updateOptions =
   }
 
   if (entityData.position) {
-    // Remark: Tests require we update component, perhaps changed test?
+
+    // update the position
     this.game.components.position.set(entityId, entityData.position);
+
     // let body = this.game.bodyMap[entityId];
     this.game.physics.setPosition(entityId, entityData.position);
 
@@ -244,6 +246,9 @@ export default function updateEntity(entityDataOrId, entityData, updateOptions =
   if (this.game.systems.rbush) {
     // this.game.systems.rbush.updateEntity(ent);
   }
+
+  // Updates the Entity.utick
+  this.game.components.utick.set(entityId, this.game.tick);
 
   //
   // Entity Lifecycle afterUpdateEntity
