@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Dev Playground</title>
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-family: Arial, sans-serif;
+      width: 100%;
+    }
+
+    #iframeContainer {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    iframe {
+      width: 90%;
+      height: 500px;
+      border: none;
+      margin-bottom: 20px;
+    }
+
+    #exampleName {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2em;
+      animation: swoopInOut 2s ease-in-out;
+      z-index: 100;
+      pointer-events: none;
+      font-size: 8em;
+      /* Make sure it doesn't interfere with scrolling */
+    }
+
+    #speedIndicators {
+      position: fixed;
+      top: 60%;
+      /* Adjusted to appear below the example name */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    #speedIndicators {
+      position: fixed;
+      top: 120px;
+      width: 200px;
+      /* Position from the top */
+      right: 10px;
+      /* Position from the right */
+      text-align: right;
+      z-index: 100;
+      pointer-events: none;
+      display: none;
+    }
+
+    .speedIndicator {
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      /* Space between indicators, adjust as needed */
+      border-radius: 5px;
+      display: block;
+      /* Ensures stacking vertically */
+    }
+
+    /* Existing styles remain unchanged */
+
+    .sourceButton {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 101;
+    }
+
+    .iframeWrapper {
+      position: relative;
+      width: 90%;
+      height: 500px;
+      margin-bottom: 20px;
+    }
+
+    .editorIframe {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      /* Start off to the right */
+      width: 100%;
+      height: 100%;
+      border: none;
+      transition: left 0.5s ease-in-out;
+      /* Smooth transition for revealing */
+    }
+
+    .iframeWrapper.revealEditor .editorIframe {
+      left: 0;
+      /* Slide in to view */
+    }
+
+
+    @keyframes swoopInOut {
+
+      0%,
+      100% {
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateY(-50%);
+      }
+    }
+
+    @media (max-width: 768px) {
+      iframe {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="exampleName"></div>
+
+  <div id="iframeContainer"></div>
+
+  <script>
+    const iframeArray = []; // Initialize your iframe URLs
+    for (let i = 0; i < 10; i++) {
+      let example = {
+        name: `Example ${i + 1}`,
+        //category: 'Collisions',
+        url: `https://yantra.gg/mantra/examples/markup/html-entity-attributes-embed`,
+      };
+      iframeArray.push(example);
+    }
+    let currentIndex = 0;
+    let lastScrollTop = 0;
+    let lastTime = Date.now();
+    let topSpeed = 0;
+    let lastSpeed = 0;
+
+    var observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          var src = entry.target.getAttribute('data-src');
+          if (src) {
+            entry.target.src = src;
+            entry.target.editorIframe.src = entry.target.editorIframe.getAttribute('data-src');
+          }
+        } else {
+          entry.target.removeAttribute('src'); // Optionally, to unload
+          entry.target.editorIframe.removeAttribute('src'); // Optionally, to unload
+        }
+      });
+    }, { threshold: 0.1 });
+
+    function addIframe() {
+      if (currentIndex >= iframeArray.length) {
+        currentIndex = 0; // Reset index if at the end of the array
+      }
+
+      let example = iframeArray[currentIndex];
+      const iframeContainer = document.getElementById('iframeContainer');
+
+      // Create a wrapper for the iframe and the source button
+      const iframeWrapper = document.createElement('div');
+      iframeWrapper.classList.add('iframeWrapper');
+
+      // Create the game instance iframe
+      const gameIframe = document.createElement('iframe');
+      gameIframe.setAttribute('class', 'autohide');
+      gameIframe.setAttribute('data-src', example.url);
+      gameIframe.src = example.url;
+
+      // Create the "View Source" button
+      const sourceButton = document.createElement('button');
+      sourceButton.textContent = 'View Source';
+      sourceButton.classList.add('sourceButton');
+      sourceButton.onclick = function () {
+        iframeWrapper.classList.toggle('revealEditor');
+      };
+
+      // Create the source editor iframe (placeholder src for demonstration)
+      const editorIframe = document.createElement('iframe');
+      editorIframe.src = 'https://yantra.gg/mantra/examples/collisions/collision-active?source=true'; // Replace with the actual CodeMirror URL
+      editorIframe.classList.add('editorIframe');
+      // set autohide class
+      editorIframe.classList.add('autohide');
+      // set data-src attribute
+      editorIframe.setAttribute('data-src', 'https://yantra.gg/mantra/examples/collisions/collision-active?source=true');
+
+      // Append elements
+      iframeWrapper.appendChild(gameIframe);
+      iframeWrapper.appendChild(sourceButton);
+      iframeWrapper.appendChild(editorIframe);
+      iframeContainer.appendChild(iframeWrapper);
+      gameIframe.editorIframe = editorIframe; // Store a reference to the editor iframe
+      observer.observe(gameIframe);
+      // observer.observe(editorIframe);
+      currentIndex++;
+    }
+
+    // The rest of your JavaScript code remains unchanged
+
+
+    function ensureScrollable() {
+      // Add iframes until the document height requires scrolling
+      while (document.documentElement.scrollHeight <= window.innerHeight) {
+        addIframe();
+      }
+    }
+
+    function handleScroll() {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - 5) { // Near bottom
+        addIframe();
+
+        // Optional: Remove the first iframe if cycling starts
+        if (currentIndex === 0) {
+          const iframeContainer = document.getElementById('iframeContainer');
+          if (iframeContainer.childNodes.length > iframeArray.length) {
+            iframeContainer.removeChild(iframeContainer.firstChild);
+          }
+        }
+      }
+    }
+
+    // Function to unload all iframes
+    function unloadIframes() {
+      var iframes = document.querySelectorAll('iframe.autohide'); // Only select iframes with 'autohide' class
+      iframes.forEach(iframe => {
+        iframe.removeAttribute('src'); // Unload the iframe
+      });
+    }
+
+    // Function to attempt to reload iframes based on existing view logic
+    function reloadIframes() {
+      var iframes = document.querySelectorAll('iframe.autohide'); // Only select iframes with 'autohide' class
+      iframes.forEach(iframe => {
+        var src = iframe.getAttribute('data-src');
+        if (src) {
+          iframe.src = src; // Manually set the src to reload the iframe
+        }
+      });
+    }
+
+    // Add indicators to the HTML
+    const speedIndicatorsDiv = document.createElement('div');
+    speedIndicatorsDiv.id = 'speedIndicators';
+    document.body.appendChild(speedIndicatorsDiv);
+
+    speedIndicatorsDiv.innerHTML = `
+  <div id="lastSpeed" class="speedIndicator">Last Speed: 0 px/s</div>
+  <div id="topSpeed" class="speedIndicator">Top Speed: 0 px/s</div>
+`;
+
+    function measureScrollSpeed() {
+      const now = Date.now();
+      const newScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const distance = Math.abs(newScrollTop - lastScrollTop);
+      const time = (now - lastTime) / 1000; // Convert to seconds
+      const speed = Math.round(distance / time); // pixels per second
+
+      // Update last speed and check for top speed
+      lastSpeed = speed;
+      document.getElementById('lastSpeed').textContent = `Last Speed: ${lastSpeed} px/s`;
+
+      if (speed > topSpeed) {
+        topSpeed = speed;
+        document.getElementById('topSpeed').textContent = `Top Speed: ${topSpeed} px/s`;
+      }
+
+      lastScrollTop = newScrollTop;
+      lastTime = now;
+    }
+
+
+    // Listen for visibility change events on the document
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') {
+        unloadIframes(); // Unload all iframes when the tab is no longer visible
+      } else if (document.visibilityState === 'visible') {
+        reloadIframes(); // Attempt to reload iframes when the tab becomes visible again
+      }
+    });
+
+
+    window.addEventListener('scroll', () => {
+      handleScroll();
+      measureScrollSpeed();
+    });
+    ensureScrollable(); // Ensure the document is tall enough to enable scrolling
+  </script>
+
+
+
+</body>
+
+</html>
