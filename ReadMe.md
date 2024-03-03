@@ -8,9 +8,8 @@ https://github.com/yantra-core/Mantra.js/assets/70011/65bb5294-b8ac-4e38-a7a0-71
 https://github.com/yantra-core/Mantra.js/assets/70011/5b0aebff-e95a-4e61-ac5f-84dd67ed7da6
 
 
-
+  <a href="https://yantra.gg/mantra">Examples Gallery</a> •
   <a href="https://yantra.gg/mantra/examples">API Examples</a> •
-  <a href="https://yantra.gg/mantra/examples">Examples Gallery</a> •
   <a href="#alpha-notice">v1 Alpha</a> •
   <a href="#contributing">Contributing</a>
   
