@@ -4,44 +4,500 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mantra - Client</title>
-  <link rel="stylesheet" href="/prism.css">
-  <link rel="stylesheet" href="/vendor/prism-live/style.css">
+  <title>Mantra.js - Game Dev Playground</title>
+  <style>
+    body,
+    html {
+      background-color: black;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      /* Allow vertical scrolling on the body when necessary */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      /* Changed to flex-start to avoid pushing content beyond viewport */
+      position: relative;
+      font-family: Arial, sans-serif;
+      width: 100%;
+    }
 
+    #iframeContainer {
+      min-height: 100vh;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: inherit;
+      width: 100%;
+    }
+
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /* Fill the width of the gameIframeContainer */
+      height: 100%;
+      /* Fill the height of the gameIframeContainer */
+      border: none;
+    }
+
+
+    #exampleName {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2em;
+      animation: swoopInOut 2s ease-in-out;
+      z-index: 100;
+      pointer-events: none;
+      font-size: 8em;
+      color: #fff;
+      /* Make sure it doesn't interfere with scrolling */
+    }
+
+    /* Existing styles remain unchanged */
+
+    .sourceButton {
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 101;
+    }
+
+    .closeEditorBtn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 101;
+      display: none;
+    }
+
+    .iframeWrapper {
+      position: relative;
+      width: 88%;
+      max-width: 1200px;
+      margin: 20px auto;
+      border: 1px solid rgba(138, 43, 226, 0.5);
+      /* Light purple border */
+      border-radius: 10px;
+      /* Slightly rounded corners for a modern look */
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.7);
+      /* Glowing purple shadow */
+      overflow: hidden;
+      /* Ensures the content does not overflow the rounded borders */
+      background: #000;
+      /* Optional: Sets a white background for the iframe wrapper */
+      padding: 20px;
+      /* Optional: Adds some space inside the wrapper */
+    }
+
+    .gameIframeContainer {
+      width: 100%;
+      padding-top: 75%;
+      /* Maintain 4:3 aspect ratio */
+      position: relative;
+    }
+
+    iframe.gameIframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .editorIframe {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      /* Initially off-screen */
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      transition: left 0.5s ease;
+    }
+
+    .iframeWrapper.revealEditor .editorIframe {
+      left: 0;
+      /* Slide in to cover the game embed */
+    }
+
+
+
+    .exampleTitle {
+      margin: 0;
+      /* padding: 10px; */
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      color: #333;
+      text-align: center;
+      font-size: 2.5em;
+      width: 100%;
+    }
+
+    .description {
+      font-size: 2.2em;
+      width: 100%;
+      height: 100%;
+      min-height: 75px;
+    }
+
+    .description p {
+      position: relative;
+      padding: 10px;
+      margin: 0;
+      top: 20px;
+    }
+
+    .categories {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .exampleTitle {
+        font-size: 1.5em;
+      }
+
+      .description {
+        font-size: 1.2em;
+      }
+
+      .description p {
+        max-width: 220px;
+        bottom: 0;
+      }
+
+      .sourceButton {
+        right: 0;
+        bottom: 0;
+      }
+
+    }
+
+    @keyframes swoopInOut {
+
+      0%,
+      100% {
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateY(-50%);
+      }
+    }
+  </style>
+  <script src="/categories.js"></script>
 </head>
 
 <body>
-  <script src="/vendor/prism-live/src/prism-live.js?load=javascript"></script> <!-- If not already included -->
+  <div id="exampleName"></div>
 
-  <script type="module" src="./mantra.js"></script>
-  <script type="module" src="./worlds.mantra.js"></script>
-  <script type="module" src="./ycraft.js"></script>
-  <script src="/categories.js"></script>
-  <script  src="/prism.min.js" data-manual></script>
-
-
-  <!-- <script  src="/prism.min.js" data-manual></script> -->
+  <div id="iframeContainer"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-      let game = new MANTRA.Game({
-        defaultPlayer: false,
-        physics: 'matter', // enum, 'physx', 'matter
-        collisions: true,
-        graphics: ['css'], // array enum, 'babylon', 'css', 'three'
-        camera: 'follow',
-        options: {
-          scriptRoot: '.',
-          assetRoot: '.'
+    const iframeArray = []; // Initialize your iframe URLs
+    // Priority examples we wish to display first
+    const priorityExamples = [
+      "items/boomerang",
+      "behaviors/entity-state",
+      "camera/camera-move",
+      "npc/hexapod",
+      "terrain/infinite-maze",
+      "terrain/procedural-maze",
+      "terrain/procedural-biome",
+      // "inputs/keyboard",
+      "games/music-world"
+    ];
+   
+    // A helper function to check if the example is a priority example
+
+    // TODO: needs to check exampleUrl.replace('/examples/demo.html?source=', '')
+    const isPriorityExample = (exampleUrl) => priorityExamples.includes(exampleUrl.replace('/examples/demo.html?source=', ''));
+
+    // Function to add an example to the iframeArray without duplicates
+    const addExample = (example) => {
+      const existingIndex = iframeArray.findIndex(item => item.url === example.url);
+      if (existingIndex === -1) { // Only add if it doesn't already exist
+        iframeArray.push(example);
+      }
+    };
+
+    // TODO: please update the examples array to include the examples you wish to display first
+    // then ensure no duplicates are added to the iframeArray
+    // Modify and sort examples
+    examples.forEach(function (example) {
+      example.url = '/examples/demo.html?source=' + example.url.replace('.html', '');
+
+      if (isPriorityExample(example.url)) {
+        // Add priority examples to the beginning
+        addExample(example);
+      }
+    });
+
+    // Add non-priority examples to the end, ensuring no duplicates
+    examples.forEach(function (example) {
+      if (!isPriorityExample(example.url)) {
+        addExample(example);
+      }
+    });
+
+
+    // console.log('iframeArray', iframeArray)
+    let currentIndex = 0;
+    let lastScrollTop = 0;
+    let lastTime = Date.now();
+    let topSpeed = 0;
+    let lastSpeed = 0;
+
+    var observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          var src = entry.target.getAttribute('data-src');
+          if (src) {
+            entry.target.src = src;
+            entry.target.editorIframe.src = entry.target.editorIframe.getAttribute('data-src');
+          }
+        } else {
+          entry.target.removeAttribute('src'); // Optionally, to unload
+          entry.target.editorIframe.removeAttribute('src'); // Optionally, to unload
         }
       });
-      game.start(function () {
-        game.use(new WORLDS.worlds['Playground']());
+    }, { threshold: 0.1 });
+
+    function addIframe() {
+      if (currentIndex >= iframeArray.length) {
+        currentIndex = 0; // Reset index if at the end of the array
+      }
+
+      let example = iframeArray[currentIndex];
+      const iframeContainer = document.getElementById('iframeContainer');
+
+      // Create a wrapper for the iframe and the source button
+      const iframeWrapper = document.createElement('div');
+      iframeWrapper.classList.add('iframeWrapper');
+
+      // Create the game instance iframe
+      const gameIframe = document.createElement('iframe');
+      gameIframe.setAttribute('class', 'autohide');
+      gameIframe.setAttribute('data-src', example.url);
+      gameIframe.src = example.url;
+      // Display and animate the example name
+      /*
+      const exampleNameDiv = document.getElementById('exampleName');
+      exampleNameDiv.textContent = example.title;
+      exampleNameDiv.style.animation = 'none';
+      exampleNameDiv.offsetHeight;
+      exampleNameDiv.style.animation = null;
+      */
+      // Create a container for the game iframe to control aspect ratio
+      const gameIframeContainer = document.createElement('div');
+      gameIframeContainer.classList.add('gameIframeContainer');
+
+      // Append the game iframe to the container instead of directly to the gameColumn
+      gameIframeContainer.appendChild(gameIframe);
+
+
+
+      // Create a title header for the example
+      const titleHeader = document.createElement('h2');
+      titleHeader.textContent = example.title;
+      titleHeader.classList.add('exampleTitle');
+      //titleHeader.style.padding = '10px';
+      titleHeader.style.marginTop = '20px';
+      titleHeader.style.marginBottom = '10px';
+      titleHeader.style.textAlign = 'center';
+      titleHeader.style.color = '#333'; // Set the text color
+      titleHeader.style.backgroundColor = '#f0f0f0'; // Set a light background color for the header
+      titleHeader.style.borderRadius = '5px';
+
+      // Description section
+      const descriptionDiv = document.createElement('div');
+      descriptionDiv.classList.add('description');
+      //descriptionDiv.style.backgroundColor = example.color; // Set the background color
+      // descriptionDiv.style.backgroundColor = '#333333'; // Set the background color
+      // descriptionDiv.style.paddingLeft = '10px';
+      // descriptionDiv.style.marginTop = '10px';
+      descriptionDiv.style.color = '#ffffff'; // Set text color for better readability
+      descriptionDiv.style.position = 'relative';
+
+      // Description text
+      const descriptionText = document.createElement('p');
+      descriptionText.classList.add('descriptionText');
+      descriptionText.textContent = example.description;
+      descriptionDiv.appendChild(descriptionText);
+
+      // Link to the example (assuming example.url is the link you want to display)
+      const exampleLink = document.createElement('a');
+      exampleLink.href = example.url; // Set the URL
+      exampleLink.textContent = 'View Example';
+      exampleLink.style.color = '#ffff00'; // Change link color for visibility
+      // descriptionDiv.appendChild(exampleLink);
+
+      // Categories - handling both string and array of strings
+      const categories = Array.isArray(example.category) ? example.category : [example.category];
+      const categoriesDiv = document.createElement('div');
+      categoriesDiv.classList.add('categories');
+      categories.forEach(category => {
+        const categorySpan = document.createElement('span');
+        // add class class
+        categorySpan.classList.add('category');
+        categorySpan.textContent = category;
+        categorySpan.style.marginRight = '5px';
+        categorySpan.style.background = '#333333';
+        categorySpan.style.color = '#ffffff';
+        categorySpan.style.padding = '2px 5px';
+        categorySpan.style.borderRadius = '5px';
+        categoriesDiv.appendChild(categorySpan);
       });
-      window.game = game;
+
+      // descriptionDiv.appendChild(categoriesDiv);
+
+      // Create the "View Source" button
+      // "Close Editor" button setup
+      const closeEditorBtn = document.createElement('button');
+      closeEditorBtn.classList.add('closeEditorBtn');
+
+      const sourceButton = document.createElement('button');
+      sourceButton.textContent = 'View Source';
+      sourceButton.classList.add('sourceButton');
+      sourceButton.onclick = function () {
+        // find the editor in the iframeWrapper, query for children with class editorIframe
+        const editorIframe = iframeWrapper.querySelector('.editorIframe');
+        // toggle the revealEditor class on the iframeWrapper
+        editorIframe.style.display = 'block';
+        editorIframe.style.left = '0'; // Bring the editor on top of the game embed
+        sourceButton.style.display = 'none';
+        closeEditorBtn.style.display = 'block';
+        //editorIframe.classList.toggle('revealEditor');
+      };
+
+
+      closeEditorBtn.textContent = 'Close Editor';
+      closeEditorBtn.classList.add('closeEditorBtn');
+      closeEditorBtn.onclick = function () {
+        //editorIframe.style.left = '100%'; // Hide the editor off-screen
+        editorIframe.style.display = 'none';
+        sourceButton.style.display = 'block';
+        closeEditorBtn.style.display = 'none';
+      };
+
+      let examplesRoot = 'https://yantra.gg/mantra';
+      //examplesRoot = 'http://192.168.1.80:7777/examples';
+      // Create the source editor iframe (placeholder src for demonstration)
+      const editorIframe = document.createElement('iframe');
+      // editorIframe.src = examplesRoot + '/collisions/collision-active?source=true'; // Replace with the actual CodeMirror URL
+      let _source = examplesRoot + example.url.replace('demo.html?source=', '');
+      _source += '?source=true';
+      editorIframe.src = _source;
+      editorIframe.classList.add('editorIframe');
+      // set autohide class
+      editorIframe.classList.add('autohide');
+      // set data-src attribute
+      //editorIframe.setAttribute('data-src', examplesRoot + '/collisions/collision-active?source=true');
+      editorIframe.setAttribute('data-src', _source);
+      descriptionDiv.appendChild(closeEditorBtn);
+
+      editorIframe.style.display = 'none';
+
+      iframeWrapper.appendChild(editorIframe);
+      // Append your gameIframe, titleHeader, and descriptionDiv to gameColumn
+      iframeWrapper.appendChild(titleHeader);
+      iframeWrapper.appendChild(gameIframeContainer);
+      iframeWrapper.appendChild(descriptionDiv);
+
+      // Append elements
+      descriptionDiv.appendChild(sourceButton);
+      iframeContainer.appendChild(iframeWrapper);
+      gameIframe.editorIframe = editorIframe; // Store a reference to the editor iframe
+      observer.observe(gameIframe);
+      // observer.observe(editorIframe);
+      currentIndex++;
+    }
+
+    function ensureScrollable() {
+      // Add iframes until the document height requires scrolling
+      while (document.documentElement.scrollHeight <= window.innerHeight) {
+        addIframe();
+      }
+    }
+
+    function handleScroll() {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - 5) { // Near bottom
+        addIframe();
+
+        // Optional: Remove the first iframe if cycling starts
+        if (currentIndex === 0) {
+          const iframeContainer = document.getElementById('iframeContainer');
+          if (iframeContainer.childNodes.length > iframeArray.length) {
+            iframeContainer.removeChild(iframeContainer.firstChild);
+          }
+        }
+      }
+    }
+
+    // Function to unload all iframes
+    function unloadIframes() {
+      var iframes = document.querySelectorAll('iframe.autohide'); // Only select iframes with 'autohide' class
+      iframes.forEach(iframe => {
+        iframe.removeAttribute('src'); // Unload the iframe
+      });
+    }
+
+    // Function to attempt to reload iframes based on existing view logic
+    function reloadIframes() {
+      var iframes = document.querySelectorAll('iframe.autohide'); // Only select iframes with 'autohide' class
+      iframes.forEach(iframe => {
+        var src = iframe.getAttribute('data-src');
+        if (src) {
+          iframe.src = src; // Manually set the src to reload the iframe
+        }
+      });
+    }
+
+    // Listen for visibility change events on the document
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') {
+        unloadIframes(); // Unload all iframes when the tab is no longer visible
+      } else if (document.visibilityState === 'visible') {
+        reloadIframes(); // Attempt to reload iframes when the tab becomes visible again
+      }
     });
+
+
+    window.addEventListener('scroll', () => {
+      handleScroll();
+    });
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      ensureScrollable(); // Ensure the document is tall enough to enable scrolling
+      addIframe();
+      addIframe();
+    });
+
   </script>
-  <div id="gameHolder"></div>
+
 </body>
 
 </html>
