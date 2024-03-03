@@ -8,6 +8,7 @@ https://github.com/yantra-core/Mantra.js/assets/70011/65bb5294-b8ac-4e38-a7a0-71
 https://github.com/yantra-core/Mantra.js/assets/70011/5b0aebff-e95a-4e61-ac5f-84dd67ed7da6
 
 
+  <a href="https://yantra.gg/mantra/playground">Infinite Playground</a> •
   <a href="https://yantra.gg/mantra">Examples Gallery</a> •
   <a href="https://yantra.gg/mantra/examples">API Examples</a> •
   <a href="#alpha-notice">v1 Alpha</a> •
@@ -47,6 +48,7 @@ https://github.com/yantra-core/Mantra.js/assets/70011/ebbf0840-0bfa-4d2c-91bb-59
 ## 100+ Code Examples
 
 
+[https://yantra.gg/mantra/playground](https://yantra.gg/mantra/playground)
 [https://yantra.gg/mantra/examples](https://yantra.gg/mantra/examples)
 
 ## Try Mantra Worlds ( ALPHA )
