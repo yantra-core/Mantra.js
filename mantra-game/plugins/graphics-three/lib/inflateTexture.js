@@ -3,6 +3,11 @@ import { TextureLoader } from 'three';
 export default async function inflateTexture(entityData) {
   if (!entityData.texture) return;
 
+
+  if (entityData.type === 'CONTAINER') {
+    return;
+  }
+
   let texture = this.game.getTexture(entityData.texture);
   if (!texture) {
     console.warn('Warning: Texture not found', entityData.texture);

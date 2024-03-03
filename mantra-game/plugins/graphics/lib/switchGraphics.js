@@ -3,6 +3,8 @@ export default async function switchGraphics(graphicsInterfaceName, cb) {
 
   let game = this.game;
 
+  let previousCameras = {};
+
   let engines = {
     'BabylonGraphics': 'graphics-babylon',
     // 'PhaserGraphics': 'graphics-phaser',
@@ -20,6 +22,13 @@ export default async function switchGraphics(graphicsInterfaceName, cb) {
 
   let graphicsInterfaceId = engines[graphicsInterfaceName];
   document.body.style.cursor = 'wait';
+
+  // clone the camera object
+  previousCameras[graphicsInterfaceId] = {
+    currentZoom: game.data.camera.currentZoom,
+    adaptiveZoom: game.data.camera.adaptiveZoom
+  }
+
   // Check if the selected graphics mode is already registered
   if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
     await this.game.use(graphicsInterfaceName, { camera: this.game.data.camera });
@@ -35,8 +44,15 @@ export default async function switchGraphics(graphicsInterfaceName, cb) {
     document.body.style.cursor = 'default';
   }
 
-  if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
-    game.setZoom(3.5);
+  // check to see if there was a previous camera object
+  if (previousCameras[graphicsInterfaceId]) {
+    // restore the previous zoom
+    game.data.camera.adaptiveZoom = previousCameras[graphicsInterfaceId].adaptiveZoom;
+  } else {
+    if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
+     // game.setZoom(3.5);
+    }
+  
   }
 
 }

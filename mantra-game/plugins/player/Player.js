@@ -13,10 +13,6 @@ export default class Player {
   build(playerConfig = {}) {
 
     if (typeof playerConfig.position === 'undefined') {
-      playerConfig.position = { x: 0, y: 0 };
-    }
-
-    if (typeof playerConfig.position === 'undefined') {
       playerConfig.position = { x: 0, y: 0, z: 1 };
     }
 

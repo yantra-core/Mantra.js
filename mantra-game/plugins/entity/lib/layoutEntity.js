@@ -64,6 +64,7 @@ export default function layoutEntity(container, entityId) {
     console.log("originoriginoriginorigin", origin)
     //alert(origin)
     // If the origin is explicitly set to 'top-left', adjust offsets to position the top-left corner of the entity at the container's center
+    // TODO: fix this and move to separate file / sub-system for layout / flex styles / etc
     if (origin === 'top-left') {
       offsetX = -entity.size.width / 2;
       offsetY = -entity.size.height / 2;
@@ -72,7 +73,6 @@ export default function layoutEntity(container, entityId) {
       offsetX -= entity.size.width / 2;
       offsetY -= entity.size.height / 2;
     }
-
 
     // Calculate the cumulative position of the container to account for nesting
     // TODO: traverse up the container hierarchy to get the cumulative position

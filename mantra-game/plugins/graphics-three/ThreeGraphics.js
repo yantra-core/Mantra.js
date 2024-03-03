@@ -43,27 +43,15 @@ class ThreeGraphics extends GraphicsInterface {
   }
 
   init(game) {
-
     this.render = render.bind(this);
     this.inflateGraphic = inflateGraphic.bind(this);
     this.createGraphic = createGraphic.bind(this);
     this.updateGraphic = updateGraphic.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
     this.inflateTexture = inflateTexture.bind(this);
-
     this.game = game;
     this.game.systemsManager.addSystem('graphics-three', this);
-
-    game.data.camera = {
-      mode: 'follow',
-      position: {
-        x: 0,
-        y: 0
-      }
-    }
-
     this.threeReady(game);
-
   }
 
   threeReady(game) {

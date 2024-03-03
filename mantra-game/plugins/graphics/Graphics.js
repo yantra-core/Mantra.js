@@ -37,6 +37,7 @@ class Graphics {
       currentZoom: 1,
       minZoom: 0.1,
       maxZoom: 10,
+      adaptiveZoom: true,
     };
 
     if (this.game.isClient) {

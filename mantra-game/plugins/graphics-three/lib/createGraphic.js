@@ -35,7 +35,14 @@ export default function createGraphic(entityData) {
 
   // console.log('setting position of entityObject', entityObject, entityData.position);
   entityObject.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
-  entityObject.visible = true; // Ensure the entity is visible
+ 
+  if (entityData.type === 'CONTAINER') {
+    // console.log('entityData.type === CONTAINER', entityData);
+    entityObject.visible = false; // Hide container entities
+  } else {
+    entityObject.visible = true; // Ensure the entity is visible
+  }
+  
   this.scene.add(entityObject);
 
   // Save the entity object in the game's component system

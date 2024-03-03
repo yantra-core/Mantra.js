@@ -242,7 +242,6 @@ export default class Markup {
     }
 
     if (repeat > 1) {
-      console.log("repeat", repeat)
       ent.repeat(repeat);
     }
 

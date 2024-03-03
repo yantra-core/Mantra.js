@@ -16,6 +16,7 @@ class GravityGardens {
     game.use('GravityWell');
     game.use('UnitSpawner');
     game.use('Teleporter');
+    game.use('SwitchGraphics');
   }
 
   init(game) {
