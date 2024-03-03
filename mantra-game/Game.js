@@ -32,6 +32,7 @@ class Game {
       collisions: true,
       camera: {},
       gravity: {},
+      useMinBuilds: true,
       keyboard: true,
       mouse: true,
       gamepad: false,
