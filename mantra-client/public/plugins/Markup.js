@@ -105,7 +105,9 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
           // Background
           'background-color', 'background-image', 'background-repeat', 'background-position', 'background-size',
           // Margin and Padding
-          'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'
+          'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+          // font and font decoration
+          'font', 'font-family', 'font-size', 'font-weight', 'font-style', 'text-decoration', 'text-align', 'text-transform', 'text-shadow', 'line-height', 'letter-spacing', 'word-spacing', 'white-space', 'vertical-align', 'list-style', 'list-style-type', 'list-style-position', 'list-style-image', 'cursor', 'z-index', 'opacity', 'visibility', 'display'
           // Add other relevant style properties here
           ]);
 
@@ -128,7 +130,12 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
           }
           var entityType = system.constructor.name;
           var ent = game.make();
-          ent[entityType]();
+          if (typeof ent[entityType] !== 'function') {
+            console.warn("Markup parsed an unknown tag type, using default instead. tag type:", entityType);
+          } else {
+            ent[entityType](ent.config);
+            console.log('ENT IS NOW', ent.config.type, ent.config);
+          }
           ent.style(safeStyles);
           that.buildEntity(ent, entity);
         });
@@ -181,6 +188,18 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
       var texture = entity.getAttribute('data-texture') || null;
       var color = entity.getAttribute('data-color') || null;
       var layout = entity.getAttribute('data-layout') || null;
+      var origin = entity.getAttribute('data-origin') || null;
+
+      //
+      // Physics Body
+      //
+      var isStatic = entity.getAttribute('data-is-static') === 'true';
+      if (isStatic) {
+        ent.isStatic(true); // default Entity.isStatic is false
+      }
+
+      //
+      // Events
       // TODO: get any pointerdown events bound to the entity
       var pointerdown = entity.getAttribute('onpointerdown') || null;
 
@@ -198,6 +217,9 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
       }
       if (layout) {
         ent.layout(layout);
+      }
+      if (origin) {
+        ent.origin(origin);
       }
       ent.pointerdown(function () {
         // TODO: check ECS pointerevents, was seeing a double event, could have been test env
@@ -219,6 +241,10 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
         console.log('Assigning meta:', meta);
         ent.meta(meta);
       }
+
+      //
+      // Special case, container children
+      //
       var containerName = entity.getAttribute('data-name');
       if (containerName) {
         ent.name(containerName);
@@ -230,10 +256,64 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
           ent.container(parentContainerName);
         }
       }
+
+      //
+      // TODO: Check to see if the entity has any children that are also of type m-*
+      // If so, assume inheritance build the children as config only, merge to meta
+      //
+      // Iterate over all immediate children of the entity
+      // do not perform this logic for CONTAINER elements
+      /*
+      if (entity.tagName.toLowerCase() !== 'm-container') {
+        Array.from(entity.children).forEach(child => {
+          // Check if the child's tag name starts with 'm-'
+          if (child.tagName.toLowerCase().startsWith('m-')) {
+            // Initialize childMeta if it hasn't been already
+            //let childMeta = ent.meta() || {}; // Assuming ent.meta() gets or sets metadata
+            let childEnt = this.game.make();
+            let childType = child.tagName.toLowerCase().slice(2); // Remove 'm-' prefix
+            // uppercased first letter
+            childType = childType.charAt(0).toUpperCase() + childType.slice(1);
+            console.log('childType', childType)
+            childEnt[childType]();
+            let childName = child.getAttribute('data-name');
+            if (childName) {
+              // Extract the specific type of the child, without the 'm-' prefix
+              if (typeof childEnt[childType] === 'function') {
+                // Call the function corresponding to the childType on childEnt
+                // Recursively build the entity for the child
+                //this.buildEntity(childEnt, child);
+                // Merge the child's metadata into childMeta
+                //childMeta[childName] = childEnt;
+              }
+            }
+            let pluginId = ent.config.type.toLowerCase().replace('_', '-');
+            if (ent.config.type && this.game.systems[pluginId]) {
+              let builderInputProperty = this.game.systems[pluginId].builderInputProperty || null;
+              if (builderInputProperty) {
+                let _meta = {};
+                this.buildEntity(childEnt, child)
+                _meta[builderInputProperty] = childEnt.config;
+                console.log('about to merge in', _meta)
+                console.log('to this config', ent.config)
+                ent.meta(_meta);
+                console.log('resulting config', ent.config)
+              } else {
+                ent.meta(childEnt);
+              }
+               } else {
+              ent.meta(childEnt);
+             }
+          }
+        });
+         }
+        */
+
+      // Repeat / Clone
       if (repeat > 1) {
-        console.log("repeat", repeat);
         ent.repeat(repeat);
       }
+      console.log('CCCCC', ent.config);
       ent.createEntity();
     }
   }, {
@@ -244,7 +324,6 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
       Object.keys(game.systems).forEach(function (systemName) {
         var tagName = "m-".concat(systemName.toLowerCase());
         var entities = document.querySelectorAll(tagName);
-        console.log('align');
         entities.forEach(function (entity) {
           var x = parseInt(entity.getAttribute('data-x') || 0, 10) + window.innerWidth / 2;
           var y = parseInt(entity.getAttribute('data-y') || 0, 10) + window.innerHeight / 2;
@@ -255,6 +334,8 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
           //entity.height = parseInt(entity.getAttribute('height'), 10) || 16;
         });
       });
+
+      this.displayOrignalHTMLInPreTag();
     }
   }, {
     key: "saveOriginalHTML",
@@ -267,7 +348,56 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
       var pre = document.createElement('pre');
       pre.textContent = this.originalHTML;
       document.body.appendChild(pre);
+      var gameHolder = document.querySelector('#gameHolder');
+      gameHolder.appendChild(pre);
     }
+  }, {
+    key: "generateMarkup",
+    value: function (_generateMarkup) {
+      function generateMarkup() {
+        return _generateMarkup.apply(this, arguments);
+      }
+      generateMarkup.toString = function () {
+        return _generateMarkup.toString();
+      };
+      return generateMarkup;
+    }(function () {
+      var markup = '';
+      var entities = this.game.data.ents._;
+      Object.keys(entities).forEach(function (eId) {
+        var entity = entities[eId];
+        // Start the tag based on the entity type
+        markup += "<m-".concat(entity.type.toLowerCase().replace('_', '-'));
+
+        // position is always defined with x y z
+        markup += " data-x=\"".concat(entity.position.x, "\" data-y=\"").concat(entity.position.y, "\"");
+        if (entity.position.z !== undefined) markup += " data-z=\"".concat(entity.position.z, "\"");
+
+        // Add data attributes based on entity properties
+        if (entity.isStatic !== undefined) markup += " data-is-static=\"".concat(entity.isStatic, "\"");
+        if (entity.x !== undefined) markup += " data-x=\"".concat(entity.x, "\"");
+        if (entity.y !== undefined) markup += " data-y=\"".concat(entity.y, "\"");
+        if (entity.width !== undefined) markup += " data-width=\"".concat(entity.width, "\"");
+        if (entity.height !== undefined) markup += " data-height=\"".concat(entity.height, "\"");
+        if (entity.texture !== undefined) markup += " data-texture=\"".concat(JSON.stringify(entity.texture), "\"");
+        if (entity.name !== undefined) markup += " data-name=\"".concat(entity.name, "\"");
+        if (entity.layout !== undefined) markup += " data-layout=\"".concat(entity.layout, "\"");
+        if (entity.origin !== undefined) markup += " data-origin=\"".concat(entity.origin, "\"");
+        if (entity.repeat !== undefined) markup += " data-repeat=\"".concat(entity.repeat, "\"");
+
+        // Close the opening tag
+        markup += '>';
+
+        // Handle nested entities, if any
+        if (entity.children && entity.children.length > 0) {
+          markup += generateMarkup(entity.children); // Recursive call for children
+        }
+
+        // Close the tag
+        markup += "</m-".concat(entity.type.toLowerCase().replace('_', '-'), ">\n");
+      });
+      return markup;
+    })
   }, {
     key: "parseHTML",
     value: function parseHTML(displayOriginalHTML) {

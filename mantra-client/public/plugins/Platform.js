@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -34,6 +36,27 @@ var Platform = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem(this.id, this);
+    }
+  }, {
+    key: "build",
+    value: function build() {
+      var platformData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      // Define default values
+      var defaults = {
+        type: 'PLATFORM',
+        hasInventory: false,
+        isStatic: true
+      };
+
+      // Merge defaults with entityData, ensuring nested objects like position and velocity are merged correctly
+      var mergedConfig = _objectSpread(_objectSpread(_objectSpread({}, defaults), platformData), {}, {
+        position: _objectSpread(_objectSpread({}, defaults.position), platformData.position),
+        texture: _objectSpread(_objectSpread({}, defaults.texture), platformData.texture),
+        style: _objectSpread(_objectSpread({}, defaults.style), platformData.style)
+      });
+
+      // Return the merged configuration
+      return mergedConfig;
     }
   }, {
     key: "update",

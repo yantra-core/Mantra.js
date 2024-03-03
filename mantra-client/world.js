@@ -24,7 +24,7 @@ let game = new Game({
   height: 600,
   plugins: ['Gamepad'],
   editor: false,
-  graphics: ['css'], // 'three', 'babylon', 'css'
+  graphics: ['three'], // 'three', 'babylon', 'css'
   plugins: ['SwitchGraphics'],
   gameRoot: '.',
   //defaultMovement: true,
@@ -101,7 +101,7 @@ game.use(new plugins.Radio());
 game.use(new plugins.Text());
 game.use(new plugins.Image());
 game.use(new plugins.Canvas());
-game.use(new plugins.CSSGraphics());
+// game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
 game.use(new plugins.Button());
 game.use(new plugins.Code());
@@ -110,6 +110,7 @@ game.use(new plugins.Entity());
 // game.use(new plugins.Monaco());
 game.use(new plugins.Key());
 //game.use(new plugins.CSSGraphics())
+//game.use(new plugins.ThreeGraphics())
 game.use(new plugins.Mouse());
 game.use(new plugins.Link());
 
@@ -118,6 +119,7 @@ game.use(new plugins.Markup());
 game.use(new plugins.Editor());
 // game.use(new Lifetime());
 
+game.use(new plugins.ThreeGraphics());
 
 game.start(function () {
   game.reset();
@@ -126,8 +128,14 @@ game.start(function () {
   game.data.camera.mouseWheelZoomEnabled = true;
   game.data.camera.adaptiveZoom = true;
   console.log('gggg', game.systems)
-  game.systems.markup.parseHTML(true);
   //game.systems.markup.preview()
+  game.use(new worlds.Home());
+
+  game.make().Container().style({
+    border: '1px solid red',
+    background: 'rgba(255, 0, 0, 0.1)'
+
+  }).createEntity();
 
   /*
   let button = game.make().Button()
@@ -145,14 +153,12 @@ game.start(function () {
 
 
   //game.data.camera.scaleMultiplier = 0.2;
-  //game.use(new worlds.Playground());
 
   //game.data.camera.mouseWheelZoomEnabled = false;
 
   // allow overflows of body
   // set body style overflow auto
   //  document.body.style.overflow = 'auto';
-  // game.use(new plugins.ThreeGraphics());
 
   /*
 

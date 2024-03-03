@@ -314,7 +314,7 @@ var BabylonGraphics = /*#__PURE__*/function (_GraphicsInterface) {
               assetsManager.onFinish = function (tasks) {
                 // All assets are loaded, now you can emit your ready event
                 game.emit('plugin::ready::graphics-babylon', _this3);
-                game.loadingPluginsCount--;
+                //game.loadingPluginsCount--;
                 document.body.style.cursor = 'default';
               };
 

@@ -8,7 +8,7 @@
     function helloCollision(a, b, pair, context) {
       let text = game.getEntityByName('last-collision-text');
       game.updateEntity(text.id, {
-        text: 'Last Player Collision: ' + context.target.type + ' and ' + context.owner.type
+        text: 'Last Player Collision<br/><br/>' + context.target.type + ' and ' + context.owner.type
       });
     }
     document.addEventListener('DOMContentLoaded', () => {
@@ -16,9 +16,19 @@
         width: 400,
         height: 300,
         markup: true,
-        plugins: ['Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame', 'Collectable', 'Text'],
-        showLoadingScreen: false,
-        gameRoot: 'http://192.168.1.80:7777'
+        plugins: [
+          'Block',
+          'Boomerang',
+          'Collectable',
+          'Container',
+          'Flame',
+          'Hexapod',
+          'Key',
+          'Player',
+          'Teleporter',
+          'Text'
+        ],
+        showLoadingScreen: false
       });
       game.start(function () {
         game.markup();
@@ -26,15 +36,17 @@
     });
   </script>
   <style>
-    m-player {
-      border: 1px solid red;
-      background: rgba(255, 0, 0, 0.1);
+    m-text {
+      font-size: 16px;
+      color: white;
+      text-align: center;
+      background-color: black;
     }
   </style>
   <m-key data-x="10" data-y="10"></m-key>
   <m-block data-x="-50" data-y="10" width="32" height="32"></m-block>
   <m-player data-x="100" data-collision-start="helloCollision"></m-player>
-  <m-text data-layout="left" data-name="last-collision-text">Last Player Collision: </m-text>
+  <m-text width="400" height="60" data-y="-120" data-name="last-collision-text">Waiting for Player Collision... </m-text>
   <m-hexapod data-texture="demon"></m-hexapod>
   <m-hexapod data-texture="demon"></m-hexapod>
   <m-hexapod data-x="-200" data-repeat="11"></m-hexapod>

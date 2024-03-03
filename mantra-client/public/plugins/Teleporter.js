@@ -45,6 +45,7 @@ var Teleporter = exports["default"] = /*#__PURE__*/function () {
       if (typeof entityData.url !== 'undefined') {
         entityData.destination.url = entityData.url;
       }
+      entityData.meta = entityData.meta || {};
 
       //
       // Click to teleport

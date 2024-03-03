@@ -4,22 +4,7 @@
   <script type="module" src="/worlds.mantra.js"></script>
 </head>
 <body>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let game = new MANTRA.Game({
-        width: 400,
-        height: 300,
-        plugins: ['Markup', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame'],
-        showLoadingScreen: false,
-        gameRoot: 'http://192.168.1.80:7777'
-      });
-      game.start(function () {
-        game.markup();
-      });
-    });
   
-  </script>
-
   <m-player data-x="100"></m-player>
 
   <m-teleporter data-x="-350" data-y="50">
@@ -66,6 +51,21 @@
       </dd>
     </dl>
   </m-teleporter>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let game = new MANTRA.Game({
+        width: 400,
+        height: 300,
+        plugins: ['Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame'],
+        showLoadingScreen: false
+      });
+      game.start(function () {
+        game.markup();
+      });
+    });
+  
+  </script>
 
 </body>
 

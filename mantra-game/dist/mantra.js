@@ -312,8 +312,15 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
     };
   }
 
-  // Remark: id is not used when creating entities, it's used for building configs
+  // provides a default Entity() builder, required for Mantra Markup
   _createClass(EntityBuilder, [{
+    key: "Entity",
+    value: function Entity() {
+      return this;
+    }
+
+    // Remark: id is not used when creating entities, it's used for building configs
+  }, {
     key: "id",
     value: function id(value) {
       this.config.id = value;
@@ -1252,6 +1259,7 @@ var Game = exports.Game = /*#__PURE__*/function () {
       collisions: true,
       camera: {},
       gravity: {},
+      useMinBuilds: true,
       keyboard: true,
       mouse: true,
       gamepad: false,
@@ -2789,6 +2797,8 @@ function construct(game) {
 
   // stores the creation tick time of the entity ( which game tick the entity was created )
   game.components.ctick = new _Component["default"]('ctick', game);
+  // stores the last tick time the entity was updated
+  game.components.ctick = new _Component["default"]('utick', game);
 
   // Systems Manager
   game.systemsManager = new _SystemsManager["default"](game);
@@ -2849,8 +2859,8 @@ var _default = exports["default"] = {
   "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
   "./plugins/BabylonCamera.min.js": "d0d3c2c6657d2dfb3c1b2cb446af3098d9ade28551f61d87469114000c552710",
-  "./plugins/BabylonGraphics.js": "90a03683013b2c9ad7e51e5bbabd120359752c400daed81a248a22086eccefbe",
-  "./plugins/BabylonGraphics.min.js": "d61e9df7858ef2d4d36f6804bf20e9a686a638bd4334826b90e4a4d8ae4e2a73",
+  "./plugins/BabylonGraphics.js": "e9a3335c4fe5c7418158853783b6586e2cd288f13fa9c3183b149a26af3096ca",
+  "./plugins/BabylonGraphics.min.js": "1ea5d0b92ac68d0fe8545f2d70808e8e8a5fe156d210b51e6e40ac4964e9e871",
   "./plugins/BabylonStarField.js": "bcbeb93b6bd0a1490055f9ad862177173fe51d2c2fcbd964a899d519017b1b72",
   "./plugins/BabylonStarField.min.js": "d4a2f4ab4cd052977c7243a0d6918035b098843a80e5704e0f261dd1c30c3774",
   "./plugins/Behaviors.js": "7b7a58950a66608f894d22cedc281c75c15c5b169d763a525c0d0c32a234e101",
@@ -2869,8 +2879,8 @@ var _default = exports["default"] = {
   "./plugins/Button.min.js": "f9b2f60b9420ce0ae8911c97be62634913da086a0fa7603cab6e9ab20844e84e",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "8270c9f237fee9cd676eb177ad201e4a9056215df30f54ee8573e8c7e8609b65",
-  "./plugins/CSSGraphics.min.js": "97c408eb6cc304872eb672ff144040d2ada758a68adf789a4bb7542719f8eddd",
+  "./plugins/CSSGraphics.js": "a34a7da70f2808c80fa1c085410d77a67d45c5f8b56d8e3a42fe7c817a3ec103",
+  "./plugins/CSSGraphics.min.js": "e23d9f9bf6656595c15b17ded5453375a670558a491e07da67f4cb702823ec5a",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "3b94a40283f14e75ad89ededdfbbffb3676532573048e60fe500c27a2bd436ff",
@@ -2919,14 +2929,14 @@ var _default = exports["default"] = {
   "./plugins/GamepadGUI.min.js": "a7364e86f4e4abbb31d6053a728c7d9d26fffd6842fc6975306bc54056a888d8",
   "./plugins/GhostTyper.js": "d13d0a0a2aa3eaefc3f5c50fa7a0a969dea114afa1fb5746c2954e1b27d2e8a6",
   "./plugins/GhostTyper.min.js": "15124babd086c31da916405d582032224301a4f01887e25e27c41c7c84be2ccd",
-  "./plugins/Graphics.js": "e83dc4884aec0f3a3c980f4b20308e46884a605d89da186798d2039abd35bb1a",
-  "./plugins/Graphics.min.js": "2653f026070a5c88dd05ec16674c4307d41e9e3e0ce831442fb97f54c6108437",
+  "./plugins/Graphics.js": "1de77df8b2bcf741fa11a39ba1edcb1f3171f2a23d8982959fcd085b12a83f2f",
+  "./plugins/Graphics.min.js": "73d5450ce99b4416e5aeae4c7027dd8bafbad84bd8c0b31558738e90111bd9c9",
   "./plugins/GravityWell.js": "a213708152c92ddbdd30a0c6b553abd368627f5adaaab72b82b181502b8781ee",
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
   "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
-  "./plugins/Hexapod.js": "93ebd8c4d1767f2438053c09fb484ec855b2fadd76f5bea512eef32c3c145f09",
-  "./plugins/Hexapod.min.js": "92f7242bfb4b062e28432450a0f94f26b33a54d83a495dd39a2eb5b5d83b74ad",
+  "./plugins/Hexapod.js": "d9402e9f3c8d929e0d057c39c87e9d9852b2df8e4eaa36b6c9c4ac30f80026a2",
+  "./plugins/Hexapod.min.js": "7f9ccc81404e71657720db8deea7c445960794eae1efb23c37d190a7c9df7b19",
   "./plugins/Iframe.js": "ef82c243d98dc49ab09ba5b54d7483128eb0fb49a4e733e1032d25730a095db0",
   "./plugins/Iframe.min.js": "486536e022cee0dc0274cd5a99b24f456ed94715b20fa2de8bbfa88c36ada101",
   "./plugins/Image.js": "a9be3447d72667f4cc83443bdefc6ae1f09be99ec50668ade91212acee362792",
@@ -2949,16 +2959,16 @@ var _default = exports["default"] = {
   "./plugins/LoadingScreen.min.js": "b3b953dc98813936e5713b170a828db888f2cac1a368281cd8cd18185e4fb17a",
   "./plugins/LocalClient.js": "62886ed824f7bc714cde5664ecca9447e6d2a047eb65b5309f2dad765cef746e",
   "./plugins/LocalClient.min.js": "a681769ec3ebbd160693301d2780545f63629098867abbeaad8a3880694a04ea",
-  "./plugins/Markup.js": "3058fa66abb0c79091c33a5c04e95fd0efc8d484f798425f1ec3d9b9ff18ba1c",
-  "./plugins/Markup.min.js": "bfa1a27c4e1be4e938c15b4f3bbfa933bf5d29788afd5ea9d3279813460b3023",
+  "./plugins/Markup.js": "6a71d3571a72aaa09aab0d45b82d7be266643dc588e8947439ca3ff4ece26030",
+  "./plugins/Markup.min.js": "dd706d9495fc9b92c4ec47198ec5259e29ade5c1ff57bd535157963e38fc4f45",
   "./plugins/MatterPhysics.js": "5178aad694dc5b2de5cf7fe9bf2e5c26bd0e70dcffa53a5734a9ee6ad5645771",
   "./plugins/MatterPhysics.min.js": "97242c00f48c93a2ea854405db5a9e6568229d2017a8149998869dc1527c3313",
   "./plugins/Midi.js": "3c8b738ed48341c4221cf20e53f631907935bdf722ebbcafb2dee3a40f544fba",
   "./plugins/Midi.min.js": "5ef8a15f87866a63e014ecbf3433f93a6c463c26d48a1c3a4448604ee8b5d229",
   "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
   "./plugins/MidiGUI.min.js": "ceb780abf5f2fadc904cbb683dde98548db60f5bdf0f90f1398728c76a0f923f",
-  "./plugins/Mouse.js": "f1dab6c48d281d6affa695a166de55f6e8cd9ec220111429a172aa82aacd0781",
-  "./plugins/Mouse.min.js": "d49db696ecb9198d7cd38cbd9cf73d7e98729e3b31a02724fa4a8bf589cf0008",
+  "./plugins/Mouse.js": "ad61cdd48f507a408e4802fba5ed8cda1ed58ec9543d7e61762ec00e7ebb8daa",
+  "./plugins/Mouse.min.js": "87e495ca8e82dda020b443d0a9557b2b718264f645a303ee420c8b919a0d90f4",
   "./plugins/PacManMovement.js": "e7b7dbe97b3192004c8bb2c58e952e27e2281a9604785faf3d0ee43771444205",
   "./plugins/PacManMovement.min.js": "31f12aa5c1ec52ed3b22dd49420a5a42ff749954306411e3983c25f257fbbe13",
   "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
@@ -2969,10 +2979,10 @@ var _default = exports["default"] = {
   "./plugins/PhysXPhysics.min.js": "f91a1b58ea914c437eb0082c78aa3c54570065978b853ef2592364f19759c401",
   "./plugins/PingTime.js": "df3ff245078e918c5c09e017266c29e58973a6b97e025c931bc25af0cc176ffe",
   "./plugins/PingTime.min.js": "df610dd9876c1b43e3c3a1e7c36273842332b0a51b2f33a150ec926f8155bca0",
-  "./plugins/Platform.js": "d6ea32e84aac9d6dfe517ce910708e6536a98c9cb28da1e71ef497c41bc52080",
-  "./plugins/Platform.min.js": "6fbd773ca904fe5ae892f14519a5ddee6547947e39ea6c0fdf4a71e9d0590531",
-  "./plugins/Player.js": "ff1d070119fbb38b26f7a307a8d20f4c515a8a28385e48f48330b4c01e56ca0b",
-  "./plugins/Player.min.js": "6f0537ba6ad197e59f6866fb1f59a3d24760f7cd05533b05f0cb1da48229e459",
+  "./plugins/Platform.js": "3c8a9709aaf415909d0ef153afc23824bd7f0de575e7ffac900f6abc4747141b",
+  "./plugins/Platform.min.js": "a365b9ef1e0c90663cbf6bc7d2f732fc7a9d85840e37a3f89740ff6e2ff73c5b",
+  "./plugins/Player.js": "cee710c93985f83dbefc341b8d7fcdcbab2515b5533c58f833559df0d94791c8",
+  "./plugins/Player.min.js": "c9ee861c565a6139f87151cf4561b98b3edbfd511431acc3ac17d64259a08b7b",
   "./plugins/PluginExplorer.js": "10a1a744380c0e425c603cf05156a6f12b7f0365daacf4b3765d88789d3e2bf4",
   "./plugins/PluginExplorer.min.js": "e03f9fe01aa34fb485508b56c3c79607cc86d17d1236712325bca6cea80cc423",
   "./plugins/PluginsGUI.js": "c8259a06f4fe79bf42c8365d224d542da67100c0a66d4bf9d1eb45256363295b",
@@ -2997,22 +3007,22 @@ var _default = exports["default"] = {
   "./plugins/SnapshotSize.min.js": "85719ef7d6a63b398d45dda88aaabeb38963aada0731c8cfc689ab0580670f9b",
   "./plugins/StarField.js": "d33e4ee1e02b8719edc5b7988b3eb2ded91a214dc911b3d800b52bfe19572669",
   "./plugins/StarField.min.js": "302c7e8878c277e6d3dc553ca7767fc98e16f66a8964c1a74cf7e4b972892467",
-  "./plugins/Sutra.js": "b4e5cf15e7cd87a9d1bedc3d8f8cc31de85e3d2c68524cb95241c67513518dcd",
-  "./plugins/Sutra.min.js": "d5f6be60cbe1a99525a021be24414dd47a2802a435cd0ee59a9dfe710503d955",
+  "./plugins/Sutra.js": "2d5a44ab53b77e29051aae171109f4ae3819f417fcd3e27bc750720e0f15aaa3",
+  "./plugins/Sutra.min.js": "d70353604dee2be046036e9ec29aaf0d3c1dc483a86ee570fd0da581800e3476",
   "./plugins/SutraGUI.js": "9ba0fb777b310fce215da25812818205db0af426952d48ea02adfa1979f931fa",
   "./plugins/SutraGUI.min.js": "978af8d0050820c3056c3410b3b4a954a8882d4dd06677c31049f5f8db167f65",
-  "./plugins/SwitchGraphics.js": "939a7ff4575bc302d6bc706ee9290004d543a7658f56e56d245008a755f0fd9e",
-  "./plugins/SwitchGraphics.min.js": "94eb1806cb4d085ba2e43064fa8618a5bcffab2fec62db52721fb0c954ec71e1",
+  "./plugins/SwitchGraphics.js": "ca91de0106a117fff19878fd93e9acaef7d9300e8537bb32ba14713182e45948",
+  "./plugins/SwitchGraphics.min.js": "d1ed0da5e94af810ccd07f89d1f7db5e2ec546418e505eb2ff1adc35911f0a3b",
   "./plugins/Sword.js": "4ed88fd1e3f9fafe239d88db8b3bb3ee1189fff9c7b3c9ff54ac9b151c58fd32",
   "./plugins/Sword.min.js": "68708f6deb1b0b7de5a4fda1eabf50f1bc12d2a97433b491a72deabba506e33d",
-  "./plugins/Teleporter.js": "028610b703c4ea4973bb64c0c7d9faaa59ff21da4dbd7c607d45ff59479e4ff5",
-  "./plugins/Teleporter.min.js": "7eaf854de64a035d01d29b34c5eef0de1205e217afab68c3deaad3fa0fbf4d09",
+  "./plugins/Teleporter.js": "4cdc7c735cb9e3186e97638406a7dd6eaa558f37edd2532439ae059cd08f21f4",
+  "./plugins/Teleporter.min.js": "efadbc9c29dd46daa59800ebe49e913513ae9d261aef961d306b8c366b915469",
   "./plugins/Text.js": "eeb50f1cffc6e0f781a77bf982ed046d02b817c572e40c4cb9da1467f3f82e5d",
   "./plugins/Text.min.js": "388b6baebbe73c0d0d736442ecc04cf00b383660c6c7bd87b3d2c554bae69d86",
   "./plugins/Textarea.js": "a9f16f27cf2721e3d75a504fd5ae68cb8238d945ac7dbb10f3787d7a12d680bb",
   "./plugins/Textarea.min.js": "4ee950d2815ee75c63ae64b260f4b95ffbce227a37ca58a9596d2a317a56b03b",
-  "./plugins/ThreeGraphics.js": "02a91241d96846b0729e8e6e87658afeb6fc0735772cbc1231df7d844b6a2156",
-  "./plugins/ThreeGraphics.min.js": "1b8fdf611aef73f9278fcf16b9c0417736cdf25a2f69e404f4dd7d0fa1965940",
+  "./plugins/ThreeGraphics.js": "293098c67c081d773dbe5ddd0df52509de871ffa698e9f5cddbb87216af2f9ee",
+  "./plugins/ThreeGraphics.min.js": "901aaeccd2df0e75ed06e9d8c5be394746495e872482320c448258bcbe7ecede",
   "./plugins/TileSet.js": "730987abc1a69c466047444b005ed25d49a6c3dab03c8128701e086e29eb6c57",
   "./plugins/TileSet.min.js": "9a83b80581a1611b7f34e2f8cc4fe9e4eef910ea55372a19a0eda54eb2033649",
   "./plugins/Timers.js": "a851809e3b6281010be54bef5f96a904ad687a860db2fc76fcb2e859adc40c23",
@@ -3023,7 +3033,6 @@ var _default = exports["default"] = {
   "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
   "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
-  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
   "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
   "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
   "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",
@@ -3186,6 +3195,9 @@ function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyri
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+// for dev, TODO: game.use() needs a test suite
+// let cache = {};
+
 function use(game) {
   return /*#__PURE__*/function () {
     var _use = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(pluginInstanceOrId) {
@@ -3202,43 +3214,41 @@ function use(game) {
             basePath = '/plugins/'; // Base path for loading plugins
             basePath = game.scriptRoot + basePath;
             if (!(typeof pluginInstanceOrId === 'string')) {
-              _context2.next = 23;
+              _context2.next = 20;
               break;
             }
-            pluginId = pluginInstanceOrId; // Initialize callback storage for this plugin if it doesn't exist
-            if (typeof game.pluginCallbacks === 'undefined') {
-              game.pluginCallbacks = {};
-            }
-            if (typeof game.pluginCallbacks[pluginId] === 'undefined') {
-              game.pluginCallbacks[pluginId] = [];
-            }
-
-            // Store the callback for later execution
-            game.pluginCallbacks[pluginId].push(cb);
+            pluginId = pluginInstanceOrId;
             if (!game._plugins[pluginId]) {
-              _context2.next = 12;
+              _context2.next = 9;
               break;
             }
             console.log("Plugin ".concat(pluginId, " is already loaded or loading."));
             return _context2.abrupt("return", game);
-          case 12:
+          case 9:
             if (!game.isServer) {
-              _context2.next = 17;
+              _context2.next = 14;
               break;
             }
             if (!game.plugins[pluginId]) {
-              _context2.next = 15;
+              _context2.next = 12;
               break;
             }
             return _context2.abrupt("return", game.use(new game.plugins[pluginId](options)));
-          case 15:
+          case 12:
             console.log("Attempted to load plugin by string name \"".concat(pluginId, "\" on server, could not find! Skipping"));
             return _context2.abrupt("return");
-          case 17:
+          case 14:
             game._plugins[pluginId] = {
               status: 'loading'
             };
             game.loadingPluginsCount++;
+            /*
+            cache[pluginId] = cache[pluginId] || {
+              start: 0,
+              finish: 0
+            };
+            cache[pluginId].start++;
+            */
             game.emit('plugin::loading', pluginId);
 
             // Store the loading promise
@@ -3249,76 +3259,75 @@ function use(game) {
                   case 0:
                     _context.prev = 0;
                     // Load unminified version of the plugin
-                    scriptUrl = "".concat(basePath).concat(pluginId, ".js"); // TODO: Load minified version of the plugin ( with config flag )
-                    // const scriptUrl = `${basePath}${pluginId}.min.js`;
-                    _context.next = 4;
+                    scriptUrl = "".concat(basePath).concat(pluginId, ".js");
+                    if (game.config.useMinBuilds) {
+                      //scriptUrl = `${basePath}${pluginId}.min.js`;
+                    }
+                    _context.next = 5;
                     return game.loadPluginScript(scriptUrl);
-                  case 4:
+                  case 5:
                     console.log("Loaded: ".concat(pluginId));
                     if (!((typeof PLUGINS === "undefined" ? "undefined" : _typeof(PLUGINS)) === 'object' && PLUGINS[pluginId])) {
-                      _context.next = 13;
+                      _context.next = 12;
                       break;
                     }
                     pluginInstance = new PLUGINS[pluginId]["default"](options);
-                    _context.next = 9;
-                    return handlePluginInstance(game, pluginInstance, pluginId, options);
-                  case 9:
-                    // Execute all callbacks stored for this plugin
-                    game.pluginCallbacks[pluginId].forEach(function (callback) {
-                      return callback();
-                    });
-                    // Clear the callbacks after execution
-                    delete game.pluginCallbacks[pluginId];
-                    _context.next = 15;
+                    _context.next = 10;
+                    return handlePluginInstance(game, pluginInstance, pluginId, options, cb);
+                  case 10:
+                    _context.next = 14;
                     break;
-                  case 13:
+                  case 12:
                     console.log('Warning: PLUGINS object not found, cannot load plugin', pluginId);
                     throw new Error('PLUGINS object not found, cannot load plugin');
-                  case 15:
-                    _context.next = 25;
+                  case 14:
+                    _context.next = 23;
                     break;
-                  case 17:
-                    _context.prev = 17;
+                  case 16:
+                    _context.prev = 16;
                     _context.t0 = _context["catch"](0);
                     console.error("Error loading plugin ".concat(pluginId, ":"), _context.t0);
                     game._plugins[pluginId] = {
                       status: 'error'
                     };
                     game.loadingPluginsCount--;
-                    // Execute all callbacks with the error
-                    game.pluginCallbacks[pluginId].forEach(function (callback) {
-                      return callback(_context.t0);
-                    });
-                    // Clear the callbacks after execution
-                    delete game.pluginCallbacks[pluginId];
+                    cb(_context.t0);
                     throw _context.t0;
-                  case 25:
-                    _context.prev = 25;
+                  case 23:
+                    _context.prev = 23;
                     // Remove the promise from the tracking object once it's settled
                     delete game.loadingPluginPromises[pluginId];
-                    return _context.finish(25);
-                  case 28:
+                    return _context.finish(23);
+                  case 26:
                   case "end":
                     return _context.stop();
                 }
-              }, _callee, null, [[0, 17, 25, 28]]);
+              }, _callee, null, [[0, 16, 23, 26]]);
             }))();
-            _context2.next = 29;
+            _context2.next = 26;
             break;
-          case 23:
+          case 20:
             game.loadingPluginsCount++;
+
+            /*
+            cache[pluginInstanceOrId.id] = cache[pluginInstanceOrId.id] || {
+              start: 0,
+              finish: 0
+            };
+            cache[pluginInstanceOrId.id].start++;
+            */
             if (pluginInstanceOrId.id) {
-              _context2.next = 27;
+              _context2.next = 24;
               break;
             }
             console.log('Error with pluginInstance', pluginInstanceOrId);
             throw new Error('All plugins must have a static id property');
-          case 27:
-            _context2.next = 29;
+          case 24:
+            _context2.next = 26;
             return handlePluginInstance(game, pluginInstanceOrId, pluginInstanceOrId.id, options, cb);
-          case 29:
+          case 26:
             return _context2.abrupt("return", game);
-          case 30:
+          case 27:
           case "end":
             return _context2.stop();
         }
@@ -3330,20 +3339,23 @@ function use(game) {
     return use;
   }();
 }
-function handlePluginInstance(_x2, _x3, _x4, _x5) {
+function handlePluginInstance(_x2, _x3, _x4, _x5, _x6) {
   return _handlePluginInstance.apply(this, arguments);
 }
 function _handlePluginInstance() {
-  _handlePluginInstance = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(game, pluginInstance, pluginId, options) {
-    var cb,
-      _args3 = arguments;
+  _handlePluginInstance = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(game, pluginInstance, pluginId, options, cb) {
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
-          cb = _args3.length > 4 && _args3[4] !== undefined ? _args3[4] : function () {};
           if (typeof pluginInstance.build === 'function') {
             extendEntityBuilder(game, pluginInstance);
           }
+
+          // console.log('pluginInstance', pluginInstance, pluginId)
+          // TODO: we may want to check to see if plugin is already in system
+          //       current behavior will most likely overwrite / double append loadedPlugins array
+          //       overwrite by default is OK, needs to be checked
+          if (game.systems[pluginInstance.id]) {}
           pluginGameSceneMethods(game, pluginInstance);
           game.loadedPlugins.push(pluginId);
           if (!pluginInstance.preload) {
@@ -3361,7 +3373,6 @@ function _handlePluginInstance() {
           delete game._plugins[pluginId];
           game.emit("plugin::loaded::".concat(pluginId), pluginInstance);
           game.emit('plugin::loaded', pluginId);
-          cb();
           if (pluginInstance.type === 'world' || pluginInstance.constructor.type === 'world') {
             game.worlds.push(pluginInstance);
             game.systemsManager.addSystem(pluginId, pluginInstance);
@@ -3378,6 +3389,17 @@ function _handlePluginInstance() {
           game.data.plugins = game.data.plugins || {};
           game.data.plugins[pluginId] = options;
           game.loadingPluginsCount--;
+
+          /*
+          cache[pluginId] = cache[pluginId] || {
+            start: 0,
+            finish: 0
+          };
+          cache[pluginId].finish++;
+          */
+
+          // Remark: Wait until all logic is process before continuing
+          cb();
         case 20:
         case "end":
           return _context3.stop();
@@ -3822,9 +3844,11 @@ function loadPluginsFromConfig(_ref) {
     });
   }
   if (gameConfig.showLoadingScreen && !this.isServer) {
-    this.use(new _LoadingScreen["default"]({
-      minLoadTime: gameConfig.minLoadTime
-    }));
+    if (!this.systems['loading-screen']) {
+      this.use(new _LoadingScreen["default"]({
+        minLoadTime: gameConfig.minLoadTime
+      }));
+    }
   }
   this.use('Entity');
   if (physics === 'matter') {

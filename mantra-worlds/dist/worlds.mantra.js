@@ -3432,7 +3432,8 @@ var GravityGardens = /*#__PURE__*/function () {
               game.use('GravityWell');
               game.use('UnitSpawner');
               game.use('Teleporter');
-            case 4:
+              game.use('SwitchGraphics');
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -3864,9 +3865,9 @@ var Home = /*#__PURE__*/function () {
               game.use('Teleporter');
               game.use('Draggable');
               game.use('Collectable');
-              // game.use('SwitchGraphics');
+              game.use('SwitchGraphics');
               game.use('Key');
-            case 21:
+            case 22:
             case "end":
               return _context.stop();
           }
@@ -4078,7 +4079,7 @@ function createBackground(game) {
     body: false,
     position: {
       x: -20,
-      y: -220,
+      y: -260,
       z: 64
     }
   });
@@ -4150,7 +4151,7 @@ function createBackground(game) {
     body: false,
     position: {
       x: -250,
-      y: -30,
+      y: -70,
       z: 64
     }
   });
@@ -4228,7 +4229,7 @@ function createBackground(game) {
     body: false,
     position: {
       x: -235,
-      y: 280,
+      y: 230,
       z: 32
     }
   });
@@ -4269,7 +4270,7 @@ function createBackground(game) {
     body: false,
     position: {
       x: 240,
-      y: 280,
+      y: 230,
       z: 32
     }
   });
@@ -4973,7 +4974,7 @@ var Maze = /*#__PURE__*/function () {
           textAlign: 'center'
         }
       }, "body", false), "position", {
-        x: -400,
+        x: -350,
         y: -120
       }));
     }
@@ -5001,7 +5002,6 @@ function createDoors(game) {
   // Containers are a way to group entities together
   // With no layout given, entities will be placed relative to the container
   // With a layout given, entities will be placed according to the layout algorithm
-
   var container = game.make().Container({
     layout: 'grid',
     grid: {
@@ -5269,7 +5269,17 @@ var Music = /*#__PURE__*/function () {
       game.reset();
       this.bindEvents();
       this.createWorld();
-      game.make().Tower().color('purple').mass(10000).position(300, -40).angle(-180).offset(50).createEntity();
+
+      /*
+      game.make()
+        .Tower()
+        .color('purple')
+        .mass(10000)
+        .position(300, -40)
+        .angle(-180)
+        .offset(50)
+        .createEntity();
+        */
     }
   }, {
     key: "bindEvents",
@@ -5368,25 +5378,6 @@ var Music = /*#__PURE__*/function () {
         width: 1028,
         height: 64
       };
-
-      // text label for piano
-      game.createEntity({
-        type: 'TEXT',
-        text: 'Click or Jump on the Piano',
-        // kind: 'dynamic',
-        //color: 0xffffff,
-        style: {
-          fontSize: '16px',
-          color: '#ffffff',
-          textAlign: 'center'
-        },
-        body: false,
-        position: {
-          x: 352,
-          y: 150,
-          z: 64
-        }
-      });
       (0, _createPiano["default"])(game, pianoConfig);
       // Usage example
       var drumKitConfig = {
@@ -5396,36 +5387,6 @@ var Music = /*#__PURE__*/function () {
         } // Base position of the drum kit
       };
       (0, _createDrumKit["default"])(game, drumKitConfig);
-
-      /*
-      game.createEntity({
-        type: 'PLATFORM',
-        isStatic: true,
-        width: 1000,
-        height: 40,
-        position: {
-          x: 0,
-          y: 200
-        }
-      });
-      */
-
-      /*
-      game.createEntity({
-        type: 'BLOCK',
-        texture: 'tile-block',
-        width: 32,
-        height: 32,
-        position: {
-          x: -400,
-          y: -150
-        },
-        friction: 1, 
-        frictionAir: 1, 
-        frictionStatic: 1
-      });
-      */
-
       game.use('Block');
       // game.use('Tile');
       game.use('Tone');
@@ -6026,7 +5987,7 @@ var Platform = /*#__PURE__*/function () {
         isStatic: true,
         position: {
           x: -100,
-          y: -100
+          y: -150
         }
       });
       game.createEntity({
@@ -8692,7 +8653,7 @@ var YCraft = /*#__PURE__*/function () {
         body: false,
         position: {
           x: 260,
-          y: 60,
+          y: 0,
           z: 64
         }
       });

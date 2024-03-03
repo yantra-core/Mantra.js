@@ -32,12 +32,6 @@ var Player = exports["default"] = /*#__PURE__*/function () {
       if (typeof playerConfig.position === 'undefined') {
         playerConfig.position = {
           x: 0,
-          y: 0
-        };
-      }
-      if (typeof playerConfig.position === 'undefined') {
-        playerConfig.position = {
-          x: 0,
           y: 0,
           z: 1
         };

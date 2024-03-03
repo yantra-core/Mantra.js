@@ -580,7 +580,8 @@ function createEntity() {
       afterUpdate: null,
       update: null,
       exit: null,
-      ctick: this.game.tick
+      ctick: this.game.tick,
+      utick: this.game.tick
     };
 
     // Remark: Adding support for new Entity.size prop, removing Entity.height and Entity.width
@@ -699,7 +700,8 @@ function createEntity() {
     afterItemCollected = _config.afterItemCollected,
     update = _config.update,
     exit = _config.exit,
-    ctick = _config.ctick;
+    ctick = _config.ctick,
+    utick = _config.utick;
   var x = position.x,
     y = position.y;
 
@@ -782,6 +784,7 @@ function createEntity() {
   this.game.addComponent(entityId, 'update', update);
   this.game.addComponent(entityId, 'exit', exit);
   this.game.addComponent(entityId, 'ctick', ctick);
+  this.game.addComponent(entityId, 'utick', utick);
   var _sutra;
   // if the incoming sutra is an object, it is config object which needs to be scoped to the new entity
   if (_typeof(sutra) === 'object' && sutra !== null) {
@@ -1057,9 +1060,8 @@ function layoutEntity(container, entityId) {
     // When the origin should be centered, calculate offsets to position the entity's center at the container's center
     var offsetX = entity.position.x; // Centered horizontally
     var offsetY = entity.position.y; // Centered vertically
-    console.log("originoriginoriginorigin", origin);
-    //alert(origin)
     // If the origin is explicitly set to 'top-left', adjust offsets to position the top-left corner of the entity at the container's center
+    // TODO: fix this and move to separate file / sub-system for layout / flex styles / etc
     if (origin === 'top-left') {
       offsetX = -entity.size.width / 2;
       offsetY = -entity.size.height / 2;
@@ -1518,8 +1520,9 @@ function updateEntity(entityDataOrId, entityData) {
     this.game.physics.setBodySize(entityId, entityData);
   }
   if (entityData.position) {
-    // Remark: Tests require we update component, perhaps changed test?
+    // update the position
     this.game.components.position.set(entityId, entityData.position);
+
     // let body = this.game.bodyMap[entityId];
     this.game.physics.setPosition(entityId, entityData.position);
   }
@@ -1651,6 +1654,9 @@ function updateEntity(entityDataOrId, entityData) {
   if (this.game.systems.rbush) {
     // this.game.systems.rbush.updateEntity(ent);
   }
+
+  // Updates the Entity.utick
+  this.game.components.utick.set(entityId, this.game.tick);
 
   //
   // Entity Lifecycle afterUpdateEntity

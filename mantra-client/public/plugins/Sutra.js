@@ -779,14 +779,6 @@ var Sutra = /*#__PURE__*/function () {
         game.data.inputTicks = this.inputTickCount;
         game.data.inputDuration = this.inputDuration;
       }
-
-      // TODO: Remove this init, it should be a check and throw
-      // camera init is handled in Graphics.js and Camera system
-      game.data.camera = game.data.camera || {};
-      game.data.camera.position = game.data.camera.position || {
-        x: 0,
-        y: 0
-      };
       if (game.data && game.data.input) {
         game.data.input.keyStates = game.systems.keyboard.keyStates;
       }

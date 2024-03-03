@@ -61,8 +61,6 @@ export default function layoutEntity(container, entityId) {
     // When the origin should be centered, calculate offsets to position the entity's center at the container's center
     let offsetX = entity.position.x; // Centered horizontally
     let offsetY = entity.position.y; // Centered vertically
-    console.log("originoriginoriginorigin", origin)
-    //alert(origin)
     // If the origin is explicitly set to 'top-left', adjust offsets to position the top-left corner of the entity at the container's center
     // TODO: fix this and move to separate file / sub-system for layout / flex styles / etc
     if (origin === 'top-left') {

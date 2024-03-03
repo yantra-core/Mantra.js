@@ -74,7 +74,7 @@ var SwitchGraphics = /*#__PURE__*/function () {
       var container = document.createElement('div');
       container.id = 'switchgraphics-container';
       container.className = 'switchgraphics-container';
-      container.style.cssText = "\n      position: absolute;\n      top: 0;\n      left: 50%;\n      transform: translateX(-50%);\n      text-align: center;\n      padding: 10px 0;\n      z-index: 1000;\n    ";
+      container.style.cssText = "\n      position: absolute;\n      top: 0;\n      left: 50%;\n      transform: translateX(-50%);\n      text-align: center;\n      padding: 10px 0;\n      z-index: 11111;\n    ";
       return container;
     }
   }, {

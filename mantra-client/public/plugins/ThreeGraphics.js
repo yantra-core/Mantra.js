@@ -53874,6 +53874,9 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       near: 0.1,
       far: 1000
     };
+
+    // Flag to determine if manual camera control is active
+    _this.isManualControlActive = false;
     return _this;
   }
   _createClass(ThreeGraphics, [{
@@ -53887,18 +53890,12 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.inflateTexture = _inflateTexture["default"].bind(this);
       this.game = game;
       this.game.systemsManager.addSystem('graphics-three', this);
-      game.data.camera = {
-        mode: 'follow',
-        position: {
-          x: 0,
-          y: 0
-        }
-      };
       this.threeReady(game);
     }
   }, {
     key: "threeReady",
     value: function threeReady(game) {
+      var _this2 = this;
       this.scene = new _three.Scene();
 
       // Initialize the renderer
@@ -53936,8 +53933,21 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Position the camera for a bird's eye view
       this.camera.position.set(0, 0, 0);
       this.camera.lookAt(new _three.Vector3(0, 0, 0));
-      // TODO: Initialize controls for camera interaction
+
+      // Initialize OrbitControls
       this.controls = new _OrbitControls.OrbitControls(this.camera, this.renderer.domElement);
+
+      // Correctly disable mouse buttons for OrbitControls
+      this.disableOrbitControlsMouseEvents(this.controls); // Pass 'this.controls' as the argument
+
+      // Add event listeners to set the flag during manual camera control
+      this.controls.addEventListener('start', function () {
+        _this2.isManualControlActive = true;
+      });
+      this.controls.addEventListener('end', function () {
+        _this2.isManualControlActive = false;
+      });
+
       // this.controls.enableZoom = true; // Enable zooming
       // async:true plugins *must* self report when they are ready
       // game.emit('plugin::ready::graphics-three', this);
@@ -53992,64 +54002,111 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     key: "updateCameraFollow",
     value: function updateCameraFollow() {
       var game = this.game;
-      // Follow the player entity with the camera
-      var currentPlayer = this.game.getEntity(game.currentPlayerId);
-      if (currentPlayer) {
-        if (game.data.camera.mode === 'fpv') {
-          this.setFirstPersonView();
-        }
-        if (game.data.camera.mode === 'follow') {
-          var playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
-          if (playerGraphic) {
-            // Calculate the new camera position with a slight offset above and behind the player
-            var newPosition = playerGraphic.position.clone().add(new _three.Vector3(0, 150, -100));
-            var lookAtPosition = playerGraphic.position.clone();
-            // Use a smaller lerp factor for smoother camera movement
-            this.camera.position.lerp(newPosition, 0.05);
-            this.camera.lookAt(lookAtPosition);
-          }
-        }
-        if (game.data.camera.mode === 'platform') {
-          var _playerGraphic = this.game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
-          if (_playerGraphic) {
-            // Calculate the new camera position with a slight offset above and behind the player
-            var _newPosition = _playerGraphic.position.clone().add(new _three.Vector3(0, 150, -100));
-            var _lookAtPosition = _playerGraphic.position.clone();
 
-            // Use a smaller lerp factor for smoother camera movement
-            this.camera.position.lerp(_newPosition, 0.05);
-            this.camera.lookAt(_lookAtPosition);
-          }
-        }
-      } else {
-        // no current player
-        // sets a default camera position and perspective
-        // TODO: add multiple camera views here / camera controls to orbital view
-        this.camera.position.set(0, 400, 100); // Set a default position
+      // if (this.isManualControlActive) return; // Skip automatic following if manual control is active
+
+      // Get the current player entity
+      var currentPlayer = game.getEntity(game.currentPlayerId);
+      if (!currentPlayer) {
+        // If no current player, set a default camera position and perspective
+        this.camera.position.set(0, 400, 100);
         this.camera.lookAt(new _three.Vector3(0, 0, 0));
+        return;
       }
+      var playerGraphic = game.components.graphics.get([game.currentPlayerId, 'graphics-three']);
+      if (!playerGraphic) {
+        console.warn('Player graphic component not found');
+        return;
+      }
+
+      // Determine the camera mode and update accordingly
+      switch (game.data.camera.mode) {
+        case 'fpv':
+          this.setFirstPersonView(playerGraphic);
+          break;
+        case 'follow':
+        case 'platform':
+          // 'follow' and 'platform' share the same logic
+          this.updateFollowCamera(playerGraphic);
+          break;
+        default:
+          console.warn('Unknown camera mode:', game.data.camera.mode);
+      }
+    }
+  }, {
+    key: "updateFollowCamera",
+    value: function updateFollowCamera(playerGraphic) {
+      // Calculate the new camera position with an offset
+      var offset = new _three.Vector3(0, 150, -100); // Adjust the offset as needed
+      var newPosition = playerGraphic.position.clone().add(offset);
+      var lookAtPosition = playerGraphic.position.clone();
+
+      // Update orientation only when not manually controlling
+      if (!this.isManualControlActive) {
+        // Smoothing the camera movement
+        this.smoothCameraUpdate(newPosition, lookAtPosition);
+      }
+    }
+  }, {
+    key: "setFirstPersonView",
+    value: function setFirstPersonView(playerGraphic) {
+      playerGraphic.visible = false;
+      var eyePositionOffset = new _three.Vector3(0, 1.6, 0);
+      var playerPosition = playerGraphic.position.clone();
+      var cameraPosition = playerPosition.add(eyePositionOffset);
+      var forwardDirection = new _three.Vector3(0, 0, -1).applyQuaternion(playerGraphic.quaternion);
+      var lookAtPosition = cameraPosition.clone().add(forwardDirection);
+      this.camera.position.copy(cameraPosition);
+      this.camera.lookAt(lookAtPosition);
+    }
+  }, {
+    key: "smoothCameraUpdate",
+    value: function smoothCameraUpdate(newPosition, lookAtPosition) {
+      // Adjust the lerp factor to control the smoothness (smaller value = smoother)
+      var lerpFactor = 0.05;
+      this.camera.position.lerp(newPosition, lerpFactor);
+      this.camera.lookAt(lookAtPosition);
+    }
+  }, {
+    key: "disableOrbitControlsMouseEvents",
+    value: function disableOrbitControlsMouseEvents(orbitControls) {
+      if (!orbitControls) return; // Guard clause in case orbitControls is not defined
+      orbitControls.mouseButtons = {
+        LEFT: null,
+        // Disables orbiting with left mouse button
+        MIDDLE: _three.MOUSE.ROTATE,
+        // Enables dollying with the middle mouse button
+        RIGHT: null // Disables panning with right mouse button
+      };
+
+      // Optionally, you might want to disable the touch events if they are not needed
+      orbitControls.touches = {
+        ONE: null,
+        // Disables touch rotation
+        TWO: null // Disables touch zoom/pan
+      };
     }
   }, {
     key: "setupZoomControls",
     value: function setupZoomControls() {
-      var _this2 = this;
+      var _this3 = this;
       var zoomSensitivity = -0.05; // Adjust this value based on desired zoom speed
       var minFov = 20; // Minimum FOV
       var maxFov = 150; // Maximum FOV, you can adjust this value
 
       this.renderer.domElement.addEventListener('wheel', function (event) {
         // Adjust the camera's FOV
-        _this2.camera.fov -= event.deltaY * zoomSensitivity;
+        _this3.camera.fov -= event.deltaY * zoomSensitivity;
         // Clamp the FOV to the min/max limits
-        _this2.camera.fov = Math.max(Math.min(_this2.camera.fov, maxFov), minFov);
+        _this3.camera.fov = Math.max(Math.min(_this3.camera.fov, maxFov), minFov);
         // Update the camera's projection matrix
-        _this2.camera.updateProjectionMatrix();
+        _this3.camera.updateProjectionMatrix();
       });
     }
   }, {
     key: "unload",
     value: function unload() {
-      var _this3 = this;
+      var _this4 = this;
       // remove events mouse wheel camera
       this.renderer.domElement.removeEventListener('wheel', function () {});
 
@@ -54072,7 +54129,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         _iterator.f();
       }
       this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this3.id;
+        return g.id !== _this4.id;
       });
       delete this.game._plugins['ThreeGraphics'];
 
@@ -54083,39 +54140,6 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         // canvas.style.display = 'none';
         canvas.remove();
       }
-    }
-
-    // New function to switch to first-person perspective
-  }, {
-    key: "setFirstPersonView",
-    value: function setFirstPersonView() {
-      var currentPlayer = this.game.getEntity(this.game.currentPlayerId);
-      if (!currentPlayer) {
-        console.warn('Current player entity not found');
-        return;
-      }
-      var playerGraphic = this.game.components.graphics.get([this.game.currentPlayerId, 'graphics-three']);
-      if (!playerGraphic) {
-        console.warn('Player graphic component not found');
-        return;
-      }
-      playerGraphic.visible = false;
-
-      // Assume the player's "eyes" are located at some offset
-      var eyePositionOffset = new _three.Vector3(0, 1.6, 0); // Adjust Y offset to represent the player's eye level
-      var playerPosition = playerGraphic.position.clone();
-
-      // Position the camera at the player's eye level
-      this.camera.position.copy(playerPosition.add(eyePositionOffset));
-
-      // Assuming the player's forward direction is along the negative Z-axis of the player's local space
-      // We need to find the forward direction in world space
-      var forwardDirection = new _three.Vector3(0, 0, 0);
-      forwardDirection.applyQuaternion(playerGraphic.quaternion); // Convert local forward direction to world space
-
-      // Look in the forward direction from the current camera position
-      var lookAtPosition = this.camera.position.clone().add(forwardDirection);
-      this.camera.lookAt(lookAtPosition);
     }
   }]);
   return ThreeGraphics;
@@ -54167,7 +54191,13 @@ function createGraphic(entityData) {
 
   // console.log('setting position of entityObject', entityObject, entityData.position);
   entityObject.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
-  entityObject.visible = true; // Ensure the entity is visible
+  if (entityData.type === 'CONTAINER') {
+    // console.log('entityData.type === CONTAINER', entityData);
+    entityObject.visible = false; // Hide container entities
+  } else {
+    entityObject.visible = true; // Ensure the entity is visible
+  }
+
   this.scene.add(entityObject);
 
   // Save the entity object in the game's component system
@@ -54324,25 +54354,31 @@ function _inflateTexture() {
           }
           return _context.abrupt("return");
         case 2:
+          if (!(entityData.type === 'CONTAINER')) {
+            _context.next = 4;
+            break;
+          }
+          return _context.abrupt("return");
+        case 4:
           texture = this.game.getTexture(entityData.texture);
           if (texture) {
-            _context.next = 6;
+            _context.next = 8;
             break;
           }
           console.warn('Warning: Texture not found', entityData.texture);
           return _context.abrupt("return");
-        case 6:
+        case 8:
           // Retrieve the entity's graphic component, which could be a Mesh or a Group
           entityGraphic = entityData.graphics['graphics-three'];
           if (entityGraphic) {
-            _context.next = 9;
+            _context.next = 11;
             break;
           }
           return _context.abrupt("return");
-        case 9:
-          _context.next = 11;
-          return applyTextureToEntityGraphic(this.game, entityData, entityGraphic);
         case 11:
+          _context.next = 13;
+          return applyTextureToEntityGraphic(this.game, entityData, entityGraphic);
+        case 13:
         case "end":
           return _context.stop();
       }

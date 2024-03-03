@@ -1372,6 +1372,7 @@ let markup_examples = [
     url: 'markup/html-pointer-events.html',
     tags: ['pointer', 'events', 'detection', 'response', 'hit', 'impact', 'contact', 'interaction', 'overlap', 'intersection', 'touch', 'crash']
   },
+  */
   {
     title: 'Preview Render',
     category: ['markup', 'preview'],
@@ -1380,7 +1381,7 @@ let markup_examples = [
     url: 'markup/html-preview.html',
     tags: ['preview', 'game', 'html', 'interface', 'user experience', 'input', 'navigation', 'interaction', 'gamepad', 'keyboard', 'mouse']
   }
-  */
+
 ]
 
 let _examples = [];

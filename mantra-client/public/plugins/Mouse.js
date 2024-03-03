@@ -289,7 +289,6 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "handleMouseDown",
     value: function handleMouseDown(event) {
-      console.log('handleMouseDownhandleMouseDownhandleMouseDown');
       var target = event.target;
       var game = this.game;
       var preventDefault = false;
@@ -348,7 +347,6 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       }
 
       if (context.target && context.target.pointerdown) {
-        console.log("SINGLE POINT", context);
         context.target.pointerdown(context, event);
       }
       this.game.emit('pointerDown', context, event);

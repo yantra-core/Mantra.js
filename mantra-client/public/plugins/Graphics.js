@@ -47,7 +47,8 @@ var Graphics = /*#__PURE__*/function () {
         },
         currentZoom: 1,
         minZoom: 0.1,
-        maxZoom: 10
+        maxZoom: 10,
+        adaptiveZoom: true
       };
       if (this.game.isClient) {
         // Ensure the gameHolder div exists
@@ -620,12 +621,13 @@ function switchGraphics(_x, _x2) {
 }
 function _switchGraphics() {
   _switchGraphics = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(graphicsInterfaceName, cb) {
-    var game, engines, mappings, graphicsInterfaceId;
+    var game, previousCameras, engines, mappings, graphicsInterfaceId;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           cb = cb || function noop() {};
           game = this.game;
+          previousCameras = {};
           engines = {
             'BabylonGraphics': 'graphics-babylon',
             // 'PhaserGraphics': 'graphics-phaser',
@@ -640,33 +642,46 @@ function _switchGraphics() {
           graphicsInterfaceName = mappings[graphicsInterfaceName] || graphicsInterfaceName;
           graphicsInterfaceId = engines[graphicsInterfaceName];
           document.body.style.cursor = 'wait';
+
+          // clone the camera object
+          previousCameras[graphicsInterfaceId] = {
+            currentZoom: game.data.camera.currentZoom,
+            adaptiveZoom: game.data.camera.adaptiveZoom
+          };
+
           // Check if the selected graphics mode is already registered
           if (!(typeof this.game.systems[graphicsInterfaceId] === 'undefined')) {
-            _context.next = 14;
+            _context.next = 16;
             break;
           }
-          _context.next = 10;
+          _context.next = 12;
           return this.game.use(graphicsInterfaceName, {
             camera: this.game.data.camera
           });
-        case 10:
+        case 12:
           this.game.graphics.forEach(function (graphics) {
             if (graphics.id !== graphicsInterfaceId) {
               game.systemsManager.removeSystem(graphics.id);
             }
           });
           document.body.style.cursor = 'default';
-          _context.next = 16;
+          _context.next = 18;
           break;
-        case 14:
+        case 16:
           // invalid graphics interface, do nothing
           console.warn('Invalid graphics interface: ' + graphicsInterfaceName);
           document.body.style.cursor = 'default';
-        case 16:
-          if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
-            game.setZoom(3.5);
+        case 18:
+          // check to see if there was a previous camera object
+          if (previousCameras[graphicsInterfaceId]) {
+            // restore the previous zoom
+            game.data.camera.adaptiveZoom = previousCameras[graphicsInterfaceId].adaptiveZoom;
+          } else {
+            if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
+              // game.setZoom(3.5);
+            }
           }
-        case 17:
+        case 19:
         case "end":
           return _context.stop();
       }

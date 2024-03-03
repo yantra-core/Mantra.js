@@ -72,45 +72,75 @@
 
 <body>
   <script type="module" src="./mantra.js"></script>
-  <script>
-    window.onload = async function () {
-      let game = new MANTRA.Game({
-        markup: true,
-        plugins: ['Markup', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame'],
-        gameRoot: '.'
+  
+
+
+    <style>
+      m-container {
+        /* certain styles will be applied to game's Entity.style properties */
+        border: 2px dashed orange;
+        background: rgba(255, 0, 0, 0.1);
+      }
+      m-entity {
+        background-color: red;
+      }
+    </style>
+    <m-unit-spawner data-is-static="true" data-x="-150" data-y="0" data-width="100" data-height="100">
+      <m-hexapod data-texture="demon"></m-hexapod>
+    </m-unit-spawner>
+    <m-key data-x="10" data-y="10"></m-key>
+    <m-block data-x="-50" data-y="10" width="32" height="32"></m-block>
+    <m-player data-x="100"></m-player>
+    <m-hexapod data-texture="demon"></m-hexapod>
+    <m-hexapod data-texture="demon"></m-hexapod>
+    <m-hexapod data-x="-200" data-repeat="11"></m-hexapod>
+    <m-container data-name="key-container" data-x="0" data-y="50" width="170" height="200">
+      <m-key data-x="50" data-y="50"></m-key>
+      <m-key data-x="-50" data-y="50"></m-key>
+      <m-key data-x="50" data-y="-50"></m-key>
+      <m-key data-x="-50" data-y="-50"></m-key>
+    </m-container>
+    <m-flame data-layout="center"></m-flame>
+
+    <m-container data-name="flame-container" data-origin="center-right" data-x="90" data-y="50" width="170" height="200">
+      <m-flame data-x="50" data-y="50"></m-flame>
+      <m-flame data-x="-50" data-y="50"></m-flame>
+      <m-flame data-x="50" data-y="-50"></m-flame>
+      <m-flame data-x="-50" data-y="-50"></m-flame>
+    </m-container>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        let game = new MANTRA.Game({
+          width: 400,
+          height: 300,
+          plugins: [
+            'Editor',
+            'Block',
+            'Boomerang',
+            'Collectable',
+            'Container',
+            'Flame',
+            'Hexapod',
+            'Key',
+            'Player',
+            'SwitchGraphics',
+            'Teleporter',
+            'Platform',
+            'UnitSpawner'
+          ],
+          showLoadingScreen: false,
+          gameRoot: 'http://192.168.1.80:7777/'
+        });
+        window.game = game;
+        game.start(function () {
+          game.markup();
+          let l = game.systems.markup.generateMarkup();
+          console.log('llll', l)
+          //game.make().Container().size(100).createEntity();
+        });
       });
-      game.start(function(){
-        //game.markup();
-      });
-
-    };
-
-  </script>
-
-  <m-key data-x="10" data-y="10" width="100" height="100"></m-key>
-  <m-block data-x="10" data-y="10" width="100" height="100"></m-block>
-  <m-player data-x="100"></m-player>
-  <m-hexapod data-radius="8"></m-hexapod>
-  <m-hexapod data-radius="16"></m-hexapod>
-  <m-hexapod></m-hexapod>
-  <m-hexapod data-repeat="11"></m-hexapod>
-  <m-teleporter data-x="200" data-y="200">
-    <dl>
-      <dt>destination</dt>
-      <dd>
-        <dl>
-          <dt>url</dt>
-          <dd>https://github.com/yantra-core/mantra.js</dd>
-        </dl>
-      </dd>
-    </dl>
-  </m-teleporter>
-  <m-container data-name="container-a" data-x="0" data-y="-50" width="100" height="100">
-    <m-flame data-x="50" data-y="50"></m-flame>
-    <m-flame data-x="-50" data-y="50"></m-flame>
-    <m-flame data-x="50" data-y="-50"></m-flame>
-    <m-flame data-x="-50" data-y="-50"></m-flame>
-  </m-container>
+    </script>
+  
 
 </body>
 

@@ -211,7 +211,7 @@ class BabylonGraphics extends GraphicsInterface {
     assetsManager.onFinish = (tasks) => {
       // All assets are loaded, now you can emit your ready event
       game.emit('plugin::ready::graphics-babylon', this);
-      game.loadingPluginsCount--;
+      //game.loadingPluginsCount--;
       document.body.style.cursor = 'default';
     };
 

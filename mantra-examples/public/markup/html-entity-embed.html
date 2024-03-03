@@ -3,20 +3,6 @@
   <script type="module" src="/mantra.js"></script>
 </head>
 <body>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let game = new MANTRA.Game({
-        width: 400,
-        height: 300,
-        plugins: ['Markup', 'SwitchGraphics', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame', 'Collectable'],
-        showLoadingScreen: false,
-        gameRoot: 'http://192.168.1.80:7777'
-      });
-      game.start(function () {
-        game.markup();
-      });
-    });
-  </script>
   <m-key data-x="10" data-y="10"></m-key>
   <m-block data-x="-50" data-y="10" width="32" height="32"></m-block>
   <m-player data-x="100"></m-player>
@@ -27,6 +13,19 @@
   <m-key data-x="-50" data-y="50"></m-key>
   <m-key data-x="50" data-y="-50"></m-key>
   <m-key data-x="-50" data-y="-50"></m-key>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let game = new MANTRA.Game({
+        width: 400,
+        height: 300,
+        plugins: ['SwitchGraphics', 'Player', 'Hexapod', 'Key', 'Block', 'Teleporter', 'Container', 'Flame', 'Collectable'],
+        showLoadingScreen: false
+      });
+      game.start(function () {
+        game.markup();
+      });
+    });
+  </script>
 </body>
 
 </html>
