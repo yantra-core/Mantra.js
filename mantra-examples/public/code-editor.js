@@ -1,18 +1,47 @@
 let editor;
 let loaded = false;
 
+// get query string check for param text=true
+let removeEmbed = false;
+let removesSource = false;
+let urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('source')) {
+  removeEmbed = true;
+}
+if(urlParams.has('embed')) {
+  removesSource = true;
+}
+
 function loadEditor(sourceUrl, extraWrap = false) {
   if (loaded) return;
 
+
+  if (removeEmbed) {
+    let iframe = document.querySelector('iframe');
+ 
+    if (iframe) {
+      iframe.remove();
+    }
+  }
+
+  if (removesSource) {
+    let codeEditor = document.querySelector('.code-editor');
+    if (codeEditor) {
+      codeEditor.remove();
+    }
+    return;
+  }
+
+
   let jsSource = sourceUrl;
-  console.log('loading remote source', jsSource)
+  //console.log('loading remote source', jsSource)
   fetchAndDisplayCode();
   function fetchAndDisplayCode() {
     fetch(jsSource)
       .then(response => response.text())
       .then(code => {
         let ogSource = code;
-        console.log(code)
+        // console.log(code)
         // alert(ogSource)
 
         // Remove the very last line of the code example.
@@ -32,6 +61,14 @@ function loadEditor(sourceUrl, extraWrap = false) {
         let mantraUrl = 'https://yantra.gg/mantra.js';
         let mantraWorldsUrl = 'https://yantra.gg/worlds.mantra.js';
 
+let worldsScript = `
+<script src="${mantraWorldsUrl}"></script>`;
+
+
+if (extraWrap) {
+  worldsScript = '';
+}
+
 let body = `<body>
 <script>
 ${code}</script>
@@ -48,8 +85,7 @@ ${code}</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mantra.js Gallery Page - ${jsSource.replace('.js', '').replace('./', '').replace('-', ' ')}</title>
-  <script src="${mantraUrl}"></script>
-  <script src="${mantraWorldsUrl}"></script>
+  <script src="${mantraUrl}"></script>${worldsScript}
 </head>
 ${body}
 </html>`;
@@ -62,7 +98,7 @@ ${body}
           const codeEditor = document.createElement('div');
           codeEditor.className = 'code-editor';
           codeEditor.innerHTML = `<pre><code>${htmlTemplate}</code></pre><div class="resize-handle"></div>`;
-          console.log('htmlTemplate', htmlTemplate)
+          // console.log('htmlTemplate', htmlTemplate)
           // set the styles
           codeEditor.style.width = '100%';
           // codeEditor.style.height = '30vh'; // Set initial height
@@ -72,7 +108,27 @@ ${body}
           codeEditor.style.padding = '20px';
           codeEditor.style.boxSizing = 'border-box';
           codeEditor.style.fontFamily = 'monospace';
-          codeEditor.style.border = '1px solid #888';
+
+          // set background opacity
+          codeEditor.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+
+
+          if (removeEmbed) {
+            codeEditor.style.margin = '0';
+            codeEditor.style.padding = '10px';
+            codeEditor.style.backgroundColor = '#1d1f21';
+
+            document.body.style.padding = '0';
+            document.body.style.margin = '0';
+            document.body.style.backgroundColor = '#1d1f21';
+          } else {
+            codeEditor.style.border = '1px solid #888';
+          }
+          
+
+          if (removeEmbed) {
+            codeEditor.style.height = '100%';
+          }
 
           // set position to bottom of page
           codeEditor.style.position = 'relative';
@@ -86,12 +142,14 @@ ${body}
           // add class language-javascript
           // codeEditor.classList.add('language-javascript');
 
-          // set background opacity
-          codeEditor.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
 
           let copyButton = createCopyButton(htmlTemplate, codeEditor);
           codeEditor.appendChild(copyButton);
 
+          window.makeCopyButton = function () {
+            let copyButton = createCopyButton(htmlTemplate, codeEditor);
+            codeEditor.appendChild(copyButton);
+          }
 
           // append at end of document
           document.body.appendChild(codeEditor);
@@ -100,6 +158,12 @@ ${body}
           document.querySelector('.code-editor pre code').textContent = htmlTemplate;
         }
         Prism.highlightAll()
+
+        if (removeEmbed) {
+          // remove padding from <pre> element
+          document.querySelector('.code-editor pre').style.padding = '0';
+          document.querySelector('.code-editor pre').style.margin = '0';
+        }
 
 
         // Set the code example to the pre element
@@ -129,6 +193,7 @@ ${body}
 
 }
 
+
 function createCopyButton (htmlTemplate, codeEditor) {
 
   // Create a "Copy to Clipboard" button
@@ -139,19 +204,29 @@ function createCopyButton (htmlTemplate, codeEditor) {
   copyButton.style.right = '10px';
   copyButton.style.zIndex = '10'; // Ensure button is clickable and visible
 
+  // style a bit as button, rounded corners, etc
+  copyButton.style.backgroundColor = '#007bff';
+  copyButton.style.color = 'white';
+  copyButton.style.border = 'none';
+  copyButton.style.padding = '10px 20px';
+  copyButton.style.borderRadius = '5px';
+  copyButton.style.cursor = 'pointer';
+  
+
   
   // Function to show a temporary message
   function showTemporaryMessage(message, duration = 3000) {
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
     messageDiv.style.position = 'absolute';
-    messageDiv.style.bottom = '10px';
+    messageDiv.style.top = '10px';
     messageDiv.style.right = '10px';
-    messageDiv.style.backgroundColor = '#f8f9fa';
-    messageDiv.style.border = '1px solid #ccc';
-    messageDiv.style.padding = '5px';
+    // set size same to button
+    messageDiv.style.padding = '10px 20px';
     messageDiv.style.borderRadius = '5px';
-    messageDiv.style.zIndex = '10';
+    messageDiv.style.zIndex = '999';
+    messageDiv.style.backgroundColor = '#b8daff';
+    messageDiv.style.color = '#000';
 
     codeEditor.appendChild(messageDiv);
 
@@ -162,16 +237,22 @@ function createCopyButton (htmlTemplate, codeEditor) {
 
   // Copy to Clipboard functionality
   copyButton.addEventListener('click', function () {
+
+
+    let scriptFromHTML = htmlTemplate.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+    parent.postMessage({ action: 'copy', text: scriptFromHTML }, '*');
+
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(htmlTemplate).then(() => {
-        //showTemporaryMessage('Code copied to clipboard!');
+      navigator.clipboard.writeText(scriptFromHTML).then(() => {
+        showTemporaryMessage('Code copied to clipboard!');
       }).catch(err => {
         console.error('Could not copy text: ', err);
-        //showTemporaryMessage('Failed to copy code.', 5000); // Show the error message longer
+        showTemporaryMessage('Failed to copy code.', 5000); // Show the error message longer
       });
     } else {
       console.error('Clipboard API not available');
-      showTemporaryMessage('Clipboard not supported.', 5000);
+      showTemporaryMessage('Clipboard API not available.', 5000);
     }
   });
   return copyButton;

@@ -8,33 +8,45 @@
   <style>
     body,
     html {
+      background-color: black;
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      overflow-y: auto;
+      /* Allow vertical scrolling on the body when necessary */
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      /* Changed to flex-start to avoid pushing content beyond viewport */
       position: relative;
       font-family: Arial, sans-serif;
       width: 100%;
     }
 
+
     #iframeContainer {
       min-height: 100vh;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: inherit;
       width: 100%;
     }
 
+
     iframe {
-      width: 90%;
-      height: 500px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /* Fill the width of the gameIframeContainer */
+      height: 100%;
+      /* Fill the height of the gameIframeContainer */
       border: none;
-      margin-bottom: 20px;
     }
+
 
     #exampleName {
       position: fixed;
@@ -45,42 +57,8 @@
       z-index: 100;
       pointer-events: none;
       font-size: 8em;
-      /* Make sure it doesn't interfere with scrolling */
-    }
-
-    #speedIndicators {
-      position: fixed;
-      top: 60%;
-      /* Adjusted to appear below the example name */
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      z-index: 100;
-      pointer-events: none;
-    }
-
-    #speedIndicators {
-      position: fixed;
-      top: 120px;
-      width: 200px;
-      /* Position from the top */
-      right: 10px;
-      /* Position from the right */
-      text-align: right;
-      z-index: 100;
-      pointer-events: none;
-      display: none;
-    }
-
-    .speedIndicator {
-      background: rgba(0, 0, 0, 0.7);
       color: #fff;
-      padding: 10px;
-      margin-top: 10px;
-      /* Space between indicators, adjust as needed */
-      border-radius: 5px;
-      display: block;
-      /* Ensures stacking vertically */
+      /* Make sure it doesn't interfere with scrolling */
     }
 
     /* Existing styles remain unchanged */
@@ -98,30 +76,100 @@
       z-index: 101;
     }
 
+    .closeEditorBtn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 101;
+      display: none;
+    }
+
     .iframeWrapper {
       position: relative;
       width: 90%;
-      height: 500px;
-      margin-bottom: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      border: 1px solid rgba(138, 43, 226, 0.5);
+      /* Light purple border */
+      border-radius: 10px;
+      /* Slightly rounded corners for a modern look */
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.7);
+      /* Glowing purple shadow */
+      overflow: hidden;
+      /* Ensures the content does not overflow the rounded borders */
+      background: #000;
+      /* Optional: Sets a white background for the iframe wrapper */
+      padding: 20px;
+      /* Optional: Adds some space inside the wrapper */
+    }
+
+    .gameIframeContainer {
+      width: 100%;
+      padding-top: 75%;
+      /* Maintain 4:3 aspect ratio */
+      position: relative;
+    }
+
+    iframe.gameIframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
 
     .editorIframe {
       position: absolute;
       top: 0;
       left: 100%;
-      /* Start off to the right */
+      /* Initially off-screen */
       width: 100%;
       height: 100%;
-      border: none;
-      transition: left 0.5s ease-in-out;
-      /* Smooth transition for revealing */
+      z-index: 10;
+      transition: left 0.5s ease;
     }
 
     .iframeWrapper.revealEditor .editorIframe {
       left: 0;
-      /* Slide in to view */
+      /* Slide in to cover the game embed */
     }
 
+
+
+    .exampleTitle {
+      margin: 0;
+      /* padding: 10px; */
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      color: #333;
+      text-align: center;
+      font-size: 2.5em;
+      width: 100%;
+    }
+
+    .description {
+      font-size: 2.2em;
+      width: 100%;
+      height: 100%;
+      min-height: 75px;
+    }
+
+    .description p {
+      padding: 10px;
+      margin: 0;
+    }
+
+    .categories {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
 
     @keyframes swoopInOut {
 
@@ -136,13 +184,8 @@
         transform: translateY(-50%);
       }
     }
-
-    @media (max-width: 768px) {
-      iframe {
-        height: 300px;
-      }
-    }
   </style>
+  <script src="/categories.js"></script>
 </head>
 
 <body>
@@ -152,14 +195,10 @@
 
   <script>
     const iframeArray = []; // Initialize your iframe URLs
-    for (let i = 0; i < 10; i++) {
-      let example = {
-        name: `Example ${i + 1}`,
-        //category: 'Collisions',
-        url: `https://yantra.gg/mantra/examples/markup/html-entity-attributes-embed`,
-      };
+    examples.forEach(function (example) {
+      example.url = '/examples/demo.html?source=' + example.url.replace('.html', '');
       iframeArray.push(example);
-    }
+    })
     let currentIndex = 0;
     let lastScrollTop = 0;
     let lastTime = Date.now();
@@ -198,37 +237,138 @@
       gameIframe.setAttribute('class', 'autohide');
       gameIframe.setAttribute('data-src', example.url);
       gameIframe.src = example.url;
+      console.log('eeeee', example)
+      // Display and animate the example name
+      /*
+      const exampleNameDiv = document.getElementById('exampleName');
+      exampleNameDiv.textContent = example.title;
+      exampleNameDiv.style.animation = 'none';
+      exampleNameDiv.offsetHeight;
+      exampleNameDiv.style.animation = null;
+      */
+      // Create a container for the game iframe to control aspect ratio
+      const gameIframeContainer = document.createElement('div');
+      gameIframeContainer.classList.add('gameIframeContainer');
+
+      // Append the game iframe to the container instead of directly to the gameColumn
+      gameIframeContainer.appendChild(gameIframe);
+
+
+
+      // Create a title header for the example
+      const titleHeader = document.createElement('h2');
+      titleHeader.textContent = example.title;
+      titleHeader.classList.add('exampleTitle');
+      //titleHeader.style.padding = '10px';
+      titleHeader.style.marginTop = '20px';
+      titleHeader.style.marginBottom = '10px';
+      titleHeader.style.textAlign = 'center';
+      titleHeader.style.color = '#333'; // Set the text color
+      titleHeader.style.backgroundColor = '#f0f0f0'; // Set a light background color for the header
+      titleHeader.style.borderRadius = '5px';
+
+      // Description section
+      const descriptionDiv = document.createElement('div');
+      descriptionDiv.classList.add('description');
+      //descriptionDiv.style.backgroundColor = example.color; // Set the background color
+      // descriptionDiv.style.backgroundColor = '#333333'; // Set the background color
+      // descriptionDiv.style.paddingLeft = '10px';
+      // descriptionDiv.style.marginTop = '10px';
+      descriptionDiv.style.color = '#ffffff'; // Set text color for better readability
+      descriptionDiv.style.position = 'relative';
+
+      // Description text
+      const descriptionText = document.createElement('p');
+      descriptionText.textContent = example.description;
+      descriptionDiv.appendChild(descriptionText);
+
+      // Link to the example (assuming example.url is the link you want to display)
+      const exampleLink = document.createElement('a');
+      exampleLink.href = example.url; // Set the URL
+      exampleLink.textContent = 'View Example';
+      exampleLink.style.color = '#ffff00'; // Change link color for visibility
+      // descriptionDiv.appendChild(exampleLink);
+
+      // Categories - handling both string and array of strings
+      const categories = Array.isArray(example.category) ? example.category : [example.category];
+      const categoriesDiv = document.createElement('div');
+      categoriesDiv.classList.add('categories');
+      categories.forEach(category => {
+        const categorySpan = document.createElement('span');
+        // add class class
+        categorySpan.classList.add('category');
+        categorySpan.textContent = category;
+        categorySpan.style.marginRight = '5px';
+        categorySpan.style.background = '#333333';
+        categorySpan.style.color = '#ffffff';
+        categorySpan.style.padding = '2px 5px';
+        categorySpan.style.borderRadius = '5px';
+        categoriesDiv.appendChild(categorySpan);
+      });
+
+      // descriptionDiv.appendChild(categoriesDiv);
 
       // Create the "View Source" button
+      // "Close Editor" button setup
+      const closeEditorBtn = document.createElement('button');
+      closeEditorBtn.classList.add('closeEditorBtn');
+
       const sourceButton = document.createElement('button');
       sourceButton.textContent = 'View Source';
       sourceButton.classList.add('sourceButton');
       sourceButton.onclick = function () {
-        iframeWrapper.classList.toggle('revealEditor');
+        // find the editor in the iframeWrapper, query for children with class editorIframe
+        const editorIframe = iframeWrapper.querySelector('.editorIframe');
+        // toggle the revealEditor class on the iframeWrapper
+        editorIframe.style.display = 'block';
+        editorIframe.style.left = '0'; // Bring the editor on top of the game embed
+        sourceButton.style.display = 'none';
+        closeEditorBtn.style.display = 'block';
+        //editorIframe.classList.toggle('revealEditor');
       };
 
+
+      closeEditorBtn.textContent = 'Close Editor';
+      closeEditorBtn.classList.add('closeEditorBtn');
+      closeEditorBtn.onclick = function () {
+        //editorIframe.style.left = '100%'; // Hide the editor off-screen
+        editorIframe.style.display = 'none';
+        sourceButton.style.display = 'block';
+        closeEditorBtn.style.display = 'none';
+      };
+
+      let examplesRoot = 'https://yantra.gg/mantra';
+      //examplesRoot = 'http://192.168.1.80:7777/examples';
       // Create the source editor iframe (placeholder src for demonstration)
       const editorIframe = document.createElement('iframe');
-      editorIframe.src = 'https://yantra.gg/mantra/examples/collisions/collision-active?source=true'; // Replace with the actual CodeMirror URL
+      // editorIframe.src = examplesRoot + '/collisions/collision-active?source=true'; // Replace with the actual CodeMirror URL
+      let _source = examplesRoot + example.url.replace('demo.html?source=', '');
+      _source += '?source=true';
+      editorIframe.src = _source;
       editorIframe.classList.add('editorIframe');
       // set autohide class
       editorIframe.classList.add('autohide');
       // set data-src attribute
-      editorIframe.setAttribute('data-src', 'https://yantra.gg/mantra/examples/collisions/collision-active?source=true');
+      //editorIframe.setAttribute('data-src', examplesRoot + '/collisions/collision-active?source=true');
+      editorIframe.setAttribute('data-src', _source);
+      descriptionDiv.appendChild(closeEditorBtn);
+
+      editorIframe.style.display = 'none';
+
+      iframeWrapper.appendChild(editorIframe);
+      // Append your gameIframe, titleHeader, and descriptionDiv to gameColumn
+      iframeWrapper.appendChild(titleHeader);
+      iframeWrapper.appendChild(gameIframeContainer);
+      iframeWrapper.appendChild(descriptionDiv);
 
       // Append elements
-      iframeWrapper.appendChild(gameIframe);
-      iframeWrapper.appendChild(sourceButton);
-      iframeWrapper.appendChild(editorIframe);
+      descriptionDiv.appendChild(sourceButton);
       iframeContainer.appendChild(iframeWrapper);
       gameIframe.editorIframe = editorIframe; // Store a reference to the editor iframe
       observer.observe(gameIframe);
       // observer.observe(editorIframe);
       currentIndex++;
     }
-
-    // The rest of your JavaScript code remains unchanged
-
 
     function ensureScrollable() {
       // Add iframes until the document height requires scrolling
@@ -271,37 +411,6 @@
       });
     }
 
-    // Add indicators to the HTML
-    const speedIndicatorsDiv = document.createElement('div');
-    speedIndicatorsDiv.id = 'speedIndicators';
-    document.body.appendChild(speedIndicatorsDiv);
-
-    speedIndicatorsDiv.innerHTML = `
-  <div id="lastSpeed" class="speedIndicator">Last Speed: 0 px/s</div>
-  <div id="topSpeed" class="speedIndicator">Top Speed: 0 px/s</div>
-`;
-
-    function measureScrollSpeed() {
-      const now = Date.now();
-      const newScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      const distance = Math.abs(newScrollTop - lastScrollTop);
-      const time = (now - lastTime) / 1000; // Convert to seconds
-      const speed = Math.round(distance / time); // pixels per second
-
-      // Update last speed and check for top speed
-      lastSpeed = speed;
-      document.getElementById('lastSpeed').textContent = `Last Speed: ${lastSpeed} px/s`;
-
-      if (speed > topSpeed) {
-        topSpeed = speed;
-        document.getElementById('topSpeed').textContent = `Top Speed: ${topSpeed} px/s`;
-      }
-
-      lastScrollTop = newScrollTop;
-      lastTime = now;
-    }
-
-
     // Listen for visibility change events on the document
     document.addEventListener('visibilitychange', function () {
       if (document.visibilityState === 'hidden') {
@@ -314,7 +423,6 @@
 
     window.addEventListener('scroll', () => {
       handleScroll();
-      measureScrollSpeed();
     });
     ensureScrollable(); // Ensure the document is tall enough to enable scrolling
   </script>
