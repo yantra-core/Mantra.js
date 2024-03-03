@@ -1,3 +1,6 @@
+// for dev, TODO: game.use() needs a test suite
+// let cache = {};
+
 export default function use(game) {
   return async function use(pluginInstanceOrId, options = {}, cb = () => {}) {
     let basePath = '/plugins/'; // Base path for loading plugins
@@ -20,13 +23,18 @@ export default function use(game) {
 
       game._plugins[pluginId] = { status: 'loading' };
       game.loadingPluginsCount++;
+      /*
+      cache[pluginId] = cache[pluginId] || {
+        start: 0,
+        finish: 0
+      };
+      cache[pluginId].start++;
+      */
       game.emit('plugin::loading', pluginId);
 
       // Store the loading promise
       game.loadingPluginPromises[pluginId] = (async () => {
         try {
-
-          
 
           // Load unminified version of the plugin
           let scriptUrl = `${basePath}${pluginId}.js`;
@@ -59,6 +67,15 @@ export default function use(game) {
 
     } else {
       game.loadingPluginsCount++;
+
+      /*
+      cache[pluginInstanceOrId.id] = cache[pluginInstanceOrId.id] || {
+        start: 0,
+        finish: 0
+      };
+      cache[pluginInstanceOrId.id].start++;
+      */
+
       if (!pluginInstanceOrId.id) {
         console.log('Error with pluginInstance', pluginInstanceOrId);
         throw new Error('All plugins must have a static id property');
@@ -75,6 +92,12 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
   if (typeof pluginInstance.build === 'function') {
     extendEntityBuilder(game, pluginInstance);
   }
+  
+  // console.log('pluginInstance', pluginInstance, pluginId)
+  // TODO: we may want to check to see if plugin is already in system
+  //       current behavior will most likely overwrite / double append loadedPlugins array
+  //       overwrite by default is OK, needs to be checked
+  if (game.systems[pluginInstance.id]) {}
 
   pluginGameSceneMethods(game, pluginInstance);
 
@@ -94,7 +117,6 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
 
   game.emit(`plugin::loaded::${pluginId}`, pluginInstance);
   game.emit('plugin::loaded', pluginId);
-  cb();
 
   if (pluginInstance.type === 'world' || pluginInstance.constructor.type === 'world') {
     game.worlds.push(pluginInstance);
@@ -114,6 +136,17 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
   game.data.plugins = game.data.plugins || {};
   game.data.plugins[pluginId] = options;
   game.loadingPluginsCount--;
+
+  /*
+  cache[pluginId] = cache[pluginId] || {
+    start: 0,
+    finish: 0
+  };
+  cache[pluginId].finish++;
+  */
+
+  // Remark: Wait until all logic is process before continuing
+  cb();
 
 }
 
