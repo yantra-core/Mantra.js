@@ -55,13 +55,29 @@ class ThreeGraphics extends GraphicsInterface {
     this.inflateTexture = inflateTexture.bind(this);
     this.game = game;
     this.game.systemsManager.addSystem('graphics-three', this);
+
+    if (typeof this.game.threeReady === 'undefined') {
+      this.game.threeReady = false; // TODO: remove this, check case in SystemManager for double plugin init
+    }
+
+
     this.threeReady(game);
   }
 
   threeReady(game) {
+    if (this.game.threeReady) {
+      console.warn('ThreeGraphics already initialized');
+      return;
+    }
+    this.game.threeReady = true;
+
+    // get the three-render-canvas, if exists, clear it
+    let canvas = document.getElementById('three-render-canvas');
+    if (canvas) {
+      canvas.remove();
+    }
 
     this.scene = new Scene();
-
     // Initialize the renderer
     this.renderer = new WebGLRenderer({ antialias: true });
     // set to transparent
@@ -122,7 +138,6 @@ class ThreeGraphics extends GraphicsInterface {
     // this.controls.enableZoom = true; // Enable zooming
     // async:true plugins *must* self report when they are ready
     // game.emit('plugin::ready::graphics-three', this);
-
     game.graphics.push(this);
 
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
@@ -286,14 +301,12 @@ class ThreeGraphics extends GraphicsInterface {
     this.game.graphics = this.game.graphics.filter(g => g.id !== this.id);
     delete this.game._plugins['ThreeGraphics'];
 
-    // remove canvas
-    let canvas = document.getElementById('three-render-canvas');
-
+    // Remove the canvas from the DOM
+    const canvas = document.getElementById('three-render-canvas');
     if (canvas) {
-      // hide canvas
-      // canvas.style.display = 'none';
       canvas.remove();
     }
+    this.game.threeReady = false;
 
   }
 

@@ -141,7 +141,7 @@ export default class Markup {
           console.warn("Markup parsed an unknown tag type, using default instead. tag type:", entityType)
         } else {
           ent[entityType](ent.config);
-          console.log('ENT IS NOW', ent.config.type, ent.config)
+          // console.log('ENT IS NOW', ent.config.type, ent.config)
         }
         ent.style(safeStyles);
         that.buildEntity(ent, entity);

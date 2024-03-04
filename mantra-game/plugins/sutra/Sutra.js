@@ -96,6 +96,8 @@ class Sutra {
         // Key Down Condition
         // Remark: These should not be bound to current player, instead to the entity that is being controlled
         // _DOWN implied as default
+        // Remark: 3/3/2024 - Basic key press test seems to indicate this is continually true
+        //                    It is expected to be true only once per press, TODO: add tests
         this.game.rules.addCondition(mantraCode, (entity, gameState) =>
           entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.down
           // gameState.input.keyStates[mantraCode]?.down
@@ -166,14 +168,6 @@ class Sutra {
       game.data.inputDuration = this.inputDuration;
 
     }
-
-    // TODO: Remove this init, it should be a check and throw
-    // camera init is handled in Graphics.js and Camera system
-    game.data.camera = game.data.camera || {};
-    game.data.camera.position = game.data.camera.position || {
-      x: 0,
-      y: 0
-    };
 
     if (game.data && game.data.input) {
       game.data.input.keyStates = game.systems.keyboard.keyStates;

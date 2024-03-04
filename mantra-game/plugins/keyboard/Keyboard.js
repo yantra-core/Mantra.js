@@ -7,7 +7,7 @@ let KEY_CODES = [
   'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter',
   'ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ShiftRight',
   'ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'MetaRight', 'ContextMenu', 'ControlRight',
-  'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'
+  'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Escape' /*, 'PrintScreen', 'ScrollLock', 'Pause', 'Insert', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', */
 ];
 
 // Filter any keys that users might not want browser to capture

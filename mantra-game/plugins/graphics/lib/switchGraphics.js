@@ -1,6 +1,6 @@
-export default async function switchGraphics(graphicsInterfaceName, cb) {
+export default function switchGraphics(graphicsInterfaceName, cb) {
   cb = cb || function noop() { };
-
+  console.log('switchGraphics ' + graphicsInterfaceName)
   let game = this.game;
 
   let previousCameras = {};
@@ -31,13 +31,14 @@ export default async function switchGraphics(graphicsInterfaceName, cb) {
 
   // Check if the selected graphics mode is already registered
   if (typeof this.game.systems[graphicsInterfaceId] === 'undefined') {
-    await this.game.use(graphicsInterfaceName, { camera: this.game.data.camera });
-    this.game.graphics.forEach(function (graphics) {
-      if (graphics.id !== graphicsInterfaceId) {
-        game.systemsManager.removeSystem(graphics.id);
-      }
+    this.game.use(graphicsInterfaceName, { camera: this.game.data.camera }, () => {
+      this.game.graphics.forEach(function (graphics) {
+        if (graphics.id !== graphicsInterfaceId) {
+          game.systemsManager.removeSystem(graphics.id);
+        }
+      });
+      document.body.style.cursor = 'default';
     });
-    document.body.style.cursor = 'default';
   } else {
     // invalid graphics interface, do nothing
     console.warn('Invalid graphics interface: ' + graphicsInterfaceName);
@@ -50,9 +51,9 @@ export default async function switchGraphics(graphicsInterfaceName, cb) {
     game.data.camera.adaptiveZoom = previousCameras[graphicsInterfaceId].adaptiveZoom;
   } else {
     if (graphicsInterfaceId === 'three' || graphicsInterfaceName === 'ThreeGraphics') {
-     // game.setZoom(3.5);
+      // game.setZoom(3.5);
     }
-  
+
   }
 
 }

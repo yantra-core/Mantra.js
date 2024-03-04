@@ -1,85 +1,63 @@
-// SwitchGraphics.js - Marak Squires 2023
+// SwitchGraphics.js - Marak Squires 2024
 class SwitchGraphics {
   static id = 'gui-switch-graphics';
+  static containerId = 'switchgraphics-container';
 
   constructor(config = {}) {
-    this.id = SwitchGraphics.id;
     this.graphicsMode = config.graphicsMode || '2D';
+    this.game = null;
+    this.id = SwitchGraphics.id;
+    this.button = null;
   }
 
   init(game) {
     this.game = game;
-    this.game.systemsManager.addSystem(this.id, this);
-    this.createUI();
+    this.game.systemsManager.addSystem(SwitchGraphics.id, this);
+    if (!document.getElementById(SwitchGraphics.containerId)) {
+      this.createUI();
+    }
   }
 
-  // TODO: make SwitchGraphics() a buildable entity
-  build(entityData = {}) {
-    /*
-    if (typeof entityData.position === 'undefined') {
-      entityData.position = { x: 0, y: 0 };
-    }
-    entityData.meta = entityData.meta || {};
-    entityData.meta.disabled = entityData.disabled;
-    return {
-      type: 'BUTTON',
-      body: false,
-      text: entityData.text || 'Switch Graphics',
-      position: entityData.position,
-      ...entityData // Spread the rest of entityData to override defaults as necessary
-    };
-    */
-  }
+  // TODO: implement build() method for SwitchGraphics() so it can be component in UI
 
   setMode() {
-    // Determine the next graphics mode
     const nextGraphicsMode = this.nextMode();
-  
-    // Update the graphics mode first
     this.graphicsMode = nextGraphicsMode;
-    // this.game.data.camera.currentZoom = 2.5;
-    this.game.switchGraphics(this.lookupGraphicsPlugin(this.graphicsMode));
-    // Then update the button label to reflect the new mode
-    this.updateButtonLabel(this.nextMode());
+    this.game.switchGraphics(this.lookupGraphicsPlugin(nextGraphicsMode));
+    this.updateButtonLabel();
   }
-  
+
+  update() {
+    const currentGraphicsId = this.game.graphics.length ? this.game.graphics[0].id : '';
+    const expectedMode = currentGraphicsId === 'graphics-three' ? '3D' : '2D';
+
+    if (this.graphicsMode !== expectedMode) {
+      this.graphicsMode = expectedMode;
+      this.updateButtonLabel();
+    }
+  }
 
   createUI() {
     const container = this.createContainer();
-    const button = this.createButton();
-
-    container.appendChild(button);
+    this.button = this.createButton();
+    container.appendChild(this.button);
     document.body.appendChild(container);
   }
 
   createContainer() {
     const container = document.createElement('div');
-    container.id = 'switchgraphics-container';
+    container.id = SwitchGraphics.containerId;
     container.className = 'switchgraphics-container';
     container.style.cssText = `
       position: absolute;
-      top: 0;
+      top: 40px;
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
-      padding: 10px 0;
+      padding-top: 10px;
       z-index: 11111;
     `;
-
     return container;
-  }
-
-  lookupGraphicsPlugin(graphicsMode) {
-    return graphicsMode === '2D' ? 'css' : 'three';
-  }
-
-  nextMode() {
-    return this.graphicsMode === '2D' ? '3D' : '2D';
-  }
-
-  updateButtonLabel(nextGraphicsMode) {
-    const button = document.querySelector('#switchgraphics-container button');
-    button.innerHTML = `Switch to ${nextGraphicsMode}`;
   }
 
   createButton() {
@@ -95,12 +73,25 @@ class SwitchGraphics {
       background-color: #4CAF50;
       color: white;
     `;
-
     return button;
   }
 
+  updateButtonLabel() {
+    if (this.button) {
+      this.button.innerHTML = `Switch to ${this.nextMode()}`;
+    }
+  }
+
+  nextMode() {
+    return this.graphicsMode === '2D' ? '3D' : '2D';
+  }
+
+  lookupGraphicsPlugin(graphicsMode) {
+    return graphicsMode === '2D' ? 'css' : 'three';
+  }
+
   unload() {
-    const container = document.getElementById('switchgraphics-container');
+    const container = document.getElementById(SwitchGraphics.containerId);
     if (container) {
       container.remove();
     }

@@ -498,6 +498,8 @@ export default class Mouse {
     window.addEventListener('blur', this.boundHandleWindowBlur);
 
     // TODO: could be a config option
+    // TODO: this should be able to bind / unbind based on user actions, defaultMouseMovement
+    //       the default behavior should be such that right click and wheel works unless bound explicitly
     if (this.disableContextMenu) {
       document.addEventListener('contextmenu', event => {
         // Handle internal Mantra events first before prevent default to disable browser right click menu
