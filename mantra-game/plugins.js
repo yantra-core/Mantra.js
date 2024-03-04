@@ -88,6 +88,10 @@ import RBush from './plugins/rbush/RBush.js';
 // Utility
 import Markup from './plugins/markup/Markup.js';
 
+// AI Nueral Net
+import TensorFlow from './plugins/tensorflow/TensorFlow.js';
+
+
 import LoadingScreen from './plugins/loading-screen/LoadingScreen.js';
 // AI Behaviors
 import Behaviors from './plugins/behaviors/Behaviors.js';
@@ -213,6 +217,7 @@ let plugins = {
   Timers,
   RBush,
   Markup,
+  TensorFlow,
   Midi,
   MidiGUI,
   FloatyTyper,
