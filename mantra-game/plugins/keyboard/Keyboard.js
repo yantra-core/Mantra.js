@@ -92,8 +92,13 @@ export default class Keyboard {
 
   handleKeyDown(event) {
     if (MANTRA_KEY_MAP[event.code]) {
-      this.keyStates[MANTRA_KEY_MAP[event.code]] = { down: true, up: false, pressed: true };
-      this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
+      if (event.repeat) {
+        this.keyStates[MANTRA_KEY_MAP[event.code]] = { down: false, up: false, pressed: true };
+        this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
+      } else {
+        this.keyStates[MANTRA_KEY_MAP[event.code]] = { down: true, up: false, pressed: true };
+        this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
+      }
       if (this.preventDefaults === true) {
         event.preventDefault();
       }

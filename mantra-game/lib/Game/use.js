@@ -94,10 +94,17 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
   }
   
   // console.log('pluginInstance', pluginInstance, pluginId)
-  // TODO: we may want to check to see if plugin is already in system
-  //       current behavior will most likely overwrite / double append loadedPlugins array
-  //       overwrite by default is OK, needs to be checked
-  if (game.systems[pluginInstance.id]) {}
+  if (game.systems[pluginInstance.id]) {
+    // Remark: 3/4/2024 - Previously we were letting double used plugins progress further,
+    //                    down the code path for initialization below, this seemed incorrect.
+    //                    The current approach is to return early and call the original plugins .init() method
+    //                    The reasoning here is that most plugins are designed to not mutate game on init(),
+    //                    but some plugins it makes sense ( like Editor / Modal windows / anything that toggles state )
+    //                    An alternate solution would be to implement something like `toggle()` or `reload()` method for all plugins
+    game.loadingPluginsCount--;
+    game.systems[pluginInstance.id].init(game, game.engine, game.scene);
+    return;
+  }
 
   pluginGameSceneMethods(game, pluginInstance);
 
