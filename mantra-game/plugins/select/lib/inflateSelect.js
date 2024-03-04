@@ -14,7 +14,6 @@ export default function inflateSelect(entityElement, entityData) {
     transition: 'background-color 0.3s ease', // Smooth transition for background color
   };
 
-
   // remove background and border
   //entityElement.style.backgroundColor = 'transparent';
   //entityElement.style.border = 'none';
@@ -84,7 +83,6 @@ function applySelectStyles(game, entityElement, select, entityData) {
     transition: 'box-shadow 0.3s ease, border-color 0.3s ease', // Smooth transition for shadow and border color
   };
 
-
   // Apply default styles
   Object.assign(select.style, defaultSelectStyles);
   Object.assign(entityElement.style, defaultSelectEntityHolderStyle);
@@ -134,13 +132,6 @@ function applySelectStyles(game, entityElement, select, entityData) {
   if (entityData.style) {
     Object.assign(select.style, entityData.style);
   }
-
-  select.addEventListener('click', (event) => {
-    event.stopPropagation();
-    alert('hi')
-    
-  });
-
 
   // Event listeners for interactive styles and entity updates
   select.addEventListener('focus', () => {

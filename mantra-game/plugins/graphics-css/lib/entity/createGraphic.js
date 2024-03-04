@@ -91,7 +91,9 @@ export default function createGraphic(entityData) {
       break;
     case 'CHECKBOX':
       // For CHECKBOX entities, create a checkbox input
-      entityElement = this.inflateCheckbox(entityElement, entityData);
+      if (this.game.systems.checkbox) {
+        entityElement = this.game.systems.checkbox.inflate(entityElement, entityData);
+      }
       break;
     case 'RADIO':
       // For RADIO entities, create a radio input

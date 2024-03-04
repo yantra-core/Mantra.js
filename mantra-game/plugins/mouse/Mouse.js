@@ -30,7 +30,7 @@ export default class Mouse {
     };
 
     this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A', 'H3'];
-    this.tagPreventsGameEvent = ['SELECT', 'BUTTON'];
+    this.tagPreventsGameEvent = ['SELECT', 'BUTTON', 'LABEL', 'INPUT'];
 
     // Window() / gui.js related, ensures UI windows captures clicks
     this.disallowedPointerDownTags = ['H3'];

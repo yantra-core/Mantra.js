@@ -1,4 +1,6 @@
 import Tile from '../tile/Tile.js'; // for now
+import generateTerrain from './lib/generateTerrain.js';
+import generateTerrainLayer from './lib/generateTerrainLayer.js';
 
 // TileMap.js - Marak Squires 2024
 export default class TileMap {
@@ -10,6 +12,8 @@ export default class TileMap {
   init(game) {
     this.game = game;
     this.game.use(new Tile());
+    this.generateTerrain = generateTerrain.bind(this);
+    this.generateTerrainLayer = generateTerrainLayer.bind(this);
     this.game.systemsManager.addSystem('tilemap', this);
   }
 
