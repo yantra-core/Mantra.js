@@ -1,4 +1,4 @@
-// SwitchGraphics.js - Marak Squires 2024
+// SwitchGraphics.js - Marak Squires 2023
 class SwitchGraphics {
   static id = 'gui-switch-graphics';
   static containerId = 'switchgraphics-container';

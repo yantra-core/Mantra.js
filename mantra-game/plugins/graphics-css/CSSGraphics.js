@@ -17,7 +17,6 @@ import inflateInput from './lib/entity/inflate/inflateInput.js';
 import inflateIframe from './lib/entity/inflate/inflateIframe.js';
 import inflateRadio from './lib/entity/inflate/inflateRadio.js';
 import inflateRange from './lib/entity/inflate/inflateRange.js';
-import inflateSelect from './lib/entity/inflate/inflateSelect.js';
 import inflateTextarea from './lib/entity/inflate/inflateTextarea.js';
 
 import updateGraphic from './lib/entity/updateGraphic.js';
@@ -56,7 +55,7 @@ class CSSGraphics extends GraphicsInterface {
     this.updateGraphic = updateGraphic.bind(this);
 
     // HTML DOM elements as Mantra entities
-    this.inflateSelect = inflateSelect.bind(this);
+    // TODO: move these to each individual plugin scope
     this.inflateRange = inflateRange.bind(this);
     this.inflateRadio = inflateRadio.bind(this);
     this.inflateInput = inflateInput.bind(this);

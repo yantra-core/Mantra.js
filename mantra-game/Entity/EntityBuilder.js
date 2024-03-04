@@ -359,7 +359,12 @@ export default class EntityBuilder {
 
   // Positioning and movement
   position(x, y, z) {
-    this.config.position = { x, y };
+    if (typeof x === 'number') {
+      this.config.position.x = x;
+    }
+    if (typeof y === 'number') {
+      this.config.position.y = y;
+    }
     if (typeof z === 'number') {
       this.config.position.z = z;
     }
@@ -446,6 +451,8 @@ export default class EntityBuilder {
     };
   
     // Map of global origin positions to their function for calculating position
+    // TODO: alias all pairs of top/bottom, left/right, center
+    //       such that API is easy to use and understand
     const globalOrigins = {
       'center': () => ({ x: 0, y: 0 }), // Center of game coordinates
       'top-left': () => ({ x: -screenCenter.x, y: -screenCenter.y }),

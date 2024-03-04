@@ -72,8 +72,10 @@ export default function createGraphic(entityData) {
       entityElement = this.inflateInput(entityElement, entityData);
       break;
     case 'SELECT':
-      // For SELECT entities, create a box
-      entityElement = this.inflateSelect(entityElement, entityData);
+      // For SELECT entities, create a select drop down
+      if (this.game.systems.select) {
+        entityElement = this.game.systems.select.inflate(entityElement, entityData);
+      }
       break;
     case 'IMAGE':
       // For IMAGE entities, create an image

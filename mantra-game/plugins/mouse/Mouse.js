@@ -30,6 +30,7 @@ export default class Mouse {
     };
 
     this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A', 'H3'];
+    this.tagPreventsGameEvent = ['SELECT', 'BUTTON'];
 
     // Window() / gui.js related, ensures UI windows captures clicks
     this.disallowedPointerDownTags = ['H3'];
@@ -252,6 +253,11 @@ export default class Mouse {
     let target = event.target;
     let game = this.game;
     let preventDefault = false
+
+
+
+
+
     this.updateMouseButtons(event, true);
 
     // middle mouse button
@@ -298,15 +304,26 @@ export default class Mouse {
       }
     }
 
-    let context = this.createMouseContext(event);
-
-    if (preventDefault) {
-      event.stopPropagation(); // This may not actually be doing what we expect? Test again
-      // event.preventDefault();
+    if (this.tagPreventsGameEvent.includes(target.tagName)) {
+      preventDefault = true;
     }
 
+    let context = this.createMouseContext(event);
+
+    //
+    // If the target that was clicked has a pointerdown event, call it
+    // Is important this happens before preventDefault check,
+    // as the element such as Select or Button may have a pointerdown event bound from ECS
     if (context.target && context.target.pointerdown) {
       context.target.pointerdown(context, event);
+    }
+
+    // if prevent, return before game emits global game pointerdown event
+    if (preventDefault) {
+      // event.stopPropagation(); // TODO: do we need to stop propagation?
+      // event.preventDefault();  // TODO: is preventDefault needed here?
+      // we return such that no game events are emitted
+      return;
     }
 
     this.game.emit('pointerDown', context, event);

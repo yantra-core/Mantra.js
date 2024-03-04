@@ -46,8 +46,8 @@ tap.test('EntityBuilder configuration', (t) => {
       .rotation(90)
       .build();
 
-    t.deepEqual(entityConfig.position, { x: 100, y: 200 }, 'Position should be (100, 200)');
-    t.deepEqual(entityConfig.startingPosition, { x: 50, y: 50 }, 'Starting position should be (50, 50)');
+    t.deepEqual(entityConfig.position, { x: 100, y: 200, z: 0 }, 'Position should be (100, 200)');
+    t.deepEqual(entityConfig.startingPosition, { x: 50, y: 50  }, 'Starting position should be (50, 50)');
     t.deepEqual(entityConfig.velocity, { x: 10, y: -5 }, 'Velocity should be (10, -5)');
     t.equal(entityConfig.rotation, 90, 'Rotation should be 90');
     t.end();

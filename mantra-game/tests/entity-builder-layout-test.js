@@ -33,7 +33,7 @@ tap.test('EntityBuilder.layout()', (t) => {
       .layout('center', { width: 800, height: 600 }); // Using explicit dimensions for predictability
 
     // Assuming the entity's position method updates an internal _position property
-    const expectedCenterPosition = { x: 0, y: 0 }; // Center position for the given dimensions
+    const expectedCenterPosition = { x: 0, y: 0, z: 0 }; // Center position for the given dimensions
     t.deepEqual(mockEntity.config.position, expectedCenterPosition, 'Entity should be centered with given dimensions');
 
     // Test other positions
@@ -49,6 +49,7 @@ tap.test('EntityBuilder.layout()', (t) => {
     };
     
     Object.entries(positionsToTest).forEach(([origin, expectedPosition]) => {
+      expectedPosition.z = 0;
       mockEntity.layout(origin, { width: 800, height: 600 }); // Reapply layout with different origins
       t.deepEqual(mockEntity.config.position, expectedPosition, `Entity should be at (${expectedPosition.x}, ${expectedPosition.y}) for ${origin}`);
     });

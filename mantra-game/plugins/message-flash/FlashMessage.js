@@ -77,7 +77,7 @@ class Flash {
   
     // Add message text
     const textSpan = document.createElement('span');
-    textSpan.textContent = messageText;
+    textSpan.innerHTML = messageText;
     messageElement.appendChild(textSpan);
 
     // Allow the message to be closed by clicking anywhere on it

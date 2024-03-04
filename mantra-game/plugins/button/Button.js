@@ -28,6 +28,11 @@ export default class Button {
       entityData.meta.disabled = entityData.disabled;
     }
 
+    // provide default size for UI elements
+    if (typeof entityData.size === 'undefined') {
+      entityData.size = { width: 100, height: 50 };
+    }
+
     return {
       type: 'BUTTON',
       body: false,
