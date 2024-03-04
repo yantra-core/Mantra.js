@@ -357,46 +357,72 @@ export default class Markup {
     gameHolder.appendChild(pre);
   }
 
-  generateMarkup() {
+  toHTML(prettyPrintAttributes = true) {
     let markup = '';
-
     let entities = this.game.data.ents._;
-
+  
     Object.keys(entities).forEach(eId => {
       let entity = entities[eId];
       // Start the tag based on the entity type
       markup += `<m-${entity.type.toLowerCase().replace('_', '-')}`;
+  
+      const addAttribute = (name, value, singleQuotes) => {
 
-      // position is always defined with x y z
-      markup += ` data-x="${entity.position.x}" data-y="${entity.position.y}"`;
-      if (entity.position.z !== undefined) markup += ` data-z="${entity.position.z}"`;
+        let quote = '"';
 
+        if (singleQuotes) {
+          quote = "'";
+        }
+
+        if (prettyPrintAttributes) {
+          // When prettyPrintAttributes is true, add each attribute on a new line with indentation
+          markup += `\n  ${name}=${quote}${value}${quote}`;
+        } else {
+          // Otherwise, add attributes on the same line
+          markup += ` ${name}=${quote}${value}${quote}`;
+        }
+      };
+  
+      // position is always defined with x, y, z
+      addAttribute('data-x', entity.position.x);
+      addAttribute('data-y', entity.position.y);
+      if (entity.position.z !== undefined) addAttribute('data-z', entity.position.z);
+  
       // Add data attributes based on entity properties
-      if (entity.isStatic !== undefined) markup += ` data-is-static="${entity.isStatic}"`;
-      if (entity.x !== undefined) markup += ` data-x="${entity.x}"`;
-      if (entity.y !== undefined) markup += ` data-y="${entity.y}"`;
-      if (entity.width !== undefined) markup += ` data-width="${entity.width}"`;
-      if (entity.height !== undefined) markup += ` data-height="${entity.height}"`;
-      if (entity.texture !== undefined) markup += ` data-texture="${JSON.stringify(entity.texture)}"`;
-      if (entity.name !== undefined) markup += ` data-name="${entity.name}"`;
-      if (entity.layout !== undefined) markup += ` data-layout="${entity.layout}"`;
-      if (entity.origin !== undefined) markup += ` data-origin="${entity.origin}"`;
-      if (entity.repeat !== undefined) markup += ` data-repeat="${entity.repeat}"`;
-
+      if (entity.isStatic !== undefined) addAttribute('data-is-static', entity.isStatic);
+      if (entity.x !== undefined) addAttribute('data-x', entity.x);
+      if (entity.y !== undefined) addAttribute('data-y', entity.y);
+      if (entity.width !== undefined) addAttribute('data-width', entity.width);
+      if (entity.height !== undefined) addAttribute('data-height', entity.height);
+      // data-texture attribute stores JSON and we are using single quote on the attribute as special case
+      // we could just use single quote for all attributes, special case of JSON on attribute should be further considered
+      // its not really safe to store JSON formatted data in HTML attribute tag ( escapes )
+      // TODO: we could implement a custom <m-texture child element to handle this
+      if (entity.texture !== undefined) addAttribute('data-texture', JSON.stringify(entity.texture), true);
+      if (entity.name !== undefined) addAttribute('data-name', entity.name);
+      if (entity.layout !== undefined) addAttribute('data-layout', entity.layout);
+      if (entity.origin !== undefined) addAttribute('data-origin', entity.origin);
+      if (entity.repeat !== undefined) addAttribute('data-repeat', entity.repeat);
+  
       // Close the opening tag
-      markup += '>';
-
+      if (prettyPrintAttributes) {
+        markup += '\n>';
+      } else {
+        markup += '>';
+      }
+  
       // Handle nested entities, if any
       if (entity.children && entity.children.length > 0) {
-        markup += generateMarkup(entity.children); // Recursive call for children
+        markup += this.toHTML(entity.children, prettyPrintAttributes); // Recursive call for children, passing the prettyPrintAttributes flag
       }
-
+  
       // Close the tag
       markup += `</m-${entity.type.toLowerCase().replace('_', '-')}>\n`;
     });
-
+  
     return markup;
   }
+  
 
 
 

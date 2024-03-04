@@ -17,6 +17,10 @@ export default function topdownMovement(game) {
   rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['Q', 'BUTTON_A'] });
   rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['E', 'BUTTON_Y'] });
 
+
+  rules.addCondition('OPEN_EDITOR', { op: 'or', conditions: ['ESCAPE'] });
+
+
   rules
     .if('PLAYER_UP')
     .then('MOVE_UP')
@@ -50,6 +54,16 @@ export default function topdownMovement(game) {
   // replace with rules.do('ZOOM_IN'), etc
   rules.if('ZOOM_IN').then('ZOOM_IN');
   rules.if('ZOOM_OUT').then('ZOOM_OUT');
+
+  //rules.do('OPEN_EDITOR'); if / then / all the same
+  rules.if('OPEN_EDITOR').then('OPEN_EDITOR');
+  game.rules.on('OPEN_EDITOR', function(){
+    if (game.systems.editor) {
+      game.systems.editor.toggle();
+    } else {
+      game.use('Editor');
+    }
+  });
 
   rules.addMap('determineShootingSprite', (player, node) => {
     // Normalize the rotation within the range of 0 to 2π

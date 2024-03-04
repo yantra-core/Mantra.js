@@ -42,10 +42,10 @@ export default function createToolbar(game) {
   inspectorIcon.style.width = '32px';
   inspectorIcon.style.height = '32px';
   inspectorIcon.style.bottom = '12px';
-  inspectorIcon.style.left = '9px';
+  //inspectorIcon.style.left = '9px';
   inspectorIcon.style.position = 'relative';
-
   inspectorIcon.style.filter = 'invert(100%)';
+  inspectorIcon.style.display = 'none';
 
   if (is_touch_enabled()) {
     // hide inspector icon on touch devices
@@ -61,6 +61,23 @@ export default function createToolbar(game) {
     window.open('https://github.com/yantra-core/Mantra.js', '_blank');
   }
 
+  let closeIcon = this.createIcon('x');
+  closeIcon.src = featherRoot + '/vendor/feather/x.svg';
+  closeIcon.style.cursor = 'pointer';
+  closeIcon.title = 'Click to open Entity Inspector';
+  closeIcon.style.marginRight = '10px';
+  closeIcon.style.marginLeft = '5px';
+  //inspectorIcon.style.marginTop = '5px';
+  closeIcon.style.width = '32px';
+  closeIcon.style.height = '32px';
+  closeIcon.style.top = '6px';
+  //closeIcon.style.right = '10px';
+  closeIcon.style.position = 'relative';
+  closeIcon.style.filter = 'invert(100%)';
+
+  
+  // add click handler to close toolbar
+  closeIcon.onclick = () => toolbarMenu.slideOutToolbar();
 
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
@@ -200,10 +217,31 @@ export default function createToolbar(game) {
   selectorsContainer.style.justifyContent = 'space-between'; // Space out items
   selectorsContainer.style.margin = '20px'; // Add some margin for aesthetics
 
+  toolbarMenu.addElement('middle', selectorsContainer);
+  
+
+  // create a text label for the current entity
+  let currentEntityLabel = document.createElement('span');
+  currentEntityLabel.style.fontSize = '22px';
+  currentEntityLabel.style.position = 'relative';
+  currentEntityLabel.style.marginRight = '10px';
+  currentEntityLabel.style.marginLeft = '10px';
+  currentEntityLabel.style.bottom = '10px';
+  //currentEntityLabel.style.marginTop = '10px';
+  //currentEntityLabel.style.marginBottom = '10px';
+  currentEntityLabel.style.cursor = 'pointer';
+  currentEntityLabel.innerText = game.selectedEntityId ? game.entities[game.selectedEntityId].constructor.name : 'No Entity Selected';
+  currentEntityLabel.onclick = () => this.showInspector();
+
+  currentEntityLabel.style.display = 'none';
+  selectorsContainer.appendChild(currentEntityLabel);
+  //let currentEntityKey = 
+
   selectorsContainer.appendChild(inspectorIcon);
+  //selectorsContainer.appendChild(closeIcon);
   //selectorsContainer.appendChild(graphicsSelectorItem);
   //selectorsContainer.appendChild(worldSelectorItem);
-  toolbarMenu.addElement('secondary', selectorsContainer);
+  toolbarMenu.addElement('secondary', closeIcon);
   
   if (game.worlds.length > 0) {
     let currentWorldName = game.worlds[0].constructor.name;

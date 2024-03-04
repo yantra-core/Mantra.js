@@ -84,7 +84,7 @@ class SutraGUI {
 
     if (this.game.rules) {
       this.setRules(this.game.rules);
-      this.viewSutraEnglish();
+      this.showSutra();
 
     } else {
       // add message to indicate no sutra
@@ -153,9 +153,23 @@ class SutraGUI {
   }
 
   showSutra() {
-    // this.redrawBehaviorTree();
+    // this.drawBehaviorTree();
     let json = this.behavior.toJSON();
-    this.redrawBehaviorTree(this.behavior);
+    this.drawBehaviorTree(this.behavior);
+  }
+
+  viewMarkup () {
+    let json = this.behavior.serializeToJson();
+    let markup = this.game.systems.markup.toHTML();
+    // clear the #sutraTable
+    let table = document.getElementById('sutraTable');
+    table.innerHTML = '';
+    // create a new div
+    let markupDiv = document.createElement('pre');
+    markupDiv.style.width = '95%';
+    markupDiv.style.height = '800px';
+    markupDiv.textContent = markup;
+    table.appendChild(markupDiv);
   }
 
   viewJson() {
@@ -198,36 +212,54 @@ class SutraGUI {
   getEmitters() {
     return this.game.emitters;
   }
-
-  redrawBehaviorTree(json) {
-    let container = document.getElementById('sutraView');
-
-    let table = document.getElementById('sutraTable');
-    table.innerHTML = '';
-    //let guiContent = container.querySelector('.gui-content');
-    json.tree.forEach(node => {
-      table.appendChild(this.createNodeElement(node, 1));
-    });
-  }
-
   drawBehaviorTree(json) {
-    // get existing container
+    // Ensure the container and table elements exist
     let container = document.getElementById('sutraView');
-    let table = document.getElementById('sutraTable');
-    //let guiContent = container.querySelector('.gui-content');
-    if (json.tree.length === 0) {
-      // add message to indicate no sutra
-      // table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
+    if (!container) {
+      console.error('Container element #sutraView not found.');
       return;
     }
-    //let container = document.createElement('div');
+  
+    let table = document.getElementById('sutraTable');
+    if (!table) {
+      console.error('Table element #sutraTable not found.');
+      return;
+    }
+  
+    // Clear the table contents initially
+    table.innerHTML = '';
+  
+    // Recursive helper function to draw a node and its children
+    const drawNode = (node, parentElement) => {
+      let nodeElement = this.createNodeElement(node, 1);
+      parentElement.appendChild(nodeElement);
+      // If the node has children, draw them recursively
+      if (node.tree && node.tree.length > 0) {
+        node.tree.forEach(child => drawNode(child, parentElement));
+      }
+    };
+  
+    // Draw the main tree nodes
     json.tree.forEach(node => {
-      table.appendChild(this.createNodeElement(node, 1));
+      drawNode(node, table);
     });
-    // Append this container to your GUI, adjust as needed
-    //guiContent.appendChild(table);
-    //container.appendChild(guiContent); // Example: appending to body
+  
+    // Draw subtrees, if any
+    if (json.subtrees) {
+      let subtrees = Object.keys(json.subtrees);
+      if (subtrees.length > 0) {
+        subtrees.forEach(key => {
+          let subtree = json.subtrees[key];
+          subtree.tree.forEach(node => {
+            console.log('subtree node', node);
+            drawNode(node, table);
+          });
+        });
+      }
+  
+    }
   }
+  
 
   getAvailableActions() {
     let re = [];
@@ -271,7 +303,8 @@ class SutraGUI {
       this.appendConditionalElement(contentDiv, node, indentLevel);
     }
     if (indentLevel !== 1) {
-      formElement.classList.add('collapsible-content');
+      // Remark: 3/4/2024 - Commented out to show all rules by default
+      // formElement.classList.add('collapsible-content');
     }
 
     return formElement;
@@ -517,7 +550,7 @@ class SutraGUI {
     let json = this.serializeFormToJSON(form);
     console.log('SutraGui.saveConditional() called', conditionalName, json)
     this.behavior.updateCondition(conditionalName, json); // Update Sutra instance
-    this.redrawBehaviorTree(); // Redraw the tree to reflect changes
+    this.drawBehaviorTree(); // Redraw the tree to reflect changes
   }
 
   handleAddRuleClick(nodeId) {
@@ -554,7 +587,7 @@ class SutraGUI {
     */
 
     let json = this.behavior.serializeToJson();
-    this.redrawBehaviorTree();
+    this.drawBehaviorTree();
   }
 
   createAddRuleButton(nodeId) {

@@ -21,6 +21,13 @@ class Editor {
 
     this.dropdownTimers = new Map(); // To manage delayed close timers
 
+    // TODO: remove this, check case in SystemManager for double plugin init case, add tests
+    // This plugin has a side-effet ( shows editor ), we don't want double editors
+    if (typeof this.game.editorReady === 'undefined') {
+      this.game.editorReady = false;
+    }
+
+
     // Check for jQuery
     if (typeof $ === 'undefined') {
       console.log('$ is not defined, attempting to load jQuery from vendor');
@@ -37,7 +44,32 @@ class Editor {
     // game.use(new this.game.plugins.PluginsGUI());
   }
 
+  jqueryReady() {
+
+    if (this.game.editorReady) {
+      //console.warn('Editor already initialized');
+      this.toggle();
+      return;
+    }
+    this.game.editorReady = true;
+
+
+    // do not create Editor on mobile ( for now )
+    if (this.game.isTouchDevice()) {
+      return;
+    }
+    this.createToolbar(this.game);
+    this.setupGlobalClickListener();
+    // this.createViewSourceModal();
+    this.game.loadCSS('/plugins/Editor/Editor.css');
+  }
+
   toggle() {
+
+    if (typeof this.toolbarMenu === 'undefined' || this.toolbarMenu === null) {
+      console.warn('Toolbar not found');
+      return;
+    }
     if (this.toolbarMenu.toggleStatus === 'open') {
       this.hide();
     } else {
@@ -53,18 +85,6 @@ class Editor {
 
   hide () {
     this.toolbarMenu.slideOutToolbar();
-  }
-
-  jqueryReady() {
-
-    // do not create Editor on mobile ( for now )
-    if (this.game.isTouchDevice()) {
-      return;
-    }
-    this.createToolbar(this.game);
-    this.setupGlobalClickListener();
-    // this.createViewSourceModal();
-    this.game.loadCSS('/plugins/Editor/Editor.css');
   }
 
   createIcon(name) {

@@ -34,6 +34,12 @@ export default function drawTable() {
   readSutraButton.textContent = 'Read Sutra';
   readSutraButton.onclick = () => this.viewSutraEnglish();
 
+  // Adds "View Markup" button
+  let viewMarkupButton = document.createElement('button');
+  viewMarkupButton.textContent = 'View Markup';
+  viewMarkupButton.onclick = () => this.viewMarkup();
+
+
   let guiContent = this.sutraView.querySelector('.gui-content');
 
   // set background color to transparent
@@ -47,8 +53,9 @@ export default function drawTable() {
   footer.className = 'gui-window-footer';
 
   guiContent.appendChild(showSutraButton);
-  guiContent.appendChild(viewJsonButton);
+  // guiContent.appendChild(viewJsonButton);
   guiContent.appendChild(readSutraButton);
+  guiContent.appendChild(viewMarkupButton);
   guiContent.appendChild(slider);
 
   guiContent.appendChild(table);

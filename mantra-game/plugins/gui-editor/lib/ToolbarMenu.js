@@ -9,10 +9,13 @@ export default class ToolbarMenu {
     // Create the primary and secondary groups
     this.primaryGroup = document.createElement('div');
     this.secondaryGroup = document.createElement('div');
+    this.middleGroup = document.createElement('div');
 
     // Set classes for primary and secondary groups
     this.primaryGroup.className = 'menu-group primary';
     this.secondaryGroup.className = 'menu-group secondary';
+    this.middleGroup.className = 'menu-group middle';
+
 
     // Style the primary and secondary groups
     this.setStyle(this.primaryGroup, {
@@ -23,11 +26,16 @@ export default class ToolbarMenu {
       display: 'flex',
       flexWrap: 'wrap'
     });
+    this.setStyle(this.middleGroup, {
+      display: 'flex',
+      flexWrap: 'wrap'
+    });
 
     // Create the toolbar and append the groups
     this.toolbar = document.createElement('div');
     this.toolbar.className = 'toolbar';
     this.toolbar.appendChild(this.primaryGroup);
+    this.toolbar.appendChild(this.middleGroup);
     this.toolbar.appendChild(this.secondaryGroup);
 
     // Style the toolbar
@@ -99,6 +107,8 @@ export default class ToolbarMenu {
         this.primaryGroup.insertBefore(element, this.primaryGroup.firstChild);
       } else if (group === 'secondary') {
         this.secondaryGroup.insertBefore(element, this.secondaryGroup.firstChild);
+      } else if (group === 'middle') {
+        this.middleGroup.insertBefore(element, this.middleGroup.firstChild);
       }
 
     } else {
@@ -106,6 +116,8 @@ export default class ToolbarMenu {
         this.primaryGroup.appendChild(element);
       } else if (group === 'secondary') {
         this.secondaryGroup.appendChild(element);
+      } else if (group === 'middle') {
+        this.middleGroup.appendChild(element);
       }
     }
 
