@@ -67,8 +67,9 @@ export default class Hexapod {
 
   swarmBehavior(entity) {
 
-    let gameState = this.game.data;
     let game = this.game;
+    let gameState = game.data;
+
     let Vector = this.game.systems.physics.Vector;
 
     // Define constant values for different forces and parameters
@@ -85,6 +86,8 @@ export default class Hexapod {
     let separation = { x: 0, y: 0 };
     let planetAvoidance = { x: 0, y: 0 };
 
+    let newRotation = hexapod.rotation;
+
     // Target movement implementation
     let targetForce = { x: 0, y: 0 };
 
@@ -93,8 +96,11 @@ export default class Hexapod {
         let target = gameState.currentPlayer.position;
         let targetDirection = Vector.sub(target, hexapod.position);
         targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+        // Calculate the angle to the target in radians
+        let angleToTarget = Math.atan2(targetDirection.y, targetDirection.x);
+        // Update hexapod rotation
+        newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
       }
-
     }
 
     // Process each hexapod in the field of view
@@ -140,7 +146,8 @@ export default class Hexapod {
     newPosition.z = 1; // for now
     game.updateEntity({
       id: hexapod.id,
-      position: newPosition
+      position: newPosition,
+      rotation: newRotation
     });
 
   }
