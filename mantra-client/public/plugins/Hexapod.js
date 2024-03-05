@@ -86,8 +86,8 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "swarmBehavior",
     value: function swarmBehavior(entity) {
-      var gameState = this.game.data;
       var game = this.game;
+      var gameState = game.data;
       var Vector = this.game.systems.physics.Vector;
 
       // Define constant values for different forces and parameters
@@ -114,6 +114,7 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         x: 0,
         y: 0
       };
+      var newRotation = hexapod.rotation;
 
       // Target movement implementation
       var targetForce = {
@@ -125,6 +126,10 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
           var target = gameState.currentPlayer.position;
           var targetDirection = Vector.sub(target, hexapod.position);
           targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+          // Calculate the angle to the target in radians
+          var angleToTarget = Math.atan2(targetDirection.y, targetDirection.x);
+          // Update hexapod rotation
+          newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
         }
       }
 
@@ -169,7 +174,8 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
       newPosition.z = 1; // for now
       game.updateEntity({
         id: hexapod.id,
-        position: newPosition
+        position: newPosition,
+        rotation: newRotation
       });
     }
   }, {

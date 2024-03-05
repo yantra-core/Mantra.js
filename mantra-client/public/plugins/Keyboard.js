@@ -15,7 +15,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 // Keyboard.js - Marak Squires 2023
 
 // All key codes available to browser
-var KEY_CODES = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter', 'ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ShiftRight', 'ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'MetaRight', 'ContextMenu', 'ControlRight', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+var KEY_CODES = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter', 'ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ShiftRight', 'ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'MetaRight', 'ContextMenu', 'ControlRight', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Escape' /*, 'PrintScreen', 'ScrollLock', 'Pause', 'Insert', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', */];
 
 // Filter any keys that users might not want browser to capture
 KEY_CODES = KEY_CODES.filter(function (code) {
@@ -61,6 +61,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     // Bind methods and store them as class properties
     this.boundHandleKeyDown = this.handleKeyDown.bind(this);
     this.boundHandleKeyUp = this.handleKeyUp.bind(this);
+    this.boundHandleWindowBlur = this.handleWindowBlur.bind(this); // Bind the window blur event handler
   }
   _createClass(Keyboard, [{
     key: "init",
@@ -79,6 +80,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     value: function bindInputControls() {
       document.addEventListener('keydown', this.boundHandleKeyDown);
       document.addEventListener('keyup', this.boundHandleKeyUp);
+      window.addEventListener('blur', this.boundHandleWindowBlur); // Listen for window blur event
     }
   }, {
     key: "update",
@@ -102,12 +104,21 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
     key: "handleKeyDown",
     value: function handleKeyDown(event) {
       if (MANTRA_KEY_MAP[event.code]) {
-        this.keyStates[MANTRA_KEY_MAP[event.code]] = {
-          down: true,
-          up: false,
-          pressed: true
-        };
-        this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
+        if (event.repeat) {
+          this.keyStates[MANTRA_KEY_MAP[event.code]] = {
+            down: false,
+            up: false,
+            pressed: true
+          };
+          this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
+        } else {
+          this.keyStates[MANTRA_KEY_MAP[event.code]] = {
+            down: true,
+            up: false,
+            pressed: true
+          };
+          this.inputPool[MANTRA_KEY_MAP[event.code]] = true;
+        }
         if (this.preventDefaults === true) {
           event.preventDefault();
         }
@@ -126,6 +137,21 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
         this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
       }
       this.game.emit('keyup', event, MANTRA_KEY_MAP[event.code]);
+    }
+  }, {
+    key: "handleWindowBlur",
+    value: function handleWindowBlur() {
+      var _this = this;
+      // On window blur we must clear all key inputs, as we may have keydown events
+      // that will never recieve a keyup event ( since the window is not focused )
+
+      // Iterate over the controls object and set each key's value to false
+      Object.keys(this.controls).forEach(function (key) {
+        _this.controls[key] = false;
+      });
+      // Reset the input pool and key states
+      this.inputPool = {};
+      this.keyStates = {};
     }
   }, {
     key: "sendInputs",

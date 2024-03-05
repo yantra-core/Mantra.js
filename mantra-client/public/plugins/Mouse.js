@@ -13,6 +13,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 // Mouse.js - Marak Squires 2023
+// TODO: Split this file into multiple functions
 var inputsBound = false;
 var Mouse = exports["default"] = /*#__PURE__*/function () {
   function Mouse(communicationClient) {
@@ -48,6 +49,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     };
 
     this.tagAllowsDefaultEvent = ['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'CODE', 'PRE', 'A', 'H3'];
+    this.tagPreventsGameEvent = ['SELECT', 'BUTTON', 'LABEL', 'INPUT'];
 
     // Window() / gui.js related, ensures UI windows captures clicks
     this.disallowedPointerDownTags = ['H3'];
@@ -67,6 +69,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
     this.boundHandlePointerMove = this.handlePointerMove.bind(this);
     this.boundHandlePointerUp = this.handlePointerUp.bind(this);
     this.boundHandleWindowBlur = this.handleWindowBlur.bind(this);
+    this.boundHandleMouseLeave = this.handleMouseLeave.bind(this);
   }
   _createClass(Mouse, [{
     key: "init",
@@ -202,6 +205,30 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         RIGHT: null,
         MIDDLE: null
       };
+
+      // update the game with the new mouse state ( all off )
+      this.sendMouseData();
+    }
+  }, {
+    key: "handleMouseLeave",
+    value: function handleMouseLeave() {
+      // Reset pointer states
+      this.isDragging = false;
+      this.activeTouches = {};
+      this.firstTouchId = null;
+      this.secondTouchId = null;
+      this.endedFirstTouch = false;
+      this.endedSecondTouch = false;
+
+      // Reset mouse buttons states
+      this.mouseButtons = {
+        LEFT: null,
+        RIGHT: null,
+        MIDDLE: null
+      };
+
+      // update the game with the new mouse state ( all off )
+      this.sendMouseData();
     }
   }, {
     key: "handleMouseMove",
@@ -340,14 +367,25 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
           preventDefault = true;
         }
       }
-      var context = this.createMouseContext(event);
-      if (preventDefault) {
-        event.stopPropagation(); // This may not actually be doing what we expect? Test again
-        // event.preventDefault();
+      if (this.tagPreventsGameEvent.includes(target.tagName)) {
+        preventDefault = true;
       }
+      var context = this.createMouseContext(event);
 
+      //
+      // If the target that was clicked has a pointerdown event, call it
+      // Is important this happens before preventDefault check,
+      // as the element such as Select or Button may have a pointerdown event bound from ECS
       if (context.target && context.target.pointerdown) {
         context.target.pointerdown(context, event);
+      }
+
+      // if prevent, return before game emits global game pointerdown event
+      if (preventDefault) {
+        // event.stopPropagation(); // TODO: do we need to stop propagation?
+        // event.preventDefault();  // TODO: is preventDefault needed here?
+        // we return such that no game events are emitted
+        return;
       }
       this.game.emit('pointerDown', context, event);
 
@@ -551,9 +589,15 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         document.addEventListener('mousedown', this.boundHandleMouseDown);
         document.addEventListener('mouseup', this.boundHandleMouseUp);
       }
+
+      // window / tab has lost focused
       window.addEventListener('blur', this.boundHandleWindowBlur);
+      // mouse leaves window, window may still have focus
+      document.body.addEventListener('mouseleave', this.boundHandleMouseLeave);
 
       // TODO: could be a config option
+      // TODO: this should be able to bind / unbind based on user actions, defaultMouseMovement
+      //       the default behavior should be such that right click and wheel works unless bound explicitly
       if (this.disableContextMenu) {
         document.addEventListener('contextmenu', function (event) {
           // Handle internal Mantra events first before prevent default to disable browser right click menu
@@ -646,6 +690,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
         document.removeEventListener('mouseup', this.boundHandleMouseUp);
       }
       window.removeEventListener('blur', this.boundHandleWindowBlur);
+      window.removeEventListener('mouseleave', this.boundHandleMouseLeave);
     }
   }, {
     key: "unload",

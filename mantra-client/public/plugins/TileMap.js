@@ -2153,78 +2153,77 @@ var Metroidvania = /*#__PURE__*/function () {
 }();
 function ALGORITHM_METROIDVANIA(tileMap) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  try {
-    tileMap.fill(0); // Fill with walls
-    var maxDimension = Math.max(tileMap.width, tileMap.height);
-    if (maxDimension <= 5) {
-      return;
-    }
-    var fractional = Math.sqrt(maxDimension);
-    if (fractional % 2 !== 1) fractional++;
-    var size = maxDimension < 10 ? Math.floor(maxDimension / 2) : 10;
-    var doorDiff = maxDimension < 10 ? 1 : 2;
-    var roomSizeHeight = Math.floor(tileMap.width / size);
-    var roomSizeWidth = Math.floor(tileMap.height / size);
-    var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
-    var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
-    var maxCount = Math.floor(numRoomsWide * numRoomsHigh * 0.8);
-    var minCount = Math.floor(maxCount / 4);
-    var generator = new Metroidvania({
-      roomWidth: roomSizeWidth,
-      roomHeight: roomSizeHeight,
-      maxFails: 25000,
-      width: numRoomsWide,
-      // Max number of zones wide
-      height: numRoomsWide,
-      // Max number of zones tall
-      gridHeight: tileMap.height,
-      gridWidth: tileMap.width,
-      minZonesPerRoom: 1,
-      // Minimum number of zones per room
-      maxZonesPerRoom: 3,
-      // Maximum number of zones per room
-      minRoomsPerMap: minCount,
-      // Minimum number of rooms per map
-      maxRoomsPerMap: maxCount,
-      // Maximum number of rooms per map
-      newDoors: doorDiff,
-      // # doors to add to prevent tedious linear mazes
-      roomDiff: doorDiff,
-      // When adding a new door, room ID distance
-      roomDiffOdds: 1 / 2 // Odds of inserting a new door on opportunity
-    });
+  // Constants for clarity and adaptability
+  var WALL_FILL_VALUE = 0;
+  var MIN_DIMENSION_THRESHOLD = 5;
+  var SIZE_THRESHOLD = 10;
+  var DOOR_DIFF_SMALL = 1;
+  var DOOR_DIFF_LARGE = 2;
+  var MAX_FAILS_ALLOWED = 25000;
+  var ROOM_OCCUPANCY_RATIO = 0.8;
+  var MIN_ROOM_RATIO = 0.25;
 
-    var built = null;
-    if (options.retries) {
-      var generated = false;
-      var currentTry = 0;
-      while (currentTry < options.retries && !generated) {
-        try {
-          currentTry++;
-          built = generator.build(function () {
-            return tileMap.random();
-          });
-          generated = true;
-        } catch (ex) {
-          console.log('RTX', ex);
-        }
-      }
-    } else {
+  // Fill tileMap with walls
+  tileMap.fill(WALL_FILL_VALUE);
+  var maxDimension = Math.max(tileMap.width, tileMap.height);
+  if (maxDimension <= MIN_DIMENSION_THRESHOLD) {
+    return;
+  }
+  var adjustedDimension = Math.sqrt(maxDimension);
+  if (adjustedDimension % 2 !== 1) adjustedDimension++;
+  var size = maxDimension < SIZE_THRESHOLD ? Math.floor(maxDimension / 2) : SIZE_THRESHOLD;
+  var doorDiff = maxDimension < SIZE_THRESHOLD ? DOOR_DIFF_SMALL : DOOR_DIFF_LARGE;
+  var roomSizeHeight = Math.floor(tileMap.width / size);
+  var roomSizeWidth = Math.floor(tileMap.height / size);
+  var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
+  var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
+  var maxRoomCount = Math.floor(numRoomsWide * numRoomsHigh * ROOM_OCCUPANCY_RATIO);
+  var minRoomCount = Math.floor(maxRoomCount * MIN_ROOM_RATIO);
+
+  // Generator configuration with corrected height assignment
+  var generator = new Metroidvania({
+    roomWidth: roomSizeWidth,
+    roomHeight: roomSizeHeight,
+    maxFails: MAX_FAILS_ALLOWED,
+    width: numRoomsWide,
+    // Max number of zones wide
+    height: numRoomsHigh,
+    // Max number of zones tall (fixed typo)
+    gridHeight: tileMap.height,
+    gridWidth: tileMap.width,
+    minZonesPerRoom: 1,
+    maxZonesPerRoom: 3,
+    minRoomsPerMap: minRoomCount,
+    maxRoomsPerMap: maxRoomCount,
+    newDoors: doorDiff,
+    roomDiff: doorDiff,
+    roomDiffOdds: 0.5
+  });
+  var built = null;
+  var maxRetries = options.retries || 4; // safe number, 5-8 is fine, 10 can start to pause slower systems
+  for (var attempt = 0; attempt < maxRetries; attempt++) {
+    try {
       built = generator.build(function () {
         return tileMap.random();
       });
+      break; // Exit loop if build succeeds
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error; // Rethrow error on last attempt
     }
-    var flattened = built.world.reduce(function (agg, line) {
-      return agg.concat(line);
-    }, []);
-    built.world = null;
-    if (!built) throw new Error('failed to build world');
-    tileMap.world = built;
-    for (var lcv = 0; lcv < tileMap.data.length; lcv++) {
-      tileMap.data[lcv] = flattened[lcv];
-    }
-  } catch (ex) {
-    console.log('MV generation error', ex);
+  }
+
+  // Ensure built is not null before proceeding
+  if (!built || !built.world) throw new Error('Failed to build world');
+  var flattened = built.world.reduce(function (agg, line) {
+    return agg.concat(line);
+  }, []);
+  // Note: The next line might not be needed as it nullifies built.world, consider removing
+  // built.world = null;
+
+  // Map the flattened world back to the tileMap
+  tileMap.world = built;
+  for (var i = 0; i < tileMap.data.length; i++) {
+    tileMap.data[i] = flattened[i];
   }
 }
 
@@ -4720,6 +4719,18 @@ var Tile = /*#__PURE__*/function () {
     this.shapes = _labyrinthos["default"].shapes;
     // in debug mode we will add colors to each chunk
     this.debug = false;
+    this.allTransformers = {};
+
+    // TODO: this aggregate should be in LABY, part of transforms 
+    for (var t in _labyrinthos["default"].mazes) {
+      this.allTransformers[t] = _labyrinthos["default"].mazes[t];
+    }
+    for (var _t in _labyrinthos["default"].terrains) {
+      this.allTransformers[_t] = _labyrinthos["default"].terrains[_t];
+    }
+    for (var _t2 in _labyrinthos["default"].shapes) {
+      this.allTransformers[_t2] = _labyrinthos["default"].shapes[_t2];
+    }
 
     // set a default tiled map
     this.tiledMap = tiledMap;
@@ -4797,6 +4808,8 @@ var Tile = /*#__PURE__*/function () {
       this.game.Biome = this.Biome;
       this.game.terrains = this.terrains;
       this.game.mazes = this.mazes;
+      this.game.terrainGenerators = this.allTransformers;
+
       // this.game.shapes = this.shapes;
 
       if (this.loadInitialChunk) {
@@ -5371,6 +5384,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = handleChunkLoadFailure;
+// TODO: move most of the processing logic in this file to dedicated infinite chunk generators / tiled-server code
 function handleChunkLoadFailure(chunkPath, chunkKey) {
   var labyrinthos = this.labyrinthos;
   // console.log("Fallback for failed load:", chunkPath, chunkKey);
@@ -5603,6 +5617,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _Tile = _interopRequireDefault(require("../tile/Tile.js"));
+var _generateTerrain = _interopRequireDefault(require("./lib/generateTerrain.js"));
+var _generateTerrainLayer = _interopRequireDefault(require("./lib/generateTerrainLayer.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5610,8 +5626,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-// for now
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // for now
 // TileMap.js - Marak Squires 2024
 var TileMap = exports["default"] = /*#__PURE__*/function () {
   function TileMap() {
@@ -5624,6 +5639,8 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.use(new _Tile["default"]());
+      this.generateTerrain = _generateTerrain["default"].bind(this);
+      this.generateTerrainLayer = _generateTerrainLayer["default"].bind(this);
       this.game.systemsManager.addSystem('tilemap', this);
     }
   }, {
@@ -5767,5 +5784,118 @@ var TileMap = exports["default"] = /*#__PURE__*/function () {
 }();
 _defineProperty(TileMap, "id", 'tilemap');
 
-},{"../tile/Tile.js":34}]},{},[46])(46)
+},{"../tile/Tile.js":34,"./lib/generateTerrain.js":47,"./lib/generateTerrainLayer.js":48}],47:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = generateTerrain;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+// Main function to generate mazes, supports both 2D and 3D, with "unique" and "extrude" modes for 3D
+// TODO: remove game references and move this logic to Labyrinthos.js library itself
+function generateTerrain() {
+  var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'AldousBroder';
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _options$width = options.width,
+    width = _options$width === void 0 ? 32 : _options$width,
+    _options$height = options.height,
+    height = _options$height === void 0 ? 12 : _options$height,
+    _options$depth = options.depth,
+    depth = _options$depth === void 0 ? 1 : _options$depth,
+    _options$mode = options.mode,
+    mode = _options$mode === void 0 ? '2D' : _options$mode,
+    _options$stackingMode = options.stackingMode,
+    stackingMode = _options$stackingMode === void 0 ? 'unique' : _options$stackingMode,
+    _options$seed = options.seed,
+    seed = _options$seed === void 0 ? 1234 : _options$seed;
+  if (this.proceduralGenerateMissingChunks && !this.game.systems.rbush) {
+    console.warn('proceduralGenerateMissingChunks is set to true, but rbush is not available. This means that chunks will not be generated procedurally and infinte mode will not work. Please game.use("RBush") plugin and try again.');
+  }
+
+  // Initialize and fill tile map
+  var tileMap = new game.TileMap({
+    x: 0,
+    y: 0,
+    width: width,
+    height: height,
+    seed: seed,
+    tileWidth: 16,
+    tileHeight: 16
+  });
+  tileMap.fill(2); // Assuming '2' is the default tile to fill the map with
+
+  if (mode === '3D') {
+    tileMap.depth = depth; // Set the depth for a 3D map
+    if (stackingMode === 'unique') {
+      for (var i = 0; i < depth; i++) {
+        var layer = new game.TileMap({
+          x: 0,
+          y: 0,
+          width: width,
+          height: height,
+          seed: seed + i,
+          tileWidth: 16,
+          tileHeight: 16
+        });
+        layer.fill(2);
+        this.generateTerrainLayer(layer, type);
+        tileMap.data.push(layer.data); // Assuming `tileMap.data` can store layers for 3D maps
+      }
+    } else if (stackingMode === 'extrude') {
+      var _layer = new game.TileMap({
+        x: 0,
+        y: 0,
+        width: width,
+        height: height,
+        seed: seed,
+        tileWidth: 16,
+        tileHeight: 16
+      });
+      _layer.fill(2);
+      this.generateTerrainLayer(_layer, type);
+      for (var _i = 0; _i < depth; _i++) {
+        tileMap.data.push(_toConsumableArray(_layer.data)); // Clone the layer for each depth level
+      }
+    }
+  } else {
+    // 2D maze generation
+    this.generateTerrainLayer(tileMap, type);
+  }
+
+  // Assuming there's a way to attach the generated map to a container or entity system
+  tileMap.container = 'tilemap-container';
+  game.systems.tile.createLayer(tileMap, 16, 16); // Assuming this creates a tile layer from the tile map
+
+  console.log("Generated Maze:", tileMap);
+}
+
+},{}],48:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = generateTerrainLayer;
+// Utility function to generate a single layer of a maze
+// TODO: remove game references and move this logic to Labyrinthos.js library itself
+function generateTerrainLayer(tileMap, generatorType) {
+  try {
+    var generator = game.terrainGenerators[generatorType];
+    generator(tileMap, {});
+    // Assume there's a function to scale tile ranges if necessary, similar to `scaleToTileRange`
+    if (game.terrains[generatorType]) {
+      // tileMap.scaleToTileRange(4); // Example function call, adjust as per actual API
+    }
+  } catch (err) {
+    throw new Error('Error generating maze layer: ' + err.message);
+  }
+}
+
+},{}]},{},[46])(46)
 });

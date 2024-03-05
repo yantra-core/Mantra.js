@@ -17,81 +17,56 @@ var SwitchGraphics = /*#__PURE__*/function () {
   function SwitchGraphics() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, SwitchGraphics);
-    this.id = SwitchGraphics.id;
     this.graphicsMode = config.graphicsMode || '2D';
+    this.game = null;
+    this.id = SwitchGraphics.id;
+    this.button = null;
   }
   _createClass(SwitchGraphics, [{
     key: "init",
     value: function init(game) {
       this.game = game;
-      this.game.systemsManager.addSystem(this.id, this);
-      this.createUI();
+      this.game.systemsManager.addSystem(SwitchGraphics.id, this);
+      if (!document.getElementById(SwitchGraphics.containerId)) {
+        this.createUI();
+      }
     }
 
-    // TODO: make SwitchGraphics() a buildable entity
-  }, {
-    key: "build",
-    value: function build() {
-      var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    } /*
-      if (typeof entityData.position === 'undefined') {
-        entityData.position = { x: 0, y: 0 };
-      }
-      entityData.meta = entityData.meta || {};
-      entityData.meta.disabled = entityData.disabled;
-      return {
-        type: 'BUTTON',
-        body: false,
-        text: entityData.text || 'Switch Graphics',
-        position: entityData.position,
-        ...entityData // Spread the rest of entityData to override defaults as necessary
-      };
-      */
+    // TODO: implement build() method for SwitchGraphics() so it can be component in UI
   }, {
     key: "setMode",
     value: function setMode() {
-      // Determine the next graphics mode
       var nextGraphicsMode = this.nextMode();
-
-      // Update the graphics mode first
       this.graphicsMode = nextGraphicsMode;
-      // this.game.data.camera.currentZoom = 2.5;
-      this.game.switchGraphics(this.lookupGraphicsPlugin(this.graphicsMode));
-      // Then update the button label to reflect the new mode
-      this.updateButtonLabel(this.nextMode());
+      this.game.switchGraphics(this.lookupGraphicsPlugin(nextGraphicsMode));
+      this.updateButtonLabel();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      var currentGraphicsId = this.game.graphics.length ? this.game.graphics[0].id : '';
+      var expectedMode = currentGraphicsId === 'graphics-three' ? '3D' : '2D';
+      if (this.graphicsMode !== expectedMode) {
+        this.graphicsMode = expectedMode;
+        this.updateButtonLabel();
+      }
     }
   }, {
     key: "createUI",
     value: function createUI() {
       var container = this.createContainer();
-      var button = this.createButton();
-      container.appendChild(button);
+      this.button = this.createButton();
+      container.appendChild(this.button);
       document.body.appendChild(container);
     }
   }, {
     key: "createContainer",
     value: function createContainer() {
       var container = document.createElement('div');
-      container.id = 'switchgraphics-container';
+      container.id = SwitchGraphics.containerId;
       container.className = 'switchgraphics-container';
-      container.style.cssText = "\n      position: absolute;\n      top: 0;\n      left: 50%;\n      transform: translateX(-50%);\n      text-align: center;\n      padding: 10px 0;\n      z-index: 11111;\n    ";
+      container.style.cssText = "\n      position: absolute;\n      top: 40px;\n      left: 50%;\n      transform: translateX(-50%);\n      text-align: center;\n      padding-top: 10px;\n      z-index: 11111;\n    ";
       return container;
-    }
-  }, {
-    key: "lookupGraphicsPlugin",
-    value: function lookupGraphicsPlugin(graphicsMode) {
-      return graphicsMode === '2D' ? 'css' : 'three';
-    }
-  }, {
-    key: "nextMode",
-    value: function nextMode() {
-      return this.graphicsMode === '2D' ? '3D' : '2D';
-    }
-  }, {
-    key: "updateButtonLabel",
-    value: function updateButtonLabel(nextGraphicsMode) {
-      var button = document.querySelector('#switchgraphics-container button');
-      button.innerHTML = "Switch to ".concat(nextGraphicsMode);
     }
   }, {
     key: "createButton",
@@ -106,9 +81,26 @@ var SwitchGraphics = /*#__PURE__*/function () {
       return button;
     }
   }, {
+    key: "updateButtonLabel",
+    value: function updateButtonLabel() {
+      if (this.button) {
+        this.button.innerHTML = "Switch to ".concat(this.nextMode());
+      }
+    }
+  }, {
+    key: "nextMode",
+    value: function nextMode() {
+      return this.graphicsMode === '2D' ? '3D' : '2D';
+    }
+  }, {
+    key: "lookupGraphicsPlugin",
+    value: function lookupGraphicsPlugin(graphicsMode) {
+      return graphicsMode === '2D' ? 'css' : 'three';
+    }
+  }, {
     key: "unload",
     value: function unload() {
-      var container = document.getElementById('switchgraphics-container');
+      var container = document.getElementById(SwitchGraphics.containerId);
       if (container) {
         container.remove();
       }
@@ -117,6 +109,7 @@ var SwitchGraphics = /*#__PURE__*/function () {
   return SwitchGraphics;
 }();
 _defineProperty(SwitchGraphics, "id", 'gui-switch-graphics');
+_defineProperty(SwitchGraphics, "containerId", 'switchgraphics-container');
 var _default = exports["default"] = SwitchGraphics;
 
 },{}]},{},[1])(1)

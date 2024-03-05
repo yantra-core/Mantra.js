@@ -396,6 +396,10 @@ function topdownMovement(game) {
     op: 'or',
     conditions: ['E', 'BUTTON_Y']
   });
+  rules.addCondition('OPEN_EDITOR', {
+    op: 'or',
+    conditions: ['ESCAPE']
+  });
   rules["if"]('PLAYER_UP').then('MOVE_UP').then('updateSprite', {
     sprite: 'playerUp'
   });
@@ -414,6 +418,16 @@ function topdownMovement(game) {
   // replace with rules.do('ZOOM_IN'), etc
   rules["if"]('ZOOM_IN').then('ZOOM_IN');
   rules["if"]('ZOOM_OUT').then('ZOOM_OUT');
+
+  //rules.do('OPEN_EDITOR'); if / then / all the same
+  rules["if"]('OPEN_EDITOR').then('OPEN_EDITOR');
+  game.rules.on('OPEN_EDITOR', function () {
+    if (game.systems.editor) {
+      game.systems.editor.toggle();
+    } else {
+      game.use('Editor');
+    }
+  });
   rules.addMap('determineShootingSprite', function (player, node) {
     var _rotationToSpriteMap;
     // Normalize the rotation within the range of 0 to 2π
@@ -456,8 +470,6 @@ function topdownMovement(game) {
   var normalizationFactor = 0.7071; // Approximately 1/√2
   var moveSpeed = 2;
   rules.on('MOVE_UP', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_UP = true;
     var force = {
       x: 0,
       y: -moveSpeed,
@@ -475,8 +487,6 @@ function topdownMovement(game) {
   });
 
   rules.on('MOVE_DOWN', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_DOWN = true;
     var force = {
       x: 0,
       y: moveSpeed,
@@ -492,8 +502,6 @@ function topdownMovement(game) {
     });
   });
   rules.on('MOVE_LEFT', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_LEFT = true;
     var force = {
       x: -moveSpeed,
       y: 0,
@@ -509,8 +517,6 @@ function topdownMovement(game) {
     });
   });
   rules.on('MOVE_RIGHT', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_RIGHT = true;
     var force = {
       x: moveSpeed,
       y: 0,
@@ -632,7 +638,6 @@ var Sutra = /*#__PURE__*/function () {
         var rules = (0, _index.createSutra)(game);
         this.setSutra(rules);
       }
-
       // Once the game is ready, register the keyboard controls as conditions
       // This allows for game.rules.if('keycode').then('action') style rules
       if (!this.inputsBound) {
@@ -706,27 +711,31 @@ var Sutra = /*#__PURE__*/function () {
           // Key Down Condition
           // Remark: These should not be bound to current player, instead to the entity that is being controlled
           // _DOWN implied as default
-          _this2.game.rules.addCondition(mantraCode, function (entity, gameState) {
+          // Remark: 3/3/2024 - Basic key press test seems to indicate this is continually true
+          //                    It is expected to be true only once per press, TODO: add tests
+
+          // Key down, only once per press
+          _this2.game.rules.addCondition(mantraCode + '_DOWN', function (entity, gameState) {
             var _gameState$input$keyS;
             return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS === void 0 ? void 0 : _gameState$input$keyS.down);
           }
           // gameState.input.keyStates[mantraCode]?.down
           );
 
-          // Key Up Condition
-          _this2.game.rules.addCondition(mantraCode + '_UP', function (entity, gameState) {
+          // Key held / pressed condition, default
+          _this2.game.rules.addCondition(mantraCode, function (entity, gameState) {
             var _gameState$input$keyS2;
-            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS2 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS2 === void 0 ? void 0 : _gameState$input$keyS2.up);
-          }
-          // gameState.input.keyStates[mantraCode]?.up
-          );
-
-          // Key held Condition
-          _this2.game.rules.addCondition(mantraCode + '_HOLD', function (entity, gameState) {
-            var _gameState$input$keyS3;
-            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS3 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS3 === void 0 ? void 0 : _gameState$input$keyS3.pressed);
+            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS2 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS2 === void 0 ? void 0 : _gameState$input$keyS2.pressed);
           }
           // gameState.input.keyStates[mantraCode]?.pressed
+          );
+
+          // Key Up Condition, only once per release
+          _this2.game.rules.addCondition(mantraCode + '_UP', function (entity, gameState) {
+            var _gameState$input$keyS3;
+            return entity.id === _this2.game.currentPlayerId && ((_gameState$input$keyS3 = gameState.input.keyStates[mantraCode]) === null || _gameState$input$keyS3 === void 0 ? void 0 : _gameState$input$keyS3.up);
+          }
+          // gameState.input.keyStates[mantraCode]?.up
           );
         };
         for (var mantraCode in keyControls) {
@@ -1462,7 +1471,59 @@ var Sutra = /*#__PURE__*/function () {
     value: function use(subSutra, name) {
       var _this = this;
       var insertAt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.tree.length;
-      var shareListeners = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+      var shareListeners = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var shareTree = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+      var shareMap = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
+      /*
+         To demonstrate valid use cases for each configuration (`shareListeners`, `shareTree`, `shareMap`):
+         ### Example 1: Game Level and Sub-Level Management (`shareTree = true`, `shareListeners = false`, `shareMap = true`)
+         In this scenario, a game consists of multiple levels, each with its own set of sub-levels (e.g., stages or challenges within the main level). Sharing the tree structure (`shareTree = true`) allows for a unified hierarchy of levels and sub-levels, while not sharing listeners (`shareListeners = false`) maintains the ability to have level-specific interactions. Sharing maps (`shareMap = true`) can provide shared configurations or metadata across levels and sub-levels.
+         ```javascript
+        // Main game level setup
+        let mainLevel = createSutra('MainLevel');
+        mainLevel.on('start', () => console.log('Main level started'));
+        mainLevel.on('complete', () => s('Main level completed'));
+         // Sub-level setup (e.g., a puzzle within the main level)
+        let puzzleSubLevel = createSutra('PuzzleSubLevel');
+        puzzleSubLevel.on('start', () => console.log('Puzzle sub-level started'));
+        puzzleSubLevel.on('complete', () => console.log('Puzzle sub-level solved'));
+         // Use the sub-level within the main level without sharing listeners but sharing the tree and maps
+        mainLevel.use(puzzleSubLevel, 'Puzzle', mainLevel.tree.length, false, true, true);
+         // Shared map might contain metadata like difficulty settings, applicable to both levels
+        mainLevel.maps.difficulty = 'Hard';
+        ```
+         ### Example 2: Character and Inventory Management (`shareListeners = true`, `shareTree = true`)
+         In this example, a character in the game has an inventory system. Sharing both the tree (`shareTree = true`) and listeners (`shareListeners = true`) allows for the inventory to be seamlessly integrated into the character's event system, enabling interactions between the character and their inventory items.
+         ```javascript
+        // Character setup
+        let character = createSutra('Character');
+        character.on('pickUp', (item) => console.log(`Character picked up ${item}`));
+        character.on('useItem', (item) => console.log(`Character used ${item}`));
+         // Inventory setup
+        let inventory = createSutra('Inventory');
+        inventory.on('addItem', (item) => console.log(`Item ${item} added to inventory`));
+        inventory.on('removeItem', (item) => console.log(`Item ${item} removed from inventory`));
+         // Integrate inventory into character, sharing both tree and listeners
+        character.use(inventory, 'CharacterInventory', character.tree.length, true, true);
+         // Now, events like 'addItem' can trigger both character and inventory listeners
+        character.emit('addItem', 'Sword'); // Character picks up Sword, and it's added to inventory
+        ```
+         ### Example 3: Game World and Area-Specific Mechanics (`shareTree = true`, `shareListeners = false`, `shareMap = false`)
+         This example involves a game world with distinct areas, each with unique mechanics. Sharing the tree structure (`shareTree = true`) allows for a unified representation of the game world, while not sharing listeners or maps (`shareListeners = false`, `shareMap = false`) keeps area-specific mechanics and configurations independent.
+         ```javascript
+        // Game world setup
+        let gameWorld = createSutra('GameWorld');
+        gameWorld.on('enterArea', (area) => console.log(`Entered ${area}`));
+         // Specific area with unique mechanics
+        let lavaZone = createSutra('LavaZone');
+        lavaZone.on('heatDamage', () => console.log('Player takes heat damage in Lava Zone'));
+         // Use lava zone in the game world, sharing only the tree structure
+        gameWorld.use(lavaZone, 'LavaZone', gameWorld.tree.length, false, true, false);
+         // Player entering Lava Zone triggers only the 'enterArea' event from the game world
+        gameWorld.emit('enterArea', 'Lava Zone');
+        ```
+        */
+
       // Store a reference to the subSutra for subtree-specific logic
       this.subtrees = this.subtrees || {};
       subSutra.isSubtree = true;
@@ -1475,10 +1536,31 @@ var Sutra = /*#__PURE__*/function () {
         this.listeners = _objectSpread(_objectSpread({}, this.listeners), subSutra.listeners);
         this.anyListeners = [].concat(_toConsumableArray(this.anyListeners || []), _toConsumableArray(subSutra.anyListeners || []));
 
-        // Optionally, update the subtree's listeners to reflect this change
         // This ensures that both the subtree and main tree have the same set of listeners
         subSutra.listeners = this.listeners;
         subSutra.anyListeners = this.anyListeners;
+      }
+      if (shareTree) {
+        this.sharedTree = true;
+        // Merge subtree's tree into the main tree
+        this.tree = [].concat(_toConsumableArray(this.tree.slice(0, insertAt)), _toConsumableArray(subSutra.tree), _toConsumableArray(this.tree.slice(insertAt)));
+        // Update sutraPath for all nodes in the subtree
+        // Remark: Is re-generating the paths required, wanted, or needed?
+        /*
+        subSutra.tree.forEach((node, index) => {
+          this.generateSutraPath(node, 'tree', insertAt + index, null);
+        });
+        */
+      }
+
+      if (shareMap) {
+        this.sharedMap = true;
+
+        // Merge subtree's maps into the main tree's maps
+        this.maps = _objectSpread(_objectSpread({}, this.maps), subSutra.maps);
+
+        // Update the subtree's maps to reflect this change
+        // subSutra.maps = this.maps;
       }
 
       // Integrate conditions from the subSutra

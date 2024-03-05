@@ -134,8 +134,9 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
             console.warn("Markup parsed an unknown tag type, using default instead. tag type:", entityType);
           } else {
             ent[entityType](ent.config);
-            console.log('ENT IS NOW', ent.config.type, ent.config);
+            // console.log('ENT IS NOW', ent.config.type, ent.config)
           }
+
           ent.style(safeStyles);
           that.buildEntity(ent, entity);
         });
@@ -351,52 +352,68 @@ var Markup = exports["default"] = /*#__PURE__*/function () {
       gameHolder.appendChild(pre);
     }
   }, {
-    key: "generateMarkup",
-    value: function (_generateMarkup) {
-      function generateMarkup() {
-        return _generateMarkup.apply(this, arguments);
-      }
-      generateMarkup.toString = function () {
-        return _generateMarkup.toString();
-      };
-      return generateMarkup;
-    }(function () {
+    key: "toHTML",
+    value: function toHTML() {
+      var _this3 = this;
+      var prettyPrintAttributes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
       var markup = '';
       var entities = this.game.data.ents._;
       Object.keys(entities).forEach(function (eId) {
         var entity = entities[eId];
         // Start the tag based on the entity type
         markup += "<m-".concat(entity.type.toLowerCase().replace('_', '-'));
+        var addAttribute = function addAttribute(name, value, singleQuotes) {
+          var quote = '"';
+          if (singleQuotes) {
+            quote = "'";
+          }
+          if (prettyPrintAttributes) {
+            // When prettyPrintAttributes is true, add each attribute on a new line with indentation
+            markup += "\n  ".concat(name, "=").concat(quote).concat(value).concat(quote);
+          } else {
+            // Otherwise, add attributes on the same line
+            markup += " ".concat(name, "=").concat(quote).concat(value).concat(quote);
+          }
+        };
 
-        // position is always defined with x y z
-        markup += " data-x=\"".concat(entity.position.x, "\" data-y=\"").concat(entity.position.y, "\"");
-        if (entity.position.z !== undefined) markup += " data-z=\"".concat(entity.position.z, "\"");
+        // position is always defined with x, y, z
+        addAttribute('data-x', entity.position.x);
+        addAttribute('data-y', entity.position.y);
+        if (entity.position.z !== undefined) addAttribute('data-z', entity.position.z);
 
         // Add data attributes based on entity properties
-        if (entity.isStatic !== undefined) markup += " data-is-static=\"".concat(entity.isStatic, "\"");
-        if (entity.x !== undefined) markup += " data-x=\"".concat(entity.x, "\"");
-        if (entity.y !== undefined) markup += " data-y=\"".concat(entity.y, "\"");
-        if (entity.width !== undefined) markup += " data-width=\"".concat(entity.width, "\"");
-        if (entity.height !== undefined) markup += " data-height=\"".concat(entity.height, "\"");
-        if (entity.texture !== undefined) markup += " data-texture=\"".concat(JSON.stringify(entity.texture), "\"");
-        if (entity.name !== undefined) markup += " data-name=\"".concat(entity.name, "\"");
-        if (entity.layout !== undefined) markup += " data-layout=\"".concat(entity.layout, "\"");
-        if (entity.origin !== undefined) markup += " data-origin=\"".concat(entity.origin, "\"");
-        if (entity.repeat !== undefined) markup += " data-repeat=\"".concat(entity.repeat, "\"");
+        if (entity.isStatic !== undefined) addAttribute('data-is-static', entity.isStatic);
+        if (entity.x !== undefined) addAttribute('data-x', entity.x);
+        if (entity.y !== undefined) addAttribute('data-y', entity.y);
+        if (entity.width !== undefined) addAttribute('data-width', entity.width);
+        if (entity.height !== undefined) addAttribute('data-height', entity.height);
+        // data-texture attribute stores JSON and we are using single quote on the attribute as special case
+        // we could just use single quote for all attributes, special case of JSON on attribute should be further considered
+        // its not really safe to store JSON formatted data in HTML attribute tag ( escapes )
+        // TODO: we could implement a custom <m-texture child element to handle this
+        if (entity.texture !== undefined) addAttribute('data-texture', JSON.stringify(entity.texture), true);
+        if (entity.name !== undefined) addAttribute('data-name', entity.name);
+        if (entity.layout !== undefined) addAttribute('data-layout', entity.layout);
+        if (entity.origin !== undefined) addAttribute('data-origin', entity.origin);
+        if (entity.repeat !== undefined) addAttribute('data-repeat', entity.repeat);
 
         // Close the opening tag
-        markup += '>';
+        if (prettyPrintAttributes) {
+          markup += '\n>';
+        } else {
+          markup += '>';
+        }
 
         // Handle nested entities, if any
         if (entity.children && entity.children.length > 0) {
-          markup += generateMarkup(entity.children); // Recursive call for children
+          markup += _this3.toHTML(entity.children, prettyPrintAttributes); // Recursive call for children, passing the prettyPrintAttributes flag
         }
 
         // Close the tag
         markup += "</m-".concat(entity.type.toLowerCase().replace('_', '-'), ">\n");
       });
       return markup;
-    })
+    }
   }, {
     key: "parseHTML",
     value: function parseHTML(displayOriginalHTML) {

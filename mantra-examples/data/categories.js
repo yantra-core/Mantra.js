@@ -329,6 +329,14 @@ let entity_examples = [
     image: 'placeholder-image.jpg',
     url: 'entity/entity-lifetime.html',
     tags: ['entity', 'lifetime', 'duration', 'time', 'exist', 'live', 'survive', 'persist', 'endure', 'continue', 'remain']
+  },
+  {
+    title: 'Absolute Position',
+    category: 'entity',
+    description: 'Set an absolute screen position for an entity.',
+    image: 'placeholder-image.jpg',
+    url: 'entity/absolute-position.html',
+    tags: ['absolute', 'fixed', 'position', 'entity', 'screen', 'location', 'place', 'spot', 'site', 'area', 'region', 'zone']
   }
 
 ];
@@ -1023,6 +1031,14 @@ let container_examples = [
     image: 'placeholder-image.jpg',
     url: 'containers/group-entities.html',
     tags: ['group', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'assemblage', 'aggregation']
+  },
+  {
+    title: 'Scene Layout',
+    category: ['containers', 'scenes', 'entity'],
+    description: 'Arrange entities by origin in a Scene.',
+    image: 'placeholder-image.jpg',
+    url: 'containers/scene-layout.html',
+    tags: ['grid', 'layout', 'arrange', 'entities', 'group', 'layout', 'arrangement', 'composition', 'assembly', 'collection', 'scene']
   },
   {
     title: 'Grid Layout',

@@ -48,6 +48,14 @@ var Button = exports["default"] = /*#__PURE__*/function () {
       if (typeof entityData.disabled !== 'undefined') {
         entityData.meta.disabled = entityData.disabled;
       }
+
+      // provide default size for UI elements
+      if (typeof entityData.size === 'undefined') {
+        entityData.size = {
+          width: 100,
+          height: 50
+        };
+      }
       return _objectSpread({
         type: 'BUTTON',
         body: false,

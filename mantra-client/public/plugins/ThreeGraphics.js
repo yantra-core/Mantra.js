@@ -53890,14 +53890,28 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       this.inflateTexture = _inflateTexture["default"].bind(this);
       this.game = game;
       this.game.systemsManager.addSystem('graphics-three', this);
+      if (typeof this.game.threeReady === 'undefined') {
+        this.game.threeReady = false; // TODO: remove this, check case in SystemManager for double plugin init
+      }
+
       this.threeReady(game);
     }
   }, {
     key: "threeReady",
     value: function threeReady(game) {
       var _this2 = this;
-      this.scene = new _three.Scene();
+      if (this.game.threeReady) {
+        console.warn('ThreeGraphics already initialized');
+        return;
+      }
+      this.game.threeReady = true;
 
+      // get the three-render-canvas, if exists, clear it
+      var canvas = document.getElementById('three-render-canvas');
+      if (canvas) {
+        canvas.remove();
+      }
+      this.scene = new _three.Scene();
       // Initialize the renderer
       this.renderer = new _three.WebGLRenderer({
         antialias: true
@@ -53951,7 +53965,6 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // this.controls.enableZoom = true; // Enable zooming
       // async:true plugins *must* self report when they are ready
       // game.emit('plugin::ready::graphics-three', this);
-
       game.graphics.push(this);
       window.addEventListener('resize', this.onWindowResize.bind(this), false);
       document.body.style.cursor = 'default';
@@ -54133,13 +54146,12 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       });
       delete this.game._plugins['ThreeGraphics'];
 
-      // remove canvas
+      // Remove the canvas from the DOM
       var canvas = document.getElementById('three-render-canvas');
       if (canvas) {
-        // hide canvas
-        // canvas.style.display = 'none';
         canvas.remove();
       }
+      this.game.threeReady = false;
     }
   }]);
   return ThreeGraphics;

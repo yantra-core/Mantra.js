@@ -3,8 +3,8 @@ import defaultMouseMovement from "./defaultMouseMovement.js";
 export default function topdownMovement(game) {
 
   let rules = game.createSutra();
-
   rules.addCondition('PLAYER_UP', { op: 'or', conditions: ['W', 'DPAD_UP'] });
+
   rules.addCondition('PLAYER_DOWN', { op: 'or', conditions: ['S', 'DPAD_DOWN'] });
   rules.addCondition('PLAYER_LEFT', { op: 'or', conditions: ['A', 'DPAD_LEFT'] });
   rules.addCondition('PLAYER_RIGHT', { op: 'or', conditions: ['D', 'DPAD_RIGHT'] });
@@ -17,9 +17,7 @@ export default function topdownMovement(game) {
   rules.addCondition('ZOOM_IN', { op: 'or', conditions: ['Q', 'BUTTON_A'] });
   rules.addCondition('ZOOM_OUT', { op: 'or', conditions: ['E', 'BUTTON_Y'] });
 
-
   rules.addCondition('OPEN_EDITOR', { op: 'or', conditions: ['ESCAPE'] });
-
 
   rules
     .if('PLAYER_UP')
@@ -116,8 +114,6 @@ export default function topdownMovement(game) {
   const moveSpeed = 2;
 
   rules.on('MOVE_UP', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_UP = true;
     let force = { x: 0, y: -moveSpeed, z: 0 };
     if (isDiagonalMovement(rules.state)) {
       force.y *= normalizationFactor;
@@ -128,9 +124,6 @@ export default function topdownMovement(game) {
   });
 
   rules.on('MOVE_DOWN', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_DOWN = true;
-
     let force = { x: 0, y: moveSpeed, z: 0 };
     if (isDiagonalMovement(rules.state)) {
       force.y *= normalizationFactor;
@@ -140,9 +133,6 @@ export default function topdownMovement(game) {
   });
 
   rules.on('MOVE_LEFT', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_LEFT = true;
-
     let force = { x: -moveSpeed, y: 0, z: 0 };
     if (isDiagonalMovement(rules.state)) {
       force.x *= normalizationFactor;
@@ -152,9 +142,6 @@ export default function topdownMovement(game) {
   });
 
   rules.on('MOVE_RIGHT', function (entity, node) {
-    node.state = node.state || {};
-    node.state.MOVE_RIGHT = true;
-
     let force = { x: moveSpeed, y: 0, z: 0 };
     if (isDiagonalMovement(rules.state)) {
       force.x *= normalizationFactor;

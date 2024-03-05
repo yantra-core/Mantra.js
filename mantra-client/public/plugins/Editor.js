@@ -38,6 +38,12 @@ var Editor = /*#__PURE__*/function () {
       document.body.style.perspective = 'none';
       this.dropdownTimers = new Map(); // To manage delayed close timers
 
+      // TODO: remove this, check case in SystemManager for double plugin init case, add tests
+      // This plugin has a side-effet ( shows editor ), we don't want double editors
+      if (typeof this.game.editorReady === 'undefined') {
+        this.game.editorReady = false;
+      }
+
       // Check for jQuery
       if (typeof $ === 'undefined') {
         console.log('$ is not defined, attempting to load jQuery from vendor');
@@ -51,8 +57,31 @@ var Editor = /*#__PURE__*/function () {
       // game.use(new this.game.plugins.PluginsGUI());
     }
   }, {
+    key: "jqueryReady",
+    value: function jqueryReady() {
+      if (this.game.editorReady) {
+        //console.warn('Editor already initialized');
+        this.toggle();
+        return;
+      }
+      this.game.editorReady = true;
+
+      // do not create Editor on mobile ( for now )
+      if (this.game.isTouchDevice()) {
+        return;
+      }
+      this.createToolbar(this.game);
+      this.setupGlobalClickListener();
+      // this.createViewSourceModal();
+      this.game.loadCSS('/plugins/Editor/Editor.css');
+    }
+  }, {
     key: "toggle",
     value: function toggle() {
+      if (typeof this.toolbarMenu === 'undefined' || this.toolbarMenu === null) {
+        console.warn('Toolbar not found');
+        return;
+      }
       if (this.toolbarMenu.toggleStatus === 'open') {
         this.hide();
       } else {
@@ -69,19 +98,6 @@ var Editor = /*#__PURE__*/function () {
     key: "hide",
     value: function hide() {
       this.toolbarMenu.slideOutToolbar();
-    }
-  }, {
-    key: "jqueryReady",
-    value: function jqueryReady() {
-      this.game.systemsManager.addSystem(this.id, this);
-      // do not create Editor on mobile ( for now )
-      if (this.game.isTouchDevice()) {
-        return;
-      }
-      this.createToolbar(this.game);
-      this.setupGlobalClickListener();
-      // this.createViewSourceModal();
-      this.game.loadCSS('/plugins/Editor/Editor.css');
     }
   }, {
     key: "createIcon",
@@ -725,10 +741,12 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
     // Create the primary and secondary groups
     this.primaryGroup = document.createElement('div');
     this.secondaryGroup = document.createElement('div');
+    this.middleGroup = document.createElement('div');
 
     // Set classes for primary and secondary groups
     this.primaryGroup.className = 'menu-group primary';
     this.secondaryGroup.className = 'menu-group secondary';
+    this.middleGroup.className = 'menu-group middle';
 
     // Style the primary and secondary groups
     this.setStyle(this.primaryGroup, {
@@ -739,11 +757,16 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
       display: 'flex',
       flexWrap: 'wrap'
     });
+    this.setStyle(this.middleGroup, {
+      display: 'flex',
+      flexWrap: 'wrap'
+    });
 
     // Create the toolbar and append the groups
     this.toolbar = document.createElement('div');
     this.toolbar.className = 'toolbar';
     this.toolbar.appendChild(this.primaryGroup);
+    this.toolbar.appendChild(this.middleGroup);
     this.toolbar.appendChild(this.secondaryGroup);
 
     // Style the toolbar
@@ -822,12 +845,16 @@ var ToolbarMenu = exports["default"] = /*#__PURE__*/function () {
           this.primaryGroup.insertBefore(element, this.primaryGroup.firstChild);
         } else if (group === 'secondary') {
           this.secondaryGroup.insertBefore(element, this.secondaryGroup.firstChild);
+        } else if (group === 'middle') {
+          this.middleGroup.insertBefore(element, this.middleGroup.firstChild);
         }
       } else {
         if (group === 'primary') {
           this.primaryGroup.appendChild(element);
         } else if (group === 'secondary') {
           this.secondaryGroup.appendChild(element);
+        } else if (group === 'middle') {
+          this.middleGroup.appendChild(element);
         }
       }
     }
@@ -1196,9 +1223,10 @@ function createToolbar(game) {
   inspectorIcon.style.width = '32px';
   inspectorIcon.style.height = '32px';
   inspectorIcon.style.bottom = '12px';
-  inspectorIcon.style.left = '9px';
+  //inspectorIcon.style.left = '9px';
   inspectorIcon.style.position = 'relative';
   inspectorIcon.style.filter = 'invert(100%)';
+  inspectorIcon.style.display = 'none';
   if (is_touch_enabled()) {
     // hide inspector icon on touch devices
     inspectorIcon.style.display = 'none';
@@ -1214,6 +1242,24 @@ function createToolbar(game) {
   function openGithub() {
     window.open('https://github.com/yantra-core/Mantra.js', '_blank');
   }
+  var closeIcon = this.createIcon('x');
+  closeIcon.src = featherRoot + '/vendor/feather/x.svg';
+  closeIcon.style.cursor = 'pointer';
+  closeIcon.title = 'Click to open Entity Inspector';
+  closeIcon.style.marginRight = '10px';
+  closeIcon.style.marginLeft = '5px';
+  //inspectorIcon.style.marginTop = '5px';
+  closeIcon.style.width = '32px';
+  closeIcon.style.height = '32px';
+  closeIcon.style.top = '6px';
+  //closeIcon.style.right = '10px';
+  closeIcon.style.position = 'relative';
+  closeIcon.style.filter = 'invert(100%)';
+
+  // add click handler to close toolbar
+  closeIcon.onclick = function () {
+    return toolbarMenu.slideOutToolbar();
+  };
   toolbarMenu.addItem('primary', {
     text: 'Mantra',
     icon: this.createIcon('slack'),
@@ -1342,10 +1388,31 @@ function createToolbar(game) {
   selectorsContainer.style.justifyContent = 'space-between'; // Space out items
   selectorsContainer.style.margin = '20px'; // Add some margin for aesthetics
 
+  toolbarMenu.addElement('middle', selectorsContainer);
+
+  // create a text label for the current entity
+  var currentEntityLabel = document.createElement('span');
+  currentEntityLabel.style.fontSize = '22px';
+  currentEntityLabel.style.position = 'relative';
+  currentEntityLabel.style.marginRight = '10px';
+  currentEntityLabel.style.marginLeft = '10px';
+  currentEntityLabel.style.bottom = '10px';
+  //currentEntityLabel.style.marginTop = '10px';
+  //currentEntityLabel.style.marginBottom = '10px';
+  currentEntityLabel.style.cursor = 'pointer';
+  currentEntityLabel.innerText = game.selectedEntityId ? game.entities[game.selectedEntityId].constructor.name : 'No Entity Selected';
+  currentEntityLabel.onclick = function () {
+    return _this.showInspector();
+  };
+  currentEntityLabel.style.display = 'none';
+  selectorsContainer.appendChild(currentEntityLabel);
+  //let currentEntityKey = 
+
   selectorsContainer.appendChild(inspectorIcon);
+  //selectorsContainer.appendChild(closeIcon);
   //selectorsContainer.appendChild(graphicsSelectorItem);
   //selectorsContainer.appendChild(worldSelectorItem);
-  toolbarMenu.addElement('secondary', selectorsContainer);
+  toolbarMenu.addElement('secondary', closeIcon);
   if (game.worlds.length > 0) {
     var currentWorldName = game.worlds[0].constructor.name;
     // worldSelector.selectElement(currentWorldName);

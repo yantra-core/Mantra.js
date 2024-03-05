@@ -1,6 +1,3 @@
-// for dev, TODO: game.use() needs a test suite
-// let cache = {};
-
 export default function use(game) {
   return async function use(pluginInstanceOrId, options = {}, cb = () => {}) {
     let basePath = '/plugins/'; // Base path for loading plugins
@@ -23,13 +20,6 @@ export default function use(game) {
 
       game._plugins[pluginId] = { status: 'loading' };
       game.loadingPluginsCount++;
-      /*
-      cache[pluginId] = cache[pluginId] || {
-        start: 0,
-        finish: 0
-      };
-      cache[pluginId].start++;
-      */
       game.emit('plugin::loading', pluginId);
 
       // Store the loading promise
@@ -67,23 +57,11 @@ export default function use(game) {
 
     } else {
 
-
-
-      /*
-      cache[pluginInstanceOrId.id] = cache[pluginInstanceOrId.id] || {
-        start: 0,
-        finish: 0
-      };
-      cache[pluginInstanceOrId.id].start++;
-      */
-
       if (!pluginInstanceOrId.id) {
         console.log('Error with pluginInstance', pluginInstanceOrId);
         throw new Error('All plugins must have a static id property');
       }
-      //console.log('pluginInstanceOrId.id', pluginInstanceOrId.id)
       if (game.systems[pluginInstanceOrId.id]) {
-        //console.log('high level, plugin already loaded returning rearly')
         return;
       }
 
@@ -98,7 +76,6 @@ export default function use(game) {
 
 async function handlePluginInstance(game, pluginInstance, pluginId, options, cb) {
   
-  // console.log('pluginInstance', pluginInstance, pluginId)
   if (game.systems[pluginInstance.id]) {
     // Remark: 3/4/2024 - Previously we were letting double used plugins progress further,
     //                    down the code path for initialization below, this seemed incorrect.
@@ -153,15 +130,6 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
   game.data.plugins = game.data.plugins || {};
   game.data.plugins[pluginId] = options;
   game.loadingPluginsCount--;
-
-  /*
-  cache[pluginId] = cache[pluginId] || {
-    start: 0,
-    finish: 0
-  };
-  cache[pluginId].finish++;
-  */
-
   // Remark: Wait until all logic is process before continuing
   cb();
 

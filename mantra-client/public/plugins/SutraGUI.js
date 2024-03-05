@@ -413,7 +413,7 @@ var SutraGUI = /*#__PURE__*/function () {
       this.drawTable();
       if (this.game.rules) {
         this.setRules(this.game.rules);
-        this.viewSutraEnglish();
+        this.showSutra();
       } else {
         // add message to indicate no sutra
         var container = document.getElementById('sutraTable');
@@ -480,9 +480,24 @@ var SutraGUI = /*#__PURE__*/function () {
   }, {
     key: "showSutra",
     value: function showSutra() {
-      // this.redrawBehaviorTree();
+      // this.drawBehaviorTree();
       var json = this.behavior.toJSON();
-      this.redrawBehaviorTree(this.behavior);
+      this.drawBehaviorTree(this.behavior);
+    }
+  }, {
+    key: "viewMarkup",
+    value: function viewMarkup() {
+      var json = this.behavior.serializeToJson();
+      var markup = this.game.systems.markup.toHTML();
+      // clear the #sutraTable
+      var table = document.getElementById('sutraTable');
+      table.innerHTML = '';
+      // create a new div
+      var markupDiv = document.createElement('pre');
+      markupDiv.style.width = '95%';
+      markupDiv.style.height = '800px';
+      markupDiv.textContent = markup;
+      table.appendChild(markupDiv);
     }
   }, {
     key: "viewJson",
@@ -528,37 +543,54 @@ var SutraGUI = /*#__PURE__*/function () {
       return this.game.emitters;
     }
   }, {
-    key: "redrawBehaviorTree",
-    value: function redrawBehaviorTree(json) {
-      var _this2 = this;
-      var container = document.getElementById('sutraView');
-      var table = document.getElementById('sutraTable');
-      table.innerHTML = '';
-      //let guiContent = container.querySelector('.gui-content');
-      json.tree.forEach(function (node) {
-        table.appendChild(_this2.createNodeElement(node, 1));
-      });
-    }
-  }, {
     key: "drawBehaviorTree",
     value: function drawBehaviorTree(json) {
-      var _this3 = this;
-      // get existing container
+      var _this2 = this;
+      // Ensure the container and table elements exist
       var container = document.getElementById('sutraView');
-      var table = document.getElementById('sutraTable');
-      //let guiContent = container.querySelector('.gui-content');
-      if (json.tree.length === 0) {
-        // add message to indicate no sutra
-        // table.innerHTML = 'No Sutra Rules have been defined yet. Click "Add Rule" to begin.';
+      if (!container) {
+        console.error('Container element #sutraView not found.');
         return;
       }
-      //let container = document.createElement('div');
+      var table = document.getElementById('sutraTable');
+      if (!table) {
+        console.error('Table element #sutraTable not found.');
+        return;
+      }
+
+      // Clear the table contents initially
+      table.innerHTML = '';
+
+      // Recursive helper function to draw a node and its children
+      var drawNode = function drawNode(node, parentElement) {
+        var nodeElement = _this2.createNodeElement(node, 1);
+        parentElement.appendChild(nodeElement);
+        // If the node has children, draw them recursively
+        if (node.tree && node.tree.length > 0) {
+          node.tree.forEach(function (child) {
+            return drawNode(child, parentElement);
+          });
+        }
+      };
+
+      // Draw the main tree nodes
       json.tree.forEach(function (node) {
-        table.appendChild(_this3.createNodeElement(node, 1));
+        drawNode(node, table);
       });
-      // Append this container to your GUI, adjust as needed
-      //guiContent.appendChild(table);
-      //container.appendChild(guiContent); // Example: appending to body
+
+      // Draw subtrees, if any
+      if (json.subtrees) {
+        var subtrees = Object.keys(json.subtrees);
+        if (subtrees.length > 0) {
+          subtrees.forEach(function (key) {
+            var subtree = json.subtrees[key];
+            subtree.tree.forEach(function (node) {
+              console.log('subtree node', node);
+              drawNode(node, table);
+            });
+          });
+        }
+      }
     }
   }, {
     key: "getAvailableActions",
@@ -573,7 +605,7 @@ var SutraGUI = /*#__PURE__*/function () {
   }, {
     key: "createNodeElement",
     value: function createNodeElement(node, indentLevel) {
-      var _this4 = this;
+      var _this3 = this;
       var path = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
       var keyword = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'IF';
       var formElement = document.createElement('form');
@@ -588,7 +620,7 @@ var SutraGUI = /*#__PURE__*/function () {
         // Check if subtree is an instance of Sutra and needs recursive rendering
         // Render each node in the subtree recursively
         subtree.tree.forEach(function (subNode) {
-          var childFormElement = _this4.createNodeElement(subNode, indentLevel + 1, nodeId);
+          var childFormElement = _this3.createNodeElement(subNode, indentLevel + 1, nodeId);
           formElement.appendChild(childFormElement);
         });
       }
@@ -598,14 +630,15 @@ var SutraGUI = /*#__PURE__*/function () {
       if (node.action) {
         formElement.classList.add('action-node-form');
         formElement.onclick = function () {
-          _this4.showActionForm(node);
+          _this3.showActionForm(node);
         };
         this.appendActionElement(contentDiv, node, indentLevel, keyword);
       } else if (node["if"]) {
         this.appendConditionalElement(contentDiv, node, indentLevel);
       }
       if (indentLevel !== 1) {
-        formElement.classList.add('collapsible-content');
+        // Remark: 3/4/2024 - Commented out to show all rules by default
+        // formElement.classList.add('collapsible-content');
       }
       return formElement;
     }
@@ -824,12 +857,12 @@ var SutraGUI = /*#__PURE__*/function () {
   }, {
     key: "createElseElement",
     value: function createElseElement(node, indentLevel) {
-      var _this5 = this;
+      var _this4 = this;
       var keyword = "ELSE";
       var elseElement = document.createElement('div');
       elseElement.className = 'else-branch';
       node["else"].forEach(function (childNode) {
-        return elseElement.appendChild(_this5.createNodeElement(childNode, indentLevel + 1, '', 'ELSE'));
+        return elseElement.appendChild(_this4.createNodeElement(childNode, indentLevel + 1, '', 'ELSE'));
       });
       return elseElement;
     }
@@ -839,7 +872,7 @@ var SutraGUI = /*#__PURE__*/function () {
       var json = this.serializeFormToJSON(form);
       console.log('SutraGui.saveConditional() called', conditionalName, json);
       this.behavior.updateCondition(conditionalName, json); // Update Sutra instance
-      this.redrawBehaviorTree(); // Redraw the tree to reflect changes
+      this.drawBehaviorTree(); // Redraw the tree to reflect changes
     }
   }, {
     key: "handleAddRuleClick",
@@ -878,19 +911,19 @@ var SutraGUI = /*#__PURE__*/function () {
       */
 
       var json = this.behavior.serializeToJson();
-      this.redrawBehaviorTree();
+      this.drawBehaviorTree();
     }
   }, {
     key: "createAddRuleButton",
     value: function createAddRuleButton(nodeId) {
-      var _this6 = this;
+      var _this5 = this;
       var button = document.createElement('button');
       button.textContent = '+';
       button.className = 'rule-button rule-button-add';
       button.title = 'Add a new rule';
       button.setAttribute('data-id', nodeId);
       button.onclick = function (e) {
-        _this6.handleAddRuleClick(e.target.getAttribute('data-id'));
+        _this5.handleAddRuleClick(e.target.getAttribute('data-id'));
         return false;
       };
       return button;
@@ -898,7 +931,7 @@ var SutraGUI = /*#__PURE__*/function () {
   }, {
     key: "createRemoveRuleButton",
     value: function createRemoveRuleButton(nodeId) {
-      var _this7 = this;
+      var _this6 = this;
       var button = document.createElement('button');
       button.textContent = '-';
       button.className = 'rule-button rule-button-remove';
@@ -906,7 +939,7 @@ var SutraGUI = /*#__PURE__*/function () {
       button.setAttribute('data-id', nodeId);
       button.onclick = function (e) {
         e.stopPropagation();
-        _this7.handleRemoveRuleClick(e.target.getAttribute('data-id'));
+        _this6.handleRemoveRuleClick(e.target.getAttribute('data-id'));
       };
       return button;
     }
@@ -990,6 +1023,13 @@ function drawTable() {
   readSutraButton.onclick = function () {
     return _this.viewSutraEnglish();
   };
+
+  // Adds "View Markup" button
+  var viewMarkupButton = document.createElement('button');
+  viewMarkupButton.textContent = 'View Markup';
+  viewMarkupButton.onclick = function () {
+    return _this.viewMarkup();
+  };
   var guiContent = this.sutraView.querySelector('.gui-content');
 
   // set background color to transparent
@@ -1001,8 +1041,9 @@ function drawTable() {
   var footer = document.createElement('div');
   footer.className = 'gui-window-footer';
   guiContent.appendChild(showSutraButton);
-  guiContent.appendChild(viewJsonButton);
+  // guiContent.appendChild(viewJsonButton);
   guiContent.appendChild(readSutraButton);
+  guiContent.appendChild(viewMarkupButton);
   guiContent.appendChild(slider);
   guiContent.appendChild(table);
 

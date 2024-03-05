@@ -3867,7 +3867,9 @@ var Home = /*#__PURE__*/function () {
               game.use('Collectable');
               game.use('SwitchGraphics');
               game.use('Key');
-            case 22:
+              _context.next = 24;
+              return game.awaitAllPlugins();
+            case 24:
             case "end":
               return _context.stop();
           }
@@ -4476,7 +4478,7 @@ function sutras(game) {
 
   // for now, ensure that player input movement sutras are top level rules
   // we should be able to use the movement sutra as a sub-sutra, see above comment
-  game.useSutra((0, _topDown["default"])(game), 'mode-topdown');
+  // game.useSutra(movement(game), 'mode-topdown');
 
   // helper for switching graphics
   var switchGraphicsSutra = (0, _switchGraphics["default"])(game);

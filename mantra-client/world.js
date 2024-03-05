@@ -22,9 +22,10 @@ import Markup from '../mantra-game/plugins/markup/Markup.js';
 let game = new Game({
   width: 800,
   height: 600,
+  fps: 60,
   plugins: ['Gamepad'],
   editor: false,
-  graphics: ['three'], // 'three', 'babylon', 'css'
+  graphics: ['css'], // 'three', 'babylon', 'css'
   plugins: ['SwitchGraphics'],
   gameRoot: '.',
   //defaultMovement: true,
@@ -83,6 +84,10 @@ game.use(new plugins.RBush())
 game.use(new plugins.Bullet())
 game.use(new plugins.Tower())
 game.use(new plugins.TileMap());
+
+//game.use(new plugins.Tile({ proceduralGenerateMissingChunks: true }));
+
+
 game.use(new plugins.TileSet());
 game.use(new plugins.Flame());
 game.use(new plugins.Label());
@@ -101,7 +106,7 @@ game.use(new plugins.Radio());
 game.use(new plugins.Text());
 game.use(new plugins.Image());
 game.use(new plugins.Canvas());
-// game.use(new plugins.CSSGraphics());
+game.use(new plugins.CSSGraphics());
 game.use(new plugins.GravityWell());
 game.use(new plugins.Button());
 game.use(new plugins.Code());
@@ -109,33 +114,161 @@ game.use(new plugins.Container());
 game.use(new plugins.Entity());
 // game.use(new plugins.Monaco());
 game.use(new plugins.Key());
+game.use(new plugins.Keyboard());
 //game.use(new plugins.CSSGraphics())
 //game.use(new plugins.ThreeGraphics())
 game.use(new plugins.Mouse());
 game.use(new plugins.Link());
 
 game.use(new plugins.Markup());
+
+// game.use(new plugins.TensorFlow());
+
+
 // game.use(new Mouse());
-game.use(new plugins.Editor());
+//game.use(new plugins.Editor());
 // game.use(new Lifetime());
+game.use(new plugins.Gamepad())
+// game.use(new plugins.SutraGUI());
 
-game.use(new plugins.ThreeGraphics());
-
+// game.use(new plugins.ThreeGraphics());
+// game.use(new plugins.Editor());
+game.use(new plugins.SwitchGraphics())
 game.start(function () {
   game.reset();
   //  game.setZoom(1);
-  game.use(new plugins.SwitchGraphics())
+  //game.systems.tile.proceduralGenerateMissingChunks = true;
   game.data.camera.mouseWheelZoomEnabled = true;
   game.data.camera.adaptiveZoom = true;
   console.log('gggg', game.systems)
   //game.systems.markup.preview()
-  game.use(new worlds.Home());
+  //game.systems.markup.parseHTML()
+  game.use(new worlds.Maze());
 
-  game.make().Container().style({
-    border: '1px solid red',
-    background: 'rgba(255, 0, 0, 0.1)'
+  console.log('rrrrr', game.rules)
+  game.rules.if('X').then('DO_STUFF');
+  game.rules.on('DO_STUFF', function (entity, node) {
+    alert('snap')
+  });
+
+
+
+  //
+  // Game and Clients
+  //
+  //import { Game } from '../mantra-game/Game.js';
+  // import { Game } from '../mantra-game';
+  //import plugins from '../mantra-game/plugins.js';
+  //import worlds from '../mantra-worlds/index.js';
+  /*
+  game.rules.if('USE_ITEM_1').then('FIRE_BULLET');
+
+  // Select drop down with all Terrain generator transforms
+  let mazeSelector = game.make().name('mazeSelector').Select();
+  // game.terrainGenerators is object, we need to convert to array of options
+
+  let options = [];
+  for (let key in game.mazes) {
+    options.push({
+      value: key,
+      label: key
+    });
+  }
+
+  mazeSelector.meta({
+    options: options
+  });
+  mazeSelector.position(0, 0, 11111);
+  game.make().Hexapod().repeat(11).createEntity();
+
+
+  // Function to handle after an option is selected and update the entity accordingly
+  // TODO: add EntityBuilder.onchange event
+  mazeSelector.afterUpdateEntity(function (context, event) {
+
+    if (!context || typeof context.value === 'undefined') {
+      return;
+    }
+    console.log('context', context.value);
+
+    generateMaze(context.value);
+  });
+  mazeSelector.style({
+    position: 'absolute',
+  })
+  mazeSelector.createEntity();
+
+  let regenButton = game.make().Button().text('Regenerate Maze').style({
+    fontSize: '10px',
+
+  }).height(30).position(170, -15, 11111);
+
+  regenButton.pointerdown(function () {
+    let currentValue = game.getEntityByName('mazeSelector');
+    console.log('currentValue', currentValue)
+    generateMaze(currentValue.value || 'RecursiveDivision'); // TODO: should *not* need a default here
+  });
+  regenButton.createEntity();
+  */
+  game.make().Block().isStatic(true).createEntity();
+  game.make().Player().position(0, 0, 16).meta({
+    //equippedItems: ['Bullet']
+
+    equippedItems: [
+      {
+        plugin: 'bullet',
+        method: 'fireBullet',
+      }
+    ]
+
 
   }).createEntity();
+
+
+  function generateMaze(type = 'RecursiveDivision') {
+
+
+    // TODO: this should use Scene API and just remove / clear the scene
+
+
+    let tileMap = new game.TileMap({
+      x: 0,
+      y: 0,
+      width: 64,
+      height: 64,
+      seed: 1234,
+      //depth: parseInt(tileMap.depth),
+      tileWidth: 16, // TODO: tileSet.tilewidth
+      tileHeight: 16 // TODO: tileSet.tileheight
+    });
+    tileMap.fill(2);
+
+    // Supports all options from Labyrinthos.js
+    // See: https://github.com/yantra-core/Labyrinthos.js
+
+
+    let maze = game.terrainGenerators[type];
+    // alert(type)
+    // TODO: use string from dropdown option its a 1:1 match
+    maze(tileMap, {});
+
+    console.log("tileMap", tileMap)
+    game.systems.tile.createLayer(tileMap, 16, 16)
+  }
+
+  // generateMaze();
+
+
+  // game.setBackground('black');
+
+
+  /*
+    game.make().Container().style({
+      border: '1px solid red',
+      background: 'rgba(255, 0, 0, 0.1)'
+  
+    }).createEntity();
+    */
 
   /*
   let button = game.make().Button()
@@ -166,235 +299,7 @@ game.start(function () {
     autoBorder: true
   }));
 
-  //
-  // Top Left
-  // 
-  game.make().Text()
-    .text('Top Left')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('top-left')
-    .origin('bottom-right')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('top-left')
-    .origin('bottom-right')
-    .createEntity();
-
-  //
-  // Top Center
-  //
-
-  game.make().Text()
-    .text('Top Center')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('top-center')
-    .origin('bottom')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('top-center')
-    .origin('top-center')
-    .createEntity();
-
-  //
-  // Top Right
-  //
-
-  game.make().Text()
-    .text('Top Right')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('top-right')
-    .origin('bottom-left')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('top-right')
-    .origin('bottom-left')
-    .createEntity();
-
-
-
-  //
-  // Center Left
-  //
-
-  game.make().Text()
-    .text('Center Left')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('center-left')
-    .origin('right')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('center-left')
-    .origin('center-left')
-    .createEntity();
-
-  //
-  // Center
-  //
-
-  game.make().Text()
-    .text('Center')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('center')
-    .origin('center')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('center')
-    .origin('center')
-    .createEntity();
-
-  //
-  // Center Right
-  //
-
-  game.make().Text()
-    .text('Center Right')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('center-right')
-    .origin('left')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('center-right')
-    .origin('center-right')
-    .createEntity();
-
-  //
-  // Bottom Left
-  //
-
-  game.make().Text()
-    .text('Bottom Left')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .origin('top-right')
-
-    .layout('bottom-left')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('bottom-left')
-    .origin('top-right')
-    .createEntity();
-
-  //
-  // Bottom Center
-  //
-
-  game.make().Text()
-    .text('Bottom Center')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('bottom-center')
-    .origin('top')
-    .z(2)
-    .createEntity();
-
-  game.make()
-    .color('white')
-    .width(100)
-    .height(100)
-    .layout('bottom-center')
-    .origin('bottom-center')
-    .createEntity();
-
-  //
-  // Bottom Right
-  //
-
-  game.make().Text()
-    .text('Bottom Right')
-    .style({
-      fontSize: '32px',
-      textAlign: 'center'
-    })
-    .color('black')
-    .width(100)
-    .height(100)
-    .layout('bottom-right')
-    .origin('top-left')
-
-    .z(2)
-    .createEntity();
-
+ 
   game.make()
     .color('white')
     .width(100)

@@ -2153,78 +2153,77 @@ var Metroidvania = /*#__PURE__*/function () {
 }();
 function ALGORITHM_METROIDVANIA(tileMap) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  try {
-    tileMap.fill(0); // Fill with walls
-    var maxDimension = Math.max(tileMap.width, tileMap.height);
-    if (maxDimension <= 5) {
-      return;
-    }
-    var fractional = Math.sqrt(maxDimension);
-    if (fractional % 2 !== 1) fractional++;
-    var size = maxDimension < 10 ? Math.floor(maxDimension / 2) : 10;
-    var doorDiff = maxDimension < 10 ? 1 : 2;
-    var roomSizeHeight = Math.floor(tileMap.width / size);
-    var roomSizeWidth = Math.floor(tileMap.height / size);
-    var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
-    var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
-    var maxCount = Math.floor(numRoomsWide * numRoomsHigh * 0.8);
-    var minCount = Math.floor(maxCount / 4);
-    var generator = new Metroidvania({
-      roomWidth: roomSizeWidth,
-      roomHeight: roomSizeHeight,
-      maxFails: 25000,
-      width: numRoomsWide,
-      // Max number of zones wide
-      height: numRoomsWide,
-      // Max number of zones tall
-      gridHeight: tileMap.height,
-      gridWidth: tileMap.width,
-      minZonesPerRoom: 1,
-      // Minimum number of zones per room
-      maxZonesPerRoom: 3,
-      // Maximum number of zones per room
-      minRoomsPerMap: minCount,
-      // Minimum number of rooms per map
-      maxRoomsPerMap: maxCount,
-      // Maximum number of rooms per map
-      newDoors: doorDiff,
-      // # doors to add to prevent tedious linear mazes
-      roomDiff: doorDiff,
-      // When adding a new door, room ID distance
-      roomDiffOdds: 1 / 2 // Odds of inserting a new door on opportunity
-    });
+  // Constants for clarity and adaptability
+  var WALL_FILL_VALUE = 0;
+  var MIN_DIMENSION_THRESHOLD = 5;
+  var SIZE_THRESHOLD = 10;
+  var DOOR_DIFF_SMALL = 1;
+  var DOOR_DIFF_LARGE = 2;
+  var MAX_FAILS_ALLOWED = 25000;
+  var ROOM_OCCUPANCY_RATIO = 0.8;
+  var MIN_ROOM_RATIO = 0.25;
 
-    var built = null;
-    if (options.retries) {
-      var generated = false;
-      var currentTry = 0;
-      while (currentTry < options.retries && !generated) {
-        try {
-          currentTry++;
-          built = generator.build(function () {
-            return tileMap.random();
-          });
-          generated = true;
-        } catch (ex) {
-          console.log('RTX', ex);
-        }
-      }
-    } else {
+  // Fill tileMap with walls
+  tileMap.fill(WALL_FILL_VALUE);
+  var maxDimension = Math.max(tileMap.width, tileMap.height);
+  if (maxDimension <= MIN_DIMENSION_THRESHOLD) {
+    return;
+  }
+  var adjustedDimension = Math.sqrt(maxDimension);
+  if (adjustedDimension % 2 !== 1) adjustedDimension++;
+  var size = maxDimension < SIZE_THRESHOLD ? Math.floor(maxDimension / 2) : SIZE_THRESHOLD;
+  var doorDiff = maxDimension < SIZE_THRESHOLD ? DOOR_DIFF_SMALL : DOOR_DIFF_LARGE;
+  var roomSizeHeight = Math.floor(tileMap.width / size);
+  var roomSizeWidth = Math.floor(tileMap.height / size);
+  var numRoomsWide = Math.floor(tileMap.width / roomSizeHeight);
+  var numRoomsHigh = Math.floor(tileMap.height / roomSizeWidth);
+  var maxRoomCount = Math.floor(numRoomsWide * numRoomsHigh * ROOM_OCCUPANCY_RATIO);
+  var minRoomCount = Math.floor(maxRoomCount * MIN_ROOM_RATIO);
+
+  // Generator configuration with corrected height assignment
+  var generator = new Metroidvania({
+    roomWidth: roomSizeWidth,
+    roomHeight: roomSizeHeight,
+    maxFails: MAX_FAILS_ALLOWED,
+    width: numRoomsWide,
+    // Max number of zones wide
+    height: numRoomsHigh,
+    // Max number of zones tall (fixed typo)
+    gridHeight: tileMap.height,
+    gridWidth: tileMap.width,
+    minZonesPerRoom: 1,
+    maxZonesPerRoom: 3,
+    minRoomsPerMap: minRoomCount,
+    maxRoomsPerMap: maxRoomCount,
+    newDoors: doorDiff,
+    roomDiff: doorDiff,
+    roomDiffOdds: 0.5
+  });
+  var built = null;
+  var maxRetries = options.retries || 4; // safe number, 5-8 is fine, 10 can start to pause slower systems
+  for (var attempt = 0; attempt < maxRetries; attempt++) {
+    try {
       built = generator.build(function () {
         return tileMap.random();
       });
+      break; // Exit loop if build succeeds
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error; // Rethrow error on last attempt
     }
-    var flattened = built.world.reduce(function (agg, line) {
-      return agg.concat(line);
-    }, []);
-    built.world = null;
-    if (!built) throw new Error('failed to build world');
-    tileMap.world = built;
-    for (var lcv = 0; lcv < tileMap.data.length; lcv++) {
-      tileMap.data[lcv] = flattened[lcv];
-    }
-  } catch (ex) {
-    console.log('MV generation error', ex);
+  }
+
+  // Ensure built is not null before proceeding
+  if (!built || !built.world) throw new Error('Failed to build world');
+  var flattened = built.world.reduce(function (agg, line) {
+    return agg.concat(line);
+  }, []);
+  // Note: The next line might not be needed as it nullifies built.world, consider removing
+  // built.world = null;
+
+  // Map the flattened world back to the tileMap
+  tileMap.world = built;
+  for (var i = 0; i < tileMap.data.length; i++) {
+    tileMap.data[i] = flattened[i];
   }
 }
 
@@ -4720,6 +4719,18 @@ var Tile = /*#__PURE__*/function () {
     this.shapes = _labyrinthos["default"].shapes;
     // in debug mode we will add colors to each chunk
     this.debug = false;
+    this.allTransformers = {};
+
+    // TODO: this aggregate should be in LABY, part of transforms 
+    for (var t in _labyrinthos["default"].mazes) {
+      this.allTransformers[t] = _labyrinthos["default"].mazes[t];
+    }
+    for (var _t in _labyrinthos["default"].terrains) {
+      this.allTransformers[_t] = _labyrinthos["default"].terrains[_t];
+    }
+    for (var _t2 in _labyrinthos["default"].shapes) {
+      this.allTransformers[_t2] = _labyrinthos["default"].shapes[_t2];
+    }
 
     // set a default tiled map
     this.tiledMap = tiledMap;
@@ -4797,6 +4808,8 @@ var Tile = /*#__PURE__*/function () {
       this.game.Biome = this.Biome;
       this.game.terrains = this.terrains;
       this.game.mazes = this.mazes;
+      this.game.terrainGenerators = this.allTransformers;
+
       // this.game.shapes = this.shapes;
 
       if (this.loadInitialChunk) {
@@ -5371,6 +5384,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = handleChunkLoadFailure;
+// TODO: move most of the processing logic in this file to dedicated infinite chunk generators / tiled-server code
 function handleChunkLoadFailure(chunkPath, chunkKey) {
   var labyrinthos = this.labyrinthos;
   // console.log("Fallback for failed load:", chunkPath, chunkKey);

@@ -579,10 +579,12 @@ button {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  margin: 12px;
+  margin-left: 20px;
+  margin-top: 24px;
   cursor: pointer;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 24px;
+  padding: 12px;
 }
 
 #sutraView button:hover {
