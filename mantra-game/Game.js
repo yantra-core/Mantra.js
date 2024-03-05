@@ -23,7 +23,7 @@ class Game {
       loadDefaultPlugins: true, // auto-loads default plugins based on pluginsConfig
       width: 800,
       height: 600,
-      fieldOfView: 1600,
+      fieldOfView: 96, // CSSGraphics can support 96 on lower end devices, Three can easily do 144 or 256
       fps: 60,
       useFoV: false,
       // game systems / auto-load based on pluginsConfig

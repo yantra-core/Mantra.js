@@ -121,6 +121,11 @@ export default function updateGraphic(entityData) {
 
     }
 
+    // check if entity.style is fixed or absolute, if so, don't move it with camera
+    if (entityData.style && (entityData.style.position === 'fixed' || entityData.style.position === 'absolute')) {
+      return entityElement;
+    }
+
     return this.updateEntityPosition(entityElement, entityData);
 
   } else {

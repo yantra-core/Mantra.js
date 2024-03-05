@@ -133,7 +133,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     // Remark: Always add to deferredEntities, this is now being used to store all local
     //         game data that may not yet be in the game.data scope ( off screen / not loaded )
     this.game.deferredEntities[config.id.toString()] = config;
-
+    // TODO: add option for allowSpatialTreeToDefer to be set to false ( ignore FoV for certain ents )
     if (this.game.config.useFoV) {
       // check to see if entity is within game.data.fieldOfView,
       // if not, we will defer creation until it is

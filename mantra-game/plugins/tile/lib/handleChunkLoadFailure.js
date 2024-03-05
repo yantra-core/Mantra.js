@@ -1,3 +1,4 @@
+// TODO: move most of the processing logic in this file to dedicated infinite chunk generators / tiled-server code
 export default function handleChunkLoadFailure(chunkPath, chunkKey) {
   let labyrinthos = this.labyrinthos;
   // console.log("Fallback for failed load:", chunkPath, chunkKey);

@@ -36,7 +36,12 @@ export default function updateEntityPosition(entityElement, entityData) {
   };
 
 
+  // Remark: Removed 3/4/2024
   // if the entity happens to be position: 'fixed' set the entityElement to absolute position with no adjustments
+  // Remark: I don't think this will work here since the setTransform will be called immediately after
+  // We now are a conditional earlier in the chain which will place absolute / fixed elements in separate container
+  // that is not affected by the camera
+  /*
   if (entityData.style && entityData.style.position === 'fixed') {
     entityElement.style.position = 'absolute';
     entityElement.style.left = position.x + 'px';
@@ -44,6 +49,8 @@ export default function updateEntityPosition(entityElement, entityData) {
     entityElement.style.display = ''; // Make sure the element is visible
     return entityElement;
   }
+  */
+  // ^^^ Remark: Removed 3/4/2024 - this file can be cleaned up now, we can remove legacy code
 
 
   // Check if the entity is within the field of view

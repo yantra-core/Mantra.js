@@ -16,7 +16,8 @@ export default function render(game, alpha) {
     //let itemInFov = game.getPlayerFieldOfView(currentPlayer, 1000);
     let itemsInFov = game.getPlayerFieldOfView(currentPlayer, game.data.fieldOfView, false);
     // console.log('itemsInFov', itemsInFov)
-  
+    // TODO: we need a smart way to allow adding entities outside the field of view
+    //       like UI components without having to iterate all entities  
     itemsInFov.forEach(eId => {
       let ent = this.game.entities.get(eId);
       if (ent) {

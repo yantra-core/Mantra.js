@@ -162,19 +162,34 @@ export default function createGraphic(entityData) {
 
 
   // if style.position is absolute, append to gameHolder instead
-  if (typeof entityData.style !== 'undefined' && entityData.style.position === 'absolute') {
+  if ((typeof entityData.style === 'object') && (entityData.style.position === 'absolute' || entityData.style.position === 'fixed')) {
     // if style has been manually set to absolute, place the entity directly in gameHolder ( instead of css-render-dev)
     // using absolute values. this will ensure that the entity is not affected by camera scroll and zoom 
     let gameHolder = document.getElementById('gameHolder');
     entityElement.style.position = 'flex';
-    entityElement.style.top = `${entityData.position.y}px`;
-    entityElement.style.left = `${entityData.position.x}px`;
-    entityElement.style.width = `${entityData.width}px`;
-    entityElement.style.height = `${entityData.height}px`;
+    if (entityData.style.positionScreen === true) {
+      // these are absolute screen coordinates starting with 0,0 at top left
+      entityElement.style.top = `${entityData.position.y}px`;
+      entityElement.style.left = `${entityData.position.x}px`;
+      entityElement.style.width = `${entityData.width}px`;
+      entityElement.style.height = `${entityData.height}px`;
+    } else {
+      // these are world coordinates starting with 0,0 in center of viewport
+      let domPosition = {};
+      let screenWidth = window.innerWidth;
+      let screenHeight = window.innerHeight;
+      domPosition.x = entityData.position.x + window.innerWidth / 2;
+      domPosition.y = entityData.position.y + window.innerHeight / 2;
+      entityElement.style.top = `${domPosition.y}px`;
+      entityElement.style.left = `${domPosition.x}px`;
+      entityElement.style.width = `${entityData.width}px`;
+      entityElement.style.height = `${entityData.height}px`;
+    }
+    // the gameHolder is parent of the css-render-div and is not affected by camera scroll and zoom
     gameHolder.appendChild(entityElement);
+    return entityElement;
   } else {
     this.renderDiv.appendChild(entityElement);
-
   }
 
   // Update the position of the entity element

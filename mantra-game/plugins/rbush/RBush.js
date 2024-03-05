@@ -87,6 +87,9 @@ class RBush {
     // If there is a current player and the `Tile` plugin is loaded,
     // Check the players position and load the tiles for the area around the player
     //
+    // Remark: 3/4/2024 - This code ( referencing Tile plugin ), should not directly exist in the RBush plugin
+    //                    Instead, we should have the Tile plugin register a hook into the lifecycle for RBush.update
+    //                    This way, the RBush plugin encapusulation is maintained and the Tile plugin reference can be removed
     if (currentPlayer) {
       if (this.game.systems.tile) { // TODO: && this.game.systems.tile.active
         this.game.systems.tile.loadTilesForArea(currentPlayer.position);
@@ -106,6 +109,9 @@ class RBush {
       if (game.config.useFoV && nearbyEntities.indexOf(eId) === -1) {
         let ent = this.game.entities.get(eId);
         if (ent && ent.type !== 'BOOMERANG') { // TODO: remove this reference, use a flag
+          // TODO: we can perform conditional checks for certain types of plugins to not be removed
+          //       do not remove entity that originate from ui-component plugin
+          //       we can check the plugin instance to see if it is a UI component
           game.removeEntity(eId, false);
         }
       }

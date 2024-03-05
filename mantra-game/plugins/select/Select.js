@@ -3,9 +3,10 @@ import inflateSelect from './lib/inflateSelect.js';
 
 export default class Select {
   static id = 'select';
-
+  static type = 'ui-component'; // type is optional for plugins
   constructor(config = {}) {
     this.id = Select.id;
+    this.type = Select.type;
     this.options = config.options ||  [
       // default select
       { label: 'Please select an option...', value: 'default', selected: true },
