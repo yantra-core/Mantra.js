@@ -8,7 +8,7 @@ export default function use(game) {
 
     if (typeof pluginInstanceOrId === 'string') {
       const pluginId = pluginInstanceOrId;
-      if (game._plugins[pluginId]) {
+      if (game._plugins[pluginId] || game.systems[pluginId]) {
         console.log(`Plugin ${pluginId} is already loaded or loading.`);
         return game;
       }
@@ -66,7 +66,8 @@ export default function use(game) {
       })();
 
     } else {
-      game.loadingPluginsCount++;
+
+
 
       /*
       cache[pluginInstanceOrId.id] = cache[pluginInstanceOrId.id] || {
@@ -80,6 +81,14 @@ export default function use(game) {
         console.log('Error with pluginInstance', pluginInstanceOrId);
         throw new Error('All plugins must have a static id property');
       }
+      //console.log('pluginInstanceOrId.id', pluginInstanceOrId.id)
+      if (game.systems[pluginInstanceOrId.id]) {
+        //console.log('high level, plugin already loaded returning rearly')
+        return;
+      }
+
+      game.loadingPluginsCount++;
+
       await handlePluginInstance(game, pluginInstanceOrId, pluginInstanceOrId.id, options, cb);
     }
 
@@ -88,10 +97,6 @@ export default function use(game) {
 }
 
 async function handlePluginInstance(game, pluginInstance, pluginId, options, cb) {
-
-  if (typeof pluginInstance.build === 'function') {
-    extendEntityBuilder(game, pluginInstance);
-  }
   
   // console.log('pluginInstance', pluginInstance, pluginId)
   if (game.systems[pluginInstance.id]) {
@@ -102,8 +107,13 @@ async function handlePluginInstance(game, pluginInstance, pluginId, options, cb)
     //                    but some plugins it makes sense ( like Editor / Modal windows / anything that toggles state )
     //                    An alternate solution would be to implement something like `toggle()` or `reload()` method for all plugins
     game.loadingPluginsCount--;
-    game.systems[pluginInstance.id].init(game, game.engine, game.scene);
+    //game.systems[pluginInstance.id].init(game, game.engine, game.scene);
     return;
+  }
+
+
+  if (typeof pluginInstance.build === 'function') {
+    extendEntityBuilder(game, pluginInstance);
   }
 
   pluginGameSceneMethods(game, pluginInstance);

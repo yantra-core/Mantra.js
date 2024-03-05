@@ -10,8 +10,11 @@ export default async function switchWorlds (selectedWorld) {
         console.log(world.id, 'world.unload', world.unload)
         // remove the world from the game.worlds array
         game.worlds.splice(i, 1);
+        // if the world has the optional custom .unload() method, call it
         world.unload();
       }
+      // unload the world itself as plugin
+      game.unload(world.id);
     });
   }
 
