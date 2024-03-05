@@ -1,4 +1,5 @@
 // Mouse.js - Marak Squires 2023
+// TODO: Split this file into multiple functions
 let inputsBound = false;
 export default class Mouse {
 
@@ -54,6 +55,7 @@ export default class Mouse {
     this.boundHandlePointerUp = this.handlePointerUp.bind(this);
 
     this.boundHandleWindowBlur = this.handleWindowBlur.bind(this);
+    this.boundHandleMouseLeave = this.handleMouseLeave.bind(this);
 
   }
 
@@ -157,6 +159,7 @@ export default class Mouse {
 
   // Method to handle window blur event
   handleWindowBlur() {
+
     // Reset pointer states
     this.isDragging = false;
     this.activeTouches = {};
@@ -172,6 +175,30 @@ export default class Mouse {
       MIDDLE: null
     };
 
+    // update the game with the new mouse state ( all off )
+    this.sendMouseData();
+
+  }
+
+  handleMouseLeave() {
+
+    // Reset pointer states
+    this.isDragging = false;
+    this.activeTouches = {};
+    this.firstTouchId = null;
+    this.secondTouchId = null;
+    this.endedFirstTouch = false;
+    this.endedSecondTouch = false;
+
+    // Reset mouse buttons states
+    this.mouseButtons = {
+      LEFT: null,
+      RIGHT: null,
+      MIDDLE: null
+    };
+
+    // update the game with the new mouse state ( all off )
+    this.sendMouseData();
   }
 
   handleMouseMove(event) {
@@ -187,7 +214,6 @@ export default class Mouse {
     } else {
       this.mousePosition = { x: event.clientX, y: event.clientY };
     }
-
 
     if (event.target instanceof HTMLCanvasElement) {
       const canvas = event.target;
@@ -253,10 +279,6 @@ export default class Mouse {
     let target = event.target;
     let game = this.game;
     let preventDefault = false
-
-
-
-
 
     this.updateMouseButtons(event, true);
 
@@ -512,7 +534,10 @@ export default class Mouse {
       document.addEventListener('mouseup', this.boundHandleMouseUp);
     }
 
+    // window / tab has lost focused
     window.addEventListener('blur', this.boundHandleWindowBlur);
+    // mouse leaves window, window may still have focus
+    document.body.addEventListener('mouseleave', this.boundHandleMouseLeave);
 
     // TODO: could be a config option
     // TODO: this should be able to bind / unbind based on user actions, defaultMouseMovement
@@ -610,6 +635,7 @@ export default class Mouse {
     }
 
     window.removeEventListener('blur', this.boundHandleWindowBlur);
+    window.removeEventListener('mouseleave', this.boundHandleMouseLeave);
 
   }
 

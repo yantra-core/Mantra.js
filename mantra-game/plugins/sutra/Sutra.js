@@ -34,7 +34,6 @@ class Sutra {
       let rules = createSutra(game);
       this.setSutra(rules);
     }
-
     // Once the game is ready, register the keyboard controls as conditions
     // This allows for game.rules.if('keycode').then('action') style rules
     if (!this.inputsBound) {
@@ -98,22 +97,26 @@ class Sutra {
         // _DOWN implied as default
         // Remark: 3/3/2024 - Basic key press test seems to indicate this is continually true
         //                    It is expected to be true only once per press, TODO: add tests
-        this.game.rules.addCondition(mantraCode, (entity, gameState) =>
+
+        // Key down, only once per press
+        this.game.rules.addCondition(mantraCode + '_DOWN', (entity, gameState) =>
           entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.down
           // gameState.input.keyStates[mantraCode]?.down
         );
 
-        // Key Up Condition
+
+        // Key held / pressed condition, default
+        this.game.rules.addCondition(mantraCode, (entity, gameState) =>
+          entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.pressed
+          // gameState.input.keyStates[mantraCode]?.pressed
+        );
+
+        // Key Up Condition, only once per release
         this.game.rules.addCondition(mantraCode + '_UP', (entity, gameState) =>
           entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.up
           // gameState.input.keyStates[mantraCode]?.up
         );
 
-        // Key held Condition
-        this.game.rules.addCondition(mantraCode + '_HOLD', (entity, gameState) =>
-          entity.id === this.game.currentPlayerId && gameState.input.keyStates[mantraCode]?.pressed
-          // gameState.input.keyStates[mantraCode]?.pressed
-        );
       }
     }
   }

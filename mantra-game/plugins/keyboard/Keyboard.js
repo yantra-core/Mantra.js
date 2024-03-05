@@ -53,6 +53,7 @@ export default class Keyboard {
     // Bind methods and store them as class properties
     this.boundHandleKeyDown = this.handleKeyDown.bind(this);
     this.boundHandleKeyUp = this.handleKeyUp.bind(this);
+    this.boundHandleWindowBlur = this.handleWindowBlur.bind(this);  // Bind the window blur event handler
 
   }
 
@@ -70,6 +71,8 @@ export default class Keyboard {
   bindInputControls() {
     document.addEventListener('keydown', this.boundHandleKeyDown);
     document.addEventListener('keyup', this.boundHandleKeyUp);
+    window.addEventListener('blur', this.boundHandleWindowBlur);  // Listen for window blur event
+
   }
 
   update() {
@@ -114,6 +117,20 @@ export default class Keyboard {
     }
     this.game.emit('keyup', event, MANTRA_KEY_MAP[event.code]);
 
+  }
+
+  handleWindowBlur() {
+
+    // On window blur we must clear all key inputs, as we may have keydown events
+    // that will never recieve a keyup event ( since the window is not focused )
+
+    // Iterate over the controls object and set each key's value to false
+    Object.keys(this.controls).forEach(key => {
+      this.controls[key] = false;
+    });
+    // Reset the input pool and key states
+    this.inputPool = {};
+    this.keyStates = {};
   }
 
   sendInputs() {
