@@ -150,7 +150,8 @@ class LoadingScreen {
     this.setupStyles(this.crtBackground, {
       position: 'fixed',
       top: '0',
-      left: '0',
+      paddingTop: '10px', // Adjust the padding to center the loading screen
+      left: '10px',
       width: '100%',
       height: '100%',
       backgroundColor: 'black',
@@ -177,7 +178,9 @@ class LoadingScreen {
     gameTitle.textContent = 'Mantra.js Game Starting';
     this.setupStyles(gameTitle, {
       fontSize: '20px',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      left: '40px',
+      position: 'absolute'
     });
 
     // Plugin counter

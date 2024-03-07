@@ -1,7 +1,7 @@
 import LoadingScreen from "../plugins/loading-screen/LoadingScreen.js";
 import GhostTyper from "../plugins/typer-ghost/GhostTyper.js";
 import Physics from "../plugins/physics/Physics.js";
-
+import FlashMessage from "../plugins/message-flash/FlashMessage.js";
 // default player movement, this could be also be set in defaultGameStart.js
 // import movement from './defaultPlayerMovement.js';
 
@@ -46,6 +46,17 @@ export default function loadPluginsFromConfig({ physics, graphics, collisions, k
       this.use(new LoadingScreen({
         minLoadTime: gameConfig.minLoadTime
       }));
+    }
+  }
+
+  if (!this.systems['message-flash'] && !this.isServer) {
+    this.use(new FlashMessage());
+    // check if gameroot does not contain yantra.gg string,
+    // if so game.flashText() the value
+    if (!this.isServer && this.config.warnNonYantraGameRoot) {
+      if (this.gameRoot && this.gameRoot.indexOf('yantra.gg') === -1) {
+        this.flashMessage('GameRoot is not yantra.gg, this may cause issues with loading assets and scripts');
+      }
     }
   }
 

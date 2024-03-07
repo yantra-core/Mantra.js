@@ -57,6 +57,7 @@ class Game {
       mode: 'topdown', // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: false, // default behavior is multiple graphics plugins will be horizontally stacked
       addLifecycleHooksToAllPlugins: true, // default behavior is to add lifecycle hooks to all plugin methods
+      warnNonYantraGameRoot: false, // warns if gameRoot is not yantra.gg
     };
 
     // Merge custom configuration with defaults
@@ -213,6 +214,15 @@ class Game {
   setPlayerId(playerId) {
     console.log('setting playerID', playerId)
     this.currentPlayerId = playerId;
+  }
+  
+  removeEntitiesByType(type) {
+    let entities = this.getEntitiesByType(type);
+    if (entities) {
+      entities.forEach((entity) => {
+        this.removeEntity(entity.id);
+      });
+    }
   }
 
   getEntitiesByType(type) {

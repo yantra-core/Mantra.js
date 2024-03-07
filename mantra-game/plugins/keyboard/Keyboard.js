@@ -107,6 +107,21 @@ export default class Keyboard {
       }
     }
     this.game.emit('keydown', event, MANTRA_KEY_MAP[event.code]);
+
+
+    // create a new object for clean reference
+    let obj = {};
+    for (let key in this.inputPool) {
+      obj[key] = this.inputPool[key];
+    }
+
+    // Remark: Optionally emit this event for user-space to listen to
+    //         In most cases, user-space will listen to sutra emitters per key stroke
+    //         Or the keyDown event above
+    if (this.game.config.emitKeyboardInputsEvents) {
+      this.game.emit('keyboard::handleInputs', { controls: obj });
+    }
+
   }
 
   handleKeyUp(event) {
@@ -116,6 +131,18 @@ export default class Keyboard {
 
     }
     this.game.emit('keyup', event, MANTRA_KEY_MAP[event.code]);
+
+   
+    // create a new object for clean reference
+    let obj = {};
+    for (let key in this.inputPool) {
+      obj[key] = this.inputPool[key];
+    }
+
+    if (this.game.config.emitKeyboardInputsEvents) {
+      this.game.emit('keyboard::handleInputs', { controls: obj });
+    }
+
 
   }
 
@@ -145,12 +172,22 @@ export default class Keyboard {
         Object.entries(this.inputPool).filter(([key, value]) => value === true)
       );
     */
-
+    //console.log('trueInputs', trueInputs)
     // Send trueInputs if there are any
     if (Object.keys(trueInputs).length > 0) {
       if (this.game.communicationClient) {
         this.game.communicationClient.sendMessage('player_input', { controls: trueInputs });
       }
+
+      /*
+      // create a new object for clean reference
+      let obj = {};
+      for (let key in trueInputs) {
+        obj[key] = trueInputs[key];
+      }
+      this.game.emit('keyboard::handleInputs', { controls: obj });
+      */
+      
     }
 
     // Reset only the false values in the inputPool

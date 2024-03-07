@@ -3,7 +3,7 @@ class Bullet {
   static id = 'bullet';
   constructor(config = {}) {
     this.id = Bullet.id;
-    
+
     this.bulletCount = 0;
     this.redGlowMaterial = null; // Used for caching the material
     this.speed = config.speed || 3; // or 22?
@@ -18,14 +18,59 @@ class Bullet {
     this.game.systemsManager.addSystem('bullet', this);
   }
 
+  build(entityData = {}) {
+    // Define default values
+    const defaults = {
+      type: 'BULLET',
+      mass: 1,
+      collisionStart: true,
+      lifetime: this.lifetime,
+      texture: {
+        sheet: 'loz_spritesheet',
+        sprite: 'arrow'
+      },
+      velocity: {
+        x: 0.5,
+        y: 0.5
+      },
+      isSensor: true,
+      width: 16,
+      height: 16,
+      radius: 8, // Assuming a default radius
+      damage: 10 // Assuming default damage
+    };
+
+    // Merge defaults with entityData, ensuring nested objects like position and velocity are merged correctly
+    const mergedConfig = {
+      ...defaults,
+      ...entityData,
+      position: { ...defaults.position, ...entityData.position },
+      velocity: { ...defaults.velocity, ...entityData.velocity },
+      texture: { ...defaults.texture, ...entityData.texture },
+      style: { ...defaults.style, ...entityData.style }
+    };
+
+    // Handle specific properties like rotation and speed, if they're not part of defaults
+    if (entityData.rotation !== undefined) {
+      mergedConfig.rotation = entityData.rotation;
+    }
+    if (entityData.speed !== undefined) {
+      mergedConfig.speed = entityData.speed;
+    }
+
+    // Return the merged configuration
+    return mergedConfig;
+  }
+
+
   update() { } // not used, physics engine updates bullets based on velocity
 
   fireBullet(entityId, bulletConfig = {}) {
     let entity = this.game.getEntity(entityId);
 
     if (!entity) {
-        console.log('Bullet.fireBullet no entity found for id', entityId);
-        return;
+      console.log('Bullet.fireBullet no entity found for id', entityId);
+      return;
     }
 
     let actionRateLimiterComponent = this.game.components.actionRateLimiter;
@@ -33,8 +78,8 @@ class Bullet {
     let currentTime = Date.now();
 
     if (currentTime - lastFired < this.fireRate) {
-        // console.log('Rate limit hit for entity', entityId, ', cannot fire yet');
-        return;
+      // console.log('Rate limit hit for entity', entityId, ', cannot fire yet');
+      return;
     }
 
     actionRateLimiterComponent.recordAction(entityId, 'fireBullet');
@@ -50,47 +95,47 @@ class Bullet {
 
     // Place the bullet in front of the player
     let bulletStartPosition = {
-        x: playerPos.x + directionX * 16, // Assuming distanceInFront is 16
-        y: playerPos.y + directionY * 16,
-        z: 1 // Assuming a default Z position
+      x: playerPos.x + directionX * 16, // Assuming distanceInFront is 16
+      y: playerPos.y + directionY * 16,
+      z: 1 // Assuming a default Z position
     };
 
     this.bulletCount++;
     const defaultBulletConfig = {
-        type: 'BULLET',
-        mass: 1,
-        collisionStart: true,
-        position: bulletStartPosition,
-        lifetime: this.lifetime,
-        texture: bulletConfig.texture || {
-          sheet: 'loz_spritesheet',
-          sprite: 'arrow'
-        },
-        owner: entityId,
-        rotation: playerRotation,
-        isSensor: true,
-        velocity: {
-            x: directionX * this.speed,
-            y: directionY * this.speed
-        },
-        width: 16,
-        height: 16,
-        radius: 8, // Assuming a default radius
-        damage: 10 // Assuming default damage
+      type: 'BULLET',
+      mass: 1,
+      collisionStart: true,
+      position: bulletStartPosition,
+      lifetime: this.lifetime,
+      texture: bulletConfig.texture || {
+        sheet: 'loz_spritesheet',
+        sprite: 'arrow'
+      },
+      owner: entityId,
+      rotation: playerRotation,
+      isSensor: true,
+      velocity: {
+        x: directionX * this.speed,
+        y: directionY * this.speed
+      },
+      width: 16,
+      height: 16,
+      radius: 8, // Assuming a default radius
+      damage: 10 // Assuming default damage
     };
 
     // Merge the bulletConfig into the defaultBulletConfig
     const mergedBulletConfig = Object.assign({}, defaultBulletConfig, bulletConfig);
 
     if (bulletConfig.velocity) {
-        mergedBulletConfig.velocity = {};
-        mergedBulletConfig.velocity.x = bulletConfig.velocity.x;
-        mergedBulletConfig.velocity.y = bulletConfig.velocity.y;
+      mergedBulletConfig.velocity = {};
+      mergedBulletConfig.velocity.x = bulletConfig.velocity.x;
+      mergedBulletConfig.velocity.y = bulletConfig.velocity.y;
     }
 
     // Create the bullet entity with the merged configuration
     return this.game.createEntity(mergedBulletConfig);
-}
+  }
 
   handleCollision(pair, bodyA, bodyB) {
     if (bodyA.myEntityId && bodyB.myEntityId) {

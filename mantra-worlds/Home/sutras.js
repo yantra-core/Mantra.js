@@ -27,7 +27,7 @@ export default function sutras(game) {
 
   // for now, ensure that player input movement sutras are top level rules
   // we should be able to use the movement sutra as a sub-sutra, see above comment
-  game.useSutra(movement(game), 'mode-topdown');
+  // game.useSutra(movement(game), 'mode-topdown');
 
   // helper for switching graphics
   let switchGraphicsSutra = switchGraphics(game);

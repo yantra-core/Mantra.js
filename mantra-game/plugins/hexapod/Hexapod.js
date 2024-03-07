@@ -4,11 +4,16 @@ export default class Hexapod {
   static type = 'sutra';
   constructor(config = {}) {
     this.id = Hexapod.id;
+    this.target = null;
   }
 
   init(game) {
     this.game = game;
     this.game.systemsManager.addSystem('hexapod', this);
+  }
+
+  setTarget(target) {
+    this.target = target;
   }
 
   build(entityData = {}) {
@@ -21,6 +26,9 @@ export default class Hexapod {
       width: 8,
       height: 8,
       health: 50,
+      meta: {
+        target: entityData.target || null
+      },
       body: true,
       collisionStart: this.grow.bind(this),
       update: this.swarmBehavior.bind(this),
@@ -50,7 +58,7 @@ export default class Hexapod {
       game.updateEntity({
         id: hexapod.id,
         health: hexapod.health,
-        style: style
+        // style: style
       });
 
       // apply a force to the Hexapod based on the bullet's velocity
@@ -91,7 +99,28 @@ export default class Hexapod {
     // Target movement implementation
     let targetForce = { x: 0, y: 0 };
 
-    if (typeof gameState.currentPlayer !== 'undefined') {
+    // Remark: 3/7/2024 - Did a quick refactor here to allow targets for CrossWindow demos
+    // TODO: clean this code up and DRY the targeting calls
+    if (this.target) {
+      let target = this.target;
+      let targetDirection = Vector.sub(target, hexapod.position);
+      targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+      // Calculate the angle to the target in radians
+      let angleToTarget = Math.atan2(targetDirection.y, targetDirection.x);
+      // Update hexapod rotation
+      newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
+    } else if (entity.meta && entity.meta.target && entity.meta.target !== null) {
+      console.log('found a target', entity.meta.target);
+      let target = entity.meta.target;
+      let targetDirection = Vector.sub(target, hexapod.position);
+      targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+      // Calculate the angle to the target in radians
+      let angleToTarget = Math.atan2(targetDirection.y, targetDirection.x);
+      // Update hexapod rotation
+      newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
+    }
+
+    else if (typeof gameState.currentPlayer !== 'undefined') {
       if (gameState.currentPlayer) {
         let target = gameState.currentPlayer.position;
         let targetDirection = Vector.sub(target, hexapod.position);

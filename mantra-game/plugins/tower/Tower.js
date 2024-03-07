@@ -4,7 +4,7 @@ export default class Tower {
 
   constructor(config = {}) {
     this.id = Tower.id;
-    this.fireRate = config.fireRate || 100; // Time between shots in game ticks
+    this.fireRate = config.fireRate || 10; // Time between shots in game ticks
     this.range = config.range || 200; // Range within which the tower can target and fire
     this.weaponType = config.weaponType || 'bullet'; // Default weapon type
   }
@@ -22,7 +22,7 @@ export default class Tower {
     // const defaultBulletConfig = game.make().radius(8).build();
     let defaultBulletConfig = {
       radius: 8,
-      velocoity: {
+      velocity: {
         x: 0,
         y: -2
       },
@@ -38,7 +38,6 @@ export default class Tower {
       // tower is shooting property
       entityData.meta.isShooting = entityData.isShooting;
     }
-
     console.log('bulletConfigbulletConfig', bulletConfig)
     return {
       ...entityData,

@@ -385,6 +385,11 @@ export default class EntityBuilder {
     return this;
   }
 
+  items(value) {
+    this.config.items = value;
+    return this;
+  }
+
   container(value) {
     this.config.container = value;
     return this;
