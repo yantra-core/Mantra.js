@@ -124,6 +124,21 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
         }
       }
       this.game.emit('keydown', event, MANTRA_KEY_MAP[event.code]);
+
+      // create a new object for clean reference
+      var obj = {};
+      for (var key in this.inputPool) {
+        obj[key] = this.inputPool[key];
+      }
+
+      // Remark: Optionally emit this event for user-space to listen to
+      //         In most cases, user-space will listen to sutra emitters per key stroke
+      //         Or the keyDown event above
+      if (this.game.config.emitKeyboardInputsEvents) {
+        this.game.emit('keyboard::handleInputs', {
+          controls: obj
+        });
+      }
     }
   }, {
     key: "handleKeyUp",
@@ -137,6 +152,17 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
         this.inputPool[MANTRA_KEY_MAP[event.code]] = false;
       }
       this.game.emit('keyup', event, MANTRA_KEY_MAP[event.code]);
+
+      // create a new object for clean reference
+      var obj = {};
+      for (var key in this.inputPool) {
+        obj[key] = this.inputPool[key];
+      }
+      if (this.game.config.emitKeyboardInputsEvents) {
+        this.game.emit('keyboard::handleInputs', {
+          controls: obj
+        });
+      }
     }
   }, {
     key: "handleWindowBlur",
@@ -166,7 +192,7 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
           Object.entries(this.inputPool).filter(([key, value]) => value === true)
         );
       */
-
+      //console.log('trueInputs', trueInputs)
       // Send trueInputs if there are any
       if (Object.keys(trueInputs).length > 0) {
         if (this.game.communicationClient) {
@@ -174,6 +200,15 @@ var Keyboard = exports["default"] = /*#__PURE__*/function () {
             controls: trueInputs
           });
         }
+
+        /*
+        // create a new object for clean reference
+        let obj = {};
+        for (let key in trueInputs) {
+          obj[key] = trueInputs[key];
+        }
+        this.game.emit('keyboard::handleInputs', { controls: obj });
+        */
       }
 
       // Reset only the false values in the inputPool

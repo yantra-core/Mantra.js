@@ -53,6 +53,7 @@ var Flash = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem(this.id, this);
+      this.game.flashMessage = this.showMessage.bind(this);
       this.createFlashContainer();
     }
   }, {

@@ -2099,6 +2099,19 @@ function render(game, alpha) {
           eId = _step$value[0],
           state = _step$value[1];
         var ent = this.game.entities.get(eId);
+
+        // if game.config.entityEmitsViewportExitEvent is true, we need to check if the entity is in the viewport
+        if (this.game.config.entityEmitsViewportExitEvent && ent && ent.position && ent.size) {
+          var result = isEntityInViewport(ent, this.game.data.camera.currentZoom);
+          // console.log(result)
+          if (result.inViewport) {
+            // ent.emit('viewportEnter');
+          } else {
+            //console.log('ent.emit', ent)
+            ent.screenPosition = result.adjustedPosition;
+            this.game.emit('entity::exited::viewport', ent);
+          }
+        }
         this.inflateGraphic(ent, alpha);
       }
     } catch (err) {
@@ -2107,6 +2120,29 @@ function render(game, alpha) {
       _iterator.f();
     }
   }
+}
+function isEntityInViewport(ent, zoomFactor) {
+  var result = {};
+  var inViewport = true;
+  // Adjust the entity's position and size based on the zoom factor
+  var adjustedPosition = {
+    x: ent.position.x * zoomFactor + window.innerWidth / 2,
+    y: ent.position.y * zoomFactor + window.innerHeight / 2
+  };
+  var adjustedSize = {
+    width: ent.size.width * zoomFactor,
+    height: ent.size.height * zoomFactor
+  };
+
+  // Check if the adjusted entity position is within the viewport
+  if (adjustedPosition.x + adjustedSize.width < 0) inViewport = false; // Left of viewport
+  if (adjustedPosition.x > window.innerWidth) inViewport = false; // Right of viewport
+  if (adjustedPosition.y + adjustedSize.height < 0) inViewport = false; // Above viewport
+  if (adjustedPosition.y > window.innerHeight) inViewport = false; // Below viewport
+
+  result.inViewport = inViewport;
+  result.adjustedPosition = adjustedPosition;
+  return result;
 }
 
 },{}],30:[function(require,module,exports){

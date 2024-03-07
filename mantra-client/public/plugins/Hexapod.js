@@ -18,12 +18,18 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, Hexapod);
     this.id = Hexapod.id;
+    this.target = null;
   }
   _createClass(Hexapod, [{
     key: "init",
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem('hexapod', this);
+    }
+  }, {
+    key: "setTarget",
+    value: function setTarget(target) {
+      this.target = target;
     }
   }, {
     key: "build",
@@ -42,6 +48,9 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         width: 8,
         height: 8,
         health: 50,
+        meta: {
+          target: entityData.target || null
+        },
         body: true,
         collisionStart: this.grow.bind(this),
         update: this.swarmBehavior.bind(this),
@@ -70,8 +79,8 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         // update entity size by 11%
         game.updateEntity({
           id: hexapod.id,
-          health: hexapod.health,
-          style: style
+          health: hexapod.health
+          // style: style
         });
 
         // apply a force to the Hexapod based on the bullet's velocity
@@ -121,15 +130,35 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         x: 0,
         y: 0
       };
-      if (typeof gameState.currentPlayer !== 'undefined') {
+
+      // Remark: 3/7/2024 - Did a quick refactor here to allow targets for CrossWindow demos
+      // TODO: clean this code up and DRY the targeting calls
+      if (this.target) {
+        var target = this.target;
+        var targetDirection = Vector.sub(target, hexapod.position);
+        targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+        // Calculate the angle to the target in radians
+        var angleToTarget = Math.atan2(targetDirection.y, targetDirection.x);
+        // Update hexapod rotation
+        newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
+      } else if (entity.meta && entity.meta.target && entity.meta.target !== null) {
+        console.log('found a target', entity.meta.target);
+        var _target = entity.meta.target;
+        var _targetDirection = Vector.sub(_target, hexapod.position);
+        targetForce = Vector.mult(Vector.normalize(_targetDirection), COHESION_FORCE);
+        // Calculate the angle to the target in radians
+        var _angleToTarget = Math.atan2(_targetDirection.y, _targetDirection.x);
+        // Update hexapod rotation
+        newRotation = _angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
+      } else if (typeof gameState.currentPlayer !== 'undefined') {
         if (gameState.currentPlayer) {
-          var target = gameState.currentPlayer.position;
-          var targetDirection = Vector.sub(target, hexapod.position);
-          targetForce = Vector.mult(Vector.normalize(targetDirection), COHESION_FORCE);
+          var _target2 = gameState.currentPlayer.position;
+          var _targetDirection2 = Vector.sub(_target2, hexapod.position);
+          targetForce = Vector.mult(Vector.normalize(_targetDirection2), COHESION_FORCE);
           // Calculate the angle to the target in radians
-          var angleToTarget = Math.atan2(targetDirection.y, targetDirection.x);
+          var _angleToTarget2 = Math.atan2(_targetDirection2.y, _targetDirection2.x);
           // Update hexapod rotation
-          newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
+          newRotation = _angleToTarget2 - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
         }
       }
 

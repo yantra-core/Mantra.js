@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -34,6 +36,51 @@ var Bullet = /*#__PURE__*/function () {
     value: function init(game) {
       this.game = game;
       this.game.systemsManager.addSystem('bullet', this);
+    }
+  }, {
+    key: "build",
+    value: function build() {
+      var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      // Define default values
+      var defaults = {
+        type: 'BULLET',
+        mass: 1,
+        collisionStart: true,
+        lifetime: this.lifetime,
+        texture: {
+          sheet: 'loz_spritesheet',
+          sprite: 'arrow'
+        },
+        velocity: {
+          x: 0.5,
+          y: 0.5
+        },
+        isSensor: true,
+        width: 16,
+        height: 16,
+        radius: 8,
+        // Assuming a default radius
+        damage: 10 // Assuming default damage
+      };
+
+      // Merge defaults with entityData, ensuring nested objects like position and velocity are merged correctly
+      var mergedConfig = _objectSpread(_objectSpread(_objectSpread({}, defaults), entityData), {}, {
+        position: _objectSpread(_objectSpread({}, defaults.position), entityData.position),
+        velocity: _objectSpread(_objectSpread({}, defaults.velocity), entityData.velocity),
+        texture: _objectSpread(_objectSpread({}, defaults.texture), entityData.texture),
+        style: _objectSpread(_objectSpread({}, defaults.style), entityData.style)
+      });
+
+      // Handle specific properties like rotation and speed, if they're not part of defaults
+      if (entityData.rotation !== undefined) {
+        mergedConfig.rotation = entityData.rotation;
+      }
+      if (entityData.speed !== undefined) {
+        mergedConfig.speed = entityData.speed;
+      }
+
+      // Return the merged configuration
+      return mergedConfig;
     }
   }, {
     key: "update",

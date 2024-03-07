@@ -772,6 +772,12 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       return this;
     }
   }, {
+    key: "items",
+    value: function items(value) {
+      this.config.items = value;
+      return this;
+    }
+  }, {
     key: "container",
     value: function container(value) {
       this.config.container = value;
@@ -1292,7 +1298,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // default entity input and movement mode defined as Sutras
       multiplexGraphicsHorizontally: false,
       // default behavior is multiple graphics plugins will be horizontally stacked
-      addLifecycleHooksToAllPlugins: true // default behavior is to add lifecycle hooks to all plugin methods
+      addLifecycleHooksToAllPlugins: true,
+      // default behavior is to add lifecycle hooks to all plugin methods
+      warnNonYantraGameRoot: false // warns if gameRoot is not yantra.gg
     };
 
     // Merge custom configuration with defaults
@@ -1467,6 +1475,17 @@ var Game = exports.Game = /*#__PURE__*/function () {
     value: function setPlayerId(playerId) {
       console.log('setting playerID', playerId);
       this.currentPlayerId = playerId;
+    }
+  }, {
+    key: "removeEntitiesByType",
+    value: function removeEntitiesByType(type) {
+      var _this = this;
+      var entities = this.getEntitiesByType(type);
+      if (entities) {
+        entities.forEach(function (entity) {
+          _this.removeEntity(entity.id);
+        });
+      }
     }
   }, {
     key: "getEntitiesByType",
@@ -2858,13 +2877,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 var _default = exports["default"] = {
-  "./plugins/ASCIIGraphics.js": "e1a7c5a38bbfc129caba6edfab1041b4633f40ef07485a02c85dc59b69a7d6c2",
-  "./plugins/ASCIIGraphics.min.js": "e8ee1bba8329feda8d469caadd777cd1800ad6e64729cea8d8088e27fd648929",
-  "./plugins/AsteroidsMovement.js": "5d3f36191fb0c7c211a6a11bf7bbc8c640c7df551411eba51960287abfe0c36f",
-  "./plugins/AsteroidsMovement.min.js": "8d0c47010240608cdb7294e2a7d566090a9b16600b402e660cd58f1f5ce990e0",
   "./plugins/BabylonCamera.js": "d081e991041950666c2e1f304e2653292d3dc131ff7e44613bf4f32e04e1d5d6",
   "./plugins/BabylonCamera.min.js": "d0d3c2c6657d2dfb3c1b2cb446af3098d9ade28551f61d87469114000c552710",
-  "./plugins/BabylonGraphics.js": "e9a3335c4fe5c7418158853783b6586e2cd288f13fa9c3183b149a26af3096ca",
   "./plugins/BabylonGraphics.min.js": "1ea5d0b92ac68d0fe8545f2d70808e8e8a5fe156d210b51e6e40ac4964e9e871",
   "./plugins/BabylonStarField.js": "bcbeb93b6bd0a1490055f9ad862177173fe51d2c2fcbd964a899d519017b1b72",
   "./plugins/BabylonStarField.min.js": "d4a2f4ab4cd052977c7243a0d6918035b098843a80e5704e0f261dd1c30c3774",
@@ -2878,14 +2892,12 @@ var _default = exports["default"] = {
   "./plugins/Boomerang.min.js": "02f004d01651777df7f30dae220c15823a444de9e49deec3af948deb6257ad0f",
   "./plugins/Border.js": "776ff9a840aee4e40b98ac21a2ece7846157de59c843f7fa335d0497baaa2b7a",
   "./plugins/Border.min.js": "3584e32fb60aae9ee6a291e4b3a89722f9eb62b345bc0b68cc06b450c854ade5",
-  "./plugins/Bullet.js": "e74dc967fd6ee2a3c3c1073a2f153e75813a07e004e3d024a67d8035866d65e9",
-  "./plugins/Bullet.min.js": "912b40049e8fdac7c1c5d5f25e4ffa209f65472562521e0111686eced5599053",
+  "./plugins/Bullet.js": "19bb3f772caa2af29d758b56865186d0b043d15277249051dda1a6418fc0c3ec",
+  "./plugins/Bullet.min.js": "f8e1f52b96ea8bee17a0c5c9ae5ba9c1925cc2daf6703093e613e4d7a92c4f07",
   "./plugins/Button.js": "2c83e710a9ba08fc3756da016a4b02db323ca6a1203ad300ec89fcf90094ad43",
   "./plugins/Button.min.js": "6403b7847805cbfacac06ac51c99e6d8d504745a27d8d4db00221a347a998385",
   "./plugins/CSS3DGraphics.js": "682cda73678716ab858e7f412b8fc4304a9ce1835a558d5f21681d8f7dbbd3ae",
   "./plugins/CSS3DGraphics.min.js": "5773e9e9d79ddbc8c295c517af3c790e74ce7069ecbfc9705746bada0b25f1e1",
-  "./plugins/CSSGraphics.js": "5a8aaafad476e5953ad1671ac11652c5e126fd13bc5f7a8b5bcef7b137a49899",
-  "./plugins/CSSGraphics.min.js": "66ab54e6bc5b3258f9159dce87e809ca5053a283ab29f520e85232f45b49d87f",
   "./plugins/Canvas.js": "f38953424cd2e9a460c13f1eec39c01732e85e1604efa5d0472bd8386bb1762a",
   "./plugins/Canvas.min.js": "ca92686ba4df78cab48c226dcd2bf6b7f88be728a58f4602a11ef3b5e5f4bc38",
   "./plugins/Checkbox.js": "16b74e6931eaa235e6ff931f699a3ec3c6d754054ba017d81d6473d450a9a125",
@@ -2912,20 +2924,14 @@ var _default = exports["default"] = {
   "./plugins/Droppable.min.js": "a69031884f922e66c0b29ec604474a62341174837222231b0db060995808e9a4",
   "./plugins/EntitiesGUI.js": "bc66200e73eebd08e38cfc060d2f4d6b748aeac903d2d314b8c23c11c3bc3d0f",
   "./plugins/EntitiesGUI.min.js": "5f9e2133a539fe3fc7cb5ef028066f82538b5d38cb24cc8404eb3219662c7e38",
-  "./plugins/EntityInput.js": "9c56bbc6c2b3b4c5a985f8e7f3488b5cce5e6d0ba99639be1bc23cfc096ab1e7",
-  "./plugins/EntityInput.min.js": "d93eef2c564085545bbae7b85acce80e1268f3e7d8837f965525e514a78efed9",
-  "./plugins/EntityMovement.js": "95617e5e5d02350640d591f545a736802d23edb4f157370f3ede85d0eecc6e46",
-  "./plugins/EntityMovement.min.js": "747ee2e2a8e2f029107bf29d7a263e3cae412f096da1f1131af822ec7d2b2d52",
   "./plugins/EventInspector.js": "6ca05415864ef09766a010f0176db7d9caac6020df1252a3a680daee4f2b4fd1",
   "./plugins/EventInspector.min.js": "84690d0c1f5fe59f3fc28062e84ee1933391c8120b22d796e3689b1abf348165",
   "./plugins/Flame.js": "15b2ccbdc64f1779e22a354d7a67328c26541d9898433cbd463e5669ec571abb",
   "./plugins/Flame.min.js": "b24ccabd1f3a74b7579d667aad4198d450c2c19208129662de30483c8826ec4a",
-  "./plugins/FlashMessage.js": "b1c25c9860239aff5dbc2f1177ca429740dc4972b26cfb1edcb229d953ac1827",
-  "./plugins/FlashMessage.min.js": "0e4a528cb7e875d7e92bfb7596a35ae8605df894e330f22aa4bc8701d1403602",
+  "./plugins/FlashMessage.js": "2a278a77a35b5575d7077580abc79f5221a3111c50d6d770a84603234ca042a0",
+  "./plugins/FlashMessage.min.js": "764f1e74b4afe5bd37cc9e1b6bd00dc78eedb5d8b50ad6407fad5d287cc006a4",
   "./plugins/FloatyTyper.js": "0e42af84fa1f30be41ce34969bc625ee6d1c275e557d832be035be76c8de1bcd",
   "./plugins/FloatyTyper.min.js": "1229f52b05300c5c5582ba7dbd594a10af236283da758f3d504440e9208f05fd",
-  "./plugins/FroggerMovement.js": "43df155f295793a316270e286bee3943cc4805e93ba5da366da7f139cff687c2",
-  "./plugins/FroggerMovement.min.js": "50db4c8376c648fa4cb3c2cdc781ebafae5becc9603b6618986518f25ad63bbb",
   "./plugins/GameEditorGui.js": "73b832620d31a9a20253bbb7dad0da557b6795fb6aa32fdcbb543ee4f82f84ad",
   "./plugins/GameEditorGui.min.js": "2778dae74a434aec88eedb7dd63242e0ebceb1bccbed35208ae0cb641d1559fd",
   "./plugins/Gamepad.js": "6eac485cee65c05d5a46f86d0d4b02ecdf827a93f11f1ae45454e4a6ff41f4ba",
@@ -2940,8 +2946,8 @@ var _default = exports["default"] = {
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
   "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
-  "./plugins/Hexapod.js": "860b42ae80e5b5f572fbb3406389b1de076c990cc406523e65a7ddf417488c14",
-  "./plugins/Hexapod.min.js": "f97cda661fe05ffa0e4aed938930bcd8c60e8fe9425a11588654ae849f708c06",
+  "./plugins/Hexapod.js": "31e3ab5c2fac35d15fe9e4ce527e4fda34135ffb3e2e1fef23a14fac9307d2a3",
+  "./plugins/Hexapod.min.js": "908249a2eb1df9b6c489937da2a4a46a81eebae104f9e51c133f1b10431755ba",
   "./plugins/Iframe.js": "ef82c243d98dc49ab09ba5b54d7483128eb0fb49a4e733e1032d25730a095db0",
   "./plugins/Iframe.min.js": "486536e022cee0dc0274cd5a99b24f456ed94715b20fa2de8bbfa88c36ada101",
   "./plugins/Image.js": "a9be3447d72667f4cc83443bdefc6ae1f09be99ec50668ade91212acee362792",
@@ -2952,16 +2958,16 @@ var _default = exports["default"] = {
   "./plugins/Inspector.min.js": "47b59a569e204210647e1bd9fbf739a57333e8174db1b7af86119304b10643eb",
   "./plugins/Key.js": "14be871e2d98ae2a84558d4680c456da0b717ab32f14ff6e3db394791b3be456",
   "./plugins/Key.min.js": "b7bb1a499c76689b538be49a2b29ccd5e57267dbcd5c4b54b8fb251cd60b8c41",
-  "./plugins/Keyboard.js": "2814942baed276d858757ce3604a32dd0f73560cbdd733d6dc475ea4175a8501",
-  "./plugins/Keyboard.min.js": "b15efb9cbf0e4bab58a45aaffd540845debd74d65f53847103742fe682247439",
+  "./plugins/Keyboard.js": "6d4c62e195bbbd24ec92def8605bcba6f15108e0cabbb68bacc6df16ab90b407",
+  "./plugins/Keyboard.min.js": "3b82b35f79a51f9bb2f179222ed24967a179d43e0d1a92e571adcfa3cadeffeb",
   "./plugins/Label.js": "16cd42e7c61bbb5b28cf22fcc4e5e1fc8a6a25a42f237fd4c7c6379d176d1774",
   "./plugins/Label.min.js": "44a9e0631d95a8ccf9d23bc2249c2653abdbea4f79db1e3c9f5cfb7faf7f2cdc",
   "./plugins/Lifetime.js": "126648fa1b787f25fa302e56603a85d2073ab372b97d66b177930c27c4ae9f68",
   "./plugins/Lifetime.min.js": "1f0e46af7af17e9fdbda0b7ac3ed9844c7b9993b3ce7682443e0c7f0188b44b5",
   "./plugins/Link.js": "15613eac362fc089cd4450fa8aeb6a519239a0b6eff35f675827813f12dfa833",
   "./plugins/Link.min.js": "ef00cc642c22ddd3ce4251674c61761194867bfc9edc484050968c24f00037d5",
-  "./plugins/LoadingScreen.js": "a83930e9d45f160bc2f61af8894283bda3e58488e449ccde5374feda9f236612",
-  "./plugins/LoadingScreen.min.js": "b3b953dc98813936e5713b170a828db888f2cac1a368281cd8cd18185e4fb17a",
+  "./plugins/LoadingScreen.js": "bfbba2189f6bf692e4e99e4342342242515289596cc14e39d7794486ebda4e1a",
+  "./plugins/LoadingScreen.min.js": "8e4ed7bde63ee1505820ef7f7287154beeeb42d757316e79ad58b36477dc686e",
   "./plugins/LocalClient.js": "62886ed824f7bc714cde5664ecca9447e6d2a047eb65b5309f2dad765cef746e",
   "./plugins/LocalClient.min.js": "a681769ec3ebbd160693301d2780545f63629098867abbeaad8a3880694a04ea",
   "./plugins/Markup.js": "fcddabcc31984abd6133fa7ab85e1c7a78046382bd27dc0cbab839178dbaac89",
@@ -2974,14 +2980,6 @@ var _default = exports["default"] = {
   "./plugins/MidiGUI.min.js": "ceb780abf5f2fadc904cbb683dde98548db60f5bdf0f90f1398728c76a0f923f",
   "./plugins/Mouse.js": "35764079e8639081a1f97a40491b4400f8126358cc99e21780cbcd4e03e0f45e",
   "./plugins/Mouse.min.js": "936fe343f2dec3d9673f06c9e76bf9de86449d7e7272a758e3de954ba5243334",
-  "./plugins/PacManMovement.js": "e7b7dbe97b3192004c8bb2c58e952e27e2281a9604785faf3d0ee43771444205",
-  "./plugins/PacManMovement.min.js": "31f12aa5c1ec52ed3b22dd49420a5a42ff749954306411e3983c25f257fbbe13",
-  "./plugins/PhaserCamera.js": "4cf17a064897a768dafcc086c1d8d9b076efd2520e145c16052cd94d2419921c",
-  "./plugins/PhaserCamera.min.js": "da4dbe5ab58c17a3716130d51ac103492a4fd201da6fa61ad5b106e2fc158459",
-  "./plugins/PhaserGraphics.js": "e14cc1c2e7256c540595b170447be93e0b38feae954772709084026a967d09e7",
-  "./plugins/PhaserGraphics.min.js": "2f436654a1728b390b3f17e6802b9e202a70d3733afbea96f5741baf4e2ff981",
-  "./plugins/PhysXPhysics.js": "42d70e5cbde1d94b4895a92b6d51739a05a4762c41c208b32b2e0b1188dd7879",
-  "./plugins/PhysXPhysics.min.js": "f91a1b58ea914c437eb0082c78aa3c54570065978b853ef2592364f19759c401",
   "./plugins/PingTime.js": "df3ff245078e918c5c09e017266c29e58973a6b97e025c931bc25af0cc176ffe",
   "./plugins/PingTime.min.js": "df610dd9876c1b43e3c3a1e7c36273842332b0a51b2f33a150ec926f8155bca0",
   "./plugins/Platform.js": "3c8a9709aaf415909d0ef153afc23824bd7f0de575e7ffac900f6abc4747141b",
@@ -2992,8 +2990,6 @@ var _default = exports["default"] = {
   "./plugins/PluginExplorer.min.js": "e03f9fe01aa34fb485508b56c3c79607cc86d17d1236712325bca6cea80cc423",
   "./plugins/PluginsGUI.js": "c8259a06f4fe79bf42c8365d224d542da67100c0a66d4bf9d1eb45256363295b",
   "./plugins/PluginsGUI.min.js": "867f4f3d9fd64ea14335531454551f63d84e9b78058c07035da2bb33af7ebd30",
-  "./plugins/PongMovement.js": "519a2acd2ac6f47789322111b81d53240e5102a28fb31b4665f2794bb80d290d",
-  "./plugins/PongMovement.min.js": "d5ac3a89f7c0285ccad40194d032293b1c58535d45f04d4e400a49a46ff9036e",
   "./plugins/RBush.js": "138a0ea04d269a7872393fb6e4c4b2b3d766381d8db0d65a59e06efe6a73957b",
   "./plugins/RBush.min.js": "1b87b4df682d7b5b6d0d249583871a1e5058d4697efe7e1d38f5ef47d4dd8f81",
   "./plugins/RadialMenu.js": "4151c73e5be8a17f8d3fd44c218a323fd36c3ed120eb27a6829f2305b1f00d62",
@@ -3006,16 +3002,8 @@ var _default = exports["default"] = {
   "./plugins/Scoreboard.min.js": "f79d065a822319e0c74c3e36a1f17da4cae47c66b9770e1f10e9075fd40ab436",
   "./plugins/Select.js": "0cf2274922e92b4a32b69f6f09ab131949360bc9e936c175dfabe49a431664bc",
   "./plugins/Select.min.js": "c4165a53da1a46cc9d27cfe2fa513903144468d37fd93d861a82c6f0a83d0c6a",
-  "./plugins/SnapshotManager.js": "c176ef73983f464725ec172bdd42217435dc5b6020d87dbfb451612ade122375",
-  "./plugins/SnapshotManager.min.js": "39ab4e4f9de781433c618b03cf315ce1ff68db19ee2c4e19bd762ac3c6c9c460",
-  "./plugins/SnapshotSize.js": "7c7d856ce1b439df52123474c1089d930b3c81582388c8e1133108d8d2d3fde7",
-  "./plugins/SnapshotSize.min.js": "85719ef7d6a63b398d45dda88aaabeb38963aada0731c8cfc689ab0580670f9b",
   "./plugins/StarField.js": "d33e4ee1e02b8719edc5b7988b3eb2ded91a214dc911b3d800b52bfe19572669",
   "./plugins/StarField.min.js": "302c7e8878c277e6d3dc553ca7767fc98e16f66a8964c1a74cf7e4b972892467",
-  "./plugins/Sutra.js": "0a72cd998d7bfd7671ebe9c056f759eed2dd95e01e150c78427df7a7abf57361",
-  "./plugins/Sutra.min.js": "912a8816bce7349c33bf21f583224746e6c00acd461261aef57da9d0f68947a5",
-  "./plugins/SutraGUI.js": "5cd52a5ad623f56ecbeae92465c752a64d4e0d5f0f644eb78218e4c30c20e740",
-  "./plugins/SutraGUI.min.js": "76359696a8f4f1381668c2bfe281d385a2c45638fde0dcb009e4f69ad0d2148b",
   "./plugins/SwitchGraphics.js": "434f7480586ccdff9d28745b90d685baa06c53252069c0d8d2b7dbf4fe5a2b8c",
   "./plugins/SwitchGraphics.min.js": "85d763b07cd52596ccc910761ac2ee786e11b5cc42fb6ff332b6be879cdf14ee",
   "./plugins/Sword.js": "4ed88fd1e3f9fafe239d88db8b3bb3ee1189fff9c7b3c9ff54ac9b151c58fd32",
@@ -3026,25 +3014,14 @@ var _default = exports["default"] = {
   "./plugins/Text.min.js": "388b6baebbe73c0d0d736442ecc04cf00b383660c6c7bd87b3d2c554bae69d86",
   "./plugins/Textarea.js": "a9f16f27cf2721e3d75a504fd5ae68cb8238d945ac7dbb10f3787d7a12d680bb",
   "./plugins/Textarea.min.js": "4ee950d2815ee75c63ae64b260f4b95ffbce227a37ca58a9596d2a317a56b03b",
-  "./plugins/ThreeGraphics.js": "3946d5f8c0ba15dc849654d415abb3e4ea63b82a0c9db5c54b48aa7420cd303a",
-  "./plugins/ThreeGraphics.min.js": "08b440022e568e15610f72137f243fd18e0bc6944fea028c8d48de5ebbd3b3b8",
   "./plugins/TileSet.js": "730987abc1a69c466047444b005ed25d49a6c3dab03c8128701e086e29eb6c57",
   "./plugins/TileSet.min.js": "9a83b80581a1611b7f34e2f8cc4fe9e4eef910ea55372a19a0eda54eb2033649",
-  "./plugins/Timers.js": "a851809e3b6281010be54bef5f96a904ad687a860db2fc76fcb2e859adc40c23",
-  "./plugins/Timers.min.js": "7fb35cb94deccd7525f4ef6dd34a58847cebada4f6a489e16ce2bfb775aef682",
   "./plugins/Tone.js": "d108292b7b9ca54609200b15005a28d4f4c7ba83f882e62b1e3e01f85a3b5d86",
   "./plugins/Tone.min.js": "acfc53c580afb09c8de27813cf407450c63a77068ad6fc5d7f996b854e825ca9",
-  "./plugins/Tower.js": "7c3cf9593228b9dc07c1d351db5b5c79f9e81e22c3816baf6eb2e40bb1899717",
-  "./plugins/Tower.min.js": "c0c67aba93655c5e41fa4ec429724c97167bc784baa10a66bf8b1e0ecf4ca696",
+  "./plugins/Tower.js": "5efe4026709064ff3fc7036f8880fd43572c9b2521a0f4d77d90e432d4980644",
+  "./plugins/Tower.min.js": "6c37a14ae5c2afd4f8a617f194ad7407826cac8d3f6f5f876a9a2d3394655bc6",
   "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
-  "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21",
-  "./plugins/XState.js": "ad5c93d21aae813126ade0811fb7b0476b2c10751e9b568fc04c48a8b61777ed",
-  "./plugins/XState.min.js": "01bba5ffdce65f83c5038b69a31813ee56e03aa93923edaa5b1e05f6b132e933",
-  "./plugins/YCraft.min.js": "abe9442e478aa52a095bdc8558d7ee3e00a4354e8156a6e0b39a5da065e390fc",
-  "./plugins/YCraftGUI.js": "db2f8a9acadf76f6cd3f535d9adcb44b3474e7274b1eba8362f99c6adb62b4f3",
-  "./plugins/YCraftGUI.min.js": "2f2cb4cd70163fef5fdccabf9a0bcffce972a13adca4ebedc13d78212a3f7013",
-  "./plugins/YantraGUI.js": "e9416f1e539bedae38a4c85d6fdce421b4e452cda1986b4495ae0481a3aea8a6",
-  "./plugins/YantraGUI.min.js": "a1f02936b62401a14b9012c25d080c556afedb8fdf403d8b1ddc1c9ed24a0219"
+  "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21"
 };
 
 },{}],13:[function(require,module,exports){
@@ -3787,6 +3764,7 @@ exports["default"] = loadPluginsFromConfig;
 var _LoadingScreen = _interopRequireDefault(require("../plugins/loading-screen/LoadingScreen.js"));
 var _GhostTyper = _interopRequireDefault(require("../plugins/typer-ghost/GhostTyper.js"));
 var _Physics = _interopRequireDefault(require("../plugins/physics/Physics.js"));
+var _FlashMessage = _interopRequireDefault(require("../plugins/message-flash/FlashMessage.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 // default player movement, this could be also be set in defaultGameStart.js
@@ -3841,6 +3819,16 @@ function loadPluginsFromConfig(_ref) {
       this.use(new _LoadingScreen["default"]({
         minLoadTime: gameConfig.minLoadTime
       }));
+    }
+  }
+  if (!this.systems['message-flash'] && !this.isServer) {
+    this.use(new _FlashMessage["default"]());
+    // check if gameroot does not contain yantra.gg string,
+    // if so game.flashText() the value
+    if (!this.isServer && this.config.warnNonYantraGameRoot) {
+      if (this.gameRoot && this.gameRoot.indexOf('yantra.gg') === -1) {
+        this.flashMessage('GameRoot is not yantra.gg, this may cause issues with loading assets and scripts');
+      }
     }
   }
   this.use('Entity');
@@ -3947,7 +3935,7 @@ function loadPluginsFromConfig(_ref) {
   }
 }
 
-},{"../plugins/loading-screen/LoadingScreen.js":28,"../plugins/physics/Physics.js":29,"../plugins/typer-ghost/GhostTyper.js":31}],20:[function(require,module,exports){
+},{"../plugins/loading-screen/LoadingScreen.js":28,"../plugins/message-flash/FlashMessage.js":29,"../plugins/physics/Physics.js":30,"../plugins/typer-ghost/GhostTyper.js":32}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4756,7 +4744,9 @@ var LoadingScreen = /*#__PURE__*/function () {
       this.setupStyles(this.crtBackground, {
         position: 'fixed',
         top: '0',
-        left: '0',
+        paddingTop: '10px',
+        // Adjust the padding to center the loading screen
+        left: '10px',
         width: '100%',
         height: '100%',
         backgroundColor: 'black',
@@ -4783,7 +4773,9 @@ var LoadingScreen = /*#__PURE__*/function () {
       gameTitle.textContent = 'Mantra.js Game Starting';
       this.setupStyles(gameTitle, {
         fontSize: '20px',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        left: '40px',
+        position: 'absolute'
       });
 
       // Plugin counter
@@ -4934,6 +4926,148 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var Flash = /*#__PURE__*/function () {
+  function Flash() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    _classCallCheck(this, Flash);
+    this.id = Flash.id;
+    this.defaultDuration = config.defaultDuration || 3000; // Default duration in milliseconds
+    this.flashContainer = null; // Will hold the container for flash messages
+    // Default style properties
+    this.style = _objectSpread({
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      zIndex: '1000'
+    }, config.style);
+    // Style for different types of messages
+    this.typeStyles = {
+      error: {
+        backgroundColor: 'rgba(255, 0, 0, 0.7)',
+        color: 'white'
+      },
+      warn: {
+        backgroundColor: 'rgba(255, 255, 0, 0.7)',
+        color: 'black'
+      },
+      info: {
+        backgroundColor: 'rgba(0, 0, 255, 0.7)',
+        color: 'white'
+      },
+      success: {
+        backgroundColor: 'rgba(0, 255, 0, 0.7)',
+        color: 'white'
+      }
+    };
+  }
+  _createClass(Flash, [{
+    key: "init",
+    value: function init(game) {
+      this.game = game;
+      this.game.systemsManager.addSystem(this.id, this);
+      this.game.flashMessage = this.showMessage.bind(this);
+      this.createFlashContainer();
+    }
+  }, {
+    key: "createFlashContainer",
+    value: function createFlashContainer() {
+      if (!this.flashContainer) {
+        this.flashContainer = document.createElement('div');
+        this.flashContainer.id = 'flash-messages-container';
+        Object.assign(this.flashContainer.style, this.style);
+        document.body.appendChild(this.flashContainer);
+      }
+    }
+  }, {
+    key: "showMessage",
+    value: function showMessage(content) {
+      var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.defaultDuration;
+      var messageElement = document.createElement('div');
+      var messageType = 'info'; // Default type
+      var messageText = content;
+
+      // If content is an object, extract type, message, style, and override duration if provided
+      if (_typeof(content) === 'object' && content !== null) {
+        messageType = content.type || messageType;
+        messageText = content.message || messageText;
+        if (content.sticky !== true) {
+          duration = content.hasOwnProperty('duration') ? content.duration : duration;
+        } else {
+          duration = null;
+        }
+      }
+
+      // Apply type style if it exists, otherwise default to empty object
+      var typeStyle = this.typeStyles[messageType] || {};
+
+      // Apply default styles and type-specific styles first
+      Object.assign(messageElement.style, {
+        cursor: 'pointer',
+        margin: '5px 0',
+        fontSize: '24px',
+        padding: '10px',
+        borderRadius: '4px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+        position: 'relative',
+        // Needed to position the close button absolutely within the message
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }, typeStyle);
+
+      // Then override with custom styles if provided
+      if (_typeof(content) === 'object' && content.style) {
+        Object.assign(messageElement.style, content.style);
+      }
+
+      // Add message text
+      var textSpan = document.createElement('span');
+      textSpan.innerHTML = messageText;
+      messageElement.appendChild(textSpan);
+
+      // Allow the message to be closed by clicking anywhere on it
+      messageElement.onclick = function () {
+        return messageElement.remove();
+      };
+      this.flashContainer.appendChild(messageElement);
+
+      // Automatically remove the message after the duration, if duration is provided
+      if (duration !== null) {
+        setTimeout(function () {
+          messageElement.remove();
+        }, duration);
+      }
+    }
+  }, {
+    key: "unload",
+    value: function unload() {
+      if (this.flashContainer) {
+        this.flashContainer.remove();
+        this.flashContainer = null;
+      }
+    }
+  }]);
+  return Flash;
+}();
+_defineProperty(Flash, "id", 'flash');
+var _default = exports["default"] = Flash;
+
+},{}],30:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
 var _applyGravity = _interopRequireDefault(require("./applyGravity.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -5001,7 +5135,7 @@ var Physics = exports["default"] = /*#__PURE__*/function () {
 _defineProperty(Physics, "id", 'physics');
 _defineProperty(Physics, "removable", false);
 
-},{"./applyGravity.js":30}],30:[function(require,module,exports){
+},{"./applyGravity.js":31}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5032,7 +5166,7 @@ function applyGravity(ent1, ent2, gravity) {
   });
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
