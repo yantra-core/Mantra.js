@@ -58,6 +58,7 @@ class Game {
       multiplexGraphicsHorizontally: false, // default behavior is multiple graphics plugins will be horizontally stacked
       addLifecycleHooksToAllPlugins: true, // default behavior is to add lifecycle hooks to all plugin methods
       warnNonYantraGameRoot: false, // warns if gameRoot is not yantra.gg
+      disableContextMenu: true, // default behavior is to disable right-click context menu
     };
 
     // Merge custom configuration with defaults

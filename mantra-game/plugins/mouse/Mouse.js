@@ -14,7 +14,6 @@ export default class Mouse {
     this.isDragging = false;
     this.dragStartPosition = { x: 0, y: 0 };
 
-
     this.inputsBound = false;
     // Stores current values of mouse buttons
     this.mouseButtons = {
@@ -539,18 +538,15 @@ export default class Mouse {
     // mouse leaves window, window may still have focus
     document.body.addEventListener('mouseleave', this.boundHandleMouseLeave);
 
-    // TODO: could be a config option
-    // TODO: this should be able to bind / unbind based on user actions, defaultMouseMovement
-    //       the default behavior should be such that right click and wheel works unless bound explicitly
-    if (this.disableContextMenu) {
-      document.addEventListener('contextmenu', event => {
-        // Handle internal Mantra events first before prevent default to disable browser right click menu
-        //let context = this.createMouseContext(event); 
-        //this.game.emit('ecsInternalEvent', context); 
-        // Prevent the default context menu from appearing
+    document.addEventListener('contextmenu', event => {
+      // Handle internal Mantra events first before prevent default to disable browser right click menu
+      //let context = this.createMouseContext(event); 
+      //this.game.emit('ecsInternalEvent', context); 
+      // Prevent the default context menu from appearing
+      if (this.disableContextMenu && this.game.config.disableContextMenu !== false) {
         event.preventDefault();
-      });
-    }
+      }
+    });
     let initialDistance = null; // Store the initial distance between two touches
     let currentZoom = 1; // Assuming 1 is your game's initial zoom level
 

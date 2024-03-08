@@ -238,6 +238,7 @@ export default function construct(game, plugins = []) {
     radius: new Component('radius', game),
     isSensor: new Component('isSensor', game),
     owner: new Component('owner', game),
+    source: new Component('source', game),
     inputs: new Component('inputs', game),
     items: new Component('items', game),
     hasInventory: new Component('hasInventory', game),

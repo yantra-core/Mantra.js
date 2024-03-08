@@ -65,6 +65,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       collectable: false,
       hasInventory: true,
       owner: 0, // 0 = server
+      source: null, // originating source of the entity, in most cases this is process id
       inputs: null,
       value: null,
       destroyed: false,
@@ -164,7 +165,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
     config.startingPosition = config.position;
   }
 
-  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, inputs, value, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterUpdateEntity, afterItemCollected, update, exit, ctick, utick } = config;
+  const { name, type, kind, position, rotation, startingPosition, body, mass, density, velocity, isSensor, isStatic, lockedProperties, width, height, depth, size, radius, shape, color, maxSpeed, health, score, items, container, sutra, scene, meta, collectable, hasInventory, owner, source, inputs, value, lifetime, yCraft, text, style, texture, collisionActive, collisionStart, collisionEnd, pointerdown, pointerup, pointermove, pointerenter, pointerleave, pointerover, pointerout, onDrop, afterRemoveEntity, afterCreateEntity, afterUpdateEntity, afterItemCollected, update, exit, ctick, utick } = config;
 
   let { x, y } = position;
 
@@ -206,6 +207,8 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.addComponent(entityId, 'color', ensuredColor);
   this.game.addComponent(entityId, 'maxSpeed', maxSpeed);
   this.game.addComponent(entityId, 'owner', owner);
+  // source is reversed in order to form the relationship between the source and the entity
+  this.game.addComponent(source, 'source', source + '_' + entityId);
   this.game.addComponent(entityId, 'items', items);
   this.game.addComponent(entityId, 'scene', scene);
 
@@ -364,6 +367,16 @@ export default function createEntity(config = {}, ignoreSetup = false) {
   this.game.data.ents[updatedEntity.type] = this.game.data.ents[updatedEntity.type] || [];
   this.game.data.ents[updatedEntity.type].push(updatedEntity);
 
+  // check to see if there are no active players, if so set the entity as the current player
+  // TODO: config flag
+  if (updatedEntity.type === 'PLAYER' && this.game.data.ents.PLAYER) {
+    let activePlayerCount = Object.keys(this.game.data.ents.PLAYER).length;
+    // console.log("activePlayerCount", activePlayerCount)
+    if (activePlayerCount < 1) {
+      // console.log('Setting player id', entityId);
+      this.game.setPlayerId(entityId);
+    }
+  }
 
   //
   // Entity Lifecycle afterCreateEntity

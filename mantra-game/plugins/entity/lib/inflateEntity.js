@@ -1,38 +1,87 @@
-export default function inflateEntity(entityData) { // TODO: ensure creator_json API can inflate without graphics / client deps
+export default function inflateEntity(entityData) {
   let game = this.game;
-  // console.log('inflateEntity', entityData)
-  // takes outside state and performs update/destroy/create depending
-  // on the current local state of the entity and incoming state
-  // if the incoming state is pending destroy, just remove it immediately and return
+
+  // Check for entity marked for destruction and remove immediately if so
   if (entityData.destroyed === true) {
     game.removeGraphic(entityData.id);
     game.removeEntity(entityData.id);
     return;
   }
 
-  // Check if the entity is marked for local removal
-  // This could happen if client-side prediction has removed an entity,
-  // and the server still has an update for it in the queue
-  if (this.game.removedEntities.has(entityData.id)) {
+  // Check for entities marked for local removal, skip updates if found
+  if (game.removedEntities.has(entityData.id)) {
     console.log('Skipping update for locally removed entity:', entityData.id);
     return;
   }
 
-  // this isn't a destroyed state, attempt to get a copy of the local state by id
+  // Check if the entity is from a remote source and handle potential source conflicts
+  if (entityData.source != null) {
+    // This entity orginated from a remote source, we'll need to account for an entity.id that was
+    // created in another system
+    let existingSourceId = game.components.source.get(entityData.source + '-' + entityData.id); // get concat source-id
+    // If a prior source exists, we should perform an update using the sourceId
+    // If the entity exists and has a different source, log the conflict and decide on handling strategy
+    if (existingSourceId) { // sourceId?
+      // console.log(`Entity ${entityData.id} from source ${entityData.source} encountered, previously associated with source ${existingSource}. Handling potential ID conflict.`);
+      // Implement conflict resolution strategy here, e.g., update, replace, ignore, etc.
+      entityData.id = entityData.source.split('_')[1]; // Remark brittle, maybe sourceId
+      // console.log("ALREADY EXISTS updateOrCreate REMOTE", entityData);
+      return updateOrCreate(game, entityData);
+    } else {
+      delete entityData.id;
+      // store a new source refer
+
+      // since this ent is remote, we should attempt to build it by type,
+      // in order to re-establish the correct components and behaviors
+      let type = entityData.type;
+      if (type) {
+
+        // tolowercase then uppercase first letter
+        type = type.toLowerCase();
+        type = type.charAt(0).toUpperCase() + type.slice(1);
+
+        try {
+          let defaultTypeConfig = this.game.make();
+          defaultTypeConfig[type](entityData);
+          let config = defaultTypeConfig.build();
+          // merge the default type config with the entity data
+          for (let p in config) {
+            entityData[p] = config[p];
+          }
+          // remove any undefined values or null values
+          for (let p in entityData) {
+            if (typeof entityData[p] === 'undefined' || entityData[p] === null) {
+              delete entityData[p];
+            }
+          }
+        }
+        catch (err) {
+          console.warn('Failed to build remote entity by type:', type, err);
+        }
+
+        //console.log('proceeding with typed data', entityData)
+
+      }
+
+      return updateOrCreate(game, entityData);
+    }
+  } else {
+    return updateOrCreate(game, entityData);
+  }
+
+}
+
+function updateOrCreate(game, entityData) {
+  // After handling potential source conflicts, proceed to create or update the entity
   let localEntity = game.entities.get(entityData.id);
   if (!localEntity) {
-    // no local copy of the state exists, create a new entity
-    if (typeof entityData.height === 'undefined' || typeof entityData.width === 'undefined') {
-      // Remark: This shouldn't happen, there is an issue where local destroyed entities are still being considered updated
-      // and the local system thinks we should create a new entity on the state update; however the state is stale and
-      // the entity is already destroyed, so we do not wish to update the state, skip for now
-      // TODO: we should resolve this with unit tests and ensure syncronization between server and client
-      return;
-    }
-    game.createEntity(entityData);
+    // If it's a new entity or a remote entity not seen before, create it
+    // console.log("createEntity LOCAL", entityData);
+    return game.createEntity(entityData);
   } else {
-    // a local copy of the state exists, update it
-    game.updateEntity(entityData);
+    //console.log("updateEntity LOCAL", entityData);
+    // If it's an existing entity, update it
+    return game.updateEntity(entityData);
   }
 
 }

@@ -140,6 +140,51 @@ class CSSGraphics extends GraphicsInterface {
     this.renderDiv = renderDiv;
   }
 
+  isEntityInViewport(ent, zoomFactor, buffer = 100) { // We could add buffer if needed
+    let result = {};
+    let inViewport = true;
+    let outsideOf = {
+      left: false,
+      right: false,
+      top: false,
+      bottom: false
+    };
+    // Adjust the entity's position and size based on the zoom factor
+    const adjustedPosition = {
+      x: (ent.position.x * zoomFactor) + (window.innerWidth / 2),
+      y: (ent.position.y * zoomFactor) + (window.innerHeight / 2)
+    };
+    const adjustedSize = {
+      width: ent.size.width * zoomFactor,
+      height: ent.size.height * zoomFactor
+    };
+  
+    // Check if the adjusted entity position is within the viewport
+    if (adjustedPosition.x + adjustedSize.width < 0) {
+      outsideOf.left = true;
+      inViewport = false;
+    }
+    if (adjustedPosition.x > window.innerWidth) {
+      outsideOf.right = true;
+      inViewport = false;
+    }
+    if (adjustedPosition.y + adjustedSize.height < 0) {
+      outsideOf.top = true;
+      inViewport = false;
+    }
+    if (adjustedPosition.y > window.innerHeight) {
+      outsideOf.bottom = true;
+      inViewport = false;
+    }
+
+    result.outsideOf = outsideOf;
+    result.inViewport = inViewport;
+    result.adjustedPosition = adjustedPosition;
+  
+    return result;
+  }
+  
+
 }
 
 export default CSSGraphics;

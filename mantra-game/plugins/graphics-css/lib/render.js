@@ -27,15 +27,16 @@ export default function render(game, alpha) {
 
   } else {
 
-
     // LOOP1 render loop ( cannot remove? )
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
      
       // if game.config.entityEmitsViewportExitEvent is true, we need to check if the entity is in the viewport
+      // Remark: This could be in a better location ( outside of graphics pipeline... )
+      // This location implies CSSGraphics only for exit viewpor events, we'll want to fix that
+      // More importantly, we didn't want to add to LOOP1 time complexity, so we added it here ( for now )
       if (this.game.config.entityEmitsViewportExitEvent && ent && ent.position && ent.size) {
-        let result = isEntityInViewport(ent, this.game.data.camera.currentZoom);
-        // console.log(result)
+        let result = this.isEntityInViewport(ent, this.game.data.camera.currentZoom);
         if (result.inViewport) {
           // ent.emit('viewportEnter');
         } else {
@@ -51,28 +52,3 @@ export default function render(game, alpha) {
   }
 
 }
-function isEntityInViewport(ent, zoomFactor) {
-  let result = {};
-  let inViewport = true;
-  // Adjust the entity's position and size based on the zoom factor
-  const adjustedPosition = {
-    x: (ent.position.x * zoomFactor) + (window.innerWidth / 2),
-    y: (ent.position.y * zoomFactor) + (window.innerHeight / 2)
-  };
-  const adjustedSize = {
-    width: ent.size.width * zoomFactor,
-    height: ent.size.height * zoomFactor
-  };
-
-  // Check if the adjusted entity position is within the viewport
-  if (adjustedPosition.x + adjustedSize.width < 0) inViewport = false; // Left of viewport
-  if (adjustedPosition.x > window.innerWidth) inViewport = false; // Right of viewport
-  if (adjustedPosition.y + adjustedSize.height < 0) inViewport = false; // Above viewport
-  if (adjustedPosition.y > window.innerHeight) inViewport = false; // Below viewport
-
-  result.inViewport = inViewport;
-  result.adjustedPosition = adjustedPosition;
-
-  return result;
-}
-
