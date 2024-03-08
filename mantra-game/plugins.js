@@ -87,6 +87,8 @@ import RBush from './plugins/rbush/RBush.js';
 
 // Utility
 import Markup from './plugins/markup/Markup.js';
+import CrossWindow from './plugins/crosswindow/CrossWindow.js';
+
 
 // AI Nueral Net
 import TensorFlow from './plugins/tensorflow/TensorFlow.js';
@@ -217,6 +219,7 @@ let plugins = {
   Timers,
   RBush,
   Markup,
+  CrossWindow,
   TensorFlow,
   Midi,
   MidiGUI,
