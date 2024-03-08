@@ -1,7 +1,6 @@
 // CrossWindow.js - Mantra Plugin - Marak Squires 2024
 // see: CrossWindow.js: https://github.com/yantra-core/CrossWindow.js
 
-// import crosswindow from 'crosswindow';
 // import { CrossWindow as CW, CrossWindowDebugger } from '../../../../CrossWindow.js/index.js'
 import { CrossWindow as CW, CrossWindowDebugger } from 'crosswindow';
 
@@ -14,6 +13,8 @@ export default class CrossWindow {
 
   init(game) {
     this.game = game;
+    this.game.systemsManager.addSystem(CrossWindow.id, this);
+
     //console.log('CrossWindow plugin initialized', CrossWindow);
     // Initialize CrossWindow instance
     this.crosswindow = new CW(window, {
@@ -81,6 +82,7 @@ export default class CrossWindow {
         // If the best window is a different window, remove the entity and send a message
         game.removeEntity(entity.id);
         entityData.action = 'message'; // TODO: fix this and add 'action' and 'payload' top-level scope to CrossWindow
+        delete entityData.sutra; // for now
         bestWindow.postMessage(entityData);
       }
     } else {
@@ -145,6 +147,8 @@ export default class CrossWindow {
         entityData.frictionStatic = 0;
         entityData.source = this.crosswindow.windowId;
 
+        delete entityData.sutra; // for now, we can toJSON this and re-inflate it
+        // console.log('sendingdata', entityData)
         // Inflate or update entity in the game
         let ent = this.game.inflateEntity(entityData);
         if (ent.type === 'PLAYER') {
