@@ -119,6 +119,11 @@ export default class EntityBuilder {
     return this;
   }
 
+  restitution(value) {
+    this.config.restitution = value;
+    return this;
+  }
+
   // Health and scoring
   health(value) {
     this.config.health = value;
@@ -636,12 +641,11 @@ export default class EntityBuilder {
   }
 }
 
-// Function to blend two colors
 function blendColors(color1, color2) {
-  const r = ((color1 >> 16) + (color2 >> 16)) >> 1;
+  const r = (((color1 >> 16) & 0xFF) + ((color2 >> 16) & 0xFF)) >> 1;
   const g = (((color1 >> 8) & 0xFF) + ((color2 >> 8) & 0xFF)) >> 1;
   const b = ((color1 & 0xFF) + (color2 & 0xFF)) >> 1;
-  return (r << 16) | (g << 8) | b;
+  return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
 }
 
 /* TODO: refactor to store Map() of OG references for granular removals / updates

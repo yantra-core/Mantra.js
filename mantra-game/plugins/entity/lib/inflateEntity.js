@@ -56,11 +56,14 @@ export default function inflateEntity(entityData) {
           }
         }
         catch (err) {
-          console.warn('Failed to build remote entity by type:', type, err);
+          console.warn('Failed to build remote entity by type:', type, err, 'using default build');
+          defaultBuild(game, entityData)
         }
 
-        //console.log('proceeding with typed data', entityData)
+        console.log('proceeding with typed data', entityData)
 
+      } else {
+        defaultBuild(game, entityData);
       }
 
       return updateOrCreate(game, entityData);
@@ -71,12 +74,28 @@ export default function inflateEntity(entityData) {
 
 }
 
+function defaultBuild(game, entityData) {
+  // merge default build make 
+  let defaultConfig = game.make().build();
+  for (let p in defaultConfig) {
+    if (typeof entityData[p] === 'undefined' || entityData[p] === null) {
+      entityData[p] = defaultConfig[p];
+    }
+  }
+  // remove any undefined values or null values ( should not be necessary at this stage ) ( more tests )
+  for (let p in entityData) {
+    if (typeof entityData[p] === 'undefined' || entityData[p] === null) {
+      delete entityData[p];
+    }
+  }
+}
+
 function updateOrCreate(game, entityData) {
   // After handling potential source conflicts, proceed to create or update the entity
   let localEntity = game.entities.get(entityData.id);
   if (!localEntity) {
     // If it's a new entity or a remote entity not seen before, create it
-    // console.log("createEntity LOCAL", entityData);
+    //console.log("createEntity LOCAL", entityData);
     return game.createEntity(entityData);
   } else {
     //console.log("updateEntity LOCAL", entityData);

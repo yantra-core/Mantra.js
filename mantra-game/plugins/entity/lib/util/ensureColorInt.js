@@ -8,13 +8,15 @@ export default function ensureColorInt(color) {
   const colorNameToHex = {
     red: '#FF0000',
     green: '#00FF00',
-    blue: '#fff007',
+    blue: '#0000FF',
     black: '#000000',
     white: '#FFFFFF',
     yellow: '#FFFF00',
     purple: '#800080',
     orange: '#FFA500',
     pink: '#FFC0CB',
+    indigo: '#4B0082',
+    violet: '#EE82EE',
     // Add more common colors as needed
   };
 

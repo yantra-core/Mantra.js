@@ -1,8 +1,9 @@
 // CrossWindow.js - Mantra Plugin - Marak Squires 2024
 // see: CrossWindow.js: https://github.com/yantra-core/CrossWindow.js
 
-import * as CW from '../../../../CrossWindow.js/browser-shim.js';
-import * as CWDEBUG from '../../../../CrossWindow.js/browser-shim-debugger.js';
+// import crosswindow from 'crosswindow';
+// import { CrossWindow as CW, CrossWindowDebugger } from '../../../../CrossWindow.js/index.js'
+import { CrossWindow as CW, CrossWindowDebugger } from 'crosswindow';
 
 export default class CrossWindow {
   static id = 'crosswindow';
@@ -13,15 +14,15 @@ export default class CrossWindow {
 
   init(game) {
     this.game = game;
-    console.log('CrossWindow plugin initialized', CW);
+    //console.log('CrossWindow plugin initialized', CrossWindow);
     // Initialize CrossWindow instance
-    this.crosswindow = new CW.CrossWindow(window, {
+    this.crosswindow = new CW(window, {
       broadcastMouseEvents: true,
       broadcastKeyboardEvents: true,
     });
 
     // Optionally initialize CrossWindow debugger
-    this.crossWindowDebugger = new CWDEBUG.CrossWindowDebugger(this.crosswindow, {
+    this.crossWindowDebugger = new CrossWindowDebugger(this.crosswindow, {
       showOtherWindows: true,
       showWindowLegend: true,
       showWindowCount: true,
