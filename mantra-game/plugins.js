@@ -63,12 +63,13 @@ import Lifetime from './plugins/lifetime/Lifetime.js';
 
 // Game Objects
 import Border from './plugins/border/Border.js';
-import GravityWell from './plugins/gravitywell/GravityWell.js';
 import Bomb from './plugins/bomb/Bomb.js';
 import Boomerang from './plugins/boomerang/Boomerang.js';
 import Bullet from './plugins/bullet/Bullet.js';
 import Block from './plugins/block/Block.js';
+import Coin from './plugins/coin/Coin.js';
 import Flame from './plugins/flame/Flame.js';
+import GravityWell from './plugins/gravitywell/GravityWell.js';
 import Hexapod from './plugins/hexapod/Hexapod.js';
 import Key from './plugins/key/Key.js';
 import Platform from './plugins/platform/Platform.js';
@@ -179,6 +180,7 @@ let plugins = {
   Bomb,
   Boomerang,
   Bullet,
+  Coin,
   Flame,
   Sword,
   // UI Objects

@@ -56,11 +56,12 @@ export default function inflateEntity(entityData) {
           }
         }
         catch (err) {
-          console.warn('Failed to build remote entity by type:', type, err, 'using default build');
+          // This will happen for any type that is not defined by an active plugin
+          // console.warn('Failed to build remote entity by type:', type, err, 'using default build');
           defaultBuild(game, entityData)
         }
 
-        console.log('proceeding with typed data', entityData)
+        // console.log('proceeding with typed data', entityData)
 
       } else {
         defaultBuild(game, entityData);

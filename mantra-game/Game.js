@@ -412,6 +412,10 @@ class Game {
     return typeof color === 'number' ? `#${color.toString(16)}` : color;
   }
 
+  getRandomColor( format = 'int' ) {
+    return this.randomColor(format);
+  }
+
   randomColor(format = 'int') {
 
     let color;

@@ -6,9 +6,32 @@ import { CrossWindow as CW, CrossWindowDebugger } from 'crosswindow';
 
 export default class CrossWindow {
   static id = 'crosswindow';
-  constructor(game) {
+  constructor(options = {}) {
     this.id = CrossWindow.id;
     this.crosswindow = null;
+    this.debugger = null;
+
+    this.config = {};
+    this.config.debugger = {
+      'showOtherWindows': false,
+      'showWindowLegend': false,
+      'showPositionLegend': false,
+      'showOpenWindowButton': false,
+      'showExamplesBar': false
+    };
+
+    if (typeof options.debugger === 'boolean') {
+      this.debugger = options.debugger;
+    }
+    if (typeof options.debugger === 'object') {
+      this.debugger = true;
+      // iterate through all options and set them on config
+      for (let key in options.debugger) {
+        console.log("in plugin setting config", key, options.debugger[key])
+        this.config.debugger[key] = options.debugger[key];
+      }
+    }
+
   }
 
   init(game) {
@@ -22,13 +45,19 @@ export default class CrossWindow {
       broadcastKeyboardEvents: true,
     });
 
-    // Optionally initialize CrossWindow debugger
-    this.crossWindowDebugger = new CrossWindowDebugger(this.crosswindow, {
-      showOtherWindows: true,
-      showWindowLegend: true,
-      showWindowCount: true,
-    });
+    if (this.debugger) {
+      console.log('crosswindow plugin config', this.config)
+      // Optionally initialize CrossWindow debugger
 
+      this.crossWindowDebugger = new CrossWindowDebugger(this.crosswindow, {
+
+        showOtherWindows: this.config.debugger.showOtherWindows,
+        showWindowLegend: this.config.debugger.showWindowLegend,
+        showOpenWindowButton: this.config.debugger.showOpenWindowButton,
+        showExamplesBar: this.config.debugger.showExamplesBar,
+      });
+
+    }
     // Listen for Mantra and CrossWindow events
     this.setupListeners();
   }
@@ -134,7 +163,7 @@ export default class CrossWindow {
           // etc, all props, iterate? mantra helper?
         };
 
-        
+
         for (let p in entity) {
           if (typeof entity[p] !== 'function' && p !== 'graphics') {
             entityData[p] = entity[p];

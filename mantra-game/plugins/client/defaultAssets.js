@@ -17,12 +17,31 @@ let defaultAssets = {
   'tile-entrance': '/img/game/tiles/tile-entrance.png',
   //'fire': '/img/game/env/loz_fire.png',
   // 'flare': '/img/game/particle/flare.png',
-    //'planet-express-base': '/img/game/env/planet-express-base.png',
+  //'planet-express-base': '/img/game/env/planet-express-base.png',
   // 'robot-arms-apartment': '/img/game/env/robot-arms-apartment.png',
   // '3d-homer': '/img/game/env/3d-homer.gif',
   'demon': '/img/game/npc/demon.gif',
   'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
   'ayyo-key': '/img/game/env/ayyo-key-medium.png',
+  'ayyo-coin': {
+    type: 'spritesheet',
+    url: '/img/game/env/coin.png',
+    frameTags: {
+      coin: {
+        rate: 32,
+        frames: [
+          { x: 0, y: 0 },
+          /*
+          { x: -16, y: 0 },
+          { x: -32, y: 0 },
+          { x: -48, y: 0 },
+          */
+        ]
+      }
+    }
+  },
+    
+
   'hexapod-single': '/img/game/npc/hexapod-single.png',
   /*
   'hexapod': {
@@ -41,7 +60,7 @@ let defaultAssets = {
   */
 
 
-  
+
   /*
   'raiden': {
     type: 'spritesheet',
@@ -58,7 +77,7 @@ let defaultAssets = {
     },
   },
   */
-   'blackMage': {
+  'blackMage': {
     type: 'spritesheet',
     url: '/img/game/sheets/mage.png',
     frameTags: {
@@ -137,7 +156,7 @@ let defaultAssets = {
           { x: -656, y: -656 },
         ]
       },
-      
+
 
       player: {
         rate: 100,
@@ -351,7 +370,7 @@ let defaultAssets = {
         ]
       },
 
-      fire: { 
+      fire: {
         frames: [
           { x: -208, y: -544 },
           { x: -224, y: -544 }

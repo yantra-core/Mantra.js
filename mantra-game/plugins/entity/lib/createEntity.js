@@ -53,7 +53,7 @@ export default function createEntity(config = {}, ignoreSetup = false) {
       // Remark: height, width, and depth are being replaced by size
       size: { width: 100, height: 100, depth: 16 },
       lifetime: null,
-      maxSpeed: 9999,
+      maxSpeed: 3,
       isStatic: false,
       isSensor: false,
       restitution: 0,
