@@ -1182,7 +1182,7 @@ function onAfterUpdate(event) {
         //
         // Clamp max speed
         //
-        var maxSpeed = 100; // TODO: move to config
+        var maxSpeed = 4; // TODO: move to config
         if (entity.maxSpeed) {
           maxSpeed = entity.maxSpeed;
         }

@@ -278,7 +278,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       }
       this.sendMouseData();
 
-      // get the reference to this ent, check for pointerdown event
+      // get the reference to this ent, check for pointermove event
       if (this.game.data && this.game.data.ents && this.game.data.ents._) {
         var ent = this.game.data.ents._[this.game.selectedEntityId];
         if (ent && ent.pointermove) {
@@ -560,6 +560,7 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "bindInputControls",
     value: function bindInputControls() {
+      var _this = this;
       if (inputsBound === true) {
         return;
       }
@@ -594,19 +595,15 @@ var Mouse = exports["default"] = /*#__PURE__*/function () {
       window.addEventListener('blur', this.boundHandleWindowBlur);
       // mouse leaves window, window may still have focus
       document.body.addEventListener('mouseleave', this.boundHandleMouseLeave);
-
-      // TODO: could be a config option
-      // TODO: this should be able to bind / unbind based on user actions, defaultMouseMovement
-      //       the default behavior should be such that right click and wheel works unless bound explicitly
-      if (this.disableContextMenu) {
-        document.addEventListener('contextmenu', function (event) {
-          // Handle internal Mantra events first before prevent default to disable browser right click menu
-          //let context = this.createMouseContext(event); 
-          //this.game.emit('ecsInternalEvent', context); 
-          // Prevent the default context menu from appearing
+      document.addEventListener('contextmenu', function (event) {
+        // Handle internal Mantra events first before prevent default to disable browser right click menu
+        //let context = this.createMouseContext(event); 
+        //this.game.emit('ecsInternalEvent', context); 
+        // Prevent the default context menu from appearing
+        if (_this.disableContextMenu && _this.game.config.disableContextMenu !== false) {
           event.preventDefault();
-        });
-      }
+        }
+      });
       var initialDistance = null; // Store the initial distance between two touches
       var currentZoom = 1; // Assuming 1 is your game's initial zoom level
 

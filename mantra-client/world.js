@@ -28,6 +28,7 @@ let game = new Game({
   graphics: ['css'], // 'three', 'babylon', 'css'
   plugins: ['SwitchGraphics'],
   gameRoot: '.',
+  disableContextMenu: false,
   //defaultMovement: true,
   // defaultMouseMovement: false
 
@@ -112,6 +113,8 @@ game.use(new plugins.Button());
 game.use(new plugins.Code());
 game.use(new plugins.Container());
 game.use(new plugins.Entity());
+game.use(new plugins.Client());
+
 // game.use(new plugins.Monaco());
 game.use(new plugins.Key());
 game.use(new plugins.Keyboard());
@@ -122,6 +125,11 @@ game.use(new plugins.Link());
 
 game.use(new plugins.Markup());
 
+
+game.use(new plugins.Collectable());
+
+
+game.use(new plugins.CrossWindow());
 // game.use(new plugins.TensorFlow());
 
 
@@ -129,27 +137,42 @@ game.use(new plugins.Markup());
 //game.use(new plugins.Editor());
 // game.use(new Lifetime());
 game.use(new plugins.Gamepad())
+game.use(new plugins.Coin())
+
+game.use(new plugins.CrossWindow())
 // game.use(new plugins.SutraGUI());
 
 // game.use(new plugins.ThreeGraphics());
 // game.use(new plugins.Editor());
 game.use(new plugins.SwitchGraphics())
 game.start(function () {
-  game.reset();
-  //  game.setZoom(1);
+  // game.reset();
   //game.systems.tile.proceduralGenerateMissingChunks = true;
   game.data.camera.mouseWheelZoomEnabled = true;
-  game.data.camera.adaptiveZoom = true;
+  game.config.entityEmitsViewportExitEvent = true;
+  game.data.camera.adaptiveZoom = false;
   console.log('gggg', game.systems)
   //game.systems.markup.preview()
   //game.systems.markup.parseHTML()
-  game.use(new worlds.Maze());
+  // game.use(new worlds.Music());
+  game.data.camera.follow = false;
 
+  game.make().Coin().size(16).position(-50, -50).createEntity();
+  game.setCameraMode('none');
+  game.setZoom(2.5);
   console.log('rrrrr', game.rules)
   game.rules.if('X').then('DO_STUFF');
   game.rules.on('DO_STUFF', function (entity, node) {
     alert('snap')
   });
+
+  /*
+   // listen to the Mantra event for when entity leaves the viewport
+   game.on('entity::exited::viewport', function (entity) {
+    // if so, remove the entity and send it CrossWindow to be opened in a new window
+    console.log('entity::exited::viewport', entity)
+   });
+   */
 
 
 
@@ -210,19 +233,25 @@ game.start(function () {
   });
   regenButton.createEntity();
   */
-  game.make().Block().isStatic(true).createEntity();
-  game.make().Player().position(0, 0, 16).meta({
-    //equippedItems: ['Bullet']
+  // game.make().Block().isStatic(true).createEntity();
 
-    equippedItems: [
-      {
-        plugin: 'bullet',
-        method: 'fireBullet',
-      }
-    ]
+  // check to see if url query has win
+  if (!window.location.search.includes('win')) {
+    game.make().Player().position(0, 0, 16).meta({
+      //equippedItems: ['Bullet']
+
+      equippedItems: [
+        {
+          plugin: 'bullet',
+          method: 'fireBullet',
+        }
+      ]
 
 
-  }).createEntity();
+    }).createEntity();
+
+  }
+
 
 
   function generateMaze(type = 'RecursiveDivision') {

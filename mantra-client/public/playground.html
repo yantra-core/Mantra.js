@@ -233,7 +233,7 @@
     // A helper function to check if the example is a priority example
 
     // TODO: needs to check exampleUrl.replace('/examples/demo.html?source=', '')
-    const isPriorityExample = (exampleUrl) => priorityExamples.includes(exampleUrl.replace('/examples/demo.html?source=', ''));
+    const isPriorityExample = (exampleUrl) => priorityExamples.includes(exampleUrl.replace('/mantra/examples/demo.html?source=', ''));
 
     // Function to add an example to the iframeArray without duplicates
     const addExample = (example) => {
@@ -247,7 +247,7 @@
     // then ensure no duplicates are added to the iframeArray
     // Modify and sort examples
     examples.forEach(function (example) {
-      example.url = '/examples/demo.html?source=' + example.url.replace('.html', '');
+      example.url = '/mantra/examples/demo.html?source=' + example.url.replace('.html', '');
 
       if (isPriorityExample(example.url)) {
         // Add priority examples to the beginning
@@ -402,12 +402,12 @@
         closeEditorBtn.style.display = 'none';
       };
 
-      let examplesRoot = 'https://yantra.gg/mantra';
+      let examplesRoot = 'https://yantra.gg/mantra/examples/';
       //examplesRoot = 'http://192.168.1.80:7777/examples';
       // Create the source editor iframe (placeholder src for demonstration)
       const editorIframe = document.createElement('iframe');
       // editorIframe.src = examplesRoot + '/collisions/collision-active?source=true'; // Replace with the actual CodeMirror URL
-      let _source = examplesRoot + example.url.replace('demo.html?source=', '');
+      let _source = examplesRoot + example.url.replace('/mantra/examples/demo.html?source=', '');
       _source += '?source=true';
       editorIframe.src = _source;
       editorIframe.classList.add('editorIframe');

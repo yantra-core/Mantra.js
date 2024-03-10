@@ -387,6 +387,51 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       }
       this.renderDiv = renderDiv;
     }
+  }, {
+    key: "isEntityInViewport",
+    value: function isEntityInViewport(ent, zoomFactor) {
+      var buffer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
+      // We could add buffer if needed
+      var result = {};
+      var inViewport = true;
+      var outsideOf = {
+        left: false,
+        right: false,
+        top: false,
+        bottom: false
+      };
+      // Adjust the entity's position and size based on the zoom factor
+      var adjustedPosition = {
+        x: ent.position.x * zoomFactor + window.innerWidth / 2,
+        y: ent.position.y * zoomFactor + window.innerHeight / 2
+      };
+      var adjustedSize = {
+        width: ent.size.width * zoomFactor,
+        height: ent.size.height * zoomFactor
+      };
+
+      // Check if the adjusted entity position is within the viewport
+      if (adjustedPosition.x + adjustedSize.width < 0) {
+        outsideOf.left = true;
+        inViewport = false;
+      }
+      if (adjustedPosition.x > window.innerWidth) {
+        outsideOf.right = true;
+        inViewport = false;
+      }
+      if (adjustedPosition.y + adjustedSize.height < 0) {
+        outsideOf.top = true;
+        inViewport = false;
+      }
+      if (adjustedPosition.y > window.innerHeight) {
+        outsideOf.bottom = true;
+        inViewport = false;
+      }
+      result.outsideOf = outsideOf;
+      result.inViewport = inViewport;
+      result.adjustedPosition = adjustedPosition;
+      return result;
+    }
   }]);
   return CSSGraphics;
 }(_GraphicsInterface2["default"]);
@@ -2101,15 +2146,21 @@ function render(game, alpha) {
         var ent = this.game.entities.get(eId);
 
         // if game.config.entityEmitsViewportExitEvent is true, we need to check if the entity is in the viewport
-        if (this.game.config.entityEmitsViewportExitEvent && ent && ent.position && ent.size) {
-          var result = isEntityInViewport(ent, this.game.data.camera.currentZoom);
-          // console.log(result)
-          if (result.inViewport) {
-            // ent.emit('viewportEnter');
-          } else {
-            //console.log('ent.emit', ent)
-            ent.screenPosition = result.adjustedPosition;
-            this.game.emit('entity::exited::viewport', ent);
+        // Remark: This could be in a better location ( outside of graphics pipeline... )
+        // This location implies CSSGraphics only for exit viewpor events, we'll want to fix that
+        // More importantly, we didn't want to add to LOOP1 time complexity, so we added it here ( for now )
+
+        // do not consider static entities for teleportation
+        if (ent.isStatic !== true) {
+          if (this.game.config.entityEmitsViewportExitEvent && ent && ent.position && ent.size) {
+            var result = this.isEntityInViewport(ent, this.game.data.camera.currentZoom);
+            if (result.inViewport) {
+              // ent.emit('viewportEnter');
+            } else {
+              //console.log('ent.emit', ent)
+              ent.screenPosition = result.adjustedPosition;
+              this.game.emit('entity::exited::viewport', ent);
+            }
           }
         }
         this.inflateGraphic(ent, alpha);
@@ -2120,29 +2171,6 @@ function render(game, alpha) {
       _iterator.f();
     }
   }
-}
-function isEntityInViewport(ent, zoomFactor) {
-  var result = {};
-  var inViewport = true;
-  // Adjust the entity's position and size based on the zoom factor
-  var adjustedPosition = {
-    x: ent.position.x * zoomFactor + window.innerWidth / 2,
-    y: ent.position.y * zoomFactor + window.innerHeight / 2
-  };
-  var adjustedSize = {
-    width: ent.size.width * zoomFactor,
-    height: ent.size.height * zoomFactor
-  };
-
-  // Check if the adjusted entity position is within the viewport
-  if (adjustedPosition.x + adjustedSize.width < 0) inViewport = false; // Left of viewport
-  if (adjustedPosition.x > window.innerWidth) inViewport = false; // Right of viewport
-  if (adjustedPosition.y + adjustedSize.height < 0) inViewport = false; // Above viewport
-  if (adjustedPosition.y > window.innerHeight) inViewport = false; // Below viewport
-
-  result.inViewport = inViewport;
-  result.adjustedPosition = adjustedPosition;
-  return result;
 }
 
 },{}],30:[function(require,module,exports){

@@ -142,7 +142,7 @@ var Hexapod = exports["default"] = /*#__PURE__*/function () {
         // Update hexapod rotation
         newRotation = angleToTarget - Math.PI / 2; // rotate 90 degrees to the right ( could be sprite alignment? )
       } else if (entity.meta && entity.meta.target && entity.meta.target !== null) {
-        console.log('found a target', entity.meta.target);
+        // console.log('found a target', entity.meta.target);
         var _target = entity.meta.target;
         var _targetDirection = Vector.sub(_target, hexapod.position);
         targetForce = Vector.mult(Vector.normalize(_targetDirection), COHESION_FORCE);

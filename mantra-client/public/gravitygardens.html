@@ -14,7 +14,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
 
-
       // check to see if 'graphics' is query string param
       let graphics = ['css'];
 
@@ -42,7 +41,7 @@
       // game.use('SwitchGraphics');
 
       game.start(function () {
-        game.use('Editor');
+        // game.use('Editor');
         game.use(new WORLDS.worlds['GravityGardens']());
       });
       window.game = game;

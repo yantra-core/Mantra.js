@@ -3654,6 +3654,7 @@ var GravityGardens = /*#__PURE__*/function () {
       var particleCollision = true;
       game.make().name('fountA').type('FOUNT').UnitSpawner({
         unitConfig: {
+          maxUnits: 50,
           type: 'PARTICLE',
           color: 0xf03025,
           isSensor: true,
@@ -3665,6 +3666,7 @@ var GravityGardens = /*#__PURE__*/function () {
       }).color(0xf03025).isStatic(true).size(8, 8).position(200, 0).createEntity(); // Finalizes and creates the entity
 
       game.make().name('fountB').type('FOUNT').UnitSpawner({
+        maxUnits: 50,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x14b161,
@@ -3678,6 +3680,7 @@ var GravityGardens = /*#__PURE__*/function () {
       }).color(0x14b161).isStatic(true).size(8, 8).position(-200, 0).createEntity(); // Finalizes and creates the entity
 
       game.make().name('fountC').type('FOUNT').UnitSpawner({
+        maxUnits: 50,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x3c62f8,
@@ -3691,6 +3694,7 @@ var GravityGardens = /*#__PURE__*/function () {
       }).color(0x3c62f8).isStatic(true).size(8, 8).position(0, -200).createEntity(); // Finalizes and creates the entity
 
       game.make().name('fountD').type('FOUNT').UnitSpawner({
+        maxUnits: 50,
         unitConfig: {
           type: 'PARTICLE',
           color: 0xe9dd34,
@@ -3867,9 +3871,7 @@ var Home = /*#__PURE__*/function () {
               game.use('Collectable');
               game.use('SwitchGraphics');
               game.use('Key');
-              _context.next = 24;
-              return game.awaitAllPlugins();
-            case 24:
+            case 22:
             case "end":
               return _context.stop();
           }
@@ -5004,6 +5006,7 @@ function createDoors(game) {
   // Containers are a way to group entities together
   // With no layout given, entities will be placed relative to the container
   // With a layout given, entities will be placed according to the layout algorithm
+
   var container = game.make().Container({
     layout: 'grid',
     grid: {

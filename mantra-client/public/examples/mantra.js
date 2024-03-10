@@ -426,6 +426,12 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
       this.config.density = value;
       return this;
     }
+  }, {
+    key: "restitution",
+    value: function restitution(value) {
+      this.config.restitution = value;
+      return this;
+    }
 
     // Health and scoring
   }, {
@@ -1122,12 +1128,12 @@ var EntityBuilder = exports["default"] = /*#__PURE__*/function () {
     }
   }]);
   return EntityBuilder;
-}(); // Function to blend two colors
+}();
 function blendColors(color1, color2) {
-  var r = (color1 >> 16) + (color2 >> 16) >> 1;
+  var r = (color1 >> 16 & 0xFF) + (color2 >> 16 & 0xFF) >> 1;
   var g = (color1 >> 8 & 0xFF) + (color2 >> 8 & 0xFF) >> 1;
   var b = (color1 & 0xFF) + (color2 & 0xFF) >> 1;
-  return r << 16 | g << 8 | b;
+  return (r & 0xFF) << 16 | (g & 0xFF) << 8 | b & 0xFF;
 }
 
 /* TODO: refactor to store Map() of OG references for granular removals / updates
@@ -1300,7 +1306,9 @@ var Game = exports.Game = /*#__PURE__*/function () {
       // default behavior is multiple graphics plugins will be horizontally stacked
       addLifecycleHooksToAllPlugins: true,
       // default behavior is to add lifecycle hooks to all plugin methods
-      warnNonYantraGameRoot: false // warns if gameRoot is not yantra.gg
+      warnNonYantraGameRoot: false,
+      // warns if gameRoot is not yantra.gg
+      disableContextMenu: true // default behavior is to disable right-click context menu
     };
 
     // Merge custom configuration with defaults
@@ -1708,6 +1716,12 @@ var Game = exports.Game = /*#__PURE__*/function () {
     key: "convertColorToHex",
     value: function convertColorToHex(color) {
       return typeof color === 'number' ? "#".concat(color.toString(16)) : color;
+    }
+  }, {
+    key: "getRandomColor",
+    value: function getRandomColor() {
+      var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'int';
+      return this.randomColor(format);
     }
   }, {
     key: "randomColor",
@@ -2773,6 +2787,7 @@ function construct(game) {
     radius: new _Component["default"]('radius', game),
     isSensor: new _Component["default"]('isSensor', game),
     owner: new _Component["default"]('owner', game),
+    source: new _Component["default"]('source', game),
     inputs: new _Component["default"]('inputs', game),
     items: new _Component["default"]('items', game),
     hasInventory: new _Component["default"]('hasInventory', game),
@@ -2906,6 +2921,8 @@ var _default = exports["default"] = {
   "./plugins/ChronoControl.min.js": "a9a511015708f05075041a02a32b9bcfd56e8cc73d07a5836699b0c1c2f1ae83",
   "./plugins/Code.js": "56988694fff92420836c8e44452dcfbe907628d74ccd8a73d15dbac7e777d809",
   "./plugins/Code.min.js": "cf633478b600ab5b225906fad83d8b353d93d756a7dd1f5f95a034b963e710ea",
+  "./plugins/Coin.js": "fa7c93f1337c6accc2707ea751860c8f17feb9159ac4496d4adc49c6ba5cf6f3",
+  "./plugins/Coin.min.js": "a465f0bb843a2f89963390ac4e7b7ab54271a395709b84dd5523bc95ef47a7e0",
   "./plugins/Collectable.js": "0ef48261adc5fc05911a3a1046f68645d9f4776a90e86b78db4e1563d9f91496",
   "./plugins/Collectable.min.js": "d6a2315ab43fe54db6af73c2df8f8eb32bc8484cddcc4075e5b3647458f225d0",
   "./plugins/Collisions.js": "947f90bbc97c4af120e61ac73087b6c20bdb61c78438f6c5c046864495839795",
@@ -2940,14 +2957,13 @@ var _default = exports["default"] = {
   "./plugins/GamepadGUI.min.js": "a7364e86f4e4abbb31d6053a728c7d9d26fffd6842fc6975306bc54056a888d8",
   "./plugins/GhostTyper.js": "d13d0a0a2aa3eaefc3f5c50fa7a0a969dea114afa1fb5746c2954e1b27d2e8a6",
   "./plugins/GhostTyper.min.js": "15124babd086c31da916405d582032224301a4f01887e25e27c41c7c84be2ccd",
-  "./plugins/Graphics.js": "349ef373638a229c9bd6b129aed466e23955f5ec8c21a303f716e9f9979ca21b",
   "./plugins/Graphics.min.js": "545b75c0728a493dc9f627639661f1d4d1a8f13b8fb93f79955bd44c3a77d7b1",
   "./plugins/GravityWell.js": "a213708152c92ddbdd30a0c6b553abd368627f5adaaab72b82b181502b8781ee",
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
   "./plugins/Health.js": "14543aa1672791249749eadc46c898105ef663b8be57ec78886c79c7903a25a8",
   "./plugins/Health.min.js": "c0b3b691a9a43ce10828818ab13199f814c49fc8abe8628afff904ae8b198923",
-  "./plugins/Hexapod.js": "31e3ab5c2fac35d15fe9e4ce527e4fda34135ffb3e2e1fef23a14fac9307d2a3",
-  "./plugins/Hexapod.min.js": "908249a2eb1df9b6c489937da2a4a46a81eebae104f9e51c133f1b10431755ba",
+  "./plugins/Hexapod.js": "ebff4294ab54e53711537a914f364d96a4c67640d7aca3771418aea811124e66",
+  "./plugins/Hexapod.min.js": "7f9d3d4c0b48b1109f74948edded4a612c5905ed6fcc799530a2995aaaee2a9e",
   "./plugins/Iframe.js": "ef82c243d98dc49ab09ba5b54d7483128eb0fb49a4e733e1032d25730a095db0",
   "./plugins/Iframe.min.js": "486536e022cee0dc0274cd5a99b24f456ed94715b20fa2de8bbfa88c36ada101",
   "./plugins/Image.js": "a9be3447d72667f4cc83443bdefc6ae1f09be99ec50668ade91212acee362792",
@@ -2972,14 +2988,14 @@ var _default = exports["default"] = {
   "./plugins/LocalClient.min.js": "a681769ec3ebbd160693301d2780545f63629098867abbeaad8a3880694a04ea",
   "./plugins/Markup.js": "fcddabcc31984abd6133fa7ab85e1c7a78046382bd27dc0cbab839178dbaac89",
   "./plugins/Markup.min.js": "588be237351529a03c0e6e237bc9a14786b7b833f653bbf9ec4ab4c83fbee7bd",
-  "./plugins/MatterPhysics.js": "5178aad694dc5b2de5cf7fe9bf2e5c26bd0e70dcffa53a5734a9ee6ad5645771",
-  "./plugins/MatterPhysics.min.js": "97242c00f48c93a2ea854405db5a9e6568229d2017a8149998869dc1527c3313",
+  "./plugins/MatterPhysics.js": "c25d3146cbb6e129b96beb5a39270e413cccb1fb7ae6d904f7a928c747b44bb6",
+  "./plugins/MatterPhysics.min.js": "69bb6ffeb4fc9f5c87618d1bffe8e8f5afb9732a5722b8a599cc9ccd4dcab4de",
   "./plugins/Midi.js": "3c8b738ed48341c4221cf20e53f631907935bdf722ebbcafb2dee3a40f544fba",
   "./plugins/Midi.min.js": "5ef8a15f87866a63e014ecbf3433f93a6c463c26d48a1c3a4448604ee8b5d229",
   "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
   "./plugins/MidiGUI.min.js": "ceb780abf5f2fadc904cbb683dde98548db60f5bdf0f90f1398728c76a0f923f",
-  "./plugins/Mouse.js": "35764079e8639081a1f97a40491b4400f8126358cc99e21780cbcd4e03e0f45e",
-  "./plugins/Mouse.min.js": "936fe343f2dec3d9673f06c9e76bf9de86449d7e7272a758e3de954ba5243334",
+  "./plugins/Mouse.js": "9b66c9ae5b9e6da7cd6d0c457aa6097f1888cc146199d49c4b19aa80342d9d5a",
+  "./plugins/Mouse.min.js": "8a03cb980883362f32ee4616caaeae0dcf2a3b7dddd371537fded7ce533f95bc",
   "./plugins/PingTime.js": "df3ff245078e918c5c09e017266c29e58973a6b97e025c931bc25af0cc176ffe",
   "./plugins/PingTime.min.js": "df610dd9876c1b43e3c3a1e7c36273842332b0a51b2f33a150ec926f8155bca0",
   "./plugins/Platform.js": "3c8a9709aaf415909d0ef153afc23824bd7f0de575e7ffac900f6abc4747141b",
@@ -3016,12 +3032,11 @@ var _default = exports["default"] = {
   "./plugins/Textarea.min.js": "4ee950d2815ee75c63ae64b260f4b95ffbce227a37ca58a9596d2a317a56b03b",
   "./plugins/TileSet.js": "730987abc1a69c466047444b005ed25d49a6c3dab03c8128701e086e29eb6c57",
   "./plugins/TileSet.min.js": "9a83b80581a1611b7f34e2f8cc4fe9e4eef910ea55372a19a0eda54eb2033649",
-  "./plugins/Tone.js": "d108292b7b9ca54609200b15005a28d4f4c7ba83f882e62b1e3e01f85a3b5d86",
   "./plugins/Tone.min.js": "acfc53c580afb09c8de27813cf407450c63a77068ad6fc5d7f996b854e825ca9",
   "./plugins/Tower.js": "5efe4026709064ff3fc7036f8880fd43572c9b2521a0f4d77d90e432d4980644",
   "./plugins/Tower.min.js": "6c37a14ae5c2afd4f8a617f194ad7407826cac8d3f6f5f876a9a2d3394655bc6",
-  "./plugins/UnitSpawner.js": "7838dd890c8a7413d9117819e4ad5d79363c363efd9548d260ff0b53d7256bda",
-  "./plugins/UnitSpawner.min.js": "9337e00ad6649b3a726d4b9f03458c4dc3f24fd0e7325d1a80dafbfba9921d21"
+  "./plugins/UnitSpawner.js": "7cb722a41db69abc7721bd02f2e29b03cb4b614e1b314db8142ed0a9de0a7adc",
+  "./plugins/UnitSpawner.min.js": "8019a94e654736688413541d67dd52f4ccf8770fb55f17ae45a388cebfc64aa1"
 };
 
 },{}],13:[function(require,module,exports){
@@ -4560,13 +4575,15 @@ function ensureColorInt(color) {
   var colorNameToHex = {
     red: '#FF0000',
     green: '#00FF00',
-    blue: '#fff007',
+    blue: '#0000FF',
     black: '#000000',
     white: '#FFFFFF',
     yellow: '#FFFF00',
     purple: '#800080',
     orange: '#FFA500',
-    pink: '#FFC0CB'
+    pink: '#FFC0CB',
+    indigo: '#4B0082',
+    violet: '#EE82EE'
     // Add more common colors as needed
   };
 

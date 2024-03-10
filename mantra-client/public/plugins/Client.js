@@ -741,6 +741,25 @@ var defaultAssets = {
   'demon': '/img/game/npc/demon.gif',
   'warp-to-home': '/img/game/env/warp-to-mantra-home-256.png',
   'ayyo-key': '/img/game/env/ayyo-key-medium.png',
+  'ayyo-coin': {
+    type: 'spritesheet',
+    url: '/img/game/env/coin.png',
+    frameTags: {
+      coin: {
+        rate: 32,
+        frames: [{
+          x: 0,
+          y: 0
+        }
+        /*
+        { x: -16, y: 0 },
+        { x: -32, y: 0 },
+        { x: -48, y: 0 },
+        */]
+      }
+    }
+  },
+
   'hexapod-single': '/img/game/npc/hexapod-single.png',
   /*
   'hexapod': {
