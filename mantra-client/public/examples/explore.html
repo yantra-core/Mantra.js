@@ -318,11 +318,16 @@
     let currentExample = "items/boomerang";
     let currentSourceURL = currentExample + ".js";
     let currentExampleEmbedUrl = 'demo.html?source=' + currentExample;
-    // alert(currentExampleEmbedUrl);
     function loadIframe() {
       const iframe = document.getElementById('exampleIframe');
       // Assuming 'currentExample' is defined and holds the current example's name
-      iframe.src = `demo.html?source=${currentExample}`;
+      // alert(currentExample)
+      // check if currentExample contains word "markup/", if so embed subpage html
+      if (currentExample.includes("markup/")) {
+        iframe.src = `${currentExample}-embed.html`;
+      } else {
+        iframe.src = `demo.html?source=${currentExample}`;
+      }
     }
 
     function loadExampleCode() {
@@ -336,9 +341,16 @@
       // set exampleLink href to currentExample
       document.getElementById('exampleLink').href = exampleUrl;
       // Fetch and load the current source URL content into the textarea
-      fetch(`${currentExample}.js`)
+
+      let sourceUrl = currentExample + ".js";
+      // check if contains "markup", if so load the HTML Page
+      if (currentExample.includes("markup/")) {
+        sourceUrl = currentExample + "-embed.html";
+      }
+      fetch(sourceUrl)
         .then(response => response.text())
         .then(data => {
+          console.log(data)
           textarea.value = data;
           // updates the code editor view
           textarea.dispatchEvent(new Event('input'));
