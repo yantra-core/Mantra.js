@@ -180,7 +180,7 @@ export default class CrossWindow {
         // console.log('sendingdata', entityData)
         // Inflate or update entity in the game
         let ent = this.game.inflateEntity(entityData);
-        if (ent.type === 'PLAYER') {
+        if (ent && ent.type === 'PLAYER') {
           this.game.setPlayerId(ent.id); // for now
         }
         break;

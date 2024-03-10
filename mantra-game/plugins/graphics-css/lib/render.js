@@ -30,19 +30,23 @@ export default function render(game, alpha) {
     // LOOP1 render loop ( cannot remove? )
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
-     
+
       // if game.config.entityEmitsViewportExitEvent is true, we need to check if the entity is in the viewport
       // Remark: This could be in a better location ( outside of graphics pipeline... )
       // This location implies CSSGraphics only for exit viewpor events, we'll want to fix that
       // More importantly, we didn't want to add to LOOP1 time complexity, so we added it here ( for now )
-      if (this.game.config.entityEmitsViewportExitEvent && ent && ent.position && ent.size) {
-        let result = this.isEntityInViewport(ent, this.game.data.camera.currentZoom);
-        if (result.inViewport) {
-          // ent.emit('viewportEnter');
-        } else {
-          //console.log('ent.emit', ent)
-          ent.screenPosition = result.adjustedPosition;
-          this.game.emit('entity::exited::viewport', ent);
+
+      // do not consider static entities for teleportation
+      if (ent.isStatic !== true) {
+        if (this.game.config.entityEmitsViewportExitEvent && ent && ent.position && ent.size) {
+          let result = this.isEntityInViewport(ent, this.game.data.camera.currentZoom);
+          if (result.inViewport) {
+            // ent.emit('viewportEnter');
+          } else {
+            //console.log('ent.emit', ent)
+            ent.screenPosition = result.adjustedPosition;
+            this.game.emit('entity::exited::viewport', ent);
+          }
         }
       }
 

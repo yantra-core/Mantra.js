@@ -17,8 +17,7 @@ let game = new MANTRA.Game({
     'SwitchGraphics',
     'Tile',
     'TileMap'
-  ],
-  gameRoot: 'http://192.168.1.80:7777/',
+  ]
 });
 window.game = game;
 game.start(function () {

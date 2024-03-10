@@ -23,8 +23,9 @@ export default class UnitSpawner {
       frictionAir: 0.005,
       frictionStatic: 0.25,
       sprayAngle: Math.PI / 8,
+      maxUnits: 10, // Default max units
       meta: {
-        maxUnits: 10, // Default max units
+        randomColor: true,
         unitsSpawned: 0 // Initialize unitsSpawned
       }
     };
@@ -42,7 +43,7 @@ export default class UnitSpawner {
       if (!parentUnitSpawner) {
         return;
       }
-      parentUnitSpawner.meta.unitConfig.meta.unitsSpawned -= 1;
+      parentUnitSpawner.meta.unitsSpawned -= 1;
       game.updateEntity(ent.owner, {
         meta: {
           unitConfig: parentUnitSpawner.meta.unitConfig
@@ -62,17 +63,25 @@ export default class UnitSpawner {
   
   unitSpawnerUpdate(entityData) {
     const unitConfig = entityData.meta.unitConfig;
-    if (this.game.tick % 10 === 0 && unitConfig.meta.unitsSpawned < unitConfig.meta.maxUnits) {
+    if (this.game.tick % 10 === 0 && unitConfig.meta.unitsSpawned < unitConfig.maxUnits) {
       let position = entityData.position;
       unitConfig.position = position;
       unitConfig.owner = entityData.id;
       delete unitConfig.id; // Clean clone might be better
+
+      unitConfig.color = entityData.color;
+
+      if (unitConfig.meta.randomColor) {
+        unitConfig.color = this.game.randomColor();
+      }
+      // TODO: fix this for 3d
       let unit = this.createEntity(unitConfig);
       if (unit) { // Assuming createEntity returns the created unit or null/undefined if not created
         unitConfig.meta.unitsSpawned += 1; // Increment unitsSpawned for this unitConfig
         this.applySprayForce(unit);
         // this needs to update entity.meta.unitConfig.unitsSpawned
         this.game.updateEntity(entityData.id, {
+          color: unitConfig.color,
           meta: {
             unitConfig
           }

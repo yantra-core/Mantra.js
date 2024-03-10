@@ -35,7 +35,6 @@ class GravityGardens {
     // enables the default top-down mouse movements
     game.config.defaultMouseMovement = true;
 
-
     // we reset the game to clear any previous state
     game.reset();
 
@@ -234,6 +233,7 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         unitConfig: {
+          maxUnits: 50,
           type: 'PARTICLE',
           color: 0xf03025,
           isSensor: true,
@@ -250,6 +250,7 @@ class GravityGardens {
       .name('fountB')
       .type('FOUNT')
       .UnitSpawner({
+        maxUnits: 50,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x14b161,
@@ -268,6 +269,7 @@ class GravityGardens {
       .name('fountC')
       .type('FOUNT')
       .UnitSpawner({
+        maxUnits: 50,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x3c62f8,
@@ -286,6 +288,7 @@ class GravityGardens {
       .name('fountD')
       .type('FOUNT')
       .UnitSpawner({
+        maxUnits: 50,
         unitConfig: {
           type: 'PARTICLE',
           color: 0xe9dd34,
