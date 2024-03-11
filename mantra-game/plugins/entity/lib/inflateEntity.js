@@ -58,7 +58,7 @@ export default function inflateEntity(entityData) {
         catch (err) {
           // This will happen for any type that is not defined by an active plugin
           // console.warn('Failed to build remote entity by type:', type, err, 'using default build');
-          defaultBuild(game, entityData)
+          defaultBuild(game, entityData);
         }
 
         // console.log('proceeding with typed data', entityData)
@@ -66,7 +66,7 @@ export default function inflateEntity(entityData) {
       } else {
         defaultBuild(game, entityData);
       }
-
+      // console.log('built ent with data', entityData)
       return updateOrCreate(game, entityData);
     }
   } else {
@@ -76,6 +76,7 @@ export default function inflateEntity(entityData) {
 }
 
 function defaultBuild(game, entityData) {
+  // console.log('defaultBuild', entityData.type)
   // merge default build make 
   let defaultConfig = game.make().build();
   for (let p in defaultConfig) {
@@ -84,7 +85,20 @@ function defaultBuild(game, entityData) {
     }
   }
   // remove any undefined values or null values ( should not be necessary at this stage ) ( more tests )
+  // console.log('inflateENtity defaultBuild got data', entityData)
+
+  let supportedSerializedEvents = ['collisionStart']; // TODO: add all events with tests
+
   for (let p in entityData) {
+
+    if (supportedSerializedEvents.includes(p)) {
+      // this is a serialized function, create a new function from the string and assign it to the entity
+      //console.log('inflateEntity serialized function', entityData[p]);
+      // this is a function that had .toSTring() called on it, we need to re-create the function
+      entityData[p] = eval('(' + entityData[p] + ')');
+      //console.log("after inflateENtity seralize fn", entityData[p])
+    }
+
     if (typeof entityData[p] === 'undefined' || entityData[p] === null) {
       delete entityData[p];
     }

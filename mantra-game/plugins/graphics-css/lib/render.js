@@ -43,8 +43,8 @@ export default function render(game, alpha) {
           if (result.inViewport) {
             // ent.emit('viewportEnter');
           } else {
-            //console.log('ent.emit', ent)
             ent.screenPosition = result.adjustedPosition;
+            ent.direction = result.direction;
             this.game.emit('entity::exited::viewport', ent);
           }
         }

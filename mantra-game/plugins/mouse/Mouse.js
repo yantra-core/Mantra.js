@@ -236,7 +236,7 @@ export default class Mouse {
 
     this.sendMouseData();
 
-    // get the reference to this ent, check for pointerdown event
+    // get the reference to this ent, check for pointermove event
     if (this.game.data && this.game.data.ents && this.game.data.ents._) {
       const ent = this.game.data.ents._[this.game.selectedEntityId];
       if (ent && ent.pointermove) {

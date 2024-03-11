@@ -140,7 +140,7 @@ class Boomerang {
 
   returnToOwner(boomerang) {
     // Find the owner entity using the owner ID stored in the boomerang
-    let ownerEntity = this.game.getEntity(boomerang.owner);
+    let ownerEntity = this.game.getEntity(boomerang.owner); // what if remote source?
     if (ownerEntity) {
       let ownerPosition = ownerEntity.position;
       let currentPosition = boomerang.position;

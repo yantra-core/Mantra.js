@@ -30,6 +30,7 @@ class Music {
     this.bindEvents();
     this.createWorld();
 
+    /*
     game.make()
       .Tower()
       .color('purple')
@@ -38,6 +39,7 @@ class Music {
       .angle(-180)
       .offset(50)
       .createEntity();
+    */
 
   }
 

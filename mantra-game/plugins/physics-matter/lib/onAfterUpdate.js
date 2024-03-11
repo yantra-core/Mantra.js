@@ -30,7 +30,7 @@ export default function onAfterUpdate(event) {
       //
       // Clamp max speed
       //
-      let maxSpeed = 4; // TODO: move to config
+      let maxSpeed = 100; // TODO: move to config
       if (entity.maxSpeed) {
         maxSpeed = entity.maxSpeed;
       }

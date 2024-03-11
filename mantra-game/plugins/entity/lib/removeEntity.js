@@ -38,11 +38,13 @@ export default function removeEntity(entityId, removeFromGameData = true) {
     let updatedEntity = this.game.getEntity(entityId);
     this.game.entities.set(entityId, updatedEntity);
 
-    if (updatedEntity && this.game.systems.rbush) {
+    if (updatedEntity) {
       // actually remove the entity from the game world
       // will be set to false for field of view related removals
       if (removeFromGameData) {
-        this.game.systems.rbush.removeEntity(updatedEntity);
+        if (this.game.systems.rbush) {
+          this.game.systems.rbush.removeEntity(updatedEntity);
+        }
         delete this.game.deferredEntities[entityId];
       }
     }

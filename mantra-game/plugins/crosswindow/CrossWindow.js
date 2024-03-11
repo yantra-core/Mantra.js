@@ -76,7 +76,8 @@ export default class CrossWindow {
 
     // Removing function properties and the 'graphics' property
     Object.keys(entityData).forEach(key => {
-      if (typeof entityData[key] === 'function' || key === 'graphics') {
+      let supportedEvents = ['collisionStart'];
+      if (!supportedEvents.includes(key) && (typeof entityData[key] === 'function' || key === 'graphics')) {
         delete entityData[key];
       }
     });
@@ -97,7 +98,6 @@ export default class CrossWindow {
     let game = this.game;
     //console.log('handleEntityExithandleEntityExit entityentityentityentity', entity)
     let entityData = this.assembleEntityData(entity);
-    //console.log("entityDataentityData", entityData)
     const bestWindow = this.crosswindow.getBestWindow(entityData, game.data.camera.currentZoom);
     //console.log('handleEntityExit', entityData, bestWindow)
     if (bestWindow) {
@@ -112,6 +112,12 @@ export default class CrossWindow {
         game.removeEntity(entity.id);
         entityData.action = 'message'; // TODO: fix this and add 'action' and 'payload' top-level scope to CrossWindow
         delete entityData.sutra; // for now
+
+        // prepare any events for transfer over JSON
+        if (typeof entityData.collisionStart === 'function') { // TODO: add all events
+          entityData.collisionStart = entityData.collisionStart.toString();
+        }
+
         bestWindow.postMessage(entityData);
       }
     } else {
@@ -145,6 +151,7 @@ export default class CrossWindow {
         }
 
         let entity = data; // remove this
+        // console.log('Crosswindow plugin got message', data)
         let entityData = {
           id: entity.id,
           type: entity.type,
@@ -160,6 +167,7 @@ export default class CrossWindow {
           mass: entity.mass,
           color: entity.color,
           source: entity.source,
+          collisionStart: entity.collisionStart,
           // etc, all props, iterate? mantra helper?
         };
 
@@ -191,7 +199,7 @@ export default class CrossWindow {
 
   ensuresEntityInViewport(entityData, buffer = 50) {
     // console.log('ensuresEntityInViewport', entityData)
-
+    let game = this.game;
     let result = game.systems['graphics-css'].isEntityInViewport(entityData, game.data.camera.currentZoom);
 
     if (!result.inViewport) {

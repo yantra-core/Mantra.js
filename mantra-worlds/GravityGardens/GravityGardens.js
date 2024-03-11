@@ -251,12 +251,12 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         maxUnits: 50,
+        sprayAngle: Math.PI,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x14b161,
           isSensor: true,
           position: { x: -200, y: 0 },
-          sprayAngle: Math.PI,
         }
       })
       .color(0x14b161)
@@ -270,12 +270,12 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         maxUnits: 50,
+        sprayAngle: Math.PI / 2,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x3c62f8,
           isSensor: true,
           position: { x: 0, y: -200 },
-          sprayAngle: Math.PI / 2,
         }
       })
       .color(0x3c62f8)
@@ -289,12 +289,13 @@ class GravityGardens {
       .type('FOUNT')
       .UnitSpawner({
         maxUnits: 50,
+        sprayAngle: -Math.PI / 2,
+
         unitConfig: {
           type: 'PARTICLE',
           color: 0xe9dd34,
           isSensor: true,
           position: { x: 0, y: 200 },
-          sprayAngle: -Math.PI / 2,
         }
       })
       .color(0xe9dd34)
