@@ -39,8 +39,8 @@ export default function updateEntity(entityDataOrId, entityData, updateOptions =
 
   // if the state doesn't exist, return error
   if (!ent) {
-    console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
-    console.log('This should not happen, if a new state came in it should be created');
+    //console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
+    //console.log('This should not happen, if a new state came in it should be created');
     return;
   }
 
