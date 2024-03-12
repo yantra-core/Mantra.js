@@ -93,9 +93,14 @@ function defaultBuild(game, entityData) {
 
     if (supportedSerializedEvents.includes(p)) {
       // this is a serialized function, create a new function from the string and assign it to the entity
-      //console.log('inflateEntity serialized function', entityData[p]);
+      // console.log('inflateEntity serialized function', entityData.type, entityData[p], entityData);
       // this is a function that had .toSTring() called on it, we need to re-create the function
-      entityData[p] = eval('(' + entityData[p] + ')');
+      try {
+        // Remark: This try/catch is not gaurenteed to catch all eval() errors
+        entityData[p] = eval('(' + entityData[p] + ')');
+      } catch (err) {
+        console.log('Failed to inflate serialized function', entityData.type, entityData[p], entityData, err)
+      }
       //console.log("after inflateENtity seralize fn", entityData[p])
     }
 

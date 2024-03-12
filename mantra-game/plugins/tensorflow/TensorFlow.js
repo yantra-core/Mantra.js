@@ -33,7 +33,7 @@ export default class TensorFlow {
 
     //    await this.loadModel();
 
-
+    setWasmPaths('/');
     this.game.systemsManager.addSystem('tensorflow', this);
   }
 
@@ -161,6 +161,7 @@ export default class TensorFlow {
     // Apply actions based on the generated random actions
     Object.keys(actions).forEach(action => {
       if (actions[action]) {
+        // console.log('applying action', action, player)
         this.game.rules.emit(action, player);
       }
     });

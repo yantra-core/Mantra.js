@@ -226,7 +226,7 @@ class MatterPhysics extends PhysicsInterface {
     let body = this.bodyMap[entityId];
     if (body) {
       Matter.World.remove(this.engine.world, body);
-      delete this.bodyMap[body.myEntityId];
+      delete this.bodyMap[body.myEntityId.toString()];
     }
   }
 
