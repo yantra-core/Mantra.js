@@ -6,10 +6,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     graphics: ['css'], // array enum, 'babylon', 'css', 'three'
     // camera: 'follow',
     // TODO: gameRoot, have this be default for scriptRoot and assetRoot
-    options: {
-      ,
-      assetRoot: 'http://192.168.1.80:7777'
-    }
   });
 
   game.use('Block');

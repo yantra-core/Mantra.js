@@ -20,6 +20,9 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, UnitSpawner);
     this.id = UnitSpawner.id;
+    this.meta = {
+      sprayAngle: Math.PI / 8 // Moved sprayAngle to UnitSpawner.meta
+    };
   }
   _createClass(UnitSpawner, [{
     key: "init",
@@ -49,22 +52,12 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
         friction: 0.05,
         frictionAir: 0.005,
         frictionStatic: 0.25,
-        sprayAngle: Math.PI / 8,
-        maxUnits: 10,
-        // Default max units
         meta: {
-          randomColor: true,
-          unitsSpawned: 0 // Initialize unitsSpawned
+          randomColor: true
         }
       };
-
       var unitConfig = _objectSpread(_objectSpread({}, defaultUnitConfig), entityData.unitConfig);
-      if (typeof unitConfig.meta.unitsSpawned !== 'number') {
-        unitConfig.meta.unitsSpawned = 0;
-      }
       unitConfig.afterRemoveEntity = function (ent) {
-        // decrement unitsSpawned for this unitConfig
-        // update the owner of this ent with meta
         var parentUnitSpawner = game.data.ents._[ent.owner];
         if (!parentUnitSpawner) {
           return;
@@ -76,12 +69,35 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
           }
         });
       };
-      return {
+      if (typeof entityData.meta === 'undefined') {
+        entityData.meta = {};
+      }
+      var defaultMeta = {
+        unitConfig: unitConfig,
+        unitsSpawned: 0,
+        // Initialize unitsSpawned
+        maxUnits: 10,
+        // Default max units
+        sprayAngle: 0 // Reference sprayAngle from UnitSpawner.meta
+      };
+
+      if (typeof entityData.sprayAngle === 'number') {
+        defaultMeta.sprayAngle = entityData.sprayAngle;
+      }
+      if (typeof entityData.maxUnits === 'number') {
+        defaultMeta.maxUnits = entityData.maxUnits;
+      }
+      if (typeof entityData.unitsSpawned === 'number') {
+        defaultMeta.unitsSpawned = entityData.unitsSpawned;
+      }
+
+      // combine entityData.meta with defaultMeta
+      entityData.meta = _objectSpread(_objectSpread({}, defaultMeta), entityData.meta);
+      console.log('using data', entityData);
+      return _objectSpread({
         type: 'UNIT_SPAWNER',
         texture: entityData.texture || 'none',
-        meta: {
-          unitConfig: unitConfig
-        },
+        meta: entityData.meta,
         update: this.unitSpawnerUpdate.bind(this),
         size: {
           width: 16,
@@ -89,29 +105,25 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
           depth: 16
         },
         position: entityData.position
-      };
+      }, entityData);
     }
   }, {
     key: "unitSpawnerUpdate",
     value: function unitSpawnerUpdate(entityData) {
       var unitConfig = entityData.meta.unitConfig;
-      if (this.game.tick % 10 === 0 && unitConfig.meta.unitsSpawned < unitConfig.maxUnits) {
+      if (this.game.tick % 10 === 0 && entityData.meta.unitsSpawned < entityData.meta.maxUnits) {
         var position = entityData.position;
         unitConfig.position = position;
         unitConfig.owner = entityData.id;
-        delete unitConfig.id; // Clean clone might be better
-
+        delete unitConfig.id;
         unitConfig.color = entityData.color;
         if (unitConfig.meta.randomColor) {
           unitConfig.color = this.game.randomColor();
         }
-        // TODO: fix this for 3d
         var unit = this.createEntity(unitConfig);
         if (unit) {
-          // Assuming createEntity returns the created unit or null/undefined if not created
-          unitConfig.meta.unitsSpawned += 1; // Increment unitsSpawned for this unitConfig
-          this.applySprayForce(unit);
-          // this needs to update entity.meta.unitConfig.unitsSpawned
+          entityData.meta.unitsSpawned += 1;
+          this.applySprayForce(unit, entityData.meta.sprayAngle); // Use sprayAngle from entityData.meta
           this.game.updateEntity(entityData.id, {
             color: unitConfig.color,
             meta: {
@@ -131,25 +143,22 @@ var UnitSpawner = exports["default"] = /*#__PURE__*/function () {
           y: 0
         };
       }
-
-      // Create the UnitSpawner entity
-      var unitSpawner = this.game.createEntity(this.build(entityData));
+      return this.game.createEntity(this.build(entityData));
     }
   }, {
     key: "create",
     value: function create() {
       var entityData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      return this.game.createEntity(this.build(entityData));
+      return this.createEntity(entityData);
     }
   }, {
     key: "applySprayForce",
-    value: function applySprayForce(unitConfig) {
-      var baseAngle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Math.PI / 8;
+    value: function applySprayForce(unitConfig, sprayAngle) {
       var sprayWidth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Math.PI / 4;
       var forceMagnitude = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.5;
       var game = this.game;
-      var angleOffset = (Math.random() - 0.5) * sprayWidth; // Random offset within a specified width
-      var angle = unitConfig.sprayAngle + angleOffset;
+      var angleOffset = (Math.random() - 0.5) * sprayWidth;
+      var angle = sprayAngle + angleOffset;
       var force = {
         x: forceMagnitude * Math.cos(angle),
         y: forceMagnitude * Math.sin(angle)

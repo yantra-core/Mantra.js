@@ -171,7 +171,7 @@ var Boomerang = /*#__PURE__*/function () {
     key: "returnToOwner",
     value: function returnToOwner(boomerang) {
       // Find the owner entity using the owner ID stored in the boomerang
-      var ownerEntity = this.game.getEntity(boomerang.owner);
+      var ownerEntity = this.game.getEntity(boomerang.owner); // what if remote source?
       if (ownerEntity) {
         var ownerPosition = ownerEntity.position;
         var currentPosition = boomerang.position;

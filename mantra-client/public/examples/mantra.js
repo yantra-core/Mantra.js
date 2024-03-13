@@ -1869,9 +1869,11 @@ var Game = exports.Game = /*#__PURE__*/function () {
     }
   }, {
     key: "reset",
-    value: function reset(mode) {
+    value: function reset() {
+      var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'topdown';
       var clearSutra = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       var game = this;
+      game.data.mode = mode;
 
       // reset all Sutra rules
       if (clearSutra) {
@@ -1922,8 +1924,20 @@ var Game = exports.Game = /*#__PURE__*/function () {
   }, {
     key: "useSutra",
     value: function useSutra(subSutra, name) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       if (this.rules) {
-        this.rules.use(subSutra, name);
+        var insertAt = 0;
+        var defaultOptions = {
+          shareListeners: true,
+          shareTree: true,
+          shareMap: true
+        };
+        for (var key in defaultOptions) {
+          if (typeof options[key] === 'undefined') {
+            options[key] = defaultOptions[key];
+          }
+        }
+        this.rules.use(subSutra, name, insertAt, options.shareListeners, options.shareTree, options.shareMap); // TODO: update sutra api to use options object
         if (this.systems['gui-sutra']) {
           this.systems['gui-sutra'].setRules(this.rules);
         }
@@ -2903,7 +2917,7 @@ var _default = exports["default"] = {
   "./plugins/Block.min.js": "15d67b27b79f808ff076860b9ca72f8b8f357d3065221ff96619eb9a750b2568",
   "./plugins/Bomb.js": "f7a362f2807f41676bcc49901c6c16d0a01b8d741dfddcd726a2d2b2b1619621",
   "./plugins/Bomb.min.js": "a6e453890b05fcab61a54c6addaa2d59fbbfa2b89a0b4429ee5a4f7f6128e02a",
-  "./plugins/Boomerang.js": "9699444f05362f0c1c653dfbfc457a840c4b7216bdb3e501e37392bb5ce8b367",
+  "./plugins/Boomerang.js": "f790c36e97e2205e83291eeb30584f9acbddd6223f84540ed3bbd043f0dda497",
   "./plugins/Boomerang.min.js": "02f004d01651777df7f30dae220c15823a444de9e49deec3af948deb6257ad0f",
   "./plugins/Border.js": "776ff9a840aee4e40b98ac21a2ece7846157de59c843f7fa335d0497baaa2b7a",
   "./plugins/Border.min.js": "3584e32fb60aae9ee6a291e4b3a89722f9eb62b345bc0b68cc06b450c854ade5",
@@ -2957,6 +2971,7 @@ var _default = exports["default"] = {
   "./plugins/GamepadGUI.min.js": "a7364e86f4e4abbb31d6053a728c7d9d26fffd6842fc6975306bc54056a888d8",
   "./plugins/GhostTyper.js": "d13d0a0a2aa3eaefc3f5c50fa7a0a969dea114afa1fb5746c2954e1b27d2e8a6",
   "./plugins/GhostTyper.min.js": "15124babd086c31da916405d582032224301a4f01887e25e27c41c7c84be2ccd",
+  "./plugins/Graphics.js": "349ef373638a229c9bd6b129aed466e23955f5ec8c21a303f716e9f9979ca21b",
   "./plugins/Graphics.min.js": "545b75c0728a493dc9f627639661f1d4d1a8f13b8fb93f79955bd44c3a77d7b1",
   "./plugins/GravityWell.js": "a213708152c92ddbdd30a0c6b553abd368627f5adaaab72b82b181502b8781ee",
   "./plugins/GravityWell.min.js": "323551ff077833c0a1c4f98b69b8d3ab65418a3a17184b5a79b94d0b57735b15",
@@ -2988,8 +3003,8 @@ var _default = exports["default"] = {
   "./plugins/LocalClient.min.js": "a681769ec3ebbd160693301d2780545f63629098867abbeaad8a3880694a04ea",
   "./plugins/Markup.js": "fcddabcc31984abd6133fa7ab85e1c7a78046382bd27dc0cbab839178dbaac89",
   "./plugins/Markup.min.js": "588be237351529a03c0e6e237bc9a14786b7b833f653bbf9ec4ab4c83fbee7bd",
-  "./plugins/MatterPhysics.js": "c25d3146cbb6e129b96beb5a39270e413cccb1fb7ae6d904f7a928c747b44bb6",
-  "./plugins/MatterPhysics.min.js": "69bb6ffeb4fc9f5c87618d1bffe8e8f5afb9732a5722b8a599cc9ccd4dcab4de",
+  "./plugins/MatterPhysics.js": "0c0250ba1b00c005c731b679e696e0dc76386f9bd6d2ad27ab3c610206e9f94b",
+  "./plugins/MatterPhysics.min.js": "d1ba3c705c85eb4beed642470580b485fbed6691dc7395a9f3e52e119b13950f",
   "./plugins/Midi.js": "3c8b738ed48341c4221cf20e53f631907935bdf722ebbcafb2dee3a40f544fba",
   "./plugins/Midi.min.js": "5ef8a15f87866a63e014ecbf3433f93a6c463c26d48a1c3a4448604ee8b5d229",
   "./plugins/MidiGUI.js": "7dc1d8d9bd9fb458409f803e86667468b6d25563c08234a19d24cd733fb9af55",
@@ -3006,8 +3021,8 @@ var _default = exports["default"] = {
   "./plugins/PluginExplorer.min.js": "e03f9fe01aa34fb485508b56c3c79607cc86d17d1236712325bca6cea80cc423",
   "./plugins/PluginsGUI.js": "c8259a06f4fe79bf42c8365d224d542da67100c0a66d4bf9d1eb45256363295b",
   "./plugins/PluginsGUI.min.js": "867f4f3d9fd64ea14335531454551f63d84e9b78058c07035da2bb33af7ebd30",
-  "./plugins/RBush.js": "138a0ea04d269a7872393fb6e4c4b2b3d766381d8db0d65a59e06efe6a73957b",
-  "./plugins/RBush.min.js": "1b87b4df682d7b5b6d0d249583871a1e5058d4697efe7e1d38f5ef47d4dd8f81",
+  "./plugins/RBush.js": "d96d06113dae59fca917136e2ed881aff5fb7a6ce0a8d2f7497238e7d83a123c",
+  "./plugins/RBush.min.js": "36adbdd4102dbe9a4947641f58cf0a279ef056d1f92c7396fc3d41ec23c3a8e7",
   "./plugins/RadialMenu.js": "4151c73e5be8a17f8d3fd44c218a323fd36c3ed120eb27a6829f2305b1f00d62",
   "./plugins/RadialMenu.min.js": "2091b1073a9d3e41d2133c7cc4ec5b22fb8dae4a9f0c255a013e72842bc315a9",
   "./plugins/Radio.js": "f942470e3247bc192bca7713e77549ed8e7f8e990eaca65b6af0413651b2a77c",
@@ -3032,11 +3047,12 @@ var _default = exports["default"] = {
   "./plugins/Textarea.min.js": "4ee950d2815ee75c63ae64b260f4b95ffbce227a37ca58a9596d2a317a56b03b",
   "./plugins/TileSet.js": "730987abc1a69c466047444b005ed25d49a6c3dab03c8128701e086e29eb6c57",
   "./plugins/TileSet.min.js": "9a83b80581a1611b7f34e2f8cc4fe9e4eef910ea55372a19a0eda54eb2033649",
+  "./plugins/Tone.js": "d108292b7b9ca54609200b15005a28d4f4c7ba83f882e62b1e3e01f85a3b5d86",
   "./plugins/Tone.min.js": "acfc53c580afb09c8de27813cf407450c63a77068ad6fc5d7f996b854e825ca9",
   "./plugins/Tower.js": "5efe4026709064ff3fc7036f8880fd43572c9b2521a0f4d77d90e432d4980644",
   "./plugins/Tower.min.js": "6c37a14ae5c2afd4f8a617f194ad7407826cac8d3f6f5f876a9a2d3394655bc6",
-  "./plugins/UnitSpawner.js": "7cb722a41db69abc7721bd02f2e29b03cb4b614e1b314db8142ed0a9de0a7adc",
-  "./plugins/UnitSpawner.min.js": "8019a94e654736688413541d67dd52f4ccf8770fb55f17ae45a388cebfc64aa1"
+  "./plugins/UnitSpawner.js": "2056520da61d0253f6d8817f6073e7f15db8b35a2e71955172aec2d36c88d9c1",
+  "./plugins/UnitSpawner.min.js": "6af7a4bb8ad60fc8adf419016c8515f6559ee9a81db1c7bf8df8db75fd1c3154"
 };
 
 },{}],13:[function(require,module,exports){

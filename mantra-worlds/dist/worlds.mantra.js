@@ -3667,6 +3667,7 @@ var GravityGardens = /*#__PURE__*/function () {
 
       game.make().name('fountB').type('FOUNT').UnitSpawner({
         maxUnits: 50,
+        sprayAngle: Math.PI,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x14b161,
@@ -3674,13 +3675,13 @@ var GravityGardens = /*#__PURE__*/function () {
           position: {
             x: -200,
             y: 0
-          },
-          sprayAngle: Math.PI
+          }
         }
       }).color(0x14b161).isStatic(true).size(8, 8).position(-200, 0).createEntity(); // Finalizes and creates the entity
 
       game.make().name('fountC').type('FOUNT').UnitSpawner({
         maxUnits: 50,
+        sprayAngle: Math.PI / 2,
         unitConfig: {
           type: 'PARTICLE',
           color: 0x3c62f8,
@@ -3688,13 +3689,13 @@ var GravityGardens = /*#__PURE__*/function () {
           position: {
             x: 0,
             y: -200
-          },
-          sprayAngle: Math.PI / 2
+          }
         }
       }).color(0x3c62f8).isStatic(true).size(8, 8).position(0, -200).createEntity(); // Finalizes and creates the entity
 
       game.make().name('fountD').type('FOUNT').UnitSpawner({
         maxUnits: 50,
+        sprayAngle: -Math.PI / 2,
         unitConfig: {
           type: 'PARTICLE',
           color: 0xe9dd34,
@@ -3702,8 +3703,7 @@ var GravityGardens = /*#__PURE__*/function () {
           position: {
             x: 0,
             y: 200
-          },
-          sprayAngle: -Math.PI / 2
+          }
         }
       }).color(0xe9dd34).isStatic(true).size(8, 8).position(0, 200).createEntity(); // Finalizes and creates the entity
     }
@@ -4456,7 +4456,6 @@ var _walker = _interopRequireDefault(require("../TowerDefense/sutras/walker.js")
 var _routing = _interopRequireDefault(require("../sutras/routing.js"));
 var _block = _interopRequireDefault(require("./sutras/block.js"));
 var _demon = _interopRequireDefault(require("../../mantra-sutras/demon.js"));
-var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 var _bomb = _interopRequireDefault(require("../../mantra-sutras/bomb.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 // helper sutra for switching worlds
@@ -4468,6 +4467,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 // import fire from "../../mantra-sutras/fire.js";
 
 // import hexapod from '../../mantra-sutras/hexapod.js';
+// import movement from "../../mantra-sutras/player-movement/top-down.js";
 
 function sutras(game) {
   var rules = game.createSutra();
@@ -4518,7 +4518,7 @@ function sutras(game) {
   return rules;
 }
 
-},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../../mantra-sutras/player-movement/top-down.js":27,"../TowerDefense/sutras/walker.js":57,"../sutras/routing.js":63,"../sutras/switchGraphics.js":64,"./sutras/block.js":34}],34:[function(require,module,exports){
+},{"../../mantra-sutras/bomb.js":20,"../../mantra-sutras/demon.js":21,"../TowerDefense/sutras/walker.js":57,"../sutras/routing.js":63,"../sutras/switchGraphics.js":64,"./sutras/block.js":34}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5241,7 +5241,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _createPiano = _interopRequireDefault(require("./instruments/createPiano.js"));
 var _createDrumKit = _interopRequireDefault(require("./instruments/createDrumKit.js"));
-var _topDown = _interopRequireDefault(require("../../mantra-sutras/player-movement/top-down.js"));
 var _sutras = _interopRequireDefault(require("./sutras.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -5253,7 +5252,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); } // import movement from '../../mantra-sutras/player-movement/top-down.js';
 var Music = /*#__PURE__*/function () {
   // type is optional for Plugins
   function Music() {
@@ -5270,11 +5269,22 @@ var Music = /*#__PURE__*/function () {
       // Actions with left click
       game.config.mouseActionButton = 'RIGHT';
       // enables the default top-down mouse movements
-      game.config.defaultMouseMovement = true;
+      //    game.config.defaultMouseMovement = true;
+
       game.reset();
       this.bindEvents();
       this.createWorld();
-      game.make().Tower().color('purple').mass(10000).position(300, -40).angle(-180).offset(50).createEntity();
+
+      /*
+      game.make()
+        .Tower()
+        .color('purple')
+        .mass(10000)
+        .position(300, -40)
+        .angle(-180)
+        .offset(50)
+        .createEntity();
+      */
     }
   }, {
     key: "bindEvents",
@@ -5476,7 +5486,7 @@ function is_touch_enabled() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 
-},{"../../mantra-sutras/player-movement/top-down.js":27,"./instruments/createDrumKit.js":40,"./instruments/createPiano.js":41,"./sutras.js":42}],40:[function(require,module,exports){
+},{"./instruments/createDrumKit.js":40,"./instruments/createPiano.js":41,"./sutras.js":42}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5903,7 +5913,8 @@ var Platform = /*#__PURE__*/function () {
       }
 
       // we should be able to use the movement sutra as a sub-sutra, see above comment
-      game.useSutra((0, _platform["default"])(game), 'mode-platform');
+      // game.useSutra(movement(game), 'mode-platform');
+
       game.createPlayer({
         height: 32,
         width: 32,

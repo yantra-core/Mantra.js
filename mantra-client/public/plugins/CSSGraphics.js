@@ -390,7 +390,6 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "isEntityInViewport",
     value: function isEntityInViewport(ent, zoomFactor) {
-      var buffer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
       // We could add buffer if needed
       var result = {};
       var inViewport = true;
@@ -400,6 +399,7 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         top: false,
         bottom: false
       };
+
       // Adjust the entity's position and size based on the zoom factor
       var adjustedPosition = {
         x: ent.position.x * zoomFactor + window.innerWidth / 2,
@@ -413,21 +413,26 @@ var CSSGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Check if the adjusted entity position is within the viewport
       if (adjustedPosition.x + adjustedSize.width < 0) {
         outsideOf.left = true;
+        outsideOf.direction = 'W';
         inViewport = false;
       }
       if (adjustedPosition.x > window.innerWidth) {
         outsideOf.right = true;
+        outsideOf.direction = 'E';
         inViewport = false;
       }
       if (adjustedPosition.y + adjustedSize.height < 0) {
         outsideOf.top = true;
+        outsideOf.direction = 'N';
         inViewport = false;
       }
       if (adjustedPosition.y > window.innerHeight) {
         outsideOf.bottom = true;
+        outsideOf.direction = 'S';
         inViewport = false;
       }
       result.outsideOf = outsideOf;
+      result.direction = outsideOf.direction;
       result.inViewport = inViewport;
       result.adjustedPosition = adjustedPosition;
       return result;
@@ -2157,8 +2162,8 @@ function render(game, alpha) {
             if (result.inViewport) {
               // ent.emit('viewportEnter');
             } else {
-              //console.log('ent.emit', ent)
               ent.screenPosition = result.adjustedPosition;
+              ent.direction = result.direction;
               this.game.emit('entity::exited::viewport', ent);
             }
           }

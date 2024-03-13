@@ -53812,6 +53812,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _three = require("three");
 var _OrbitControls = require("../../vendor/three/examples/jsm/controls/OrbitControls.js");
+var _FontLoader = require("../../vendor/three/examples/jsm/loaders/FontLoader.js");
 var _GraphicsInterface2 = _interopRequireDefault(require("../../lib/GraphicsInterface.js"));
 var _render = _interopRequireDefault(require("./lib/render.js"));
 var _createGraphic = _interopRequireDefault(require("./lib/createGraphic.js"));
@@ -53819,6 +53820,7 @@ var _updateGraphic = _interopRequireDefault(require("./lib/updateGraphic.js"));
 var _removeGraphic = _interopRequireDefault(require("./lib/removeGraphic.js"));
 var _inflateGraphic = _interopRequireDefault(require("./lib/inflateGraphic.js"));
 var _inflateTexture = _interopRequireDefault(require("./lib/inflateTexture.js"));
+var _inflateText = _interopRequireDefault(require("./lib/inflateText.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -53882,24 +53884,28 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   _createClass(ThreeGraphics, [{
     key: "init",
     value: function init(game) {
+      var _this2 = this;
       this.render = _render["default"].bind(this);
       this.inflateGraphic = _inflateGraphic["default"].bind(this);
       this.createGraphic = _createGraphic["default"].bind(this);
       this.updateGraphic = _updateGraphic["default"].bind(this);
       this.removeGraphic = _removeGraphic["default"].bind(this);
       this.inflateTexture = _inflateTexture["default"].bind(this);
+      this.inflateText = _inflateText["default"].bind(this);
       this.game = game;
       this.game.systemsManager.addSystem('graphics-three', this);
       if (typeof this.game.threeReady === 'undefined') {
         this.game.threeReady = false; // TODO: remove this, check case in SystemManager for double plugin init
       }
 
-      this.threeReady(game);
+      this.loadFont(function () {
+        _this2.threeReady(game);
+      });
     }
   }, {
     key: "threeReady",
     value: function threeReady(game) {
-      var _this2 = this;
+      var _this3 = this;
       if (this.game.threeReady) {
         console.warn('ThreeGraphics already initialized');
         return;
@@ -53956,10 +53962,10 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
 
       // Add event listeners to set the flag during manual camera control
       this.controls.addEventListener('start', function () {
-        _this2.isManualControlActive = true;
+        _this3.isManualControlActive = true;
       });
       this.controls.addEventListener('end', function () {
-        _this2.isManualControlActive = false;
+        _this3.isManualControlActive = false;
       });
 
       // this.controls.enableZoom = true; // Enable zooming
@@ -53993,30 +53999,32 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
     }
   }, {
     key: "loadFont",
-    value: function loadFont(path, cb) {
+    value: function loadFont(cb) {
       var game = this.game;
-      var fontLoader = new FontLoader();
+      var fontLoader = new _FontLoader.FontLoader();
       fontLoader.load('vendor/fonts/helvetiker_regular.typeface.json', function (font) {
         // Store the loaded font in your game's state
-        console.log('got back', null, font);
+        // console.log('got back', null, font)
         game.font = font;
         cb(null, font);
         //game.setFont(font);
       });
     }
 
-    // called by systemsManager on each game tick
+    // update() is called by the SystemsManager, it's the main game loop
+    // Remark: Graphics generally should run in the render() loop, not the update() loop
+    // update() {}
+
+    // Remark: updateCamera() is called from within the render() loop
   }, {
-    key: "update",
-    value: function update() {
-      this.updateCameraFollow();
-    }
-  }, {
-    key: "updateCameraFollow",
-    value: function updateCameraFollow() {
+    key: "updateCamera",
+    value: function updateCamera() {
       var game = this.game;
 
-      // if (this.isManualControlActive) return; // Skip automatic following if manual control is active
+      /* default camera view 
+      this.camera.position.set(0, 400, 100);
+      this.camera.lookAt(new Vector3(0, 150, -100));
+      */
 
       // Get the current player entity
       var currentPlayer = game.getEntity(game.currentPlayerId);
@@ -54035,20 +54043,23 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Determine the camera mode and update accordingly
       switch (game.data.camera.mode) {
         case 'fpv':
+        case 'none':
           this.setFirstPersonView(playerGraphic);
           break;
         case 'follow':
+          this.updateFollowCamera(playerGraphic);
+          break;
         case 'platform':
           // 'follow' and 'platform' share the same logic
-          this.updateFollowCamera(playerGraphic);
+          this.updatePlatformCamera(playerGraphic);
           break;
         default:
           console.warn('Unknown camera mode:', game.data.camera.mode);
       }
     }
   }, {
-    key: "updateFollowCamera",
-    value: function updateFollowCamera(playerGraphic) {
+    key: "updatePlatformCamera",
+    value: function updatePlatformCamera(playerGraphic) {
       // Calculate the new camera position with an offset
       var offset = new _three.Vector3(0, 150, -100); // Adjust the offset as needed
       var newPosition = playerGraphic.position.clone().add(offset);
@@ -54057,7 +54068,41 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
       // Update orientation only when not manually controlling
       if (!this.isManualControlActive) {
         // Smoothing the camera movement
-        this.smoothCameraUpdate(newPosition, lookAtPosition);
+        this.camera.position.copy(newPosition);
+        this.camera.lookAt(lookAtPosition);
+      }
+    }
+  }, {
+    key: "updateFollowCamera",
+    value: function updateFollowCamera(playerGraphic) {
+      // Calculate the new camera position with an offset
+
+      // top-down
+      var offset;
+      if (this.game.data.mode === 'topdown') {
+        offset = new _three.Vector3(0, 150, -100); // Adjust the offset as needed
+        var newPosition = playerGraphic.position.clone().add(offset);
+        // top-down
+        var lookAtPosition = playerGraphic.position.clone();
+
+        // Update orientation only when not manually controlling
+        if (!this.isManualControlActive) {
+          this.camera.position.copy(newPosition);
+          this.camera.lookAt(lookAtPosition);
+          this.camera.up.set(0, 1, 0);
+        }
+      } else if (this.game.data.mode === 'platform') {
+        offset = new _three.Vector3(0, 250, 0);
+        var _newPosition = playerGraphic.position.clone().add(offset);
+        // 2d platform side view
+        var _lookAtPosition = new _three.Vector3(playerGraphic.position.x, playerGraphic.position.y, playerGraphic.position.z);
+
+        // Update orientation only when not manually controlling
+        if (!this.isManualControlActive) {
+          this.camera.position.copy(_newPosition);
+          this.camera.lookAt(_lookAtPosition);
+          this.camera.up.set(0, -1, 0);
+        }
       }
     }
   }, {
@@ -54102,24 +54147,24 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
   }, {
     key: "setupZoomControls",
     value: function setupZoomControls() {
-      var _this3 = this;
+      var _this4 = this;
       var zoomSensitivity = -0.05; // Adjust this value based on desired zoom speed
       var minFov = 20; // Minimum FOV
       var maxFov = 150; // Maximum FOV, you can adjust this value
 
       this.renderer.domElement.addEventListener('wheel', function (event) {
         // Adjust the camera's FOV
-        _this3.camera.fov -= event.deltaY * zoomSensitivity;
+        _this4.camera.fov -= event.deltaY * zoomSensitivity;
         // Clamp the FOV to the min/max limits
-        _this3.camera.fov = Math.max(Math.min(_this3.camera.fov, maxFov), minFov);
+        _this4.camera.fov = Math.max(Math.min(_this4.camera.fov, maxFov), minFov);
         // Update the camera's projection matrix
-        _this3.camera.updateProjectionMatrix();
+        _this4.camera.updateProjectionMatrix();
       });
     }
   }, {
     key: "unload",
     value: function unload() {
-      var _this4 = this;
+      var _this5 = this;
       // remove events mouse wheel camera
       this.renderer.domElement.removeEventListener('wheel', function () {});
 
@@ -54142,7 +54187,7 @@ var ThreeGraphics = /*#__PURE__*/function (_GraphicsInterface) {
         _iterator.f();
       }
       this.game.graphics = this.game.graphics.filter(function (g) {
-        return g.id !== _this4.id;
+        return g.id !== _this5.id;
       });
       delete this.game._plugins['ThreeGraphics'];
 
@@ -54161,7 +54206,7 @@ _defineProperty(ThreeGraphics, "removable", false);
 _defineProperty(ThreeGraphics, "async", false);
 var _default = exports["default"] = ThreeGraphics;
 
-},{"../../lib/GraphicsInterface.js":1,"../../vendor/three/examples/jsm/controls/OrbitControls.js":10,"./lib/createGraphic.js":4,"./lib/inflateGraphic.js":5,"./lib/inflateTexture.js":6,"./lib/removeGraphic.js":7,"./lib/render.js":8,"./lib/updateGraphic.js":9,"three":2}],4:[function(require,module,exports){
+},{"../../lib/GraphicsInterface.js":1,"../../vendor/three/examples/jsm/controls/OrbitControls.js":11,"../../vendor/three/examples/jsm/loaders/FontLoader.js":13,"./lib/createGraphic.js":4,"./lib/inflateGraphic.js":5,"./lib/inflateText.js":6,"./lib/inflateTexture.js":7,"./lib/removeGraphic.js":8,"./lib/render.js":9,"./lib/updateGraphic.js":10,"three":2}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54193,7 +54238,8 @@ function createGraphic(entityData) {
     //console.log('entityObject after processModel()', entityObject);
   } else {
     // console.log("Creating new geometry for entity.");
-    entityObject = createGeometryForEntity(entityData);
+
+    entityObject = createGeometryForEntity.call(this, entityData);
   }
 
   // Set entity position and add to the scene
@@ -54233,6 +54279,11 @@ function processModel(model) {
 function createGeometryForEntity(entityData) {
   var geometry, material, mesh;
   var entityGroup = new _three.Group();
+  if (entityData.type === 'TEXT') {
+    mesh = this.inflateText(entityData, this.scene, this.game.font);
+    entityGroup.add(mesh);
+    return entityGroup;
+  }
 
   // Define geometry based on entity type
   switch (entityData.type) {
@@ -54345,6 +54396,78 @@ function easeInQuad(t) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = inflateText;
+var _TextGeometry = require("../../../vendor/three/examples/jsm/geometries/TextGeometry.js");
+var _three = require("three");
+function inflateText(entityData, scene, font) {
+  var text = entityData.text;
+  var style = entityData.style || {}; // Ensure style exists to prevent errors
+
+  // Default values
+  var fontSize = 80; // Default font size
+  var fontColor = 0xff0000; // Default font color (red)
+
+  // Override default values if specific styles are provided
+  if (style.fontSize) {
+    fontSize = parseInt(style.fontSize, 10); // Convert fontSize from CSS style to integer
+  }
+
+  if (style.color) {
+    fontColor = new _three.Color(style.color).getHex(); // Convert CSS color string to Three.js color hex
+  }
+
+  var textGeo = new _TextGeometry.TextGeometry(text, {
+    font: font,
+    size: fontSize,
+    // Use the fontSize from style or default
+    height: 1,
+    // Thickness of the text. Adjust as needed.
+    curveSegments: 12,
+    // How many curve segments to use for letters, more makes letters rounder.
+    bevelEnabled: true,
+    // Whether to use bevel edges.
+    bevelThickness: 2,
+    // How deep the bevel is.
+    bevelSize: 1.5,
+    // How far the bevel extends from the text outline.
+    bevelOffset: 0,
+    bevelSegments: 5 // Number of bevel segments.
+  });
+
+  var textMaterial = new _three.MeshPhongMaterial({
+    color: fontColor,
+    // Use the fontColor from style or default
+    specular: 0xffffff // Specular color of the material (for shininess). Adjust as needed.
+  });
+
+  var mesh = new _three.Mesh(textGeo, textMaterial);
+  mesh.rotation.y = Math.PI; // Math.PI radians equals 180 degrees
+
+  // Compute the geometry's bounding box to get its dimensions
+  textGeo.computeBoundingBox();
+  var boundingBox = textGeo.boundingBox;
+
+  // Calculate the offset to center the text
+  var offset = new _three.Vector3();
+  offset.x = (boundingBox.max.x - boundingBox.min.x) / 2; // Center in X
+  offset.y = boundingBox.min.y; // Align bottom to origin in Y
+
+  // Move the mesh by the calculated offset
+  mesh.geometry.translate(-offset.x, -offset.y, 0);
+
+  // Add the mesh to the scene if provided
+  if (scene) {
+    scene.add(mesh);
+  }
+  return mesh; // Return the text mesh in case you need to further manipulate it.
+}
+
+},{"../../../vendor/three/examples/jsm/geometries/TextGeometry.js":12,"three":2}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = inflateTexture;
 var _three = require("three");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -54372,25 +54495,31 @@ function _inflateTexture() {
           }
           return _context.abrupt("return");
         case 4:
+          if (!(entityData.texture === 'none')) {
+            _context.next = 6;
+            break;
+          }
+          return _context.abrupt("return");
+        case 6:
           texture = this.game.getTexture(entityData.texture);
           if (texture) {
-            _context.next = 8;
+            _context.next = 10;
             break;
           }
           console.warn('Warning: Texture not found', entityData.texture);
           return _context.abrupt("return");
-        case 8:
+        case 10:
           // Retrieve the entity's graphic component, which could be a Mesh or a Group
           entityGraphic = entityData.graphics['graphics-three'];
           if (entityGraphic) {
-            _context.next = 11;
+            _context.next = 13;
             break;
           }
           return _context.abrupt("return");
-        case 11:
-          _context.next = 13;
-          return applyTextureToEntityGraphic(this.game, entityData, entityGraphic);
         case 13:
+          _context.next = 15;
+          return applyTextureToEntityGraphic(this.game, entityData, entityGraphic);
+        case 15:
         case "end":
           return _context.stop();
       }
@@ -54442,7 +54571,7 @@ function _applyTextureToEntityGraphic() {
           // Traverse the entity graphic component and apply texture to all child meshes
           entityGraphic.traverse(function (child) {
             if (child.isMesh) {
-              applyTextureToMesh(child, cachedTexture, texture.sprite);
+              applyTextureToMesh(child, cachedTexture, texture.sprite, entityData);
             }
           });
         case 16:
@@ -54453,7 +54582,23 @@ function _applyTextureToEntityGraphic() {
   }));
   return _applyTextureToEntityGraphic.apply(this, arguments);
 }
-function applyTextureToMesh(mesh, cachedTexture, sprite) {
+function flipUVsHorizontally(geometry) {
+  var uvs = geometry.attributes.uv;
+  for (var i = 0; i < uvs.array.length; i += 2) {
+    uvs.array[i] = 1 - uvs.array[i]; // Flip the U coordinate
+    // flip the V coordinate
+    uvs.array[i + 1] = 1 - uvs.array[i + 1];
+
+    // At this stage, top side looks GOOD
+    // if we uncomment the following line, the sides look good, the TOP is upside down
+    uvs.array[i + 1] = 1 - uvs.array[i + 1];
+    // Remark: how to now flip the top side?
+    uvs.array[i + 1] = 1 - uvs.array[i + 1];
+  }
+  uvs.needsUpdate = true; // Inform Three.js that the UVs have been updated
+}
+
+function applyTextureToMesh(mesh, cachedTexture, sprite, entityData) {
   // console.log("applyTextureToMesh", mesh, cachedTexture, sprite)
   if (sprite) {
     // Adjust UV mapping for sprites
@@ -54469,14 +54614,48 @@ function applyTextureToMesh(mesh, cachedTexture, sprite) {
     mesh.material.map = clonedTexture;
   } else {
     // For non-sprite textures that need to be flipped on the X-axis
-    var _clonedTexture = cachedTexture.clone();
-    _clonedTexture.repeat.set(-1, 1); // Flip texture on the X-axis
-    _clonedTexture.offset.set(1, 0); // Adjust offset for the flipped texture
 
+    var _clonedTexture = cachedTexture.clone();
+
+    // TODO: entityData.texture.scrollingRepeat
+    _clonedTexture.wrapS = _clonedTexture.wrapT = _three.RepeatWrapping; // Set texture to repeat
+
+    //clonedTexture.repeat.set(-1, 1);
+    //clonedTexture.offset.set(1, 0);
+    // Remark: Ths is now working; however it seems to be toggling state back and forth each game tick? that is not expected
+    // we should be able to set this once and be done with it
+
+    if (!mesh.userData.uvsFlipped) {
+      flipUVsHorizontally(mesh.geometry);
+      mesh.userData.uvsFlipped = true; // Mark UVs as flipped
+    }
+    // mesh.rotation.y += 0.01
+    // TODO: entityData.texture.scrollingRepeat
+    // console.log(sprite)
+    if (entityData && entityData.style && entityData.style.scrollTexture) {
+      scrollTexture(mesh, 0.000, 0.001);
+    }
     mesh.material.map = _clonedTexture;
   }
   mesh.material.needsUpdate = true;
   mesh.visible = true;
+}
+function scrollTexture(mesh) {
+  var speedX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.01;
+  var speedY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.01;
+  var geometry = mesh.geometry;
+
+  // Assuming the geometry is using BufferGeometry
+  var uvs = geometry.attributes.uv;
+
+  // Update UV coordinates for scrolling effect
+  for (var i = 0; i < uvs.array.length; i += 2) {
+    uvs.array[i] += speedX; // Scroll horizontally
+    uvs.array[i + 1] += speedY; // Scroll vertically
+  }
+
+  // Mark the UV attribute as needing an update in the next render cycle
+  uvs.needsUpdate = true;
 }
 function calculateSpriteUVs(sprite, textureWidth, textureHeight) {
   sprite.width = sprite.width || 16; // Default sprite width
@@ -54730,7 +54909,7 @@ function customizeBoxUVs(geometry, textureWidth, textureHeight) {
 
   */
 
-},{"three":2}],7:[function(require,module,exports){
+},{"three":2}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54773,7 +54952,7 @@ function removeGraphic(entityId) {
 }
 var _default = exports["default"] = removeGraphic;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54826,10 +55005,11 @@ function render(game, alpha) {
       _iterator.f();
     }
   }
+  this.updateCamera();
   this.renderer.render(this.scene, this.camera);
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54863,20 +55043,31 @@ function updateGraphic(entityData) {
 
   // Get the current group position
   var currentGroupPosition = group.position.clone();
-  // Compare the current group position with the entityData position
-  // Only update the group position if the entityData position has changed
-  //console.log("CHECKING POS UPDATE POSITON OF GROUP", currentGroupPosition)
+  if (typeof entityData.position.z !== 'number') {
+    entityData.position.z = 0;
+  }
+  updateGroupPosition(group, entityData);
+}
+function truncateToDecimalPlaces(num, decimalPlaces) {
+  var factor = Math.pow(10, decimalPlaces);
+  return Math.round(num * factor) / factor;
+}
 
-  if (-currentGroupPosition.x !== entityData.position.x || currentGroupPosition.y !== entityData.position.z) {
-    if (typeof entityData.position.z !== 'number') {
-      entityData.position.z = 0;
-    }
-    // console.log("UPDATING POSITON OF GROUP", entityData.position, group)
-    group.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+// Function to update the group's position if it has changed significantly
+function updateGroupPosition(group, entityData) {
+  // Truncate the incoming positions to reduce the frequency of updates
+  var truncatedX = truncateToDecimalPlaces(-entityData.position.x, 4);
+  var truncatedY = truncateToDecimalPlaces(entityData.position.z, 4);
+  var truncatedZ = truncateToDecimalPlaces(-entityData.position.y, 4);
+
+  // Check if the group's position differs significantly from the entity's position
+  if (group.position.x !== truncatedX || group.position.y !== truncatedY || group.position.z !== truncatedZ) {
+    // Only update the group's position if it has changed
+    group.position.set(truncatedX, truncatedY, truncatedZ);
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -55836,6 +56027,224 @@ var OrbitControls = exports.OrbitControls = /*#__PURE__*/function (_EventDispatc
   }
   return _createClass(OrbitControls);
 }(_three.EventDispatcher);
+
+},{"three":2}],12:[function(require,module,exports){
+"use strict";
+
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TextGeometry = void 0;
+var _three = require("three");
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); } /**
+                                                                                                                                                                                                                      * Text = 3D Text
+                                                                                                                                                                                                                      *
+                                                                                                                                                                                                                      * parameters = {
+                                                                                                                                                                                                                      *  font: <THREE.Font>, // font
+                                                                                                                                                                                                                      *
+                                                                                                                                                                                                                      *  size: <float>, // size of the text
+                                                                                                                                                                                                                      *  height: <float>, // thickness to extrude text
+                                                                                                                                                                                                                      *  curveSegments: <int>, // number of points on the curves
+                                                                                                                                                                                                                      *
+                                                                                                                                                                                                                      *  bevelEnabled: <bool>, // turn on bevel
+                                                                                                                                                                                                                      *  bevelThickness: <float>, // how deep into text bevel goes
+                                                                                                                                                                                                                      *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+                                                                                                                                                                                                                      *  bevelOffset: <float> // how far from text outline does bevel start
+                                                                                                                                                                                                                      * }
+                                                                                                                                                                                                                      */
+var TextGeometry = exports.TextGeometry = /*#__PURE__*/function (_ExtrudeGeometry) {
+  _inherits(TextGeometry, _ExtrudeGeometry);
+  var _super = _createSuper(TextGeometry);
+  function TextGeometry(text) {
+    var _this;
+    var parameters = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    _classCallCheck(this, TextGeometry);
+    var font = parameters.font;
+    if (font === undefined) {
+      _this = _super.call(this); // generate default extrude geometry
+    } else {
+      var shapes = font.generateShapes(text, parameters.size);
+
+      // translate parameters to ExtrudeGeometry API
+
+      parameters.depth = parameters.height !== undefined ? parameters.height : 50;
+
+      // defaults
+
+      if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
+      if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
+      if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
+      _this = _super.call(this, shapes, parameters);
+    }
+    _this.type = 'TextGeometry';
+    return _possibleConstructorReturn(_this);
+  }
+  return _createClass(TextGeometry);
+}(_three.ExtrudeGeometry);
+
+},{"three":2}],13:[function(require,module,exports){
+"use strict";
+
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FontLoader = exports.Font = void 0;
+var _three = require("three");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+var FontLoader = exports.FontLoader = /*#__PURE__*/function (_Loader) {
+  _inherits(FontLoader, _Loader);
+  var _super = _createSuper(FontLoader);
+  function FontLoader(manager) {
+    _classCallCheck(this, FontLoader);
+    return _super.call(this, manager);
+  }
+  _createClass(FontLoader, [{
+    key: "load",
+    value: function load(url, onLoad, onProgress, onError) {
+      var scope = this;
+      var loader = new _three.FileLoader(this.manager);
+      loader.setPath(this.path);
+      loader.setRequestHeader(this.requestHeader);
+      loader.setWithCredentials(this.withCredentials);
+      loader.load(url, function (text) {
+        var font = scope.parse(JSON.parse(text));
+        if (onLoad) onLoad(font);
+      }, onProgress, onError);
+    }
+  }, {
+    key: "parse",
+    value: function parse(json) {
+      return new Font(json);
+    }
+  }]);
+  return FontLoader;
+}(_three.Loader); //
+var Font = exports.Font = /*#__PURE__*/function () {
+  function Font(data) {
+    _classCallCheck(this, Font);
+    this.isFont = true;
+    this.type = 'Font';
+    this.data = data;
+  }
+  _createClass(Font, [{
+    key: "generateShapes",
+    value: function generateShapes(text) {
+      var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+      var shapes = [];
+      var paths = createPaths(text, size, this.data);
+      for (var p = 0, pl = paths.length; p < pl; p++) {
+        shapes.push.apply(shapes, _toConsumableArray(paths[p].toShapes()));
+      }
+      return shapes;
+    }
+  }]);
+  return Font;
+}();
+function createPaths(text, size, data) {
+  var chars = Array.from(text);
+  var scale = size / data.resolution;
+  var line_height = (data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness) * scale;
+  var paths = [];
+  var offsetX = 0,
+    offsetY = 0;
+  for (var i = 0; i < chars.length; i++) {
+    var _char = chars[i];
+    if (_char === '\n') {
+      offsetX = 0;
+      offsetY -= line_height;
+    } else {
+      var ret = createPath(_char, scale, offsetX, offsetY, data);
+      offsetX += ret.offsetX;
+      paths.push(ret.path);
+    }
+  }
+  return paths;
+}
+function createPath(_char2, scale, offsetX, offsetY, data) {
+  var glyph = data.glyphs[_char2] || data.glyphs['?'];
+  if (!glyph) {
+    console.error('THREE.Font: character "' + _char2 + '" does not exists in font family ' + data.familyName + '.');
+    return;
+  }
+  var path = new _three.ShapePath();
+  var x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
+  if (glyph.o) {
+    var outline = glyph._cachedOutline || (glyph._cachedOutline = glyph.o.split(' '));
+    for (var i = 0, l = outline.length; i < l;) {
+      var action = outline[i++];
+      switch (action) {
+        case 'm':
+          // moveTo
+
+          x = outline[i++] * scale + offsetX;
+          y = outline[i++] * scale + offsetY;
+          path.moveTo(x, y);
+          break;
+        case 'l':
+          // lineTo
+
+          x = outline[i++] * scale + offsetX;
+          y = outline[i++] * scale + offsetY;
+          path.lineTo(x, y);
+          break;
+        case 'q':
+          // quadraticCurveTo
+
+          cpx = outline[i++] * scale + offsetX;
+          cpy = outline[i++] * scale + offsetY;
+          cpx1 = outline[i++] * scale + offsetX;
+          cpy1 = outline[i++] * scale + offsetY;
+          path.quadraticCurveTo(cpx1, cpy1, cpx, cpy);
+          break;
+        case 'b':
+          // bezierCurveTo
+
+          cpx = outline[i++] * scale + offsetX;
+          cpy = outline[i++] * scale + offsetY;
+          cpx1 = outline[i++] * scale + offsetX;
+          cpy1 = outline[i++] * scale + offsetY;
+          cpx2 = outline[i++] * scale + offsetX;
+          cpy2 = outline[i++] * scale + offsetY;
+          path.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, cpx, cpy);
+          break;
+      }
+    }
+  }
+  return {
+    offsetX: glyph.ha * scale,
+    path: path
+  };
+}
 
 },{"three":2}]},{},[3])(3)
 });

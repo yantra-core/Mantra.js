@@ -5,8 +5,7 @@ let game = new MANTRA.Game({
     'Button',
     'Player'
   ],
-  camera: 'follow',
-  gameRoot: 'http://192.168.1.80:7777'
+  camera: 'follow'
 });
 game.start(function(){
 

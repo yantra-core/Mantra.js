@@ -529,7 +529,7 @@ function createEntity() {
         depth: 16
       },
       lifetime: null,
-      maxSpeed: 3,
+      maxSpeed: 100,
       isStatic: false,
       isSensor: false,
       restitution: 0,
@@ -1022,6 +1022,7 @@ function inflateEntity(entityData) {
       } else {
         defaultBuild(game, entityData);
       }
+      // console.log('built ent with data', entityData)
       return updateOrCreate(game, entityData);
     }
   } else {
@@ -1029,6 +1030,7 @@ function inflateEntity(entityData) {
   }
 }
 function defaultBuild(game, entityData) {
+  // console.log('defaultBuild', entityData.type)
   // merge default build make 
   var defaultConfig = game.make().build();
   for (var p in defaultConfig) {
@@ -1037,7 +1039,24 @@ function defaultBuild(game, entityData) {
     }
   }
   // remove any undefined values or null values ( should not be necessary at this stage ) ( more tests )
+  // console.log('inflateENtity defaultBuild got data', entityData)
+
+  var supportedSerializedEvents = ['collisionStart']; // TODO: add all events with tests
+
   for (var _p2 in entityData) {
+    if (supportedSerializedEvents.includes(_p2)) {
+      // this is a serialized function, create a new function from the string and assign it to the entity
+      // console.log('inflateEntity serialized function', entityData.type, entityData[p], entityData);
+      // this is a function that had .toSTring() called on it, we need to re-create the function
+      try {
+        // Remark: This try/catch is not gaurenteed to catch all eval() errors
+        entityData[_p2] = eval('(' + entityData[_p2] + ')');
+      } catch (err) {
+        console.log('Failed to inflate serialized function', entityData.type, entityData[_p2], entityData, err);
+      }
+      //console.log("after inflateENtity seralize fn", entityData[p])
+    }
+
     if (typeof entityData[_p2] === 'undefined' || entityData[_p2] === null) {
       delete entityData[_p2];
     }
@@ -1474,11 +1493,13 @@ function removeEntity(entityId) {
     // update the entity with the destroyed state
     var updatedEntity = this.game.getEntity(entityId);
     this.game.entities.set(entityId, updatedEntity);
-    if (updatedEntity && this.game.systems.rbush) {
+    if (updatedEntity) {
       // actually remove the entity from the game world
       // will be set to false for field of view related removals
       if (removeFromGameData) {
-        this.game.systems.rbush.removeEntity(updatedEntity);
+        if (this.game.systems.rbush) {
+          this.game.systems.rbush.removeEntity(updatedEntity);
+        }
         delete this.game.deferredEntities[entityId];
       }
     }
@@ -1542,8 +1563,8 @@ function updateEntity(entityDataOrId, entityData) {
 
   // if the state doesn't exist, return error
   if (!ent) {
-    console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
-    console.log('This should not happen, if a new state came in it should be created');
+    //console.log('Error: updateEntity called for non-existent entity', entityId, entityData);
+    //console.log('This should not happen, if a new state came in it should be created');
     return;
   }
 

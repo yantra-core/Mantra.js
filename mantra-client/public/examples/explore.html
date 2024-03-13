@@ -350,7 +350,6 @@
       fetch(sourceUrl)
         .then(response => response.text())
         .then(data => {
-          console.log(data)
           textarea.value = data;
           // updates the code editor view
           textarea.dispatchEvent(new Event('input'));

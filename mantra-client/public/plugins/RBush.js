@@ -67,6 +67,8 @@ var RBush = /*#__PURE__*/function () {
       var spatialData = this.idToNodeMap.get(entity.id.toString());
       if (spatialData) {
         this.tree.remove(spatialData);
+        // TODO: fix possible data leak
+        console.log('deleting id from node map', entity.id.toString());
         this.idToNodeMap["delete"](entity.id.toString());
       }
     }

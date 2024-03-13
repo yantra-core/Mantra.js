@@ -2,22 +2,26 @@
 let game = new MANTRA.Game({
   width: 400,
   height: 300,
-  graphics: ['three'], // array enum, 'babylon', 'phaser', 'css', 'three'
+  graphics: ['three'], // array enum, 'babylon', 'css', 'three'
   defaultMovement: true,
-  plugins: ['RBush', 'Tile', 'Player'], // RBush is required for Field of View
+  fps: 30,
+  plugins: ['SwitchGraphics', 'TensorFlow', 'RBush', 'Tile', 'TileMap', 'Player', 'Bullet', 'Boomerang', 'Gamepad'], // RBush is required for Field of View
 });
+window.game = game;
+
 game.start(function () {
   
   game.make().Player().position(0, 0, 16).createEntity();
   game.setBackground('#000000');
 
+  // TODO: we can remove game.TileMap and use game.make().TileMap() instead ( see below )
   let tileMap = new game.TileMap({
     x: 0,
     y: 0,
     width: 32,
     height: 32,
-    tileWidth: 16, // TODO: tileSet.tilewidth
-    tileHeight: 16 // TODO: tileSet.tileheight
+    tileWidth: 16,
+    tileHeight: 16
   });
 
   // file entire tilemap with grass
@@ -66,8 +70,24 @@ game.start(function () {
     return tile;
   });
   
+
+  
+  // Construct the TileMap config
+  let tileMap2 = game.make().TileMap({
+    tileMapWidth: 32,
+    tileMapHeight: 32,
+    tileSize: 16,
+    // TileMap.data array of integers ( see: Labyrinthos.js )
+    data: tileMap.data,
+    // tileSet can also be a `.TileSet()` builder config
+    tileSet: tileset,
+  }).position(-100, 0);
+
+  tileMap2.createEntity();
+
+
   console.log("tileMap", tileMap)
 
-  game.systems.tile.createLayer(tileMap, 16, 16)
+    // game.systems.tile.createLayer(tileMap, 16, 16)
 
 });

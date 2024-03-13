@@ -272,7 +272,9 @@ function platformMovement(game) {
   //rules.if('P').then('ZOOM_OUT');
 
   rules.on('JUMP', function (player, node, gameState) {
-    // console.log("JUMP", gameState.input, gameState.controls)
+    // console.log("JUMP", gameState.inputTicks.SPACE, maxJumpTicks)
+    // TODO: fix this, it now seems to be resetting to zero prematurely
+    //        could be input system, keyboard?
     if (gameState.inputTicks.SPACE >= maxJumpTicks) {
       return;
     }
@@ -644,16 +646,11 @@ var Sutra = /*#__PURE__*/function () {
         // for each key in game.controls, add a condition that checks if the key is pressed
         // these are currently explicitly bound to the player entity, we may want to make this more generic
         self.bindInputsToSutraConditions();
-        if (self.defaultMovement) {
-          if (self.game.config.mode === 'topdown') {
-            self.game.useSutra((0, _defaultTopdownMovement["default"])(self.game), 'mode-topdown');
-          }
-          if (self.game.config.mode === 'platform') {
-            // TODO: better platform control
-            self.game.useSutra((0, _defaultPlatformMovement["default"])(self.game), 'mode-platform');
-          }
-        }
         self.inputsBound = true;
+        if (self.defaultMovement) {
+          // TODO: remove defaultMovement flag?
+          this.bindDefaultMovementSutra(self.game.config.mode);
+        }
       }
     }
   }, {
@@ -661,7 +658,11 @@ var Sutra = /*#__PURE__*/function () {
     value: function bindDefaultMovementSutra() {
       var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'topdown';
       if (mode === 'topdown') {
-        this.game.useSutra((0, _defaultTopdownMovement["default"])(this.game), 'mode-topdown');
+        this.game.useSutra((0, _defaultTopdownMovement["default"])(this.game), 'mode-topdown', {
+          shareListeners: true,
+          shareTree: false,
+          shareMap: false
+        });
       }
       if (mode === 'platform') {
         this.game.useSutra((0, _defaultPlatformMovement["default"])(this.game), 'mode-platform');
@@ -1474,6 +1475,8 @@ var Sutra = /*#__PURE__*/function () {
       var shareListeners = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       var shareTree = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
       var shareMap = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
+      console.log('using a sutra', subSutra, name, insertAt, shareListeners, shareTree, shareMap);
+      // alert('using sutra')
       /*
          To demonstrate valid use cases for each configuration (`shareListeners`, `shareTree`, `shareMap`):
          ### Example 1: Game Level and Sub-Level Management (`shareTree = true`, `shareListeners = false`, `shareMap = true`)

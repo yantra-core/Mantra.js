@@ -651,7 +651,7 @@ var MatterPhysics = /*#__PURE__*/function (_PhysicsInterface) {
       var body = this.bodyMap[entityId];
       if (body) {
         _matterJs["default"].World.remove(this.engine.world, body);
-        delete this.bodyMap[body.myEntityId];
+        delete this.bodyMap[body.myEntityId.toString()];
       }
     }
   }, {
@@ -1182,7 +1182,7 @@ function onAfterUpdate(event) {
         //
         // Clamp max speed
         //
-        var maxSpeed = 4; // TODO: move to config
+        var maxSpeed = 100; // TODO: move to config
         if (entity.maxSpeed) {
           maxSpeed = entity.maxSpeed;
         }

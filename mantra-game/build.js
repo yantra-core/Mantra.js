@@ -58,9 +58,10 @@ let plugins = [
   './plugins/textarea/Textarea.js',
    // './plugins/monaco/Monaco.js',
 
-  './plugins/entity-movement/strategies/AsteroidsMovement.js',
+  // './plugins/entity-movement/strategies/AsteroidsMovement.js',
   './plugins/behaviors/Behaviors.js',
   './plugins/sutra/Sutra.js',
+  './plugins/crosswindow/CrossWindow.js',
   './plugins/ycraft/YCraft.js',
   './plugins/graphics-babylon/camera/BabylonCamera.js',
   './plugins/graphics-ascii/ASCIIGraphics.js',
@@ -69,6 +70,7 @@ let plugins = [
 
   './plugins/block/Block.js',
   './plugins/hexapod/Hexapod.js',
+  './plugins/coin/Coin.js',
   './plugins/key/Key.js',
   './plugins/tile/Tile.js',
   './plugins/tilemap/TileMap.js',
@@ -113,8 +115,8 @@ let plugins = [
   './plugins/menu-radial/RadialMenu.js',
   './plugins/text/Text.js',
   './plugins/gui-plugins/PluginsGUI.js',
-  './plugins/gui-ycraft/YCraftGUI.js',
-  './plugins/gui-yantra/YantraGUI.js',
+  //'./plugins/gui-ycraft/YCraftGUI.js',
+  //'./plugins/gui-yantra/YantraGUI.js',
   './plugins/gui-sutra/SutraGUI.js',
   './plugins/gui-scoreboard/Scoreboard.js',
   './plugins/gui-switch-graphics/SwitchGraphics.js',
@@ -130,16 +132,16 @@ let plugins = [
   './plugins/lifetime/Lifetime.js',
   './plugins/client/LocalClient.js',
   './plugins/physics-matter/MatterPhysics.js',
-  './plugins/physics-physx/PhysXPhysics.js',
+  //'./plugins/physics-physx/PhysXPhysics.js',
   './plugins/mouse/Mouse.js',
-  './plugins/graphics-phaser/PhaserGraphics.js',
-  './plugins/graphics-phaser/PhaserCamera.js',
+  //'./plugins/graphics-phaser/PhaserGraphics.js',
+  //'./plugins/graphics-phaser/PhaserCamera.js',
   './plugins/graphics-three/ThreeGraphics.js',
-  './plugins/entity-movement/strategies/PongMovement.js',
+  //'./plugins/entity-movement/strategies/PongMovement.js',
   './plugins/starfield/StarField.js',
   './plugins/starfield/BabylonStarField.js',
-  './plugins/entity-movement/strategies/FroggerMovement.js',
-  './plugins/entity-movement/strategies/PacManMovement.js',
+  //'./plugins/entity-movement/strategies/FroggerMovement.js',
+  //'./plugins/entity-movement/strategies/PacManMovement.js',
   './plugins/gui-midi/MidiGUI.js',
   './plugins/typer-floaty/FloatyTyper.js',
   './plugins/typer-ghost/GhostTyper.js',
@@ -148,7 +150,7 @@ let plugins = [
   // './plugins/nes/Nes.js',
   // 'MovementPong' is the same as 'PongMovement', so it's not repeated
   // 'MovementAsteroids' is the same as 'AsteroidsMovement', so it's not repeated
-  './plugins/xstate/XState.js',
+  // './plugins/xstate/XState.js',
   // ... add other plugins if you have more
 ];
 
@@ -159,15 +161,50 @@ let plugins = [
 //console.log('Changed Plugins:', changedPlugins);
 //process.exit();
 //plugins = [];
+//plugins.push('./plugins/tensorflow/TensorFlow.js')
+//plugins.push('./plugins/sutra/Sutra.js')
+
+//plugins.push('./plugins/unit-spawner/UnitSpawner.js')
+
+//plugins.push('./plugins/crosswindow/CrossWindow.js')
+//plugins.push('./plugins/graphics-css/CSSGraphics.js');
+
+//plugins.push('./plugins/coin/Coin.js')
+
+//plugins.push('./plugins/unit-spawner/UnitSpawner.js')
+
 //plugins.push('./plugins/entity/Entity.js')
+
+//plugins.push('./plugins/hexapod/Hexapod.js')
+//plugins.push('./plugins/loading-screen/LoadingScreen.js')
+
+//plugins.push('./plugins/bullet/Bullet.js')
+//plugins.push('./plugins/keyboard/Keyboard.js')
+
+//plugins.push('./plugins/mouse/Mouse.js')
+//plugins.push('./plugins/graphics/Graphics.js')
+
+//plugins = [];
+//plugins.push('./plugins/graphics/Graphics.js')
+//plugins.push('./plugins/graphics-css/CSSGraphics.js');
+//plugins.push('./plugins/graphics-css/CSSGraphics.js');
+
+//plugins.push('./plugins/sutra/Sutra.js')
+//plugins.push('./plugins/checkbox/Checkbox.js')
+
+//plugins.push('./plugins/select/Select.js')
+//plugins.push('./plugins/mouse/Mouse.js')
+
+//plugins.push('./plugins/gui-editor/Editor.js');
+
+//plugins.push('./plugins/markup/Markup.js')
+
 
 //plugins = ['./plugins/client/Client.js']
 //plugins.push('./plugins/collisions/Collisions.js')
 //plugins = ['./plugins/link/Link.js']
 //plugins.push('./plugins/code/Code.js')
 // plugins = ['./plugins/monaco/Monaco.js']
-// plugins.push('./plugins/graphics-css/CSSGraphics.js');
-//plugins.push('./plugins/gui-editor/Editor.js');
 //plugins.push('./plugins/entity/Entity.js');
 
 // Function to copy directory recursively
