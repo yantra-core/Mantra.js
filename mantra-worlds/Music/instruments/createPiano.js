@@ -19,7 +19,8 @@ export default function createPiano(game, config) {
         kind: key,
         color: 0xffffff, // White key color
         style: {
-          borderRadius: '0px'
+          borderRadius: '0px',
+          border: 'solid'
         },
         pointerdown: function () {
           // alert('play')
@@ -76,7 +77,7 @@ export default function createPiano(game, config) {
           position: {
             x: xPosition - blackKeyWidth, // Position the black key in the middle of two white keys
             y: config.position.y - blackKeyHeight / 2, // Slightly higher than white keys
-            z: 9990
+            z: 2
           }
         });
       }

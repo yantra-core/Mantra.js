@@ -1,4 +1,4 @@
-import { MeshBasicMaterial, BoxGeometry, Mesh, Group } from 'three';
+import { MeshBasicMaterial, BoxGeometry, Mesh, Group, LineBasicMaterial, EdgesGeometry, LineSegments } from 'three';
 
 export default function createGraphic(entityData) {
   // Early exit if entity is marked as destroyed
@@ -109,6 +109,19 @@ function createGeometryForEntity(entityData) {
     mesh.visible = false; // Hide text meshes for now
   }
 
+  // CSS style border support
+  if (entityData.style && entityData.style.border) {
+    // Extract border thickness and color from the style object
+    const borderThickness = parseFloat(entityData.style.border.split(' ')[0]);
+    const borderColor = entityData.style.border.split(' ')[1];
+    
+    // Create a border for the mesh
+    const border = createBorderForMesh(mesh, borderThickness, borderColor);
+
+    // Add the border to the group
+    entityGroup.add(border);
+  }
+
   if (entityData.texture) {
     mesh.visible = false; // Hide mesh until texture is loaded
   }
@@ -118,3 +131,20 @@ function createGeometryForEntity(entityData) {
   return entityGroup;
 }
 
+function createBorderForMesh(mesh, thickness = 0.05, color = 0x000000) {
+  // Create an EdgesGeometry from the original mesh's geometry
+  const edgesGeometry = new EdgesGeometry(mesh.geometry);
+
+  // Create a line material using the border's color and thickness
+  const lineMaterial = new LineBasicMaterial({ color: color, linewidth: thickness });
+
+  // Create a line segments mesh to represent the border
+  const border = new LineSegments(edgesGeometry, lineMaterial);
+
+  // Align the border with the original mesh
+  border.position.copy(mesh.position);
+  border.rotation.copy(mesh.rotation);
+  border.scale.copy(mesh.scale);
+
+  return border;
+}
