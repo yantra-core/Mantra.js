@@ -8,6 +8,10 @@ export default async function inflateTexture(entityData) {
     return;
   }
 
+  if (entityData.texture === 'none') {
+    return;
+  }
+
   let texture = this.game.getTexture(entityData.texture);
   if (!texture) {
     console.warn('Warning: Texture not found', entityData.texture);

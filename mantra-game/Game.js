@@ -581,9 +581,23 @@ class Game {
   //
   // Sutra Behavior Tree APIs
   //
-  useSutra(subSutra, name) {
+  useSutra(subSutra, name, options = {}) {
     if (this.rules) {
-      this.rules.use(subSutra, name);
+      let insertAt = 0;
+
+      let defaultOptions = {
+        shareListeners: true,
+        shareTree: true,
+        shareMap: true
+      };
+
+      for (let key in defaultOptions) {
+        if (typeof options[key] === 'undefined') {
+          options[key] = defaultOptions[key];
+        }
+      }
+
+      this.rules.use(subSutra, name, insertAt, options.shareListeners, options.shareTree, options.shareMap); // TODO: update sutra api to use options object
       if (this.systems['gui-sutra']) {
         this.systems['gui-sutra'].setRules(this.rules);
       }

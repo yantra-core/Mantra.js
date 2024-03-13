@@ -40,28 +40,27 @@ class Sutra {
       // for each key in game.controls, add a condition that checks if the key is pressed
       // these are currently explicitly bound to the player entity, we may want to make this more generic
       self.bindInputsToSutraConditions();
-      if (self.defaultMovement) {
-        if (self.game.config.mode === 'topdown') {
-          self.game.useSutra(topdown(self.game), 'mode-topdown');
-        }
-        if (self.game.config.mode === 'platform') {
-          // TODO: better platform control
-          self.game.useSutra(platform(self.game), 'mode-platform');
-        }
-      }
       self.inputsBound = true;
+      if (self.defaultMovement) { // TODO: remove defaultMovement flag?
+        this.bindDefaultMovementSutra(self.game.config.mode)
+      }
     }
 
   }
 
   bindDefaultMovementSutra(mode = 'topdown') {
     if (mode === 'topdown') {
-      this.game.useSutra(topdown(this.game), 'mode-topdown');
+      this.game.useSutra(topdown(this.game), 'mode-topdown', {
+        shareListeners: true,
+        shareTree: false,
+        shareMap: false
+      });
     }
     if (mode=== 'platform') {
       this.game.useSutra(platform(this.game), 'mode-platform');
     }
   }
+
   bindInputsToSutraConditions() {
     this.bindKeyCodesToSutraConditions();
     this.bindGamepadToSutraConditions();

@@ -178,17 +178,15 @@ class ThreeGraphics extends GraphicsInterface {
 
   }
 
-  // called by systemsManager on each game tick
-  update() {
-    this.updateCameraFollow();
-  }
+  // update() is called by the SystemsManager, it's the main game loop
+  // Remark: Graphics generally should run in the render() loop, not the update() loop
+  // update() {}
 
-  updateCameraFollow() {
+  // Remark: updateCamera() is called from within the render() loop
+  updateCamera() {
     let game = this.game;
 
-
     // if (this.isManualControlActive) return; // Skip automatic following if manual control is active
-
 
     // Get the current player entity
     const currentPlayer = game.getEntity(game.currentPlayerId);
@@ -208,6 +206,7 @@ class ThreeGraphics extends GraphicsInterface {
     // Determine the camera mode and update accordingly
     switch (game.data.camera.mode) {
       case 'fpv':
+      case 'none':
         this.setFirstPersonView(playerGraphic);
         break;
       case 'follow':

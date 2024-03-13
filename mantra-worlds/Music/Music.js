@@ -1,6 +1,6 @@
 import createPiano from "./instruments/createPiano.js";
 import createDrumKit from "./instruments/createDrumKit.js";
-import movement from '../../mantra-sutras/player-movement/top-down.js';
+// import movement from '../../mantra-sutras/player-movement/top-down.js';
 
 import sutras from "./sutras.js";
 
@@ -23,7 +23,7 @@ class Music {
     // Actions with left click
     game.config.mouseActionButton = 'RIGHT';
     // enables the default top-down mouse movements
-    game.config.defaultMouseMovement = true;
+//    game.config.defaultMouseMovement = true;
 
 
     game.reset();

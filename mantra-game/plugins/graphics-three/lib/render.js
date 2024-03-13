@@ -23,14 +23,13 @@ export default function render(game, alpha) {
     });
 
   } else {
-
     for (let [eId, state] of this.game.entities.entries()) {
       let ent = this.game.entities.get(eId);
       this.inflateGraphic(ent, alpha);
     }
-
   }
 
+  this.updateCamera();
 
   this.renderer.render(this.scene, this.camera);
 }

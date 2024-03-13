@@ -11,7 +11,7 @@ import routing from '../sutras/routing.js';
 import block from "./sutras/block.js";
 import demon from "../../mantra-sutras/demon.js";
 // import hexapod from '../../mantra-sutras/hexapod.js';
-import movement from "../../mantra-sutras/player-movement/top-down.js";
+// import movement from "../../mantra-sutras/player-movement/top-down.js";
 
 import bomb from '../../mantra-sutras/bomb.js';
 

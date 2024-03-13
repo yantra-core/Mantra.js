@@ -124,7 +124,9 @@ export default function platformMovement(game) {
   //rules.if('P').then('ZOOM_OUT');
 
   rules.on('JUMP', function (player, node, gameState) {
-    // console.log("JUMP", gameState.input, gameState.controls)
+    // console.log("JUMP", gameState.inputTicks.SPACE, maxJumpTicks)
+    // TODO: fix this, it now seems to be resetting to zero prematurely
+    //        could be input system, keyboard?
     if (gameState.inputTicks.SPACE >= maxJumpTicks) {
       return;
     }
