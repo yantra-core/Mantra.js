@@ -28,14 +28,12 @@ let defaultAssets = {
     url: '/img/game/env/coin.png',
     frameTags: {
       coin: {
-        rate: 32,
+        rate: 12,
         frames: [
           { x: 0, y: 0 },
-          /*
           { x: -16, y: 0 },
           { x: -32, y: 0 },
           { x: -48, y: 0 },
-          */
         ]
       }
     }
@@ -174,6 +172,7 @@ let defaultAssets = {
       },
 
       playerIdle: {
+        rate: 100,
         frames: [
           { x: -16, y: -16 },
           { x: -64, y: -16 },
@@ -181,6 +180,7 @@ let defaultAssets = {
       },
 
       playerUp: {
+        rate: 10,
         frames: [
           { x: -304, y: -16 },
           { x: -352, y: -16 },
@@ -189,6 +189,7 @@ let defaultAssets = {
 
 
       playerDown: {
+        rate: 10,
         frames: [
           { x: -16, y: -16 },
           { x: -64, y: -16 },
@@ -196,7 +197,7 @@ let defaultAssets = {
       },
 
       playerLeft: {
-        rate: 100,
+        rate: 10,
         frames: [
           { x: -208, y: -16 },
           { x: -256, y: -16 },
@@ -204,6 +205,7 @@ let defaultAssets = {
       },
 
       playerRight: {
+        rate: 10,
         frames: [
           { x: -112, y: -16 },
           { x: -160, y: -16 },
@@ -278,7 +280,7 @@ let defaultAssets = {
 
       arrow: {
         frames: [
-          { x: -16, y: -496 }
+          { x: -15, y: -496 }
         ]
       },
 

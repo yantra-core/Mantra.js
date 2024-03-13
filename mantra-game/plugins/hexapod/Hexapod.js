@@ -25,7 +25,7 @@ export default class Hexapod {
       texture: 'hexapod-single',
       width: 8,
       height: 8,
-      health: 50,
+      health: 20,
       meta: {
         target: entityData.target || null
       },

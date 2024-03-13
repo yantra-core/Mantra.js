@@ -88,7 +88,7 @@ export default function platformMovement(game) {
         frameIndex: 0,
         sheet: player.texture.sheet,
         sprite: sprite,
-        animationPlaying: true
+        playing: true
       }
     })
 
@@ -122,6 +122,16 @@ export default function platformMovement(game) {
   //rules.if('L').then('SWING_SWORD');
   //rules.if('O').then('ZOOM_IN');
   //rules.if('P').then('ZOOM_OUT');
+
+  // on keyup, pause all default player animations
+  game.on('keyup', function(context, event){
+    game.updateEntity({
+      id: game.currentPlayerId,
+      texture: {
+        playing: false
+      }
+    });
+  });
 
   rules.on('JUMP', function (player, node, gameState) {
     // console.log("JUMP", gameState.inputTicks.SPACE, maxJumpTicks)

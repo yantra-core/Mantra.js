@@ -67,7 +67,7 @@ export default function updateSprite(entityId, actions, SheetManager, anims) {
         frameIndex: 0,
         sheet: playerEntity.texture.sheet,
         sprite: newSpriteName,
-        animationPlaying: true
+        playing: true
       }
     })
     return;

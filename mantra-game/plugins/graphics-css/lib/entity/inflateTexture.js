@@ -8,7 +8,10 @@ export default function inflateTexture(entityData, entityElement) {
     return;
   }
 
-  let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames, rate, playing = true} = texture;
+
+  let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames, rate, playing = true } = texture;
+
+  //console.log('playing', playing)
   // Extract the current texture URL from the element's style
   let currentTextureUrl = entityElement.style.backgroundImage.slice(5, -2);
 
@@ -32,6 +35,7 @@ export default function inflateTexture(entityData, entityElement) {
     applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
   }
 
+  // console.log("playing", entityData.type, playing, frames)
   // Update frame index and position for animated sprites
   if (Array.isArray(frames) && playing) {
     let frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;

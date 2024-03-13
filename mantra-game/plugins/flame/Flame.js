@@ -22,6 +22,7 @@ export default class Flame {
       texture: {
         sheet: 'loz_spritesheet',
         sprite: 'fire',
+        playing: true
         // frame: 0 // TODO: support single frame / bypass animation of array
       },
       //texture: 'flame',

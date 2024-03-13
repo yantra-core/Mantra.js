@@ -236,7 +236,7 @@ class Platform {
         hasInventory: false,
         width: 16,
         height: 16,
-        depth: 32,
+        depth: 4,
         texture: {
           sheet: 'loz_spritesheet',
           sprite: item,

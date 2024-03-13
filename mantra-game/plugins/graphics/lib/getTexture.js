@@ -73,7 +73,8 @@ export default function getTexture(config) {
         url: url,
         frames: [{ x: sprite.x, y: sprite.y }],
         sprite,
-        rate: spriteName.rate || 30
+        rate: spriteName.rate || 30,
+        playing: config.playing
       };
     }
 

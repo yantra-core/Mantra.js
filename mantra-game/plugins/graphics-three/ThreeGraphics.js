@@ -13,10 +13,6 @@ import inflateGraphic from './lib/inflateGraphic.js';
 import inflateTexture from './lib/inflateTexture.js';
 import inflateText from './lib/inflateText.js';
 
-// import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-// import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-// import { FontLoader } from './lib/FontLoader.js'
-
 class ThreeGraphics extends GraphicsInterface {
   static id = 'graphics-three';
   static removable = false;
@@ -28,7 +24,6 @@ class ThreeGraphics extends GraphicsInterface {
     this.async = ThreeGraphics.async;
     this.renderer = null;
     this.camera = null;
-
     // config scope for convenience
     let config = {
       camera
@@ -49,6 +44,7 @@ class ThreeGraphics extends GraphicsInterface {
   }
 
   init(game) {
+    
     this.render = render.bind(this);
     this.inflateGraphic = inflateGraphic.bind(this);
     this.createGraphic = createGraphic.bind(this);
@@ -152,7 +148,7 @@ class ThreeGraphics extends GraphicsInterface {
 
   setCameraDefaults() {
     // this.camera.position.set(0, 0, 100); // Set a default position
-    this.setZoom(1); // Set a default zoom level
+    // this.setZoom(1); // Set a default zoom level
     this.game.data.camera.mode = 'follow';
   }
 
@@ -161,6 +157,7 @@ class ThreeGraphics extends GraphicsInterface {
     const newFov = 75 / zoomLevel;
     this.camera.fov = newFov;
     this.camera.updateProjectionMatrix();
+    this.game.data.camera.currentZoom = zoomLevel;
   }
 
   onWindowResize() {
@@ -277,7 +274,6 @@ class ThreeGraphics extends GraphicsInterface {
       }
 
     }
-
 
   }
 

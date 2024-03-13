@@ -63,6 +63,16 @@ export default function topdownMovement(game) {
     }
   });
 
+  // on keyup, pause all default player animations
+  game.on('keyup', function(context, event){
+    game.updateEntity({
+      id: game.currentPlayerId,
+      texture: {
+        playing: false
+      }
+    });
+  });
+
   rules.addMap('determineShootingSprite', (player, node) => {
     // Normalize the rotation within the range of 0 to 2π
 
@@ -91,14 +101,13 @@ export default function topdownMovement(game) {
     }
 
     let sprite = node.data.sprite || player.texture.sprite;
-
     game.updateEntity({
       id: player.id,
       texture: {
         frameIndex: 0,
         sheet: player.texture.sheet,
         sprite: sprite,
-        animationPlaying: true
+        playing: true
       }
     })
   });
@@ -179,10 +188,12 @@ export default function topdownMovement(game) {
     game.shakeCamera(1000);
   });
   rules.on('ZOOM_IN', function (entity) {
+    alert('default zoom in')
     let currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom + 0.05);
   });
   rules.on('ZOOM_OUT', function (entity) {
+    alert('default zoom out')
     let currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });

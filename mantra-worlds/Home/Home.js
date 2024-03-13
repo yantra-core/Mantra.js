@@ -87,6 +87,7 @@ class Home {
     game.use('Tone');
     game.use('Hexapod');
     game.use('Teleporter');
+    game.use('Text');
     game.use('Draggable');
     game.use('Collectable');
     game.use('SwitchGraphics');
@@ -112,7 +113,6 @@ class Home {
     // enables mouse wheel zoom
     game.data.camera.mouseWheelZoomEnabled = false;
     this.createWorld();
-
   }
 
   update() {}
@@ -120,7 +120,6 @@ class Home {
   createWorld() {
 
     let game = this.game;
-
     game.setBackground('#007fff');
 
     game.data.camera.follow = true;
