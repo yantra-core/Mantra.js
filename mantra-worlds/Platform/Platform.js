@@ -35,7 +35,7 @@ class Platform {
     }
 
     // we should be able to use the movement sutra as a sub-sutra, see above comment
-    game.useSutra(movement(game), 'mode-platform');
+    // game.useSutra(movement(game), 'mode-platform');
 
     game.createPlayer({
       height: 32,

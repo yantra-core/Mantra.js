@@ -529,9 +529,10 @@ class Game {
     }
   }
 
-  reset(mode, clearSutra = true) {
+  reset(mode = 'topdown', clearSutra = true) {
 
     let game = this;
+    game.data.mode = mode;
 
     // reset all Sutra rules
     if (clearSutra) {
@@ -558,7 +559,6 @@ class Game {
 
     // reset the default player controls
     this.setControls({});
-
     this.setCameraMode('follow');
 
     // set the default movement sutra

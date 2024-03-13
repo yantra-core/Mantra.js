@@ -1,4 +1,4 @@
-import { TextureLoader } from 'three';
+import { TextureLoader, RepeatWrapping } from 'three';
 
 export default async function inflateTexture(entityData) {
   if (!entityData.texture) return;
@@ -52,12 +52,30 @@ async function applyTextureToEntityGraphic(game, entityData, entityGraphic) {
   // Traverse the entity graphic component and apply texture to all child meshes
   entityGraphic.traverse((child) => {
     if (child.isMesh) {
-      applyTextureToMesh(child, cachedTexture, texture.sprite);
+      applyTextureToMesh(child, cachedTexture, texture.sprite, entityData);
     }
   });
 }
 
-function applyTextureToMesh(mesh, cachedTexture, sprite) {
+function flipUVsHorizontally(geometry) {
+  const uvs = geometry.attributes.uv;
+  for (let i = 0; i < uvs.array.length; i += 2) {
+    uvs.array[i] = 1 - uvs.array[i]; // Flip the U coordinate
+    // flip the V coordinate
+    uvs.array[i + 1] = 1 - uvs.array[i + 1];
+
+    // At this stage, top side looks GOOD
+    // if we uncomment the following line, the sides look good, the TOP is upside down
+    uvs.array[i + 1] = 1 - uvs.array[i + 1];
+    // Remark: how to now flip the top side?
+    uvs.array[i + 1] = 1 - uvs.array[i + 1];
+
+
+  }
+  uvs.needsUpdate = true; // Inform Three.js that the UVs have been updated
+}
+
+function applyTextureToMesh(mesh, cachedTexture, sprite, entityData) {
   // console.log("applyTextureToMesh", mesh, cachedTexture, sprite)
   if (sprite) {
     // Adjust UV mapping for sprites
@@ -73,15 +91,52 @@ function applyTextureToMesh(mesh, cachedTexture, sprite) {
     mesh.material.map = clonedTexture;
   } else {
     // For non-sprite textures that need to be flipped on the X-axis
+
+
     let clonedTexture = cachedTexture.clone();
-    clonedTexture.repeat.set(-1, 1); // Flip texture on the X-axis
-    clonedTexture.offset.set(1, 0); // Adjust offset for the flipped texture
+
+    // TODO: entityData.texture.scrollingRepeat
+    clonedTexture.wrapS = clonedTexture.wrapT = RepeatWrapping; // Set texture to repeat
+
+    //clonedTexture.repeat.set(-1, 1);
+    //clonedTexture.offset.set(1, 0);
+    // Remark: Ths is now working; however it seems to be toggling state back and forth each game tick? that is not expected
+    // we should be able to set this once and be done with it
+
+    if (!mesh.userData.uvsFlipped) {
+      flipUVsHorizontally(mesh.geometry);
+      mesh.userData.uvsFlipped = true; // Mark UVs as flipped
+    }
+    // mesh.rotation.y += 0.01
+    // TODO: entityData.texture.scrollingRepeat
+    // console.log(sprite)
+    if (entityData && entityData.style && entityData.style.scrollTexture) {
+      scrollTexture(mesh, 0.000, 0.001);
+    }
+
 
     mesh.material.map = clonedTexture;
   }
   mesh.material.needsUpdate = true;
   mesh.visible = true;
 }
+
+function scrollTexture(mesh, speedX = 0.01, speedY = 0.01) {
+  const geometry = mesh.geometry;
+
+  // Assuming the geometry is using BufferGeometry
+  const uvs = geometry.attributes.uv;
+
+  // Update UV coordinates for scrolling effect
+  for (let i = 0; i < uvs.array.length; i += 2) {
+    uvs.array[i] += speedX; // Scroll horizontally
+    uvs.array[i + 1] += speedY; // Scroll vertically
+  }
+
+  // Mark the UV attribute as needing an update in the next render cycle
+  uvs.needsUpdate = true;
+}
+
 
 function calculateSpriteUVs(sprite, textureWidth, textureHeight) {
   sprite.width = sprite.width || 16; // Default sprite width

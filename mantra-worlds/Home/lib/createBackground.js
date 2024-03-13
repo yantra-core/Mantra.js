@@ -56,6 +56,9 @@ export default function createBackground(game) {
     texture: 'warp-to-ycraft',
     isStatic: true,
     isSensor: true,
+    style: {
+      scrollTexture: true
+    },
     exit: {
       world: 'YCraft', // optional, if not specified will use the current world
       position: {      // optional, if not specified will use 0,0,0
@@ -81,7 +84,7 @@ export default function createBackground(game) {
       fontSize: '16px',
       textAlign: 'center',
       paddingLeft: '20px', // for now
-
+      scrollTexture: true
     },
     body: false,
     position: {
@@ -91,100 +94,49 @@ export default function createBackground(game) {
     }
   });
 
-  game.createEntity({
-    name: 'css-text',
-    type: 'TEXT',
-    text: 'CSSGraphics Engine',
-    width: 20,
-    color: 0x000000,
-    style: {
-      width: '150px',
-      fontSize: '12px',
-      textAlign: 'center',
-      color: 'black',
-      opacity: 0.22
-    },
-    body: false,
-    position: {
-      x: -63,
-      y: -16,
-      z: -2
-    }
-  });
-
-  /*
-  game.make().Teleporter().position(55, 71, 10)
-    .size(16)
-    .width(16)
-    .height(16)
+  // Teleports the Player to the Home world
+  game.make()
+    .Teleporter({
+      destination: {
+        world: 'Music'
+      },
+      clickToTeleport: false
+    })
+    .style({
+      scrollTexture: true
+    })
+    .texture('warp-to-music')
+    .size(64)
+    .position(-250, -10, 1)
     .createEntity();
 
-    game.make().Teleporter().position(-55, 71, 10)
-    .size(16)
-    .width(16)
-    .height(16)
-    .createEntity();
-    */
-  
-
-  // if touch warp, switch to Music level
-  game.createEntity({
-    type: 'WARP',
-    exit: {
-      world: 'Music'
-    },
-    width: 64,
-    height: 64,
-    depth: 64,
-    texture: 'warp-to-music',
-    isStatic: true,
-    isSensor: true,
-    position: {
-      x: -250,
-      y: 0,
-      z: 32
-    }
-  });
-
-  // text label saying "Warp To Platform World"
-  game.createEntity({
-    type: 'TEXT',
-    width: 100,
-    text: 'Warp To Music World',
-    // width: 200,
-    color: 0x000000,
-    style: {
-      width: '100px',
+  game.make().Text()
+    .text('Warp To Music World')
+    .width(200)
+    .height(100)
+    .style({
+      padding: '2px',
       fontSize: '16px',
+      color: '#ffffff',
       textAlign: 'center'
-    },
-    body: false,
-    position: {
-      x: -250,
-      y: -70,
-      z: 64
-    }
-  });
+    })
+    .position(-250, -20, 32)
+    .createEntity();
 
-  // text label saying "Warp To Platform World"
-  game.createEntity({
-    type: 'TEXT',
-    text: 'Warp To Platform World',
-    color: 0x000000,
-    width: 120,
-    height: 200,
-    style: {
+
+    game.make().Text()
+    .text('Warp To Platform World')
+    .width(120)
+    .height(200)
+    .style({
       width: '120px',
       fontSize: '16px',
       textAlign: 'center'
-    },
-    body: false,
-    position: {
-      x: 250,
-      y: 20,
-      z: 64
-    }
-  });
+    })
+    .position(250, -20, 32)
+    .createEntity();
+
+
 
   game.createEntity({
     type: 'WARP',
@@ -195,12 +147,16 @@ export default function createBackground(game) {
     height: 64,
     depth: 64,
     texture: 'warp-to-platform',
+    style: {
+      scrollTexture: true
+    },
+
     isStatic: true,
     isSensor: true,
     position: {
       x: 250,
       y: 0,
-      z: 32
+      z: 1
     }
   });
 
@@ -218,6 +174,7 @@ export default function createBackground(game) {
     // texture: 'warp-to-platform',
     isStatic: true,
     isSensor: true,
+
     position: {
       x: -250,
       y: 250,
@@ -307,39 +264,6 @@ export default function createBackground(game) {
 }
 
 
-
-/*
-// switch to CSSGraphics
-game.createEntity({
-  name: 'CSSGraphics',
-  kind: 'CSSGraphics',
-  collisionActive: true,
-  collisionEnd: true,
-  collisionStart: true,
-
-  type: 'TEXT',
-  text: 'CSS',
-  width: 60,
-  height: 50,
-  //color: 0xffffff,
-  style: {
-    width: '60px',
-    height: '30px',
-    fontSize: '12px',
-    color: 'white',
-    textAlign: 'center',
-    // border: '1px solid white',
-    opacity: 0.7
-  },
-  body: true,
-  isSensor: true,
-  position: {
-    x: -55,
-    y: 75,
-    z: 10
-  }
-});
-*/
 
 /*
 // switch to 3d text label

@@ -1,6 +1,7 @@
 // ThreeGraphics.js - Marak Squires 2023
 import { MOUSE, Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Vector3 } from 'three';
 import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
+import { FontLoader } from '../../vendor/three/examples/jsm/loaders/FontLoader.js';
 
 import GraphicsInterface from '../../lib/GraphicsInterface.js';
 
@@ -10,6 +11,7 @@ import updateGraphic from './lib/updateGraphic.js';
 import removeGraphic from './lib/removeGraphic.js';
 import inflateGraphic from './lib/inflateGraphic.js';
 import inflateTexture from './lib/inflateTexture.js';
+import inflateText from './lib/inflateText.js';
 
 // import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 // import { FontLoader } from 'three/addons/loaders/FontLoader.js';
@@ -53,6 +55,7 @@ class ThreeGraphics extends GraphicsInterface {
     this.updateGraphic = updateGraphic.bind(this);
     this.removeGraphic = removeGraphic.bind(this);
     this.inflateTexture = inflateTexture.bind(this);
+    this.inflateText = inflateText.bind(this);
     this.game = game;
     this.game.systemsManager.addSystem('graphics-three', this);
 
@@ -60,8 +63,10 @@ class ThreeGraphics extends GraphicsInterface {
       this.game.threeReady = false; // TODO: remove this, check case in SystemManager for double plugin init
     }
 
+    this.loadFont(()=>{
+      this.threeReady(game);
+    });
 
-    this.threeReady(game);
   }
 
   threeReady(game) {
@@ -143,7 +148,6 @@ class ThreeGraphics extends GraphicsInterface {
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
     document.body.style.cursor = 'default';
-
   }
 
   setCameraDefaults() {
@@ -165,12 +169,12 @@ class ThreeGraphics extends GraphicsInterface {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  loadFont(path, cb) {
+  loadFont(cb) {
     let game = this.game;
     const fontLoader = new FontLoader();
     fontLoader.load('vendor/fonts/helvetiker_regular.typeface.json', function (font) {
       // Store the loaded font in your game's state
-      console.log('got back', null, font)
+      // console.log('got back', null, font)
       game.font = font;
       cb(null, font)
       //game.setFont(font);
@@ -186,7 +190,10 @@ class ThreeGraphics extends GraphicsInterface {
   updateCamera() {
     let game = this.game;
 
-    // if (this.isManualControlActive) return; // Skip automatic following if manual control is active
+    /* default camera view 
+    this.camera.position.set(0, 400, 100);
+    this.camera.lookAt(new Vector3(0, 150, -100));
+    */
 
     // Get the current player entity
     const currentPlayer = game.getEntity(game.currentPlayerId);
@@ -210,27 +217,67 @@ class ThreeGraphics extends GraphicsInterface {
         this.setFirstPersonView(playerGraphic);
         break;
       case 'follow':
-      case 'platform': // 'follow' and 'platform' share the same logic
         this.updateFollowCamera(playerGraphic);
+        break;
+      case 'platform': // 'follow' and 'platform' share the same logic
+        this.updatePlatformCamera(playerGraphic);
         break;
       default:
         console.warn('Unknown camera mode:', game.data.camera.mode);
     }
   }
 
-  updateFollowCamera(playerGraphic) {
+  updatePlatformCamera(playerGraphic) {
     // Calculate the new camera position with an offset
     const offset = new Vector3(0, 150, -100); // Adjust the offset as needed
     const newPosition = playerGraphic.position.clone().add(offset);
     const lookAtPosition = playerGraphic.position.clone();
 
-
-
     // Update orientation only when not manually controlling
     if (!this.isManualControlActive) {
       // Smoothing the camera movement
-      this.smoothCameraUpdate(newPosition, lookAtPosition);
+      this.camera.position.copy(newPosition);
+      this.camera.lookAt(lookAtPosition);
     }
+  }
+
+  updateFollowCamera(playerGraphic) {
+    // Calculate the new camera position with an offset
+
+    // top-down
+    let offset;
+
+    if (this.game.data.mode === 'topdown') {
+      offset = new Vector3(0, 150, -100); // Adjust the offset as needed
+      let newPosition = playerGraphic.position.clone().add(offset);
+      // top-down
+      let lookAtPosition = playerGraphic.position.clone();
+
+      // Update orientation only when not manually controlling
+      if (!this.isManualControlActive) {
+        this.camera.position.copy(newPosition);
+        this.camera.lookAt(lookAtPosition);
+        this.camera.up.set(0, 1, 0);
+      }
+
+    } else if (this.game.data.mode === 'platform') {
+
+      offset = new Vector3(0, 250, 0);
+
+      let newPosition = playerGraphic.position.clone().add(offset);
+      // 2d platform side view
+      let lookAtPosition = new Vector3(playerGraphic.position.x, playerGraphic.position.y, playerGraphic.position.z);
+
+      // Update orientation only when not manually controlling
+      if (!this.isManualControlActive) {
+        this.camera.position.copy(newPosition);
+        this.camera.lookAt(lookAtPosition);
+
+        this.camera.up.set(0, -1, 0);
+      }
+
+    }
+
 
   }
 

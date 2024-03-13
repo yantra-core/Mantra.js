@@ -25,7 +25,10 @@ export default function createGraphic(entityData) {
     //console.log('entityObject after processModel()', entityObject);
   } else {
     // console.log("Creating new geometry for entity.");
-    entityObject = createGeometryForEntity(entityData);
+
+
+    
+    entityObject = createGeometryForEntity.call(this, entityData);
   }
 
   // Set entity position and add to the scene
@@ -70,6 +73,13 @@ function processModel(model) {
 function createGeometryForEntity(entityData) {
   let geometry, material, mesh;
   const entityGroup = new Group();
+
+  if (entityData.type === 'TEXT') {
+    mesh = this.inflateText(entityData, this.scene, this.game.font);
+    entityGroup.add(mesh);
+
+    return entityGroup;
+  }
 
   // Define geometry based on entity type
   switch (entityData.type) {

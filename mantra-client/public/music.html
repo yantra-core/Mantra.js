@@ -21,16 +21,10 @@
         collisions: true,
         graphics: ['css'], // array enum, 'babylon', 'css', 'three'
         camera: 'follow',
-        options: {
-          scriptRoot: '.',
-          assetRoot: '.'
-        }
+        plugins: ['Gamepad'],
+        gameRoot: '.'
       });
 
-      // game.use('Bullet');
-      game.use('Sutra');
-      game.use('Gamepad');
-      game.use('GamepadGUI');
       game.start(function () {
         game.use('Editor');
         game.use(new WORLDS.worlds['Music']());

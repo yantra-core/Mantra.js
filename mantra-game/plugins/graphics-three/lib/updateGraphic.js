@@ -24,16 +24,29 @@ export default function updateGraphic(entityData) {
 
   // Get the current group position
   let currentGroupPosition = group.position.clone();
-  // Compare the current group position with the entityData position
-  // Only update the group position if the entityData position has changed
-  //console.log("CHECKING POS UPDATE POSITON OF GROUP", currentGroupPosition)
-
-  if (-currentGroupPosition.x !== entityData.position.x || currentGroupPosition.y !== entityData.position.z) {
-    if (typeof entityData.position.z !== 'number') {
-      entityData.position.z = 0;
-    }
-    // console.log("UPDATING POSITON OF GROUP", entityData.position, group)
-    group.position.set(-entityData.position.x, entityData.position.z, -entityData.position.y);
+  if (typeof entityData.position.z !== 'number') {
+    entityData.position.z = 0;
   }
 
+  updateGroupPosition(group, entityData);
+
+}
+
+function truncateToDecimalPlaces(num, decimalPlaces) {
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(num * factor) / factor;
+}
+
+// Function to update the group's position if it has changed significantly
+function updateGroupPosition(group, entityData) {
+  // Truncate the incoming positions to reduce the frequency of updates
+  const truncatedX = truncateToDecimalPlaces(-entityData.position.x, 4);
+  const truncatedY = truncateToDecimalPlaces(entityData.position.z, 4);
+  const truncatedZ = truncateToDecimalPlaces(-entityData.position.y, 4);
+
+  // Check if the group's position differs significantly from the entity's position
+  if (group.position.x !== truncatedX || group.position.y !== truncatedY || group.position.z !== truncatedZ) {
+    // Only update the group's position if it has changed
+    group.position.set(truncatedX, truncatedY, truncatedZ);
+  }
 }
