@@ -21,6 +21,7 @@ class DragAndDropFileUpload {
     this.bindEvents();
 
 
+    // TODO: remove this hard-coded event and replace with generic mappable handler
     game.on('tilemap::created', () => {
       // hide overlay ( for now )
       this.overlay.style.visibility = 'hidden';

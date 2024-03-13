@@ -10,8 +10,6 @@
 
 <body>
   <script type="module" src="/mantra.js"></script>
-  <script type="module" src="/worlds.mantra.js"></script>
-  <script type="module" src="/ycraft.js"></script>
   <style>
     .score {
       position: absolute;
@@ -71,11 +69,8 @@
       if (graphics === 'three' || graphics === 'babylon') {
         fieldOfView = 256;
       }
-
       //fieldOfView = 1024;
       let game = new MANTRA.Game({
-        defaultPlayer: false,
-        defaultMovement: true,
         mode: mode,
         fieldOfView: fieldOfView,
         useFoV: true,
@@ -83,13 +78,10 @@
         collisions: true,
         graphics: [graphics], // array enum, 'babylon', 'phaser', 'css', 'three'
         camera: 'follow',
-        options: {
-          scriptRoot: '.',
-          assetRoot: '.'
-        }
+        plugins: ['Sutra'],
+        gameRoot: '.'
       });
 
-      game.use('Sutra');
       game.use('RBush');
       game.use('SwitchGraphics');
       game.use('Bullet');
@@ -101,7 +93,7 @@
       game.use('CurrentFPS');
 
       game.use('Gamepad');
-      game.use('GamepadGUI');
+      // game.use('GamepadGUI');
       game.start(function () {
         game.setBackground('#000000');
 
@@ -113,7 +105,10 @@
           game.setZoom(4.5);
         }
 
-        game.use('DragAndDropFileUpload');
+        // check if there are no query string variables, if none, use drag and drop file upload
+        if (!tiledmap && !source) {
+          game.use('DragAndDropFileUpload');
+        }
 
         if (mode === 'topdown') {
           game.createPlayer({
