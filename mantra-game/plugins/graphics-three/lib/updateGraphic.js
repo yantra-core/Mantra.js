@@ -28,6 +28,22 @@ export default function updateGraphic(entityData) {
     entityData.position.z = 0;
   }
 
+  // Update the color if it has changed
+  if (entityData.color) {
+    // search for all mesh children and update their color
+    group.traverse((child) => {
+      if (child.isMesh) {
+        // Convert child.material.color to a hexadecimal integer to compare
+        const childColorHex = child.material.color.getHex();
+        // check that the color has changed
+        if (childColorHex !== entityData.color) {
+          // Update the material color with the new color
+          child.material.color.set(entityData.color);
+        }
+      }
+    });
+  }
+
   updateGroupPosition(group, entityData);
 
 }
