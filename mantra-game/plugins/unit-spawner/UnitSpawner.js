@@ -17,11 +17,10 @@ export default class UnitSpawner {
 
   build(entityData = {}) {
     let game = this.game;
-    entityData.position = entityData.position || { x: 0, y: 0 };
-
+    entityData.position = entityData.position || { x: 0, y: 0, z: 0 };
     const defaultUnitConfig = {
-      position: { x: 0, y: 0 },
-      size: { width: 4, height: 4 },
+      position: { x: 0, y: 0, z: 0 },
+      size: { width: 4, height: 4, depth: 4 },
       friction: 0.05,
       frictionAir: 0.005,
       frictionStatic: 0.25,
@@ -93,7 +92,6 @@ export default class UnitSpawner {
       if (unitConfig.meta.randomColor) {
         unitConfig.color = this.game.randomColor();
       }
-
       let unit = this.createEntity(unitConfig);
       if (unit) {
         entityData.meta.unitsSpawned += 1;
