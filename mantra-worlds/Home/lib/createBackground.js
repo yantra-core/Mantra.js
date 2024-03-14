@@ -76,7 +76,7 @@ export default function createBackground(game) {
   // text label saying "Warp To YCraft World"
   game.createEntity({
     type: 'TEXT',
-    text: 'Warp To YCraft World',
+    text: 'YCraft World',
     width: 164,
     // kind: 'dynamic',
     color: 0x000000,
@@ -111,7 +111,7 @@ export default function createBackground(game) {
     .createEntity();
 
   game.make().Text()
-    .text('Warp To Music World')
+    .text('Music World')
     .width(200)
     .height(100)
     .style({
@@ -125,18 +125,16 @@ export default function createBackground(game) {
 
 
     game.make().Text()
-    .text('Warp To Platform World')
-    .width(120)
-    .height(200)
+    .text('Platform World')
+    .width(200)
+    .height(100)
     .style({
       width: '120px',
       fontSize: '16px',
       textAlign: 'center'
     })
-    .position(250, -20, 32)
+    .position(290, -10, 32)
     .createEntity();
-
-
 
   game.createEntity({
     type: 'WARP',
@@ -150,7 +148,6 @@ export default function createBackground(game) {
     style: {
       scrollTexture: true
     },
-
     isStatic: true,
     isSensor: true,
     position: {
@@ -168,9 +165,11 @@ export default function createBackground(game) {
     exit: {
       world: 'Maze'
     },
-    width: 64,
-    height: 64,
-    depth: 64,
+    size: {
+      width: 64,
+      height: 64,
+      depth: 16
+    },
     // texture: 'warp-to-platform',
     isStatic: true,
     isSensor: true,
@@ -178,7 +177,7 @@ export default function createBackground(game) {
     position: {
       x: -250,
       y: 250,
-      z: 32
+      z: 16
     }
   });
 
@@ -213,14 +212,14 @@ export default function createBackground(game) {
     },
     width: 64,
     height: 64,
-    depth: 64,
+    depth: 16,
     // texture: 'warp-to-platform',
     isStatic: true,
     isSensor: true,
     position: {
       x: 250,
       y: 250,
-      z: 32
+      z: 16
     }
   });
 
@@ -244,79 +243,11 @@ export default function createBackground(game) {
     }
   });
 
-  /*
-  // if touch note play sound
-  game.createEntity({
-    type: 'NOTE',
-    color: 0xccff00,
-    width: 32,
-    height: 32,
-    depth: 16,
-    isStatic: true,
-    position: {
-      x: -120,
-      y: -200,
-      z: 32
-    }
-  });
-  */
 
 }
 
 
 
-/*
-// switch to 3d text label
-game.createEntity({
-  name: 'BabylonGraphics',
-  collisionActive: true,
-  collisionEnd: true,
-  collisionStart: true,
-  kind: 'BabylonGraphics',
-  type: 'TEXT',
-  text: '3D',
-  width: 60,
-  height: 50,
-  color: 0x000000,
-  style: {
-    width: '60px',
-    height: '30px',
-    fontSize: '12px',
-    color: 'white',
-    textAlign: 'center',
-    opacity: 0.7
-  },
-  body: true,
-  isSensor: true,
-  position: {
-    x: 55,
-    y: 75,
-    z: 64
-  }
-});
-*/
-
-
-
-
-/*
-game.createEntity({
-  name: 'noteInfo',
-  type: 'TEXT',
-  text: 'This is a note, touch it to play a sound',
-  fontSize: 16,
-  color: 0x000000,
-  body: false,
-  style: {
-    fontSize: '16px'
-  },
-  position: {
-    x: 0,
-    y: -200,
-    z: 64
-  }
-});
-*/
 
 /*
 

@@ -177,8 +177,8 @@ class Home {
 
   createTwinFlames() {
     // See Flame plugin for .build() entity config
-    this.game.make().Flame().position(-80, -60, 16).createEntity();
-    this.game.make().Flame().position(80, -60, 16).createEntity();
+    this.game.make().Flame().position(-80, -60, 1).createEntity();
+    this.game.make().Flame().position(80, -60, 1).createEntity();
   }
 
   unload() {

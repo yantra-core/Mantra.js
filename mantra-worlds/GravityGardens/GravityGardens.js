@@ -56,6 +56,8 @@ class GravityGardens {
 
     game.setGravity(0, 0, 0);
     game.setSize(800, 600);
+    game.setBackground('black');
+
     game.createBorder({
       thickness: 20,
       collisionStart: function (a, b, pair, context) {
@@ -152,7 +154,7 @@ class GravityGardens {
     let game = this.game;
     // mouse drops particles logic
     if (this.dropping && game.tick % 3 === 0) {
-      // console.log('dropping', mousePosition.x, mousePosition.y);
+      // console.log('dropping', this.mousePosition.x, this.mousePosition.y);
       let randomRadialPosition = game.randomPositionRadial(this.mousePosition.x, this.mousePosition.y, 15);
       let randomColor = game.randomColor();
       // create burst of particles at this position
@@ -196,27 +198,33 @@ class GravityGardens {
       that.mousePosition = position;
 
       // adjust position for game camera offset
-      that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
-      that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
+      // Removed: 3/13/2024, not using zoom anymore, can change this to be part of Mouse context
+      //                     was causing minor conflict with Three.js pointer events
+      //that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
+      //that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
+      //that.mousePosition.clientX = event.clientX;
+      //that.mousePosition.clientY = event.clientY;
 
-      that.mousePosition.clientX = event.clientX;
-      that.mousePosition.clientY = event.clientY;
       // if right click
       if (event.button === 2) {}
 
       // if left click
       if (event.button === 0) {
         that.dropping = true;
-        game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+        //game.pingPosition(event.clientX, event.clientY, 1, { color: 'white', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
         that.slurping = true;
-        game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
+        //game.pingPosition(event.clientX, event.clientY, 1, { reverse: true, color: 'red', duration: 1500, size: 25, finalSize: 100, borderWidth: 3 });
       }
     });
 
-    game.on('pointerMove', function (position, event) {
-      that.mousePosition = position;
+    game.on('pointerMove', function (context, event) {
+      that.mousePosition = context.position;
+
+      // css graphics only
+      /*
       that.mousePosition.x = that.mousePosition.x - game.data.camera.offsetX;
       that.mousePosition.y = that.mousePosition.y - game.data.camera.offsetY;
+      */
     });
 
   }
@@ -237,7 +245,7 @@ class GravityGardens {
           type: 'PARTICLE',
           color: 0xf03025,
           isSensor: true,
-          position: { x: 200, y: 0 },
+          position: { x: 200, y: 0, z: 1 },
         }
       })
       .color(0xf03025)
@@ -256,7 +264,7 @@ class GravityGardens {
           type: 'PARTICLE',
           color: 0x14b161,
           isSensor: true,
-          position: { x: -200, y: 0 },
+          position: { x: -200, y: 0, z: 1 },
         }
       })
       .color(0x14b161)
@@ -275,7 +283,7 @@ class GravityGardens {
           type: 'PARTICLE',
           color: 0x3c62f8,
           isSensor: true,
-          position: { x: 0, y: -200 },
+          position: { x: 0, y: -200, z: 1 },
         }
       })
       .color(0x3c62f8)
@@ -295,7 +303,7 @@ class GravityGardens {
           type: 'PARTICLE',
           color: 0xe9dd34,
           isSensor: true,
-          position: { x: 0, y: 200 },
+          position: { x: 0, y: 200, z: 1 },
         }
       })
       .color(0xe9dd34)

@@ -69,6 +69,9 @@ class Maze {
       exit: {
         world: 'Home'
       },
+      style: {
+        scrollingTexture: true
+      },
       texture: 'warp-to-home',
       width: 64,
       height: 64,

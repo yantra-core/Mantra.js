@@ -348,8 +348,9 @@ class Game {
     // not implemented directly, Graphics plugin will hoist this
   }
 
-  setZoom() { // TODO: remove setZoom, use delegation to camera.zoom() instead of hoisting
+  setZoom(zoomScale) { // TODO: remove setZoom, use delegation to camera.zoom() instead of hoisting
     // not implemented directly, Graphics plugin will hoist this
+    this.data.camera.currentZoom = zoomScale; // save the current zoom scale regardless
   }
   
   setCameraMode(mode) {
@@ -574,7 +575,7 @@ class Game {
     game.viewportCenterOffsetY = 0;
 
     // defaults camera back to 1x zoom
-    game.zoom(1);
+    // game.zoom(1);
 
   }
 

@@ -188,12 +188,10 @@ export default function topdownMovement(game) {
     game.shakeCamera(1000);
   });
   rules.on('ZOOM_IN', function (entity) {
-    alert('default zoom in')
     let currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom + 0.05);
   });
   rules.on('ZOOM_OUT', function (entity) {
-    alert('default zoom out')
     let currentZoom = game.data.camera.currentZoom || 1;
     game.setZoom(currentZoom - 0.05);
   });

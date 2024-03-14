@@ -1,5 +1,5 @@
 // ThreeGraphics.js - Marak Squires 2023
-import { MOUSE, Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Vector3 } from 'three';
+import { MOUSE, Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Vector3, Vector2, Raycaster, Plane } from 'three';
 import { OrbitControls } from '../../vendor/three/examples/jsm/controls/OrbitControls.js';
 import { FontLoader } from '../../vendor/three/examples/jsm/loaders/FontLoader.js';
 
@@ -30,6 +30,12 @@ class ThreeGraphics extends GraphicsInterface {
     };
     this.config = config;
 
+    this.mouseButtons = {
+      LEFT: null,
+      RIGHT: null,
+      MIDDLE: null
+    };
+
     // Set default camera configuration or use the provided one
     this.cameraConfig = cameraConfig || {
       fov: 75,
@@ -44,7 +50,7 @@ class ThreeGraphics extends GraphicsInterface {
   }
 
   init(game) {
-    
+
     this.render = render.bind(this);
     this.inflateGraphic = inflateGraphic.bind(this);
     this.createGraphic = createGraphic.bind(this);
@@ -59,7 +65,7 @@ class ThreeGraphics extends GraphicsInterface {
       this.game.threeReady = false; // TODO: remove this, check case in SystemManager for double plugin init
     }
 
-    this.loadFont(()=>{
+    this.loadFont(() => {
       this.threeReady(game);
     });
 
@@ -71,7 +77,6 @@ class ThreeGraphics extends GraphicsInterface {
       return;
     }
     this.game.threeReady = true;
-
     // get the three-render-canvas, if exists, clear it
     let canvas = document.getElementById('three-render-canvas');
     if (canvas) {
@@ -141,9 +146,143 @@ class ThreeGraphics extends GraphicsInterface {
     // game.emit('plugin::ready::graphics-three', this);
     game.graphics.push(this);
 
+    this.raycaster = new Raycaster();
+
+
+    //this.renderer.domElement.addEventListener('pointerdown', this.onPointerDown.bind(this), false);
+
+
+    // remove the default mouse pointerdown handler
+
+    this.renderer.domElement.addEventListener('pointermove', (event) => {
+      event.preventDefault();
+      // emit the pointer move event
+      const gameCoordinates = this.getGameCoordinates(event, this.camera);
+      // console.log('gameCoordinates', gameCoordinates)
+      game.emit('pointerMove', {
+        position: {
+          x: -gameCoordinates.x,
+          y: -gameCoordinates.z // mapped to 2d screen space
+        },
+        buttons: {},
+      }, event)
+    });
+
+    this.renderer.domElement.addEventListener('pointerup', (event) => {
+      event.preventDefault();
+
+      // TODO: better buttons control, use Mouse.js code ( shared )
+      /*
+      if (event.buttons === 1) {
+        this.mouseButtons.LEFT = false;
+      } else if (event.buttons === 2) {
+        this.mouseButtons.RIGHT = false;
+      } else if (event.buttons === 4) {
+        this.mouseButtons.MIDDLE = false;
+      }
+      */
+      this.mouseButtons.LEFT = false;
+      this.mouseButtons.RIGHT = false;
+      this.mouseButtons.MIDDLE = false;
+
+      const gameCoordinates = this.getGameCoordinates(event, this.camera);
+      game.emit('pointerUp', {
+        position: {
+          x: -gameCoordinates.x,
+          y: -gameCoordinates.z // mapped to 2d screen space
+        },
+        buttons: this.mouseButtons,
+      }, event)
+    });
+
+    this.renderer.domElement.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+
+      const gameCoordinates = this.getGameCoordinates(event, this.camera);
+
+      this.mouseButtons.LEFT = false;
+      this.mouseButtons.RIGHT = false;
+      this.mouseButtons.MIDDLE = false;
+
+      // check event for buttons and map the this.mouseButtons
+      // TODO: remove this and move to Mouse.js with refactor
+      // console.log("event.buttons", event.buttons)
+      if (event.buttons === 1) {
+        this.mouseButtons.LEFT = true;
+      } else if (event.buttons === 2) {
+        this.mouseButtons.RIGHT = true;
+      } else if (event.buttons === 4) {
+        this.mouseButtons.MIDDLE = true;
+      }
+
+      //console.log('Game Coordinates:', gameCoordinates);
+      //console.log("three pointerdown", this.mouseButtons)
+      // TODO: should create mouse context using same code from Mouse.js / share the function
+      game.emit('pointerDown', {
+        position: {
+          x: -gameCoordinates.x,
+          y: -gameCoordinates.z // mapped to 2d screen space
+        },
+        buttons: this.mouseButtons,
+      }, event)
+    });
+
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
     document.body.style.cursor = 'default';
+  }
+
+  // Function to get the game coordinates of a click/tap
+  getGameCoordinates(event, camera, plane = new Plane(new Vector3(0, 1, 0), 0)) {
+    const mouse = new Vector2();
+    const raycaster = new Raycaster();
+
+    // Convert the mouse position to normalized device coordinates (-1 to +1)
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the picking ray with the camera and mouse position
+    raycaster.setFromCamera(mouse, camera);
+
+    // Calculate the intersection of the picking ray with the ground plane
+    const intersectPoint = new Vector3();
+    raycaster.ray.intersectPlane(plane, intersectPoint);
+
+    // Return the intersection point as the game coordinates
+    return intersectPoint;
+  }
+
+  onPointerDown(event) {
+
+    // console.log("onPointerDown", event.clientX, event.clientY);
+    // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
+    const mouse = new Vector3();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the picking ray with the camera and mouse position
+    this.raycaster.setFromCamera(mouse, this.camera);
+
+    // Calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+    // console.log('intersects', intersects);
+
+    if (intersects.length > 0) {
+      // Handle the first intersected object (closest to the camera)
+      const intersectedObject = intersects[0].object;
+      const intersectPoint = intersects[0].point; // World coordinate position of the intersection
+
+      // console.log("Intersected at", intersectPoint);
+
+      // Provide intersected object context to your ECS
+      const entityId = intersectedObject.userData.entityId;
+
+      if (entityId) {
+        // console.log("Entity clicked:", entityId);
+        // this.handleEntityClick(entityId, intersectPoint);
+        // see Mouse.js, use shared code
+      }
+    }
   }
 
   setCameraDefaults() {
@@ -315,7 +454,7 @@ class ThreeGraphics extends GraphicsInterface {
   setupZoomControls() {
     const zoomSensitivity = -0.05; // Adjust this value based on desired zoom speed
     const minFov = 20; // Minimum FOV
-    const maxFov = 150; // Maximum FOV, you can adjust this value
+    const maxFov = 120; // Maximum FOV, you can adjust this value
 
     this.renderer.domElement.addEventListener('wheel', (event) => {
       // Adjust the camera's FOV

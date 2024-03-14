@@ -65,12 +65,14 @@ class Music {
 
       that.mousePosition.clientX = event.clientX;
       that.mousePosition.clientY = event.clientY;
-      // if right click
+      // TODO: click to place items if right click
+      /*
       if (context.buttons[game.config.mouseActionButton]) {
         game.make().Tower({
           fireRate: 10,
         }).x(position.x).y(position.y).angle(-180).createEntity();
       }
+      */
 
       // if left click
       if (event.button === 0) {
@@ -108,7 +110,7 @@ class Music {
     //game.setGravity(0, 4.3, 0);
     game.setGravity(0, 0, 0);
 
-    game.make().Hexapod().repeat(22).createEntity();
+    // game.make().Hexapod().repeat(22).createEntity();
 
     if (game.isTouchDevice()) {
       game.zoom(1.44);
@@ -194,6 +196,9 @@ class Music {
         clickToTeleport: false
       })
       .texture('warp-to-home')
+      .style({
+        scrollTexture: true
+      })
       .size(64)
       .position(195, -10, 1)
       .createEntity();

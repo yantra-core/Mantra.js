@@ -29,9 +29,9 @@ class Block {
     if (typeof entityData.position === 'undefined') {
       entityData.position = { x: 0, y: 0 };
     }
-
     return {
       type: 'BLOCK',
+      mass: 50000,
       texture: entityData.texture || 'tile-block',
       size: entityData.size || { width: this.width, height: this.height },
       position: entityData.position,

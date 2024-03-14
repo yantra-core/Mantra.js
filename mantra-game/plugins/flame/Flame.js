@@ -8,7 +8,6 @@ export default class Flame {
 
   init(game) {
     this.game = game;
-    this.bindEvents();
     this.game.systemsManager.addSystem('flame', this);
   }
 
@@ -65,13 +64,5 @@ export default class Flame {
 
   }
 
-  bindEvents() {
-    // TODO: move pointerDown event into Sutra
-    this.game.on('pointerDown', (entity, ev) => {
-      if (entity.type === 'FLAME') {
-        game.playNote('G4');
-      }
-    });
-  }
 
 }

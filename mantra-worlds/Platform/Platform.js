@@ -168,6 +168,9 @@ class Platform {
         textAlign: 'center',
         backgroundColor: 'transparent',
       },
+      rotation: {
+        z: -15
+      },
       body: false,
       position: {
         x: -105,
