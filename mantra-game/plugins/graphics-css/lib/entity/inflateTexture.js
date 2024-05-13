@@ -8,61 +8,75 @@ export default function inflateTexture(entityData, entityElement) {
     return;
   }
 
-
   let { url: textureUrl, sprite: spritePosition = { x: 0, y: 0 }, frames, rate, playing = true } = texture;
 
-  //console.log('playing', playing)
+
   // Extract the current texture URL from the element's style
   let currentTextureUrl = entityElement.style.backgroundImage.slice(5, -2);
 
   // Extract the current sprite name from the data attribute
   let currentSpriteName = entityElement.getAttribute('data-texture-sprite');
+  let initialTextureSet = entityElement.getAttribute('data-texture-set');
   let newSpriteName = entityData.texture.sprite;
 
   // Check if the texture or its sprite name has changed
   let isTextureChanged = currentTextureUrl !== textureUrl || currentSpriteName !== newSpriteName;
 
-  // Check if the element already has a texture applied
-  let isTextureSet = entityElement.style.backgroundImage.includes(textureUrl);
-
   // Set initial texture state only if no texture is applied or if the texture has changed
-  if (!isTextureSet || isTextureChanged) {
+  if (initialTextureSet === null || isTextureChanged) {
+
     if (Array.isArray(frames) && frames.length > 0) {
       spritePosition = frames[0];
     } else if (typeof entityData.texture.frame === 'number') {
       spritePosition = frames[entityData.texture.frame];
     }
+
+    // assign data attribute to prevent reapplying texture
+    entityElement.setAttribute('data-texture-set', true);
     applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+
   }
 
-  // console.log("playing", entityData.type, playing, frames)
   // Update frame index and position for animated sprites
   if (Array.isArray(frames) && playing) {
-    let frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
-
-    let frame = frames[frameIndex];
 
     if (typeof rate !== 'number') {
       rate = 30;
     }
+
     if (game.tick % rate === 0) { // uses configurable rate from texture.rate, see defaulAssets.js file
+
+      let frameIndex = parseInt(entityElement.getAttribute('data-frame-index'), 10) || 0;
+
+      // Increment frameIndex once per game tick
+      frameIndex = (frameIndex + 1) % frames.length; 
+
+      //console.log("frameIndex", frameIndex)
+      let frame = frames[frameIndex];
+
       if (frame) {
         spritePosition = frame;
-        frameIndex = frameIndex >= frames.length - 1 ? 0 : frameIndex + 1;
+        // frameIndex = frameIndex >= frames.length - 1 ? 0 : frameIndex + 1;
         entityElement.setAttribute('data-texture-sprite', texture.sprite.name);
       }
       entityElement.setAttribute('data-frame-index', frameIndex);
 
       applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+    } else {
+      //console.log('waiting')
     }
   } else {
+    // TODO: better logic check here
     // Update the background size for non-animated textures
-    applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+    // Remark: Removed 5/13/2024 - Appears not to be required?
+    // applyTextureStyles(texture, entityElement, textureUrl, spritePosition, entityData);
+    // console.log('non-playing non-frame texture', entityData, entityElement)
   }
 
 }
 
 function applyTextureStyles(texture, element, textureUrl, spritePosition, entityData) {
+  // console.log('applying texture styles', textureUrl, spritePosition, entityData, element)
   Object.assign(element.style, {
     background: `url('${textureUrl}') no-repeat ${spritePosition.x}px ${spritePosition.y}px`,
     border: 'none',

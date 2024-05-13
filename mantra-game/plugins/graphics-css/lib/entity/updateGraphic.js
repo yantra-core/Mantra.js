@@ -18,7 +18,9 @@ export default function updateGraphic(entityData) {
       // entityData.color is int number here we need a hex
       let hexColor = '#' + entityData.color.toString(16);
       // update the background color
-      entityElement.style.background = hexColor;
+      // Remark: Update "background" to "backgroundColor" 5/13/2024, was causing sprites to disappear
+      // console.log('entityElement.style', entityElement.style)
+      entityElement.style.backgroundColor = hexColor;
     }
 
     if (typeof entityData.position.z === 'number') {
